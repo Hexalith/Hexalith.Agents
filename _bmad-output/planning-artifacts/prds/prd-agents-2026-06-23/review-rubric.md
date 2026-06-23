@@ -2,73 +2,70 @@
 
 ## Overall verdict
 
-The PRD has a strong product spine: named AI participant identity, explicit conversation-originated invocation, confirmation workflow, tenant isolation, and audit are coherent and consistently reinforced. It is usable for UX and architecture discovery, but it is not yet safe as a direct story-generation or launch-readiness source because two core launch behaviors remain under-specified: how Conversation Context is bounded when it exceeds model capacity, and what safety/content policy gates generated responses before automatic posting or proposal creation.
+The PRD is now decision-ready as a launch-level product artifact. The prior high-risk gaps around automatic-posting safety and oversized Conversation Context are closed by explicit Content Safety Policy, Conversation Context Policy, and launch-readiness gate requirements. Several downstream decisions still need owners to resolve them, but the PRD now makes those decisions phase blockers instead of hidden assumptions.
 
-## Decision-readiness - adequate
+## Decision-readiness - strong
 
-The document makes real decisions instead of hiding behind generic AI-assistant language. The Vision commits to "named, governed AI participants" and explicitly excludes long-term memory, tools, project content, folder content, external channels, and ambient triggers. The Open Questions table also gives owners and revisit conditions, which keeps unresolved work visible rather than silently smoothed over.
+The document makes the V1 bet clearly: governed AI participation inside Hexalith Conversations, not a general autonomous-agent platform. The fix strengthens decision-readiness by moving content safety, context bounds, launch metric thresholds, latency targets, cost posture, and audit governance out of vague assumptions and into explicit gates.
 
-The risk is that several questions are labeled "non-blocking for PRD finalization" while they are blocking for implementation or release readiness. That is acceptable for a finalized PRD only if downstream consumers treat the revisit conditions as gates, not optional follow-ups.
-
-### Findings
-- **high** Safety policy is deferred even though generated content can be posted automatically (section 7; section 12 OQ-9) - The NFRs cover authorization, privacy, reliability, auditability, provider secret safety, performance, and cost, but the actual AI response safety policy is only an open question: "What safety filters, content policies, or prompt constraints are required before launch?" Automatic Response Mode is in scope, so a generated response can become a Conversation Message without human approval. *Fix:* Add a Content Safety / Prompt Policy NFR and requirement consequences: generation cannot be enabled until a policy is configured; safety failures cannot create Conversation Messages; safety decisions are captured in Audit Evidence; automatic posting is blocked when policy checks fail.
-- **medium** Launch thresholds are still placeholders (section 11 SM-2, SM-3; section 12 OQ-11) - The PRD says "a defined share" and "most Proposed Agent Replies" but does not define the numerator, denominator, target, time window, or launch cohort. OQ-11 correctly defers this to launch planning, but the document should make that a launch-readiness gate. *Fix:* Keep the exact numbers deferred if necessary, but add required metric fields and state that V1 launch readiness cannot pass until SM-2 and SM-3 thresholds are set.
-
-## Substance over theater - adequate
-
-Most sections earn their place. The personas are tied to real workflows, the non-goals protect the V1 bet, and the audit/security requirements are product-specific rather than generic boilerplate. The addendum also keeps competitor landscape notes out of the main PRD, which prevents positioning research from bloating the requirements.
-
-The weak spot is the NFR section. Several NFRs are concrete, but Performance and Cost Control are still assumption statements rather than testable requirements. For a governed AI launch, those two affect provider choice, context policy, abuse prevention, tenant operations, and release gates.
+Open Questions are now framed as downstream phase blockers where appropriate. That lets product, UX, architecture, governance, and release work proceed without pretending unresolved launch choices are already settled.
 
 ### Findings
-- **medium** Performance and cost control are not yet product requirements (section 7 Performance and Cost Control; section 12 OQ-5, OQ-6) - The PRD says latency targets and cost controls will be defined during architecture, but those constraints influence the product shape: automatic replies, confirmation workflow, context size, provider/model selection, and tenant quotas. *Fix:* Add minimum product-level constraints now, even if exact thresholds are deferred: what status must expose, what quota/budget decisions must exist before production, and whether launch tenants can exceed reporting-only cost controls.
+- No substantive findings.
+
+## Substance over theater - strong
+
+The requirements are earned by the product's actual risk profile. Identity, provider governance, response policy, proposal versioning, tenant isolation, safety policy, context bounds, public contracts, audit, and operational visibility all map to a concrete concern in the brief or validation findings.
+
+The NFR section is no longer generic: safety, context, performance, and cost now carry specific consequences and launch-readiness implications.
+
+### Findings
+- No substantive findings.
 
 ## Strategic coherence - strong
 
-The thesis is clear and repeated without becoming vague: Hexalith Agents is not a general autonomous-agent platform; it proves governed participation inside Hexalith Conversations. The feature set follows that thesis. Agent identity, Party attribution, explicit invocation, automatic versus confirmation response modes, proposal versioning, tenant isolation, API/admin parity, and audit all reinforce the same product bet.
+The thesis remains coherent and has become sharper. The PRD consistently protects the core promise: a named AI participant can be called from a Conversation, respond under governed configuration, and either post automatically or move through a traceable approval workflow without weakening Party identity, tenant isolation, or audit guarantees.
 
-The success metrics mostly validate that thesis, and the counter-metrics are a good sign that the PRD is not optimizing adoption at the expense of audit or governance. Once SM-2 and SM-3 receive concrete thresholds, this dimension will be fully launch-ready.
-
-### Findings
-- No additional substantive findings.
-
-## Done-ness clarity - thin
-
-Most FRs are written with testable consequences, and the globally numbered FRs are usable by downstream story work. The proposal workflow is especially concrete: generated, edited, regenerated, approved, rejected, abandoned, and expired states are all represented, and version preservation is repeatedly stated.
-
-The thinness is concentrated in generation behavior. The core output path depends on Conversation Context construction and AI safety checks, but those are not yet expressed as done criteria. Without those constraints, teams can implement incompatible versions of the central behavior while still claiming to satisfy the PRD.
+Success metrics and counter-metrics continue to validate the thesis without incentivizing unsafe automatic posting, weak audit, or premature provider breadth.
 
 ### Findings
-- **high** The "full Source Conversation context" requirement is not implementable as written for oversized conversations (section 4.4 FR-9; section 6.1 In Scope; section 12 OQ-10) - FR-9 says the system supplies "the full Source Conversation context," and MVP scope repeats "Full Source Conversation context for V1 generation." OQ-10 later asks how context should be bounded when a Conversation is too large for the selected model. That is not a minor architecture detail; it defines whether the product fails closed, truncates, summarizes, chunks, or blocks the call. *Fix:* Replace the absolute "full context" promise with a Conversation Context Policy: complete context when it fits; deterministic fail-closed or approved bounded-context behavior when it does not; no silent truncation; context policy/version captured in Audit Evidence.
-- **medium** Proposal notification remains below story-ready detail (section 4.6 FR-13; section 12 OQ-4) - FR-13 says authorized Approvers can discover pending proposals, but OQ-4 asks what notification path tells Approvers that a Proposed Agent Reply is waiting. Discovery alone may not meet the approval workflow journey if users must poll. *Fix:* Add a minimum approval visibility requirement: where pending proposals appear, what status/count indicators are required, and whether launch requires active notification or only an in-product queue.
-- **low** "Safe to disclose" is not testable (section 4.3 FR-7; section 4.9 FR-24/FR-25) - FR-7 says the system exposes which policy source authorized the Approver "when the source is safe to disclose," but the PRD does not define disclosure categories. *Fix:* Define which approval-policy basis values are always displayable, operator-only, redacted, or omitted from external API responses.
+- No substantive findings.
+
+## Done-ness clarity - adequate
+
+FRs are stable, globally numbered, and mostly testable. The original context and safety blockers are now explicit: FR-9 defines full-context behavior, bounded-context handling, no silent truncation, and context-policy audit; FR-26 and FR-27 define safety-policy setup and enforcement before conversation side effects.
+
+Some launch values are still intentionally deferred, including exact metric thresholds, latency budgets, cost controls, retention behavior, and safety categories. That is acceptable because the PRD now states the owning phase and prevents production or implementation acceptance from bypassing those decisions.
+
+### Findings
+- **low** Several phase gates still require follow-up decisions before implementation or launch readiness (section 12 OQ-5 through OQ-11) - This is not a PRD defect after the fix, but downstream teams must treat these as blockers for the named phases. *Fix:* Keep these OQs visible in architecture, governance, and release-readiness tracking; do not generate implementation stories for blocked areas until the relevant gate is resolved.
 
 ## Scope honesty - strong
 
-The PRD is unusually honest about boundaries. V1 non-goals are explicit, V2 items are kept out of the main scope, assumptions are indexed, and unresolved questions are assigned owners plus revisit conditions. The brief reconciliation gaps around approver sources, proposal ownership, and invocation membership/mention resolution were carried into the PRD.
+The PRD is explicit about V1 boundaries and now honest about what remains unresolved. V1 still excludes long-term memory, tools, project/folder retrieval, ambient activation, external channels, and multiple exposed agents beyond `hexa`. It also adds a non-goal against silent context truncation, which directly protects the core quality bar.
 
 ### Findings
-- **medium** Generated-content retention and deletion behavior is deferred even though audit storage is in MVP scope (section 9; section 12 OQ-8) - The PRD requires preserving every generated, edited, and regenerated proposal version, but retention period, legal hold, and export/deletion behavior are still assumed to inherit platform governance. That may be correct, but generated AI drafts can contain sensitive conversation content and will be stored outside the Conversation until approved or terminal. *Fix:* Either explicitly bind Agent audit records to the existing platform retention/deletion/export policy by name, or mark audit-storage implementation stories blocked until OQ-8 is resolved.
+- No substantive findings.
 
 ## Downstream usability - adequate
 
-The artifact is easy to source-extract. Glossary terms are present, FR IDs are contiguous from FR-1 through FR-25, UJ IDs are clear, and the success metrics reference related FR ranges. The public-surface section gives architecture and API work a useful boundary: consumers should not depend on EventStore stream names, aggregate mechanics, projection internals, or provider SDK details.
+The artifact is source-extractable for UX, architecture, and story creation. Glossary terms cover the newly added policy concepts, FR IDs are contiguous from FR-1 through FR-28, and the API/public surface now includes Context Policy and Content Safety Policy.
 
-The remaining issues are not mechanical; they are downstream blockers. Story creation for context building, safety gating, proposal notifications, and audit retention should stop until the corresponding open questions are resolved or explicitly converted into assumptions with acceptance criteria.
+The only downstream caution is procedural: teams must honor the gate language. The PRD is usable now, but not every feature slice is story-ready until its associated OQ is resolved.
 
 ### Findings
-- No additional substantive findings beyond the Done-ness and Scope Honesty findings.
+- No additional substantive findings beyond the phase-gate note under Done-ness clarity.
 
 ## Shape fit - strong
 
-The shape fits a launch-level, multi-stakeholder B2B/platform capability. User journeys with named protagonists are useful here because administration, runtime calling, approval, and API integration are distinct workflows. The capability grouping also fits the domain better than a pure journey-led PRD would: identity, provider governance, response policy, invocation, proposal lifecycle, authorization, API/admin surfaces, and audit are the right load-bearing clusters.
+The PRD shape fits a launch-level B2B/platform capability. User journeys remain useful because administration, runtime invocation, approval, and integration are distinct workflows; feature grouping remains useful because the product is governance-heavy.
 
 ### Findings
-- No additional substantive findings.
+- No substantive findings.
 
 ## Mechanical notes
 
-- FR IDs are contiguous from FR-1 through FR-25.
+- FR IDs are contiguous from FR-1 through FR-28.
 - UJ IDs are contiguous from UJ-1 through UJ-4.
 - SM IDs are contiguous and include counter-metrics.
 - Inline `[ASSUMPTION]` entries round-trip to the Assumptions Index.

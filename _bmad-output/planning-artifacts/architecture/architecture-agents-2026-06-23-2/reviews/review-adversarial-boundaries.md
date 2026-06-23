@@ -28,3 +28,24 @@ Remaining adversarial risk:
 
 - If implementation chooses to make denial audit events for unauthorized callers, it must avoid cross-tenant audit leakage. AD-12 and AD-14 constrain this, but the detailed denial-audit contract should be tested under AD-17.
 
+## 2026-06-23 Dapr Runtime Amendment
+
+Verdict: Pass.
+
+Attack: two builders both obey the ADs but still diverge.
+
+Case 6: Runtime builder implements generation with an in-memory hosted service; workflow builder implements proposal expiry with Dapr Workflow.
+
+- Covered by AD-18. V1 agent workflow execution must run through Dapr Workflow for context loading, generation, proposal waits, expiry, retries, and posting.
+
+Case 7: Provider builder exposes Dapr AI or Dapr Agents request types in public contracts; domain builder keeps aggregates SDK-neutral.
+
+- Covered by AD-9 and AD-18. Dapr AI, Dapr Agents, provider SDK, and workflow SDK types are adapter/runtime leaves and cannot appear in public contracts or EventStore aggregates.
+
+Case 8: Workflow builder treats Dapr Workflow state as the source of truth; aggregate builder treats EventStore as the source of truth.
+
+- Covered by AD-1, AD-3, and AD-18. Dapr Workflow owns execution coordination only; Agents domain state changes through `AgentInteraction` commands/events.
+
+Remaining adversarial risk:
+
+- Workflow versioning and replay-safe activity naming need implementation discipline. AD-18 binds the substrate; detailed workflow versioning tests should be included under AD-17.

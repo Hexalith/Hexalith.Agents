@@ -81,8 +81,8 @@
   }
   .dim-card .dim-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
   .dim-card .dim-verdict { font-size: 14px; font-weight: 600; }
-  section.dimension, section.reviewer-section { margin-bottom: 14px; }
-  section.dimension details, section.reviewer-section details {
+  section.dimension { margin-bottom: 14px; }
+  section.dimension details {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -152,9 +152,6 @@
     line-height: 1.4;
   }
   .badge-sev-low { background: rgba(100, 116, 139, 0.12); color: var(--sev-low); }
-  .badge-sev-medium { background: rgba(202, 138, 4, 0.14); color: var(--sev-medium); }
-  .badge-sev-high { background: rgba(234, 88, 12, 0.14); color: var(--sev-high); }
-  .badge-sev-critical { background: rgba(220, 38, 38, 0.14); color: var(--sev-critical); }
   .finding-title { margin: 0; font-size: 15px; font-weight: 500; flex: 1; min-width: 200px; }
   .finding-location { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; color: var(--muted); }
   .finding-note, .finding-fix { margin-top: 6px; font-size: 14px; }
@@ -188,19 +185,19 @@
         <h1>Hexalith Agents - Validation Report</h1>
         <div class="subtitle">/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/prds/prd-agents-2026-06-23/prd.md</div>
       </div>
-      <div class="grade grade-fair">Fair</div>
+      <div class="grade grade-excellent">Excellent</div>
     </header>
 
     <div class="synthesis">
-      <p>The PRD has a strong product spine: named AI participant identity, explicit conversation-originated invocation, confirmation workflow, tenant isolation, and audit are coherent and consistently reinforced.</p>
-      <p>It is usable for UX and architecture discovery, but it is not yet safe as a direct story-generation or launch-readiness source because two core launch behaviors remain under-specified: how Conversation Context is bounded when it exceeds model capacity, and what safety/content policy gates generated responses before automatic posting or proposal creation.</p>
+      <p>The PRD is now decision-ready as a launch-level product artifact.</p>
+      <p>The prior high-risk gaps around automatic-posting safety and oversized Conversation Context are closed by explicit Content Safety Policy, Conversation Context Policy, and launch-readiness gate requirements. Several downstream decisions still need owners to resolve them, but the PRD now makes those decisions phase blockers instead of hidden assumptions.</p>
     </div>
 
     <div class="dimension-summary">
-      <div class="dim-card"><div class="dim-name">Decision-readiness</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
-      <div class="dim-card"><div class="dim-name">Substance over theater</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">Decision-readiness</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Substance over theater</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
       <div class="dim-card"><div class="dim-name">Strategic coherence</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
-      <div class="dim-card"><div class="dim-name">Done-ness clarity</div><div class="dim-verdict" style="color: var(--verdict-thin)">thin</div></div>
+      <div class="dim-card"><div class="dim-name">Done-ness clarity</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
       <div class="dim-card"><div class="dim-name">Scope honesty</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
       <div class="dim-card"><div class="dim-name">Downstream usability</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
       <div class="dim-card"><div class="dim-name">Shape fit</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
@@ -208,80 +205,34 @@
 
     <section class="dimension">
       <details>
-        <summary><h2>Decision-readiness</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
-        <div class="dim-body">
-          <div class="dim-judgment">
-            <p>The document makes real decisions instead of hiding behind generic AI-assistant language. The Vision commits to named, governed AI participants and explicitly excludes long-term memory, tools, project content, folder content, external channels, and ambient triggers.</p>
-            <p>The risk is that several questions are labeled non-blocking for PRD finalization while they are blocking for implementation or release readiness. That is acceptable only if downstream consumers treat revisit conditions as gates.</p>
-          </div>
-        </div>
-        <div class="findings-list">
-          <article class="finding">
-            <header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Safety policy is deferred even though generated content can be posted automatically</h3><span class="finding-location">section 7; section 12 OQ-9</span></header>
-            <div class="finding-note">The actual AI response safety policy is only an open question, while Automatic Response Mode can turn generated output into a Conversation Message without human approval.</div>
-            <div class="finding-fix"><strong>Fix:</strong> Add a Content Safety / Prompt Policy NFR and block generation or posting when policy checks fail.</div>
-          </article>
-          <article class="finding">
-            <header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Launch thresholds are still placeholders</h3><span class="finding-location">section 11 SM-2, SM-3; section 12 OQ-11</span></header>
-            <div class="finding-note">The adoption and approval metrics do not define numerator, denominator, target, time window, or launch cohort.</div>
-            <div class="finding-fix"><strong>Fix:</strong> Add required metric fields and make threshold selection a launch-readiness gate.</div>
-          </article>
-        </div>
+        <summary><h2>Decision-readiness</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>The document makes the V1 bet clearly and moves safety, context, metric thresholds, latency, cost, and audit governance into explicit gates.</p></div></div>
       </details>
     </section>
 
     <section class="dimension">
       <details>
-        <summary><h2>Substance over theater</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
-        <div class="dim-body">
-          <div class="dim-judgment">
-            <p>Most sections earn their place. The personas are tied to workflows, the non-goals protect the V1 bet, and audit/security requirements are product-specific. Performance and Cost Control are still assumption statements rather than testable requirements.</p>
-          </div>
-        </div>
-        <div class="findings-list">
-          <article class="finding">
-            <header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Performance and cost control are not yet product requirements</h3><span class="finding-location">section 7; section 12 OQ-5, OQ-6</span></header>
-            <div class="finding-note">Latency and cost constraints influence automatic replies, confirmation workflow, context size, provider/model selection, and tenant quotas.</div>
-            <div class="finding-fix"><strong>Fix:</strong> Add minimum product-level constraints for status visibility, quota/budget decisions, and production enablement.</div>
-          </article>
-        </div>
+        <summary><h2>Substance over theater</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>The requirements are earned by the product's actual risk profile: identity, governance, proposal versioning, tenant isolation, safety policy, context bounds, public contracts, audit, and operational visibility.</p></div></div>
       </details>
     </section>
 
     <section class="dimension">
       <details>
         <summary><h2>Strategic coherence</h2><span class="verdict-pill verdict-strong">strong</span></summary>
-        <div class="dim-body">
-          <div class="dim-judgment">
-            <p>The thesis is clear and repeated without becoming vague: Hexalith Agents proves governed participation inside Hexalith Conversations, not a general autonomous-agent platform. The feature set follows that thesis.</p>
-          </div>
-        </div>
+        <div class="dim-body"><div class="dim-judgment"><p>The thesis remains coherent: governed participation inside Hexalith Conversations, not a general autonomous-agent platform.</p></div></div>
       </details>
     </section>
 
     <section class="dimension">
-      <details open>
-        <summary><h2>Done-ness clarity</h2><span class="verdict-pill verdict-thin">thin</span></summary>
-        <div class="dim-body">
-          <div class="dim-judgment">
-            <p>Most FRs include testable consequences, and the proposal workflow is concrete. The thinness is concentrated in generation behavior: Conversation Context construction and AI safety checks are not yet expressed as done criteria.</p>
-          </div>
-        </div>
+      <details>
+        <summary><h2>Done-ness clarity</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>FRs are stable, globally numbered, and mostly testable. Remaining values are intentionally deferred and now blocked by explicit phase gates.</p></div></div>
         <div class="findings-list">
           <article class="finding">
-            <header><span class="badge badge-sev-high">high</span><h3 class="finding-title">The full Source Conversation context requirement is not implementable as written for oversized conversations</h3><span class="finding-location">section 4.4 FR-9; section 6.1; section 12 OQ-10</span></header>
-            <div class="finding-note">The PRD promises full context but later asks how context should be bounded when too large for the selected model.</div>
-            <div class="finding-fix"><strong>Fix:</strong> Replace the absolute promise with a Conversation Context Policy: complete context when it fits, deterministic fail-closed or approved bounded behavior when it does not, no silent truncation, and context policy/version in Audit Evidence.</div>
-          </article>
-          <article class="finding">
-            <header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Proposal notification remains below story-ready detail</h3><span class="finding-location">section 4.6 FR-13; section 12 OQ-4</span></header>
-            <div class="finding-note">Approver discovery is specified, but the notification path is still unresolved.</div>
-            <div class="finding-fix"><strong>Fix:</strong> Define where pending proposals appear, what indicators are required, and whether launch requires active notification or only an in-product queue.</div>
-          </article>
-          <article class="finding">
-            <header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Safe to disclose is not testable</h3><span class="finding-location">section 4.3 FR-7; section 4.9 FR-24/FR-25</span></header>
-            <div class="finding-note">The PRD does not define disclosure categories for approval-policy basis values.</div>
-            <div class="finding-fix"><strong>Fix:</strong> Define values that are always displayable, operator-only, redacted, or omitted from external API responses.</div>
+            <header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Several phase gates still require follow-up decisions before implementation or launch readiness</h3><span class="finding-location">section 12 OQ-5 through OQ-11</span></header>
+            <div class="finding-note">This is not a PRD defect after the fix, but downstream teams must treat these as blockers for the named phases.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Keep these OQs visible in architecture, governance, and release-readiness tracking.</div>
           </article>
         </div>
       </details>
@@ -290,47 +241,28 @@
     <section class="dimension">
       <details>
         <summary><h2>Scope honesty</h2><span class="verdict-pill verdict-strong">strong</span></summary>
-        <div class="dim-body">
-          <div class="dim-judgment">
-            <p>The PRD is honest about boundaries. V1 non-goals are explicit, V2 items are kept out of scope, assumptions are indexed, and unresolved questions have owners plus revisit conditions.</p>
-          </div>
-        </div>
-        <div class="findings-list">
-          <article class="finding">
-            <header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Generated-content retention and deletion behavior is deferred even though audit storage is in MVP scope</h3><span class="finding-location">section 9; section 12 OQ-8</span></header>
-            <div class="finding-note">Generated AI drafts can contain sensitive conversation content and will be stored outside the Conversation until approved or terminal.</div>
-            <div class="finding-fix"><strong>Fix:</strong> Explicitly bind Agent audit records to the existing platform policy by name, or block audit-storage stories until OQ-8 is resolved.</div>
-          </article>
-        </div>
+        <div class="dim-body"><div class="dim-judgment"><p>The PRD is explicit about V1 boundaries and adds a non-goal against silent context truncation.</p></div></div>
       </details>
     </section>
 
     <section class="dimension">
       <details>
         <summary><h2>Downstream usability</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
-        <div class="dim-body">
-          <div class="dim-judgment">
-            <p>The artifact is easy to source-extract. Glossary terms are present, FR IDs are contiguous, UJ IDs are clear, and the public-surface section gives architecture and API work a useful boundary. The remaining blockers are the unresolved context, safety, notification, and retention decisions already called out above.</p>
-          </div>
-        </div>
+        <div class="dim-body"><div class="dim-judgment"><p>The artifact is source-extractable for UX, architecture, and story creation. The API surface now includes Context Policy and Content Safety Policy.</p></div></div>
       </details>
     </section>
 
     <section class="dimension">
       <details>
         <summary><h2>Shape fit</h2><span class="verdict-pill verdict-strong">strong</span></summary>
-        <div class="dim-body">
-          <div class="dim-judgment">
-            <p>The shape fits a launch-level, multi-stakeholder B2B/platform capability. User journeys with named protagonists are useful because administration, runtime calling, approval, and API integration are distinct workflows.</p>
-          </div>
-        </div>
+        <div class="dim-body"><div class="dim-judgment"><p>The PRD shape fits a launch-level B2B/platform capability with distinct administration, invocation, approval, and integration workflows.</p></div></div>
       </details>
     </section>
 
     <div class="mechanical">
       <h3>Mechanical notes</h3>
       <ul>
-        <li>FR IDs are contiguous from FR-1 through FR-25.</li>
+        <li>FR IDs are contiguous from FR-1 through FR-28.</li>
         <li>UJ IDs are contiguous from UJ-1 through UJ-4.</li>
         <li>SM IDs are contiguous and include counter-metrics.</li>
         <li>Inline [ASSUMPTION] entries round-trip to the Assumptions Index.</li>
@@ -341,7 +273,7 @@
     <footer class="report-footer">
       <div class="meta">
         <span>Rubric: /home/administrator/projects/hexalith/agents/.agents/skills/bmad-prd/assets/prd-validation-checklist.md</span>
-        <span>Generated: 2026-06-23T18:41:29+02:00</span>
+        <span>Generated: 2026-06-23T19:06:48+02:00</span>
       </div>
     </footer>
   </div>

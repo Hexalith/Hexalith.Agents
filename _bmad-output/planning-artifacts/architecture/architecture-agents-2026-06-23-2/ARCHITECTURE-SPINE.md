@@ -22,6 +22,9 @@ sources:
   - ../../../../Hexalith.Tenants/_bmad-output/project-context.md
   - ../../../../Hexalith.Parties/_bmad-output/project-context.md
   - ../../../../Hexalith.FrontComposer/_bmad-output/project-context.md
+  - https://docs.dapr.io/developing-ai/dapr-agents/
+  - https://docs.dapr.io/developing-applications/sdks/dotnet/dotnet-workflow/
+  - https://docs.dapr.io/developing-applications/sdks/dotnet/dotnet-ai/
 companions: []
 ---
 
@@ -29,15 +32,17 @@ companions: []
 
 ## Design Paradigm
 
-Hexalith Agents is an event-sourced hexagonal Hexalith domain module.
+Hexalith Agents is an event-sourced, Dapr Workflow-backed, hexagonal Hexalith domain module.
 
-The domain core is EventStore-backed: aggregates decide from commands and current state, then emit domain or rejection events. Application services coordinate side effects through ports. Adapters implement Conversations, Parties, Tenants, provider, secret, notification, and FrontComposer integration.
+The domain core is EventStore-backed: aggregates decide from commands and current state, then emit domain or rejection events. Dapr Workflow instances coordinate long-running agent execution and feed results back through commands. Adapters implement Dapr AI/Dapr Agents, Conversations, Parties, Tenants, provider, secret, notification, and FrontComposer integration.
 
 ```mermaid
 flowchart LR
   UI[FrontComposer UI] --> Client[Hexalith.Agents.Client]
   API[Agents API] --> App[Application orchestration]
   Client --> API
+  API --> Workflow[Dapr Workflow runtime]
+  Workflow --> App
   App --> Ports[Ports]
   App --> ES[EventStore command/query boundary]
   ES --> Agg[Agents aggregates]
@@ -45,7 +50,8 @@ flowchart LR
   Ports --> Conversations[Conversations client]
   Ports --> Parties[Parties client/projection]
   Ports --> Tenants[Tenants projection]
-  Ports --> Provider[Provider adapters]
+  Ports --> DaprAI[Dapr AI or Dapr Agents adapter]
+  DaprAI --> Provider[Provider adapters]
   Ports --> Secrets[Secret store]
   Events --> Proj[Agents projections]
   Proj --> UI
@@ -155,6 +161,12 @@ flowchart LR
 - **Prevents:** launch-critical invariants relying on manual QA or undocumented client behavior.
 - **Rule:** Public contracts are versioned and additive-first. Tests must cover aggregate transition purity, authorization fail-closed paths, proposal version immutability, idempotent generation/posting retries, tenant isolation, context-too-large blocking, provider-secret non-disclosure, FrontComposer UI/contract conformance, and audit completeness for every posted response.
 
+### AD-18 - Dapr Agent Workflow Runtime [ADOPTED]
+
+- **Binds:** FR-9..FR-18, FR-24, runtime orchestration, deployment and environments.
+- **Prevents:** incompatible orchestration substrates, in-memory background jobs, direct provider SDK loops, or non-Dapr workflow engines owning durable agent progress.
+- **Rule:** V1 agent workflow execution runs through Dapr Workflow. Workflow instances coordinate context loading, generation, proposal waits, expiry, retries, and posting as replay-safe steps, then mutate Agents domain state only through `AgentInteraction` commands/events. Dapr AI and Dapr Agents integrations are adapter/runtime leaves for LLM calls and agent execution where they fit the .NET host boundary; if a Python Dapr Agents worker is needed, it runs behind the same adapter boundary. Public contracts and EventStore aggregates do not depend on Dapr AI, Dapr Agents, provider SDK, or workflow SDK types.
+
 ```mermaid
 flowchart TB
   Contracts[Hexalith.Agents.Contracts]
@@ -162,6 +174,7 @@ flowchart TB
   Server[Hexalith.Agents.Server]
   Host[Hexalith.Agents host]
   UI[Hexalith.Agents.UI]
+  Workflow[Dapr Workflow runtime]
   ProviderAdapters[Provider adapter projects]
   Testing[Hexalith.Agents.Testing]
   AppHost[Hexalith.Agents.AppHost]
@@ -170,6 +183,8 @@ flowchart TB
   Server --> Contracts
   Host --> Server
   Host --> Client
+  Host --> Workflow
+  Workflow --> Server
   UI --> Client
   UI --> Contracts
   ProviderAdapters --> Server
@@ -184,31 +199,34 @@ sequenceDiagram
   participant Caller
   participant AgentsAPI
   participant Interaction as AgentInteraction
-  participant Orch as Orchestrator
+  participant Workflow as Dapr Workflow
   participant Conv as Conversations
+  participant DaprAI as Dapr AI/Agents adapter
   participant Provider
 
   Caller->>AgentsAPI: request hexa(SourceConversationId, prompt)
   AgentsAPI->>Interaction: RequestInteraction
   Interaction-->>AgentsAPI: InteractionRequested snapshot
-  AgentsAPI->>Orch: continue interaction
-  Orch->>Conv: authorized GetConversation
-  Conv-->>Orch: details/freshness
-  Orch->>Interaction: RecordContextReady or ContextBlocked
-  Orch->>Provider: generate only after gates pass
-  Provider-->>Orch: generated content / failure
-  Orch->>Interaction: RecordGeneratedVersion or GenerationFailed
+  AgentsAPI->>Workflow: schedule Dapr workflow instance
+  Workflow->>Conv: authorized GetConversation
+  Conv-->>Workflow: details/freshness
+  Workflow->>Interaction: RecordContextReady or ContextBlocked
+  Workflow->>DaprAI: generate only after gates pass
+  DaprAI->>Provider: invoke model/tool provider
+  Provider-->>DaprAI: generated content / failure
+  DaprAI-->>Workflow: safe result / safe error
+  Workflow->>Interaction: RecordGeneratedVersion or GenerationFailed
   alt automatic
-    Orch->>Conv: ensure AIAgent participant + AppendMessage
-    Conv-->>Orch: accepted / error
-    Orch->>Interaction: RecordPostingSucceeded/Failed
+    Workflow->>Conv: ensure AIAgent participant + AppendMessage
+    Conv-->>Workflow: accepted / error
+    Workflow->>Interaction: RecordPostingSucceeded/Failed
   else confirmation
     Caller->>AgentsAPI: edit/regenerate/approve/reject/abandon
     AgentsAPI->>Interaction: proposal command
     Interaction-->>AgentsAPI: version or terminal event
-    Orch->>Conv: Append approved version
-    Conv-->>Orch: accepted / error
-    Orch->>Interaction: RecordPostingSucceeded/Failed
+    Workflow->>Conv: Append approved version
+    Conv-->>Workflow: accepted / error
+    Workflow->>Interaction: RecordPostingSucceeded/Failed
   end
 ```
 
@@ -219,6 +237,7 @@ sequenceDiagram
 | Naming | Domain terms are `Agent`, `ProviderCatalog`, `AgentInteraction`, `ProposedAgentReply`, `VersionedProposalContent`, `ApproverPolicy`, `AgentCall`, `AgentResponse`, `AuditEvidence`. Use `hexa` only as the first configured Agent, not as a type name. |
 | Identity | Agents owns `AgentId`, `AgentInteractionId`, `ProposalVersionId`, `ProviderId`, `ModelId`. Parties owns `PartyId`; Conversations owns `ConversationId` and `MessageId`; Tenants owns tenant membership/roles. |
 | Mutation | Only EventStore commands mutate Agents state. External effects return through follow-up commands/events. |
+| Runtime orchestration | Agent workflows run as Dapr Workflow instances; workflow/activity code is replay-safe, idempotent, and side effects occur through adapters. |
 | Time | Expiry and time-based decisions use injected time and snapshotted policy; no aggregate wall-clock reads. |
 | Idempotency | API commands accept idempotency metadata. Provider attempts, version ids, and Conversation posts derive deterministic ids from interaction/version context. |
 | Errors | Business failures are typed rejection/status events or structured public errors. Provider errors are mapped to safe classes. |
@@ -241,6 +260,9 @@ sequenceDiagram
 | Hexalith.Tenants | local sibling source commit `9a3567b` |
 | Hexalith.FrontComposer | local sibling source commit `eee5e6b` |
 | Dapr packages | `1.18.4` local sibling baseline |
+| Dapr Workflow | `1.18.4` local sibling baseline |
+| Dapr AI / Dapr.AI.Microsoft.Extensions | `1.18.4` local sibling baseline |
+| Dapr Agents | `v1.0` GA; adapter/worker boundary if used |
 | .NET Aspire Hosting | `13.4.6` local sibling baseline |
 | MediatR | `14.1.0` local sibling baseline |
 | FluentValidation | `12.1.1` local sibling baseline |
@@ -264,6 +286,8 @@ Hexalith.Agents/
     Hexalith.Agents.Server/
       Aggregates/
       Application/
+        Workflows/
+        Activities/
       Ports/
       Projections/
     Hexalith.Agents/
@@ -330,14 +354,15 @@ classDiagram
 | Capability / Area | Lives In | Governed By |
 | --- | --- | --- |
 | Agent identity/config/lifecycle | `Agent` aggregate, Agents API/UI | AD-1, AD-2, AD-4, AD-7, AD-15 |
-| Provider governance/model selection | `ProviderCatalog` aggregate, provider adapters | AD-2, AD-9, AD-10, AD-14 |
-| Explicit conversation invocation | Agents API/client, invocation adapters | AD-3, AD-6, AD-11, AD-12 |
-| Automatic response posting | `AgentInteraction` + Conversations client | AD-5, AD-6, AD-7, AD-13 |
-| Confirmation/proposal workflow | `AgentInteraction` proposal state | AD-4, AD-5, AD-8, AD-13 |
+| Provider governance/model selection | `ProviderCatalog` aggregate, Dapr AI/Agents provider adapters | AD-2, AD-9, AD-10, AD-14, AD-18 |
+| Explicit conversation invocation | Agents API/client, invocation adapters | AD-3, AD-6, AD-11, AD-12, AD-18 |
+| Agent runtime/workflow execution | Dapr Workflow instances, Dapr AI/Agents adapters, `AgentInteraction` commands/events | AD-3, AD-9, AD-13, AD-18 |
+| Automatic response posting | `AgentInteraction` + Dapr Workflow + Conversations client | AD-5, AD-6, AD-7, AD-13, AD-18 |
+| Confirmation/proposal workflow | `AgentInteraction` proposal state + Dapr Workflow waits | AD-4, AD-5, AD-8, AD-13, AD-18 |
 | Authorization/tenant isolation | Agents application gates/projections | AD-8, AD-12 |
 | Admin UI/API contracts | Agents Client/API/UI | AD-15, AD-17 |
 | Audit/status evidence | Agents events/projections/queries | AD-5, AD-13, AD-14, AD-17 |
-| Deployment/dev topology | Agents AppHost/host/service defaults | AD-16 |
+| Deployment/dev topology | Agents AppHost/host/service defaults | AD-16, AD-18 |
 
 ## Deferred
 
@@ -350,6 +375,7 @@ classDiagram
 | Notification channel and templates | Notifications are non-authoritative adapters over proposal events and queues. |
 | Tenant-wide quota/budget enforcement | V1 has per-call guardrails and usage capture; quotas require product pricing/launch thresholds. |
 | Concrete provider SDK and provider-specific options | Provider adapters are leaves; selecting an SDK does not alter public contracts or aggregate boundaries. |
+| Exact Dapr Agents worker packaging or language split | AD-18 fixes Dapr Workflow and Dapr AI/Agents as the runtime substrate; in-process .NET APIs versus a Python Dapr Agents worker depends on concrete tool/provider needs. |
 | Launch latency targets | Operational metrics and timeout policy are in place; exact SLOs need release planning. |
 | Audit retention/legal hold/export/deletion policy for Agents audit records | Product/governance decision; architecture already keeps content and evidence durable and tenant-scoped. |
 | Safety filters/content policy provider | Launch security/product decision; provider adapters and generation gates can host it without changing aggregate boundaries. |

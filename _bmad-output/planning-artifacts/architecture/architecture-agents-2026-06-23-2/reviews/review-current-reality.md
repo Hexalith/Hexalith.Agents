@@ -22,3 +22,17 @@ Residual risks:
 - Provider SDK is intentionally not selected, so no provider package version is pinned.
 - .NET SDK patch differs across sibling modules (`10.0.300` and `10.0.301` observed). Spine records the range rather than inventing a single module baseline.
 
+## 2026-06-23 Dapr Runtime Amendment
+
+Verdict: Pass.
+
+Reality checks:
+
+- Official Dapr docs currently present v1.18 as the latest docs stream and v1.19 as preview.
+- Official Dapr Agents docs describe Dapr Agents v1.0 as GA and production ready, but also describe it as a Python framework.
+- Official Dapr Agents core concepts describe `DurableAgent` as workflow-based and backed by Dapr Workflows for long-running, fault-tolerant, durable execution.
+- Official Dapr .NET SDK docs expose Dapr Workflow and Dapr AI pages; the local Hexalith baseline already uses `Dapr.Workflow`, `Dapr.AI`, and `Dapr.AI.Microsoft.Extensions` at `1.18.4` in sibling package props where applicable.
+
+Residual risks:
+
+- Exact Dapr Agents worker packaging is intentionally deferred because the core Hexalith module is .NET and Dapr Agents itself is Python. AD-18 constrains this to an adapter/worker boundary rather than letting Python SDK types leak into contracts or aggregates.

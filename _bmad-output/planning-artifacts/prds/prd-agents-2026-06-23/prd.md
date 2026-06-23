@@ -81,11 +81,14 @@ V1 deliberately does less than a broad autonomous agent platform. `hexa` does no
 - **Audit Evidence** - Durable records connecting caller, Agent, provider/model, source Conversation, generated versions, edits, regenerations, approval decisions, posting outcome, timestamps, and authorization decisions.
 - **Automatic Response Mode** - Agent Response mode where the generated response is posted directly to the Conversation as the Agent's Party identity after generation succeeds.
 - **Confirmation Response Mode** - Agent Response mode where generated output becomes a Proposed Agent Reply and requires approval before posting.
+- **Content Safety Policy** - The configured launch policy that defines prompt constraints, blocked or restricted output categories, safety failure handling, and audit treatment for Agent generation.
 - **Conversation** - A tenant-scoped Hexalith.Conversations record containing durable multi-party discussion content.
 - **Conversation Context** - The source Conversation content and related participant/context metadata supplied to the Agent for a V1 Agent Call. [ASSUMPTION: V1 Conversation Context excludes long-term memory, project content, folder content, external tools, and non-conversation retrieval.]
+- **Conversation Context Policy** - The configured rule set that determines how much Conversation Context is sent to the Provider, what happens when the Source Conversation exceeds the selected Provider/model's safe context budget, and how the chosen context behavior is recorded.
 - **Conversation Message** - Durable content posted to a Conversation through Hexalith.Conversations.
 - **Conversation Participant** - A Party with access to a Conversation who may call `hexa` when authorized.
 - **Global Providers Aggregate** - The tenant-scoped or platform-scoped catalog of configured AI providers and provider capabilities available for per-Agent provider/model selection. [ASSUMPTION: Hexalith Agents owns this domain concept unless architecture later assigns provider governance to a shared AI infrastructure module.]
+- **Launch Readiness Gate** - A product, governance, architecture, or release condition that must be resolved before production or production-like launch validation can pass.
 - **Party** - A stable Hexalith.Parties identity representing a human, organization, or AI participant.
 - **Provider** - An AI service provider available through the Global Providers Aggregate.
 - **Proposed Agent Reply** - Generated Agent output held outside the Conversation until an Approver approves it.
@@ -176,8 +179,9 @@ Agent Administrators can define all Approvers through the Agent's Approver Polic
 **Consequences (testable):**
 - The system authorizes proposal edit, regeneration, approval, rejection, abandonment, and expiry-resolution actions using the Approver Policy.
 - The system rejects approval actions by Parties not authorized by the current policy for the proposal.
-- The system exposes which configured policy source authorized the Approver when the source is safe to disclose.
+- The system exposes which configured policy source authorized the Approver according to a defined disclosure category: user-visible, operator-only, redacted, or omitted.
 - The proposal records the policy basis used for each approval-related decision.
+- API/client contracts and admin UI use the same disclosure category for the same approval-policy basis.
 
 ### 4.4 Explicit Conversation-Originated Invocation
 
@@ -196,16 +200,19 @@ Authorized Conversation Participants can explicitly call `hexa` from a Source Co
 
 #### FR-9: Build V1 Conversation Context
 
-The system supplies the Agent with the full Source Conversation context required to answer the Agent Call.
+The system supplies the Agent with Conversation Context according to the configured Conversation Context Policy.
 
 **Consequences (testable):**
 - V1 Agent generation uses Conversation Context only.
 - V1 generation does not include long-term memory, project content, folder content, external tool output, or external-channel content.
-- If Conversation Context cannot be loaded safely, the Agent Call fails closed and no partial or misleading response is posted.
+- When the full Source Conversation fits the selected Provider/model's safe context budget, V1 generation uses the full Source Conversation.
+- When the Source Conversation exceeds the selected Provider/model's safe context budget, the system does not silently truncate context. It either fails closed or uses an explicitly approved bounded-context behavior defined by Conversation Context Policy.
+- Agent Calls record whether full or bounded context was used, the Conversation Context Policy version or equivalent identifier, and enough context metadata for audit without leaking unrelated tenant data.
+- If Conversation Context cannot be loaded or bounded safely, the Agent Call fails closed and no partial or misleading response is posted.
 
 #### FR-10: Handle Generation Failure
 
-The system handles Provider failures, timeout, disabled provider/model state, invalid context, and policy failures without posting incomplete Agent Responses.
+The system handles Provider failures, timeout, disabled provider/model state, invalid context, Content Safety Policy failures, and policy failures without posting incomplete or unsafe Agent Responses.
 
 **Consequences (testable):**
 - Failed generation creates status and Audit Evidence visible to authorized administrators or callers.
@@ -229,12 +236,13 @@ When `hexa` is configured for Automatic Response Mode, the system posts successf
 
 #### FR-12: Prevent Automatic Posting When Policy Fails
 
-The system prevents automatic posting when authorization, Agent lifecycle, Provider/model, Party identity, Source Conversation access, or generation status is invalid.
+The system prevents automatic posting when authorization, Agent lifecycle, Provider/model, Party identity, Source Conversation access, Conversation Context Policy, Content Safety Policy, or generation status is invalid.
 
 **Consequences (testable):**
 - No Conversation Message is created when a required policy check fails.
+- No Conversation Message is created when generated content fails the active Content Safety Policy.
 - The failure reason is visible through authorized status surfaces without leaking secrets or unrelated tenant data.
-- Audit Evidence distinguishes policy failures from Provider/runtime failures.
+- Audit Evidence distinguishes authorization, context policy, content safety, Provider/runtime, and posting failures.
 
 ### 4.6 Proposed Agent Reply Workflow
 
@@ -250,6 +258,8 @@ When `hexa` is configured for Confirmation Response Mode, successful generation 
 - A Proposed Agent Reply is not a Conversation Message.
 - A Proposed Agent Reply records caller, Agent, Source Conversation, generated version, Provider/model, response mode, and current proposal state.
 - Authorized Approvers can discover pending proposals requiring their action.
+- V1 includes an in-product pending-proposal visibility surface for authorized Approvers, including proposal count or status indication.
+- If active notifications are not included in the V1 launch, the launch-readiness review explicitly accepts that Approvers must rely on the in-product visibility surface.
 
 #### FR-14: Preserve All Proposal Versions
 
@@ -366,6 +376,7 @@ The system captures Audit Evidence for Agent configuration, Provider/model confi
 **Consequences (testable):**
 - Every posted Agent Response can be traced back to caller, Agent, Source Conversation, Provider/model, generated content, and approval path where applicable.
 - Every Proposed Agent Reply preserves all Versioned Proposal Content.
+- Audit Evidence records the Content Safety Policy decision, Conversation Context Policy behavior, and policy/version identifiers where available.
 - Audit Evidence is queryable by authorized users without exposing unrelated tenant data or Provider secrets.
 
 #### FR-25: Expose Operational Status
@@ -374,8 +385,44 @@ The system exposes status for Agent readiness, Provider/model readiness, recent 
 
 **Consequences (testable):**
 - Authorized administrators can identify whether `hexa` is callable for a tenant.
-- Authorized administrators can distinguish configuration errors, authorization failures, Provider failures, generation failures, pending approvals, and posting failures.
+- Authorized administrators can distinguish configuration errors, authorization failures, context policy failures, content safety failures, Provider failures, generation failures, pending approvals, and posting failures.
 - Status surfaces support launch monitoring of adoption and approval workflow metrics.
+
+### 4.10 Content Safety And Launch Readiness
+
+**Description:** V1 generation must be gated by explicit safety, context, cost, performance, and metric decisions before production or production-like launch validation. This realizes UJ-1, UJ-2, UJ-3, and UJ-4.
+
+**Functional Requirements:**
+
+#### FR-26: Configure Content Safety And Prompt Policy
+
+Authorized administrators or release operators can define the active Content Safety Policy for `hexa`.
+
+**Consequences (testable):**
+- `hexa` cannot be enabled for production or production-like launch validation without an active Content Safety Policy.
+- The Content Safety Policy defines prompt constraints, blocked or restricted output categories, safety failure handling, and audit treatment.
+- Content Safety Policy changes are auditable and affect future Agent Calls only.
+- Automatic Response Mode and Confirmation Response Mode use the same active Content Safety Policy unless a stricter mode-specific policy is configured.
+
+#### FR-27: Enforce Safety Before Conversation Side Effects
+
+The system applies Content Safety Policy before generated content becomes a Conversation Message or an approvable Proposed Agent Reply.
+
+**Consequences (testable):**
+- Generated content that fails Content Safety Policy cannot be posted automatically.
+- Generated content that fails Content Safety Policy cannot become an approvable Proposed Agent Reply.
+- Safety failures create authorized status and Audit Evidence without exposing unsafe content in surfaces where policy forbids display.
+- Approvers cannot override a Content Safety Policy failure unless the policy explicitly defines an auditable override path.
+
+#### FR-28: Define Launch Readiness Controls
+
+V1 launch readiness requires explicit metric thresholds, latency targets, context-bounding behavior, and cost-control posture.
+
+**Consequences (testable):**
+- SM-2 and SM-3 cannot be used for launch readiness until each defines its numerator, denominator, target, measurement window, and launch cohort.
+- Launch readiness defines latency targets for Automatic Response Mode and Confirmation Response Mode before performance gates are accepted.
+- Launch readiness defines whether cost control is enforced through quotas, budgets, provider/model limits, reporting-only monitoring, or an explicitly accepted launch risk.
+- Production or production-like generation cannot be enabled until Content Safety Policy, Conversation Context Policy, launch metric thresholds, latency targets, and cost-control posture are recorded.
 
 ## 5. Non-Goals
 
@@ -389,6 +436,7 @@ The system exposes status for Agent readiness, Provider/model readiness, recent 
 - V1 will not make unapproved generated content a Conversation Message.
 - V1 will not rewrite or delete historical generated versions when an Approver edits or regenerates content.
 - V1 will not expose Provider secrets through UI, API/client contracts, logs, or Audit Evidence.
+- V1 will not silently truncate Conversation Context to fit a Provider/model budget.
 
 ## 6. MVP Scope
 
@@ -400,7 +448,8 @@ The system exposes status for Agent readiness, Provider/model readiness, recent 
 - Per-Agent Provider/model selection.
 - Agent Instructions, lifecycle, response mode, and Approver Policy configuration.
 - Explicit Conversation-originated Agent Calls.
-- Full Source Conversation context for V1 generation.
+- Conversation Context Policy that uses full Source Conversation context when it fits and fails closed or uses approved bounded context when it does not.
+- Content Safety Policy and safety enforcement before conversation side effects.
 - Automatic Response Mode.
 - Confirmation Response Mode.
 - Proposed Agent Reply lifecycle: generated, edited, regenerated, approved, rejected, abandoned, and expired.
@@ -409,7 +458,7 @@ The system exposes status for Agent readiness, Provider/model readiness, recent 
 - Admin UI for Agent and Provider administration.
 - API/client contracts for configuration, invocation, proposal workflow, status, and audit.
 - Strict tenant isolation, authorization, fail-closed dependency handling, and Audit Evidence.
-- Launch metrics for adoption and approval workflow completion.
+- Launch metrics, latency targets, context policy, and cost-control posture required for launch readiness.
 
 ### 6.2 Out Of Scope For MVP
 
@@ -430,8 +479,10 @@ The system exposes status for Agent readiness, Provider/model readiness, recent 
 - **Observability:** The system must expose enough status to debug configuration errors, Provider failures, authorization denials, pending approval bottlenecks, and posting failures.
 - **Auditability:** Audit Evidence must preserve all generated and edited proposal versions and link final posted responses to their source call and approval path.
 - **Provider Safety:** Provider secrets must be write-only or secret-backed where applicable and must never appear in logs, status payloads, audit records, or UI display.
-- **Performance:** [ASSUMPTION: V1 launch defines latency targets during architecture; the PRD requires status visibility and counter-metrics but does not set hard latency budgets yet.]
-- **Cost Control:** [ASSUMPTION: V1 launch requires provider/model selection and operational visibility, while hard cost quotas or budgets remain an open product/architecture decision.]
+- **Content Safety:** Agent generation must be governed by an active Content Safety Policy before generated content can create Conversation side effects.
+- **Context Bounds:** Conversation Context must not be silently truncated; oversized Conversations must fail closed or use approved bounded-context behavior.
+- **Performance:** V1 launch readiness must define latency targets for Automatic Response Mode and Confirmation Response Mode before production or production-like generation is enabled.
+- **Cost Control:** V1 launch readiness must define cost-control posture before production or production-like generation is enabled.
 
 ## 8. Integration And Dependencies
 
@@ -440,6 +491,7 @@ The system exposes status for Agent readiness, Provider/model readiness, recent 
 - **Provider Infrastructure:** Provider/model availability depends on the Global Providers Aggregate and the underlying provider integration selected per Agent.
 - **Tenant Access:** Tenant isolation and authorization must align with existing Hexalith tenant access patterns and fail closed when tenant state is missing or unavailable.
 - **Admin Surface:** The admin UI must use the same capability and authorization model as the API/client contracts.
+- **Release Governance:** Production or production-like generation depends on recorded launch-readiness gates for safety, context, metrics, latency, cost, and audit governance.
 
 ## 9. Data Governance And Audit
 
@@ -450,17 +502,17 @@ The system exposes status for Agent readiness, Provider/model readiness, recent 
 - Regenerating a Proposed Agent Reply must never delete prior generated or edited versions.
 - Rejected, abandoned, and expired proposals remain audit records and cannot later be posted.
 - Provider secrets and raw credentials are never audit content.
-- [ASSUMPTION: retention period, legal hold, and deletion/export behavior for Agent audit records inherit platform data governance until a dedicated governance decision supersedes it.]
+- Agent audit implementation stories are blocked until retention period, legal hold, export behavior, and deletion behavior are explicitly bound to a named platform policy or a dedicated Agents governance decision.
 
 ## 10. API Contracts And Public Surface
 
 V1 must expose public API/client contracts for these capability areas:
 
 - Provider administration: create/update/list/enable/disable Provider and model options where authorized.
-- Agent administration: configure `hexa`, lifecycle, Party identity link, Agent Instructions, Provider/model selection, Response Policy, and Approver Policy.
+- Agent administration: configure `hexa`, lifecycle, Party identity link, Agent Instructions, Provider/model selection, Response Policy, Approver Policy, Conversation Context Policy, and Content Safety Policy.
 - Agent invocation: call `hexa` from a Source Conversation.
 - Proposal workflow: list pending proposals, inspect proposal versions, edit, regenerate, approve, reject, abandon, and inspect expiry.
-- Status: inspect Agent readiness, Provider readiness, Agent Call status, proposal state, and posting outcome.
+- Status: inspect Agent readiness, Provider readiness, context policy outcome, content safety outcome, Agent Call status, proposal state, and posting outcome.
 - Audit: inspect authorized Audit Evidence for Agent Calls, proposal lifecycle, and posted responses.
 
 The public surface must not require consumers to understand internal EventStore stream names, aggregate mechanics, projection internals, or provider SDK details.
@@ -469,9 +521,9 @@ The public surface must not require consumers to understand internal EventStore 
 
 **Primary**
 
-- **SM-1: Active tenant adoption** - At least one launch tenant configures `hexa`, enables a Provider/model, and records successful Agent Calls in production or production-like launch validation. Validates FR-1 through FR-12 and FR-22 through FR-25.
-- **SM-2: Conversation adoption** - A defined share of eligible launch Conversations use at least one Agent Call after enablement. [ASSUMPTION: target percentage is set during launch planning once eligible tenant/conversation volume is known.] Validates FR-8, FR-9, FR-11, and FR-13.
-- **SM-3: Approval workflow completion** - In Confirmation Response Mode, most Proposed Agent Replies reach an explicit terminal state: approved, rejected, abandoned, or expired. [ASSUMPTION: exact target threshold is set during launch planning.] Validates FR-13 through FR-18 and FR-24.
+- **SM-1: Active tenant adoption** - At least one launch tenant configures `hexa`, enables a Provider/model, satisfies launch-readiness gates, and records successful Agent Calls in production or production-like launch validation. Validates FR-1 through FR-12 and FR-22 through FR-28.
+- **SM-2: Conversation adoption** - A defined share of eligible launch Conversations use at least one Agent Call after enablement. Before launch-readiness review, this metric must define eligible Conversation denominator, launch cohort, target percentage, and measurement window. Validates FR-8, FR-9, FR-11, FR-13, and FR-28.
+- **SM-3: Approval workflow completion** - In Confirmation Response Mode, a defined share of Proposed Agent Replies reach an explicit terminal state: approved, rejected, abandoned, or expired. Before launch-readiness review, this metric must define numerator, denominator, target threshold, terminal-state inclusion rules, and measurement window. Validates FR-13 through FR-18, FR-24, and FR-28.
 
 **Secondary**
 
@@ -487,20 +539,20 @@ The public surface must not require consumers to understand internal EventStore 
 
 ## 12. Open Questions And Deferred Decisions
 
-These items are non-blocking for PRD finalization but must be revisited before the named downstream phase proceeds.
+These items are non-blocking for PRD finalization but must be revisited before the named downstream phase proceeds. Items tied to launch readiness or implementation acceptance are phase blockers for those downstream phases.
 
 | ID | Question | Owner | Revisit Condition |
 | --- | --- | --- | --- |
 | OQ-1 | What exact UI pattern represents Conversation-originated invocation in V1: mention, command, action button, multiple entry points, participant membership, mention resolution, or a combination? | Product + UX | Before UX flow specification and API route naming. |
 | OQ-2 | Which module owns Proposed Agent Reply runtime state and storage boundaries? | Architecture | Before aggregate and persistence design. |
 | OQ-3 | What is the default proposal expiry duration, and can Agent Administrators configure it? | Product + Architecture | Before proposal lifecycle stories are created. |
-| OQ-4 | What notification path tells Approvers that a Proposed Agent Reply is waiting? | Product + UX | Before approval workflow UX and notification stories are created. |
-| OQ-5 | What latency target applies to Agent Calls in Automatic Response Mode and Confirmation Response Mode? | Architecture + Release PM | Before performance budgets or release readiness gates are defined. |
-| OQ-6 | What cost controls are required for launch: per-tenant quotas, per-Agent quotas, Provider/model budgets, or reporting only? | Product + Architecture | Before Provider administration stories are accepted for implementation. |
+| OQ-4 | Which active notification path, beyond the required in-product pending-proposal surface, tells Approvers that a Proposed Agent Reply is waiting? | Product + UX | Before notification stories are created or before launch readiness if active notifications are required. |
+| OQ-5 | What latency target applies to Agent Calls in Automatic Response Mode and Confirmation Response Mode? | Architecture + Release PM | Before performance budgets or launch-readiness gates are accepted. |
+| OQ-6 | What cost controls are required for launch: per-tenant quotas, per-Agent quotas, Provider/model budgets, or reporting-only monitoring with explicit risk acceptance? | Product + Architecture | Before Provider administration stories are accepted for implementation and before launch-readiness gates are accepted. |
 | OQ-7 | What provider capability metadata is required in the Global Providers Aggregate for V1? | Architecture | Before provider configuration contract design. |
-| OQ-8 | What is the exact audit retention period and export/deletion behavior for generated proposal versions? | Product + Governance | Before data governance and audit implementation stories are accepted. |
-| OQ-9 | What safety filters, content policies, or prompt constraints are required before launch? | Product + Security | Before generation can be enabled in production or production-like launch validation. |
-| OQ-10 | How should Conversation Context be bounded when a Conversation is too large for the selected model? | Architecture | Before context-building implementation stories are accepted. |
+| OQ-8 | What is the exact audit retention period, legal hold, export behavior, and deletion behavior for generated proposal versions? | Product + Governance | Before data governance and audit implementation stories are accepted. |
+| OQ-9 | What exact content categories, filters, prompt constraints, and override rules are included in the active Content Safety Policy? | Product + Security | Before generation can be enabled in production or production-like launch validation. |
+| OQ-10 | Which approved bounded-context behavior, if any, is allowed when a Conversation is too large for the selected model, and what provider/model budgets define that branch? | Architecture | Before context-building implementation stories are accepted. |
 | OQ-11 | What launch threshold should be attached to SM-2 and SM-3 once pilot tenant volume is known? | Product + Release PM | Before launch-readiness review. |
 
 ## 13. Assumptions Index
@@ -510,8 +562,3 @@ These items are non-blocking for PRD finalization but must be revisited before t
 - §4.4 Explicit Conversation-Originated Invocation - Conversation-originated invocation may be implemented as a mention, command, or conversation action if the Source Conversation, caller, prompt, and authorization evidence are captured.
 - §4.6 FR-18 - Exact proposal expiry duration is configurable or defined by deployment policy, not hardcoded in this PRD.
 - §6.2 Out Of Scope For MVP - V1 product behavior exposes only `hexa`, even if implementation uses generalized Agent structures.
-- §7 Performance - V1 launch defines latency targets during architecture; this PRD requires status visibility and counter-metrics but does not set hard latency budgets yet.
-- §7 Cost Control - V1 launch requires provider/model selection and operational visibility, while hard cost quotas or budgets remain an open product/architecture decision.
-- §9 Data Governance And Audit - Retention period, legal hold, and deletion/export behavior for Agent audit records inherit platform data governance until a dedicated governance decision supersedes it.
-- §11 SM-2 - Target percentage is set during launch planning once eligible tenant/conversation volume is known.
-- §11 SM-3 - Exact approval workflow completion target threshold is set during launch planning.

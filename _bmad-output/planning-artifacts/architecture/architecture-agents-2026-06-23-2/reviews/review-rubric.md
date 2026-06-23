@@ -16,3 +16,18 @@ Residual risks:
 - The product term "conversation owner" remains mapped to `ParticipantRole.Facilitator` for V1. This is explicit in AD-8 and Deferred; product or Conversations can still replace it with a first-class owner resolver.
 - The concrete provider SDK is intentionally deferred. AD-9/AD-10 constrain the adapter and metadata floor enough for implementation to start without choosing a provider package in the spine.
 
+## 2026-06-23 Dapr Runtime Amendment
+
+Verdict: Pass.
+
+Checklist results:
+
+- AD-18 fixes a real divergence point: different builders could otherwise choose custom hosted services, direct provider loops, Dapr Workflow, or another workflow engine.
+- The rule is enforceable: V1 agent workflow execution must use Dapr Workflow and mutate durable domain state only through `AgentInteraction` commands/events.
+- The brownfield stack remains consistent: Dapr `1.18.4` is already a local package baseline and Dapr Workflow/AI packages are present in sibling modules where used.
+- Named technology was current-checked against official Dapr docs before binding.
+- The Deferred entry for Dapr Agents worker packaging does not reopen the substrate decision; it only defers whether the adapter is in-process .NET or a Python worker.
+
+Residual risks:
+
+- No provider component or Dapr AI component configuration is selected yet. This remains implementation/provider selection work under AD-9, AD-10, and AD-18.
