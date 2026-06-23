@@ -1,0 +1,84 @@
+# generated: 2026-06-23T21:28:59+02:00
+# last_updated: 2026-06-23T21:28:59+02:00
+# project: agents
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog -> in-progress: Automatically when first story is created (via create-story)
+#   - in-progress -> done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# Action Item Status:
+#   - open: Committed during a retrospective, not yet addressed
+#   - in-progress: Actively being worked on
+#   - done: Completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+# - Retrospective appends its action items to action_items; sprint-status surfaces open ones
+
+generated: 2026-06-23T21:28:59+02:00
+last_updated: 2026-06-23T21:28:59+02:00
+project: agents
+project_key: NOKEY
+tracking_system: file-system
+story_location: /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts
+
+development_status:
+  epic-1: backlog
+  1-1-buildable-agents-module-shell-and-public-boundaries: backlog
+  1-2-govern-provider-catalog-entries: backlog
+  1-3-configure-and-manage-hexa-lifecycle: backlog
+  1-4-link-hexa-to-a-party-identity: backlog
+  1-5-select-provider-and-model-for-hexa: backlog
+  1-6-configure-response-mode-and-approver-policy: backlog
+  1-7-configure-content-safety-policy-and-activation-gate: backlog
+  1-8-admin-setup-ui-and-readiness-overview: backlog
+  epic-1-retrospective: optional
+  epic-2: backlog
+  2-1-request-hexa-from-a-source-conversation: backlog
+  2-2-enforce-invocation-authorization-and-dependency-readiness: backlog
+  2-3-build-conversation-context-with-safe-bounds: backlog
+  2-4-generate-and-safety-check-agent-output: backlog
+  2-5-post-automatic-responses-through-conversations: backlog
+  2-6-conversation-invocation-ux-and-call-status-feedback: backlog
+  epic-2-retrospective: optional
+  epic-3: backlog
+  3-1-create-proposed-agent-replies-in-confirmation-mode: backlog
+  3-2-discover-pending-proposals-in-product: backlog
+  3-3-edit-proposed-reply-versions: backlog
+  3-4-regenerate-proposed-reply-versions: backlog
+  3-5-approve-a-selected-version-and-post-it: backlog
+  3-6-reject-abandon-and-expire-proposals: backlog
+  3-7-proposal-detail-version-history-and-accessibility: backlog
+  epic-3-retrospective: optional
+  epic-4: backlog
+  4-1-stable-api-and-client-contracts-for-agent-operations: backlog
+  4-2-query-audit-evidence-safely: backlog
+  4-3-expose-operational-status-and-admin-workflows: backlog
+  4-4-define-and-enforce-launch-readiness-gates: backlog
+  4-5-verify-end-to-end-governance-and-contract-conformance: backlog
+  epic-4-retrospective: optional
