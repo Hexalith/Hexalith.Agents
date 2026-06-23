@@ -1,0 +1,24 @@
+[submodule "Hexalith.AI.Tools"]
+	path = Hexalith.AI.Tools
+	url = https://github.com/Hexalith/Hexalith.AI.Tools.git
+[submodule "Hexalith.Commons"]
+	path = Hexalith.Commons
+	url = https://github.com/Hexalith/Hexalith.Commons.git
+[submodule "Hexalith.PolymorphicSerializations"]
+	path = Hexalith.PolymorphicSerializations
+	url = https://github.com/Hexalith/Hexalith.PolymorphicSerializations.git
+[submodule "Hexalith.Conversations"]
+	path = Hexalith.Conversations
+	url = https://github.com/Hexalith/Hexalith.Conversations.git
+[submodule "Hexalith.EventStore"]
+	path = Hexalith.EventStore
+	url = https://github.com/Hexalith/Hexalith.EventStore.git
+[submodule "Hexalith.Memories"]
+	path = Hexalith.Memories
+	url = https://github.com/Hexalith/Hexalith.Memories.git
+[submodule "Hexalith.Tenants"]
+	path = Hexalith.Tenants
+	url = https://github.com/Hexalith/Hexalith.Tenants.git
+[submodule "Hexalith.Parties"]
+	path = Hexalith.Parties
+	url = https://github.com/Hexalith/Hexalith.Parties.git
