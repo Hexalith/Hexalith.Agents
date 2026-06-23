@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>UX Design Validation: Hexalith Agents</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+    --verdict-strong: #16a34a;
+    --verdict-adequate: #65a30d;
+    --verdict-thin: #d97706;
+    --verdict-broken: #dc2626;
+    --sev-low: #64748b;
+    --sev-medium: #ca8a04;
+    --sev-high: #ea580c;
+    --sev-critical: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+  header.report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 0; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .synthesis {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--muted);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    font-size: 15.5px;
+  }
+  .synthesis p { margin: 0 0 10px; }
+  .synthesis p:last-child { margin-bottom: 0; }
+  .dimension-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .dim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .dim-card .dim-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .dim-card .dim-verdict { font-size: 14px; font-weight: 600; }
+  section.dimension, section.reviewer-section { margin-bottom: 14px; }
+  section.dimension details, section.reviewer-section details {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  section summary {
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  section summary::-webkit-details-marker { display: none; }
+  section summary::before {
+    content: ">";
+    display: inline-block;
+    color: var(--muted);
+    transition: transform 0.15s ease;
+  }
+  section details[open] summary::before { transform: rotate(90deg); }
+  section summary h2 {
+    display: inline;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0;
+    flex: 1;
+  }
+  .verdict-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: white;
+  }
+  .verdict-strong { background: var(--verdict-strong); }
+  .verdict-adequate { background: var(--verdict-adequate); }
+  .verdict-thin { background: var(--verdict-thin); }
+  .verdict-broken { background: var(--verdict-broken); }
+  .dim-body { padding: 4px 20px 18px; }
+  .dim-judgment { color: var(--text); font-size: 14.5px; }
+  .dim-judgment p { margin: 0 0 10px; }
+  .findings-list { padding: 0 20px 4px; }
+  article.finding {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+  }
+  article.finding:first-child { border-top: none; }
+  article.finding header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+  }
+  .badge-sev-low { background: rgba(100, 116, 139, 0.12); color: var(--sev-low); }
+  .badge-sev-medium { background: rgba(202, 138, 4, 0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234, 88, 12, 0.14); color: var(--sev-high); }
+  .badge-sev-critical { background: rgba(220, 38, 38, 0.14); color: var(--sev-critical); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 500; flex: 1; min-width: 200px; }
+  .finding-location { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; color: var(--muted); }
+  .finding-note, .finding-fix { margin-top: 6px; font-size: 14px; }
+  .finding-fix strong { color: var(--muted); font-weight: 500; }
+  .reviewer-source {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  .mechanical {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  .mechanical h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mechanical ul { margin: 0; padding-left: 20px; }
+  .mechanical li { margin-bottom: 4px; color: var(--text); }
+  footer.report-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="report-header">
+      <div class="title">
+        <h1>Hexalith Agents - UX Design Validation Report</h1>
+        <div class="subtitle">/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23</div>
+      </div>
+    </header>
+
+    <div class="synthesis">
+      <p>The spine pair is broadly usable for architecture and story planning: the PRD's four key journeys are carried forward, the FrontComposer/Fluent inheritance model is explicit, and component names align across DESIGN.md and EXPERIENCE.md. The main downstream risk is not visual identity; it is implementation ambiguity around conversation invocation, proposal ownership, authorization/evidence boundaries, and per-surface state coverage.</p>
+      <p>The extra reviewer lenses sharpen the picture: accessibility is directionally strong, but governance and implementation readiness are not safe to hand off as final. Treat the current pair as a strong draft that needs blocking amendments before architecture and story-dev rely on it.</p>
+    </div>
+
+    <div class="dimension-summary">
+      <div class="dim-card"><div class="dim-name">Flow coverage</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">Token completeness</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">Component coverage</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">State coverage</div><div class="dim-verdict" style="color: var(--verdict-thin)">thin</div></div>
+      <div class="dim-card"><div class="dim-name">Visual reference coverage</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">Bloat and overspecification</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Inheritance discipline</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Shape fit</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+    </div>
+
+    <section class="dimension">
+      <details>
+        <summary><h2>Flow coverage</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>UJ-1 through UJ-4 are present with named protagonists, numbered steps, climax beats, and failure paths where applicable.</p></div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">FR traceability is incomplete</h3><span class="finding-location">prd.md:106, EXPERIENCE.md:224</span></header><div class="finding-note">The four PRD UJs are covered, but FR-1 through FR-25 are not traced to flows or IA surfaces.</div><div class="finding-fix"><strong>Fix:</strong> Add a compact FR-to-surface/flow coverage table, or cite FR IDs directly in IA rows and flow steps.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary><h2>Token completeness</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Local token references resolve, and the Fluent/FrontComposer inheritance posture is deliberate.</p></div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Contrast and forced-colors verification are not stated</h3><span class="finding-location">DESIGN.md:121, EXPERIENCE.md:178</span></header><div class="finding-note">Status colors inherit Fluent roles, but contrast targets and verification obligations are not stated.</div><div class="finding-fix"><strong>Fix:</strong> Add explicit contrast targets, forced-colors expectations, and build-time verification rules.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Inherited tokens may need machine-readable bindings</h3><span class="finding-location">DESIGN.md:17, DESIGN.md:45</span></header><div class="finding-note">Strict design.md consumers may not mechanically resolve note-only inherited color and shape tokens.</div><div class="finding-fix"><strong>Fix:</strong> Add machine-readable inherited bindings such as Fluent BadgeColor.* and shape-owner fields.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary><h2>Component coverage</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>The twelve Agents-specific component names align across both spines.</p></div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Proposal notification/status entry components are missing</h3><span class="finding-location">EXPERIENCE.md:46, EXPERIENCE.md:292</span></header><div class="finding-note">Proposal discovery references notification entry and Conversation status routes without component patterns.</div><div class="finding-fix"><strong>Fix:</strong> Add component patterns for these entry points, or defer them behind OQ-4 with interim queue discovery behavior.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details open>
+        <summary><h2>State coverage</h2><span class="verdict-pill verdict-thin">thin</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>The spine has strong domain state vocabularies, but it does not allocate those states per surface.</p></div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Per-surface state coverage is thin</h3><span class="finding-location">EXPERIENCE.md:39, EXPERIENCE.md:152</span></header><div class="finding-note">The IA lists ten surfaces, but there is no state matrix for cold load, empty, filtered-empty, permission-denied, stale/degraded, error, in-flight, expiry, or read-only modes.</div><div class="finding-fix"><strong>Fix:</strong> Add one table row per IA surface with required states and treatments.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Latency, timeout, and cost-control behaviors are not landed</h3><span class="finding-location">DESIGN.md:125, EXPERIENCE.md:293</span></header><div class="finding-note">These are named as product risks/open questions but not behavioral state treatments.</div><div class="finding-fix"><strong>Fix:</strong> Add slow/timeout/cost-warning states, or explicitly block them pending OQ-5/OQ-6.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary><h2>Visual reference coverage</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>No visual files are present, so there are no orphans. Complex layout surfaces rely entirely on prose/table contracts.</p></div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Visual reference coverage is prose-only</h3><span class="finding-location">EXPERIENCE.md:23, .memlog.md:20</span></header><div class="finding-note">No mockups, wireframes, or imports exist for layout-heavy surfaces.</div><div class="finding-fix"><strong>Fix:</strong> Record mock coverage as spine-only per IA surface or add key-screen references.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary><h2>Bloat and overspecification</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>No findings. The spines keep product content out of the UX contract, use tables effectively, and avoid inventing a bespoke visual system.</p></div></div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary><h2>Inheritance discipline</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>No findings. UJ names, proposal lifecycle terms, component names, and FrontComposer responsibilities are consistent enough for extraction.</p></div></div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary><h2>Shape fit</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>No findings. DESIGN.md follows canonical order and EXPERIENCE.md contains required defaults plus justified product-specific sections.</p></div></div>
+      </details>
+    </section>
+
+    <section class="reviewer-section">
+      <details open>
+        <summary><h2>Governance review</h2><span class="reviewer-source">review-governance.md</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Strong draft, but not sufficient as a downstream implementation contract for every security-sensitive path.</p></div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-critical">critical</span><h3 class="finding-title">Approver authorization does not require current Source Conversation access</h3><span class="finding-location">EXPERIENCE.md:89</span></header><div class="finding-note">Policy authorization could leak generated content to a same-tenant Party without current Source Conversation access.</div><div class="finding-fix"><strong>Fix:</strong> Require both Approver Policy authorization and fresh Source Conversation access for proposal discovery/detail/action paths.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-critical">critical</span><h3 class="finding-title">Conversation invocation is unresolved</h3><span class="finding-location">EXPERIENCE.md:52</span></header><div class="finding-note">The primary runtime entry point leaves identity attribution, prompt capture, denial copy, and proposed-vs-posted rendering open.</div><div class="finding-fix"><strong>Fix:</strong> Make OQ-1 a blocking UX governance gate before invocation stories.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Action-time reauthorization is missing</h3><span class="finding-location">EXPERIENCE.md:123</span></header><div class="finding-note">The model lacks stale/revalidation states when permissions or dependencies change while an editor is open.</div><div class="finding-fix"><strong>Fix:</strong> Add revalidating, authorization stale, and denied after revalidation states.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Proposal discovery and notification are not privacy-bounded</h3><span class="finding-location">EXPERIENCE.md:91</span></header><div class="finding-note">Queue and notification payload rules are not defined for generated text, snippets, names, or denial-safe counts.</div><div class="finding-fix"><strong>Fix:</strong> Define payload tiers and default notifications to opaque references until authorization is proven.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Audit availability is not a side-effect invariant</h3><span class="finding-location">EXPERIENCE.md:156</span></header><div class="finding-note">Posted/approved success could be reported while evidence is missing or uncorrelated.</div><div class="finding-fix"><strong>Fix:</strong> Require every side-effecting success state to show durable audit/correlation evidence or incident state.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">API/admin parity is not a build contract</h3><span class="finding-location">EXPERIENCE.md:271</span></header><div class="finding-note">The UX lacks operation-by-operation parity for states, denials, errors, and audit references.</div><div class="finding-fix"><strong>Fix:</strong> Add a parity matrix for each admin action and API/client operation.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <section class="reviewer-section">
+      <details open>
+        <summary><h2>Implementation readiness review</h2><span class="reviewer-source">review-implementation-readiness.md</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>The pair is not implementation-ready as a complete source for architecture and story-dev.</p></div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-critical">critical</span><h3 class="finding-title">Proposed Agent Reply ownership is unresolved</h3><span class="finding-location">EXPERIENCE.md:290</span></header><div class="finding-note">Architecture cannot assign aggregate boundaries, API contracts, status ownership, or proposal queue/editor responsibility without a product/architecture decision.</div><div class="finding-fix"><strong>Fix:</strong> Add an ownership contract for proposal state, versions, expiry, authorization, audit, and module boundaries.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Open questions are not triaged</h3><span class="finding-location">EXPERIENCE.md:283</span></header><div class="finding-note">Open questions are copied into the spine without blocker vs carry-forward classification.</div><div class="finding-fix"><strong>Fix:</strong> Replace the flat list with blocker/carry-forward, owner, downstream gate, affected surface, and minimum assumption.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Component contracts are not detailed enough for story-dev</h3><span class="finding-location">EXPERIENCE.md:82</span></header><div class="finding-note">Component rows lack inputs, actions, events, ownership, auth/read-only variants, and required data fields.</div><div class="finding-fix"><strong>Fix:</strong> Add component contracts per named component.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">FrontComposer implementation constraints are not carried into the spine</h3><span class="finding-location">Hexalith.FrontComposer/_bmad-output/project-context.md:29</span></header><div class="finding-note">Stories would need to reread project context for non-obvious Fluent and FrontComposer rules.</div><div class="finding-fix"><strong>Fix:</strong> Add a short FrontComposer implementation appendix.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Mock/wireframe coverage is undecided</h3><span class="finding-location">.memlog.md:20</span></header><div class="finding-note">The most complex surfaces are not sketched even at low fidelity.</div><div class="finding-fix"><strong>Fix:</strong> Add minimal wireframes or explicit no-mock rationale for key surfaces.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <section class="reviewer-section">
+      <details>
+        <summary><h2>Accessibility review</h2><span class="reviewer-source">review-accessibility.md</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Solid accessibility floor, but high-risk workflows need deterministic focus, selection, live-region, and responsive-denial contracts.</p></div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Proposal version selection and focus recovery are under-specified</h3><span class="finding-location">EXPERIENCE.md:171, EXPERIENCE.md:183</span></header><div class="finding-note">Approval posts the selected version, but version selection and focus fallback after row removal are undefined.</div><div class="finding-fix"><strong>Fix:</strong> Specify version-list semantics, deterministic focus order, labelled editor, exact-version approval confirmation, and fallback focus targets.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Live-region behavior is too broad</h3><span class="finding-location">EXPERIENCE.md:184</span></header><div class="finding-note">Transitions are listed without politeness, atomicity, de-duplication, or source-specific announcement text.</div><div class="finding-fix"><strong>Fix:</strong> Add a transition matrix for important state changes.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Assistive localization is not explicit</h3><span class="finding-location">DESIGN.md:139</span></header><div class="finding-note">Accessible names, descriptions, tooltips, and live-region text are not explicitly in the whole-string localization contract.</div><div class="finding-fix"><strong>Fix:</strong> Extend FC-L10N requirements to non-visible assistive text.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <div class="mechanical">
+      <h3>Mechanical notes</h3>
+      <ul>
+        <li>Both spines remain status: draft, consistent with pending reviewer gate, mock coverage, and open UX questions.</li>
+        <li>DESIGN.md and EXPERIENCE.md source frontmatter resolves to local files for the brief, PRD, addendum, reconciliation note, Tenants references, and FrontComposer references.</li>
+        <li>No broken {path.to.token} references were found. No Mermaid syntax is present.</li>
+      </ul>
+    </div>
+
+    <footer class="report-footer">
+      <div class="meta">
+        <span>Rubric: /home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23/review-rubric.md</span>
+        <span>Generated: 2026-06-23T16:54:29+02:00</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
