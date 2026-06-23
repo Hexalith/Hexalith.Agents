@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Hexalith.Agents.UI</PackageId>
+    <Description>UI components for the Hexalith Agents module. FrontComposer navigation registration and FluentUI pages are added by the admin-setup UI story (1.8).</Description>
+    <PackageTags>hexalith;agents;ui</PackageTags>
+  </PropertyGroup>
+
+  <!-- Dependency direction (AD-15): UI -> Contracts (+ Client). -->
+  <ItemGroup>
+    <ProjectReference Include="..\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
+    <ProjectReference Include="..\Hexalith.Agents.Client\Hexalith.Agents.Client.csproj" />
+  </ItemGroup>
+
+</Project>

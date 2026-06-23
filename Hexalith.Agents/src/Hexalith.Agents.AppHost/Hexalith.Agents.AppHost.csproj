@@ -1,0 +1,18 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.4.6">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsPublishable>true</IsPublishable>
+    <UserSecretsId>hexalith-agents</UserSecretsId>
+  </PropertyGroup>
+
+  <!-- Dependency direction (AD-15): AppHost -> Server (+ UI). Referenced for build/dependency ordering
+       only; NOT added to the Aspire resource graph this story (IsAspireProjectResource="false"). A
+       functioning topology is deliberately deferred (AD-16; Scope Guardrails). -->
+  <ItemGroup>
+    <ProjectReference Include="..\Hexalith.Agents.Server\Hexalith.Agents.Server.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\Hexalith.Agents.UI\Hexalith.Agents.UI.csproj" IsAspireProjectResource="false" />
+  </ItemGroup>
+
+</Project>

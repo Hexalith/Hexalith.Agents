@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Hexalith.Agents.Client</PackageId>
+    <Description>Client-side contracts and proxies for the Hexalith Agents module. Consumes Agents.Contracts only.</Description>
+    <PackageTags>hexalith;agents;client</PackageTags>
+  </PropertyGroup>
+
+  <!-- Dependency direction (AD-15): Client -> Contracts. -->
+  <ItemGroup>
+    <ProjectReference Include="..\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

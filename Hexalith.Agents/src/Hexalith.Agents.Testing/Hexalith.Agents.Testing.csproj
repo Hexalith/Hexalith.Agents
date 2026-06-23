@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Hexalith.Agents.Testing</PackageId>
+    <Description>Shared test helpers for consumers of the Hexalith Agents module. Fixtures and builders are added by the stories that introduce testable behavior.</Description>
+    <PackageTags>hexalith;agents;testing</PackageTags>
+  </PropertyGroup>
+
+  <!-- Dependency direction (AD-15): Testing -> Contracts (+ Server). -->
+  <ItemGroup>
+    <ProjectReference Include="..\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
+    <ProjectReference Include="..\Hexalith.Agents.Server\Hexalith.Agents.Server.csproj" />
+  </ItemGroup>
+
+</Project>

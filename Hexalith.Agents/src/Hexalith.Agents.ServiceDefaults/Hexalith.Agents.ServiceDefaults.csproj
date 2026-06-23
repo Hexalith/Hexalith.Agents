@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsAspireSharedProject>true</IsAspireSharedProject>
+  </PropertyGroup>
+
+  <!-- Named extension point (AC4). The AddServiceDefaults convention (OpenTelemetry, health checks,
+       service discovery, resilience) is added by the operational-topology story along with its package
+       dependencies - kept dependency-free here to avoid premature infrastructure (AD-16; Scope Guardrails). -->
+
+</Project>

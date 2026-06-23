@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsPublishable>true</IsPublishable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Hexalith.Agents.Server.Tests" />
+  </ItemGroup>
+
+  <!-- Dependency direction (AD-15): Server -> Contracts (+ Client). The EventStore domain-service host
+       wiring (AddEventStoreDomainService) arrives with Story 1.2 once aggregates exist; this story ships a
+       minimal buildable WebApplication host (Scope Guardrails: not a runnable topology). -->
+  <ItemGroup>
+    <ProjectReference Include="..\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
+    <ProjectReference Include="..\Hexalith.Agents.Client\Hexalith.Agents.Client.csproj" />
+  </ItemGroup>
+
+</Project>

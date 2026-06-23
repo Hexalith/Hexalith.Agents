@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Hexalith.Agents.Contracts</PackageId>
+    <Description>Public contracts for the Hexalith Agents module. References nothing outward (no server infrastructure, provider SDKs, EventStore server internals, Dapr runtime, or UI shell).</Description>
+    <PackageTags>hexalith;agents;contracts</PackageTags>
+  </PropertyGroup>
+
+  <!-- AC2: Contracts is the inward-most boundary and references no other project. Cross-module and
+       sibling-source references are added by the stories that introduce contract types (1.2-1.8). -->
+
+</Project>

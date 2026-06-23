@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Hexalith.Agents</PackageId>
+    <Description>Main domain library for the Hexalith Agents module. Aggregate roots and state (Agent, ProviderCatalog, AgentInteraction) are added by the Agent-setup stories (1.2-1.8).</Description>
+    <PackageTags>hexalith;agents;domain</PackageTags>
+  </PropertyGroup>
+
+  <!-- Inward dependency on its own contracts. Aggregates/events/state live here in later stories. -->
+  <ItemGroup>
+    <ProjectReference Include="..\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

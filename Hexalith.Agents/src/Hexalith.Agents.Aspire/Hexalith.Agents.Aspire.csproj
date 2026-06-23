@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Hexalith.Agents.Aspire</PackageId>
+    <Description>.NET Aspire hosting extensions for the Hexalith Agents module. The AddHexalithAgentsServer hosting recipe and its DAPR/topology wiring are added by the operational-topology stories (AD-16); this is the named extension point.</Description>
+    <PackageTags>hexalith;agents;aspire</PackageTags>
+  </PropertyGroup>
+
+  <!-- Named extension point (AC4). Aspire.Hosting and the server-resource extension methods are added by
+       the story that wires a runnable topology - deliberately not a runnable topology in this story. -->
+
+</Project>
