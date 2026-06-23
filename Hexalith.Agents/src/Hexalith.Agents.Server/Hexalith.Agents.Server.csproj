@@ -9,12 +9,17 @@
     <InternalsVisibleTo Include="Hexalith.Agents.Server.Tests" />
   </ItemGroup>
 
-  <!-- Dependency direction (AD-15): Server -> Contracts (+ Client). The EventStore domain-service host
-       wiring (AddEventStoreDomainService) arrives with Story 1.2 once aggregates exist; this story ships a
-       minimal buildable WebApplication host (Scope Guardrails: not a runnable topology). -->
+  <!-- Dependency direction (AD-15): Server -> Contracts + Client + the domain library (Hexalith.Agents, where
+       ProviderCatalogAggregate lives, scanned by AddEventStoreDomainService). The canonical EventStore
+       domain-service host (AddEventStoreDomainService / UseEventStoreDomainService) is provided by the
+       EventStore.DomainService SDK — referenced as sibling source via $(HexalithEventStoreRoot), never a NuGet
+       package. DAPR and the EventStore contracts arrive transitively through that SDK, so the Server declares
+       no provider-SDK, Dapr, or UI-shell dependency (Scope Guardrails). -->
   <ItemGroup>
     <ProjectReference Include="..\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
     <ProjectReference Include="..\Hexalith.Agents.Client\Hexalith.Agents.Client.csproj" />
+    <ProjectReference Include="..\Hexalith.Agents\Hexalith.Agents.csproj" />
+    <ProjectReference Include="$(HexalithEventStoreRoot)\src\Hexalith.EventStore.DomainService\Hexalith.EventStore.DomainService.csproj" />
   </ItemGroup>
 
 </Project>

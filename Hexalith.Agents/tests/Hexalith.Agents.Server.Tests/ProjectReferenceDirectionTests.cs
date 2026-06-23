@@ -22,7 +22,7 @@ public sealed class ProjectReferenceDirectionTests
         ["Hexalith.Agents.Contracts"] = [],                                                           // inward-most
         ["Hexalith.Agents.Client"] = ["Hexalith.Agents.Contracts"],
         ["Hexalith.Agents"] = ["Hexalith.Agents.Contracts"],                                          // domain library
-        ["Hexalith.Agents.Server"] = ["Hexalith.Agents.Contracts", "Hexalith.Agents.Client"],
+        ["Hexalith.Agents.Server"] = ["Hexalith.Agents.Contracts", "Hexalith.Agents.Client", "Hexalith.Agents"], // + domain library (Story 1.2: aggregate discovery)
         ["Hexalith.Agents.UI"] = ["Hexalith.Agents.Contracts", "Hexalith.Agents.Client"],
         ["Hexalith.Agents.Testing"] = ["Hexalith.Agents.Contracts", "Hexalith.Agents.Server"],
         ["Hexalith.Agents.AppHost"] = ["Hexalith.Agents.Server", "Hexalith.Agents.UI"],

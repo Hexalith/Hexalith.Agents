@@ -7,7 +7,17 @@
     <PackageTags>hexalith;agents;contracts</PackageTags>
   </PropertyGroup>
 
-  <!-- AC2: Contracts is the inward-most boundary and references no other project. Cross-module and
-       sibling-source references are added by the stories that introduce contract types (1.2-1.8). -->
+  <!-- AC2: Contracts is the inward-most boundary. The only sanctioned outward dependency is the EventStore
+       *contracts* (IEventPayload / IRejectionEvent marker interfaces) needed by the ProviderCatalog events and
+       rejections (Story 1.2). Server internals, the DomainService SDK, provider SDKs, the Dapr runtime, and the
+       UI shell remain forbidden (enforced by the contracts boundary guard tests). Sibling source reference via
+       the $(HexalithEventStoreRoot) discovery block in Directory.Build.props — never a NuGet package. -->
+  <ItemGroup>
+    <ProjectReference Include="$(HexalithEventStoreRoot)\src\Hexalith.EventStore.Contracts\Hexalith.EventStore.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Hexalith.EventStore.Contracts.Events" />
+  </ItemGroup>
 
 </Project>

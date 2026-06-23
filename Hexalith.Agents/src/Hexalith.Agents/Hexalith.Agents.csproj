@@ -3,13 +3,26 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Hexalith.Agents</PackageId>
-    <Description>Main domain library for the Hexalith Agents module. Aggregate roots and state (Agent, ProviderCatalog, AgentInteraction) are added by the Agent-setup stories (1.2-1.8).</Description>
+    <Description>Main domain library for the Hexalith Agents module. Hosts the ProviderCatalog aggregate, state, and inspection (Story 1.2); the Agent and AgentInteraction aggregates are added by later stories.</Description>
     <PackageTags>hexalith;agents;domain</PackageTags>
   </PropertyGroup>
 
-  <!-- Inward dependency on its own contracts. Aggregates/events/state live here in later stories. -->
+  <!-- Inward dependency on its own contracts, plus the EventStore *client* (the EventStoreAggregate base and
+       [EventStoreDomain] attribute) consumed by the ProviderCatalog aggregate. The EventStore contracts arrive
+       transitively through the client. Sibling source reference via the $(HexalithEventStoreRoot) discovery
+       block in Directory.Build.props — never a NuGet package (Hexalith siblings stay source references). -->
   <ItemGroup>
     <ProjectReference Include="..\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
+    <ProjectReference Include="$(HexalithEventStoreRoot)\src\Hexalith.EventStore.Client\Hexalith.EventStore.Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Hexalith.EventStore.Contracts.Events" />
+    <Using Include="Hexalith.EventStore.Contracts.Results" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Hexalith.Agents.Tests" />
   </ItemGroup>
 
 </Project>
