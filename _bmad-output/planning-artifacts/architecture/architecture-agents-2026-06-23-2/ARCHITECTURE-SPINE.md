@@ -3,7 +3,7 @@ name: Hexalith Agents
 type: architecture-spine
 purpose: build-substrate
 altitude: initiative
-paradigm: event-sourced hexagonal Hexalith domain module
+paradigm: event-sourced hybrid agent-runtime hexagonal Hexalith domain module
 scope: Hexalith Agents module in the agents workspace
 status: final
 created: 2026-06-23
@@ -15,6 +15,7 @@ binds:
 sources:
   - ../../briefs/brief-agents-2026-06-23/brief.md
   - ../../prds/prd-agents-2026-06-23/prd.md
+  - ../../research/technical-dapr-ai-agents-research-2026-06-23.md
   - ../../ux-designs/ux-agents-2026-06-23/DESIGN.md
   - ../../ux-designs/ux-agents-2026-06-23/EXPERIENCE.md
   - ../../../../Hexalith.Conversations/_bmad-output/project-context.md
@@ -23,6 +24,10 @@ sources:
   - ../../../../Hexalith.Parties/_bmad-output/project-context.md
   - ../../../../Hexalith.FrontComposer/_bmad-output/project-context.md
   - https://docs.dapr.io/developing-ai/dapr-agents/
+  - https://docs.dapr.io/developing-ai/mcp/mcp-server-resource/
+  - https://learn.microsoft.com/en-us/agent-framework/overview/
+  - https://www.nuget.org/packages/Microsoft.Agents.AI/
+  - https://www.nuget.org/packages/Microsoft.Agents.AI.Workflows/
   - https://docs.dapr.io/developing-applications/sdks/dotnet/dotnet-workflow/
   - https://docs.dapr.io/developing-applications/sdks/dotnet/dotnet-ai/
 companions: []
@@ -32,17 +37,20 @@ companions: []
 
 ## Design Paradigm
 
-Hexalith Agents is an event-sourced, Dapr Workflow-backed, hexagonal Hexalith domain module.
+Hexalith Agents is an event-sourced, hybrid agent-runtime, hexagonal Hexalith domain module.
 
-The domain core is EventStore-backed: aggregates decide from commands and current state, then emit domain or rejection events. Dapr Workflow instances coordinate long-running agent execution and feed results back through commands. Adapters implement Dapr AI/Dapr Agents, Conversations, Parties, Tenants, provider, secret, notification, and FrontComposer integration.
+The domain core is EventStore-backed: aggregates decide from commands and current state, then emit domain or rejection events. The .NET AgentHost uses Microsoft Agent Framework for typed agents, sessions, model/provider integration, MCP/A2A clients, tool approval, and graph workflows. Dapr supplies the distributed runtime substrate: sidecars, service invocation, state, pub/sub, workflow, secrets, resiliency, security, and observability. Optional Python Dapr Agents `DurableAgent` workers run behind adapter/service boundaries only for workloads that justify that runtime.
 
 ```mermaid
 flowchart LR
   UI[FrontComposer UI] --> Client[Hexalith.Agents.Client]
-  API[Agents API] --> App[Application orchestration]
   Client --> API
-  API --> Workflow[Dapr Workflow runtime]
-  Workflow --> App
+  API[Agents API/BFF] --> AgentHost[.NET AgentHost<br/>Microsoft Agent Framework]
+  AgentHost --> App[Application orchestration]
+  AgentHost --> Runtime[Dapr runtime substrate<br/>workflow/state/pubsub/invocation]
+  AgentHost --> Tools[Tool and agent boundary<br/>function tools/MCP/A2A]
+  DaprWorker[Optional Python DaprAgentWorker<br/>DurableAgent] --> Runtime
+  DaprWorker --> App
   App --> Ports[Ports]
   App --> ES[EventStore command/query boundary]
   ES --> Agg[Agents aggregates]
@@ -50,8 +58,9 @@ flowchart LR
   Ports --> Conversations[Conversations client]
   Ports --> Parties[Parties client/projection]
   Ports --> Tenants[Tenants projection]
-  Ports --> DaprAI[Dapr AI or Dapr Agents adapter]
-  DaprAI --> Provider[Provider adapters]
+  Ports --> ProviderPort[Provider/model port]
+  ProviderPort --> Provider[Provider adapters]
+  Tools --> Policy[Policy/governance hooks]
   Ports --> Secrets[Secret store]
   Events --> Proj[Agents projections]
   Proj --> UI
@@ -159,22 +168,33 @@ flowchart LR
 
 - **Binds:** implementation readiness.
 - **Prevents:** launch-critical invariants relying on manual QA or undocumented client behavior.
-- **Rule:** Public contracts are versioned and additive-first. Tests must cover aggregate transition purity, authorization fail-closed paths, proposal version immutability, idempotent generation/posting retries, tenant isolation, context-too-large blocking, provider-secret non-disclosure, FrontComposer UI/contract conformance, and audit completeness for every posted response.
+- **Rule:** Public contracts are versioned and additive-first. Tests must cover aggregate transition purity, authorization fail-closed paths, proposal version immutability, selected durable-owner replay/idempotency, Agent Framework workflow/session restore, MCP/A2A/tool schema contracts, idempotent generation/posting retries, tenant isolation, context-too-large blocking, provider-secret non-disclosure, FrontComposer UI/contract conformance, and audit completeness for every posted response.
 
-### AD-18 - Dapr Agent Workflow Runtime [ADOPTED]
+### AD-18 - Hybrid Agent Runtime Ownership [ADOPTED]
 
 - **Binds:** FR-9..FR-18, FR-24, runtime orchestration, deployment and environments.
-- **Prevents:** incompatible orchestration substrates, in-memory background jobs, direct provider SDK loops, or non-Dapr workflow engines owning durable agent progress.
-- **Rule:** V1 agent workflow execution runs through Dapr Workflow. Workflow instances coordinate context loading, generation, proposal waits, expiry, retries, and posting as replay-safe steps, then mutate Agents domain state only through `AgentInteraction` commands/events. Dapr AI and Dapr Agents integrations are adapter/runtime leaves for LLM calls and agent execution where they fit the .NET host boundary; if a Python Dapr Agents worker is needed, it runs behind the same adapter boundary. Public contracts and EventStore aggregates do not depend on Dapr AI, Dapr Agents, provider SDK, or workflow SDK types.
+- **Prevents:** double orchestration, in-memory background workers, direct provider SDK loops, or framework-specific runtime types leaking into public contracts or aggregates.
+- **Rule:** Every agent task has exactly one durable owner: a Microsoft Agent Framework workflow in the .NET AgentHost, a Dapr Workflow for deterministic long-running process orchestration, or an optional Python Dapr Agents `DurableAgent` worker for bounded autonomous durable workloads. Dapr supplies the sidecar/runtime substrate for service invocation, state, pub/sub, workflow, secrets, resiliency, security, and observability. All durable owners coordinate context loading, generation, proposal waits, expiry, retries, and posting as replay/idempotency-safe steps, then mutate Agents domain state only through `AgentInteraction` commands/events. Public contracts and EventStore aggregates do not depend on Microsoft Agent Framework, Dapr AI, Dapr Agents, provider SDK, or workflow SDK types.
+
+### AD-19 - Tool And Remote-Agent Protocol Boundaries [ADOPTED]
+
+- **Binds:** FR-9..FR-21, FR-24, tool integration, remote-agent integration, governance.
+- **Prevents:** each agent, tool host, or adapter choosing incompatible protocols, using workflow-backed MCP for trivial calls, or bypassing domain commands for business mutations.
+- **Rule:** Same-process, same-owner tools use Microsoft Agent Framework function tools. Reusable cross-process tools use MCP over Dapr service invocation by default. Dapr `MCPServer` is reserved for argument-aware RBAC, audit, redaction, durable retry, or per-tool observability. A2A is only for independently deployed remote agents. Dapr pub/sub CloudEvents carry asynchronous coordination. Domain mutations remain domain commands, and tool contracts carry tenant context, idempotency, correlation, authorization, and audit metadata.
 
 ```mermaid
 flowchart TB
   Contracts[Hexalith.Agents.Contracts]
   Client[Hexalith.Agents.Client]
   Server[Hexalith.Agents.Server]
-  Host[Hexalith.Agents host]
+  Host[.NET AgentHost]
   UI[Hexalith.Agents.UI]
-  Workflow[Dapr Workflow runtime]
+  AgentFramework[Microsoft Agent Framework]
+  DaprRuntime[Dapr runtime substrate]
+  DaprWorkflow[Dapr Workflow]
+  DaprAgentWorker[Optional Python DaprAgentWorker]
+  ToolHost[ToolHost / MCP servers]
+  PolicyHost[PolicyHost / MCPServer hooks]
   ProviderAdapters[Provider adapter projects]
   Testing[Hexalith.Agents.Testing]
   AppHost[Hexalith.Agents.AppHost]
@@ -183,8 +203,14 @@ flowchart TB
   Server --> Contracts
   Host --> Server
   Host --> Client
-  Host --> Workflow
-  Workflow --> Server
+  Host --> AgentFramework
+  Host --> DaprRuntime
+  DaprWorkflow --> Server
+  DaprAgentWorker --> DaprRuntime
+  DaprAgentWorker --> Server
+  ToolHost --> Server
+  ToolHost --> Contracts
+  PolicyHost --> ToolHost
   UI --> Client
   UI --> Contracts
   ProviderAdapters --> Server
@@ -199,34 +225,36 @@ sequenceDiagram
   participant Caller
   participant AgentsAPI
   participant Interaction as AgentInteraction
-  participant Workflow as Dapr Workflow
+  participant Host as .NET AgentHost
+  participant Owner as Durable owner
+  participant Tools as Tools/MCP/A2A
   participant Conv as Conversations
-  participant DaprAI as Dapr AI/Agents adapter
   participant Provider
 
   Caller->>AgentsAPI: request hexa(SourceConversationId, prompt)
+  AgentsAPI->>Host: start agent task
   AgentsAPI->>Interaction: RequestInteraction
   Interaction-->>AgentsAPI: InteractionRequested snapshot
-  AgentsAPI->>Workflow: schedule Dapr workflow instance
-  Workflow->>Conv: authorized GetConversation
-  Conv-->>Workflow: details/freshness
-  Workflow->>Interaction: RecordContextReady or ContextBlocked
-  Workflow->>DaprAI: generate only after gates pass
-  DaprAI->>Provider: invoke model/tool provider
-  Provider-->>DaprAI: generated content / failure
-  DaprAI-->>Workflow: safe result / safe error
-  Workflow->>Interaction: RecordGeneratedVersion or GenerationFailed
+  Host->>Owner: select one durable owner
+  Owner->>Conv: authorized GetConversation
+  Conv-->>Owner: details/freshness
+  Owner->>Interaction: RecordContextReady or ContextBlocked
+  Owner->>Tools: invoke governed tool/model path
+  Tools->>Provider: invoke model/provider when selected
+  Provider-->>Tools: generated content / failure
+  Tools-->>Owner: safe result / safe error
+  Owner->>Interaction: RecordGeneratedVersion or GenerationFailed
   alt automatic
-    Workflow->>Conv: ensure AIAgent participant + AppendMessage
-    Conv-->>Workflow: accepted / error
-    Workflow->>Interaction: RecordPostingSucceeded/Failed
+    Owner->>Conv: ensure AIAgent participant + AppendMessage
+    Conv-->>Owner: accepted / error
+    Owner->>Interaction: RecordPostingSucceeded/Failed
   else confirmation
     Caller->>AgentsAPI: edit/regenerate/approve/reject/abandon
     AgentsAPI->>Interaction: proposal command
     Interaction-->>AgentsAPI: version or terminal event
-    Workflow->>Conv: Append approved version
-    Conv-->>Workflow: accepted / error
-    Workflow->>Interaction: RecordPostingSucceeded/Failed
+    Owner->>Conv: Append approved version
+    Conv-->>Owner: accepted / error
+    Owner->>Interaction: RecordPostingSucceeded/Failed
   end
 ```
 
@@ -237,7 +265,9 @@ sequenceDiagram
 | Naming | Domain terms are `Agent`, `ProviderCatalog`, `AgentInteraction`, `ProposedAgentReply`, `VersionedProposalContent`, `ApproverPolicy`, `AgentCall`, `AgentResponse`, `AuditEvidence`. Use `hexa` only as the first configured Agent, not as a type name. |
 | Identity | Agents owns `AgentId`, `AgentInteractionId`, `ProposalVersionId`, `ProviderId`, `ModelId`. Parties owns `PartyId`; Conversations owns `ConversationId` and `MessageId`; Tenants owns tenant membership/roles. |
 | Mutation | Only EventStore commands mutate Agents state. External effects return through follow-up commands/events. |
-| Runtime orchestration | Agent workflows run as Dapr Workflow instances; workflow/activity code is replay-safe, idempotent, and side effects occur through adapters. |
+| Runtime orchestration | Each task declares one durable owner: Agent Framework workflow, Dapr Workflow, or Dapr Agents `DurableAgent`. Runtime code is replay-safe, idempotent, and side effects occur through adapters/tools. |
+| Tool and protocol boundary | Function tools are same-process only; MCP over Dapr service invocation is the reusable tool default; Dapr `MCPServer` is reserved for governed durable tool calls; A2A is remote-agent only. |
+| Data planes | EventStore events/projections are domain truth. Workflow history, Agent Framework sessions/checkpoints, Dapr Agents memory, and retrieval indexes are execution/supporting state and never become business truth. |
 | Time | Expiry and time-based decisions use injected time and snapshotted policy; no aggregate wall-clock reads. |
 | Idempotency | API commands accept idempotency metadata. Provider attempts, version ids, and Conversation posts derive deterministic ids from interaction/version context. |
 | Errors | Business failures are typed rejection/status events or structured public errors. Provider errors are mapped to safe classes. |
@@ -259,10 +289,15 @@ sequenceDiagram
 | Hexalith.Parties | local sibling source commit `0191a6c` |
 | Hexalith.Tenants | local sibling source commit `9a3567b` |
 | Hexalith.FrontComposer | local sibling source commit `eee5e6b` |
+| Microsoft.Agents.AI | `1.10.0` verified current |
+| Microsoft.Agents.AI.Workflows | `1.10.0` verified current |
+| ModelContextProtocol | `1.4.0` local sibling baseline |
 | Dapr packages | `1.18.4` local sibling baseline |
 | Dapr Workflow | `1.18.4` local sibling baseline |
 | Dapr AI / Dapr.AI.Microsoft.Extensions | `1.18.4` local sibling baseline |
 | Dapr Agents | `v1.0` GA; adapter/worker boundary if used |
+| Dapr MCPServer | Dapr `v1.18` runtime resource; governed tool path only |
+| Python | `3.11+` only for optional Dapr Agents worker |
 | .NET Aspire Hosting | `13.4.6` local sibling baseline |
 | MediatR | `14.1.0` local sibling baseline |
 | FluentValidation | `12.1.1` local sibling baseline |
@@ -286,8 +321,10 @@ Hexalith.Agents/
     Hexalith.Agents.Server/
       Aggregates/
       Application/
+        Agents/
         Workflows/
         Activities/
+        Tools/
       Ports/
       Projections/
     Hexalith.Agents/
@@ -355,14 +392,15 @@ classDiagram
 | --- | --- | --- |
 | Agent identity/config/lifecycle | `Agent` aggregate, Agents API/UI | AD-1, AD-2, AD-4, AD-7, AD-15 |
 | Provider governance/model selection | `ProviderCatalog` aggregate, Dapr AI/Agents provider adapters | AD-2, AD-9, AD-10, AD-14, AD-18 |
-| Explicit conversation invocation | Agents API/client, invocation adapters | AD-3, AD-6, AD-11, AD-12, AD-18 |
-| Agent runtime/workflow execution | Dapr Workflow instances, Dapr AI/Agents adapters, `AgentInteraction` commands/events | AD-3, AD-9, AD-13, AD-18 |
-| Automatic response posting | `AgentInteraction` + Dapr Workflow + Conversations client | AD-5, AD-6, AD-7, AD-13, AD-18 |
-| Confirmation/proposal workflow | `AgentInteraction` proposal state + Dapr Workflow waits | AD-4, AD-5, AD-8, AD-13, AD-18 |
+| Explicit conversation invocation | Agents API/client, invocation adapters | AD-3, AD-6, AD-11, AD-12, AD-18, AD-19 |
+| Agent runtime/workflow execution | .NET AgentHost, selected durable owner, `AgentInteraction` commands/events | AD-3, AD-9, AD-13, AD-18 |
+| Tool and remote-agent integration | Agent Framework function tools, MCP/Dapr service invocation, Dapr `MCPServer`, A2A adapters | AD-12, AD-13, AD-14, AD-19 |
+| Automatic response posting | `AgentInteraction` + selected durable owner + Conversations client | AD-5, AD-6, AD-7, AD-13, AD-18 |
+| Confirmation/proposal workflow | `AgentInteraction` proposal state + selected durable owner waits | AD-4, AD-5, AD-8, AD-13, AD-18 |
 | Authorization/tenant isolation | Agents application gates/projections | AD-8, AD-12 |
 | Admin UI/API contracts | Agents Client/API/UI | AD-15, AD-17 |
 | Audit/status evidence | Agents events/projections/queries | AD-5, AD-13, AD-14, AD-17 |
-| Deployment/dev topology | Agents AppHost/host/service defaults | AD-16, AD-18 |
+| Deployment/dev topology | Agents AppHost/host/service defaults | AD-16, AD-18, AD-19 |
 
 ## Deferred
 
@@ -375,7 +413,8 @@ classDiagram
 | Notification channel and templates | Notifications are non-authoritative adapters over proposal events and queues. |
 | Tenant-wide quota/budget enforcement | V1 has per-call guardrails and usage capture; quotas require product pricing/launch thresholds. |
 | Concrete provider SDK and provider-specific options | Provider adapters are leaves; selecting an SDK does not alter public contracts or aggregate boundaries. |
-| Exact Dapr Agents worker packaging or language split | AD-18 fixes Dapr Workflow and Dapr AI/Agents as the runtime substrate; in-process .NET APIs versus a Python Dapr Agents worker depends on concrete tool/provider needs. |
+| Exact optional Dapr Agents worker packaging and lifecycle | AD-18 fixes when Python Dapr Agents may own a task; concrete worker packaging depends on a workload that justifies `DurableAgent`. |
+| Dapr Conversation API adoption | It remains an evolving/alpha Dapr capability; provider routing, caching, PII obfuscation, and prompt middleware can be tested behind the provider/model port without changing domain contracts. |
 | Launch latency targets | Operational metrics and timeout policy are in place; exact SLOs need release planning. |
 | Audit retention/legal hold/export/deletion policy for Agents audit records | Product/governance decision; architecture already keeps content and evidence durable and tenant-scoped. |
 | Safety filters/content policy provider | Launch security/product decision; provider adapters and generation gates can host it without changing aggregate boundaries. |

@@ -49,3 +49,33 @@ Case 8: Workflow builder treats Dapr Workflow state as the source of truth; aggr
 Remaining adversarial risk:
 
 - Workflow versioning and replay-safe activity naming need implementation discipline. AD-18 binds the substrate; detailed workflow versioning tests should be included under AD-17.
+
+## 2026-06-23 Hybrid Runtime Research Amendment
+
+Verdict: Pass after fixes.
+
+Attack: two builders both obey the ADs but still diverge.
+
+Case 9: Agent builder uses Agent Framework workflow for a task while operations builder also wraps the same task in Dapr Workflow for durability.
+
+- Covered by amended AD-18. Every task has exactly one durable owner.
+
+Case 10: Tool builder sends all MCP calls through Dapr `MCPServer`; performance builder uses ordinary MCP over service invocation.
+
+- Covered by AD-19. MCP over Dapr service invocation is the reusable default; Dapr `MCPServer` is reserved for governed durable tool calls.
+
+Case 11: Remote-agent builder exposes an independently deployed agent as an MCP tool; orchestration builder expects A2A semantics.
+
+- Covered by AD-19. A2A is the remote-agent boundary; MCP remains the tool boundary.
+
+Case 12: Tool host performs a side-effecting business mutation directly after model output; domain builder expects EventStore command handling.
+
+- Covered by AD-1, AD-3, and AD-19. Domain mutations remain domain commands, and durable state mutates through commands/events.
+
+Case 13: Python Dapr Agents worker emits SDK/runtime types into public contracts; .NET client builder consumes contract-only Agents models.
+
+- Covered by AD-18. Public contracts and EventStore aggregates do not depend on Agent Framework, Dapr AI, Dapr Agents, provider SDK, or workflow SDK types.
+
+Remaining adversarial risk:
+
+- The first implementation slice should make task-owner selection observable in traces/status so runtime ownership is easy to audit and debug.

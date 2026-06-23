@@ -31,3 +31,20 @@ Checklist results:
 Residual risks:
 
 - No provider component or Dapr AI component configuration is selected yet. This remains implementation/provider selection work under AD-9, AD-10, and AD-18.
+
+## 2026-06-23 Hybrid Runtime Research Amendment
+
+Verdict: Pass after one clear fix.
+
+Checklist results:
+
+- AD-18 now fixes the real divergence point introduced by the technical research: every task has exactly one durable owner, selected from Agent Framework workflow, Dapr Workflow, or Dapr Agents `DurableAgent`.
+- AD-19 fixes the protocol divergence point: function tools, MCP, Dapr `MCPServer`, A2A, service invocation, pub/sub CloudEvents, and domain commands each have a bounded use.
+- AD-17 was tightened during review to require selected-owner replay/idempotency, Agent Framework workflow/session restore, and MCP/A2A/tool schema contract tests.
+- Named technologies were current-checked against primary sources before binding: Microsoft Agent Framework, NuGet package versions, Dapr Agents, and Dapr `MCPServer`.
+- Deferred items do not reopen the runtime decision. They defer concrete Python worker packaging, Dapr Conversation API adoption, provider SDKs, and launch policies.
+
+Residual risks:
+
+- The concrete task-owner selection mechanism is intentionally not specified. Implementation should make it explicit enough that a task cannot accidentally run under two owners.
+- Microsoft Agent Framework packages are not yet in local `Directory.Packages.props`; the spine pins the seed version but implementation still owns the package addition.

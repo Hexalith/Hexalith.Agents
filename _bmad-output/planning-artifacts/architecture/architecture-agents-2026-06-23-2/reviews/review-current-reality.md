@@ -36,3 +36,20 @@ Reality checks:
 Residual risks:
 
 - Exact Dapr Agents worker packaging is intentionally deferred because the core Hexalith module is .NET and Dapr Agents itself is Python. AD-18 constrains this to an adapter/worker boundary rather than letting Python SDK types leak into contracts or aggregates.
+
+## 2026-06-23 Hybrid Runtime Research Amendment
+
+Verdict: Pass.
+
+Reality checks:
+
+- Microsoft Learn currently describes Microsoft Agent Framework as supporting agents, MCP servers, graph workflows, sessions, middleware, telemetry, checkpointing, and human-in-the-loop behavior for .NET/Python.
+- NuGet currently lists `Microsoft.Agents.AI` and `Microsoft.Agents.AI.Workflows` at `1.10.0`, compatible with `net10.0`.
+- Dapr Agents docs currently describe Dapr Agents v1.0 as generally available/production-ready and Python-based.
+- Dapr `MCPServer` docs currently describe service invocation as the default MCP path and `MCPServer` as the workflow-centric path for argument-level RBAC, audit, redaction, durable retries, and per-tool observability.
+- The local Hexalith stack already uses Dapr, Aspire, OpenTelemetry, MCP, EventStore, and module-local AppHost conventions; the amendment adds Microsoft Agent Framework as a new seed dependency without changing domain ownership.
+
+Residual risks:
+
+- Agent Framework provider/hosting subpackages beyond the core `Microsoft.Agents.AI` and `Workflows` packages are not selected. Keep those adapter-local and pin them centrally when implementation chooses them.
+- Dapr Conversation remains deferred behind the provider/model port because current docs still treat it as evolving/alpha.
