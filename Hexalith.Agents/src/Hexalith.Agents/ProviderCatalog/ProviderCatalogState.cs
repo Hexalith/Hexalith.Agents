@@ -49,6 +49,9 @@ public sealed class ProviderCatalogState
             SafeCapabilityFlags = e.SafeCapabilityFlags,
             ConfigurationState = e.ConfigurationState,
             ConfigurationReferenceId = e.ConfigurationReferenceId,
+
+            // Story 1.5: the replay-derived capability version starts at 1 on create.
+            CapabilityVersion = 1,
         };
     }
 
@@ -70,6 +73,10 @@ public sealed class ProviderCatalogState
         entry.SafeCapabilityFlags = e.SafeCapabilityFlags;
         entry.ConfigurationState = e.ConfigurationState;
         entry.ConfigurationReferenceId = e.ConfigurationReferenceId;
+
+        // Story 1.5: a genuine capability-metadata change bumps the version. Story 1.2 emits this event only on a
+        // real change (exact-duplicate updates are NoOp), so the counter increments only on genuine changes.
+        entry.CapabilityVersion += 1;
     }
 
     /// <summary>Applies an entry enablement.</summary>

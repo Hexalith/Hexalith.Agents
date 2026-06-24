@@ -94,5 +94,6 @@ public static class ProviderCatalogInspection
             entry.SafeCapabilityFlags,
             entry.ConfigurationState,
             entry.ConfigurationReferenceId,
-            IsSelectableForNewActiveUse: entry.IsEnabled);
+            IsSelectableForNewActiveUse: entry.IsEnabled,
+            entry.CapabilityVersion);
 }

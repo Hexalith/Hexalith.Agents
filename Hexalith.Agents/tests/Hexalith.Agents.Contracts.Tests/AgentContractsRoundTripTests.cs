@@ -163,6 +163,9 @@ public sealed class AgentContractsRoundTripTests
             InstructionsValid: false,
             InstructionsVersion: 1,
             HasPartyIdentity: false,
+            HasProviderSelection: true,
+            SelectedProviderId: "openai",
+            SelectedModelId: "gpt-4o",
             [AgentActivationBlocker.InvalidInstructions, AgentActivationBlocker.MissingPartyIdentity]);
 
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(view);
@@ -176,6 +179,9 @@ public sealed class AgentContractsRoundTripTests
         roundTripped.InstructionsValid.ShouldBe(view.InstructionsValid);
         roundTripped.InstructionsVersion.ShouldBe(view.InstructionsVersion);
         roundTripped.HasPartyIdentity.ShouldBe(view.HasPartyIdentity);
+        roundTripped.HasProviderSelection.ShouldBe(view.HasProviderSelection);
+        roundTripped.SelectedProviderId.ShouldBe(view.SelectedProviderId);
+        roundTripped.SelectedModelId.ShouldBe(view.SelectedModelId);
         roundTripped.ActivationBlockers.ShouldBe(view.ActivationBlockers);
     }
 

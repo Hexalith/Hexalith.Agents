@@ -31,4 +31,10 @@ public enum AgentActivationBlocker
 
     /// <summary>No valid Party identity is linked, so the Agent has no attributable AI participant (AC2, AC4; 1.4).</summary>
     MissingPartyIdentity,
+
+    /// <summary>No Provider/model has been selected yet, so the Agent has no model to call (AC2; 1.5).</summary>
+    MissingProviderSelection,
+
+    /// <summary>A Provider/model is selected but it is currently not selectable/ready — maps to the canonical UX <c>provider unavailable</c> readiness state (AC2; 1.5).</summary>
+    ProviderUnavailable,
 }

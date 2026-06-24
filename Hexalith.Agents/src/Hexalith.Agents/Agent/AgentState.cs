@@ -54,6 +54,24 @@ public sealed class AgentState
     /// </summary>
     public string? PartyId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the selected stable safe provider identifier (<see langword="null"/> = no selection). A safe
+    /// reference, never a secret (AD-9); one of the only new durable selection fields (Story 1.5 AC1).
+    /// </summary>
+    public string? ProviderId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the selected stable safe model identifier (<see langword="null"/> = no selection). A safe
+    /// reference, never a secret (AD-9).
+    /// </summary>
+    public string? ModelId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the captured provider capability version of the current selection (<see langword="null"/> = no
+    /// selection). A plain int — never a capability-metadata blob (AC1; AD-9, AD-14).
+    /// </summary>
+    public int? ProviderCapabilityVersion { get; set; }
+
     /// <summary>Applies the Agent creation: the record exists and starts in <see cref="AgentLifecycleStatus.Draft"/>.</summary>
     /// <param name="e">The event.</param>
     public void Apply(AgentCreated e)
@@ -135,6 +153,34 @@ public sealed class AgentState
 
         PartyId = e.PartyId;
         ConfigurationVersion = e.ConfigurationVersion;
+    }
+
+    /// <summary>
+    /// Applies a Provider/model selection: stores only the safe identifiers + captured capability version and
+    /// bumps the configuration version (AC1). Lifecycle is unchanged (Story 1.3 invariant). A changed selection
+    /// deterministically overwrites the single recorded selection; prior events are never rewritten (AC3).
+    /// </summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentProviderModelSelected e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsCreated)
+        {
+            return;
+        }
+
+        ProviderId = e.ProviderId;
+        ModelId = e.ModelId;
+        ProviderCapabilityVersion = e.ProviderCapabilityVersion;
+        ConfigurationVersion = e.ConfigurationVersion;
+    }
+
+    /// <summary>No-op replay handler — rejection events carry no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(AgentProviderModelSelectionRejected e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
     }
 
     /// <summary>No-op replay handler — rejection events carry no state change.</summary>

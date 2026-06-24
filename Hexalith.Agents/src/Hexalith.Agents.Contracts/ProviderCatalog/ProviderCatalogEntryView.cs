@@ -21,6 +21,11 @@ namespace Hexalith.Agents.Contracts.ProviderCatalog;
 /// Whether the entry may be selected for new active Agent configuration. Disabled entries are inspectable but
 /// not selectable (AC2).
 /// </param>
+/// <param name="CapabilityVersion">
+/// Replay-derived provider capability version (1 at create, +1 on each safe-metadata update; unchanged by
+/// enable/disable). This is the safe version the Agent selection orchestration captures into the Agent's
+/// <c>ProviderCapabilityVersion</c> for AC1 Audit Evidence (Story 1.5). A plain int — exposes nothing secret.
+/// </param>
 public record ProviderCatalogEntryView(
     string ProviderId,
     string ModelId,
@@ -33,4 +38,5 @@ public record ProviderCatalogEntryView(
     ProviderModelCapabilityFlags SafeCapabilityFlags,
     ProviderConfigurationState ConfigurationState,
     string? ConfigurationReferenceId,
-    bool IsSelectableForNewActiveUse);
+    bool IsSelectableForNewActiveUse,
+    int CapabilityVersion);

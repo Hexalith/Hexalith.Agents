@@ -78,19 +78,26 @@ internal static class AgentConfigurationPolicy
     }
 
     /// <summary>
-    /// Computes the current activation blockers for an Agent's state (AC2; 1.4 AC4). An empty list means the Agent
-    /// is activatable as configured. Order is stable (display name, then instructions, then party identity) for
-    /// deterministic results. Party identity is a <em>distinct</em> readiness gate — separate from lifecycle and
-    /// from the configuration gates (1.4 AC4).
+    /// Computes the current activation blockers for an Agent's state (AC2; 1.4 AC4; 1.5 AC2). An empty list means
+    /// the Agent is activatable as configured. Order is stable and deterministic: display name → instructions →
+    /// party identity → provider selection → provider unavailable. Party identity and provider/model readiness are
+    /// <em>distinct</em> readiness gates — separate from lifecycle and from the configuration gates (1.4 AC4, 1.5 AC2).
     /// </summary>
     /// <param name="displayName">The Agent's display name.</param>
     /// <param name="instructions">The Agent's instructions text.</param>
     /// <param name="hasPartyIdentity">Whether a valid Party identity is linked (1.4 AC4).</param>
+    /// <param name="hasProviderSelection">Whether a Provider/model has been selected at all (1.5 AC2).</param>
+    /// <param name="selectedProviderReady">
+    /// Whether the selected Provider/model is currently ready (the trusted catalog verdict was <c>Valid</c>). Only
+    /// consulted when <paramref name="hasProviderSelection"/> is set (1.5 AC2).
+    /// </param>
     /// <returns>The specific blockers (empty when none).</returns>
     internal static IReadOnlyList<AgentActivationBlocker> ComputeActivationBlockers(
         string displayName,
         string instructions,
-        bool hasPartyIdentity)
+        bool hasPartyIdentity,
+        bool hasProviderSelection,
+        bool selectedProviderReady)
     {
         var blockers = new List<AgentActivationBlocker>();
 
@@ -111,6 +118,17 @@ internal static class AgentConfigurationPolicy
         if (!hasPartyIdentity)
         {
             blockers.Add(AgentActivationBlocker.MissingPartyIdentity);
+        }
+
+        // Provider/model readiness is appended last and in deterministic order: a missing selection is reported as
+        // MissingProviderSelection; a present-but-not-ready selection as ProviderUnavailable (1.5 AC2).
+        if (!hasProviderSelection)
+        {
+            blockers.Add(AgentActivationBlocker.MissingProviderSelection);
+        }
+        else if (!selectedProviderReady)
+        {
+            blockers.Add(AgentActivationBlocker.ProviderUnavailable);
         }
 
         return blockers;

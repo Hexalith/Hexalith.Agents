@@ -45,6 +45,16 @@ builder.Services.AddScoped<IAgentPartyDirectory, PartiesAgentPartyDirectory>();
 builder.Services.AddSingleton<IAgentCommandDispatcher, DeferredAgentCommandDispatcher>();
 builder.Services.AddScoped<AgentPartyIdentityOrchestrator>();
 
+// Story 1.5: Provider/model selection wiring. The decision logic — the provider-catalog reader port and the
+// selection + activation re-validation orchestrations — is registered here and fully unit-tested. Binding the
+// reader to the live ProviderCatalog read-model (and the dispatcher to the live DAPR/EventStore gateway), plus a
+// runnable AppHost topology, is deferred to the operational-topology/read-model story (mirroring Story 1.2/1.3/1.4).
+// The DeferredProviderCatalogReader keeps the DI graph complete and compiling. No provider SDK is referenced — the
+// ProviderCatalog is in-module.
+builder.Services.AddSingleton<IProviderCatalogReader, DeferredProviderCatalogReader>();
+builder.Services.AddScoped<AgentProviderSelectionOrchestrator>();
+builder.Services.AddScoped<AgentActivationProviderRevalidation>();
+
 WebApplication app = builder.Build();
 
 app.UseEventStoreDomainService();

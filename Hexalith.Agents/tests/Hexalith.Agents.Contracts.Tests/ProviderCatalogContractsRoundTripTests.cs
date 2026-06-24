@@ -75,6 +75,32 @@ public sealed class ProviderCatalogContractsRoundTripTests
     }
 
     [Fact]
+    public void Catalog_entry_view_round_trips_with_the_capability_version()
+    {
+        // Story 1.5: the safe projection gains a trailing CapabilityVersion (a plain int — exposes nothing secret).
+        var view = new ProviderCatalogEntryView(
+            "openai",
+            "gpt-4o",
+            "OpenAI GPT-4o",
+            ProviderModelStatus.Enabled,
+            SupportsTextGeneration: true,
+            ContextWindowTokenLimit: 128_000,
+            MaxOutputTokenLimit: 16_000,
+            new ProviderModelTimeoutPolicy(30_000, 3),
+            ProviderModelCapabilityFlags.Streaming | ProviderModelCapabilityFlags.ToolCalling,
+            ProviderConfigurationState.Configured,
+            "cfg-openai-gpt4o",
+            IsSelectableForNewActiveUse: true,
+            CapabilityVersion: 2);
+
+        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(view);
+
+        ProviderCatalogEntryView? roundTripped = JsonSerializer.Deserialize<ProviderCatalogEntryView>(bytes);
+        roundTripped.ShouldBe(view);
+        roundTripped!.CapabilityVersion.ShouldBe(2);
+    }
+
+    [Fact]
     public void Configuration_state_serializes_by_name()
     {
         string json = JsonSerializer.Serialize(ProviderConfigurationState.Configured);

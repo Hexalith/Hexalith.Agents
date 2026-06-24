@@ -57,6 +57,14 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
     // Unknown and is rejected — the aggregate's independent non-Valid rejection is the security guarantee (AC2).
     private const string PartyLinkValidationExtensionKey = "party:linkValidation";
 
+    // SECURITY: server-populated only, identical trust model to the two keys above (Story 1.5). The ProviderCatalog
+    // read + verdict computation runs in the Server orchestration (AD-3) and its verdict is fed back here through
+    // this trusted extension. The command entry point strips any client-supplied value and repopulates it from the
+    // orchestration's catalog read. A direct client command (e.g. a spoofed capability version) carries no trusted
+    // verdict, so it parses to Unknown and is rejected — the aggregate makes no provider/catalog call at all, so no
+    // bad selection is recorded and no provider SDK/credential path is reachable from the aggregate (AC2; AD-9).
+    private const string ProviderSelectionValidationExtensionKey = "provider:selectionValidation";
+
     /// <summary>Handles creation (or idempotent re-creation) of the governed Agent record.</summary>
     /// <param name="command">The create command.</param>
     /// <param name="state">The current Agent state (null/never-created before the first creation).</param>
@@ -199,11 +207,17 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
 
         // Reactivating a Disabled agent re-runs the same gates (AC2): activation is never a blind flip to active.
         // Party identity is a distinct readiness gate (1.4 AC4) — activation fails closed until a valid Party is linked.
+        // Provider/model readiness is re-validated here (1.5 AC2 "or activate"): the activation orchestration re-reads
+        // the catalog for the recorded (ProviderId, ModelId) and populates the trusted verdict; a direct activation
+        // that did not re-validate carries no trusted verdict, so a present selection fails closed with
+        // ProviderUnavailable until a genuinely-ready verdict clears it (AD-9, AD-12).
         IReadOnlyList<AgentActivationBlocker> blockers =
             AgentConfigurationPolicy.ComputeActivationBlockers(
                 state.DisplayName,
                 state.Instructions,
-                state.PartyId is not null);
+                state.PartyId is not null,
+                hasProviderSelection: state.ProviderId is not null,
+                selectedProviderReady: ReadProviderSelectionValidation(envelope) == ProviderSelectionValidationStatus.Valid);
         return blockers.Count > 0
             ? DomainResult.Rejection([new AgentActivationBlockedRejection(agentId, blockers)])
             : DomainResult.Success([new AgentActivated(agentId)]);
@@ -329,6 +343,60 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         ]);
     }
 
+    /// <summary>Handles selecting an enabled Provider/model from the governed catalog for the Agent (AC1, AC2, AC3; FR-5).</summary>
+    /// <param name="command">The selection command (carries only the safe ids + captured capability version).</param>
+    /// <param name="state">The current Agent state.</param>
+    /// <param name="envelope">The command envelope (carries the trusted authorization and provider-validation extensions).</param>
+    /// <returns>The domain result.</returns>
+    public static DomainResult Handle(SelectAgentProviderModel command, AgentState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string agentId = envelope.AggregateId;
+
+        if (!IsAgentAdmin(envelope))
+        {
+            return Denied(agentId, envelope, nameof(SelectAgentProviderModel));
+        }
+
+        if (state is null || !state.IsCreated)
+        {
+            return DomainResult.Rejection([new AgentNotFoundRejection(agentId)]);
+        }
+
+        // AC2 fail-closed: anything other than a trusted Valid verdict (disabled/missing/not-configured/not-text-gen/
+        // missing-metadata/unauthorized/unavailable — or an absent/unparseable verdict from a direct-gateway call)
+        // rejects the selection and changes no state. The catalog/provider is never reached from here (AD-3, AD-9);
+        // the verdict is plain trusted data — so no provider SDK call or credential access occurs on this path.
+        ProviderSelectionValidationStatus validation = ReadProviderSelectionValidation(envelope);
+        if (validation != ProviderSelectionValidationStatus.Valid)
+        {
+            return DomainResult.Rejection([new AgentProviderModelSelectionRejected(agentId, validation)]);
+        }
+
+        // Valid verdict, idempotent re-select: re-asserting the same provider/model/version is a deterministic no-op
+        // (AD-13) — no duplicate event, no version bump.
+        if (string.Equals(state.ProviderId, command.ProviderId, StringComparison.Ordinal)
+            && string.Equals(state.ModelId, command.ModelId, StringComparison.Ordinal)
+            && state.ProviderCapabilityVersion == command.ProviderCapabilityVersion)
+        {
+            return DomainResult.NoOp();
+        }
+
+        // Valid verdict, new/changed selection: selecting/changing the provider is a configuration change → bump
+        // ConfigurationVersion (needed for the AD-4 interaction snapshot in Epic 2). A changed selection
+        // deterministically overwrites the single recorded selection; prior events are append-only and never
+        // rewritten (AC3). Lifecycle is unchanged (Story 1.3 invariant) — readiness is surfaced through the blocker.
+        return DomainResult.Success([
+            new AgentProviderModelSelected(
+                agentId,
+                command.ProviderId,
+                command.ModelId,
+                command.ProviderCapabilityVersion,
+                state.ConfigurationVersion + 1),
+        ]);
+    }
+
     private static bool IsAgentAdmin(CommandEnvelope envelope)
         => envelope.Extensions?.TryGetValue(AgentAdminExtensionKey, out string? value) == true
             && string.Equals(value, "true", StringComparison.Ordinal);
@@ -344,6 +412,17 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             && string.Equals(Enum.GetName(status), value, StringComparison.Ordinal)
                 ? status
                 : PartyLinkValidationStatus.Unknown;
+
+    // Reads the trusted, server-populated provider-readiness verdict from the envelope extension. Fails closed to
+    // Unknown when the key is absent, or when its value is not an exact, case-sensitive ProviderSelectionValidationStatus
+    // *name* (AC2) — identical hardening to ReadPartyLinkValidation, so numeric/aliased/cased input (e.g. "1", "valid",
+    // " Valid") can never become Valid and bypass catalog validation.
+    private static ProviderSelectionValidationStatus ReadProviderSelectionValidation(CommandEnvelope envelope)
+        => envelope.Extensions?.TryGetValue(ProviderSelectionValidationExtensionKey, out string? value) == true
+            && Enum.TryParse(value, ignoreCase: false, out ProviderSelectionValidationStatus status)
+            && string.Equals(Enum.GetName(status), value, StringComparison.Ordinal)
+                ? status
+                : ProviderSelectionValidationStatus.Unknown;
 
     private static DomainResult Denied(string agentId, CommandEnvelope envelope, string commandName)
         => DomainResult.Rejection([new AgentAdministrationDeniedRejection(agentId, envelope.UserId, commandName)]);

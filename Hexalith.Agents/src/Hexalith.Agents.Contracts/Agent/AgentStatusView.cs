@@ -30,6 +30,9 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// <param name="InstructionsValid">Whether the present Agent Instructions meet validity requirements.</param>
 /// <param name="InstructionsVersion">Version of the Agent Instructions (bumps only when the instructions text changes).</param>
 /// <param name="HasPartyIdentity">Whether a valid Party identity is linked (presence only — never the Party id or any Party PII; AC4).</param>
+/// <param name="HasProviderSelection">Whether a Provider/model has been selected (presence only; 1.5 AC1).</param>
+/// <param name="SelectedProviderId">The selected stable safe provider identifier, or <see langword="null"/> when none (a reference, not a secret — AD-9).</param>
+/// <param name="SelectedModelId">The selected stable safe model identifier, or <see langword="null"/> when none (a reference, not a secret — AD-9).</param>
 /// <param name="ActivationBlockers">The specific blockers preventing activation as currently configured (empty when none).</param>
 public record AgentStatusView(
     string AgentId,
@@ -42,4 +45,7 @@ public record AgentStatusView(
     bool InstructionsValid,
     int InstructionsVersion,
     bool HasPartyIdentity,
+    bool HasProviderSelection,
+    string? SelectedProviderId,
+    string? SelectedModelId,
     IReadOnlyList<AgentActivationBlocker> ActivationBlockers);

@@ -20,8 +20,9 @@ public sealed class AgentInspectionTests
     [Fact]
     public void GetStatus_authorized_active_agent_returns_view_without_instructions_text()
     {
-        // A realistic active agent is linked to a Party (1.4 AC4) before it can activate.
-        AgentState state = StateWithLinkedParty(ValidCreate());
+        // A realistic active agent is linked to a Party (1.4 AC4) and has a selected Provider/model (1.5 AC1)
+        // before it can activate.
+        AgentState state = StateWithSelectedProvider(ValidCreate());
         state.Apply(new AgentActivated(AgentId));
 
         AgentInspectionResult result = AgentInspection.GetStatus(state, isAgentsAdmin: true);
@@ -35,6 +36,9 @@ public sealed class AgentInspectionTests
         view.InstructionsValid.ShouldBeTrue();
         view.InstructionsVersion.ShouldBe(1);
         view.HasPartyIdentity.ShouldBeTrue(); // AC4: presence surfaced without the Party id or any PII
+        view.HasProviderSelection.ShouldBeTrue(); // 1.5 AC1: selection presence surfaced...
+        view.SelectedProviderId.ShouldBe(SelectedProviderId); // ...with the safe id (a reference, never a secret)
+        view.SelectedModelId.ShouldBe(SelectedModelId);
         view.ActivationBlockers.ShouldBeEmpty();
 
         // AD-14: the raw instructions text must never appear anywhere on the serialized status view.

@@ -61,6 +61,30 @@ public sealed class ProviderCatalogStateReplayTests
     }
 
     [Fact]
+    public void Capability_version_is_one_after_create_increments_on_metadata_update_and_is_unchanged_by_enable_disable()
+    {
+        // Story 1.5: the replay-derived capability version starts at 1 on create, +1 on each genuine metadata
+        // update, and is left unchanged by enable/disable (those carry no capability-metadata change).
+        var state = new ProviderCatalogState();
+        string key = ProviderCatalogState.EntryKey("openai", "gpt-4o");
+
+        state.Apply(CreatedEvent(ValidCreate()));
+        state.Entries[key].CapabilityVersion.ShouldBe(1);
+
+        // Enable/disable must NOT bump the capability version.
+        state.Apply(new ProviderModelEntryDisabled(CatalogId, "openai", "gpt-4o"));
+        state.Apply(new ProviderModelEntryEnabled(CatalogId, "openai", "gpt-4o"));
+        state.Entries[key].CapabilityVersion.ShouldBe(1);
+
+        // Each metadata update bumps it by one.
+        state.Apply(MetadataUpdate("Label v2", contextWindowTokenLimit: 200_000));
+        state.Entries[key].CapabilityVersion.ShouldBe(2);
+
+        state.Apply(MetadataUpdate("Label v3", contextWindowTokenLimit: 250_000));
+        state.Entries[key].CapabilityVersion.ShouldBe(3);
+    }
+
+    [Fact]
     public void Apply_rejection_events_are_replay_safe_noops()
     {
         ProviderCatalogState state = StateWith(ValidCreate());
@@ -78,4 +102,18 @@ public sealed class ProviderCatalogStateReplayTests
         state.Entries.Count.ShouldBe(entryCountBefore);
         state.Entries[ProviderCatalogState.EntryKey("openai", "gpt-4o")].IsEnabled.ShouldBeTrue();
     }
+
+    private static ProviderModelEntryMetadataUpdated MetadataUpdate(string displayLabel, int contextWindowTokenLimit)
+        => new(
+            CatalogId,
+            "openai",
+            "gpt-4o",
+            displayLabel,
+            SupportsTextGeneration: true,
+            contextWindowTokenLimit,
+            MaxOutputTokenLimit: 16_000,
+            new ProviderModelTimeoutPolicy(30_000, 3),
+            ProviderModelCapabilityFlags.Streaming,
+            ProviderConfigurationState.Configured,
+            "cfg-openai-gpt4o");
 }

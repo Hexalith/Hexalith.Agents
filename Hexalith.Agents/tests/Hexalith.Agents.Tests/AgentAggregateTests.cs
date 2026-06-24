@@ -205,10 +205,11 @@ public sealed class AgentAggregateTests
     [Fact]
     public void Activate_valid_draft_produces_activated()
     {
-        // Story 1.4 AC4: a linked Party identity is now a required activation gate.
-        AgentState state = StateWithLinkedParty(ValidCreate());
+        // Story 1.4 AC4 + Story 1.5 AC2: a linked Party identity AND a re-validated Provider/model are required
+        // activation gates; the trusted Valid provider verdict is supplied on the envelope.
+        AgentState state = StateWithSelectedProvider(ValidCreate());
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, Envelope(new ActivateAgent()));
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, SelectEnvelope(new ActivateAgent()));
 
         result.IsSuccess.ShouldBeTrue();
         result.Events[0].ShouldBeOfType<AgentActivated>().AgentId.ShouldBe(AgentId);
@@ -290,11 +291,12 @@ public sealed class AgentAggregateTests
     [Fact]
     public void Reactivate_disabled_valid_agent_reruns_gates_and_activates()
     {
-        // A disabled agent that has a linked Party (1.4 AC4) and valid config re-activates when its gates pass.
-        AgentState state = StateWithLinkedParty(ValidCreate());
+        // A disabled agent that has a linked Party (1.4 AC4), a selected Provider/model (1.5 AC1), and valid config
+        // re-activates when its gates pass (the provider is re-validated Valid on the envelope).
+        AgentState state = StateWithSelectedProvider(ValidCreate());
         state.Apply(new AgentDisabled(AgentId));
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, Envelope(new ActivateAgent()));
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, SelectEnvelope(new ActivateAgent()));
 
         result.IsSuccess.ShouldBeTrue();
         _ = result.Events[0].ShouldBeOfType<AgentActivated>();
@@ -419,7 +421,11 @@ public sealed class AgentAggregateTests
         var link = new LinkAgentPartyIdentity(LinkedPartyId);
         (await ProcessAndApplyAsync(aggregate, state, link, LinkEnvelope(link))).IsSuccess.ShouldBeTrue();
 
-        DomainResult activated = await ProcessAndApplyAsync(aggregate, state, new ActivateAgent());
+        // 1.5 AC1: a selected Provider/model is also required before activation.
+        var select = new SelectAgentProviderModel(SelectedProviderId, SelectedModelId, SelectedCapabilityVersion);
+        (await ProcessAndApplyAsync(aggregate, state, select, SelectEnvelope(select))).IsSuccess.ShouldBeTrue();
+
+        DomainResult activated = await ProcessAndApplyAsync(aggregate, state, new ActivateAgent(), SelectEnvelope(new ActivateAgent()));
         activated.IsSuccess.ShouldBeTrue();
         state.Lifecycle.ShouldBe(AgentLifecycleStatus.Active);
 

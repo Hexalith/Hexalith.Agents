@@ -55,7 +55,11 @@ public sealed class AgentLifecycleE2ETests
         view.InstructionsValid.ShouldBeTrue();
         view.InstructionsVersion.ShouldBe(1);
         view.HasPartyIdentity.ShouldBeFalse(); // 1.4 AC4: a newly created agent is not yet linked to a Party
-        view.ActivationBlockers.ShouldBe([AgentActivationBlocker.MissingPartyIdentity]);
+        view.HasProviderSelection.ShouldBeFalse(); // 1.5 AC1: nor has it selected a Provider/model yet
+        view.ActivationBlockers.ShouldBe([
+            AgentActivationBlocker.MissingPartyIdentity,
+            AgentActivationBlocker.MissingProviderSelection,
+        ]);
 
         // AC1 / AD-14: the safe status surface never carries the raw Agent Instructions text.
         JsonSerializer.Serialize(view).ShouldNotContain(ValidInstructions);
@@ -87,18 +91,26 @@ public sealed class AgentLifecycleE2ETests
         (await ProcessAndApplyAsync(aggregate, state, new UpdateAgentConfiguration("Hexa Assistant", "desc", ValidInstructions)))
             .IsSuccess.ShouldBeTrue();
 
-        // 1.4 AC4: the party-identity gate remains until a valid Party is linked.
+        // 1.4 AC4 + 1.5 AC2: the party-identity and provider-selection gates remain until both are satisfied.
         AgentStatusView remediatedView = AgentInspection.GetStatus(state, isAgentsAdmin: true).Agent.ShouldNotBeNull();
-        remediatedView.ActivationBlockers.ShouldBe([AgentActivationBlocker.MissingPartyIdentity]);
+        remediatedView.ActivationBlockers.ShouldBe([
+            AgentActivationBlocker.MissingPartyIdentity,
+            AgentActivationBlocker.MissingProviderSelection,
+        ]);
         var link = new LinkAgentPartyIdentity(LinkedPartyId);
         (await ProcessAndApplyAsync(aggregate, state, link, LinkEnvelope(link))).IsSuccess.ShouldBeTrue();
 
-        // AC2: activation now succeeds and the agent is active with no remaining blockers.
-        (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent())).IsSuccess.ShouldBeTrue();
+        // 1.5 AC1: select an enabled Provider/model (trusted Valid verdict supplied by the orchestration).
+        var select = new SelectAgentProviderModel(SelectedProviderId, SelectedModelId, SelectedCapabilityVersion);
+        (await ProcessAndApplyAsync(aggregate, state, select, SelectEnvelope(select))).IsSuccess.ShouldBeTrue();
+
+        // AC2: activation now succeeds (the recorded selection re-validates Valid) with no remaining blockers.
+        (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent(), SelectEnvelope(new ActivateAgent()))).IsSuccess.ShouldBeTrue();
         AgentStatusView activeView = AgentInspection.GetStatus(state, isAgentsAdmin: true).Agent.ShouldNotBeNull();
         activeView.Lifecycle.ShouldBe(AgentLifecycleStatus.Active);
         activeView.ActivationBlockers.ShouldBeEmpty();
         activeView.InstructionsValid.ShouldBeTrue();
+        activeView.HasProviderSelection.ShouldBeTrue();
     }
 
     // ===== AC3: disable is publicly visible, preserves history, and reactivation re-runs the gates =====
@@ -116,7 +128,11 @@ public sealed class AgentLifecycleE2ETests
         var link = new LinkAgentPartyIdentity(LinkedPartyId);
         (await ProcessAndApplyAsync(aggregate, state, link, LinkEnvelope(link))).IsSuccess.ShouldBeTrue();
 
-        (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent())).IsSuccess.ShouldBeTrue();
+        // 1.5 AC1: a selected Provider/model is also required before the agent can activate.
+        var select = new SelectAgentProviderModel(SelectedProviderId, SelectedModelId, SelectedCapabilityVersion);
+        (await ProcessAndApplyAsync(aggregate, state, select, SelectEnvelope(select))).IsSuccess.ShouldBeTrue();
+
+        (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent(), SelectEnvelope(new ActivateAgent()))).IsSuccess.ShouldBeTrue();
 
         // Disable: a lifecycle flag flip only.
         (await ProcessAndApplyAsync(aggregate, state, new DisableAgent())).IsSuccess.ShouldBeTrue();
@@ -127,14 +143,15 @@ public sealed class AgentLifecycleE2ETests
 
         // ...and prior identity/instructions/configuration are not deleted or rewritten by the disable.
         disabledView.DisplayName.ShouldBe(create.DisplayName);
-        disabledView.ConfigurationVersion.ShouldBe(2); // create (1) + party link (2)
+        disabledView.ConfigurationVersion.ShouldBe(3); // create (1) + party link (2) + provider selection (3)
         disabledView.HasInstructions.ShouldBeTrue();
         disabledView.HasPartyIdentity.ShouldBeTrue(); // the link survives the disable (history preserved, AC3)
+        disabledView.HasProviderSelection.ShouldBeTrue(); // the selection survives the disable too (AC3)
         disabledView.InstructionsVersion.ShouldBe(1);
         state.Instructions.ShouldBe(ValidInstructions); // durable instructions survive the disable
 
-        // Reactivating a disabled-but-valid agent re-runs the gates and restores Active.
-        (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent())).IsSuccess.ShouldBeTrue();
+        // Reactivating a disabled-but-valid agent re-runs the gates (provider re-validated Valid) and restores Active.
+        (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent(), SelectEnvelope(new ActivateAgent()))).IsSuccess.ShouldBeTrue();
         AgentInspection.GetStatus(state, isAgentsAdmin: true).Agent.ShouldNotBeNull()
             .Lifecycle.ShouldBe(AgentLifecycleStatus.Active);
     }
@@ -225,7 +242,9 @@ public sealed class AgentLifecycleE2ETests
         await Drive(new UpdateAgentConfiguration("Hexa Renamed", "Updated description", "You are hexa, an updated and careful assistant."));
         var link = new LinkAgentPartyIdentity(LinkedPartyId); // 1.4 AC4: link before activation
         await DriveWith(link, LinkEnvelope(link));
-        await Drive(new ActivateAgent());
+        var select = new SelectAgentProviderModel(SelectedProviderId, SelectedModelId, SelectedCapabilityVersion); // 1.5 AC1: select before activation
+        await DriveWith(select, SelectEnvelope(select));
+        await DriveWith(new ActivateAgent(), SelectEnvelope(new ActivateAgent())); // 1.5 AC2: provider re-validated at activation
         await Drive(new DisableAgent());
 
         // Replay the captured stream into a brand-new state through the production Apply handlers.
@@ -245,13 +264,17 @@ public sealed class AgentLifecycleE2ETests
         replayedView.Lifecycle.ShouldBe(liveView.Lifecycle);
         replayedView.Lifecycle.ShouldBe(AgentLifecycleStatus.Disabled);
         replayedView.ConfigurationVersion.ShouldBe(liveView.ConfigurationVersion);
-        replayedView.ConfigurationVersion.ShouldBe(3); // create (1) + one accepted update (2) + party link (3)
+        replayedView.ConfigurationVersion.ShouldBe(4); // create (1) + update (2) + party link (3) + provider selection (4)
         replayedView.HasInstructions.ShouldBe(liveView.HasInstructions);
         replayedView.InstructionsValid.ShouldBe(liveView.InstructionsValid);
         replayedView.InstructionsVersion.ShouldBe(liveView.InstructionsVersion);
         replayedView.InstructionsVersion.ShouldBe(2); // instructions text changed once on the update
         replayedView.HasPartyIdentity.ShouldBe(liveView.HasPartyIdentity);
         replayedView.HasPartyIdentity.ShouldBeTrue(); // the party link replays deterministically
+        replayedView.HasProviderSelection.ShouldBe(liveView.HasProviderSelection);
+        replayedView.HasProviderSelection.ShouldBeTrue(); // the provider selection replays deterministically
+        replayedView.SelectedProviderId.ShouldBe(liveView.SelectedProviderId);
+        replayedView.SelectedModelId.ShouldBe(liveView.SelectedModelId);
         replayedView.ActivationBlockers.ShouldBe(liveView.ActivationBlockers);
     }
 }

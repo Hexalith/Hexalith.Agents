@@ -291,9 +291,11 @@ public sealed class AgentPartyIdentityTests
     public void Activation_is_blocked_by_missing_party_identity_then_unblocked_after_a_valid_link()
     {
         AgentState state = StateWith(ValidCreate()); // valid display name + instructions, but no party
+        // Pre-record a ready Provider/model selection so the party gate is the only one in play (1.5).
+        state.Apply(new AgentProviderModelSelected(AgentId, SelectedProviderId, SelectedModelId, SelectedCapabilityVersion, state.ConfigurationVersion + 1));
 
-        // Only the party gate remains — display name and instructions are valid.
-        DomainResult blocked = AgentAggregate.Handle(new ActivateAgent(), state, Envelope(new ActivateAgent()));
+        // Only the party gate remains — display name, instructions, and provider readiness are valid (provider verdict supplied).
+        DomainResult blocked = AgentAggregate.Handle(new ActivateAgent(), state, SelectEnvelope(new ActivateAgent()));
         AgentActivationBlockedRejection rejection = blocked.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>();
         rejection.Blockers.ShouldBe([AgentActivationBlocker.MissingPartyIdentity]);
 
@@ -301,7 +303,7 @@ public sealed class AgentPartyIdentityTests
         var link = new LinkAgentPartyIdentity(LinkedPartyId);
         ApplyAll(state, AgentAggregate.Handle(link, state, LinkEnvelope(link)));
 
-        DomainResult activated = AgentAggregate.Handle(new ActivateAgent(), state, Envelope(new ActivateAgent()));
+        DomainResult activated = AgentAggregate.Handle(new ActivateAgent(), state, SelectEnvelope(new ActivateAgent()));
         activated.IsSuccess.ShouldBeTrue();
         _ = activated.Events[0].ShouldBeOfType<AgentActivated>();
     }
@@ -310,8 +312,8 @@ public sealed class AgentPartyIdentityTests
     public void Activation_reports_the_party_gate_last_in_the_documented_deterministic_order()
     {
         // When every gate fails, the blockers must be reported in the policy's documented order — display name,
-        // then instructions, then party identity (the 1.4 gate is appended last, never interleaved).
-        AgentState state = StateWith(ValidCreate(displayName: "", instructions: "")); // all three gates fail, no party
+        // then instructions, then party identity (1.4), then provider selection (1.5), each appended, never interleaved.
+        AgentState state = StateWith(ValidCreate(displayName: "", instructions: "")); // all gates fail, no party, no provider
 
         DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, Envelope(new ActivateAgent()));
 
@@ -320,6 +322,7 @@ public sealed class AgentPartyIdentityTests
             AgentActivationBlocker.MissingDisplayName,
             AgentActivationBlocker.MissingInstructions,
             AgentActivationBlocker.MissingPartyIdentity,
+            AgentActivationBlocker.MissingProviderSelection,
         ]);
     }
 
@@ -342,11 +345,16 @@ public sealed class AgentPartyIdentityTests
         (await ProcessAndApplyAsync(aggregate, state, link, LinkEnvelope(link))).IsSuccess.ShouldBeTrue();
         state.PartyId.ShouldBe(LinkedPartyId);
 
+        // Select a ready Provider/model so the remaining activation gate clears (1.5).
+        var select = new SelectAgentProviderModel(SelectedProviderId, SelectedModelId, SelectedCapabilityVersion);
+        (await ProcessAndApplyAsync(aggregate, state, select, SelectEnvelope(select))).IsSuccess.ShouldBeTrue();
+
         // Now activation succeeds, and the party presence is visible through the read path (AC4).
-        (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent())).IsSuccess.ShouldBeTrue();
+        (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent(), SelectEnvelope(new ActivateAgent()))).IsSuccess.ShouldBeTrue();
         AgentStatusView active = AgentInspection.GetStatus(state, isAgentsAdmin: true).Agent.ShouldNotBeNull();
         active.Lifecycle.ShouldBe(AgentLifecycleStatus.Active);
         active.HasPartyIdentity.ShouldBeTrue();
+        active.HasProviderSelection.ShouldBeTrue();
         active.ActivationBlockers.ShouldBeEmpty();
 
         // Replace keeps exactly one identity.

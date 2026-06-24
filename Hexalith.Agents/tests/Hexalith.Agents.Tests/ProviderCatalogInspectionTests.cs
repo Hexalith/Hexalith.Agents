@@ -1,4 +1,5 @@
 using Hexalith.Agents.Contracts.ProviderCatalog;
+using Hexalith.Agents.Contracts.ProviderCatalog.Events;
 using Hexalith.Agents.ProviderCatalog;
 
 using Shouldly;
@@ -29,6 +30,32 @@ public sealed class ProviderCatalogInspectionTests
         view.IsSelectableForNewActiveUse.ShouldBeTrue();
         view.ConfigurationState.ShouldBe(ProviderConfigurationState.Configured);
         view.ConfigurationReferenceId.ShouldBe("cfg-openai-gpt4o"); // safe reference only — no secret value
+    }
+
+    [Fact]
+    public void GetEntry_maps_the_capability_version_from_state()
+    {
+        // Story 1.5: the view surfaces the replay-derived capability version (1 at create, +1 per metadata update).
+        ProviderCatalogState state = StateWith(ValidCreate());
+
+        ProviderCatalogInspection.GetEntry(state, isProviderAdmin: true, "openai", "gpt-4o")
+            .Entries.ShouldHaveSingleItem().CapabilityVersion.ShouldBe(1);
+
+        state.Apply(new ProviderModelEntryMetadataUpdated(
+            CatalogId,
+            "openai",
+            "gpt-4o",
+            "OpenAI GPT-4o (v2)",
+            SupportsTextGeneration: true,
+            ContextWindowTokenLimit: 200_000,
+            MaxOutputTokenLimit: 16_000,
+            new ProviderModelTimeoutPolicy(30_000, 3),
+            ProviderModelCapabilityFlags.Streaming,
+            ProviderConfigurationState.Configured,
+            "cfg-openai-gpt4o"));
+
+        ProviderCatalogInspection.GetEntry(state, isProviderAdmin: true, "openai", "gpt-4o")
+            .Entries.ShouldHaveSingleItem().CapabilityVersion.ShouldBe(2);
     }
 
     [Fact]

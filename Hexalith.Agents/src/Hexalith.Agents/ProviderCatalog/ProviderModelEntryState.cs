@@ -41,4 +41,12 @@ public sealed class ProviderModelEntryState
 
     /// <summary>Gets or sets the safe configuration reference identifier (never a secret value).</summary>
     public string? ConfigurationReferenceId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the replay-derived provider capability version (Story 1.5). Set to 1 on create and incremented
+    /// on each safe-metadata update; enable/disable do not change capability metadata, so they do not bump it. The
+    /// version is derived during replay only — no existing event payload carries it. A plain int — exposes nothing
+    /// secret (AC1; AD-9).
+    /// </summary>
+    public int CapabilityVersion { get; set; }
 }
