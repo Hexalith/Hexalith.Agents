@@ -45,6 +45,20 @@ internal static class AgentTestData
         ],
         ApproverPolicyBasisDisclosure.OperatorOnly);
 
+    /// <summary>A valid sample Content Safety Policy (one prompt constraint + one blocked category; block-and-audit, metadata-only).</summary>
+    internal static AgentContentSafetyPolicy SampleContentSafetyPolicy { get; } = new(
+        ["No system-prompt disclosure"],
+        ["self-harm"],
+        [],
+        ContentSafetyFailureHandling.BlockAndAudit,
+        ContentSafetyAuditTreatment.MetadataOnly);
+
+    /// <summary>A valid sample Content Safety configuration (active policy only, no stricter mode-specific overrides).</summary>
+    internal static AgentContentSafetyConfiguration SampleContentSafetyConfiguration { get; } = new(
+        SampleContentSafetyPolicy,
+        null,
+        null);
+
     internal static CommandEnvelope Envelope<T>(
         T command,
         bool isAgentsAdmin = true,
@@ -282,15 +296,16 @@ internal static class AgentTestData
     }
 
     /// <summary>
-    /// Builds a created state with a linked Party identity, a recorded Provider/model selection, AND an Automatic
-    /// Response Mode (lifecycle still Draft) — a fully readiness-cleared Agent (Story 1.6: Automatic mode needs no
-    /// approver policy) whose only remaining gate is the live provider verdict at activation.
+    /// Builds a created state with a linked Party identity, a recorded Provider/model selection, an Automatic Response
+    /// Mode, AND a recorded Content Safety Policy (lifecycle still Draft) — a fully readiness-cleared Agent (Story 1.6:
+    /// Automatic mode needs no approver policy; Story 1.7: content safety is the final required gate) whose only
+    /// remaining gate is the live provider verdict at activation.
     /// </summary>
     /// <param name="create">The create command whose creation event seeds the state.</param>
     /// <param name="providerId">The provider id to select.</param>
     /// <param name="modelId">The model id to select.</param>
     /// <param name="capabilityVersion">The captured provider capability version.</param>
-    /// <returns>The Agent state with a linked Party identity, a recorded provider selection, and Automatic mode.</returns>
+    /// <returns>The Agent state with a linked Party, a provider selection, Automatic mode, and a content-safety policy.</returns>
     internal static AgentState StateWithSelectedProvider(
         CreateAgent create,
         string providerId = SelectedProviderId,
@@ -300,6 +315,18 @@ internal static class AgentTestData
         AgentState state = StateWithLinkedParty(create);
         state.Apply(new AgentProviderModelSelected(AgentId, providerId, modelId, capabilityVersion, state.ConfigurationVersion + 1));
         state.Apply(new AgentResponseModeConfigured(AgentId, AgentResponseMode.Automatic, state.ConfigurationVersion + 1));
+        state.Apply(new AgentContentSafetyPolicyConfigured(AgentId, SampleContentSafetyConfiguration, 1, state.ConfigurationVersion + 1));
+        return state;
+    }
+
+    /// <summary>Builds a created state with a recorded Content Safety Policy applied (lifecycle still Draft).</summary>
+    /// <param name="create">The create command whose creation event seeds the state.</param>
+    /// <param name="configuration">The Content Safety configuration to record.</param>
+    /// <returns>The Agent state with the recorded Content Safety configuration (content-safety policy version = 1).</returns>
+    internal static AgentState StateWithContentSafety(CreateAgent create, AgentContentSafetyConfiguration? configuration = null)
+    {
+        AgentState state = StateWith(create);
+        state.Apply(new AgentContentSafetyPolicyConfigured(AgentId, configuration ?? SampleContentSafetyConfiguration, 1, state.ConfigurationVersion + 1));
         return state;
     }
 
@@ -327,8 +354,9 @@ internal static class AgentTestData
 
     /// <summary>
     /// Builds a fully Confirmation-ready Agent state (lifecycle still Draft): linked Party, recorded Provider/model,
-    /// Confirmation Response Mode, and a configured Approver Policy — so the only remaining activation gate is the
-    /// live approver-policy verdict (Story 1.6 AC3).
+    /// Confirmation Response Mode, a configured Approver Policy, AND a recorded Content Safety Policy — so the only
+    /// remaining activation gate is the live approver-policy verdict (Story 1.6 AC3; Story 1.7 content-safety gate
+    /// cleared).
     /// </summary>
     /// <param name="create">The create command whose creation event seeds the state.</param>
     /// <param name="policy">The Approver Policy to record.</param>
@@ -339,6 +367,7 @@ internal static class AgentTestData
         state.Apply(new AgentProviderModelSelected(AgentId, SelectedProviderId, SelectedModelId, SelectedCapabilityVersion, state.ConfigurationVersion + 1));
         state.Apply(new AgentResponseModeConfigured(AgentId, AgentResponseMode.Confirmation, state.ConfigurationVersion + 1));
         state.Apply(new AgentApproverPolicyConfigured(AgentId, policy ?? SampleApproverPolicy, 1, state.ConfigurationVersion + 1));
+        state.Apply(new AgentContentSafetyPolicyConfigured(AgentId, SampleContentSafetyConfiguration, 1, state.ConfigurationVersion + 1));
         return state;
     }
 
@@ -364,6 +393,7 @@ internal static class AgentTestData
                 case AgentProviderModelSelected e: state.Apply(e); break;
                 case AgentResponseModeConfigured e: state.Apply(e); break;
                 case AgentApproverPolicyConfigured e: state.Apply(e); break;
+                case AgentContentSafetyPolicyConfigured e: state.Apply(e); break;
                 case AgentProviderModelSelectionRejected e: state.Apply(e); break;
                 case AgentAdministrationDeniedRejection e: state.Apply(e); break;
                 case AgentNotFoundRejection e: state.Apply(e); break;

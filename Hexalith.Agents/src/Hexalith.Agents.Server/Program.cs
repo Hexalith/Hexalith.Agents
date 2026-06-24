@@ -66,6 +66,13 @@ builder.Services.AddSingleton<IApproverPolicyResolver, DeferredApproverPolicyRes
 builder.Services.AddScoped<AgentResponseModeOrchestrator>();
 builder.Services.AddScoped<AgentApproverPolicyOrchestrator>();
 
+// Story 1.7: Content Safety Policy configuration wiring. The thin config orchestration is registered here and fully
+// unit-tested; the aggregate's new Handle auto-registers via the existing assembly scan. Content safety is
+// self-contained Agent state — no Parties/Tenants/Conversations/provider read, no resolver port, no verdict, and no
+// change to AgentActivationProviderRevalidation (it still re-resolves only provider + approver). Live command dispatch
+// / AppHost topology remain deferred via DeferredAgentCommandDispatcher (mirroring 1.2/1.4/1.5/1.6).
+builder.Services.AddScoped<AgentContentSafetyPolicyOrchestrator>();
+
 WebApplication app = builder.Build();
 
 app.UseEventStoreDomainService();

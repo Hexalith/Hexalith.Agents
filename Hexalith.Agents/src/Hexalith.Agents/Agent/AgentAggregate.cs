@@ -74,6 +74,15 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
     // the aggregate makes no Parties/Tenants/Conversations call at all (AD-3; AC3).
     private const string ApproverPolicyValidationExtensionKey = "approver:policyValidation";
 
+    // The fail-safe placeholder returned in the `out` parameter when a Content Safety configuration is rejected, so the
+    // value is never null. It is never emitted — a rejection carries no configuration — and its Unknown sentinels make
+    // it incapable of satisfying the activation gate.
+    private static readonly AgentContentSafetyConfiguration EmptyContentSafetyConfiguration =
+        new(
+            new AgentContentSafetyPolicy([], [], [], ContentSafetyFailureHandling.Unknown, ContentSafetyAuditTreatment.Unknown),
+            null,
+            null);
+
     /// <summary>Handles creation (or idempotent re-creation) of the governed Agent record.</summary>
     /// <param name="command">The create command.</param>
     /// <param name="state">The current Agent state (null/never-created before the first creation).</param>
@@ -223,6 +232,10 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         // Response mode + approver policy are re-validated the same way (1.6 AC1, AC3): a Confirmation-mode agent with
         // a configured policy fails closed with ApproverPolicyUnresolvable unless the activation orchestration re-resolved
         // the sources and populated a trusted Valid verdict. Automatic mode needs no approver policy and is unaffected.
+        // Content safety is the final Epic 1 activation gate (1.7 AC2, AC4): unlike the provider/approver gates it needs
+        // NO trusted verdict — an empty/invalid policy is rejected at configuration time, so a non-null ContentSafety is
+        // exactly a valid active policy and the gate is a pure state check read straight from rehydrated state. It
+        // therefore cannot be bypassed by a direct-gateway ActivateAgent (there is no verdict to omit or forge).
         IReadOnlyList<AgentActivationBlocker> blockers =
             AgentConfigurationPolicy.ComputeActivationBlockers(
                 state.DisplayName,
@@ -232,7 +245,8 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
                 selectedProviderReady: ReadProviderSelectionValidation(envelope) == ProviderSelectionValidationStatus.Valid,
                 responseMode: state.ResponseMode,
                 hasApproverPolicy: state.ApproverPolicySources is { Count: > 0 },
-                approverPolicyResolved: ReadApproverPolicyValidation(envelope) == ApproverPolicyValidationStatus.Valid);
+                approverPolicyResolved: ReadApproverPolicyValidation(envelope) == ApproverPolicyValidationStatus.Valid,
+                hasContentSafetyPolicy: state.ContentSafety is not null);
         return blockers.Count > 0
             ? DomainResult.Rejection([new AgentActivationBlockedRejection(agentId, blockers)])
             : DomainResult.Success([new AgentActivated(agentId)]);
@@ -501,6 +515,55 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         ]);
     }
 
+    /// <summary>Handles defining the Agent's Content Safety Policy — the final Epic 1 activation gate (AC1, AC3; FR-26).</summary>
+    /// <param name="command">The content-safety command (carries only the safe configuration value).</param>
+    /// <param name="state">The current Agent state.</param>
+    /// <param name="envelope">The command envelope (carries the trusted authorization extension; no dependency verdict).</param>
+    /// <returns>The domain result.</returns>
+    public static DomainResult Handle(ConfigureAgentContentSafetyPolicy command, AgentState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string agentId = envelope.AggregateId;
+
+        if (!IsAgentAdmin(envelope))
+        {
+            return Denied(agentId, envelope, nameof(ConfigureAgentContentSafetyPolicy));
+        }
+
+        if (state is null || !state.IsCreated)
+        {
+            return DomainResult.Rejection([new AgentNotFoundRejection(agentId)]);
+        }
+
+        // Structural validation + normalization only — content-safety configuration reads NO sibling module (AD-3):
+        // it is self-contained Agent state, so there is no external dependency to resolve and no trusted verdict. The
+        // reason is a safe classification and never echoes a configured value (AD-14).
+        string? reason = ValidateAndNormalizeContentSafety(command.Configuration, out AgentContentSafetyConfiguration normalized);
+        if (reason is not null)
+        {
+            return Invalid(agentId, reason);
+        }
+
+        // Re-asserting an equal configuration (active policy + both mode overrides equal by value) is a deterministic
+        // no-op (AD-13). Record value-equality does not deep-compare the string-list members, so they are compared
+        // element-wise explicitly (mirroring the approver-policy SequenceEqual idempotency check).
+        if (state.ContentSafety is not null && ContentSafetyConfigurationsEqual(state.ContentSafety, normalized))
+        {
+            return DomainResult.NoOp();
+        }
+
+        // A genuine change bumps both the content-safety policy version (AC1) and the configuration version (AD-4).
+        // Lifecycle is unchanged; prior events are append-only and never rewritten, so the change is future-only (AC1).
+        return DomainResult.Success([
+            new AgentContentSafetyPolicyConfigured(
+                agentId,
+                normalized,
+                state.ContentSafetyPolicyVersion + 1,
+                state.ConfigurationVersion + 1),
+        ]);
+    }
+
     private static bool IsAgentAdmin(CommandEnvelope envelope)
         => envelope.Extensions?.TryGetValue(AgentAdminExtensionKey, out string? value) == true
             && string.Equals(value, "true", StringComparison.Ordinal);
@@ -604,6 +667,146 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
 
         normalized = new AgentApproverPolicy(normalizedSources, policy.DisclosureCategory);
         return null;
+    }
+
+    // Structurally validates and normalizes a Content Safety configuration (Story 1.7 AC1, AC3). The active policy is
+    // required and must itself be valid; each configured mode override (if present) must independently be a valid
+    // policy. Storing reads no sibling module (AD-3) — there is no dependency to resolve and no verdict. Returns a safe
+    // rejection reason (never echoing a configured value, AD-14), or null when storable (with the normalized
+    // configuration in <paramref name="normalized"/>).
+    private static string? ValidateAndNormalizeContentSafety(
+        AgentContentSafetyConfiguration? config,
+        out AgentContentSafetyConfiguration normalized)
+    {
+        normalized = config ?? EmptyContentSafetyConfiguration;
+        if (config is null)
+        {
+            return "Content safety configuration is required.";
+        }
+
+        if (config.ActivePolicy is null)
+        {
+            return "An active content safety policy is required.";
+        }
+
+        string? activeReason = ValidateAndNormalizePolicy(config.ActivePolicy, out AgentContentSafetyPolicy normalizedActive);
+        if (activeReason is not null)
+        {
+            return activeReason;
+        }
+
+        AgentContentSafetyPolicy? normalizedAutomatic = null;
+        if (config.AutomaticModePolicy is not null)
+        {
+            string? automaticReason = ValidateAndNormalizePolicy(config.AutomaticModePolicy, out AgentContentSafetyPolicy normalizedMode);
+            if (automaticReason is not null)
+            {
+                return automaticReason;
+            }
+
+            normalizedAutomatic = normalizedMode;
+        }
+
+        AgentContentSafetyPolicy? normalizedConfirmation = null;
+        if (config.ConfirmationModePolicy is not null)
+        {
+            string? confirmationReason = ValidateAndNormalizePolicy(config.ConfirmationModePolicy, out AgentContentSafetyPolicy normalizedMode);
+            if (confirmationReason is not null)
+            {
+                return confirmationReason;
+            }
+
+            normalizedConfirmation = normalizedMode;
+        }
+
+        normalized = new AgentContentSafetyConfiguration(normalizedActive, normalizedAutomatic, normalizedConfirmation);
+        return null;
+    }
+
+    // Validates and normalizes a single Content Safety Policy (Story 1.7 AC1). Both governance enums must be specified
+    // (the Unknown sentinel is the fail-safe and can never be configured); the descriptor/category lists are trimmed,
+    // blank-dropped, and ordinally de-duplicated; and after normalization the policy must define at least one prompt
+    // constraint or output category, so an empty policy can never satisfy the activation gate. The reason is a safe
+    // classification and never echoes a configured value (AD-14).
+    private static string? ValidateAndNormalizePolicy(AgentContentSafetyPolicy policy, out AgentContentSafetyPolicy normalized)
+    {
+        normalized = policy;
+        if (policy.FailureHandling == ContentSafetyFailureHandling.Unknown)
+        {
+            return "Content safety failure handling must be specified.";
+        }
+
+        if (policy.AuditTreatment == ContentSafetyAuditTreatment.Unknown)
+        {
+            return "Content safety audit treatment must be specified.";
+        }
+
+        IReadOnlyList<string> promptConstraints = NormalizeSafetyList(policy.PromptConstraints);
+        IReadOnlyList<string> blockedCategories = NormalizeSafetyList(policy.BlockedOutputCategories);
+        IReadOnlyList<string> restrictedCategories = NormalizeSafetyList(policy.RestrictedOutputCategories);
+
+        if (promptConstraints.Count == 0 && blockedCategories.Count == 0 && restrictedCategories.Count == 0)
+        {
+            return "A content safety policy must define at least one prompt constraint or output category.";
+        }
+
+        normalized = new AgentContentSafetyPolicy(
+            promptConstraints,
+            blockedCategories,
+            restrictedCategories,
+            policy.FailureHandling,
+            policy.AuditTreatment);
+        return null;
+    }
+
+    // Trims each entry, drops null/blank entries, and ordinally de-duplicates. The existing NormalizeOptionalText only
+    // maps blank→null and does NOT trim a non-blank value, so trimming is done explicitly here before storing/comparing.
+    private static IReadOnlyList<string> NormalizeSafetyList(IReadOnlyList<string>? values)
+    {
+        if (values is null || values.Count == 0)
+        {
+            return [];
+        }
+
+        var normalized = new List<string>(values.Count);
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        foreach (string? value in values)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                continue;
+            }
+
+            string trimmed = value.Trim();
+            if (seen.Add(trimmed))
+            {
+                normalized.Add(trimmed);
+            }
+        }
+
+        return normalized;
+    }
+
+    // By-value equality of two normalized configurations: the active policy and both mode overrides must match
+    // (matching null/non-null overrides + equal enums + sequence-equal string lists). Used for the idempotent-no-op
+    // check (AD-13) since record value-equality does not deep-compare the IReadOnlyList<string> members.
+    private static bool ContentSafetyConfigurationsEqual(AgentContentSafetyConfiguration a, AgentContentSafetyConfiguration b)
+        => ContentSafetyPoliciesEqual(a.ActivePolicy, b.ActivePolicy)
+            && ContentSafetyPoliciesEqual(a.AutomaticModePolicy, b.AutomaticModePolicy)
+            && ContentSafetyPoliciesEqual(a.ConfirmationModePolicy, b.ConfirmationModePolicy);
+
+    private static bool ContentSafetyPoliciesEqual(AgentContentSafetyPolicy? a, AgentContentSafetyPolicy? b)
+    {
+        if (a is null || b is null)
+        {
+            return a is null && b is null;
+        }
+
+        return a.FailureHandling == b.FailureHandling
+            && a.AuditTreatment == b.AuditTreatment
+            && a.PromptConstraints.SequenceEqual(b.PromptConstraints, StringComparer.Ordinal)
+            && a.BlockedOutputCategories.SequenceEqual(b.BlockedOutputCategories, StringComparer.Ordinal)
+            && a.RestrictedOutputCategories.SequenceEqual(b.RestrictedOutputCategories, StringComparer.Ordinal);
     }
 
     private static DomainResult Denied(string agentId, CommandEnvelope envelope, string commandName)

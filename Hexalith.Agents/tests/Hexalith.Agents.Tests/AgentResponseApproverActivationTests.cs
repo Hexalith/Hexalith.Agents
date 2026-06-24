@@ -43,7 +43,11 @@ public sealed class AgentResponseApproverActivationTests
         DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope());
 
         AgentActivationBlockedRejection blocked = result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>();
-        blocked.Blockers.ShouldBe([AgentActivationBlocker.MissingResponseMode]);
+        // 1.7: this state has no content-safety policy, so the content-safety gate is appended last.
+        blocked.Blockers.ShouldBe([
+            AgentActivationBlocker.MissingResponseMode,
+            AgentActivationBlocker.MissingContentSafetyPolicy,
+        ]);
         state.Lifecycle.ShouldBe(AgentLifecycleStatus.Draft);
     }
 
@@ -70,7 +74,11 @@ public sealed class AgentResponseApproverActivationTests
         DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope());
 
         AgentActivationBlockedRejection blocked = result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>();
-        blocked.Blockers.ShouldBe([AgentActivationBlocker.MissingApproverPolicy]);
+        // 1.7: this state has no content-safety policy, so the content-safety gate is appended after the approver gate.
+        blocked.Blockers.ShouldBe([
+            AgentActivationBlocker.MissingApproverPolicy,
+            AgentActivationBlocker.MissingContentSafetyPolicy,
+        ]);
     }
 
     [Fact]
@@ -153,8 +161,9 @@ public sealed class AgentResponseApproverActivationTests
     [Fact]
     public void Activation_blockers_are_reported_in_the_documented_order_including_the_response_mode_gate()
     {
-        // A freshly created Draft agent has no Party, no Provider, and an unchosen mode. The gate order is fixed:
-        // party identity → provider selection → response mode (the 1.6 gate is appended last, never reordered).
+        // A freshly created Draft agent has no Party, no Provider, an unchosen mode, and no content-safety policy. The
+        // gate order is fixed: party identity → provider selection → response mode → content safety (each 1.4–1.7 gate
+        // is appended last, never reordered).
         AgentState state = StateWith(ValidCreate());
 
         DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope());
@@ -164,6 +173,7 @@ public sealed class AgentResponseApproverActivationTests
                 AgentActivationBlocker.MissingPartyIdentity,
                 AgentActivationBlocker.MissingProviderSelection,
                 AgentActivationBlocker.MissingResponseMode,
+                AgentActivationBlocker.MissingContentSafetyPolicy,
             ]);
     }
 

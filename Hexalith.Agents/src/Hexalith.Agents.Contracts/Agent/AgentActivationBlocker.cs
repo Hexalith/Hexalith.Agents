@@ -46,4 +46,7 @@ public enum AgentActivationBlocker
 
     /// <summary>The Agent is in Confirmation mode and a configured approver source is missing/disabled/ambiguous/unavailable/unauthorized — fails closed (AC3; 1.6).</summary>
     ApproverPolicyUnresolvable,
+
+    /// <summary>No active Content Safety Policy is configured, so production/production-like enablement is not permitted — the final Epic 1 activation gate (AC2, AC4; 1.7).</summary>
+    MissingContentSafetyPolicy = 10,
 }

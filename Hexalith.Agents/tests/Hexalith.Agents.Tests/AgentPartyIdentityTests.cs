@@ -291,12 +291,14 @@ public sealed class AgentPartyIdentityTests
     public void Activation_is_blocked_by_missing_party_identity_then_unblocked_after_a_valid_link()
     {
         AgentState state = StateWith(ValidCreate()); // valid display name + instructions, but no party
-        // Pre-record a ready Provider/model selection and an Automatic response mode (1.6) so the party gate is the
-        // only one in play.
+        // Pre-record a ready Provider/model selection, an Automatic response mode (1.6), and a content-safety policy
+        // (1.7) so the party gate is the only one in play.
         state.Apply(new AgentProviderModelSelected(AgentId, SelectedProviderId, SelectedModelId, SelectedCapabilityVersion, state.ConfigurationVersion + 1));
         state.Apply(new AgentResponseModeConfigured(AgentId, AgentResponseMode.Automatic, state.ConfigurationVersion + 1));
+        state.Apply(new AgentContentSafetyPolicyConfigured(AgentId, SampleContentSafetyConfiguration, 1, state.ConfigurationVersion + 1));
 
-        // Only the party gate remains — display name, instructions, provider readiness, and response mode are valid.
+        // Only the party gate remains — display name, instructions, provider readiness, response mode, and content
+        // safety are valid.
         DomainResult blocked = AgentAggregate.Handle(new ActivateAgent(), state, SelectEnvelope(new ActivateAgent()));
         AgentActivationBlockedRejection rejection = blocked.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>();
         rejection.Blockers.ShouldBe([AgentActivationBlocker.MissingPartyIdentity]);
@@ -314,9 +316,9 @@ public sealed class AgentPartyIdentityTests
     public void Activation_reports_the_party_gate_last_in_the_documented_deterministic_order()
     {
         // When every gate fails, the blockers must be reported in the policy's documented order — display name, then
-        // instructions, then party identity (1.4), then provider selection (1.5), then response mode (1.6), each
-        // appended, never interleaved.
-        AgentState state = StateWith(ValidCreate(displayName: "", instructions: "")); // all gates fail, no party/provider/mode
+        // instructions, then party identity (1.4), then provider selection (1.5), then response mode (1.6), then
+        // content safety (1.7), each appended, never interleaved.
+        AgentState state = StateWith(ValidCreate(displayName: "", instructions: "")); // all gates fail, no party/provider/mode/safety
 
         DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, Envelope(new ActivateAgent()));
 
@@ -327,6 +329,7 @@ public sealed class AgentPartyIdentityTests
             AgentActivationBlocker.MissingPartyIdentity,
             AgentActivationBlocker.MissingProviderSelection,
             AgentActivationBlocker.MissingResponseMode,
+            AgentActivationBlocker.MissingContentSafetyPolicy,
         ]);
     }
 
@@ -349,10 +352,12 @@ public sealed class AgentPartyIdentityTests
         (await ProcessAndApplyAsync(aggregate, state, link, LinkEnvelope(link))).IsSuccess.ShouldBeTrue();
         state.PartyId.ShouldBe(LinkedPartyId);
 
-        // Select a ready Provider/model and choose a Response Mode so the remaining activation gates clear (1.5/1.6).
+        // Select a ready Provider/model, choose a Response Mode, and define a Content Safety Policy so the remaining
+        // activation gates clear (1.5/1.6/1.7).
         var select = new SelectAgentProviderModel(SelectedProviderId, SelectedModelId, SelectedCapabilityVersion);
         (await ProcessAndApplyAsync(aggregate, state, select, SelectEnvelope(select))).IsSuccess.ShouldBeTrue();
         (await ProcessAndApplyAsync(aggregate, state, new ConfigureAgentResponseMode(AgentResponseMode.Automatic))).IsSuccess.ShouldBeTrue();
+        (await ProcessAndApplyAsync(aggregate, state, new ConfigureAgentContentSafetyPolicy(SampleContentSafetyConfiguration))).IsSuccess.ShouldBeTrue();
 
         // Now activation succeeds, and the party presence is visible through the read path (AC4).
         (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent(), SelectEnvelope(new ActivateAgent()))).IsSuccess.ShouldBeTrue();

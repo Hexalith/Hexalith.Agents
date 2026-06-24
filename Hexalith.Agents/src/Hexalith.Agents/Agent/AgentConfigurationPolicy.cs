@@ -78,11 +78,12 @@ internal static class AgentConfigurationPolicy
     }
 
     /// <summary>
-    /// Computes the current activation blockers for an Agent's state (AC2; 1.4 AC4; 1.5 AC2; 1.6 AC1, AC3). An empty
-    /// list means the Agent is activatable as configured. Order is stable and deterministic: display name →
-    /// instructions → party identity → provider selection → provider unavailable → response mode → approver policy
-    /// missing → approver policy unresolvable. Party identity, provider/model readiness, response mode, and approver
-    /// policy are <em>distinct</em> readiness gates — separate from lifecycle and from the configuration gates.
+    /// Computes the current activation blockers for an Agent's state (AC2; 1.4 AC4; 1.5 AC2; 1.6 AC1, AC3; 1.7 AC2,
+    /// AC4). An empty list means the Agent is activatable as configured. Order is stable and deterministic: display
+    /// name → instructions → party identity → provider selection → provider unavailable → response mode → approver
+    /// policy missing → approver policy unresolvable → content safety policy missing. Party identity, provider/model
+    /// readiness, response mode, approver policy, and content safety are <em>distinct</em> readiness gates — separate
+    /// from lifecycle and from the configuration gates.
     /// </summary>
     /// <param name="displayName">The Agent's display name.</param>
     /// <param name="instructions">The Agent's instructions text.</param>
@@ -98,6 +99,11 @@ internal static class AgentConfigurationPolicy
     /// Whether the configured approver policy currently resolves (the trusted approver verdict was <c>Valid</c>).
     /// Only consulted in Confirmation mode when <paramref name="hasApproverPolicy"/> is set (1.6 AC3).
     /// </param>
+    /// <param name="hasContentSafetyPolicy">
+    /// Whether an active Content Safety Policy is configured (1.7 AC2). A pure state check — content safety is
+    /// self-contained Agent state with no external dependency, so (unlike the provider/approver gates) it needs no
+    /// trusted verdict and cannot be bypassed by a direct-gateway activation.
+    /// </param>
     /// <returns>The specific blockers (empty when none).</returns>
     internal static IReadOnlyList<AgentActivationBlocker> ComputeActivationBlockers(
         string displayName,
@@ -107,7 +113,8 @@ internal static class AgentConfigurationPolicy
         bool selectedProviderReady,
         AgentResponseMode responseMode,
         bool hasApproverPolicy,
-        bool approverPolicyResolved)
+        bool approverPolicyResolved,
+        bool hasContentSafetyPolicy)
     {
         var blockers = new List<AgentActivationBlocker>();
 
@@ -157,6 +164,14 @@ internal static class AgentConfigurationPolicy
             {
                 blockers.Add(AgentActivationBlocker.ApproverPolicyUnresolvable);
             }
+        }
+
+        // Content safety is the final Epic 1 gate, appended last (1.7 AC2, AC4). A missing active policy blocks
+        // production/production-like enablement; because an empty/invalid policy is rejected at configuration time, a
+        // present policy is a valid one and this gate is a pure state check needing no verdict.
+        if (!hasContentSafetyPolicy)
+        {
+            blockers.Add(AgentActivationBlocker.MissingContentSafetyPolicy);
         }
 
         return blockers;

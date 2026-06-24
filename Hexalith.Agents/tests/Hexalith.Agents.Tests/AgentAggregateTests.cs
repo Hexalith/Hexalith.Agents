@@ -428,6 +428,9 @@ public sealed class AgentAggregateTests
         // 1.6 AC1: a chosen Response Mode is also required before activation (Automatic needs no approver policy).
         (await ProcessAndApplyAsync(aggregate, state, new ConfigureAgentResponseMode(AgentResponseMode.Automatic))).IsSuccess.ShouldBeTrue();
 
+        // 1.7 AC1: a defined Content Safety Policy is the final required activation gate.
+        (await ProcessAndApplyAsync(aggregate, state, new ConfigureAgentContentSafetyPolicy(SampleContentSafetyConfiguration))).IsSuccess.ShouldBeTrue();
+
         DomainResult activated = await ProcessAndApplyAsync(aggregate, state, new ActivateAgent(), SelectEnvelope(new ActivateAgent()));
         activated.IsSuccess.ShouldBeTrue();
         state.Lifecycle.ShouldBe(AgentLifecycleStatus.Active);

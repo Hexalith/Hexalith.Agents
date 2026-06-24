@@ -12,7 +12,11 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// <b>Sensitive content (AD-14):</b> the raw Agent Instructions text is deliberately absent from this view. The
 /// view exposes only instruction <em>presence</em> (<see cref="HasInstructions"/>), <em>validity</em>
 /// (<see cref="InstructionsValid"/>), and <see cref="InstructionsVersion"/> — never the instruction text — so
-/// status, badges, logs, and accessible names cannot leak the prompt.
+/// status, badges, logs, and accessible names cannot leak the prompt. The Content Safety Policy content (prompt
+/// constraints, blocked/restricted output categories) is treated identically (1.7 AC2): the view exposes only
+/// <see cref="HasContentSafetyPolicy"/>, <see cref="ContentSafetyPolicyVersion"/>, and which modes carry a stricter
+/// override (<see cref="HasAutomaticContentSafetyOverride"/>/<see cref="HasConfirmationContentSafetyOverride"/>) —
+/// never the policy content itself.
 /// </para>
 /// <para>
 /// <see cref="Lifecycle"/> and <see cref="ActivationBlockers"/> are kept distinct: an Agent can be
@@ -37,6 +41,10 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// <param name="HasApproverPolicy">Whether at least one approver source is configured (presence only — never the source list or any Party PII; 1.6 AC2).</param>
 /// <param name="ApproverPolicyDisclosure">The configured FR-7 disclosure category (safe metadata; 1.6 AC4).</param>
 /// <param name="ApproverPolicyVersion">The monotonic approver-policy version (0 until a policy is configured; 1.6 AC4).</param>
+/// <param name="HasContentSafetyPolicy">Whether an active Content Safety Policy is configured (presence only — never the policy content; 1.7 AC2).</param>
+/// <param name="ContentSafetyPolicyVersion">The monotonic content-safety policy version (0 until a policy is configured; 1.7 AC1).</param>
+/// <param name="HasAutomaticContentSafetyOverride">Whether a stricter Automatic-mode content-safety override is configured (presence only; 1.7 AC3).</param>
+/// <param name="HasConfirmationContentSafetyOverride">Whether a stricter Confirmation-mode content-safety override is configured (presence only; 1.7 AC3).</param>
 /// <param name="ActivationBlockers">The specific blockers preventing activation as currently configured (empty when none).</param>
 public record AgentStatusView(
     string AgentId,
@@ -56,4 +64,8 @@ public record AgentStatusView(
     bool HasApproverPolicy,
     ApproverPolicyBasisDisclosure ApproverPolicyDisclosure,
     int ApproverPolicyVersion,
+    bool HasContentSafetyPolicy,
+    int ContentSafetyPolicyVersion,
+    bool HasAutomaticContentSafetyOverride,
+    bool HasConfirmationContentSafetyOverride,
     IReadOnlyList<AgentActivationBlocker> ActivationBlockers);

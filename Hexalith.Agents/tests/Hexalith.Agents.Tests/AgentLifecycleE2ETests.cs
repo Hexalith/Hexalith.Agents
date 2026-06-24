@@ -58,10 +58,13 @@ public sealed class AgentLifecycleE2ETests
         view.HasProviderSelection.ShouldBeFalse(); // 1.5 AC1: nor has it selected a Provider/model yet
         view.ResponseMode.ShouldBe(AgentResponseMode.Unknown); // 1.6 AC1: nor has it chosen a Response Mode yet
         view.HasApproverPolicy.ShouldBeFalse();
+        view.HasContentSafetyPolicy.ShouldBeFalse(); // 1.7 AC2: nor has it defined a Content Safety Policy yet
+        view.ContentSafetyPolicyVersion.ShouldBe(0);
         view.ActivationBlockers.ShouldBe([
             AgentActivationBlocker.MissingPartyIdentity,
             AgentActivationBlocker.MissingProviderSelection,
             AgentActivationBlocker.MissingResponseMode,
+            AgentActivationBlocker.MissingContentSafetyPolicy,
         ]);
 
         // AC1 / AD-14: the safe status surface never carries the raw Agent Instructions text.
@@ -94,12 +97,14 @@ public sealed class AgentLifecycleE2ETests
         (await ProcessAndApplyAsync(aggregate, state, new UpdateAgentConfiguration("Hexa Assistant", "desc", ValidInstructions)))
             .IsSuccess.ShouldBeTrue();
 
-        // 1.4 AC4 + 1.5 AC2 + 1.6 AC1: the party-identity, provider-selection, and response-mode gates remain until satisfied.
+        // 1.4 AC4 + 1.5 AC2 + 1.6 AC1 + 1.7 AC2: the party-identity, provider-selection, response-mode, and
+        // content-safety gates remain until satisfied.
         AgentStatusView remediatedView = AgentInspection.GetStatus(state, isAgentsAdmin: true).Agent.ShouldNotBeNull();
         remediatedView.ActivationBlockers.ShouldBe([
             AgentActivationBlocker.MissingPartyIdentity,
             AgentActivationBlocker.MissingProviderSelection,
             AgentActivationBlocker.MissingResponseMode,
+            AgentActivationBlocker.MissingContentSafetyPolicy,
         ]);
         var link = new LinkAgentPartyIdentity(LinkedPartyId);
         (await ProcessAndApplyAsync(aggregate, state, link, LinkEnvelope(link))).IsSuccess.ShouldBeTrue();
@@ -108,8 +113,11 @@ public sealed class AgentLifecycleE2ETests
         var select = new SelectAgentProviderModel(SelectedProviderId, SelectedModelId, SelectedCapabilityVersion);
         (await ProcessAndApplyAsync(aggregate, state, select, SelectEnvelope(select))).IsSuccess.ShouldBeTrue();
 
-        // 1.6 AC1: choose Automatic Response Mode (needs no approver policy) so the final gate clears.
+        // 1.6 AC1: choose Automatic Response Mode (needs no approver policy).
         (await ProcessAndApplyAsync(aggregate, state, new ConfigureAgentResponseMode(AgentResponseMode.Automatic))).IsSuccess.ShouldBeTrue();
+
+        // 1.7 AC1: define the Content Safety Policy so the final Epic 1 activation gate clears.
+        (await ProcessAndApplyAsync(aggregate, state, new ConfigureAgentContentSafetyPolicy(SampleContentSafetyConfiguration))).IsSuccess.ShouldBeTrue();
 
         // AC2: activation now succeeds (the recorded selection re-validates Valid) with no remaining blockers.
         (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent(), SelectEnvelope(new ActivateAgent()))).IsSuccess.ShouldBeTrue();
@@ -119,6 +127,8 @@ public sealed class AgentLifecycleE2ETests
         activeView.InstructionsValid.ShouldBeTrue();
         activeView.HasProviderSelection.ShouldBeTrue();
         activeView.ResponseMode.ShouldBe(AgentResponseMode.Automatic);
+        activeView.HasContentSafetyPolicy.ShouldBeTrue(); // 1.7: the content-safety gate is cleared
+        activeView.ContentSafetyPolicyVersion.ShouldBe(1);
     }
 
     // ===== AC3: disable is publicly visible, preserves history, and reactivation re-runs the gates =====
@@ -143,6 +153,9 @@ public sealed class AgentLifecycleE2ETests
         // 1.6 AC1: a chosen Response Mode is also required before the agent can activate.
         (await ProcessAndApplyAsync(aggregate, state, new ConfigureAgentResponseMode(AgentResponseMode.Automatic))).IsSuccess.ShouldBeTrue();
 
+        // 1.7 AC1: a defined Content Safety Policy is the final required activation gate.
+        (await ProcessAndApplyAsync(aggregate, state, new ConfigureAgentContentSafetyPolicy(SampleContentSafetyConfiguration))).IsSuccess.ShouldBeTrue();
+
         (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent(), SelectEnvelope(new ActivateAgent()))).IsSuccess.ShouldBeTrue();
 
         // Disable: a lifecycle flag flip only.
@@ -154,11 +167,12 @@ public sealed class AgentLifecycleE2ETests
 
         // ...and prior identity/instructions/configuration are not deleted or rewritten by the disable.
         disabledView.DisplayName.ShouldBe(create.DisplayName);
-        disabledView.ConfigurationVersion.ShouldBe(4); // create (1) + party link (2) + provider selection (3) + response mode (4)
+        disabledView.ConfigurationVersion.ShouldBe(5); // create (1) + party link (2) + provider selection (3) + response mode (4) + content safety (5)
         disabledView.HasInstructions.ShouldBeTrue();
         disabledView.HasPartyIdentity.ShouldBeTrue(); // the link survives the disable (history preserved, AC3)
         disabledView.HasProviderSelection.ShouldBeTrue(); // the selection survives the disable too (AC3)
         disabledView.ResponseMode.ShouldBe(AgentResponseMode.Automatic); // the chosen mode survives the disable (AC3)
+        disabledView.HasContentSafetyPolicy.ShouldBeTrue(); // the content-safety policy survives the disable too (AC3)
         disabledView.InstructionsVersion.ShouldBe(1);
         state.Instructions.ShouldBe(ValidInstructions); // durable instructions survive the disable
 
@@ -257,6 +271,7 @@ public sealed class AgentLifecycleE2ETests
         var select = new SelectAgentProviderModel(SelectedProviderId, SelectedModelId, SelectedCapabilityVersion); // 1.5 AC1: select before activation
         await DriveWith(select, SelectEnvelope(select));
         await Drive(new ConfigureAgentResponseMode(AgentResponseMode.Automatic)); // 1.6 AC1: choose a mode before activation
+        await Drive(new ConfigureAgentContentSafetyPolicy(SampleContentSafetyConfiguration)); // 1.7 AC1: define content safety before activation
         await DriveWith(new ActivateAgent(), SelectEnvelope(new ActivateAgent())); // 1.5 AC2: provider re-validated at activation
         await Drive(new DisableAgent());
 
@@ -277,7 +292,7 @@ public sealed class AgentLifecycleE2ETests
         replayedView.Lifecycle.ShouldBe(liveView.Lifecycle);
         replayedView.Lifecycle.ShouldBe(AgentLifecycleStatus.Disabled);
         replayedView.ConfigurationVersion.ShouldBe(liveView.ConfigurationVersion);
-        replayedView.ConfigurationVersion.ShouldBe(5); // create (1) + update (2) + party link (3) + provider selection (4) + response mode (5)
+        replayedView.ConfigurationVersion.ShouldBe(6); // create (1) + update (2) + party link (3) + provider selection (4) + response mode (5) + content safety (6)
         replayedView.HasInstructions.ShouldBe(liveView.HasInstructions);
         replayedView.InstructionsValid.ShouldBe(liveView.InstructionsValid);
         replayedView.InstructionsVersion.ShouldBe(liveView.InstructionsVersion);

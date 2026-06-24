@@ -90,6 +90,17 @@ public sealed class AgentState
     /// <summary>Gets or sets the monotonic approver-policy version (0 until a policy is configured; Story 1.6 AC4).</summary>
     public int ApproverPolicyVersion { get; set; }
 
+    /// <summary>
+    /// Gets or sets the configured Content Safety configuration (<see langword="null"/> = no policy configured, which
+    /// fails the activation gate). The policy text is policy/governance content held here as the durable source of
+    /// truth but never surfaced on the status view, rejections, logs, or audit summaries (Story 1.7 AC2; AD-9, AD-14)
+    /// — mirroring the <see cref="Instructions"/> field.
+    /// </summary>
+    public AgentContentSafetyConfiguration? ContentSafety { get; set; }
+
+    /// <summary>Gets or sets the monotonic content-safety policy version (0 until a policy is configured; Story 1.7 AC1).</summary>
+    public int ContentSafetyPolicyVersion { get; set; }
+
     /// <summary>Applies the Agent creation: the record exists and starts in <see cref="AgentLifecycleStatus.Draft"/>.</summary>
     /// <param name="e">The event.</param>
     public void Apply(AgentCreated e)
@@ -227,6 +238,25 @@ public sealed class AgentState
         ApproverPolicySources = e.Policy.Sources;
         ApproverPolicyDisclosure = e.Policy.DisclosureCategory;
         ApproverPolicyVersion = e.ApproverPolicyVersion;
+        ConfigurationVersion = e.ConfigurationVersion;
+    }
+
+    /// <summary>
+    /// Applies a Content Safety Policy configuration: records the safe configuration (active policy + optional mode
+    /// overrides) and bumps both the content-safety policy version and the configuration version (Story 1.7 AC1).
+    /// Lifecycle is unchanged; a changed policy is future-only (prior events never rewritten).
+    /// </summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentContentSafetyPolicyConfigured e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsCreated)
+        {
+            return;
+        }
+
+        ContentSafety = e.Configuration;
+        ContentSafetyPolicyVersion = e.ContentSafetyPolicyVersion;
         ConfigurationVersion = e.ConfigurationVersion;
     }
 

@@ -60,12 +60,18 @@ public static class AgentInspection
             state.ApproverPolicySources is { Count: > 0 },
             state.ApproverPolicyDisclosure,
             state.ApproverPolicyVersion,
+            state.ContentSafety is not null,
+            state.ContentSafetyPolicyVersion,
+            state.ContentSafety?.AutomaticModePolicy is not null,
+            state.ContentSafety?.ConfirmationModePolicy is not null,
             // AgentInspection is a *pure* read over Agent state only — it cannot freshly re-read the catalog or the
             // Tenants/Conversations dependencies, so it trusts the last-validated recorded selection/policy
             // (selectedProviderReady: true, approverPolicyResolved: true) and surfaces only the static
             // MissingProviderSelection / MissingResponseMode / MissingApproverPolicy gates. Live ProviderUnavailable /
             // ApproverPolicyUnresolvable surfacing for the readiness badge is supplied by the activation path (this
             // story, via the trusted verdicts) and by the 1.8 status/overview orchestration that resolves them.
+            // Content safety is self-contained Agent state (no external dependency), so it is surfaced live/accurate
+            // here with no trust assumption: hasContentSafetyPolicy reads straight from state.
             // Making this read those dependencies would break purity and AD-3 — do not.
             AgentConfigurationPolicy.ComputeActivationBlockers(
                 state.DisplayName,
@@ -75,5 +81,6 @@ public static class AgentInspection
                 selectedProviderReady: true,
                 responseMode: state.ResponseMode,
                 hasApproverPolicy: state.ApproverPolicySources is { Count: > 0 },
-                approverPolicyResolved: true));
+                approverPolicyResolved: true,
+                hasContentSafetyPolicy: state.ContentSafety is not null));
 }

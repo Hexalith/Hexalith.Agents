@@ -170,6 +170,10 @@ public sealed class AgentContractsRoundTripTests
             HasApproverPolicy: true,
             ApproverPolicyDisclosure: ApproverPolicyBasisDisclosure.OperatorOnly,
             ApproverPolicyVersion: 2,
+            HasContentSafetyPolicy: true,
+            ContentSafetyPolicyVersion: 3,
+            HasAutomaticContentSafetyOverride: false,
+            HasConfirmationContentSafetyOverride: true,
             [AgentActivationBlocker.InvalidInstructions, AgentActivationBlocker.MissingPartyIdentity]);
 
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(view);
@@ -190,6 +194,10 @@ public sealed class AgentContractsRoundTripTests
         roundTripped.HasApproverPolicy.ShouldBe(view.HasApproverPolicy);
         roundTripped.ApproverPolicyDisclosure.ShouldBe(view.ApproverPolicyDisclosure);
         roundTripped.ApproverPolicyVersion.ShouldBe(view.ApproverPolicyVersion);
+        roundTripped.HasContentSafetyPolicy.ShouldBe(view.HasContentSafetyPolicy);
+        roundTripped.ContentSafetyPolicyVersion.ShouldBe(view.ContentSafetyPolicyVersion);
+        roundTripped.HasAutomaticContentSafetyOverride.ShouldBe(view.HasAutomaticContentSafetyOverride);
+        roundTripped.HasConfirmationContentSafetyOverride.ShouldBe(view.HasConfirmationContentSafetyOverride);
         roundTripped.ActivationBlockers.ShouldBe(view.ActivationBlockers);
     }
 

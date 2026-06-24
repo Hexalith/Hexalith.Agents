@@ -41,6 +41,10 @@ public sealed class AgentInspectionTests
         view.SelectedModelId.ShouldBe(SelectedModelId);
         view.ResponseMode.ShouldBe(AgentResponseMode.Automatic); // 1.6 AC1: Automatic mode cleared the response-mode gate
         view.HasApproverPolicy.ShouldBeFalse(); // Automatic mode needs no approver policy
+        view.HasContentSafetyPolicy.ShouldBeTrue(); // 1.7 AC2: a readiness-cleared agent has a content-safety policy (presence only)
+        view.ContentSafetyPolicyVersion.ShouldBe(1);
+        view.HasAutomaticContentSafetyOverride.ShouldBeFalse(); // 1.7 AC3: no stricter mode-specific override configured
+        view.HasConfirmationContentSafetyOverride.ShouldBeFalse();
         view.ActivationBlockers.ShouldBeEmpty();
 
         // AD-14: the raw instructions text must never appear anywhere on the serialized status view.

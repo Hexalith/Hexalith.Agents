@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-06-23T21:28:59+02:00
-last_updated: 2026-06-24T00:00:00+02:00
+last_updated: 2026-06-24T12:00:00+02:00
 project: agents
 project_key: NOKEY
 tracking_system: file-system
@@ -55,7 +55,7 @@ development_status:
   1-4-link-hexa-to-a-party-identity: done
   1-5-select-provider-and-model-for-hexa: done
   1-6-configure-response-mode-and-approver-policy: done
-  1-7-configure-content-safety-policy-and-activation-gate: backlog
+  1-7-configure-content-safety-policy-and-activation-gate: done
   1-8-admin-setup-ui-and-readiness-overview: backlog
   epic-1-retrospective: optional
   epic-2: backlog
