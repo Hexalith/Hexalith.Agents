@@ -1,16 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Hexalith.Agents.UI</PackageId>
-    <Description>UI components for the Hexalith Agents module. FrontComposer navigation registration and FluentUI pages are added by the admin-setup UI story (1.8).</Description>
-    <PackageTags>hexalith;agents;ui</PackageTags>
+    <Description>FrontComposer admin-setup UI for the Hexalith Agents module: the Agents domain/navigation registration, the setup surfaces (overview, hexa configuration, provider catalog, approver policy), and the readiness/provider status badges. Binds to the public Agents display contracts through a UI-side gateway abstraction (the live read path is deferred to the Agents read-model story).</Description>
+    <PackageTags>hexalith;agents;ui;frontcomposer</PackageTags>
   </PropertyGroup>
 
-  <!-- Dependency direction (AD-15): UI -> Contracts (+ Client). -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="Hexalith.Agents.UI.Tests" />
+  </ItemGroup>
+
+  <!-- Dependency direction (AD-15): UI -> Contracts (+ Client) in-module. -->
   <ItemGroup>
     <ProjectReference Include="..\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
     <ProjectReference Include="..\Hexalith.Agents.Client\Hexalith.Agents.Client.csproj" />
+    <!-- Out-of-module FrontComposer shell/contracts (sibling source via the resolved root MSBuild var).
+         These are intentionally outside the in-module direction guard (AD-15: UI calls the shell, never
+         Server/EventStore/provider internals). -->
+    <ProjectReference Include="$(HexalithFrontComposerRoot)\src\Hexalith.FrontComposer.Contracts\Hexalith.FrontComposer.Contracts.csproj" />
+    <ProjectReference Include="$(HexalithFrontComposerRoot)\src\Hexalith.FrontComposer.Shell\Hexalith.FrontComposer.Shell.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,26 @@
+@*
+    Renders nav entries through the SAME gate the FrontComposer shell uses
+    (FrontComposerNavigation: <AuthorizeView Policy="@entry.RequiredPolicy">). Lets the AC1 "never leak a gated
+    link" test drive the REAL registered entries + the REAL AuthorizeView gate without standing up the whole shell.
+    A gated entry renders its link only inside <Authorized>; an ungated entry always renders.
+*@
+@foreach (FrontComposerNavEntry entry in Entries)
+{
+    @if (!string.IsNullOrWhiteSpace(entry.RequiredPolicy))
+    {
+        <AuthorizeView Policy="@entry.RequiredPolicy">
+            <Authorized>
+                <a href="@entry.Href">@entry.Title</a>
+            </Authorized>
+        </AuthorizeView>
+    }
+    else
+    {
+        <a href="@entry.Href">@entry.Title</a>
+    }
+}
+
+@code {
+    [Parameter]
+    public IReadOnlyList<FrontComposerNavEntry> Entries { get; set; } = [];
+}

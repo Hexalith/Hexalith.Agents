@@ -24,5 +24,6 @@
     <Project Path="tests/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj" />
     <Project Path="tests/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj" />
     <Project Path="tests/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj" />
+    <Project Path="tests/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj" />
   </Folder>
 </Solution>

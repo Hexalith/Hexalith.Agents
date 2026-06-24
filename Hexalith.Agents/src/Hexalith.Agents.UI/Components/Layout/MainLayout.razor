@@ -1,0 +1,8 @@
+@inherits LayoutComponentBase
+@using Hexalith.FrontComposer.Shell.Components.Layout
+
+@* The FrontComposer shell is fully framework-owned: it renders the skip links (#fc-main-content / #fc-nav),
+   the role="main" landmark, the nav landmark, the left navigation from the domain's registered nav entries
+   (AgentsFrontComposerRegistration), and the header account control. The Agents admin-setup UI therefore only
+   composes its body through the shell and never re-declares skip links or landmarks (FC-A11Y). *@
+<FrontComposerShell>@Body</FrontComposerShell>

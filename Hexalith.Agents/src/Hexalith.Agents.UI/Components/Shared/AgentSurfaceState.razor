@@ -1,0 +1,60 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+
+@* Shared surface-state component for every Agents setup page (AC6). Errors and permission-denied announce
+   assertively (role="alert"/aria-live="assertive"); all other states announce politely (UX-DR36). Empty and
+   permission-denied carry no record identity (AD-12). FilteredEmpty offers a reset; Stale offers a refresh. *@
+<section class="agent-surface-state agent-surface-state--@CssClass"
+         role="@Role"
+         aria-live="@AriaLive"
+         data-testid="@TestId">
+    <h2>@Title</h2>
+    <p>@Message</p>
+    @if (Kind is AgentSurfaceKind.FilteredEmpty && OnReset.HasDelegate)
+    {
+        <FluentButton Appearance="ButtonAppearance.Outline" data-testid="@($"{TestId}-reset")" OnClick="OnReset">
+            @Localizer["Agents.Surface.Reset"]
+        </FluentButton>
+    }
+    @if (Kind is AgentSurfaceKind.Stale && OnRefresh.HasDelegate)
+    {
+        <FluentButton Appearance="ButtonAppearance.Primary" data-testid="@($"{TestId}-refresh")" OnClick="OnRefresh">
+            @Localizer["Agents.Surface.Refresh"]
+        </FluentButton>
+    }
+</section>
+
+@code {
+    /// <summary>The surface state to render.</summary>
+    [Parameter]
+    public AgentSurfaceKind Kind { get; set; }
+
+    /// <summary>Stable test id base for the surface (suffixed for the reset/refresh actions).</summary>
+    [Parameter]
+    public string TestId { get; set; } = "agents-surface-state";
+
+    /// <summary>Optional override message (defaults to the localized whole string for the kind).</summary>
+    [Parameter]
+    public string? Detail { get; set; }
+
+    /// <summary>Raised when the user resets filters from the filtered-empty state.</summary>
+    [Parameter]
+    public EventCallback OnReset { get; set; }
+
+    /// <summary>Raised when the user refreshes from the stale state.</summary>
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
+
+    private string CssClass => Kind.ToString().ToLowerInvariant();
+
+    private bool IsAssertive => Kind is AgentSurfaceKind.Error or AgentSurfaceKind.PermissionDenied;
+
+    private string Role => IsAssertive ? "alert" : "status";
+
+    private string AriaLive => IsAssertive ? "assertive" : "polite";
+
+    private string Title => Localizer[$"Agents.Surface.{Kind}.Title"];
+
+    private string Message => string.IsNullOrWhiteSpace(Detail)
+        ? Localizer[$"Agents.Surface.{Kind}.Message"]
+        : Detail;
+}

@@ -1,0 +1,177 @@
+@page "/agents/configuration"
+@attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsAdministratorPolicy)]
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IAgentSetupGateway Gateway
+
+@* hexa configuration (AC4, AC5, AC6): a constrained Fluent form (UX-DR15). Identity/instructions/provider/
+   content-safety surface presence/validity/version only — never the instruction text or policy content (AD-14).
+   The response mode uses a mutually-exclusive radio group whose copy states the change affects future Agent Calls
+   only. Activation is a distinct affordance shown after validity is visible; the activation command dispatch is
+   deferred (this screen renders readiness + the affordance only). *@
+<FcPageLayout Mode="FcPageLayoutMode.Constrained">
+    <FcContentLabel LabelledBy="@HeadingId" />
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="24px" Class="agents-config" data-testid="agents-config">
+        <FcPageHeader @ref="_header"
+                      PageTitle="@Localizer["Agents.Config.Title"]"
+                      Heading="@Localizer["Agents.Config.Title"]"
+                      HeadingId="@HeadingId"
+                      HeadingTabIndex="-1"
+                      Eyebrow="@Localizer["Agents.Config.Eyebrow"]"
+                      Description="@Localizer["Agents.Config.Description"]"
+                      TestId="agents-config-header" />
+
+        @if (_result is null)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Loading" TestId="agents-config-state" />
+        }
+        else if (_result.Status is AgentInspectionStatus.NotAuthorized)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-config-state" />
+        }
+        else if (_result.Status is AgentInspectionStatus.AgentNotFound || _result.Agent is null)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Empty" TestId="agents-config-state" />
+        }
+        else
+        {
+            AgentStatusView agent = _result.Agent;
+
+            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Identity"]">
+                <h2>@Localizer["Agents.Config.Section.Identity"]</h2>
+                <dl>
+                    <dt>@Localizer["Agents.Config.DisplayName.Label"]</dt>
+                    <dd data-testid="agents-config-display-name">@(string.IsNullOrEmpty(agent.DisplayName) ? Localizer["Agents.Common.None"] : agent.DisplayName)</dd>
+                    <dt>@Localizer["Agents.Config.Description.Label"]</dt>
+                    <dd data-testid="agents-config-description">@(string.IsNullOrEmpty(agent.Description) ? Localizer["Agents.Common.None"] : agent.Description)</dd>
+                </dl>
+            </section>
+
+            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Instructions"]">
+                <h2>@Localizer["Agents.Config.Section.Instructions"]</h2>
+                <ul>
+                    <li data-testid="agents-config-instructions-presence">@(agent.HasInstructions ? Localizer["Agents.Config.Instructions.Present"] : Localizer["Agents.Config.Instructions.Absent"])</li>
+                    @if (agent.HasInstructions)
+                    {
+                        <li data-testid="agents-config-instructions-validity">@(agent.InstructionsValid ? Localizer["Agents.Config.Instructions.Valid"] : Localizer["Agents.Config.Instructions.Invalid"])</li>
+                        <li data-testid="agents-config-instructions-version">@Localizer["Agents.Config.Instructions.Version", agent.InstructionsVersion]</li>
+                    }
+                </ul>
+            </section>
+
+            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Provider"]">
+                <h2>@Localizer["Agents.Config.Section.Provider"]</h2>
+                <p data-testid="agents-config-provider">
+                    @if (agent.HasProviderSelection && agent.SelectedProviderId is { } providerId && agent.SelectedModelId is { } modelId)
+                    {
+                        <code>@Localizer["Agents.Config.Provider.Selected", providerId, modelId]</code>
+                    }
+                    else
+                    {
+                        @Localizer["Agents.Config.Provider.None"]
+                    }
+                </p>
+            </section>
+
+            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.ResponseMode"]">
+                <h2>@Localizer["Agents.Config.Section.ResponseMode"]</h2>
+                <ResponseModeToggle Value="@_responseMode" ValueChanged="OnResponseModeChanged" Name="agents-config-response-mode" />
+            </section>
+
+            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.ApproverPolicy"]">
+                <h2>@Localizer["Agents.Config.Section.ApproverPolicy"]</h2>
+                <p data-testid="agents-config-approver-presence">@(agent.HasApproverPolicy ? Localizer["Agents.ApproverPolicy.Present"] : Localizer["Agents.ApproverPolicy.Absent"])</p>
+                @if (agent.HasApproverPolicy)
+                {
+                    <p>@Localizer["Agents.ApproverPolicy.Version", agent.ApproverPolicyVersion]</p>
+                    <p>@Localizer["Agents.ApproverPolicy.Disclosure.Label"]: @Localizer[$"Agents.ApproverPolicy.Disclosure.{agent.ApproverPolicyDisclosure}"]</p>
+                }
+                <FluentAnchorButton Href="/agents/approver-policy" Appearance="ButtonAppearance.Subtle" data-testid="agents-config-approver-link">
+                    @Localizer["Agents.Config.ApproverPolicy.Link"]
+                </FluentAnchorButton>
+            </section>
+
+            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Lifecycle"]">
+                <h2>@Localizer["Agents.Config.Section.Lifecycle"]</h2>
+                <AgentReadinessBadge State="@AgentReadiness.MapState(agent)" />
+                <p data-testid="agents-config-lifecycle">@Localizer[$"Agents.Lifecycle.{agent.Lifecycle}"]</p>
+            </section>
+
+            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Blockers"]">
+                <h2>@Localizer["Agents.Config.Section.Blockers"]</h2>
+                @if (agent.ActivationBlockers.Count == 0)
+                {
+                    <p data-testid="agents-config-blockers-none">@Localizer["Agents.Overview.Blockers.None"]</p>
+                }
+                else
+                {
+                    <ul data-testid="agents-config-blockers">
+                        @foreach (AgentActivationBlocker blocker in agent.ActivationBlockers)
+                        {
+                            <li data-testid="@($"agents-config-blocker-{blocker}")">@Localizer[AgentReadiness.BlockerKeyFor(blocker)]</li>
+                        }
+                    </ul>
+                }
+            </section>
+
+            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.ContentSafety"]">
+                <h2>@Localizer["Agents.Config.Section.ContentSafety"]</h2>
+                <ul>
+                    <li data-testid="agents-config-content-safety-presence">@(agent.HasContentSafetyPolicy ? Localizer["Agents.Config.ContentSafety.Present"] : Localizer["Agents.Config.ContentSafety.Absent"])</li>
+                    @if (agent.HasContentSafetyPolicy)
+                    {
+                        <li data-testid="agents-config-content-safety-version">@Localizer["Agents.Config.ContentSafety.Version", agent.ContentSafetyPolicyVersion]</li>
+                    }
+                    @if (agent.HasAutomaticContentSafetyOverride)
+                    {
+                        <li>@Localizer["Agents.Config.ContentSafety.AutomaticOverride"]</li>
+                    }
+                    @if (agent.HasConfirmationContentSafetyOverride)
+                    {
+                        <li>@Localizer["Agents.Config.ContentSafety.ConfirmationOverride"]</li>
+                    }
+                </ul>
+            </section>
+
+            <section class="agents-config__activation" aria-label="@Localizer["Agents.Config.Activation.Label"]">
+                @* Activation is a distinct action shown after validity is visible; the command dispatch is deferred
+                   to the write-path story, so the affordance is disabled with a visible reason (fail-closed). *@
+                <FluentButton Appearance="ButtonAppearance.Primary" Disabled="true" data-testid="agents-config-activate">
+                    @Localizer["Agents.Config.Activation.Label"]
+                </FluentButton>
+                <p class="agents-config__activation-note" data-testid="agents-config-activation-note">
+                    @Localizer["Agents.Config.Activation.Deferred"]
+                </p>
+            </section>
+        }
+    </FluentStack>
+</FcPageLayout>
+
+@code {
+    private const string HeadingId = "agents-config-heading";
+
+    private FcPageHeader? _header;
+    private AgentInspectionResult? _result;
+    private AgentResponseMode _responseMode = AgentResponseMode.Unknown;
+    private bool _focusHeadingPending = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _result = await Gateway.GetConfigurationAsync(CancellationToken.None).ConfigureAwait(false);
+        if (_result.Agent is { } agent)
+        {
+            _responseMode = agent.ResponseMode;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusHeadingPending && _header is not null)
+        {
+            _focusHeadingPending = false;
+            await _header.FocusHeadingAsync().ConfigureAwait(false);
+        }
+    }
+
+    // Local UI selection only — the write path (ConfigureAgentResponseMode dispatch) is deferred.
+    private void OnResponseModeChanged(AgentResponseMode mode) => _responseMode = mode;
+}

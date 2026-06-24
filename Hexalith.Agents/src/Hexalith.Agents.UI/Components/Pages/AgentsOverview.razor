@@ -1,0 +1,147 @@
+@page "/agents"
+@attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsAdministratorPolicy)]
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IAgentSetupGateway Gateway
+
+@* Agents overview (AC2, AC5, AC6): the default Agents surface (UX-DR2). Read-heavy readiness/status content in a
+   full-width layout (UX-DR15). The readiness badge separates active lifecycle from callability (UX-DR20); blockers
+   are explained inline, grouped by recovery action (UX-DR9), never hidden behind a generic "not ready". *@
+<FcPageLayout Mode="FcPageLayoutMode.FullWidth">
+    <FcContentLabel LabelledBy="@HeadingId" />
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="24px" Class="agents-overview" data-testid="agents-overview">
+        <FcPageHeader @ref="_header"
+                      PageTitle="@Localizer["Agents.Overview.Title"]"
+                      Heading="@Localizer["Agents.Overview.Title"]"
+                      HeadingId="@HeadingId"
+                      HeadingTabIndex="-1"
+                      Eyebrow="@Localizer["Agents.Overview.Eyebrow"]"
+                      Description="@Localizer["Agents.Overview.Description"]"
+                      TestId="agents-overview-header" />
+
+        @if (_result is null)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Loading" TestId="agents-overview-state" />
+        }
+        else if (_result.Status is AgentInspectionStatus.NotAuthorized)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-overview-state" />
+        }
+        else if (_result.Status is AgentInspectionStatus.AgentNotFound || _result.Agent is null)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Empty" TestId="agents-overview-state" />
+        }
+        else
+        {
+            AgentStatusView agent = _result.Agent;
+
+            <section class="agents-overview__readiness" aria-label="@Localizer["Agents.Overview.Readiness.Label"]">
+                <AgentReadinessBadge State="@AgentReadiness.MapState(agent)" />
+                <p class="agents-overview__callability" data-testid="agents-overview-callability">
+                    @(AgentReadiness.IsCallable(agent)
+                        ? Localizer["Agents.Overview.Callable.Yes"]
+                        : Localizer["Agents.Overview.Callable.No"])
+                </p>
+            </section>
+
+            <dl class="agents-overview__facts" data-testid="agents-overview-facts">
+                <dt>@Localizer["Agents.Overview.Lifecycle.Label"]</dt>
+                <dd data-testid="agents-overview-lifecycle">@Localizer[$"Agents.Lifecycle.{agent.Lifecycle}"]</dd>
+
+                <dt>@Localizer["Agents.Overview.ResponseMode.Label"]</dt>
+                <dd data-testid="agents-overview-response-mode">@Localizer[$"Agents.ResponseMode.{agent.ResponseMode}"]</dd>
+
+                <dt>@Localizer["Agents.Overview.Provider.Label"]</dt>
+                <dd data-testid="agents-overview-provider">
+                    @if (agent.HasProviderSelection && agent.SelectedProviderId is { } providerId && agent.SelectedModelId is { } modelId)
+                    {
+                        <code>@Localizer["Agents.Overview.Provider.Reference", providerId, modelId]</code>
+                    }
+                    else
+                    {
+                        @Localizer["Agents.Config.Provider.None"]
+                    }
+                </dd>
+
+                <dt>@Localizer["Agents.Overview.Callability.Label"]</dt>
+                <dd>@(AgentReadiness.IsCallable(agent) ? Localizer["Agents.Common.Yes"] : Localizer["Agents.Common.No"])</dd>
+            </dl>
+
+            <section class="agents-overview__blockers" aria-label="@Localizer["Agents.Overview.Blockers.Title"]" data-testid="agents-overview-blockers">
+                <h2>@Localizer["Agents.Overview.Blockers.Title"]</h2>
+                @if (agent.ActivationBlockers.Count == 0)
+                {
+                    <p data-testid="agents-overview-blockers-none">@Localizer["Agents.Overview.Blockers.None"]</p>
+                }
+                else
+                {
+                    @foreach (BlockerRecoveryGroup group in GroupBlockers(agent.ActivationBlockers))
+                    {
+                        <section class="agents-overview__recovery-group" role="group" aria-label="@group.RecoveryLabel">
+                            <h3>@group.RecoveryLabel</h3>
+                            <ul>
+                                @foreach (AgentActivationBlocker blocker in group.Blockers)
+                                {
+                                    <li data-testid="@($"agents-overview-blocker-{blocker}")">@Localizer[AgentReadiness.BlockerKeyFor(blocker)]</li>
+                                }
+                            </ul>
+                        </section>
+                    }
+                }
+            </section>
+
+            @* Pending proposal count + recent failures (UX-DR2) have no Epic-1 contract source — they depend on
+               Epic 2/3 interaction data and the operational-status surface (Epic 4.3). Surface them as an explicit
+               "not available yet" affordance rather than fabricating counts (Scope guardrails / UX-DR2-vs-AC2). *@
+            <dl class="agents-overview__deferred" data-testid="agents-overview-deferred">
+                <dt>@Localizer["Agents.Overview.PendingProposals.Label"]</dt>
+                <dd data-testid="agents-overview-pending-proposals">@Localizer["Agents.Common.NotAvailableYet"]</dd>
+                <dt>@Localizer["Agents.Overview.RecentFailures.Label"]</dt>
+                <dd data-testid="agents-overview-recent-failures">@Localizer["Agents.Common.NotAvailableYet"]</dd>
+            </dl>
+        }
+    </FluentStack>
+</FcPageLayout>
+
+@code {
+    private const string HeadingId = "agents-overview-heading";
+
+    private FcPageHeader? _header;
+    private AgentInspectionResult? _result;
+    private bool _focusHeadingPending = true;
+
+    protected override async Task OnInitializedAsync()
+        => _result = await Gateway.GetStatusAsync(CancellationToken.None).ConfigureAwait(false);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusHeadingPending && _header is not null)
+        {
+            _focusHeadingPending = false;
+            await _header.FocusHeadingAsync().ConfigureAwait(false);
+        }
+    }
+
+    private IReadOnlyList<BlockerRecoveryGroup> GroupBlockers(IReadOnlyList<AgentActivationBlocker> blockers)
+        => blockers
+            .GroupBy(RecoveryKeyFor)
+            .Select(group => new BlockerRecoveryGroup(Localizer[group.Key], group.ToArray()))
+            .ToArray();
+
+    // Group blockers by the recovery action an administrator takes (UX-DR9), not by raw subsystem label.
+    private static string RecoveryKeyFor(AgentActivationBlocker blocker)
+        => blocker switch
+        {
+            AgentActivationBlocker.MissingProviderSelection or AgentActivationBlocker.ProviderUnavailable
+                => "Agents.Overview.Recovery.Provider",
+            AgentActivationBlocker.MissingPartyIdentity
+                => "Agents.Overview.Recovery.PartyIdentity",
+            AgentActivationBlocker.MissingResponseMode or AgentActivationBlocker.MissingApproverPolicy
+                or AgentActivationBlocker.ApproverPolicyUnresolvable
+                => "Agents.Overview.Recovery.Policy",
+            AgentActivationBlocker.MissingContentSafetyPolicy
+                => "Agents.Overview.Recovery.ContentSafety",
+            _ => "Agents.Overview.Recovery.Configuration",
+        };
+
+    private sealed record BlockerRecoveryGroup(string RecoveryLabel, IReadOnlyList<AgentActivationBlocker> Blockers);
+}

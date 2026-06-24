@@ -1,0 +1,130 @@
+@page "/agents/approver-policy"
+@attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsAdministratorPolicy)]
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IAgentSetupGateway Gateway
+
+@* Approver policy (AC4, AC5, AC6): a constrained, row-based builder scaffold (UX-DR5/UX-DR15). The view exposes
+   only presence/disclosure/version; the source rows themselves come from the deferred configuration read path, so
+   this story renders presence + a structured scaffold for the four V1 source kinds (AD-8) and surfaces "blocked"
+   when an approver source is missing/ambiguous. The builder is required only in confirmation mode; in automatic
+   mode it is shown as not-applicable rather than blocked. No Party PII is rendered (AD-7, AD-14). *@
+<FcPageLayout Mode="FcPageLayoutMode.Constrained">
+    <FcContentLabel LabelledBy="@HeadingId" />
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="24px" Class="agents-approver-policy" data-testid="agents-approver-policy">
+        <FcPageHeader @ref="_header"
+                      PageTitle="@Localizer["Agents.ApproverPolicy.Title"]"
+                      Heading="@Localizer["Agents.ApproverPolicy.Title"]"
+                      HeadingId="@HeadingId"
+                      HeadingTabIndex="-1"
+                      Eyebrow="@Localizer["Agents.ApproverPolicy.Eyebrow"]"
+                      Description="@Localizer["Agents.ApproverPolicy.Description"]"
+                      TestId="agents-approver-policy-header" />
+
+        @if (_result is null)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Loading" TestId="agents-approver-policy-state" />
+        }
+        else if (_result.Status is AgentInspectionStatus.NotAuthorized)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-approver-policy-state" />
+        }
+        else if (_result.Status is AgentInspectionStatus.AgentNotFound || _result.Agent is null)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Empty" TestId="agents-approver-policy-state" />
+        }
+        else
+        {
+            AgentStatusView agent = _result.Agent;
+
+            @if (agent.ResponseMode is AgentResponseMode.Automatic)
+            {
+                <FluentBadge Appearance="BadgeAppearance.Tint"
+                             Color="BadgeColor.Subtle"
+                             IconStart="@FcFluentIcons.SubtractCircle16()"
+                             role="status"
+                             aria-label="@Localizer["Agents.ApproverPolicy.NotApplicable"]"
+                             data-testid="agents-approver-policy-not-applicable">
+                    @Localizer["Agents.ApproverPolicy.NotApplicable"]
+                </FluentBadge>
+            }
+            else
+            {
+                <section class="agents-approver-policy__summary">
+                    <p data-testid="agents-approver-policy-presence">@(agent.HasApproverPolicy ? Localizer["Agents.ApproverPolicy.Present"] : Localizer["Agents.ApproverPolicy.Absent"])</p>
+                    @if (agent.HasApproverPolicy)
+                    {
+                        <p data-testid="agents-approver-policy-version">@Localizer["Agents.ApproverPolicy.Version", agent.ApproverPolicyVersion]</p>
+                        <p data-testid="agents-approver-policy-disclosure">@Localizer["Agents.ApproverPolicy.Disclosure.Label"]: @Localizer[$"Agents.ApproverPolicy.Disclosure.{agent.ApproverPolicyDisclosure}"]</p>
+                    }
+                    else
+                    {
+                        @* Confirmation mode with no configured approver source fails closed — render as blocked,
+                           never as an empty success (UX-DR5, AD-12). *@
+                        <FluentBadge Appearance="BadgeAppearance.Tint"
+                                     Color="BadgeColor.Severe"
+                                     IconStart="@FcFluentIcons.Warning16()"
+                                     role="status"
+                                     aria-label="@Localizer["Agents.ApproverPolicy.Blocked"]"
+                                     data-testid="agents-approver-policy-blocked">
+                            @Localizer["Agents.ApproverPolicy.Blocked"]
+                        </FluentBadge>
+                    }
+                </section>
+
+                <section class="agents-approver-policy__sources" aria-label="@Localizer["Agents.ApproverPolicy.Sources.Title"]" data-testid="agents-approver-policy-sources">
+                    <h2>@Localizer["Agents.ApproverPolicy.Sources.Title"]</h2>
+                    @* Per-source availability is indeterminate in this story: resolving whether a Caller / Predefined
+                       party / Tenant role / Conversation facilitator is actually available requires the live
+                       configuration read path (deferred to Epic 4). Render a neutral "not yet evaluated" state —
+                       never an affirmative "Available", which would render an unknown dependency as ready (AD-12
+                       fail-closed). Icon (question), colour (informative) and text all agree on "unknown" (AC5). *@
+                    <ul>
+                        @foreach (ApproverPolicySourceKind kind in _v1SourceKinds)
+                        {
+                            <li class="agents-approver-policy__source-row" data-testid="@($"agents-approver-policy-source-{kind}")">
+                                <span class="agents-approver-policy__source-basis">@Localizer[$"Agents.ApproverPolicy.SourceKind.{kind}"]</span>
+                                <FluentBadge Appearance="BadgeAppearance.Tint"
+                                             Color="BadgeColor.Informative"
+                                             IconStart="@FcFluentIcons.QuestionCircle16()"
+                                             role="status"
+                                             aria-label="@Localizer["Agents.ApproverPolicy.SourceAvailability.Unknown"]"
+                                             data-testid="@($"agents-approver-policy-source-availability-{kind}")">
+                                    @Localizer["Agents.ApproverPolicy.SourceAvailability.Unknown"]
+                                </FluentBadge>
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+        }
+    </FluentStack>
+</FcPageLayout>
+
+@code {
+    private const string HeadingId = "agents-approver-policy-heading";
+
+    // The four V1 approver-source kinds (AD-8). Unknown is the sentinel and is never offered as a configurable row.
+    private static readonly ApproverPolicySourceKind[] _v1SourceKinds =
+    [
+        ApproverPolicySourceKind.Caller,
+        ApproverPolicySourceKind.PredefinedParty,
+        ApproverPolicySourceKind.TenantRole,
+        ApproverPolicySourceKind.ConversationOwner,
+    ];
+
+    private FcPageHeader? _header;
+    private AgentInspectionResult? _result;
+    private bool _focusHeadingPending = true;
+
+    protected override async Task OnInitializedAsync()
+        => _result = await Gateway.GetConfigurationAsync(CancellationToken.None).ConfigureAwait(false);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusHeadingPending && _header is not null)
+        {
+            _focusHeadingPending = false;
+            await _header.FocusHeadingAsync().ConfigureAwait(false);
+        }
+    }
+}

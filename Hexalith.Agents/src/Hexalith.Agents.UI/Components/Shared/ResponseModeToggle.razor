@@ -1,0 +1,46 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+
+@* Response mode (AC4): a mutually-exclusive Fluent radio group inside a fieldset/legend — the project convention
+   for a mutually-exclusive choice (there is no bespoke segmented control). The copy states the change affects
+   future Agent Calls only (UX-DR23). Neither option is given more visual weight than the other (DESIGN
+   response-mode-toggle); Brand is never used as a status color (UX-DR11). *@
+<fieldset class="agents-response-mode" disabled="@Disabled">
+    <legend>@Localizer["Agents.Config.ResponseMode.Legend"]</legend>
+    <FluentRadioGroup Value="@Value"
+                      ValueChanged="@OnValueChanged"
+                      TValue="AgentResponseMode"
+                      Name="@Name"
+                      aria-label="@Localizer["Agents.Config.ResponseMode.Legend"]"
+                      data-testid="agents-response-mode">
+        <FluentRadio Value="@AgentResponseMode.Automatic" data-testid="agents-response-mode-automatic">
+            @Localizer["Agents.ResponseMode.Automatic"]
+        </FluentRadio>
+        <FluentRadio Value="@AgentResponseMode.Confirmation" data-testid="agents-response-mode-confirmation">
+            @Localizer["Agents.ResponseMode.Confirmation"]
+        </FluentRadio>
+    </FluentRadioGroup>
+    <p class="agents-response-mode__note" data-testid="agents-response-mode-future-note">
+        @Localizer["Agents.Config.ResponseMode.FutureOnlyNote"]
+    </p>
+</fieldset>
+
+@code {
+    /// <summary>The currently selected response mode.</summary>
+    [Parameter]
+    public AgentResponseMode Value { get; set; } = AgentResponseMode.Unknown;
+
+    /// <summary>Raised when the user selects a different mode (no command is dispatched — the write path is deferred).</summary>
+    [Parameter]
+    public EventCallback<AgentResponseMode> ValueChanged { get; set; }
+
+    /// <summary>When <see langword="true"/>, the choice is shown read-only.</summary>
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    /// <summary>Radio group name (kept unique when multiple toggles render on a page).</summary>
+    [Parameter]
+    public string Name { get; set; } = "agents-response-mode";
+
+    private async Task OnValueChanged(AgentResponseMode value)
+        => await ValueChanged.InvokeAsync(value).ConfigureAwait(false);
+}

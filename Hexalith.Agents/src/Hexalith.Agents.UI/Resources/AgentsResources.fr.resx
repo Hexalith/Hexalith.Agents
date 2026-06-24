@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Navigation (AC1) -->
+  <data name="Agents.Navigation.Agents" xml:space="preserve"><value>Agents</value></data>
+  <data name="Agents.Navigation.Overview" xml:space="preserve"><value>Vue d'ensemble des agents</value></data>
+  <data name="Agents.Navigation.Configuration" xml:space="preserve"><value>Configuration de hexa</value></data>
+  <data name="Agents.Navigation.ProviderCatalog" xml:space="preserve"><value>Catalogue des fournisseurs</value></data>
+  <data name="Agents.Navigation.ApproverPolicy" xml:space="preserve"><value>Politique d'approbation</value></data>
+
+  <!-- Common -->
+  <data name="Agents.Common.NotAvailableYet" xml:space="preserve"><value>Pas encore disponible</value></data>
+  <data name="Agents.Common.None" xml:space="preserve"><value>Aucun</value></data>
+  <data name="Agents.Common.Yes" xml:space="preserve"><value>Oui</value></data>
+  <data name="Agents.Common.No" xml:space="preserve"><value>Non</value></data>
+
+  <!-- Surface states (AC6) -->
+  <data name="Agents.Surface.Loading.Title" xml:space="preserve"><value>Chargement</value></data>
+  <data name="Agents.Surface.Loading.Message" xml:space="preserve"><value>Les données de l'agent se chargent.</value></data>
+  <data name="Agents.Surface.Empty.Title" xml:space="preserve"><value>Rien à afficher</value></data>
+  <data name="Agents.Surface.Empty.Message" xml:space="preserve"><value>Aucun enregistrement d'agent n'est encore disponible pour ce locataire.</value></data>
+  <data name="Agents.Surface.FilteredEmpty.Title" xml:space="preserve"><value>Aucune correspondance</value></data>
+  <data name="Agents.Surface.FilteredEmpty.Message" xml:space="preserve"><value>Aucune entrée ne correspond aux filtres actuels.</value></data>
+  <data name="Agents.Surface.Error.Title" xml:space="preserve"><value>Indisponible</value></data>
+  <data name="Agents.Surface.Error.Message" xml:space="preserve"><value>Les données de l'agent n'ont pas pu être chargées. Réessayez lorsque le service est joignable.</value></data>
+  <data name="Agents.Surface.PermissionDenied.Title" xml:space="preserve"><value>Accès refusé</value></data>
+  <data name="Agents.Surface.PermissionDenied.Message" xml:space="preserve"><value>Vous n'êtes pas autorisé à administrer les agents pour ce locataire.</value></data>
+  <data name="Agents.Surface.Stale.Title" xml:space="preserve"><value>Données obsolètes</value></data>
+  <data name="Agents.Surface.Stale.Message" xml:space="preserve"><value>La dernière preuve de disponibilité est obsolète. Actualisez pour réévaluer.</value></data>
+  <data name="Agents.Surface.Reset" xml:space="preserve"><value>Réinitialiser les filtres</value></data>
+  <data name="Agents.Surface.Refresh" xml:space="preserve"><value>Actualiser</value></data>
+
+  <!-- Agent readiness badge canonical states (AC2, AC5; UX-DR20) -->
+  <data name="Agents.Readiness.State.Callable" xml:space="preserve"><value>Appelable</value></data>
+  <data name="Agents.Readiness.State.Disabled" xml:space="preserve"><value>Désactivé</value></data>
+  <data name="Agents.Readiness.State.MissingPartyIdentity" xml:space="preserve"><value>Identité de tiers manquante</value></data>
+  <data name="Agents.Readiness.State.ProviderUnavailable" xml:space="preserve"><value>Fournisseur indisponible</value></data>
+  <data name="Agents.Readiness.State.InvalidConfiguration" xml:space="preserve"><value>Configuration non valide</value></data>
+  <data name="Agents.Readiness.State.Unresolved" xml:space="preserve"><value>Non résolu — à examiner avant l'activation</value></data>
+  <data name="Agents.Readiness.State.Checking" xml:space="preserve"><value>Vérification de la disponibilité</value></data>
+  <data name="Agents.Readiness.State.Unknown" xml:space="preserve"><value>Inconnu</value></data>
+
+  <!-- Activation blockers — one whole string per AgentActivationBlocker value (AC2; UX-DR14) -->
+  <data name="Agents.Readiness.Blocker.Unknown" xml:space="preserve"><value>Un blocage d'activation non reconnu est présent.</value></data>
+  <data name="Agents.Readiness.Blocker.MissingDisplayName" xml:space="preserve"><value>Ajoutez un nom d'affichage pour hexa.</value></data>
+  <data name="Agents.Readiness.Blocker.MissingInstructions" xml:space="preserve"><value>Ajoutez des instructions d'agent pour hexa.</value></data>
+  <data name="Agents.Readiness.Blocker.InvalidInstructions" xml:space="preserve"><value>Corrigez les instructions d'agent — elles ne respectent pas les exigences de validité.</value></data>
+  <data name="Agents.Readiness.Blocker.MissingPartyIdentity" xml:space="preserve"><value>Liez une identité de tiers pour que hexa ait un participant attribuable.</value></data>
+  <data name="Agents.Readiness.Blocker.MissingProviderSelection" xml:space="preserve"><value>Sélectionnez un fournisseur et un modèle pour hexa.</value></data>
+  <data name="Agents.Readiness.Blocker.ProviderUnavailable" xml:space="preserve"><value>Le fournisseur ou le modèle sélectionné n'est pas actuellement disponible.</value></data>
+  <data name="Agents.Readiness.Blocker.MissingResponseMode" xml:space="preserve"><value>Choisissez un mode de réponse pour hexa.</value></data>
+  <data name="Agents.Readiness.Blocker.MissingApproverPolicy" xml:space="preserve"><value>Configurez une politique d'approbation pour le mode confirmation.</value></data>
+  <data name="Agents.Readiness.Blocker.ApproverPolicyUnresolvable" xml:space="preserve"><value>La source d'approbation configurée ne peut pas être résolue.</value></data>
+  <data name="Agents.Readiness.Blocker.MissingContentSafetyPolicy" xml:space="preserve"><value>Configurez une politique de sécurité du contenu avant d'activer hexa.</value></data>
+
+  <!-- Lifecycle -->
+  <data name="Agents.Lifecycle.Unknown" xml:space="preserve"><value>Inconnu</value></data>
+  <data name="Agents.Lifecycle.Draft" xml:space="preserve"><value>Brouillon</value></data>
+  <data name="Agents.Lifecycle.Active" xml:space="preserve"><value>Actif</value></data>
+  <data name="Agents.Lifecycle.Disabled" xml:space="preserve"><value>Désactivé</value></data>
+
+  <!-- Response mode (AC4) -->
+  <data name="Agents.ResponseMode.Unknown" xml:space="preserve"><value>Non configuré</value></data>
+  <data name="Agents.ResponseMode.Automatic" xml:space="preserve"><value>Automatique</value></data>
+  <data name="Agents.ResponseMode.Confirmation" xml:space="preserve"><value>Confirmation</value></data>
+
+  <!-- Overview page (AC2) -->
+  <data name="Agents.Overview.Title" xml:space="preserve"><value>Vue d'ensemble des agents</value></data>
+  <data name="Agents.Overview.Eyebrow" xml:space="preserve"><value>Configuration de l'agent</value></data>
+  <data name="Agents.Overview.Description" xml:space="preserve"><value>Disponibilité, cycle de vie, mode de réponse, fournisseur/modèle et blocages d'activation de hexa pour ce locataire.</value></data>
+  <data name="Agents.Overview.Readiness.Label" xml:space="preserve"><value>Disponibilité</value></data>
+  <data name="Agents.Overview.Lifecycle.Label" xml:space="preserve"><value>Cycle de vie</value></data>
+  <data name="Agents.Overview.ResponseMode.Label" xml:space="preserve"><value>Mode de réponse</value></data>
+  <data name="Agents.Overview.Provider.Label" xml:space="preserve"><value>Fournisseur / modèle</value></data>
+  <data name="Agents.Overview.Callability.Label" xml:space="preserve"><value>Appelable pour ce locataire</value></data>
+  <data name="Agents.Overview.Callable.Yes" xml:space="preserve"><value>Appelable</value></data>
+  <data name="Agents.Overview.Callable.No" xml:space="preserve"><value>Non appelable</value></data>
+  <data name="Agents.Overview.Blockers.Title" xml:space="preserve"><value>Blocages d'activation</value></data>
+  <data name="Agents.Overview.Blockers.None" xml:space="preserve"><value>Aucun blocage d'activation — toutes les conditions de disponibilité sont remplies.</value></data>
+  <data name="Agents.Overview.Recovery.Provider" xml:space="preserve"><value>Configurer le fournisseur</value></data>
+  <data name="Agents.Overview.Recovery.PartyIdentity" xml:space="preserve"><value>Lier l'identité de tiers</value></data>
+  <data name="Agents.Overview.Recovery.Policy" xml:space="preserve"><value>Corriger la politique</value></data>
+  <data name="Agents.Overview.Recovery.ContentSafety" xml:space="preserve"><value>Définir la sécurité du contenu</value></data>
+  <data name="Agents.Overview.Recovery.Configuration" xml:space="preserve"><value>Compléter la configuration</value></data>
+  <data name="Agents.Overview.PendingProposals.Label" xml:space="preserve"><value>Propositions en attente</value></data>
+  <data name="Agents.Overview.RecentFailures.Label" xml:space="preserve"><value>Échecs récents</value></data>
+  <data name="Agents.Overview.Provider.Reference" xml:space="preserve"><value>{0} / {1}</value></data>
+
+  <!-- Provider catalog grid (AC3) -->
+  <data name="Agents.ProviderCatalog.Title" xml:space="preserve"><value>Catalogue des fournisseurs</value></data>
+  <data name="Agents.ProviderCatalog.Eyebrow" xml:space="preserve"><value>Configuration de l'agent</value></data>
+  <data name="Agents.ProviderCatalog.Description" xml:space="preserve"><value>Options de fournisseur et de modèle, métadonnées de capacité, disponibilité et état de configuration. Les secrets ne sont jamais affichés.</value></data>
+  <data name="Agents.ProviderCatalog.Column.Provider" xml:space="preserve"><value>Fournisseur</value></data>
+  <data name="Agents.ProviderCatalog.Column.Model" xml:space="preserve"><value>Modèle</value></data>
+  <data name="Agents.ProviderCatalog.Column.Label" xml:space="preserve"><value>Libellé d'affichage</value></data>
+  <data name="Agents.ProviderCatalog.Column.Status" xml:space="preserve"><value>État</value></data>
+  <data name="Agents.ProviderCatalog.Column.Capabilities" xml:space="preserve"><value>Capacités</value></data>
+  <data name="Agents.ProviderCatalog.Column.ContextWindow" xml:space="preserve"><value>Fenêtre de contexte</value></data>
+  <data name="Agents.ProviderCatalog.Column.MaxOutput" xml:space="preserve"><value>Sortie maximale</value></data>
+  <data name="Agents.ProviderCatalog.Column.Timeout" xml:space="preserve"><value>Politique de délai</value></data>
+  <data name="Agents.ProviderCatalog.Column.Selectable" xml:space="preserve"><value>Sélectionnable</value></data>
+  <data name="Agents.ProviderCatalog.Column.Configured" xml:space="preserve"><value>Configuré</value></data>
+  <data name="Agents.ProviderCatalog.Selectable.Yes" xml:space="preserve"><value>Sélectionnable</value></data>
+  <data name="Agents.ProviderCatalog.Selectable.No" xml:space="preserve"><value>Non sélectionnable</value></data>
+  <data name="Agents.ProviderCatalog.Filter.SelectableOnly" xml:space="preserve"><value>Sélectionnable pour un nouvel usage actif uniquement</value></data>
+  <data name="Agents.ProviderCatalog.ControlsLabel" xml:space="preserve"><value>Filtres du catalogue des fournisseurs</value></data>
+  <data name="Agents.ProviderCatalog.Tokens.Value" xml:space="preserve"><value>{0} jetons</value></data>
+  <data name="Agents.ProviderCatalog.Timeout.Value" xml:space="preserve"><value>{0} ms, {1} tentatives</value></data>
+
+  <!-- Provider status badge canonical states (AC3, AC5) -->
+  <data name="Agents.ProviderCatalog.Status.Enabled" xml:space="preserve"><value>Activé</value></data>
+  <data name="Agents.ProviderCatalog.Status.NotConfigured" xml:space="preserve"><value>Non configuré</value></data>
+  <data name="Agents.ProviderCatalog.Status.Disabled" xml:space="preserve"><value>Désactivé</value></data>
+  <data name="Agents.ProviderCatalog.Status.Degraded" xml:space="preserve"><value>Dégradé</value></data>
+  <data name="Agents.ProviderCatalog.Status.Failed" xml:space="preserve"><value>En échec</value></data>
+  <data name="Agents.ProviderCatalog.Status.HistoricalSelection" xml:space="preserve"><value>Désactivé (sélection historique)</value></data>
+  <data name="Agents.ProviderCatalog.Status.Unknown" xml:space="preserve"><value>Inconnu</value></data>
+
+  <!-- Raw ProviderModelStatus values -->
+  <data name="Agents.ProviderCatalog.ModelStatus.Unknown" xml:space="preserve"><value>Inconnu</value></data>
+  <data name="Agents.ProviderCatalog.ModelStatus.Enabled" xml:space="preserve"><value>Activé</value></data>
+  <data name="Agents.ProviderCatalog.ModelStatus.Disabled" xml:space="preserve"><value>Désactivé</value></data>
+  <data name="Agents.ProviderCatalog.ModelStatus.Degraded" xml:space="preserve"><value>Dégradé</value></data>
+  <data name="Agents.ProviderCatalog.ModelStatus.Failed" xml:space="preserve"><value>En échec</value></data>
+
+  <!-- ProviderConfigurationState values -->
+  <data name="Agents.ProviderCatalog.ConfigurationState.Unknown" xml:space="preserve"><value>Non configuré</value></data>
+  <data name="Agents.ProviderCatalog.ConfigurationState.NotConfigured" xml:space="preserve"><value>Non configuré</value></data>
+  <data name="Agents.ProviderCatalog.ConfigurationState.Configured" xml:space="preserve"><value>Configuré</value></data>
+
+  <!-- Provider capability flags -->
+  <data name="Agents.ProviderCatalog.Capability.TextGeneration" xml:space="preserve"><value>Génération de texte</value></data>
+  <data name="Agents.ProviderCatalog.Capability.None" xml:space="preserve"><value>Aucune capacité optionnelle</value></data>
+  <data name="Agents.ProviderCatalog.Capability.Streaming" xml:space="preserve"><value>Diffusion en continu</value></data>
+  <data name="Agents.ProviderCatalog.Capability.ToolCalling" xml:space="preserve"><value>Appel d'outils</value></data>
+  <data name="Agents.ProviderCatalog.Capability.Vision" xml:space="preserve"><value>Vision</value></data>
+  <data name="Agents.ProviderCatalog.Capability.StructuredOutput" xml:space="preserve"><value>Sortie structurée</value></data>
+
+  <!-- Configuration form (AC4) -->
+  <data name="Agents.Config.Title" xml:space="preserve"><value>Configuration de hexa</value></data>
+  <data name="Agents.Config.Eyebrow" xml:space="preserve"><value>Configuration de l'agent</value></data>
+  <data name="Agents.Config.Description" xml:space="preserve"><value>Configurez l'identité, les instructions, le fournisseur/modèle, le mode de réponse, la politique d'approbation, le cycle de vie et la sécurité du contenu de hexa.</value></data>
+  <data name="Agents.Config.Section.Identity" xml:space="preserve"><value>Identité</value></data>
+  <data name="Agents.Config.Section.Instructions" xml:space="preserve"><value>Instructions</value></data>
+  <data name="Agents.Config.Section.Provider" xml:space="preserve"><value>Fournisseur et modèle</value></data>
+  <data name="Agents.Config.Section.ResponseMode" xml:space="preserve"><value>Mode de réponse</value></data>
+  <data name="Agents.Config.Section.ApproverPolicy" xml:space="preserve"><value>Politique d'approbation</value></data>
+  <data name="Agents.Config.Section.Lifecycle" xml:space="preserve"><value>Cycle de vie et disponibilité</value></data>
+  <data name="Agents.Config.Section.Blockers" xml:space="preserve"><value>Blocages d'activation</value></data>
+  <data name="Agents.Config.Section.ContentSafety" xml:space="preserve"><value>Sécurité du contenu</value></data>
+  <data name="Agents.Config.DisplayName.Label" xml:space="preserve"><value>Nom d'affichage</value></data>
+  <data name="Agents.Config.Description.Label" xml:space="preserve"><value>Description</value></data>
+  <data name="Agents.Config.Instructions.Present" xml:space="preserve"><value>Des instructions sont présentes.</value></data>
+  <data name="Agents.Config.Instructions.Absent" xml:space="preserve"><value>Aucune instruction n'est configurée.</value></data>
+  <data name="Agents.Config.Instructions.Valid" xml:space="preserve"><value>Les instructions sont valides.</value></data>
+  <data name="Agents.Config.Instructions.Invalid" xml:space="preserve"><value>Les instructions ne respectent pas les exigences de validité.</value></data>
+  <data name="Agents.Config.Instructions.Version" xml:space="preserve"><value>Version des instructions {0}</value></data>
+  <data name="Agents.Config.Provider.Selected" xml:space="preserve"><value>Sélectionné : {0} / {1}</value></data>
+  <data name="Agents.Config.Provider.None" xml:space="preserve"><value>Aucun fournisseur ou modèle sélectionné.</value></data>
+  <data name="Agents.Config.ContentSafety.Present" xml:space="preserve"><value>Une politique de sécurité du contenu est configurée.</value></data>
+  <data name="Agents.Config.ContentSafety.Absent" xml:space="preserve"><value>Aucune politique de sécurité du contenu n'est configurée.</value></data>
+  <data name="Agents.Config.ContentSafety.Version" xml:space="preserve"><value>Version de sécurité du contenu {0}</value></data>
+  <data name="Agents.Config.ContentSafety.AutomaticOverride" xml:space="preserve"><value>Dérogation plus stricte en mode automatique configurée.</value></data>
+  <data name="Agents.Config.ContentSafety.ConfirmationOverride" xml:space="preserve"><value>Dérogation plus stricte en mode confirmation configurée.</value></data>
+  <data name="Agents.Config.ApproverPolicy.Link" xml:space="preserve"><value>Ouvrir la politique d'approbation</value></data>
+  <data name="Agents.Config.Activation.Label" xml:space="preserve"><value>Activer hexa</value></data>
+  <data name="Agents.Config.Activation.Deferred" xml:space="preserve"><value>L'activation est effectuée depuis la surface de commande différée ; cet écran affiche uniquement la disponibilité.</value></data>
+  <data name="Agents.Config.ResponseMode.Legend" xml:space="preserve"><value>Mode de réponse</value></data>
+  <data name="Agents.Config.ResponseMode.FutureOnlyNote" xml:space="preserve"><value>La modification du mode de réponse n'affecte que les futurs appels d'agent ; les interactions précédentes ne sont jamais réécrites.</value></data>
+
+  <!-- Approver policy builder (AC4) -->
+  <data name="Agents.ApproverPolicy.Title" xml:space="preserve"><value>Politique d'approbation</value></data>
+  <data name="Agents.ApproverPolicy.Eyebrow" xml:space="preserve"><value>Configuration de l'agent</value></data>
+  <data name="Agents.ApproverPolicy.Description" xml:space="preserve"><value>Sources d'approbation utilisées pour confirmer le contenu généré avant qu'il n'atteigne une conversation en mode confirmation.</value></data>
+  <data name="Agents.ApproverPolicy.Present" xml:space="preserve"><value>Une politique d'approbation est configurée.</value></data>
+  <data name="Agents.ApproverPolicy.Absent" xml:space="preserve"><value>Aucune politique d'approbation n'est configurée.</value></data>
+  <data name="Agents.ApproverPolicy.Version" xml:space="preserve"><value>Version de la politique d'approbation {0}</value></data>
+  <data name="Agents.ApproverPolicy.NotApplicable" xml:space="preserve"><value>Non applicable — une politique d'approbation n'est requise qu'en mode confirmation.</value></data>
+  <data name="Agents.ApproverPolicy.Blocked" xml:space="preserve"><value>Bloqué — une source d'approbation est manquante, ambiguë ou indisponible.</value></data>
+  <data name="Agents.ApproverPolicy.Sources.Title" xml:space="preserve"><value>Sources d'approbation</value></data>
+  <data name="Agents.ApproverPolicy.SourceAvailability.Unknown" xml:space="preserve"><value>Disponibilité pas encore évaluée</value></data>
+  <data name="Agents.ApproverPolicy.SourceAvailability.Available" xml:space="preserve"><value>Disponible</value></data>
+  <data name="Agents.ApproverPolicy.SourceAvailability.Blocked" xml:space="preserve"><value>Bloqué</value></data>
+  <data name="Agents.ApproverPolicy.Disclosure.Label" xml:space="preserve"><value>Divulgation</value></data>
+
+  <!-- ApproverPolicyBasisDisclosure values -->
+  <data name="Agents.ApproverPolicy.Disclosure.Unknown" xml:space="preserve"><value>Non défini</value></data>
+  <data name="Agents.ApproverPolicy.Disclosure.UserVisible" xml:space="preserve"><value>Visible par l'utilisateur</value></data>
+  <data name="Agents.ApproverPolicy.Disclosure.OperatorOnly" xml:space="preserve"><value>Opérateur uniquement</value></data>
+  <data name="Agents.ApproverPolicy.Disclosure.Redacted" xml:space="preserve"><value>Expurgé</value></data>
+  <data name="Agents.ApproverPolicy.Disclosure.Omitted" xml:space="preserve"><value>Omis</value></data>
+
+  <!-- ApproverPolicySourceKind values -->
+  <data name="Agents.ApproverPolicy.SourceKind.Unknown" xml:space="preserve"><value>Source non reconnue</value></data>
+  <data name="Agents.ApproverPolicy.SourceKind.Caller" xml:space="preserve"><value>Appelant</value></data>
+  <data name="Agents.ApproverPolicy.SourceKind.PredefinedParty" xml:space="preserve"><value>Tiers prédéfini</value></data>
+  <data name="Agents.ApproverPolicy.SourceKind.TenantRole" xml:space="preserve"><value>Rôle de locataire</value></data>
+  <data name="Agents.ApproverPolicy.SourceKind.ConversationOwner" xml:space="preserve"><value>Facilitateur de conversation</value></data>
+</root>

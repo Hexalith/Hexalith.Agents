@@ -1,0 +1,37 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+
+@* provider-status-badge (AC3, AC5): color + icon + visible localized whole-string label (UX-DR21/26). Never
+   renders the ConfigurationReferenceId, any secret, provider payload, or SDK detail in text, tooltip, aria-label,
+   or test id (AD-9, AD-14). Icons come from the curated FcFluentIcons set (the only icon surface a domain module
+   references — mirroring Tenants); the Danger semantic role + "Failed" text distinguish a failed entry. *@
+<FluentBadge Appearance="BadgeAppearance.Tint"
+             Color="@AgentReadiness.ColorFor(State)"
+             IconStart="@StateIcon"
+             role="status"
+             aria-label="@Label"
+             data-testid="@TestId">
+    @Label
+</FluentBadge>
+
+@code {
+    /// <summary>The canonical provider status to render (compute via <see cref="AgentReadiness.MapProviderState"/>).</summary>
+    [Parameter]
+    public ProviderReadinessState State { get; set; } = ProviderReadinessState.Unknown;
+
+    /// <summary>Stable test id for the badge surface.</summary>
+    [Parameter]
+    public string TestId { get; set; } = "provider-status-badge";
+
+    private string Label => Localizer[AgentReadiness.LabelKeyFor(State)];
+
+    private Icon StateIcon => State switch
+    {
+        ProviderReadinessState.Enabled => FcFluentIcons.Checkmark16(),
+        ProviderReadinessState.NotConfigured => FcFluentIcons.Warning16(),
+        ProviderReadinessState.Disabled => FcFluentIcons.SubtractCircle16(),
+        ProviderReadinessState.HistoricalSelection => FcFluentIcons.SubtractCircle16(),
+        ProviderReadinessState.Degraded => FcFluentIcons.Warning16(),
+        ProviderReadinessState.Failed => FcFluentIcons.Warning16(),
+        _ => FcFluentIcons.QuestionCircle16(),
+    };
+}

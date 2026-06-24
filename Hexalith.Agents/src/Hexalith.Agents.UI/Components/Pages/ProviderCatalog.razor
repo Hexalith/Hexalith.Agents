@@ -1,0 +1,166 @@
+@page "/agents/providers"
+@attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsAdministratorPolicy)]
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IProviderCatalogGateway Gateway
+
+@* Provider catalog (AC3, AC5, AC6): a full-width FluentDataGrid surface (UX-DR4/UX-DR15) showing safe capability
+   metadata, readiness, and configured/not-configured state — never secret values, the configuration reference id,
+   raw provider payloads, or SDK details (AD-9, AD-14). *@
+<FcContentLabel LabelledBy="@HeadingId" />
+<FcAggregateListPage @ref="_listPage"
+                     TItem="ProviderCatalogEntryView"
+                     LayoutMode="FcPageLayoutMode.FullWidth"
+                     RootTestId="agents-provider-catalog"
+                     RootClass="agents-provider-catalog"
+                     PageTitle="@Localizer["Agents.ProviderCatalog.Title"]"
+                     Heading="@Localizer["Agents.ProviderCatalog.Title"]"
+                     HeadingId="@HeadingId"
+                     HeadingTabIndex="-1"
+                     Eyebrow="@Localizer["Agents.ProviderCatalog.Eyebrow"]"
+                     Description="@Localizer["Agents.ProviderCatalog.Description"]"
+                     HeaderTestId="agents-provider-catalog-header">
+    <Filters>
+        <section aria-label="@Localizer["Agents.ProviderCatalog.ControlsLabel"]">
+            <FluentSwitch @bind-Value="_selectableOnly"
+                          Label="@Localizer["Agents.ProviderCatalog.Filter.SelectableOnly"]"
+                          data-testid="agents-provider-catalog-selectable-filter" />
+        </section>
+    </Filters>
+    <States>
+        @if (_result is null)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Loading" TestId="agents-provider-catalog-state" />
+        }
+        else if (_result.Status is ProviderCatalogInspectionStatus.NotAuthorized)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-provider-catalog-state" />
+        }
+        else if (_result.Status is ProviderCatalogInspectionStatus.EntryNotFound || _result.Entries.Count == 0)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Empty" TestId="agents-provider-catalog-state" />
+        }
+        else if (VisibleRows.Count == 0)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.FilteredEmpty" TestId="agents-provider-catalog-state" OnReset="ResetFilters" />
+        }
+    </States>
+    <Body>
+        @if (ShowGrid)
+        {
+            <FluentDataGrid Items="@VisibleRows.AsQueryable()"
+                            ResizableColumns="true"
+                            GenerateHeader="DataGridGeneratedHeaderType.Sticky"
+                            ItemKey="@(entry => entry.ProviderId + "/" + entry.ModelId)"
+                            data-testid="agents-provider-catalog-grid">
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Provider"]"
+                                ColumnId="provider"
+                                Width="200px"
+                                Sortable="true"
+                                SortBy="@_sortByProvider"
+                                Pin="DataGridColumnPin.Start">
+                    <code data-testid="agents-provider-catalog-provider">@context.ProviderId</code>
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Model"]" ColumnId="model">
+                    <code>@context.ModelId</code>
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Label"]" ColumnId="label">
+                    @context.DisplayLabel
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Status"]" ColumnId="status">
+                    <ProviderStatusBadge State="@AgentReadiness.MapProviderState(context)" />
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Capabilities"]" ColumnId="capabilities">
+                    <ul class="agents-provider-catalog__capabilities">
+                        @foreach (string capability in CapabilityLabels(context))
+                        {
+                            <li>@capability</li>
+                        }
+                    </ul>
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.ContextWindow"]" ColumnId="context-window">
+                    @Localizer["Agents.ProviderCatalog.Tokens.Value", context.ContextWindowTokenLimit]
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.MaxOutput"]" ColumnId="max-output">
+                    @Localizer["Agents.ProviderCatalog.Tokens.Value", context.MaxOutputTokenLimit]
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Timeout"]" ColumnId="timeout">
+                    @Localizer["Agents.ProviderCatalog.Timeout.Value", context.TimeoutPolicy.RequestTimeoutMilliseconds, context.TimeoutPolicy.MaxRetries]
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Selectable"]" ColumnId="selectable">
+                    @(context.IsSelectableForNewActiveUse
+                        ? Localizer["Agents.ProviderCatalog.Selectable.Yes"]
+                        : Localizer["Agents.ProviderCatalog.Selectable.No"])
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Configured"]" ColumnId="configured">
+                    <span data-testid="agents-provider-catalog-configured">@Localizer[$"Agents.ProviderCatalog.ConfigurationState.{context.ConfigurationState}"]</span>
+                </TemplateColumn>
+            </FluentDataGrid>
+        }
+    </Body>
+</FcAggregateListPage>
+
+@code {
+    private const string HeadingId = "agents-provider-catalog-heading";
+
+    private static readonly GridSort<ProviderCatalogEntryView> _sortByProvider =
+        GridSort<ProviderCatalogEntryView>.ByAscending(entry => entry.ProviderId).ThenAscending(entry => entry.ModelId);
+
+    private FcAggregateListPage<ProviderCatalogEntryView>? _listPage;
+    private ProviderCatalogInspectionResult? _result;
+    private bool _selectableOnly;
+    private bool _focusHeadingPending = true;
+
+    private IReadOnlyList<ProviderCatalogEntryView> VisibleRows
+        => _result is { Status: ProviderCatalogInspectionStatus.Success }
+            ? (_selectableOnly
+                ? _result.Entries.Where(entry => entry.IsSelectableForNewActiveUse).ToArray()
+                : _result.Entries)
+            : [];
+
+    private bool ShowGrid => VisibleRows.Count > 0;
+
+    protected override async Task OnInitializedAsync()
+        => _result = await Gateway.ListEntriesAsync(includeDisabled: true, CancellationToken.None).ConfigureAwait(false);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusHeadingPending && _listPage is not null)
+        {
+            _focusHeadingPending = false;
+            await _listPage.FocusHeadingAsync().ConfigureAwait(false);
+        }
+    }
+
+    private void ResetFilters() => _selectableOnly = false;
+
+    // Safe capability labels only (AD-10 capability floor) — each a complete localizable whole string (UX-DR14).
+    private IEnumerable<string> CapabilityLabels(ProviderCatalogEntryView entry)
+    {
+        if (entry.SupportsTextGeneration)
+        {
+            yield return Localizer["Agents.ProviderCatalog.Capability.TextGeneration"];
+        }
+
+        if (entry.SafeCapabilityFlags == ProviderModelCapabilityFlags.None && !entry.SupportsTextGeneration)
+        {
+            yield return Localizer["Agents.ProviderCatalog.Capability.None"];
+            yield break;
+        }
+
+        foreach (ProviderModelCapabilityFlags flag in _optionalCapabilityFlags)
+        {
+            if (entry.SafeCapabilityFlags.HasFlag(flag))
+            {
+                yield return Localizer[$"Agents.ProviderCatalog.Capability.{flag}"];
+            }
+        }
+    }
+
+    private static readonly ProviderModelCapabilityFlags[] _optionalCapabilityFlags =
+    [
+        ProviderModelCapabilityFlags.Streaming,
+        ProviderModelCapabilityFlags.ToolCalling,
+        ProviderModelCapabilityFlags.Vision,
+        ProviderModelCapabilityFlags.StructuredOutput,
+    ];
+}
