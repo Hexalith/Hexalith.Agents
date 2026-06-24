@@ -350,6 +350,83 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
         ]);
     }
 
+    /// <summary>
+    /// Records the terminal proposal-edit decision from the server-assembled outcome (AC1, AC2, AC4; FR-14, FR-15; AD-3,
+    /// AD-5, AD-13, AD-14). The orchestrator resolves edit-time approver authorization + derives the deterministic edited
+    /// version id and returns the outcome through <see cref="EditProposedAgentReply.Result"/>; the aggregate's sole job is
+    /// to validate that a pending proposal exists (AC2) and do the outcome → event math. This is the seventh handler on the
+    /// aggregate; it builds directly on the Story 3.1 proposal created by <see cref="Handle(CreateProposedAgentReply, AgentInteractionState?, CommandEnvelope)"/>.
+    /// </summary>
+    /// <param name="command">The edit command carrying the server-assembled proposal-edit outcome (client values discarded upstream).</param>
+    /// <param name="state">The current interaction state (must hold a pending/edited proposal before it can be edited).</param>
+    /// <param name="envelope">The command envelope (carries the interaction id and the tenant scope).</param>
+    /// <returns>The domain result (the edited/failed outcome event, a not-editable rejection, or an idempotent no-op).</returns>
+    public static DomainResult Handle(EditProposedAgentReply command, AgentInteractionState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string interactionId = envelope.AggregateId;
+
+        // State precondition: a proposal can only be edited on a recorded interaction. An edit command on a never-requested
+        // stream is a structural rejection (no state change), not a recorded decision (AD-12). The positive pattern binds the
+        // non-null requested state so the edit logic runs only over a recorded interaction (CA1062 idiom).
+        if (state is { IsRequested: true } requested)
+        {
+            // Idempotent edited version (AD-13): a retried edit command carries the same deterministic edited version id, so
+            // if that version is already on the append-only history the edit already landed — a clean no-op that never
+            // appends a duplicate version. Keyed on the version id (NOT the status) because a proposal may be edited more
+            // than once, each distinct edit appending a new version (AC4).
+            if (EditAlreadyLanded(requested, command.Result.EditedVersion.VersionId))
+            {
+                return DomainResult.NoOp();
+            }
+
+            // Precondition (AC2): there must be a pending/edited proposal to edit. The proposal exists once creation
+            // succeeded (ProposalCreated) or after a prior edit (ProposalEdited), AND its sub-state must be in the editable
+            // set { Pending, Edited }. A terminal proposal (approved/rejected/abandoned/expired/posted — Stories 3.5/3.6) or
+            // an interaction with no pending proposal is ProposalNotPending → reject, no new version. This is the structural
+            // enforcement of AC2: a terminal proposal can never be edited because it can no longer post.
+            bool proposalExists = requested.Status is AgentInteractionStatus.ProposalCreated or AgentInteractionStatus.ProposalEdited;
+            bool editable = requested.ProposalState is ProposedAgentReplyState.Pending or ProposedAgentReplyState.Edited;
+            if (!proposalExists || !editable)
+            {
+                return DomainResult.Rejection([
+                    new ProposedAgentReplyNotEditableRejection(interactionId, AgentProposedReplyNotEditableReason.ProposalNotPending),
+                ]);
+            }
+
+            // Pure evaluation (AD-3): emit the edited/failed outcome only. The result arrives pre-assembled from the trusted
+            // edit orchestration (authorization resolved + version id derived); the aggregate's sole job is the outcome →
+            // event/status math.
+            return AgentProposalEditPolicy.Evaluate(interactionId, command.Result);
+        }
+
+        return DomainResult.Rejection([
+            new ProposedAgentReplyNotEditableRejection(interactionId, AgentProposedReplyNotEditableReason.InteractionNotProposed),
+        ]);
+    }
+
+    // True when the deterministic edited version id is already on the append-only version history — a retried edit that
+    // already landed (AD-13). The edited version id uses a distinct SHA-256 purpose tag, so it never collides with a
+    // generated version id; checking the whole history is safe.
+    private static bool EditAlreadyLanded(AgentInteractionState state, string editedVersionId)
+    {
+        if (string.IsNullOrEmpty(editedVersionId) || state.GeneratedVersions is null)
+        {
+            return false;
+        }
+
+        foreach (AgentGeneratedVersion version in state.GeneratedVersions)
+        {
+            if (string.Equals(version.VersionId, editedVersionId, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // By-value comparison of a re-issued request against the recorded one (AD-13). Strings are compared ordinally;
     // the snapshot scalars are compared explicitly so a re-derived-id collision with a different configuration is
     // surfaced as a conflict rather than a silent no-op.

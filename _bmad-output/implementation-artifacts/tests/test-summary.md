@@ -1,104 +1,99 @@
-# Test Automation Summary — Story 3.2 (Discover Pending Proposals In Product)
+# Test Automation Summary — Story 3.3: Edit Proposed Reply Versions
 
 **Workflow:** `bmad-qa-generate-e2e-tests` · **Date:** 2026-06-24 · **Engineer role:** QA automation (Administrator)
-**Story:** `_bmad-output/implementation-artifacts/3-2-discover-pending-proposals-in-product.md` (status: review)
+**Story:** `_bmad-output/implementation-artifacts/3-3-edit-proposed-reply-versions.md` (status: review)
+**Test framework (detected):** .NET 10 / Blazor — xUnit v3 `3.2.2`, Shouldly `4.3.0`, NSubstitute `5.3.0`, bUnit (no Playwright/Cypress JS stack). Run via the built executables directly (VSTest TCP socket unavailable in the sandbox). Used the existing framework; added no dependency.
 
-## Framework Detected
+## Scope
 
-The Agents module is a .NET 10 / Blazor (FluentUI v5 RC) project — **no Playwright/Cypress JS stack**. The
-established automated-test stack (per `Hexalith.FrontComposer/_bmad-output/project-context.md` and the as-built suite)
-is this project's "E2E/API" surface:
+Story 3.3 shipped with a comprehensive existing suite across all four layers (Contracts, Domain, Server, UI). This QA pass did **not** regenerate that suite; it performed a coverage-gap analysis — every Story 3.3 production behavior, branch, enum, guard and fail-closed path cross-referenced against every existing test — and **auto-applied tests for the discovered gaps only**. No production code was changed.
 
-- **xUnit v3** + **Shouldly** (no raw `Assert.*`) + **NSubstitute**
-- **bUnit** for Blazor component ("E2E" page) tests — substituting the read gateway seam
-- **Contract** tests = the API-shape guards (System.Text.Json round-trip, fail-closed envelopes)
+## Baseline (before this pass)
 
-Story 3.2 is the read-side + UI discovery surface only (the live server read path is deferred to Epic 4), so the
-testable surface is: the public READ contracts, the proposal-queue page, the state presentation/badge, the gateway
-seam, nav/policy gating, and localization. Used the existing framework; added no dependency.
+| Project | Total | Failed |
+| --- | --- | --- |
+| Hexalith.Agents.Contracts.Tests | 242 | 0 |
+| Hexalith.Agents.Server.Tests | 275 | 0 |
+| Hexalith.Agents.Tests (domain) | 576 | 0 |
+| Hexalith.Agents.UI.Tests | 459 | 0 |
+| **Total** | **1552** | **0** |
 
-## Coverage Gap Analysis
+Release build: **0 warnings / 0 errors** (warnings-as-errors).
 
-The as-built suite was already strong. Auto-applied **15 net-new tests** filling the discovered gaps — all in
-untested **branching logic** that maps directly to acceptance criteria. No production code was changed.
+## Coverage gap analysis — discovered gaps and the tests added
 
-### UI page — `tests/Hexalith.Agents.UI.Tests/ProposalQueueTests.cs` (+12)
+Four genuinely-uncovered behaviors were found. All are in Story 3.3 scope (the editor's shipped output/error surfaces and the AC4 audit read-result). The Story 3.7-owned Esc-without-commit / version-history accessibility was deliberately **not** duplicated.
 
-| Test | Gap closed | AC |
-|------|-----------|----|
-| `Expiry_filter_narrows_the_queue_to_the_matching_bucket` (Theory ×3) | `MatchesExpiry` — 4 branches, ISO parse + 24h window — had **0 coverage** | AC2 |
-| `Agent_filter_narrows_the_queue_to_the_selected_agent` | `FluentSelect` over distinct AgentIds | AC2 |
-| `Source_conversation_filter_keeps_only_contains_matches` | contains-match (`FluentTextInput`) | AC2 |
-| `Caller_filter_keeps_only_contains_matches` | contains-match (`FluentTextInput`) | AC2 |
-| `Responsibility_column_reads_you_for_actionable_rows_and_approver_otherwise` | derived "current responsibility" label (Task 1 note) | AC1 |
-| `Age_column_renders_a_deterministic_bucket_from_the_injected_clock` | `TimeProvider` → age-column wiring (non-flaky) | AC1 |
-| `Expiry_column_shows_the_no_expiry_label_and_a_time_element` | null-vs-`<time>` expiry-column branch | AC1 |
-| `Count_indication_renders_on_a_stale_result` | count surfaces on **Stale** (only Success was tested) | AC3 |
-| `Stale_result_still_renders_the_authorized_rows_behind_the_stale_notice` | degraded-data-with-rows coexists with the stale notice | AD-12 |
-| `Unavailable_read_discloses_no_records_count_or_grid` | error/fault path fails closed — no grid/count/record leak | AC4 |
+### Contracts — `AgentInteractionProposalEditContractsTests.cs` (+4)
 
-### Presentation — `tests/Hexalith.Agents.UI.Tests/ProposedAgentReplyStatePresentationTests.cs` (+1)
+The AC4 audit read-result `AgentProposalEditEvidenceResult` had only its **view** round-trip tested; the result's own fail-closed factory contract (AD-12 — a denied/absent inspection must reveal nothing) was untested.
 
 | Test | Gap closed | AC |
 |------|-----------|----|
-| `Age_helper_uses_inclusive_lower_bounds_at_each_bucket_boundary` | exact 1h / 1d / 7d boundaries (each belongs to the next bucket) | AC1 |
+| `Edit_evidence_result_success_carries_the_safe_view` | `Success(view)` ⇒ `Status=Success`, evidence present | AC4 |
+| `Edit_evidence_result_not_authorized_is_fail_closed_with_no_evidence` | `NotAuthorized()` ⇒ `Status=NotAuthorized`, `Evidence == null` | AC4 / AD-12 |
+| `Edit_evidence_result_not_found_reveals_no_cross_tenant_existence` | `NotFound()` ⇒ `Status=NotFound`, `Evidence == null` (no cross-tenant disclosure) | AC4 / AD-12 |
+| `Edit_evidence_result_round_trips_with_its_view` | result survives System.Text.Json (durable read contract) | AC4 |
 
-### Contracts — `tests/Hexalith.Agents.Contracts.Tests/PendingProposalsContractsTests.cs` (+2)
+### UI — `ProposalEditorTests.cs` (+3)
+
+The editor's status branch only exercised `Edited` and `NotAuthorized`; its `Unavailable` error surface and both component output callbacks (`OnEdited`, `OnCancel`) were untested.
 
 | Test | Gap closed | AC |
 |------|-----------|----|
-| `Stale_result_can_carry_no_trustworthy_rows` | `Stale([], 0)` fails safe like a denial | AC4 |
-| `Success_result_round_trips_multiple_rows_in_order` | nested multi-row list serialization + ordering | AC1/AC4 |
+| `An_unavailable_gateway_shows_the_unavailable_status` | faulted seam (`ProposalEditResult.Unavailable()`) renders the distinct `Status.Unavailable`, never a fabricated success | AC3 (fail-closed surface) |
+| `A_successful_save_raises_on_edited_with_the_result_so_the_host_can_refresh` | a successful save raises `OnEdited` with the safe result (id only, no content) — the component's output contract to its 3.7 host | AC1 / AC3 |
+| `Clicking_cancel_invokes_the_on_cancel_callback_without_saving` | the Cancel button raises `OnCancel` and never calls the edit seam | AC3 |
 
-### Already covered (no action)
+### Already covered (no action needed)
 
-Loading / PermissionDenied / Error / Stale / Empty / FilteredEmpty surfaces · needs-my-action + state filters ·
-count-on-Success · no-leak-on-NotAuthorized · badge conformance (color+icon+text, no hex) · nav admin-vs-approver
-gating · en/fr localization parity · deferred-gateway fail-closed · presentation totality over reserved states.
+Authorized edit appends an immutable version + prior versions preserved · every failure combination → `ProposalEditFailed` with the mapped reason · not-editable rejections (never-requested / no-pending-proposal, AC2) · idempotent terminal no-op + second distinct edit · `Evaluate`/`Decide` no-drift · reflection-dispatch + JSON round-trip · deterministic edited-version identity (distinct purpose tag, retry dedupe) · orchestrator fail-closed authorization (6 non-Resolved sources, null/empty policy, resolver-throws, all-deferred), `OperationCanceledException` propagation, reserved-trust-key stripping, content confinement · ordinal stability + nullable backward-compat · badge/presentation totality · en/fr localization parity · deferred-gateway fail-closed · accessibility (editor region name, polite live region) · editor render (editable vs read-only, distinct version labels, no content in accessible names/test ids, empty-edit guard).
 
-## Generated Tests
+## Result (after this pass)
 
-### Contract (API-shape) tests
-- [x] `tests/Hexalith.Agents.Contracts.Tests/PendingProposalsContractsTests.cs` — Stale-empty fail-safe; multi-row round-trip + ordering
+| Project | Before | After | Δ |
+| --- | --- | --- | --- |
+| Hexalith.Agents.Contracts.Tests | 242 | **246** | +4 |
+| Hexalith.Agents.Server.Tests | 275 | **275** | 0 (regression check) |
+| Hexalith.Agents.Tests (domain) | 576 | **576** | 0 (regression check) |
+| Hexalith.Agents.UI.Tests | 459 | **462** | +3 |
+| **Total** | 1552 | **1559** | **+7** |
 
-### E2E (bUnit page) + presentation tests
-- [x] `tests/Hexalith.Agents.UI.Tests/ProposalQueueTests.cs` — agent/expiry/source/caller filters; responsibility/age/expiry columns; stale-count; stale-rows; unavailable no-leak
-- [x] `tests/Hexalith.Agents.UI.Tests/ProposedAgentReplyStatePresentationTests.cs` — age-bucket boundary correctness
+**Result: Passed — Failed: 0, Skipped: 0** across all four projects. Release build after additions: **0 warnings / 0 errors**. All 7 new tests verified passing under explicit `-method` filters.
 
-## Results (Release, warnings-as-errors, `-m:1`, run per project)
+## AC coverage after this pass
 
-Build: `dotnet build Hexalith.Agents.slnx --configuration Release -m:1` → **Build succeeded, 0 Warning(s) / 0 Error(s)**.
+- **AC1** — authorized edit appends an immutable version, prior versions preserved: covered (aggregate, lifecycle E2E, orchestrator, editor save + new `OnEdited`). ✅
+- **AC2** — terminal/non-pending proposals cannot be edited, no new version: covered (aggregate rejections, fail-closed orchestrator authorization, lifecycle E2E). ✅
+- **AC3** — versions labeled distinctly, content never leaks, fail-closed UI surfaces: covered (presentation totality, badge, en/fr localization, editor render/labels/status incl. new `Unavailable` + `Cancel` paths, accessibility). ✅
+- **AC4** — auditable without overwriting prior content, idempotent: covered (deterministic identity, idempotent no-op, content-confinement no-leak, and the now-covered audit read-result fail-closed factories). ✅
 
-| Project | Before | After | Delta |
-|---|---|---|---|
-| `Hexalith.Agents.Contracts.Tests` | 215 | **217** | +2 |
-| `Hexalith.Agents.UI.Tests` | 415 | **428** | +13 |
-| `Hexalith.Agents.Tests` (aggregate) | 557 | **557** | 0 (regression check) |
-| `Hexalith.Agents.Server.Tests` | 253 | **253** | 0 (regression check) |
-| **Total** | 1440 | **1455** | **+15** |
+## Checklist validation (`bmad-qa-generate-e2e-tests/checklist.md`)
 
-**Result: Passed! Failed: 0, Skipped: 0** across all four projects. ✅
+- [x] API / write-path tests generated (contract + orchestrator + aggregate command/event surface)
+- [x] E2E / component tests generated (bUnit editor + lifecycle E2E)
+- [x] Tests use standard framework APIs (xUnit v3 / Shouldly / NSubstitute / bUnit; no raw `Assert.*`)
+- [x] Happy path covered (authorized edit + successful save)
+- [x] 1–2 critical error cases covered (terminal rejection, fail-closed auth, Unavailable, NotAuthorized, NotFound)
+- [x] All tests run successfully — **1559 total, 0 failed**
+- [x] Proper locators (semantic `data-testid` / `role` / `aria` queries)
+- [x] Clear descriptions (`Method_with_context_behavior` / `Subject_scenario_expectation`)
+- [x] No hardcoded waits/sleeps (bUnit `WaitForAssertion`, no `Thread.Sleep`)
+- [x] Tests are independent (each builds its own state/render; no order dependency)
+- [x] Summary created with coverage metrics (this file)
 
-## AC Coverage After This Pass
+## Files changed (tests only — no production change)
 
-- **AC1** — queue lists safe fields; responsibility/age/expiry columns + state badge now asserted at render; no content field by construction. ✅
-- **AC2** — **all six filters** (needs-my-action, state, agent, source conversation, caller, expiry) now have narrowing tests; filtered-empty→reset covered. ✅
-- **AC3** — count indication asserted on **both** Success and Stale; absent on denial. ✅
-- **AC4** — denied **and** faulted (Unavailable) reads assert no grid/count/record disclosure; Stale-empty + denial envelopes carry empty list + zero count. ✅
+- `Hexalith.Agents/tests/Hexalith.Agents.Contracts.Tests/AgentInteractionProposalEditContractsTests.cs` (+1 `EditView` fixture, +4 tests)
+- `Hexalith.Agents/tests/Hexalith.Agents.UI.Tests/ProposalEditorTests.cs` (+3 tests)
 
-## Notes / Boundaries
+## Notes / boundaries
 
-- No production code changed — gaps were purely missing test coverage. The two write-side/regression suites were
-  re-run to confirm (not modify) green status.
-- The live server read-model / projection / query-handler / BFF binding remains **deferred to Epic 4**; those paths
-  are not yet testable here (the deferred gateway fails closed to `NotAuthorized`).
-- Standards held: PascalCase BDD-style names, Shouldly assertions, `ConfigureAwait`-clean, deterministic clock
-  (`FixedTimeProvider`) — no hardcoded waits, order-independent, consistent with the surrounding Story 3.2 tests.
+- No production code changed — the gaps were purely missing test coverage. The two write-side/regression suites (domain + server) were re-run to confirm (not modify) green status.
+- The live server read-model / projection / query-handler / BFF binding for `AgentProposalEditEvidenceResult` remains **deferred to Epic 4**; the fail-closed factory tests added here lock its contract ahead of that binding.
+- Story 3.7 will host the editor and complete the Esc-without-commit / version-history / live-region accessibility — intentionally not duplicated here.
 
-## Next Steps
+## Next steps
 
-- Run the suite in CI alongside the existing Agents lanes (unit/bUnit; no Docker/Aspire required).
-- When Epic 4 wires the live read path (`NeedsCurrentUserAction` / age / freshness computation + read-authorization
-  audit), add integration/API tests against the real read-model and the tenant-isolation denial audit.
-- Stories 3.3–3.7 add row-level actions (edit/regenerate/approve/reject) — extend the queue tests with focus-return,
-  `Esc` semantics, and live-region politeness when those land.
+- Run the four projects in CI individually (never solution-level `dotnet test`; build with `-m:1`).
+- When Epic 4 wires the live edit-evidence read path, add integration/API tests against the real read-model + the tenant-isolation denial audit.

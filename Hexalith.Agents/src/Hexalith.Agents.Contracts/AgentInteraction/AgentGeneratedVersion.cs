@@ -9,10 +9,11 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// <remarks>
 /// <para>
 /// <b>Sensitive content (AD-14):</b> <see cref="GeneratedContent"/> is conversation-derived content of the SAME class as
-/// the caller <c>Prompt</c>. It lives ONLY on the durable success event (<see cref="Events.AgentOutputGenerated"/>) and
-/// the aggregate state — it must NEVER appear on a command, view, result, rejection, failure event, log, telemetry, or
-/// audit summary. Every other member is a safe scalar/reference: provider/model identity, capability/policy versions,
-/// and token usage counts (AD-9, AD-14).
+/// the caller <c>Prompt</c>. It lives ONLY on the durable success events (<see cref="Events.AgentOutputGenerated"/> for a
+/// generated version, <see cref="Events.ProposedAgentReplyEdited"/> for an edited version) and the aggregate state — it
+/// must NEVER appear on a command (other than the legitimate content-bearing write-path edit command/result), view,
+/// evidence, rejection, failure event, log, telemetry, or audit summary. Every other member is a safe scalar/reference:
+/// provider/model identity, capability/policy versions, token usage counts, and the edited-version provenance ids (AD-9, AD-14).
 /// </para>
 /// <para>
 /// <see cref="VersionId"/> is derived deterministically from <see cref="AttemptId"/> so a retried generation reuses the
@@ -30,6 +31,8 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// <param name="ContentSafetyPolicyVersion">The Content Safety Policy version the generated content passed.</param>
 /// <param name="PromptTokenCount">The prompt/input token usage (a safe count).</param>
 /// <param name="OutputTokenCount">The generated-output token usage (a safe count).</param>
+/// <param name="SourceVersionId">For an <see cref="AgentGenerationKind.Edited"/> version, the id of the version it was edited from (its provenance); <see langword="null"/> for a first-pass <see cref="AgentGenerationKind.Generated"/> version (Story 3.3; AC1; AD-5, AD-17).</param>
+/// <param name="EditorPartyId">For an <see cref="AgentGenerationKind.Edited"/> version, the authoring Approver's stable Party reference (a reference, not PII — AD-7); <see langword="null"/> for a <see cref="AgentGenerationKind.Generated"/> version (Story 3.3; AC1).</param>
 public record AgentGeneratedVersion(
     string VersionId,
     string AttemptId,
@@ -40,4 +43,6 @@ public record AgentGeneratedVersion(
     int ProviderCapabilityVersion,
     int ContentSafetyPolicyVersion,
     int PromptTokenCount,
-    int OutputTokenCount);
+    int OutputTokenCount,
+    string? SourceVersionId = null,
+    string? EditorPartyId = null);

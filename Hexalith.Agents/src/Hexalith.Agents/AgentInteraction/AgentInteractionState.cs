@@ -78,6 +78,12 @@ public sealed class AgentInteractionState
     /// <summary>Gets or sets the safe proposal-creation failure-reason classification recorded when creation failed closed (FR-24, AD-12). <see langword="null"/> until a creation-failed decision is recorded.</summary>
     public AgentProposalCreationFailureReason? ProposalCreationFailureReason { get; set; }
 
+    /// <summary>Gets or sets the safe proposal-edit evidence recorded when the latest edit decision was made (Audit Evidence; FR-24, AD-14; ids + policy basis only, never content). <see langword="null"/> until an edit decision is recorded (Story 3.3).</summary>
+    public AgentProposedReplyEditEvidence? ProposalEditEvidence { get; set; }
+
+    /// <summary>Gets or sets the safe proposal-edit failure-reason classification recorded when an edit failed closed (FR-24, AD-12). <see langword="null"/> until an edit-failed decision is recorded (Story 3.3).</summary>
+    public AgentProposalEditFailureReason? ProposalEditFailureReason { get; set; }
+
     /// <summary>Applies the Agent Call request: the interaction exists and freezes its configuration snapshot (AC1).</summary>
     /// <param name="e">The event.</param>
     public void Apply(InteractionRequested e)
@@ -276,6 +282,49 @@ public sealed class AgentInteractionState
     /// <summary>No-op replay handler — the not-creatable rejection carries no state change.</summary>
     /// <param name="e">The rejection event.</param>
     public void Apply(ProposedAgentReplyNotCreatableRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>Applies the proposal-edited outcome: appends the new immutable edited version to the append-only history (preserving prior versions), records the <see cref="ProposedAgentReplyState.Edited"/> sub-state, and records the safe edit evidence (AC1, AC4; Story 3.3; AD-5, AD-14).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyEdited e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalEdited;
+        ProposalState = ProposedAgentReplyState.Edited;
+        ProposalEditEvidence = e.Evidence;
+        var versions = GeneratedVersions is null
+            ? new List<AgentGeneratedVersion>()
+            : new List<AgentGeneratedVersion>(GeneratedVersions);
+        versions.Add(e.EditedVersion);
+        GeneratedVersions = versions;
+    }
+
+    /// <summary>Applies the proposal-edit-failed outcome: records the terminal fail-closed decision, its safe reason, and the attempted evidence — no new version is appended and the prior <see cref="ProposalState"/> is preserved (AC2, AC4; Story 3.3; AD-12, AD-14).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyEditFailed e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalEditFailed;
+        ProposalEditFailureReason = e.Reason;
+        ProposalEditEvidence = e.Evidence;
+    }
+
+    /// <summary>No-op replay handler — the not-editable rejection carries no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(ProposedAgentReplyNotEditableRejection e)
     {
         ArgumentNullException.ThrowIfNull(e);
         MarkReplayOnlyEventHandled();

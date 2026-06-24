@@ -43,11 +43,14 @@ public abstract class AgentsTestContext : FrontComposerTestBase
             .Returns(Task.FromResult(AgentInteractionInspectionResult.NotAuthorized()));
         ProposalGateway.ListPendingProposalsAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(PendingProposalsResult.NotAuthorized()));
+        ProposalEditGateway.EditProposalAsync(Arg.Any<ProposalEditRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProposalEditResult.NotAuthorized()));
 
         Services.AddSingleton(SetupGateway);
         Services.AddSingleton(CatalogGateway);
         Services.AddSingleton(CallGateway);
         Services.AddSingleton(ProposalGateway);
+        Services.AddSingleton(ProposalEditGateway);
         Services.AddSingleton<TimeProvider>(Clock);
         Services.AddSingleton<IStringLocalizer<AgentsResources>>(new StubAgentsLocalizer());
         Authorization = AddAuthorization();
@@ -64,6 +67,9 @@ public abstract class AgentsTestContext : FrontComposerTestBase
 
     /// <summary>The substituted proposal-queue read gateway (defaults to the fail-closed result).</summary>
     protected IProposalQueueGateway ProposalGateway { get; } = Substitute.For<IProposalQueueGateway>();
+
+    /// <summary>The substituted proposal-edit write gateway (defaults to the fail-closed result).</summary>
+    protected IProposalEditGateway ProposalEditGateway { get; } = Substitute.For<IProposalEditGateway>();
 
     /// <summary>The deterministic clock injected into the proposal queue so the rendered "age" bucket is stable.</summary>
     protected FixedTimeProvider Clock { get; } = new(new DateTimeOffset(2026, 6, 24, 12, 0, 0, TimeSpan.Zero));

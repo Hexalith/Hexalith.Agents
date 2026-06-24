@@ -97,6 +97,7 @@ public sealed class BadgeConformanceTests : AgentsTestContext
 
     [Theory]
     [InlineData(ProposedAgentReplyState.Pending)]
+    [InlineData(ProposedAgentReplyState.Edited)]
     [InlineData(ProposedAgentReplyState.Unknown)]
     public void Proposal_state_badge_renders_color_icon_and_localized_whole_string(ProposedAgentReplyState state)
     {

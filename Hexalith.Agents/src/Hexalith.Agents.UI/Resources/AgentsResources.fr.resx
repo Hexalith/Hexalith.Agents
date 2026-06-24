@@ -326,4 +326,21 @@
   <data name="Agents.ProposalQueue.Filter.Expiry.None" xml:space="preserve"><value>Aucune expiration</value></data>
   <data name="Agents.ProposalState.Label.Unknown" xml:space="preserve"><value>Inconnu</value></data>
   <data name="Agents.ProposalState.Label.Pending" xml:space="preserve"><value>En attente d'approbation</value></data>
+  <data name="Agents.ProposalState.Label.Edited" xml:space="preserve"><value>Modifiée, en attente d'approbation</value></data>
+
+  <!-- Generation-kind version labels (Story 3.3 — distinct generated vs edited; AC1, AC3) -->
+  <data name="Agents.GenerationKind.Label.Unknown" xml:space="preserve"><value>Version inconnue</value></data>
+  <data name="Agents.GenerationKind.Label.Generated" xml:space="preserve"><value>Version générée</value></data>
+  <data name="Agents.GenerationKind.Label.Edited" xml:space="preserve"><value>Version modifiée</value></data>
+
+  <!-- Proposed-reply editor (Story 3.3; AC1, AC3) -->
+  <data name="Agents.ProposalEditor.Label" xml:space="preserve"><value>Éditeur de réponse proposée</value></data>
+  <data name="Agents.ProposalEditor.Content.Label" xml:space="preserve"><value>Réponse proposée</value></data>
+  <data name="Agents.ProposalEditor.Author.Label" xml:space="preserve"><value>Modifiée par</value></data>
+  <data name="Agents.ProposalEditor.Save" xml:space="preserve"><value>Enregistrer la modification</value></data>
+  <data name="Agents.ProposalEditor.Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Agents.ProposalEditor.PriorVersionsPreserved" xml:space="preserve"><value>Les versions générées précédentes sont conservées.</value></data>
+  <data name="Agents.ProposalEditor.Status.Edited" xml:space="preserve"><value>Votre modification a été enregistrée comme nouvelle version.</value></data>
+  <data name="Agents.ProposalEditor.Status.NotAuthorized" xml:space="preserve"><value>Vous n'êtes pas autorisé à modifier cette réponse proposée.</value></data>
+  <data name="Agents.ProposalEditor.Status.Unavailable" xml:space="preserve"><value>La modification n'a pas pu être enregistrée. Réessayez lorsque le service sera disponible.</value></data>
 </root>

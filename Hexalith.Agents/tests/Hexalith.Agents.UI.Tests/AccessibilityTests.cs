@@ -7,9 +7,11 @@ using AngleSharp.Dom;
 using Bunit;
 
 using Hexalith.Agents.Contracts.Agent;
+using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.UI.Components.Pages;
 using Hexalith.Agents.UI.Components.Shared;
+using Hexalith.Agents.UI.Services.Gateways;
 using Hexalith.FrontComposer.Shell.Components.Layout;
 
 using Microsoft.FluentUI.AspNetCore.Components;
@@ -153,6 +155,40 @@ public sealed class AccessibilityTests : AgentsTestContext
 
         cut.WaitForAssertion(() =>
             cut.Find("#agents-conversation-call-heading").GetAttribute("tabindex").ShouldBe("-1"));
+    }
+
+    [Fact]
+    public void Proposal_editor_names_its_region_via_a_localized_whole_string()
+    {
+        // AC3 — the editor region carries an accessible name from a localized whole string (the stub localizer returns the
+        // key), never a raw content fragment.
+        IRenderedComponent<ProposalEditor> cut = Render<ProposalEditor>(parameters => parameters
+            .Add(editor => editor.CanEdit, true)
+            .Add(editor => editor.Content, "a proposed reply"));
+
+        cut.Find("[data-testid='proposal-editor']").GetAttribute("aria-label").ShouldBe("Agents.ProposalEditor.Label");
+    }
+
+    [Fact]
+    public void Proposal_editor_save_outcome_announces_with_a_polite_live_region()
+    {
+        // AC3 — the save outcome is conveyed through a named polite status live region (perceivable without animation),
+        // mirroring the call-status feedback region.
+        ProposalEditGateway.EditProposalAsync(Arg.Any<ProposalEditRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProposalEditResult.Edited("edited-version-2")));
+
+        IRenderedComponent<ProposalEditor> cut = Render<ProposalEditor>(parameters => parameters
+            .Add(editor => editor.CanEdit, true)
+            .Add(editor => editor.Content, "a proposed reply"));
+
+        cut.Find("[data-testid='proposal-editor-save']").Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            IElement status = cut.Find("[data-testid='proposal-editor-status']");
+            status.GetAttribute("role").ShouldBe("status");
+            status.GetAttribute("aria-live").ShouldBe("polite");
+        });
     }
 
     [Fact]

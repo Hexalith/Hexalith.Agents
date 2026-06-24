@@ -189,6 +189,23 @@ public sealed class LocalizationResourceTests
         yield return "Agents.ProposalQueue.Filter.Expiry.ExpiringSoon";
         yield return "Agents.ProposalQueue.Filter.Expiry.Expired";
         yield return "Agents.ProposalQueue.Filter.Expiry.None";
+
+        // Story 3.3 — distinct generated-vs-edited version labels (one whole string per AgentGenerationKind value; UX-DR14).
+        foreach (AgentGenerationKind kind in Enum.GetValues<AgentGenerationKind>())
+        {
+            yield return AgentGenerationKindPresentation.LabelKeyFor(kind);
+        }
+
+        // Story 3.3 — proposal-editor whole strings (labels, save/cancel, preserved notice, outcome statuses).
+        yield return "Agents.ProposalEditor.Label";
+        yield return "Agents.ProposalEditor.Content.Label";
+        yield return "Agents.ProposalEditor.Author.Label";
+        yield return "Agents.ProposalEditor.Save";
+        yield return "Agents.ProposalEditor.Cancel";
+        yield return "Agents.ProposalEditor.PriorVersionsPreserved";
+        yield return "Agents.ProposalEditor.Status.Edited";
+        yield return "Agents.ProposalEditor.Status.NotAuthorized";
+        yield return "Agents.ProposalEditor.Status.Unavailable";
     }
 
     public static IEnumerable<object[]> EnumDerivedKeyCases() => EnumDerivedKeys().Distinct().Select(key => new object[] { key });

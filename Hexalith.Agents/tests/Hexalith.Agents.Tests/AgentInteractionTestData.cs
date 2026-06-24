@@ -458,6 +458,94 @@ internal static class AgentInteractionTestData
     internal static CreateProposedAgentReply ProposalCommand(AgentProposalCreationResult result, string interactionId = InteractionId)
         => new(interactionId, result);
 
+    // ===== Story 3.3 edit fixtures =====
+
+    /// <summary>The authoring Approver's stable Party reference used for an edit (a reference, not PII — AD-7).</summary>
+    internal const string EditorPartyId = "editor-party-001";
+
+    /// <summary>The sample Approver-edited content (sensitive — durable only on the edit version; AD-14).</summary>
+    internal const string EditedContentText = "An Approver-corrected version of the reply.";
+
+    /// <summary>The sample deterministic edit attempt id (reused across retries; AD-13).</summary>
+    internal const string EditAttemptId = "edit-attempt-001";
+
+    /// <summary>The sample deterministic edited-version id (a safe id derived server-side; AD-13).</summary>
+    internal const string EditedVersionId = "edited-version-001";
+
+    /// <summary>Builds an edited generated version (Kind=Edited, carrying the edited content + source/editor provenance).</summary>
+    /// <param name="versionId">The deterministic edited version id.</param>
+    /// <param name="content">The edited content (sensitive — carried only on the edit version; AD-14).</param>
+    /// <param name="sourceVersionId">The id of the version edited from (its provenance).</param>
+    /// <returns>The edited version.</returns>
+    internal static AgentGeneratedVersion SampleEditedVersion(
+        string versionId = EditedVersionId,
+        string content = EditedContentText,
+        string sourceVersionId = PostedVersionId)
+        => new(
+            versionId,
+            EditAttemptId,
+            AgentGenerationKind.Edited,
+            content,
+            SampleSnapshot.ProviderId,
+            SampleSnapshot.ModelId,
+            SampleSnapshot.ProviderCapabilityVersion,
+            ContentSafetyPolicyVersion,
+            PromptTokenCount: 0,
+            OutputTokenCount: 0,
+            sourceVersionId,
+            EditorPartyId);
+
+    /// <summary>Builds a server-assembled proposal-edit result with sane defaults (carries the edited version + content).</summary>
+    /// <param name="outcome">The server-assembled edit outcome.</param>
+    /// <param name="verdict">The resolved edit-time approver-policy verdict (Valid authorizes the edit).</param>
+    /// <param name="editedVersionId">The deterministic edited version id.</param>
+    /// <returns>The proposal-edit result.</returns>
+    internal static AgentProposalEditResult EditResult(
+        AgentProposalEditOutcome outcome = AgentProposalEditOutcome.Edited,
+        ApproverPolicyValidationStatus verdict = ApproverPolicyValidationStatus.Valid,
+        string editedVersionId = EditedVersionId)
+        => new(
+            outcome,
+            SampleEditedVersion(editedVersionId),
+            verdict,
+            SampleProposalId,
+            SourceConversationId,
+            ConfirmationSnapshot.ApproverPolicyVersion,
+            ApproverPolicyBasisDisclosure.OperatorOnly);
+
+    /// <summary>A successful, authorized proposal-edit result.</summary>
+    /// <returns>The authorized edited result.</returns>
+    internal static AgentProposalEditResult EditedProposalResult() => EditResult();
+
+    /// <summary>An adapter-failure proposal-edit result (still authorized — fails closed at the adapter).</summary>
+    /// <returns>The adapter-failure result.</returns>
+    internal static AgentProposalEditResult AdapterFailureEditResult()
+        => EditResult(AgentProposalEditOutcome.AdapterFailure);
+
+    /// <summary>The edit-proposal command carrying the given result for the sample interaction.</summary>
+    /// <param name="result">The server-assembled proposal-edit result.</param>
+    /// <param name="interactionId">The deterministic interaction id (the aggregate id).</param>
+    /// <returns>The edit-proposal command.</returns>
+    internal static EditProposedAgentReply EditCommand(AgentProposalEditResult result, string interactionId = InteractionId)
+        => new(interactionId, result);
+
+    /// <summary>The edit precondition: a Confirmation-mode interaction that reached a Pending proposal (status <c>ProposalCreated</c>).</summary>
+    /// <returns>The rehydrated proposal-created interaction state, driven through the real <c>Apply</c> handlers.</returns>
+    internal static AgentInteractionState StateProposalCreated()
+    {
+        AgentInteractionState state = StateGeneratedConfirmationMode();
+        state.Apply(new ProposedAgentReplyCreated(
+            InteractionId,
+            new AgentProposedReplyEvidence(
+                SampleProposalId,
+                SourceConversationId,
+                PostedVersionId,
+                ConfirmationSnapshot.ApproverPolicyVersion,
+                ConfirmationSnapshot.ContentSafetyPolicyVersion,
+                ExpiresAt: null)));
+        return state;
+    }
+
     /// <summary>
     /// Applies every event of a <see cref="DomainResult"/> to the supplied state through the aggregate's typed
     /// <c>Apply</c> methods — the same production replay handlers the EventStore state-store invokes. The success
@@ -489,6 +577,9 @@ internal static class AgentInteractionTestData
                 case ProposedAgentReplyCreated e: state.Apply(e); break;
                 case ProposedAgentReplyCreationFailed e: state.Apply(e); break;
                 case ProposedAgentReplyNotCreatableRejection e: state.Apply(e); break;
+                case ProposedAgentReplyEdited e: state.Apply(e); break;
+                case ProposedAgentReplyEditFailed e: state.Apply(e); break;
+                case ProposedAgentReplyNotEditableRejection e: state.Apply(e); break;
                 default: throw new InvalidOperationException($"Unhandled event type '{payload.GetType().Name}' in test apply dispatch.");
             }
         }

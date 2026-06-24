@@ -58,4 +58,10 @@ public enum AgentInteractionStatus
 
     /// <summary>Proposal creation failed closed AFTER successful generation — the selected version could not be read / adapter failure — recorded as fail-closed Audit Evidence; no approvable proposal exists; distinct from generation/auth/context/safety failure (Story 3.1; AC3, AC4).</summary>
     ProposalCreationFailed,
+
+    /// <summary>An authorized Approver edited the Proposed Agent Reply, appending a new immutable edited version; the proposal stays pending approval (the proposal sub-state is <see cref="ProposedAgentReplyState.Edited"/>) (Story 3.3; AC1).</summary>
+    ProposalEdited,
+
+    /// <summary>An edit attempt failed closed AFTER the proposal was pending — recorded as fail-closed Audit Evidence; no new version is created and prior versions are preserved; distinct from a structural not-editable rejection (Story 3.3; AC2, AC4).</summary>
+    ProposalEditFailed,
 }

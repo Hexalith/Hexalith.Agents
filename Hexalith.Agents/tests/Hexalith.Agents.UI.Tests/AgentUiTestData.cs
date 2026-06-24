@@ -107,4 +107,26 @@ internal static class AgentUiTestData
     // Builds a Success result, deriving the AC3 pending count from the rows' "needs my action" flags.
     public static PendingProposalsResult ProposalsResult(params PendingProposalView[] proposals)
         => PendingProposalsResult.Success(proposals, proposals.Count(proposal => proposal.NeedsCurrentUserAction));
+
+    // ===== Story 3.3 edit factories =====
+
+    /// <summary>A safe edited generated version (Kind=Edited, carrying its source/editor provenance) for the editor / version-history tests.</summary>
+    public static AgentGeneratedVersion EditedVersion(
+        string versionId = "edited-version-1",
+        string sourceVersionId = "version-1",
+        string editorPartyId = "editor-1",
+        string content = "an edited reply")
+        => new(
+            VersionId: versionId,
+            AttemptId: "edit-attempt-1",
+            Kind: AgentGenerationKind.Edited,
+            GeneratedContent: content,
+            ProviderId: "openai",
+            ModelId: "gpt-x",
+            ProviderCapabilityVersion: 1,
+            ContentSafetyPolicyVersion: 1,
+            PromptTokenCount: 0,
+            OutputTokenCount: 0,
+            SourceVersionId: sourceVersionId,
+            EditorPartyId: editorPartyId);
 }

@@ -19,10 +19,11 @@ namespace Hexalith.Agents.UI.Components.Shared;
 public static class ProposedAgentReplyStatePresentation
 {
     /// <summary>
-    /// Maps a proposal state to its Fluent semantic badge role. <c>Pending</c> (awaiting approval) is Informative
-    /// (DESIGN <c>status-informative</c>); the sentinel and every reserved 3.3–3.6 state map through the Subtle total
-    /// default until their owning stories add explicit roles (mirroring <see cref="AgentCallStatusPresentation.MapStatus"/>'s
-    /// totality). Brand/Success are never used for a not-yet-resolved proposal.
+    /// Maps a proposal state to its Fluent semantic badge role. <c>Pending</c> (awaiting approval) and <c>Edited</c>
+    /// (edited, still awaiting approval — the in-progress/pending set) are Informative (DESIGN <c>status-informative</c>);
+    /// the sentinel and every reserved 3.4–3.6 state map through the Subtle total default until their owning stories add
+    /// explicit roles (mirroring <see cref="AgentCallStatusPresentation.MapStatus"/>'s totality). Brand/Success are never
+    /// used for a not-yet-resolved proposal.
     /// </summary>
     /// <param name="state">The safe proposal state.</param>
     /// <returns>The Fluent badge color role.</returns>
@@ -30,6 +31,7 @@ public static class ProposedAgentReplyStatePresentation
         => state switch
         {
             ProposedAgentReplyState.Pending => BadgeColor.Informative,
+            ProposedAgentReplyState.Edited => BadgeColor.Informative,
             ProposedAgentReplyState.Unknown => BadgeColor.Subtle,
             _ => BadgeColor.Subtle,
         };
@@ -37,8 +39,8 @@ public static class ProposedAgentReplyStatePresentation
     /// <summary>
     /// Maps a proposal state to its icon, composed ONLY from the curated <see cref="FcFluentIcons"/> factory. <c>Pending</c>
     /// reuses the in-flight <see cref="FcFluentIcons.ArrowSync16"/> (no clock glyph exists in the curated set, exactly as
-    /// the call-status/readiness badges reuse curated glyphs); every other (incl. reserved) state maps through the
-    /// question-mark total default.
+    /// the call-status/readiness badges reuse curated glyphs); <c>Edited</c> uses the curated <see cref="FcFluentIcons.Edit16"/>;
+    /// every other (incl. reserved) state maps through the question-mark total default.
     /// </summary>
     /// <param name="state">The safe proposal state.</param>
     /// <returns>The Fluent icon for the state.</returns>
@@ -46,6 +48,7 @@ public static class ProposedAgentReplyStatePresentation
         => state switch
         {
             ProposedAgentReplyState.Pending => FcFluentIcons.ArrowSync16(),
+            ProposedAgentReplyState.Edited => FcFluentIcons.Edit16(),
             _ => FcFluentIcons.QuestionCircle16(),
         };
 

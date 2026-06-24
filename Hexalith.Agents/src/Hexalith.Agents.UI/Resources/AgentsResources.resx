@@ -326,4 +326,21 @@
   <data name="Agents.ProposalQueue.Filter.Expiry.None" xml:space="preserve"><value>No expiry</value></data>
   <data name="Agents.ProposalState.Label.Unknown" xml:space="preserve"><value>Unknown</value></data>
   <data name="Agents.ProposalState.Label.Pending" xml:space="preserve"><value>Pending approval</value></data>
+  <data name="Agents.ProposalState.Label.Edited" xml:space="preserve"><value>Edited, pending approval</value></data>
+
+  <!-- Generation-kind version labels (Story 3.3 — distinct generated vs edited; AC1, AC3) -->
+  <data name="Agents.GenerationKind.Label.Unknown" xml:space="preserve"><value>Unknown version</value></data>
+  <data name="Agents.GenerationKind.Label.Generated" xml:space="preserve"><value>Generated version</value></data>
+  <data name="Agents.GenerationKind.Label.Edited" xml:space="preserve"><value>Edited version</value></data>
+
+  <!-- Proposed-reply editor (Story 3.3; AC1, AC3) -->
+  <data name="Agents.ProposalEditor.Label" xml:space="preserve"><value>Proposed reply editor</value></data>
+  <data name="Agents.ProposalEditor.Content.Label" xml:space="preserve"><value>Proposed reply</value></data>
+  <data name="Agents.ProposalEditor.Author.Label" xml:space="preserve"><value>Edited by</value></data>
+  <data name="Agents.ProposalEditor.Save" xml:space="preserve"><value>Save edit</value></data>
+  <data name="Agents.ProposalEditor.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Agents.ProposalEditor.PriorVersionsPreserved" xml:space="preserve"><value>Prior generated versions are preserved.</value></data>
+  <data name="Agents.ProposalEditor.Status.Edited" xml:space="preserve"><value>Your edit was saved as a new version.</value></data>
+  <data name="Agents.ProposalEditor.Status.NotAuthorized" xml:space="preserve"><value>You are not authorized to edit this proposed reply.</value></data>
+  <data name="Agents.ProposalEditor.Status.Unavailable" xml:space="preserve"><value>The edit could not be saved. Try again once the service is reachable.</value></data>
 </root>

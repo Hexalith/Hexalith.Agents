@@ -1,0 +1,147 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IProposalEditGateway Gateway
+@inject TimeProvider TimeProvider
+
+@* proposal-editor (AC1, AC3; DESIGN proposal-editor): a Constrained editor region for an authorized Approver to correct a
+   pending Proposed Agent Reply before approval. Generated and edited versions are labeled DISTINCTLY; the proposal is NEVER
+   styled like a posted Conversation Message and the AI/edited text uses the inherited `body` typography role (no display
+   typography). The edited content is sensitive (AD-14): it flows to the gateway on save only and is NEVER echoed into a
+   version label, badge, aria-label, data-testid, tooltip, or diagnostic. A non-authorized viewer gets a read-only render. *@
+<section class="proposal-editor"
+         data-testid="@TestId"
+         aria-label="@Localizer["Agents.ProposalEditor.Label"]"
+         @onkeydown="OnKeyDownAsync">
+
+    @* Distinct generated-vs-edited version label (AC3 core) — a whole localized string, never the content. *@
+    <p class="proposal-editor__version-label" data-testid="@($"{TestId}-version-label")">
+        @Localizer[AgentGenerationKindPresentation.LabelKeyFor(Kind)]
+    </p>
+
+    @if (CanEdit)
+    {
+        @* Editable content area — a Fluent multi-line input, never a raw <textarea>. Pre-filled with the version content;
+           the value is sensitive and flows to the gateway only (AD-14). *@
+        <FluentTextArea @bind-Value="_editedContent"
+                        Label="@Localizer["Agents.ProposalEditor.Content.Label"]"
+                        AriaLabel="@Localizer["Agents.ProposalEditor.Content.Label"]"
+                        Required="true"
+                        data-testid="@($"{TestId}-content")" />
+
+        <div class="proposal-editor__actions">
+            <FluentButton Appearance="ButtonAppearance.Primary" OnClick="OnSaveAsync" data-testid="@($"{TestId}-save")">
+                @Localizer["Agents.ProposalEditor.Save"]
+            </FluentButton>
+            <FluentButton Appearance="ButtonAppearance.Outline" OnClick="OnCancelAsync" data-testid="@($"{TestId}-cancel")">
+                @Localizer["Agents.ProposalEditor.Cancel"]
+            </FluentButton>
+        </div>
+    }
+    else
+    {
+        @* Read-only render for a non-authorized viewer — the content is shown with inherited `body` typography, never as a
+           posted Conversation Message and never editable (AC3). *@
+        <p class="proposal-editor__readonly body" data-testid="@($"{TestId}-readonly")">@Content</p>
+    }
+
+    @* "Prior generated versions are preserved." — never "Old draft replaced." (DESIGN Do's and Don'ts; AC1). *@
+    <p class="proposal-editor__preserved" data-testid="@($"{TestId}-preserved")">
+        @Localizer["Agents.ProposalEditor.PriorVersionsPreserved"]
+    </p>
+
+    @if (_submitted)
+    {
+        <p class="proposal-editor__status" role="status" aria-live="polite" data-testid="@($"{TestId}-status")">
+            @Localizer[StatusKey]
+        </p>
+    }
+</section>
+
+@code {
+    /// <summary>The deterministic Agent Call identifier (the proposal's aggregate id).</summary>
+    [Parameter]
+    public string AgentInteractionId { get; set; } = string.Empty;
+
+    /// <summary>The deterministic proposal identifier being edited (created in Story 3.1).</summary>
+    [Parameter]
+    public string ProposalId { get; set; } = string.Empty;
+
+    /// <summary>The id of the version being edited from (its provenance; drives the server-side edited-version id).</summary>
+    [Parameter]
+    public string SourceVersionId { get; set; } = string.Empty;
+
+    /// <summary>The kind of the version shown (drives the distinct generated-vs-edited version label).</summary>
+    [Parameter]
+    public AgentGenerationKind Kind { get; set; } = AgentGenerationKind.Generated;
+
+    /// <summary>The version content to display/edit (sensitive — shown for authorized display only; never echoed into a label/accessible name; AD-14).</summary>
+    [Parameter]
+    public string Content { get; set; } = string.Empty;
+
+    /// <summary>Whether the current viewer is an authorized Approver who may edit (read-only render otherwise; AC3).</summary>
+    [Parameter]
+    public bool CanEdit { get; set; }
+
+    /// <summary>An optional client correlation id carried with the edit (idempotency/telemetry).</summary>
+    [Parameter]
+    public string? ClientCorrelationId { get; set; }
+
+    /// <summary>Raised when the Approver cancels the editor (Cancel or Esc) so the host can return focus to the trigger (Story 3.7 completes the accessibility).</summary>
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    /// <summary>Raised after a successful edit so the host can refresh the version history (Story 3.7).</summary>
+    [Parameter]
+    public EventCallback<ProposalEditResult> OnEdited { get; set; }
+
+    /// <summary>Stable test id base for the editor (suffixed for its sub-elements).</summary>
+    [Parameter]
+    public string TestId { get; set; } = "proposal-editor";
+
+    private string _editedContent = string.Empty;
+    private bool _submitted;
+    private ProposalEditStatus _status = ProposalEditStatus.Unknown;
+
+    // In-flight copy only; one whole localized string per outcome (UX-DR14), never assembled from fragments.
+    private string StatusKey => _status switch
+    {
+        ProposalEditStatus.Edited => "Agents.ProposalEditor.Status.Edited",
+        ProposalEditStatus.NotAuthorized => "Agents.ProposalEditor.Status.NotAuthorized",
+        _ => "Agents.ProposalEditor.Status.Unavailable",
+    };
+
+    protected override void OnParametersSet()
+    {
+        // Seed the editable area from the version content once, before the Approver makes changes.
+        if (!_submitted && string.IsNullOrEmpty(_editedContent))
+        {
+            _editedContent = Content;
+        }
+    }
+
+    private async Task OnSaveAsync()
+    {
+        // The edited content is Required (AC1): an empty/whitespace edit is never submitted.
+        if (string.IsNullOrWhiteSpace(_editedContent))
+        {
+            return;
+        }
+
+        ProposalEditRequest request = new(AgentInteractionId, ProposalId, SourceVersionId, _editedContent, ClientCorrelationId);
+        ProposalEditResult result = await Gateway.EditProposalAsync(request, CancellationToken.None).ConfigureAwait(false);
+
+        _status = result.Status;
+        _submitted = true;
+        await OnEdited.InvokeAsync(result).ConfigureAwait(false);
+    }
+
+    private async Task OnCancelAsync() => await OnCancel.InvokeAsync().ConfigureAwait(false);
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        // Esc cancels the editor and returns focus to the trigger (Story 3.7 completes the Esc-without-commit semantics).
+        if (string.Equals(args.Key, "Escape", StringComparison.Ordinal))
+        {
+            await OnCancelAsync().ConfigureAwait(false);
+        }
+    }
+}

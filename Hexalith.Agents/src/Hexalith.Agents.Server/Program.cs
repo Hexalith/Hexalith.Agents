@@ -171,6 +171,18 @@ builder.Services.AddScoped<AgentInteractionPostingOrchestrator>();
 builder.Services.AddSingleton<IProposalExpiryPolicyReader, DeferredProposalExpiryPolicyReader>();
 builder.Services.AddScoped<AgentInteractionProposalOrchestrator>();
 
+// Story 3.3: Confirmation-mode Proposed-Agent-Reply edit wiring. The new edit aggregate handler (the 7th Handle on
+// AgentInteraction) auto-registers via the existing AddEventStoreDomainService assembly scan (no host change needed). The
+// edit orchestration is the first edit-time approver-authorization use: it reuses the IApproverPolicyResolver (Story 1.6,
+// already registered above) to re-resolve the snapshotted Approver Policy against current dependencies + freshness and the
+// IAgentCommandDispatcher (already registered above) to dispatch the EditProposedAgentReply command. It reads no Party
+// identity and makes no Conversations write — an edited Proposed Agent Reply is NEVER a Conversation Message (AD-6) — so NO
+// new sibling-module/provider reference is added, and NO new read port is needed (the source version + edited content
+// arrive on the request). The deferred approver resolver fails closed (denied, no dispatch), keeping the default graph
+// fail-closed. The live command dispatch / read-model bindings and the audit-evidence projection remain deferred to the
+// operational-topology / read-model story (Epic 4), mirroring 1.2/1.4/1.5/1.6/1.7/2.1-2.5/3.1.
+builder.Services.AddScoped<AgentInteractionProposalEditOrchestrator>();
+
 WebApplication app = builder.Build();
 
 app.UseEventStoreDomainService();

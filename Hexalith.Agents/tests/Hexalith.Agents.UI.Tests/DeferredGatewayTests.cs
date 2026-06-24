@@ -89,4 +89,16 @@ public sealed class DeferredGatewayTests
         result.Proposals.ShouldBeEmpty();
         result.PendingCount.ShouldBe(0);
     }
+
+    [Fact]
+    public async Task DeferredProposalEditGateway_fails_closed_with_not_authorized_and_no_version()
+    {
+        DeferredProposalEditGateway gateway = new();
+
+        ProposalEditResult result = await gateway.EditProposalAsync(
+            new ProposalEditRequest("interaction-1", "proposal-1", "version-1", "edited content", null), CancellationToken.None);
+
+        result.Status.ShouldBe(ProposalEditStatus.NotAuthorized);
+        result.EditedVersionId.ShouldBeNull();
+    }
 }
