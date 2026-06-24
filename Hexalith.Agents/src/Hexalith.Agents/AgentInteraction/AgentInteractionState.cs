@@ -111,6 +111,15 @@ public sealed class AgentInteractionState
     /// <summary>Gets or sets the safe approved-version posting failure reason (Story 3.5).</summary>
     public AgentProposalApprovalFailureReason? ProposalPostingFailureReason { get; set; }
 
+    /// <summary>Gets or sets the safe proposal-rejection evidence recorded when the proposal was rejected (Audit Evidence; FR-24, AD-14; ids + policy basis + rationale code only, never content). <see langword="null"/> until a rejection is recorded (Story 3.6).</summary>
+    public AgentProposedReplyRejectionEvidence? ProposalRejectionEvidence { get; set; }
+
+    /// <summary>Gets or sets the safe proposal-abandonment evidence recorded when the proposal was abandoned (Audit Evidence; FR-24, AD-14; ids + policy basis only, never content). <see langword="null"/> until an abandonment is recorded (Story 3.6).</summary>
+    public AgentProposedReplyAbandonmentEvidence? ProposalAbandonmentEvidence { get; set; }
+
+    /// <summary>Gets or sets the safe proposal-expiry evidence recorded when the proposal expired (Audit Evidence; FR-24, AD-14; ids + recorded expiry only, never content). <see langword="null"/> until an expiry is recorded (Story 3.6).</summary>
+    public AgentProposedReplyExpiryEvidence? ProposalExpiryEvidence { get; set; }
+
     /// <summary>Applies the Agent Call request: the interaction exists and freezes its configuration snapshot (AC1).</summary>
     /// <param name="e">The event.</param>
     public void Apply(InteractionRequested e)
@@ -483,6 +492,91 @@ public sealed class AgentInteractionState
     /// <summary>No-op replay handler — the not-approvable rejection carries no state change.</summary>
     /// <param name="e">The rejection event.</param>
     public void Apply(ProposedAgentReplyNotApprovableRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>Applies the rejected outcome: records the terminal <see cref="AgentInteractionStatus.ProposalRejected"/> status, the <see cref="ProposedAgentReplyState.Rejected"/> sub-state, and the safe rejection evidence — every prior version is preserved (the version history is NOT touched) (AC1, AC4; Story 3.6; AD-5, AD-14).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyRejected e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalRejected;
+        ProposalState = ProposedAgentReplyState.Rejected;
+        ProposalRejectionEvidence = e.Evidence;
+    }
+
+    /// <summary>Applies the abandoned outcome: records the terminal <see cref="AgentInteractionStatus.ProposalAbandoned"/> status, the <see cref="ProposedAgentReplyState.Abandoned"/> sub-state, and the safe abandonment evidence — every prior version is preserved (the version history is NOT touched) (AC2, AC4; Story 3.6; AD-5, AD-14).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyAbandoned e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalAbandoned;
+        ProposalState = ProposedAgentReplyState.Abandoned;
+        ProposalAbandonmentEvidence = e.Evidence;
+    }
+
+    /// <summary>Applies the expired outcome: records the terminal <see cref="AgentInteractionStatus.ProposalExpired"/> status, the <see cref="ProposedAgentReplyState.Expired"/> sub-state, and the safe expiry evidence — every prior version is preserved (the version history is NOT touched) (AC3; Story 3.6; AD-3, AD-5, AD-14).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyExpired e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalExpired;
+        ProposalState = ProposedAgentReplyState.Expired;
+        ProposalExpiryEvidence = e.Evidence;
+    }
+
+    /// <summary>No-op replay handler — a fail-closed rejection-failed decision is durable Audit Evidence in the stream but leaves the pending proposal unchanged so an authorized Approver can retry (Story 3.6).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyRejectionFailed e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>No-op replay handler — a fail-closed abandonment-failed decision is durable Audit Evidence in the stream but leaves the pending proposal unchanged so an authorized Approver can retry (Story 3.6).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyAbandonmentFailed e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>No-op replay handler — the not-rejectable rejection carries no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(ProposedAgentReplyNotRejectableRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>No-op replay handler — the not-abandonable rejection carries no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(ProposedAgentReplyNotAbandonableRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>No-op replay handler — the not-expirable rejection carries no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(ProposedAgentReplyNotExpirableRejection e)
     {
         ArgumentNullException.ThrowIfNull(e);
         MarkReplayOnlyEventHandled();

@@ -49,6 +49,10 @@ public abstract class AgentsTestContext : FrontComposerTestBase
             .Returns(Task.FromResult(ProposalRegenerationResult.NotAuthorized()));
         ProposalApprovalGateway.ApproveProposalAsync(Arg.Any<ProposalApprovalRequest>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProposalApprovalResult.NotAuthorized()));
+        ProposalRejectionGateway.RejectProposalAsync(Arg.Any<ProposalRejectionRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProposalRejectionResult.NotAuthorized()));
+        ProposalAbandonmentGateway.AbandonProposalAsync(Arg.Any<ProposalAbandonmentRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProposalAbandonmentResult.NotAuthorized()));
 
         Services.AddSingleton(SetupGateway);
         Services.AddSingleton(CatalogGateway);
@@ -57,6 +61,8 @@ public abstract class AgentsTestContext : FrontComposerTestBase
         Services.AddSingleton(ProposalEditGateway);
         Services.AddSingleton(ProposalRegenerationGateway);
         Services.AddSingleton(ProposalApprovalGateway);
+        Services.AddSingleton(ProposalRejectionGateway);
+        Services.AddSingleton(ProposalAbandonmentGateway);
         Services.AddSingleton<TimeProvider>(Clock);
         Services.AddSingleton<IStringLocalizer<AgentsResources>>(new StubAgentsLocalizer());
         Authorization = AddAuthorization();
@@ -82,6 +88,12 @@ public abstract class AgentsTestContext : FrontComposerTestBase
 
     /// <summary>The substituted proposal-approval write gateway (defaults to the fail-closed result).</summary>
     protected IProposalApprovalGateway ProposalApprovalGateway { get; } = Substitute.For<IProposalApprovalGateway>();
+
+    /// <summary>The substituted proposal-rejection write gateway (defaults to the fail-closed result).</summary>
+    protected IProposalRejectionGateway ProposalRejectionGateway { get; } = Substitute.For<IProposalRejectionGateway>();
+
+    /// <summary>The substituted proposal-abandonment write gateway (defaults to the fail-closed result).</summary>
+    protected IProposalAbandonmentGateway ProposalAbandonmentGateway { get; } = Substitute.For<IProposalAbandonmentGateway>();
 
     /// <summary>The deterministic clock injected into the proposal queue so the rendered "age" bucket is stable.</summary>
     protected FixedTimeProvider Clock { get; } = new(new DateTimeOffset(2026, 6, 24, 12, 0, 0, TimeSpan.Zero));

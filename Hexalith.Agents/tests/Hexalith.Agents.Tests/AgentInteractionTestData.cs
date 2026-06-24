@@ -612,6 +612,79 @@ internal static class AgentInteractionTestData
     internal static RegenerateProposedAgentReply RegenerateCommand(AgentProposalRegenerationResult result, string interactionId = InteractionId)
         => new(interactionId, result);
 
+    // ===== Story 3.6 reject / abandon / expire fixtures =====
+
+    /// <summary>The acting Approver's stable Party reference used for a terminal action (a reference, not PII — AD-7).</summary>
+    internal const string ActorPartyId = "actor-party-001";
+
+    /// <summary>A sample policy-defined safe rejection rationale code (a category handle, never free text or content; AD-14).</summary>
+    internal const string SampleRationaleCode = "OffTopic";
+
+    /// <summary>Builds a server-assembled proposal-rejection result with sane safe-id defaults (never content).</summary>
+    /// <param name="outcome">The server-assembled rejection outcome.</param>
+    /// <param name="verdict">The resolved rejection-time approver-policy verdict (Valid authorizes the rejection).</param>
+    /// <param name="rationaleCode">The optional safe rationale code (a category, never content).</param>
+    /// <returns>The proposal-rejection result.</returns>
+    internal static AgentProposalRejectionResult RejectionResult(
+        AgentProposalRejectionOutcome outcome = AgentProposalRejectionOutcome.Rejected,
+        ApproverPolicyValidationStatus verdict = ApproverPolicyValidationStatus.Valid,
+        string? rationaleCode = SampleRationaleCode)
+        => new(
+            outcome,
+            SampleProposalId,
+            SourceConversationId,
+            ActorPartyId,
+            ConfirmationSnapshot.ApproverPolicyVersion,
+            verdict,
+            ApproverPolicyBasisDisclosure.OperatorOnly,
+            rationaleCode);
+
+    /// <summary>Builds a server-assembled proposal-abandonment result with sane safe-id defaults (never content).</summary>
+    /// <param name="outcome">The server-assembled abandonment outcome.</param>
+    /// <param name="verdict">The resolved abandonment-time approver-policy verdict (Valid authorizes the abandonment).</param>
+    /// <returns>The proposal-abandonment result.</returns>
+    internal static AgentProposalAbandonmentResult AbandonmentResult(
+        AgentProposalAbandonmentOutcome outcome = AgentProposalAbandonmentOutcome.Abandoned,
+        ApproverPolicyValidationStatus verdict = ApproverPolicyValidationStatus.Valid)
+        => new(
+            outcome,
+            SampleProposalId,
+            SourceConversationId,
+            ActorPartyId,
+            ConfirmationSnapshot.ApproverPolicyVersion,
+            verdict,
+            ApproverPolicyBasisDisclosure.OperatorOnly);
+
+    /// <summary>Builds a server-assembled proposal-expiry result with sane safe-id defaults (never content; no approver fields).</summary>
+    /// <param name="outcome">The server-assembled expiry outcome (only Expired transitions).</param>
+    /// <param name="expiresAt">The recorded ISO-8601 expiry timestamp that elapsed.</param>
+    /// <returns>The proposal-expiry result.</returns>
+    internal static AgentProposalExpiryResult ExpiryResult(
+        AgentProposalExpiryOutcome outcome = AgentProposalExpiryOutcome.Expired,
+        string? expiresAt = SampleExpiresAt)
+        => new(outcome, SampleProposalId, SourceConversationId, expiresAt);
+
+    /// <summary>The reject-proposal command carrying the given result for the sample interaction.</summary>
+    /// <param name="result">The server-assembled proposal-rejection result.</param>
+    /// <param name="interactionId">The deterministic interaction id (the aggregate id).</param>
+    /// <returns>The reject-proposal command.</returns>
+    internal static RejectProposedAgentReply RejectCommand(AgentProposalRejectionResult result, string interactionId = InteractionId)
+        => new(interactionId, result);
+
+    /// <summary>The abandon-proposal command carrying the given result for the sample interaction.</summary>
+    /// <param name="result">The server-assembled proposal-abandonment result.</param>
+    /// <param name="interactionId">The deterministic interaction id (the aggregate id).</param>
+    /// <returns>The abandon-proposal command.</returns>
+    internal static AbandonProposedAgentReply AbandonCommand(AgentProposalAbandonmentResult result, string interactionId = InteractionId)
+        => new(interactionId, result);
+
+    /// <summary>The expire-proposal command carrying the given result for the sample interaction.</summary>
+    /// <param name="result">The server-assembled proposal-expiry result.</param>
+    /// <param name="interactionId">The deterministic interaction id (the aggregate id).</param>
+    /// <returns>The expire-proposal command.</returns>
+    internal static ExpireProposedAgentReply ExpireCommand(AgentProposalExpiryResult result, string interactionId = InteractionId)
+        => new(interactionId, result);
+
     /// <summary>The edit precondition: a Confirmation-mode interaction that reached a Pending proposal (status <c>ProposalCreated</c>).</summary>
     /// <returns>The rehydrated proposal-created interaction state, driven through the real <c>Apply</c> handlers.</returns>
     internal static AgentInteractionState StateProposalCreated()
@@ -672,6 +745,14 @@ internal static class AgentInteractionTestData
                 case ProposedAgentReplyApprovalFailed e: state.Apply(e); break;
                 case ProposedAgentReplyPostingFailed e: state.Apply(e); break;
                 case ProposedAgentReplyNotApprovableRejection e: state.Apply(e); break;
+                case ProposedAgentReplyRejected e: state.Apply(e); break;
+                case ProposedAgentReplyAbandoned e: state.Apply(e); break;
+                case ProposedAgentReplyExpired e: state.Apply(e); break;
+                case ProposedAgentReplyRejectionFailed e: state.Apply(e); break;
+                case ProposedAgentReplyAbandonmentFailed e: state.Apply(e); break;
+                case ProposedAgentReplyNotRejectableRejection e: state.Apply(e); break;
+                case ProposedAgentReplyNotAbandonableRejection e: state.Apply(e); break;
+                case ProposedAgentReplyNotExpirableRejection e: state.Apply(e); break;
                 default: throw new InvalidOperationException($"Unhandled event type '{payload.GetType().Name}' in test apply dispatch.");
             }
         }

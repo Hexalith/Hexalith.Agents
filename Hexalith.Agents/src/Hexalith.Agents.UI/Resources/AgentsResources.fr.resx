@@ -324,6 +324,7 @@
   <data name="Agents.ProposalQueue.Filter.Expiry.ExpiringSoon" xml:space="preserve"><value>Expire bientôt</value></data>
   <data name="Agents.ProposalQueue.Filter.Expiry.Expired" xml:space="preserve"><value>Expiré</value></data>
   <data name="Agents.ProposalQueue.Filter.Expiry.None" xml:space="preserve"><value>Aucune expiration</value></data>
+  <data name="Agents.ProposalQueue.StartNewCall" xml:space="preserve"><value>Cette proposition ne peut plus être publiée. Démarrez un nouvel appel d'agent si une réponse est toujours nécessaire.</value></data>
   <data name="Agents.ProposalState.Label.Unknown" xml:space="preserve"><value>Inconnu</value></data>
   <data name="Agents.ProposalState.Label.Pending" xml:space="preserve"><value>En attente d'approbation</value></data>
   <data name="Agents.ProposalState.Label.Edited" xml:space="preserve"><value>Modifiée, en attente d'approbation</value></data>
@@ -332,6 +333,9 @@
   <data name="Agents.ProposalState.Label.PostingPending" xml:space="preserve"><value>Publication de la réponse approuvée</value></data>
   <data name="Agents.ProposalState.Label.Posted" xml:space="preserve"><value>Publiée dans la conversation</value></data>
   <data name="Agents.ProposalState.Label.PostingFailed" xml:space="preserve"><value>Échec de la publication</value></data>
+  <data name="Agents.ProposalState.Label.Rejected" xml:space="preserve"><value>Rejetée</value></data>
+  <data name="Agents.ProposalState.Label.Abandoned" xml:space="preserve"><value>Abandonnée</value></data>
+  <data name="Agents.ProposalState.Label.Expired" xml:space="preserve"><value>Expirée</value></data>
 
   <!-- Generation-kind version labels (Story 3.3 / 3.4 — distinct generated vs edited vs regenerated; AC1, AC2, AC3) -->
   <data name="Agents.GenerationKind.Label.Unknown" xml:space="preserve"><value>Version inconnue</value></data>
@@ -369,4 +373,28 @@
   <data name="Agents.ProposalApprover.Status.NotPending" xml:space="preserve"><value>Cette réponse proposée n'est plus en attente et ne peut pas être approuvée.</value></data>
   <data name="Agents.ProposalApprover.Status.PostingFailed" xml:space="preserve"><value>La version sélectionnée a été approuvée, mais la publication a échoué.</value></data>
   <data name="Agents.ProposalApprover.Status.Unavailable" xml:space="preserve"><value>L'approbation n'a pas pu être terminée. Réessayez lorsque le service sera disponible.</value></data>
+
+  <!-- Proposed-reply rejector / abandoner (Story 3.6; AC1, AC2, AC4) -->
+  <data name="Agents.ProposalRejector.Label" xml:space="preserve"><value>Rejeter la réponse proposée</value></data>
+  <data name="Agents.ProposalRejector.Reject" xml:space="preserve"><value>Rejeter la réponse</value></data>
+  <data name="Agents.ProposalRejector.Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Agents.ProposalRejector.RationaleLabel" xml:space="preserve"><value>Motif du rejet</value></data>
+  <data name="Agents.ProposalRejector.PriorVersionsPreserved" xml:space="preserve"><value>Toutes les versions sont conservées pour l'audit.</value></data>
+  <data name="Agents.ProposalRejector.Status.Rejected" xml:space="preserve"><value>La réponse proposée a été rejetée.</value></data>
+  <data name="Agents.ProposalRejector.Status.NotAuthorized" xml:space="preserve"><value>Vous n'êtes pas autorisé à rejeter cette réponse proposée.</value></data>
+  <data name="Agents.ProposalRejector.Status.NotPending" xml:space="preserve"><value>Cette réponse proposée n'est plus en attente et ne peut pas être rejetée.</value></data>
+  <data name="Agents.ProposalRejector.Status.Unavailable" xml:space="preserve"><value>Le rejet n'a pas pu être terminé. Réessayez lorsque le service sera disponible.</value></data>
+  <data name="Agents.ProposalRejector.Rationale.None" xml:space="preserve"><value>Aucun motif indiqué</value></data>
+  <data name="Agents.ProposalRejector.Rationale.OffTopic" xml:space="preserve"><value>Hors sujet</value></data>
+  <data name="Agents.ProposalRejector.Rationale.Inaccurate" xml:space="preserve"><value>Inexacte</value></data>
+  <data name="Agents.ProposalRejector.Rationale.Duplicate" xml:space="preserve"><value>En double</value></data>
+  <data name="Agents.ProposalRejector.Rationale.PolicyViolation" xml:space="preserve"><value>Violation de politique</value></data>
+  <data name="Agents.ProposalAbandoner.Label" xml:space="preserve"><value>Abandonner la réponse proposée</value></data>
+  <data name="Agents.ProposalAbandoner.Abandon" xml:space="preserve"><value>Abandonner la réponse</value></data>
+  <data name="Agents.ProposalAbandoner.Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Agents.ProposalAbandoner.PriorVersionsPreserved" xml:space="preserve"><value>Toutes les versions sont conservées pour l'audit.</value></data>
+  <data name="Agents.ProposalAbandoner.Status.Abandoned" xml:space="preserve"><value>La réponse proposée a été abandonnée.</value></data>
+  <data name="Agents.ProposalAbandoner.Status.NotAuthorized" xml:space="preserve"><value>Vous n'êtes pas autorisé à abandonner cette réponse proposée.</value></data>
+  <data name="Agents.ProposalAbandoner.Status.NotPending" xml:space="preserve"><value>Cette réponse proposée n'est plus en attente et ne peut pas être abandonnée.</value></data>
+  <data name="Agents.ProposalAbandoner.Status.Unavailable" xml:space="preserve"><value>L'abandon n'a pas pu être terminé. Réessayez lorsque le service sera disponible.</value></data>
 </root>

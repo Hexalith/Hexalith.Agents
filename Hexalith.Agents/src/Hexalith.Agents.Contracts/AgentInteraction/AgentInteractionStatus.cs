@@ -85,4 +85,19 @@ public enum AgentInteractionStatus
 
     /// <summary>Approval failed closed before any Conversation side effect; no version was frozen for posting (Story 3.5; AC4).</summary>
     ProposalApprovalFailed,
+
+    /// <summary>An authorized Approver rejected the proposal; it is terminal and preserves all versions for audit (Story 3.6; AC1).</summary>
+    ProposalRejected,
+
+    /// <summary>An authorized Approver abandoned the proposal; it is terminal and can never act again (Story 3.6; AC2).</summary>
+    ProposalAbandoned,
+
+    /// <summary>The configured proposal expiry elapsed; the proposal moved deterministically to the expired terminal state (Story 3.6; AC3).</summary>
+    ProposalExpired,
+
+    /// <summary>Rejection failed closed before any side effect — the trusted approver verdict was not <c>Valid</c>; recorded as fail-closed Audit Evidence, no terminal transition (Story 3.6; AC1, AC4).</summary>
+    ProposalRejectionFailed,
+
+    /// <summary>Abandonment failed closed before any side effect — the trusted approver verdict was not <c>Valid</c>; recorded as fail-closed Audit Evidence, no terminal transition (Story 3.6; AC2, AC4).</summary>
+    ProposalAbandonmentFailed,
 }

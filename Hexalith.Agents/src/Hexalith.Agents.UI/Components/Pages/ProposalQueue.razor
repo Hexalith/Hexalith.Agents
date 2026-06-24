@@ -105,6 +105,13 @@
                                 Width="180px"
                                 Pin="DataGridColumnPin.Start">
                     <ProposedAgentReplyStateBadge State="@context.State" />
+                    @* AC3/AC4: a terminal proposal can never post — route the user to start a new Agent Call (never styled as a posted Conversation Message). *@
+                    @if (IsTerminal(context.State))
+                    {
+                        <p class="agents-proposal-queue__start-new-call" data-testid="agents-proposal-queue-start-new-call">
+                            @Localizer["Agents.ProposalQueue.StartNewCall"]
+                        </p>
+                    }
                 </TemplateColumn>
                 <TemplateColumn Title="@Localizer["Agents.ProposalQueue.Column.SourceConversation"]"
                                 ColumnId="source-conversation"
@@ -147,7 +154,10 @@
 @code {
     private const string HeadingId = "agents-proposal-queue-heading";
     private const string AllSentinel = "__all__";
-    private const bool IncludeHistorical = false;
+
+    // Surface authorized historical/terminal proposals (rejected/abandoned/expired) so the queue is visible through the admin
+    // UI per AC3/AC4 (the flag was reserved for Stories 3.5/3.6). The state filter auto-gains the terminal options from the enum.
+    private const bool IncludeHistorical = true;
 
     // Sort newest-first, then by the stable aggregate-id handle so ordering is deterministic (ISO-8601 sorts
     // chronologically; a null CreatedAt sorts last under descending ordinal string comparison).
@@ -277,6 +287,13 @@
         => option == AllSentinel
             ? Localizer["Agents.ProposalQueue.Filter.State.All"]
             : Localizer[$"Agents.ProposalState.Label.{option}"];
+
+    // A terminal proposal can no longer post (AC3, AC4) — the queue routes the user to start a new Agent Call and never
+    // styles it as a posted Conversation Message.
+    private static bool IsTerminal(ProposedAgentReplyState state)
+        => state is ProposedAgentReplyState.Rejected
+            or ProposedAgentReplyState.Abandoned
+            or ProposedAgentReplyState.Expired;
 
     private string AgentOptionLabel(string option)
         => option == AllSentinel ? Localizer["Agents.ProposalQueue.Filter.Agent.All"] : option;

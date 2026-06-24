@@ -27,9 +27,26 @@ public sealed class ProposedAgentReplyStatePresentationTests
     [InlineData(ProposedAgentReplyState.PostingPending, BadgeColor.Informative)]
     [InlineData(ProposedAgentReplyState.Posted, BadgeColor.Success)]
     [InlineData(ProposedAgentReplyState.PostingFailed, BadgeColor.Danger)]
+    // Story 3.6 terminal states (DESIGN #Colors): rejected = Danger, abandoned = Subtle, expired = Severe.
+    [InlineData(ProposedAgentReplyState.Rejected, BadgeColor.Danger)]
+    [InlineData(ProposedAgentReplyState.Abandoned, BadgeColor.Subtle)]
+    [InlineData(ProposedAgentReplyState.Expired, BadgeColor.Severe)]
     [InlineData(ProposedAgentReplyState.Unknown, BadgeColor.Subtle)]
     public void ColorFor_binds_each_shipped_state_to_its_role(ProposedAgentReplyState state, BadgeColor expected)
         => ProposedAgentReplyStatePresentation.ColorFor(state).ShouldBe(expected);
+
+    [Theory]
+    // Story 3.6 terminal states bind to a dedicated curated glyph (reject/abandon = "removed", expired = "warning"),
+    // never the QuestionCircle total default that the Unknown sentinel and unmapped reserved states render through.
+    [InlineData(ProposedAgentReplyState.Rejected, "SubtractCircle")]
+    [InlineData(ProposedAgentReplyState.Abandoned, "SubtractCircle")]
+    [InlineData(ProposedAgentReplyState.Expired, "Warning")]
+    public void IconFor_binds_each_terminal_state_to_a_dedicated_curated_glyph(ProposedAgentReplyState state, string expectedIconName)
+    {
+        ProposedAgentReplyStatePresentation.IconFor(state).Name.ShouldBe(expectedIconName);
+        ProposedAgentReplyStatePresentation.IconFor(state).Name
+            .ShouldNotBe(ProposedAgentReplyStatePresentation.IconFor((ProposedAgentReplyState)999).Name);
+    }
 
     [Fact]
     public void ColorFor_is_total_and_uses_posted_success_only_for_posted()

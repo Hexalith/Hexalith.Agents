@@ -98,6 +98,11 @@ public sealed class BadgeConformanceTests : AgentsTestContext
     [Theory]
     [InlineData(ProposedAgentReplyState.Pending)]
     [InlineData(ProposedAgentReplyState.Edited)]
+    // Story 3.6 terminal states render through the badge with color + icon + whole localized string (DESIGN: color is
+    // never the only signal; never inline hex).
+    [InlineData(ProposedAgentReplyState.Rejected)]
+    [InlineData(ProposedAgentReplyState.Abandoned)]
+    [InlineData(ProposedAgentReplyState.Expired)]
     [InlineData(ProposedAgentReplyState.Unknown)]
     public void Proposal_state_badge_renders_color_icon_and_localized_whole_string(ProposedAgentReplyState state)
     {

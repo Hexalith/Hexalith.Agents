@@ -227,6 +227,35 @@ public sealed class LocalizationResourceTests
         yield return "Agents.ProposalApprover.Status.NotAuthorized";
         yield return "Agents.ProposalApprover.Status.NotPending";
         yield return "Agents.ProposalApprover.Status.Unavailable";
+
+        // Story 3.6 — proposal-rejector whole strings (label, action, rationale selector + options, preserved notice, outcome statuses).
+        yield return "Agents.ProposalRejector.Label";
+        yield return "Agents.ProposalRejector.Reject";
+        yield return "Agents.ProposalRejector.Cancel";
+        yield return "Agents.ProposalRejector.RationaleLabel";
+        yield return "Agents.ProposalRejector.PriorVersionsPreserved";
+        yield return "Agents.ProposalRejector.Status.Rejected";
+        yield return "Agents.ProposalRejector.Status.NotAuthorized";
+        yield return "Agents.ProposalRejector.Status.NotPending";
+        yield return "Agents.ProposalRejector.Status.Unavailable";
+        yield return "Agents.ProposalRejector.Rationale.None";
+        yield return "Agents.ProposalRejector.Rationale.OffTopic";
+        yield return "Agents.ProposalRejector.Rationale.Inaccurate";
+        yield return "Agents.ProposalRejector.Rationale.Duplicate";
+        yield return "Agents.ProposalRejector.Rationale.PolicyViolation";
+
+        // Story 3.6 — proposal-abandoner whole strings (label, action, preserved notice, outcome statuses).
+        yield return "Agents.ProposalAbandoner.Label";
+        yield return "Agents.ProposalAbandoner.Abandon";
+        yield return "Agents.ProposalAbandoner.Cancel";
+        yield return "Agents.ProposalAbandoner.PriorVersionsPreserved";
+        yield return "Agents.ProposalAbandoner.Status.Abandoned";
+        yield return "Agents.ProposalAbandoner.Status.NotAuthorized";
+        yield return "Agents.ProposalAbandoner.Status.NotPending";
+        yield return "Agents.ProposalAbandoner.Status.Unavailable";
+
+        // Story 3.6 — terminal proposals route the user to start a new Agent Call (AC4; never styled as a posted message).
+        yield return "Agents.ProposalQueue.StartNewCall";
     }
 
     public static IEnumerable<object[]> EnumDerivedKeyCases() => EnumDerivedKeys().Distinct().Select(key => new object[] { key });

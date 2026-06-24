@@ -203,6 +203,21 @@ builder.Services.AddScoped<AgentInteractionProposalRegenerationOrchestrator>();
 // graph fails closed and cannot post content until live readers/posters are wired.
 builder.Services.AddScoped<AgentInteractionProposalApprovalOrchestrator>();
 
+// Story 3.6: Confirmation-mode reject / abandon / expire wiring. The three new terminal-transition aggregate handlers (the
+// 9th-11th Handle on AgentInteraction) and their event types auto-register via the existing AddEventStoreDomainService
+// assembly scan (no host change needed). The reject/abandon orchestrators are minimal-deps terminal actions: they reuse the
+// IApproverPolicyResolver (Story 1.6) to re-resolve the snapshotted Approver Policy and the IAgentCommandDispatcher to
+// dispatch the terminal command — they read no Party identity and make no Conversations write (a terminal proposal is NEVER
+// a Conversation Message — AD-6). The expiry orchestrator reuses the IProposalExpiryPolicyReader (Story 3.1) + dispatcher to
+// ship the deterministic expiry decision + transition against a trusted evaluation timestamp supplied on the request (AD-3 —
+// no aggregate wall-clock). Per AD-18 this story does NOT introduce the module's first scheduler: the reader stays the
+// fail-closed DeferredProposalExpiryPolicyReader and the dispatcher stays Deferred, so the default graph fails closed (no
+// expiry, no terminal transition) until the live reader/dispatcher bindings and the automatic firing trigger are wired in
+// Epic 4, mirroring every prior Epic-3 orchestrator.
+builder.Services.AddScoped<AgentInteractionProposalRejectionOrchestrator>();
+builder.Services.AddScoped<AgentInteractionProposalAbandonmentOrchestrator>();
+builder.Services.AddScoped<AgentInteractionProposalExpiryOrchestrator>();
+
 WebApplication app = builder.Build();
 
 app.UseEventStoreDomainService();

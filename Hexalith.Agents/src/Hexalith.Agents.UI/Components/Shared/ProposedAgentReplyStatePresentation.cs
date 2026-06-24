@@ -22,10 +22,11 @@ public static class ProposedAgentReplyStatePresentation
     /// Maps a proposal state to its Fluent semantic badge role. <c>Pending</c> (awaiting approval), <c>Edited</c> (edited,
     /// still awaiting approval), and <c>Regenerated</c> (regenerated, still awaiting approval — the in-progress/pending set)
     /// are Informative (DESIGN <c>status-informative</c>); <c>Approved</c> is Important, <c>PostingPending</c> is Informative,
-    /// <c>Posted</c> is Success, and <c>PostingFailed</c> is Danger (Story 3.5); the <see cref="ProposedAgentReplyState.Unknown"/>
-    /// sentinel and any future reserved state map through the Subtle total default until their owning stories add explicit roles
-    /// (mirroring <see cref="AgentCallStatusPresentation.MapStatus"/>'s totality). Brand/Success are never used for a
-    /// not-yet-resolved proposal.
+    /// <c>Posted</c> is Success, and <c>PostingFailed</c> is Danger (Story 3.5); the three terminal states are
+    /// <c>Rejected</c> = Danger, <c>Abandoned</c> = Subtle, <c>Expired</c> = Severe (Story 3.6; DESIGN <c>Colors</c>); the
+    /// <see cref="ProposedAgentReplyState.Unknown"/> sentinel and any future reserved state map through the Subtle total
+    /// default until their owning stories add explicit roles (mirroring <see cref="AgentCallStatusPresentation.MapStatus"/>'s
+    /// totality). Brand/Success are never used for a not-yet-resolved proposal.
     /// </summary>
     /// <param name="state">The safe proposal state.</param>
     /// <returns>The Fluent badge color role.</returns>
@@ -39,6 +40,9 @@ public static class ProposedAgentReplyStatePresentation
             ProposedAgentReplyState.PostingPending => BadgeColor.Informative,
             ProposedAgentReplyState.Posted => BadgeColor.Success,
             ProposedAgentReplyState.PostingFailed => BadgeColor.Danger,
+            ProposedAgentReplyState.Rejected => BadgeColor.Danger,
+            ProposedAgentReplyState.Abandoned => BadgeColor.Subtle,
+            ProposedAgentReplyState.Expired => BadgeColor.Severe,
             ProposedAgentReplyState.Unknown => BadgeColor.Subtle,
             _ => BadgeColor.Subtle,
         };
@@ -49,8 +53,11 @@ public static class ProposedAgentReplyStatePresentation
     /// the call-status/readiness badges reuse curated glyphs); <c>Edited</c> uses the curated <see cref="FcFluentIcons.Edit16"/>;
     /// <c>Regenerated</c> and <c>PostingPending</c> reuse <see cref="FcFluentIcons.ArrowSync16"/>, <c>Approved</c> and
     /// <c>Posted</c> use <see cref="FcFluentIcons.Checkmark16"/>, and <c>PostingFailed</c> uses <see cref="FcFluentIcons.Warning16"/>
-    /// (Story 3.5); the <see cref="ProposedAgentReplyState.Unknown"/> sentinel and any future reserved state map through the
-    /// question-mark total default.
+    /// (Story 3.5); the terminal states reuse curated glyphs — <c>Rejected</c> and <c>Abandoned</c> use the
+    /// <see cref="FcFluentIcons.SubtractCircle16"/> "removed" glyph (distinguished by their Danger vs Subtle role) and
+    /// <c>Expired</c> uses <see cref="FcFluentIcons.Warning16"/> (no clock glyph exists in the curated set, exactly as the
+    /// call-status/readiness badges reuse curated glyphs) (Story 3.6); the <see cref="ProposedAgentReplyState.Unknown"/>
+    /// sentinel and any future reserved state map through the question-mark total default.
     /// </summary>
     /// <param name="state">The safe proposal state.</param>
     /// <returns>The Fluent icon for the state.</returns>
@@ -64,6 +71,9 @@ public static class ProposedAgentReplyStatePresentation
             ProposedAgentReplyState.PostingPending => FcFluentIcons.ArrowSync16(),
             ProposedAgentReplyState.Posted => FcFluentIcons.Checkmark16(),
             ProposedAgentReplyState.PostingFailed => FcFluentIcons.Warning16(),
+            ProposedAgentReplyState.Rejected => FcFluentIcons.SubtractCircle16(),
+            ProposedAgentReplyState.Abandoned => FcFluentIcons.SubtractCircle16(),
+            ProposedAgentReplyState.Expired => FcFluentIcons.Warning16(),
             _ => FcFluentIcons.QuestionCircle16(),
         };
 

@@ -536,6 +536,155 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
         ]);
     }
 
+    /// <summary>
+    /// Records the terminal proposal-rejection decision from the server-assembled outcome (AC1, AC4; FR-18, FR-7, FR-24;
+    /// AD-3, AD-5, AD-12, AD-13, AD-14). The orchestrator resolves rejection-time approver authorization and returns the
+    /// outcome through <see cref="RejectProposedAgentReply.Result"/>; the aggregate's sole job is to validate that a pending
+    /// proposal exists (a terminal proposal can never be rejected) and do the outcome → event math. A rejection is a
+    /// terminal-state transition, NOT a new version: it appends nothing to the version history and performs no Conversation
+    /// side effect.
+    /// </summary>
+    /// <param name="command">The reject command carrying the server-assembled rejection outcome (client values discarded upstream).</param>
+    /// <param name="state">The current interaction state (must hold a pending/edited/regenerated proposal before it can be rejected).</param>
+    /// <param name="envelope">The command envelope (carries the interaction id and the tenant scope).</param>
+    /// <returns>The domain result (the rejected/failed outcome event, a not-rejectable rejection, or an idempotent no-op).</returns>
+    public static DomainResult Handle(RejectProposedAgentReply command, AgentInteractionState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string interactionId = envelope.AggregateId;
+
+        // State precondition: a proposal can only be rejected on a recorded interaction. A reject command on a never-requested
+        // stream is a structural rejection (no state change), not a recorded decision (AD-12).
+        if (state is { IsRequested: true } requested)
+        {
+            // Idempotent terminal rejection (AD-13): re-issuing a reject command on an already-rejected proposal is a clean
+            // no-op. Idempotency is keyed on the terminal sub-state, not a new id — no new version is appended.
+            if (requested.ProposalState is ProposedAgentReplyState.Rejected)
+            {
+                return DomainResult.NoOp();
+            }
+
+            // Precondition (AC1, AC4): there must be a pending proposal to reject — the sub-state must be in the pending set
+            // { Pending, Edited, Regenerated }. A terminal proposal (approved/abandoned/expired/posted) or an interaction with
+            // no proposal is ProposalNotPending → reject, no state change. This is the structural enforcement of AC4: a
+            // terminal proposal can never be rejected.
+            if (requested.ProposalState is not (ProposedAgentReplyState.Pending
+                or ProposedAgentReplyState.Edited
+                or ProposedAgentReplyState.Regenerated))
+            {
+                return DomainResult.Rejection([
+                    new ProposedAgentReplyNotRejectableRejection(interactionId, AgentProposedReplyNotRejectableReason.ProposalNotPending),
+                ]);
+            }
+
+            // Pure evaluation (AD-3): emit the rejected/failed outcome only. The result arrives pre-assembled from the trusted
+            // rejection orchestration (authorization resolved); the aggregate's sole job is the outcome → event/status math.
+            return AgentProposalRejectionPolicy.Evaluate(interactionId, command.Result);
+        }
+
+        return DomainResult.Rejection([
+            new ProposedAgentReplyNotRejectableRejection(interactionId, AgentProposedReplyNotRejectableReason.InteractionNotProposed),
+        ]);
+    }
+
+    /// <summary>
+    /// Records the terminal proposal-abandonment decision from the server-assembled outcome (AC2, AC4; FR-18, FR-7, FR-24;
+    /// AD-3, AD-5, AD-12, AD-13, AD-14). The orchestrator resolves abandonment-time approver authorization and returns the
+    /// outcome through <see cref="AbandonProposedAgentReply.Result"/>; the aggregate's sole job is to validate that a pending
+    /// proposal exists and do the outcome → event math. An abandonment is a terminal-state transition, NOT a new version: it
+    /// appends nothing to the version history, performs no Conversation side effect, and the proposal can never act again.
+    /// </summary>
+    /// <param name="command">The abandon command carrying the server-assembled abandonment outcome (client values discarded upstream).</param>
+    /// <param name="state">The current interaction state (must hold a pending/edited/regenerated proposal before it can be abandoned).</param>
+    /// <param name="envelope">The command envelope (carries the interaction id and the tenant scope).</param>
+    /// <returns>The domain result (the abandoned/failed outcome event, a not-abandonable rejection, or an idempotent no-op).</returns>
+    public static DomainResult Handle(AbandonProposedAgentReply command, AgentInteractionState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string interactionId = envelope.AggregateId;
+
+        // State precondition: a proposal can only be abandoned on a recorded interaction (AD-12).
+        if (state is { IsRequested: true } requested)
+        {
+            // Idempotent terminal abandonment (AD-13): re-issuing an abandon command on an already-abandoned proposal is a
+            // clean no-op, keyed on the terminal sub-state (no new version is appended).
+            if (requested.ProposalState is ProposedAgentReplyState.Abandoned)
+            {
+                return DomainResult.NoOp();
+            }
+
+            // Precondition (AC2, AC4): there must be a pending proposal to abandon — the sub-state must be in the pending set
+            // { Pending, Edited, Regenerated }. A terminal proposal or an interaction with no proposal is ProposalNotPending →
+            // reject, no state change (structural enforcement of AC4).
+            if (requested.ProposalState is not (ProposedAgentReplyState.Pending
+                or ProposedAgentReplyState.Edited
+                or ProposedAgentReplyState.Regenerated))
+            {
+                return DomainResult.Rejection([
+                    new ProposedAgentReplyNotAbandonableRejection(interactionId, AgentProposedReplyNotAbandonableReason.ProposalNotPending),
+                ]);
+            }
+
+            // Pure evaluation (AD-3): emit the abandoned/failed outcome only.
+            return AgentProposalAbandonmentPolicy.Evaluate(interactionId, command.Result);
+        }
+
+        return DomainResult.Rejection([
+            new ProposedAgentReplyNotAbandonableRejection(interactionId, AgentProposedReplyNotAbandonableReason.InteractionNotProposed),
+        ]);
+    }
+
+    /// <summary>
+    /// Records the terminal proposal-expiry decision from the server-assembled outcome (AC3; FR-18, FR-24; AD-3, AD-5,
+    /// AD-13). The orchestrator compares the recorded <c>ExpiresAt</c> to a trusted evaluation timestamp and returns the
+    /// outcome through <see cref="ExpireProposedAgentReply.Result"/>; the aggregate's sole job is to validate that a pending
+    /// proposal exists and do the outcome → event math. The aggregate NEVER reads the clock (AD-3) — expiry "now" is decided
+    /// outside and the elapsed <c>ExpiresAt</c> rides the result. An expiry is a terminal-state transition, NOT a new version.
+    /// </summary>
+    /// <param name="command">The expire command carrying the server-assembled expiry outcome (client values discarded upstream).</param>
+    /// <param name="state">The current interaction state (must hold a pending/edited/regenerated proposal before it can expire).</param>
+    /// <param name="envelope">The command envelope (carries the interaction id and the tenant scope).</param>
+    /// <returns>The domain result (the expired outcome event, a not-expirable rejection, or an idempotent no-op).</returns>
+    public static DomainResult Handle(ExpireProposedAgentReply command, AgentInteractionState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string interactionId = envelope.AggregateId;
+
+        // State precondition: a proposal can only expire on a recorded interaction (AD-12).
+        if (state is { IsRequested: true } requested)
+        {
+            // Idempotent terminal expiry (AD-13): re-issuing an expire command on an already-expired proposal is a clean
+            // no-op, keyed on the terminal sub-state (no new version is appended).
+            if (requested.ProposalState is ProposedAgentReplyState.Expired)
+            {
+                return DomainResult.NoOp();
+            }
+
+            // Precondition (AC3, AC4): there must be a pending proposal to expire — the sub-state must be in the pending set
+            // { Pending, Edited, Regenerated }. A terminal proposal or an interaction with no proposal is ProposalNotPending →
+            // reject, no state change.
+            if (requested.ProposalState is not (ProposedAgentReplyState.Pending
+                or ProposedAgentReplyState.Edited
+                or ProposedAgentReplyState.Regenerated))
+            {
+                return DomainResult.Rejection([
+                    new ProposedAgentReplyNotExpirableRejection(interactionId, AgentProposedReplyNotExpirableReason.ProposalNotPending),
+                ]);
+            }
+
+            // Pure evaluation (AD-3): emit the expired outcome only (or a no-op when the result does not represent an elapsed
+            // expiry). The result arrives pre-assembled from the trusted expiry orchestration with a server-decided "now".
+            return AgentProposalExpiryPolicy.Evaluate(interactionId, command.Result);
+        }
+
+        return DomainResult.Rejection([
+            new ProposedAgentReplyNotExpirableRejection(interactionId, AgentProposedReplyNotExpirableReason.InteractionNotProposed),
+        ]);
+    }
+
     // True when the deterministic edited version id is already on the append-only version history — a retried edit that
     // already landed (AD-13). The edited version id uses a distinct SHA-256 purpose tag, so it never collides with a
     // generated version id; checking the whole history is safe.

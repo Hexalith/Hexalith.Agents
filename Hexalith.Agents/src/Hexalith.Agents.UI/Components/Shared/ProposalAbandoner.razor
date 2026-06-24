@@ -1,0 +1,117 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IProposalAbandonmentGateway Gateway
+
+@* proposal-abandoner (Story 3.6; AC2, AC4): a minimal, hostable action region for an authorized Approver to abandon a pending
+   Proposed Agent Reply. An abandonment is a terminal-state transition that can never act again, NOT a new version, and touches
+   NO Conversation — the request is ids only (no rationale, no content; AD-14). A non-authorized viewer gets no action. The
+   confirm step has a non-committing Esc escape (cancels without acting). Accessible names are whole localized strings only —
+   never an id, content, or runtime-assembled sentence. The full keyboard-focus contract, version-history, and live-region
+   a11y belong to Story 3.7; this control owns only the action + its distinct safe status. Mirrors ProposalRejector. *@
+<section class="proposal-abandoner"
+         data-testid="@TestId"
+         aria-label="@Localizer["Agents.ProposalAbandoner.Label"]"
+         @onkeydown="OnKeyDownAsync">
+
+    @if (CanAbandon && !_submitted)
+    {
+        @if (_confirming)
+        {
+            <div class="proposal-abandoner__confirm">
+                <FluentButton Appearance="ButtonAppearance.Primary" OnClick="OnAbandonAsync" data-testid="@($"{TestId}-confirm")">
+                    @Localizer["Agents.ProposalAbandoner.Abandon"]
+                </FluentButton>
+                <FluentButton Appearance="ButtonAppearance.Outline" OnClick="OnCancel" data-testid="@($"{TestId}-cancel")">
+                    @Localizer["Agents.ProposalAbandoner.Cancel"]
+                </FluentButton>
+            </div>
+        }
+        else
+        {
+            <div class="proposal-abandoner__actions">
+                <FluentButton Appearance="ButtonAppearance.Primary" OnClick="StartConfirm" data-testid="@($"{TestId}-abandon")">
+                    @Localizer["Agents.ProposalAbandoner.Abandon"]
+                </FluentButton>
+            </div>
+        }
+    }
+
+    @* "All versions are preserved for audit." — never "Reply discarded." (AC2, AC4; FR-14). *@
+    <p class="proposal-abandoner__preserved" data-testid="@($"{TestId}-preserved")">
+        @Localizer["Agents.ProposalAbandoner.PriorVersionsPreserved"]
+    </p>
+
+    @if (_submitted)
+    {
+        <p class="proposal-abandoner__status" role="@StatusRole" aria-live="@StatusLive" data-testid="@($"{TestId}-status")">
+            @Localizer[StatusKey]
+        </p>
+    }
+</section>
+
+@code {
+    /// <summary>The deterministic Agent Call identifier (the proposal's aggregate id).</summary>
+    [Parameter]
+    public string AgentInteractionId { get; set; } = string.Empty;
+
+    /// <summary>The deterministic proposal identifier being abandoned (created in Story 3.1).</summary>
+    [Parameter]
+    public string ProposalId { get; set; } = string.Empty;
+
+    /// <summary>Whether the current viewer is an authorized Approver who may abandon (no action otherwise; AC4).</summary>
+    [Parameter]
+    public bool CanAbandon { get; set; }
+
+    /// <summary>An optional client correlation id carried with the abandonment (idempotency/telemetry).</summary>
+    [Parameter]
+    public string? ClientCorrelationId { get; set; }
+
+    /// <summary>Raised after an abandonment attempt with the safe result so the host can refresh proposal details (Story 3.7).</summary>
+    [Parameter]
+    public EventCallback<ProposalAbandonmentResult> OnAbandoned { get; set; }
+
+    /// <summary>Stable test id base for the abandoner (suffixed for its sub-elements).</summary>
+    [Parameter]
+    public string TestId { get; set; } = "proposal-abandoner";
+
+    private bool _confirming;
+    private bool _submitted;
+    private ProposalAbandonmentStatus _status = ProposalAbandonmentStatus.Unknown;
+
+    // In-flight copy only; one whole localized string per outcome (UX-DR14), never assembled from fragments and never content.
+    private string StatusKey => _status switch
+    {
+        ProposalAbandonmentStatus.Abandoned => "Agents.ProposalAbandoner.Status.Abandoned",
+        ProposalAbandonmentStatus.NotAuthorized => "Agents.ProposalAbandoner.Status.NotAuthorized",
+        ProposalAbandonmentStatus.NotPending => "Agents.ProposalAbandoner.Status.NotPending",
+        _ => "Agents.ProposalAbandoner.Status.Unavailable",
+    };
+
+    private string StatusRole => _status is ProposalAbandonmentStatus.Abandoned ? "status" : "alert";
+
+    private string StatusLive => StatusRole == "alert" ? "assertive" : "polite";
+
+    private void StartConfirm() => _confirming = true;
+
+    private void OnCancel() => _confirming = false;
+
+    // Esc cancels the confirm without acting — a non-committing escape (Story 3.6; Story 3.7 completes the focus-return semantics).
+    private void OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (_confirming && string.Equals(args.Key, "Escape", StringComparison.Ordinal))
+        {
+            _confirming = false;
+        }
+    }
+
+    private async Task OnAbandonAsync()
+    {
+        // The request carries ids only — an abandonment carries no rationale and no content (AD-14).
+        ProposalAbandonmentRequest request = new(AgentInteractionId, ProposalId, ClientCorrelationId);
+        ProposalAbandonmentResult result = await Gateway.AbandonProposalAsync(request, CancellationToken.None).ConfigureAwait(false);
+
+        _status = result.Status;
+        _confirming = false;
+        _submitted = true;
+        await OnAbandoned.InvokeAsync(result).ConfigureAwait(false);
+    }
+}

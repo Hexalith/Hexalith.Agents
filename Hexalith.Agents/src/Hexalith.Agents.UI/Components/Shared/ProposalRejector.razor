@@ -1,0 +1,139 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IProposalRejectionGateway Gateway
+
+@* proposal-rejector (Story 3.6; AC1, AC4): a minimal, hostable action region for an authorized Approver to reject a pending
+   Proposed Agent Reply. A rejection is a terminal-state transition, NOT a new version, and touches NO Conversation — the
+   request is ids + an optional policy-defined rationale CODE only (never free text, never content; AD-14). A non-authorized
+   viewer gets no action. The confirm step has a non-committing Esc escape (cancels without acting). Accessible names are
+   whole localized strings only — never an id, content, or runtime-assembled sentence. The full keyboard-focus contract,
+   version-history, and live-region a11y belong to Story 3.7; this control owns only the action + its distinct safe status. *@
+<section class="proposal-rejector"
+         data-testid="@TestId"
+         aria-label="@Localizer["Agents.ProposalRejector.Label"]"
+         @onkeydown="OnKeyDownAsync">
+
+    @if (CanReject && !_submitted)
+    {
+        @if (_confirming)
+        {
+            <div class="proposal-rejector__confirm">
+                <FluentSelect TOption="string"
+                              TValue="string"
+                              Items="@_rationaleOptions"
+                              OptionValue="@(option => option)"
+                              OptionText="@RationaleOptionLabel"
+                              @bind-Value="_rationaleCode"
+                              Label="@Localizer["Agents.ProposalRejector.RationaleLabel"]"
+                              data-testid="@($"{TestId}-rationale")" />
+                <FluentButton Appearance="ButtonAppearance.Primary" OnClick="OnRejectAsync" data-testid="@($"{TestId}-confirm")">
+                    @Localizer["Agents.ProposalRejector.Reject"]
+                </FluentButton>
+                <FluentButton Appearance="ButtonAppearance.Outline" OnClick="OnCancel" data-testid="@($"{TestId}-cancel")">
+                    @Localizer["Agents.ProposalRejector.Cancel"]
+                </FluentButton>
+            </div>
+        }
+        else
+        {
+            <div class="proposal-rejector__actions">
+                <FluentButton Appearance="ButtonAppearance.Primary" OnClick="StartConfirm" data-testid="@($"{TestId}-reject")">
+                    @Localizer["Agents.ProposalRejector.Reject"]
+                </FluentButton>
+            </div>
+        }
+    }
+
+    @* "All versions are preserved for audit." — never "Reply discarded." (AC1, AC4; FR-14). *@
+    <p class="proposal-rejector__preserved" data-testid="@($"{TestId}-preserved")">
+        @Localizer["Agents.ProposalRejector.PriorVersionsPreserved"]
+    </p>
+
+    @if (_submitted)
+    {
+        <p class="proposal-rejector__status" role="@StatusRole" aria-live="@StatusLive" data-testid="@($"{TestId}-status")">
+            @Localizer[StatusKey]
+        </p>
+    }
+</section>
+
+@code {
+    // The optional rationale is a bounded set of policy-defined SAFE codes (never free text, never content; AD-14). The
+    // empty option is "no reason given". Live policy may narrow this set in Epic 4; the codes are stable category handles.
+    private const string NoneRationale = "";
+
+    private static readonly string[] _rationaleOptions =
+        [NoneRationale, "OffTopic", "Inaccurate", "Duplicate", "PolicyViolation"];
+
+    /// <summary>The deterministic Agent Call identifier (the proposal's aggregate id).</summary>
+    [Parameter]
+    public string AgentInteractionId { get; set; } = string.Empty;
+
+    /// <summary>The deterministic proposal identifier being rejected (created in Story 3.1).</summary>
+    [Parameter]
+    public string ProposalId { get; set; } = string.Empty;
+
+    /// <summary>Whether the current viewer is an authorized Approver who may reject (no action otherwise; AC4).</summary>
+    [Parameter]
+    public bool CanReject { get; set; }
+
+    /// <summary>An optional client correlation id carried with the rejection (idempotency/telemetry).</summary>
+    [Parameter]
+    public string? ClientCorrelationId { get; set; }
+
+    /// <summary>Raised after a rejection attempt with the safe result so the host can refresh proposal details (Story 3.7).</summary>
+    [Parameter]
+    public EventCallback<ProposalRejectionResult> OnRejected { get; set; }
+
+    /// <summary>Stable test id base for the rejector (suffixed for its sub-elements).</summary>
+    [Parameter]
+    public string TestId { get; set; } = "proposal-rejector";
+
+    private bool _confirming;
+    private bool _submitted;
+    private string _rationaleCode = NoneRationale;
+    private ProposalRejectionStatus _status = ProposalRejectionStatus.Unknown;
+
+    // In-flight copy only; one whole localized string per outcome (UX-DR14), never assembled from fragments and never content.
+    private string StatusKey => _status switch
+    {
+        ProposalRejectionStatus.Rejected => "Agents.ProposalRejector.Status.Rejected",
+        ProposalRejectionStatus.NotAuthorized => "Agents.ProposalRejector.Status.NotAuthorized",
+        ProposalRejectionStatus.NotPending => "Agents.ProposalRejector.Status.NotPending",
+        _ => "Agents.ProposalRejector.Status.Unavailable",
+    };
+
+    private string StatusRole => _status is ProposalRejectionStatus.Rejected ? "status" : "alert";
+
+    private string StatusLive => StatusRole == "alert" ? "assertive" : "polite";
+
+    private void StartConfirm() => _confirming = true;
+
+    private void OnCancel() => _confirming = false;
+
+    // Esc cancels the confirm without acting — a non-committing escape (Story 3.6; Story 3.7 completes the focus-return semantics).
+    private void OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (_confirming && string.Equals(args.Key, "Escape", StringComparison.Ordinal))
+        {
+            _confirming = false;
+        }
+    }
+
+    private string RationaleOptionLabel(string option)
+        => option == NoneRationale
+            ? Localizer["Agents.ProposalRejector.Rationale.None"]
+            : Localizer[$"Agents.ProposalRejector.Rationale.{option}"];
+
+    private async Task OnRejectAsync()
+    {
+        // The request carries ids + an optional safe rationale code only — never free text, never content (AD-14).
+        string? rationaleCode = string.IsNullOrEmpty(_rationaleCode) ? null : _rationaleCode;
+        ProposalRejectionRequest request = new(AgentInteractionId, ProposalId, rationaleCode, ClientCorrelationId);
+        ProposalRejectionResult result = await Gateway.RejectProposalAsync(request, CancellationToken.None).ConfigureAwait(false);
+
+        _status = result.Status;
+        _confirming = false;
+        _submitted = true;
+        await OnRejected.InvokeAsync(result).ConfigureAwait(false);
+    }
+}

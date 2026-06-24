@@ -51,14 +51,50 @@ public sealed class ProposalQueueTests : AgentsTestContext
     }
 
     [Fact]
-    public void List_is_requested_without_historical_proposals()
+    public void List_is_requested_with_historical_proposals_so_terminal_states_are_visible()
     {
         ProposalGateway.ListPendingProposalsAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(AgentUiTestData.ProposalsResult(AgentUiTestData.PendingProposal())));
 
         _ = RenderPage<ProposalQueue>();
 
-        ProposalGateway.Received().ListPendingProposalsAsync(false, Arg.Any<CancellationToken>());
+        ProposalGateway.Received().ListPendingProposalsAsync(true, Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData(ProposedAgentReplyState.Rejected)]
+    [InlineData(ProposedAgentReplyState.Abandoned)]
+    [InlineData(ProposedAgentReplyState.Expired)]
+    public void Terminal_proposal_row_offers_a_start_a_new_agent_call_affordance(ProposedAgentReplyState terminalState)
+    {
+        // AC4 — a rejected/abandoned/expired proposal can never post; the queue surfaces a "start a new Agent Call"
+        // affordance (whole localized string) instead of styling it as a posted Conversation Message.
+        ProposalGateway.ListPendingProposalsAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentUiTestData.ProposalsResult(
+                AgentUiTestData.PendingProposal(agentInteractionId: "terminal", state: terminalState))));
+
+        IRenderedComponent<ProposalQueue> cut = RenderPage<ProposalQueue>();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.Find("[data-testid='agents-proposal-queue-grid']");
+            cut.Find("[data-testid='agents-proposal-queue-start-new-call']").TextContent
+                .ShouldContain("Agents.ProposalQueue.StartNewCall");
+        });
+    }
+
+    [Fact]
+    public void Pending_proposal_row_does_not_offer_the_start_a_new_agent_call_affordance()
+    {
+        // The affordance is terminal-only: a still-actionable (pending) proposal must NOT route the user away to a new call.
+        ProposalGateway.ListPendingProposalsAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentUiTestData.ProposalsResult(
+                AgentUiTestData.PendingProposal(agentInteractionId: "pending", state: ProposedAgentReplyState.Pending))));
+
+        IRenderedComponent<ProposalQueue> cut = RenderPage<ProposalQueue>();
+
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-proposal-queue-grid']"));
+        cut.FindAll("[data-testid='agents-proposal-queue-start-new-call']").ShouldBeEmpty();
     }
 
     [Fact]
