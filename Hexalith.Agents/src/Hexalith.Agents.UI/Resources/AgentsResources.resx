@@ -328,6 +328,10 @@
   <data name="Agents.ProposalState.Label.Pending" xml:space="preserve"><value>Pending approval</value></data>
   <data name="Agents.ProposalState.Label.Edited" xml:space="preserve"><value>Edited, pending approval</value></data>
   <data name="Agents.ProposalState.Label.Regenerated" xml:space="preserve"><value>Regenerated, pending approval</value></data>
+  <data name="Agents.ProposalState.Label.Approved" xml:space="preserve"><value>Approved, not posted</value></data>
+  <data name="Agents.ProposalState.Label.PostingPending" xml:space="preserve"><value>Posting approved reply</value></data>
+  <data name="Agents.ProposalState.Label.Posted" xml:space="preserve"><value>Posted to Conversation</value></data>
+  <data name="Agents.ProposalState.Label.PostingFailed" xml:space="preserve"><value>Posting failed</value></data>
 
   <!-- Generation-kind version labels (Story 3.3 / 3.4 — distinct generated vs edited vs regenerated; AC1, AC2, AC3) -->
   <data name="Agents.GenerationKind.Label.Unknown" xml:space="preserve"><value>Unknown version</value></data>
@@ -354,4 +358,15 @@
   <data name="Agents.ProposalRegenerator.Status.NotAuthorized" xml:space="preserve"><value>You are not authorized to regenerate this proposed reply.</value></data>
   <data name="Agents.ProposalRegenerator.Status.Unavailable" xml:space="preserve"><value>The reply could not be regenerated. Try again once the service is reachable.</value></data>
   <data name="Agents.ProposalRegenerator.Status.NotPending" xml:space="preserve"><value>This proposed reply is no longer pending and cannot be regenerated.</value></data>
+
+  <data name="Agents.ProposalApprover.Label" xml:space="preserve"><value>Approve proposed reply</value></data>
+  <data name="Agents.ProposalApprover.SelectedVersion" xml:space="preserve"><value>Selected version will be approved for posting.</value></data>
+  <data name="Agents.ProposalApprover.Approve" xml:space="preserve"><value>Approve and post</value></data>
+  <data name="Agents.ProposalApprover.Status.Approved" xml:space="preserve"><value>The selected version was approved and is not yet posted.</value></data>
+  <data name="Agents.ProposalApprover.Status.PostingPending" xml:space="preserve"><value>The selected version is approved and posting is pending.</value></data>
+  <data name="Agents.ProposalApprover.Status.Posted" xml:space="preserve"><value>The selected version was posted to the Conversation.</value></data>
+  <data name="Agents.ProposalApprover.Status.NotAuthorized" xml:space="preserve"><value>You are not authorized to approve this proposed reply.</value></data>
+  <data name="Agents.ProposalApprover.Status.NotPending" xml:space="preserve"><value>This proposed reply is no longer pending and cannot be approved.</value></data>
+  <data name="Agents.ProposalApprover.Status.PostingFailed" xml:space="preserve"><value>The selected version was approved, but posting failed.</value></data>
+  <data name="Agents.ProposalApprover.Status.Unavailable" xml:space="preserve"><value>The approval could not be completed. Try again once the service is reachable.</value></data>
 </root>

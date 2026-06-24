@@ -70,4 +70,19 @@ public enum AgentInteractionStatus
 
     /// <summary>A regeneration attempt failed closed AFTER the proposal was pending — provider/timeout/safety/policy/authorization failure — recorded as fail-closed Audit Evidence; no new version is created, prior versions are preserved, and the proposal remains retryable; distinct from a structural not-regeneratable rejection (Story 3.4; AC3).</summary>
     ProposalRegenerationFailed,
+
+    /// <summary>An authorized Approver approved exactly one preserved proposal version for posting; this is not yet a Conversation Message (Story 3.5; AC1).</summary>
+    ProposalApproved,
+
+    /// <summary>The approved proposal version is frozen and posting is pending; it must not be rendered as posted until Conversations returns a message id (Story 3.5; AC1, AC2).</summary>
+    ProposalPostingPending,
+
+    /// <summary>The approved proposal version was posted as a Conversation Message authored by the Agent Party identity (Story 3.5; AC2, AC3).</summary>
+    ProposalPosted,
+
+    /// <summary>Posting the approved proposal version failed closed after approval was recorded; no duplicate Conversation Message should be created on retry (Story 3.5; AC3, AC4).</summary>
+    ProposalPostingFailed,
+
+    /// <summary>Approval failed closed before any Conversation side effect; no version was frozen for posting (Story 3.5; AC4).</summary>
+    ProposalApprovalFailed,
 }

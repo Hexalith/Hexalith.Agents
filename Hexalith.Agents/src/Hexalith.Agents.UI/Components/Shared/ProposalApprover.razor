@@ -1,0 +1,93 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IProposalApprovalGateway Gateway
+
+<section class="proposal-approver"
+         data-testid="@TestId"
+         aria-label="@Localizer["Agents.ProposalApprover.Label"]">
+    <p class="proposal-approver__selected-version" data-testid="@($"{TestId}-selected-version")">
+        @Localizer["Agents.ProposalApprover.SelectedVersion"]
+    </p>
+
+    @if (CanApprove)
+    {
+        <div class="proposal-approver__actions">
+            <FluentButton Appearance="ButtonAppearance.Primary" OnClick="OnApproveAsync" data-testid="@($"{TestId}-approve")">
+                @Localizer["Agents.ProposalApprover.Approve"]
+            </FluentButton>
+        </div>
+    }
+
+    @if (_submitted)
+    {
+        <p class="proposal-approver__status" role="@StatusRole" aria-live="@StatusLive" data-testid="@($"{TestId}-status")">
+            @Localizer[StatusKey]
+        </p>
+    }
+</section>
+
+@code {
+    /// <summary>The deterministic Agent Call identifier.</summary>
+    [Parameter]
+    public string AgentInteractionId { get; set; } = string.Empty;
+
+    /// <summary>The proposal identifier.</summary>
+    [Parameter]
+    public string ProposalId { get; set; } = string.Empty;
+
+    /// <summary>The exact selected version id to approve.</summary>
+    [Parameter]
+    public string SelectedVersionId { get; set; } = string.Empty;
+
+    /// <summary>Whether the current viewer may approve.</summary>
+    [Parameter]
+    public bool CanApprove { get; set; }
+
+    /// <summary>Optional client correlation id.</summary>
+    [Parameter]
+    public string? ClientCorrelationId { get; set; }
+
+    /// <summary>Raised after the approval attempt so the host can refresh proposal details.</summary>
+    [Parameter]
+    public EventCallback<ProposalApprovalResult> OnApproved { get; set; }
+
+    /// <summary>Stable test id base.</summary>
+    [Parameter]
+    public string TestId { get; set; } = "proposal-approver";
+
+    private bool _submitted;
+    private ProposalApprovalStatus _status = ProposalApprovalStatus.Unknown;
+
+    private string StatusKey => _status switch
+    {
+        ProposalApprovalStatus.Approved => "Agents.ProposalApprover.Status.Approved",
+        ProposalApprovalStatus.PostingPending => "Agents.ProposalApprover.Status.PostingPending",
+        ProposalApprovalStatus.Posted => "Agents.ProposalApprover.Status.Posted",
+        ProposalApprovalStatus.NotAuthorized => "Agents.ProposalApprover.Status.NotAuthorized",
+        ProposalApprovalStatus.NotPending => "Agents.ProposalApprover.Status.NotPending",
+        ProposalApprovalStatus.PostingFailed => "Agents.ProposalApprover.Status.PostingFailed",
+        _ => "Agents.ProposalApprover.Status.Unavailable",
+    };
+
+    private string StatusRole => _status is ProposalApprovalStatus.NotAuthorized or ProposalApprovalStatus.NotPending or ProposalApprovalStatus.PostingFailed or ProposalApprovalStatus.Unavailable
+        ? "alert"
+        : "status";
+
+    private string StatusLive => StatusRole == "alert" ? "assertive" : "polite";
+
+    private async Task OnApproveAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedVersionId))
+        {
+            _status = ProposalApprovalStatus.Unavailable;
+            _submitted = true;
+            await OnApproved.InvokeAsync(ProposalApprovalResult.Unavailable()).ConfigureAwait(false);
+            return;
+        }
+
+        ProposalApprovalRequest request = new(AgentInteractionId, ProposalId, SelectedVersionId, ClientCorrelationId);
+        ProposalApprovalResult result = await Gateway.ApproveProposalAsync(request, CancellationToken.None).ConfigureAwait(false);
+        _status = result.Status;
+        _submitted = true;
+        await OnApproved.InvokeAsync(result).ConfigureAwait(false);
+    }
+}

@@ -666,6 +666,12 @@ internal static class AgentInteractionTestData
                 case ProposedAgentReplyRegenerated e: state.Apply(e); break;
                 case ProposedAgentReplyRegenerationFailed e: state.Apply(e); break;
                 case ProposedAgentReplyNotRegeneratableRejection e: state.Apply(e); break;
+                case ProposedAgentReplyApproved e: state.Apply(e); break;
+                case ProposedAgentReplyPostingPending e: state.Apply(e); break;
+                case ProposedAgentReplyPosted e: state.Apply(e); break;
+                case ProposedAgentReplyApprovalFailed e: state.Apply(e); break;
+                case ProposedAgentReplyPostingFailed e: state.Apply(e); break;
+                case ProposedAgentReplyNotApprovableRejection e: state.Apply(e); break;
                 default: throw new InvalidOperationException($"Unhandled event type '{payload.GetType().Name}' in test apply dispatch.");
             }
         }

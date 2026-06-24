@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-06-23T21:28:59+02:00
-last_updated: 2026-06-24T21:32:31+02:00
+last_updated: 2026-06-24T22:45:54+02:00
 project: agents
 # retrospectives: epic-2 retro completed 2026-06-24 (epic-2-retro-2026-06-24.md)
 project_key: NOKEY
@@ -72,7 +72,7 @@ development_status:
   3-2-discover-pending-proposals-in-product: done
   3-3-edit-proposed-reply-versions: done
   3-4-regenerate-proposed-reply-versions: done
-  3-5-approve-a-selected-version-and-post-it: backlog
+  3-5-approve-a-selected-version-and-post-it: done
   3-6-reject-abandon-and-expire-proposals: backlog
   3-7-proposal-detail-version-history-and-accessibility: backlog
   epic-3-retrospective: optional

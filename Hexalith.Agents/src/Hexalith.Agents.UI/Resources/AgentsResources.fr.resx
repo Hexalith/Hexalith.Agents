@@ -328,6 +328,10 @@
   <data name="Agents.ProposalState.Label.Pending" xml:space="preserve"><value>En attente d'approbation</value></data>
   <data name="Agents.ProposalState.Label.Edited" xml:space="preserve"><value>Modifiée, en attente d'approbation</value></data>
   <data name="Agents.ProposalState.Label.Regenerated" xml:space="preserve"><value>Régénérée, en attente d'approbation</value></data>
+  <data name="Agents.ProposalState.Label.Approved" xml:space="preserve"><value>Approuvée, non publiée</value></data>
+  <data name="Agents.ProposalState.Label.PostingPending" xml:space="preserve"><value>Publication de la réponse approuvée</value></data>
+  <data name="Agents.ProposalState.Label.Posted" xml:space="preserve"><value>Publiée dans la conversation</value></data>
+  <data name="Agents.ProposalState.Label.PostingFailed" xml:space="preserve"><value>Échec de la publication</value></data>
 
   <!-- Generation-kind version labels (Story 3.3 / 3.4 — distinct generated vs edited vs regenerated; AC1, AC2, AC3) -->
   <data name="Agents.GenerationKind.Label.Unknown" xml:space="preserve"><value>Version inconnue</value></data>
@@ -354,4 +358,15 @@
   <data name="Agents.ProposalRegenerator.Status.NotAuthorized" xml:space="preserve"><value>Vous n'êtes pas autorisé à régénérer cette réponse proposée.</value></data>
   <data name="Agents.ProposalRegenerator.Status.Unavailable" xml:space="preserve"><value>La réponse n'a pas pu être régénérée. Réessayez lorsque le service sera disponible.</value></data>
   <data name="Agents.ProposalRegenerator.Status.NotPending" xml:space="preserve"><value>Cette réponse proposée n'est plus en attente et ne peut pas être régénérée.</value></data>
+
+  <data name="Agents.ProposalApprover.Label" xml:space="preserve"><value>Approuver la réponse proposée</value></data>
+  <data name="Agents.ProposalApprover.SelectedVersion" xml:space="preserve"><value>La version sélectionnée sera approuvée pour publication.</value></data>
+  <data name="Agents.ProposalApprover.Approve" xml:space="preserve"><value>Approuver et publier</value></data>
+  <data name="Agents.ProposalApprover.Status.Approved" xml:space="preserve"><value>La version sélectionnée a été approuvée et n'est pas encore publiée.</value></data>
+  <data name="Agents.ProposalApprover.Status.PostingPending" xml:space="preserve"><value>La version sélectionnée est approuvée et la publication est en attente.</value></data>
+  <data name="Agents.ProposalApprover.Status.Posted" xml:space="preserve"><value>La version sélectionnée a été publiée dans la conversation.</value></data>
+  <data name="Agents.ProposalApprover.Status.NotAuthorized" xml:space="preserve"><value>Vous n'êtes pas autorisé à approuver cette réponse proposée.</value></data>
+  <data name="Agents.ProposalApprover.Status.NotPending" xml:space="preserve"><value>Cette réponse proposée n'est plus en attente et ne peut pas être approuvée.</value></data>
+  <data name="Agents.ProposalApprover.Status.PostingFailed" xml:space="preserve"><value>La version sélectionnée a été approuvée, mais la publication a échoué.</value></data>
+  <data name="Agents.ProposalApprover.Status.Unavailable" xml:space="preserve"><value>L'approbation n'a pas pu être terminée. Réessayez lorsque le service sera disponible.</value></data>
 </root>

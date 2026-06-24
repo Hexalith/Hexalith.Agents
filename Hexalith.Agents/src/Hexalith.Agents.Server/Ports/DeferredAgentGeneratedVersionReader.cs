@@ -20,4 +20,8 @@ public sealed class DeferredAgentGeneratedVersionReader : IAgentGeneratedVersion
     /// <inheritdoc />
     public Task<AgentGeneratedVersionReadResult> ReadSelectedVersionAsync(string tenantId, string agentInteractionId, CancellationToken ct)
         => Task.FromResult(AgentGeneratedVersionReadResult.NotAvailable);
+
+    /// <inheritdoc />
+    public Task<AgentGeneratedVersionReadResult> ReadVersionAsync(string tenantId, string agentInteractionId, string versionId, CancellationToken ct)
+        => Task.FromResult(AgentGeneratedVersionReadResult.NotAvailable);
 }

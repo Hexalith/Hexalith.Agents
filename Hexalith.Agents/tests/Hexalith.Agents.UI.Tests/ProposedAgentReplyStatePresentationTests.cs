@@ -23,23 +23,25 @@ public sealed class ProposedAgentReplyStatePresentationTests
     [InlineData(ProposedAgentReplyState.Pending, BadgeColor.Informative)]
     [InlineData(ProposedAgentReplyState.Edited, BadgeColor.Informative)]
     [InlineData(ProposedAgentReplyState.Regenerated, BadgeColor.Informative)]
+    [InlineData(ProposedAgentReplyState.Approved, BadgeColor.Important)]
+    [InlineData(ProposedAgentReplyState.PostingPending, BadgeColor.Informative)]
+    [InlineData(ProposedAgentReplyState.Posted, BadgeColor.Success)]
+    [InlineData(ProposedAgentReplyState.PostingFailed, BadgeColor.Danger)]
     [InlineData(ProposedAgentReplyState.Unknown, BadgeColor.Subtle)]
     public void ColorFor_binds_each_shipped_state_to_its_role(ProposedAgentReplyState state, BadgeColor expected)
         => ProposedAgentReplyStatePresentation.ColorFor(state).ShouldBe(expected);
 
     [Fact]
-    public void ColorFor_is_total_and_never_success_or_brand()
+    public void ColorFor_is_total_and_uses_posted_success_only_for_posted()
     {
         foreach (ProposedAgentReplyState state in Enum.GetValues<ProposedAgentReplyState>())
         {
-            // Pending, Edited, and Regenerated are the in-progress/pending set (Informative); every other state maps
-            // through the Subtle total default.
             BadgeColor color = ProposedAgentReplyStatePresentation.ColorFor(state);
-            BadgeColor expected = state is ProposedAgentReplyState.Pending or ProposedAgentReplyState.Edited or ProposedAgentReplyState.Regenerated
-                ? BadgeColor.Informative
-                : BadgeColor.Subtle;
-            color.ShouldBe(expected);
-            color.ShouldNotBe(BadgeColor.Success);
+            if (state != ProposedAgentReplyState.Posted)
+            {
+                color.ShouldNotBe(BadgeColor.Success);
+            }
+
             color.ShouldNotBe(BadgeColor.Brand);
         }
 

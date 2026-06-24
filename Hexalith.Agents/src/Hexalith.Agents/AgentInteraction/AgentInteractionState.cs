@@ -90,6 +90,27 @@ public sealed class AgentInteractionState
     /// <summary>Gets or sets the safe proposal-regeneration failure-reason classification recorded when a regeneration failed closed (FR-24, AD-12). <see langword="null"/> until a regeneration-failed decision is recorded (Story 3.4).</summary>
     public AgentProposalRegenerationFailureReason? ProposalRegenerationFailureReason { get; set; }
 
+    /// <summary>Gets or sets the approved proposal version id frozen for posting (Story 3.5).</summary>
+    public string ApprovedVersionId { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the approving Party reference (Story 3.5).</summary>
+    public string ApproverPartyId { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the deterministic posting message id for the approved version (Story 3.5).</summary>
+    public string ApprovalPostingMessageId { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the deterministic posting idempotency key for the approved version (Story 3.5).</summary>
+    public string ApprovalPostingIdempotencyKey { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the safe approval/posting evidence (Story 3.5).</summary>
+    public AgentProposedReplyApprovalEvidence? ProposalApprovalEvidence { get; set; }
+
+    /// <summary>Gets or sets the safe approval failure reason (Story 3.5).</summary>
+    public AgentProposalApprovalFailureReason? ProposalApprovalFailureReason { get; set; }
+
+    /// <summary>Gets or sets the safe approved-version posting failure reason (Story 3.5).</summary>
+    public AgentProposalApprovalFailureReason? ProposalPostingFailureReason { get; set; }
+
     /// <summary>Applies the Agent Call request: the interaction exists and freezes its configuration snapshot (AC1).</summary>
     /// <param name="e">The event.</param>
     public void Apply(InteractionRequested e)
@@ -371,9 +392,97 @@ public sealed class AgentInteractionState
         ProposalRegenerationEvidence = e.Evidence;
     }
 
+    /// <summary>Applies the approved outcome: exactly one selected version is frozen for posting.</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyApproved e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalApproved;
+        ProposalState = ProposedAgentReplyState.Approved;
+        ProposalApprovalEvidence = e.Evidence;
+        ApprovedVersionId = e.Evidence.ApprovedVersionId;
+        ApproverPartyId = e.Evidence.ApproverPartyId;
+        ApprovalPostingMessageId = e.Evidence.MessageId;
+        ApprovalPostingIdempotencyKey = e.Evidence.IdempotencyKey;
+    }
+
+    /// <summary>Applies the posting-pending outcome for an approved proposal version.</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyPostingPending e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalPostingPending;
+        ProposalState = ProposedAgentReplyState.PostingPending;
+        ProposalApprovalEvidence = e.Evidence;
+    }
+
+    /// <summary>Applies the posted outcome for an approved proposal version.</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyPosted e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalPosted;
+        ProposalState = ProposedAgentReplyState.Posted;
+        ProposalApprovalEvidence = e.Evidence;
+    }
+
+    /// <summary>Applies an approval failure; no version is frozen for posting.</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyApprovalFailed e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalApprovalFailed;
+        ProposalApprovalFailureReason = e.Reason;
+        ProposalApprovalEvidence = e.Evidence;
+    }
+
+    /// <summary>Applies a posting failure for an approved proposal version.</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyPostingFailed e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalPostingFailed;
+        ProposalState = ProposedAgentReplyState.PostingFailed;
+        ProposalPostingFailureReason = e.Reason;
+        ProposalApprovalEvidence = e.Evidence;
+    }
+
     /// <summary>No-op replay handler — the not-regeneratable rejection carries no state change.</summary>
     /// <param name="e">The rejection event.</param>
     public void Apply(ProposedAgentReplyNotRegeneratableRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>No-op replay handler — the not-approvable rejection carries no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(ProposedAgentReplyNotApprovableRejection e)
     {
         ArgumentNullException.ThrowIfNull(e);
         MarkReplayOnlyEventHandled();

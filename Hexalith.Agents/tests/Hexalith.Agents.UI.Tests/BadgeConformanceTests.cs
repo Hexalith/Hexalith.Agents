@@ -116,12 +116,16 @@ public sealed class BadgeConformanceTests : AgentsTestContext
     }
 
     [Fact]
-    public void Proposal_state_badge_never_uses_a_success_or_brand_color()
+    public void Proposal_state_badge_uses_success_only_after_posting_and_never_uses_brand()
     {
         foreach (ProposedAgentReplyState state in Enum.GetValues<ProposedAgentReplyState>())
         {
             BadgeColor color = ProposedAgentReplyStatePresentation.ColorFor(state);
-            color.ShouldNotBe(BadgeColor.Success);
+            if (state != ProposedAgentReplyState.Posted)
+            {
+                color.ShouldNotBe(BadgeColor.Success);
+            }
+
             color.ShouldNotBe(BadgeColor.Brand);
         }
     }

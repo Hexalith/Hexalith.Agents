@@ -13,18 +13,19 @@ namespace Hexalith.Agents.UI.Components.Shared;
 /// + curated icon + whole-string localization key, plus a deterministic coarse "age" bucket helper (AC1). Bind status to
 /// a Fluent role, never to a hex value (DESIGN Colors). The mapping derives only the coarse, content-free classification
 /// and never exposes any generated content, secret, id, or PII (AD-14). Mirrors <see cref="AgentCallStatusPresentation"/>
-/// and is unit-testable in isolation (no bUnit). Every switch is <b>total</b> so the reserved 3.3–3.6 states render
-/// through a safe default until those stories add explicit roles.
+/// and is unit-testable in isolation (no bUnit). Every switch is <b>total</b> so the <see cref="ProposedAgentReplyState.Unknown"/>
+/// sentinel (and any future reserved state) renders through a safe default until an owning story adds an explicit role.
 /// </summary>
 public static class ProposedAgentReplyStatePresentation
 {
     /// <summary>
     /// Maps a proposal state to its Fluent semantic badge role. <c>Pending</c> (awaiting approval), <c>Edited</c> (edited,
     /// still awaiting approval), and <c>Regenerated</c> (regenerated, still awaiting approval — the in-progress/pending set)
-    /// are Informative (DESIGN <c>status-informative</c>); the sentinel and every reserved 3.5–3.6 state map through the
-    /// Subtle total default until their owning stories add explicit roles (mirroring
-    /// <see cref="AgentCallStatusPresentation.MapStatus"/>'s totality). Brand/Success are never used for a not-yet-resolved
-    /// proposal.
+    /// are Informative (DESIGN <c>status-informative</c>); <c>Approved</c> is Important, <c>PostingPending</c> is Informative,
+    /// <c>Posted</c> is Success, and <c>PostingFailed</c> is Danger (Story 3.5); the <see cref="ProposedAgentReplyState.Unknown"/>
+    /// sentinel and any future reserved state map through the Subtle total default until their owning stories add explicit roles
+    /// (mirroring <see cref="AgentCallStatusPresentation.MapStatus"/>'s totality). Brand/Success are never used for a
+    /// not-yet-resolved proposal.
     /// </summary>
     /// <param name="state">The safe proposal state.</param>
     /// <returns>The Fluent badge color role.</returns>
@@ -34,6 +35,10 @@ public static class ProposedAgentReplyStatePresentation
             ProposedAgentReplyState.Pending => BadgeColor.Informative,
             ProposedAgentReplyState.Edited => BadgeColor.Informative,
             ProposedAgentReplyState.Regenerated => BadgeColor.Informative,
+            ProposedAgentReplyState.Approved => BadgeColor.Important,
+            ProposedAgentReplyState.PostingPending => BadgeColor.Informative,
+            ProposedAgentReplyState.Posted => BadgeColor.Success,
+            ProposedAgentReplyState.PostingFailed => BadgeColor.Danger,
             ProposedAgentReplyState.Unknown => BadgeColor.Subtle,
             _ => BadgeColor.Subtle,
         };
@@ -42,7 +47,10 @@ public static class ProposedAgentReplyStatePresentation
     /// Maps a proposal state to its icon, composed ONLY from the curated <see cref="FcFluentIcons"/> factory. <c>Pending</c>
     /// reuses the in-flight <see cref="FcFluentIcons.ArrowSync16"/> (no clock glyph exists in the curated set, exactly as
     /// the call-status/readiness badges reuse curated glyphs); <c>Edited</c> uses the curated <see cref="FcFluentIcons.Edit16"/>;
-    /// every other (incl. reserved) state maps through the question-mark total default.
+    /// <c>Regenerated</c> and <c>PostingPending</c> reuse <see cref="FcFluentIcons.ArrowSync16"/>, <c>Approved</c> and
+    /// <c>Posted</c> use <see cref="FcFluentIcons.Checkmark16"/>, and <c>PostingFailed</c> uses <see cref="FcFluentIcons.Warning16"/>
+    /// (Story 3.5); the <see cref="ProposedAgentReplyState.Unknown"/> sentinel and any future reserved state map through the
+    /// question-mark total default.
     /// </summary>
     /// <param name="state">The safe proposal state.</param>
     /// <returns>The Fluent icon for the state.</returns>
@@ -52,6 +60,10 @@ public static class ProposedAgentReplyStatePresentation
             ProposedAgentReplyState.Pending => FcFluentIcons.ArrowSync16(),
             ProposedAgentReplyState.Edited => FcFluentIcons.Edit16(),
             ProposedAgentReplyState.Regenerated => FcFluentIcons.ArrowSync16(),
+            ProposedAgentReplyState.Approved => FcFluentIcons.Checkmark16(),
+            ProposedAgentReplyState.PostingPending => FcFluentIcons.ArrowSync16(),
+            ProposedAgentReplyState.Posted => FcFluentIcons.Checkmark16(),
+            ProposedAgentReplyState.PostingFailed => FcFluentIcons.Warning16(),
             _ => FcFluentIcons.QuestionCircle16(),
         };
 

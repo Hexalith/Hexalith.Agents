@@ -30,6 +30,7 @@ public static class AgentsUiServiceCollectionExtensions
         services.TryAddScoped<IProposalQueueGateway, DeferredProposalQueueGateway>();
         services.TryAddScoped<IProposalEditGateway, DeferredProposalEditGateway>();
         services.TryAddScoped<IProposalRegenerationGateway, DeferredProposalRegenerationGateway>();
+        services.TryAddScoped<IProposalApprovalGateway, DeferredProposalApprovalGateway>();
 
         return services;
     }

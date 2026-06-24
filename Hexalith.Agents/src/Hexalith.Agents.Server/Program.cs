@@ -197,6 +197,12 @@ builder.Services.AddScoped<AgentInteractionProposalEditOrchestrator>();
 // 1.2/1.4/1.5/1.6/1.7/2.1-2.5/3.1/3.3.
 builder.Services.AddScoped<AgentInteractionProposalRegenerationOrchestrator>();
 
+// Story 3.5: Confirmation-mode approval + posting wiring. The approval aggregate handler auto-registers via the existing
+// assembly scan. The approval orchestration reuses approver authorization, exact selected-version reads, Agent Party
+// identity, Conversations membership/posting, deterministic message identity, and command dispatch. The deferred default
+// graph fails closed and cannot post content until live readers/posters are wired.
+builder.Services.AddScoped<AgentInteractionProposalApprovalOrchestrator>();
+
 WebApplication app = builder.Build();
 
 app.UseEventStoreDomainService();

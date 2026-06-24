@@ -113,4 +113,17 @@ public sealed class DeferredGatewayTests
         result.Status.ShouldBe(ProposalRegenerationStatus.NotAuthorized);
         result.RegeneratedVersionId.ShouldBeNull();
     }
+
+    [Fact]
+    public async Task DeferredProposalApprovalGateway_fails_closed_with_not_authorized_and_no_message()
+    {
+        DeferredProposalApprovalGateway gateway = new();
+
+        ProposalApprovalResult result = await gateway.ApproveProposalAsync(
+            new ProposalApprovalRequest("interaction-1", "proposal-1", "version-1", null), CancellationToken.None);
+
+        result.Status.ShouldBe(ProposalApprovalStatus.NotAuthorized);
+        result.SelectedVersionId.ShouldBeNull();
+        result.MessageId.ShouldBeNull();
+    }
 }

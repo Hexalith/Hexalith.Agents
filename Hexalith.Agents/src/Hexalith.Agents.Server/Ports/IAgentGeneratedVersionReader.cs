@@ -26,4 +26,12 @@ public interface IAgentGeneratedVersionReader
     /// <param name="ct">The cancellation token.</param>
     /// <returns>The selected version's id + content, or a fail-closed not-available result.</returns>
     Task<AgentGeneratedVersionReadResult> ReadSelectedVersionAsync(string tenantId, string agentInteractionId, CancellationToken ct);
+
+    /// <summary>Reads an exact generated/edited/regenerated version by id, fail-closed.</summary>
+    /// <param name="tenantId">The interaction's tenant scope.</param>
+    /// <param name="agentInteractionId">The interaction whose version is read.</param>
+    /// <param name="versionId">The exact selected version id to read.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The exact version's id + content, or a fail-closed not-available result.</returns>
+    Task<AgentGeneratedVersionReadResult> ReadVersionAsync(string tenantId, string agentInteractionId, string versionId, CancellationToken ct);
 }

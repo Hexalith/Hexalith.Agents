@@ -474,6 +474,68 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
         ]);
     }
 
+    /// <summary>Records approval of one selected preserved proposal version plus the trusted posting outcome.</summary>
+    /// <param name="command">The approve command carrying the server-assembled approval/posting result.</param>
+    /// <param name="state">The current interaction state.</param>
+    /// <param name="envelope">The command envelope.</param>
+    /// <returns>The domain result.</returns>
+    public static DomainResult Handle(ApproveProposedAgentReply command, AgentInteractionState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string interactionId = envelope.AggregateId;
+
+        if (state is { IsRequested: true } requested)
+        {
+            string selectedVersionId = command.Result.SelectedVersionId;
+
+            if (AlreadyApprovedDifferentVersion(requested, selectedVersionId))
+            {
+                return DomainResult.Rejection([
+                    new ProposedAgentReplyNotApprovableRejection(interactionId, AgentProposedReplyNotApprovableReason.DifferentVersionAlreadyApproved),
+                ]);
+            }
+
+            if (ApprovalAlreadyCompleted(requested, command.Result))
+            {
+                return DomainResult.NoOp();
+            }
+
+            bool approvable = requested.ProposalState is ProposedAgentReplyState.Pending
+                or ProposedAgentReplyState.Edited
+                or ProposedAgentReplyState.Regenerated
+                or ProposedAgentReplyState.Approved
+                or ProposedAgentReplyState.PostingPending
+                or ProposedAgentReplyState.PostingFailed;
+            if (!approvable)
+            {
+                return DomainResult.Rejection([
+                    new ProposedAgentReplyNotApprovableRejection(interactionId, AgentProposedReplyNotApprovableReason.ProposalNotPending),
+                ]);
+            }
+
+            if (string.IsNullOrWhiteSpace(selectedVersionId))
+            {
+                return AgentProposalApprovalPolicy.Evaluate(
+                    interactionId,
+                    command.Result with { Outcome = AgentProposalApprovalOutcome.SelectedVersionMissing });
+            }
+
+            if (!VersionExists(requested, selectedVersionId))
+            {
+                return AgentProposalApprovalPolicy.Evaluate(
+                    interactionId,
+                    command.Result with { Outcome = AgentProposalApprovalOutcome.SelectedVersionInvalid });
+            }
+
+            return AgentProposalApprovalPolicy.Evaluate(interactionId, command.Result);
+        }
+
+        return DomainResult.Rejection([
+            new ProposedAgentReplyNotApprovableRejection(interactionId, AgentProposedReplyNotApprovableReason.InteractionNotProposed),
+        ]);
+    }
+
     // True when the deterministic edited version id is already on the append-only version history — a retried edit that
     // already landed (AD-13). The edited version id uses a distinct SHA-256 purpose tag, so it never collides with a
     // generated version id; checking the whole history is safe.
@@ -516,6 +578,33 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
 
         return false;
     }
+
+    private static bool VersionExists(AgentInteractionState state, string versionId)
+    {
+        if (state.GeneratedVersions is null)
+        {
+            return false;
+        }
+
+        foreach (AgentGeneratedVersion version in state.GeneratedVersions)
+        {
+            if (string.Equals(version.VersionId, versionId, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool AlreadyApprovedDifferentVersion(AgentInteractionState state, string selectedVersionId)
+        => !string.IsNullOrEmpty(state.ApprovedVersionId)
+            && !string.Equals(state.ApprovedVersionId, selectedVersionId, StringComparison.Ordinal);
+
+    private static bool ApprovalAlreadyCompleted(AgentInteractionState state, AgentProposalApprovalResult result)
+        => state.ProposalState == ProposedAgentReplyState.Posted
+            && string.Equals(state.ApprovedVersionId, result.SelectedVersionId, StringComparison.Ordinal)
+            && string.Equals(state.ApprovalPostingMessageId, result.MessageId, StringComparison.Ordinal);
 
     // By-value comparison of a re-issued request against the recorded one (AD-13). Strings are compared ordinally;
     // the snapshot scalars are compared explicitly so a re-derived-id collision with a different configuration is

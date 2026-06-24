@@ -215,6 +215,18 @@ public sealed class LocalizationResourceTests
         yield return "Agents.ProposalRegenerator.Status.NotAuthorized";
         yield return "Agents.ProposalRegenerator.Status.Unavailable";
         yield return "Agents.ProposalRegenerator.Status.NotPending";
+
+        // Story 3.5 — proposal-approver whole strings (label, action, selected-version copy, outcome statuses).
+        yield return "Agents.ProposalApprover.Label";
+        yield return "Agents.ProposalApprover.Approve";
+        yield return "Agents.ProposalApprover.SelectedVersion";
+        yield return "Agents.ProposalApprover.Status.Approved";
+        yield return "Agents.ProposalApprover.Status.PostingPending";
+        yield return "Agents.ProposalApprover.Status.Posted";
+        yield return "Agents.ProposalApprover.Status.PostingFailed";
+        yield return "Agents.ProposalApprover.Status.NotAuthorized";
+        yield return "Agents.ProposalApprover.Status.NotPending";
+        yield return "Agents.ProposalApprover.Status.Unavailable";
     }
 
     public static IEnumerable<object[]> EnumDerivedKeyCases() => EnumDerivedKeys().Distinct().Select(key => new object[] { key });
