@@ -75,4 +75,18 @@ public sealed class DeferredGatewayTests
         result.Status.ShouldBe(AgentInteractionInspectionStatus.NotAuthorized);
         result.View.ShouldBeNull();
     }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task DeferredProposalQueueGateway_fails_closed_with_not_authorized_no_rows_and_zero_count(bool includeHistorical)
+    {
+        DeferredProposalQueueGateway gateway = new();
+
+        PendingProposalsResult result = await gateway.ListPendingProposalsAsync(includeHistorical, CancellationToken.None);
+
+        result.Status.ShouldBe(PendingProposalsInspectionStatus.NotAuthorized);
+        result.Proposals.ShouldBeEmpty();
+        result.PendingCount.ShouldBe(0);
+    }
 }

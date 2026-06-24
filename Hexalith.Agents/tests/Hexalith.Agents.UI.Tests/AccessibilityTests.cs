@@ -132,6 +132,18 @@ public sealed class AccessibilityTests : AgentsTestContext
     }
 
     [Fact]
+    public void Proposal_queue_in_shell_exposes_a_focusable_heading()
+    {
+        ProposalGateway.ListPendingProposalsAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentUiTestData.ProposalsResult(AgentUiTestData.PendingProposal())));
+
+        IRenderedComponent<FrontComposerShell> cut = RenderInShellWithNavigation<ProposalQueue>();
+
+        cut.WaitForAssertion(() =>
+            cut.Find("#agents-proposal-queue-heading").GetAttribute("tabindex").ShouldBe("-1"));
+    }
+
+    [Fact]
     public void Conversation_call_in_shell_exposes_a_focusable_heading()
     {
         // The invocation page's heading is a focusable route target (tabindex=-1) regardless of the authorization

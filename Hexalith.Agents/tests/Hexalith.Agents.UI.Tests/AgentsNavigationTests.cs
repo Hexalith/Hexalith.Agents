@@ -19,7 +19,7 @@ namespace Hexalith.Agents.UI.Tests;
 public sealed class AgentsNavigationTests : AgentsTestContext
 {
     [Fact]
-    public void RegisterDomain_registers_agents_manifest_and_five_ordered_entries()
+    public void RegisterDomain_registers_agents_manifest_and_six_ordered_entries()
     {
         CapturingFrontComposerRegistry registry = new();
 
@@ -30,23 +30,41 @@ public sealed class AgentsNavigationTests : AgentsTestContext
         manifest.NameKey.ShouldBe("Agents.Navigation.Agents");
 
         registry.NavEntries.Select(entry => entry.Href)
-            .ShouldBe(["/agents", "/agents/configuration", "/agents/providers", "/agents/approver-policy", "/agents/conversation-call"]);
+            .ShouldBe(["/agents", "/agents/configuration", "/agents/providers", "/agents/approver-policy", "/agents/conversation-call", "/agents/proposals"]);
         registry.NavEntries.Select(entry => entry.Order)
-            .ShouldBe([0, 1, 2, 3, 4]);
+            .ShouldBe([0, 1, 2, 3, 4, 5]);
         registry.NavEntries.ShouldAllBe(entry => entry.BoundedContext == "agents");
         registry.NavEntries.First().Title.ShouldBe("Agents overview");
-        registry.NavEntries.Last().Title.ShouldBe("Conversation call");
+        registry.NavEntries.Last().Title.ShouldBe("Pending proposals");
     }
 
     [Fact]
-    public void Every_setup_entry_is_gated_by_the_agents_administrator_policy()
+    public void Setup_entries_are_administrator_gated_and_the_proposal_queue_is_approver_gated()
     {
+        // The five setup entries are administrator-only; the approver-facing proposal queue is the first entry gated by
+        // the distinct Approver policy (PRD glossary: Approver ≠ Administrator).
         CapturingFrontComposerRegistry registry = new();
 
         AgentsFrontComposerRegistration.RegisterDomain(registry);
 
-        registry.NavEntries.ShouldAllBe(entry =>
-            entry.RequiredPolicy == AgentsFrontComposerRegistration.AgentsAdministratorPolicy);
+        registry.NavEntries.Where(entry => entry.Href != "/agents/proposals")
+            .ShouldAllBe(entry => entry.RequiredPolicy == AgentsFrontComposerRegistration.AgentsAdministratorPolicy);
+
+        FrontComposerNavEntry proposals = registry.NavEntries.Single(entry => entry.Href == "/agents/proposals");
+        proposals.RequiredPolicy.ShouldBe(AgentsFrontComposerRegistration.AgentsApproverPolicy);
+        proposals.Order.ShouldBe(5);
+        proposals.Title.ShouldBe("Pending proposals");
+    }
+
+    [Fact]
+    public void Authorized_approver_sees_the_proposal_queue_link()
+    {
+        Authorization.SetAuthorized("approver");
+        Authorization.SetPolicies(AgentsFrontComposerRegistration.AgentsApproverPolicy);
+
+        IRenderedComponent<NavEntryGatingHarness> cut = RenderRegisteredEntries();
+
+        cut.WaitForAssertion(() => cut.Markup.ShouldContain("href=\"/agents/proposals\""));
     }
 
     [Fact]
@@ -64,6 +82,8 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             cut.Markup.ShouldContain("href=\"/agents/providers\"");
             cut.Markup.ShouldContain("href=\"/agents/approver-policy\"");
             cut.Markup.ShouldContain("href=\"/agents/conversation-call\"");
+            // The administrator policy does NOT grant the approver-only proposal queue (Approver ≠ Administrator).
+            cut.Markup.ShouldNotContain("href=\"/agents/proposals\"");
         });
     }
 
@@ -81,6 +101,7 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             cut.Markup.ShouldNotContain("href=\"/agents/providers\"");
             cut.Markup.ShouldNotContain("href=\"/agents/approver-policy\"");
             cut.Markup.ShouldNotContain("href=\"/agents/conversation-call\"");
+            cut.Markup.ShouldNotContain("href=\"/agents/proposals\"");
         });
     }
 
@@ -100,6 +121,7 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             cut.Markup.ShouldNotContain("href=\"/agents/providers\"");
             cut.Markup.ShouldNotContain("href=\"/agents/approver-policy\"");
             cut.Markup.ShouldNotContain("href=\"/agents/conversation-call\"");
+            cut.Markup.ShouldNotContain("href=\"/agents/proposals\"");
         });
     }
 
@@ -122,6 +144,7 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             "Agents.Navigation.ProviderCatalog",
             "Agents.Navigation.ApproverPolicy",
             "Agents.Navigation.ConversationCall",
+            "Agents.Navigation.ProposalQueue",
         ]);
     }
 

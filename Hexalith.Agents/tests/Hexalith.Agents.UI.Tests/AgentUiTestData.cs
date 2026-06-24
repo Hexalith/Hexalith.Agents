@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using Hexalith.Agents.Contracts.Agent;
+using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 
 namespace Hexalith.Agents.UI.Tests;
@@ -72,4 +74,37 @@ internal static class AgentUiTestData
             ConfigurationReferenceId: configurationReferenceId,
             IsSelectableForNewActiveUse: isSelectable,
             CapabilityVersion: 1);
+
+    public static PendingProposalView PendingProposal(
+        string agentInteractionId = "interaction-1",
+        string proposalId = "proposal-1",
+        ProposedAgentReplyState state = ProposedAgentReplyState.Pending,
+        AgentInteractionStatus interactionStatus = AgentInteractionStatus.ProposalCreated,
+        string sourceConversationId = "conversation-1",
+        string callerPartyId = "caller-1",
+        string agentId = "agent-1",
+        bool needsCurrentUserAction = true,
+        string proposedVersionId = "version-1",
+        int approverPolicyVersion = 1,
+        int contentSafetyPolicyVersion = 1,
+        string? expiresAt = null,
+        string? createdAt = null)
+        => new(
+            AgentInteractionId: agentInteractionId,
+            ProposalId: proposalId,
+            State: state,
+            InteractionStatus: interactionStatus,
+            SourceConversationId: sourceConversationId,
+            CallerPartyId: callerPartyId,
+            AgentId: agentId,
+            NeedsCurrentUserAction: needsCurrentUserAction,
+            ProposedVersionId: proposedVersionId,
+            ApproverPolicyVersion: approverPolicyVersion,
+            ContentSafetyPolicyVersion: contentSafetyPolicyVersion,
+            ExpiresAt: expiresAt,
+            CreatedAt: createdAt);
+
+    // Builds a Success result, deriving the AC3 pending count from the rows' "needs my action" flags.
+    public static PendingProposalsResult ProposalsResult(params PendingProposalView[] proposals)
+        => PendingProposalsResult.Success(proposals, proposals.Count(proposal => proposal.NeedsCurrentUserAction));
 }

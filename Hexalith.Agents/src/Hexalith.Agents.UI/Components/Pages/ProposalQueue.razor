@@ -1,0 +1,286 @@
+@page "/agents/proposals"
+@attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsApproverPolicy)]
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IProposalQueueGateway Gateway
+@inject TimeProvider TimeProvider
+
+@* Proposal queue (AC1–AC4): the in-product pending-proposal discovery surface (FR-13). A full-width FluentDataGrid
+   table of SAFE ids/enums/timestamps — it lists, filters, and counts Proposed Agent Replies but never renders one as a
+   Conversation Message and never carries generated content (AC1; AD-6, AD-14). The gateway fails closed, so an
+   unauthorized read discloses nothing through counts, empty states, filters, or accessible names (AC4; AD-12). *@
+<FcContentLabel LabelledBy="@HeadingId" />
+<FcAggregateListPage @ref="_listPage"
+                     TItem="PendingProposalView"
+                     LayoutMode="FcPageLayoutMode.FullWidth"
+                     RootTestId="agents-proposal-queue"
+                     RootClass="agents-proposal-queue"
+                     PageTitle="@Localizer["Agents.ProposalQueue.Title"]"
+                     Heading="@Localizer["Agents.ProposalQueue.Title"]"
+                     HeadingId="@HeadingId"
+                     HeadingTabIndex="-1"
+                     Eyebrow="@Localizer["Agents.ProposalQueue.Eyebrow"]"
+                     Description="@Localizer["Agents.ProposalQueue.Description"]"
+                     HeaderTestId="agents-proposal-queue-header">
+    <HeaderMetadata>
+        @if (HasAuthorizedResult)
+        {
+            <span data-testid="agents-proposal-queue-count">@Localizer["Agents.ProposalQueue.PendingCount", _result!.PendingCount]</span>
+        }
+    </HeaderMetadata>
+    <Filters>
+        <section aria-label="@Localizer["Agents.ProposalQueue.ControlsLabel"]">
+            <FluentSwitch @bind-Value="_needsMyActionOnly"
+                          Label="@Localizer["Agents.ProposalQueue.Filter.NeedsMyAction"]"
+                          data-testid="agents-proposal-queue-needs-action-filter" />
+            <FluentSelect TOption="string"
+                          TValue="string"
+                          Items="@_stateOptions"
+                          OptionValue="@(option => option)"
+                          OptionText="@StateOptionLabel"
+                          @bind-Value="_stateFilter"
+                          Label="@Localizer["Agents.ProposalQueue.Filter.State"]"
+                          data-testid="agents-proposal-queue-state-filter" />
+            <FluentSelect TOption="string"
+                          TValue="string"
+                          Items="@AgentOptions"
+                          OptionValue="@(option => option)"
+                          OptionText="@AgentOptionLabel"
+                          @bind-Value="_agentFilter"
+                          Label="@Localizer["Agents.ProposalQueue.Filter.Agent"]"
+                          data-testid="agents-proposal-queue-agent-filter" />
+            <FluentSelect TOption="string"
+                          TValue="string"
+                          Items="@_expiryOptions"
+                          OptionValue="@(option => option)"
+                          OptionText="@ExpiryOptionLabel"
+                          @bind-Value="_expiryFilter"
+                          Label="@Localizer["Agents.ProposalQueue.Filter.Expiry"]"
+                          data-testid="agents-proposal-queue-expiry-filter" />
+            <FluentTextInput @bind-Value="_sourceConversationFilter"
+                             TextInputType="TextInputType.Search"
+                             Label="@Localizer["Agents.ProposalQueue.Filter.SourceConversation"]"
+                             data-testid="agents-proposal-queue-source-conversation-filter" />
+            <FluentTextInput @bind-Value="_callerFilter"
+                             TextInputType="TextInputType.Search"
+                             Label="@Localizer["Agents.ProposalQueue.Filter.Caller"]"
+                             data-testid="agents-proposal-queue-caller-filter" />
+        </section>
+    </Filters>
+    <States>
+        @if (_result is null)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Loading" TestId="agents-proposal-queue-state" />
+        }
+        else if (_result.Status is PendingProposalsInspectionStatus.NotAuthorized)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-proposal-queue-state" />
+        }
+        else if (_result.Status is PendingProposalsInspectionStatus.Unavailable)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Error" TestId="agents-proposal-queue-state" />
+        }
+        else if (_result.Status is PendingProposalsInspectionStatus.Stale)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Stale" TestId="agents-proposal-queue-state" OnRefresh="ReloadAsync" />
+        }
+        else if (_result.Proposals.Count == 0)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Empty" TestId="agents-proposal-queue-state" />
+        }
+        else if (VisibleRows.Count == 0)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.FilteredEmpty" TestId="agents-proposal-queue-state" OnReset="ResetFilters" />
+        }
+    </States>
+    <Body>
+        @if (ShowGrid)
+        {
+            <FluentDataGrid Items="@VisibleRows.AsQueryable()"
+                            ResizableColumns="true"
+                            GenerateHeader="DataGridGeneratedHeaderType.Sticky"
+                            ItemKey="@(proposal => proposal.AgentInteractionId)"
+                            data-testid="agents-proposal-queue-grid">
+                <TemplateColumn Title="@Localizer["Agents.ProposalQueue.Column.State"]"
+                                ColumnId="state"
+                                Width="180px"
+                                Pin="DataGridColumnPin.Start">
+                    <ProposedAgentReplyStateBadge State="@context.State" />
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProposalQueue.Column.SourceConversation"]"
+                                ColumnId="source-conversation"
+                                Width="220px"
+                                Pin="DataGridColumnPin.Start">
+                    <code data-testid="agents-proposal-queue-source-conversation">@context.SourceConversationId</code>
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProposalQueue.Column.Caller"]" ColumnId="caller">
+                    <code>@context.CallerPartyId</code>
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProposalQueue.Column.Agent"]" ColumnId="agent">
+                    <code>@context.AgentId</code>
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProposalQueue.Column.Responsibility"]" ColumnId="responsibility">
+                    @(context.NeedsCurrentUserAction
+                        ? Localizer["Agents.ProposalQueue.Responsibility.You"]
+                        : Localizer["Agents.ProposalQueue.Responsibility.Approver"])
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProposalQueue.Column.Expiry"]" ColumnId="expiry">
+                    @if (context.ExpiresAt is null)
+                    {
+                        <span>@Localizer["Agents.ProposalQueue.Expiry.None"]</span>
+                    }
+                    else
+                    {
+                        <time datetime="@context.ExpiresAt">@context.ExpiresAt</time>
+                    }
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProposalQueue.Column.Age"]"
+                                ColumnId="age"
+                                Sortable="true"
+                                SortBy="@_sortByCreatedAt">
+                    @Localizer[ProposedAgentReplyStatePresentation.AgeLabelKeyOrText(context.CreatedAt, TimeProvider.GetUtcNow())]
+                </TemplateColumn>
+            </FluentDataGrid>
+        }
+    </Body>
+</FcAggregateListPage>
+
+@code {
+    private const string HeadingId = "agents-proposal-queue-heading";
+    private const string AllSentinel = "__all__";
+    private const bool IncludeHistorical = false;
+
+    // Sort newest-first, then by the stable aggregate-id handle so ordering is deterministic (ISO-8601 sorts
+    // chronologically; a null CreatedAt sorts last under descending ordinal string comparison).
+    private static readonly GridSort<PendingProposalView> _sortByCreatedAt =
+        GridSort<PendingProposalView>.ByDescending(proposal => proposal.CreatedAt).ThenAscending(proposal => proposal.AgentInteractionId);
+
+    private static readonly string[] _stateOptions =
+        [AllSentinel, .. Enum.GetNames<ProposedAgentReplyState>()];
+
+    private static readonly string[] _expiryOptions =
+        ["Any", "ExpiringSoon", "Expired", "None"];
+
+    private FcAggregateListPage<PendingProposalView>? _listPage;
+    private PendingProposalsResult? _result;
+    private bool _needsMyActionOnly;
+    private string _stateFilter = AllSentinel;
+    private string _agentFilter = AllSentinel;
+    private string _expiryFilter = "Any";
+    private string _sourceConversationFilter = string.Empty;
+    private string _callerFilter = string.Empty;
+    private bool _focusHeadingPending = true;
+
+    private bool HasAuthorizedResult
+        => _result is { Status: PendingProposalsInspectionStatus.Success or PendingProposalsInspectionStatus.Stale };
+
+    // Only an authorized (fresh or stale) read exposes rows; every fail-closed outcome yields none (AC4).
+    private IReadOnlyList<PendingProposalView> AuthorizedRows
+        => HasAuthorizedResult ? _result!.Proposals : [];
+
+    private IReadOnlyList<string> AgentOptions
+        => [AllSentinel, .. AuthorizedRows.Select(proposal => proposal.AgentId).Distinct().OrderBy(id => id, StringComparer.Ordinal)];
+
+    // In-memory filtering over the authorized rows — never a second gateway round-trip.
+    private IReadOnlyList<PendingProposalView> VisibleRows
+    {
+        get
+        {
+            DateTimeOffset now = TimeProvider.GetUtcNow();
+            return [.. AuthorizedRows.Where(proposal => Matches(proposal, now))];
+        }
+    }
+
+    private bool ShowGrid => VisibleRows.Count > 0;
+
+    protected override async Task OnInitializedAsync()
+        => _result = await Gateway.ListPendingProposalsAsync(IncludeHistorical, CancellationToken.None).ConfigureAwait(false);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusHeadingPending && _listPage is not null)
+        {
+            _focusHeadingPending = false;
+            await _listPage.FocusHeadingAsync().ConfigureAwait(false);
+        }
+    }
+
+    private async Task ReloadAsync()
+        => _result = await Gateway.ListPendingProposalsAsync(IncludeHistorical, CancellationToken.None).ConfigureAwait(false);
+
+    private void ResetFilters()
+    {
+        _needsMyActionOnly = false;
+        _stateFilter = AllSentinel;
+        _agentFilter = AllSentinel;
+        _expiryFilter = "Any";
+        _sourceConversationFilter = string.Empty;
+        _callerFilter = string.Empty;
+    }
+
+    private bool Matches(PendingProposalView proposal, DateTimeOffset now)
+    {
+        if (_needsMyActionOnly && !proposal.NeedsCurrentUserAction)
+        {
+            return false;
+        }
+
+        if (_stateFilter != AllSentinel && proposal.State.ToString() != _stateFilter)
+        {
+            return false;
+        }
+
+        if (_agentFilter != AllSentinel && proposal.AgentId != _agentFilter)
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_sourceConversationFilter)
+            && !proposal.SourceConversationId.Contains(_sourceConversationFilter, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_callerFilter)
+            && !proposal.CallerPartyId.Contains(_callerFilter, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return MatchesExpiry(proposal, now);
+    }
+
+    private bool MatchesExpiry(PendingProposalView proposal, DateTimeOffset now)
+    {
+        switch (_expiryFilter)
+        {
+            case "None":
+                return proposal.ExpiresAt is null;
+            case "Expired":
+                return TryParseTimestamp(proposal.ExpiresAt, out DateTimeOffset expired) && expired < now;
+            case "ExpiringSoon":
+                return TryParseTimestamp(proposal.ExpiresAt, out DateTimeOffset soon)
+                    && soon >= now
+                    && soon < now.AddHours(24);
+            default:
+                return true;
+        }
+    }
+
+    private static bool TryParseTimestamp(string? value, out DateTimeOffset timestamp)
+        => DateTimeOffset.TryParse(
+            value,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+            out timestamp);
+
+    private string StateOptionLabel(string option)
+        => option == AllSentinel
+            ? Localizer["Agents.ProposalQueue.Filter.State.All"]
+            : Localizer[$"Agents.ProposalState.Label.{option}"];
+
+    private string AgentOptionLabel(string option)
+        => option == AllSentinel ? Localizer["Agents.ProposalQueue.Filter.Agent.All"] : option;
+
+    private string ExpiryOptionLabel(string option)
+        => Localizer[$"Agents.ProposalQueue.Filter.Expiry.{option}"];
+}

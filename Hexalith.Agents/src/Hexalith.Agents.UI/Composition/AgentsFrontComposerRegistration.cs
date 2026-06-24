@@ -23,6 +23,18 @@ public static class AgentsFrontComposerRegistration
     public const string AgentsAdministratorPolicy = "Agents.Administrator";
 
     /// <summary>
+    /// Authorization policy gating the approver-facing proposal-queue navigation entry and page (AD-12, AD-15). This
+    /// is the first <b>Approver</b> (not Administrator) surface — the proposal queue's audience is Approvers, not only
+    /// Agent Administrators (PRD glossary: Approver ≠ Administrator). Nav hiding alone is not authorization — the page
+    /// also carries <c>[Authorize(Policy = …)]</c> and the real authorization decision is server-side and shared with
+    /// the API (UI parity). The shell evaluates this via <c>AuthorizeView</c> so unauthorized users never see (or can
+    /// navigate to) the gated link — no record leak (AD-12, AC4). Registering the actual
+    /// <c>AddAuthorizationCore(... AddPolicy(...))</c> lives in the deferred host <c>Program.cs</c>; the constant +
+    /// entry/page wiring is in scope.
+    /// </summary>
+    public const string AgentsApproverPolicy = "Agents.Approver";
+
+    /// <summary>
     /// The Agents domain manifest contributed to the shell's left navigation. The shell shows the pinned Fluent
     /// glyph on the collapsed rail and resolves the localized category title ("Agents" / "Agents") from
     /// <see cref="AgentsResources"/> per the request culture; <c>Name</c> stays the invariant English fallback.
@@ -39,9 +51,10 @@ public static class AgentsFrontComposerRegistration
         Resource: typeof(AgentsResources));
 
     /// <summary>
-    /// Registers the Agents domain and its five ordered, policy-gated nav entries, from operational setup to the V1
-    /// in-product Conversation invocation surface (UX-DR1). The invariant <c>Title</c> is the English fallback that
-    /// drives stable test ids and sort order; <c>TitleKey</c> + <c>Resource</c> localize the label per request culture.
+    /// Registers the Agents domain and its six ordered, policy-gated nav entries, from operational setup through the V1
+    /// in-product Conversation invocation surface to the approver-facing proposal queue (UX-DR1). The invariant
+    /// <c>Title</c> is the English fallback that drives stable test ids and sort order; <c>TitleKey</c> + <c>Resource</c>
+    /// localize the label per request culture.
     /// </summary>
     /// <param name="registry">The FrontComposer registry the shell exposes during composition.</param>
     public static void RegisterDomain(IFrontComposerRegistry registry)
@@ -103,6 +116,20 @@ public static class AgentsFrontComposerRegistration
             Order: 4,
             RequiredPolicy: AgentsAdministratorPolicy,
             TitleKey: "Agents.Navigation.ConversationCall",
+            Resource: typeof(AgentsResources)));
+
+        // Approver-facing in-product pending-proposal discovery surface (FR-13; AC1, AC4). This is the first entry gated
+        // by the Approver policy rather than the Administrator policy (PRD glossary: Approver ≠ Administrator). The
+        // Size20 inbox/queue glyph is not in the curated FcFluentIcons vocabulary, so the list-style "Navigation" glyph
+        // is reused (as the "Conversation call" entry reused "ChevronRight").
+        registry.AddNavEntry(new FrontComposerNavEntry(
+            "agents",
+            "Pending proposals",
+            "/agents/proposals",
+            Icon: "Regular.Size20.Navigation",
+            Order: 5,
+            RequiredPolicy: AgentsApproverPolicy,
+            TitleKey: "Agents.Navigation.ProposalQueue",
             Resource: typeof(AgentsResources)));
     }
 }

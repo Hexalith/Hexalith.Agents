@@ -1,0 +1,28 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+
+@* proposed-agent-reply-state-badge (AC1): color + icon + visible text together — never color-only (DESIGN
+   no-color-only; BadgeConformanceTests enforces color + icon + text and a no-raw-hex regex). The accessible name is
+   the same safe localized whole string and never carries an id, generated content, or PII (AD-14). The reserved
+   3.3–3.6 states render through the presentation's total Subtle/question-mark default. *@
+<FluentBadge Appearance="BadgeAppearance.Tint"
+             Color="@ProposedAgentReplyStatePresentation.ColorFor(State)"
+             IconStart="@StateIcon"
+             role="status"
+             aria-label="@Label"
+             data-testid="@TestId">
+    @Label
+</FluentBadge>
+
+@code {
+    /// <summary>The safe proposal state to render.</summary>
+    [Parameter]
+    public ProposedAgentReplyState State { get; set; } = ProposedAgentReplyState.Unknown;
+
+    /// <summary>Stable test id for the badge surface.</summary>
+    [Parameter]
+    public string TestId { get; set; } = "proposed-agent-reply-state-badge";
+
+    private string Label => Localizer[ProposedAgentReplyStatePresentation.LabelKeyFor(State)];
+
+    private Icon StateIcon => ProposedAgentReplyStatePresentation.IconFor(State);
+}

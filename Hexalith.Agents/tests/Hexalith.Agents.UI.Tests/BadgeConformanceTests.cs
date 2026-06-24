@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 
 using Bunit;
 
+using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.UI.Components.Shared;
 
 using Microsoft.FluentUI.AspNetCore.Components;
@@ -91,6 +92,36 @@ public sealed class BadgeConformanceTests : AgentsTestContext
             {
                 color.ShouldNotBe(BadgeColor.Success);
             }
+        }
+    }
+
+    [Theory]
+    [InlineData(ProposedAgentReplyState.Pending)]
+    [InlineData(ProposedAgentReplyState.Unknown)]
+    public void Proposal_state_badge_renders_color_icon_and_localized_whole_string(ProposedAgentReplyState state)
+    {
+        IRenderedComponent<ProposedAgentReplyStateBadge> cut = Render<ProposedAgentReplyStateBadge>(
+            parameters => parameters.Add(badge => badge.State, state));
+
+        FluentBadge badge = cut.FindComponent<FluentBadge>().Instance;
+        badge.Color.ShouldBe(ProposedAgentReplyStatePresentation.ColorFor(state));
+        badge.IconStart.ShouldNotBeNull();
+
+        string expectedKey = ProposedAgentReplyStatePresentation.LabelKeyFor(state);
+        cut.VisibleText().Trim().ShouldBe(expectedKey);
+        cut.Find("[data-testid='proposed-agent-reply-state-badge']").GetAttribute("role").ShouldBe("status");
+        cut.Find("[data-testid='proposed-agent-reply-state-badge']").GetAttribute("aria-label").ShouldBe(expectedKey);
+        _sixDigitHex.IsMatch(cut.Markup).ShouldBeFalse("status badges bind to Fluent roles, never inline hex (AC5)");
+    }
+
+    [Fact]
+    public void Proposal_state_badge_never_uses_a_success_or_brand_color()
+    {
+        foreach (ProposedAgentReplyState state in Enum.GetValues<ProposedAgentReplyState>())
+        {
+            BadgeColor color = ProposedAgentReplyStatePresentation.ColorFor(state);
+            color.ShouldNotBe(BadgeColor.Success);
+            color.ShouldNotBe(BadgeColor.Brand);
         }
     }
 }

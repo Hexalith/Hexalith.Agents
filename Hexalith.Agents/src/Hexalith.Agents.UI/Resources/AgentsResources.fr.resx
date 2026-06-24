@@ -288,4 +288,42 @@
   <data name="Agents.ConversationCall.Panel.Status.Posted" xml:space="preserve"><value>Publié dans la conversation.</value></data>
   <data name="Agents.ConversationCall.Panel.Status.Failed" xml:space="preserve"><value>L'appel n'a pas abouti. Consultez l'état pour plus de détails.</value></data>
   <data name="Agents.ConversationCall.Feedback.Unavailable" xml:space="preserve"><value>L'appel automatique est indisponible sur cette vue. Seul l'état en lecture seule est affiché.</value></data>
+  <data name="Agents.Navigation.ProposalQueue" xml:space="preserve"><value>Propositions en attente</value></data>
+  <data name="Agents.ProposalQueue.Title" xml:space="preserve"><value>Propositions en attente</value></data>
+  <data name="Agents.ProposalQueue.Eyebrow" xml:space="preserve"><value>File des propositions</value></data>
+  <data name="Agents.ProposalQueue.Description" xml:space="preserve"><value>Trouvez les réponses d'agent proposées qui nécessitent votre action avant leur publication dans une conversation.</value></data>
+  <data name="Agents.ProposalQueue.ControlsLabel" xml:space="preserve"><value>Filtres de la file des propositions</value></data>
+  <data name="Agents.ProposalQueue.PendingCount" xml:space="preserve"><value>{0} en attente de votre action</value></data>
+  <data name="Agents.ProposalQueue.Column.State" xml:space="preserve"><value>État</value></data>
+  <data name="Agents.ProposalQueue.Column.SourceConversation" xml:space="preserve"><value>Conversation source</value></data>
+  <data name="Agents.ProposalQueue.Column.Caller" xml:space="preserve"><value>Appelant</value></data>
+  <data name="Agents.ProposalQueue.Column.Agent" xml:space="preserve"><value>Agent</value></data>
+  <data name="Agents.ProposalQueue.Column.Responsibility" xml:space="preserve"><value>Responsabilité actuelle</value></data>
+  <data name="Agents.ProposalQueue.Column.Expiry" xml:space="preserve"><value>Expiration</value></data>
+  <data name="Agents.ProposalQueue.Column.Age" xml:space="preserve"><value>Ancienneté</value></data>
+  <data name="Agents.ProposalQueue.Responsibility.You" xml:space="preserve"><value>En attente de votre approbation</value></data>
+  <data name="Agents.ProposalQueue.Responsibility.Approver" xml:space="preserve"><value>En attente d'approbation</value></data>
+  <data name="Agents.ProposalQueue.Expiry.None" xml:space="preserve"><value>Aucune expiration</value></data>
+  <data name="Agents.ProposalQueue.Expiry.ExpiringSoon" xml:space="preserve"><value>Expire bientôt</value></data>
+  <data name="Agents.ProposalQueue.Expiry.Expired" xml:space="preserve"><value>Expiré</value></data>
+  <data name="Agents.ProposalQueue.Expiry.Label" xml:space="preserve"><value>Expiration</value></data>
+  <data name="Agents.ProposalQueue.Age.Unknown" xml:space="preserve"><value>Inconnue</value></data>
+  <data name="Agents.ProposalQueue.Age.LessThanHour" xml:space="preserve"><value>Moins d'une heure</value></data>
+  <data name="Agents.ProposalQueue.Age.Today" xml:space="preserve"><value>Plus tôt aujourd'hui</value></data>
+  <data name="Agents.ProposalQueue.Age.ThisWeek" xml:space="preserve"><value>Cette semaine</value></data>
+  <data name="Agents.ProposalQueue.Age.Older" xml:space="preserve"><value>Il y a plus d'une semaine</value></data>
+  <data name="Agents.ProposalQueue.Filter.NeedsMyAction" xml:space="preserve"><value>Nécessite mon action</value></data>
+  <data name="Agents.ProposalQueue.Filter.State" xml:space="preserve"><value>État</value></data>
+  <data name="Agents.ProposalQueue.Filter.State.All" xml:space="preserve"><value>Tous les états</value></data>
+  <data name="Agents.ProposalQueue.Filter.Agent" xml:space="preserve"><value>Agent</value></data>
+  <data name="Agents.ProposalQueue.Filter.Agent.All" xml:space="preserve"><value>Tous les agents</value></data>
+  <data name="Agents.ProposalQueue.Filter.SourceConversation" xml:space="preserve"><value>Conversation source</value></data>
+  <data name="Agents.ProposalQueue.Filter.Caller" xml:space="preserve"><value>Appelant</value></data>
+  <data name="Agents.ProposalQueue.Filter.Expiry" xml:space="preserve"><value>Expiration</value></data>
+  <data name="Agents.ProposalQueue.Filter.Expiry.Any" xml:space="preserve"><value>Toute expiration</value></data>
+  <data name="Agents.ProposalQueue.Filter.Expiry.ExpiringSoon" xml:space="preserve"><value>Expire bientôt</value></data>
+  <data name="Agents.ProposalQueue.Filter.Expiry.Expired" xml:space="preserve"><value>Expiré</value></data>
+  <data name="Agents.ProposalQueue.Filter.Expiry.None" xml:space="preserve"><value>Aucune expiration</value></data>
+  <data name="Agents.ProposalState.Label.Unknown" xml:space="preserve"><value>Inconnu</value></data>
+  <data name="Agents.ProposalState.Label.Pending" xml:space="preserve"><value>En attente d'approbation</value></data>
 </root>

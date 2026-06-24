@@ -148,6 +148,47 @@ public sealed class LocalizationResourceTests
         yield return "Agents.ConversationCall.Panel.Status.Posted";
         yield return "Agents.ConversationCall.Panel.Status.Failed";
         yield return "Agents.ConversationCall.Feedback.Unavailable";
+
+        // Story 3.2 — proposal-state labels (one whole string per shipped ProposedAgentReplyState value; UX-DR14).
+        foreach (ProposedAgentReplyState state in Enum.GetValues<ProposedAgentReplyState>())
+        {
+            yield return ProposedAgentReplyStatePresentation.LabelKeyFor(state);
+        }
+
+        // Story 3.2 — proposal-queue nav entry, page chrome, columns, responsibility, expiry, age, filters, and count.
+        yield return "Agents.Navigation.ProposalQueue";
+        yield return "Agents.ProposalQueue.Title";
+        yield return "Agents.ProposalQueue.Eyebrow";
+        yield return "Agents.ProposalQueue.Description";
+        yield return "Agents.ProposalQueue.ControlsLabel";
+        yield return "Agents.ProposalQueue.PendingCount";
+        yield return "Agents.ProposalQueue.Column.State";
+        yield return "Agents.ProposalQueue.Column.SourceConversation";
+        yield return "Agents.ProposalQueue.Column.Caller";
+        yield return "Agents.ProposalQueue.Column.Agent";
+        yield return "Agents.ProposalQueue.Column.Responsibility";
+        yield return "Agents.ProposalQueue.Column.Expiry";
+        yield return "Agents.ProposalQueue.Column.Age";
+        yield return "Agents.ProposalQueue.Responsibility.You";
+        yield return "Agents.ProposalQueue.Responsibility.Approver";
+        yield return "Agents.ProposalQueue.Expiry.None";
+        yield return "Agents.ProposalQueue.Age.Unknown";
+        yield return "Agents.ProposalQueue.Age.LessThanHour";
+        yield return "Agents.ProposalQueue.Age.Today";
+        yield return "Agents.ProposalQueue.Age.ThisWeek";
+        yield return "Agents.ProposalQueue.Age.Older";
+        yield return "Agents.ProposalQueue.Filter.NeedsMyAction";
+        yield return "Agents.ProposalQueue.Filter.State";
+        yield return "Agents.ProposalQueue.Filter.State.All";
+        yield return "Agents.ProposalQueue.Filter.Agent";
+        yield return "Agents.ProposalQueue.Filter.Agent.All";
+        yield return "Agents.ProposalQueue.Filter.SourceConversation";
+        yield return "Agents.ProposalQueue.Filter.Caller";
+        yield return "Agents.ProposalQueue.Filter.Expiry";
+        yield return "Agents.ProposalQueue.Filter.Expiry.Any";
+        yield return "Agents.ProposalQueue.Filter.Expiry.ExpiringSoon";
+        yield return "Agents.ProposalQueue.Filter.Expiry.Expired";
+        yield return "Agents.ProposalQueue.Filter.Expiry.None";
     }
 
     public static IEnumerable<object[]> EnumDerivedKeyCases() => EnumDerivedKeys().Distinct().Select(key => new object[] { key });

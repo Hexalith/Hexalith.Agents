@@ -1,104 +1,104 @@
-# Test Automation Summary — Story 3.1 (Create Proposed Agent Replies In Confirmation Mode)
+# Test Automation Summary — Story 3.2 (Discover Pending Proposals In Product)
 
-**Workflow:** `bmad-qa-generate-e2e-tests`
-**Date:** 2026-06-24
-**Engineer role:** QA automation (Administrator)
-**Story:** `_bmad-output/implementation-artifacts/3-1-create-proposed-agent-replies-in-confirmation-mode.md` (status: review)
+**Workflow:** `bmad-qa-generate-e2e-tests` · **Date:** 2026-06-24 · **Engineer role:** QA automation (Administrator)
+**Story:** `_bmad-output/implementation-artifacts/3-2-discover-pending-proposals-in-product.md` (status: review)
 
-## Test Framework Detected
+## Framework Detected
 
-xUnit v3 (`xunit.v3` 3.2.2) + Shouldly 4.3.0 + NSubstitute 5.3.0, .NET 10 (`net10.0`), warnings-as-errors,
-`ConfigureAwait(false)` enforced (CA2007). Tests run **per project** (never solution-level), Release configuration.
-This is a DDD / event-sourced domain library (no HTTP API surface and no UI in this story — proposal read UI is deferred to
-Stories 3.2/3.7), so "E2E" here means the full command → event → replay-state chain through the real aggregate pipeline.
+The Agents module is a .NET 10 / Blazor (FluentUI v5 RC) project — **no Playwright/Cypress JS stack**. The
+established automated-test stack (per `Hexalith.FrontComposer/_bmad-output/project-context.md` and the as-built suite)
+is this project's "E2E/API" surface:
 
-## Scope
+- **xUnit v3** + **Shouldly** (no raw `Assert.*`) + **NSubstitute**
+- **bUnit** for Blazor component ("E2E" page) tests — substituting the read gateway seam
+- **Contract** tests = the API-shape guards (System.Text.Json round-trip, fail-closed envelopes)
 
-Story 3.1 was already implemented (status `review`) with extensive per-layer tests. This QA pass mapped the existing
-coverage against AC1–AC4 + the story's Testing Requirements, then **auto-applied the discovered coverage gaps**. No
-production code was changed — tests only.
+Story 3.2 is the read-side + UI discovery surface only (the live server read path is deferred to Epic 4), so the
+testable surface is: the public READ contracts, the proposal-queue page, the state presentation/badge, the gateway
+seam, nav/policy gating, and localization. Used the existing framework; added no dependency.
 
-## Coverage Map (pre-existing, verified green)
+## Coverage Gap Analysis
 
-| Layer | File | Covers |
-|---|---|---|
-| Domain (aggregate) | `AgentInteractionProposalAggregateTests.cs` | created path + every failure outcome → `ProposalCreationFailed`; not-creatable rejections (not-requested / not-confirmation / not-generated incl. `SafetyFailed`/`GenerationFailed` for AC3); terminal idempotent no-op on both terminal states (AC4); Evaluate/Decide no-drift; `ProcessAsync` reflection-dispatch + JSON round-trip |
-| Domain (replay) | `AgentInteractionStateReplayTests.cs` | `Apply` for created / creation-failed / not-creatable no-op; `IsRequested` guard totality; deterministic rebuild for both terminal states (AC4) |
-| Domain (fixtures) | `AgentInteractionTestData.cs` | proposal result/command builders + 3 new `ApplyAll` dispatch cases |
-| Contracts | `AgentInteractionProposalContractsTests.cs` | marker interfaces; JSON round-trip (command, both events, evidence, result incl. null expiry); enums by-name + `Unknown` sentinel; ordinals 10–13 pinned; AD-14 content/secret no-leak + no content-bearing member |
-| Server (orchestrator) | `AgentInteractionProposalOrchestratorTests.cs` | happy path → `ProposalCreated` w/ deterministic id; no content on envelope/result; version-unavailable / reader-throws → `ProposalCreationFailed`; all-deferred graph fails closed; deterministic id reuse; reserved-key stripping; non-Confirmation short-circuit; expiry flows; version-read cancellation propagates |
-| Server (identity) | `AgentProposalIdentityTests.cs` | determinism, distinctness, distinct-from-posting-id, 64-char lowercase hex |
-| Server (deferred port) | `DeferredProposalExpiryPolicyReaderTests.cs` | returns null expiry |
+The as-built suite was already strong. Auto-applied **15 net-new tests** filling the discovered gaps — all in
+untested **branching logic** that maps directly to acceptance criteria. No production code was changed.
 
-## Discovered Gaps → Auto-Applied
+### UI page — `tests/Hexalith.Agents.UI.Tests/ProposalQueueTests.cs` (+12)
 
-### Gap 1 — Full Confirmation-mode lifecycle E2E (request → gate → context → generate → propose)
+| Test | Gap closed | AC |
+|------|-----------|----|
+| `Expiry_filter_narrows_the_queue_to_the_matching_bucket` (Theory ×3) | `MatchesExpiry` — 4 branches, ISO parse + 24h window — had **0 coverage** | AC2 |
+| `Agent_filter_narrows_the_queue_to_the_selected_agent` | `FluentSelect` over distinct AgentIds | AC2 |
+| `Source_conversation_filter_keeps_only_contains_matches` | contains-match (`FluentTextInput`) | AC2 |
+| `Caller_filter_keeps_only_contains_matches` | contains-match (`FluentTextInput`) | AC2 |
+| `Responsibility_column_reads_you_for_actionable_rows_and_approver_otherwise` | derived "current responsibility" label (Task 1 note) | AC1 |
+| `Age_column_renders_a_deterministic_bucket_from_the_injected_clock` | `TimeProvider` → age-column wiring (non-flaky) | AC1 |
+| `Expiry_column_shows_the_no_expiry_label_and_a_time_element` | null-vs-`<time>` expiry-column branch | AC1 |
+| `Count_indication_renders_on_a_stale_result` | count surfaces on **Stale** (only Success was tested) | AC3 |
+| `Stale_result_still_renders_the_authorized_rows_behind_the_stale_notice` | degraded-data-with-rows coexists with the stale notice | AD-12 |
+| `Unavailable_read_discloses_no_records_count_or_grid` | error/fault path fails closed — no grid/count/record leak | AC4 |
 
-Every existing domain test built the `Generated` precondition via direct `Apply(...)`. No test drove the **whole command
-chain through the real reflection-dispatch pipeline** (`AgentInteractionAggregate.ProcessAsync` + JSON round-trip + the
-production `Apply` handlers), so the actual precondition enforcement at each step was never exercised end-to-end for the
-proposal path. This is the canonical E2E for an event-sourced aggregate (mirrors `ProviderCatalogLifecycleE2ETests`) and the
-signature deliverable of this workflow.
+### Presentation — `tests/Hexalith.Agents.UI.Tests/ProposedAgentReplyStatePresentationTests.cs` (+1)
 
-**Added:** `tests/Hexalith.Agents.Tests/AgentInteractionProposalLifecycleE2ETests.cs` (2 tests)
+| Test | Gap closed | AC |
+|------|-----------|----|
+| `Age_helper_uses_inclusive_lower_bounds_at_each_bucket_boundary` | exact 1h / 1d / 7d boundaries (each belongs to the next bucket) | AC1 |
 
-- `A_confirmation_interaction_reaches_a_pending_proposal_through_the_full_command_chain` — drives all 5 commands through the
-  real handlers, asserting each intermediate status (Requested → Authorized → ContextReady → Generated → ProposalCreated),
-  `Pending` sub-state, safe evidence ids, and that the round-tripped outcome carries no generated content (AC1, AC2).
-- `A_safety_blocked_confirmation_interaction_can_never_reach_a_proposal_end_to_end` — drives a Content-Safety-blocked
-  generation (→ `SafetyFailed`, no version appended) then a create command, proving the create is structurally rejected
-  (`OutputNotGenerated`) with no state change — the **end-to-end** enforcement of AC3.
+### Contracts — `tests/Hexalith.Agents.Contracts.Tests/PendingProposalsContractsTests.cs` (+2)
 
-### Gap 2 — Expiry-read cancellation propagation (orchestrator)
+| Test | Gap closed | AC |
+|------|-----------|----|
+| `Stale_result_can_carry_no_trustworthy_rows` | `Stale([], 0)` fails safe like a denial | AC4 |
+| `Success_result_round_trips_multiple_rows_in_order` | nested multi-row list serialization + ordering | AC1/AC4 |
 
-`AgentInteractionProposalOrchestrator.ReadExpiryAsync` re-throws `OperationCanceledException` (the fail-closed catch
-deliberately excludes it). Only the **version**-read cancellation path was tested; the **expiry**-read cancellation branch
-was uncovered.
+### Already covered (no action)
 
-**Added:** `tests/Hexalith.Agents.Server.Tests/AgentInteractionProposalOrchestratorTests.cs` (1 test)
-
-- `A_cancellation_during_the_expiry_read_propagates_and_no_command_is_dispatched` — a genuine cancellation during the expiry
-  read propagates (does not silently degrade to no-expiry) and dispatches nothing.
+Loading / PermissionDenied / Error / Stale / Empty / FilteredEmpty surfaces · needs-my-action + state filters ·
+count-on-Success · no-leak-on-NotAuthorized · badge conformance (color+icon+text, no hex) · nav admin-vs-approver
+gating · en/fr localization parity · deferred-gateway fail-closed · presentation totality over reserved states.
 
 ## Generated Tests
 
-### E2E Tests
-- [x] `tests/Hexalith.Agents.Tests/AgentInteractionProposalLifecycleE2ETests.cs` — full Confirmation-mode lifecycle (happy path + AC3 safety-blocked path)
+### Contract (API-shape) tests
+- [x] `tests/Hexalith.Agents.Contracts.Tests/PendingProposalsContractsTests.cs` — Stale-empty fail-safe; multi-row round-trip + ordering
 
-### API / Service Tests
-- [x] `tests/Hexalith.Agents.Server.Tests/AgentInteractionProposalOrchestratorTests.cs` — +1 expiry-read cancellation-propagation test
+### E2E (bUnit page) + presentation tests
+- [x] `tests/Hexalith.Agents.UI.Tests/ProposalQueueTests.cs` — agent/expiry/source/caller filters; responsibility/age/expiry columns; stale-count; stale-rows; unavailable no-leak
+- [x] `tests/Hexalith.Agents.UI.Tests/ProposedAgentReplyStatePresentationTests.cs` — age-bucket boundary correctness
 
-## Test Run (Release, run per project)
+## Results (Release, warnings-as-errors, `-m:1`, run per project)
 
 Build: `dotnet build Hexalith.Agents.slnx --configuration Release -m:1` → **Build succeeded, 0 Warning(s) / 0 Error(s)**.
 
 | Project | Before | After | Delta |
 |---|---|---|---|
-| `Hexalith.Agents.Tests` (domain) | 555 | **557** | +2 (lifecycle E2E) |
-| `Hexalith.Agents.Server.Tests` | 252 | **253** | +1 (expiry cancellation) |
-| `Hexalith.Agents.Contracts.Tests` | 204 | **204** | 0 (regression check) |
-| **Total** | 1011 | **1014** | **+3** |
+| `Hexalith.Agents.Contracts.Tests` | 215 | **217** | +2 |
+| `Hexalith.Agents.UI.Tests` | 415 | **428** | +13 |
+| `Hexalith.Agents.Tests` (aggregate) | 557 | **557** | 0 (regression check) |
+| `Hexalith.Agents.Server.Tests` | 253 | **253** | 0 (regression check) |
+| **Total** | 1440 | **1455** | **+15** |
 
-**Result: Passed! Failed: 0, Skipped: 0** across all three projects. ✅
+**Result: Passed! Failed: 0, Skipped: 0** across all four projects. ✅
 
-## Coverage
+## AC Coverage After This Pass
 
-- **AC1** (proposal created recording safe facts incl. optional expiry): covered — aggregate + replay + orchestrator + new full-chain E2E.
-- **AC2** (never a Conversation Message; content-free surfaces): covered — content-free contract/aggregate/orchestrator guards + new E2E no-leak round-trip.
-- **AC3** (unsafe content never yields an approvable proposal): covered — unit (`SafetyFailed`/`GenerationFailed` rejections) **and now end-to-end** via the new safety-blocked lifecycle test.
-- **AC4** (no duplicate proposals/versions; deterministic replay): covered — terminal no-op + deterministic id + replay-determinism tests.
+- **AC1** — queue lists safe fields; responsibility/age/expiry columns + state badge now asserted at render; no content field by construction. ✅
+- **AC2** — **all six filters** (needs-my-action, state, agent, source conversation, caller, expiry) now have narrowing tests; filtered-empty→reset covered. ✅
+- **AC3** — count indication asserted on **both** Success and Stale; absent on denial. ✅
+- **AC4** — denied **and** faulted (Unavailable) reads assert no grid/count/record disclosure; Stale-empty + denial envelopes carry empty list + zero count. ✅
+
+## Notes / Boundaries
+
+- No production code changed — gaps were purely missing test coverage. The two write-side/regression suites were
+  re-run to confirm (not modify) green status.
+- The live server read-model / projection / query-handler / BFF binding remains **deferred to Epic 4**; those paths
+  are not yet testable here (the deferred gateway fails closed to `NotAuthorized`).
+- Standards held: PascalCase BDD-style names, Shouldly assertions, `ConfigureAwait`-clean, deterministic clock
+  (`FixedTimeProvider`) — no hardcoded waits, order-independent, consistent with the surrounding Story 3.2 tests.
 
 ## Next Steps
 
-- Run in CI alongside the existing Tier-1/Tier-2 suites (these are unit/replay tests; no Docker/Aspire required).
-- The live read-model / expiry-policy / command-dispatch / Conversations bindings remain deferred (default DI graph fails
-  closed); Tier-3 integration coverage of the real dispatch/read path arrives with the Epic 4 operational topology and
-  Stories 3.2/3.6.
-
-## Notes
-
-- **Keep-it-simple:** the new E2E tests are linear command-chain drives through the existing `ProcessAndApplyAsync` /
-  fixture helpers — no new mocks, no hardcoded waits, fully order-independent. The cancellation test mirrors the existing
-  version-read cancellation test exactly.
-- **Standards:** PascalCase BDD-style names (`{behavior}`), Shouldly assertions (no raw `Assert.*`), file-scoped namespaces,
-  Allman braces, `ConfigureAwait`-clean, consistent with the surrounding Story 3.1 tests and `CLAUDE.md`.
+- Run the suite in CI alongside the existing Agents lanes (unit/bUnit; no Docker/Aspire required).
+- When Epic 4 wires the live read path (`NeedsCurrentUserAction` / age / freshness computation + read-authorization
+  audit), add integration/API tests against the real read-model and the tenant-isolation denial audit.
+- Stories 3.3–3.7 add row-level actions (edit/regenerate/approve/reject) — extend the queue tests with focus-return,
+  `Esc` semantics, and live-region politeness when those land.
