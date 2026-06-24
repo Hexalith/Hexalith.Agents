@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -102,6 +104,48 @@ internal static class AgentInteractionTestData
         return state;
     }
 
+    // ===== Story 2.2 gate fixtures =====
+
+    /// <summary>The gate precondition: requested interaction state (status <c>Requested</c>) for the sample request.</summary>
+    /// <returns>The rehydrated requested interaction state, driven through the real <c>Apply(InteractionRequested)</c>.</returns>
+    internal static AgentInteractionState StateRequested() => StateWith(ValidRequest());
+
+    /// <summary>Builds one gate verdict.</summary>
+    /// <param name="check">The gate check.</param>
+    /// <param name="outcome">The fail-closed outcome.</param>
+    /// <returns>The verdict.</returns>
+    internal static AgentInvocationGateVerdict Verdict(AgentInteractionGateCheck check, AgentInteractionGateOutcome outcome)
+        => new(check, outcome);
+
+    /// <summary>All nine gate checks satisfied (the authorized path), one verdict per check in evaluation order.</summary>
+    /// <returns>The all-satisfied verdict list.</returns>
+    internal static IReadOnlyList<AgentInvocationGateVerdict> AllSatisfied() =>
+    [
+        Verdict(AgentInteractionGateCheck.TenantAccess, AgentInteractionGateOutcome.Satisfied),
+        Verdict(AgentInteractionGateCheck.CallerPartyState, AgentInteractionGateOutcome.Satisfied),
+        Verdict(AgentInteractionGateCheck.SourceConversationAccess, AgentInteractionGateOutcome.Satisfied),
+        Verdict(AgentInteractionGateCheck.AgentLifecycle, AgentInteractionGateOutcome.Satisfied),
+        Verdict(AgentInteractionGateCheck.AgentPartyIdentity, AgentInteractionGateOutcome.Satisfied),
+        Verdict(AgentInteractionGateCheck.ProviderModelReadiness, AgentInteractionGateOutcome.Satisfied),
+        Verdict(AgentInteractionGateCheck.ResponsePolicy, AgentInteractionGateOutcome.Satisfied),
+        Verdict(AgentInteractionGateCheck.ContentSafetyPolicy, AgentInteractionGateOutcome.Satisfied),
+        Verdict(AgentInteractionGateCheck.DependencyFreshness, AgentInteractionGateOutcome.Satisfied),
+    ];
+
+    /// <summary>The all-satisfied set with one check overridden to a (blocking) outcome.</summary>
+    /// <param name="check">The check to override.</param>
+    /// <param name="outcome">The overriding outcome.</param>
+    /// <returns>The verdict list with exactly one overridden check.</returns>
+    internal static IReadOnlyList<AgentInvocationGateVerdict> SatisfiedExcept(AgentInteractionGateCheck check, AgentInteractionGateOutcome outcome)
+        => AllSatisfied().Select(v => v.Check == check ? v with { Outcome = outcome } : v).ToList();
+
+    /// <summary>The gate command carrying the given verdicts for the sample interaction.</summary>
+    /// <param name="verdicts">The server-assembled verdicts.</param>
+    /// <param name="interactionId">The deterministic interaction id (the aggregate id).</param>
+    /// <returns>The gate command.</returns>
+    internal static EvaluateAgentInteractionGate GateCommand(IReadOnlyList<AgentInvocationGateVerdict> verdicts, string interactionId = InteractionId)
+        => new(interactionId, verdicts);
+
     /// <summary>
     /// Applies every event of a <see cref="DomainResult"/> to the supplied state through the aggregate's typed
     /// <c>Apply</c> methods — the same production replay handlers the EventStore state-store invokes. The success
@@ -116,8 +160,11 @@ internal static class AgentInteractionTestData
             switch (payload)
             {
                 case InteractionRequested e: state.Apply(e); break;
+                case AgentInteractionAuthorized e: state.Apply(e); break;
+                case AgentInteractionGateFailed e: state.Apply(e); break;
                 case InvalidAgentInteractionRequestRejection e: state.Apply(e); break;
                 case AgentInteractionAlreadyRequestedRejection e: state.Apply(e); break;
+                case AgentInteractionGateNotEvaluableRejection e: state.Apply(e); break;
                 default: throw new InvalidOperationException($"Unhandled event type '{payload.GetType().Name}' in test apply dispatch.");
             }
         }

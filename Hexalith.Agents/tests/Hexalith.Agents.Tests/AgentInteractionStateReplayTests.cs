@@ -1,5 +1,6 @@
 using Hexalith.Agents.AgentInteraction;
 using Hexalith.Agents.Contracts.AgentInteraction;
+using Hexalith.Agents.Contracts.AgentInteraction.Events;
 using Hexalith.Agents.Contracts.AgentInteraction.Events.Rejections;
 
 using Shouldly;
@@ -89,5 +90,80 @@ public sealed class AgentInteractionStateReplayTests
         state.Prompt.ShouldBe(Prompt);
         state.Snapshot.ShouldBe(SampleSnapshot);
         state.AgentInteractionId.ShouldBe(InteractionId);
+    }
+
+    // ===== Story 2.2 gate replay (status transitions; AC1, AC4) =====
+
+    [Fact]
+    public void Apply_authorized_transitions_status_to_authorized()
+    {
+        AgentInteractionState state = StateRequested();
+
+        state.Apply(new AgentInteractionAuthorized(InteractionId));
+
+        state.Status.ShouldBe(AgentInteractionStatus.Authorized);
+        state.GateVerdicts.ShouldBeNull();
+        state.Prompt.ShouldBe(Prompt); // the request payload is untouched by the gate (AD-14)
+    }
+
+    [Fact]
+    public void Apply_gate_failed_records_the_decision_and_safe_blocker_evidence()
+    {
+        AgentInteractionState state = StateRequested();
+        var blockers = new[] { Verdict(AgentInteractionGateCheck.TenantAccess, AgentInteractionGateOutcome.Unauthorized) };
+
+        state.Apply(new AgentInteractionGateFailed(InteractionId, AgentInteractionStatus.Denied, blockers));
+
+        state.Status.ShouldBe(AgentInteractionStatus.Denied);
+        state.GateVerdicts.ShouldNotBeNull().ShouldHaveSingleItem().Check.ShouldBe(AgentInteractionGateCheck.TenantAccess);
+    }
+
+    [Fact]
+    public void Apply_gate_not_evaluable_rejection_is_a_replay_safe_noop()
+    {
+        AgentInteractionState state = StateRequested();
+
+        // A persisted not-evaluable rejection must not throw or mutate the recorded request/status.
+        state.Apply(new AgentInteractionGateNotEvaluableRejection(InteractionId, AgentInteractionGateNotEvaluableReason.NoVerdictsProvided));
+
+        state.Status.ShouldBe(AgentInteractionStatus.Requested);
+        state.IsRequested.ShouldBeTrue();
+        state.GateVerdicts.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Gate_outcome_applies_only_over_a_requested_stream()
+    {
+        // A gate outcome event ahead of the request (a malformed stream) must not flip status — every non-request Apply
+        // keeps the IsRequested guard so replay over a stream that begins before the request stays total.
+        var state = new AgentInteractionState();
+
+        state.Apply(new AgentInteractionAuthorized(InteractionId));
+        state.Apply(new AgentInteractionGateFailed(InteractionId, AgentInteractionStatus.Blocked, [Verdict(AgentInteractionGateCheck.AgentLifecycle, AgentInteractionGateOutcome.Missing)]));
+
+        state.IsRequested.ShouldBeFalse();
+        state.Status.ShouldBe(AgentInteractionStatus.Unknown);
+        state.GateVerdicts.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Replay_over_request_then_gate_failed_is_deterministic_across_rebuilds()
+    {
+        var blockers = new[] { Verdict(AgentInteractionGateCheck.ProviderModelReadiness, AgentInteractionGateOutcome.Disabled) };
+
+        AgentInteractionState first = Rebuild(blockers);
+        AgentInteractionState second = Rebuild(blockers);
+
+        second.Status.ShouldBe(first.Status);
+        second.Status.ShouldBe(AgentInteractionStatus.Blocked);
+        second.GateVerdicts.ShouldNotBeNull().Count.ShouldBe(first.GateVerdicts!.Count);
+        second.AgentInteractionId.ShouldBe(first.AgentInteractionId);
+
+        static AgentInteractionState Rebuild(AgentInvocationGateVerdict[] blockers)
+        {
+            AgentInteractionState state = StateRequested();
+            state.Apply(new AgentInteractionGateFailed(InteractionId, AgentInteractionStatus.Blocked, blockers));
+            return state;
+        }
     }
 }

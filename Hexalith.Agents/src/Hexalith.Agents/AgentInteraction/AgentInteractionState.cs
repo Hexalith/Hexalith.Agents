@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.AgentInteraction.Events;
@@ -44,6 +45,12 @@ public sealed class AgentInteractionState
     /// <summary>Gets or sets the caller idempotency metadata recorded for the deterministic-id derivation (AD-13).</summary>
     public string IdempotencyKey { get; set; } = string.Empty;
 
+    /// <summary>Gets or sets the coarse Agent Call status (Story 2.2 records the terminal gate decision; Story 2.1 leaves it at <see cref="AgentInteractionStatus.Requested"/>).</summary>
+    public AgentInteractionStatus Status { get; set; } = AgentInteractionStatus.Unknown;
+
+    /// <summary>Gets or sets the safe blocker verdicts recorded when the gate failed (Audit Evidence; FR-24, AD-14). <see langword="null"/> until a gate decision is recorded.</summary>
+    public IReadOnlyList<AgentInvocationGateVerdict>? GateVerdicts { get; set; }
+
     /// <summary>Applies the Agent Call request: the interaction exists and freezes its configuration snapshot (AC1).</summary>
     /// <param name="e">The event.</param>
     public void Apply(InteractionRequested e)
@@ -57,6 +64,42 @@ public sealed class AgentInteractionState
         Snapshot = e.Snapshot;
         Prompt = e.Prompt;
         IdempotencyKey = e.IdempotencyKey;
+        Status = AgentInteractionStatus.Requested;
+    }
+
+    /// <summary>Applies the passed-gate outcome: the interaction is authorized to proceed to context building (AC1; Story 2.2).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentInteractionAuthorized e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.Authorized;
+    }
+
+    /// <summary>Applies the failed-gate outcome: records the terminal denied/blocked decision and its safe blocker evidence (AC1, AC2, AC4; Story 2.2).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentInteractionGateFailed e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = e.Decision;
+        GateVerdicts = e.Blockers;
+    }
+
+    /// <summary>No-op replay handler — the gate-not-evaluable rejection carries no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(AgentInteractionGateNotEvaluableRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
     }
 
     /// <summary>No-op replay handler — rejection events carry no state change.</summary>

@@ -87,6 +87,51 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
         ]);
     }
 
+    /// <summary>
+    /// Evaluates the invocation authorization + dependency-readiness gate from server-assembled verdicts and records the
+    /// terminal decision (AC1–AC4; FR-20, FR-21; AD-3, AD-12, AD-13).
+    /// </summary>
+    /// <param name="command">The gate command carrying the server-assembled per-check verdicts (client values discarded upstream).</param>
+    /// <param name="state">The current interaction state (must be requested before the gate can run).</param>
+    /// <param name="envelope">The command envelope (carries the interaction id and the tenant scope).</param>
+    /// <returns>The domain result (the authorized/failed outcome event, a not-evaluable rejection, or an idempotent no-op).</returns>
+    public static DomainResult Handle(EvaluateAgentInteractionGate command, AgentInteractionState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string interactionId = envelope.AggregateId;
+
+        // State precondition: the gate can only evaluate an interaction whose request was recorded. A gate command on a
+        // never-requested stream is a structural rejection (no state change), not a recorded decision (AD-12). The
+        // positive pattern binds the non-null requested state so the gate logic runs only over a recorded interaction.
+        if (state is { IsRequested: true } requested)
+        {
+            // No verdicts means the gate has nothing to decide — fail closed as a structural rejection rather than
+            // silently authorizing (a zero-blocker set must come from a real, populated evaluation, never an empty one).
+            if (command.Verdicts is null or { Count: 0 })
+            {
+                return DomainResult.Rejection([
+                    new AgentInteractionGateNotEvaluableRejection(interactionId, AgentInteractionGateNotEvaluableReason.NoVerdictsProvided),
+                ]);
+            }
+
+            // Idempotent terminal gate (AD-13): the decision is recorded once and is terminal. A re-issued gate command
+            // on an already-gated interaction is a clean no-op — the aggregate never silently flips a recorded decision.
+            if (requested.Status is AgentInteractionStatus.Authorized or AgentInteractionStatus.Denied or AgentInteractionStatus.Blocked)
+            {
+                return DomainResult.NoOp();
+            }
+
+            // Pure evaluation (AD-3): emit the authorized/failed outcome only. The verdicts arrive pre-assembled from
+            // trusted server reads (the gate orchestration); the aggregate's sole job is the blockers → decision math.
+            return AgentInvocationGatePolicy.Evaluate(interactionId, command.Verdicts);
+        }
+
+        return DomainResult.Rejection([
+            new AgentInteractionGateNotEvaluableRejection(interactionId, AgentInteractionGateNotEvaluableReason.InteractionNotRequested),
+        ]);
+    }
+
     // By-value comparison of a re-issued request against the recorded one (AD-13). Strings are compared ordinally;
     // the snapshot scalars are compared explicitly so a re-derived-id collision with a different configuration is
     // surfaced as a conflict rather than a silent no-op.

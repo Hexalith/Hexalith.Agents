@@ -23,6 +23,9 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Hexalith.Agents.Tests" />
+    <!-- The Server gate orchestration reuses the internal AgentInvocationGatePolicy so its returned gate status
+         cannot drift from the pure aggregate's recorded decision (Story 2.2 Task 4; AD-12). -->
+    <InternalsVisibleTo Include="Hexalith.Agents.Server" />
   </ItemGroup>
 
 </Project>

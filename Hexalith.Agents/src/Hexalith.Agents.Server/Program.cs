@@ -83,6 +83,18 @@ builder.Services.AddScoped<AgentContentSafetyPolicyOrchestrator>();
 builder.Services.AddSingleton<IAgentConfigurationSnapshotReader, DeferredAgentConfigurationSnapshotReader>();
 builder.Services.AddScoped<AgentInteractionRequestOrchestrator>();
 
+// Story 2.2: Invocation authorization + dependency-readiness gate wiring. The gate aggregate handler auto-registers
+// via the existing AddEventStoreDomainService assembly scan (no host change needed). The gate orchestration assembles
+// trusted verdicts from three new read ports — tenant access, Source Conversation access, and current Agent readiness
+// — plus the reused Parties/ProviderCatalog/approver ports registered above, then dispatches the EvaluateAgentInteractionGate
+// command. The three new ports' live bindings stay deferred and fail closed (Tenants projection, Story 2.3 Conversations
+// read, and the Agent read-model respectively); their Deferred* placeholders keep the DI graph complete and compiling.
+// No provider adapter, no Conversations post, and no proposal is wired here (AC2), mirroring 1.2/1.4/1.5/1.6/1.7/2.1.
+builder.Services.AddSingleton<ITenantAccessReader, DeferredTenantAccessReader>();
+builder.Services.AddSingleton<IConversationAccessReader, DeferredConversationAccessReader>();
+builder.Services.AddSingleton<IAgentInvocationReadinessReader, DeferredAgentInvocationReadinessReader>();
+builder.Services.AddScoped<AgentInteractionGateOrchestrator>();
+
 WebApplication app = builder.Build();
 
 app.UseEventStoreDomainService();

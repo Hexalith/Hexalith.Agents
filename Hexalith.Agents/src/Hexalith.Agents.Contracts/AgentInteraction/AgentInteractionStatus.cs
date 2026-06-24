@@ -19,4 +19,13 @@ public enum AgentInteractionStatus
 
     /// <summary>The Agent Call request record was created with its configuration snapshot (Story 2.1).</summary>
     Requested,
+
+    /// <summary>The invocation gate passed: every dependency check was satisfied and the call may proceed to context building (Story 2.2; Story 2.3 consumes this).</summary>
+    Authorized,
+
+    /// <summary>An authorization-class gate check failed (tenant access, caller Party state, or Source Conversation access) — the caller is not permitted; recorded as fail-closed Audit Evidence (Story 2.2; AC2, AC3).</summary>
+    Denied,
+
+    /// <summary>A dependency-readiness-class gate check failed (Agent lifecycle/Party identity, Provider/model, response/content-safety policy, or dependency freshness) — required state is missing/stale/ambiguous/disabled/unavailable; recorded as fail-closed Audit Evidence (Story 2.2; AC1).</summary>
+    Blocked,
 }
