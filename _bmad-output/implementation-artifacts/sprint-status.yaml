@@ -43,6 +43,7 @@
 generated: 2026-06-23T21:28:59+02:00
 last_updated: 2026-06-24
 project: agents
+# retrospectives: epic-2 retro completed 2026-06-24 (epic-2-retro-2026-06-24.md)
 project_key: NOKEY
 tracking_system: file-system
 story_location: /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts
@@ -65,7 +66,7 @@ development_status:
   2-4-generate-and-safety-check-agent-output: done
   2-5-post-automatic-responses-through-conversations: done
   2-6-conversation-invocation-ux-and-call-status-feedback: done
-  epic-2-retrospective: optional
+  epic-2-retrospective: done
   epic-3: backlog
   3-1-create-proposed-agent-replies-in-confirmation-mode: backlog
   3-2-discover-pending-proposals-in-product: backlog
@@ -82,3 +83,25 @@ development_status:
   4-4-define-and-enforce-launch-readiness-gates: backlog
   4-5-verify-end-to-end-governance-and-contract-conformance: backlog
   epic-4-retrospective: optional
+
+action_items:
+  - epic: 2
+    action: "Automate Dev Agent Record accuracy: regenerate test counts from the latest run and diff the File List against git status before review (recurring stale-count/omission finding across all 6 stories)."
+    owner: "Amelia (Developer)"
+    status: open
+  - epic: 2
+    action: "Track the deferred live-binding backlog explicitly: a living checklist pairing each Deferred* adapter with its target live binding (read-models, IAgentCommandDispatcher, provider adapter, content-safety engine, Conversations AddParticipant seam, AppHost topology) to de-risk Epic 4."
+    owner: "Winston (Architect)"
+    status: open
+  - epic: 2
+    action: "Codify the step-pattern as a written convention: orchestrator to single-command to twin-policy (Evaluate/Decide, InternalsVisibleTo Server not Server.Tests) so Epic 3 proposal commands reuse it without re-derivation."
+    owner: "Winston (Architect)"
+    status: open
+  - epic: 2
+    action: "Reconcile architecture spine AD-4 with the shipped AgentInteractionSnapshot (add ContentSafetyPolicyVersion as an additive snapshot field). Completed during the Epic 2 retro doc audit."
+    owner: "Paige (Tech Writer)"
+    status: done
+  - epic: 2
+    action: "Decide the capability-version reconciliation (Story 2.3): confirm whether a context-time floor re-check of catalog CapabilityVersion against the snapshot ProviderCapabilityVersion is wanted (AD-4/AD-10), or formally accept current behaviour in the spine."
+    owner: "Winston (Architect)"
+    status: open

@@ -7,7 +7,7 @@ paradigm: event-sourced hybrid agent-runtime hexagonal Hexalith domain module
 scope: Hexalith Agents module in the agents workspace
 status: final
 created: 2026-06-23
-updated: 2026-06-23
+updated: 2026-06-24
 binds:
   - PRD FR-1..FR-25
   - Hexalith Agents V1
@@ -90,7 +90,8 @@ flowchart LR
 
 - **Binds:** FR-5, FR-6, FR-7, FR-13..FR-18, FR-24.
 - **Prevents:** pending interactions changing model, instructions, response mode, or approval authority when administrators edit configuration later.
-- **Rule:** `AgentInteraction` snapshots Agent configuration version, instructions version, response mode, approver policy version, `ProviderId`, `ModelId`, provider capability version, caller `PartyId`, source `ConversationId`, and context-build policy at request time. Later Agent or ProviderCatalog changes affect future interactions only.
+- **Rule:** `AgentInteraction` snapshots Agent configuration version, instructions version, response mode, approver policy version, `ProviderId`, `ModelId`, provider capability version, content-safety policy version, caller `PartyId`, source `ConversationId`, and context-build policy at request time. Later Agent or ProviderCatalog changes affect future interactions only.
+- *Epic 2 reconciliation (2026-06-24): the shipped `AgentInteractionSnapshot` contract folds in `ContentSafetyPolicyVersion` (added to the list above) and carries the context-build policy as `ContextPolicyReference` (V1 default `full-conversation-v1`). Both were added additively during implementation, anticipating the Story 2.4 safety check and the Story 2.3 context policy, without a contract break.*
 
 ### AD-5 - Proposal Lifecycle
 
