@@ -56,9 +56,12 @@ public sealed class AgentLifecycleE2ETests
         view.InstructionsVersion.ShouldBe(1);
         view.HasPartyIdentity.ShouldBeFalse(); // 1.4 AC4: a newly created agent is not yet linked to a Party
         view.HasProviderSelection.ShouldBeFalse(); // 1.5 AC1: nor has it selected a Provider/model yet
+        view.ResponseMode.ShouldBe(AgentResponseMode.Unknown); // 1.6 AC1: nor has it chosen a Response Mode yet
+        view.HasApproverPolicy.ShouldBeFalse();
         view.ActivationBlockers.ShouldBe([
             AgentActivationBlocker.MissingPartyIdentity,
             AgentActivationBlocker.MissingProviderSelection,
+            AgentActivationBlocker.MissingResponseMode,
         ]);
 
         // AC1 / AD-14: the safe status surface never carries the raw Agent Instructions text.
@@ -91,11 +94,12 @@ public sealed class AgentLifecycleE2ETests
         (await ProcessAndApplyAsync(aggregate, state, new UpdateAgentConfiguration("Hexa Assistant", "desc", ValidInstructions)))
             .IsSuccess.ShouldBeTrue();
 
-        // 1.4 AC4 + 1.5 AC2: the party-identity and provider-selection gates remain until both are satisfied.
+        // 1.4 AC4 + 1.5 AC2 + 1.6 AC1: the party-identity, provider-selection, and response-mode gates remain until satisfied.
         AgentStatusView remediatedView = AgentInspection.GetStatus(state, isAgentsAdmin: true).Agent.ShouldNotBeNull();
         remediatedView.ActivationBlockers.ShouldBe([
             AgentActivationBlocker.MissingPartyIdentity,
             AgentActivationBlocker.MissingProviderSelection,
+            AgentActivationBlocker.MissingResponseMode,
         ]);
         var link = new LinkAgentPartyIdentity(LinkedPartyId);
         (await ProcessAndApplyAsync(aggregate, state, link, LinkEnvelope(link))).IsSuccess.ShouldBeTrue();
@@ -104,6 +108,9 @@ public sealed class AgentLifecycleE2ETests
         var select = new SelectAgentProviderModel(SelectedProviderId, SelectedModelId, SelectedCapabilityVersion);
         (await ProcessAndApplyAsync(aggregate, state, select, SelectEnvelope(select))).IsSuccess.ShouldBeTrue();
 
+        // 1.6 AC1: choose Automatic Response Mode (needs no approver policy) so the final gate clears.
+        (await ProcessAndApplyAsync(aggregate, state, new ConfigureAgentResponseMode(AgentResponseMode.Automatic))).IsSuccess.ShouldBeTrue();
+
         // AC2: activation now succeeds (the recorded selection re-validates Valid) with no remaining blockers.
         (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent(), SelectEnvelope(new ActivateAgent()))).IsSuccess.ShouldBeTrue();
         AgentStatusView activeView = AgentInspection.GetStatus(state, isAgentsAdmin: true).Agent.ShouldNotBeNull();
@@ -111,6 +118,7 @@ public sealed class AgentLifecycleE2ETests
         activeView.ActivationBlockers.ShouldBeEmpty();
         activeView.InstructionsValid.ShouldBeTrue();
         activeView.HasProviderSelection.ShouldBeTrue();
+        activeView.ResponseMode.ShouldBe(AgentResponseMode.Automatic);
     }
 
     // ===== AC3: disable is publicly visible, preserves history, and reactivation re-runs the gates =====
@@ -132,6 +140,9 @@ public sealed class AgentLifecycleE2ETests
         var select = new SelectAgentProviderModel(SelectedProviderId, SelectedModelId, SelectedCapabilityVersion);
         (await ProcessAndApplyAsync(aggregate, state, select, SelectEnvelope(select))).IsSuccess.ShouldBeTrue();
 
+        // 1.6 AC1: a chosen Response Mode is also required before the agent can activate.
+        (await ProcessAndApplyAsync(aggregate, state, new ConfigureAgentResponseMode(AgentResponseMode.Automatic))).IsSuccess.ShouldBeTrue();
+
         (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent(), SelectEnvelope(new ActivateAgent()))).IsSuccess.ShouldBeTrue();
 
         // Disable: a lifecycle flag flip only.
@@ -143,10 +154,11 @@ public sealed class AgentLifecycleE2ETests
 
         // ...and prior identity/instructions/configuration are not deleted or rewritten by the disable.
         disabledView.DisplayName.ShouldBe(create.DisplayName);
-        disabledView.ConfigurationVersion.ShouldBe(3); // create (1) + party link (2) + provider selection (3)
+        disabledView.ConfigurationVersion.ShouldBe(4); // create (1) + party link (2) + provider selection (3) + response mode (4)
         disabledView.HasInstructions.ShouldBeTrue();
         disabledView.HasPartyIdentity.ShouldBeTrue(); // the link survives the disable (history preserved, AC3)
         disabledView.HasProviderSelection.ShouldBeTrue(); // the selection survives the disable too (AC3)
+        disabledView.ResponseMode.ShouldBe(AgentResponseMode.Automatic); // the chosen mode survives the disable (AC3)
         disabledView.InstructionsVersion.ShouldBe(1);
         state.Instructions.ShouldBe(ValidInstructions); // durable instructions survive the disable
 
@@ -244,6 +256,7 @@ public sealed class AgentLifecycleE2ETests
         await DriveWith(link, LinkEnvelope(link));
         var select = new SelectAgentProviderModel(SelectedProviderId, SelectedModelId, SelectedCapabilityVersion); // 1.5 AC1: select before activation
         await DriveWith(select, SelectEnvelope(select));
+        await Drive(new ConfigureAgentResponseMode(AgentResponseMode.Automatic)); // 1.6 AC1: choose a mode before activation
         await DriveWith(new ActivateAgent(), SelectEnvelope(new ActivateAgent())); // 1.5 AC2: provider re-validated at activation
         await Drive(new DisableAgent());
 
@@ -264,7 +277,7 @@ public sealed class AgentLifecycleE2ETests
         replayedView.Lifecycle.ShouldBe(liveView.Lifecycle);
         replayedView.Lifecycle.ShouldBe(AgentLifecycleStatus.Disabled);
         replayedView.ConfigurationVersion.ShouldBe(liveView.ConfigurationVersion);
-        replayedView.ConfigurationVersion.ShouldBe(4); // create (1) + update (2) + party link (3) + provider selection (4)
+        replayedView.ConfigurationVersion.ShouldBe(5); // create (1) + update (2) + party link (3) + provider selection (4) + response mode (5)
         replayedView.HasInstructions.ShouldBe(liveView.HasInstructions);
         replayedView.InstructionsValid.ShouldBe(liveView.InstructionsValid);
         replayedView.InstructionsVersion.ShouldBe(liveView.InstructionsVersion);

@@ -37,4 +37,13 @@ public enum AgentActivationBlocker
 
     /// <summary>A Provider/model is selected but it is currently not selectable/ready — maps to the canonical UX <c>provider unavailable</c> readiness state (AC2; 1.5).</summary>
     ProviderUnavailable,
+
+    /// <summary>No Response Mode has been chosen yet, so the Agent has no governed delivery policy (AC1; 1.6). Automatic mode requires no approver policy.</summary>
+    MissingResponseMode,
+
+    /// <summary>The Agent is in Confirmation mode but no approver source is configured, so confirmation has nothing to confirm with (AC3; 1.6).</summary>
+    MissingApproverPolicy,
+
+    /// <summary>The Agent is in Confirmation mode and a configured approver source is missing/disabled/ambiguous/unavailable/unauthorized — fails closed (AC3; 1.6).</summary>
+    ApproverPolicyUnresolvable,
 }

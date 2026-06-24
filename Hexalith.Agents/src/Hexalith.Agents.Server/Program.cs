@@ -55,6 +55,17 @@ builder.Services.AddSingleton<IProviderCatalogReader, DeferredProviderCatalogRea
 builder.Services.AddScoped<AgentProviderSelectionOrchestrator>();
 builder.Services.AddScoped<AgentActivationProviderRevalidation>();
 
+// Story 1.6: Response-mode + approver-policy configuration wiring. The two thin config orchestrations and the
+// approver-policy resolver port are registered here and fully unit-tested. The extended activation re-validation
+// (registered above) now also resolves the added IApproverPolicyResolver dependency to populate the trusted
+// approver:policyValidation verdict at activation. The live Tenants-projection / Conversations-facilitator legs (and
+// the live command dispatch / AppHost topology) remain deferred — the DeferredApproverPolicyResolver keeps the DI
+// graph complete and compiling (mirroring Story 1.2/1.4/1.5). No provider SDK or sibling-module reference is needed
+// (Parties is already referenced; its leg can reuse PartiesAgentPartyDirectory once the read-model story wires it).
+builder.Services.AddSingleton<IApproverPolicyResolver, DeferredApproverPolicyResolver>();
+builder.Services.AddScoped<AgentResponseModeOrchestrator>();
+builder.Services.AddScoped<AgentApproverPolicyOrchestrator>();
+
 WebApplication app = builder.Build();
 
 app.UseEventStoreDomainService();

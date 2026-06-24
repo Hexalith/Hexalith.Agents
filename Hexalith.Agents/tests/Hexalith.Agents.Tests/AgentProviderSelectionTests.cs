@@ -252,8 +252,10 @@ public sealed class AgentProviderSelectionTests
     [Fact]
     public void Activation_is_blocked_by_missing_provider_selection_when_no_provider_is_selected()
     {
-        // Party cleared, but no provider selected yet — the only remaining gate is MissingProviderSelection.
+        // Party cleared and Automatic mode chosen (1.6), but no provider selected yet — the only remaining gate is
+        // MissingProviderSelection.
         AgentState state = StateWithLinkedParty(ValidCreate());
+        state.Apply(new AgentResponseModeConfigured(AgentId, AgentResponseMode.Automatic, state.ConfigurationVersion + 1));
 
         DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, SelectEnvelope(new ActivateAgent()));
 

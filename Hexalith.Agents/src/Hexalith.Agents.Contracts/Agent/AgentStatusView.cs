@@ -33,6 +33,10 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// <param name="HasProviderSelection">Whether a Provider/model has been selected (presence only; 1.5 AC1).</param>
 /// <param name="SelectedProviderId">The selected stable safe provider identifier, or <see langword="null"/> when none (a reference, not a secret — AD-9).</param>
 /// <param name="SelectedModelId">The selected stable safe model identifier, or <see langword="null"/> when none (a reference, not a secret — AD-9).</param>
+/// <param name="ResponseMode">The configured Response Mode (<see cref="AgentResponseMode.Unknown"/> until a mode is chosen; 1.6 AC1).</param>
+/// <param name="HasApproverPolicy">Whether at least one approver source is configured (presence only — never the source list or any Party PII; 1.6 AC2).</param>
+/// <param name="ApproverPolicyDisclosure">The configured FR-7 disclosure category (safe metadata; 1.6 AC4).</param>
+/// <param name="ApproverPolicyVersion">The monotonic approver-policy version (0 until a policy is configured; 1.6 AC4).</param>
 /// <param name="ActivationBlockers">The specific blockers preventing activation as currently configured (empty when none).</param>
 public record AgentStatusView(
     string AgentId,
@@ -48,4 +52,8 @@ public record AgentStatusView(
     bool HasProviderSelection,
     string? SelectedProviderId,
     string? SelectedModelId,
+    AgentResponseMode ResponseMode,
+    bool HasApproverPolicy,
+    ApproverPolicyBasisDisclosure ApproverPolicyDisclosure,
+    int ApproverPolicyVersion,
     IReadOnlyList<AgentActivationBlocker> ActivationBlockers);

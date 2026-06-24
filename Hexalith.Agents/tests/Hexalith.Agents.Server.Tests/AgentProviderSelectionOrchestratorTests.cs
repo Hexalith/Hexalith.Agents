@@ -34,6 +34,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
     private const string ModelId = "gpt-4o";
 
     private readonly IProviderCatalogReader _reader = Substitute.For<IProviderCatalogReader>();
+    private readonly IApproverPolicyResolver _approverResolver = Substitute.For<IApproverPolicyResolver>();
     private readonly IAgentCommandDispatcher _dispatcher = Substitute.For<IAgentCommandDispatcher>();
 
     private AgentProviderSelectionOrchestrator Orchestrator => new(_reader, _dispatcher);
@@ -207,7 +208,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
     {
         ReaderReturns(SuccessRead(ValidEntry()));
         CaptureDispatch();
-        var revalidation = new AgentActivationProviderRevalidation(_reader, _dispatcher);
+        var revalidation = new AgentActivationProviderRevalidation(_reader, _approverResolver, _dispatcher);
 
         AgentActivationRevalidationOutcome outcome = await revalidation.ExecuteAsync(
             ActivationRequest(ProviderId, ModelId), CancellationToken.None);
@@ -223,7 +224,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
     public async Task Activation_revalidation_with_no_recorded_selection_skips_the_catalog_read()
     {
         CaptureDispatch();
-        var revalidation = new AgentActivationProviderRevalidation(_reader, _dispatcher);
+        var revalidation = new AgentActivationProviderRevalidation(_reader, _approverResolver, _dispatcher);
 
         AgentActivationRevalidationOutcome outcome = await revalidation.ExecuteAsync(
             ActivationRequest(selectedProviderId: null, selectedModelId: null), CancellationToken.None);
@@ -236,7 +237,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
     [Fact]
     public async Task Activation_revalidation_denies_an_unauthorized_actor_without_reading_or_dispatching()
     {
-        var revalidation = new AgentActivationProviderRevalidation(_reader, _dispatcher);
+        var revalidation = new AgentActivationProviderRevalidation(_reader, _approverResolver, _dispatcher);
 
         AgentActivationRevalidationOutcome outcome = await revalidation.ExecuteAsync(
             ActivationRequest(ProviderId, ModelId, isAgentsAdmin: false), CancellationToken.None);
@@ -256,7 +257,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
     {
         ReaderReturns(SuccessRead(ValidEntry() with { Status = ProviderModelStatus.Disabled }));
         CaptureDispatch();
-        var revalidation = new AgentActivationProviderRevalidation(_reader, _dispatcher);
+        var revalidation = new AgentActivationProviderRevalidation(_reader, _approverResolver, _dispatcher);
 
         var clientExtensions = new Dictionary<string, string>
         {
@@ -274,7 +275,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
             IsAgentsAdmin: true,
             SelectedProviderId: ProviderId,
             SelectedModelId: ModelId,
-            clientExtensions);
+            ClientSuppliedExtensions: clientExtensions);
 
         await revalidation.ExecuteAsync(request, CancellationToken.None);
 

@@ -425,6 +425,9 @@ public sealed class AgentAggregateTests
         var select = new SelectAgentProviderModel(SelectedProviderId, SelectedModelId, SelectedCapabilityVersion);
         (await ProcessAndApplyAsync(aggregate, state, select, SelectEnvelope(select))).IsSuccess.ShouldBeTrue();
 
+        // 1.6 AC1: a chosen Response Mode is also required before activation (Automatic needs no approver policy).
+        (await ProcessAndApplyAsync(aggregate, state, new ConfigureAgentResponseMode(AgentResponseMode.Automatic))).IsSuccess.ShouldBeTrue();
+
         DomainResult activated = await ProcessAndApplyAsync(aggregate, state, new ActivateAgent(), SelectEnvelope(new ActivateAgent()));
         activated.IsSuccess.ShouldBeTrue();
         state.Lifecycle.ShouldBe(AgentLifecycleStatus.Active);

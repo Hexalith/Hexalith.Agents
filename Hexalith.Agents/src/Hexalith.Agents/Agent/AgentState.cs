@@ -72,6 +72,24 @@ public sealed class AgentState
     /// </summary>
     public int? ProviderCapabilityVersion { get; set; }
 
+    /// <summary>
+    /// Gets or sets the configured Response Mode (default <see cref="AgentResponseMode.Unknown"/> = not configured,
+    /// which fails the activation gate). A safe enum, no secret/content (Story 1.6 AC1; AD-9, AD-14).
+    /// </summary>
+    public AgentResponseMode ResponseMode { get; set; } = AgentResponseMode.Unknown;
+
+    /// <summary>
+    /// Gets or sets the configured approver sources (<see langword="null"/> = no policy configured). Safe references
+    /// only — never Party PII (Story 1.6 AC2; AD-7, AD-14).
+    /// </summary>
+    public IReadOnlyList<ApproverPolicySource>? ApproverPolicySources { get; set; }
+
+    /// <summary>Gets or sets the configured FR-7 disclosure category (safe metadata; Story 1.6 AC4).</summary>
+    public ApproverPolicyBasisDisclosure ApproverPolicyDisclosure { get; set; }
+
+    /// <summary>Gets or sets the monotonic approver-policy version (0 until a policy is configured; Story 1.6 AC4).</summary>
+    public int ApproverPolicyVersion { get; set; }
+
     /// <summary>Applies the Agent creation: the record exists and starts in <see cref="AgentLifecycleStatus.Draft"/>.</summary>
     /// <param name="e">The event.</param>
     public void Apply(AgentCreated e)
@@ -172,6 +190,43 @@ public sealed class AgentState
         ProviderId = e.ProviderId;
         ModelId = e.ModelId;
         ProviderCapabilityVersion = e.ProviderCapabilityVersion;
+        ConfigurationVersion = e.ConfigurationVersion;
+    }
+
+    /// <summary>
+    /// Applies a Response Mode choice: records the mode and bumps the configuration version (Story 1.6 AC1).
+    /// Lifecycle is unchanged (Story 1.3 invariant); a changed mode is future-only (prior events never rewritten).
+    /// </summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentResponseModeConfigured e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsCreated)
+        {
+            return;
+        }
+
+        ResponseMode = e.Mode;
+        ConfigurationVersion = e.ConfigurationVersion;
+    }
+
+    /// <summary>
+    /// Applies an Approver Policy configuration: records the safe sources + disclosure category and bumps both the
+    /// approver-policy version and the configuration version (Story 1.6 AC2, AC4). Lifecycle is unchanged; a changed
+    /// policy is future-only (prior events never rewritten).
+    /// </summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentApproverPolicyConfigured e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsCreated)
+        {
+            return;
+        }
+
+        ApproverPolicySources = e.Policy.Sources;
+        ApproverPolicyDisclosure = e.Policy.DisclosureCategory;
+        ApproverPolicyVersion = e.ApproverPolicyVersion;
         ConfigurationVersion = e.ConfigurationVersion;
     }
 

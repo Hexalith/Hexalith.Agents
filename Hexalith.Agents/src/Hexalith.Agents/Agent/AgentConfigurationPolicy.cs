@@ -78,10 +78,11 @@ internal static class AgentConfigurationPolicy
     }
 
     /// <summary>
-    /// Computes the current activation blockers for an Agent's state (AC2; 1.4 AC4; 1.5 AC2). An empty list means
-    /// the Agent is activatable as configured. Order is stable and deterministic: display name → instructions →
-    /// party identity → provider selection → provider unavailable. Party identity and provider/model readiness are
-    /// <em>distinct</em> readiness gates — separate from lifecycle and from the configuration gates (1.4 AC4, 1.5 AC2).
+    /// Computes the current activation blockers for an Agent's state (AC2; 1.4 AC4; 1.5 AC2; 1.6 AC1, AC3). An empty
+    /// list means the Agent is activatable as configured. Order is stable and deterministic: display name →
+    /// instructions → party identity → provider selection → provider unavailable → response mode → approver policy
+    /// missing → approver policy unresolvable. Party identity, provider/model readiness, response mode, and approver
+    /// policy are <em>distinct</em> readiness gates — separate from lifecycle and from the configuration gates.
     /// </summary>
     /// <param name="displayName">The Agent's display name.</param>
     /// <param name="instructions">The Agent's instructions text.</param>
@@ -91,13 +92,22 @@ internal static class AgentConfigurationPolicy
     /// Whether the selected Provider/model is currently ready (the trusted catalog verdict was <c>Valid</c>). Only
     /// consulted when <paramref name="hasProviderSelection"/> is set (1.5 AC2).
     /// </param>
+    /// <param name="responseMode">The configured Response Mode (<c>Unknown</c> until a mode is chosen; 1.6 AC1).</param>
+    /// <param name="hasApproverPolicy">Whether at least one approver source is configured (1.6 AC2). Only consulted in Confirmation mode.</param>
+    /// <param name="approverPolicyResolved">
+    /// Whether the configured approver policy currently resolves (the trusted approver verdict was <c>Valid</c>).
+    /// Only consulted in Confirmation mode when <paramref name="hasApproverPolicy"/> is set (1.6 AC3).
+    /// </param>
     /// <returns>The specific blockers (empty when none).</returns>
     internal static IReadOnlyList<AgentActivationBlocker> ComputeActivationBlockers(
         string displayName,
         string instructions,
         bool hasPartyIdentity,
         bool hasProviderSelection,
-        bool selectedProviderReady)
+        bool selectedProviderReady,
+        AgentResponseMode responseMode,
+        bool hasApproverPolicy,
+        bool approverPolicyResolved)
     {
         var blockers = new List<AgentActivationBlocker>();
 
@@ -120,7 +130,7 @@ internal static class AgentConfigurationPolicy
             blockers.Add(AgentActivationBlocker.MissingPartyIdentity);
         }
 
-        // Provider/model readiness is appended last and in deterministic order: a missing selection is reported as
+        // Provider/model readiness is appended in deterministic order: a missing selection is reported as
         // MissingProviderSelection; a present-but-not-ready selection as ProviderUnavailable (1.5 AC2).
         if (!hasProviderSelection)
         {
@@ -129,6 +139,24 @@ internal static class AgentConfigurationPolicy
         else if (!selectedProviderReady)
         {
             blockers.Add(AgentActivationBlocker.ProviderUnavailable);
+        }
+
+        // Response-mode + approver-policy gates are appended last (1.6). A not-yet-chosen mode blocks; Automatic mode
+        // requires no approver policy; Confirmation mode requires a configured policy that currently resolves.
+        if (responseMode == AgentResponseMode.Unknown)
+        {
+            blockers.Add(AgentActivationBlocker.MissingResponseMode);
+        }
+        else if (responseMode == AgentResponseMode.Confirmation)
+        {
+            if (!hasApproverPolicy)
+            {
+                blockers.Add(AgentActivationBlocker.MissingApproverPolicy);
+            }
+            else if (!approverPolicyResolved)
+            {
+                blockers.Add(AgentActivationBlocker.ApproverPolicyUnresolvable);
+            }
         }
 
         return blockers;

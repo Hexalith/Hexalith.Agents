@@ -166,6 +166,10 @@ public sealed class AgentContractsRoundTripTests
             HasProviderSelection: true,
             SelectedProviderId: "openai",
             SelectedModelId: "gpt-4o",
+            ResponseMode: AgentResponseMode.Confirmation,
+            HasApproverPolicy: true,
+            ApproverPolicyDisclosure: ApproverPolicyBasisDisclosure.OperatorOnly,
+            ApproverPolicyVersion: 2,
             [AgentActivationBlocker.InvalidInstructions, AgentActivationBlocker.MissingPartyIdentity]);
 
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(view);
@@ -182,6 +186,10 @@ public sealed class AgentContractsRoundTripTests
         roundTripped.HasProviderSelection.ShouldBe(view.HasProviderSelection);
         roundTripped.SelectedProviderId.ShouldBe(view.SelectedProviderId);
         roundTripped.SelectedModelId.ShouldBe(view.SelectedModelId);
+        roundTripped.ResponseMode.ShouldBe(view.ResponseMode);
+        roundTripped.HasApproverPolicy.ShouldBe(view.HasApproverPolicy);
+        roundTripped.ApproverPolicyDisclosure.ShouldBe(view.ApproverPolicyDisclosure);
+        roundTripped.ApproverPolicyVersion.ShouldBe(view.ApproverPolicyVersion);
         roundTripped.ActivationBlockers.ShouldBe(view.ActivationBlockers);
     }
 

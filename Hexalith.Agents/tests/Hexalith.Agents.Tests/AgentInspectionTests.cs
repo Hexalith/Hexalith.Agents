@@ -39,6 +39,8 @@ public sealed class AgentInspectionTests
         view.HasProviderSelection.ShouldBeTrue(); // 1.5 AC1: selection presence surfaced...
         view.SelectedProviderId.ShouldBe(SelectedProviderId); // ...with the safe id (a reference, never a secret)
         view.SelectedModelId.ShouldBe(SelectedModelId);
+        view.ResponseMode.ShouldBe(AgentResponseMode.Automatic); // 1.6 AC1: Automatic mode cleared the response-mode gate
+        view.HasApproverPolicy.ShouldBeFalse(); // Automatic mode needs no approver policy
         view.ActivationBlockers.ShouldBeEmpty();
 
         // AD-14: the raw instructions text must never appear anywhere on the serialized status view.
@@ -102,5 +104,41 @@ public sealed class AgentInspectionTests
 
         result.Status.ShouldBe(AgentInspectionStatus.AgentNotFound);
         result.Agent.ShouldBeNull();
+    }
+
+    // ===== QA gap-fill (1.6 AC1, AC3): the Confirmation-mode read path surfaces the right gates =====
+
+    [Fact]
+    public void GetStatus_confirmation_mode_without_a_policy_reports_the_missing_approver_policy_blocker()
+    {
+        // Party + provider ready and Confirmation mode chosen, but no approver policy configured — the static read
+        // path surfaces MissingApproverPolicy (the 1.6 completeness gate the readiness badge consumes).
+        AgentState state = StateWithLinkedParty(ValidCreate());
+        state.Apply(new AgentProviderModelSelected(AgentId, SelectedProviderId, SelectedModelId, SelectedCapabilityVersion, state.ConfigurationVersion + 1));
+        state.Apply(new AgentResponseModeConfigured(AgentId, AgentResponseMode.Confirmation, state.ConfigurationVersion + 1));
+
+        AgentStatusView view = AgentInspection.GetStatus(state, isAgentsAdmin: true).Agent.ShouldNotBeNull();
+
+        view.ResponseMode.ShouldBe(AgentResponseMode.Confirmation);
+        view.HasApproverPolicy.ShouldBeFalse();
+        view.ActivationBlockers.ShouldContain(AgentActivationBlocker.MissingApproverPolicy);
+    }
+
+    [Fact]
+    public void GetStatus_confirmation_ready_agent_surfaces_policy_fields_and_no_unresolvable_blocker()
+    {
+        // The pure read trusts the last-configured policy (it cannot freshly resolve Tenants/Conversations — AD-3),
+        // so a Confirmation-ready agent reports the safe policy fields and clears its blockers; live
+        // ApproverPolicyUnresolvable surfacing belongs to the activation path, never the static read.
+        AgentState state = StateConfirmationReady(ValidCreate());
+
+        AgentStatusView view = AgentInspection.GetStatus(state, isAgentsAdmin: true).Agent.ShouldNotBeNull();
+
+        view.ResponseMode.ShouldBe(AgentResponseMode.Confirmation);
+        view.HasApproverPolicy.ShouldBeTrue();
+        view.ApproverPolicyDisclosure.ShouldBe(ApproverPolicyBasisDisclosure.OperatorOnly);
+        view.ApproverPolicyVersion.ShouldBe(1);
+        view.ActivationBlockers.ShouldNotContain(AgentActivationBlocker.ApproverPolicyUnresolvable);
+        view.ActivationBlockers.ShouldBeEmpty();
     }
 }

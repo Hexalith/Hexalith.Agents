@@ -56,15 +56,24 @@ public static class AgentInspection
             state.ProviderId is not null,
             state.ProviderId,
             state.ModelId,
-            // AgentInspection is a *pure* read over Agent state only — it cannot freshly re-read the catalog, so it
-            // trusts the last-validated recorded selection (selectedProviderReady: true) and surfaces only the static
-            // MissingProviderSelection gate. Live ProviderUnavailable surfacing for the readiness badge is supplied by
-            // the activation path (this story, via the trusted verdict) and by the 1.8 status/overview orchestration
-            // that reads the catalog. Making this read the catalog would break purity and AD-3 — do not.
+            state.ResponseMode,
+            state.ApproverPolicySources is { Count: > 0 },
+            state.ApproverPolicyDisclosure,
+            state.ApproverPolicyVersion,
+            // AgentInspection is a *pure* read over Agent state only — it cannot freshly re-read the catalog or the
+            // Tenants/Conversations dependencies, so it trusts the last-validated recorded selection/policy
+            // (selectedProviderReady: true, approverPolicyResolved: true) and surfaces only the static
+            // MissingProviderSelection / MissingResponseMode / MissingApproverPolicy gates. Live ProviderUnavailable /
+            // ApproverPolicyUnresolvable surfacing for the readiness badge is supplied by the activation path (this
+            // story, via the trusted verdicts) and by the 1.8 status/overview orchestration that resolves them.
+            // Making this read those dependencies would break purity and AD-3 — do not.
             AgentConfigurationPolicy.ComputeActivationBlockers(
                 state.DisplayName,
                 state.Instructions,
                 state.PartyId is not null,
                 hasProviderSelection: state.ProviderId is not null,
-                selectedProviderReady: true));
+                selectedProviderReady: true,
+                responseMode: state.ResponseMode,
+                hasApproverPolicy: state.ApproverPolicySources is { Count: > 0 },
+                approverPolicyResolved: true));
 }

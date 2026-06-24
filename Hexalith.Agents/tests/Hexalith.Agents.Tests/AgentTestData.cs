@@ -27,11 +27,23 @@ internal static class AgentTestData
     internal const string AgentAdminExtensionKey = "actor:agentsAdmin";
     internal const string PartyLinkValidationExtensionKey = "party:linkValidation";
     internal const string ProviderSelectionValidationExtensionKey = "provider:selectionValidation";
+    internal const string ApproverPolicyValidationExtensionKey = "approver:policyValidation";
     internal const string LinkedPartyId = "party-001";
     internal const string SelectedProviderId = "openai";
     internal const string SelectedModelId = "gpt-4o";
     internal const int SelectedCapabilityVersion = 1;
+    internal const string ApproverPartyId = "party-approver";
+    internal const string ApproverTenantRole = "tenant-approver";
     internal const string ValidInstructions = "You are hexa, a helpful and concise enterprise assistant.";
+
+    /// <summary>A valid sample Approver Policy (caller + a predefined Party + a tenant role) with operator-only disclosure.</summary>
+    internal static AgentApproverPolicy SampleApproverPolicy { get; } = new(
+        [
+            new ApproverPolicySource(ApproverPolicySourceKind.Caller, null, null),
+            new ApproverPolicySource(ApproverPolicySourceKind.PredefinedParty, ApproverPartyId, null),
+            new ApproverPolicySource(ApproverPolicySourceKind.TenantRole, null, ApproverTenantRole),
+        ],
+        ApproverPolicyBasisDisclosure.OperatorOnly);
 
     internal static CommandEnvelope Envelope<T>(
         T command,
@@ -154,6 +166,63 @@ internal static class AgentTestData
             extensions.Count > 0 ? extensions : null);
     }
 
+    /// <summary>
+    /// Builds an <see cref="ActivateAgent"/> command envelope carrying the trusted Agents-admin extension plus the
+    /// server-populated <c>provider:selectionValidation</c> and <c>approver:policyValidation</c> verdicts — the trust
+    /// model the activation gate reads (Task 3/4). Use this to activate a Confirmation-mode Agent whose recorded
+    /// approver policy must re-resolve. Set <paramref name="includeApproverValidation"/>/<paramref name="includeProviderValidation"/>
+    /// to <see langword="false"/> to simulate a direct-gateway activation that never went through the orchestration
+    /// (absent verdict → fails closed to <c>Unknown</c>).
+    /// </summary>
+    /// <param name="providerValidation">The trusted provider-readiness verdict to populate.</param>
+    /// <param name="approverValidation">The trusted approver-policy verdict to populate.</param>
+    /// <param name="isAgentsAdmin">Whether the trusted Agents-admin extension is present.</param>
+    /// <param name="includeProviderValidation">Whether the <c>provider:selectionValidation</c> extension is present at all.</param>
+    /// <param name="includeApproverValidation">Whether the <c>approver:policyValidation</c> extension is present at all.</param>
+    /// <param name="agentId">The Agent aggregate id.</param>
+    /// <param name="tenantId">The tenant scope.</param>
+    /// <param name="actorUserId">The actor.</param>
+    /// <returns>The command envelope.</returns>
+    internal static CommandEnvelope ActivateEnvelope(
+        ProviderSelectionValidationStatus providerValidation = ProviderSelectionValidationStatus.Valid,
+        ApproverPolicyValidationStatus approverValidation = ApproverPolicyValidationStatus.Valid,
+        bool isAgentsAdmin = true,
+        bool includeProviderValidation = true,
+        bool includeApproverValidation = true,
+        string agentId = AgentId,
+        string tenantId = TenantId,
+        string actorUserId = "admin-user")
+    {
+        var command = new ActivateAgent();
+        var extensions = new Dictionary<string, string>();
+        if (isAgentsAdmin)
+        {
+            extensions[AgentAdminExtensionKey] = "true";
+        }
+
+        if (includeProviderValidation)
+        {
+            extensions[ProviderSelectionValidationExtensionKey] = providerValidation.ToString();
+        }
+
+        if (includeApproverValidation)
+        {
+            extensions[ApproverPolicyValidationExtensionKey] = approverValidation.ToString();
+        }
+
+        return new(
+            "msg-ActivateAgent",
+            tenantId,
+            "agent",
+            agentId,
+            nameof(ActivateAgent),
+            JsonSerializer.SerializeToUtf8Bytes(command),
+            "corr-1",
+            null,
+            actorUserId,
+            extensions.Count > 0 ? extensions : null);
+    }
+
     internal static CreateAgent ValidCreate(
         string tenantId = TenantId,
         string displayName = "Hexa Assistant",
@@ -213,14 +282,15 @@ internal static class AgentTestData
     }
 
     /// <summary>
-    /// Builds a created state with a linked Party identity AND a recorded Provider/model selection (lifecycle still
-    /// Draft) — a fully readiness-cleared Agent whose only remaining gate is the live provider verdict at activation.
+    /// Builds a created state with a linked Party identity, a recorded Provider/model selection, AND an Automatic
+    /// Response Mode (lifecycle still Draft) — a fully readiness-cleared Agent (Story 1.6: Automatic mode needs no
+    /// approver policy) whose only remaining gate is the live provider verdict at activation.
     /// </summary>
     /// <param name="create">The create command whose creation event seeds the state.</param>
     /// <param name="providerId">The provider id to select.</param>
     /// <param name="modelId">The model id to select.</param>
     /// <param name="capabilityVersion">The captured provider capability version.</param>
-    /// <returns>The Agent state with a linked Party identity and a recorded provider selection.</returns>
+    /// <returns>The Agent state with a linked Party identity, a recorded provider selection, and Automatic mode.</returns>
     internal static AgentState StateWithSelectedProvider(
         CreateAgent create,
         string providerId = SelectedProviderId,
@@ -229,6 +299,46 @@ internal static class AgentTestData
     {
         AgentState state = StateWithLinkedParty(create);
         state.Apply(new AgentProviderModelSelected(AgentId, providerId, modelId, capabilityVersion, state.ConfigurationVersion + 1));
+        state.Apply(new AgentResponseModeConfigured(AgentId, AgentResponseMode.Automatic, state.ConfigurationVersion + 1));
+        return state;
+    }
+
+    /// <summary>Builds a created state with only a chosen Response Mode applied (lifecycle still Draft).</summary>
+    /// <param name="create">The create command whose creation event seeds the state.</param>
+    /// <param name="mode">The Response Mode to record.</param>
+    /// <returns>The Agent state with the recorded Response Mode.</returns>
+    internal static AgentState StateWithResponseMode(CreateAgent create, AgentResponseMode mode = AgentResponseMode.Automatic)
+    {
+        AgentState state = StateWith(create);
+        state.Apply(new AgentResponseModeConfigured(AgentId, mode, state.ConfigurationVersion + 1));
+        return state;
+    }
+
+    /// <summary>Builds a created state with a recorded Approver Policy applied (no Response Mode; lifecycle Draft).</summary>
+    /// <param name="create">The create command whose creation event seeds the state.</param>
+    /// <param name="policy">The Approver Policy to record.</param>
+    /// <returns>The Agent state with the recorded Approver Policy (approver-policy version = 1).</returns>
+    internal static AgentState StateWithApproverPolicy(CreateAgent create, AgentApproverPolicy? policy = null)
+    {
+        AgentState state = StateWith(create);
+        state.Apply(new AgentApproverPolicyConfigured(AgentId, policy ?? SampleApproverPolicy, 1, state.ConfigurationVersion + 1));
+        return state;
+    }
+
+    /// <summary>
+    /// Builds a fully Confirmation-ready Agent state (lifecycle still Draft): linked Party, recorded Provider/model,
+    /// Confirmation Response Mode, and a configured Approver Policy — so the only remaining activation gate is the
+    /// live approver-policy verdict (Story 1.6 AC3).
+    /// </summary>
+    /// <param name="create">The create command whose creation event seeds the state.</param>
+    /// <param name="policy">The Approver Policy to record.</param>
+    /// <returns>The Confirmation-ready Agent state.</returns>
+    internal static AgentState StateConfirmationReady(CreateAgent create, AgentApproverPolicy? policy = null)
+    {
+        AgentState state = StateWithLinkedParty(create);
+        state.Apply(new AgentProviderModelSelected(AgentId, SelectedProviderId, SelectedModelId, SelectedCapabilityVersion, state.ConfigurationVersion + 1));
+        state.Apply(new AgentResponseModeConfigured(AgentId, AgentResponseMode.Confirmation, state.ConfigurationVersion + 1));
+        state.Apply(new AgentApproverPolicyConfigured(AgentId, policy ?? SampleApproverPolicy, 1, state.ConfigurationVersion + 1));
         return state;
     }
 
@@ -252,6 +362,8 @@ internal static class AgentTestData
                 case AgentPartyIdentityLinked e: state.Apply(e); break;
                 case AgentPartyIdentityReplaced e: state.Apply(e); break;
                 case AgentProviderModelSelected e: state.Apply(e); break;
+                case AgentResponseModeConfigured e: state.Apply(e); break;
+                case AgentApproverPolicyConfigured e: state.Apply(e); break;
                 case AgentProviderModelSelectionRejected e: state.Apply(e); break;
                 case AgentAdministrationDeniedRejection e: state.Apply(e); break;
                 case AgentNotFoundRejection e: state.Apply(e); break;
