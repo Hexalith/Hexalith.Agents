@@ -57,6 +57,12 @@ public sealed class AgentInteractionState
     /// <summary>Gets or sets the safe block-reason classification recorded when context could not be built within safe bounds (FR-25, AD-12). <see langword="null"/> until a context-blocked decision is recorded.</summary>
     public AgentInteractionContextBlockReason? ContextBlockReason { get; set; }
 
+    /// <summary>Gets or sets the append-only generated version history (AD-5; sole durable home of generated content alongside the success event, AD-14). A list so Epic 3 regeneration can append. <see langword="null"/> until the first successful generation.</summary>
+    public IReadOnlyList<AgentGeneratedVersion>? GeneratedVersions { get; set; }
+
+    /// <summary>Gets or sets the safe generation failure-reason classification recorded when generation failed closed (FR-24, AD-12). <see langword="null"/> until a generation-failed/safety-failed decision is recorded.</summary>
+    public AgentOutputGenerationFailureReason? GenerationFailureReason { get; set; }
+
     /// <summary>Applies the Agent Call request: the interaction exists and freezes its configuration snapshot (AC1).</summary>
     /// <param name="e">The event.</param>
     public void Apply(InteractionRequested e)
@@ -140,6 +146,46 @@ public sealed class AgentInteractionState
     /// <summary>No-op replay handler — the context-not-buildable rejection carries no state change.</summary>
     /// <param name="e">The rejection event.</param>
     public void Apply(AgentInteractionContextNotBuildableRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>Applies the generated outcome: records the success status and appends the approvable version to the append-only history (AC2, AC4; Story 2.4; AD-5, AD-14).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentOutputGenerated e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.Generated;
+        var versions = GeneratedVersions is null
+            ? new List<AgentGeneratedVersion>()
+            : new List<AgentGeneratedVersion>(GeneratedVersions);
+        versions.Add(e.Version);
+        GeneratedVersions = versions;
+    }
+
+    /// <summary>Applies the generation-failed outcome: records the terminal fail-closed decision and its safe reason (AC3; Story 2.4; AD-5, AD-12).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentOutputGenerationFailed e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = e.Decision;
+        GenerationFailureReason = e.Reason;
+    }
+
+    /// <summary>No-op replay handler — the not-generatable rejection carries no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(AgentOutputNotGeneratableRejection e)
     {
         ArgumentNullException.ThrowIfNull(e);
         MarkReplayOnlyEventHandled();

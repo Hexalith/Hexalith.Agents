@@ -216,6 +216,106 @@ internal static class AgentInteractionTestData
     internal static BuildAgentInteractionContext ContextCommand(AgentInteractionContextMeasurement measurement, string interactionId = InteractionId)
         => new(interactionId, measurement);
 
+    // ===== Story 2.4 generation fixtures =====
+
+    /// <summary>The sample generated content (sensitive — used to assert it never leaks onto a failure event/result; AD-14).</summary>
+    internal const string GeneratedContentText = "Here is a concise summary of the latest decisions in this thread.";
+
+    /// <summary>The sample deterministic generation attempt id (reused across retries; AD-13).</summary>
+    internal const string GenerationAttemptId = "attempt-interaction-001";
+
+    /// <summary>The sample prompt/input token usage.</summary>
+    internal const int PromptTokenCount = 1_200;
+
+    /// <summary>The sample generated-output token usage.</summary>
+    internal const int OutputTokenCount = 350;
+
+    /// <summary>The sample content-safety policy version the generated content passed.</summary>
+    internal const int ContentSafetyPolicyVersion = 1;
+
+    /// <summary>The generation precondition: an interaction whose context built within bounds (status <c>ContextReady</c>) so generation may run.</summary>
+    /// <returns>The rehydrated context-ready interaction state, driven through the real <c>Apply</c> handlers.</returns>
+    internal static AgentInteractionState StateContextReady()
+    {
+        AgentInteractionState state = StateAuthorized();
+        state.Apply(new AgentInteractionContextReady(
+            InteractionId,
+            new AgentInteractionContextEvidence(
+                AgentInteractionContextMode.Full,
+                FullContextTokenCount: 1_000,
+                UsedContextTokenCount: 1_000,
+                MessageCount: 3,
+                ReservedOutputTokenCount,
+                ContextWindowTokenLimit,
+                ProviderCapabilityVersion,
+                AgentInteractionSnapshot.DefaultContextPolicyReference,
+                BoundedBehaviorReference: null)));
+        return state;
+    }
+
+    /// <summary>A requested interaction whose context build was BLOCKED (status <c>ContextBlocked</c>) — generation must still refuse with <c>ContextNotReady</c> (AD-11).</summary>
+    /// <returns>The rehydrated context-blocked interaction state, driven through the real <c>Apply</c> handlers.</returns>
+    internal static AgentInteractionState StateContextBlocked()
+    {
+        AgentInteractionState state = StateAuthorized();
+        state.Apply(new AgentInteractionContextBlocked(
+            InteractionId,
+            AgentInteractionContextBlockReason.ExceedsModelBudget,
+            new AgentInteractionContextEvidence(
+                AgentInteractionContextMode.Full,
+                FullContextTokenCount: 200_000,
+                UsedContextTokenCount: 0,
+                MessageCount: 3,
+                ReservedOutputTokenCount,
+                ContextWindowTokenLimit,
+                ProviderCapabilityVersion,
+                AgentInteractionSnapshot.DefaultContextPolicyReference,
+                BoundedBehaviorReference: null)));
+        return state;
+    }
+
+    /// <summary>Builds a server-assembled generation result with sane defaults. Content rides on a success outcome only.</summary>
+    /// <param name="outcome">The server-assembled generation outcome.</param>
+    /// <param name="generatedContent">The generated content (carried only on a success outcome).</param>
+    /// <param name="promptTokenCount">The prompt/input token usage.</param>
+    /// <param name="outputTokenCount">The generated-output token usage.</param>
+    /// <returns>The generation result.</returns>
+    internal static AgentOutputGenerationResult GenerationResult(
+        AgentGenerationOutcome outcome = AgentGenerationOutcome.Succeeded,
+        string? generatedContent = GeneratedContentText,
+        int promptTokenCount = PromptTokenCount,
+        int outputTokenCount = OutputTokenCount)
+        => new(
+            outcome,
+            GenerationAttemptId,
+            SampleSnapshot.ProviderId,
+            SampleSnapshot.ModelId,
+            SampleSnapshot.ProviderCapabilityVersion,
+            ContentSafetyPolicyVersion,
+            outcome == AgentGenerationOutcome.Succeeded ? generatedContent : null,
+            promptTokenCount,
+            outputTokenCount);
+
+    /// <summary>A successful generation result carrying the generated content.</summary>
+    /// <returns>The succeeded result.</returns>
+    internal static AgentOutputGenerationResult SucceededGenerationResult() => GenerationResult(AgentGenerationOutcome.Succeeded);
+
+    /// <summary>A safety-blocked result that DELIBERATELY still carries the (unsafe) content, to prove the policy never emits it (AD-5, AD-14).</summary>
+    /// <returns>The safety-blocked result with content attached.</returns>
+    internal static AgentOutputGenerationResult SafetyBlockedGenerationResult()
+        => GenerationResult(AgentGenerationOutcome.ContentSafetyBlocked) with { GeneratedContent = GeneratedContentText };
+
+    /// <summary>A provider-timeout generation result (no content).</summary>
+    /// <returns>The timeout result.</returns>
+    internal static AgentOutputGenerationResult ProviderTimeoutGenerationResult() => GenerationResult(AgentGenerationOutcome.ProviderTimeout);
+
+    /// <summary>The generate command carrying the given result for the sample interaction.</summary>
+    /// <param name="result">The server-assembled generation result.</param>
+    /// <param name="interactionId">The deterministic interaction id (the aggregate id).</param>
+    /// <returns>The generate command.</returns>
+    internal static GenerateAgentOutput GenerateCommand(AgentOutputGenerationResult result, string interactionId = InteractionId)
+        => new(interactionId, result);
+
     /// <summary>
     /// Applies every event of a <see cref="DomainResult"/> to the supplied state through the aggregate's typed
     /// <c>Apply</c> methods — the same production replay handlers the EventStore state-store invokes. The success
@@ -238,6 +338,9 @@ internal static class AgentInteractionTestData
                 case AgentInteractionContextReady e: state.Apply(e); break;
                 case AgentInteractionContextBlocked e: state.Apply(e); break;
                 case AgentInteractionContextNotBuildableRejection e: state.Apply(e); break;
+                case AgentOutputGenerated e: state.Apply(e); break;
+                case AgentOutputGenerationFailed e: state.Apply(e); break;
+                case AgentOutputNotGeneratableRejection e: state.Apply(e); break;
                 default: throw new InvalidOperationException($"Unhandled event type '{payload.GetType().Name}' in test apply dispatch.");
             }
         }

@@ -179,6 +179,55 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
         ]);
     }
 
+    /// <summary>
+    /// Records the terminal generation decision from the server-assembled outcome (AC1–AC4; FR-9, FR-10, FR-12; AD-3,
+    /// AD-5, AD-9, AD-13). The orchestrator performs the impure provider invocation + content-safety gate and returns the
+    /// outcome through <see cref="GenerateAgentOutput.Result"/>; the aggregate's sole job is the outcome → event math.
+    /// </summary>
+    /// <param name="command">The generate command carrying the server-assembled generation outcome (client values discarded upstream).</param>
+    /// <param name="state">The current interaction state (must be ContextReady before output can be generated).</param>
+    /// <param name="envelope">The command envelope (carries the interaction id and the tenant scope).</param>
+    /// <returns>The domain result (the generated/failed outcome event, a not-generatable rejection, or an idempotent no-op).</returns>
+    public static DomainResult Handle(GenerateAgentOutput command, AgentInteractionState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string interactionId = envelope.AggregateId;
+
+        // State precondition: output can only be generated on a recorded interaction. A generate command on a
+        // never-requested stream is a structural rejection (no state change), not a recorded decision (AD-12). The
+        // positive pattern binds the non-null requested state so the generation logic runs only over a recorded interaction.
+        if (state is { IsRequested: true } requested)
+        {
+            // Idempotent terminal generation (AD-13): the decision is recorded once and is terminal. Re-dispatching a
+            // generate command after a terminal Generated/GenerationFailed/SafetyFailed outcome is a clean no-op that
+            // preserves version history — the aggregate never silently flips a recorded decision or appends a duplicate
+            // version (AC4).
+            if (requested.Status is AgentInteractionStatus.Generated or AgentInteractionStatus.GenerationFailed or AgentInteractionStatus.SafetyFailed)
+            {
+                return DomainResult.NoOp();
+            }
+
+            // Context-ready precondition (AD-11): generation must never run before Conversation context is built within
+            // safe bounds. Any other status (Requested/Authorized/Denied/Blocked/ContextBlocked) is a structural rejection
+            // (no state change) — distinct from a recorded generation-failed decision, which only ever follows ContextReady.
+            if (requested.Status != AgentInteractionStatus.ContextReady)
+            {
+                return DomainResult.Rejection([
+                    new AgentOutputNotGeneratableRejection(interactionId, AgentOutputNotGeneratableReason.ContextNotReady),
+                ]);
+            }
+
+            // Pure evaluation (AD-3): emit the generated/failed outcome only. The result arrives pre-assembled from the
+            // trusted generation orchestration; the aggregate's sole job is the outcome → event/status math.
+            return AgentOutputGenerationPolicy.Evaluate(interactionId, command.Result);
+        }
+
+        return DomainResult.Rejection([
+            new AgentOutputNotGeneratableRejection(interactionId, AgentOutputNotGeneratableReason.InteractionNotRequested),
+        ]);
+    }
+
     // By-value comparison of a re-issued request against the recorded one (AD-13). Strings are compared ordinally;
     // the snapshot scalars are compared explicitly so a re-derived-id collision with a different configuration is
     // surfaced as a conflict rather than a silent no-op.

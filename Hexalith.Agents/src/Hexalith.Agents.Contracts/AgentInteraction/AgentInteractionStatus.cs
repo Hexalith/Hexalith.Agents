@@ -34,4 +34,13 @@ public enum AgentInteractionStatus
 
     /// <summary>Conversation context could not be built within safe bounds (oversized with no approved bounded behavior, not loadable fresh enough, or an untrustworthy model budget) — the call fails closed with no provider call, proposal, or Conversation Message; recorded as fail-closed Audit Evidence (Story 2.3; AC3).</summary>
     ContextBlocked,
+
+    /// <summary>Generation succeeded and the generated content passed Content Safety Policy; the call may proceed to the response-mode branch (Story 2.5 automatic post / Story 3.1 proposal — these consume this state) (Story 2.4; AC2).</summary>
+    Generated,
+
+    /// <summary>Generation failed closed — provider timeout, disabled provider/model, adapter failure, invalid/unloadable context, or safety-policy failure — recorded as fail-closed Audit Evidence; no Conversation Message and no approvable proposal is created (Story 2.4; AC3).</summary>
+    GenerationFailed,
+
+    /// <summary>Generated content failed Content Safety Policy — recorded as fail-closed Audit Evidence; the content is non-postable and non-approvable (no generated version is created) (Story 2.4; AC2, AC3).</summary>
+    SafetyFailed,
 }

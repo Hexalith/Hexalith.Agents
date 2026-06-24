@@ -275,6 +275,103 @@ public sealed class AgentInteractionStateReplayTests
         }
     }
 
+    // ===== Story 2.4 generation replay (status transitions; AC2, AC3, AC4) =====
+
+    [Fact]
+    public void Apply_generated_transitions_status_and_appends_the_version()
+    {
+        AgentInteractionState state = StateContextReady();
+
+        state.Apply(new AgentOutputGenerated(InteractionId, SampleVersion()));
+
+        state.Status.ShouldBe(AgentInteractionStatus.Generated);
+        state.GeneratedVersions.ShouldNotBeNull().ShouldHaveSingleItem().GeneratedContent.ShouldBe(GeneratedContentText);
+        state.GenerationFailureReason.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Apply_generated_twice_appends_to_the_version_history()
+    {
+        // Epic 3 regeneration appends; the state holds an append-only version history (AD-5).
+        AgentInteractionState state = StateContextReady();
+
+        state.Apply(new AgentOutputGenerated(InteractionId, SampleVersion("attempt-a")));
+        state.Apply(new AgentOutputGenerated(InteractionId, SampleVersion("attempt-b")));
+
+        state.GeneratedVersions.ShouldNotBeNull().Count.ShouldBe(2);
+        state.GeneratedVersions![0].AttemptId.ShouldBe("attempt-a");
+        state.GeneratedVersions[1].AttemptId.ShouldBe("attempt-b");
+    }
+
+    [Fact]
+    public void Apply_generation_failed_records_the_decision_and_reason()
+    {
+        AgentInteractionState state = StateContextReady();
+
+        state.Apply(new AgentOutputGenerationFailed(
+            InteractionId,
+            AgentInteractionStatus.SafetyFailed,
+            AgentOutputGenerationFailureReason.ContentSafetyBlocked,
+            SampleAttemptEvidence()));
+
+        state.Status.ShouldBe(AgentInteractionStatus.SafetyFailed);
+        state.GenerationFailureReason.ShouldBe(AgentOutputGenerationFailureReason.ContentSafetyBlocked);
+        state.GeneratedVersions.ShouldBeNull(); // no approvable version on a failure (AD-5)
+    }
+
+    [Fact]
+    public void Apply_not_generatable_rejection_is_a_replay_safe_noop()
+    {
+        AgentInteractionState state = StateContextReady();
+
+        // A persisted not-generatable rejection must not throw or mutate the recorded request/status.
+        state.Apply(new AgentOutputNotGeneratableRejection(InteractionId, AgentOutputNotGeneratableReason.ContextNotReady));
+
+        state.Status.ShouldBe(AgentInteractionStatus.ContextReady);
+        state.IsRequested.ShouldBeTrue();
+        state.GeneratedVersions.ShouldBeNull();
+        state.GenerationFailureReason.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Generation_outcome_applies_only_over_a_requested_stream()
+    {
+        // A generation outcome event ahead of the request (a malformed stream) must not flip status — every non-request
+        // Apply keeps the IsRequested guard so replay over a stream that begins before the request stays total.
+        var state = new AgentInteractionState();
+
+        state.Apply(new AgentOutputGenerated(InteractionId, SampleVersion()));
+        state.Apply(new AgentOutputGenerationFailed(
+            InteractionId,
+            AgentInteractionStatus.GenerationFailed,
+            AgentOutputGenerationFailureReason.ProviderTimeout,
+            SampleAttemptEvidence()));
+
+        state.IsRequested.ShouldBeFalse();
+        state.Status.ShouldBe(AgentInteractionStatus.Unknown);
+        state.GeneratedVersions.ShouldBeNull();
+        state.GenerationFailureReason.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Replay_over_request_authorize_context_then_generated_is_deterministic_across_rebuilds()
+    {
+        AgentInteractionState first = Rebuild();
+        AgentInteractionState second = Rebuild();
+
+        second.Status.ShouldBe(first.Status);
+        second.Status.ShouldBe(AgentInteractionStatus.Generated);
+        second.GeneratedVersions.ShouldNotBeNull().Count.ShouldBe(first.GeneratedVersions!.Count);
+        second.GeneratedVersions![0].VersionId.ShouldBe(first.GeneratedVersions![0].VersionId);
+
+        static AgentInteractionState Rebuild()
+        {
+            AgentInteractionState state = StateContextReady();
+            state.Apply(new AgentOutputGenerated(InteractionId, SampleVersion()));
+            return state;
+        }
+    }
+
     private static AgentInteractionContextEvidence SampleEvidence()
         => new(
             AgentInteractionContextMode.Full,
@@ -286,4 +383,26 @@ public sealed class AgentInteractionStateReplayTests
             ProviderCapabilityVersion: ProviderCapabilityVersion,
             AgentInteractionSnapshot.DefaultContextPolicyReference,
             BoundedBehaviorReference: null);
+
+    private static AgentGeneratedVersion SampleVersion(string attemptId = GenerationAttemptId)
+        => new(
+            VersionId: $"version-{attemptId}",
+            attemptId,
+            AgentGenerationKind.Generated,
+            GeneratedContentText,
+            SampleSnapshot.ProviderId,
+            SampleSnapshot.ModelId,
+            SampleSnapshot.ProviderCapabilityVersion,
+            ContentSafetyPolicyVersion,
+            PromptTokenCount,
+            OutputTokenCount);
+
+    private static AgentGenerationAttemptEvidence SampleAttemptEvidence()
+        => new(
+            GenerationAttemptId,
+            SampleSnapshot.ProviderId,
+            SampleSnapshot.ModelId,
+            SampleSnapshot.ProviderCapabilityVersion,
+            PromptTokenCount,
+            OutputTokenCount);
 }

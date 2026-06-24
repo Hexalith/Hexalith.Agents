@@ -118,6 +118,22 @@ else
 
 builder.Services.AddScoped<AgentInteractionContextOrchestrator>();
 
+// Story 2.4: Agent-output generation + content-safety wiring. The generation aggregate handler auto-registers via the
+// existing AddEventStoreDomainService assembly scan (no host change needed). The generation orchestration re-reads the
+// Source Conversation content (reusing the Story 2.3 IConversationContextReader registered above — live behind the
+// "Conversations" section, else deferred), reads the reused provider-catalog budget/timeout, invokes the provider behind
+// the NEW IAgentGenerationProvider adapter (the first real model-invocation seam), resolves + evaluates the effective
+// Content Safety Policy, and dispatches the GenerateAgentOutput command. The three new ports' live bindings stay deferred
+// and FAIL CLOSED so the default DI graph blocks content-bearing generation safely: DeferredAgentGenerationProvider
+// (ProviderUnavailable), DeferredContentSafetyEvaluator (Blocked — engine deferred, PRD OQ-9), and
+// DeferredAgentContentSafetyPolicyReader (not-available). A future live provider-SDK adapter binding is gated behind a
+// config section, mirroring the Conversations block; no provider SDK enters the default graph (AD-9, AD-14). Live command
+// dispatch stays deferred behind DeferredAgentCommandDispatcher, mirroring 1.2/1.4/1.5/1.6/1.7/2.1/2.2/2.3.
+builder.Services.AddSingleton<IAgentGenerationProvider, DeferredAgentGenerationProvider>();
+builder.Services.AddSingleton<IContentSafetyEvaluator, DeferredContentSafetyEvaluator>();
+builder.Services.AddSingleton<IAgentContentSafetyPolicyReader, DeferredAgentContentSafetyPolicyReader>();
+builder.Services.AddScoped<AgentInteractionGenerationOrchestrator>();
+
 WebApplication app = builder.Build();
 
 app.UseEventStoreDomainService();
