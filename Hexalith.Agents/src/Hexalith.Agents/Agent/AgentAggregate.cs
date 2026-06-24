@@ -50,6 +50,13 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
     // repopulates this key from trusted claims only.
     private const string AgentAdminExtensionKey = "actor:agentsAdmin";
 
+    // SECURITY: server-populated only, identical trust model to AgentAdminExtensionKey. The Parties
+    // validation/provisioning runs in the Server orchestration (AD-3) and its verdict is fed back here through
+    // this trusted extension. The command entry point strips any client-supplied value and repopulates it from
+    // the orchestration's port result. A direct client command carries no trusted verdict, so it parses to
+    // Unknown and is rejected — the aggregate's independent non-Valid rejection is the security guarantee (AC2).
+    private const string PartyLinkValidationExtensionKey = "party:linkValidation";
+
     /// <summary>Handles creation (or idempotent re-creation) of the governed Agent record.</summary>
     /// <param name="command">The create command.</param>
     /// <param name="state">The current Agent state (null/never-created before the first creation).</param>
@@ -191,8 +198,12 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         }
 
         // Reactivating a Disabled agent re-runs the same gates (AC2): activation is never a blind flip to active.
+        // Party identity is a distinct readiness gate (1.4 AC4) — activation fails closed until a valid Party is linked.
         IReadOnlyList<AgentActivationBlocker> blockers =
-            AgentConfigurationPolicy.ComputeActivationBlockers(state.DisplayName, state.Instructions);
+            AgentConfigurationPolicy.ComputeActivationBlockers(
+                state.DisplayName,
+                state.Instructions,
+                state.PartyId is not null);
         return blockers.Count > 0
             ? DomainResult.Rejection([new AgentActivationBlockedRejection(agentId, blockers)])
             : DomainResult.Success([new AgentActivated(agentId)]);
@@ -229,9 +240,110 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             : DomainResult.Success([new AgentDisabled(agentId)]);
     }
 
+    /// <summary>Handles linking the Agent's single active Party identity (AC1, AC2, AC3; FR-2).</summary>
+    /// <param name="command">The link command (carries only the stable <c>PartyId</c>).</param>
+    /// <param name="state">The current Agent state.</param>
+    /// <param name="envelope">The command envelope (carries the trusted authorization and Parties-validation extensions).</param>
+    /// <returns>The domain result.</returns>
+    public static DomainResult Handle(LinkAgentPartyIdentity command, AgentState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string agentId = envelope.AggregateId;
+
+        if (!IsAgentAdmin(envelope))
+        {
+            return Denied(agentId, envelope, nameof(LinkAgentPartyIdentity));
+        }
+
+        if (state is null || !state.IsCreated)
+        {
+            return DomainResult.Rejection([new AgentNotFoundRejection(agentId)]);
+        }
+
+        // AC2 fail-closed: anything other than a trusted Valid verdict (missing/disabled/ambiguous/unavailable/
+        // unauthorized — or an absent/unparseable verdict from a direct-gateway call) rejects the link and changes
+        // no state. The Parties dependency is never called from here (AD-3); the verdict is plain trusted data.
+        PartyLinkValidationStatus validation = ReadPartyLinkValidation(envelope);
+        if (validation != PartyLinkValidationStatus.Valid)
+        {
+            return DomainResult.Rejection([new AgentPartyIdentityLinkRejected(agentId, validation)]);
+        }
+
+        // Re-asserting the same id is a deterministic no-op (AD-13); a different id while one is already linked is
+        // rejected — changing identity requires the explicit ReplaceAgentPartyIdentity (AC3).
+        if (string.Equals(state.PartyId, command.PartyId, StringComparison.Ordinal))
+        {
+            return DomainResult.NoOp();
+        }
+
+        if (state.PartyId is not null)
+        {
+            return DomainResult.Rejection([new AgentPartyIdentityAlreadyLinkedRejection(agentId, command.PartyId)]);
+        }
+
+        // Linking is a configuration change → bump ConfigurationVersion (AD-4 snapshot). Lifecycle is unchanged:
+        // a linked Party clears MissingPartyIdentity but does not auto-activate (Story 1.3 lifecycle invariant).
+        return DomainResult.Success([
+            new AgentPartyIdentityLinked(agentId, command.PartyId, state.ConfigurationVersion + 1),
+        ]);
+    }
+
+    /// <summary>Handles explicitly replacing the Agent's linked Party identity with a different one (AC2, AC3; FR-2).</summary>
+    /// <param name="command">The replace command (carries only the stable <c>PartyId</c>).</param>
+    /// <param name="state">The current Agent state.</param>
+    /// <param name="envelope">The command envelope (carries the trusted authorization and Parties-validation extensions).</param>
+    /// <returns>The domain result.</returns>
+    public static DomainResult Handle(ReplaceAgentPartyIdentity command, AgentState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string agentId = envelope.AggregateId;
+
+        if (!IsAgentAdmin(envelope))
+        {
+            return Denied(agentId, envelope, nameof(ReplaceAgentPartyIdentity));
+        }
+
+        if (state is null || !state.IsCreated)
+        {
+            return DomainResult.Rejection([new AgentNotFoundRejection(agentId)]);
+        }
+
+        // AC2 fail-closed: the same trusted-verdict gate applies to a replacement.
+        PartyLinkValidationStatus validation = ReadPartyLinkValidation(envelope);
+        if (validation != PartyLinkValidationStatus.Valid)
+        {
+            return DomainResult.Rejection([new AgentPartyIdentityLinkRejected(agentId, validation)]);
+        }
+
+        // Re-asserting the already-linked id is a deterministic no-op (AD-13).
+        if (string.Equals(state.PartyId, command.PartyId, StringComparison.Ordinal))
+        {
+            return DomainResult.NoOp();
+        }
+
+        // Replace deterministically sets the single active identity, so there is always at most one PartyId (AC3).
+        return DomainResult.Success([
+            new AgentPartyIdentityReplaced(agentId, state.PartyId, command.PartyId, state.ConfigurationVersion + 1),
+        ]);
+    }
+
     private static bool IsAgentAdmin(CommandEnvelope envelope)
         => envelope.Extensions?.TryGetValue(AgentAdminExtensionKey, out string? value) == true
             && string.Equals(value, "true", StringComparison.Ordinal);
+
+    // Reads the trusted, server-populated Parties-validation verdict from the envelope extension. Fails closed to
+    // Unknown when the key is absent, or when its value is not an exact, case-sensitive PartyLinkValidationStatus
+    // *name* (AC2). Numeric/aliased forms (e.g. "1", which Enum.TryParse would otherwise resolve to Valid) are
+    // rejected on purpose: the verdict is contractually serialized by name ([JsonStringEnumConverter]), and this
+    // gate is kept as strict as the "true"-only Agents-admin check so a surprising value can never become Valid.
+    private static PartyLinkValidationStatus ReadPartyLinkValidation(CommandEnvelope envelope)
+        => envelope.Extensions?.TryGetValue(PartyLinkValidationExtensionKey, out string? value) == true
+            && Enum.TryParse(value, ignoreCase: false, out PartyLinkValidationStatus status)
+            && string.Equals(Enum.GetName(status), value, StringComparison.Ordinal)
+                ? status
+                : PartyLinkValidationStatus.Unknown;
 
     private static DomainResult Denied(string agentId, CommandEnvelope envelope, string commandName)
         => DomainResult.Rejection([new AgentAdministrationDeniedRejection(agentId, envelope.UserId, commandName)]);

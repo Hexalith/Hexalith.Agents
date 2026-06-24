@@ -35,6 +35,7 @@ public sealed class PublicContractPackageBoundaryTests
         "ModelContextProtocol",        // tool-host runtime
         "Hexalith.EventStore.Server",  // EventStore server internals
         "Hexalith.FrontComposer",      // UI shell
+        "Hexalith.Parties",            // Story 1.4: Parties stays a Server-only dependency, never in public contracts
     ];
 
     [Fact]

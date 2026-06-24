@@ -103,4 +103,44 @@ public sealed class AgentStateReplayTests
         state.IsCreated.ShouldBeFalse();
         state.Lifecycle.ShouldBe(AgentLifecycleStatus.Unknown);
     }
+
+    [Fact]
+    public void Apply_party_link_then_replace_tracks_a_single_identity_and_bumps_version()
+    {
+        AgentState state = StateWith(ValidCreate()); // ConfigurationVersion = 1, no party
+
+        state.Apply(new AgentPartyIdentityLinked(AgentId, "party-001", ConfigurationVersion: 2));
+        state.PartyId.ShouldBe("party-001");
+        state.ConfigurationVersion.ShouldBe(2);
+        state.Lifecycle.ShouldBe(AgentLifecycleStatus.Draft); // linking never changes lifecycle
+
+        state.Apply(new AgentPartyIdentityReplaced(AgentId, "party-001", "party-002", ConfigurationVersion: 3));
+        state.PartyId.ShouldBe("party-002"); // still exactly one identity, now the replacement
+        state.ConfigurationVersion.ShouldBe(3);
+    }
+
+    [Fact]
+    public void Apply_party_rejection_events_are_replay_safe_noops()
+    {
+        AgentState state = StateWithLinkedParty(ValidCreate());
+        string? partyBefore = state.PartyId;
+
+        state.Apply(new AgentPartyIdentityLinkRejected(AgentId, PartyLinkValidationStatus.Unavailable));
+        state.Apply(new AgentPartyIdentityAlreadyLinkedRejection(AgentId, "party-999"));
+
+        state.PartyId.ShouldBe(partyBefore); // persisted rejections never mutate the linked identity
+    }
+
+    [Fact]
+    public void Apply_party_link_before_create_is_ignored()
+    {
+        // A link event replayed against a never-created state must be ignored (IsCreated guard), exactly like the
+        // other update applies.
+        var state = new AgentState();
+
+        state.Apply(new AgentPartyIdentityLinked(AgentId, "party-001", ConfigurationVersion: 2));
+
+        state.PartyId.ShouldBeNull();
+        state.IsCreated.ShouldBeFalse();
+    }
 }

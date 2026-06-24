@@ -22,4 +22,14 @@
     <ProjectReference Include="$(HexalithEventStoreRoot)\src\Hexalith.EventStore.DomainService\Hexalith.EventStore.DomainService.csproj" />
   </ItemGroup>
 
+  <!-- Story 1.4: the Party validation/provisioning adapter consumes only the PUBLIC Hexalith.Parties client +
+       contracts (server/projection internals stay off-limits). Sibling source via the $(HexalithPartiesRoot)
+       discovery block in Directory.Build.props — never a NuGet PackageReference. These refs are out-of-module
+       (Hexalith.Parties.*), so the in-module AD-15 direction guard does not flag them; they are added to the
+       Server boundary ONLY (never Contracts/Client/domain), keeping Parties out of the public Agents surface. -->
+  <ItemGroup>
+    <ProjectReference Include="$(HexalithPartiesRoot)\src\Hexalith.Parties.Client\Hexalith.Parties.Client.csproj" />
+    <ProjectReference Include="$(HexalithPartiesRoot)\src\Hexalith.Parties.Contracts\Hexalith.Parties.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

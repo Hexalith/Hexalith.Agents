@@ -109,9 +109,10 @@ public sealed class AgentConfigurationValidationTests
     [Fact]
     public void Activate_with_instructions_exactly_at_min_length_succeeds()
     {
-        // A present, trimmed-to-exactly-min instructions string sits on the valid edge of the band.
+        // A present, trimmed-to-exactly-min instructions string sits on the valid edge of the band. A linked Party
+        // is also required to activate (1.4 AC4), so the agent is created with one.
         string instructions = new('a', AgentConfigurationPolicy.MinInstructionsLength);
-        AgentState state = StateWith(ValidCreate(instructions: instructions));
+        AgentState state = StateWithLinkedParty(ValidCreate(instructions: instructions));
 
         DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, Envelope(new ActivateAgent()));
 

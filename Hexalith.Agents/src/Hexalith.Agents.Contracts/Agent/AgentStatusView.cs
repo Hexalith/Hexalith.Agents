@@ -29,6 +29,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// <param name="HasInstructions">Whether Agent Instructions are present (never the text itself).</param>
 /// <param name="InstructionsValid">Whether the present Agent Instructions meet validity requirements.</param>
 /// <param name="InstructionsVersion">Version of the Agent Instructions (bumps only when the instructions text changes).</param>
+/// <param name="HasPartyIdentity">Whether a valid Party identity is linked (presence only — never the Party id or any Party PII; AC4).</param>
 /// <param name="ActivationBlockers">The specific blockers preventing activation as currently configured (empty when none).</param>
 public record AgentStatusView(
     string AgentId,
@@ -40,4 +41,5 @@ public record AgentStatusView(
     bool HasInstructions,
     bool InstructionsValid,
     int InstructionsVersion,
+    bool HasPartyIdentity,
     IReadOnlyList<AgentActivationBlocker> ActivationBlockers);

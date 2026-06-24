@@ -7,6 +7,7 @@ using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Contracts.Agent.Events.Rejections;
 
+using Hexalith.EventStore.Contracts.Commands;
 using Hexalith.EventStore.Contracts.Events;
 using Hexalith.EventStore.Contracts.Results;
 
@@ -53,7 +54,8 @@ public sealed class AgentLifecycleE2ETests
         view.HasInstructions.ShouldBeTrue();
         view.InstructionsValid.ShouldBeTrue();
         view.InstructionsVersion.ShouldBe(1);
-        view.ActivationBlockers.ShouldBeEmpty();
+        view.HasPartyIdentity.ShouldBeFalse(); // 1.4 AC4: a newly created agent is not yet linked to a Party
+        view.ActivationBlockers.ShouldBe([AgentActivationBlocker.MissingPartyIdentity]);
 
         // AC1 / AD-14: the safe status surface never carries the raw Agent Instructions text.
         JsonSerializer.Serialize(view).ShouldNotContain(ValidInstructions);
@@ -85,6 +87,12 @@ public sealed class AgentLifecycleE2ETests
         (await ProcessAndApplyAsync(aggregate, state, new UpdateAgentConfiguration("Hexa Assistant", "desc", ValidInstructions)))
             .IsSuccess.ShouldBeTrue();
 
+        // 1.4 AC4: the party-identity gate remains until a valid Party is linked.
+        AgentStatusView remediatedView = AgentInspection.GetStatus(state, isAgentsAdmin: true).Agent.ShouldNotBeNull();
+        remediatedView.ActivationBlockers.ShouldBe([AgentActivationBlocker.MissingPartyIdentity]);
+        var link = new LinkAgentPartyIdentity(LinkedPartyId);
+        (await ProcessAndApplyAsync(aggregate, state, link, LinkEnvelope(link))).IsSuccess.ShouldBeTrue();
+
         // AC2: activation now succeeds and the agent is active with no remaining blockers.
         (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent())).IsSuccess.ShouldBeTrue();
         AgentStatusView activeView = AgentInspection.GetStatus(state, isAgentsAdmin: true).Agent.ShouldNotBeNull();
@@ -103,6 +111,11 @@ public sealed class AgentLifecycleE2ETests
         CreateAgent create = ValidCreate();
 
         (await ProcessAndApplyAsync(aggregate, state, create)).IsSuccess.ShouldBeTrue();
+
+        // 1.4 AC4: a linked Party is required before the agent can activate.
+        var link = new LinkAgentPartyIdentity(LinkedPartyId);
+        (await ProcessAndApplyAsync(aggregate, state, link, LinkEnvelope(link))).IsSuccess.ShouldBeTrue();
+
         (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent())).IsSuccess.ShouldBeTrue();
 
         // Disable: a lifecycle flag flip only.
@@ -114,8 +127,9 @@ public sealed class AgentLifecycleE2ETests
 
         // ...and prior identity/instructions/configuration are not deleted or rewritten by the disable.
         disabledView.DisplayName.ShouldBe(create.DisplayName);
-        disabledView.ConfigurationVersion.ShouldBe(1);
+        disabledView.ConfigurationVersion.ShouldBe(2); // create (1) + party link (2)
         disabledView.HasInstructions.ShouldBeTrue();
+        disabledView.HasPartyIdentity.ShouldBeTrue(); // the link survives the disable (history preserved, AC3)
         disabledView.InstructionsVersion.ShouldBe(1);
         state.Instructions.ShouldBe(ValidInstructions); // durable instructions survive the disable
 
@@ -200,8 +214,17 @@ public sealed class AgentLifecycleE2ETests
             stream.AddRange(r.Events);
         }
 
+        async Task DriveWith<TCommand>(TCommand command, CommandEnvelope envelope) where TCommand : notnull
+        {
+            DomainResult r = await ProcessAndApplyAsync(aggregate, live, command, envelope);
+            r.IsRejection.ShouldBeFalse();
+            stream.AddRange(r.Events);
+        }
+
         await Drive(ValidCreate());
         await Drive(new UpdateAgentConfiguration("Hexa Renamed", "Updated description", "You are hexa, an updated and careful assistant."));
+        var link = new LinkAgentPartyIdentity(LinkedPartyId); // 1.4 AC4: link before activation
+        await DriveWith(link, LinkEnvelope(link));
         await Drive(new ActivateAgent());
         await Drive(new DisableAgent());
 
@@ -222,11 +245,13 @@ public sealed class AgentLifecycleE2ETests
         replayedView.Lifecycle.ShouldBe(liveView.Lifecycle);
         replayedView.Lifecycle.ShouldBe(AgentLifecycleStatus.Disabled);
         replayedView.ConfigurationVersion.ShouldBe(liveView.ConfigurationVersion);
-        replayedView.ConfigurationVersion.ShouldBe(2); // create (1) + one accepted update (2)
+        replayedView.ConfigurationVersion.ShouldBe(3); // create (1) + one accepted update (2) + party link (3)
         replayedView.HasInstructions.ShouldBe(liveView.HasInstructions);
         replayedView.InstructionsValid.ShouldBe(liveView.InstructionsValid);
         replayedView.InstructionsVersion.ShouldBe(liveView.InstructionsVersion);
         replayedView.InstructionsVersion.ShouldBe(2); // instructions text changed once on the update
+        replayedView.HasPartyIdentity.ShouldBe(liveView.HasPartyIdentity);
+        replayedView.HasPartyIdentity.ShouldBeTrue(); // the party link replays deterministically
         replayedView.ActivationBlockers.ShouldBe(liveView.ActivationBlockers);
     }
 }

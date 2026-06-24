@@ -21,6 +21,7 @@ public sealed class ContractsBoundaryTests
         "Hexalith.EventStore.Server",       // EventStore server internals
         "Hexalith.EventStore.DomainService",
         "Hexalith.FrontComposer.Shell",     // UI shell
+        "Hexalith.Parties",                 // Story 1.4: Parties stays a Server-only dependency, never in public contracts
         "Microsoft.SemanticKernel",         // provider / agent-runtime SDK
         "Microsoft.Agents",                 // Microsoft.Agents.AI / .Workflows
         "Microsoft.Extensions.AI",          // AI runtime

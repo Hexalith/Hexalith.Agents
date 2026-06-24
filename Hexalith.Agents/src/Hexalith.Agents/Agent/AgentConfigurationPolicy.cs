@@ -78,13 +78,19 @@ internal static class AgentConfigurationPolicy
     }
 
     /// <summary>
-    /// Computes the current activation blockers for an Agent's state (AC2). An empty list means the Agent is
-    /// activatable as configured. Order is stable (display name, then instructions) for deterministic results.
+    /// Computes the current activation blockers for an Agent's state (AC2; 1.4 AC4). An empty list means the Agent
+    /// is activatable as configured. Order is stable (display name, then instructions, then party identity) for
+    /// deterministic results. Party identity is a <em>distinct</em> readiness gate — separate from lifecycle and
+    /// from the configuration gates (1.4 AC4).
     /// </summary>
     /// <param name="displayName">The Agent's display name.</param>
     /// <param name="instructions">The Agent's instructions text.</param>
+    /// <param name="hasPartyIdentity">Whether a valid Party identity is linked (1.4 AC4).</param>
     /// <returns>The specific blockers (empty when none).</returns>
-    internal static IReadOnlyList<AgentActivationBlocker> ComputeActivationBlockers(string displayName, string instructions)
+    internal static IReadOnlyList<AgentActivationBlocker> ComputeActivationBlockers(
+        string displayName,
+        string instructions,
+        bool hasPartyIdentity)
     {
         var blockers = new List<AgentActivationBlocker>();
 
@@ -100,6 +106,11 @@ internal static class AgentConfigurationPolicy
         else if (!AreInstructionsValid(instructions))
         {
             blockers.Add(AgentActivationBlocker.InvalidInstructions);
+        }
+
+        if (!hasPartyIdentity)
+        {
+            blockers.Add(AgentActivationBlocker.MissingPartyIdentity);
         }
 
         return blockers;

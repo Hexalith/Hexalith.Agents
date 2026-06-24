@@ -162,7 +162,8 @@ public sealed class AgentContractsRoundTripTests
             HasInstructions: true,
             InstructionsValid: false,
             InstructionsVersion: 1,
-            [AgentActivationBlocker.InvalidInstructions]);
+            HasPartyIdentity: false,
+            [AgentActivationBlocker.InvalidInstructions, AgentActivationBlocker.MissingPartyIdentity]);
 
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(view);
 
@@ -174,6 +175,7 @@ public sealed class AgentContractsRoundTripTests
         roundTripped.HasInstructions.ShouldBe(view.HasInstructions);
         roundTripped.InstructionsValid.ShouldBe(view.InstructionsValid);
         roundTripped.InstructionsVersion.ShouldBe(view.InstructionsVersion);
+        roundTripped.HasPartyIdentity.ShouldBe(view.HasPartyIdentity);
         roundTripped.ActivationBlockers.ShouldBe(view.ActivationBlockers);
     }
 

@@ -28,4 +28,7 @@ public enum AgentActivationBlocker
 
     /// <summary>The Agent Instructions are present but do not meet validity requirements.</summary>
     InvalidInstructions,
+
+    /// <summary>No valid Party identity is linked, so the Agent has no attributable AI participant (AC2, AC4; 1.4).</summary>
+    MissingPartyIdentity,
 }

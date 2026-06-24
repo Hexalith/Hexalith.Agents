@@ -205,7 +205,8 @@ public sealed class AgentAggregateTests
     [Fact]
     public void Activate_valid_draft_produces_activated()
     {
-        AgentState state = StateWith(ValidCreate());
+        // Story 1.4 AC4: a linked Party identity is now a required activation gate.
+        AgentState state = StateWithLinkedParty(ValidCreate());
 
         DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, Envelope(new ActivateAgent()));
 
@@ -289,7 +290,9 @@ public sealed class AgentAggregateTests
     [Fact]
     public void Reactivate_disabled_valid_agent_reruns_gates_and_activates()
     {
-        AgentState state = DisabledStateWith(ValidCreate());
+        // A disabled agent that has a linked Party (1.4 AC4) and valid config re-activates when its gates pass.
+        AgentState state = StateWithLinkedParty(ValidCreate());
+        state.Apply(new AgentDisabled(AgentId));
 
         DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, Envelope(new ActivateAgent()));
 
@@ -411,6 +414,10 @@ public sealed class AgentAggregateTests
         DomainResult created = await ProcessAndApplyAsync(aggregate, state, ValidCreate());
         created.IsSuccess.ShouldBeTrue();
         state.Lifecycle.ShouldBe(AgentLifecycleStatus.Draft);
+
+        // 1.4 AC4: a linked Party identity is required before activation.
+        var link = new LinkAgentPartyIdentity(LinkedPartyId);
+        (await ProcessAndApplyAsync(aggregate, state, link, LinkEnvelope(link))).IsSuccess.ShouldBeTrue();
 
         DomainResult activated = await ProcessAndApplyAsync(aggregate, state, new ActivateAgent());
         activated.IsSuccess.ShouldBeTrue();

@@ -52,5 +52,9 @@ public static class AgentInspection
             AgentConfigurationPolicy.HasInstructions(state.Instructions),
             AgentConfigurationPolicy.AreInstructionsValid(state.Instructions),
             state.InstructionsVersion,
-            AgentConfigurationPolicy.ComputeActivationBlockers(state.DisplayName, state.Instructions));
+            state.PartyId is not null,
+            AgentConfigurationPolicy.ComputeActivationBlockers(
+                state.DisplayName,
+                state.Instructions,
+                state.PartyId is not null));
 }

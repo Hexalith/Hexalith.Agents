@@ -48,6 +48,12 @@ public sealed class AgentState
     /// <summary>Gets or sets the instructions version (bumped only when the instructions text changes).</summary>
     public int InstructionsVersion { get; set; }
 
+    /// <summary>
+    /// Gets or sets the single linked Party identity reference (<see langword="null"/> = no linked identity). This
+    /// is the only new durable field for the Party link (AC1) — a stable Parties-owned id, never Party PII (AD-7).
+    /// </summary>
+    public string? PartyId { get; set; }
+
     /// <summary>Applies the Agent creation: the record exists and starts in <see cref="AgentLifecycleStatus.Draft"/>.</summary>
     /// <param name="e">The event.</param>
     public void Apply(AgentCreated e)
@@ -101,6 +107,50 @@ public sealed class AgentState
         {
             Lifecycle = AgentLifecycleStatus.Disabled;
         }
+    }
+
+    /// <summary>Applies a Party-identity link: stores only the stable id reference and bumps the configuration version (AC1).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentPartyIdentityLinked e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsCreated)
+        {
+            return;
+        }
+
+        PartyId = e.PartyId;
+        ConfigurationVersion = e.ConfigurationVersion;
+    }
+
+    /// <summary>Applies a Party-identity replacement: the single active id reference becomes the new one (AC3).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentPartyIdentityReplaced e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsCreated)
+        {
+            return;
+        }
+
+        PartyId = e.PartyId;
+        ConfigurationVersion = e.ConfigurationVersion;
+    }
+
+    /// <summary>No-op replay handler — rejection events carry no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(AgentPartyIdentityLinkRejected e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>No-op replay handler — rejection events carry no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(AgentPartyIdentityAlreadyLinkedRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
     }
 
     /// <summary>No-op replay handler — rejection events carry no state change.</summary>
