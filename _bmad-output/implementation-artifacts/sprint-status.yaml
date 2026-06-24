@@ -58,8 +58,8 @@ development_status:
   1-7-configure-content-safety-policy-and-activation-gate: done
   1-8-admin-setup-ui-and-readiness-overview: done
   epic-1-retrospective: optional
-  epic-2: backlog
-  2-1-request-hexa-from-a-source-conversation: backlog
+  epic-2: in-progress
+  2-1-request-hexa-from-a-source-conversation: done
   2-2-enforce-invocation-authorization-and-dependency-readiness: backlog
   2-3-build-conversation-context-with-safe-bounds: backlog
   2-4-generate-and-safety-check-agent-output: backlog

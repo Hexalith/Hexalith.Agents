@@ -11,6 +11,7 @@
 // topology — those arrive in later stories.
 using Hexalith.Agents;
 using Hexalith.Agents.Server;
+using Hexalith.Agents.Server.Application.AgentInteractions;
 using Hexalith.Agents.Server.Application.Agents;
 using Hexalith.Agents.Server.Ports;
 using Hexalith.EventStore.DomainService;
@@ -72,6 +73,15 @@ builder.Services.AddScoped<AgentApproverPolicyOrchestrator>();
 // change to AgentActivationProviderRevalidation (it still re-resolves only provider + approver). Live command dispatch
 // / AppHost topology remain deferred via DeferredAgentCommandDispatcher (mirroring 1.2/1.4/1.5/1.6).
 builder.Services.AddScoped<AgentContentSafetyPolicyOrchestrator>();
+
+// Story 2.1: Agent Call request-creation wiring. The new AgentInteraction aggregate auto-registers via the existing
+// AddEventStoreDomainService assembly scan (no host change needed). The request orchestration (deterministic id +
+// AD-4 snapshot assembly + dispatch) and the Agent configuration snapshot reader port are registered here and fully
+// unit-tested. The live read-model binding stays deferred behind DeferredAgentConfigurationSnapshotReader (it fails
+// closed to a not-available snapshot), and live command dispatch stays deferred behind DeferredAgentCommandDispatcher
+// (mirroring 1.2/1.4/1.5/1.6/1.7). No provider adapter and no IConversationClient/Parties client is wired (AC3).
+builder.Services.AddSingleton<IAgentConfigurationSnapshotReader, DeferredAgentConfigurationSnapshotReader>();
+builder.Services.AddScoped<AgentInteractionRequestOrchestrator>();
 
 WebApplication app = builder.Build();
 
