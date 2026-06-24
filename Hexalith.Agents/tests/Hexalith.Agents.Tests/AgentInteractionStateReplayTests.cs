@@ -372,6 +372,112 @@ public sealed class AgentInteractionStateReplayTests
         }
     }
 
+    // ===== Story 2.5 posting replay (status transitions; AC1, AC4) =====
+
+    [Fact]
+    public void Apply_posted_transitions_status_and_records_safe_evidence()
+    {
+        AgentInteractionState state = StateGenerated();
+
+        state.Apply(new AgentResponsePosted(InteractionId, SamplePostedEvidence()));
+
+        state.Status.ShouldBe(AgentInteractionStatus.Posted);
+        state.PostingEvidence.ShouldNotBeNull().MessageId.ShouldBe(PostedMessageId);
+        state.PostingFailureReason.ShouldBeNull();
+        state.Prompt.ShouldBe(Prompt); // the request payload is untouched by posting (AD-14)
+    }
+
+    [Fact]
+    public void Apply_posting_failed_records_the_decision_reason_and_evidence()
+    {
+        AgentInteractionState state = StateGenerated();
+
+        state.Apply(new AgentResponsePostingFailed(
+            InteractionId,
+            AgentResponsePostingFailureReason.MembershipUnavailable,
+            SamplePostedEvidence()));
+
+        state.Status.ShouldBe(AgentInteractionStatus.PostingFailed);
+        state.PostingFailureReason.ShouldBe(AgentResponsePostingFailureReason.MembershipUnavailable);
+        state.PostingEvidence.ShouldNotBeNull().AgentPartyId.ShouldBe(AgentPartyId);
+    }
+
+    [Fact]
+    public void Apply_not_postable_rejection_is_a_replay_safe_noop()
+    {
+        AgentInteractionState state = StateGenerated();
+
+        // A persisted not-postable rejection must not throw or mutate the recorded request/status.
+        state.Apply(new AgentResponseNotPostableRejection(InteractionId, AgentResponseNotPostableReason.OutputNotGenerated));
+
+        state.Status.ShouldBe(AgentInteractionStatus.Generated);
+        state.IsRequested.ShouldBeTrue();
+        state.PostingEvidence.ShouldBeNull();
+        state.PostingFailureReason.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Posting_outcome_applies_only_over_a_requested_stream()
+    {
+        // A posting outcome event ahead of the request (a malformed stream) must not flip status — every non-request
+        // Apply keeps the IsRequested guard so replay over a stream that begins before the request stays total.
+        var state = new AgentInteractionState();
+
+        state.Apply(new AgentResponsePosted(InteractionId, SamplePostedEvidence()));
+        state.Apply(new AgentResponsePostingFailed(InteractionId, AgentResponsePostingFailureReason.AdapterFailure, SamplePostedEvidence()));
+
+        state.IsRequested.ShouldBeFalse();
+        state.Status.ShouldBe(AgentInteractionStatus.Unknown);
+        state.PostingEvidence.ShouldBeNull();
+        state.PostingFailureReason.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Replay_over_request_through_posted_is_deterministic_across_rebuilds()
+    {
+        AgentInteractionState first = Rebuild();
+        AgentInteractionState second = Rebuild();
+
+        second.Status.ShouldBe(first.Status);
+        second.Status.ShouldBe(AgentInteractionStatus.Posted);
+        second.PostingEvidence.ShouldNotBeNull().MessageId.ShouldBe(first.PostingEvidence!.MessageId);
+        second.AgentInteractionId.ShouldBe(first.AgentInteractionId);
+
+        static AgentInteractionState Rebuild()
+        {
+            AgentInteractionState state = StateGenerated();
+            state.Apply(new AgentResponsePosted(InteractionId, SamplePostedEvidence()));
+            return state;
+        }
+    }
+
+    [Fact]
+    public void Replay_over_request_through_posting_failed_is_deterministic_across_rebuilds()
+    {
+        // The fail-closed posting audit record (status + safe reason + safe-id evidence) must rehydrate identically across
+        // independent rebuilds, so the durable PostingFailed Audit Evidence is stable for inspection and never drifts
+        // (AC4; AD-13). Mirrors the context-blocked determinism guard for the post step.
+        AgentInteractionState first = Rebuild();
+        AgentInteractionState second = Rebuild();
+
+        second.Status.ShouldBe(first.Status);
+        second.Status.ShouldBe(AgentInteractionStatus.PostingFailed);
+        second.PostingFailureReason.ShouldBe(first.PostingFailureReason);
+        second.PostingFailureReason.ShouldBe(AgentResponsePostingFailureReason.MembershipUnavailable);
+        second.PostingEvidence.ShouldNotBeNull().AgentPartyId.ShouldBe(first.PostingEvidence!.AgentPartyId);
+
+        static AgentInteractionState Rebuild()
+        {
+            AgentInteractionState state = StateGenerated();
+            state.Apply(new AgentResponsePostingFailed(
+                InteractionId, AgentResponsePostingFailureReason.MembershipUnavailable, SamplePostedEvidence()));
+            return state;
+        }
+    }
+
+    private static AgentPostedMessageEvidence SamplePostedEvidence()
+        => new(PostedMessageId, SourceConversationId, AgentPartyId, PostedVersionId);
+
     private static AgentInteractionContextEvidence SampleEvidence()
         => new(
             AgentInteractionContextMode.Full,

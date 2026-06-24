@@ -6,6 +6,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// Lifecycle status of one Agent Call (<c>AgentInteraction</c>) (AC2; FR-8). Story 2.1 introduces only the
 /// initial <see cref="Requested"/> state; later states (authorized/denied, context-loading, generating, posted)
 /// are appended <em>additively</em> by Stories 2.2–2.5 without reshaping this enum or its ordinals (AD-2).
+/// Story 2.5 appends the two terminal posting states <see cref="Posted"/> and <see cref="PostingFailed"/>.
 /// </summary>
 /// <remarks>
 /// <see cref="Unknown"/> (ordinal 0) is the "not-yet-known" sentinel: an absent/unrecognized status must never
@@ -43,4 +44,10 @@ public enum AgentInteractionStatus
 
     /// <summary>Generated content failed Content Safety Policy — recorded as fail-closed Audit Evidence; the content is non-postable and non-approvable (no generated version is created) (Story 2.4; AC2, AC3).</summary>
     SafetyFailed,
+
+    /// <summary>The generated version was appended to the Source Conversation as a Conversation Message authored by the Agent Party identity (Story 2.5 automatic mode); this is the terminal success state for an automatic interaction (AC1, AC2).</summary>
+    Posted,
+
+    /// <summary>Posting failed closed AFTER successful generation — membership/Party/Conversation/append failure — recorded as fail-closed Audit Evidence; no Conversation Message exists; distinct from generation/auth/context/safety failure (Story 2.5; AC4).</summary>
+    PostingFailed,
 }

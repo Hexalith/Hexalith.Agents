@@ -63,6 +63,12 @@ public sealed class AgentInteractionState
     /// <summary>Gets or sets the safe generation failure-reason classification recorded when generation failed closed (FR-24, AD-12). <see langword="null"/> until a generation-failed/safety-failed decision is recorded.</summary>
     public AgentOutputGenerationFailureReason? GenerationFailureReason { get; set; }
 
+    /// <summary>Gets or sets the safe posted-message evidence recorded when the posting decision was made (Audit Evidence; FR-24, AD-14; ids only, never content). <see langword="null"/> until a posting decision is recorded.</summary>
+    public AgentPostedMessageEvidence? PostingEvidence { get; set; }
+
+    /// <summary>Gets or sets the safe posting failure-reason classification recorded when posting failed closed (FR-24, AD-12). <see langword="null"/> until a posting-failed decision is recorded.</summary>
+    public AgentResponsePostingFailureReason? PostingFailureReason { get; set; }
+
     /// <summary>Applies the Agent Call request: the interaction exists and freezes its configuration snapshot (AC1).</summary>
     /// <param name="e">The event.</param>
     public void Apply(InteractionRequested e)
@@ -186,6 +192,43 @@ public sealed class AgentInteractionState
     /// <summary>No-op replay handler — the not-generatable rejection carries no state change.</summary>
     /// <param name="e">The rejection event.</param>
     public void Apply(AgentOutputNotGeneratableRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>Applies the posted outcome: records the terminal success status and the safe posted-message evidence (AC1, AC2; Story 2.5; AD-7, AD-14).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentResponsePosted e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.Posted;
+        PostingEvidence = e.Evidence;
+    }
+
+    /// <summary>Applies the posting-failed outcome: records the terminal fail-closed decision, its safe reason, and the attempted evidence (AC4; Story 2.5; AD-12, AD-14).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentResponsePostingFailed e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.PostingFailed;
+        PostingFailureReason = e.Reason;
+        PostingEvidence = e.Evidence;
+    }
+
+    /// <summary>No-op replay handler — the not-postable rejection carries no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(AgentResponseNotPostableRejection e)
     {
         ArgumentNullException.ThrowIfNull(e);
         MarkReplayOnlyEventHandled();

@@ -316,6 +316,100 @@ internal static class AgentInteractionTestData
     internal static GenerateAgentOutput GenerateCommand(AgentOutputGenerationResult result, string interactionId = InteractionId)
         => new(interactionId, result);
 
+    // ===== Story 2.5 posting fixtures =====
+
+    /// <summary>The Agent's stable Party reference used for posting (a reference, not PII — AD-7).</summary>
+    internal const string AgentPartyId = "agent-party-001";
+
+    /// <summary>The selected generated version id that posting targets (matches the generation attempt-derived version id).</summary>
+    internal const string PostedVersionId = "version-" + GenerationAttemptId;
+
+    /// <summary>A sample deterministic Conversation Message id (a safe id; never content).</summary>
+    internal const string PostedMessageId = "post-message-001";
+
+    /// <summary>A confirmation-mode snapshot (posts via Epic 3 approval, not automatic posting) for the not-automatic precondition.</summary>
+    internal static AgentInteractionSnapshot ConfirmationSnapshot { get; } = SampleSnapshot with { ResponseMode = AgentResponseMode.Confirmation };
+
+    /// <summary>The single generated version on the interaction history (the postable unit; AD-5).</summary>
+    /// <returns>The sample generated version.</returns>
+    internal static AgentGeneratedVersion SampleGeneratedVersion()
+        => new(
+            VersionId: PostedVersionId,
+            GenerationAttemptId,
+            AgentGenerationKind.Generated,
+            GeneratedContentText,
+            SampleSnapshot.ProviderId,
+            SampleSnapshot.ModelId,
+            SampleSnapshot.ProviderCapabilityVersion,
+            ContentSafetyPolicyVersion,
+            PromptTokenCount,
+            OutputTokenCount);
+
+    /// <summary>The posting precondition: an interaction that generated output (status <c>Generated</c>) with the given snapshot.</summary>
+    /// <param name="snapshot">The AD-4 snapshot to freeze (default: the Automatic-mode sample snapshot).</param>
+    /// <returns>The rehydrated generated interaction state, driven through the real <c>Apply</c> handlers.</returns>
+    internal static AgentInteractionState StateGenerated(AgentInteractionSnapshot? snapshot = null)
+    {
+        var state = new AgentInteractionState();
+        state.Apply(new InteractionRequested(
+            InteractionId, AgentId, CallerPartyId, SourceConversationId, snapshot ?? SampleSnapshot, Prompt, IdempotencyKey));
+        state.Apply(new AgentInteractionAuthorized(InteractionId));
+        state.Apply(new AgentInteractionContextReady(
+            InteractionId,
+            new AgentInteractionContextEvidence(
+                AgentInteractionContextMode.Full,
+                FullContextTokenCount: 1_000,
+                UsedContextTokenCount: 1_000,
+                MessageCount: 3,
+                ReservedOutputTokenCount,
+                ContextWindowTokenLimit,
+                ProviderCapabilityVersion,
+                AgentInteractionSnapshot.DefaultContextPolicyReference,
+                BoundedBehaviorReference: null)));
+        state.Apply(new AgentOutputGenerated(InteractionId, SampleGeneratedVersion()));
+        return state;
+    }
+
+    /// <summary>The not-automatic precondition: a generated interaction whose snapshot Response Mode is Confirmation.</summary>
+    /// <returns>The rehydrated generated, confirmation-mode interaction state.</returns>
+    internal static AgentInteractionState StateGeneratedConfirmationMode() => StateGenerated(ConfirmationSnapshot);
+
+    /// <summary>Builds a server-assembled posting result with sane safe-id defaults (never content).</summary>
+    /// <param name="outcome">The server-assembled posting outcome.</param>
+    /// <param name="messageId">The deterministic Conversation Message id.</param>
+    /// <param name="agentPartyId">The Agent's stable Party reference.</param>
+    /// <param name="postedVersionId">The selected generated version id.</param>
+    /// <returns>The posting result.</returns>
+    internal static AgentResponsePostingResult PostingResult(
+        AgentResponsePostingOutcome outcome = AgentResponsePostingOutcome.Posted,
+        string messageId = PostedMessageId,
+        string agentPartyId = AgentPartyId,
+        string postedVersionId = PostedVersionId)
+        => new(outcome, messageId, SourceConversationId, agentPartyId, postedVersionId);
+
+    /// <summary>A successful posting result.</summary>
+    /// <returns>The posted result.</returns>
+    internal static AgentResponsePostingResult PostedResult() => PostingResult(AgentResponsePostingOutcome.Posted);
+
+    /// <summary>A membership-unavailable (seam-absent) posting result.</summary>
+    /// <returns>The membership-unavailable result.</returns>
+    internal static AgentResponsePostingResult MembershipUnavailableResult() => PostingResult(AgentResponsePostingOutcome.MembershipUnavailable);
+
+    /// <summary>A party-identity-unavailable posting result.</summary>
+    /// <returns>The party-identity-unavailable result.</returns>
+    internal static AgentResponsePostingResult PartyIdentityUnavailableResult() => PostingResult(AgentResponsePostingOutcome.PartyIdentityUnavailable);
+
+    /// <summary>A post-rejected posting result.</summary>
+    /// <returns>The post-rejected result.</returns>
+    internal static AgentResponsePostingResult PostRejectedResult() => PostingResult(AgentResponsePostingOutcome.PostRejected);
+
+    /// <summary>The post command carrying the given result for the sample interaction.</summary>
+    /// <param name="result">The server-assembled posting result.</param>
+    /// <param name="interactionId">The deterministic interaction id (the aggregate id).</param>
+    /// <returns>The post command.</returns>
+    internal static PostAgentResponse PostCommand(AgentResponsePostingResult result, string interactionId = InteractionId)
+        => new(interactionId, result);
+
     /// <summary>
     /// Applies every event of a <see cref="DomainResult"/> to the supplied state through the aggregate's typed
     /// <c>Apply</c> methods — the same production replay handlers the EventStore state-store invokes. The success
@@ -341,6 +435,9 @@ internal static class AgentInteractionTestData
                 case AgentOutputGenerated e: state.Apply(e); break;
                 case AgentOutputGenerationFailed e: state.Apply(e); break;
                 case AgentOutputNotGeneratableRejection e: state.Apply(e); break;
+                case AgentResponsePosted e: state.Apply(e); break;
+                case AgentResponsePostingFailed e: state.Apply(e); break;
+                case AgentResponseNotPostableRejection e: state.Apply(e); break;
                 default: throw new InvalidOperationException($"Unhandled event type '{payload.GetType().Name}' in test apply dispatch.");
             }
         }

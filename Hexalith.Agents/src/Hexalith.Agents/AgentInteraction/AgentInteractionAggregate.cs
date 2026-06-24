@@ -1,5 +1,6 @@
 using System;
 
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.AgentInteraction.Commands;
 using Hexalith.Agents.Contracts.AgentInteraction.Events;
@@ -225,6 +226,66 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
 
         return DomainResult.Rejection([
             new AgentOutputNotGeneratableRejection(interactionId, AgentOutputNotGeneratableReason.InteractionNotRequested),
+        ]);
+    }
+
+    /// <summary>
+    /// Records the terminal automatic-posting decision from the server-assembled outcome (AC1–AC4; FR-11, FR-12; AD-3,
+    /// AD-6, AD-7, AD-13, AD-14). The orchestrator performs the impure Agent-Party read + selected-version read +
+    /// Conversations membership ensure + message append and returns the outcome through <see cref="PostAgentResponse.Result"/>;
+    /// the aggregate's sole job is the outcome → event math.
+    /// </summary>
+    /// <param name="command">The post command carrying the server-assembled posting outcome (client values discarded upstream).</param>
+    /// <param name="state">The current interaction state (must be Generated + Automatic mode before output can be posted).</param>
+    /// <param name="envelope">The command envelope (carries the interaction id and the tenant scope).</param>
+    /// <returns>The domain result (the posted/failed outcome event, a not-postable rejection, or an idempotent no-op).</returns>
+    public static DomainResult Handle(PostAgentResponse command, AgentInteractionState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string interactionId = envelope.AggregateId;
+
+        // State precondition: output can only be posted on a recorded interaction. A post command on a never-requested
+        // stream is a structural rejection (no state change), not a recorded decision (AD-12). The positive pattern binds
+        // the non-null requested state so the posting logic runs only over a recorded interaction.
+        if (state is { IsRequested: true } requested)
+        {
+            // Idempotent terminal posting (AD-13): the decision is recorded once and is terminal. Re-dispatching a post
+            // command after a terminal Posted/PostingFailed outcome is a clean no-op that preserves the recorded outcome —
+            // the aggregate never silently flips a recorded decision or appends a duplicate Conversation Message (AC3).
+            if (requested.Status is AgentInteractionStatus.Posted or AgentInteractionStatus.PostingFailed)
+            {
+                return DomainResult.NoOp();
+            }
+
+            // Response-mode precondition (AD-7): automatic posting must never run for a Confirmation-mode interaction —
+            // that path posts via Epic 3 approval (Story 3.5). A Confirmation-mode post command is a structural rejection
+            // (no state change), distinct from a recorded posting-failed decision.
+            if (requested.Snapshot?.ResponseMode != AgentResponseMode.Automatic)
+            {
+                return DomainResult.Rejection([
+                    new AgentResponseNotPostableRejection(interactionId, AgentResponseNotPostableReason.NotAutomaticResponseMode),
+                ]);
+            }
+
+            // Generation precondition (AD-12): posting must never run before output is generated within safe bounds. Any
+            // other status (Requested/Authorized/Denied/Blocked/ContextReady/ContextBlocked/GenerationFailed/SafetyFailed)
+            // is a structural rejection (no state change) — distinct from a recorded posting-failed decision, which only
+            // ever follows Generated.
+            if (requested.Status != AgentInteractionStatus.Generated)
+            {
+                return DomainResult.Rejection([
+                    new AgentResponseNotPostableRejection(interactionId, AgentResponseNotPostableReason.OutputNotGenerated),
+                ]);
+            }
+
+            // Pure evaluation (AD-3): emit the posted/failed outcome only. The result arrives pre-assembled from the
+            // trusted posting orchestration; the aggregate's sole job is the outcome → event/status math.
+            return AgentResponsePostingPolicy.Evaluate(interactionId, command.Result);
+        }
+
+        return DomainResult.Rejection([
+            new AgentResponseNotPostableRejection(interactionId, AgentResponseNotPostableReason.InteractionNotRequested),
         ]);
     }
 

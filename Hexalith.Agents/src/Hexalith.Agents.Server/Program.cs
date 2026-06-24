@@ -110,10 +110,16 @@ if (builder.Configuration.GetSection("Conversations").Exists())
 {
     builder.Services.AddHexalithConversationsClient(o => o.Endpoint = new Uri(builder.Configuration["Conversations:BaseUrl"]!));
     builder.Services.AddSingleton<IConversationContextReader, ConversationClientContextReader>();
+
+    // Story 2.5: the live Conversation posting + membership port reuses the same IConversationClient registered above.
+    builder.Services.AddSingleton<IConversationResponsePoster, ConversationClientResponsePoster>();
 }
 else
 {
     builder.Services.AddSingleton<IConversationContextReader, DeferredConversationContextReader>();
+
+    // Story 2.5: no Conversations config → the deferred poster fails closed (membership SeamUnavailable, append unavailable).
+    builder.Services.AddSingleton<IConversationResponsePoster, DeferredConversationResponsePoster>();
 }
 
 builder.Services.AddScoped<AgentInteractionContextOrchestrator>();
@@ -133,6 +139,22 @@ builder.Services.AddSingleton<IAgentGenerationProvider, DeferredAgentGenerationP
 builder.Services.AddSingleton<IContentSafetyEvaluator, DeferredContentSafetyEvaluator>();
 builder.Services.AddSingleton<IAgentContentSafetyPolicyReader, DeferredAgentContentSafetyPolicyReader>();
 builder.Services.AddScoped<AgentInteractionGenerationOrchestrator>();
+
+// Story 2.5: Automatic-response posting wiring. The posting aggregate handler auto-registers via the existing
+// AddEventStoreDomainService assembly scan (no host change needed). The posting orchestration reads the Agent's linked
+// Party identity + posting-time validity (new IAgentPartyReader), reads the selected generated version + content (new
+// IAgentGeneratedVersionReader), verifies the Agent's AiAgent membership and appends the message authored by the Agent
+// Party through the NEW IConversationResponsePoster (over the same Hexalith.Conversations.Client, live behind the
+// "Conversations" section, else deferred — registered above), and dispatches the PostAgentResponse command. The two new
+// in-module readers' live bindings stay deferred and FAIL CLOSED so the default DI graph cannot read content, cannot prove
+// membership, and cannot post — every path resolves to PostingFailed: DeferredAgentPartyReader (PartyIdentityUnavailable)
+// and DeferredAgentGeneratedVersionReader (content unavailable → AdapterFailure). A future live IAgentPartyReader /
+// IAgentGeneratedVersionReader binding (over the in-module Agent/AgentInteraction read models) and the live Conversations
+// poster are wired only when their dependencies/config are present. Live command dispatch stays deferred behind
+// DeferredAgentCommandDispatcher, mirroring 1.2/1.4/1.5/1.6/1.7/2.1/2.2/2.3/2.4.
+builder.Services.AddSingleton<IAgentPartyReader, DeferredAgentPartyReader>();
+builder.Services.AddSingleton<IAgentGeneratedVersionReader, DeferredAgentGeneratedVersionReader>();
+builder.Services.AddScoped<AgentInteractionPostingOrchestrator>();
 
 WebApplication app = builder.Build();
 
