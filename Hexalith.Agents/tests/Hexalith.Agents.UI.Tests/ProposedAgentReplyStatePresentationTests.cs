@@ -22,6 +22,7 @@ public sealed class ProposedAgentReplyStatePresentationTests
     [Theory]
     [InlineData(ProposedAgentReplyState.Pending, BadgeColor.Informative)]
     [InlineData(ProposedAgentReplyState.Edited, BadgeColor.Informative)]
+    [InlineData(ProposedAgentReplyState.Regenerated, BadgeColor.Informative)]
     [InlineData(ProposedAgentReplyState.Unknown, BadgeColor.Subtle)]
     public void ColorFor_binds_each_shipped_state_to_its_role(ProposedAgentReplyState state, BadgeColor expected)
         => ProposedAgentReplyStatePresentation.ColorFor(state).ShouldBe(expected);
@@ -31,10 +32,10 @@ public sealed class ProposedAgentReplyStatePresentationTests
     {
         foreach (ProposedAgentReplyState state in Enum.GetValues<ProposedAgentReplyState>())
         {
-            // Pending and Edited are the in-progress/pending set (Informative); every other state maps through the
-            // Subtle total default.
+            // Pending, Edited, and Regenerated are the in-progress/pending set (Informative); every other state maps
+            // through the Subtle total default.
             BadgeColor color = ProposedAgentReplyStatePresentation.ColorFor(state);
-            BadgeColor expected = state is ProposedAgentReplyState.Pending or ProposedAgentReplyState.Edited
+            BadgeColor expected = state is ProposedAgentReplyState.Pending or ProposedAgentReplyState.Edited or ProposedAgentReplyState.Regenerated
                 ? BadgeColor.Informative
                 : BadgeColor.Subtle;
             color.ShouldBe(expected);

@@ -206,6 +206,15 @@ public sealed class LocalizationResourceTests
         yield return "Agents.ProposalEditor.Status.Edited";
         yield return "Agents.ProposalEditor.Status.NotAuthorized";
         yield return "Agents.ProposalEditor.Status.Unavailable";
+
+        // Story 3.4 — proposal-regenerator whole strings (label, action, preserved notice, outcome statuses).
+        yield return "Agents.ProposalRegenerator.Label";
+        yield return "Agents.ProposalRegenerator.Regenerate";
+        yield return "Agents.ProposalRegenerator.PriorVersionsPreserved";
+        yield return "Agents.ProposalRegenerator.Status.Regenerated";
+        yield return "Agents.ProposalRegenerator.Status.NotAuthorized";
+        yield return "Agents.ProposalRegenerator.Status.Unavailable";
+        yield return "Agents.ProposalRegenerator.Status.NotPending";
     }
 
     public static IEnumerable<object[]> EnumDerivedKeyCases() => EnumDerivedKeys().Distinct().Select(key => new object[] { key });

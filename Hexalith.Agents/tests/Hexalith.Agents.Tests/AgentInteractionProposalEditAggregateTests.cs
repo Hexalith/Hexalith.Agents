@@ -163,6 +163,33 @@ public sealed class AgentInteractionProposalEditAggregateTests
         state.ProposalState.ShouldBe(ProposedAgentReplyState.Edited);
     }
 
+    // ===== Interplay (Story 3.3 × 3.4): a regenerated proposal is still editable =====
+
+    [Fact]
+    public void Editing_a_regenerated_proposal_is_allowed_and_appends_an_edited_version_preserving_prior_versions()
+    {
+        // A proposal whose latest version was produced by an authorized regeneration is still pending approval (sub-state
+        // Regenerated), so an authorized Approver may edit it — the symmetric counterpart to regenerating an Edited proposal.
+        // Neither operation locks out the other before approval (FR-14). The edit appends a new immutable Edited version and
+        // preserves every prior generated + regenerated version.
+        AgentInteractionState state = StateProposalCreated();
+        RegenerateProposedAgentReply regenerate = RegenerateCommand(RegeneratedProposalResult());
+        ApplyAll(state, AgentInteractionAggregate.Handle(regenerate, state, Envelope(regenerate)));
+        state.Status.ShouldBe(AgentInteractionStatus.ProposalRegenerated);
+        state.ProposalState.ShouldBe(ProposedAgentReplyState.Regenerated);
+        int count = state.GeneratedVersions!.Count; // the generated + regenerated versions
+
+        DomainResult result = Edit(EditResult(editedVersionId: "edited-after-regen-001"), state);
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Events[0].ShouldBeOfType<ProposedAgentReplyEdited>().EditedVersion.VersionId.ShouldBe("edited-after-regen-001");
+        ApplyAll(state, result);
+        state.Status.ShouldBe(AgentInteractionStatus.ProposalEdited);
+        state.ProposalState.ShouldBe(ProposedAgentReplyState.Edited);
+        state.GeneratedVersions!.Count.ShouldBe(count + 1); // appended; prior generated + regenerated versions preserved (FR-14)
+        state.GeneratedVersions[^2].VersionId.ShouldBe(RegeneratedVersionId); // the regenerated version is still inspectable
+    }
+
     // ===== Decide / Evaluate no-drift =====
 
     [Theory]

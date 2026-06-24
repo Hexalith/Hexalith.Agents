@@ -84,6 +84,12 @@ public sealed class AgentInteractionState
     /// <summary>Gets or sets the safe proposal-edit failure-reason classification recorded when an edit failed closed (FR-24, AD-12). <see langword="null"/> until an edit-failed decision is recorded (Story 3.3).</summary>
     public AgentProposalEditFailureReason? ProposalEditFailureReason { get; set; }
 
+    /// <summary>Gets or sets the safe proposal-regeneration evidence recorded when the latest regeneration decision was made (Audit Evidence; FR-24, AD-14; ids + provider/policy basis only, never content). <see langword="null"/> until a regeneration decision is recorded (Story 3.4).</summary>
+    public AgentProposedReplyRegenerationEvidence? ProposalRegenerationEvidence { get; set; }
+
+    /// <summary>Gets or sets the safe proposal-regeneration failure-reason classification recorded when a regeneration failed closed (FR-24, AD-12). <see langword="null"/> until a regeneration-failed decision is recorded (Story 3.4).</summary>
+    public AgentProposalRegenerationFailureReason? ProposalRegenerationFailureReason { get; set; }
+
     /// <summary>Applies the Agent Call request: the interaction exists and freezes its configuration snapshot (AC1).</summary>
     /// <param name="e">The event.</param>
     public void Apply(InteractionRequested e)
@@ -325,6 +331,49 @@ public sealed class AgentInteractionState
     /// <summary>No-op replay handler — the not-editable rejection carries no state change.</summary>
     /// <param name="e">The rejection event.</param>
     public void Apply(ProposedAgentReplyNotEditableRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>Applies the proposal-regenerated outcome: appends the new immutable regenerated version to the append-only history (preserving prior versions), records the <see cref="ProposedAgentReplyState.Regenerated"/> sub-state, and records the safe regeneration evidence (AC1, AC2, AC4; Story 3.4; AD-5, AD-14).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyRegenerated e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalRegenerated;
+        ProposalState = ProposedAgentReplyState.Regenerated;
+        ProposalRegenerationEvidence = e.Evidence;
+        var versions = GeneratedVersions is null
+            ? new List<AgentGeneratedVersion>()
+            : new List<AgentGeneratedVersion>(GeneratedVersions);
+        versions.Add(e.RegeneratedVersion);
+        GeneratedVersions = versions;
+    }
+
+    /// <summary>Applies the proposal-regeneration-failed outcome: records the terminal fail-closed decision, its safe reason, and the attempted evidence — no new version is appended and the prior <see cref="ProposalState"/> is preserved so the proposal stays retryable (AC3, AC4; Story 3.4; AD-12, AD-14).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyRegenerationFailed e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalRegenerationFailed;
+        ProposalRegenerationFailureReason = e.Reason;
+        ProposalRegenerationEvidence = e.Evidence;
+    }
+
+    /// <summary>No-op replay handler — the not-regeneratable rejection carries no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(ProposedAgentReplyNotRegeneratableRejection e)
     {
         ArgumentNullException.ThrowIfNull(e);
         MarkReplayOnlyEventHandled();

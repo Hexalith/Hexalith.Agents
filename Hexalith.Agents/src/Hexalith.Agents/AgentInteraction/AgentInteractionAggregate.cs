@@ -381,13 +381,20 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
                 return DomainResult.NoOp();
             }
 
-            // Precondition (AC2): there must be a pending/edited proposal to edit. The proposal exists once creation
-            // succeeded (ProposalCreated) or after a prior edit (ProposalEdited), AND its sub-state must be in the editable
-            // set { Pending, Edited }. A terminal proposal (approved/rejected/abandoned/expired/posted — Stories 3.5/3.6) or
-            // an interaction with no pending proposal is ProposalNotPending → reject, no new version. This is the structural
-            // enforcement of AC2: a terminal proposal can never be edited because it can no longer post.
-            bool proposalExists = requested.Status is AgentInteractionStatus.ProposalCreated or AgentInteractionStatus.ProposalEdited;
-            bool editable = requested.ProposalState is ProposedAgentReplyState.Pending or ProposedAgentReplyState.Edited;
+            // Precondition (AC2): there must be a pending proposal to edit. The proposal exists once creation succeeded
+            // (ProposalCreated), after a prior edit (ProposalEdited), or after an authorized regeneration (ProposalRegenerated —
+            // Story 3.4), AND its sub-state must be in the editable set { Pending, Edited, Regenerated }. Editing a regenerated
+            // proposal is the symmetric counterpart to regenerating an edited one — both remain pending approval, so neither
+            // operation locks out the other before approval (FR-14). A terminal proposal (approved/rejected/abandoned/expired/
+            // posted — Stories 3.5/3.6) or an interaction with no pending proposal is ProposalNotPending → reject, no new
+            // version. This is the structural enforcement of AC2: a terminal proposal can never be edited because it can no
+            // longer post.
+            bool proposalExists = requested.Status is AgentInteractionStatus.ProposalCreated
+                or AgentInteractionStatus.ProposalEdited
+                or AgentInteractionStatus.ProposalRegenerated;
+            bool editable = requested.ProposalState is ProposedAgentReplyState.Pending
+                or ProposedAgentReplyState.Edited
+                or ProposedAgentReplyState.Regenerated;
             if (!proposalExists || !editable)
             {
                 return DomainResult.Rejection([
@@ -406,6 +413,67 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
         ]);
     }
 
+    /// <summary>
+    /// Records the terminal proposal-regeneration decision from the server-assembled outcome (AC1–AC4; FR-14, FR-16; AD-3,
+    /// AD-5, AD-9, AD-13, AD-14). The orchestrator resolves regeneration-time approver authorization, re-reads the same Source
+    /// Conversation, re-invokes the provider behind its adapter, runs the content-safety gate, and derives the deterministic
+    /// regenerated version id, returning the outcome through <see cref="RegenerateProposedAgentReply.Result"/>; the aggregate's
+    /// sole job is to validate that a pending (retryable) proposal exists (AC4 — a terminal proposal never invokes the
+    /// provider) and do the outcome → event math. This is the eighth handler on the aggregate; it builds directly on the
+    /// Story 3.1 proposal and reuses the Story 3.3 retryable-proposal precondition shape.
+    /// </summary>
+    /// <param name="command">The regenerate command carrying the server-assembled proposal-regeneration outcome (client values discarded upstream).</param>
+    /// <param name="state">The current interaction state (must hold a pending/edited/regenerated proposal before it can be regenerated).</param>
+    /// <param name="envelope">The command envelope (carries the interaction id and the tenant scope).</param>
+    /// <returns>The domain result (the regenerated/failed outcome event, a not-regeneratable rejection, or an idempotent no-op).</returns>
+    public static DomainResult Handle(RegenerateProposedAgentReply command, AgentInteractionState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string interactionId = envelope.AggregateId;
+
+        // State precondition: a proposal can only be regenerated on a recorded interaction. A regenerate command on a
+        // never-requested stream is a structural rejection (no state change), not a recorded decision (AD-12). The positive
+        // pattern binds the non-null requested state so the regeneration logic runs only over a recorded interaction (CA1062).
+        if (state is { IsRequested: true } requested)
+        {
+            // Idempotent regenerated version (AD-13): a retried regenerate command carries the same deterministic regenerated
+            // version id, so if that version is already on the append-only history the regeneration already landed — a clean
+            // no-op that never appends a duplicate version. Keyed on the version id (NOT the status) because a proposal may be
+            // regenerated more than once, each distinct attempt appending a new version (AC2).
+            if (RegenerationAlreadyLanded(requested, command.Result.RegeneratedVersionId))
+            {
+                return DomainResult.NoOp();
+            }
+
+            // Precondition (AC4): there must be a pending/edited/regenerated proposal to regenerate. Eligibility is keyed on
+            // the proposal SUB-STATE (the retryable set { Pending, Edited, Regenerated }) — NOT the coarse interaction status —
+            // so a prior ProposalRegenerationFailed/ProposalEditFailed status (which preserves the retryable sub-state) does
+            // NOT block a retry: the failure-status retry trap. A terminal proposal (approved/rejected/abandoned/expired/posted
+            // — Stories 3.5/3.6 set a terminal sub-state) or an interaction with no proposal is ProposalNotPending → reject, no
+            // new version, and — critically — NO provider/regeneration event is emitted. This is the structural enforcement of
+            // AC4: a terminal proposal can never invoke the provider.
+            bool retryable = requested.ProposalState is ProposedAgentReplyState.Pending
+                or ProposedAgentReplyState.Edited
+                or ProposedAgentReplyState.Regenerated;
+            if (!retryable)
+            {
+                return DomainResult.Rejection([
+                    new ProposedAgentReplyNotRegeneratableRejection(interactionId, AgentProposedReplyNotRegeneratableReason.ProposalNotPending),
+                ]);
+            }
+
+            // Pure evaluation (AD-3): emit the regenerated/failed outcome only. The result arrives pre-assembled from the
+            // trusted regeneration orchestration (authorization resolved + provider invoked + safety gated + version id
+            // derived); the aggregate's sole job is the outcome → event/status math.
+            return AgentProposalRegenerationPolicy.Evaluate(interactionId, command.Result);
+        }
+
+        return DomainResult.Rejection([
+            new ProposedAgentReplyNotRegeneratableRejection(interactionId, AgentProposedReplyNotRegeneratableReason.InteractionNotProposed),
+        ]);
+    }
+
     // True when the deterministic edited version id is already on the append-only version history — a retried edit that
     // already landed (AD-13). The edited version id uses a distinct SHA-256 purpose tag, so it never collides with a
     // generated version id; checking the whole history is safe.
@@ -419,6 +487,28 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
         foreach (AgentGeneratedVersion version in state.GeneratedVersions)
         {
             if (string.Equals(version.VersionId, editedVersionId, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // True when the deterministic regenerated version id is already on the append-only version history — a retried
+    // regeneration that already landed (AD-13). The regenerated version id uses a distinct SHA-256 purpose tag, so it never
+    // collides with a generated/edited version id; checking the whole history is safe. A failed regeneration appended no
+    // version, so a retry after failure is correctly NOT treated as already-landed and re-evaluates.
+    private static bool RegenerationAlreadyLanded(AgentInteractionState state, string regeneratedVersionId)
+    {
+        if (string.IsNullOrEmpty(regeneratedVersionId) || state.GeneratedVersions is null)
+        {
+            return false;
+        }
+
+        foreach (AgentGeneratedVersion version in state.GeneratedVersions)
+        {
+            if (string.Equals(version.VersionId, regeneratedVersionId, StringComparison.Ordinal))
             {
                 return true;
             }

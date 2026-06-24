@@ -101,4 +101,16 @@ public sealed class DeferredGatewayTests
         result.Status.ShouldBe(ProposalEditStatus.NotAuthorized);
         result.EditedVersionId.ShouldBeNull();
     }
+
+    [Fact]
+    public async Task DeferredProposalRegenerationGateway_fails_closed_with_not_authorized_and_no_version()
+    {
+        DeferredProposalRegenerationGateway gateway = new();
+
+        ProposalRegenerationResult result = await gateway.RegenerateProposalAsync(
+            new ProposalRegenerationRequest("interaction-1", "proposal-1", null), CancellationToken.None);
+
+        result.Status.ShouldBe(ProposalRegenerationStatus.NotAuthorized);
+        result.RegeneratedVersionId.ShouldBeNull();
+    }
 }

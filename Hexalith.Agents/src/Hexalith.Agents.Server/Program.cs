@@ -183,6 +183,20 @@ builder.Services.AddScoped<AgentInteractionProposalOrchestrator>();
 // operational-topology / read-model story (Epic 4), mirroring 1.2/1.4/1.5/1.6/1.7/2.1-2.5/3.1.
 builder.Services.AddScoped<AgentInteractionProposalEditOrchestrator>();
 
+// Story 3.4: Confirmation-mode Proposed-Agent-Reply regeneration wiring. The new regeneration aggregate handler (the 8th
+// Handle on AgentInteraction) auto-registers via the existing AddEventStoreDomainService assembly scan (no host change
+// needed). The regeneration orchestration combines the Story 3.3 edit-time approver authorization (IApproverPolicyResolver,
+// already registered above) with the Story 2.4 provider invocation + content-safety gate, reusing the IConversationContextReader
+// (live behind the "Conversations" section, else deferred), IProviderCatalogReader, IAgentGenerationProvider,
+// IAgentContentSafetyPolicyReader, IContentSafetyEvaluator, and IAgentCommandDispatcher already registered above — NO new port
+// is introduced. AC4 (a terminal proposal never invokes the provider) is enforced before any conversation re-read/provider
+// call from the trusted proposal sub-state on the request. A regenerated Proposed Agent Reply is NEVER a Conversation Message
+// and reads no Party identity (AD-6) — no new sibling-module/provider reference is added. The deferred provider/safety/approver
+// seams keep the default graph fail-closed (no content-bearing regeneration). The live command dispatch / read-model bindings
+// and the audit-evidence projection remain deferred to the operational-topology / read-model story (Epic 4), mirroring
+// 1.2/1.4/1.5/1.6/1.7/2.1-2.5/3.1/3.3.
+builder.Services.AddScoped<AgentInteractionProposalRegenerationOrchestrator>();
+
 WebApplication app = builder.Build();
 
 app.UseEventStoreDomainService();

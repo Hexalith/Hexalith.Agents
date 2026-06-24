@@ -1,0 +1,92 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IProposalRegenerationGateway Gateway
+
+@* proposal-regenerator (AC1, AC2, AC3, AC4; DESIGN proposal-editor): a Constrained action region for an authorized Approver to
+   request a fresh Agent regeneration of a pending Proposed Agent Reply before approval. Generated, edited, and regenerated
+   versions are labeled DISTINCTLY; the proposal is NEVER styled like a posted Conversation Message. Regeneration carries NO
+   Approver content (the provider is re-invoked server-side), so nothing sensitive flows from this control — the request is
+   ids only (AD-14). A non-authorized viewer gets no action button. This reusable control is hosted by the Story 3.7 proposal
+   detail workspace; it owns only the action + its distinct safe status, never the full version-history panel. *@
+<section class="proposal-regenerator"
+         data-testid="@TestId"
+         aria-label="@Localizer["Agents.ProposalRegenerator.Label"]">
+
+    @* Distinct generated-vs-edited-vs-regenerated version label (AC2 core) — a whole localized string, never the content. *@
+    <p class="proposal-regenerator__version-label" data-testid="@($"{TestId}-version-label")">
+        @Localizer[AgentGenerationKindPresentation.LabelKeyFor(Kind)]
+    </p>
+
+    @if (CanRegenerate)
+    {
+        <div class="proposal-regenerator__actions">
+            <FluentButton Appearance="ButtonAppearance.Primary" OnClick="OnRegenerateAsync" data-testid="@($"{TestId}-regenerate")">
+                @Localizer["Agents.ProposalRegenerator.Regenerate"]
+            </FluentButton>
+        </div>
+    }
+
+    @* "Prior generated and edited versions are preserved." — never "Old draft replaced." (DESIGN Do's and Don'ts; AC1, AC2). *@
+    <p class="proposal-regenerator__preserved" data-testid="@($"{TestId}-preserved")">
+        @Localizer["Agents.ProposalRegenerator.PriorVersionsPreserved"]
+    </p>
+
+    @if (_submitted)
+    {
+        <p class="proposal-regenerator__status" role="status" aria-live="polite" data-testid="@($"{TestId}-status")">
+            @Localizer[StatusKey]
+        </p>
+    }
+</section>
+
+@code {
+    /// <summary>The deterministic Agent Call identifier (the proposal's aggregate id).</summary>
+    [Parameter]
+    public string AgentInteractionId { get; set; } = string.Empty;
+
+    /// <summary>The deterministic proposal identifier being regenerated (created in Story 3.1).</summary>
+    [Parameter]
+    public string ProposalId { get; set; } = string.Empty;
+
+    /// <summary>The kind of the latest version shown (drives the distinct generated-vs-edited-vs-regenerated version label).</summary>
+    [Parameter]
+    public AgentGenerationKind Kind { get; set; } = AgentGenerationKind.Generated;
+
+    /// <summary>Whether the current viewer is an authorized Approver who may regenerate (no action otherwise; AC3, AC4).</summary>
+    [Parameter]
+    public bool CanRegenerate { get; set; }
+
+    /// <summary>An optional client correlation id carried with the regeneration (idempotency/telemetry).</summary>
+    [Parameter]
+    public string? ClientCorrelationId { get; set; }
+
+    /// <summary>Raised after a regeneration attempt with the safe result so the host can refresh the version history (Story 3.7).</summary>
+    [Parameter]
+    public EventCallback<ProposalRegenerationResult> OnRegenerated { get; set; }
+
+    /// <summary>Stable test id base for the regenerator (suffixed for its sub-elements).</summary>
+    [Parameter]
+    public string TestId { get; set; } = "proposal-regenerator";
+
+    private bool _submitted;
+    private ProposalRegenerationStatus _status = ProposalRegenerationStatus.Unknown;
+
+    // In-flight copy only; one whole localized string per outcome (UX-DR14), never assembled from fragments and never content.
+    private string StatusKey => _status switch
+    {
+        ProposalRegenerationStatus.Regenerated => "Agents.ProposalRegenerator.Status.Regenerated",
+        ProposalRegenerationStatus.NotAuthorized => "Agents.ProposalRegenerator.Status.NotAuthorized",
+        ProposalRegenerationStatus.NotPending => "Agents.ProposalRegenerator.Status.NotPending",
+        _ => "Agents.ProposalRegenerator.Status.Unavailable",
+    };
+
+    private async Task OnRegenerateAsync()
+    {
+        // The request carries ids only — regeneration re-invokes the provider server-side; no Approver content flows here (AD-14).
+        ProposalRegenerationRequest request = new(AgentInteractionId, ProposalId, ClientCorrelationId);
+        ProposalRegenerationResult result = await Gateway.RegenerateProposalAsync(request, CancellationToken.None).ConfigureAwait(false);
+
+        _status = result.Status;
+        _submitted = true;
+        await OnRegenerated.InvokeAsync(result).ConfigureAwait(false);
+    }
+}

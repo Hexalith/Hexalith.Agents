@@ -64,4 +64,10 @@ public enum AgentInteractionStatus
 
     /// <summary>An edit attempt failed closed AFTER the proposal was pending — recorded as fail-closed Audit Evidence; no new version is created and prior versions are preserved; distinct from a structural not-editable rejection (Story 3.3; AC2, AC4).</summary>
     ProposalEditFailed,
+
+    /// <summary>An authorized Approver regenerated the Proposed Agent Reply, appending a new immutable regenerated version that passed Content Safety Policy; the proposal stays pending approval (the proposal sub-state is <see cref="ProposedAgentReplyState.Regenerated"/>) (Story 3.4; AC1, AC2).</summary>
+    ProposalRegenerated,
+
+    /// <summary>A regeneration attempt failed closed AFTER the proposal was pending — provider/timeout/safety/policy/authorization failure — recorded as fail-closed Audit Evidence; no new version is created, prior versions are preserved, and the proposal remains retryable; distinct from a structural not-regeneratable rejection (Story 3.4; AC3).</summary>
+    ProposalRegenerationFailed,
 }

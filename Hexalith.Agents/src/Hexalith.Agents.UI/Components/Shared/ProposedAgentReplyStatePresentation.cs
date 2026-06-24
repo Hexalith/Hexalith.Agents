@@ -19,11 +19,12 @@ namespace Hexalith.Agents.UI.Components.Shared;
 public static class ProposedAgentReplyStatePresentation
 {
     /// <summary>
-    /// Maps a proposal state to its Fluent semantic badge role. <c>Pending</c> (awaiting approval) and <c>Edited</c>
-    /// (edited, still awaiting approval — the in-progress/pending set) are Informative (DESIGN <c>status-informative</c>);
-    /// the sentinel and every reserved 3.4–3.6 state map through the Subtle total default until their owning stories add
-    /// explicit roles (mirroring <see cref="AgentCallStatusPresentation.MapStatus"/>'s totality). Brand/Success are never
-    /// used for a not-yet-resolved proposal.
+    /// Maps a proposal state to its Fluent semantic badge role. <c>Pending</c> (awaiting approval), <c>Edited</c> (edited,
+    /// still awaiting approval), and <c>Regenerated</c> (regenerated, still awaiting approval — the in-progress/pending set)
+    /// are Informative (DESIGN <c>status-informative</c>); the sentinel and every reserved 3.5–3.6 state map through the
+    /// Subtle total default until their owning stories add explicit roles (mirroring
+    /// <see cref="AgentCallStatusPresentation.MapStatus"/>'s totality). Brand/Success are never used for a not-yet-resolved
+    /// proposal.
     /// </summary>
     /// <param name="state">The safe proposal state.</param>
     /// <returns>The Fluent badge color role.</returns>
@@ -32,6 +33,7 @@ public static class ProposedAgentReplyStatePresentation
         {
             ProposedAgentReplyState.Pending => BadgeColor.Informative,
             ProposedAgentReplyState.Edited => BadgeColor.Informative,
+            ProposedAgentReplyState.Regenerated => BadgeColor.Informative,
             ProposedAgentReplyState.Unknown => BadgeColor.Subtle,
             _ => BadgeColor.Subtle,
         };
@@ -49,6 +51,7 @@ public static class ProposedAgentReplyStatePresentation
         {
             ProposedAgentReplyState.Pending => FcFluentIcons.ArrowSync16(),
             ProposedAgentReplyState.Edited => FcFluentIcons.Edit16(),
+            ProposedAgentReplyState.Regenerated => FcFluentIcons.ArrowSync16(),
             _ => FcFluentIcons.QuestionCircle16(),
         };
 

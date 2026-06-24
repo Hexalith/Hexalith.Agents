@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.UI.Components.Shared;
@@ -17,6 +18,7 @@ public sealed class AgentGenerationKindPresentationTests
     [Theory]
     [InlineData(AgentGenerationKind.Generated, "Agents.GenerationKind.Label.Generated")]
     [InlineData(AgentGenerationKind.Edited, "Agents.GenerationKind.Label.Edited")]
+    [InlineData(AgentGenerationKind.Regenerated, "Agents.GenerationKind.Label.Regenerated")]
     [InlineData(AgentGenerationKind.Unknown, "Agents.GenerationKind.Label.Unknown")]
     public void LabelKeyFor_maps_each_kind_to_its_whole_string_key(AgentGenerationKind kind, string expected)
         => AgentGenerationKindPresentation.LabelKeyFor(kind).ShouldBe(expected);
@@ -34,7 +36,12 @@ public sealed class AgentGenerationKindPresentationTests
     }
 
     [Fact]
-    public void Generated_and_edited_get_distinct_labels()
-        => AgentGenerationKindPresentation.LabelKeyFor(AgentGenerationKind.Generated)
-            .ShouldNotBe(AgentGenerationKindPresentation.LabelKeyFor(AgentGenerationKind.Edited));
+    public void Generated_edited_and_regenerated_get_distinct_labels()
+    {
+        string generated = AgentGenerationKindPresentation.LabelKeyFor(AgentGenerationKind.Generated);
+        string edited = AgentGenerationKindPresentation.LabelKeyFor(AgentGenerationKind.Edited);
+        string regenerated = AgentGenerationKindPresentation.LabelKeyFor(AgentGenerationKind.Regenerated);
+
+        new[] { generated, edited, regenerated }.Distinct().Count().ShouldBe(3);
+    }
 }

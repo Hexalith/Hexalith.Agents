@@ -529,6 +529,89 @@ internal static class AgentInteractionTestData
     internal static EditProposedAgentReply EditCommand(AgentProposalEditResult result, string interactionId = InteractionId)
         => new(interactionId, result);
 
+    // ===== Story 3.4 regeneration fixtures =====
+
+    /// <summary>The requesting Approver's stable Party reference used for a regeneration (a reference, not PII — AD-7).</summary>
+    internal const string RequesterPartyId = "requester-party-001";
+
+    /// <summary>The sample freshly regenerated content (sensitive — durable only on the regeneration version; AD-14).</summary>
+    internal const string RegeneratedContentText = "A freshly regenerated version of the reply.";
+
+    /// <summary>The sample deterministic regeneration attempt id (reused across retries; AD-13).</summary>
+    internal const string RegenerationAttemptId = "regeneration-attempt-001";
+
+    /// <summary>The sample deterministic regenerated-version id (a safe id derived server-side; AD-13).</summary>
+    internal const string RegeneratedVersionId = "regenerated-version-001";
+
+    /// <summary>Builds a regenerated generated version (Kind=Regenerated, carrying the regenerated content; a fresh generation has no source-version/editor provenance).</summary>
+    /// <param name="versionId">The deterministic regenerated version id.</param>
+    /// <param name="content">The regenerated content (sensitive — carried only on the regeneration version; AD-14).</param>
+    /// <returns>The regenerated version.</returns>
+    internal static AgentGeneratedVersion SampleRegeneratedVersion(
+        string versionId = RegeneratedVersionId,
+        string content = RegeneratedContentText)
+        => new(
+            versionId,
+            RegenerationAttemptId,
+            AgentGenerationKind.Regenerated,
+            content,
+            SampleSnapshot.ProviderId,
+            SampleSnapshot.ModelId,
+            SampleSnapshot.ProviderCapabilityVersion,
+            ContentSafetyPolicyVersion,
+            PromptTokenCount,
+            OutputTokenCount);
+
+    /// <summary>Builds a server-assembled proposal-regeneration result with sane defaults (carries the regenerated version + content on a success outcome).</summary>
+    /// <param name="outcome">The server-assembled regeneration outcome.</param>
+    /// <param name="verdict">The resolved regeneration-time approver-policy verdict (Valid authorizes the regeneration).</param>
+    /// <param name="regeneratedVersionId">The deterministic regenerated version id.</param>
+    /// <param name="withVersion">Whether to carry the content-bearing version (a successful safe regeneration carries it; every failure carries none).</param>
+    /// <returns>The proposal-regeneration result.</returns>
+    internal static AgentProposalRegenerationResult RegenerationResult(
+        AgentProposalRegenerationOutcome outcome = AgentProposalRegenerationOutcome.Regenerated,
+        ApproverPolicyValidationStatus verdict = ApproverPolicyValidationStatus.Valid,
+        string regeneratedVersionId = RegeneratedVersionId,
+        bool withVersion = true)
+        => new(
+            outcome,
+            RegenerationAttemptId,
+            regeneratedVersionId,
+            withVersion && outcome == AgentProposalRegenerationOutcome.Regenerated ? SampleRegeneratedVersion(regeneratedVersionId) : null,
+            verdict,
+            SampleProposalId,
+            SourceConversationId,
+            RequesterPartyId,
+            SampleSnapshot.ProviderId,
+            SampleSnapshot.ModelId,
+            SampleSnapshot.ProviderCapabilityVersion,
+            ContentSafetyPolicyVersion,
+            ConfirmationSnapshot.ApproverPolicyVersion,
+            ApproverPolicyBasisDisclosure.OperatorOnly,
+            PromptTokenCount,
+            OutputTokenCount);
+
+    /// <summary>A successful, authorized proposal-regeneration result.</summary>
+    /// <returns>The authorized regenerated result.</returns>
+    internal static AgentProposalRegenerationResult RegeneratedProposalResult() => RegenerationResult();
+
+    /// <summary>A provider-timeout regeneration result (still authorized — fails closed at the provider; no version).</summary>
+    /// <returns>The provider-timeout result.</returns>
+    internal static AgentProposalRegenerationResult ProviderTimeoutRegenerationResult()
+        => RegenerationResult(AgentProposalRegenerationOutcome.ProviderTimeout, withVersion: false);
+
+    /// <summary>A content-safety-blocked regeneration result (still authorized — fails closed at the safety gate; no version).</summary>
+    /// <returns>The safety-blocked result.</returns>
+    internal static AgentProposalRegenerationResult ContentSafetyBlockedRegenerationResult()
+        => RegenerationResult(AgentProposalRegenerationOutcome.ContentSafetyBlocked, withVersion: false);
+
+    /// <summary>The regenerate-proposal command carrying the given result for the sample interaction.</summary>
+    /// <param name="result">The server-assembled proposal-regeneration result.</param>
+    /// <param name="interactionId">The deterministic interaction id (the aggregate id).</param>
+    /// <returns>The regenerate-proposal command.</returns>
+    internal static RegenerateProposedAgentReply RegenerateCommand(AgentProposalRegenerationResult result, string interactionId = InteractionId)
+        => new(interactionId, result);
+
     /// <summary>The edit precondition: a Confirmation-mode interaction that reached a Pending proposal (status <c>ProposalCreated</c>).</summary>
     /// <returns>The rehydrated proposal-created interaction state, driven through the real <c>Apply</c> handlers.</returns>
     internal static AgentInteractionState StateProposalCreated()
@@ -580,6 +663,9 @@ internal static class AgentInteractionTestData
                 case ProposedAgentReplyEdited e: state.Apply(e); break;
                 case ProposedAgentReplyEditFailed e: state.Apply(e); break;
                 case ProposedAgentReplyNotEditableRejection e: state.Apply(e); break;
+                case ProposedAgentReplyRegenerated e: state.Apply(e); break;
+                case ProposedAgentReplyRegenerationFailed e: state.Apply(e); break;
+                case ProposedAgentReplyNotRegeneratableRejection e: state.Apply(e); break;
                 default: throw new InvalidOperationException($"Unhandled event type '{payload.GetType().Name}' in test apply dispatch.");
             }
         }
