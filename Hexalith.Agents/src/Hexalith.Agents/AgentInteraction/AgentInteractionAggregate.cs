@@ -289,6 +289,67 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
         ]);
     }
 
+    /// <summary>
+    /// Records the terminal proposal-creation decision from the server-assembled outcome (AC1–AC4; FR-13, FR-14, FR-27;
+    /// AD-3, AD-5, AD-6, AD-13, AD-14). The orchestrator performs the impure selected-version read + optional expiry read and
+    /// returns the outcome through <see cref="CreateProposedAgentReply.Result"/>; the aggregate's sole job is the outcome →
+    /// event math. This is the Confirmation-mode counterpart to <see cref="Handle(PostAgentResponse, AgentInteractionState?, CommandEnvelope)"/>:
+    /// the response-mode precondition is the exact inverse (it requires <see cref="AgentResponseMode.Confirmation"/>).
+    /// </summary>
+    /// <param name="command">The create command carrying the server-assembled proposal-creation outcome (client values discarded upstream).</param>
+    /// <param name="state">The current interaction state (must be Generated + Confirmation mode before a proposal can be created).</param>
+    /// <param name="envelope">The command envelope (carries the interaction id and the tenant scope).</param>
+    /// <returns>The domain result (the created/failed outcome event, a not-creatable rejection, or an idempotent no-op).</returns>
+    public static DomainResult Handle(CreateProposedAgentReply command, AgentInteractionState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string interactionId = envelope.AggregateId;
+
+        // State precondition: a proposal can only be created on a recorded interaction. A create command on a never-requested
+        // stream is a structural rejection (no state change), not a recorded decision (AD-12). The positive pattern binds the
+        // non-null requested state so the creation logic runs only over a recorded interaction.
+        if (state is { IsRequested: true } requested)
+        {
+            // Idempotent terminal creation (AD-13): the decision is recorded once and is terminal. Re-dispatching a create
+            // command after a terminal ProposalCreated/ProposalCreationFailed outcome is a clean no-op that preserves the
+            // recorded decision — the aggregate never silently flips a decision or creates a duplicate proposal/version (AC4).
+            if (requested.Status is AgentInteractionStatus.ProposalCreated or AgentInteractionStatus.ProposalCreationFailed)
+            {
+                return DomainResult.NoOp();
+            }
+
+            // Response-mode precondition (the Confirmation counterpart to PostAgentResponse's Automatic check): proposal
+            // creation must never run for an Automatic-mode interaction — that path posts via Story 2.5, never creates a
+            // proposal. An Automatic-mode create command is a structural rejection (no state change).
+            if (requested.Snapshot?.ResponseMode != AgentResponseMode.Confirmation)
+            {
+                return DomainResult.Rejection([
+                    new ProposedAgentReplyNotCreatableRejection(interactionId, AgentProposedReplyNotCreatableReason.NotConfirmationResponseMode),
+                ]);
+            }
+
+            // Generation precondition (AD-12): proposal creation only ever follows a successful, safety-passing generation.
+            // Any other status (Requested/Authorized/Denied/Blocked/ContextReady/ContextBlocked/GenerationFailed/SafetyFailed)
+            // is a structural rejection (no state change). This is the structural enforcement of AC3: a SafetyFailed/
+            // GenerationFailed interaction never reaches proposal creation — there is no generated version to propose (AD-5).
+            if (requested.Status != AgentInteractionStatus.Generated)
+            {
+                return DomainResult.Rejection([
+                    new ProposedAgentReplyNotCreatableRejection(interactionId, AgentProposedReplyNotCreatableReason.OutputNotGenerated),
+                ]);
+            }
+
+            // Pure evaluation (AD-3): emit the created/failed outcome only. The result arrives pre-assembled from the trusted
+            // proposal orchestration; the aggregate's sole job is the outcome → event/status math.
+            return AgentProposalCreationPolicy.Evaluate(interactionId, command.Result);
+        }
+
+        return DomainResult.Rejection([
+            new ProposedAgentReplyNotCreatableRejection(interactionId, AgentProposedReplyNotCreatableReason.InteractionNotRequested),
+        ]);
+    }
+
     // By-value comparison of a re-issued request against the recorded one (AD-13). Strings are compared ordinally;
     // the snapshot scalars are compared explicitly so a re-derived-id collision with a different configuration is
     // surfaced as a conflict rather than a silent no-op.

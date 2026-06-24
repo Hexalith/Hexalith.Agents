@@ -475,6 +475,122 @@ public sealed class AgentInteractionStateReplayTests
         }
     }
 
+    // ===== Story 3.1 proposal replay (status transitions; AC1, AC3, AC4) =====
+
+    [Fact]
+    public void Apply_proposal_created_transitions_status_and_records_pending_state_and_safe_evidence()
+    {
+        AgentInteractionState state = StateGeneratedConfirmationMode();
+
+        state.Apply(new ProposedAgentReplyCreated(InteractionId, SampleProposalEvidence()));
+
+        state.Status.ShouldBe(AgentInteractionStatus.ProposalCreated);
+        state.ProposalState.ShouldBe(ProposedAgentReplyState.Pending);
+        state.ProposalEvidence.ShouldNotBeNull().ProposalId.ShouldBe(SampleProposalId);
+        state.ProposalCreationFailureReason.ShouldBeNull();
+        state.Prompt.ShouldBe(Prompt); // the request payload is untouched by proposal creation (AD-14)
+    }
+
+    [Fact]
+    public void Apply_proposal_creation_failed_records_the_decision_reason_and_evidence_with_no_proposal_state()
+    {
+        AgentInteractionState state = StateGeneratedConfirmationMode();
+
+        state.Apply(new ProposedAgentReplyCreationFailed(
+            InteractionId,
+            AgentProposalCreationFailureReason.GeneratedVersionUnavailable,
+            SampleProposalEvidence()));
+
+        state.Status.ShouldBe(AgentInteractionStatus.ProposalCreationFailed);
+        state.ProposalCreationFailureReason.ShouldBe(AgentProposalCreationFailureReason.GeneratedVersionUnavailable);
+        state.ProposalEvidence.ShouldNotBeNull().ProposalId.ShouldBe(SampleProposalId);
+        state.ProposalState.ShouldBeNull(); // no proposal exists on a failure
+    }
+
+    [Fact]
+    public void Apply_not_creatable_rejection_is_a_replay_safe_noop()
+    {
+        AgentInteractionState state = StateGeneratedConfirmationMode();
+
+        // A persisted not-creatable rejection must not throw or mutate the recorded request/status.
+        state.Apply(new ProposedAgentReplyNotCreatableRejection(InteractionId, AgentProposedReplyNotCreatableReason.OutputNotGenerated));
+
+        state.Status.ShouldBe(AgentInteractionStatus.Generated);
+        state.IsRequested.ShouldBeTrue();
+        state.ProposalEvidence.ShouldBeNull();
+        state.ProposalState.ShouldBeNull();
+        state.ProposalCreationFailureReason.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Proposal_outcome_applies_only_over_a_requested_stream()
+    {
+        // A proposal outcome event ahead of the request (a malformed stream) must not flip status — every non-request Apply
+        // keeps the IsRequested guard so replay over a stream that begins before the request stays total.
+        var state = new AgentInteractionState();
+
+        state.Apply(new ProposedAgentReplyCreated(InteractionId, SampleProposalEvidence()));
+        state.Apply(new ProposedAgentReplyCreationFailed(InteractionId, AgentProposalCreationFailureReason.AdapterFailure, SampleProposalEvidence()));
+
+        state.IsRequested.ShouldBeFalse();
+        state.Status.ShouldBe(AgentInteractionStatus.Unknown);
+        state.ProposalEvidence.ShouldBeNull();
+        state.ProposalState.ShouldBeNull();
+        state.ProposalCreationFailureReason.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Replay_over_request_through_proposal_created_is_deterministic_across_rebuilds()
+    {
+        AgentInteractionState first = Rebuild();
+        AgentInteractionState second = Rebuild();
+
+        second.Status.ShouldBe(first.Status);
+        second.Status.ShouldBe(AgentInteractionStatus.ProposalCreated);
+        second.ProposalState.ShouldBe(first.ProposalState);
+        second.ProposalEvidence.ShouldNotBeNull().ProposalId.ShouldBe(first.ProposalEvidence!.ProposalId);
+        second.AgentInteractionId.ShouldBe(first.AgentInteractionId);
+
+        static AgentInteractionState Rebuild()
+        {
+            AgentInteractionState state = StateGeneratedConfirmationMode();
+            state.Apply(new ProposedAgentReplyCreated(InteractionId, SampleProposalEvidence()));
+            return state;
+        }
+    }
+
+    [Fact]
+    public void Replay_over_request_through_proposal_creation_failed_is_deterministic_across_rebuilds()
+    {
+        // The fail-closed proposal audit record (status + safe reason + safe-id evidence) must rehydrate identically across
+        // independent rebuilds, so the durable ProposalCreationFailed Audit Evidence is stable for inspection (AC4; AD-13).
+        AgentInteractionState first = Rebuild();
+        AgentInteractionState second = Rebuild();
+
+        second.Status.ShouldBe(first.Status);
+        second.Status.ShouldBe(AgentInteractionStatus.ProposalCreationFailed);
+        second.ProposalCreationFailureReason.ShouldBe(first.ProposalCreationFailureReason);
+        second.ProposalCreationFailureReason.ShouldBe(AgentProposalCreationFailureReason.GeneratedVersionUnavailable);
+        second.ProposalEvidence.ShouldNotBeNull().ProposalId.ShouldBe(first.ProposalEvidence!.ProposalId);
+
+        static AgentInteractionState Rebuild()
+        {
+            AgentInteractionState state = StateGeneratedConfirmationMode();
+            state.Apply(new ProposedAgentReplyCreationFailed(
+                InteractionId, AgentProposalCreationFailureReason.GeneratedVersionUnavailable, SampleProposalEvidence()));
+            return state;
+        }
+    }
+
+    private static AgentProposedReplyEvidence SampleProposalEvidence()
+        => new(
+            SampleProposalId,
+            SourceConversationId,
+            PostedVersionId,
+            ConfirmationSnapshot.ApproverPolicyVersion,
+            ConfirmationSnapshot.ContentSafetyPolicyVersion,
+            ExpiresAt: null);
+
     private static AgentPostedMessageEvidence SamplePostedEvidence()
         => new(PostedMessageId, SourceConversationId, AgentPartyId, PostedVersionId);
 

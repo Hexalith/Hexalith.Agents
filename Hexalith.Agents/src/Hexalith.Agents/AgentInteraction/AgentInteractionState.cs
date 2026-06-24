@@ -69,6 +69,15 @@ public sealed class AgentInteractionState
     /// <summary>Gets or sets the safe posting failure-reason classification recorded when posting failed closed (FR-24, AD-12). <see langword="null"/> until a posting-failed decision is recorded.</summary>
     public AgentResponsePostingFailureReason? PostingFailureReason { get; set; }
 
+    /// <summary>Gets or sets the Confirmation-mode proposal sub-state (<see cref="ProposedAgentReplyState.Pending"/> after creation; Story 3.1; AD-5). <see langword="null"/> until a proposal is created.</summary>
+    public ProposedAgentReplyState? ProposalState { get; set; }
+
+    /// <summary>Gets or sets the safe proposal evidence recorded when the proposal-creation decision was made (Audit Evidence; FR-24, AD-14; ids only, never content). <see langword="null"/> until a proposal-creation decision is recorded.</summary>
+    public AgentProposedReplyEvidence? ProposalEvidence { get; set; }
+
+    /// <summary>Gets or sets the safe proposal-creation failure-reason classification recorded when creation failed closed (FR-24, AD-12). <see langword="null"/> until a creation-failed decision is recorded.</summary>
+    public AgentProposalCreationFailureReason? ProposalCreationFailureReason { get; set; }
+
     /// <summary>Applies the Agent Call request: the interaction exists and freezes its configuration snapshot (AC1).</summary>
     /// <param name="e">The event.</param>
     public void Apply(InteractionRequested e)
@@ -229,6 +238,44 @@ public sealed class AgentInteractionState
     /// <summary>No-op replay handler — the not-postable rejection carries no state change.</summary>
     /// <param name="e">The rejection event.</param>
     public void Apply(AgentResponseNotPostableRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>Applies the proposal-created outcome: records the terminal success status, the initial <see cref="ProposedAgentReplyState.Pending"/> proposal sub-state, and the safe proposal evidence (AC1, AC2; Story 3.1; AD-5, AD-14).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyCreated e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalCreated;
+        ProposalState = ProposedAgentReplyState.Pending;
+        ProposalEvidence = e.Evidence;
+    }
+
+    /// <summary>Applies the proposal-creation-failed outcome: records the terminal fail-closed decision, its safe reason, and the attempted evidence — no proposal exists, so <see cref="ProposalState"/> stays null (AC3, AC4; Story 3.1; AD-12, AD-14).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(ProposedAgentReplyCreationFailed e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ProposalCreationFailed;
+        ProposalCreationFailureReason = e.Reason;
+        ProposalEvidence = e.Evidence;
+    }
+
+    /// <summary>No-op replay handler — the not-creatable rejection carries no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(ProposedAgentReplyNotCreatableRejection e)
     {
         ArgumentNullException.ThrowIfNull(e);
         MarkReplayOnlyEventHandled();

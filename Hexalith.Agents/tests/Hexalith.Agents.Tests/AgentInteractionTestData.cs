@@ -410,6 +410,54 @@ internal static class AgentInteractionTestData
     internal static PostAgentResponse PostCommand(AgentResponsePostingResult result, string interactionId = InteractionId)
         => new(interactionId, result);
 
+    // ===== Story 3.1 proposal fixtures =====
+
+    /// <summary>A sample deterministic proposal id (a safe id; never content).</summary>
+    internal const string SampleProposalId = "proposal-001";
+
+    /// <summary>A sample optional ISO-8601 expiry timestamp (where configured; AC1).</summary>
+    internal const string SampleExpiresAt = "2026-12-31T23:59:59Z";
+
+    /// <summary>Builds a server-assembled proposal-creation result with sane safe-id defaults (never content).</summary>
+    /// <param name="outcome">The server-assembled proposal-creation outcome.</param>
+    /// <param name="proposalId">The deterministic proposal id.</param>
+    /// <param name="proposedVersionId">The selected generated version id held in the proposal.</param>
+    /// <param name="expiresAt">The optional ISO-8601 expiry timestamp (null when no expiry policy is configured).</param>
+    /// <returns>The proposal-creation result.</returns>
+    internal static AgentProposalCreationResult ProposalResult(
+        AgentProposalCreationOutcome outcome = AgentProposalCreationOutcome.Created,
+        string proposalId = SampleProposalId,
+        string proposedVersionId = PostedVersionId,
+        string? expiresAt = null)
+        => new(
+            outcome,
+            proposalId,
+            SourceConversationId,
+            proposedVersionId,
+            ConfirmationSnapshot.ApproverPolicyVersion,
+            ConfirmationSnapshot.ContentSafetyPolicyVersion,
+            expiresAt);
+
+    /// <summary>A successful proposal-creation result.</summary>
+    /// <returns>The created result.</returns>
+    internal static AgentProposalCreationResult CreatedProposalResult() => ProposalResult(AgentProposalCreationOutcome.Created);
+
+    /// <summary>A version-unavailable proposal-creation result (no version id, no proposal id).</summary>
+    /// <returns>The version-unavailable result.</returns>
+    internal static AgentProposalCreationResult GeneratedVersionUnavailableProposalResult()
+        => ProposalResult(AgentProposalCreationOutcome.GeneratedVersionUnavailable, proposalId: string.Empty, proposedVersionId: string.Empty);
+
+    /// <summary>An adapter-failure proposal-creation result.</summary>
+    /// <returns>The adapter-failure result.</returns>
+    internal static AgentProposalCreationResult AdapterFailureProposalResult() => ProposalResult(AgentProposalCreationOutcome.AdapterFailure);
+
+    /// <summary>The create-proposal command carrying the given result for the sample interaction.</summary>
+    /// <param name="result">The server-assembled proposal-creation result.</param>
+    /// <param name="interactionId">The deterministic interaction id (the aggregate id).</param>
+    /// <returns>The create-proposal command.</returns>
+    internal static CreateProposedAgentReply ProposalCommand(AgentProposalCreationResult result, string interactionId = InteractionId)
+        => new(interactionId, result);
+
     /// <summary>
     /// Applies every event of a <see cref="DomainResult"/> to the supplied state through the aggregate's typed
     /// <c>Apply</c> methods — the same production replay handlers the EventStore state-store invokes. The success
@@ -438,6 +486,9 @@ internal static class AgentInteractionTestData
                 case AgentResponsePosted e: state.Apply(e); break;
                 case AgentResponsePostingFailed e: state.Apply(e); break;
                 case AgentResponseNotPostableRejection e: state.Apply(e); break;
+                case ProposedAgentReplyCreated e: state.Apply(e); break;
+                case ProposedAgentReplyCreationFailed e: state.Apply(e); break;
+                case ProposedAgentReplyNotCreatableRejection e: state.Apply(e); break;
                 default: throw new InvalidOperationException($"Unhandled event type '{payload.GetType().Name}' in test apply dispatch.");
             }
         }

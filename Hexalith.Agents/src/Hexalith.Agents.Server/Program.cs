@@ -156,6 +156,21 @@ builder.Services.AddSingleton<IAgentPartyReader, DeferredAgentPartyReader>();
 builder.Services.AddSingleton<IAgentGeneratedVersionReader, DeferredAgentGeneratedVersionReader>();
 builder.Services.AddScoped<AgentInteractionPostingOrchestrator>();
 
+// Story 3.1: Confirmation-mode Proposed-Agent-Reply creation wiring. The new creation aggregate handler auto-registers via
+// the existing AddEventStoreDomainService assembly scan (no host change needed). The proposal orchestration reuses the
+// selected-version reader (Story 2.5 IAgentGeneratedVersionReader — for the authoritative version id ONLY; the generated
+// content is deliberately ignored, AD-14) and the IAgentCommandDispatcher (both already registered above), reads the
+// optional expiry via the NEW IProposalExpiryPolicyReader, derives a deterministic ProposalId, and dispatches the
+// CreateProposedAgentReply command. A Proposed Agent Reply is NEVER a Conversation Message: this path makes no Conversations
+// write and reads no Party identity (AD-6, AC2) — NO new sibling-module/provider references are added. The new expiry
+// reader's live binding (and expiry enforcement → an Expired terminal state) stays deferred to Story 3.6; the
+// DeferredProposalExpiryPolicyReader records no expiry, keeping the DI graph complete and the default graph fail-closed to
+// ProposalCreationFailed (the deferred version reader returns not-available). Live command dispatch / read-model bindings
+// and the durable-owner chaining (generate → branch on response mode → post (2.5) / propose (3.1)) remain deferred to the
+// operational-topology story (Epic 4), mirroring 1.2/1.4/1.5/1.6/1.7/2.1–2.5.
+builder.Services.AddSingleton<IProposalExpiryPolicyReader, DeferredProposalExpiryPolicyReader>();
+builder.Services.AddScoped<AgentInteractionProposalOrchestrator>();
+
 WebApplication app = builder.Build();
 
 app.UseEventStoreDomainService();

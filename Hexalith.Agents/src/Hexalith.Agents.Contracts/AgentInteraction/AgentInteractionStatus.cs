@@ -7,6 +7,8 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// initial <see cref="Requested"/> state; later states (authorized/denied, context-loading, generating, posted)
 /// are appended <em>additively</em> by Stories 2.2–2.5 without reshaping this enum or its ordinals (AD-2).
 /// Story 2.5 appends the two terminal posting states <see cref="Posted"/> and <see cref="PostingFailed"/>.
+/// Story 3.1 appends the two Confirmation-mode states <see cref="ProposalCreated"/> and <see cref="ProposalCreationFailed"/>
+/// the same way (the Confirmation-mode counterparts to <see cref="Posted"/>/<see cref="PostingFailed"/>).
 /// </summary>
 /// <remarks>
 /// <see cref="Unknown"/> (ordinal 0) is the "not-yet-known" sentinel: an absent/unrecognized status must never
@@ -36,7 +38,7 @@ public enum AgentInteractionStatus
     /// <summary>Conversation context could not be built within safe bounds (oversized with no approved bounded behavior, not loadable fresh enough, or an untrustworthy model budget) — the call fails closed with no provider call, proposal, or Conversation Message; recorded as fail-closed Audit Evidence (Story 2.3; AC3).</summary>
     ContextBlocked,
 
-    /// <summary>Generation succeeded and the generated content passed Content Safety Policy; the call may proceed to the response-mode branch (Story 2.5 automatic post / Story 3.1 proposal — these consume this state) (Story 2.4; AC2).</summary>
+    /// <summary>Generation succeeded and the generated content passed Content Safety Policy; the call may proceed to the response-mode branch — Story 2.5 automatic post (→ <see cref="Posted"/>/<see cref="PostingFailed"/>) or Story 3.1 proposal creation (→ <see cref="ProposalCreated"/>/<see cref="ProposalCreationFailed"/>), which consume this state (Story 2.4; AC2).</summary>
     Generated,
 
     /// <summary>Generation failed closed — provider timeout, disabled provider/model, adapter failure, invalid/unloadable context, or safety-policy failure — recorded as fail-closed Audit Evidence; no Conversation Message and no approvable proposal is created (Story 2.4; AC3).</summary>
@@ -50,4 +52,10 @@ public enum AgentInteractionStatus
 
     /// <summary>Posting failed closed AFTER successful generation — membership/Party/Conversation/append failure — recorded as fail-closed Audit Evidence; no Conversation Message exists; distinct from generation/auth/context/safety failure (Story 2.5; AC4).</summary>
     PostingFailed,
+
+    /// <summary>A Proposed Agent Reply was created (in Confirmation Response Mode) and awaits authorized Approver action — the terminal creation-success state for a confirmation interaction; the Confirmation-mode counterpart to <see cref="Posted"/> (Story 3.1; AC1).</summary>
+    ProposalCreated,
+
+    /// <summary>Proposal creation failed closed AFTER successful generation — the selected version could not be read / adapter failure — recorded as fail-closed Audit Evidence; no approvable proposal exists; distinct from generation/auth/context/safety failure (Story 3.1; AC3, AC4).</summary>
+    ProposalCreationFailed,
 }
