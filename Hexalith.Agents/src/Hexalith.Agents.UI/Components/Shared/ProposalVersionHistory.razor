@@ -1,0 +1,123 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+
+@* version-history (AC2, AC3; DESIGN version-history): the append-only history of a Proposed Agent Reply rendered as an
+   accessible single-select listbox (UX-DR8 / review-accessibility [high] version-selection model). Every generated,
+   edited, or regenerated version stays listed after every transition (append-only — AD-5); prior versions are never
+   deleted. Each option carries a whole localized kind label + SAFE ids/timestamps/provider-model only — NEVER the
+   generated/edited content, a provider payload, a stack trace, a secret, or other-tenant data (AD-9, AD-14). The
+   selected option exposes an explicit `aria-selected="true"` + a visible "selected" marker so the editor can be labelled
+   by it and the approval confirmation can name the exact version. No accessible name or test id carries content. *@
+<section class="proposal-version-history"
+         data-testid="@TestId"
+         aria-label="@Localizer["Agents.ProposalDetail.VersionHistory.Label"]">
+    <ul class="proposal-version-history__list"
+        role="listbox"
+        aria-label="@Localizer["Agents.ProposalDetail.VersionHistory.SelectLabel"]"
+        data-testid="@($"{TestId}-listbox")">
+        @foreach ((ProposalVersionSummary version, int index) in Indexed)
+        {
+            bool selected = string.Equals(version.VersionId, SelectedVersionId, StringComparison.Ordinal);
+            <li class="proposal-version-history__option@(selected ? " proposal-version-history__option--selected" : string.Empty)"
+                role="option"
+                aria-selected="@(selected ? "true" : "false")"
+                tabindex="0"
+                data-testid="@($"{TestId}-version-{index}")"
+                data-version-id="@version.VersionId"
+                @onclick="@(() => SelectAsync(version.VersionId))"
+                @onkeydown="@(args => OnOptionKeyDownAsync(args, version.VersionId))">
+                <span class="proposal-version-history__kind" data-testid="@($"{TestId}-version-{index}-kind")">
+                    @Localizer[AgentGenerationKindPresentation.LabelKeyFor(version.Kind)]
+                </span>
+                <code class="proposal-version-history__id">@version.VersionId</code>
+                @if (version.CreatedAt is { } createdAt)
+                {
+                    <time class="proposal-version-history__timestamp" datetime="@createdAt">@createdAt</time>
+                }
+                else
+                {
+                    <span class="proposal-version-history__timestamp">@Localizer["Agents.ProposalDetail.VersionHistory.Timestamp.Unknown"]</span>
+                }
+                <span class="proposal-version-history__provider">
+                    @Localizer["Agents.ProposalDetail.VersionHistory.Provider"]
+                    <code>@version.ProviderId</code>
+                    <code>@version.ModelId</code>
+                </span>
+                @if (version.SourceVersionId is { } sourceVersionId)
+                {
+                    <span class="proposal-version-history__source">
+                        @Localizer["Agents.ProposalDetail.VersionHistory.Source"]
+                        <code>@sourceVersionId</code>
+                    </span>
+                }
+                @if (version.EditorPartyId is { } editorPartyId)
+                {
+                    <span class="proposal-version-history__author">
+                        @Localizer["Agents.ProposalEditor.Author.Label"]
+                        <code>@editorPartyId</code>
+                    </span>
+                }
+                @if (version.IsApproved)
+                {
+                    <span class="proposal-version-history__marker proposal-version-history__marker--approved"
+                          data-testid="@($"{TestId}-version-{index}-approved")">
+                        @Localizer["Agents.ProposalDetail.VersionHistory.Approved"]
+                    </span>
+                }
+                @if (version.IsPosted)
+                {
+                    <span class="proposal-version-history__marker proposal-version-history__marker--posted"
+                          data-testid="@($"{TestId}-version-{index}-posted")">
+                        @Localizer["Agents.ProposalDetail.VersionHistory.Posted"]
+                    </span>
+                }
+                @if (selected)
+                {
+                    <span class="proposal-version-history__selected"
+                          data-testid="@($"{TestId}-version-{index}-selected")">
+                        @Localizer["Agents.ProposalDetail.VersionHistory.Selected"]
+                    </span>
+                }
+            </li>
+        }
+    </ul>
+</section>
+
+@code {
+    /// <summary>The append-only version history to render (oldest-first; every preserved version — AD-5).</summary>
+    [Parameter]
+    public IReadOnlyList<ProposalVersionSummary> Versions { get; set; } = [];
+
+    /// <summary>The currently selected version id — drives the explicit selected/current state and labels the editor.</summary>
+    [Parameter]
+    public string SelectedVersionId { get; set; } = string.Empty;
+
+    /// <summary>Raised when the Approver selects a different version (the host owns the selected-version lock; Story 3.7).</summary>
+    [Parameter]
+    public EventCallback<string> OnSelectVersion { get; set; }
+
+    /// <summary>Stable test id base for the history (suffixed for its sub-elements).</summary>
+    [Parameter]
+    public string TestId { get; set; } = "proposal-version-history";
+
+    private IEnumerable<(ProposalVersionSummary Version, int Index)> Indexed
+        => Versions.Select((version, index) => (version, index));
+
+    private async Task SelectAsync(string versionId)
+    {
+        if (!string.Equals(versionId, SelectedVersionId, StringComparison.Ordinal))
+        {
+            await OnSelectVersion.InvokeAsync(versionId).ConfigureAwait(false);
+        }
+    }
+
+    // Enter / Space select the focused option — each option is a keyboard-reachable tab stop in a clear focus order (AC3).
+    private async Task OnOptionKeyDownAsync(KeyboardEventArgs args, string versionId)
+    {
+        if (string.Equals(args.Key, "Enter", StringComparison.Ordinal)
+            || string.Equals(args.Key, " ", StringComparison.Ordinal)
+            || string.Equals(args.Key, "Spacebar", StringComparison.Ordinal))
+        {
+            await SelectAsync(versionId).ConfigureAwait(false);
+        }
+    }
+}

@@ -26,6 +26,7 @@ public sealed class AgentsUiCompositionTests
         services.Single(d => d.ServiceType == typeof(IProviderCatalogGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
         services.Single(d => d.ServiceType == typeof(IConversationAgentCallGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
         services.Single(d => d.ServiceType == typeof(IProposalQueueGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
+        services.Single(d => d.ServiceType == typeof(IProposalDetailGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
 
         using ServiceProvider provider = services.BuildServiceProvider();
         using IServiceScope scope = provider.CreateScope();
@@ -34,6 +35,7 @@ public sealed class AgentsUiCompositionTests
         scope.ServiceProvider.GetRequiredService<IProviderCatalogGateway>().ShouldBeOfType<DeferredProviderCatalogGateway>();
         scope.ServiceProvider.GetRequiredService<IConversationAgentCallGateway>().ShouldBeOfType<DeferredConversationAgentCallGateway>();
         scope.ServiceProvider.GetRequiredService<IProposalQueueGateway>().ShouldBeOfType<DeferredProposalQueueGateway>();
+        scope.ServiceProvider.GetRequiredService<IProposalDetailGateway>().ShouldBeOfType<DeferredProposalDetailGateway>();
     }
 
     [Fact]

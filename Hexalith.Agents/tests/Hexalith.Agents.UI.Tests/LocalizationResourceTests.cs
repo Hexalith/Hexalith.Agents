@@ -256,6 +256,58 @@ public sealed class LocalizationResourceTests
 
         // Story 3.6 — terminal proposals route the user to start a new Agent Call (AC4; never styled as a posted message).
         yield return "Agents.ProposalQueue.StartNewCall";
+
+        // Story 3.7 — proposal-detail transition announcements (one whole string per ProposalTransitionKind value; AC4).
+        foreach (ProposalTransitionKind transition in Enum.GetValues<ProposalTransitionKind>())
+        {
+            yield return ProposalTransitionPresentation.LabelKeyFor(transition);
+        }
+
+        // Story 3.7 — proposal-detail workspace chrome, metadata fields, posting outcomes, version history, lock/compare/approval.
+        yield return "Agents.ProposalDetail.Title";
+        yield return "Agents.ProposalDetail.Eyebrow";
+        yield return "Agents.ProposalDetail.Description";
+        yield return "Agents.ProposalDetail.BackLink";
+        yield return "Agents.ProposalDetail.Workspace.Label";
+        yield return "Agents.ProposalDetail.NotFound.Title";
+        yield return "Agents.ProposalDetail.NotFound.Message";
+        yield return "Agents.ProposalDetail.Field.SelectedVersion";
+        yield return "Agents.ProposalDetail.Field.SourceConversation";
+        yield return "Agents.ProposalDetail.Field.Caller";
+        yield return "Agents.ProposalDetail.Field.Agent";
+        yield return "Agents.ProposalDetail.Field.Provider";
+        yield return "Agents.ProposalDetail.Field.ResponseMode";
+        yield return "Agents.ProposalDetail.Field.Expiry";
+        yield return "Agents.ProposalDetail.Field.PostingOutcome";
+        yield return "Agents.ProposalDetail.Field.State";
+        yield return "Agents.ProposalDetail.Field.Created";
+        yield return "Agents.ProposalDetail.PostingOutcome.None";
+        yield return "Agents.ProposalDetail.PostingOutcome.Approved";
+        yield return "Agents.ProposalDetail.PostingOutcome.Pending";
+        yield return "Agents.ProposalDetail.PostingOutcome.Posted";
+        yield return "Agents.ProposalDetail.PostingOutcome.Failed";
+        yield return "Agents.ProposalDetail.VersionHistory.Label";
+        yield return "Agents.ProposalDetail.VersionHistory.SelectLabel";
+        yield return "Agents.ProposalDetail.VersionHistory.Timestamp.Unknown";
+        yield return "Agents.ProposalDetail.VersionHistory.Provider";
+        yield return "Agents.ProposalDetail.VersionHistory.Source";
+        yield return "Agents.ProposalDetail.VersionHistory.Approved";
+        yield return "Agents.ProposalDetail.VersionHistory.Posted";
+        yield return "Agents.ProposalDetail.VersionHistory.Selected";
+        yield return "Agents.ProposalDetail.SelectionLock.Message";
+        yield return "Agents.ProposalDetail.SelectionLock.Review";
+        yield return "Agents.ProposalDetail.ActionRail.Label";
+        yield return "Agents.ProposalDetail.Compare.Toggle";
+        yield return "Agents.ProposalDetail.Compare.Label";
+        yield return "Agents.ProposalDetail.Compare.Selected";
+        yield return "Agents.ProposalDetail.Compare.Latest";
+        yield return "Agents.ProposalDetail.Compare.Close";
+        yield return "Agents.ProposalDetail.ApprovalSummary.Label";
+        yield return "Agents.ProposalDetail.StartNewCall.Link";
+
+        // Story 3.7 — proposal-queue row → detail deep link.
+        yield return "Agents.ProposalQueue.Column.Detail";
+        yield return "Agents.ProposalQueue.OpenDetail";
     }
 
     public static IEnumerable<object[]> EnumDerivedKeyCases() => EnumDerivedKeys().Distinct().Select(key => new object[] { key });

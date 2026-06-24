@@ -471,4 +471,22 @@ public sealed class ProposalQueueTests : AgentsTestContext
             cut.Markup.ShouldContain("caller-stale");
         });
     }
+
+    [Fact]
+    public void Each_row_links_to_the_proposal_detail_workspace()
+    {
+        // Story 3.7 — every queue row exposes a keyboard-reachable deep link into the proposal detail workspace.
+        ProposalGateway.ListPendingProposalsAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentUiTestData.ProposalsResult(
+                AgentUiTestData.PendingProposal(agentInteractionId: "i1"),
+                AgentUiTestData.PendingProposal(agentInteractionId: "i2"))));
+
+        IRenderedComponent<ProposalQueue> cut = RenderPage<ProposalQueue>();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.Find("[data-testid='agents-proposal-queue-detail-link-i1']").GetAttribute("href").ShouldBe("/agents/proposals/i1");
+            cut.Find("[data-testid='agents-proposal-queue-detail-link-i2']").GetAttribute("href").ShouldBe("/agents/proposals/i2");
+        });
+    }
 }

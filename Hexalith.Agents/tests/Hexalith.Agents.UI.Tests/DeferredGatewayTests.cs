@@ -91,6 +91,17 @@ public sealed class DeferredGatewayTests
     }
 
     [Fact]
+    public async Task DeferredProposalDetailGateway_fails_closed_with_not_authorized_and_no_detail()
+    {
+        DeferredProposalDetailGateway gateway = new();
+
+        ProposalDetailResult result = await gateway.GetProposalDetailAsync("interaction-1", CancellationToken.None);
+
+        result.Status.ShouldBe(ProposalDetailInspectionStatus.NotAuthorized);
+        result.Detail.ShouldBeNull();
+    }
+
+    [Fact]
     public async Task DeferredProposalEditGateway_fails_closed_with_not_authorized_and_no_version()
     {
         DeferredProposalEditGateway gateway = new();

@@ -129,6 +129,26 @@ public sealed class ProposalRegeneratorTests : AgentsTestContext
         captured.RegeneratedVersionId.ShouldBe("regenerated-version-9");
     }
 
+    [Fact]
+    public void A_double_activation_does_not_double_submit_the_regeneration()
+    {
+        // Story 3.7 in-flight guard (the 3.4 control left no guard): while a regeneration is in flight, a second
+        // activation must not dispatch a second request.
+        TaskCompletionSource<ProposalRegenerationResult> pending = new();
+        ProposalRegenerationGateway.RegenerateProposalAsync(Arg.Any<ProposalRegenerationRequest>(), Arg.Any<CancellationToken>())
+            .Returns(pending.Task);
+
+        IRenderedComponent<ProposalRegenerator> cut = RenderRegenerator(canRegenerate: true);
+
+        cut.Find("[data-testid='proposal-regenerator-regenerate']").Click();
+        cut.Find("[data-testid='proposal-regenerator-regenerate']").Click();
+
+        pending.SetResult(ProposalRegenerationResult.Regenerated("regenerated-version-1"));
+
+        cut.WaitForAssertion(() =>
+            ProposalRegenerationGateway.Received(1).RegenerateProposalAsync(Arg.Any<ProposalRegenerationRequest>(), Arg.Any<CancellationToken>()));
+    }
+
     private IRenderedComponent<ProposalRegenerator> RenderRegenerator(bool canRegenerate)
         => Render<ProposalRegenerator>(parameters => parameters
             .Add(e => e.CanRegenerate, canRegenerate)

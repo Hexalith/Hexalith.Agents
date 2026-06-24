@@ -1,0 +1,37 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+
+@* proposal-transition-announcer (AC4; UX-DR33, UX-DR36; review-accessibility live-region matrix): a single ARIA live
+   region that announces the important Proposed-Agent-Reply lifecycle transitions with the correct politeness — the six
+   ordinary status transitions (generation failed, proposal created, proposal expired, approval posted, posting failed,
+   permission denied) are POLITE (role="status"/aria-live="polite"); the assertive role="alert" is reserved ONLY for the
+   destructive-action-prevention transition (a stale selected version). Ordinary pending progress is Kind=None, so it
+   never produces a disruptive assertive announcement (AC4). The announced text is a whole localized string only — NEVER
+   generated/edited content, a provider payload, a stack trace, a secret, or other-tenant data (AD-14). *@
+<section class="proposal-transition-announcer"
+         role="@Role"
+         aria-live="@AriaLive"
+         aria-atomic="true"
+         data-testid="@TestId">
+    @if (Kind is not ProposalTransitionKind.None)
+    {
+        <p class="proposal-transition-announcer__message" data-testid="@($"{TestId}-message")">
+            @Localizer[ProposalTransitionPresentation.LabelKeyFor(Kind)]
+        </p>
+    }
+</section>
+
+@code {
+    /// <summary>The transition to announce. <see cref="ProposalTransitionKind.None"/> keeps the live region silent.</summary>
+    [Parameter]
+    public ProposalTransitionKind Kind { get; set; } = ProposalTransitionKind.None;
+
+    /// <summary>Stable test id for the live region (suffixed for the message).</summary>
+    [Parameter]
+    public string TestId { get; set; } = "proposal-transition-announcer";
+
+    private bool IsAssertive => ProposalTransitionPresentation.IsAssertive(Kind);
+
+    private string Role => IsAssertive ? "alert" : "status";
+
+    private string AriaLive => IsAssertive ? "assertive" : "polite";
+}

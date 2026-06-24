@@ -1,0 +1,469 @@
+@page "/agents/proposals/{AgentInteractionId}"
+@attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsApproverPolicy)]
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IProposalDetailGateway Gateway
+
+@* Proposal detail workspace (AC1–AC4; FR-13/FR-15/FR-16/FR-17): the bounded approval surface that hosts the version
+   history + the act-on controls 3.3–3.6 shipped, and completes the cross-cutting keyboard/focus/Esc/live-region a11y
+   contract. Judgment-heavy flow → Constrained measure (UX-DR15). It surfaces only SAFE snapshot ids/enums/timestamps —
+   never generated content, provider payloads, stack traces, secrets, or other-tenant data (AD-9, AD-14). Against the
+   deferred gateway it fails closed to permission-denied/unavailable (AD-12); a Success read renders the workspace. The
+   focusable route heading renders OUTSIDE the surface branch so the page is keyboard-reachable regardless of outcome. *@
+<FcContentLabel LabelledBy="@HeadingId" />
+<FcPageLayout Mode="FcPageLayoutMode.Constrained">
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="24px" Class="agents-proposal-detail" data-testid="agents-proposal-detail-page">
+        <FcPageHeader @ref="_header"
+                      PageTitle="@Localizer["Agents.ProposalDetail.Title"]"
+                      Heading="@Localizer["Agents.ProposalDetail.Title"]"
+                      HeadingId="@HeadingId"
+                      HeadingTabIndex="-1"
+                      Eyebrow="@Localizer["Agents.ProposalDetail.Eyebrow"]"
+                      Description="@Localizer["Agents.ProposalDetail.Description"]"
+                      TestId="agents-proposal-detail-header" />
+
+        @* Persistent polite live region for the lifecycle transitions (AC4); flips assertive only for stale-approval prevention. *@
+        <ProposalTransitionAnnouncer Kind="@_transition" TestId="agents-proposal-detail-announcer" />
+
+        <FcAggregateDetailPage TItem="ProposalDetailView"
+                               LayoutMode="FcPageLayoutMode.Constrained"
+                               RootTestId="agents-proposal-detail"
+                               RootClass="agents-proposal-detail__surface"
+                               State="@DetailState"
+                               Item="@DetailOrNull"
+                               BackHref="/agents/proposals"
+                               BackLinkLabel="@Localizer["Agents.ProposalDetail.BackLink"]"
+                               BackLinkTestId="agents-proposal-detail-back">
+            <LoadingContent>
+                <AgentSurfaceState Kind="AgentSurfaceKind.Loading" TestId="agents-proposal-detail-state" />
+            </LoadingContent>
+            <UnauthorizedContent>
+                <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-proposal-detail-state" />
+            </UnauthorizedContent>
+            <UnavailableContent>
+                <AgentSurfaceState Kind="AgentSurfaceKind.Error" TestId="agents-proposal-detail-state" />
+            </UnavailableContent>
+            <NotFoundContent>
+                @* Worded neutrally so a not-found read never fingerprints whether the proposal exists in another tenant (AD-12). *@
+                <section class="agents-proposal-detail__notfound" role="status" aria-live="polite" data-testid="agents-proposal-detail-notfound">
+                    <h2>@Localizer["Agents.ProposalDetail.NotFound.Title"]</h2>
+                    <p>@Localizer["Agents.ProposalDetail.NotFound.Message"]</p>
+                </section>
+            </NotFoundContent>
+            <StaleBanner>
+                <AgentSurfaceState Kind="AgentSurfaceKind.Stale" TestId="agents-proposal-detail-stale" OnRefresh="ReloadAsync" />
+            </StaleBanner>
+            <ReadyContent>
+                <FluentStack Orientation="Orientation.Vertical"
+                             VerticalGap="24px"
+                             Class="agents-proposal-detail__workspace"
+                             aria-label="@Localizer["Agents.ProposalDetail.Workspace.Label"]"
+                             data-testid="agents-proposal-detail-workspace">
+
+                    @* Zone 1 — AC1 metadata block: selected version, source metadata, provider/model, response mode, expiry, state, posting outcome. *@
+                    <section class="agents-proposal-detail__metadata" data-testid="agents-proposal-detail-metadata">
+                        <div class="agents-proposal-detail__state">
+                            <ProposedAgentReplyStateBadge State="@Detail.State" TestId="agents-proposal-detail-state-badge" />
+                        </div>
+                        <dl class="agents-proposal-detail__facts">
+                            <div>
+                                <dt>@Localizer["Agents.ProposalDetail.Field.SelectedVersion"]</dt>
+                                <dd><code data-testid="agents-proposal-detail-selected-version">@_selectedVersionId</code></dd>
+                            </div>
+                            <div>
+                                <dt>@Localizer["Agents.ProposalDetail.Field.SourceConversation"]</dt>
+                                <dd><code data-testid="agents-proposal-detail-source-conversation">@Detail.SourceConversationId</code></dd>
+                            </div>
+                            <div>
+                                <dt>@Localizer["Agents.ProposalDetail.Field.Caller"]</dt>
+                                <dd><code>@Detail.CallerPartyId</code></dd>
+                            </div>
+                            <div>
+                                <dt>@Localizer["Agents.ProposalDetail.Field.Agent"]</dt>
+                                <dd><code>@Detail.AgentId</code></dd>
+                            </div>
+                            <div>
+                                <dt>@Localizer["Agents.ProposalDetail.Field.Provider"]</dt>
+                                <dd><code data-testid="agents-proposal-detail-provider">@Detail.ProviderId</code> <code>@Detail.ModelId</code></dd>
+                            </div>
+                            <div>
+                                <dt>@Localizer["Agents.ProposalDetail.Field.ResponseMode"]</dt>
+                                <dd data-testid="agents-proposal-detail-response-mode">@Localizer[$"Agents.ResponseMode.{Detail.ResponseMode}"]</dd>
+                            </div>
+                            <div>
+                                <dt>@Localizer["Agents.ProposalDetail.Field.Expiry"]</dt>
+                                <dd data-testid="agents-proposal-detail-expiry">
+                                    @if (Detail.ExpiresAt is { } expiresAt)
+                                    {
+                                        <time datetime="@expiresAt">@expiresAt</time>
+                                    }
+                                    else
+                                    {
+                                        <span>@Localizer["Agents.ProposalQueue.Expiry.None"]</span>
+                                    }
+                                </dd>
+                            </div>
+                            <div>
+                                <dt>@Localizer["Agents.ProposalDetail.Field.PostingOutcome"]</dt>
+                                <dd data-testid="agents-proposal-detail-posting-outcome">@Localizer[PostingOutcomeKey]</dd>
+                            </div>
+                        </dl>
+                    </section>
+
+                    @* Zone 2 — AC2 version history (the accessible single-select listbox). *@
+                    <ProposalVersionHistory Versions="@Detail.Versions"
+                                            SelectedVersionId="@_selectedVersionId"
+                                            OnSelectVersion="OnSelectVersionAsync"
+                                            TestId="agents-proposal-detail-version-history" />
+
+                    @* Selected-version lock (review-governance): a newer version appeared after selection — block approval, re-prompt. *@
+                    @if (_selectionLocked)
+                    {
+                        <section class="agents-proposal-detail__selection-lock" data-testid="agents-proposal-detail-selection-lock">
+                            <p>@Localizer["Agents.ProposalDetail.SelectionLock.Message"]</p>
+                            <FluentButton Appearance="ButtonAppearance.Primary"
+                                          OnClick="ReviewLatestVersion"
+                                          data-testid="agents-proposal-detail-selection-lock-review">
+                                @Localizer["Agents.ProposalDetail.SelectionLock.Review"]
+                            </FluentButton>
+                        </section>
+                    }
+
+                    @* Zone 3 — the act-on rail, gated on the retryable sub-state set { Pending, Edited, Regenerated }. *@
+                    @if (CanActOn)
+                    {
+                        <section class="agents-proposal-detail__actions"
+                                 aria-label="@Localizer["Agents.ProposalDetail.ActionRail.Label"]"
+                                 data-testid="agents-proposal-detail-actions">
+
+                            <ProposalEditor AgentInteractionId="@Detail.AgentInteractionId"
+                                            ProposalId="@Detail.ProposalId"
+                                            SourceVersionId="@_selectedVersionId"
+                                            Kind="@SelectedKind"
+                                            Content="@string.Empty"
+                                            CanEdit="true"
+                                            OnEdited="OnActionCompletedAsync"
+                                            OnCancel="ReturnFocusToHeadingAsync"
+                                            TestId="agents-proposal-detail-editor" />
+
+                            <ProposalRegenerator AgentInteractionId="@Detail.AgentInteractionId"
+                                                 ProposalId="@Detail.ProposalId"
+                                                 Kind="@SelectedKind"
+                                                 CanRegenerate="true"
+                                                 OnRegenerated="OnActionCompletedAsync"
+                                                 TestId="agents-proposal-detail-regenerator" />
+
+                            @* Compare metadata — reachable BEFORE approve (review-accessibility); Esc closes it without committing. *@
+                            <div class="agents-proposal-detail__compare" data-testid="agents-proposal-detail-compare" @onkeydown="OnCompareKeyDown">
+                                <FluentButton Appearance="ButtonAppearance.Outline"
+                                              OnClick="ToggleCompare"
+                                              aria-expanded="@(_comparing ? "true" : "false")"
+                                              data-testid="agents-proposal-detail-compare-toggle">
+                                    @Localizer["Agents.ProposalDetail.Compare.Toggle"]
+                                </FluentButton>
+                                @if (_comparing)
+                                {
+                                    <section class="agents-proposal-detail__compare-panel"
+                                             aria-label="@Localizer["Agents.ProposalDetail.Compare.Label"]"
+                                             data-testid="agents-proposal-detail-compare-panel">
+                                        <div data-testid="agents-proposal-detail-compare-selected">
+                                            <h3>@Localizer["Agents.ProposalDetail.Compare.Selected"]</h3>
+                                            @VersionMetadata(SelectedVersion)
+                                        </div>
+                                        <div data-testid="agents-proposal-detail-compare-latest">
+                                            <h3>@Localizer["Agents.ProposalDetail.Compare.Latest"]</h3>
+                                            @VersionMetadata(LatestVersion)
+                                        </div>
+                                        <FluentButton Appearance="ButtonAppearance.Outline"
+                                                      OnClick="CloseCompare"
+                                                      data-testid="agents-proposal-detail-compare-close">
+                                            @Localizer["Agents.ProposalDetail.Compare.Close"]
+                                        </FluentButton>
+                                    </section>
+                                }
+                            </div>
+
+                            @* Approval confirmation names the EXACT selected version (timestamp/source) before approval (review-accessibility). *@
+                            <section class="agents-proposal-detail__approval" data-testid="agents-proposal-detail-approval">
+                                <p class="agents-proposal-detail__approval-summary" data-testid="agents-proposal-detail-approval-summary">
+                                    @Localizer["Agents.ProposalDetail.ApprovalSummary.Label"]
+                                    <span class="agents-proposal-detail__kind">@Localizer[AgentGenerationKindPresentation.LabelKeyFor(SelectedKind)]</span>
+                                    <code>@_selectedVersionId</code>
+                                    @if (SelectedVersion?.CreatedAt is { } selectedCreatedAt)
+                                    {
+                                        <time datetime="@selectedCreatedAt">@selectedCreatedAt</time>
+                                    }
+                                    @if (SelectedVersion?.SourceVersionId is { } selectedSource)
+                                    {
+                                        <span>@Localizer["Agents.ProposalDetail.VersionHistory.Source"] <code>@selectedSource</code></span>
+                                    }
+                                </p>
+                                <ProposalApprover AgentInteractionId="@Detail.AgentInteractionId"
+                                                  ProposalId="@Detail.ProposalId"
+                                                  SelectedVersionId="@_selectedVersionId"
+                                                  CanApprove="@(!_selectionLocked)"
+                                                  OnApproved="OnActionCompletedAsync"
+                                                  TestId="agents-proposal-detail-approver" />
+                            </section>
+
+                            <ProposalRejector AgentInteractionId="@Detail.AgentInteractionId"
+                                              ProposalId="@Detail.ProposalId"
+                                              CanReject="true"
+                                              OnRejected="OnActionCompletedAsync"
+                                              TestId="agents-proposal-detail-rejector" />
+
+                            <ProposalAbandoner AgentInteractionId="@Detail.AgentInteractionId"
+                                               ProposalId="@Detail.ProposalId"
+                                               CanAbandon="true"
+                                               OnAbandoned="OnActionCompletedAsync"
+                                               TestId="agents-proposal-detail-abandoner" />
+                        </section>
+                    }
+                    else if (IsTerminal)
+                    {
+                        @* AC3/AC4 — a terminal proposal can never post; route the user to start a new Agent Call. Never offer act-on. *@
+                        <section class="agents-proposal-detail__terminal" data-testid="agents-proposal-detail-terminal">
+                            <p>@Localizer["Agents.ProposalQueue.StartNewCall"]</p>
+                            <a class="agents-proposal-detail__start-new-call"
+                               href="/agents/conversation-call"
+                               data-testid="agents-proposal-detail-start-new-call">
+                                @Localizer["Agents.ProposalDetail.StartNewCall.Link"]
+                            </a>
+                        </section>
+                    }
+                </FluentStack>
+            </ReadyContent>
+        </FcAggregateDetailPage>
+    </FluentStack>
+</FcPageLayout>
+
+@code {
+    private const string HeadingId = "agents-proposal-detail-heading";
+
+    // The retryable sub-state set: act-on affordances (edit/regenerate/approve/reject/abandon) gate on this, NOT the
+    // coarse status — after an edit/regeneration FAILED the status can block while the proposal is otherwise retryable
+    // (the edit-failed retry trap; Dev Notes).
+    private static readonly ProposedAgentReplyState[] _retryableStates =
+        [ProposedAgentReplyState.Pending, ProposedAgentReplyState.Edited, ProposedAgentReplyState.Regenerated];
+
+    // Terminal states can never post — show the state + "Start a new Agent Call", never an act-on affordance (AC3, AC4).
+    private static readonly ProposedAgentReplyState[] _terminalStates =
+        [ProposedAgentReplyState.Rejected, ProposedAgentReplyState.Abandoned, ProposedAgentReplyState.Expired,
+         ProposedAgentReplyState.Posted, ProposedAgentReplyState.PostingFailed];
+
+    /// <summary>The deterministic Agent Call identifier from the route (the proposal's aggregate id).</summary>
+    [Parameter]
+    public string AgentInteractionId { get; set; } = string.Empty;
+
+    private FcPageHeader? _header;
+    private ProposalDetailResult? _result;
+    private bool _focusHeadingPending = true;
+
+    private string _selectedVersionId = string.Empty;
+    private string _acknowledgedLatestVersionId = string.Empty;
+    private bool _selectionLocked;
+    private bool _comparing;
+    private ProposalTransitionKind _transition = ProposalTransitionKind.None;
+
+    // Nullable accessor for logic/binding (Loading/Unauthorized/… have no detail); the FcAggregateDetailPage Item binds this.
+    private ProposalDetailView? DetailOrNull => _result?.Detail;
+
+    // Non-null accessor for the ready body only — the FC-DTL wrapper renders ReadyContent solely for Ready/Stale with a
+    // detail, so a null here is a misuse, not a runtime path.
+    private ProposalDetailView Detail
+        => DetailOrNull ?? throw new InvalidOperationException("Detail is only accessed when the proposal-detail surface is ready.");
+
+    private bool HasReadyDetail
+        => DetailOrNull is not null && DetailState is FcAggregateDetailState.Ready or FcAggregateDetailState.Stale;
+
+    // Maps the proposal-detail read result onto the domain-agnostic FC-DTL surface state. The status takes precedence and
+    // the ready body (Ready/Stale) only renders WITH a detail, so a success/stale read that somehow carries no detail
+    // fails closed to Unavailable rather than an optimistic ready surface (AD-12).
+    private FcAggregateDetailState DetailState
+        => _result switch
+        {
+            null => FcAggregateDetailState.Loading,
+            { Status: ProposalDetailInspectionStatus.NotAuthorized } => FcAggregateDetailState.Unauthorized,
+            { Status: ProposalDetailInspectionStatus.NotFound } => FcAggregateDetailState.NotFound,
+            { Status: ProposalDetailInspectionStatus.Unavailable } => FcAggregateDetailState.Unavailable,
+            { Status: ProposalDetailInspectionStatus.Stale, Detail: not null } => FcAggregateDetailState.Stale,
+            { Status: ProposalDetailInspectionStatus.Success, Detail: not null } => FcAggregateDetailState.Ready,
+            _ => FcAggregateDetailState.Unavailable,
+        };
+
+    private bool CanActOn => DetailOrNull is { } detail && HasReadyDetail && Array.IndexOf(_retryableStates, detail.State) >= 0;
+
+    private bool IsTerminal => DetailOrNull is { } detail && HasReadyDetail && Array.IndexOf(_terminalStates, detail.State) >= 0;
+
+    private ProposalVersionSummary? SelectedVersion
+        => DetailOrNull?.Versions.FirstOrDefault(version => string.Equals(version.VersionId, _selectedVersionId, StringComparison.Ordinal));
+
+    private ProposalVersionSummary? LatestVersion
+        => DetailOrNull is { Versions.Count: > 0 } detail ? detail.Versions[^1] : null;
+
+    private AgentGenerationKind SelectedKind => SelectedVersion?.Kind ?? AgentGenerationKind.Generated;
+
+    private string PostingOutcomeKey => DetailOrNull?.State switch
+    {
+        ProposedAgentReplyState.Posted => "Agents.ProposalDetail.PostingOutcome.Posted",
+        ProposedAgentReplyState.PostingFailed => "Agents.ProposalDetail.PostingOutcome.Failed",
+        ProposedAgentReplyState.PostingPending => "Agents.ProposalDetail.PostingOutcome.Pending",
+        ProposedAgentReplyState.Approved => "Agents.ProposalDetail.PostingOutcome.Approved",
+        _ => "Agents.ProposalDetail.PostingOutcome.None",
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _result = await Gateway.GetProposalDetailAsync(AgentInteractionId, CancellationToken.None).ConfigureAwait(false);
+        InitializeSelection();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusHeadingPending && _header is not null)
+        {
+            _focusHeadingPending = false;
+            await _header.FocusHeadingAsync().ConfigureAwait(false);
+        }
+    }
+
+    // Seeds the selection state from a fresh read and announces the notable load-time transition (posted/failed/expired).
+    private void InitializeSelection()
+    {
+        if (DetailOrNull is not { } detail)
+        {
+            return;
+        }
+
+        _selectedVersionId = detail.SelectedVersionId;
+        _acknowledgedLatestVersionId = LatestVersion?.VersionId ?? string.Empty;
+        _selectionLocked = false;
+        _transition = LoadTimeTransition(detail.State);
+    }
+
+    private static ProposalTransitionKind LoadTimeTransition(ProposedAgentReplyState state)
+        => state switch
+        {
+            ProposedAgentReplyState.Posted => ProposalTransitionKind.ApprovalPosted,
+            ProposedAgentReplyState.PostingFailed => ProposalTransitionKind.PostingFailed,
+            ProposedAgentReplyState.Expired => ProposalTransitionKind.ProposalExpired,
+            _ => ProposalTransitionKind.None,
+        };
+
+    private async Task ReloadAsync()
+    {
+        _result = await Gateway.GetProposalDetailAsync(AgentInteractionId, CancellationToken.None).ConfigureAwait(false);
+        InitializeSelection();
+    }
+
+    private async Task OnSelectVersionAsync(string versionId)
+    {
+        _selectedVersionId = versionId;
+        // Re-selecting the acknowledged latest clears the lock; selecting an older one after a newer appeared keeps it.
+        _selectionLocked = _selectionLocked && !string.Equals(versionId, _acknowledgedLatestVersionId, StringComparison.Ordinal);
+        await Task.CompletedTask.ConfigureAwait(false);
+    }
+
+    // After any hosted action completes, refresh the detail and re-evaluate the selected-version lock: if a NEWER version
+    // appeared while an OLDER one is selected, block approval and announce assertively (review-governance / review-a11y).
+    private async Task OnActionCompletedAsync()
+    {
+        string previousSelection = _selectedVersionId;
+        _result = await Gateway.GetProposalDetailAsync(AgentInteractionId, CancellationToken.None).ConfigureAwait(false);
+
+        if (DetailOrNull is not { } detail)
+        {
+            InitializeSelection();
+            await ReturnFocusToHeadingAsync().ConfigureAwait(false);
+            return;
+        }
+
+        string latestVersionId = LatestVersion?.VersionId ?? string.Empty;
+        bool aNewerVersionAppeared = !string.Equals(latestVersionId, _acknowledgedLatestVersionId, StringComparison.Ordinal);
+        bool olderStillSelected = !string.Equals(previousSelection, latestVersionId, StringComparison.Ordinal);
+
+        if (aNewerVersionAppeared && olderStillSelected && detail.Versions.Count > 0)
+        {
+            _selectedVersionId = previousSelection;
+            _selectionLocked = true;
+            _transition = ProposalTransitionKind.StaleApprovalBlocked;
+        }
+        else
+        {
+            _selectedVersionId = string.IsNullOrEmpty(latestVersionId) ? detail.SelectedVersionId : latestVersionId;
+            _acknowledgedLatestVersionId = latestVersionId;
+            _selectionLocked = false;
+            _transition = LoadTimeTransition(detail.State);
+        }
+
+        // Focus-return fallback (review-accessibility): when the act-on controls leave the view (terminal transition),
+        // return focus to the proposal-detail heading.
+        if (!CanActOn)
+        {
+            await ReturnFocusToHeadingAsync().ConfigureAwait(false);
+        }
+    }
+
+    private void ReviewLatestVersion()
+    {
+        _selectedVersionId = LatestVersion?.VersionId ?? _selectedVersionId;
+        _acknowledgedLatestVersionId = _selectedVersionId;
+        _selectionLocked = false;
+        _transition = ProposalTransitionKind.None;
+    }
+
+    private void ToggleCompare() => _comparing = !_comparing;
+
+    private void CloseCompare() => _comparing = false;
+
+    // Esc closes the transient compare panel without committing and keeps focus in the workspace (AC3).
+    private void OnCompareKeyDown(KeyboardEventArgs args)
+    {
+        if (_comparing && string.Equals(args.Key, "Escape", StringComparison.Ordinal))
+        {
+            _comparing = false;
+        }
+    }
+
+    private async Task ReturnFocusToHeadingAsync()
+    {
+        if (_header is not null)
+        {
+            await _header.FocusHeadingAsync().ConfigureAwait(false);
+        }
+    }
+
+    // Safe metadata-only comparison fragment (ids/enums/timestamps via whole strings — never content; AD-14).
+    private RenderFragment VersionMetadata(ProposalVersionSummary? version) =>@<text>
+        @if (version is not null)
+        {
+            <dl class="agents-proposal-detail__compare-facts">
+                <div>
+                    <dt>@Localizer["Agents.ProposalDetail.Field.SelectedVersion"]</dt>
+                    <dd><code>@version.VersionId</code></dd>
+                </div>
+                <div>
+                    <dt>@Localizer["Agents.ProposalDetail.Field.State"]</dt>
+                    <dd>@Localizer[AgentGenerationKindPresentation.LabelKeyFor(version.Kind)]</dd>
+                </div>
+                <div>
+                    <dt>@Localizer["Agents.ProposalDetail.Field.Provider"]</dt>
+                    <dd><code>@version.ProviderId</code> <code>@version.ModelId</code></dd>
+                </div>
+                @if (version.CreatedAt is { } createdAt)
+                {
+                    <div>
+                        <dt>@Localizer["Agents.ProposalDetail.Field.Created"]</dt>
+                        <dd><time datetime="@createdAt">@createdAt</time></dd>
+                    </div>
+                }
+                @if (version.SourceVersionId is { } sourceVersionId)
+                {
+                    <div>
+                        <dt>@Localizer["Agents.ProposalDetail.VersionHistory.Source"]</dt>
+                        <dd><code>@sourceVersionId</code></dd>
+                    </div>
+                }
+            </dl>
+        }
+    </text>;
+}

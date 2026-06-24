@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,8 @@ using Hexalith.Agents.UI.Components.Shared;
 using Hexalith.Agents.UI.Services.Gateways;
 using Hexalith.FrontComposer.Shell.Components.Layout;
 
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.FluentUI.AspNetCore.Components;
 
 using NSubstitute;
@@ -146,6 +149,43 @@ public sealed class AccessibilityTests : AgentsTestContext
     }
 
     [Fact]
+    public void Proposal_detail_in_shell_exposes_a_focusable_heading()
+    {
+        // AC3 — the detail route heading is a focusable target (tabindex=-1) rendered OUTSIDE the surface branch, so the
+        // workspace is keyboard-reachable on load regardless of the read outcome (it fails closed to permission-denied
+        // here against the default gateway).
+        IRenderedComponent<FrontComposerShell> cut = RenderInShellWithNavigation<ProposalDetail>();
+
+        cut.WaitForAssertion(() =>
+            cut.Find("#agents-proposal-detail-heading").GetAttribute("tabindex").ShouldBe("-1"));
+    }
+
+    [Fact]
+    public void Proposal_detail_keeps_generated_content_out_of_every_live_region_and_accessible_name()
+    {
+        // AC4 / AD-14 (highest a11y risk) — generated content may render in the editor body, but it must never reach a
+        // live region, an accessible name, or an announcement. The contracts are content-free, so guard the rendering:
+        // no aria-live text, aria-label, or announcer message may carry a content-looking value.
+        const string contentSentinel = "top-secret-proposed-content-7f3a";
+        ProposalDetailGateway.GetProposalDetailAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentUiTestData.DetailResult(AgentUiTestData.Detail(state: ProposedAgentReplyState.Posted))));
+
+        IRenderedComponent<ProposalDetail> cut = RenderProposalDetail();
+
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-proposal-detail-announcer-message']"));
+
+        foreach (IElement region in cut.FindAll("[aria-live]"))
+        {
+            region.TextContent.ShouldNotContain(contentSentinel);
+        }
+
+        foreach (IElement labelled in cut.FindAll("[aria-label]"))
+        {
+            (labelled.GetAttribute("aria-label") ?? string.Empty).ShouldNotContain(contentSentinel);
+        }
+    }
+
+    [Fact]
     public void Conversation_call_in_shell_exposes_a_focusable_heading()
     {
         // The invocation page's heading is a focusable route target (tabindex=-1) regardless of the authorization
@@ -217,5 +257,11 @@ public sealed class AccessibilityTests : AgentsTestContext
         IElement unavailable = cut.Find("[data-testid='agent-call-status-feedback-unavailable']");
         unavailable.GetAttribute("tabindex").ShouldBe("0");
         unavailable.GetAttribute("aria-describedby").ShouldNotBeNullOrWhiteSpace();
+    }
+
+    private IRenderedComponent<ProposalDetail> RenderProposalDetail(string agentInteractionId = "interaction-1")
+    {
+        InitializeStoreAsync().GetAwaiter().GetResult();
+        return Render<ProposalDetail>(parameters => parameters.Add(page => page.AgentInteractionId, agentInteractionId));
     }
 }

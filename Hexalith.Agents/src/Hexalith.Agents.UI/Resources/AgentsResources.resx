@@ -397,4 +397,56 @@
   <data name="Agents.ProposalAbandoner.Status.NotAuthorized" xml:space="preserve"><value>You are not authorized to abandon this proposed reply.</value></data>
   <data name="Agents.ProposalAbandoner.Status.NotPending" xml:space="preserve"><value>This proposed reply is no longer pending and cannot be abandoned.</value></data>
   <data name="Agents.ProposalAbandoner.Status.Unavailable" xml:space="preserve"><value>The abandonment could not be completed. Try again once the service is reachable.</value></data>
+
+  <!-- Proposal detail workspace (Story 3.7; AC1–AC4) -->
+  <data name="Agents.ProposalDetail.Title" xml:space="preserve"><value>Proposal detail</value></data>
+  <data name="Agents.ProposalDetail.Eyebrow" xml:space="preserve"><value>Approval workspace</value></data>
+  <data name="Agents.ProposalDetail.Description" xml:space="preserve"><value>Review the proposed reply, its version history, and the approval decision with full context.</value></data>
+  <data name="Agents.ProposalDetail.BackLink" xml:space="preserve"><value>Back to pending proposals</value></data>
+  <data name="Agents.ProposalDetail.Workspace.Label" xml:space="preserve"><value>Proposal approval workspace</value></data>
+  <data name="Agents.ProposalDetail.NotFound.Title" xml:space="preserve"><value>Proposal unavailable</value></data>
+  <data name="Agents.ProposalDetail.NotFound.Message" xml:space="preserve"><value>No proposal is available here, or you are not authorized to view it.</value></data>
+  <data name="Agents.ProposalDetail.Field.SelectedVersion" xml:space="preserve"><value>Selected version</value></data>
+  <data name="Agents.ProposalDetail.Field.SourceConversation" xml:space="preserve"><value>Source Conversation</value></data>
+  <data name="Agents.ProposalDetail.Field.Caller" xml:space="preserve"><value>Caller</value></data>
+  <data name="Agents.ProposalDetail.Field.Agent" xml:space="preserve"><value>Agent</value></data>
+  <data name="Agents.ProposalDetail.Field.Provider" xml:space="preserve"><value>Provider and model</value></data>
+  <data name="Agents.ProposalDetail.Field.ResponseMode" xml:space="preserve"><value>Response mode</value></data>
+  <data name="Agents.ProposalDetail.Field.Expiry" xml:space="preserve"><value>Expiry</value></data>
+  <data name="Agents.ProposalDetail.Field.PostingOutcome" xml:space="preserve"><value>Posting outcome</value></data>
+  <data name="Agents.ProposalDetail.Field.State" xml:space="preserve"><value>State</value></data>
+  <data name="Agents.ProposalDetail.Field.Created" xml:space="preserve"><value>Created</value></data>
+  <data name="Agents.ProposalDetail.PostingOutcome.None" xml:space="preserve"><value>Not yet approved or posted</value></data>
+  <data name="Agents.ProposalDetail.PostingOutcome.Approved" xml:space="preserve"><value>Approved, awaiting posting</value></data>
+  <data name="Agents.ProposalDetail.PostingOutcome.Pending" xml:space="preserve"><value>Posting the approved version</value></data>
+  <data name="Agents.ProposalDetail.PostingOutcome.Posted" xml:space="preserve"><value>Posted to the Conversation</value></data>
+  <data name="Agents.ProposalDetail.PostingOutcome.Failed" xml:space="preserve"><value>Posting failed after approval</value></data>
+  <data name="Agents.ProposalDetail.VersionHistory.Label" xml:space="preserve"><value>Version history</value></data>
+  <data name="Agents.ProposalDetail.VersionHistory.SelectLabel" xml:space="preserve"><value>Select a version to review</value></data>
+  <data name="Agents.ProposalDetail.VersionHistory.Timestamp.Unknown" xml:space="preserve"><value>Timestamp unavailable</value></data>
+  <data name="Agents.ProposalDetail.VersionHistory.Provider" xml:space="preserve"><value>Provider and model</value></data>
+  <data name="Agents.ProposalDetail.VersionHistory.Source" xml:space="preserve"><value>Derived from</value></data>
+  <data name="Agents.ProposalDetail.VersionHistory.Approved" xml:space="preserve"><value>Approved version</value></data>
+  <data name="Agents.ProposalDetail.VersionHistory.Posted" xml:space="preserve"><value>Posted version</value></data>
+  <data name="Agents.ProposalDetail.VersionHistory.Selected" xml:space="preserve"><value>Selected version</value></data>
+  <data name="Agents.ProposalDetail.SelectionLock.Message" xml:space="preserve"><value>A newer version is available. Review it before approving.</value></data>
+  <data name="Agents.ProposalDetail.SelectionLock.Review" xml:space="preserve"><value>Review the latest version</value></data>
+  <data name="Agents.ProposalDetail.ActionRail.Label" xml:space="preserve"><value>Proposal actions</value></data>
+  <data name="Agents.ProposalDetail.Compare.Toggle" xml:space="preserve"><value>Compare version metadata</value></data>
+  <data name="Agents.ProposalDetail.Compare.Label" xml:space="preserve"><value>Version metadata comparison</value></data>
+  <data name="Agents.ProposalDetail.Compare.Selected" xml:space="preserve"><value>Selected version</value></data>
+  <data name="Agents.ProposalDetail.Compare.Latest" xml:space="preserve"><value>Latest version</value></data>
+  <data name="Agents.ProposalDetail.Compare.Close" xml:space="preserve"><value>Close comparison</value></data>
+  <data name="Agents.ProposalDetail.ApprovalSummary.Label" xml:space="preserve"><value>You are approving this version:</value></data>
+  <data name="Agents.ProposalDetail.StartNewCall.Link" xml:space="preserve"><value>Start a new Agent Call</value></data>
+  <data name="Agents.ProposalDetail.Transition.None" xml:space="preserve"><value>No change to announce.</value></data>
+  <data name="Agents.ProposalDetail.Transition.GenerationFailed" xml:space="preserve"><value>Generation failed. No proposed reply was created.</value></data>
+  <data name="Agents.ProposalDetail.Transition.ProposalCreated" xml:space="preserve"><value>A proposed reply was created and awaits your action.</value></data>
+  <data name="Agents.ProposalDetail.Transition.ProposalExpired" xml:space="preserve"><value>This proposal expired. It can no longer be approved or posted.</value></data>
+  <data name="Agents.ProposalDetail.Transition.ApprovalPosted" xml:space="preserve"><value>The approved version was posted to the Conversation.</value></data>
+  <data name="Agents.ProposalDetail.Transition.PostingFailed" xml:space="preserve"><value>Posting the approved version failed. It was not posted.</value></data>
+  <data name="Agents.ProposalDetail.Transition.PermissionDenied" xml:space="preserve"><value>You are not authorized to act on this proposal.</value></data>
+  <data name="Agents.ProposalDetail.Transition.StaleApprovalBlocked" xml:space="preserve"><value>A newer version appeared. Approval of your earlier selection is blocked until you review it.</value></data>
+  <data name="Agents.ProposalQueue.Column.Detail" xml:space="preserve"><value>Detail</value></data>
+  <data name="Agents.ProposalQueue.OpenDetail" xml:space="preserve"><value>Open detail</value></data>
 </root>

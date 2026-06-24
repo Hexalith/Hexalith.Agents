@@ -108,6 +108,69 @@ internal static class AgentUiTestData
     public static PendingProposalsResult ProposalsResult(params PendingProposalView[] proposals)
         => PendingProposalsResult.Success(proposals, proposals.Count(proposal => proposal.NeedsCurrentUserAction));
 
+    // ===== Story 3.7 proposal-detail factories =====
+
+    /// <summary>A safe content-free version summary for the version-history / detail tests.</summary>
+    public static ProposalVersionSummary VersionSummary(
+        string versionId = "version-1",
+        AgentGenerationKind kind = AgentGenerationKind.Generated,
+        string providerId = "openai",
+        string modelId = "gpt-x",
+        string? sourceVersionId = null,
+        string? editorPartyId = null,
+        string? createdAt = "2026-06-24T08:00:00Z",
+        bool isApproved = false,
+        bool isPosted = false)
+        => new(versionId, kind, providerId, modelId, sourceVersionId, editorPartyId, createdAt, isApproved, isPosted);
+
+    /// <summary>A safe proposal-detail view; tests use <c>with</c> expressions or the named params to vary a single field.</summary>
+    public static ProposalDetailView Detail(
+        string agentInteractionId = "interaction-1",
+        string proposalId = "proposal-1",
+        ProposedAgentReplyState state = ProposedAgentReplyState.Pending,
+        AgentInteractionStatus interactionStatus = AgentInteractionStatus.ProposalCreated,
+        string sourceConversationId = "conversation-1",
+        string callerPartyId = "caller-1",
+        string agentId = "agent-1",
+        bool needsCurrentUserAction = true,
+        string selectedVersionId = "version-1",
+        AgentResponseMode responseMode = AgentResponseMode.Confirmation,
+        string providerId = "openai",
+        string modelId = "gpt-x",
+        int approverPolicyVersion = 1,
+        int contentSafetyPolicyVersion = 1,
+        string? expiresAt = null,
+        string? createdAt = "2026-06-24T08:00:00Z",
+        string? approvedVersionId = null,
+        string? approvedAt = null,
+        string? postedAt = null,
+        IReadOnlyList<ProposalVersionSummary>? versions = null)
+        => new(
+            AgentInteractionId: agentInteractionId,
+            ProposalId: proposalId,
+            State: state,
+            InteractionStatus: interactionStatus,
+            SourceConversationId: sourceConversationId,
+            CallerPartyId: callerPartyId,
+            AgentId: agentId,
+            NeedsCurrentUserAction: needsCurrentUserAction,
+            SelectedVersionId: selectedVersionId,
+            ResponseMode: responseMode,
+            ProviderId: providerId,
+            ModelId: modelId,
+            ApproverPolicyVersion: approverPolicyVersion,
+            ContentSafetyPolicyVersion: contentSafetyPolicyVersion,
+            ExpiresAt: expiresAt,
+            CreatedAt: createdAt,
+            ApprovedVersionId: approvedVersionId,
+            ApprovedAt: approvedAt,
+            PostedAt: postedAt,
+            Versions: versions ?? [VersionSummary()]);
+
+    /// <summary>Wraps a detail view in a successful read result (defaults to a single pending generated version).</summary>
+    public static ProposalDetailResult DetailResult(ProposalDetailView? detail = null)
+        => ProposalDetailResult.Success(detail ?? Detail());
+
     // ===== Story 3.3 edit factories =====
 
     /// <summary>A safe edited generated version (Kind=Edited, carrying its source/editor provenance) for the editor / version-history tests.</summary>

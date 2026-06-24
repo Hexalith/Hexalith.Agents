@@ -19,7 +19,12 @@
     @if (CanRegenerate)
     {
         <div class="proposal-regenerator__actions">
-            <FluentButton Appearance="ButtonAppearance.Primary" OnClick="OnRegenerateAsync" data-testid="@($"{TestId}-regenerate")">
+            @* Disabled while a regeneration is in flight so a double activation cannot double-submit (Story 3.7 owns the
+               in-flight guard the 3.4 control deferred to its host). *@
+            <FluentButton Appearance="ButtonAppearance.Primary"
+                          Disabled="@_submitting"
+                          OnClick="OnRegenerateAsync"
+                          data-testid="@($"{TestId}-regenerate")">
                 @Localizer["Agents.ProposalRegenerator.Regenerate"]
             </FluentButton>
         </div>
@@ -68,6 +73,7 @@
     public string TestId { get; set; } = "proposal-regenerator";
 
     private bool _submitted;
+    private bool _submitting;
     private ProposalRegenerationStatus _status = ProposalRegenerationStatus.Unknown;
 
     // In-flight copy only; one whole localized string per outcome (UX-DR14), never assembled from fragments and never content.
@@ -81,12 +87,26 @@
 
     private async Task OnRegenerateAsync()
     {
-        // The request carries ids only — regeneration re-invokes the provider server-side; no Approver content flows here (AD-14).
-        ProposalRegenerationRequest request = new(AgentInteractionId, ProposalId, ClientCorrelationId);
-        ProposalRegenerationResult result = await Gateway.RegenerateProposalAsync(request, CancellationToken.None).ConfigureAwait(false);
+        // In-flight guard: a double activation (double-click / Enter+click) must not dispatch a second regeneration (Story 3.7).
+        if (_submitting)
+        {
+            return;
+        }
 
-        _status = result.Status;
-        _submitted = true;
-        await OnRegenerated.InvokeAsync(result).ConfigureAwait(false);
+        _submitting = true;
+        try
+        {
+            // The request carries ids only — regeneration re-invokes the provider server-side; no Approver content flows here (AD-14).
+            ProposalRegenerationRequest request = new(AgentInteractionId, ProposalId, ClientCorrelationId);
+            ProposalRegenerationResult result = await Gateway.RegenerateProposalAsync(request, CancellationToken.None).ConfigureAwait(false);
+
+            _status = result.Status;
+            _submitted = true;
+            await OnRegenerated.InvokeAsync(result).ConfigureAwait(false);
+        }
+        finally
+        {
+            _submitting = false;
+        }
     }
 }

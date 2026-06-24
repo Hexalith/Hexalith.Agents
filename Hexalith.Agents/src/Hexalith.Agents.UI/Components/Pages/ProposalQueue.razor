@@ -146,6 +146,15 @@
                                 SortBy="@_sortByCreatedAt">
                     @Localizer[ProposedAgentReplyStatePresentation.AgeLabelKeyOrText(context.CreatedAt, TimeProvider.GetUtcNow())]
                 </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProposalQueue.Column.Detail"]" ColumnId="detail">
+                    @* AC1 — a keyboard-reachable deep link from each queue row into the proposal detail workspace (Story 3.7).
+                       The Agent Call id is a safe aggregate-id handle, never content (AD-14). *@
+                    <a class="agents-proposal-queue__detail-link"
+                       href="@($"/agents/proposals/{context.AgentInteractionId}")"
+                       data-testid="@($"agents-proposal-queue-detail-link-{context.AgentInteractionId}")">
+                        @Localizer["Agents.ProposalQueue.OpenDetail"]
+                    </a>
+                </TemplateColumn>
             </FluentDataGrid>
         }
     </Body>

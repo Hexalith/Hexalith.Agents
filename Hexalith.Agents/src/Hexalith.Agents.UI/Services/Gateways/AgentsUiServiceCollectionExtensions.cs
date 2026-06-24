@@ -28,6 +28,7 @@ public static class AgentsUiServiceCollectionExtensions
         services.TryAddScoped<IProviderCatalogGateway, DeferredProviderCatalogGateway>();
         services.TryAddScoped<IConversationAgentCallGateway, DeferredConversationAgentCallGateway>();
         services.TryAddScoped<IProposalQueueGateway, DeferredProposalQueueGateway>();
+        services.TryAddScoped<IProposalDetailGateway, DeferredProposalDetailGateway>();
         services.TryAddScoped<IProposalEditGateway, DeferredProposalEditGateway>();
         services.TryAddScoped<IProposalRegenerationGateway, DeferredProposalRegenerationGateway>();
         services.TryAddScoped<IProposalApprovalGateway, DeferredProposalApprovalGateway>();

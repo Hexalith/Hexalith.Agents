@@ -43,6 +43,8 @@ public abstract class AgentsTestContext : FrontComposerTestBase
             .Returns(Task.FromResult(AgentInteractionInspectionResult.NotAuthorized()));
         ProposalGateway.ListPendingProposalsAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(PendingProposalsResult.NotAuthorized()));
+        ProposalDetailGateway.GetProposalDetailAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProposalDetailResult.NotAuthorized()));
         ProposalEditGateway.EditProposalAsync(Arg.Any<ProposalEditRequest>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProposalEditResult.NotAuthorized()));
         ProposalRegenerationGateway.RegenerateProposalAsync(Arg.Any<ProposalRegenerationRequest>(), Arg.Any<CancellationToken>())
@@ -58,6 +60,7 @@ public abstract class AgentsTestContext : FrontComposerTestBase
         Services.AddSingleton(CatalogGateway);
         Services.AddSingleton(CallGateway);
         Services.AddSingleton(ProposalGateway);
+        Services.AddSingleton(ProposalDetailGateway);
         Services.AddSingleton(ProposalEditGateway);
         Services.AddSingleton(ProposalRegenerationGateway);
         Services.AddSingleton(ProposalApprovalGateway);
@@ -79,6 +82,9 @@ public abstract class AgentsTestContext : FrontComposerTestBase
 
     /// <summary>The substituted proposal-queue read gateway (defaults to the fail-closed result).</summary>
     protected IProposalQueueGateway ProposalGateway { get; } = Substitute.For<IProposalQueueGateway>();
+
+    /// <summary>The substituted single-proposal detail read gateway (defaults to the fail-closed result).</summary>
+    protected IProposalDetailGateway ProposalDetailGateway { get; } = Substitute.For<IProposalDetailGateway>();
 
     /// <summary>The substituted proposal-edit write gateway (defaults to the fail-closed result).</summary>
     protected IProposalEditGateway ProposalEditGateway { get; } = Substitute.For<IProposalEditGateway>();
