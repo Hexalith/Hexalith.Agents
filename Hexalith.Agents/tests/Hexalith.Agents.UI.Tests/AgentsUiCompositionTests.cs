@@ -16,7 +16,7 @@ namespace Hexalith.Agents.UI.Tests;
 public sealed class AgentsUiCompositionTests
 {
     [Fact]
-    public void AddAgentsUi_registers_both_gateways_scoped_with_deferred_placeholders()
+    public void AddAgentsUi_registers_all_gateways_scoped_with_deferred_placeholders()
     {
         ServiceCollection services = new();
 
@@ -24,12 +24,14 @@ public sealed class AgentsUiCompositionTests
 
         services.Single(d => d.ServiceType == typeof(IAgentSetupGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
         services.Single(d => d.ServiceType == typeof(IProviderCatalogGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
+        services.Single(d => d.ServiceType == typeof(IConversationAgentCallGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
 
         using ServiceProvider provider = services.BuildServiceProvider();
         using IServiceScope scope = provider.CreateScope();
 
         scope.ServiceProvider.GetRequiredService<IAgentSetupGateway>().ShouldBeOfType<DeferredAgentSetupGateway>();
         scope.ServiceProvider.GetRequiredService<IProviderCatalogGateway>().ShouldBeOfType<DeferredProviderCatalogGateway>();
+        scope.ServiceProvider.GetRequiredService<IConversationAgentCallGateway>().ShouldBeOfType<DeferredConversationAgentCallGateway>();
     }
 
     [Fact]

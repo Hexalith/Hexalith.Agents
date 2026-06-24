@@ -39,9 +39,9 @@ public static class AgentsFrontComposerRegistration
         Resource: typeof(AgentsResources));
 
     /// <summary>
-    /// Registers the Agents domain and its four ordered, policy-gated setup nav entries, from operational setup to
-    /// workflow handling (UX-DR1). The invariant <c>Title</c> is the English fallback that drives stable test ids
-    /// and sort order; <c>TitleKey</c> + <c>Resource</c> localize the label per request culture.
+    /// Registers the Agents domain and its five ordered, policy-gated nav entries, from operational setup to the V1
+    /// in-product Conversation invocation surface (UX-DR1). The invariant <c>Title</c> is the English fallback that
+    /// drives stable test ids and sort order; <c>TitleKey</c> + <c>Resource</c> localize the label per request culture.
     /// </summary>
     /// <param name="registry">The FrontComposer registry the shell exposes during composition.</param>
     public static void RegisterDomain(IFrontComposerRegistry registry)
@@ -89,6 +89,20 @@ public static class AgentsFrontComposerRegistration
             Order: 3,
             RequiredPolicy: AgentsAdministratorPolicy,
             TitleKey: "Agents.Navigation.ApproverPolicy",
+            Resource: typeof(AgentsResources)));
+
+        // V1 in-product Conversation invocation surface (UX-DR1). Gated by the same Agents administrator policy for the
+        // demonstrable surface; the participant-facing Conversation-owned affordance and its participant-level
+        // authorization are deferred to PRD OQ-1 resolution — no new auth semantics are invented in this story. The
+        // Size20 "Play" glyph is not in the curated FcFluentIcons vocabulary, so the proceed/chevron glyph is reused.
+        registry.AddNavEntry(new FrontComposerNavEntry(
+            "agents",
+            "Conversation call",
+            "/agents/conversation-call",
+            Icon: "Regular.Size20.ChevronRight",
+            Order: 4,
+            RequiredPolicy: AgentsAdministratorPolicy,
+            TitleKey: "Agents.Navigation.ConversationCall",
             Resource: typeof(AgentsResources)));
     }
 }

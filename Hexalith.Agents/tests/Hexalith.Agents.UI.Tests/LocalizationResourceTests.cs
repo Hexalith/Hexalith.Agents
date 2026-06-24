@@ -5,6 +5,7 @@ using System.Linq;
 using System.Resources;
 
 using Hexalith.Agents.Contracts.Agent;
+using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.UI.Components.Shared;
 using Hexalith.Agents.UI.Resources;
@@ -85,6 +86,68 @@ public sealed class LocalizationResourceTests
             yield return $"Agents.Surface.{kind}.Title";
             yield return $"Agents.Surface.{kind}.Message";
         }
+
+        // Story 2.6 — call-status labels + coarse reasons (one whole string per AgentCallStatus value; UX-DR14).
+        foreach (AgentCallStatus state in Enum.GetValues<AgentCallStatus>())
+        {
+            yield return AgentCallStatusPresentation.LabelKeyFor(state);
+            if (AgentCallStatusPresentation.ReasonKeyFor(state) is { } reason)
+            {
+                yield return reason;
+            }
+        }
+
+        // Story 2.6 — fine-grained safe reasons (one whole string per reason-enum value; UX-DR14).
+        foreach (AgentInteractionContextBlockReason r in Enum.GetValues<AgentInteractionContextBlockReason>())
+        {
+            yield return AgentCallStatusPresentation.ReasonKeyFor(r);
+        }
+
+        foreach (AgentOutputGenerationFailureReason r in Enum.GetValues<AgentOutputGenerationFailureReason>())
+        {
+            yield return AgentCallStatusPresentation.ReasonKeyFor(r);
+        }
+
+        foreach (AgentResponsePostingFailureReason r in Enum.GetValues<AgentResponsePostingFailureReason>())
+        {
+            yield return AgentCallStatusPresentation.ReasonKeyFor(r);
+        }
+
+        foreach (AgentInteractionGateOutcome o in Enum.GetValues<AgentInteractionGateOutcome>())
+        {
+            yield return AgentCallStatusPresentation.ReasonKeyFor(o);
+        }
+
+        foreach (AgentInteractionGateCheck c in Enum.GetValues<AgentInteractionGateCheck>())
+        {
+            yield return AgentCallStatusPresentation.ReasonKeyFor(c);
+        }
+
+        // Story 2.6 — nav entry, page header, invocation panel, and feedback whole strings.
+        yield return "Agents.Navigation.ConversationCall";
+        yield return "Agents.ConversationCall.Title";
+        yield return "Agents.ConversationCall.Eyebrow";
+        yield return "Agents.ConversationCall.Description";
+        yield return "Agents.ConversationCall.Panel.Label";
+        yield return "Agents.ConversationCall.Panel.CallLabel";
+        yield return "Agents.ConversationCall.Panel.AgentName";
+        yield return "Agents.ConversationCall.Panel.Caller.Label";
+        yield return "Agents.ConversationCall.Panel.Caller.You";
+        yield return "Agents.ConversationCall.Panel.Agent.Label";
+        yield return "Agents.ConversationCall.Panel.SourceConversation.Label";
+        yield return "Agents.ConversationCall.Panel.Prompt.Label";
+        yield return "Agents.ConversationCall.Panel.Prompt.Placeholder";
+        yield return "Agents.ConversationCall.Panel.ResponseMode.Label";
+        yield return "Agents.ConversationCall.Panel.Implication.Automatic";
+        yield return "Agents.ConversationCall.Panel.Implication.Confirmation";
+        yield return "Agents.ConversationCall.Panel.Submit";
+        yield return "Agents.ConversationCall.Panel.Cancel";
+        yield return "Agents.ConversationCall.Panel.Status.Calling";
+        yield return "Agents.ConversationCall.Panel.Status.Generating";
+        yield return "Agents.ConversationCall.Panel.Status.Posting";
+        yield return "Agents.ConversationCall.Panel.Status.Posted";
+        yield return "Agents.ConversationCall.Panel.Status.Failed";
+        yield return "Agents.ConversationCall.Feedback.Unavailable";
     }
 
     public static IEnumerable<object[]> EnumDerivedKeyCases() => EnumDerivedKeys().Distinct().Select(key => new object[] { key });

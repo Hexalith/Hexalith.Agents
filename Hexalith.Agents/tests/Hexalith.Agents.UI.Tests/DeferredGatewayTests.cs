@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Hexalith.Agents.Contracts.Agent;
+using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.UI.Services.Gateways;
 
@@ -50,5 +51,28 @@ public sealed class DeferredGatewayTests
 
         result.Status.ShouldBe(ProviderCatalogInspectionStatus.NotAuthorized);
         result.Entries.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task DeferredConversationAgentCallGateway_request_fails_closed_with_not_authorized_and_no_reference()
+    {
+        DeferredConversationAgentCallGateway gateway = new();
+
+        AgentCallRequestResult result = await gateway.RequestCallAsync(
+            new ConversationAgentCallRequest("conversation-1", "prompt", null), CancellationToken.None);
+
+        result.Status.ShouldBe(AgentCallRequestStatus.NotAuthorized);
+        result.Reference.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task DeferredConversationAgentCallGateway_status_fails_closed_with_not_authorized_and_no_view()
+    {
+        DeferredConversationAgentCallGateway gateway = new();
+
+        AgentInteractionInspectionResult result = await gateway.GetCallStatusAsync("interaction-1", CancellationToken.None);
+
+        result.Status.ShouldBe(AgentInteractionInspectionStatus.NotAuthorized);
+        result.View.ShouldBeNull();
     }
 }

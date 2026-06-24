@@ -1,0 +1,79 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+
+@* agent-call-status-feedback (AC2, AC3, AC4): renders the live call status of one Agent Call. The badge sits in a
+   reserved, fixed slot so rows do not jump on transition (UX-DR17) and state changes are perceivable from the
+   color+icon+text swap alone — no dependence on animation (UX-DR38). Ordinary transitions announce politely; only
+   denial/terminal-failure announces assertively (the accessibility-review transition matrix; UX-DR36). The safe reason
+   is a coarse, status-level whole string — never raw provider/Conversations error text, the prompt, generated content,
+   or any cross-tenant/Party/Conversation detail (AD-14). A stale/degraded read renders the Stale surface, never fresh
+   (Consistency Conventions). *@
+@if (Stale)
+{
+    <AgentSurfaceState Kind="AgentSurfaceKind.Stale" TestId="@($"{TestId}-stale")" OnRefresh="OnRefresh" />
+}
+else
+{
+    <section class="agent-call-status-feedback"
+             role="@Role"
+             aria-live="@AriaLive"
+             data-testid="@TestId">
+        <div class="agent-call-status-feedback__slot" data-testid="@($"{TestId}-slot")">
+            <AgentCallStatusBadge State="@State" TestId="@($"{TestId}-badge")" />
+        </div>
+
+        @if (ReasonKey is { } reasonKey)
+        {
+            <p class="agent-call-status-feedback__reason" data-testid="@($"{TestId}-reason")">
+                @Localizer[reasonKey]
+            </p>
+        }
+
+        @if (Constrained)
+        {
+            @* Fail closed on a constrained viewport / reduced motion: the high-impact automatic call action is
+               unavailable, surfaced through a focusable, aria-describedby-linked reason — never a bare disabled
+               control — while review-only status (the badge above) stays visible (UX-DR40). *@
+            <p class="agent-call-status-feedback__unavailable"
+               id="@UnavailableReasonId"
+               tabindex="0"
+               aria-describedby="@UnavailableReasonId"
+               data-testid="@($"{TestId}-unavailable")">
+                @Localizer["Agents.ConversationCall.Feedback.Unavailable"]
+            </p>
+        }
+    </section>
+}
+
+@code {
+    /// <summary>The canonical UX call-status to render (compute via <see cref="AgentCallStatusPresentation.MapStatus"/> / <see cref="AgentCallStatusPresentation.Derive"/>).</summary>
+    [Parameter]
+    public AgentCallStatus State { get; set; } = AgentCallStatus.Unknown;
+
+    /// <summary>When <see langword="true"/>, the gateway returned a stale/degraded read — render the Stale surface, never fresh status.</summary>
+    [Parameter]
+    public bool Stale { get; set; }
+
+    /// <summary>When <see langword="true"/>, a constrained viewport / reduced-motion setting cannot show enough context for the high-impact automatic action — render it unavailable with a focusable reason, review-only status remaining (UX-DR40).</summary>
+    [Parameter]
+    public bool Constrained { get; set; }
+
+    /// <summary>Raised when the user refreshes from the stale state.</summary>
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
+
+    /// <summary>Stable test id base for the feedback surface (suffixed for the badge/reason/unavailable/stale slots).</summary>
+    [Parameter]
+    public string TestId { get; set; } = "agent-call-status-feedback";
+
+    private string UnavailableReasonId => $"{TestId}-unavailable-reason";
+
+    // The states that carry a safe reason are exactly the denial/blocked/terminal-failure states; they are the only
+    // ones announced assertively (the transition matrix). Everything else (in-flight + Posted) announces politely.
+    private string? ReasonKey => AgentCallStatusPresentation.ReasonKeyFor(State);
+
+    private bool IsAssertive => ReasonKey is not null;
+
+    private string Role => IsAssertive ? "alert" : "status";
+
+    private string AriaLive => IsAssertive ? "assertive" : "polite";
+}

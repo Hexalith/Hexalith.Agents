@@ -5,6 +5,7 @@ using Bunit;
 using Bunit.TestDoubles;
 
 using Hexalith.Agents.Contracts.Agent;
+using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.UI.Resources;
 using Hexalith.Agents.UI.Services.Gateways;
@@ -35,9 +36,14 @@ public abstract class AgentsTestContext : FrontComposerTestBase
             .Returns(Task.FromResult(AgentInspectionResult.NotAuthorized()));
         CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogInspectionResult.NotAuthorized()));
+        CallGateway.RequestCallAsync(Arg.Any<ConversationAgentCallRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentCallRequestResult.NotAuthorized()));
+        CallGateway.GetCallStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentInteractionInspectionResult.NotAuthorized()));
 
         Services.AddSingleton(SetupGateway);
         Services.AddSingleton(CatalogGateway);
+        Services.AddSingleton(CallGateway);
         Services.AddSingleton<IStringLocalizer<AgentsResources>>(new StubAgentsLocalizer());
         Authorization = AddAuthorization();
     }
@@ -47,6 +53,9 @@ public abstract class AgentsTestContext : FrontComposerTestBase
 
     /// <summary>The substituted provider-catalog read gateway.</summary>
     protected IProviderCatalogGateway CatalogGateway { get; } = Substitute.For<IProviderCatalogGateway>();
+
+    /// <summary>The substituted Conversation Agent Call request/status gateway (defaults to the fail-closed result).</summary>
+    protected IConversationAgentCallGateway CallGateway { get; } = Substitute.For<IConversationAgentCallGateway>();
 
     /// <summary>The bUnit authorization context (default: unauthenticated).</summary>
     protected BunitAuthorizationContext Authorization { get; }

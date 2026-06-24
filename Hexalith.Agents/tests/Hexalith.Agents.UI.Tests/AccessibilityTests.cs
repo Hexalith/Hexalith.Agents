@@ -12,6 +12,8 @@ using Hexalith.Agents.UI.Components.Pages;
 using Hexalith.Agents.UI.Components.Shared;
 using Hexalith.FrontComposer.Shell.Components.Layout;
 
+using Microsoft.FluentUI.AspNetCore.Components;
+
 using NSubstitute;
 
 using Shouldly;
@@ -127,5 +129,45 @@ public sealed class AccessibilityTests : AgentsTestContext
 
         cut.WaitForAssertion(() =>
             cut.Find("#agents-approver-policy-heading").GetAttribute("tabindex").ShouldBe("-1"));
+    }
+
+    [Fact]
+    public void Conversation_call_in_shell_exposes_a_focusable_heading()
+    {
+        // The invocation page's heading is a focusable route target (tabindex=-1) regardless of the authorization
+        // outcome — the FcPageHeader renders outside the surface branch, so the page is keyboard-reachable even when it
+        // fails closed to permission-denied (AC4 keyboard/focus parity with the other four setup pages).
+        IRenderedComponent<FrontComposerShell> cut = RenderInShellWithNavigation<ConversationCall>();
+
+        cut.WaitForAssertion(() =>
+            cut.Find("#agents-conversation-call-heading").GetAttribute("tabindex").ShouldBe("-1"));
+    }
+
+    [Fact]
+    public void Call_status_feedback_exposes_a_named_polite_status_live_region_perceivable_without_animation()
+    {
+        IRenderedComponent<AgentCallStatusFeedback> cut = Render<AgentCallStatusFeedback>(
+            parameters => parameters.Add(f => f.State, AgentCallStatus.Generating));
+
+        IElement region = cut.Find("[data-testid='agent-call-status-feedback']");
+        region.GetAttribute("role").ShouldBe("status");
+        region.GetAttribute("aria-live").ShouldBe("polite");
+
+        // Reduced motion does not gate perceivability: status is conveyed by the badge text + icon swap, not animation
+        // (UX-DR38). The badge resolves a visible whole string and a non-null icon.
+        cut.Find("[data-testid='agent-call-status-feedback-badge']").TextContent.Trim().ShouldNotBeNullOrEmpty();
+        cut.FindComponent<AgentCallStatusBadge>().FindComponent<FluentBadge>().Instance.IconStart.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void Call_status_feedback_constrained_viewport_reason_is_focusable_and_described()
+    {
+        IRenderedComponent<AgentCallStatusFeedback> cut = Render<AgentCallStatusFeedback>(parameters => parameters
+            .Add(f => f.State, AgentCallStatus.Generating)
+            .Add(f => f.Constrained, true));
+
+        IElement unavailable = cut.Find("[data-testid='agent-call-status-feedback-unavailable']");
+        unavailable.GetAttribute("tabindex").ShouldBe("0");
+        unavailable.GetAttribute("aria-describedby").ShouldNotBeNullOrWhiteSpace();
     }
 }

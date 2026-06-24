@@ -1,0 +1,154 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IConversationAgentCallGateway Gateway
+
+@* conversation-agent-call-panel (AC1): the normalized, pattern-agnostic invocation affordance. PRD OQ-1 leaves the
+   exact mention/command/action/participant entry open, and the architecture normalizes every entry into the same
+   Agents request command, so the panel does NOT over-fit to one pattern (AD-15 Deferred row; UX-DR24). Before any
+   submit it visibly names hexa, captures the prompt + Source Conversation context, and shows the response-mode
+   implication — without ever implying a post has happened until status reaches Posted (UX-DR22). *@
+<section class="conversation-agent-call-panel"
+         data-testid="@TestId"
+         aria-label="@Localizer["Agents.ConversationCall.Panel.Label"]"
+         @onkeydown="OnKeyDownAsync">
+
+    <p class="conversation-agent-call-panel__agent" data-testid="@($"{TestId}-agent-name")">
+        @Localizer["Agents.ConversationCall.Panel.CallLabel"]
+        <strong data-testid="@($"{TestId}-agent-name-value")">@AgentName</strong>
+    </p>
+
+    @* Source Conversation context (UX-DR13: ids/references in mono typography). The caller/agent/conversation are
+       safe references — never PII or a raw stream name. *@
+    <dl class="conversation-agent-call-panel__context" data-testid="@($"{TestId}-context")">
+        <dt>@Localizer["Agents.ConversationCall.Panel.Caller.Label"]</dt>
+        <dd><code class="mono" data-testid="@($"{TestId}-caller")">@CallerDisplay</code></dd>
+        <dt>@Localizer["Agents.ConversationCall.Panel.Agent.Label"]</dt>
+        <dd><code class="mono" data-testid="@($"{TestId}-agent")">@AgentName</code></dd>
+        <dt>@Localizer["Agents.ConversationCall.Panel.SourceConversation.Label"]</dt>
+        <dd><code class="mono" data-testid="@($"{TestId}-source-conversation")">@SourceConversationId</code></dd>
+    </dl>
+
+    @* Prompt: a Fluent input, never a raw <textarea>. The value is sensitive (AD-14) — it flows to the gateway only and
+       is never echoed into a badge label, accessible name, tooltip, or data-testid. *@
+    <FluentTextArea @bind-Value="_prompt"
+                    Label="@Localizer["Agents.ConversationCall.Panel.Prompt.Label"]"
+                    Placeholder="@Localizer["Agents.ConversationCall.Panel.Prompt.Placeholder"]"
+                    AriaLabel="@Localizer["Agents.ConversationCall.Panel.Prompt.Label"]"
+                    Required="true"
+                    data-testid="@($"{TestId}-prompt")" />
+
+    @* Response-mode implication (UX-DR23): both implications are shown with equal weight — Automatic is never visually
+       biased. The read-only toggle conveys the snapshotted mode; the statements explain what each mode means. *@
+    <section class="conversation-agent-call-panel__mode" aria-label="@Localizer["Agents.ConversationCall.Panel.ResponseMode.Label"]">
+        <ResponseModeToggle Value="@ResponseMode" Disabled="true" Name="@($"{TestId}-response-mode")" />
+        <p data-testid="@($"{TestId}-implication-automatic")">@Localizer["Agents.ConversationCall.Panel.Implication.Automatic"]</p>
+        <p data-testid="@($"{TestId}-implication-confirmation")">@Localizer["Agents.ConversationCall.Panel.Implication.Confirmation"]</p>
+    </section>
+
+    <div class="conversation-agent-call-panel__actions">
+        <FluentButton Appearance="ButtonAppearance.Primary" OnClick="OnSubmitAsync" data-testid="@($"{TestId}-submit")">
+            @Localizer["Agents.ConversationCall.Panel.Submit"]
+        </FluentButton>
+        <FluentButton Appearance="ButtonAppearance.Outline" OnClick="OnCancelAsync" data-testid="@($"{TestId}-cancel")">
+            @Localizer["Agents.ConversationCall.Panel.Cancel"]
+        </FluentButton>
+    </div>
+
+    @if (_submitted)
+    {
+        @* In-flight wording only — never "posted"/"sent" until status is Posted (UX-DR22). A Generated/PostingPending
+           (automatic) state reads "posting…", never "posted". *@
+        <p class="conversation-agent-call-panel__status" data-testid="@($"{TestId}-status-caption")">
+            @Localizer[StatusCaptionKey]
+        </p>
+        <AgentCallStatusFeedback State="@_state" TestId="@($"{TestId}-feedback")" />
+    }
+</section>
+
+@code {
+    /// <summary>The safe Agent display name (e.g. <c>hexa</c>) — never a raw id. Falls back to the localized hexa label when empty.</summary>
+    [Parameter]
+    public string? AgentDisplayName { get; set; }
+
+    /// <summary>The safe caller reference to surface as context (a reference, not PII — AD-7). Falls back to a localized "you" label when empty.</summary>
+    [Parameter]
+    public string? CallerReference { get; set; }
+
+    /// <summary>The Source Conversation reference the call originates from (an opaque reference — AD-6).</summary>
+    [Parameter]
+    public string SourceConversationId { get; set; } = string.Empty;
+
+    /// <summary>The snapshotted Response Mode whose implication the panel explains (read-only; the panel never changes the mode).</summary>
+    [Parameter]
+    public AgentResponseMode ResponseMode { get; set; } = AgentResponseMode.Automatic;
+
+    /// <summary>An optional client correlation id carried with the request (idempotency/telemetry).</summary>
+    [Parameter]
+    public string? ClientCorrelationId { get; set; }
+
+    /// <summary>Raised when the participant cancels the transient panel (Esc or Cancel) so the host can return focus to the trigger (UX-DR32/UX-DR37).</summary>
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    /// <summary>Stable test id base for the panel (suffixed for its sub-elements).</summary>
+    [Parameter]
+    public string TestId { get; set; } = "conversation-agent-call-panel";
+
+    private string _prompt = string.Empty;
+    private bool _submitted;
+    private AgentCallStatus _state = AgentCallStatus.Unknown;
+
+    private string AgentName => string.IsNullOrWhiteSpace(AgentDisplayName)
+        ? Localizer["Agents.ConversationCall.Panel.AgentName"]
+        : AgentDisplayName;
+
+    private string CallerDisplay => string.IsNullOrWhiteSpace(CallerReference)
+        ? Localizer["Agents.ConversationCall.Panel.Caller.You"]
+        : CallerReference;
+
+    // In-flight copy only; the single Posted key is reserved for the proven-complete state (UX-DR22).
+    private string StatusCaptionKey => _state switch
+    {
+        AgentCallStatus.Posted => "Agents.ConversationCall.Panel.Status.Posted",
+        AgentCallStatus.Generated or AgentCallStatus.PostingPending => "Agents.ConversationCall.Panel.Status.Posting",
+        AgentCallStatus.Generating or AgentCallStatus.ContextLoading => "Agents.ConversationCall.Panel.Status.Generating",
+        AgentCallStatus.Denied or AgentCallStatus.Blocked or AgentCallStatus.ContextBlocked
+            or AgentCallStatus.GenerationFailed or AgentCallStatus.SafetyFailed or AgentCallStatus.PostingFailed
+            => "Agents.ConversationCall.Panel.Status.Failed",
+        _ => "Agents.ConversationCall.Panel.Status.Calling",
+    };
+
+    private async Task OnSubmitAsync()
+    {
+        // The prompt is Required (AC1): an empty/whitespace prompt is never submitted, so the panel honors its own
+        // declared contract without relying on an EditForm to enforce it.
+        if (string.IsNullOrWhiteSpace(_prompt))
+        {
+            return;
+        }
+
+        // Assemble ONLY the safe inputs; the trusted AgentId/Snapshot are server-populated per RequestAgentInteraction
+        // (AC1 precondition). The sensitive prompt flows to the gateway here and nowhere else (AD-14).
+        ConversationAgentCallRequest request = new(SourceConversationId, _prompt, ClientCorrelationId);
+        AgentCallRequestResult result = await Gateway.RequestCallAsync(request, CancellationToken.None).ConfigureAwait(false);
+
+        _state = result.Status switch
+        {
+            AgentCallRequestStatus.Accepted => AgentCallStatusPresentation.MapStatus(result.Reference?.Status ?? AgentInteractionStatus.Unknown),
+            AgentCallRequestStatus.NotAuthorized => AgentCallStatus.Denied,
+            AgentCallRequestStatus.Rejected => AgentCallStatus.Blocked,
+            _ => AgentCallStatus.Unknown,
+        };
+        _submitted = true;
+    }
+
+    private async Task OnCancelAsync() => await OnCancel.InvokeAsync().ConfigureAwait(false);
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        // Esc cancels the transient panel without committing and returns focus to the trigger (UX-DR32/UX-DR37).
+        if (string.Equals(args.Key, "Escape", StringComparison.Ordinal))
+        {
+            await OnCancelAsync().ConfigureAwait(false);
+        }
+    }
+}

@@ -19,7 +19,7 @@ namespace Hexalith.Agents.UI.Tests;
 public sealed class AgentsNavigationTests : AgentsTestContext
 {
     [Fact]
-    public void RegisterDomain_registers_agents_manifest_and_four_ordered_setup_entries()
+    public void RegisterDomain_registers_agents_manifest_and_five_ordered_entries()
     {
         CapturingFrontComposerRegistry registry = new();
 
@@ -30,11 +30,12 @@ public sealed class AgentsNavigationTests : AgentsTestContext
         manifest.NameKey.ShouldBe("Agents.Navigation.Agents");
 
         registry.NavEntries.Select(entry => entry.Href)
-            .ShouldBe(["/agents", "/agents/configuration", "/agents/providers", "/agents/approver-policy"]);
+            .ShouldBe(["/agents", "/agents/configuration", "/agents/providers", "/agents/approver-policy", "/agents/conversation-call"]);
         registry.NavEntries.Select(entry => entry.Order)
-            .ShouldBe([0, 1, 2, 3]);
+            .ShouldBe([0, 1, 2, 3, 4]);
         registry.NavEntries.ShouldAllBe(entry => entry.BoundedContext == "agents");
         registry.NavEntries.First().Title.ShouldBe("Agents overview");
+        registry.NavEntries.Last().Title.ShouldBe("Conversation call");
     }
 
     [Fact]
@@ -62,6 +63,7 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             cut.Markup.ShouldContain("href=\"/agents/configuration\"");
             cut.Markup.ShouldContain("href=\"/agents/providers\"");
             cut.Markup.ShouldContain("href=\"/agents/approver-policy\"");
+            cut.Markup.ShouldContain("href=\"/agents/conversation-call\"");
         });
     }
 
@@ -78,6 +80,7 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             cut.Markup.ShouldNotContain("href=\"/agents/configuration\"");
             cut.Markup.ShouldNotContain("href=\"/agents/providers\"");
             cut.Markup.ShouldNotContain("href=\"/agents/approver-policy\"");
+            cut.Markup.ShouldNotContain("href=\"/agents/conversation-call\"");
         });
     }
 
@@ -96,6 +99,7 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             cut.Markup.ShouldNotContain("href=\"/agents/configuration\"");
             cut.Markup.ShouldNotContain("href=\"/agents/providers\"");
             cut.Markup.ShouldNotContain("href=\"/agents/approver-policy\"");
+            cut.Markup.ShouldNotContain("href=\"/agents/conversation-call\"");
         });
     }
 
@@ -117,6 +121,7 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             "Agents.Navigation.Configuration",
             "Agents.Navigation.ProviderCatalog",
             "Agents.Navigation.ApproverPolicy",
+            "Agents.Navigation.ConversationCall",
         ]);
     }
 

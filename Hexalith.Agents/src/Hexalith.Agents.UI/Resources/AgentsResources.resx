@@ -208,4 +208,84 @@
   <data name="Agents.ApproverPolicy.SourceKind.PredefinedParty" xml:space="preserve"><value>Predefined party</value></data>
   <data name="Agents.ApproverPolicy.SourceKind.TenantRole" xml:space="preserve"><value>Tenant role</value></data>
   <data name="Agents.ApproverPolicy.SourceKind.ConversationOwner" xml:space="preserve"><value>Conversation facilitator</value></data>
+
+  <!-- Story 2.6 — Conversation invocation UX and call-status feedback (AC1-AC4) -->
+  <data name="Agents.Navigation.ConversationCall" xml:space="preserve"><value>Conversation call</value></data>
+  <data name="Agents.ConversationCall.Title" xml:space="preserve"><value>Conversation call</value></data>
+  <data name="Agents.ConversationCall.Eyebrow" xml:space="preserve"><value>Agent invocation</value></data>
+  <data name="Agents.ConversationCall.Description" xml:space="preserve"><value>Call hexa from a Conversation and follow the call status — pending, blocked, failed, or posted.</value></data>
+  <data name="Agents.CallStatus.Status.Requested" xml:space="preserve"><value>Requested</value></data>
+  <data name="Agents.CallStatus.Status.Authorized" xml:space="preserve"><value>Authorized</value></data>
+  <data name="Agents.CallStatus.Status.Denied" xml:space="preserve"><value>Denied</value></data>
+  <data name="Agents.CallStatus.Status.Blocked" xml:space="preserve"><value>Blocked</value></data>
+  <data name="Agents.CallStatus.Status.ContextLoading" xml:space="preserve"><value>Loading context</value></data>
+  <data name="Agents.CallStatus.Status.ContextBlocked" xml:space="preserve"><value>Context blocked</value></data>
+  <data name="Agents.CallStatus.Status.Generating" xml:space="preserve"><value>Generating</value></data>
+  <data name="Agents.CallStatus.Status.GenerationFailed" xml:space="preserve"><value>Generation failed</value></data>
+  <data name="Agents.CallStatus.Status.SafetyFailed" xml:space="preserve"><value>Safety check failed</value></data>
+  <data name="Agents.CallStatus.Status.Generated" xml:space="preserve"><value>Generated</value></data>
+  <data name="Agents.CallStatus.Status.PostingPending" xml:space="preserve"><value>Posting</value></data>
+  <data name="Agents.CallStatus.Status.Posted" xml:space="preserve"><value>Posted</value></data>
+  <data name="Agents.CallStatus.Status.PostingFailed" xml:space="preserve"><value>Posting failed</value></data>
+  <data name="Agents.CallStatus.Status.Unknown" xml:space="preserve"><value>Unknown</value></data>
+  <data name="Agents.CallStatus.Reason.Denied" xml:space="preserve"><value>You do not have permission to call hexa in this Conversation.</value></data>
+  <data name="Agents.CallStatus.Reason.Blocked" xml:space="preserve"><value>The provider or a dependency is unavailable. The call is blocked.</value></data>
+  <data name="Agents.CallStatus.Reason.ContextBlocked" xml:space="preserve"><value>The Conversation context could not be built safely.</value></data>
+  <data name="Agents.CallStatus.Reason.SafetyFailed" xml:space="preserve"><value>Content safety blocked this response.</value></data>
+  <data name="Agents.CallStatus.Reason.GenerationFailed" xml:space="preserve"><value>The response could not be generated.</value></data>
+  <data name="Agents.CallStatus.Reason.PostingFailed" xml:space="preserve"><value>The response could not be posted to the Conversation.</value></data>
+  <data name="Agents.CallStatus.Reason.Unknown" xml:space="preserve"><value>The call could not be completed for an unrecognized reason.</value></data>
+  <data name="Agents.CallStatus.Reason.ContextUnavailable" xml:space="preserve"><value>The Conversation context is unavailable.</value></data>
+  <data name="Agents.CallStatus.Reason.ContextNotFresh" xml:space="preserve"><value>The Conversation context could not be read fresh enough.</value></data>
+  <data name="Agents.CallStatus.Reason.ExceedsModelBudget" xml:space="preserve"><value>The context exceeds the model budget.</value></data>
+  <data name="Agents.CallStatus.Reason.ModelBudgetUnavailable" xml:space="preserve"><value>The model budget could not be determined.</value></data>
+  <data name="Agents.CallStatus.Reason.ProviderTimeout" xml:space="preserve"><value>The provider timed out.</value></data>
+  <data name="Agents.CallStatus.Reason.ProviderDisabled" xml:space="preserve"><value>The selected provider or model is disabled.</value></data>
+  <data name="Agents.CallStatus.Reason.ProviderUnavailable" xml:space="preserve"><value>The provider is unavailable.</value></data>
+  <data name="Agents.CallStatus.Reason.AdapterFailure" xml:space="preserve"><value>A dependency adapter failed.</value></data>
+  <data name="Agents.CallStatus.Reason.InvalidContext" xml:space="preserve"><value>The context could not be prepared for generation.</value></data>
+  <data name="Agents.CallStatus.Reason.GenerationError" xml:space="preserve"><value>Generation failed.</value></data>
+  <data name="Agents.CallStatus.Reason.ContentSafetyBlocked" xml:space="preserve"><value>Content safety blocked the generated content.</value></data>
+  <data name="Agents.CallStatus.Reason.PolicyFailure" xml:space="preserve"><value>The content-safety policy could not be evaluated.</value></data>
+  <data name="Agents.CallStatus.Reason.PartyIdentityUnavailable" xml:space="preserve"><value>The Agent's Party identity is unavailable.</value></data>
+  <data name="Agents.CallStatus.Reason.MembershipUnavailable" xml:space="preserve"><value>The Conversation membership is unavailable.</value></data>
+  <data name="Agents.CallStatus.Reason.MembershipRejected" xml:space="preserve"><value>The Conversation rejected the Agent's participation.</value></data>
+  <data name="Agents.CallStatus.Reason.ConversationUnavailable" xml:space="preserve"><value>The Source Conversation is unavailable.</value></data>
+  <data name="Agents.CallStatus.Reason.PostRejected" xml:space="preserve"><value>The Conversation rejected the message.</value></data>
+  <data name="Agents.CallStatus.Reason.Satisfied" xml:space="preserve"><value>The check passed.</value></data>
+  <data name="Agents.CallStatus.Reason.Missing" xml:space="preserve"><value>A required dependency is missing.</value></data>
+  <data name="Agents.CallStatus.Reason.Stale" xml:space="preserve"><value>A required dependency could not be read fresh enough.</value></data>
+  <data name="Agents.CallStatus.Reason.Ambiguous" xml:space="preserve"><value>A required dependency is ambiguous.</value></data>
+  <data name="Agents.CallStatus.Reason.Disabled" xml:space="preserve"><value>A required dependency is disabled.</value></data>
+  <data name="Agents.CallStatus.Reason.Unavailable" xml:space="preserve"><value>A required dependency is unavailable.</value></data>
+  <data name="Agents.CallStatus.Reason.Unauthorized" xml:space="preserve"><value>You are not authorized for a required dependency.</value></data>
+  <data name="Agents.CallStatus.Reason.TenantAccess" xml:space="preserve"><value>Tenant access is required.</value></data>
+  <data name="Agents.CallStatus.Reason.CallerPartyState" xml:space="preserve"><value>Your Party must be active.</value></data>
+  <data name="Agents.CallStatus.Reason.SourceConversationAccess" xml:space="preserve"><value>Access to the Source Conversation is required.</value></data>
+  <data name="Agents.CallStatus.Reason.AgentLifecycle" xml:space="preserve"><value>hexa is not active.</value></data>
+  <data name="Agents.CallStatus.Reason.AgentPartyIdentity" xml:space="preserve"><value>The Agent's Party identity is required.</value></data>
+  <data name="Agents.CallStatus.Reason.ProviderModelReadiness" xml:space="preserve"><value>The provider or model is not ready.</value></data>
+  <data name="Agents.CallStatus.Reason.ResponsePolicy" xml:space="preserve"><value>The response policy is not resolvable.</value></data>
+  <data name="Agents.CallStatus.Reason.ContentSafetyPolicy" xml:space="preserve"><value>A content-safety policy is required.</value></data>
+  <data name="Agents.CallStatus.Reason.DependencyFreshness" xml:space="preserve"><value>A dependency is stale.</value></data>
+  <data name="Agents.ConversationCall.Panel.Label" xml:space="preserve"><value>Call hexa</value></data>
+  <data name="Agents.ConversationCall.Panel.CallLabel" xml:space="preserve"><value>Call</value></data>
+  <data name="Agents.ConversationCall.Panel.AgentName" xml:space="preserve"><value>hexa</value></data>
+  <data name="Agents.ConversationCall.Panel.Caller.Label" xml:space="preserve"><value>Caller</value></data>
+  <data name="Agents.ConversationCall.Panel.Caller.You" xml:space="preserve"><value>You</value></data>
+  <data name="Agents.ConversationCall.Panel.Agent.Label" xml:space="preserve"><value>Agent</value></data>
+  <data name="Agents.ConversationCall.Panel.SourceConversation.Label" xml:space="preserve"><value>Source Conversation</value></data>
+  <data name="Agents.ConversationCall.Panel.Prompt.Label" xml:space="preserve"><value>Prompt</value></data>
+  <data name="Agents.ConversationCall.Panel.Prompt.Placeholder" xml:space="preserve"><value>Ask hexa…</value></data>
+  <data name="Agents.ConversationCall.Panel.ResponseMode.Label" xml:space="preserve"><value>Response mode</value></data>
+  <data name="Agents.ConversationCall.Panel.Implication.Automatic" xml:space="preserve"><value>Automatic posts directly to the Conversation.</value></data>
+  <data name="Agents.ConversationCall.Panel.Implication.Confirmation" xml:space="preserve"><value>Confirmation requires approval before posting.</value></data>
+  <data name="Agents.ConversationCall.Panel.Submit" xml:space="preserve"><value>Call hexa</value></data>
+  <data name="Agents.ConversationCall.Panel.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Agents.ConversationCall.Panel.Status.Calling" xml:space="preserve"><value>Calling hexa…</value></data>
+  <data name="Agents.ConversationCall.Panel.Status.Generating" xml:space="preserve"><value>Generating…</value></data>
+  <data name="Agents.ConversationCall.Panel.Status.Posting" xml:space="preserve"><value>Generating complete — posting…</value></data>
+  <data name="Agents.ConversationCall.Panel.Status.Posted" xml:space="preserve"><value>Posted to the Conversation.</value></data>
+  <data name="Agents.ConversationCall.Panel.Status.Failed" xml:space="preserve"><value>The call did not complete. See the status for details.</value></data>
+  <data name="Agents.ConversationCall.Feedback.Unavailable" xml:space="preserve"><value>Automatic calling is unavailable on this view. Review-only status is shown.</value></data>
 </root>

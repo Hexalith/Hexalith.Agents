@@ -1,0 +1,28 @@
+@inject IStringLocalizer<AgentsResources> Localizer
+
+@* agent-call-status-badge (AC2, AC4): color + icon + visible text together — never color-only (UX-DR12). The
+   accessible name is the same safe whole string and never carries a prompt, generated content, id, secret, or PII
+   (AD-14). Success is used only for the proven-complete Posted state (UX-DR11). The badge only swaps color+icon+text;
+   the consuming surface owns the reserved, fixed-width slot so rows do not jump on transition (UX-DR17/UX-DR38). *@
+<FluentBadge Appearance="BadgeAppearance.Tint"
+             Color="@AgentCallStatusPresentation.ColorFor(State)"
+             IconStart="@StateIcon"
+             role="status"
+             aria-label="@Label"
+             data-testid="@TestId">
+    @Label
+</FluentBadge>
+
+@code {
+    /// <summary>The canonical UX call-status to render (compute via <see cref="AgentCallStatusPresentation.MapStatus"/> / <see cref="AgentCallStatusPresentation.Derive"/>).</summary>
+    [Parameter]
+    public AgentCallStatus State { get; set; } = AgentCallStatus.Unknown;
+
+    /// <summary>Stable test id for the badge surface.</summary>
+    [Parameter]
+    public string TestId { get; set; } = "agent-call-status-badge";
+
+    private string Label => Localizer[AgentCallStatusPresentation.LabelKeyFor(State)];
+
+    private Icon StateIcon => AgentCallStatusPresentation.IconFor(State);
+}

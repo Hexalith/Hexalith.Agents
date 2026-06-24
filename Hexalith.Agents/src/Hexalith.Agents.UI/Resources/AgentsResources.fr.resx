@@ -208,4 +208,84 @@
   <data name="Agents.ApproverPolicy.SourceKind.PredefinedParty" xml:space="preserve"><value>Tiers prédéfini</value></data>
   <data name="Agents.ApproverPolicy.SourceKind.TenantRole" xml:space="preserve"><value>Rôle de locataire</value></data>
   <data name="Agents.ApproverPolicy.SourceKind.ConversationOwner" xml:space="preserve"><value>Facilitateur de conversation</value></data>
+
+  <!-- Story 2.6 — Conversation invocation UX and call-status feedback (AC1-AC4) -->
+  <data name="Agents.Navigation.ConversationCall" xml:space="preserve"><value>Appel depuis la conversation</value></data>
+  <data name="Agents.ConversationCall.Title" xml:space="preserve"><value>Appel depuis la conversation</value></data>
+  <data name="Agents.ConversationCall.Eyebrow" xml:space="preserve"><value>Invocation de l'agent</value></data>
+  <data name="Agents.ConversationCall.Description" xml:space="preserve"><value>Appelez hexa depuis une conversation et suivez l'état de l'appel : en attente, bloqué, échoué ou publié.</value></data>
+  <data name="Agents.CallStatus.Status.Requested" xml:space="preserve"><value>Demandé</value></data>
+  <data name="Agents.CallStatus.Status.Authorized" xml:space="preserve"><value>Autorisé</value></data>
+  <data name="Agents.CallStatus.Status.Denied" xml:space="preserve"><value>Refusé</value></data>
+  <data name="Agents.CallStatus.Status.Blocked" xml:space="preserve"><value>Bloqué</value></data>
+  <data name="Agents.CallStatus.Status.ContextLoading" xml:space="preserve"><value>Chargement du contexte</value></data>
+  <data name="Agents.CallStatus.Status.ContextBlocked" xml:space="preserve"><value>Contexte bloqué</value></data>
+  <data name="Agents.CallStatus.Status.Generating" xml:space="preserve"><value>Génération en cours</value></data>
+  <data name="Agents.CallStatus.Status.GenerationFailed" xml:space="preserve"><value>Échec de la génération</value></data>
+  <data name="Agents.CallStatus.Status.SafetyFailed" xml:space="preserve"><value>Échec du contrôle de sécurité</value></data>
+  <data name="Agents.CallStatus.Status.Generated" xml:space="preserve"><value>Généré</value></data>
+  <data name="Agents.CallStatus.Status.PostingPending" xml:space="preserve"><value>Publication en cours</value></data>
+  <data name="Agents.CallStatus.Status.Posted" xml:space="preserve"><value>Publié</value></data>
+  <data name="Agents.CallStatus.Status.PostingFailed" xml:space="preserve"><value>Échec de la publication</value></data>
+  <data name="Agents.CallStatus.Status.Unknown" xml:space="preserve"><value>Inconnu</value></data>
+  <data name="Agents.CallStatus.Reason.Denied" xml:space="preserve"><value>Vous n'êtes pas autorisé à appeler hexa dans cette conversation.</value></data>
+  <data name="Agents.CallStatus.Reason.Blocked" xml:space="preserve"><value>Le fournisseur ou une dépendance est indisponible. L'appel est bloqué.</value></data>
+  <data name="Agents.CallStatus.Reason.ContextBlocked" xml:space="preserve"><value>Le contexte de la conversation n'a pas pu être construit en toute sécurité.</value></data>
+  <data name="Agents.CallStatus.Reason.SafetyFailed" xml:space="preserve"><value>La sécurité du contenu a bloqué cette réponse.</value></data>
+  <data name="Agents.CallStatus.Reason.GenerationFailed" xml:space="preserve"><value>La réponse n'a pas pu être générée.</value></data>
+  <data name="Agents.CallStatus.Reason.PostingFailed" xml:space="preserve"><value>La réponse n'a pas pu être publiée dans la conversation.</value></data>
+  <data name="Agents.CallStatus.Reason.Unknown" xml:space="preserve"><value>L'appel n'a pas pu aboutir pour une raison non reconnue.</value></data>
+  <data name="Agents.CallStatus.Reason.ContextUnavailable" xml:space="preserve"><value>Le contexte de la conversation est indisponible.</value></data>
+  <data name="Agents.CallStatus.Reason.ContextNotFresh" xml:space="preserve"><value>Le contexte de la conversation n'a pas pu être lu de façon suffisamment récente.</value></data>
+  <data name="Agents.CallStatus.Reason.ExceedsModelBudget" xml:space="preserve"><value>Le contexte dépasse le budget du modèle.</value></data>
+  <data name="Agents.CallStatus.Reason.ModelBudgetUnavailable" xml:space="preserve"><value>Le budget du modèle n'a pas pu être déterminé.</value></data>
+  <data name="Agents.CallStatus.Reason.ProviderTimeout" xml:space="preserve"><value>Le fournisseur a expiré.</value></data>
+  <data name="Agents.CallStatus.Reason.ProviderDisabled" xml:space="preserve"><value>Le fournisseur ou le modèle sélectionné est désactivé.</value></data>
+  <data name="Agents.CallStatus.Reason.ProviderUnavailable" xml:space="preserve"><value>Le fournisseur est indisponible.</value></data>
+  <data name="Agents.CallStatus.Reason.AdapterFailure" xml:space="preserve"><value>Un adaptateur de dépendance a échoué.</value></data>
+  <data name="Agents.CallStatus.Reason.InvalidContext" xml:space="preserve"><value>Le contexte n'a pas pu être préparé pour la génération.</value></data>
+  <data name="Agents.CallStatus.Reason.GenerationError" xml:space="preserve"><value>La génération a échoué.</value></data>
+  <data name="Agents.CallStatus.Reason.ContentSafetyBlocked" xml:space="preserve"><value>La sécurité du contenu a bloqué le contenu généré.</value></data>
+  <data name="Agents.CallStatus.Reason.PolicyFailure" xml:space="preserve"><value>La politique de sécurité du contenu n'a pas pu être évaluée.</value></data>
+  <data name="Agents.CallStatus.Reason.PartyIdentityUnavailable" xml:space="preserve"><value>L'identité de tiers de l'agent est indisponible.</value></data>
+  <data name="Agents.CallStatus.Reason.MembershipUnavailable" xml:space="preserve"><value>L'adhésion à la conversation est indisponible.</value></data>
+  <data name="Agents.CallStatus.Reason.MembershipRejected" xml:space="preserve"><value>La conversation a refusé la participation de l'agent.</value></data>
+  <data name="Agents.CallStatus.Reason.ConversationUnavailable" xml:space="preserve"><value>La conversation source est indisponible.</value></data>
+  <data name="Agents.CallStatus.Reason.PostRejected" xml:space="preserve"><value>La conversation a refusé le message.</value></data>
+  <data name="Agents.CallStatus.Reason.Satisfied" xml:space="preserve"><value>La vérification a réussi.</value></data>
+  <data name="Agents.CallStatus.Reason.Missing" xml:space="preserve"><value>Une dépendance requise est absente.</value></data>
+  <data name="Agents.CallStatus.Reason.Stale" xml:space="preserve"><value>Une dépendance requise n'a pas pu être lue de façon suffisamment récente.</value></data>
+  <data name="Agents.CallStatus.Reason.Ambiguous" xml:space="preserve"><value>Une dépendance requise est ambiguë.</value></data>
+  <data name="Agents.CallStatus.Reason.Disabled" xml:space="preserve"><value>Une dépendance requise est désactivée.</value></data>
+  <data name="Agents.CallStatus.Reason.Unavailable" xml:space="preserve"><value>Une dépendance requise est indisponible.</value></data>
+  <data name="Agents.CallStatus.Reason.Unauthorized" xml:space="preserve"><value>Vous n'êtes pas autorisé pour une dépendance requise.</value></data>
+  <data name="Agents.CallStatus.Reason.TenantAccess" xml:space="preserve"><value>L'accès au locataire est requis.</value></data>
+  <data name="Agents.CallStatus.Reason.CallerPartyState" xml:space="preserve"><value>Votre tiers doit être actif.</value></data>
+  <data name="Agents.CallStatus.Reason.SourceConversationAccess" xml:space="preserve"><value>L'accès à la conversation source est requis.</value></data>
+  <data name="Agents.CallStatus.Reason.AgentLifecycle" xml:space="preserve"><value>hexa n'est pas actif.</value></data>
+  <data name="Agents.CallStatus.Reason.AgentPartyIdentity" xml:space="preserve"><value>L'identité de tiers de l'agent est requise.</value></data>
+  <data name="Agents.CallStatus.Reason.ProviderModelReadiness" xml:space="preserve"><value>Le fournisseur ou le modèle n'est pas prêt.</value></data>
+  <data name="Agents.CallStatus.Reason.ResponsePolicy" xml:space="preserve"><value>La politique de réponse n'est pas résoluble.</value></data>
+  <data name="Agents.CallStatus.Reason.ContentSafetyPolicy" xml:space="preserve"><value>Une politique de sécurité du contenu est requise.</value></data>
+  <data name="Agents.CallStatus.Reason.DependencyFreshness" xml:space="preserve"><value>Une dépendance est périmée.</value></data>
+  <data name="Agents.ConversationCall.Panel.Label" xml:space="preserve"><value>Appeler hexa</value></data>
+  <data name="Agents.ConversationCall.Panel.CallLabel" xml:space="preserve"><value>Appeler</value></data>
+  <data name="Agents.ConversationCall.Panel.AgentName" xml:space="preserve"><value>hexa</value></data>
+  <data name="Agents.ConversationCall.Panel.Caller.Label" xml:space="preserve"><value>Appelant</value></data>
+  <data name="Agents.ConversationCall.Panel.Caller.You" xml:space="preserve"><value>Vous</value></data>
+  <data name="Agents.ConversationCall.Panel.Agent.Label" xml:space="preserve"><value>Agent</value></data>
+  <data name="Agents.ConversationCall.Panel.SourceConversation.Label" xml:space="preserve"><value>Conversation source</value></data>
+  <data name="Agents.ConversationCall.Panel.Prompt.Label" xml:space="preserve"><value>Invite</value></data>
+  <data name="Agents.ConversationCall.Panel.Prompt.Placeholder" xml:space="preserve"><value>Demandez à hexa…</value></data>
+  <data name="Agents.ConversationCall.Panel.ResponseMode.Label" xml:space="preserve"><value>Mode de réponse</value></data>
+  <data name="Agents.ConversationCall.Panel.Implication.Automatic" xml:space="preserve"><value>Le mode automatique publie directement dans la conversation.</value></data>
+  <data name="Agents.ConversationCall.Panel.Implication.Confirmation" xml:space="preserve"><value>Le mode confirmation exige une approbation avant la publication.</value></data>
+  <data name="Agents.ConversationCall.Panel.Submit" xml:space="preserve"><value>Appeler hexa</value></data>
+  <data name="Agents.ConversationCall.Panel.Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Agents.ConversationCall.Panel.Status.Calling" xml:space="preserve"><value>Appel de hexa…</value></data>
+  <data name="Agents.ConversationCall.Panel.Status.Generating" xml:space="preserve"><value>Génération en cours…</value></data>
+  <data name="Agents.ConversationCall.Panel.Status.Posting" xml:space="preserve"><value>Génération terminée — publication en cours…</value></data>
+  <data name="Agents.ConversationCall.Panel.Status.Posted" xml:space="preserve"><value>Publié dans la conversation.</value></data>
+  <data name="Agents.ConversationCall.Panel.Status.Failed" xml:space="preserve"><value>L'appel n'a pas abouti. Consultez l'état pour plus de détails.</value></data>
+  <data name="Agents.ConversationCall.Feedback.Unavailable" xml:space="preserve"><value>L'appel automatique est indisponible sur cette vue. Seul l'état en lecture seule est affiché.</value></data>
 </root>

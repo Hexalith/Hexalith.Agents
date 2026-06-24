@@ -1,0 +1,63 @@
+@page "/agents/conversation-call"
+@attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsAdministratorPolicy)]
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IConversationAgentCallGateway Gateway
+
+@* Conversation call (AC1, AC2): the V1 in-product invocation surface. Judgment-heavy invocation uses a Constrained
+   layout (UX-DR15); the status badge sits in a reserved slot inside the feedback surface (UX-DR17). By default the
+   deferred gateway returns NotAuthorized, so the page renders the permission-denied surface — exactly like the admin
+   pages — proving the fail-closed default (AD-12). The actual Conversation-owned mention/command/action wiring is
+   deferred to PRD OQ-1; this page hosts the pattern-agnostic affordance per UX-DR24. *@
+<FcPageLayout Mode="FcPageLayoutMode.Constrained">
+    <FcContentLabel LabelledBy="@HeadingId" />
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="24px" Class="agents-conversation-call" data-testid="agents-conversation-call">
+        <FcPageHeader @ref="_header"
+                      PageTitle="@Localizer["Agents.ConversationCall.Title"]"
+                      Heading="@Localizer["Agents.ConversationCall.Title"]"
+                      HeadingId="@HeadingId"
+                      HeadingTabIndex="-1"
+                      Eyebrow="@Localizer["Agents.ConversationCall.Eyebrow"]"
+                      Description="@Localizer["Agents.ConversationCall.Description"]"
+                      TestId="agents-conversation-call-header" />
+
+        @if (_result is null)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Loading" TestId="agents-conversation-call-state" />
+        }
+        else if (_result.Status is AgentInteractionInspectionStatus.NotAuthorized)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-conversation-call-state" />
+        }
+        else
+        {
+            @* Authorized: render the pattern-agnostic invocation panel. It captures the prompt + Source Conversation
+               context, shows the response-mode implication, calls the gateway on submit, and renders live call status
+               through the feedback surface — never implying a post until status reaches Posted (AC1). *@
+            <ConversationAgentCallPanel SourceConversationId="@string.Empty"
+                                        TestId="agents-conversation-call-panel" />
+        }
+    </FluentStack>
+</FcPageLayout>
+
+@code {
+    private const string HeadingId = "agents-conversation-call-heading";
+
+    private FcPageHeader? _header;
+    private AgentInteractionInspectionResult? _result;
+    private bool _focusHeadingPending = true;
+
+    // Authorization probe: an unauthorized caller fails closed to NotAuthorized regardless of id; an authorized caller
+    // with no such interaction reads NotFound. Either non-NotAuthorized outcome unlocks the invocation panel. With the
+    // deferred gateway bound, this returns NotAuthorized so the page renders permission-denied (AD-12).
+    protected override async Task OnInitializedAsync()
+        => _result = await Gateway.GetCallStatusAsync(string.Empty, CancellationToken.None).ConfigureAwait(false);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusHeadingPending && _header is not null)
+        {
+            _focusHeadingPending = false;
+            await _header.FocusHeadingAsync().ConfigureAwait(false);
+        }
+    }
+}

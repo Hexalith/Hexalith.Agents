@@ -64,7 +64,7 @@ development_status:
   2-3-build-conversation-context-with-safe-bounds: done
   2-4-generate-and-safety-check-agent-output: done
   2-5-post-automatic-responses-through-conversations: done
-  2-6-conversation-invocation-ux-and-call-status-feedback: backlog
+  2-6-conversation-invocation-ux-and-call-status-feedback: done
   epic-2-retrospective: optional
   epic-3: backlog
   3-1-create-proposed-agent-replies-in-confirmation-mode: backlog
