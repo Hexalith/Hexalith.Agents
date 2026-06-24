@@ -146,6 +146,76 @@ internal static class AgentInteractionTestData
     internal static EvaluateAgentInteractionGate GateCommand(IReadOnlyList<AgentInvocationGateVerdict> verdicts, string interactionId = InteractionId)
         => new(interactionId, verdicts);
 
+    // ===== Story 2.3 context fixtures =====
+
+    /// <summary>The sample model context-window token limit (matches the OpenAI gpt-4o catalog entry used in the gate tests).</summary>
+    internal const int ContextWindowTokenLimit = 128_000;
+
+    /// <summary>The sample reserved-output token count (the catalog entry's max-output limit; AC2).</summary>
+    internal const int ReservedOutputTokenCount = 16_000;
+
+    /// <summary>The sample provider capability version backing the budget.</summary>
+    internal const int ProviderCapabilityVersion = 1;
+
+    /// <summary>The context precondition: an interaction whose gate passed (status <c>Authorized</c>) so context building may run.</summary>
+    /// <returns>The rehydrated authorized interaction state, driven through the real <c>Apply</c> handlers.</returns>
+    internal static AgentInteractionState StateAuthorized()
+    {
+        AgentInteractionState state = StateRequested();
+        state.Apply(new AgentInteractionAuthorized(InteractionId));
+        return state;
+    }
+
+    /// <summary>Builds a server-assembled context measurement with sane budget defaults.</summary>
+    /// <param name="loadOutcome">The Conversations load classification.</param>
+    /// <param name="fullContextTokenCount">The measured full-context token count.</param>
+    /// <param name="messageCount">The visible message count.</param>
+    /// <param name="contextWindowTokenLimit">The model context-window token limit.</param>
+    /// <param name="reservedOutputTokenCount">The reserved output tokens.</param>
+    /// <param name="providerCapabilityVersion">The provider capability version.</param>
+    /// <param name="approvedBoundedBehavior">The approved bounded behavior, if any.</param>
+    /// <returns>The context measurement.</returns>
+    internal static AgentInteractionContextMeasurement Measurement(
+        AgentInteractionContextLoadOutcome loadOutcome = AgentInteractionContextLoadOutcome.Loaded,
+        int fullContextTokenCount = 1_000,
+        int messageCount = 3,
+        int contextWindowTokenLimit = ContextWindowTokenLimit,
+        int reservedOutputTokenCount = ReservedOutputTokenCount,
+        int providerCapabilityVersion = ProviderCapabilityVersion,
+        AgentInteractionBoundedContextBehavior? approvedBoundedBehavior = null)
+        => new(
+            loadOutcome,
+            fullContextTokenCount,
+            messageCount,
+            contextWindowTokenLimit,
+            reservedOutputTokenCount,
+            providerCapabilityVersion,
+            AgentInteractionSnapshot.DefaultContextPolicyReference,
+            approvedBoundedBehavior);
+
+    /// <summary>A loaded measurement whose full context fits the budget (available = 112000) → ContextReady(Full).</summary>
+    /// <returns>The fitting measurement.</returns>
+    internal static AgentInteractionContextMeasurement FullFitsMeasurement() => Measurement(fullContextTokenCount: 1_000);
+
+    /// <summary>A loaded measurement whose full context exceeds the budget with no approved bounded behavior → ContextBlocked(ExceedsModelBudget).</summary>
+    /// <returns>The oversized measurement.</returns>
+    internal static AgentInteractionContextMeasurement OversizedMeasurement() => Measurement(fullContextTokenCount: 200_000);
+
+    /// <summary>A loaded, oversized measurement with an approved bounded behavior that fits → ContextReady(Bounded).</summary>
+    /// <param name="boundedLimit">The approved bounded-context token limit.</param>
+    /// <returns>The bounded-approved measurement.</returns>
+    internal static AgentInteractionContextMeasurement BoundedApprovedMeasurement(int boundedLimit = 50_000)
+        => Measurement(
+            fullContextTokenCount: 200_000,
+            approvedBoundedBehavior: new AgentInteractionBoundedContextBehavior("bounded-conversation-test-v1", boundedLimit));
+
+    /// <summary>The context command carrying the given measurement for the sample interaction.</summary>
+    /// <param name="measurement">The server-assembled measurement.</param>
+    /// <param name="interactionId">The deterministic interaction id (the aggregate id).</param>
+    /// <returns>The context command.</returns>
+    internal static BuildAgentInteractionContext ContextCommand(AgentInteractionContextMeasurement measurement, string interactionId = InteractionId)
+        => new(interactionId, measurement);
+
     /// <summary>
     /// Applies every event of a <see cref="DomainResult"/> to the supplied state through the aggregate's typed
     /// <c>Apply</c> methods — the same production replay handlers the EventStore state-store invokes. The success
@@ -165,6 +235,9 @@ internal static class AgentInteractionTestData
                 case InvalidAgentInteractionRequestRejection e: state.Apply(e); break;
                 case AgentInteractionAlreadyRequestedRejection e: state.Apply(e); break;
                 case AgentInteractionGateNotEvaluableRejection e: state.Apply(e); break;
+                case AgentInteractionContextReady e: state.Apply(e); break;
+                case AgentInteractionContextBlocked e: state.Apply(e); break;
+                case AgentInteractionContextNotBuildableRejection e: state.Apply(e); break;
                 default: throw new InvalidOperationException($"Unhandled event type '{payload.GetType().Name}' in test apply dispatch.");
             }
         }

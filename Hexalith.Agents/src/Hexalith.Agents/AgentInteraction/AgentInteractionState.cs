@@ -51,6 +51,12 @@ public sealed class AgentInteractionState
     /// <summary>Gets or sets the safe blocker verdicts recorded when the gate failed (Audit Evidence; FR-24, AD-14). <see langword="null"/> until a gate decision is recorded.</summary>
     public IReadOnlyList<AgentInvocationGateVerdict>? GateVerdicts { get; set; }
 
+    /// <summary>Gets or sets the safe Conversation context evidence recorded when the context decision was made (Audit Evidence; FR-24, AD-14). <see langword="null"/> until a context decision is recorded.</summary>
+    public AgentInteractionContextEvidence? ContextEvidence { get; set; }
+
+    /// <summary>Gets or sets the safe block-reason classification recorded when context could not be built within safe bounds (FR-25, AD-12). <see langword="null"/> until a context-blocked decision is recorded.</summary>
+    public AgentInteractionContextBlockReason? ContextBlockReason { get; set; }
+
     /// <summary>Applies the Agent Call request: the interaction exists and freezes its configuration snapshot (AC1).</summary>
     /// <param name="e">The event.</param>
     public void Apply(InteractionRequested e)
@@ -97,6 +103,43 @@ public sealed class AgentInteractionState
     /// <summary>No-op replay handler — the gate-not-evaluable rejection carries no state change.</summary>
     /// <param name="e">The rejection event.</param>
     public void Apply(AgentInteractionGateNotEvaluableRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>Applies the context-ready outcome: the interaction built its context within safe bounds and may proceed to generation (AC2, AC4; Story 2.3).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentInteractionContextReady e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ContextReady;
+        ContextEvidence = e.Evidence;
+    }
+
+    /// <summary>Applies the context-blocked outcome: records the terminal fail-closed context decision and its safe evidence (AC3; Story 2.3).</summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentInteractionContextBlocked e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsRequested)
+        {
+            return;
+        }
+
+        Status = AgentInteractionStatus.ContextBlocked;
+        ContextEvidence = e.Evidence;
+        ContextBlockReason = e.Reason;
+    }
+
+    /// <summary>No-op replay handler — the context-not-buildable rejection carries no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(AgentInteractionContextNotBuildableRejection e)
     {
         ArgumentNullException.ThrowIfNull(e);
         MarkReplayOnlyEventHandled();

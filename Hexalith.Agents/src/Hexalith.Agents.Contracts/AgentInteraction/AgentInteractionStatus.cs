@@ -28,4 +28,10 @@ public enum AgentInteractionStatus
 
     /// <summary>A dependency-readiness-class gate check failed (Agent lifecycle/Party identity, Provider/model, response/content-safety policy, or dependency freshness) — required state is missing/stale/ambiguous/disabled/unavailable; recorded as fail-closed Audit Evidence (Story 2.2; AC1).</summary>
     Blocked,
+
+    /// <summary>Conversation context was built within safe bounds (full or an approved bounded behavior) and the call may proceed to generation (Story 2.3; Story 2.4 consumes this) (AC2, AC4).</summary>
+    ContextReady,
+
+    /// <summary>Conversation context could not be built within safe bounds (oversized with no approved bounded behavior, not loadable fresh enough, or an untrustworthy model budget) — the call fails closed with no provider call, proposal, or Conversation Message; recorded as fail-closed Audit Evidence (Story 2.3; AC3).</summary>
+    ContextBlocked,
 }

@@ -14,6 +14,7 @@ using Hexalith.Agents.Server;
 using Hexalith.Agents.Server.Application.AgentInteractions;
 using Hexalith.Agents.Server.Application.Agents;
 using Hexalith.Agents.Server.Ports;
+using Hexalith.Conversations.Client;
 using Hexalith.EventStore.DomainService;
 using Hexalith.Parties.Client.Extensions;
 
@@ -94,6 +95,28 @@ builder.Services.AddSingleton<ITenantAccessReader, DeferredTenantAccessReader>()
 builder.Services.AddSingleton<IConversationAccessReader, DeferredConversationAccessReader>();
 builder.Services.AddSingleton<IAgentInvocationReadinessReader, DeferredAgentInvocationReadinessReader>();
 builder.Services.AddScoped<AgentInteractionGateOrchestrator>();
+
+// Story 2.3: Conversation context-building wiring. The context aggregate handler auto-registers via the existing
+// AddEventStoreDomainService assembly scan (no host change needed). The context orchestration reads the authorized
+// Source Conversation content, measures tokens, reads the reused provider-catalog budget, and dispatches the
+// BuildAgentInteractionContext command. Per Story 2.2's hand-off, the LIVE Conversations content reader
+// (ConversationClientContextReader over IConversationClient.GetConversationAsync) IS authored here, but registered only
+// when a "Conversations" config section exists; otherwise the DeferredConversationContextReader keeps the DI graph
+// complete and fails closed (ContextBlocked/ContextUnavailable). Token measurement stays deferred (no tokenizer bound),
+// and live command dispatch stays deferred behind DeferredAgentCommandDispatcher. No provider adapter, no Conversations
+// post, and no proposal is wired here (AC3), mirroring 1.2/1.4/1.5/1.6/1.7/2.1/2.2.
+builder.Services.AddSingleton<IConversationContextTokenMeasurer, DeferredConversationContextTokenMeasurer>();
+if (builder.Configuration.GetSection("Conversations").Exists())
+{
+    builder.Services.AddHexalithConversationsClient(o => o.Endpoint = new Uri(builder.Configuration["Conversations:BaseUrl"]!));
+    builder.Services.AddSingleton<IConversationContextReader, ConversationClientContextReader>();
+}
+else
+{
+    builder.Services.AddSingleton<IConversationContextReader, DeferredConversationContextReader>();
+}
+
+builder.Services.AddScoped<AgentInteractionContextOrchestrator>();
 
 WebApplication app = builder.Build();
 

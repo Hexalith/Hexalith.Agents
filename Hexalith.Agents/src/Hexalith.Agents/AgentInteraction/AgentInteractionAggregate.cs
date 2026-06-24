@@ -132,6 +132,53 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
         ]);
     }
 
+    /// <summary>
+    /// Builds the Conversation context within safe bounds from the server-assembled measurement and records the terminal
+    /// context decision (AC1–AC4; FR-9; AD-3, AD-11, AD-12, AD-13).
+    /// </summary>
+    /// <param name="command">The context command carrying the server-assembled measurement (client values discarded upstream).</param>
+    /// <param name="state">The current interaction state (must be Authorized before context can be built).</param>
+    /// <param name="envelope">The command envelope (carries the interaction id and the tenant scope).</param>
+    /// <returns>The domain result (the context-ready/blocked outcome event, a not-buildable rejection, or an idempotent no-op).</returns>
+    public static DomainResult Handle(BuildAgentInteractionContext command, AgentInteractionState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string interactionId = envelope.AggregateId;
+
+        // State precondition: context can only be built on a recorded interaction. A context command on a never-requested
+        // stream is a structural rejection (no state change), not a recorded decision (AD-12). The positive pattern binds
+        // the non-null requested state so the context logic runs only over a recorded interaction.
+        if (state is { IsRequested: true } requested)
+        {
+            // Idempotent terminal context (AD-13): the decision is recorded once and is terminal. A re-issued context
+            // command on an already-decided interaction is a clean no-op — the aggregate never silently flips a recorded
+            // ContextReady/ContextBlocked decision.
+            if (requested.Status is AgentInteractionStatus.ContextReady or AgentInteractionStatus.ContextBlocked)
+            {
+                return DomainResult.NoOp();
+            }
+
+            // Authorization precondition (AD-11): context must never be built on a call that has not cleared the gate. A
+            // Requested/Denied/Blocked interaction is a structural rejection (no state change) — distinct from a recorded
+            // context-blocked decision, which only ever follows an Authorized interaction.
+            if (requested.Status != AgentInteractionStatus.Authorized)
+            {
+                return DomainResult.Rejection([
+                    new AgentInteractionContextNotBuildableRejection(interactionId, AgentInteractionContextNotBuildableReason.InteractionNotAuthorized),
+                ]);
+            }
+
+            // Pure evaluation (AD-3): emit the context-ready/blocked outcome only. The measurement arrives pre-assembled
+            // from trusted server reads (the context orchestration); the aggregate's sole job is the budget → decision math.
+            return AgentInteractionContextPolicy.Evaluate(interactionId, command.Measurement);
+        }
+
+        return DomainResult.Rejection([
+            new AgentInteractionContextNotBuildableRejection(interactionId, AgentInteractionContextNotBuildableReason.InteractionNotRequested),
+        ]);
+    }
+
     // By-value comparison of a re-issued request against the recorded one (AD-13). Strings are compared ordinally;
     // the snapshot scalars are compared explicitly so a re-derived-id collision with a different configuration is
     // surfaced as a conflict rather than a silent no-op.

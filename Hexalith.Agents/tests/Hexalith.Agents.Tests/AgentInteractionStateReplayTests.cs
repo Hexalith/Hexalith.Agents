@@ -166,4 +166,124 @@ public sealed class AgentInteractionStateReplayTests
             return state;
         }
     }
+
+    // ===== Story 2.3 context replay (status transitions; AC2, AC3, AC4) =====
+
+    [Fact]
+    public void Apply_context_ready_transitions_status_and_records_safe_evidence()
+    {
+        AgentInteractionState state = StateAuthorized();
+        AgentInteractionContextReady ready = AgentInteractionContextPolicy.Evaluate(InteractionId, FullFitsMeasurement())
+            .Events[0].ShouldBeOfType<AgentInteractionContextReady>();
+
+        state.Apply(ready);
+
+        state.Status.ShouldBe(AgentInteractionStatus.ContextReady);
+        state.ContextEvidence.ShouldNotBeNull().Mode.ShouldBe(AgentInteractionContextMode.Full);
+        state.ContextBlockReason.ShouldBeNull();
+        state.Prompt.ShouldBe(Prompt); // the request payload is untouched by context building (AD-14)
+    }
+
+    [Fact]
+    public void Apply_context_blocked_records_the_decision_and_block_reason()
+    {
+        AgentInteractionState state = StateAuthorized();
+        AgentInteractionContextBlocked blocked = AgentInteractionContextPolicy.Evaluate(InteractionId, OversizedMeasurement())
+            .Events[0].ShouldBeOfType<AgentInteractionContextBlocked>();
+
+        state.Apply(blocked);
+
+        state.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+        state.ContextBlockReason.ShouldBe(AgentInteractionContextBlockReason.ExceedsModelBudget);
+        state.ContextEvidence.ShouldNotBeNull().FullContextTokenCount.ShouldBe(200_000);
+    }
+
+    [Fact]
+    public void Apply_context_not_buildable_rejection_is_a_replay_safe_noop()
+    {
+        AgentInteractionState state = StateAuthorized();
+
+        // A persisted not-buildable rejection must not throw or mutate the recorded request/status.
+        state.Apply(new AgentInteractionContextNotBuildableRejection(InteractionId, AgentInteractionContextNotBuildableReason.InteractionNotAuthorized));
+
+        state.Status.ShouldBe(AgentInteractionStatus.Authorized);
+        state.IsRequested.ShouldBeTrue();
+        state.ContextEvidence.ShouldBeNull();
+        state.ContextBlockReason.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Context_outcome_applies_only_over_a_requested_stream()
+    {
+        // A context outcome event ahead of the request (a malformed stream) must not flip status — every non-request
+        // Apply keeps the IsRequested guard so replay over a stream that begins before the request stays total.
+        var state = new AgentInteractionState();
+        AgentInteractionContextEvidence evidence = SampleEvidence();
+
+        state.Apply(new AgentInteractionContextReady(InteractionId, evidence));
+        state.Apply(new AgentInteractionContextBlocked(InteractionId, AgentInteractionContextBlockReason.ExceedsModelBudget, evidence));
+
+        state.IsRequested.ShouldBeFalse();
+        state.Status.ShouldBe(AgentInteractionStatus.Unknown);
+        state.ContextEvidence.ShouldBeNull();
+        state.ContextBlockReason.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Replay_over_request_authorize_then_context_ready_is_deterministic_across_rebuilds()
+    {
+        AgentInteractionState first = Rebuild();
+        AgentInteractionState second = Rebuild();
+
+        second.Status.ShouldBe(first.Status);
+        second.Status.ShouldBe(AgentInteractionStatus.ContextReady);
+        second.ContextEvidence.ShouldNotBeNull().Mode.ShouldBe(first.ContextEvidence!.Mode);
+        second.AgentInteractionId.ShouldBe(first.AgentInteractionId);
+
+        static AgentInteractionState Rebuild()
+        {
+            var state = new AgentInteractionState();
+            state.Apply(RequestedEvent(ValidRequest()));
+            state.Apply(new AgentInteractionAuthorized(InteractionId));
+            state.Apply(new AgentInteractionContextReady(InteractionId, SampleEvidence()));
+            return state;
+        }
+    }
+
+    [Fact]
+    public void Replay_over_request_authorize_then_context_blocked_is_deterministic_across_rebuilds()
+    {
+        // The fail-closed block decision (status + reason + evidence) must rehydrate identically on every rebuild so an
+        // administrator inspecting the audit record always sees the same context-blocked outcome (AC3; FR-24).
+        AgentInteractionState first = Rebuild();
+        AgentInteractionState second = Rebuild();
+
+        second.Status.ShouldBe(first.Status);
+        second.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+        second.ContextBlockReason.ShouldBe(first.ContextBlockReason);
+        second.ContextBlockReason.ShouldBe(AgentInteractionContextBlockReason.ExceedsModelBudget);
+        second.ContextEvidence.ShouldNotBeNull().FullContextTokenCount.ShouldBe(first.ContextEvidence!.FullContextTokenCount);
+
+        static AgentInteractionState Rebuild()
+        {
+            var state = new AgentInteractionState();
+            state.Apply(RequestedEvent(ValidRequest()));
+            state.Apply(new AgentInteractionAuthorized(InteractionId));
+            state.Apply(AgentInteractionContextPolicy.Evaluate(InteractionId, OversizedMeasurement())
+                .Events[0].ShouldBeOfType<AgentInteractionContextBlocked>());
+            return state;
+        }
+    }
+
+    private static AgentInteractionContextEvidence SampleEvidence()
+        => new(
+            AgentInteractionContextMode.Full,
+            FullContextTokenCount: 1_000,
+            UsedContextTokenCount: 1_000,
+            MessageCount: 3,
+            ReservedOutputTokenCount: ReservedOutputTokenCount,
+            ContextWindowTokenLimit: ContextWindowTokenLimit,
+            ProviderCapabilityVersion: ProviderCapabilityVersion,
+            AgentInteractionSnapshot.DefaultContextPolicyReference,
+            BoundedBehaviorReference: null);
 }
