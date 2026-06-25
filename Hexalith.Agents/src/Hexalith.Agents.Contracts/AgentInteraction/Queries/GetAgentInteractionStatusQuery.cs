@@ -11,4 +11,11 @@ namespace Hexalith.Agents.Contracts.AgentInteraction.Queries;
 /// deferred to the dedicated Agents read-model story (mirroring Story 1.2 / <c>GetAgentStatusQuery</c>). The stable
 /// query/view contracts land here.
 /// </remarks>
-public record GetAgentInteractionStatusQuery();
+public record GetAgentInteractionStatusQuery()
+{
+    /// <summary>The EventStore query domain.</summary>
+    public const string Domain = "agent-interaction";
+
+    /// <summary>The query type discriminator.</summary>
+    public const string QueryType = "get-agent-interaction-status";
+}

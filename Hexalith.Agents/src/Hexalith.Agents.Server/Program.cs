@@ -97,6 +97,8 @@ builder.Services.AddScoped<AgentInteractionRequestOrchestrator>();
 builder.Services.AddSingleton<ITenantAccessReader, DeferredTenantAccessReader>();
 builder.Services.AddSingleton<IConversationAccessReader, DeferredConversationAccessReader>();
 builder.Services.AddSingleton<IAgentInvocationReadinessReader, DeferredAgentInvocationReadinessReader>();
+builder.Services.AddSingleton<IAgentInteractionAuditStateReader, DeferredAgentInteractionAuditStateReader>();
+builder.Services.AddSingleton<IAgentAuditGovernanceReadinessProvider, AgentAuditGovernanceReadinessProvider>();
 builder.Services.AddScoped<AgentInteractionGateOrchestrator>();
 
 // Story 2.3: Conversation context-building wiring. The context aggregate handler auto-registers via the existing

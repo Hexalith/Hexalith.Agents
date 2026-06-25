@@ -15,4 +15,11 @@ namespace Hexalith.Agents.Contracts.AgentInteraction.Queries;
 /// </remarks>
 /// <param name="AgentInteractionId">The deterministic Agent Call identifier (the aggregate id) whose proposal regeneration evidence is inspected.</param>
 public record GetAgentProposalRegenerationEvidenceQuery(
-    string AgentInteractionId);
+    string AgentInteractionId)
+{
+    /// <summary>The EventStore query domain.</summary>
+    public const string Domain = "agent-interaction";
+
+    /// <summary>The query type discriminator.</summary>
+    public const string QueryType = "get-agent-proposal-regeneration-evidence";
+}

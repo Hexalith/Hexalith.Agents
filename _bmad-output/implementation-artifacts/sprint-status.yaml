@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-06-23T21:28:59+02:00
-last_updated: 2026-06-25T02:41:14+02:00
+last_updated: 2026-06-25
 project: agents
 # retrospectives: epic-2 retro completed 2026-06-24 (epic-2-retro-2026-06-24.md)
 project_key: NOKEY
@@ -78,7 +78,7 @@ development_status:
   epic-3-retrospective: optional
   epic-4: in-progress
   4-1-stable-api-and-client-contracts-for-agent-operations: done
-  4-2-query-audit-evidence-safely: backlog
+  4-2-query-audit-evidence-safely: done
   4-3-expose-operational-status-and-admin-workflows: backlog
   4-4-define-and-enforce-launch-readiness-gates: backlog
   4-5-verify-end-to-end-governance-and-contract-conformance: backlog
