@@ -62,6 +62,10 @@ public sealed class AccessibilityTests : AgentsTestContext
     [InlineData(AgentSurfaceKind.Empty, "status", "polite")]
     [InlineData(AgentSurfaceKind.Stale, "status", "polite")]
     [InlineData(AgentSurfaceKind.FilteredEmpty, "status", "polite")]
+    // Story 4.3 AC2 — the two new surface kinds: Degraded announces politely (completed-but-stale), Unavailable
+    // announces assertively (a down dependency/projection).
+    [InlineData(AgentSurfaceKind.Degraded, "status", "polite")]
+    [InlineData(AgentSurfaceKind.Unavailable, "alert", "assertive")]
     public void Surface_state_announces_with_the_correct_politeness(AgentSurfaceKind kind, string role, string ariaLive)
     {
         IRenderedComponent<AgentSurfaceState> cut = Render<AgentSurfaceState>(parameters => parameters
@@ -71,6 +75,21 @@ public sealed class AccessibilityTests : AgentsTestContext
         IElement region = cut.Find("[data-testid='surface']");
         region.GetAttribute("role").ShouldBe(role);
         region.GetAttribute("aria-live").ShouldBe(ariaLive);
+    }
+
+    [Fact]
+    public void Every_surface_kind_renders_a_distinct_title_and_message()
+    {
+        // Story 4.3 AC2 — each of the eight kinds is visibly distinct (the stub localizer returns the key, so distinct
+        // keys prove distinct whole strings per kind).
+        string[] titles = Enum.GetValues<AgentSurfaceKind>()
+            .Select(kind => Render<AgentSurfaceState>(parameters => parameters
+                    .Add(state => state.Kind, kind)
+                    .Add(state => state.TestId, "surface"))
+                .Find("[data-testid='surface'] h2").TextContent)
+            .ToArray();
+
+        titles.Distinct().Count().ShouldBe(titles.Length);
     }
 
     [Fact]
@@ -97,6 +116,34 @@ public sealed class AccessibilityTests : AgentsTestContext
 
         cut.Find("[data-testid='surface-refresh']").Click();
         refreshed.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Degraded_surface_offers_a_refresh()
+    {
+        // Story 4.3 AC2 — the completed-but-stale Degraded surface offers a refresh affordance (never rendered as a
+        // fresh success), exactly as the Stale surface does.
+        bool refreshed = false;
+        IRenderedComponent<AgentSurfaceState> cut = Render<AgentSurfaceState>(parameters => parameters
+            .Add(state => state.Kind, AgentSurfaceKind.Degraded)
+            .Add(state => state.TestId, "surface")
+            .Add(state => state.OnRefresh, () => refreshed = true));
+
+        cut.Find("[data-testid='surface-refresh']").Click();
+        refreshed.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Surface_state_detail_overrides_the_default_message()
+    {
+        // The optional Detail parameter overrides the localized default message (used where a page supplies a more
+        // specific safe whole string); the title remains the kind's localized whole string.
+        IRenderedComponent<AgentSurfaceState> cut = Render<AgentSurfaceState>(parameters => parameters
+            .Add(state => state.Kind, AgentSurfaceKind.Empty)
+            .Add(state => state.TestId, "surface")
+            .Add(state => state.Detail, "a specific safe message"));
+
+        cut.Find("[data-testid='surface'] p").TextContent.Trim().ShouldBe("a specific safe message");
     }
 
     [Fact]
@@ -257,6 +304,40 @@ public sealed class AccessibilityTests : AgentsTestContext
         IElement unavailable = cut.Find("[data-testid='agent-call-status-feedback-unavailable']");
         unavailable.GetAttribute("tabindex").ShouldBe("0");
         unavailable.GetAttribute("aria-describedby").ShouldNotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public void Operational_status_in_shell_exposes_a_focusable_heading()
+    {
+        // Story 4.3 AC2 — the operational-status heading is a focusable route target (tabindex=-1) rendered outside the
+        // surface branch, so the page is keyboard-reachable even when it fails closed to permission-denied by default.
+        IRenderedComponent<FrontComposerShell> cut = RenderInShellWithNavigation<OperationalStatus>();
+
+        cut.WaitForAssertion(() =>
+            cut.Find("#agents-operational-status-heading").GetAttribute("tabindex").ShouldBe("-1"));
+    }
+
+    [Fact]
+    public void Audit_evidence_in_shell_exposes_a_focusable_heading()
+    {
+        // Story 4.3 AC2 — the audit-evidence landing heading is a focusable route target (tabindex=-1).
+        IRenderedComponent<FrontComposerShell> cut = RenderInShellWithNavigation<AuditEvidence>();
+
+        cut.WaitForAssertion(() =>
+            cut.Find("#agents-audit-heading").GetAttribute("tabindex").ShouldBe("-1"));
+    }
+
+    [Fact]
+    public void Operational_status_panel_announces_politely_and_never_assertively()
+    {
+        // Story 4.3 AC2 — the operational-status panel is an ordinary status region (polite), never assertive for the
+        // historical failure counts it renders (UX-DR36).
+        IRenderedComponent<OperationalStatusPanel> cut = Render<OperationalStatusPanel>(parameters => parameters
+            .Add(panel => panel.Summary, AgentUiTestData.OperationalStatusSummary()));
+
+        IElement region = cut.Find("[data-testid='agents-operational-status-panel']");
+        region.GetAttribute("role").ShouldBe("status");
+        region.GetAttribute("aria-live").ShouldBe("polite");
     }
 
     private IRenderedComponent<ProposalDetail> RenderProposalDetail(string agentInteractionId = "interaction-1")

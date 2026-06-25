@@ -1,0 +1,148 @@
+@using Hexalith.Agents.Contracts.AgentInteraction
+@using Hexalith.Agents.Contracts.AgentInteraction.Queries
+@using Hexalith.Agents.Contracts.Operations
+@using Hexalith.Agents.UI.Services.Gateways
+@inject IStringLocalizer<AgentsResources> Localizer
+
+@* audit-evidence-panel (Story 4.3 AC1, AC2, AC3; DESIGN audit-evidence-panel): base = Fluent details/MessageBar panel.
+   Renders the SUPPORT-SAFE Story 4.2 evidence — caller, Agent, Source Conversation, provider/model, response mode,
+   version metadata, approver, approval/posting outcome, timestamps, and the final Conversation Message reference where
+   applicable — in {typography.mono} for ids/timestamps (padding {spacing.4}). It MUST NEVER display provider secrets,
+   raw credentials, unrelated tenant data, raw payload dumps, stack traces, or any prompt/generated/edited/context
+   content (AD-9, AD-14). It shows the AuditAvailabilityBadge and, when a side-effecting success lacks fresh evidence,
+   an explicit "posted with audit pending" non-success state (UX governance: no silent success without a durable
+   reference). The named launch-readiness governance blocker is surfaced for Story 4.4. Content-bearing audit stays
+   blocked — metadata-only (Story 4.2 AC4; OQ-8). *@
+<section class="agents-audit-evidence-panel"
+         role="status"
+         aria-live="polite"
+         aria-label="@Localizer["Agents.Audit.Panel.Label"]"
+         data-testid="@TestId">
+    <header class="agents-audit-evidence-panel__header">
+        <span class="agents-audit-evidence-panel__availability">
+            <span class="agents-audit-evidence-panel__field-label">@Localizer["Agents.Audit.Field.Availability"]</span>
+            <AuditAvailabilityBadge State="@Result.Availability" TestId="@($"{TestId}-availability")" />
+        </span>
+        <p class="agents-audit-evidence-panel__metadata-only" data-testid="@($"{TestId}-metadata-only")">
+            @Localizer["Agents.Audit.MetadataOnly"]
+        </p>
+    </header>
+
+    @if (ShowPostedAuditPending)
+    {
+        @* No silent success: a posted response whose audit evidence is not yet available is rendered as a distinct
+           non-success state, never as a confirmed/audited success (UX governance: audit-as-display-state). *@
+        <p class="agents-audit-evidence-panel__audit-pending" data-testid="@($"{TestId}-audit-pending")">
+            @Localizer["Agents.Audit.PostedAuditPending"]
+        </p>
+    }
+
+    @if (Result.Detail is { } detail)
+    {
+        <dl class="agents-audit-evidence-panel__fields">
+            <dt>@Localizer["Agents.Audit.Field.State"]</dt>
+            <dd><ProposedAgentReplyStateBadge State="@detail.State" TestId="@($"{TestId}-state")" /></dd>
+
+            <dt>@Localizer["Agents.Audit.Field.Caller"]</dt>
+            <dd><code data-testid="@($"{TestId}-caller")">@detail.CallerPartyId</code></dd>
+
+            <dt>@Localizer["Agents.Audit.Field.Agent"]</dt>
+            <dd><code data-testid="@($"{TestId}-agent")">@detail.AgentId</code></dd>
+
+            <dt>@Localizer["Agents.Audit.Field.SourceConversation"]</dt>
+            <dd><code data-testid="@($"{TestId}-source-conversation")">@detail.SourceConversationId</code></dd>
+
+            <dt>@Localizer["Agents.Audit.Field.Provider"]</dt>
+            <dd><code data-testid="@($"{TestId}-provider")">@detail.ProviderId</code></dd>
+
+            <dt>@Localizer["Agents.Audit.Field.Model"]</dt>
+            <dd><code data-testid="@($"{TestId}-model")">@detail.ModelId</code></dd>
+
+            <dt>@Localizer["Agents.Audit.Field.ResponseMode"]</dt>
+            <dd data-testid="@($"{TestId}-response-mode")">@Localizer[$"Agents.ResponseMode.{detail.ResponseMode}"]</dd>
+
+            <dt>@Localizer["Agents.Audit.Field.ApprovedVersion"]</dt>
+            <dd><code data-testid="@($"{TestId}-approved-version")">@DisplayId(detail.ApprovedVersionId)</code></dd>
+
+            <dt>@Localizer["Agents.Audit.Field.PostingOutcome"]</dt>
+            <dd data-testid="@($"{TestId}-posting-outcome")">@Localizer[PostingOutcomeKey(detail)]</dd>
+
+            <dt>@Localizer["Agents.Audit.Field.Created"]</dt>
+            <dd><time datetime="@detail.CreatedAt" data-testid="@($"{TestId}-created")">@DisplayTimestamp(detail.CreatedAt)</time></dd>
+
+            <dt>@Localizer["Agents.Audit.Field.Approved"]</dt>
+            <dd><time datetime="@detail.ApprovedAt" data-testid="@($"{TestId}-approved")">@DisplayTimestamp(detail.ApprovedAt)</time></dd>
+
+            <dt>@Localizer["Agents.Audit.Field.Posted"]</dt>
+            <dd><time datetime="@detail.PostedAt" data-testid="@($"{TestId}-posted")">@DisplayTimestamp(detail.PostedAt)</time></dd>
+
+            @if (Result.Approval is { } approval)
+            {
+                <dt>@Localizer["Agents.Audit.Field.Approver"]</dt>
+                <dd><code data-testid="@($"{TestId}-approver")">@DisplayId(approval.ApproverPartyId)</code></dd>
+
+                <dt>@Localizer["Agents.Audit.Field.PostedMessage"]</dt>
+                <dd><code data-testid="@($"{TestId}-posted-message")">@DisplayId(approval.PostedConversationMessageId)</code></dd>
+            }
+        </dl>
+    }
+
+    @if (Result.Governance.Blockers.Count > 0)
+    {
+        <section class="agents-audit-evidence-panel__governance" data-testid="@($"{TestId}-governance")">
+            <h3 class="agents-audit-evidence-panel__governance-label">@Localizer["Agents.Audit.GovernanceBlockers.Label"]</h3>
+            <ul>
+                @foreach (string blocker in Result.Governance.Blockers)
+                {
+                    <li>@blocker</li>
+                }
+            </ul>
+        </section>
+    }
+</section>
+
+@code {
+    /// <summary>The fail-closed audit-evidence read result (success payload is rendered; non-success is owned by the page surface state).</summary>
+    [Parameter]
+    [EditorRequired]
+    public AuditEvidenceResult Result { get; set; } = default!;
+
+    /// <summary>Stable test id base for the panel and its fields.</summary>
+    [Parameter]
+    public string TestId { get; set; } = "agents-audit-evidence-panel";
+
+    // A posted response whose audit evidence is not yet available must not read as a confirmed/audited success (AD-5).
+    private bool ShowPostedAuditPending
+        => Result.Detail is { } detail
+            && (detail.State == ProposedAgentReplyState.Posted || detail.PostedAt is not null)
+            && Result.Availability != AuditAvailabilityStatus.AuditAvailable;
+
+    private string DisplayId(string? value)
+        => string.IsNullOrWhiteSpace(value) ? Localizer["Agents.Audit.None"] : value;
+
+    private string DisplayTimestamp(string? value)
+        => string.IsNullOrWhiteSpace(value) ? Localizer["Agents.Audit.None"] : value;
+
+    // Reuses the Story 3.7 posting-outcome whole strings; never implies "posted" while posting is pending/failed (AD-5).
+    private static string PostingOutcomeKey(ProposalDetailView detail)
+    {
+        if (detail.State == ProposedAgentReplyState.PostingFailed)
+        {
+            return "Agents.ProposalDetail.PostingOutcome.Failed";
+        }
+
+        if (detail.PostedAt is not null || detail.State == ProposedAgentReplyState.Posted)
+        {
+            return "Agents.ProposalDetail.PostingOutcome.Posted";
+        }
+
+        if (detail.State == ProposedAgentReplyState.PostingPending)
+        {
+            return "Agents.ProposalDetail.PostingOutcome.Pending";
+        }
+
+        return detail.ApprovedVersionId is not null
+            ? "Agents.ProposalDetail.PostingOutcome.Approved"
+            : "Agents.ProposalDetail.PostingOutcome.None";
+    }
+}

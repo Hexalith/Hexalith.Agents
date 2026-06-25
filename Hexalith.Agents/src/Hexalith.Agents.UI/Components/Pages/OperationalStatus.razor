@@ -1,0 +1,121 @@
+@page "/agents/status"
+@attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsOperatorPolicy)]
+@using Hexalith.Agents.Contracts.Operations
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IOperationalStatusGateway Gateway
+
+@* Operational status (Story 4.3 AC1, AC2, AC4): the consolidated operational surface for the Administrator/Operator
+   persona. A full-width read-heavy layout (DESIGN layout). It distinguishes every readiness/failure/posting state and
+   groups recovery by action via the operational-status-panel (AC1), routes all eight data-states through
+   AgentSurfaceState (AC2), and surfaces the AC4 launch-monitoring signals (recent call outcomes, proposal-queue summary,
+   terminal-state rates, posting outcomes, readiness blockers) from SAFE counts only — never raw content (AD-14). The
+   live aggregate projection is deferred (Projections/ is .gitkeep-only); against the default DI graph the gateway fails
+   closed and this page renders PermissionDenied/Unavailable, and signals with no live source render an explicit "not
+   available yet" affordance rather than fabricated counts (AC4 read-source reconciliation). *@
+<FcPageLayout Mode="FcPageLayoutMode.FullWidth">
+    <FcContentLabel LabelledBy="@HeadingId" />
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="24px" Class="agents-operational-status" data-testid="agents-operational-status">
+        <FcPageHeader @ref="_header"
+                      PageTitle="@Localizer["Agents.OperationalStatus.Title"]"
+                      Heading="@Localizer["Agents.OperationalStatus.Title"]"
+                      HeadingId="@HeadingId"
+                      HeadingTabIndex="-1"
+                      Eyebrow="@Localizer["Agents.OperationalStatus.Eyebrow"]"
+                      Description="@Localizer["Agents.OperationalStatus.Description"]"
+                      TestId="agents-operational-status-header" />
+
+        @if (_result is null)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Loading" TestId="agents-operational-status-state" />
+        }
+        else if (_result.Status is OperationalStatusInspectionStatus.NotAuthorized)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-operational-status-state" />
+        }
+        else if (_result.Status is OperationalStatusInspectionStatus.Unavailable)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Unavailable" TestId="agents-operational-status-state" />
+        }
+        else if (_result.Status is OperationalStatusInspectionStatus.Stale && _result.Summary is null)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Stale" TestId="agents-operational-status-state" OnRefresh="ReloadAsync" />
+        }
+        else if (_result.Summary is null || !HasSignals)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Empty" TestId="agents-operational-status-state" />
+        }
+        else
+        {
+            AgentOperationalStatusSummaryView summary = _result.Summary;
+
+            @* Completed-but-stale data is shown behind a distinct Degraded notice — never as a fresh success (AC2; AD-12). *@
+            @if (_result.Status is OperationalStatusInspectionStatus.Stale)
+            {
+                <AgentSurfaceState Kind="AgentSurfaceKind.Degraded" TestId="agents-operational-status-state" OnRefresh="ReloadAsync" />
+            }
+
+            <OperationalStatusPanel Summary="@summary" />
+
+            <section class="agents-operational-status__metrics"
+                     aria-label="@Localizer["Agents.OperationalStatus.Metrics.Label"]"
+                     data-testid="agents-operational-status-metrics">
+                <dl class="agents-operational-status__signals">
+                    <dt>@Localizer["Agents.OperationalStatus.PendingProposals.Label"]</dt>
+                    <dd data-testid="agents-operational-status-pending-count">@summary.PendingProposalCount</dd>
+
+                    <dt>@Localizer["Agents.OperationalStatus.GeneratedAt.Label"]</dt>
+                    <dd data-testid="agents-operational-status-generated-at">
+                        @if (summary.GeneratedAt is { } generatedAt)
+                        {
+                            <time datetime="@generatedAt">@generatedAt</time>
+                        }
+                        else
+                        {
+                            @* No live projection has produced the summary yet — never fabricate a value (AC4). *@
+                            @Localizer["Agents.Common.NotAvailableYet"]
+                        }
+                    </dd>
+                </dl>
+
+                <nav class="agents-operational-status__links" aria-label="@Localizer["Agents.OperationalStatus.Links.Label"]">
+                    <a href="/agents/proposals" data-testid="agents-operational-status-proposals-link">@Localizer["Agents.OperationalStatus.ProposalsLink"]</a>
+                    <a href="/agents/audit" data-testid="agents-operational-status-audit-link">@Localizer["Agents.OperationalStatus.AuditLink"]</a>
+                </nav>
+            </section>
+        }
+    </FluentStack>
+</FcPageLayout>
+
+@code {
+    private const string HeadingId = "agents-operational-status-heading";
+
+    private FcPageHeader? _header;
+    private AgentOperationalStatusSummaryResult? _result;
+    private bool _focusHeadingPending = true;
+
+    // An authorized summary carries a signal worth rendering — otherwise the page renders the Empty surface.
+    private bool HasSignals
+        => _result?.Summary is { } summary
+            && (summary.AgentReadiness != AgentReadinessStatus.Unknown
+                || summary.ReadinessBlockers.Count > 0
+                || summary.AuditGovernanceBlockers.Count > 0
+                || summary.AuditAvailability != AuditAvailabilityStatus.Unknown
+                || summary.PendingProposalCount > 0
+                || summary.RecentCallOutcomes.Any(outcome => outcome.Count > 0)
+                || summary.ProposalOutcomes.Any(outcome => outcome.Count > 0));
+
+    protected override async Task OnInitializedAsync()
+        => _result = await Gateway.GetSummaryAsync(CancellationToken.None).ConfigureAwait(false);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusHeadingPending && _header is not null)
+        {
+            _focusHeadingPending = false;
+            await _header.FocusHeadingAsync().ConfigureAwait(false);
+        }
+    }
+
+    private async Task ReloadAsync()
+        => _result = await Gateway.GetSummaryAsync(CancellationToken.None).ConfigureAwait(false);
+}

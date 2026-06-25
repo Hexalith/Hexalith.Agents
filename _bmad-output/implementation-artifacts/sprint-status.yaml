@@ -79,7 +79,7 @@ development_status:
   epic-4: in-progress
   4-1-stable-api-and-client-contracts-for-agent-operations: done
   4-2-query-audit-evidence-safely: done
-  4-3-expose-operational-status-and-admin-workflows: backlog
+  4-3-expose-operational-status-and-admin-workflows: done
   4-4-define-and-enforce-launch-readiness-gates: backlog
   4-5-verify-end-to-end-governance-and-contract-conformance: backlog
   epic-4-retrospective: optional

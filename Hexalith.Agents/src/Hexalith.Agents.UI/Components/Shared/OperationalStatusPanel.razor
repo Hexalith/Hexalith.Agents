@@ -1,0 +1,145 @@
+@using System.Collections.Generic
+@using System.Linq
+@using Hexalith.Agents.Contracts.Operations
+@inject IStringLocalizer<AgentsResources> Localizer
+
+@* operational-status-panel (Story 4.3 AC1, AC2): base = Fluent status region (DESIGN operational-status-panel,
+   padding {spacing.4}, itemGap {spacing.3}). It groups Agent readiness + runtime failures BY RecoveryActionGroup
+   (configure provider, link party identity, fix policy, wait for approval, retry generation, inspect audit, start a
+   new call) — never by the raw subsystem (UX-DR9). Each group is a status region: an action heading, the safe localized
+   guidance, then the contributing badges (color + icon + visible text; UX-DR12). The container announces politely and
+   never assertively for ordinary status (UX-DR36); the page's AgentSurfaceState owns the assertive error/permission
+   states. No secret/payload/content appears in any string, aria-label, or data-testid (AD-14). Stable slots reserve row
+   space so the layout does not jump when a state changes (UX-DR17). *@
+<section class="agents-operational-status-panel"
+         role="status"
+         aria-live="polite"
+         aria-label="@Localizer["Agents.OperationalStatus.Panel.Label"]"
+         data-testid="@TestId">
+    @foreach (RecoveryActionGroup group in _groupOrder)
+    {
+        IReadOnlyList<Chip> chips = ChipsFor(group);
+        @if (chips.Count > 0)
+        {
+            <section class="agents-operational-status-panel__group agents-operational-status-panel__group--@GroupCss(group)"
+                     data-testid="@($"{TestId}-group-{group}")">
+                <h3 class="agents-operational-status-panel__action">@Localizer[OperationalStatusPresentation.GroupLabelKeyFor(group)]</h3>
+                <p class="agents-operational-status-panel__guidance" data-testid="@($"{TestId}-guidance-{group}")">
+                    @Localizer[OperationalStatusPresentation.GuidanceKeyFor(group)]
+                </p>
+                <div class="agents-operational-status-panel__badges">
+                    @foreach (Chip chip in chips)
+                    {
+                        <span class="agents-operational-status-panel__badge" data-testid="@chip.TestId">
+                            <FluentBadge Appearance="BadgeAppearance.Tint"
+                                         Color="@chip.Color"
+                                         IconStart="@chip.Icon"
+                                         aria-label="@chip.AccessibleName">
+                                @chip.Label@(chip.Count is { } count ? $" ({count})" : string.Empty)
+                            </FluentBadge>
+                        </span>
+                    }
+                </div>
+            </section>
+        }
+    }
+</section>
+
+@code {
+    /// <summary>The safe operational-status summary the panel renders (counts/rates/blockers only; AD-14).</summary>
+    [Parameter]
+    [EditorRequired]
+    public AgentOperationalStatusSummaryView Summary { get; set; } = default!;
+
+    /// <summary>Stable test id base for the panel and its group regions.</summary>
+    [Parameter]
+    public string TestId { get; set; } = "agents-operational-status-panel";
+
+    // Rendered in the canonical operational-setup → workflow → recovery order (RecoveryActionGroup declaration order).
+    private static readonly RecoveryActionGroup[] _groupOrder = Enum.GetValues<RecoveryActionGroup>();
+
+    private List<Chip>? _chips;
+
+    protected override void OnParametersSet() => _chips = BuildChips();
+
+    private IReadOnlyList<Chip> ChipsFor(RecoveryActionGroup group)
+        => (_chips ?? []).Where(chip => chip.Group == group).ToList();
+
+    private static string GroupCss(RecoveryActionGroup group) => group.ToString().ToLowerInvariant();
+
+    private List<Chip> BuildChips()
+    {
+        List<Chip> chips =
+        [
+            // Agent readiness (single canonical state) — the readiness badge equivalent (color + icon + text).
+            new(
+                OperationalStatusPresentation.GroupFor(Summary.AgentReadiness),
+                OperationalStatusPresentation.ColorFor(Summary.AgentReadiness),
+                OperationalStatusPresentation.IconFor(Summary.AgentReadiness),
+                Localizer[OperationalStatusPresentation.LabelKeyFor(Summary.AgentReadiness)],
+                null,
+                "agents-operational-status-readiness"),
+        ];
+
+        // Readiness blockers — grouped by the recovery action, never by the raw subsystem name (UX-DR9). The blocker
+        // label is the safe whole-string reason; it never carries the raw Agent Instructions text (AD-14).
+        foreach (AgentActivationBlocker blocker in Summary.ReadinessBlockers)
+        {
+            chips.Add(new(
+                OperationalStatusPresentation.GroupForBlocker(blocker),
+                BadgeColor.Severe,
+                FcFluentIcons.Warning16(),
+                Localizer[AgentReadiness.BlockerKeyFor(blocker)],
+                null,
+                $"agents-operational-status-blocker-{blocker}"));
+        }
+
+        // Recent Agent Call outcomes — counts dimensioned only by the safe status enum (AC4).
+        foreach (AgentCallOutcomeCount outcome in Summary.RecentCallOutcomes.Where(o => o.Count > 0))
+        {
+            chips.Add(new(
+                OperationalStatusPresentation.GroupFor(outcome.Status),
+                OperationalStatusPresentation.ColorFor(outcome.Status),
+                OperationalStatusPresentation.IconFor(outcome.Status),
+                Localizer[OperationalStatusPresentation.LabelKeyFor(outcome.Status)],
+                outcome.Count,
+                $"agents-operational-status-call-{outcome.Status}"));
+        }
+
+        // Proposal terminal-state + posting outcomes — counts dimensioned only by the safe status enum (AC4; AD-5 never
+        // collapses PostingPending into Posted / Approved into Posted — each status is a distinct chip).
+        foreach (ProposalOutcomeCount outcome in Summary.ProposalOutcomes.Where(o => o.Count > 0))
+        {
+            chips.Add(new(
+                OperationalStatusPresentation.GroupFor(outcome.Status),
+                OperationalStatusPresentation.ColorFor(outcome.Status),
+                OperationalStatusPresentation.IconFor(outcome.Status),
+                Localizer[OperationalStatusPresentation.LabelKeyFor(outcome.Status)],
+                outcome.Count,
+                $"agents-operational-status-proposal-{outcome.Status}"));
+        }
+
+        // Audit availability — never rendered as success unless AuditAvailable (AD-5).
+        chips.Add(new(
+            OperationalStatusPresentation.GroupFor(Summary.AuditAvailability),
+            OperationalStatusPresentation.ColorFor(Summary.AuditAvailability),
+            OperationalStatusPresentation.IconFor(Summary.AuditAvailability),
+            Localizer[OperationalStatusPresentation.LabelKeyFor(Summary.AuditAvailability)],
+            null,
+            "agents-operational-status-audit"));
+
+        return chips;
+    }
+
+    private sealed record Chip(
+        RecoveryActionGroup Group,
+        BadgeColor Color,
+        Icon Icon,
+        string Label,
+        int? Count,
+        string TestId)
+    {
+        // The accessible name is the same safe whole string (plus the safe count), never a raw subsystem/id/content.
+        public string AccessibleName => Count is { } count ? $"{Label} ({count})" : Label;
+    }
+}

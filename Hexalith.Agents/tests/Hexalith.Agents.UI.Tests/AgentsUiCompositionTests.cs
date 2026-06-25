@@ -27,6 +27,9 @@ public sealed class AgentsUiCompositionTests
         services.Single(d => d.ServiceType == typeof(IConversationAgentCallGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
         services.Single(d => d.ServiceType == typeof(IProposalQueueGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
         services.Single(d => d.ServiceType == typeof(IProposalDetailGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
+        // Story 4.3 — the operational-status and audit-evidence read gateways are registered scoped + fail-closed.
+        services.Single(d => d.ServiceType == typeof(IOperationalStatusGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
+        services.Single(d => d.ServiceType == typeof(IAuditEvidenceGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
 
         using ServiceProvider provider = services.BuildServiceProvider();
         using IServiceScope scope = provider.CreateScope();
@@ -36,6 +39,8 @@ public sealed class AgentsUiCompositionTests
         scope.ServiceProvider.GetRequiredService<IConversationAgentCallGateway>().ShouldBeOfType<DeferredConversationAgentCallGateway>();
         scope.ServiceProvider.GetRequiredService<IProposalQueueGateway>().ShouldBeOfType<DeferredProposalQueueGateway>();
         scope.ServiceProvider.GetRequiredService<IProposalDetailGateway>().ShouldBeOfType<DeferredProposalDetailGateway>();
+        scope.ServiceProvider.GetRequiredService<IOperationalStatusGateway>().ShouldBeOfType<DeferredOperationalStatusGateway>();
+        scope.ServiceProvider.GetRequiredService<IAuditEvidenceGateway>().ShouldBeOfType<DeferredAuditEvidenceGateway>();
     }
 
     [Fact]

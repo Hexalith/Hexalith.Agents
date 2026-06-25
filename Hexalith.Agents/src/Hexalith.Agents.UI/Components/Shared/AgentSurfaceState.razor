@@ -1,8 +1,10 @@
 @inject IStringLocalizer<AgentsResources> Localizer
 
-@* Shared surface-state component for every Agents setup page (AC6). Errors and permission-denied announce
-   assertively (role="alert"/aria-live="assertive"); all other states announce politely (UX-DR36). Empty and
-   permission-denied carry no record identity (AD-12). FilteredEmpty offers a reset; Stale offers a refresh. *@
+@* Shared surface-state component for every Agents setup/operational page (AC6, 4.3-AC2). Errors, permission-denied,
+   and unavailable announce assertively (role="alert"/aria-live="assertive"); all other states — including the
+   completed-but-stale Degraded kind — announce politely (UX-DR36). Empty/permission-denied/unavailable carry no record
+   identity (AD-12). FilteredEmpty offers a reset; Stale and Degraded each offer a refresh (Degraded is never rendered
+   as a fresh success). *@
 <section class="agent-surface-state agent-surface-state--@CssClass"
          role="@Role"
          aria-live="@AriaLive"
@@ -15,7 +17,7 @@
             @Localizer["Agents.Surface.Reset"]
         </FluentButton>
     }
-    @if (Kind is AgentSurfaceKind.Stale && OnRefresh.HasDelegate)
+    @if (Kind is AgentSurfaceKind.Stale or AgentSurfaceKind.Degraded && OnRefresh.HasDelegate)
     {
         <FluentButton Appearance="ButtonAppearance.Primary" data-testid="@($"{TestId}-refresh")" OnClick="OnRefresh">
             @Localizer["Agents.Surface.Refresh"]
@@ -46,7 +48,7 @@
 
     private string CssClass => Kind.ToString().ToLowerInvariant();
 
-    private bool IsAssertive => Kind is AgentSurfaceKind.Error or AgentSurfaceKind.PermissionDenied;
+    private bool IsAssertive => Kind is AgentSurfaceKind.Error or AgentSurfaceKind.PermissionDenied or AgentSurfaceKind.Unavailable;
 
     private string Role => IsAssertive ? "alert" : "status";
 

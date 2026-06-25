@@ -6,6 +6,7 @@ using System.Resources;
 
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.AgentInteraction;
+using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.UI.Components.Shared;
 using Hexalith.Agents.UI.Resources;
@@ -308,6 +309,84 @@ public sealed class LocalizationResourceTests
         // Story 3.7 — proposal-queue row → detail deep link.
         yield return "Agents.ProposalQueue.Column.Detail";
         yield return "Agents.ProposalQueue.OpenDetail";
+
+        // Story 4.3 — operational-status presentation: one whole string per canonical status value (AC1; UX-DR14).
+        foreach (AgentReadinessStatus status in Enum.GetValues<AgentReadinessStatus>())
+        {
+            yield return OperationalStatusPresentation.LabelKeyFor(status);
+        }
+
+        foreach (ProviderModelReadinessStatus status in Enum.GetValues<ProviderModelReadinessStatus>())
+        {
+            yield return OperationalStatusPresentation.LabelKeyFor(status);
+        }
+
+        foreach (AgentCallOperationStatus status in Enum.GetValues<AgentCallOperationStatus>())
+        {
+            yield return OperationalStatusPresentation.LabelKeyFor(status);
+        }
+
+        foreach (ProposalOperationStatus status in Enum.GetValues<ProposalOperationStatus>())
+        {
+            yield return OperationalStatusPresentation.LabelKeyFor(status);
+        }
+
+        foreach (AuditAvailabilityStatus status in Enum.GetValues<AuditAvailabilityStatus>())
+        {
+            yield return OperationalStatusPresentation.LabelKeyFor(status);
+        }
+
+        // Story 4.3 — recovery-action group heading + guidance (one whole string per RecoveryActionGroup; UX-DR9/14).
+        foreach (RecoveryActionGroup group in Enum.GetValues<RecoveryActionGroup>())
+        {
+            yield return OperationalStatusPresentation.GroupLabelKeyFor(group);
+            yield return OperationalStatusPresentation.GuidanceKeyFor(group);
+        }
+
+        // Story 4.3 — operational-status page + panel chrome.
+        yield return "Agents.Navigation.OperationalStatus";
+        yield return "Agents.OperationalStatus.Panel.Label";
+        yield return "Agents.OperationalStatus.Title";
+        yield return "Agents.OperationalStatus.Eyebrow";
+        yield return "Agents.OperationalStatus.Description";
+        yield return "Agents.OperationalStatus.Metrics.Label";
+        yield return "Agents.OperationalStatus.PendingProposals.Label";
+        yield return "Agents.OperationalStatus.GeneratedAt.Label";
+        yield return "Agents.OperationalStatus.Links.Label";
+        yield return "Agents.OperationalStatus.ProposalsLink";
+        yield return "Agents.OperationalStatus.AuditLink";
+
+        // Story 4.3 — audit-evidence page + panel chrome.
+        yield return "Agents.Navigation.AuditEvidence";
+        yield return "Agents.Audit.Title";
+        yield return "Agents.Audit.Eyebrow";
+        yield return "Agents.Audit.Description";
+        yield return "Agents.Audit.Panel.Label";
+        yield return "Agents.Audit.MetadataOnly";
+        yield return "Agents.Audit.PostedAuditPending";
+        yield return "Agents.Audit.Field.Availability";
+        yield return "Agents.Audit.Field.State";
+        yield return "Agents.Audit.Field.Caller";
+        yield return "Agents.Audit.Field.Agent";
+        yield return "Agents.Audit.Field.SourceConversation";
+        yield return "Agents.Audit.Field.Provider";
+        yield return "Agents.Audit.Field.Model";
+        yield return "Agents.Audit.Field.ResponseMode";
+        yield return "Agents.Audit.Field.ApprovedVersion";
+        yield return "Agents.Audit.Field.PostingOutcome";
+        yield return "Agents.Audit.Field.Created";
+        yield return "Agents.Audit.Field.Approved";
+        yield return "Agents.Audit.Field.Posted";
+        yield return "Agents.Audit.Field.Approver";
+        yield return "Agents.Audit.Field.PostedMessage";
+        yield return "Agents.Audit.GovernanceBlockers.Label";
+        yield return "Agents.Audit.None";
+        yield return "Agents.Audit.Landing.Description";
+        yield return "Agents.Audit.EntryPoints.Label";
+        yield return "Agents.Audit.EntryPoint.Overview";
+        yield return "Agents.Audit.EntryPoint.OperationalStatus";
+        yield return "Agents.Audit.EntryPoint.ProposalDetail";
+        yield return "Agents.Audit.EntryPoint.PostedResponse";
     }
 
     public static IEnumerable<object[]> EnumDerivedKeyCases() => EnumDerivedKeys().Distinct().Select(key => new object[] { key });

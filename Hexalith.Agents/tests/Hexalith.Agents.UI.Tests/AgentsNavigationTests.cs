@@ -1,11 +1,15 @@
 using System.Linq;
+using System.Reflection;
 
 using Bunit;
 using Bunit.TestDoubles;
 
+using Hexalith.Agents.UI.Components.Pages;
 using Hexalith.Agents.UI.Composition;
 using Hexalith.Agents.UI.Resources;
 using Hexalith.FrontComposer.Contracts.Registration;
+
+using Microsoft.AspNetCore.Authorization;
 
 using Shouldly;
 
@@ -19,8 +23,10 @@ namespace Hexalith.Agents.UI.Tests;
 public sealed class AgentsNavigationTests : AgentsTestContext
 {
     [Fact]
-    public void RegisterDomain_registers_agents_manifest_and_six_ordered_entries()
+    public void RegisterDomain_registers_agents_manifest_and_eight_ordered_entries()
     {
+        // Story 4.3 AC3 — the Agents domain is coherent in operational-setup → workflow → status → audit order, now
+        // eight ordered entries.
         CapturingFrontComposerRegistry registry = new();
 
         AgentsFrontComposerRegistration.RegisterDomain(registry);
@@ -30,30 +36,67 @@ public sealed class AgentsNavigationTests : AgentsTestContext
         manifest.NameKey.ShouldBe("Agents.Navigation.Agents");
 
         registry.NavEntries.Select(entry => entry.Href)
-            .ShouldBe(["/agents", "/agents/configuration", "/agents/providers", "/agents/approver-policy", "/agents/conversation-call", "/agents/proposals"]);
+            .ShouldBe(["/agents", "/agents/configuration", "/agents/providers", "/agents/approver-policy", "/agents/conversation-call", "/agents/proposals", "/agents/status", "/agents/audit"]);
         registry.NavEntries.Select(entry => entry.Order)
-            .ShouldBe([0, 1, 2, 3, 4, 5]);
+            .ShouldBe([0, 1, 2, 3, 4, 5, 6, 7]);
         registry.NavEntries.ShouldAllBe(entry => entry.BoundedContext == "agents");
         registry.NavEntries.First().Title.ShouldBe("Agents overview");
-        registry.NavEntries.Last().Title.ShouldBe("Pending proposals");
+        registry.NavEntries.Last().Title.ShouldBe("Audit evidence");
     }
 
     [Fact]
     public void Setup_entries_are_administrator_gated_and_the_proposal_queue_is_approver_gated()
     {
-        // The five setup entries are administrator-only; the approver-facing proposal queue is the first entry gated by
-        // the distinct Approver policy (PRD glossary: Approver ≠ Administrator).
+        // The five setup entries are administrator-only; the approver-facing proposal queue is gated by the distinct
+        // Approver policy (PRD glossary: Approver ≠ Administrator).
         CapturingFrontComposerRegistry registry = new();
 
         AgentsFrontComposerRegistration.RegisterDomain(registry);
 
-        registry.NavEntries.Where(entry => entry.Href != "/agents/proposals")
+        string[] adminHrefs = ["/agents", "/agents/configuration", "/agents/providers", "/agents/approver-policy", "/agents/conversation-call"];
+        registry.NavEntries.Where(entry => adminHrefs.Contains(entry.Href))
             .ShouldAllBe(entry => entry.RequiredPolicy == AgentsFrontComposerRegistration.AgentsAdministratorPolicy);
 
         FrontComposerNavEntry proposals = registry.NavEntries.Single(entry => entry.Href == "/agents/proposals");
         proposals.RequiredPolicy.ShouldBe(AgentsFrontComposerRegistration.AgentsApproverPolicy);
         proposals.Order.ShouldBe(5);
         proposals.Title.ShouldBe("Pending proposals");
+    }
+
+    [Fact]
+    public void Operational_status_and_audit_entries_carry_their_per_audience_policies()
+    {
+        // Story 4.3 AC3 — the two new entries are gated by the distinct Operator / Audit Operator policies (per-audience
+        // precedent set by the Approver policy).
+        CapturingFrontComposerRegistry registry = new();
+
+        AgentsFrontComposerRegistration.RegisterDomain(registry);
+
+        FrontComposerNavEntry status = registry.NavEntries.Single(entry => entry.Href == "/agents/status");
+        status.RequiredPolicy.ShouldBe(AgentsFrontComposerRegistration.AgentsOperatorPolicy);
+        status.Order.ShouldBe(6);
+        status.Title.ShouldBe("Operational status");
+        status.TitleKey.ShouldBe("Agents.Navigation.OperationalStatus");
+
+        FrontComposerNavEntry audit = registry.NavEntries.Single(entry => entry.Href == "/agents/audit");
+        audit.RequiredPolicy.ShouldBe(AgentsFrontComposerRegistration.AgentsAuditOperatorPolicy);
+        audit.Order.ShouldBe(7);
+        audit.Title.ShouldBe("Audit evidence");
+        audit.TitleKey.ShouldBe("Agents.Navigation.AuditEvidence");
+
+        // The two new entries carry a non-empty RequiredPolicy (policy-gated, never an ungated link).
+        registry.NavEntries.Where(entry => entry.Href is "/agents/status" or "/agents/audit")
+            .ShouldAllBe(entry => !string.IsNullOrWhiteSpace(entry.RequiredPolicy));
+    }
+
+    [Theory]
+    [InlineData(typeof(OperationalStatus), "Agents.Operator")]
+    [InlineData(typeof(AuditEvidence), "Agents.AuditOperator")]
+    public void Operational_status_and_audit_pages_are_policy_gated(System.Type pageType, string expectedPolicy)
+    {
+        // Story 4.3 AC3 — nav hiding is not authorization: the pages themselves carry [Authorize(Policy = …)].
+        AuthorizeAttribute authorize = pageType.GetCustomAttributes<AuthorizeAttribute>(inherit: true).ShouldHaveSingleItem();
+        authorize.Policy.ShouldBe(expectedPolicy);
     }
 
     [Fact]
@@ -65,6 +108,39 @@ public sealed class AgentsNavigationTests : AgentsTestContext
         IRenderedComponent<NavEntryGatingHarness> cut = RenderRegisteredEntries();
 
         cut.WaitForAssertion(() => cut.Markup.ShouldContain("href=\"/agents/proposals\""));
+    }
+
+    [Fact]
+    public void Authorized_operator_sees_the_operational_status_link()
+    {
+        // Story 4.3 AC3 — the operational-status link renders only for a user granted the Operator policy.
+        Authorization.SetAuthorized("operator");
+        Authorization.SetPolicies(AgentsFrontComposerRegistration.AgentsOperatorPolicy);
+
+        IRenderedComponent<NavEntryGatingHarness> cut = RenderRegisteredEntries();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.Markup.ShouldContain("href=\"/agents/status\"");
+            // The Operator policy does NOT grant the distinct Audit Operator surface.
+            cut.Markup.ShouldNotContain("href=\"/agents/audit\"");
+        });
+    }
+
+    [Fact]
+    public void Authorized_audit_operator_sees_the_audit_evidence_link()
+    {
+        // Story 4.3 AC3 — the audit-evidence link renders only for a user granted the Audit Operator policy.
+        Authorization.SetAuthorized("auditor");
+        Authorization.SetPolicies(AgentsFrontComposerRegistration.AgentsAuditOperatorPolicy);
+
+        IRenderedComponent<NavEntryGatingHarness> cut = RenderRegisteredEntries();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.Markup.ShouldContain("href=\"/agents/audit\"");
+            cut.Markup.ShouldNotContain("href=\"/agents/status\"");
+        });
     }
 
     [Fact]
@@ -102,6 +178,8 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             cut.Markup.ShouldNotContain("href=\"/agents/approver-policy\"");
             cut.Markup.ShouldNotContain("href=\"/agents/conversation-call\"");
             cut.Markup.ShouldNotContain("href=\"/agents/proposals\"");
+            cut.Markup.ShouldNotContain("href=\"/agents/status\"");
+            cut.Markup.ShouldNotContain("href=\"/agents/audit\"");
         });
     }
 
@@ -145,6 +223,8 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             "Agents.Navigation.ApproverPolicy",
             "Agents.Navigation.ConversationCall",
             "Agents.Navigation.ProposalQueue",
+            "Agents.Navigation.OperationalStatus",
+            "Agents.Navigation.AuditEvidence",
         ]);
     }
 

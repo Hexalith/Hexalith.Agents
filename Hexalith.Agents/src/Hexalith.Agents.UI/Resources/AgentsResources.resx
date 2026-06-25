@@ -449,4 +449,124 @@
   <data name="Agents.ProposalDetail.Transition.StaleApprovalBlocked" xml:space="preserve"><value>A newer version appeared. Approval of your earlier selection is blocked until you review it.</value></data>
   <data name="Agents.ProposalQueue.Column.Detail" xml:space="preserve"><value>Detail</value></data>
   <data name="Agents.ProposalQueue.OpenDetail" xml:space="preserve"><value>Open detail</value></data>
+
+  <!-- Story 4.3 — new surface-state kinds (Degraded/Unavailable) for the operational surfaces (AC2) -->
+  <data name="Agents.Surface.Degraded.Title" xml:space="preserve"><value>Data is degraded</value></data>
+  <data name="Agents.Surface.Degraded.Message" xml:space="preserve"><value>This data completed but is stale. Refresh to re-evaluate; it is not a fresh result.</value></data>
+  <data name="Agents.Surface.Unavailable.Title" xml:space="preserve"><value>Status is unavailable</value></data>
+  <data name="Agents.Surface.Unavailable.Message" xml:space="preserve"><value>A required dependency is unavailable. Operational status cannot be shown right now.</value></data>
+
+  <!-- Story 4.3 — operational-status presentation: Agent readiness status labels (AC1) -->
+  <data name="Agents.OperationalStatus.AgentReadiness.Unknown" xml:space="preserve"><value>Readiness unknown</value></data>
+  <data name="Agents.OperationalStatus.AgentReadiness.Callable" xml:space="preserve"><value>Callable</value></data>
+  <data name="Agents.OperationalStatus.AgentReadiness.Checking" xml:space="preserve"><value>Checking readiness</value></data>
+  <data name="Agents.OperationalStatus.AgentReadiness.InvalidConfiguration" xml:space="preserve"><value>Invalid configuration</value></data>
+  <data name="Agents.OperationalStatus.AgentReadiness.MissingPartyIdentity" xml:space="preserve"><value>Missing Party identity</value></data>
+  <data name="Agents.OperationalStatus.AgentReadiness.ProviderUnavailable" xml:space="preserve"><value>Provider unavailable</value></data>
+  <data name="Agents.OperationalStatus.AgentReadiness.Disabled" xml:space="preserve"><value>Agent disabled</value></data>
+
+  <!-- Story 4.3 — operational-status presentation: provider/model readiness status labels (AC1) -->
+  <data name="Agents.OperationalStatus.ProviderReadiness.Unknown" xml:space="preserve"><value>Provider status unknown</value></data>
+  <data name="Agents.OperationalStatus.ProviderReadiness.Enabled" xml:space="preserve"><value>Provider enabled</value></data>
+  <data name="Agents.OperationalStatus.ProviderReadiness.Disabled" xml:space="preserve"><value>Provider disabled</value></data>
+  <data name="Agents.OperationalStatus.ProviderReadiness.Degraded" xml:space="preserve"><value>Provider degraded</value></data>
+  <data name="Agents.OperationalStatus.ProviderReadiness.Failed" xml:space="preserve"><value>Provider failed</value></data>
+  <data name="Agents.OperationalStatus.ProviderReadiness.NotConfigured" xml:space="preserve"><value>Provider not configured</value></data>
+
+  <!-- Story 4.3 — operational-status presentation: Agent Call status labels (AC1) -->
+  <data name="Agents.OperationalStatus.CallStatus.Unknown" xml:space="preserve"><value>Call status unknown</value></data>
+  <data name="Agents.OperationalStatus.CallStatus.Requested" xml:space="preserve"><value>Requested</value></data>
+  <data name="Agents.OperationalStatus.CallStatus.Authorized" xml:space="preserve"><value>Authorized</value></data>
+  <data name="Agents.OperationalStatus.CallStatus.Denied" xml:space="preserve"><value>Denied</value></data>
+  <data name="Agents.OperationalStatus.CallStatus.ContextLoading" xml:space="preserve"><value>Loading context</value></data>
+  <data name="Agents.OperationalStatus.CallStatus.ContextBlocked" xml:space="preserve"><value>Context blocked</value></data>
+  <data name="Agents.OperationalStatus.CallStatus.Generating" xml:space="preserve"><value>Generating</value></data>
+  <data name="Agents.OperationalStatus.CallStatus.GenerationFailed" xml:space="preserve"><value>Generation failed</value></data>
+  <data name="Agents.OperationalStatus.CallStatus.Generated" xml:space="preserve"><value>Generated</value></data>
+
+  <!-- Story 4.3 — operational-status presentation: proposal/posting status labels (AC1) -->
+  <data name="Agents.OperationalStatus.ProposalStatus.Unknown" xml:space="preserve"><value>Proposal status unknown</value></data>
+  <data name="Agents.OperationalStatus.ProposalStatus.Generated" xml:space="preserve"><value>Generated</value></data>
+  <data name="Agents.OperationalStatus.ProposalStatus.Edited" xml:space="preserve"><value>Edited</value></data>
+  <data name="Agents.OperationalStatus.ProposalStatus.Regenerated" xml:space="preserve"><value>Regenerated</value></data>
+  <data name="Agents.OperationalStatus.ProposalStatus.PendingApproval" xml:space="preserve"><value>Pending approval</value></data>
+  <data name="Agents.OperationalStatus.ProposalStatus.Approved" xml:space="preserve"><value>Approved</value></data>
+  <data name="Agents.OperationalStatus.ProposalStatus.Rejected" xml:space="preserve"><value>Rejected</value></data>
+  <data name="Agents.OperationalStatus.ProposalStatus.Abandoned" xml:space="preserve"><value>Abandoned</value></data>
+  <data name="Agents.OperationalStatus.ProposalStatus.Expired" xml:space="preserve"><value>Expired</value></data>
+  <data name="Agents.OperationalStatus.ProposalStatus.PostingPending" xml:space="preserve"><value>Posting pending</value></data>
+  <data name="Agents.OperationalStatus.ProposalStatus.Posted" xml:space="preserve"><value>Posted</value></data>
+  <data name="Agents.OperationalStatus.ProposalStatus.PostingFailed" xml:space="preserve"><value>Posting failed</value></data>
+
+  <!-- Story 4.3 — audit availability labels (shared by AuditAvailabilityBadge + operational-status panel; AC1) -->
+  <data name="Agents.Audit.Availability.Unknown" xml:space="preserve"><value>Audit status unknown</value></data>
+  <data name="Agents.Audit.Availability.AuditPending" xml:space="preserve"><value>Audit pending</value></data>
+  <data name="Agents.Audit.Availability.AuditAvailable" xml:space="preserve"><value>Audit available</value></data>
+  <data name="Agents.Audit.Availability.AuditDelayed" xml:space="preserve"><value>Audit delayed</value></data>
+  <data name="Agents.Audit.Availability.AuditUnavailable" xml:space="preserve"><value>Audit unavailable</value></data>
+
+  <!-- Story 4.3 — recovery-action group headings (group by action, not subsystem; UX-DR9) -->
+  <data name="Agents.OperationalStatus.Group.ConfigureProvider" xml:space="preserve"><value>Configure provider</value></data>
+  <data name="Agents.OperationalStatus.Group.LinkPartyIdentity" xml:space="preserve"><value>Link Party identity</value></data>
+  <data name="Agents.OperationalStatus.Group.FixPolicy" xml:space="preserve"><value>Review configuration and policy</value></data>
+  <data name="Agents.OperationalStatus.Group.WaitForApproval" xml:space="preserve"><value>Wait for approval</value></data>
+  <data name="Agents.OperationalStatus.Group.RetryGeneration" xml:space="preserve"><value>Retry generation</value></data>
+  <data name="Agents.OperationalStatus.Group.InspectAudit" xml:space="preserve"><value>Inspect audit evidence</value></data>
+  <data name="Agents.OperationalStatus.Group.StartNewCall" xml:space="preserve"><value>Start a new call</value></data>
+  <data name="Agents.OperationalStatus.Group.None" xml:space="preserve"><value>No action required</value></data>
+
+  <!-- Story 4.3 — recovery-action guidance (names the action, never the raw subsystem; UX-DR9/14) -->
+  <data name="Agents.OperationalStatus.Recovery.ConfigureProvider" xml:space="preserve"><value>Select an enabled provider and model for hexa, then retry the call.</value></data>
+  <data name="Agents.OperationalStatus.Recovery.LinkPartyIdentity" xml:space="preserve"><value>Link a valid Party identity to hexa so it has an attributable participant.</value></data>
+  <data name="Agents.OperationalStatus.Recovery.FixPolicy" xml:space="preserve"><value>Review the Agent configuration and approver policy, then re-enable hexa.</value></data>
+  <data name="Agents.OperationalStatus.Recovery.WaitForApproval" xml:space="preserve"><value>An approver must review the pending proposal before it can post.</value></data>
+  <data name="Agents.OperationalStatus.Recovery.RetryGeneration" xml:space="preserve"><value>Retry the generation or posting once the failure cause is resolved.</value></data>
+  <data name="Agents.OperationalStatus.Recovery.InspectAudit" xml:space="preserve"><value>Inspect the support-safe audit evidence for this Agent Call.</value></data>
+  <data name="Agents.OperationalStatus.Recovery.StartNewCall" xml:space="preserve"><value>This work can no longer post. Start a new Agent Call to continue.</value></data>
+  <data name="Agents.OperationalStatus.Recovery.None" xml:space="preserve"><value>No recovery action is required.</value></data>
+
+  <!-- Story 4.3 — operational-status page + panel chrome (AC1, AC4) -->
+  <data name="Agents.Navigation.OperationalStatus" xml:space="preserve"><value>Operational status</value></data>
+  <data name="Agents.OperationalStatus.Panel.Label" xml:space="preserve"><value>Operational status by recovery action</value></data>
+  <data name="Agents.OperationalStatus.Title" xml:space="preserve"><value>Operational status</value></data>
+  <data name="Agents.OperationalStatus.Eyebrow" xml:space="preserve"><value>Operations</value></data>
+  <data name="Agents.OperationalStatus.Description" xml:space="preserve"><value>Diagnose readiness, calls, proposals, failures, and posting outcomes.</value></data>
+  <data name="Agents.OperationalStatus.Metrics.Label" xml:space="preserve"><value>Operational signals</value></data>
+  <data name="Agents.OperationalStatus.PendingProposals.Label" xml:space="preserve"><value>Pending proposals</value></data>
+  <data name="Agents.OperationalStatus.GeneratedAt.Label" xml:space="preserve"><value>Summary generated</value></data>
+  <data name="Agents.OperationalStatus.Links.Label" xml:space="preserve"><value>Related surfaces</value></data>
+  <data name="Agents.OperationalStatus.ProposalsLink" xml:space="preserve"><value>Open the proposal queue</value></data>
+  <data name="Agents.OperationalStatus.AuditLink" xml:space="preserve"><value>Open audit evidence</value></data>
+
+  <!-- Story 4.3 — audit-evidence page + panel chrome (AC1, AC2, AC3) -->
+  <data name="Agents.Navigation.AuditEvidence" xml:space="preserve"><value>Audit evidence</value></data>
+  <data name="Agents.Audit.Title" xml:space="preserve"><value>Audit evidence</value></data>
+  <data name="Agents.Audit.Eyebrow" xml:space="preserve"><value>Compliance</value></data>
+  <data name="Agents.Audit.Description" xml:space="preserve"><value>Inspect support-safe, metadata-only audit evidence for Agent Calls.</value></data>
+  <data name="Agents.Audit.Panel.Label" xml:space="preserve"><value>Audit evidence details</value></data>
+  <data name="Agents.Audit.MetadataOnly" xml:space="preserve"><value>Metadata only. No message content is recorded.</value></data>
+  <data name="Agents.Audit.PostedAuditPending" xml:space="preserve"><value>Posted with audit pending. Durable audit evidence is not yet available.</value></data>
+  <data name="Agents.Audit.Field.Availability" xml:space="preserve"><value>Audit availability</value></data>
+  <data name="Agents.Audit.Field.State" xml:space="preserve"><value>State</value></data>
+  <data name="Agents.Audit.Field.Caller" xml:space="preserve"><value>Caller</value></data>
+  <data name="Agents.Audit.Field.Agent" xml:space="preserve"><value>Agent</value></data>
+  <data name="Agents.Audit.Field.SourceConversation" xml:space="preserve"><value>Source Conversation</value></data>
+  <data name="Agents.Audit.Field.Provider" xml:space="preserve"><value>Provider</value></data>
+  <data name="Agents.Audit.Field.Model" xml:space="preserve"><value>Model</value></data>
+  <data name="Agents.Audit.Field.ResponseMode" xml:space="preserve"><value>Response mode</value></data>
+  <data name="Agents.Audit.Field.ApprovedVersion" xml:space="preserve"><value>Approved version</value></data>
+  <data name="Agents.Audit.Field.PostingOutcome" xml:space="preserve"><value>Posting outcome</value></data>
+  <data name="Agents.Audit.Field.Created" xml:space="preserve"><value>Created</value></data>
+  <data name="Agents.Audit.Field.Approved" xml:space="preserve"><value>Approved</value></data>
+  <data name="Agents.Audit.Field.Posted" xml:space="preserve"><value>Posted</value></data>
+  <data name="Agents.Audit.Field.Approver" xml:space="preserve"><value>Approver</value></data>
+  <data name="Agents.Audit.Field.PostedMessage" xml:space="preserve"><value>Posted message</value></data>
+  <data name="Agents.Audit.GovernanceBlockers.Label" xml:space="preserve"><value>Launch-readiness blockers</value></data>
+  <data name="Agents.Audit.None" xml:space="preserve"><value>Not recorded</value></data>
+  <data name="Agents.Audit.Landing.Description" xml:space="preserve"><value>Audit evidence is reached from an Agent Call. Open a Conversation invocation, proposal, operational status, or posted response to inspect its support-safe evidence.</value></data>
+  <data name="Agents.Audit.EntryPoints.Label" xml:space="preserve"><value>Audit entry points</value></data>
+  <data name="Agents.Audit.EntryPoint.Overview" xml:space="preserve"><value>Agents overview</value></data>
+  <data name="Agents.Audit.EntryPoint.OperationalStatus" xml:space="preserve"><value>Operational status</value></data>
+  <data name="Agents.Audit.EntryPoint.ProposalDetail" xml:space="preserve"><value>Proposal detail</value></data>
+  <data name="Agents.Audit.EntryPoint.PostedResponse" xml:space="preserve"><value>Audit is also reachable from a posted response reference.</value></data>
 </root>

@@ -3,7 +3,10 @@ using System.Linq;
 
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.AgentInteraction;
+using Hexalith.Agents.Contracts.AgentInteraction.Queries;
+using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.ProviderCatalog;
+using Hexalith.Agents.UI.Services.Gateways;
 
 namespace Hexalith.Agents.UI.Tests;
 
@@ -192,4 +195,69 @@ internal static class AgentUiTestData
             OutputTokenCount: 0,
             SourceVersionId: sourceVersionId,
             EditorPartyId: editorPartyId);
+
+    // ===== Story 4.3 operational-status + audit-evidence factories =====
+
+    /// <summary>A safe operational-status summary; tests use <c>with</c> expressions or named params to vary a single field.</summary>
+    public static AgentOperationalStatusSummaryView OperationalStatusSummary(
+        AgentReadinessStatus agentReadiness = AgentReadinessStatus.Callable,
+        IReadOnlyList<AgentActivationBlocker>? readinessBlockers = null,
+        IReadOnlyList<string>? auditGovernanceBlockers = null,
+        AuditAvailabilityStatus auditAvailability = AuditAvailabilityStatus.AuditAvailable,
+        IReadOnlyList<AgentCallOutcomeCount>? recentCallOutcomes = null,
+        IReadOnlyList<ProposalOutcomeCount>? proposalOutcomes = null,
+        int pendingProposalCount = 2,
+        string? generatedAt = "2026-06-24T12:00:00Z")
+        => new(
+            AgentReadiness: agentReadiness,
+            ReadinessBlockers: readinessBlockers ?? [],
+            AuditGovernanceBlockers: auditGovernanceBlockers ?? [AgentAuditGovernanceReadiness.RetentionLegalHoldExportDeletionPolicyUnresolved],
+            AuditAvailability: auditAvailability,
+            RecentCallOutcomes: recentCallOutcomes ?? [new AgentCallOutcomeCount(AgentCallOperationStatus.Generated, 3), new AgentCallOutcomeCount(AgentCallOperationStatus.Denied, 1)],
+            ProposalOutcomes: proposalOutcomes ?? [new ProposalOutcomeCount(ProposalOperationStatus.Posted, 4), new ProposalOutcomeCount(ProposalOperationStatus.PostingFailed, 1)],
+            PendingProposalCount: pendingProposalCount,
+            GeneratedAt: generatedAt);
+
+    /// <summary>Wraps a summary in a successful read result.</summary>
+    public static AgentOperationalStatusSummaryResult OperationalStatusResult(AgentOperationalStatusSummaryView? summary = null)
+        => AgentOperationalStatusSummaryResult.Success(summary ?? OperationalStatusSummary());
+
+    /// <summary>A safe approval/posting evidence view for the audit panel tests.</summary>
+    public static AgentProposalApprovalEvidenceView ApprovalEvidence(
+        string agentInteractionId = "interaction-1",
+        string proposalId = "proposal-1",
+        ProposedAgentReplyState state = ProposedAgentReplyState.Posted,
+        string approvedVersionId = "version-1",
+        string approverPartyId = "approver-1",
+        string postedConversationMessageId = "posted-message-1",
+        string? approvedAt = "2026-06-24T09:00:00Z",
+        string? postedAt = "2026-06-24T09:01:00Z")
+        => new(
+            AgentInteractionId: agentInteractionId,
+            ProposalId: proposalId,
+            State: state,
+            ApprovedVersionId: approvedVersionId,
+            ApproverPartyId: approverPartyId,
+            SourceConversationId: "conversation-1",
+            AgentPartyId: "agent-party-1",
+            MessageId: "message-1",
+            IdempotencyKey: "idempotency-1",
+            PostedConversationMessageId: postedConversationMessageId,
+            ApproverPolicyVersion: 1,
+            PolicyBasisVerdict: ApproverPolicyValidationStatus.Valid,
+            DisclosureCategory: ApproverPolicyBasisDisclosure.OperatorOnly,
+            ApprovalFailureReason: default,
+            PostingFailureReason: default,
+            ApprovedAt: approvedAt,
+            PostedAt: postedAt);
+
+    /// <summary>Wraps audit evidence in a successful read result (defaults to a posted, audit-available interaction).</summary>
+    public static AuditEvidenceResult AuditEvidence(
+        ProposalDetailView? detail = null,
+        AgentProposalApprovalEvidenceView? approval = null,
+        AuditAvailabilityStatus availability = AuditAvailabilityStatus.AuditAvailable)
+        => AuditEvidenceResult.Success(
+            detail ?? Detail(state: ProposedAgentReplyState.Posted, approvedVersionId: "version-1", approvedAt: "2026-06-24T09:00:00Z", postedAt: "2026-06-24T09:01:00Z"),
+            approval ?? ApprovalEvidence(),
+            availability);
 }

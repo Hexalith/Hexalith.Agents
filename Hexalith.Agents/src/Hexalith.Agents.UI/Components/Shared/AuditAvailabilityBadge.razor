@@ -1,0 +1,29 @@
+@using Hexalith.Agents.Contracts.Operations
+@inject IStringLocalizer<AgentsResources> Localizer
+
+@* audit-availability-badge (Story 4.3 AC1, AC2; 4.2 AC3): color + icon + visible localized whole-string label
+   (UX-DR12) mapping AuditAvailabilityStatus → Fluent role. AuditAvailable → Success; AuditPending → Informative
+   (never success); AuditDelayed → Warning; AuditUnavailable → Severe; Unknown → Subtle. Pending/delayed/unavailable
+   are NEVER rendered as success (AD-5; EXPERIENCE Audit Availability). The accessible name is the same safe whole
+   string and never carries an id, content, payload, or secret (AD-9, AD-14). Reuses the OperationalStatusPresentation
+   role/icon/label mapping (shared with the operational-status panel). *@
+<FluentBadge Appearance="BadgeAppearance.Tint"
+             Color="@OperationalStatusPresentation.ColorFor(State)"
+             IconStart="@OperationalStatusPresentation.IconFor(State)"
+             role="status"
+             aria-label="@Label"
+             data-testid="@TestId">
+    @Label
+</FluentBadge>
+
+@code {
+    /// <summary>The canonical audit availability state to render.</summary>
+    [Parameter]
+    public AuditAvailabilityStatus State { get; set; } = AuditAvailabilityStatus.Unknown;
+
+    /// <summary>Stable test id for the badge surface.</summary>
+    [Parameter]
+    public string TestId { get; set; } = "audit-availability-badge";
+
+    private string Label => Localizer[OperationalStatusPresentation.LabelKeyFor(State)];
+}

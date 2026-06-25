@@ -1,0 +1,109 @@
+@page "/agents/audit"
+@page "/agents/proposals/{AgentInteractionId}/audit"
+@attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsAuditOperatorPolicy)]
+@using Hexalith.Agents.Contracts.Operations
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IAuditEvidenceGateway Gateway
+
+@* Audit evidence (Story 4.3 AC1, AC2, AC3): the consolidated support-safe audit surface for the Tenant/Compliance
+   Operator persona. The landing (/agents/audit) is full-width and lists the IA entry points (overview, operational
+   status, proposal detail, posted-response reference) via safe links and surfaces the named launch-readiness governance
+   blocker for Story 4.4. The per-interaction view (/agents/proposals/{id}/audit) is constrained and renders the
+   metadata-only AuditEvidencePanel through all eight surface states. Content-bearing audit stays blocked — metadata-only
+   (Story 4.2 AC4; OQ-8). The gateway fails closed by default → PermissionDenied/Unavailable, disclosing nothing (AD-12). *@
+<FcPageLayout Mode="@(IsDetail ? FcPageLayoutMode.Constrained : FcPageLayoutMode.FullWidth)">
+    <FcContentLabel LabelledBy="@HeadingId" />
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="24px" Class="agents-audit" data-testid="agents-audit">
+        <FcPageHeader @ref="_header"
+                      PageTitle="@Localizer["Agents.Audit.Title"]"
+                      Heading="@Localizer["Agents.Audit.Title"]"
+                      HeadingId="@HeadingId"
+                      HeadingTabIndex="-1"
+                      Eyebrow="@Localizer["Agents.Audit.Eyebrow"]"
+                      Description="@Localizer["Agents.Audit.Description"]"
+                      TestId="agents-audit-header" />
+
+        @if (IsDetail)
+        {
+            @if (_result is null)
+            {
+                <AgentSurfaceState Kind="AgentSurfaceKind.Loading" TestId="agents-audit-state" />
+            }
+            else if (_result.Status is AuditEvidenceInspectionStatus.NotAuthorized)
+            {
+                <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-audit-state" />
+            }
+            else if (_result.Status is AuditEvidenceInspectionStatus.Unavailable)
+            {
+                <AgentSurfaceState Kind="AgentSurfaceKind.Unavailable" TestId="agents-audit-state" />
+            }
+            else if (_result.Status is AuditEvidenceInspectionStatus.NotFound || _result.Detail is null)
+            {
+                <AgentSurfaceState Kind="AgentSurfaceKind.Empty" TestId="agents-audit-state" />
+            }
+            else
+            {
+                <AuditEvidencePanel Result="@_result" />
+            }
+        }
+        else
+        {
+            <section class="agents-audit__entry-points"
+                     aria-label="@Localizer["Agents.Audit.EntryPoints.Label"]"
+                     data-testid="agents-audit-entry-points">
+                <p>@Localizer["Agents.Audit.Landing.Description"]</p>
+                <nav aria-label="@Localizer["Agents.Audit.EntryPoints.Label"]">
+                    <ul>
+                        <li><a href="/agents" data-testid="agents-audit-link-overview">@Localizer["Agents.Audit.EntryPoint.Overview"]</a></li>
+                        <li><a href="/agents/status" data-testid="agents-audit-link-status">@Localizer["Agents.Audit.EntryPoint.OperationalStatus"]</a></li>
+                        <li><a href="/agents/proposals" data-testid="agents-audit-link-proposals">@Localizer["Agents.Audit.EntryPoint.ProposalDetail"]</a></li>
+                    </ul>
+                </nav>
+                <p class="agents-audit__posted-reference" data-testid="agents-audit-posted-reference">@Localizer["Agents.Audit.EntryPoint.PostedResponse"]</p>
+            </section>
+
+            @* The named launch-readiness governance blocker is surfaced (metadata-only) so Story 4.4 can consume it. *@
+            <section class="agents-audit__governance" aria-label="@Localizer["Agents.Audit.GovernanceBlockers.Label"]" data-testid="agents-audit-governance">
+                <h2>@Localizer["Agents.Audit.GovernanceBlockers.Label"]</h2>
+                <p class="agents-audit__metadata-only">@Localizer["Agents.Audit.MetadataOnly"]</p>
+                <ul>
+                    @foreach (string blocker in AgentAuditGovernanceReadiness.MetadataOnlyBlocked.Blockers)
+                    {
+                        <li>@blocker</li>
+                    }
+                </ul>
+            </section>
+        }
+    </FluentStack>
+</FcPageLayout>
+
+@code {
+    private const string HeadingId = "agents-audit-heading";
+
+    /// <summary>The optional Agent Call id for the per-interaction audit view (null on the /agents/audit landing).</summary>
+    [Parameter]
+    public string? AgentInteractionId { get; set; }
+
+    private FcPageHeader? _header;
+    private AuditEvidenceResult? _result;
+    private bool _focusHeadingPending = true;
+
+    private bool IsDetail => !string.IsNullOrWhiteSpace(AgentInteractionId);
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (IsDetail)
+        {
+            _result = await Gateway.GetEvidenceAsync(AgentInteractionId!, CancellationToken.None).ConfigureAwait(false);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusHeadingPending && _header is not null)
+        {
+            _focusHeadingPending = false;
+            await _header.FocusHeadingAsync().ConfigureAwait(false);
+        }
+    }
+}

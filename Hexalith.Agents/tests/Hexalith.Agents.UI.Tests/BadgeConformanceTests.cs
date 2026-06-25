@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Bunit;
 
 using Hexalith.Agents.Contracts.AgentInteraction;
+using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.UI.Components.Shared;
 
 using Microsoft.FluentUI.AspNetCore.Components;
@@ -127,6 +128,44 @@ public sealed class BadgeConformanceTests : AgentsTestContext
         {
             BadgeColor color = ProposedAgentReplyStatePresentation.ColorFor(state);
             if (state != ProposedAgentReplyState.Posted)
+            {
+                color.ShouldNotBe(BadgeColor.Success);
+            }
+
+            color.ShouldNotBe(BadgeColor.Brand);
+        }
+    }
+
+    [Theory]
+    [InlineData(AuditAvailabilityStatus.Unknown)]
+    [InlineData(AuditAvailabilityStatus.AuditPending)]
+    [InlineData(AuditAvailabilityStatus.AuditAvailable)]
+    [InlineData(AuditAvailabilityStatus.AuditDelayed)]
+    [InlineData(AuditAvailabilityStatus.AuditUnavailable)]
+    public void Audit_availability_badge_renders_color_icon_and_localized_whole_string(AuditAvailabilityStatus state)
+    {
+        IRenderedComponent<AuditAvailabilityBadge> cut = Render<AuditAvailabilityBadge>(
+            parameters => parameters.Add(badge => badge.State, state));
+
+        FluentBadge badge = cut.FindComponent<FluentBadge>().Instance;
+        badge.Color.ShouldBe(OperationalStatusPresentation.ColorFor(state));
+        badge.IconStart.ShouldNotBeNull();
+
+        string expectedKey = OperationalStatusPresentation.LabelKeyFor(state);
+        cut.VisibleText().Trim().ShouldBe(expectedKey);
+        cut.Find("[data-testid='audit-availability-badge']").GetAttribute("role").ShouldBe("status");
+        cut.Find("[data-testid='audit-availability-badge']").GetAttribute("aria-label").ShouldBe(expectedKey);
+        _sixDigitHex.IsMatch(cut.Markup).ShouldBeFalse("status badges bind to Fluent roles, never inline hex (AC5)");
+    }
+
+    [Fact]
+    public void Audit_availability_badge_uses_success_only_for_audit_available()
+    {
+        // AD-5 — pending/delayed/unavailable/unknown audit is NEVER rendered as success.
+        foreach (AuditAvailabilityStatus state in Enum.GetValues<AuditAvailabilityStatus>())
+        {
+            BadgeColor color = OperationalStatusPresentation.ColorFor(state);
+            if (state != AuditAvailabilityStatus.AuditAvailable)
             {
                 color.ShouldNotBe(BadgeColor.Success);
             }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.AgentInteraction;
+using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.UI.Services.Gateways;
 
@@ -136,5 +137,31 @@ public sealed class DeferredGatewayTests
         result.Status.ShouldBe(ProposalApprovalStatus.NotAuthorized);
         result.SelectedVersionId.ShouldBeNull();
         result.MessageId.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task DeferredOperationalStatusGateway_fails_closed_with_not_authorized_and_no_summary()
+    {
+        // Story 4.3 — a host that has not bound the live operational read-model renders permission-denied, never
+        // fabricated counts/rates (AD-12).
+        DeferredOperationalStatusGateway gateway = new();
+
+        AgentOperationalStatusSummaryResult result = await gateway.GetSummaryAsync(CancellationToken.None);
+
+        result.Status.ShouldBe(OperationalStatusInspectionStatus.NotAuthorized);
+        result.Summary.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task DeferredAuditEvidenceGateway_fails_closed_with_not_authorized_and_no_evidence()
+    {
+        // Story 4.3 — the deferred audit read fails closed, disclosing no evidence (AD-12).
+        DeferredAuditEvidenceGateway gateway = new();
+
+        AuditEvidenceResult result = await gateway.GetEvidenceAsync("interaction-1", CancellationToken.None);
+
+        result.Status.ShouldBe(AuditEvidenceInspectionStatus.NotAuthorized);
+        result.Detail.ShouldBeNull();
+        result.Approval.ShouldBeNull();
     }
 }

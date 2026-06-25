@@ -1,101 +1,104 @@
-# Test Automation Summary — Story 4.2: Query Audit Evidence Safely
+# Test Automation Summary — Story 4.3: Expose Operational Status And Admin Workflows
 
 **Workflow:** `bmad-qa-generate-e2e-tests`
 **Date:** 2026-06-25
 **Engineer:** QA automation (Administrator)
-**Story:** `_bmad-output/implementation-artifacts/4-2-query-audit-evidence-safely.md`
-**Mode:** Auto-apply all discovered coverage gaps.
+**Story:** `_bmad-output/implementation-artifacts/4-3-expose-operational-status-and-admin-workflows.md`
+**Mode:** Auto-apply all discovered coverage gaps. **No production code changed** — test-only additions.
 
 ## Framework Detected
 
-- .NET 10 solution using xUnit v3 `3.2.2`, Shouldly `4.3.0`, NSubstitute. No JS/Playwright workspace for this module.
-- No new framework introduced — reused the project's established test conventions and `AgentInteractionTestData` builders.
+- .NET 10 Blazor/FrontComposer UI module. UI tests: bUnit `2.8.4-preview` + xUnit v3 `3.2.2` + Shouldly `4.3.0` +
+  NSubstitute `5.3.0` (AngleSharp). Contracts tests: xUnit v3 + Shouldly. No new framework introduced — reused
+  `AgentsTestContext`, `AgentUiTestData`, and `StubAgentsLocalizer`.
 - `dotnet test` (VSTest) hits the known sandbox failure `SocketException (13)`; validation used serialized
-  `dotnet build … -m:1 -nr:false` plus running the built xUnit v3 executables directly.
+  `dotnet build … -c Release -m:1` + running the built xUnit v3 executables directly (`DiffEngine_Disabled=true`).
 
 ## Scope
 
-Story 4.2 is the server-side **safe Audit Evidence read-model / query** story (metadata-only; content-bearing
-`RedactedExcerpt` stays blocked per AC4). No new UI (owned by 4.3). This QA pass added tests over the implemented audit
-read surface: pure inspection helpers, the content-bearing block policy, the live `IDomainQueryHandler`s, the
-governance-readiness blocker, and end-to-end traceability.
+Story 4.3 is the consolidated **operational-status + audit UI** story (read-only surfaces over the fail-closed UI
+gateway seam; the live read-model binding is deferred — AD-16, `Server/Projections/` is `.gitkeep`-only). It shipped with
+a "one suite per AC" set (UI 840, Contracts 316, all green at baseline). This QA pass audited the new surface against the
+ACs and the checklist, then generated tests for behaviour no existing test asserted.
 
 ## Coverage gaps discovered & closed
 
 | # | Gap (AC / guardrail) | Closed by |
 |---|---|---|
-| G1 | AC2/AD-12 fail-closed: per-helper `NotAuthorized`/`NotFound` indistinguishability untested for context, gate, proposal edit/regen/approval; status `NotFound` untested | `AgentInteractionAuditInspectionTests` |
-| G2 | AC3 never-pending-as-success: genuine `AuditPending` branch (requested, no captured evidence) uncovered — never Available (fresh) or Delayed (stale) | `AgentInteractionAuditInspectionTests` theory |
-| G3 | Generation/posting null fail-closed paths (unauthorized, absent, latest-of-many selection) | `AgentInteractionAuditInspectionTests` |
-| G4 | AC4 content-block enforcement: `AgentAuditContentPolicy.Evaluate` (`MetadataOnly→Succeeded`, `RedactedExcerpt`/`Unknown→Blocked`) had zero direct tests | **new** `AgentAuditContentPolicyTests` |
-| G5 | Server authorization derivation: non-global caller via `ITenantAccessReader` — fresh→authorized+reads scoped state; stale→NotAuthorized without state access | `AgentInteractionAuditQueryHandlerTests` |
-| G6 | Per-handler fail-closed: 6 of 9 handlers had no direct test — every handler returns non-success `NotAuthorized` with no state access | `AgentInteractionAuditQueryHandlerTests` (loops all 9) |
-| G7 | Unavailable-reader fail-closed payloads: posting→`Unavailable`, gate→`NotFound` (never success) | `AgentInteractionAuditQueryHandlerTests` |
-| G8 | Structural tenant isolation: read scoped strictly to envelope `TenantId` + `AggregateId` (cross-tenant impossible by construction) | `AgentInteractionAuditQueryHandlerTests` |
-| G9 | Contracts: shared `agent-interaction` domain across all 9 query records; safe round-trip of the 6 existing records; governance readiness serializes by name without secret/content | `AgentAuditQueryContractsTests` |
-| G10 | AC1/Task 6/AD-17 audit completeness: only Automatic-mode trace existed — no **Confirmation-mode** end-to-end "every posted response traces to source interaction" proof | **new** `AgentInteractionAuditTraceabilityE2ETests` |
+| G1 | AC1/UX-DR9: `OperationalStatusPresentation.GroupForBlocker` only exercised indirectly via one panel case — no per-blocker group assertion | **new theory** `Activation_blocker_maps_to_its_recovery_action_group` (11 cases) |
+| G2 | AC1: public `ToReadinessState` mapping had **zero** coverage | **new theory** `Agent_readiness_status_maps_to_the_canonical_ui_readiness_state` (7 cases) |
+| G3 | AD-14 totality: the "every switch is total" / `Unknown=0` safe-default claim was untested (`Subtle` + non-null icon, audit `Unknown`→`None`) | **new fact** `Unknown_sentinels_resolve_to_a_safe_subtle_default_with_a_non_null_icon` |
+| G4 | AC1: several canonical states the story enumerates were unasserted (readiness `Disabled`/`Checking`, call `Requested`/`Generated`, provider `Disabled`/`Degraded`, proposal `Abandoned`/`Generated`) | extended the 4 mapping theories |
+| G5 | AC4: the panel renders a visible `(n)` count, and zero-count outcomes are omitted — neither was asserted | **new** `Panel_renders_outcome_counts_and_omits_zero_count_outcomes` |
+| G6 | AC2: the page `Empty` branch (`HasSignals=false`) and the `Stale(null)`→`Stale`-surface branch (distinct from `Degraded`) were untested | **new** `Page_renders_empty_surface_…` + `Page_renders_stale_surface_with_refresh_…` |
+| G7 | AC1/AD-5: the audit `PostingOutcomeKey` never-collapse (Posted vs Failed) was untested at the field level | **new** `Panel_renders_posting_outcome_distinctly_for_posted_and_posting_failed` |
+| G8 | AC1: the `DisplayId` "None" fallback and the approval-row omission (no approval recorded) were untested | **new** `Panel_renders_the_none_affordance_for_absent_optional_ids_and_omits_the_approver_rows` |
+| G9 | AC3: the panel-level governance-blocker section (consumed by Story 4.4) was untested (only the landing copy was) | **new** `Panel_surfaces_the_named_governance_blocker_metadata_only` |
+| G10 | AC2/AD-12: the audit `NotFound`→`Empty` branch (no cross-tenant existence leak) was untested | **new** `Detail_renders_empty_surface_when_the_evidence_is_not_found` |
+| G11 | AC2: the `Degraded`→refresh affordance and the surface-state `Detail` message override were untested | **new** `Degraded_surface_offers_a_refresh` + `Surface_state_detail_overrides_the_default_message` |
 
-## Generated / extended tests
+## Generated / extended tests (UI) — `tests/Hexalith.Agents.UI.Tests/`
 
-### API / read-model tests (Server) — `tests/Hexalith.Agents.Server.Tests/` (+6)
-- [x] `AgentInteractionAuditQueryHandlerTests.cs` — tenant-access authorization (fresh vs stale), every-handler fail-closed
-  `NotAuthorized` without state access, unavailable-reader payloads (posting `Unavailable`, gate `NotFound`), strict
-  tenant+aggregate scoping.
+### AC1 — presentation mapper — `OperationalStatusPresentationTests.cs`
+- [x] `Activation_blocker_maps_to_its_recovery_action_group` (**new**, 11 cases) — every blocker groups by recovery
+  **action** (party-identity → link, provider → configure, all policy blockers → fix policy), incl. the `Unknown` default.
+- [x] `Agent_readiness_status_maps_to_the_canonical_ui_readiness_state` (**new**, 7 cases) — each status → its UI readiness
+  state; `Unknown`→`Unknown`.
+- [x] `Unknown_sentinels_resolve_to_a_safe_subtle_default_with_a_non_null_icon` (**new**) — totality / safe default.
+- [x] Extended the four `…maps_to_action_group_and_role` theories with the unasserted canonical AC1 states.
 
-### Domain pure-helper + content-policy + traceability tests — `tests/Hexalith.Agents.Tests/` (+19)
-- [x] `AgentInteractionAuditInspectionTests.cs` (extended) — fail-closed `NotAuthorized`/`NotFound` per evidence kind;
-  `AuditPending` never-success branch; generation latest-attempt selection; posting/generation null fail-closed; no-content
-  serialization checks.
-- [x] `AgentAuditContentPolicyTests.cs` (**new**) — AC4: only `MetadataOnly` succeeds; `RedactedExcerpt`/`Unknown` resolve to
-  safe `Blocked` (never success, never content); named governance blocker surfaced; readiness serializes by name.
-- [x] `AgentInteractionAuditTraceabilityE2ETests.cs` (**new**) — Confirmation-mode full command chain then queries the audit
-  surface; proves `MessageId ← AgentInteractionId + approved VersionId ← Snapshot` with no prompt/generated/edited leak.
+### AC2 / AC4 — panel + page — `OperationalStatusSurfaceTests.cs`
+- [x] `Panel_renders_outcome_counts_and_omits_zero_count_outcomes` (**new**) — visible `(n)` suffix; zero-count omitted;
+  readiness + audit chips always present.
+- [x] `Page_renders_empty_surface_when_the_authorized_summary_has_no_signals` (**new**).
+- [x] `Page_renders_stale_surface_with_refresh_when_no_trustworthy_summary` (**new**).
 
-### Contract tests — `tests/Hexalith.Agents.Contracts.Tests/` (+3)
-- [x] `AgentAuditQueryContractsTests.cs` (extended) — shared domain discriminator across all 9 query records; safe
-  round-trip; governance-readiness no-secret/no-content serialization.
+### AC1 / AC2 / AC3 — audit panel + page — `AuditEvidenceSurfaceTests.cs`
+- [x] `Panel_renders_posting_outcome_distinctly_for_posted_and_posting_failed` (**new**) — AD-5 never-collapse.
+- [x] `Panel_renders_the_none_affordance_for_absent_optional_ids_and_omits_the_approver_rows` (**new**).
+- [x] `Panel_surfaces_the_named_governance_blocker_metadata_only` (**new**).
+- [x] `Detail_renders_empty_surface_when_the_evidence_is_not_found` (**new**).
+
+### AC2 — shared surface state — `AccessibilityTests.cs`
+- [x] `Degraded_surface_offers_a_refresh` (**new**).
+- [x] `Surface_state_detail_overrides_the_default_message` (**new**).
 
 ## Coverage
 
 | Project | Before | After | Added | Result |
 |---|---|---|---|---|
-| Agents domain (`Hexalith.Agents.Tests`) | 661 | 680 | +19 | ✅ 0 failed |
-| Server (`Hexalith.Agents.Server.Tests`) | 345 | 351 | +6 | ✅ 0 failed |
-| Contracts (`Hexalith.Agents.Contracts.Tests`) | 306 | 309 | +3 | ✅ 0 failed |
-| **Total new** | — | — | **+28** | — |
+| UI (`Hexalith.Agents.UI.Tests`) | 840 | **876** | **+36** | ✅ 0 failed |
+| Contracts (`Hexalith.Agents.Contracts.Tests`) | 316 | 316 | 0 | ✅ already complete (round-trip / ordinal / no-leak / fail-closed / query discriminators) |
+| Server (`Hexalith.Agents.Server.Tests`) | 351 | 351 | 0 | ✅ no server code touched |
 
-- **AC coverage:** AC1 (traceability/linked evidence), AC2 (authorized/redacted/no-leak fail-closed), AC3 (distinguished
-  audit status, never pending-as-success), AC4 (content-bearing block + governance blocker) — all exercised.
-- **Audit query handlers:** 9/9 covered for the fail-closed authorization gate; status/availability/generation/posting/gate
-  additionally covered for success and unavailable paths.
+- **Presentation mapper:** partial → every canonical status + every blocker + every `Unknown` sentinel + both public
+  helpers (`ToReadinessState`, `GroupForBlocker`).
+- **UI data-states (AgentSurfaceKind):** all eight kinds incl. the `Empty` / `Stale(null)` / `Degraded` page branches,
+  the `Degraded` refresh, and the `Detail` override.
+- **Audit-evidence panel:** posting-outcome non-collapse, "None" fallback, approval-row omission, governance blocker,
+  `NotFound`→`Empty`.
 
 ## Build & run
 
-- `dotnet build Hexalith.Agents.slnx -c Release -m:1` → **0 warnings / 0 errors**.
-- Each touched test project's built xUnit v3 executable run directly → all pass (0 failed across 1340 tests in the three
-  projects).
-
-## Notes
-
-- One initially-drafted test (`Empty user id is forbidden`) was removed: `QueryEnvelope` validates a non-whitespace
-  `UserId` at construction, so the handler's belt-and-suspenders guard is unreachable through the public envelope
-  contract. The intent is covered by the `NotAuthorized`-without-state tests.
-- **No production code changed** — test-only additions. Deferred public client / live BFF binding remain fail-closed (no
-  regression).
+- `dotnet build Hexalith.Agents.slnx -c Release -m:1` → **Build succeeded, 0 Warning(s), 0 Error(s)** (warnings-as-errors;
+  CA2007/nullable clean).
+- `Hexalith.Agents.UI.Tests` built xUnit v3 executable run directly → **Total: 876, Failed: 0**.
 
 ## Validation checklist (`bmad-qa-generate-e2e-tests/checklist.md`)
 
-- [x] API tests generated (server read-model query handlers)
-- [x] E2E tests generated (Confirmation-mode capture→query traceability; no UI in 4.2)
-- [x] Tests use standard framework APIs (xUnit v3 + Shouldly)
-- [x] Happy path covered; [x] 1–2 critical error cases (fail-closed / unavailable / stale / blocked)
-- [x] All generated tests run successfully (0 failed)
-- [x] Semantic assertions; clear BDD descriptions; no hardcoded waits; tests independent (pure builders)
-- [x] Test summary created; tests saved to appropriate directories; coverage metrics included
+- [x] API/contract tests — already complete for the additive summary contract; UI gateway seam covered fail-closed.
+- [x] E2E (bUnit) tests generated for the operational-status + audit UI.
+- [x] Tests use standard framework APIs (bUnit + xUnit v3 + Shouldly + NSubstitute).
+- [x] Happy path covered; [x] critical error cases (permission-denied / unavailable / stale / not-found / empty).
+- [x] All generated tests run successfully (0 failed).
+- [x] Semantic/accessible locators (`data-testid`, `role`, `aria-live`, visible text); clear `Subject_scenario_expectation`
+  names; no hardcoded waits (uses `WaitForAssertion`); tests order-independent.
+- [x] Test summary created; tests saved to the established suites; coverage metrics included.
 
-## Next steps
+## Notes & next steps
 
-- Run touched test projects in CI (Tier 1 Contracts + domain; Tier 2 Server).
-- Story 4.3: add browser/bUnit E2E over this read path when the `audit-evidence-panel` UI is built.
-- Story 4.4: consumes the governance readiness blocker; add content-bearing (`RedactedExcerpt`) tests only once
-  retention/legal-hold/export/deletion governance is resolved (out of scope while the block holds).
+- Surfaces are tested against the fail-closed default DI graph (the live operational read-model binding is deferred —
+  AD-16). When that binding lands, add integration tests over the live `IOperationalStatusGateway`/`IAuditEvidenceGateway`
+  → BFF/API → read-model path.
+- Story 4.4 consumes the named launch-readiness governance blocker surfaced here (now panel-level tested).
+- Run the suite in CI alongside the existing per-AC suites.
