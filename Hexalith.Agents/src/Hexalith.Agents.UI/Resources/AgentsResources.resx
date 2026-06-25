@@ -569,4 +569,59 @@
   <data name="Agents.Audit.EntryPoint.OperationalStatus" xml:space="preserve"><value>Operational status</value></data>
   <data name="Agents.Audit.EntryPoint.ProposalDetail" xml:space="preserve"><value>Proposal detail</value></data>
   <data name="Agents.Audit.EntryPoint.PostedResponse" xml:space="preserve"><value>Audit is also reachable from a posted response reference.</value></data>
+
+  <!-- Launch readiness (Story 4.4) -->
+  <data name="Agents.Navigation.LaunchReadiness" xml:space="preserve"><value>Launch readiness</value></data>
+  <data name="Agents.CallStatus.Reason.LaunchReadiness" xml:space="preserve"><value>Production-like launch readiness is not enabled.</value></data>
+  <data name="Agents.LaunchReadiness.Title" xml:space="preserve"><value>Launch readiness</value></data>
+  <data name="Agents.LaunchReadiness.Eyebrow" xml:space="preserve"><value>Agents</value></data>
+  <data name="Agents.LaunchReadiness.Description" xml:space="preserve"><value>Record the launch-readiness decisions that gate production-like generation: launch metrics, latency targets, and cost-control posture.</value></data>
+  <data name="Agents.LaunchReadiness.Panel.Label" xml:space="preserve"><value>Launch-readiness status</value></data>
+  <data name="Agents.LaunchReadiness.ProductionLike.Label" xml:space="preserve"><value>Production-like generation</value></data>
+  <data name="Agents.LaunchReadiness.ProductionLike.Enabled" xml:space="preserve"><value>Enabled</value></data>
+  <data name="Agents.LaunchReadiness.ProductionLike.Disabled" xml:space="preserve"><value>Not enabled</value></data>
+  <data name="Agents.LaunchReadiness.Prerequisites.Label" xml:space="preserve"><value>Launch prerequisites</value></data>
+  <data name="Agents.LaunchReadiness.ContentSafety.Label" xml:space="preserve"><value>Content Safety Policy</value></data>
+  <data name="Agents.LaunchReadiness.ContextPolicy.Label" xml:space="preserve"><value>Conversation Context Policy</value></data>
+  <data name="Agents.LaunchReadiness.Present" xml:space="preserve"><value>Recorded</value></data>
+  <data name="Agents.LaunchReadiness.Missing" xml:space="preserve"><value>Not recorded</value></data>
+  <data name="Agents.LaunchReadiness.Version.Label" xml:space="preserve"><value>Launch-readiness version</value></data>
+  <data name="Agents.LaunchReadiness.Latency.Label" xml:space="preserve"><value>Latency targets</value></data>
+  <data name="Agents.LaunchReadiness.Latency.Empty" xml:space="preserve"><value>No latency targets are recorded yet.</value></data>
+  <data name="Agents.LaunchReadiness.Latency.Milliseconds" xml:space="preserve"><value>{0} ms</value></data>
+  <data name="Agents.LaunchReadiness.Latency.Automatic" xml:space="preserve"><value>Automatic Response Mode</value></data>
+  <data name="Agents.LaunchReadiness.Latency.Confirmation" xml:space="preserve"><value>Confirmation Response Mode</value></data>
+  <data name="Agents.LaunchReadiness.Latency.Unknown" xml:space="preserve"><value>Unspecified response mode</value></data>
+  <data name="Agents.LaunchReadiness.Metrics.Label" xml:space="preserve"><value>Launch metrics</value></data>
+  <data name="Agents.LaunchReadiness.Metrics.Empty" xml:space="preserve"><value>No launch metrics are recorded yet.</value></data>
+  <data name="Agents.LaunchReadiness.Metric.MetricId" xml:space="preserve"><value>Metric</value></data>
+  <data name="Agents.LaunchReadiness.Metric.Classification" xml:space="preserve"><value>Classification</value></data>
+  <data name="Agents.LaunchReadiness.Metric.Numerator" xml:space="preserve"><value>Numerator</value></data>
+  <data name="Agents.LaunchReadiness.Metric.Denominator" xml:space="preserve"><value>Denominator</value></data>
+  <data name="Agents.LaunchReadiness.Metric.Target" xml:space="preserve"><value>Target</value></data>
+  <data name="Agents.LaunchReadiness.Metric.Window" xml:space="preserve"><value>Measurement window</value></data>
+  <data name="Agents.LaunchReadiness.Metric.Cohort" xml:space="preserve"><value>Launch cohort</value></data>
+  <data name="Agents.LaunchReadiness.CostPosture.Label" xml:space="preserve"><value>Cost-control posture</value></data>
+  <data name="Agents.LaunchReadiness.CostPosture.Unknown" xml:space="preserve"><value>Not recorded</value></data>
+  <data name="Agents.LaunchReadiness.CostPosture.Quotas" xml:space="preserve"><value>Quotas</value></data>
+  <data name="Agents.LaunchReadiness.CostPosture.Budgets" xml:space="preserve"><value>Budgets</value></data>
+  <data name="Agents.LaunchReadiness.CostPosture.ProviderModelLimits" xml:space="preserve"><value>Provider/model limits</value></data>
+  <data name="Agents.LaunchReadiness.CostPosture.ReportingOnlyMonitoring" xml:space="preserve"><value>Reporting-only monitoring</value></data>
+  <data name="Agents.LaunchReadiness.CostPosture.AcceptedLaunchRisk" xml:space="preserve"><value>Accepted launch risk</value></data>
+  <data name="Agents.LaunchReadiness.Classification.Unknown" xml:space="preserve"><value>Unclassified</value></data>
+  <data name="Agents.LaunchReadiness.Classification.Primary" xml:space="preserve"><value>Primary metric</value></data>
+  <data name="Agents.LaunchReadiness.Classification.Secondary" xml:space="preserve"><value>Secondary metric</value></data>
+  <data name="Agents.LaunchReadiness.Classification.Counter" xml:space="preserve"><value>Counter-metric</value></data>
+  <data name="Agents.LaunchReadiness.Blocker.Unknown" xml:space="preserve"><value>An unrecognized launch-readiness requirement is unmet.</value></data>
+  <data name="Agents.LaunchReadiness.Blocker.MissingContentSafetyPolicy" xml:space="preserve"><value>No active Content Safety Policy is configured.</value></data>
+  <data name="Agents.LaunchReadiness.Blocker.MissingContextPolicy" xml:space="preserve"><value>No Conversation Context Policy is in force.</value></data>
+  <data name="Agents.LaunchReadiness.Blocker.MissingLaunchMetrics" xml:space="preserve"><value>No launch metrics are recorded.</value></data>
+  <data name="Agents.LaunchReadiness.Blocker.IncompleteLaunchMetricDefinition" xml:space="preserve"><value>A launch metric is missing a required field.</value></data>
+  <data name="Agents.LaunchReadiness.Blocker.MissingAutomaticLatencyTarget" xml:space="preserve"><value>No Automatic Response Mode latency target is recorded.</value></data>
+  <data name="Agents.LaunchReadiness.Blocker.MissingConfirmationLatencyTarget" xml:space="preserve"><value>No Confirmation Response Mode latency target is recorded.</value></data>
+  <data name="Agents.LaunchReadiness.Blocker.MissingCostControlPosture" xml:space="preserve"><value>No cost-control posture is recorded.</value></data>
+  <data name="Agents.LaunchReadiness.Blocker.UnresolvedAuditGovernance" xml:space="preserve"><value>Audit-evidence governance is unresolved.</value></data>
+  <data name="Agents.LaunchReadiness.Enable.Label" xml:space="preserve"><value>Enable production-like generation</value></data>
+  <data name="Agents.LaunchReadiness.Enable.Button" xml:space="preserve"><value>Enable production-like generation</value></data>
+  <data name="Agents.LaunchReadiness.Enable.Submitted" xml:space="preserve"><value>Enablement request submitted.</value></data>
 </root>

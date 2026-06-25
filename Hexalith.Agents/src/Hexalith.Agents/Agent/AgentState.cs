@@ -101,6 +101,23 @@ public sealed class AgentState
     /// <summary>Gets or sets the monotonic content-safety policy version (0 until a policy is configured; Story 1.7 AC1).</summary>
     public int ContentSafetyPolicyVersion { get; set; }
 
+    /// <summary>
+    /// Gets or sets the recorded launch-readiness decision (<see langword="null"/> = none recorded, which fails the
+    /// launch-readiness gate). Safe governance descriptors/enums only — never secrets, raw payloads, or Party PII
+    /// (Story 4.4 AC1; AD-14).
+    /// </summary>
+    public AgentLaunchReadiness? LaunchReadiness { get; set; }
+
+    /// <summary>Gets or sets the monotonic launch-readiness version (0 until readiness is recorded; Story 4.4 AC1).</summary>
+    public int LaunchReadinessVersion { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether production-like generation has been enabled behind the launch-readiness
+    /// gate (default <see langword="false"/> = disabled, the fail-closed state). The higher gate distinct from baseline
+    /// activation (Story 4.4 AC1, AC4; AD-12).
+    /// </summary>
+    public bool ProductionLikeGenerationEnabled { get; set; }
+
     /// <summary>Applies the Agent creation: the record exists and starts in <see cref="AgentLifecycleStatus.Draft"/>.</summary>
     /// <param name="e">The event.</param>
     public void Apply(AgentCreated e)
@@ -258,6 +275,58 @@ public sealed class AgentState
         ContentSafety = e.Configuration;
         ContentSafetyPolicyVersion = e.ContentSafetyPolicyVersion;
         ConfigurationVersion = e.ConfigurationVersion;
+    }
+
+    /// <summary>
+    /// Applies a launch-readiness recording: records the safe readiness decision (metrics + per-mode latency targets +
+    /// cost posture + context-policy reference) and bumps both the launch-readiness version and the configuration
+    /// version (Story 4.4 AC1). Lifecycle is unchanged; a changed readiness is future-only (prior events never rewritten).
+    /// </summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentLaunchReadinessRecorded e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsCreated)
+        {
+            return;
+        }
+
+        LaunchReadiness = e.Readiness;
+        LaunchReadinessVersion = e.LaunchReadinessVersion;
+        ConfigurationVersion = e.ConfigurationVersion;
+    }
+
+    /// <summary>
+    /// Applies enabling production-like generation: flips the gate flag and bumps the configuration version (Story 4.4
+    /// AC1, AC4). The higher gate distinct from baseline activation; lifecycle is unchanged.
+    /// </summary>
+    /// <param name="e">The event.</param>
+    public void Apply(AgentProductionLikeGenerationEnabled e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        if (!IsCreated)
+        {
+            return;
+        }
+
+        ProductionLikeGenerationEnabled = true;
+        ConfigurationVersion = e.ConfigurationVersion;
+    }
+
+    /// <summary>No-op replay handler — rejection events carry no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(AgentLaunchReadinessRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>No-op replay handler — rejection events carry no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(AgentProductionLikeGenerationBlockedRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
     }
 
     /// <summary>No-op replay handler — rejection events carry no state change.</summary>

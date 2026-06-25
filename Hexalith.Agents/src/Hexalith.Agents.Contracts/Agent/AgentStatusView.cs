@@ -46,6 +46,8 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// <param name="HasAutomaticContentSafetyOverride">Whether a stricter Automatic-mode content-safety override is configured (presence only; 1.7 AC3).</param>
 /// <param name="HasConfirmationContentSafetyOverride">Whether a stricter Confirmation-mode content-safety override is configured (presence only; 1.7 AC3).</param>
 /// <param name="ActivationBlockers">The specific blockers preventing activation as currently configured (empty when none).</param>
+/// <param name="LaunchReadinessBlockers">The specific blockers preventing production-like generation as currently recorded (empty when none; 4.4 AC4). Appended after <paramref name="ActivationBlockers"/> per AD-17.</param>
+/// <param name="ProductionLikeGenerationEnabled">Whether production-like generation has been enabled behind the launch-readiness gate (4.4 AC4).</param>
 public record AgentStatusView(
     string AgentId,
     string TenantId,
@@ -68,4 +70,6 @@ public record AgentStatusView(
     int ContentSafetyPolicyVersion,
     bool HasAutomaticContentSafetyOverride,
     bool HasConfirmationContentSafetyOverride,
-    IReadOnlyList<AgentActivationBlocker> ActivationBlockers);
+    IReadOnlyList<AgentActivationBlocker> ActivationBlockers,
+    IReadOnlyList<AgentLaunchReadinessBlocker> LaunchReadinessBlockers,
+    bool ProductionLikeGenerationEnabled);

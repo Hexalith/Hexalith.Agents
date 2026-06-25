@@ -3,6 +3,7 @@ using System.Text.Json;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Events;
 using Hexalith.Agents.Contracts.Agent.Events.Rejections;
+using Hexalith.Agents.Contracts.AgentInteraction;
 
 using Shouldly;
 
@@ -174,12 +175,16 @@ public sealed class AgentContractsRoundTripTests
             ContentSafetyPolicyVersion: 3,
             HasAutomaticContentSafetyOverride: false,
             HasConfirmationContentSafetyOverride: true,
-            [AgentActivationBlocker.InvalidInstructions, AgentActivationBlocker.MissingPartyIdentity]);
+            [AgentActivationBlocker.InvalidInstructions, AgentActivationBlocker.MissingPartyIdentity],
+            [AgentLaunchReadinessBlocker.MissingLaunchMetrics, AgentLaunchReadinessBlocker.UnresolvedAuditGovernance],
+            ProductionLikeGenerationEnabled: false);
 
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(view);
 
         AgentStatusView? roundTripped = JsonSerializer.Deserialize<AgentStatusView>(bytes);
         roundTripped.ShouldNotBeNull();
+        roundTripped.LaunchReadinessBlockers.ShouldBe(view.LaunchReadinessBlockers);
+        roundTripped.ProductionLikeGenerationEnabled.ShouldBe(view.ProductionLikeGenerationEnabled);
         roundTripped.AgentId.ShouldBe(view.AgentId);
         roundTripped.Lifecycle.ShouldBe(view.Lifecycle);
         roundTripped.ConfigurationVersion.ShouldBe(view.ConfigurationVersion);
@@ -199,6 +204,178 @@ public sealed class AgentContractsRoundTripTests
         roundTripped.HasAutomaticContentSafetyOverride.ShouldBe(view.HasAutomaticContentSafetyOverride);
         roundTripped.HasConfirmationContentSafetyOverride.ShouldBe(view.HasConfirmationContentSafetyOverride);
         roundTripped.ActivationBlockers.ShouldBe(view.ActivationBlockers);
+    }
+
+    // ===== Story 4.4 launch-readiness contracts (events, rejections, value objects, view) =====
+
+    private static AgentLaunchReadiness SampleReadiness() => new(
+        [
+            new LaunchMetricDefinition("SM-2", LaunchMetricClassification.Primary, "numerator", "denominator", 0.30m, "14 days", "cohort A"),
+            new LaunchMetricDefinition("SM-C1", LaunchMetricClassification.Counter, "blocks", "calls", 0.05m, "7 days", "all"),
+        ],
+        [
+            new ResponseModeLatencyTarget(AgentResponseMode.Automatic, 4000),
+            new ResponseModeLatencyTarget(AgentResponseMode.Confirmation, 8000),
+        ],
+        CostControlPosture.Budgets,
+        CostPostureNote: null,
+        ContextPolicyReference: "full-conversation-v1");
+
+    [Fact]
+    public void Launch_readiness_value_object_round_trips_with_metric_and_latency_lists()
+    {
+        AgentLaunchReadiness readiness = SampleReadiness();
+
+        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(readiness);
+
+        AgentLaunchReadiness? roundTripped = JsonSerializer.Deserialize<AgentLaunchReadiness>(bytes);
+        roundTripped.ShouldNotBeNull();
+        roundTripped.Metrics.ShouldBe(readiness.Metrics);
+        roundTripped.LatencyTargets.ShouldBe(readiness.LatencyTargets);
+        roundTripped.CostPosture.ShouldBe(CostControlPosture.Budgets);
+        roundTripped.ContextPolicyReference.ShouldBe("full-conversation-v1");
+    }
+
+    [Fact]
+    public void Launch_readiness_recorded_event_round_trips_through_system_text_json()
+    {
+        var recorded = new AgentLaunchReadinessRecorded("hexa", SampleReadiness(), LaunchReadinessVersion: 1, ConfigurationVersion: 2);
+
+        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(recorded);
+
+        AgentLaunchReadinessRecorded? roundTripped = JsonSerializer.Deserialize<AgentLaunchReadinessRecorded>(bytes);
+        roundTripped.ShouldNotBeNull();
+        roundTripped.AgentId.ShouldBe("hexa");
+        roundTripped.LaunchReadinessVersion.ShouldBe(1);
+        roundTripped.ConfigurationVersion.ShouldBe(2);
+        roundTripped.Readiness.Metrics.ShouldBe(recorded.Readiness.Metrics);
+    }
+
+    [Fact]
+    public void Production_like_generation_enabled_event_round_trips_through_system_text_json()
+    {
+        var enabled = new AgentProductionLikeGenerationEnabled("hexa", ConfigurationVersion: 5);
+
+        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(enabled);
+
+        JsonSerializer.Deserialize<AgentProductionLikeGenerationEnabled>(bytes).ShouldBe(enabled);
+    }
+
+    [Fact]
+    public void Launch_readiness_rejection_round_trips_through_system_text_json()
+    {
+        var rejection = new AgentLaunchReadinessRejection("hexa", "A cost-control posture must be specified.");
+
+        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(rejection);
+
+        JsonSerializer.Deserialize<AgentLaunchReadinessRejection>(bytes).ShouldBe(rejection);
+    }
+
+    [Fact]
+    public void Production_like_generation_blocked_rejection_round_trips_the_blocker_collection()
+    {
+        var rejection = new AgentProductionLikeGenerationBlockedRejection(
+            "hexa",
+            [AgentLaunchReadinessBlocker.MissingLaunchMetrics, AgentLaunchReadinessBlocker.UnresolvedAuditGovernance]);
+
+        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(rejection);
+
+        AgentProductionLikeGenerationBlockedRejection? roundTripped = JsonSerializer.Deserialize<AgentProductionLikeGenerationBlockedRejection>(bytes);
+        roundTripped.ShouldNotBeNull();
+        roundTripped.AgentId.ShouldBe("hexa");
+        roundTripped.Blockers.ShouldBe(rejection.Blockers);
+    }
+
+    [Fact]
+    public void Launch_readiness_view_round_trips_through_system_text_json()
+    {
+        var view = new AgentLaunchReadinessView(
+            SampleReadiness().Metrics,
+            SampleReadiness().LatencyTargets,
+            CostControlPosture.Budgets,
+            LaunchReadinessVersion: 2,
+            HasContentSafetyPolicy: true,
+            HasContextPolicy: true,
+            ProductionLikeGenerationEnabled: false,
+            [AgentLaunchReadinessBlocker.UnresolvedAuditGovernance]);
+
+        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(view);
+
+        AgentLaunchReadinessView? roundTripped = JsonSerializer.Deserialize<AgentLaunchReadinessView>(bytes);
+        roundTripped.ShouldNotBeNull();
+        roundTripped.Metrics.ShouldBe(view.Metrics);
+        roundTripped.LatencyTargets.ShouldBe(view.LatencyTargets);
+        roundTripped.CostPosture.ShouldBe(view.CostPosture);
+        roundTripped.LaunchReadinessVersion.ShouldBe(view.LaunchReadinessVersion);
+        roundTripped.HasContentSafetyPolicy.ShouldBe(view.HasContentSafetyPolicy);
+        roundTripped.HasContextPolicy.ShouldBe(view.HasContextPolicy);
+        roundTripped.ProductionLikeGenerationEnabled.ShouldBe(view.ProductionLikeGenerationEnabled);
+        roundTripped.Blockers.ShouldBe(view.Blockers);
+    }
+
+    // ===== Story 4.4 additive enums: stable ordinals + fail-safe Unknown sentinel =====
+
+    [Fact]
+    public void Launch_readiness_blocker_ordinals_are_stable_and_additive()
+    {
+        // AD-17: the documented ordinals must not shift (downstream persisted blockers depend on them).
+        ((int)AgentLaunchReadinessBlocker.Unknown).ShouldBe(0);
+        ((int)AgentLaunchReadinessBlocker.MissingContentSafetyPolicy).ShouldBe(1);
+        ((int)AgentLaunchReadinessBlocker.MissingContextPolicy).ShouldBe(2);
+        ((int)AgentLaunchReadinessBlocker.MissingLaunchMetrics).ShouldBe(3);
+        ((int)AgentLaunchReadinessBlocker.IncompleteLaunchMetricDefinition).ShouldBe(4);
+        ((int)AgentLaunchReadinessBlocker.MissingAutomaticLatencyTarget).ShouldBe(5);
+        ((int)AgentLaunchReadinessBlocker.MissingConfirmationLatencyTarget).ShouldBe(6);
+        ((int)AgentLaunchReadinessBlocker.MissingCostControlPosture).ShouldBe(7);
+        ((int)AgentLaunchReadinessBlocker.UnresolvedAuditGovernance).ShouldBe(8);
+    }
+
+    [Fact]
+    public void Launch_metric_classification_ordinals_are_stable_and_additive()
+    {
+        // AD-17 / AC2: the primary/secondary/counter classification distinguishes the metric families (SM-1..3 /
+        // SM-4..6 / SM-C1..3). The ordinals back governance reporting and must not shift; Unknown stays the sentinel.
+        ((int)LaunchMetricClassification.Unknown).ShouldBe(0);
+        ((int)LaunchMetricClassification.Primary).ShouldBe(1);
+        ((int)LaunchMetricClassification.Secondary).ShouldBe(2);
+        ((int)LaunchMetricClassification.Counter).ShouldBe(3);
+    }
+
+    [Fact]
+    public void Cost_control_posture_ordinals_are_stable_and_additive()
+    {
+        // AD-17 / AC3: the recorded cost-control posture kind is persisted; its ordinals must not shift. Unknown
+        // (ordinal 0) is the not-yet-decided sentinel that fails readiness recording.
+        ((int)CostControlPosture.Unknown).ShouldBe(0);
+        ((int)CostControlPosture.Quotas).ShouldBe(1);
+        ((int)CostControlPosture.Budgets).ShouldBe(2);
+        ((int)CostControlPosture.ProviderModelLimits).ShouldBe(3);
+        ((int)CostControlPosture.ReportingOnlyMonitoring).ShouldBe(4);
+        ((int)CostControlPosture.AcceptedLaunchRisk).ShouldBe(5);
+    }
+
+    [Fact]
+    public void Agent_interaction_gate_check_appends_launch_readiness_without_shifting_ordinals()
+    {
+        // AD-17: Story 4.4 appends LaunchReadiness as the tenth gate check (ordinal 10) AFTER the original nine, so no
+        // already-persisted verdict's check is renumbered. Unknown (ordinal 0) stays the absent-check sentinel.
+        ((int)AgentInteractionGateCheck.Unknown).ShouldBe(0);
+        ((int)AgentInteractionGateCheck.DependencyFreshness).ShouldBe(9);
+        ((int)AgentInteractionGateCheck.LaunchReadiness).ShouldBe(10);
+        JsonSerializer.Deserialize<AgentInteractionGateCheck>("\"LaunchReadiness\"").ShouldBe(AgentInteractionGateCheck.LaunchReadiness);
+    }
+
+    [Fact]
+    public void Launch_readiness_enums_serialize_by_name_and_fail_safe_to_unknown()
+    {
+        default(AgentLaunchReadinessBlocker).ShouldBe(AgentLaunchReadinessBlocker.Unknown);
+        default(LaunchMetricClassification).ShouldBe(LaunchMetricClassification.Unknown);
+        default(CostControlPosture).ShouldBe(CostControlPosture.Unknown);
+        JsonSerializer.Deserialize<AgentLaunchReadinessBlocker>("\"Unknown\"").ShouldBe(AgentLaunchReadinessBlocker.Unknown);
+        JsonSerializer.Deserialize<LaunchMetricClassification>("\"Primary\"").ShouldBe(LaunchMetricClassification.Primary);
+        JsonSerializer.Deserialize<CostControlPosture>("\"Budgets\"").ShouldBe(CostControlPosture.Budgets);
+        // Serialized by name (not ordinal).
+        JsonSerializer.Serialize(CostControlPosture.AcceptedLaunchRisk).ShouldBe("\"AcceptedLaunchRisk\"");
     }
 
     // ===== Enum fail-safe defaults =====

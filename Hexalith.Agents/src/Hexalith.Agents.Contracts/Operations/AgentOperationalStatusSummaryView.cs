@@ -32,6 +32,7 @@ namespace Hexalith.Agents.Contracts.Operations;
 /// <param name="ProposalOutcomes">The proposal terminal-state and posting outcome counts, dimensioned only by <see cref="ProposalOperationStatus"/> (AC4).</param>
 /// <param name="PendingProposalCount">The authorized pending-proposal count (reuses the Story 3.2 <c>PendingProposalsResult.PendingCount</c> semantics; <c>0</c> on a fail-closed read).</param>
 /// <param name="GeneratedAt">The optional ISO-8601 timestamp at which the summary was computed (<see langword="null"/> when no live source has produced it yet — the UI renders a "not available yet" affordance, never a fabricated value).</param>
+/// <param name="LaunchReadinessBlockers">The named launch-readiness blockers preventing production-like generation (Story 4.4 AC4). A <em>distinct</em> typed list — never merged into <see cref="ReadinessBlockers"/> (typed <see cref="AgentActivationBlocker"/>) or <see cref="AuditGovernanceBlockers"/> (typed <see cref="string"/>). Appended last per AD-17.</param>
 public sealed record AgentOperationalStatusSummaryView(
     AgentReadinessStatus AgentReadiness,
     IReadOnlyList<AgentActivationBlocker> ReadinessBlockers,
@@ -40,4 +41,5 @@ public sealed record AgentOperationalStatusSummaryView(
     IReadOnlyList<AgentCallOutcomeCount> RecentCallOutcomes,
     IReadOnlyList<ProposalOutcomeCount> ProposalOutcomes,
     int PendingProposalCount,
-    string? GeneratedAt);
+    string? GeneratedAt,
+    IReadOnlyList<AgentLaunchReadinessBlocker> LaunchReadinessBlockers);

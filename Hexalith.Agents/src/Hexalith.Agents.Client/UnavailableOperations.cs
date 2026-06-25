@@ -69,6 +69,12 @@ internal sealed class UnavailableAgentAdministrationOperations : IAgentAdministr
     public ValueTask<AgentOperationResult> ConfigureContentSafetyPolicyAsync(ConfigureAgentContentSafetyPolicy command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
         => Unavailable.Command(command);
 
+    public ValueTask<AgentOperationResult> RecordLaunchReadinessAsync(RecordAgentLaunchReadiness command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+        => Unavailable.Command(command);
+
+    public ValueTask<AgentOperationResult> EnableProductionLikeGenerationAsync(EnableProductionLikeGeneration command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+        => Unavailable.Command(command);
+
     public ValueTask<AgentOperationResult> ActivateAsync(ActivateAgent command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
         => Unavailable.Command(command);
 
@@ -149,6 +155,9 @@ internal sealed class UnavailableAgentStatusOperations : IAgentStatusOperations
 {
     public ValueTask<AgentOperationResult<AgentReadinessStatus>> GetAgentReadinessAsync(string agentId, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
         => Id<AgentReadinessStatus>(agentId);
+
+    public ValueTask<AgentOperationResult<AgentLaunchReadinessView>> GetAgentLaunchReadinessAsync(string agentId, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+        => Id<AgentLaunchReadinessView>(agentId);
 
     public ValueTask<AgentOperationResult<ProviderModelReadinessStatus>> GetProviderModelReadinessAsync(string providerId, string modelId, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
     {

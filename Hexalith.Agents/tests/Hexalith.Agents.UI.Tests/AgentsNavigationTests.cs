@@ -23,10 +23,10 @@ namespace Hexalith.Agents.UI.Tests;
 public sealed class AgentsNavigationTests : AgentsTestContext
 {
     [Fact]
-    public void RegisterDomain_registers_agents_manifest_and_eight_ordered_entries()
+    public void RegisterDomain_registers_agents_manifest_and_nine_ordered_entries()
     {
-        // Story 4.3 AC3 — the Agents domain is coherent in operational-setup → workflow → status → audit order, now
-        // eight ordered entries.
+        // Story 4.3/4.4 AC3 — the Agents domain is coherent in operational-setup → workflow → status → audit → launch
+        // order, now nine ordered entries (the Story 4.4 launch-readiness surface is appended at Order 8).
         CapturingFrontComposerRegistry registry = new();
 
         AgentsFrontComposerRegistration.RegisterDomain(registry);
@@ -36,12 +36,36 @@ public sealed class AgentsNavigationTests : AgentsTestContext
         manifest.NameKey.ShouldBe("Agents.Navigation.Agents");
 
         registry.NavEntries.Select(entry => entry.Href)
-            .ShouldBe(["/agents", "/agents/configuration", "/agents/providers", "/agents/approver-policy", "/agents/conversation-call", "/agents/proposals", "/agents/status", "/agents/audit"]);
+            .ShouldBe(["/agents", "/agents/configuration", "/agents/providers", "/agents/approver-policy", "/agents/conversation-call", "/agents/proposals", "/agents/status", "/agents/audit", "/agents/launch-readiness"]);
         registry.NavEntries.Select(entry => entry.Order)
-            .ShouldBe([0, 1, 2, 3, 4, 5, 6, 7]);
+            .ShouldBe([0, 1, 2, 3, 4, 5, 6, 7, 8]);
         registry.NavEntries.ShouldAllBe(entry => entry.BoundedContext == "agents");
         registry.NavEntries.First().Title.ShouldBe("Agents overview");
-        registry.NavEntries.Last().Title.ShouldBe("Audit evidence");
+        registry.NavEntries.Last().Title.ShouldBe("Launch readiness");
+    }
+
+    [Fact]
+    public void Launch_readiness_entry_is_administrator_gated_at_order_8()
+    {
+        // Story 4.4 AC3 — the launch-readiness surface is the ninth entry (Order 8), gated by the Agents administrator
+        // policy (the Release Operator persona folds under the administrator policy for V1).
+        CapturingFrontComposerRegistry registry = new();
+
+        AgentsFrontComposerRegistration.RegisterDomain(registry);
+
+        FrontComposerNavEntry launch = registry.NavEntries.Single(entry => entry.Href == "/agents/launch-readiness");
+        launch.RequiredPolicy.ShouldBe(AgentsFrontComposerRegistration.AgentsAdministratorPolicy);
+        launch.Order.ShouldBe(8);
+        launch.Title.ShouldBe("Launch readiness");
+        launch.TitleKey.ShouldBe("Agents.Navigation.LaunchReadiness");
+    }
+
+    [Fact]
+    public void Launch_readiness_page_is_administrator_policy_gated()
+    {
+        // Story 4.4 AC3 — nav hiding is not authorization: the page itself carries [Authorize(Policy = …)].
+        AuthorizeAttribute authorize = typeof(LaunchReadiness).GetCustomAttributes<AuthorizeAttribute>(inherit: true).ShouldHaveSingleItem();
+        authorize.Policy.ShouldBe(AgentsFrontComposerRegistration.AgentsAdministratorPolicy);
     }
 
     [Fact]
@@ -225,6 +249,7 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             "Agents.Navigation.ProposalQueue",
             "Agents.Navigation.OperationalStatus",
             "Agents.Navigation.AuditEvidence",
+            "Agents.Navigation.LaunchReadiness",
         ]);
     }
 

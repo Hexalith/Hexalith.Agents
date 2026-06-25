@@ -1,0 +1,176 @@
+@page "/agents/launch-readiness"
+@attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsAdministratorPolicy)]
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject ILaunchReadinessGateway Gateway
+
+@* Launch readiness (Story 4.4 AC2, AC3, AC4): the Release Operator surface for the production-like launch-readiness
+   gate. A full-width read-heavy layout (DESIGN). It surfaces the recorded launch metric definitions
+   (numerator/denominator/target/window/cohort + classification), the per-mode latency targets (Automatic +
+   Confirmation), the cost-control posture, the launch-readiness blockers grouped by recovery action, and the
+   production-like-enablement state — from SAFE governance data only, never secrets/content (AD-14). All non-success
+   states route through AgentSurfaceState. The live read-model is deferred (Projections/ is .gitkeep-only); against the
+   default DI graph the gateway fails closed and this page renders PermissionDenied. *@
+<FcPageLayout Mode="FcPageLayoutMode.FullWidth">
+    <FcContentLabel LabelledBy="@HeadingId" />
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="24px" Class="agents-launch-readiness" data-testid="agents-launch-readiness">
+        <FcPageHeader @ref="_header"
+                      PageTitle="@Localizer["Agents.LaunchReadiness.Title"]"
+                      Heading="@Localizer["Agents.LaunchReadiness.Title"]"
+                      HeadingId="@HeadingId"
+                      HeadingTabIndex="-1"
+                      Eyebrow="@Localizer["Agents.LaunchReadiness.Eyebrow"]"
+                      Description="@Localizer["Agents.LaunchReadiness.Description"]"
+                      TestId="agents-launch-readiness-header" />
+
+        @if (_result is null)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Loading" TestId="agents-launch-readiness-state" />
+        }
+        else if (_result.Status is LaunchReadinessInspectionStatus.NotAuthorized)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-launch-readiness-state" />
+        }
+        else if (_result.Status is LaunchReadinessInspectionStatus.Unavailable)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Unavailable" TestId="agents-launch-readiness-state" />
+        }
+        else if (_result.Readiness is null)
+        {
+            @* NotFound or an empty success carries no readiness view — render the authorized Empty surface (no leak; AD-12). *@
+            <AgentSurfaceState Kind="AgentSurfaceKind.Empty" TestId="agents-launch-readiness-state" />
+        }
+        else
+        {
+            AgentLaunchReadinessView readiness = _result.Readiness;
+
+            <LaunchReadinessPanel Readiness="@readiness" />
+
+            <section class="agents-launch-readiness__prerequisites"
+                     aria-label="@Localizer["Agents.LaunchReadiness.Prerequisites.Label"]"
+                     data-testid="agents-launch-readiness-prerequisites">
+                <dl class="agents-launch-readiness__facts">
+                    <dt>@Localizer["Agents.LaunchReadiness.ContentSafety.Label"]</dt>
+                    <dd data-testid="agents-launch-readiness-content-safety">@PresenceLabel(readiness.HasContentSafetyPolicy)</dd>
+
+                    <dt>@Localizer["Agents.LaunchReadiness.ContextPolicy.Label"]</dt>
+                    <dd data-testid="agents-launch-readiness-context-policy">@PresenceLabel(readiness.HasContextPolicy)</dd>
+
+                    <dt>@Localizer["Agents.LaunchReadiness.CostPosture.Label"]</dt>
+                    <dd data-testid="agents-launch-readiness-cost-posture">
+                        @Localizer[LaunchReadinessPresentation.CostPostureKeyFor(readiness.CostPosture)]
+                    </dd>
+
+                    <dt>@Localizer["Agents.LaunchReadiness.Version.Label"]</dt>
+                    <dd data-testid="agents-launch-readiness-version">@readiness.LaunchReadinessVersion</dd>
+                </dl>
+            </section>
+
+            <section class="agents-launch-readiness__latency"
+                     aria-label="@Localizer["Agents.LaunchReadiness.Latency.Label"]"
+                     data-testid="agents-launch-readiness-latency">
+                <h2>@Localizer["Agents.LaunchReadiness.Latency.Label"]</h2>
+                @if (readiness.LatencyTargets.Count == 0)
+                {
+                    <p data-testid="agents-launch-readiness-latency-empty">@Localizer["Agents.LaunchReadiness.Latency.Empty"]</p>
+                }
+                else
+                {
+                    <dl class="agents-launch-readiness__facts">
+                        @foreach (ResponseModeLatencyTarget target in readiness.LatencyTargets)
+                        {
+                            <dt>@Localizer[LaunchReadinessPresentation.LatencyModeKeyFor(target.Mode)]</dt>
+                            <dd data-testid="@($"agents-launch-readiness-latency-{target.Mode}")">
+                                @Localizer["Agents.LaunchReadiness.Latency.Milliseconds", target.TargetMilliseconds]
+                            </dd>
+                        }
+                    </dl>
+                }
+            </section>
+
+            <section class="agents-launch-readiness__metrics"
+                     aria-label="@Localizer["Agents.LaunchReadiness.Metrics.Label"]"
+                     data-testid="agents-launch-readiness-metrics">
+                <h2>@Localizer["Agents.LaunchReadiness.Metrics.Label"]</h2>
+                @if (readiness.Metrics.Count == 0)
+                {
+                    <p data-testid="agents-launch-readiness-metrics-empty">@Localizer["Agents.LaunchReadiness.Metrics.Empty"]</p>
+                }
+                else
+                {
+                    <table class="agents-launch-readiness__metrics-table">
+                        <caption>@Localizer["Agents.LaunchReadiness.Metrics.Label"]</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">@Localizer["Agents.LaunchReadiness.Metric.MetricId"]</th>
+                                <th scope="col">@Localizer["Agents.LaunchReadiness.Metric.Classification"]</th>
+                                <th scope="col">@Localizer["Agents.LaunchReadiness.Metric.Numerator"]</th>
+                                <th scope="col">@Localizer["Agents.LaunchReadiness.Metric.Denominator"]</th>
+                                <th scope="col">@Localizer["Agents.LaunchReadiness.Metric.Target"]</th>
+                                <th scope="col">@Localizer["Agents.LaunchReadiness.Metric.Window"]</th>
+                                <th scope="col">@Localizer["Agents.LaunchReadiness.Metric.Cohort"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (LaunchMetricDefinition metric in readiness.Metrics)
+                            {
+                                <tr data-testid="@($"agents-launch-readiness-metric-{metric.MetricId}")">
+                                    <th scope="row">@metric.MetricId</th>
+                                    <td>@Localizer[LaunchReadinessPresentation.ClassificationKeyFor(metric.Classification)]</td>
+                                    <td>@metric.Numerator</td>
+                                    <td>@metric.Denominator</td>
+                                    <td>@metric.Target</td>
+                                    <td>@metric.MeasurementWindow</td>
+                                    <td>@metric.LaunchCohort</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </section>
+
+            <section class="agents-launch-readiness__enable"
+                     aria-label="@Localizer["Agents.LaunchReadiness.Enable.Label"]"
+                     data-testid="agents-launch-readiness-enable">
+                <FluentButton Appearance="ButtonAppearance.Primary"
+                              Disabled="@(readiness.Blockers.Count > 0 || readiness.ProductionLikeGenerationEnabled)"
+                              data-testid="agents-launch-readiness-enable-button"
+                              OnClick="EnableProductionLikeGeneration">
+                    @Localizer["Agents.LaunchReadiness.Enable.Button"]
+                </FluentButton>
+                @if (_enableMessage is { } message)
+                {
+                    <p role="status" aria-live="polite" data-testid="agents-launch-readiness-enable-status">@message</p>
+                }
+            </section>
+        }
+    </FluentStack>
+</FcPageLayout>
+
+@code {
+    private const string HeadingId = "agents-launch-readiness-heading";
+
+    private FcPageHeader? _header;
+    private LaunchReadinessResult? _result;
+    private string? _enableMessage;
+    private bool _focusHeadingPending = true;
+
+    protected override async Task OnInitializedAsync()
+        => _result = await Gateway.GetLaunchReadinessAsync(CancellationToken.None).ConfigureAwait(false);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusHeadingPending && _header is not null)
+        {
+            _focusHeadingPending = false;
+            await _header.FocusHeadingAsync().ConfigureAwait(false);
+        }
+    }
+
+    // The live enablement command dispatch is deferred (the read/write read-model path is not bound in this story), so
+    // the affordance acknowledges submission with a safe localized status message rather than fabricating a result.
+    private void EnableProductionLikeGeneration()
+        => _enableMessage = Localizer["Agents.LaunchReadiness.Enable.Submitted"];
+
+    private string PresenceLabel(bool present)
+        => Localizer[present ? "Agents.LaunchReadiness.Present" : "Agents.LaunchReadiness.Missing"];
+}

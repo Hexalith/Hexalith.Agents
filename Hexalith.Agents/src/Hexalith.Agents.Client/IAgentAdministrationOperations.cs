@@ -67,6 +67,18 @@ public interface IAgentAdministrationOperations
         AgentOperationOptions? options = null,
         CancellationToken cancellationToken = default);
 
+    /// <summary>Records an Agent launch-readiness decision (metrics, per-mode latency targets, cost posture, context reference).</summary>
+    ValueTask<AgentOperationResult> RecordLaunchReadinessAsync(
+        RecordAgentLaunchReadiness command,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Enables production-like generation behind the launch-readiness gate (blocked when readiness gates fail).</summary>
+    ValueTask<AgentOperationResult> EnableProductionLikeGenerationAsync(
+        EnableProductionLikeGeneration command,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Activates an Agent.</summary>
     ValueTask<AgentOperationResult> ActivateAsync(
         ActivateAgent command,

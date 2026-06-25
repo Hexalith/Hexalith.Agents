@@ -25,6 +25,7 @@ namespace Hexalith.Agents.Server.Ports;
 /// <param name="ModelId">The Agent's selected model reference (opaque, not a secret — AD-9), or <see langword="null"/> when none.</param>
 /// <param name="ApproverPolicy">The Agent's configured Approver Policy (safe references/enums only — AD-7, AD-14), used by the Confirmation-mode <see cref="AgentInteractionGateCheck.ResponsePolicy"/> resolution; <see langword="null"/> when none / not Confirmation.</param>
 /// <param name="IsFresh">Whether the consulted Agent read-model is within its freshness threshold (the <see cref="AgentInteractionGateCheck.DependencyFreshness"/> input).</param>
+/// <param name="ProductionLikeGenerationEnabled">Whether production-like generation has been enabled behind the launch-readiness gate (the <see cref="AgentInteractionGateCheck.LaunchReadiness"/> input; Story 4.4 AC4). Appended last per AD-17; the deferred default reader leaves it <see langword="false"/>, so the gate fails closed.</param>
 public sealed record AgentInvocationReadiness(
     bool IsAvailable,
     AgentLifecycleStatus Lifecycle,
@@ -35,7 +36,8 @@ public sealed record AgentInvocationReadiness(
     string? ProviderId,
     string? ModelId,
     AgentApproverPolicy? ApproverPolicy,
-    bool IsFresh)
+    bool IsFresh,
+    bool ProductionLikeGenerationEnabled)
 {
     /// <summary>Gets the fail-closed not-available readiness (the deferred default) — every readiness field at its non-ready sentinel.</summary>
     public static AgentInvocationReadiness NotAvailable { get; } = new(
@@ -48,5 +50,6 @@ public sealed record AgentInvocationReadiness(
         ProviderId: null,
         ModelId: null,
         ApproverPolicy: null,
-        IsFresh: false);
+        IsFresh: false,
+        ProductionLikeGenerationEnabled: false);
 }

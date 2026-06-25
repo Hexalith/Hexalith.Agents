@@ -37,7 +37,8 @@ public sealed class AgentOperationalStatusSummaryContractsTests
             RecentCallOutcomes: [new AgentCallOutcomeCount(AgentCallOperationStatus.Generated, 3)],
             ProposalOutcomes: [new ProposalOutcomeCount(ProposalOperationStatus.Posted, 4)],
             PendingProposalCount: 2,
-            GeneratedAt: "2026-06-25T10:00:00Z");
+            GeneratedAt: "2026-06-25T10:00:00Z",
+            LaunchReadinessBlockers: [AgentLaunchReadinessBlocker.UnresolvedAuditGovernance]);
 
     [Fact]
     public void Summary_result_round_trips_status_by_name_and_preserves_safe_fields()
@@ -55,6 +56,8 @@ public sealed class AgentOperationalStatusSummaryContractsTests
         roundTrip.Summary.AgentReadiness.ShouldBe(AgentReadinessStatus.Callable);
         roundTrip.Summary.RecentCallOutcomes.ShouldHaveSingleItem().Count.ShouldBe(3);
         roundTrip.Summary.ProposalOutcomes.ShouldHaveSingleItem().Status.ShouldBe(ProposalOperationStatus.Posted);
+        // Story 4.4: the additive launch-readiness blocker list (a distinct typed list) round-trips, appended last (AD-17).
+        roundTrip.Summary.LaunchReadinessBlockers.ShouldBe([AgentLaunchReadinessBlocker.UnresolvedAuditGovernance]);
     }
 
     [Fact]

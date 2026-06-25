@@ -59,6 +59,8 @@ public abstract class AgentsTestContext : FrontComposerTestBase
             .Returns(Task.FromResult(Contracts.Operations.AgentOperationalStatusSummaryResult.NotAuthorized()));
         AuditEvidenceGateway.GetEvidenceAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(AuditEvidenceResult.NotAuthorized()));
+        LaunchReadinessGateway.GetLaunchReadinessAsync(Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(LaunchReadinessResult.NotAuthorized()));
 
         Services.AddSingleton(SetupGateway);
         Services.AddSingleton(CatalogGateway);
@@ -72,6 +74,7 @@ public abstract class AgentsTestContext : FrontComposerTestBase
         Services.AddSingleton(ProposalAbandonmentGateway);
         Services.AddSingleton(OperationalStatusGateway);
         Services.AddSingleton(AuditEvidenceGateway);
+        Services.AddSingleton(LaunchReadinessGateway);
         Services.AddSingleton<TimeProvider>(Clock);
         Services.AddSingleton<IStringLocalizer<AgentsResources>>(new StubAgentsLocalizer());
         Authorization = AddAuthorization();
@@ -112,6 +115,9 @@ public abstract class AgentsTestContext : FrontComposerTestBase
 
     /// <summary>The substituted audit-evidence read gateway (defaults to the fail-closed result; Story 4.3).</summary>
     protected IAuditEvidenceGateway AuditEvidenceGateway { get; } = Substitute.For<IAuditEvidenceGateway>();
+
+    /// <summary>The substituted launch-readiness read gateway (defaults to the fail-closed result; Story 4.4).</summary>
+    protected ILaunchReadinessGateway LaunchReadinessGateway { get; } = Substitute.For<ILaunchReadinessGateway>();
 
     /// <summary>The deterministic clock injected into the proposal queue so the rendered "age" bucket is stable.</summary>
     protected FixedTimeProvider Clock { get; } = new(new DateTimeOffset(2026, 6, 24, 12, 0, 0, TimeSpan.Zero));

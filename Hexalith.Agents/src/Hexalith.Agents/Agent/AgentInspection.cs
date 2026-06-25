@@ -82,5 +82,16 @@ public static class AgentInspection
                 responseMode: state.ResponseMode,
                 hasApproverPolicy: state.ApproverPolicySources is { Count: > 0 },
                 approverPolicyResolved: true,
-                hasContentSafetyPolicy: state.ContentSafety is not null));
+                hasContentSafetyPolicy: state.ContentSafety is not null),
+            // Launch-readiness blockers (4.4 AC4). Like the provider/approver gates above, this pure read cannot
+            // freshly resolve the audit-governance port, so it trusts it as resolved (auditGovernanceResolved: true)
+            // and surfaces only the static state-derived launch-readiness blockers (missing content safety / context
+            // policy / launch metrics / latency targets / cost posture). Live UnresolvedAuditGovernance surfacing is
+            // supplied by the Story 4.2/4.3 operational-status orchestration that resolves the port.
+            AgentLaunchReadinessPolicy.ComputeLaunchReadinessBlockers(
+                hasContentSafetyPolicy: state.ContentSafety is not null,
+                hasContextPolicy: !string.IsNullOrWhiteSpace(state.LaunchReadiness?.ContextPolicyReference),
+                readiness: state.LaunchReadiness,
+                auditGovernanceResolved: true),
+            state.ProductionLikeGenerationEnabled);
 }

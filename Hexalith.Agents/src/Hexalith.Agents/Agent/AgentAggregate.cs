@@ -74,6 +74,15 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
     // the aggregate makes no Parties/Tenants/Conversations call at all (AD-3; AC3).
     private const string ApproverPolicyValidationExtensionKey = "approver:policyValidation";
 
+    // SECURITY: server-populated only, identical trust model to the verdict keys above (Story 4.4). Whether the Agents
+    // audit-evidence governance is resolved is computed in the Server orchestration from the
+    // IAgentAuditGovernanceReadinessProvider port (AD-3) and fed back here through this trusted extension. The command
+    // entry point strips any client-supplied value and repopulates it from the provider result. A direct-gateway
+    // EnableProductionLikeGeneration that did not resolve audit governance carries no trusted flag, so it parses to
+    // false and the launch-readiness gate fails closed with UnresolvedAuditGovernance (AD-12). The aggregate makes no
+    // port/dependency call at all.
+    private const string AuditGovernanceResolvedExtensionKey = "audit:governanceResolved";
+
     // The fail-safe placeholder returned in the `out` parameter when a Content Safety configuration is rejected, so the
     // value is never null. It is never emitted — a rejection carries no configuration — and its Unknown sentinels make
     // it incapable of satisfying the activation gate.
@@ -82,6 +91,12 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             new AgentContentSafetyPolicy([], [], [], ContentSafetyFailureHandling.Unknown, ContentSafetyAuditTreatment.Unknown),
             null,
             null);
+
+    // The fail-safe placeholder returned in the `out` parameter when a launch-readiness payload is rejected, so the
+    // value is never null. It is never emitted — a rejection carries no readiness — and its empty lists / Unknown cost
+    // posture / empty context reference make it incapable of satisfying the launch-readiness gate.
+    private static readonly AgentLaunchReadiness EmptyLaunchReadiness =
+        new([], [], CostControlPosture.Unknown, null, string.Empty);
 
     /// <summary>Handles creation (or idempotent re-creation) of the governed Agent record.</summary>
     /// <param name="command">The create command.</param>
@@ -564,6 +579,100 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         ]);
     }
 
+    /// <summary>Handles recording the Agent's launch-readiness decision (Story 4.4 AC1, AC2, AC3; FR-28).</summary>
+    /// <param name="command">The record-readiness command (carries only the safe readiness value).</param>
+    /// <param name="state">The current Agent state.</param>
+    /// <param name="envelope">The command envelope (carries the trusted authorization extension; no dependency verdict).</param>
+    /// <returns>The domain result.</returns>
+    public static DomainResult Handle(RecordAgentLaunchReadiness command, AgentState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string agentId = envelope.AggregateId;
+
+        if (!IsAgentAdmin(envelope))
+        {
+            return Denied(agentId, envelope, nameof(RecordAgentLaunchReadiness));
+        }
+
+        if (state is null || !state.IsCreated)
+        {
+            return DomainResult.Rejection([new AgentNotFoundRejection(agentId)]);
+        }
+
+        // Structural validation + normalization only — launch-readiness values are self-contained Agent state (AD-3):
+        // there is no external dependency to resolve and no trusted verdict. The reason is a safe classification and
+        // never echoes a configured value (AD-14).
+        string? reason = ValidateAndNormalizeLaunchReadiness(command.Readiness, out AgentLaunchReadiness normalized);
+        if (reason is not null)
+        {
+            return DomainResult.Rejection([new AgentLaunchReadinessRejection(agentId, reason)]);
+        }
+
+        // Re-asserting an equal readiness (metrics + latency targets + cost posture + note + context reference equal by
+        // value) is a deterministic no-op (AD-13). Record value-equality does not deep-compare the IReadOnlyList<>
+        // members, so the lists are compared element-wise explicitly (mirroring ContentSafetyConfigurationsEqual).
+        if (state.LaunchReadiness is not null && LaunchReadinessEqual(state.LaunchReadiness, normalized))
+        {
+            return DomainResult.NoOp();
+        }
+
+        // A genuine change bumps both the launch-readiness version (AC1) and the configuration version (AD-4) so future
+        // AgentInteraction snapshots pick up the new posture. Lifecycle is unchanged; prior events are append-only and
+        // never rewritten, so the change is future-only (AC1).
+        return DomainResult.Success([
+            new AgentLaunchReadinessRecorded(
+                agentId,
+                normalized,
+                state.LaunchReadinessVersion + 1,
+                state.ConfigurationVersion + 1),
+        ]);
+    }
+
+    /// <summary>Handles enabling production-like generation behind the launch-readiness gate (Story 4.4 AC1, AC4; FR-28).</summary>
+    /// <param name="command">The enable command (no payload; the gate reads recorded state).</param>
+    /// <param name="state">The current Agent state.</param>
+    /// <param name="envelope">The command envelope (carries the trusted authorization + audit-governance extensions).</param>
+    /// <returns>The domain result.</returns>
+    public static DomainResult Handle(EnableProductionLikeGeneration command, AgentState? state, CommandEnvelope envelope)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(envelope);
+        string agentId = envelope.AggregateId;
+
+        if (!IsAgentAdmin(envelope))
+        {
+            return Denied(agentId, envelope, nameof(EnableProductionLikeGeneration));
+        }
+
+        if (state is null || !state.IsCreated)
+        {
+            return DomainResult.Rejection([new AgentNotFoundRejection(agentId)]);
+        }
+
+        // Re-enabling an already-enabled Agent is a deterministic no-op (AD-13) — no duplicate event, no version bump.
+        if (state.ProductionLikeGenerationEnabled)
+        {
+            return DomainResult.NoOp();
+        }
+
+        // The launch-readiness gate is a pure state check (AD-3): content safety, the in-force context policy, launch
+        // metrics, per-mode latency targets, and cost posture are read straight from recorded Agent state (an
+        // empty/invalid readiness was rejected at recording time, so present ≡ valid). The only externally-resolved
+        // input — whether the Agents audit-evidence governance is resolved — is fed back through the trusted
+        // server-populated extension; a direct-gateway enable that did not resolve it carries no trusted flag, parses
+        // to false, and fails closed with UnresolvedAuditGovernance, so generation stays disabled (AC4; AD-12).
+        IReadOnlyList<AgentLaunchReadinessBlocker> blockers =
+            AgentLaunchReadinessPolicy.ComputeLaunchReadinessBlockers(
+                hasContentSafetyPolicy: state.ContentSafety is not null,
+                hasContextPolicy: !string.IsNullOrWhiteSpace(state.LaunchReadiness?.ContextPolicyReference),
+                readiness: state.LaunchReadiness,
+                auditGovernanceResolved: ReadAuditGovernanceResolved(envelope));
+        return blockers.Count > 0
+            ? DomainResult.Rejection([new AgentProductionLikeGenerationBlockedRejection(agentId, blockers)])
+            : DomainResult.Success([new AgentProductionLikeGenerationEnabled(agentId, state.ConfigurationVersion + 1)]);
+    }
+
     private static bool IsAgentAdmin(CommandEnvelope envelope)
         => envelope.Extensions?.TryGetValue(AgentAdminExtensionKey, out string? value) == true
             && string.Equals(value, "true", StringComparison.Ordinal);
@@ -601,6 +710,15 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             && string.Equals(Enum.GetName(status), value, StringComparison.Ordinal)
                 ? status
                 : ApproverPolicyValidationStatus.Unknown;
+
+    // Reads the trusted, server-populated audit-governance-resolved flag from the envelope extension (Story 4.4). Fails
+    // closed to false when the key is absent or its value is not the exact, case-sensitive "true" — identical hardening
+    // to the IsAgentAdmin check, so a surprising value can never resolve audit governance. The aggregate never reads the
+    // IAgentAuditGovernanceReadinessProvider port itself (AD-3); the Server orchestration resolves it and repopulates
+    // this key from trusted state.
+    private static bool ReadAuditGovernanceResolved(CommandEnvelope envelope)
+        => envelope.Extensions?.TryGetValue(AuditGovernanceResolvedExtensionKey, out string? value) == true
+            && string.Equals(value, "true", StringComparison.Ordinal);
 
     // Structurally validates and normalizes a configured Approver Policy (Story 1.6 AC2). Each source's shape must
     // match its kind; the disclosure category must be specified; duplicate sources are rejected. An EMPTY source
@@ -808,6 +926,114 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             && a.BlockedOutputCategories.SequenceEqual(b.BlockedOutputCategories, StringComparer.Ordinal)
             && a.RestrictedOutputCategories.SequenceEqual(b.RestrictedOutputCategories, StringComparer.Ordinal);
     }
+
+    // Structurally validates and normalizes a launch-readiness payload (Story 4.4 AC2, AC3). Recording validates only
+    // well-formedness — presence/completeness of the gate inputs (at least one metric, both per-mode latency targets, a
+    // context-policy reference) is the launch-readiness gate's concern, not recording's. Each PRESENT metric must be
+    // complete (a concrete classification + all five governance descriptors); each PRESENT latency target must name a
+    // concrete mode with a positive target and a mode may appear at most once; the cost posture must be explicitly
+    // recorded (AC3). Storing reads no sibling module (AD-3). Returns a safe rejection reason (never echoing a
+    // configured value, AD-14), or null when storable (with the normalized readiness in <paramref name="normalized"/>).
+    private static string? ValidateAndNormalizeLaunchReadiness(
+        AgentLaunchReadiness? readiness,
+        out AgentLaunchReadiness normalized)
+    {
+        normalized = readiness ?? EmptyLaunchReadiness;
+        if (readiness is null)
+        {
+            return "Launch readiness is required.";
+        }
+
+        IReadOnlyList<LaunchMetricDefinition> sourceMetrics = readiness.Metrics ?? [];
+        var normalizedMetrics = new List<LaunchMetricDefinition>(sourceMetrics.Count);
+        foreach (LaunchMetricDefinition metric in sourceMetrics)
+        {
+            if (metric is null)
+            {
+                return "A launch metric definition is required.";
+            }
+
+            if (metric.Classification == LaunchMetricClassification.Unknown)
+            {
+                return "Each launch metric must specify a classification.";
+            }
+
+            string? metricId = NormalizeOptionalText(metric.MetricId);
+            string? numerator = NormalizeOptionalText(metric.Numerator);
+            string? denominator = NormalizeOptionalText(metric.Denominator);
+            string? window = NormalizeOptionalText(metric.MeasurementWindow);
+            string? cohort = NormalizeOptionalText(metric.LaunchCohort);
+            if (metricId is null || numerator is null || denominator is null || window is null || cohort is null)
+            {
+                return "Each launch metric must define a metric id, numerator, denominator, measurement window, and launch cohort.";
+            }
+
+            normalizedMetrics.Add(new LaunchMetricDefinition(
+                metricId.Trim(),
+                metric.Classification,
+                numerator.Trim(),
+                denominator.Trim(),
+                metric.Target,
+                window.Trim(),
+                cohort.Trim()));
+        }
+
+        IReadOnlyList<ResponseModeLatencyTarget> sourceTargets = readiness.LatencyTargets ?? [];
+        var normalizedTargets = new List<ResponseModeLatencyTarget>(sourceTargets.Count);
+        var seenModes = new HashSet<AgentResponseMode>();
+        foreach (ResponseModeLatencyTarget target in sourceTargets)
+        {
+            if (target is null)
+            {
+                return "A latency target is required.";
+            }
+
+            if (target.Mode == AgentResponseMode.Unknown)
+            {
+                return "Each latency target must specify a response mode.";
+            }
+
+            if (target.TargetMilliseconds <= 0)
+            {
+                return "Each latency target must specify a positive target in milliseconds.";
+            }
+
+            if (!seenModes.Add(target.Mode))
+            {
+                return "Latency targets must not contain duplicate response modes.";
+            }
+
+            normalizedTargets.Add(target);
+        }
+
+        if (readiness.CostPosture == CostControlPosture.Unknown)
+        {
+            return "A cost-control posture must be specified.";
+        }
+
+        string? costNote = NormalizeOptionalText(readiness.CostPostureNote);
+        string contextReference = NormalizeRequiredText(readiness.ContextPolicyReference).Trim();
+
+        normalized = new AgentLaunchReadiness(
+            normalizedMetrics,
+            normalizedTargets,
+            readiness.CostPosture,
+            costNote,
+            contextReference);
+        return null;
+    }
+
+    // By-value equality of two normalized launch-readiness values: cost posture + optional note + context reference
+    // equal, and the metric/latency lists sequence-equal. Used for the idempotent-no-op check (AD-13). Record
+    // value-equality does not deep-compare the IReadOnlyList<> members, so they are compared element-wise; the list
+    // element records (LaunchMetricDefinition / ResponseModeLatencyTarget) carry only scalar/string members, so the
+    // default record equality used by SequenceEqual compares them correctly element-by-element.
+    private static bool LaunchReadinessEqual(AgentLaunchReadiness a, AgentLaunchReadiness b)
+        => a.CostPosture == b.CostPosture
+            && string.Equals(a.CostPostureNote, b.CostPostureNote, StringComparison.Ordinal)
+            && string.Equals(a.ContextPolicyReference, b.ContextPolicyReference, StringComparison.Ordinal)
+            && a.Metrics.SequenceEqual(b.Metrics)
+            && a.LatencyTargets.SequenceEqual(b.LatencyTargets);
 
     private static DomainResult Denied(string agentId, CommandEnvelope envelope, string commandName)
         => DomainResult.Rejection([new AgentAdministrationDeniedRejection(agentId, envelope.UserId, commandName)]);

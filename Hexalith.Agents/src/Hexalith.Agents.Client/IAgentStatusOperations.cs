@@ -1,3 +1,4 @@
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Operations;
 
 namespace Hexalith.Agents.Client;
@@ -7,6 +8,12 @@ public interface IAgentStatusOperations
 {
     /// <summary>Gets canonical Agent readiness status.</summary>
     ValueTask<AgentOperationResult<AgentReadinessStatus>> GetAgentReadinessAsync(
+        string agentId,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Gets the safe Agent launch-readiness view (recorded metrics/latency/cost + presence flags + blockers).</summary>
+    ValueTask<AgentOperationResult<AgentLaunchReadinessView>> GetAgentLaunchReadinessAsync(
         string agentId,
         AgentOperationOptions? options = null,
         CancellationToken cancellationToken = default);

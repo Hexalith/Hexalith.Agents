@@ -47,6 +47,7 @@ public sealed class AgentInteractionGateOrchestrator
         "provider:selectionValidation",
         "approver:policyValidation",
         "party:linkValidation",
+        "audit:governanceResolved",
     ];
 
     private readonly ITenantAccessReader _tenantAccessReader;
@@ -120,6 +121,7 @@ public sealed class AgentInteractionGateOrchestrator
             new(AgentInteractionGateCheck.ResponsePolicy, responsePolicy),
             new(AgentInteractionGateCheck.ContentSafetyPolicy, MapContentSafety(readiness)),
             new(AgentInteractionGateCheck.DependencyFreshness, MapFreshness(tenant, conversation, readiness)),
+            new(AgentInteractionGateCheck.LaunchReadiness, MapLaunchReadiness(readiness)),
         };
 
         // (3) Assemble the server-trusted gate command — the verdicts are server-read; any client-supplied verdict is
@@ -332,6 +334,23 @@ public sealed class AgentInteractionGateOrchestrator
         }
 
         return readiness.HasActiveContentSafetyPolicy
+            ? AgentInteractionGateOutcome.Satisfied
+            : AgentInteractionGateOutcome.Missing;
+    }
+
+    // LaunchReadiness (Story 4.4 AC4; FR-28): production-like generation must be enabled behind the launch-readiness
+    // gate before an Agent Call may run against a production-like launch. Mirrors MapContentSafety — a degraded read
+    // fails closed to Unavailable; an Agent whose production-like generation is not enabled is Missing (a readiness-class
+    // blocker → Blocked). Live read-model binding stays deferred, so the default DeferredAgentInvocationReadinessReader
+    // returns NotAvailable and this check fails closed across the whole default DI graph (AD-12).
+    private static AgentInteractionGateOutcome MapLaunchReadiness(AgentInvocationReadiness readiness)
+    {
+        if (!readiness.IsAvailable)
+        {
+            return AgentInteractionGateOutcome.Unavailable;
+        }
+
+        return readiness.ProductionLikeGenerationEnabled
             ? AgentInteractionGateOutcome.Satisfied
             : AgentInteractionGateOutcome.Missing;
     }

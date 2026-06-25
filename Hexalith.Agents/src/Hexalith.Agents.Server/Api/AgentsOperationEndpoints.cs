@@ -73,6 +73,10 @@ public static class AgentsOperationEndpoints
             client.AgentAdministration.ConfigureApproverPolicyAsync(command, cancellationToken: cancellationToken));
         agents.MapPost("/content-safety-policy", (ConfigureAgentContentSafetyPolicy command, IAgentsClient client, CancellationToken cancellationToken) =>
             client.AgentAdministration.ConfigureContentSafetyPolicyAsync(command, cancellationToken: cancellationToken));
+        agents.MapPost("/launch-readiness", (RecordAgentLaunchReadiness command, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.AgentAdministration.RecordLaunchReadinessAsync(command, cancellationToken: cancellationToken));
+        agents.MapPost("/enable-production-like-generation", (EnableProductionLikeGeneration command, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.AgentAdministration.EnableProductionLikeGenerationAsync(command, cancellationToken: cancellationToken));
         agents.MapPost("/activate", (ActivateAgent command, IAgentsClient client, CancellationToken cancellationToken) =>
             client.AgentAdministration.ActivateAsync(command, cancellationToken: cancellationToken));
         agents.MapPost("/disable", (DisableAgent command, IAgentsClient client, CancellationToken cancellationToken) =>
@@ -127,6 +131,8 @@ public static class AgentsOperationEndpoints
 
         status.MapGet("/agents/{agentId}/readiness", (string agentId, IAgentsClient client, CancellationToken cancellationToken) =>
             client.Status.GetAgentReadinessAsync(agentId, cancellationToken: cancellationToken));
+        status.MapGet("/agents/{agentId}/launch-readiness", (string agentId, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.Status.GetAgentLaunchReadinessAsync(agentId, cancellationToken: cancellationToken));
         status.MapGet("/providers/{providerId}/{modelId}/readiness", (string providerId, string modelId, IAgentsClient client, CancellationToken cancellationToken) =>
             client.Status.GetProviderModelReadinessAsync(providerId, modelId, cancellationToken: cancellationToken));
         status.MapGet("/interactions/{agentInteractionId}/call", (string agentInteractionId, IAgentsClient client, CancellationToken cancellationToken) =>

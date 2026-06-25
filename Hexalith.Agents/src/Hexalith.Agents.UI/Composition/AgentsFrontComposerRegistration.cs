@@ -186,5 +186,19 @@ public static class AgentsFrontComposerRegistration
             RequiredPolicy: AgentsAuditOperatorPolicy,
             TitleKey: "Agents.Navigation.AuditEvidence",
             Resource: typeof(AgentsResources)));
+
+        // Launch-readiness surface (Story 4.4; AC2, AC3, AC4). The Release Operator persona folds under the Agents
+        // administrator policy for V1 (the distinct release-operator authorization model is itself deferred). The
+        // curated FcFluentIcons Size20 vocabulary has no dedicated launch/rocket glyph, so the "Settings" configuration
+        // glyph is reused (launch readiness is a configuration/gate surface).
+        registry.AddNavEntry(new FrontComposerNavEntry(
+            "agents",
+            "Launch readiness",
+            "/agents/launch-readiness",
+            Icon: "Regular.Size20.Settings",
+            Order: 8,
+            RequiredPolicy: AgentsAdministratorPolicy,
+            TitleKey: "Agents.Navigation.LaunchReadiness",
+            Resource: typeof(AgentsResources)));
     }
 }

@@ -29,7 +29,9 @@ internal static class AgentUiTestData
         ApproverPolicyBasisDisclosure approverPolicyDisclosure = ApproverPolicyBasisDisclosure.OperatorOnly,
         bool hasContentSafetyPolicy = false,
         bool hasAutomaticContentSafetyOverride = false,
-        bool hasConfirmationContentSafetyOverride = false)
+        bool hasConfirmationContentSafetyOverride = false,
+        IReadOnlyList<AgentLaunchReadinessBlocker>? launchReadinessBlockers = null,
+        bool productionLikeGenerationEnabled = false)
         => new(
             AgentId: "agent-1",
             TenantId: "tenant-1",
@@ -52,7 +54,9 @@ internal static class AgentUiTestData
             ContentSafetyPolicyVersion: hasContentSafetyPolicy ? 1 : 0,
             HasAutomaticContentSafetyOverride: hasAutomaticContentSafetyOverride,
             HasConfirmationContentSafetyOverride: hasConfirmationContentSafetyOverride,
-            ActivationBlockers: blockers ?? []);
+            ActivationBlockers: blockers ?? [],
+            LaunchReadinessBlockers: launchReadinessBlockers ?? [],
+            ProductionLikeGenerationEnabled: productionLikeGenerationEnabled);
 
     public static ProviderCatalogEntryView Entry(
         string providerId = "openai",
@@ -207,7 +211,8 @@ internal static class AgentUiTestData
         IReadOnlyList<AgentCallOutcomeCount>? recentCallOutcomes = null,
         IReadOnlyList<ProposalOutcomeCount>? proposalOutcomes = null,
         int pendingProposalCount = 2,
-        string? generatedAt = "2026-06-24T12:00:00Z")
+        string? generatedAt = "2026-06-24T12:00:00Z",
+        IReadOnlyList<AgentLaunchReadinessBlocker>? launchReadinessBlockers = null)
         => new(
             AgentReadiness: agentReadiness,
             ReadinessBlockers: readinessBlockers ?? [],
@@ -216,11 +221,38 @@ internal static class AgentUiTestData
             RecentCallOutcomes: recentCallOutcomes ?? [new AgentCallOutcomeCount(AgentCallOperationStatus.Generated, 3), new AgentCallOutcomeCount(AgentCallOperationStatus.Denied, 1)],
             ProposalOutcomes: proposalOutcomes ?? [new ProposalOutcomeCount(ProposalOperationStatus.Posted, 4), new ProposalOutcomeCount(ProposalOperationStatus.PostingFailed, 1)],
             PendingProposalCount: pendingProposalCount,
-            GeneratedAt: generatedAt);
+            GeneratedAt: generatedAt,
+            LaunchReadinessBlockers: launchReadinessBlockers ?? []);
 
     /// <summary>Wraps a summary in a successful read result.</summary>
     public static AgentOperationalStatusSummaryResult OperationalStatusResult(AgentOperationalStatusSummaryView? summary = null)
         => AgentOperationalStatusSummaryResult.Success(summary ?? OperationalStatusSummary());
+
+    // ===== Story 4.4 launch-readiness factories =====
+
+    /// <summary>A safe launch-readiness view; tests use <c>with</c> expressions or named params to vary a single field.</summary>
+    public static AgentLaunchReadinessView LaunchReadinessView(
+        IReadOnlyList<LaunchMetricDefinition>? metrics = null,
+        IReadOnlyList<ResponseModeLatencyTarget>? latencyTargets = null,
+        CostControlPosture costPosture = CostControlPosture.Budgets,
+        int launchReadinessVersion = 1,
+        bool hasContentSafetyPolicy = true,
+        bool hasContextPolicy = true,
+        bool productionLikeGenerationEnabled = false,
+        IReadOnlyList<AgentLaunchReadinessBlocker>? blockers = null)
+        => new(
+            Metrics: metrics ?? [new LaunchMetricDefinition("SM-2", LaunchMetricClassification.Primary, "numerator", "denominator", 0.30m, "14 days", "cohort A")],
+            LatencyTargets: latencyTargets ?? [new ResponseModeLatencyTarget(AgentResponseMode.Automatic, 4000), new ResponseModeLatencyTarget(AgentResponseMode.Confirmation, 8000)],
+            CostPosture: costPosture,
+            LaunchReadinessVersion: launchReadinessVersion,
+            HasContentSafetyPolicy: hasContentSafetyPolicy,
+            HasContextPolicy: hasContextPolicy,
+            ProductionLikeGenerationEnabled: productionLikeGenerationEnabled,
+            Blockers: blockers ?? []);
+
+    /// <summary>Wraps a launch-readiness view in a successful read result.</summary>
+    public static LaunchReadinessResult LaunchReadinessResultSuccess(AgentLaunchReadinessView? view = null)
+        => LaunchReadinessResult.Success(view ?? LaunchReadinessView());
 
     /// <summary>A safe approval/posting evidence view for the audit panel tests.</summary>
     public static AgentProposalApprovalEvidenceView ApprovalEvidence(

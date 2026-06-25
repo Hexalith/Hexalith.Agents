@@ -1,0 +1,88 @@
+@using System.Collections.Generic
+@using System.Linq
+@inject IStringLocalizer<AgentsResources> Localizer
+
+@* launch-readiness-panel (Story 4.4 AC4): a Fluent status region that surfaces the production-like-enablement state and
+   the launch-readiness blockers grouped BY RecoveryActionGroup (fix policy, inspect audit) — never by the raw subsystem
+   (UX-DR9). The enablement badge uses status-success ONLY when production-like generation is enabled (all gates pass);
+   blocked readiness is status-severe (color + icon + visible text; UX-DR12). The container announces politely
+   (UX-DR36); the page's AgentSurfaceState owns the assertive error/permission states. No secret/payload/content appears
+   in any string, aria-label, or data-testid (AD-14). *@
+<section class="agents-launch-readiness-panel"
+         role="status"
+         aria-live="polite"
+         aria-label="@Localizer["Agents.LaunchReadiness.Panel.Label"]"
+         data-testid="@TestId">
+    <div class="agents-launch-readiness-panel__enablement" data-testid="@($"{TestId}-enablement")">
+        <span class="agents-launch-readiness-panel__label">@Localizer["Agents.LaunchReadiness.ProductionLike.Label"]</span>
+        <span class="agents-launch-readiness-panel__badge">
+            <FluentBadge Appearance="BadgeAppearance.Tint"
+                         Color="@EnablementColor"
+                         IconStart="@EnablementIcon"
+                         aria-label="@EnablementLabel">
+                @EnablementLabel
+            </FluentBadge>
+        </span>
+    </div>
+
+    @foreach (RecoveryActionGroup group in _groupOrder)
+    {
+        IReadOnlyList<AgentLaunchReadinessBlocker> blockers = BlockersFor(group);
+        @if (blockers.Count > 0)
+        {
+            <section class="agents-launch-readiness-panel__group agents-launch-readiness-panel__group--@GroupCss(group)"
+                     data-testid="@($"{TestId}-group-{group}")">
+                <h3 class="agents-launch-readiness-panel__action">@Localizer[OperationalStatusPresentation.GroupLabelKeyFor(group)]</h3>
+                <p class="agents-launch-readiness-panel__guidance" data-testid="@($"{TestId}-guidance-{group}")">
+                    @Localizer[OperationalStatusPresentation.GuidanceKeyFor(group)]
+                </p>
+                <div class="agents-launch-readiness-panel__badges">
+                    @foreach (AgentLaunchReadinessBlocker blocker in blockers)
+                    {
+                        <span class="agents-launch-readiness-panel__badge" data-testid="@($"agents-launch-readiness-blocker-{blocker}")">
+                            <FluentBadge Appearance="BadgeAppearance.Tint"
+                                         Color="BadgeColor.Severe"
+                                         IconStart="@FcFluentIcons.Warning16()"
+                                         aria-label="@Localizer[LaunchReadinessPresentation.BlockerKeyFor(blocker)]">
+                                @Localizer[LaunchReadinessPresentation.BlockerKeyFor(blocker)]
+                            </FluentBadge>
+                        </span>
+                    }
+                </div>
+            </section>
+        }
+    }
+</section>
+
+@code {
+    /// <summary>The safe launch-readiness view the panel renders (presence flags + blockers + governance data; AD-14).</summary>
+    [Parameter]
+    [EditorRequired]
+    public AgentLaunchReadinessView Readiness { get; set; } = default!;
+
+    /// <summary>Stable test id base for the panel and its group regions.</summary>
+    [Parameter]
+    public string TestId { get; set; } = "agents-launch-readiness-panel";
+
+    // Rendered in the canonical recovery order (RecoveryActionGroup declaration order).
+    private static readonly RecoveryActionGroup[] _groupOrder = Enum.GetValues<RecoveryActionGroup>();
+
+    // status-success ONLY when production-like generation is enabled (all gates pass); blocked/not-enabled is severe.
+    private BadgeColor EnablementColor
+        => Readiness.ProductionLikeGenerationEnabled ? BadgeColor.Success : BadgeColor.Severe;
+
+    private Icon EnablementIcon
+        => Readiness.ProductionLikeGenerationEnabled ? FcFluentIcons.Checkmark16() : FcFluentIcons.SubtractCircle16();
+
+    private string EnablementLabel
+        => Readiness.ProductionLikeGenerationEnabled
+            ? Localizer["Agents.LaunchReadiness.ProductionLike.Enabled"]
+            : Localizer["Agents.LaunchReadiness.ProductionLike.Disabled"];
+
+    private IReadOnlyList<AgentLaunchReadinessBlocker> BlockersFor(RecoveryActionGroup group)
+        => Readiness.Blockers
+            .Where(blocker => LaunchReadinessPresentation.GroupForBlocker(blocker) == group)
+            .ToList();
+
+    private static string GroupCss(RecoveryActionGroup group) => group.ToString().ToLowerInvariant();
+}

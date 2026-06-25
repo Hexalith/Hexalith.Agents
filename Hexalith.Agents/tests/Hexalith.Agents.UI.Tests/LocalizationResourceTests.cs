@@ -387,6 +387,61 @@ public sealed class LocalizationResourceTests
         yield return "Agents.Audit.EntryPoint.OperationalStatus";
         yield return "Agents.Audit.EntryPoint.ProposalDetail";
         yield return "Agents.Audit.EntryPoint.PostedResponse";
+
+        // Story 4.4 — launch-readiness presentation: one whole string per blocker / classification / cost posture and
+        // per-mode latency label (UX-DR14). The gate-check reason for the new LaunchReadiness value is already covered
+        // by the AgentInteractionGateCheck loop above (AgentCallStatusPresentation.ReasonKeyFor).
+        foreach (AgentLaunchReadinessBlocker blocker in Enum.GetValues<AgentLaunchReadinessBlocker>())
+        {
+            yield return LaunchReadinessPresentation.BlockerKeyFor(blocker);
+        }
+
+        foreach (LaunchMetricClassification classification in Enum.GetValues<LaunchMetricClassification>())
+        {
+            yield return LaunchReadinessPresentation.ClassificationKeyFor(classification);
+        }
+
+        foreach (CostControlPosture posture in Enum.GetValues<CostControlPosture>())
+        {
+            yield return LaunchReadinessPresentation.CostPostureKeyFor(posture);
+        }
+
+        foreach (AgentResponseMode mode in Enum.GetValues<AgentResponseMode>())
+        {
+            yield return LaunchReadinessPresentation.LatencyModeKeyFor(mode);
+        }
+
+        // Story 4.4 — launch-readiness page + panel chrome.
+        yield return "Agents.Navigation.LaunchReadiness";
+        yield return "Agents.LaunchReadiness.Title";
+        yield return "Agents.LaunchReadiness.Eyebrow";
+        yield return "Agents.LaunchReadiness.Description";
+        yield return "Agents.LaunchReadiness.Panel.Label";
+        yield return "Agents.LaunchReadiness.ProductionLike.Label";
+        yield return "Agents.LaunchReadiness.ProductionLike.Enabled";
+        yield return "Agents.LaunchReadiness.ProductionLike.Disabled";
+        yield return "Agents.LaunchReadiness.Prerequisites.Label";
+        yield return "Agents.LaunchReadiness.ContentSafety.Label";
+        yield return "Agents.LaunchReadiness.ContextPolicy.Label";
+        yield return "Agents.LaunchReadiness.Present";
+        yield return "Agents.LaunchReadiness.Missing";
+        yield return "Agents.LaunchReadiness.Version.Label";
+        yield return "Agents.LaunchReadiness.Latency.Label";
+        yield return "Agents.LaunchReadiness.Latency.Empty";
+        yield return "Agents.LaunchReadiness.Latency.Milliseconds";
+        yield return "Agents.LaunchReadiness.Metrics.Label";
+        yield return "Agents.LaunchReadiness.Metrics.Empty";
+        yield return "Agents.LaunchReadiness.Metric.MetricId";
+        yield return "Agents.LaunchReadiness.Metric.Classification";
+        yield return "Agents.LaunchReadiness.Metric.Numerator";
+        yield return "Agents.LaunchReadiness.Metric.Denominator";
+        yield return "Agents.LaunchReadiness.Metric.Target";
+        yield return "Agents.LaunchReadiness.Metric.Window";
+        yield return "Agents.LaunchReadiness.Metric.Cohort";
+        yield return "Agents.LaunchReadiness.CostPosture.Label";
+        yield return "Agents.LaunchReadiness.Enable.Label";
+        yield return "Agents.LaunchReadiness.Enable.Button";
+        yield return "Agents.LaunchReadiness.Enable.Submitted";
     }
 
     public static IEnumerable<object[]> EnumDerivedKeyCases() => EnumDerivedKeys().Distinct().Select(key => new object[] { key });

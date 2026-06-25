@@ -164,4 +164,17 @@ public sealed class DeferredGatewayTests
         result.Detail.ShouldBeNull();
         result.Approval.ShouldBeNull();
     }
+
+    [Fact]
+    public async Task DeferredLaunchReadinessGateway_fails_closed_with_not_authorized_and_no_readiness()
+    {
+        // Story 4.4 — a host that has not bound the live read-model renders permission-denied, never a fabricated
+        // "ready" launch-readiness view (AD-12).
+        DeferredLaunchReadinessGateway gateway = new();
+
+        LaunchReadinessResult result = await gateway.GetLaunchReadinessAsync(CancellationToken.None);
+
+        result.Status.ShouldBe(LaunchReadinessInspectionStatus.NotAuthorized);
+        result.Readiness.ShouldBeNull();
+    }
 }

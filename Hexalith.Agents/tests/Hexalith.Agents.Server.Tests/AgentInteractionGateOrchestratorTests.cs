@@ -82,7 +82,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         dispatched.AggregateId.ShouldBe(AgentInteractionId);
 
         IReadOnlyList<AgentInvocationGateVerdict> verdicts = DispatchedVerdicts();
-        verdicts.Count.ShouldBe(9); // one per AgentInteractionGateCheck, in evaluation order
+        verdicts.Count.ShouldBe(10); // one per AgentInteractionGateCheck, in evaluation order
         verdicts.Select(v => v.Check).ShouldBe(EvaluationOrder());
         verdicts.ShouldAllBe(v => v.Outcome == AgentInteractionGateOutcome.Satisfied);
     }
@@ -282,6 +282,23 @@ public sealed class AgentInteractionGateOrchestratorTests
     }
 
     [Fact]
+    public async Task Production_like_generation_not_enabled_maps_launch_readiness_to_missing_blocked()
+    {
+        // Story 4.4: an available Agent that has not had production-like generation enabled fails the readiness-class
+        // LaunchReadiness check (Missing → Blocked). The pure decision policy needs no change — the new verdict folds in.
+        StubAllReady();
+        _readinessReader.ReadAsync(TenantId, AgentId, Arg.Any<CancellationToken>())
+            .Returns(Readiness() with { ProductionLikeGenerationEnabled = false });
+        CaptureDispatch();
+
+        AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        outcome.Status.ShouldBe(AgentInteractionStatus.Blocked);
+        VerdictFor(AgentInteractionGateCheck.LaunchReadiness).ShouldBe(AgentInteractionGateOutcome.Missing);
+        VerdictFor(AgentInteractionGateCheck.AgentLifecycle).ShouldBe(AgentInteractionGateOutcome.Satisfied); // launch readiness is a distinct check
+    }
+
+    [Fact]
     public async Task Stale_projection_maps_dependency_freshness_to_stale_blocked()
     {
         StubAllReady();
@@ -332,6 +349,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         VerdictFor(AgentInteractionGateCheck.AgentPartyIdentity).ShouldBe(AgentInteractionGateOutcome.Unavailable);
         VerdictFor(AgentInteractionGateCheck.ResponsePolicy).ShouldBe(AgentInteractionGateOutcome.Unavailable);
         VerdictFor(AgentInteractionGateCheck.ContentSafetyPolicy).ShouldBe(AgentInteractionGateOutcome.Unavailable);
+        VerdictFor(AgentInteractionGateCheck.LaunchReadiness).ShouldBe(AgentInteractionGateOutcome.Unavailable);
         VerdictFor(AgentInteractionGateCheck.DependencyFreshness).ShouldBe(AgentInteractionGateOutcome.Stale);
     }
 
@@ -349,6 +367,7 @@ public sealed class AgentInteractionGateOrchestratorTests
             ["provider:selectionValidation"] = "Valid",
             ["approver:policyValidation"] = "Valid",
             ["party:linkValidation"] = "Valid",
+            ["audit:governanceResolved"] = "true",
             ["trace"] = "abc-123",
         };
 
@@ -360,6 +379,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         dispatched.Extensions.ShouldNotContainKey("provider:selectionValidation");
         dispatched.Extensions.ShouldNotContainKey("approver:policyValidation");
         dispatched.Extensions.ShouldNotContainKey("party:linkValidation");
+        dispatched.Extensions.ShouldNotContainKey("audit:governanceResolved");
         dispatched.Extensions["trace"].ShouldBe("abc-123");
     }
 
@@ -375,7 +395,7 @@ public sealed class AgentInteractionGateOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
-        DispatchedVerdicts().Count.ShouldBe(9);
+        DispatchedVerdicts().Count.ShouldBe(10);
         VerdictFor(AgentInteractionGateCheck.ProviderModelReadiness).ShouldBe(AgentInteractionGateOutcome.Disabled);
     }
 
@@ -675,6 +695,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         AgentInteractionGateCheck.ResponsePolicy,
         AgentInteractionGateCheck.ContentSafetyPolicy,
         AgentInteractionGateCheck.DependencyFreshness,
+        AgentInteractionGateCheck.LaunchReadiness,
     ];
 
     private void StubAllReady()
@@ -702,7 +723,8 @@ public sealed class AgentInteractionGateOrchestratorTests
             ProviderId,
             ModelId,
             ApproverPolicy: null,
-            IsFresh: true);
+            IsFresh: true,
+            ProductionLikeGenerationEnabled: true);
 
     private static ProviderCatalogEntryView Entry(bool selectable)
         => new(

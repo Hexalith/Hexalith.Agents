@@ -1,6 +1,8 @@
 namespace Hexalith.Agents.Server.Tests;
 
 using Hexalith.Agents.Client;
+using Hexalith.Agents.Contracts.Agent;
+using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Server.Api;
 
@@ -50,6 +52,72 @@ public sealed class AgentsOperationEndpointsTests
         patterns.ShouldContain("/api/agents/operations/status/interactions/{agentInteractionId}/audit");
         patterns.ShouldContain("/api/agents/operations/audit/interactions/{agentInteractionId}/posting");
         patterns.ShouldContain("/api/agents/operations/audit/interactions/{agentInteractionId}/proposal-approval");
+        // Story 4.4 — launch-readiness record/enable commands + the launch-readiness status read.
+        patterns.ShouldContain("/api/agents/operations/agents/launch-readiness");
+        patterns.ShouldContain("/api/agents/operations/agents/enable-production-like-generation");
+        patterns.ShouldContain("/api/agents/operations/status/agents/{agentId}/launch-readiness");
+    }
+
+    [Fact]
+    public async Task Launch_readiness_status_endpoint_returns_client_result_json()
+    {
+        var view = new AgentLaunchReadinessView(
+            [],
+            [],
+            CostControlPosture.Budgets,
+            LaunchReadinessVersion: 1,
+            HasContentSafetyPolicy: true,
+            HasContextPolicy: true,
+            ProductionLikeGenerationEnabled: false,
+            [AgentLaunchReadinessBlocker.MissingLaunchMetrics]);
+        IAgentsClient client = Substitute.For<IAgentsClient>();
+        IAgentStatusOperations status = Substitute.For<IAgentStatusOperations>();
+        status.GetAgentLaunchReadinessAsync("agent-1", Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentLaunchReadinessView>>(
+                AgentOperationResult<AgentLaunchReadinessView>.Succeeded(view)));
+        client.Status.Returns(status);
+
+        await using WebApplication app = BuildApp(client);
+        string json = await InvokeEndpointAsync(
+            app,
+            "/api/agents/operations/status/agents/{agentId}/launch-readiness",
+            ("agentId", "agent-1")).ConfigureAwait(true);
+
+        json.ShouldContain("\"status\":\"Succeeded\"");
+        json.ShouldContain("MissingLaunchMetrics");
+    }
+
+    [Fact]
+    public async Task Launch_readiness_status_endpoint_fails_closed_without_leaking_internal_text()
+    {
+        await using WebApplication app = BuildApp(AgentsClient.Unavailable());
+        string json = await InvokeEndpointAsync(
+            app,
+            "/api/agents/operations/status/agents/{agentId}/launch-readiness",
+            ("agentId", "agent-1")).ConfigureAwait(true);
+
+        json.ShouldContain("\"status\":\"Unavailable\"");
+        json.ShouldContain("\"code\":\"Unavailable\"");
+        foreach (string poison in _poisonValues)
+        {
+            json.ShouldNotContain(poison, Case.Insensitive);
+        }
+    }
+
+    [Fact]
+    public async Task Default_client_maps_launch_readiness_commands_to_structured_unavailable_never_success()
+    {
+        IAgentsClient client = AgentsClient.Unavailable();
+
+        AgentOperationResult record = await client.AgentAdministration.RecordLaunchReadinessAsync(
+            new RecordAgentLaunchReadiness(new AgentLaunchReadiness([], [], CostControlPosture.Budgets, null, "full-conversation-v1")));
+        AgentOperationResult enable = await client.AgentAdministration.EnableProductionLikeGenerationAsync(new EnableProductionLikeGeneration());
+
+        // Fail-closed: a deferred binding is Unavailable, never Succeeded — pending/blocked is never success (AD-12).
+        record.Status.ShouldBe(AgentOperationStatus.Unavailable);
+        enable.Status.ShouldBe(AgentOperationStatus.Unavailable);
+        record.Error.ShouldNotBeNull();
+        record.Error.Message.ShouldNotContain("DeferredAgentCommandDispatcher", Case.Sensitive);
     }
 
     [Fact]

@@ -28,6 +28,7 @@ internal static class AgentTestData
     internal const string PartyLinkValidationExtensionKey = "party:linkValidation";
     internal const string ProviderSelectionValidationExtensionKey = "provider:selectionValidation";
     internal const string ApproverPolicyValidationExtensionKey = "approver:policyValidation";
+    internal const string AuditGovernanceResolvedExtensionKey = "audit:governanceResolved";
     internal const string LinkedPartyId = "party-001";
     internal const string SelectedProviderId = "openai";
     internal const string SelectedModelId = "gpt-4o";
@@ -58,6 +59,20 @@ internal static class AgentTestData
         SampleContentSafetyPolicy,
         null,
         null);
+
+    /// <summary>A valid sample launch-readiness decision: a primary + counter metric, both per-mode latency targets, a budgets cost posture, and the V1 context-policy reference (Story 4.4).</summary>
+    internal static AgentLaunchReadiness SampleLaunchReadiness { get; } = new(
+        [
+            new LaunchMetricDefinition("SM-2", LaunchMetricClassification.Primary, "Launch Conversations using >=1 Agent Call", "Eligible launch Conversations", 0.30m, "First 14 days post-enablement", "Launch cohort A"),
+            new LaunchMetricDefinition("SM-C1", LaunchMetricClassification.Counter, "Safety-blocked Agent Calls", "Total Agent Calls", 0.05m, "Rolling 7 days", "All launch tenants"),
+        ],
+        [
+            new ResponseModeLatencyTarget(AgentResponseMode.Automatic, 4000),
+            new ResponseModeLatencyTarget(AgentResponseMode.Confirmation, 8000),
+        ],
+        CostControlPosture.Budgets,
+        null,
+        "full-conversation-v1");
 
     internal static CommandEnvelope Envelope<T>(
         T command,
@@ -237,6 +252,79 @@ internal static class AgentTestData
             extensions.Count > 0 ? extensions : null);
     }
 
+    /// <summary>
+    /// Builds an <see cref="EnableProductionLikeGeneration"/> command envelope carrying the trusted Agents-admin
+    /// extension plus the server-populated <c>audit:governanceResolved</c> flag — the trust model the launch-readiness
+    /// gate reads (Story 4.4). Set <paramref name="includeAuditGovernance"/> to <see langword="false"/> to simulate a
+    /// direct-gateway enablement that never resolved audit governance (absent flag → fails closed to false).
+    /// </summary>
+    /// <param name="auditGovernanceResolved">The trusted audit-governance-resolved flag to populate.</param>
+    /// <param name="isAgentsAdmin">Whether the trusted Agents-admin extension is present.</param>
+    /// <param name="includeAuditGovernance">Whether the <c>audit:governanceResolved</c> extension is present at all.</param>
+    /// <param name="agentId">The Agent aggregate id.</param>
+    /// <param name="tenantId">The tenant scope.</param>
+    /// <param name="actorUserId">The actor.</param>
+    /// <returns>The command envelope.</returns>
+    internal static CommandEnvelope EnableEnvelope(
+        bool auditGovernanceResolved = true,
+        bool isAgentsAdmin = true,
+        bool includeAuditGovernance = true,
+        string agentId = AgentId,
+        string tenantId = TenantId,
+        string actorUserId = "admin-user")
+    {
+        var command = new EnableProductionLikeGeneration();
+        var extensions = new Dictionary<string, string>();
+        if (isAgentsAdmin)
+        {
+            extensions[AgentAdminExtensionKey] = "true";
+        }
+
+        if (includeAuditGovernance)
+        {
+            extensions[AuditGovernanceResolvedExtensionKey] = auditGovernanceResolved ? "true" : "false";
+        }
+
+        return new(
+            "msg-EnableProductionLikeGeneration",
+            tenantId,
+            "agent",
+            agentId,
+            nameof(EnableProductionLikeGeneration),
+            JsonSerializer.SerializeToUtf8Bytes(command),
+            "corr-1",
+            null,
+            actorUserId,
+            extensions.Count > 0 ? extensions : null);
+    }
+
+    /// <summary>Builds a created state with a recorded launch-readiness decision applied (lifecycle still Draft).</summary>
+    /// <param name="create">The create command whose creation event seeds the state.</param>
+    /// <param name="readiness">The launch-readiness decision to record.</param>
+    /// <returns>The Agent state with the recorded launch readiness (launch-readiness version = 1).</returns>
+    internal static AgentState StateWithLaunchReadiness(CreateAgent create, AgentLaunchReadiness? readiness = null)
+    {
+        AgentState state = StateWith(create);
+        state.Apply(new AgentLaunchReadinessRecorded(AgentId, readiness ?? SampleLaunchReadiness, 1, state.ConfigurationVersion + 1));
+        return state;
+    }
+
+    /// <summary>
+    /// Builds a fully launch-ready Agent state (lifecycle still Draft): a recorded Content Safety Policy AND a recorded
+    /// launch-readiness decision (which carries the in-force context-policy reference, both per-mode latency targets, the
+    /// launch metrics, and the cost posture). The only remaining launch-readiness gate is the trusted audit-governance
+    /// flag supplied on the enablement envelope (Story 4.4).
+    /// </summary>
+    /// <param name="create">The create command whose creation event seeds the state.</param>
+    /// <param name="readiness">The launch-readiness decision to record.</param>
+    /// <returns>The launch-ready Agent state.</returns>
+    internal static AgentState StateLaunchReady(CreateAgent create, AgentLaunchReadiness? readiness = null)
+    {
+        AgentState state = StateWithContentSafety(create);
+        state.Apply(new AgentLaunchReadinessRecorded(AgentId, readiness ?? SampleLaunchReadiness, 1, state.ConfigurationVersion + 1));
+        return state;
+    }
+
     internal static CreateAgent ValidCreate(
         string tenantId = TenantId,
         string displayName = "Hexa Assistant",
@@ -394,6 +482,10 @@ internal static class AgentTestData
                 case AgentResponseModeConfigured e: state.Apply(e); break;
                 case AgentApproverPolicyConfigured e: state.Apply(e); break;
                 case AgentContentSafetyPolicyConfigured e: state.Apply(e); break;
+                case AgentLaunchReadinessRecorded e: state.Apply(e); break;
+                case AgentProductionLikeGenerationEnabled e: state.Apply(e); break;
+                case AgentLaunchReadinessRejection e: state.Apply(e); break;
+                case AgentProductionLikeGenerationBlockedRejection e: state.Apply(e); break;
                 case AgentProviderModelSelectionRejected e: state.Apply(e); break;
                 case AgentAdministrationDeniedRejection e: state.Apply(e); break;
                 case AgentNotFoundRejection e: state.Apply(e); break;
