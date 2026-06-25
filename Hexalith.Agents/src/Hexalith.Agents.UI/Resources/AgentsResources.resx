@@ -366,6 +366,7 @@
   <data name="Agents.ProposalApprover.Label" xml:space="preserve"><value>Approve proposed reply</value></data>
   <data name="Agents.ProposalApprover.SelectedVersion" xml:space="preserve"><value>Selected version will be approved for posting.</value></data>
   <data name="Agents.ProposalApprover.Approve" xml:space="preserve"><value>Approve and post</value></data>
+  <data name="Agents.ProposalApprover.ConstrainedUnavailable" xml:space="preserve"><value>Approval is unavailable on this view because it cannot show enough context for a safe decision. Review-only access is shown.</value></data>
   <data name="Agents.ProposalApprover.Status.Approved" xml:space="preserve"><value>The selected version was approved and is not yet posted.</value></data>
   <data name="Agents.ProposalApprover.Status.PostingPending" xml:space="preserve"><value>The selected version is approved and posting is pending.</value></data>
   <data name="Agents.ProposalApprover.Status.Posted" xml:space="preserve"><value>The selected version was posted to the Conversation.</value></data>

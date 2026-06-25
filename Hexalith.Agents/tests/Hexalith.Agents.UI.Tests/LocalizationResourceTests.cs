@@ -220,6 +220,7 @@ public sealed class LocalizationResourceTests
         // Story 3.5 — proposal-approver whole strings (label, action, selected-version copy, outcome statuses).
         yield return "Agents.ProposalApprover.Label";
         yield return "Agents.ProposalApprover.Approve";
+        yield return "Agents.ProposalApprover.ConstrainedUnavailable";
         yield return "Agents.ProposalApprover.SelectedVersion";
         yield return "Agents.ProposalApprover.Status.Approved";
         yield return "Agents.ProposalApprover.Status.PostingPending";

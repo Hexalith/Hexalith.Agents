@@ -81,7 +81,7 @@ development_status:
   4-2-query-audit-evidence-safely: done
   4-3-expose-operational-status-and-admin-workflows: done
   4-4-define-and-enforce-launch-readiness-gates: done
-  4-5-verify-end-to-end-governance-and-contract-conformance: backlog
+  4-5-verify-end-to-end-governance-and-contract-conformance: done
   epic-4-retrospective: optional
 
 action_items:

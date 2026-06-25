@@ -366,6 +366,7 @@
   <data name="Agents.ProposalApprover.Label" xml:space="preserve"><value>Approuver la réponse proposée</value></data>
   <data name="Agents.ProposalApprover.SelectedVersion" xml:space="preserve"><value>La version sélectionnée sera approuvée pour publication.</value></data>
   <data name="Agents.ProposalApprover.Approve" xml:space="preserve"><value>Approuver et publier</value></data>
+  <data name="Agents.ProposalApprover.ConstrainedUnavailable" xml:space="preserve"><value>L'approbation est indisponible sur cette vue car elle ne peut pas afficher assez de contexte pour une décision sûre. Seul l'accès en lecture seule est affiché.</value></data>
   <data name="Agents.ProposalApprover.Status.Approved" xml:space="preserve"><value>La version sélectionnée a été approuvée et n'est pas encore publiée.</value></data>
   <data name="Agents.ProposalApprover.Status.PostingPending" xml:space="preserve"><value>La version sélectionnée est approuvée et la publication est en attente.</value></data>
   <data name="Agents.ProposalApprover.Status.Posted" xml:space="preserve"><value>La version sélectionnée a été publiée dans la conversation.</value></data>

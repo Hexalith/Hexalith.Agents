@@ -8,13 +8,26 @@
         @Localizer["Agents.ProposalApprover.SelectedVersion"]
     </p>
 
-    @if (CanApprove)
+    @if (CanApprove && !Constrained)
     {
         <div class="proposal-approver__actions">
             <FluentButton Appearance="ButtonAppearance.Primary" OnClick="OnApproveAsync" data-testid="@($"{TestId}-approve")">
                 @Localizer["Agents.ProposalApprover.Approve"]
             </FluentButton>
         </div>
+    }
+    else if (CanApprove && Constrained)
+    {
+        @* UX-DR40: fail closed on a constrained viewport — the high-impact approve/post action is unavailable, surfaced
+           through a focusable, aria-describedby-linked reason (never a bare disabled control and never a color/animation-only
+           signal), while review-only access (the selected-version summary above) stays visible. *@
+        <p class="proposal-approver__unavailable"
+           id="@UnavailableReasonId"
+           tabindex="0"
+           aria-describedby="@UnavailableReasonId"
+           data-testid="@($"{TestId}-unavailable")">
+            @Localizer["Agents.ProposalApprover.ConstrainedUnavailable"]
+        </p>
     }
 
     @if (_submitted)
@@ -42,6 +55,10 @@
     [Parameter]
     public bool CanApprove { get; set; }
 
+    /// <summary>When <see langword="true"/>, a constrained viewport cannot show enough context for a safe approve/post decision — render the high-impact action unavailable with a focusable reason, review-only access remaining (UX-DR40).</summary>
+    [Parameter]
+    public bool Constrained { get; set; }
+
     /// <summary>Optional client correlation id.</summary>
     [Parameter]
     public string? ClientCorrelationId { get; set; }
@@ -56,6 +73,8 @@
 
     private bool _submitted;
     private ProposalApprovalStatus _status = ProposalApprovalStatus.Unknown;
+
+    private string UnavailableReasonId => $"{TestId}-unavailable-reason";
 
     private string StatusKey => _status switch
     {
