@@ -10,7 +10,9 @@
 // Scope (Story 1.2): no provider adapter, AgentHost workflow, FrontComposer UI page, or runnable full AppHost
 // topology — those arrive in later stories.
 using Hexalith.Agents;
+using Hexalith.Agents.Client;
 using Hexalith.Agents.Server;
+using Hexalith.Agents.Server.Api;
 using Hexalith.Agents.Server.Application.AgentInteractions;
 using Hexalith.Agents.Server.Application.Agents;
 using Hexalith.Agents.Server.Ports;
@@ -20,6 +22,7 @@ using Hexalith.Parties.Client.Extensions;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -218,8 +221,11 @@ builder.Services.AddScoped<AgentInteractionProposalRejectionOrchestrator>();
 builder.Services.AddScoped<AgentInteractionProposalAbandonmentOrchestrator>();
 builder.Services.AddScoped<AgentInteractionProposalExpiryOrchestrator>();
 
+builder.Services.TryAddSingleton<IAgentsClient>(_ => AgentsClient.Unavailable());
+
 WebApplication app = builder.Build();
 
 app.UseEventStoreDomainService();
+app.MapAgentsOperationEndpoints();
 
 app.Run();

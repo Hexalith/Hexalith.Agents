@@ -1,8 +1,9 @@
 namespace Hexalith.Agents.Client;
 
 /// <summary>
-/// Identifies the <c>Hexalith.Agents.Client</c> assembly. Client proxies/HTTP adapters for Agent
-/// operations are added by the stories that need them; this marker is the buildable-shell placeholder.
+/// Identifies the <c>Hexalith.Agents.Client</c> assembly. The assembly hosts the public Agents client surface
+/// (<see cref="IAgentsClient"/> and its operation groups); this marker provides a stable assembly anchor for
+/// boundary/inventory tests, matching the convention used across the other Hexalith modules.
 /// </summary>
 public sealed class AgentsClientAssemblyMarker
 {
