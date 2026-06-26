@@ -9,28 +9,28 @@
 
   <PropertyGroup>
     <!-- Sibling-source resolution (mirrors the Hexalith*Root pattern used across the ecosystem).
-         Hexalith.Agents sits at the `agents` workspace root next to its sibling modules, so the
-         `..\Hexalith.Xxx` branch resolves them. The nested-copy branch (`Hexalith.Xxx\...`) supports a
-         future standalone/submodule layout where a dependency is initialized inside this module.
+         The root `agents` workspace keeps its sibling modules as root-level submodules, so the
+         `Hexalith.Xxx\...` branch resolves the normal layout. The `..\Hexalith.Xxx` branch supports a
+         future standalone checkout where dependencies sit beside the workspace directory.
          No project references these roots yet (the buildable shell needs no cross-module source); they
          are scaffolding for the Agent-setup stories (1.2-1.8) that will. -->
-    <HexalithEventStoreRoot Condition="'$(HexalithEventStoreRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.EventStore\src\Hexalith.EventStore.Contracts')">$(MSBuildThisFileDirectory)..\Hexalith.EventStore</HexalithEventStoreRoot>
     <HexalithEventStoreRoot Condition="'$(HexalithEventStoreRoot)' == '' and Exists('$(MSBuildThisFileDirectory)Hexalith.EventStore\src\Hexalith.EventStore.Contracts')">$(MSBuildThisFileDirectory)Hexalith.EventStore</HexalithEventStoreRoot>
+    <HexalithEventStoreRoot Condition="'$(HexalithEventStoreRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.EventStore\src\Hexalith.EventStore.Contracts')">$(MSBuildThisFileDirectory)..\Hexalith.EventStore</HexalithEventStoreRoot>
 
-    <HexalithConversationsRoot Condition="'$(HexalithConversationsRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.Conversations\src\Hexalith.Conversations.Contracts')">$(MSBuildThisFileDirectory)..\Hexalith.Conversations</HexalithConversationsRoot>
     <HexalithConversationsRoot Condition="'$(HexalithConversationsRoot)' == '' and Exists('$(MSBuildThisFileDirectory)Hexalith.Conversations\src\Hexalith.Conversations.Contracts')">$(MSBuildThisFileDirectory)Hexalith.Conversations</HexalithConversationsRoot>
+    <HexalithConversationsRoot Condition="'$(HexalithConversationsRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.Conversations\src\Hexalith.Conversations.Contracts')">$(MSBuildThisFileDirectory)..\Hexalith.Conversations</HexalithConversationsRoot>
 
-    <HexalithPartiesRoot Condition="'$(HexalithPartiesRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.Parties\src\Hexalith.Parties.Contracts')">$(MSBuildThisFileDirectory)..\Hexalith.Parties</HexalithPartiesRoot>
     <HexalithPartiesRoot Condition="'$(HexalithPartiesRoot)' == '' and Exists('$(MSBuildThisFileDirectory)Hexalith.Parties\src\Hexalith.Parties.Contracts')">$(MSBuildThisFileDirectory)Hexalith.Parties</HexalithPartiesRoot>
+    <HexalithPartiesRoot Condition="'$(HexalithPartiesRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.Parties\src\Hexalith.Parties.Contracts')">$(MSBuildThisFileDirectory)..\Hexalith.Parties</HexalithPartiesRoot>
 
-    <HexalithTenantsRoot Condition="'$(HexalithTenantsRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.Tenants\src\Hexalith.Tenants.Contracts')">$(MSBuildThisFileDirectory)..\Hexalith.Tenants</HexalithTenantsRoot>
     <HexalithTenantsRoot Condition="'$(HexalithTenantsRoot)' == '' and Exists('$(MSBuildThisFileDirectory)Hexalith.Tenants\src\Hexalith.Tenants.Contracts')">$(MSBuildThisFileDirectory)Hexalith.Tenants</HexalithTenantsRoot>
+    <HexalithTenantsRoot Condition="'$(HexalithTenantsRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.Tenants\src\Hexalith.Tenants.Contracts')">$(MSBuildThisFileDirectory)..\Hexalith.Tenants</HexalithTenantsRoot>
 
-    <HexalithFrontComposerRoot Condition="'$(HexalithFrontComposerRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.FrontComposer\src\Hexalith.FrontComposer.Contracts')">$(MSBuildThisFileDirectory)..\Hexalith.FrontComposer</HexalithFrontComposerRoot>
     <HexalithFrontComposerRoot Condition="'$(HexalithFrontComposerRoot)' == '' and Exists('$(MSBuildThisFileDirectory)Hexalith.FrontComposer\src\Hexalith.FrontComposer.Contracts')">$(MSBuildThisFileDirectory)Hexalith.FrontComposer</HexalithFrontComposerRoot>
+    <HexalithFrontComposerRoot Condition="'$(HexalithFrontComposerRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.FrontComposer\src\Hexalith.FrontComposer.Contracts')">$(MSBuildThisFileDirectory)..\Hexalith.FrontComposer</HexalithFrontComposerRoot>
 
-    <HexalithCommonsRoot Condition="'$(HexalithCommonsRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.Commons\src\libraries\Hexalith.Commons.UniqueIds')">$(MSBuildThisFileDirectory)..\Hexalith.Commons</HexalithCommonsRoot>
     <HexalithCommonsRoot Condition="'$(HexalithCommonsRoot)' == '' and Exists('$(MSBuildThisFileDirectory)Hexalith.Commons\src\libraries\Hexalith.Commons.UniqueIds')">$(MSBuildThisFileDirectory)Hexalith.Commons</HexalithCommonsRoot>
+    <HexalithCommonsRoot Condition="'$(HexalithCommonsRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.Commons\src\libraries\Hexalith.Commons.UniqueIds')">$(MSBuildThisFileDirectory)..\Hexalith.Commons</HexalithCommonsRoot>
   </PropertyGroup>
 
   <!-- Detect missing root-level git submodules (the Memories RequiredRootSubmodule/CheckSubmodules pattern). -->

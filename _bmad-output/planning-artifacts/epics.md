@@ -101,7 +101,7 @@ NFR10: Cost Control - V1 launch readiness must define cost-control posture befor
 
 ### Additional Requirements
 
-- Architecture does not specify an external starter template; Epic 1 Story 1 should scaffold the `Hexalith.Agents` module from the architecture Structural Seed using `.slnx`, `global.json`, `Directory.Build.props`, `Directory.Packages.props`, and the planned `src/` and `tests/` project layout.
+- Architecture does not specify an external starter template; Epic 1 Story 1 should scaffold the `Hexalith.Agents` module from the architecture Structural Seed using `.slnx`, `global.json`, `Directory.Build.props`, `Directory.Packages.props`, and the planned workspace-root `src/` and `test/` project layout.
 - Hexalith Agents must be implemented as a full EventStore-backed Hexalith domain module owning durable Agent configuration, provider governance, Agent interactions, proposal versions, approval decisions, posting outcomes, audit evidence, and operational status.
 - Use separate aggregate boundaries: `Agent` for identity/lifecycle/instructions/provider selection/response and approver policy; `ProviderCatalog` for provider/model records/capability metadata/enablement/secret references; `AgentInteraction` for each call, generation attempt, proposal lifecycle, version history, approval/rejection/abandonment/expiry, automatic-post evidence, and posting outcome.
 - Keep aggregates pure: aggregate handlers emit events only, while provider calls, Conversations reads/posts, Parties validation/provisioning, Tenants projection reads, expiry timers, and notifications run in application orchestration/adapters and return through commands.
@@ -308,7 +308,7 @@ So that governed Agent setup can be implemented through stable Hexalith conventi
 
 **Given** the agents workspace has no completed `Hexalith.Agents` module
 **When** the story is implemented
-**Then** the solution contains a buildable `Hexalith.Agents.slnx`, `global.json`, `Directory.Build.props`, `Directory.Packages.props`, workspace-root `src/` projects, and module `tests/` projects matching the architecture Structural Seed
+**Then** the workspace root contains a buildable `Hexalith.Agents.slnx`, `global.json`, `Directory.Build.props`, `Directory.Packages.props`, workspace-root `src/` projects, and workspace-root `test/` projects matching the architecture Structural Seed
 **And** projects target `net10.0`, use Central Package Management, nullable, implicit usings, and warnings as errors.
 
 **Given** the module shell exists

@@ -5,24 +5,23 @@ using System.Linq;
 
 /// <summary>
 /// Shared file-system facts for the module-conformance guard tests. Locates the <c>Hexalith.Agents</c>
-/// module root (the directory holding <c>Hexalith.Agents.slnx</c>) from the test output directory and
-/// enumerates the module's project files, excluding build output. Centralizes the discovery logic the
+/// workspace root from the test output directory and enumerates the module's project files,
+/// excluding build output. Centralizes the discovery logic the
 /// structural / boundary / centralization guards share.
 /// </summary>
 internal static class ModuleLayout
 {
-    /// <summary>Absolute path to the module root (the directory containing <c>Hexalith.Agents.slnx</c>).</summary>
-    internal static string ModuleRoot { get; } = FindModuleRoot();
+    /// <summary>Absolute path to the workspace root that owns the solution, <c>src/</c>, and <c>test/</c>.</summary>
+    internal static string WorkspaceRoot { get; } = FindWorkspaceRoot();
 
-    /// <summary>Absolute path to the workspace root that owns the moved <c>src/</c> tree.</summary>
-    internal static string WorkspaceRoot { get; } = Directory.GetParent(ModuleRoot)?.FullName
-        ?? throw new InvalidOperationException("Could not locate the agents workspace root.");
+    /// <summary>Absolute path to the module root (the directory containing <c>Hexalith.Agents.slnx</c>).</summary>
+    internal static string ModuleRoot { get; } = WorkspaceRoot;
 
     /// <summary>Absolute path to the production source tree.</summary>
     internal static string SourceRoot { get; } = FindSourceRoot();
 
-    /// <summary>Absolute path to the module test tree.</summary>
-    internal static string TestsRoot { get; } = Path.Combine(ModuleRoot, "tests");
+    /// <summary>Absolute path to the workspace test tree.</summary>
+    internal static string TestsRoot { get; } = Path.Combine(WorkspaceRoot, "test");
 
     /// <summary>Every module <c>*.csproj</c>, excluding <c>bin/</c> and <c>obj/</c> output.</summary>
     internal static string[] ProjectFiles { get; } = new[] { SourceRoot, TestsRoot }
@@ -49,9 +48,9 @@ internal static class ModuleLayout
             return Path.Combine(SourceRoot, normalized["src/".Length..].Replace('/', Path.DirectorySeparatorChar));
         }
 
-        if (normalized.StartsWith("tests/", StringComparison.Ordinal))
+        if (normalized.StartsWith("test/", StringComparison.Ordinal))
         {
-            return Path.Combine(TestsRoot, normalized["tests/".Length..].Replace('/', Path.DirectorySeparatorChar));
+            return Path.Combine(TestsRoot, normalized["test/".Length..].Replace('/', Path.DirectorySeparatorChar));
         }
 
         return Path.Combine(ModuleRoot, normalized.Replace('/', Path.DirectorySeparatorChar));
@@ -65,13 +64,15 @@ internal static class ModuleLayout
             || normalized.Contains("/obj/", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static string FindModuleRoot()
+    private static string FindWorkspaceRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);
 
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "Hexalith.Agents.slnx")))
+            if (File.Exists(Path.Combine(directory.FullName, "Hexalith.Agents.slnx"))
+                && Directory.Exists(Path.Combine(directory.FullName, "src"))
+                && Directory.Exists(Path.Combine(directory.FullName, "test")))
             {
                 return directory.FullName;
             }
@@ -80,7 +81,7 @@ internal static class ModuleLayout
         }
 
         throw new InvalidOperationException(
-            "Could not locate the Hexalith.Agents module root (Hexalith.Agents.slnx) from the test output directory.");
+            "Could not locate the agents workspace root from the test output directory.");
     }
 
     private static string FindSourceRoot()
@@ -89,12 +90,6 @@ internal static class ModuleLayout
         if (Directory.Exists(workspaceSourceRoot))
         {
             return workspaceSourceRoot;
-        }
-
-        string moduleSourceRoot = Path.Combine(ModuleRoot, "src");
-        if (Directory.Exists(moduleSourceRoot))
-        {
-            return moduleSourceRoot;
         }
 
         throw new InvalidOperationException("Could not locate the Hexalith.Agents source root.");

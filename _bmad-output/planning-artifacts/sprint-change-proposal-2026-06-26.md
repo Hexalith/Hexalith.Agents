@@ -14,7 +14,7 @@ The implementation source tree for Hexalith Agents lived under `Hexalith.Agents/
 Evidence:
 
 - Existing live source projects were under `Hexalith.Agents/src`.
-- `Hexalith.Agents/Hexalith.Agents.slnx` referenced those projects with `src/...` paths.
+- The then-nested Agents solution referenced those projects with `src/...` paths.
 - Test project references and layout conformance tests assumed `src` was inside the `Hexalith.Agents` module directory.
 - Build discovery for moved projects would lose `Directory.Build.props`, `Directory.Packages.props`, `.editorconfig`, `global.json`, and `NuGet.config` unless root-level files were added.
 
@@ -33,7 +33,7 @@ Artifact conflicts:
 Technical impact:
 
 - Move tracked source files from `Hexalith.Agents/src` to workspace-root `src`.
-- Update `.slnx` source project paths to `../src/...`.
+- Update `.slnx` source project paths to workspace-root `src/...`.
 - Update test project references to `../../../src/...`.
 - Add root-level build discovery files for moved projects.
 - Update layout helpers/tests to resolve `SourceRoot` separately from `ModuleRoot`.
@@ -80,17 +80,12 @@ agents/
   Directory.Build.props
   Directory.Packages.props
   NuGet.config
+  Hexalith.Agents.slnx
   src/
-  Hexalith.Agents/
-    Hexalith.Agents.slnx
-    global.json
-    Directory.Build.props
-    Directory.Packages.props
-    NuGet.config
-    tests/
+  test/
 ```
 
-Rationale: The structural seed now reflects the requested workspace-root source tree while preserving the module solution and tests.
+Rationale: The structural seed now reflects the requested workspace-root source, test, solution, and build-file layout.
 
 ### Epics
 
@@ -128,9 +123,9 @@ Rationale: Satisfies the requested move directly.
 
 Supporting edits:
 
-- Added root `.editorconfig`, `global.json`, `NuGet.config`, `Directory.Build.props`, and `Directory.Packages.props`.
-- Updated `Hexalith.Agents/Hexalith.Agents.slnx`.
-- Updated all `Hexalith.Agents/tests/*/*.csproj` source project references.
+- Moved root build/solution files to the workspace root.
+- Updated `Hexalith.Agents.slnx`.
+- Updated all `test/*/*.csproj` source project references.
 - Updated `ModuleLayout` and dependent conformance tests to use `SourceRoot`.
 - Updated UI floor source-file discovery to use workspace-root `src`.
 
@@ -170,10 +165,10 @@ Success criteria:
 
 ## 7. Verification
 
-- `dotnet restore Hexalith.Agents/Hexalith.Agents.slnx` passed.
-- `dotnet build Hexalith.Agents/Hexalith.Agents.slnx -c Release -m:1 --no-restore` passed with 0 warnings and 0 errors.
-- `dotnet test Hexalith.Agents/tests/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Release --no-build` passed: 367 tests.
-- `dotnet test Hexalith.Agents/tests/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj -c Release --no-build` passed: 968 tests.
-- `dotnet test Hexalith.Agents/tests/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj -c Release --no-build` passed: 327 tests.
-- `dotnet test Hexalith.Agents/tests/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj -c Release --no-build` passed: 6 tests.
-- `dotnet test Hexalith.Agents/tests/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj -c Release --no-build` passed: 724 tests.
+- `dotnet restore Hexalith.Agents.slnx` passed.
+- `dotnet build Hexalith.Agents.slnx -c Release -m:1 --no-restore` passed with 0 warnings and 0 errors.
+- `DiffEngine_Disabled=true dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Release --no-build` passed: 367 tests.
+- `DiffEngine_Disabled=true dotnet test test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj -c Release --no-build` passed: 968 tests.
+- `DiffEngine_Disabled=true dotnet test test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj -c Release --no-build` passed: 327 tests.
+- `DiffEngine_Disabled=true dotnet test test/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj -c Release --no-build` passed: 6 tests.
+- `DiffEngine_Disabled=true dotnet test test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj -c Release --no-build` passed: 724 tests.

@@ -6,7 +6,7 @@ using Shouldly;
 
 /// <summary>
 /// Structural-seed conformance guard (AC1 / AC4). Asserts the module ships the architecture Structural Seed:
-/// the root build/solution files, the named <c>src/</c> + <c>tests/</c> project set (extension points), and
+/// the root build/solution files, the named <c>src/</c> + <c>test/</c> project set (extension points), and
 /// the empty <c>Hexalith.Agents.Server</c> extension folders. Required entries are checked as a subset so
 /// later stories may add projects/folders without breaking the guard.
 /// </summary>
@@ -63,12 +63,12 @@ public sealed class StructuralSeedConformanceTests
     }
 
     [Fact]
-    public void ModuleShouldExposeSrcAndTestsTrees()
+    public void ModuleShouldExposeSrcAndTestTrees()
     {
         Directory.Exists(ModuleLayout.SourceRoot)
             .ShouldBeTrue("Structural Seed requires a 'src/' tree (AC1).");
         Directory.Exists(ModuleLayout.TestsRoot)
-            .ShouldBeTrue("Structural Seed requires a 'tests/' tree (AC1).");
+            .ShouldBeTrue("Structural Seed requires a 'test/' tree (AC1).");
     }
 
     [Fact]

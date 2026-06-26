@@ -7,9 +7,9 @@
   <!-- Domain-library tests: ProviderCatalog aggregate, state replay, and inspection. References the domain
        library (which brings the EventStore client + contracts transitively) plus the EventStore contracts
        directly for the CommandEnvelope / DomainResult test surface. xUnit/Shouldly/etc. come from
-       tests/Directory.Build.props. -->
+       test/Directory.Build.props. -->
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Hexalith.Agents\Hexalith.Agents.csproj" />
+    <ProjectReference Include="..\..\src\Hexalith.Agents\Hexalith.Agents.csproj" />
     <ProjectReference Include="$(HexalithEventStoreRoot)\src\Hexalith.EventStore.Contracts\Hexalith.EventStore.Contracts.csproj" />
   </ItemGroup>
 

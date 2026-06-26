@@ -214,36 +214,24 @@ public sealed class UiFloorCoverageTests : AgentsTestContext
             && type.GetCustomAttributes<RouteAttribute>(inherit: false).Any())
         .ToArray();
 
-    /// <summary>Walks up from the test output directory to the module root (the directory holding <c>Hexalith.Agents.slnx</c>).</summary>
-    private static string ModuleRoot()
+    /// <summary>Walks up from the test output directory to the workspace root.</summary>
+    private static string WorkspaceRoot()
     {
         for (DirectoryInfo? directory = new(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "Hexalith.Agents.slnx")))
+            if (File.Exists(Path.Combine(directory.FullName, "Hexalith.Agents.slnx"))
+                && Directory.Exists(Path.Combine(directory.FullName, "src"))
+                && Directory.Exists(Path.Combine(directory.FullName, "test")))
             {
                 return directory.FullName;
             }
         }
 
-        throw new InvalidOperationException("Could not locate the Hexalith.Agents module root (Hexalith.Agents.slnx) from the test output directory.");
+        throw new InvalidOperationException("Could not locate the agents workspace root from the test output directory.");
     }
 
     /// <summary>Returns the Agents source root, supporting the workspace-root <c>src/</c> layout.</summary>
-    private static string SourceRoot()
-    {
-        string moduleRoot = ModuleRoot();
-        string? workspaceRoot = Directory.GetParent(moduleRoot)?.FullName;
-        if (workspaceRoot is not null)
-        {
-            string workspaceSourceRoot = Path.Combine(workspaceRoot, "src");
-            if (Directory.Exists(workspaceSourceRoot))
-            {
-                return workspaceSourceRoot;
-            }
-        }
-
-        return Path.Combine(moduleRoot, "src");
-    }
+    private static string SourceRoot() => Path.Combine(WorkspaceRoot(), "src");
 
     private static void AssertFamilyMapped(string family, IEnumerable<string> labelKeys)
     {

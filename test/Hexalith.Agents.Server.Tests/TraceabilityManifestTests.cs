@@ -74,8 +74,8 @@ public sealed class TraceabilityManifestTests
             "AC4: the manifest's blocker:true set must equal the explicit unresolved-governance launch-blocker set.");
 
         // (c3) The report's blocker section names every unresolved-governance id (not hidden in the prose).
-        string reportPath = Path.GetFullPath(Path.Combine(
-            ModuleLayout.ModuleRoot, "..", "_bmad-output", "implementation-artifacts", "4-5-governance-conformance-report.md"));
+        string reportPath = Path.Combine(
+            ModuleLayout.WorkspaceRoot, "_bmad-output", "implementation-artifacts", "4-5-governance-conformance-report.md");
         File.Exists(reportPath).ShouldBeTrue($"AC4: the governance-conformance report must exist at '{reportPath}'.");
 
         string report = File.ReadAllText(reportPath);

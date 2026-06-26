@@ -316,6 +316,7 @@ agents/
   Directory.Build.props
   Directory.Packages.props
   NuGet.config
+  Hexalith.Agents.slnx
   src/
     Hexalith.Agents.Contracts/
     Hexalith.Agents.Client/
@@ -334,18 +335,12 @@ agents/
     Hexalith.Agents.Aspire/
     Hexalith.Agents.ServiceDefaults/
     Hexalith.Agents.Testing/
-  Hexalith.Agents/
-    Hexalith.Agents.slnx
-    global.json
-    Directory.Build.props
-    Directory.Packages.props
-    NuGet.config
-    tests/
-      Hexalith.Agents.Contracts.Tests/
-      Hexalith.Agents.Server.Tests/
-      Hexalith.Agents.Client.Tests/
-      Hexalith.Agents.UI.Tests/
-      Hexalith.Agents.IntegrationTests/
+  test/
+    Hexalith.Agents.Contracts.Tests/
+    Hexalith.Agents.Server.Tests/
+    Hexalith.Agents.Client.Tests/
+    Hexalith.Agents.UI.Tests/
+    Hexalith.Agents.IntegrationTests/
 ```
 
 ```mermaid
