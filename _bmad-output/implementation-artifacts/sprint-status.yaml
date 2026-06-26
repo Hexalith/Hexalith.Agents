@@ -1,5 +1,5 @@
 # generated: 2026-06-23T21:28:59+02:00
-# last_updated: 2026-06-25
+# last_updated: 2026-06-26
 # project: agents
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,9 +41,9 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-06-23T21:28:59+02:00
-last_updated: 2026-06-25
+last_updated: 2026-06-26
 project: agents
-# retrospectives: epic-2 retro completed 2026-06-24 (epic-2-retro-2026-06-24.md)
+# retrospectives: epic-1 retro completed 2026-06-26 (epic-1-retro-2026-06-26.md); epic-2 retro completed 2026-06-24 (epic-2-retro-2026-06-24.md); epic-4 retro completed 2026-06-25 (epic-4-retro-2026-06-25.md)
 project_key: NOKEY
 tracking_system: file-system
 story_location: /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts
@@ -58,7 +58,7 @@ development_status:
   1-6-configure-response-mode-and-approver-policy: done
   1-7-configure-content-safety-policy-and-activation-gate: done
   1-8-admin-setup-ui-and-readiness-overview: done
-  epic-1-retrospective: optional
+  epic-1-retrospective: done
   epic-2: in-progress
   2-1-request-hexa-from-a-source-conversation: done
   2-2-enforce-invocation-authorization-and-dependency-readiness: done
@@ -74,7 +74,7 @@ development_status:
   3-4-regenerate-proposed-reply-versions: done
   3-5-approve-a-selected-version-and-post-it: done
   3-6-reject-abandon-and-expire-proposals: done
-  3-7-proposal-detail-version-history-and-accessibility: done
+  3-7-proposal-detail-version-histopstory-and-accessibility: done
   epic-3-retrospective: optional
   epic-4: in-progress
   4-1-stable-api-and-client-contracts-for-agent-operations: done
@@ -82,7 +82,7 @@ development_status:
   4-3-expose-operational-status-and-admin-workflows: done
   4-4-define-and-enforce-launch-readiness-gates: done
   4-5-verify-end-to-end-governance-and-contract-conformance: done
-  epic-4-retrospective: optional
+  epic-4-retrospective: done
 
 action_items:
   - epic: 2
@@ -92,11 +92,11 @@ action_items:
   - epic: 2
     action: "Track the deferred live-binding backlog explicitly: a living checklist pairing each Deferred* adapter with its target live binding (read-models, IAgentCommandDispatcher, provider adapter, content-safety engine, Conversations AddParticipant seam, AppHost topology) to de-risk Epic 4."
     owner: "Winston (Architect)"
-    status: open
+    status: done  # Epic 4 follow-through: delivered (stronger than asked) via Story 4.5 governance report sections 5/6 + machine-checked traceability-manifest.json.
   - epic: 2
     action: "Codify the step-pattern as a written convention: orchestrator to single-command to twin-policy (Evaluate/Decide, InternalsVisibleTo Server not Server.Tests) so Epic 3 proposal commands reuse it without re-derivation."
     owner: "Winston (Architect)"
-    status: open
+    status: in-progress  # Epic 4 follow-through: pattern reused (4.4 mirrors 1.7 record-and-gate) but still only in per-story Dev Notes, no standalone convention note. See Epic 4 AI #6.
   - epic: 2
     action: "Reconcile architecture spine AD-4 with the shipped AgentInteractionSnapshot (add ContentSafetyPolicyVersion as an additive snapshot field). Completed during the Epic 2 retro doc audit."
     owner: "Paige (Tech Writer)"
@@ -104,4 +104,40 @@ action_items:
   - epic: 2
     action: "Decide the capability-version reconciliation (Story 2.3): confirm whether a context-time floor re-check of catalog CapabilityVersion against the snapshot ProviderCapabilityVersion is wanted (AD-4/AD-10), or formally accept current behaviour in the spine."
     owner: "Winston (Architect)"
+    status: open  # Epic 4 follow-through: still unaddressed. Re-committed as Epic 4 AI #5.
+  - epic: 4
+    action: "Enforce Dev Agent Record accuracy mechanically (Epic 2 AI#1's checklist did not stop recurrence across 5 more stories): a pre-review script/hook or test that regenerates test counts from the latest Release run and diffs the File List against git status --short, failing the story if they drift."
+    owner: "Amelia (Developer)"
+    status: open
+  - epic: 4
+    action: "Author the production / live-binding plan (de-facto Epic 5): convert the Story 4.5 report sections 5/6 enumeration into a real epic+story plan (durable runtime owner AD-18, read-model projections, Conversations AddParticipant seam AD-6/7, provider-SDK adapter, content-safety engine, AppHost topology), each gated on its prerequisite governance decision."
+    owner: "Winston (Architect)"
+    status: open
+  - epic: 4
+    action: "Drive the six named governance decisions to closure (OQ-5 latency SLOs, OQ-6 cost thresholds, OQ-8 audit retention/legal-hold/export/deletion, OQ-9 content-safety categories, OQ-10 bounded-context values, OQ-11 SM-2/SM-3 thresholds). Each fails closed and blocks production-like enablement by design."
+    owner: "John (PM) + Winston (Architect)"
+    status: open
+  - epic: 4
+    action: "Stand up the live integration-test tier when the first deferred seam binds (create Hexalith.Agents.IntegrationTests): each 'reverify on live binding' row in report section 6 gets a live integration test the day its seam goes live (session-restore replay, durable-owner ownership, tool-schema conformance, retry idempotency, projection freshness)."
+    owner: "Murat (Test Architect)"
+    status: open
+  - epic: 4
+    action: "Close the still-open capability-version reconciliation (carries Epic 2 AI#5, Story 2.3): add the context-time floor re-check of catalog CapabilityVersion vs snapshot ProviderCapabilityVersion, or formally accept current behaviour in the spine."
+    owner: "Winston (Architect)"
+    status: open
+  - epic: 4
+    action: "Write down the load-bearing patterns (carries Epic 2 AI#3): the orchestrator->single-command->twin-policy and the 1.7/4.4 record-and-gate patterns as a referenced convention note rather than per-story Dev Notes."
+    owner: "Paige (Tech Writer) + Winston (Architect)"
+    status: open
+  - epic: 1
+    action: "Record the Epic 1 static-vs-live readiness contract: which facts come from durable Agent state, which blockers require live dependency verdicts, and which UI states must render as not evaluated until live read models are bound."
+    owner: "Paige (Tech Writer) + Winston (Architect)"
+    status: open
+  - epic: 1
+    action: "Decide the module placement path for Hexalith.Agents: keep it as a workspace folder, promote it to its own submodule/repository, or document the current folder layout as the V1 production layout."
+    owner: "Winston (Architect)"
+    status: open
+  - epic: 1
+    action: "Create an Epic 2 seam map pairing every Epic 1 deferred setup seam (IAgentCommandDispatcher, IProviderCatalogReader, IApproverPolicyResolver, UI gateways, AppHost topology, and Conversations membership) with its live owner and fail-closed fallback."
+    owner: "Winston (Architect) + Amelia (Developer)"
     status: open
