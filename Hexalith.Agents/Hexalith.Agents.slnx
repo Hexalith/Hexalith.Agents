@@ -8,15 +8,15 @@
   </Folder>
 
   <Folder Name="/src/">
-    <Project Path="src/Hexalith.Agents.AppHost/Hexalith.Agents.AppHost.csproj" />
-    <Project Path="src/Hexalith.Agents.Aspire/Hexalith.Agents.Aspire.csproj" />
-    <Project Path="src/Hexalith.Agents.Client/Hexalith.Agents.Client.csproj" />
-    <Project Path="src/Hexalith.Agents.Contracts/Hexalith.Agents.Contracts.csproj" />
-    <Project Path="src/Hexalith.Agents.Server/Hexalith.Agents.Server.csproj" />
-    <Project Path="src/Hexalith.Agents.ServiceDefaults/Hexalith.Agents.ServiceDefaults.csproj" />
-    <Project Path="src/Hexalith.Agents.Testing/Hexalith.Agents.Testing.csproj" />
-    <Project Path="src/Hexalith.Agents.UI/Hexalith.Agents.UI.csproj" />
-    <Project Path="src/Hexalith.Agents/Hexalith.Agents.csproj" />
+    <Project Path="../src/Hexalith.Agents.AppHost/Hexalith.Agents.AppHost.csproj" />
+    <Project Path="../src/Hexalith.Agents.Aspire/Hexalith.Agents.Aspire.csproj" />
+    <Project Path="../src/Hexalith.Agents.Client/Hexalith.Agents.Client.csproj" />
+    <Project Path="../src/Hexalith.Agents.Contracts/Hexalith.Agents.Contracts.csproj" />
+    <Project Path="../src/Hexalith.Agents.Server/Hexalith.Agents.Server.csproj" />
+    <Project Path="../src/Hexalith.Agents.ServiceDefaults/Hexalith.Agents.ServiceDefaults.csproj" />
+    <Project Path="../src/Hexalith.Agents.Testing/Hexalith.Agents.Testing.csproj" />
+    <Project Path="../src/Hexalith.Agents.UI/Hexalith.Agents.UI.csproj" />
+    <Project Path="../src/Hexalith.Agents/Hexalith.Agents.csproj" />
   </Folder>
 
   <Folder Name="/tests/">

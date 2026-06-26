@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\src\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

@@ -85,7 +85,7 @@ public sealed class UiFloorCoverageTests : AgentsTestContext
         // surface states (UX-DR30). Enforce both per page from source so a new page cannot silently drop FcPageLayout or
         // AgentSurfaceState. Every current page satisfies this; the guard is for the next one (the AC3 "no page silently
         // skips the floor" intent — the nav test covers reachability, this covers composition).
-        string pagesDirectory = Path.Combine(ModuleRoot(), "src", "Hexalith.Agents.UI", "Components", "Pages");
+        string pagesDirectory = Path.Combine(SourceRoot(), "Hexalith.Agents.UI", "Components", "Pages");
         Directory.Exists(pagesDirectory).ShouldBeTrue($"UX-DR15/30: expected the Agents Pages source directory at '{pagesDirectory}'.");
 
         Type[] pages = RoutablePages();
@@ -226,6 +226,23 @@ public sealed class UiFloorCoverageTests : AgentsTestContext
         }
 
         throw new InvalidOperationException("Could not locate the Hexalith.Agents module root (Hexalith.Agents.slnx) from the test output directory.");
+    }
+
+    /// <summary>Returns the Agents source root, supporting the workspace-root <c>src/</c> layout.</summary>
+    private static string SourceRoot()
+    {
+        string moduleRoot = ModuleRoot();
+        string? workspaceRoot = Directory.GetParent(moduleRoot)?.FullName;
+        if (workspaceRoot is not null)
+        {
+            string workspaceSourceRoot = Path.Combine(workspaceRoot, "src");
+            if (Directory.Exists(workspaceSourceRoot))
+            {
+                return workspaceSourceRoot;
+            }
+        }
+
+        return Path.Combine(moduleRoot, "src");
     }
 
     private static void AssertFamilyMapped(string family, IEnumerable<string> labelKeys)

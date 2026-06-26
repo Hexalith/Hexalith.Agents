@@ -56,8 +56,7 @@ public sealed class ProjectReferenceDirectionTests
     // In-module (Hexalith.Agents*) ProjectReference targets declared by the given source project.
     private static IReadOnlyList<string> InModuleReferences(string project)
     {
-        string projectFile = Path.Combine(
-            ModuleLayout.ModuleRoot, "src", project, $"{project}.csproj");
+        string projectFile = ModuleLayout.SourceProjectFile(project);
 
         File.Exists(projectFile).ShouldBeTrue($"Expected source project '{project}' to exist for the direction guard.");
 

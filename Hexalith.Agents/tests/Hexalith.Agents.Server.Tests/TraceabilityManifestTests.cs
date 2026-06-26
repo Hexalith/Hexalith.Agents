@@ -50,7 +50,7 @@ public sealed class TraceabilityManifestTests
     {
         foreach (ManifestEntry entry in AllEntries())
         {
-            string resolved = Path.Combine(ModuleLayout.ModuleRoot, entry.VerificationPath.Replace('/', Path.DirectorySeparatorChar));
+            string resolved = ModuleLayout.ResolveModulePath(entry.VerificationPath);
             File.Exists(resolved).ShouldBeTrue(
                 $"Traceability is dishonest: '{entry.Id}' names verification path '{entry.VerificationPath}', which does not exist on disk.");
         }
@@ -102,7 +102,7 @@ public sealed class TraceabilityManifestTests
     private static Manifest LoadManifest()
     {
         string manifestPath = Path.Combine(
-            ModuleLayout.ModuleRoot, "tests", "Hexalith.Agents.Server.Tests", "Conformance", "traceability-manifest.json");
+            ModuleLayout.TestsRoot, "Hexalith.Agents.Server.Tests", "Conformance", "traceability-manifest.json");
         File.Exists(manifestPath).ShouldBeTrue($"Expected the traceability manifest at '{manifestPath}'.");
 
         Manifest? manifest = JsonSerializer.Deserialize<Manifest>(

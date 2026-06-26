@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Hexalith.Agents.UI\Hexalith.Agents.UI.csproj" />
+    <ProjectReference Include="..\..\..\src\Hexalith.Agents.UI\Hexalith.Agents.UI.csproj" />
     <ProjectReference Include="$(HexalithFrontComposerRoot)\src\Hexalith.FrontComposer.Contracts\Hexalith.FrontComposer.Contracts.csproj" />
     <ProjectReference Include="$(HexalithFrontComposerRoot)\src\Hexalith.FrontComposer.Shell\Hexalith.FrontComposer.Shell.csproj" />
     <ProjectReference Include="$(HexalithFrontComposerRoot)\src\Hexalith.FrontComposer.Testing\Hexalith.FrontComposer.Testing.csproj" />

@@ -308,7 +308,7 @@ So that governed Agent setup can be implemented through stable Hexalith conventi
 
 **Given** the agents workspace has no completed `Hexalith.Agents` module
 **When** the story is implemented
-**Then** the solution contains a buildable `Hexalith.Agents.slnx`, `global.json`, `Directory.Build.props`, `Directory.Packages.props`, and initial `src/` and `tests/` projects matching the architecture Structural Seed
+**Then** the solution contains a buildable `Hexalith.Agents.slnx`, `global.json`, `Directory.Build.props`, `Directory.Packages.props`, workspace-root `src/` projects, and module `tests/` projects matching the architecture Structural Seed
 **And** projects target `net10.0`, use Central Package Management, nullable, implicit usings, and warnings as errors.
 
 **Given** the module shell exists

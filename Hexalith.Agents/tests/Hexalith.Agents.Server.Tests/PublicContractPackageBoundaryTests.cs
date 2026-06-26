@@ -43,8 +43,7 @@ public sealed class PublicContractPackageBoundaryTests
     {
         foreach (string project in _publicContractProjects)
         {
-            string projectFile = Path.Combine(
-                ModuleLayout.ModuleRoot, "src", project, $"{project}.csproj");
+            string projectFile = ModuleLayout.SourceProjectFile(project);
 
             File.Exists(projectFile).ShouldBeTrue($"Expected public contract project '{project}' to exist.");
 

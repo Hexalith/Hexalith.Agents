@@ -188,8 +188,8 @@ Rationale: A test prevents this from regressing back to a build-only empty host 
 
 Code targets:
 
-- `Hexalith.Agents/src/Hexalith.Agents.AppHost/Hexalith.Agents.AppHost.csproj`
-- `Hexalith.Agents/src/Hexalith.Agents.AppHost/Program.cs`
+- `src/Hexalith.Agents.AppHost/Hexalith.Agents.AppHost.csproj`
+- `src/Hexalith.Agents.AppHost/Program.cs`
 - `Hexalith.Agents/tests/Hexalith.Agents.Server.Tests` or a dedicated topology test project
 
 Likely implementation tasks:

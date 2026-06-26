@@ -65,9 +65,9 @@ public sealed class StructuralSeedConformanceTests
     [Fact]
     public void ModuleShouldExposeSrcAndTestsTrees()
     {
-        Directory.Exists(Path.Combine(ModuleLayout.ModuleRoot, "src"))
+        Directory.Exists(ModuleLayout.SourceRoot)
             .ShouldBeTrue("Structural Seed requires a 'src/' tree (AC1).");
-        Directory.Exists(Path.Combine(ModuleLayout.ModuleRoot, "tests"))
+        Directory.Exists(ModuleLayout.TestsRoot)
             .ShouldBeTrue("Structural Seed requires a 'tests/' tree (AC1).");
     }
 
@@ -76,7 +76,7 @@ public sealed class StructuralSeedConformanceTests
     {
         foreach (string project in _requiredSourceProjects)
         {
-            string projectFile = Path.Combine(ModuleLayout.ModuleRoot, "src", project, $"{project}.csproj");
+            string projectFile = ModuleLayout.SourceProjectFile(project);
 
             File.Exists(projectFile)
                 .ShouldBeTrue($"Structural Seed requires the named extension-point project '{project}' (AC4).");
@@ -88,7 +88,7 @@ public sealed class StructuralSeedConformanceTests
     {
         foreach (string project in _requiredTestProjects)
         {
-            string projectFile = Path.Combine(ModuleLayout.ModuleRoot, "tests", project, $"{project}.csproj");
+            string projectFile = Path.Combine(ModuleLayout.TestsRoot, project, $"{project}.csproj");
 
             File.Exists(projectFile)
                 .ShouldBeTrue($"Structural Seed requires the boundary-guard test project '{project}' (AC3).");
@@ -98,7 +98,7 @@ public sealed class StructuralSeedConformanceTests
     [Fact]
     public void ServerShouldExposeNamedExtensionFolders()
     {
-        string serverRoot = Path.Combine(ModuleLayout.ModuleRoot, "src", "Hexalith.Agents.Server");
+        string serverRoot = Path.Combine(ModuleLayout.SourceRoot, "Hexalith.Agents.Server");
 
         foreach (string folder in _requiredServerExtensionFolders)
         {

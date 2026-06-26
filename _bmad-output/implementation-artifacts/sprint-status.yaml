@@ -43,13 +43,13 @@
 generated: 2026-06-23T21:28:59+02:00
 last_updated: 2026-06-26
 project: agents
-# retrospectives: epic-1 retro completed 2026-06-26 (epic-1-retro-2026-06-26.md); epic-2 retro completed 2026-06-24 (epic-2-retro-2026-06-24.md); epic-4 retro completed 2026-06-25 (epic-4-retro-2026-06-25.md)
+# retrospectives: epic-1 retro completed 2026-06-26 (epic-1-retro-2026-06-26.md); epic-2 retro completed 2026-06-24 (epic-2-retro-2026-06-24.md); epic-3 retro completed 2026-06-26 (epic-3-retro-2026-06-26.md); epic-4 retro completed 2026-06-25 (epic-4-retro-2026-06-25.md)
 project_key: NOKEY
 tracking_system: file-system
 story_location: /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts
 
 development_status:
-  epic-1: in-progress
+  epic-1: done
   1-1-buildable-agents-module-shell-and-public-boundaries: done
   1-2-govern-provider-catalog-entries: done
   1-3-configure-and-manage-hexa-lifecycle: done
@@ -59,7 +59,7 @@ development_status:
   1-7-configure-content-safety-policy-and-activation-gate: done
   1-8-admin-setup-ui-and-readiness-overview: done
   epic-1-retrospective: done
-  epic-2: in-progress
+  epic-2: done
   2-1-request-hexa-from-a-source-conversation: done
   2-2-enforce-invocation-authorization-and-dependency-readiness: done
   2-3-build-conversation-context-with-safe-bounds: done
@@ -67,7 +67,7 @@ development_status:
   2-5-post-automatic-responses-through-conversations: done
   2-6-conversation-invocation-ux-and-call-status-feedback: done
   epic-2-retrospective: done
-  epic-3: in-progress
+  epic-3: done
   3-1-create-proposed-agent-replies-in-confirmation-mode: done
   3-2-discover-pending-proposals-in-product: done
   3-3-edit-proposed-reply-versions: done
@@ -75,8 +75,8 @@ development_status:
   3-5-approve-a-selected-version-and-post-it: done
   3-6-reject-abandon-and-expire-proposals: done
   3-7-proposal-detail-version-histopstory-and-accessibility: done
-  epic-3-retrospective: optional
-  epic-4: in-progress
+  epic-3-retrospective: done
+  epic-4: done
   4-1-stable-api-and-client-contracts-for-agent-operations: done
   4-2-query-audit-evidence-safely: done
   4-3-expose-operational-status-and-admin-workflows: done
@@ -140,4 +140,24 @@ action_items:
   - epic: 1
     action: "Create an Epic 2 seam map pairing every Epic 1 deferred setup seam (IAgentCommandDispatcher, IProviderCatalogReader, IApproverPolicyResolver, UI gateways, AppHost topology, and Conversations membership) with its live owner and fail-closed fallback."
     owner: "Winston (Architect) + Amelia (Developer)"
+    status: open
+  - epic: 3
+    action: "Replace the Dev Agent Record checklist with a mechanical pre-review gate that fails when recorded test counts or File List entries drift from actual test output and git status --short."
+    owner: "Amelia (Developer)"
+    status: open
+  - epic: 3
+    action: "Publish a standalone proposal lifecycle convention covering orchestrator-to-command-to-twin-policy, proposal sub-state eligibility, terminal-state behavior, and hosted action-control boundaries."
+    owner: "Winston (Architect) + Paige (Tech Writer)"
+    status: open
+  - epic: 3
+    action: "Close the edit-failed retryability trap: update edit eligibility to follow proposal sub-state after recorded failures, or document the accepted behavior with tests."
+    owner: "Amelia (Developer) + Winston (Architect)"
+    status: open
+  - epic: 3
+    action: "Decide and record proposal expiry and active-notification policy (OQ-3 and OQ-4), including what in-product visibility only means for launch readiness."
+    owner: "John (PM) + Winston (Architect)"
+    status: open
+  - epic: 3
+    action: "When the live proposal read/projection seam binds, add integration tests for proposal queue/detail authorization, freshness, tenant non-disclosure, and content-safe rendering."
+    owner: "Murat (Test Architect)"
     status: open

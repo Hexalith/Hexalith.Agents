@@ -150,7 +150,7 @@ public sealed class RuntimeOwnershipConformanceTests
     {
         foreach (string project in _sdkFreeProjects)
         {
-            string projectFile = Path.Combine(ModuleLayout.ModuleRoot, "src", project, $"{project}.csproj");
+            string projectFile = ModuleLayout.SourceProjectFile(project);
             File.Exists(projectFile).ShouldBeTrue($"Expected SDK-free project '{project}' to exist for the AD-18 boundary guard.");
 
             foreach (string package in PackageReferenceNames(projectFile))
@@ -195,7 +195,7 @@ public sealed class RuntimeOwnershipConformanceTests
     public void Exactly_one_durable_owner_no_live_workflow_or_background_worker()
     {
         // (a) The Workflows + Projections extension points hold no compiled durable owner / live read-model binding.
-        string serverRoot = Path.Combine(ModuleLayout.ModuleRoot, "src", "Hexalith.Agents.Server");
+        string serverRoot = Path.Combine(ModuleLayout.SourceRoot, "Hexalith.Agents.Server");
         Directory.GetFiles(Path.Combine(serverRoot, "Application", "Workflows"), "*.cs", SearchOption.AllDirectories)
             .ShouldBeEmpty("AD-18: Server/Application/Workflows must hold no compiled durable-owner type (the live workflow owner is deferred).");
         Directory.GetFiles(Path.Combine(serverRoot, "Projections"), "*.cs", SearchOption.AllDirectories)
@@ -284,7 +284,7 @@ public sealed class RuntimeOwnershipConformanceTests
     [Trait(RequirementTraits.Gate, RequirementTraits.Gates.RuntimeOwnership)]
     public void Live_runtime_owner_session_restore_and_MCP_A2A_tool_schemas_are_deferred_and_fail_closed()
     {
-        string serverRoot = Path.Combine(ModuleLayout.ModuleRoot, "src", "Hexalith.Agents.Server");
+        string serverRoot = Path.Combine(ModuleLayout.SourceRoot, "Hexalith.Agents.Server");
 
         // The seam: no live owner is bound (deferred), so there is no session-restore / MCP / A2A / tool-schema surface yet.
         Directory.GetFiles(Path.Combine(serverRoot, "Application", "Workflows"), "*.cs", SearchOption.AllDirectories)

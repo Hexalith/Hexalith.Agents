@@ -311,11 +311,11 @@ sequenceDiagram
 ## Structural Seed
 
 ```text
-Hexalith.Agents/
-  Hexalith.Agents.slnx
+agents/
   global.json
   Directory.Build.props
   Directory.Packages.props
+  NuGet.config
   src/
     Hexalith.Agents.Contracts/
     Hexalith.Agents.Client/
@@ -334,12 +334,18 @@ Hexalith.Agents/
     Hexalith.Agents.Aspire/
     Hexalith.Agents.ServiceDefaults/
     Hexalith.Agents.Testing/
-  tests/
-    Hexalith.Agents.Contracts.Tests/
-    Hexalith.Agents.Server.Tests/
-    Hexalith.Agents.Client.Tests/
-    Hexalith.Agents.UI.Tests/
-    Hexalith.Agents.IntegrationTests/
+  Hexalith.Agents/
+    Hexalith.Agents.slnx
+    global.json
+    Directory.Build.props
+    Directory.Packages.props
+    NuGet.config
+    tests/
+      Hexalith.Agents.Contracts.Tests/
+      Hexalith.Agents.Server.Tests/
+      Hexalith.Agents.Client.Tests/
+      Hexalith.Agents.UI.Tests/
+      Hexalith.Agents.IntegrationTests/
 ```
 
 ```mermaid

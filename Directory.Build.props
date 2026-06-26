@@ -1,0 +1,3 @@
+<Project>
+  <Import Project="Hexalith.Agents/Directory.Build.props" />
+</Project>
