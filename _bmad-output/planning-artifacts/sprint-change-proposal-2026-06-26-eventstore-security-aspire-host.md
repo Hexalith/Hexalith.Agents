@@ -2,100 +2,114 @@
 title: Sprint Change Proposal - EventStore Security Initialization In Agents Aspire Host
 status: draft
 created: 2026-06-26
+updated: 2026-06-26
+mode: Batch
 change_scope: minor
 recommended_path: direct-adjustment
 owner: Administrator
+approval_required: true
 ---
 
 # Sprint Change Proposal: EventStore Security Initialization In Agents Aspire Host
 
 ## 1. Issue Summary
 
-The Agents AppHost remains a minimal buildable shell and does not initialize the shared EventStore security service. Runtime/live-binding work for Hexalith.Agents now depends on a real Aspire topology, so the AppHost story must explicitly require use of `HexalithEventStoreSecurityExtensions.AddHexalithEventStoreSecurity()` and the related `WithJwtBearerSecurity`, `WithEventStoreClientCredentials`, or `WithOpenIdConnectSecurity` helpers where applicable.
+The Agents Aspire host is still the Story 1.1 buildable shell. It creates an empty distributed application and does not initialize the shared EventStore security service. The live-binding/AppHost topology follow-through now needs the Agents host to reuse `HexalithEventStoreSecurityExtensions.AddHexalithEventStoreSecurity()` instead of duplicating Keycloak, JWT bearer, OIDC, or service credential wiring.
 
-### Trigger
+Trigger: `HexalithEventStoreSecurityExtensions` must initialize the security service in the Agents Aspire host.
 
-- Triggering issue: `HexalithEventStoreSecurityExtensions` must initialize the security service in the Agents Aspire host.
-- Triggering area: deferred AppHost/local topology work tracked from Epic 4 live-binding follow-through.
-- Evidence:
-  - `Hexalith.EventStore.Aspire` already exposes `AddHexalithEventStoreSecurity()` and security resource wiring helpers.
-  - `Hexalith.EventStore.AppHost` already calls `builder.AddHexalithEventStoreSecurity()` and wires security into EventStore, Tenants, Admin Server, Admin UI, and sample UI resources.
-  - `Hexalith.Agents.AppHost` currently builds an empty distributed application and explicitly defers the real topology.
-  - `epics.md` already says Hexalith.Agents owns its AppHost/local orchestration, but no story currently names the EventStore security service requirement.
-  - `sprint-status.yaml` tracks AppHost topology as part of the live-binding plan, but without this explicit security-service acceptance criterion.
+Evidence:
+
+- `src/Hexalith.Agents.AppHost/Program.cs` currently only creates the builder and runs an empty distributed application.
+- `src/Hexalith.Agents.AppHost/Hexalith.Agents.AppHost.csproj` references only Agents Server and UI, both with `IsAspireProjectResource="false"`.
+- `Hexalith.EventStore.Aspire` already exposes `AddHexalithEventStoreSecurity()`, `WithJwtBearerSecurity()`, `WithEventStoreClientCredentials()`, and `WithOpenIdConnectSecurity()`.
+- `Hexalith.EventStore.AppHost` already uses `builder.AddHexalithEventStoreSecurity()` and applies the returned security resources to EventStore, Tenants, Admin Server, Admin UI, and sample UI resources.
+- Architecture AD-16 requires Hexalith.Agents to own its own AppHost/local orchestration.
+- `sprint-status.yaml` has open live-binding/AppHost topology follow-through instead of a canonical implementation story.
+
+This is a topology and implementation-readiness correction. It does not change PRD scope, UX behavior, domain contracts, or MVP requirements.
 
 ## 2. Impact Analysis
 
 ### Epic Impact
 
-Epic 4 is the primary impact because the current sprint status tracks production/live-binding work as the follow-through from Story 4.5. The change does not alter the product MVP. It tightens the AppHost topology acceptance criteria so local/dev/test orchestration starts with the same security resource model used by EventStore.
+No existing product epic is invalidated. Epics 1-4 are marked done in sprint status. The change belongs to the open live-binding/AppHost topology follow-through, effectively the planned production/live-binding slice after Epic 4.
 
-Epic 2 is indirectly affected because safe invocation, context loading, posting, and fail-closed dependency gates depend on authenticated EventStore, Conversations, Parties, and Tenants paths.
+Primary impacted item:
 
-Epic 1 remains conceptually aligned: setup readiness still depends on identity, provider, response policy, approver policy, and content safety. This change adds infrastructure preconditions for executing those workflows locally, not a new product feature.
+- Epic 4 action item: author the production/live-binding plan, including AppHost topology.
+
+Secondary impacted items:
+
+- Epic 1 action item: record static-vs-live readiness and AppHost topology seams.
+- Epic 2/Epic 4 live-binding backlog: bind deferred seams behind a runnable local topology.
+
+No epic resequencing is required if this is handled before the first live topology story depends on EventStore-authenticated resources.
 
 ### Story Impact
 
-The change should amend the deferred AppHost/local topology story or the planned live-binding Epic 5 story, not create a broad new epic.
+There is no current canonical story that explicitly names the EventStore security extension. The next AppHost/live-binding topology story should add acceptance criteria for:
 
-Most directly affected story candidate:
+- Initializing security through `builder.AddHexalithEventStoreSecurity()`.
+- Referencing `Hexalith.EventStore.Aspire` from the AppHost only.
+- Applying `WithJwtBearerSecurity`, `WithEventStoreClientCredentials`, or `WithOpenIdConnectSecurity` when EventStore-authenticated resources are introduced.
+- Preserving `EnableKeycloak=false` local fallback behavior.
+- Guarding against regression with a static topology test and AppHost build.
 
-- Story 1.1a from the prior sprint change proposal: "Establish AppHost, Local Topology, And CI Build Gate."
+### PRD Impact
 
-If Story 1.1a has not been merged into the canonical epics, apply the same acceptance criteria to the live-binding/AppHost topology story currently planned from Epic 4 action item #2.
+No PRD edit is required. The PRD already requires tenant isolation, authorization before side effects, fail-closed dependency handling, provider secret safety, and safe status/audit behavior. This change supplies local orchestration support for those requirements.
 
-### Artifact Conflicts
+### Architecture Impact
 
-PRD impact: none. The PRD already requires strict tenant isolation, authorization, fail-closed dependency handling, and safe API/client contracts.
+Small clarification recommended for AD-16. AD-16 already says Agents owns AppHost/local orchestration; it should also state that EventStore-authenticated local topology uses the shared EventStore Aspire security helper rather than copy-pasted security wiring.
 
-Architecture impact: small clarification to AD-16 or the AppHost/local topology implementation notes. AD-16 already requires Agents AppHost/local orchestration; it should explicitly say the Agents AppHost uses the shared EventStore security extension rather than reimplementing Keycloak/OIDC wiring.
+### UX Impact
 
-UX impact: none for screen layout. UX readiness/status states remain valid. If the topology is absent or security is disabled, readiness/status surfaces should continue to show blocked/unavailable states rather than success.
-
-Sprint status impact: after approval, add an action item or update the existing AppHost topology action so EventStore security initialization is tracked as a required acceptance gate.
+No UX design or screen-flow edit is required. Existing readiness/status surfaces remain valid. Until the live topology is complete, unavailable/blocked states should remain visible and fail closed.
 
 ### Technical Impact
 
 Implementation should:
 
-- Add a reference from `Hexalith.Agents.AppHost` to `Hexalith.EventStore.Aspire` using the existing `$(HexalithEventStoreRoot)` MSBuild property.
-- Initialize security with `builder.AddHexalithEventStoreSecurity()` in `Hexalith.Agents.AppHost/Program.cs`.
-- Wire security into the EventStore resource and any Agents, UI, or dependent domain resources once those resources exist.
-- Preserve `EnableKeycloak=false` fallback behavior.
-- Avoid duplicating Keycloak, JWT bearer, OIDC, service credential, or realm URL configuration.
-- Add focused topology/build tests that detect missing security initialization without requiring production secrets.
-- Document that AppHost changes require restarting `aspire run`.
+- Add an AppHost-only project reference to `$(HexalithEventStoreRoot)\src\Hexalith.EventStore.Aspire\Hexalith.EventStore.Aspire.csproj` with `IsAspireProjectResource="false"`.
+- Add `using Hexalith.EventStore.Aspire;` in `src/Hexalith.Agents.AppHost/Program.cs`.
+- Initialize the security resource with `builder.AddHexalithEventStoreSecurity()`.
+- Use the returned resources when concrete EventStore, Agents service, UI, Tenants, Conversations, or Parties resources are added to the topology.
+- Avoid any duplicated Keycloak/OIDC/JWT/service-credential environment logic in Agents.
+- Add a static topology guard to the existing test lane.
+- Build the AppHost after the change.
 
 ## 3. Checklist Findings
 
 | Item | Status | Finding |
 | --- | --- | --- |
 | 1.1 | Done | Trigger is the Agents Aspire host missing explicit initialization of the shared EventStore security service. |
-| 1.2 | Done | Issue type: technical limitation discovered during implementation/live-binding planning. |
-| 1.3 | Done | Evidence exists in EventStore security extension, EventStore AppHost usage, Agents empty AppHost shell, epics AD-16 requirement, and sprint-status live-binding action. |
-| 2.1 | Done | Current epic plan can continue if AppHost topology acceptance criteria are amended. |
-| 2.2 | Done | No new epic required; modify the AppHost/local topology story or live-binding plan. |
-| 2.3 | Done | Future runtime stories depend on this for authenticated local topology. |
-| 2.4 | Done | No planned epic becomes obsolete. |
-| 2.5 | Done | No resequencing required if the AppHost topology story is completed before live runtime binding. |
-| 3.1 | Done | PRD remains aligned; no PRD edits required. |
-| 3.2 | Done | Architecture should clarify AD-16 implementation note around shared EventStore security. |
-| 3.3 | N/A | No direct UI/UX artifact edit is required. |
-| 3.4 | Done | Secondary artifacts: AppHost code, AppHost csproj, topology/build tests, sprint-status action item. |
-| 4.1 | Viable | Direct adjustment is low effort and low risk. |
+| 1.2 | Done | Issue type: technical limitation discovered during live-binding/AppHost topology planning. |
+| 1.3 | Done | Evidence exists in Agents AppHost, EventStore Aspire extension, EventStore AppHost usage, AD-16, and sprint-status live-binding actions. |
+| 2.1 | Done | Current epic plan remains valid; the live-binding/AppHost follow-through needs explicit security acceptance criteria. |
+| 2.2 | Done | No new product epic required; add or amend the AppHost topology implementation slice. |
+| 2.3 | Done | Future runtime/live topology work depends on this before authenticated local orchestration is meaningful. |
+| 2.4 | Done | No planned epic is obsolete. |
+| 2.5 | Done | No resequencing required if the AppHost security slice lands before live resource wiring. |
+| 3.1 | Done | PRD remains aligned; no PRD edit required. |
+| 3.2 | Done | Architecture should clarify AD-16 with the shared EventStore security initialization invariant. |
+| 3.3 | N/A | No direct UI/UX artifact edit required. |
+| 3.4 | Done | Secondary artifacts: AppHost code, AppHost csproj, static topology guard, sprint-status action item after approval. |
+| 4.1 | Viable | Direct adjustment is low effort and low to medium risk. |
 | 4.2 | Not viable | Rollback is unnecessary; no completed behavior must be reverted. |
-| 4.3 | Not viable | MVP scope is unaffected. |
+| 4.3 | Not viable | MVP review is unnecessary; product scope is unaffected. |
 | 4.4 | Done | Recommended path: Direct Adjustment. |
-| 5.1 | Done | Issue summary included in this proposal. |
-| 5.2 | Done | Epic, story, architecture, and technical impacts documented. |
-| 5.3 | Done | Direct adjustment selected because it preserves scope and reuses existing EventStore APIs. |
+| 5.1 | Done | Issue summary included. |
+| 5.2 | Done | Epic, story, architecture, UX, and technical impacts documented. |
+| 5.3 | Done | Direct adjustment selected because the shared EventStore API already exists. |
 | 5.4 | Done | MVP unaffected; implementation plan defined below. |
-| 5.5 | Done | Handoff: Developer for code/tests, Architect for acceptance wording if canonical epics are updated. |
-| 6.1 | Done | Applicable checklist sections completed. |
-| 6.2 | Done | Proposal is specific and actionable. |
-| 6.3 | Action-needed | Explicit user approval is still required before implementation or sprint-status changes. |
-| 6.4 | Action-needed | Update `sprint-status.yaml` only after approval. |
-| 6.5 | Action-needed | Confirm implementation handoff after approval. |
+| 5.5 | Done | Handoff: Developer for code/tests; Architect/PO only for backlog wording. |
+| 6.1 | Done | Applicable checklist sections addressed. |
+| 6.2 | Done | Proposal reviewed against current docs and source. |
+| 6.3 | Action-needed | Explicit user approval is required before implementation. |
+| 6.4 | Action-needed | Update sprint status only after approval. |
+| 6.5 | Action-needed | Final handoff confirmation depends on approval. |
 
 ## 4. Recommended Approach
 
@@ -103,17 +117,17 @@ Use Direct Adjustment.
 
 Rationale:
 
-- The missing behavior is topology wiring, not a change in product scope.
-- EventStore already owns and exposes the correct Aspire security extension.
-- Reusing `HexalithEventStoreSecurityExtensions` avoids duplicate Keycloak/OIDC environment logic.
-- The risk is mainly local/runtime readiness; acceptance tests can catch it.
-- No rollback or MVP review is justified.
+- The missing behavior is AppHost/security composition, not product scope.
+- EventStore already owns the correct reusable Aspire security extension.
+- Reusing the extension avoids duplicated Keycloak, JWT bearer, OIDC, and client credential wiring.
+- The current Agents AppHost is intentionally empty, so the blast radius is narrow.
+- Static topology tests plus an AppHost build can catch regression without requiring a full live Dapr topology yet.
 
 Effort estimate: low.
 
-Risk level: low to medium. The risk is cross-module AppHost composition and dependency-reference hygiene, not domain behavior.
+Risk level: low to medium. The risk is mostly AppHost composition and cross-module source reference hygiene.
 
-Timeline impact: one focused implementation slice plus build/topology verification.
+Timeline impact: one focused implementation slice plus verification. No sprint replan is required.
 
 ## 5. Detailed Change Proposals
 
@@ -121,7 +135,7 @@ Timeline impact: one focused implementation slice plus build/topology verificati
 
 Artifact: `_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md`
 
-Section: AD-16 - Module-Local Operational Topology
+Section: `AD-16 - Module-Local Operational Topology`
 
 OLD:
 
@@ -135,115 +149,155 @@ NEW:
 Hexalith.Agents owns its own AppHost/local orchestration and deployable workloads. The root `agents` workspace remains a coordination/super-repo. Agents AppHost composes Agents service/UI with existing EventStore, Conversations, Parties, Tenants, and provider adapter dependencies for local/dev/test. When the local topology includes EventStore-authenticated resources, the AppHost initializes security through `HexalithEventStoreSecurityExtensions.AddHexalithEventStoreSecurity()` and applies the returned resources through the shared EventStore Aspire helpers instead of duplicating Keycloak, JWT bearer, OIDC, or service-credential wiring.
 ```
 
-Rationale: AD-16 already owns topology; this clarifies the shared security initialization invariant.
+Rationale: AD-16 already owns topology. The new sentence fixes the security wiring invariant for local/dev/test composition.
 
-### Story Change
+### Backlog / Story Change
 
-Artifact: `_bmad-output/planning-artifacts/epics.md` or the live-binding/AppHost topology story derived from sprint-status.
-
-Section: Story 1.1a or equivalent AppHost topology story.
+Artifact: `_bmad-output/implementation-artifacts/sprint-status.yaml` or the next live-binding/AppHost topology story.
 
 OLD:
 
-```markdown
-**Given** the Agents module shell exists
-**When** local orchestration is inspected
-**Then** `Hexalith.Agents.AppHost` composes the Agents service/UI with EventStore, Conversations, Parties, Tenants, and provider-adapter placeholders needed for local/dev/test
-**And** the root `agents` workspace remains only a coordination/super-repo.
+```yaml
+action: "Author the production / live-binding plan (de-facto Epic 5): convert the Story 4.5 report sections 5/6 enumeration into a real epic+story plan (durable runtime owner AD-18, read-model projections, Conversations AddParticipant seam AD-6/7, provider-SDK adapter, content-safety engine, AppHost topology), each gated on its prerequisite governance decision."
 ```
 
 NEW:
 
+```yaml
+action: "Author the production / live-binding plan (de-facto Epic 5): convert the Story 4.5 report sections 5/6 enumeration into a real epic+story plan (durable runtime owner AD-18, read-model projections, Conversations AddParticipant seam AD-6/7, provider-SDK adapter, content-safety engine, AppHost topology), each gated on its prerequisite governance decision. The AppHost topology story must initialize shared EventStore security with builder.AddHexalithEventStoreSecurity() and apply EventStore Aspire security helpers to authenticated resources."
+```
+
+Rationale: The current action names AppHost topology but does not make the shared security service a tracked acceptance gate.
+
+Proposed acceptance criteria for the implementation story:
+
 ```markdown
-**Given** the Agents module shell exists
-**When** local orchestration is inspected
-**Then** `Hexalith.Agents.AppHost` composes the Agents service/UI with EventStore, Conversations, Parties, Tenants, and provider-adapter placeholders needed for local/dev/test
-**And** the AppHost initializes the shared security resource through `HexalithEventStoreSecurityExtensions.AddHexalithEventStoreSecurity()`
-**And** EventStore-authenticated project resources use the returned security resources through `WithJwtBearerSecurity`, `WithEventStoreClientCredentials`, or `WithOpenIdConnectSecurity` as appropriate
+**Given** the Agents AppHost composes local/dev/test resources
+**When** the AppHost starts
+**Then** it initializes shared EventStore security through `builder.AddHexalithEventStoreSecurity()`
+**And** it references `Hexalith.EventStore.Aspire` only from AppHost/topology code
+**And** EventStore-authenticated resources use `WithJwtBearerSecurity`, `WithEventStoreClientCredentials`, or `WithOpenIdConnectSecurity` as appropriate
 **And** `EnableKeycloak=false` remains a supported local fallback path
-**And** the root `agents` workspace remains only a coordination/super-repo.
+**And** tests fail if the AppHost no longer initializes the shared security service.
 ```
 
-Rationale: The story currently requires local topology but does not name the security service needed for authenticated EventStore and dependent resources.
+### AppHost Project Change
 
-### Test/Verification Change
+Artifact: `src/Hexalith.Agents.AppHost/Hexalith.Agents.AppHost.csproj`
 
-Artifact: `Hexalith.Agents/tests/Hexalith.Agents.Server.Tests` or a future AppHost/topology test project.
-
-NEW:
-
-```markdown
-Add a topology/build guard that verifies `Hexalith.Agents.AppHost`:
-
-- References `Hexalith.EventStore.Aspire` only from AppHost or Aspire composition code, not from contracts/domain/UI.
-- Calls `AddHexalithEventStoreSecurity()` when composing the local topology.
-- Wires security helper methods to EventStore-authenticated resources when those resources are present.
-- Preserves `EnableKeycloak=false` as a local fallback.
-- Does not require production secrets for build or static topology tests.
-```
-
-Rationale: A test prevents this from regressing back to a build-only empty host while live-binding work proceeds.
-
-### Implementation Handoff
-
-Code targets:
-
-- `src/Hexalith.Agents.AppHost/Hexalith.Agents.AppHost.csproj`
-- `src/Hexalith.Agents.AppHost/Program.cs`
-- `Hexalith.Agents/tests/Hexalith.Agents.Server.Tests` or a dedicated topology test project
-
-Likely implementation tasks:
-
-1. Add a guarded project reference:
+OLD:
 
 ```xml
-<ProjectReference Include="$(HexalithEventStoreRoot)\src\Hexalith.EventStore.Aspire\Hexalith.EventStore.Aspire.csproj" />
+<ItemGroup>
+  <ProjectReference Include="..\Hexalith.Agents.Server\Hexalith.Agents.Server.csproj" IsAspireProjectResource="false" />
+  <ProjectReference Include="..\Hexalith.Agents.UI\Hexalith.Agents.UI.csproj" IsAspireProjectResource="false" />
+</ItemGroup>
 ```
 
-2. Import `Hexalith.EventStore.Aspire` in the AppHost.
+NEW:
 
-3. Call:
+```xml
+<ItemGroup>
+  <ProjectReference Include="..\Hexalith.Agents.Server\Hexalith.Agents.Server.csproj" IsAspireProjectResource="false" />
+  <ProjectReference Include="..\Hexalith.Agents.UI\Hexalith.Agents.UI.csproj" IsAspireProjectResource="false" />
+  <ProjectReference Include="$(HexalithEventStoreRoot)\src\Hexalith.EventStore.Aspire\Hexalith.EventStore.Aspire.csproj" IsAspireProjectResource="false" />
+</ItemGroup>
+```
+
+Rationale: This mirrors EventStore AppHost's own reference to `Hexalith.EventStore.Aspire` and keeps the shared hosting helpers out of contracts/domain/UI projects.
+
+### AppHost Program Change
+
+Artifact: `src/Hexalith.Agents.AppHost/Program.cs`
+
+OLD:
+
+```csharp
+IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
+
+builder.Build().Run();
+```
+
+NEW:
+
+```csharp
+using Hexalith.EventStore.Aspire;
+
+IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
+
+_ = builder.AddHexalithEventStoreSecurity();
+
+builder.Build().Run();
+```
+
+Future resource wiring when concrete resources exist:
 
 ```csharp
 HexalithEventStoreSecurityResources? security = builder.AddHexalithEventStoreSecurity();
-```
-
-4. When Agents AppHost resources are added, apply:
-
-```csharp
 if (security is not null)
 {
     _ = eventStore.WithJwtBearerSecurity(security);
-    // Add client/OIDC helper calls for Agents UI or service resources as their concrete resources are introduced.
+    _ = agentsServer.WithEventStoreClientCredentials(security);
+    _ = agentsUi.WithOpenIdConnectSecurity(security, clientId: "...", clientSecret: "...");
 }
 ```
 
-5. Add static or Aspire testing coverage that proves the initialization path exists without launching production dependencies.
+Rationale: The current minimal AppHost can initialize the shared security resource immediately. Actual helper application belongs with the resource graph once the live topology adds concrete resources.
 
-6. Validate with a narrow build/test lane. Do not run solution-level `dotnet test` for EventStore-owned tests; follow the Agents repo's current test conventions for the touched test project.
+### Test / Verification Change
+
+Artifact: `test/Hexalith.Agents.Server.Tests` or a future AppHost-specific test project.
+
+NEW:
+
+```markdown
+Add a static topology guard that verifies:
+
+- `Hexalith.Agents.AppHost.csproj` references `Hexalith.EventStore.Aspire` with `IsAspireProjectResource="false"`.
+- `Program.cs` calls `AddHexalithEventStoreSecurity()`.
+- No Agents contracts, domain, client, UI, or server project references `Hexalith.EventStore.Aspire`.
+- AppHost code does not duplicate Keycloak/OIDC/JWT/service credential environment wiring that belongs to EventStore Aspire helpers.
+```
+
+Rationale: This catches regression before the broader runnable topology exists.
 
 ## 6. Implementation Handoff
 
 Change scope: Minor.
 
-Route to: Developer agent for direct implementation, with Architect review only if the canonical epics/architecture text is updated.
+Route to: Developer agent for direct implementation after approval.
 
-Responsibilities:
+Developer responsibilities:
 
-- Developer: implement AppHost security initialization and tests.
-- Architect: approve AD-16/story wording if planning artifacts are updated.
-- Product Owner: no PRD/MVP approval needed unless the live-binding plan is reorganized.
+- Update `src/Hexalith.Agents.AppHost/Hexalith.Agents.AppHost.csproj`.
+- Update `src/Hexalith.Agents.AppHost/Program.cs`.
+- Add static topology guard coverage in the existing test lane.
+- Build the AppHost and run the focused test project.
+
+Architect/Product Owner responsibilities:
+
+- If backlog artifacts are being updated, amend the live-binding/AppHost topology story or sprint action item with the acceptance criteria above.
+- No PRD/MVP approval is needed unless the live-binding plan is otherwise reorganized.
 
 Success criteria:
 
-- Agents AppHost uses `HexalithEventStoreSecurityExtensions` for security initialization.
-- No duplicate Keycloak/OIDC/security environment implementation appears in Agents.
-- Security can be disabled with `EnableKeycloak=false` for local fallback.
-- Tests or static conformance checks fail if the AppHost no longer initializes the shared security service.
-- `aspire run` restart is documented or called out for AppHost model changes.
+- Agents AppHost initializes shared EventStore security.
+- EventStore Aspire security wiring is referenced only from AppHost/topology code.
+- No duplicated Keycloak/OIDC/JWT/service credential configuration appears in Agents.
+- `EnableKeycloak=false` remains a supported local fallback through the shared EventStore helper.
+- Static guard tests fail if the security initialization is removed.
+- AppHost builds cleanly.
+
+Recommended verification:
+
+```bash
+dotnet restore Hexalith.Agents.slnx
+dotnet build src/Hexalith.Agents.AppHost/Hexalith.Agents.AppHost.csproj -c Release --no-restore
+DiffEngine_Disabled=true dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Release --no-build
+```
 
 ## 7. Approval Needed
 
 This proposal is ready for review.
 
-Approve to route to Developer for direct implementation. After approval, update `sprint-status.yaml` to add or amend the AppHost topology action with the explicit EventStore security initialization acceptance gate.
+Review complete proposal. Continue [c] to approve routing to Developer for implementation, or Edit [e] to revise the proposal.
