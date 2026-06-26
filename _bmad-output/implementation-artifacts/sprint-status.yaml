@@ -110,7 +110,7 @@ action_items:
     owner: "Amelia (Developer)"
     status: open
   - epic: 4
-    action: "Author the production / live-binding plan (de-facto Epic 5): convert the Story 4.5 report sections 5/6 enumeration into a real epic+story plan (durable runtime owner AD-18, read-model projections, Conversations AddParticipant seam AD-6/7, provider-SDK adapter, content-safety engine, AppHost topology), each gated on its prerequisite governance decision."
+    action: "Author the production / live-binding plan (de-facto Epic 5): convert the Story 4.5 report sections 5/6 enumeration into a real epic+story plan (durable runtime owner AD-18, read-model projections, Conversations AddParticipant seam AD-6/7, provider-SDK adapter, content-safety engine, AppHost topology), each gated on its prerequisite governance decision. The AppHost topology story must initialize shared EventStore security with builder.AddHexalithEventStoreSecurity() and apply EventStore Aspire security helpers to authenticated resources."
     owner: "Winston (Architect)"
     status: open
   - epic: 4

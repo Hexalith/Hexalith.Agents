@@ -1,13 +1,16 @@
 ---
 title: Sprint Change Proposal - EventStore Security Initialization In Agents Aspire Host
-status: draft
+status: implemented
 created: 2026-06-26
 updated: 2026-06-26
 mode: Batch
 change_scope: minor
 recommended_path: direct-adjustment
 owner: Administrator
-approval_required: true
+approved_by: Administrator
+approved_on: 2026-06-26
+implemented_on: 2026-06-26
+approval_required: false
 ---
 
 # Sprint Change Proposal: EventStore Security Initialization In Agents Aspire Host
@@ -107,9 +110,9 @@ Implementation should:
 | 5.5 | Done | Handoff: Developer for code/tests; Architect/PO only for backlog wording. |
 | 6.1 | Done | Applicable checklist sections addressed. |
 | 6.2 | Done | Proposal reviewed against current docs and source. |
-| 6.3 | Action-needed | Explicit user approval is required before implementation. |
-| 6.4 | Action-needed | Update sprint status only after approval. |
-| 6.5 | Action-needed | Final handoff confirmation depends on approval. |
+| 6.3 | Done | Administrator approved with `c` on 2026-06-26. |
+| 6.4 | Done | Sprint status action item amended with the explicit EventStore security acceptance gate. |
+| 6.5 | Done | Minor-scope implementation routed to Developer and completed in this workflow run. |
 
 ## 4. Recommended Approach
 
@@ -296,8 +299,30 @@ dotnet build src/Hexalith.Agents.AppHost/Hexalith.Agents.AppHost.csproj -c Relea
 DiffEngine_Disabled=true dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Release --no-build
 ```
 
-## 7. Approval Needed
+## 7. Implementation Result
 
-This proposal is ready for review.
+Approved by Administrator on 2026-06-26 and implemented directly as a minor change.
 
-Review complete proposal. Continue [c] to approve routing to Developer for implementation, or Edit [e] to revise the proposal.
+Changed files:
+
+- `src/Hexalith.Agents.AppHost/Hexalith.Agents.AppHost.csproj` now references `Hexalith.EventStore.Aspire` as an AppHost-only helper project with `IsAspireProjectResource="false"`.
+- `src/Hexalith.Agents.AppHost/Program.cs` imports `Hexalith.EventStore.Aspire` and calls `builder.AddHexalithEventStoreSecurity()`.
+- `test/Hexalith.Agents.Server.Tests/AppHostSecurityTopologyTests.cs` adds static topology guards for the security reference, initialization call, boundary placement, and no duplicate environment wiring.
+- `_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md` clarifies AD-16 with the shared EventStore security invariant.
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` amends the live-binding/AppHost topology action item with the explicit security acceptance gate.
+
+Verification:
+
+```bash
+dotnet restore Hexalith.Agents.slnx
+dotnet build src/Hexalith.Agents.AppHost/Hexalith.Agents.AppHost.csproj -c Release --no-restore
+DiffEngine_Disabled=true dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Release --no-restore
+git diff --check
+```
+
+Result:
+
+- Restore passed.
+- AppHost Release build passed with 0 warnings and 0 errors.
+- Server test project passed: 371 passed, 0 failed, 0 skipped.
+- Diff whitespace check passed.

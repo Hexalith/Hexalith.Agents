@@ -163,7 +163,7 @@ flowchart LR
 
 - **Binds:** deployment and environments.
 - **Prevents:** the root workspace becoming an accidental product topology or stories guessing where to compose dependencies.
-- **Rule:** Hexalith.Agents owns its own AppHost/local orchestration and deployable workloads. The root `agents` workspace remains a coordination/super-repo. Agents AppHost composes Agents service/UI with existing EventStore, Conversations, Parties, Tenants, and provider adapter dependencies for local/dev/test.
+- **Rule:** Hexalith.Agents owns its own AppHost/local orchestration and deployable workloads. The root `agents` workspace remains a coordination/super-repo. Agents AppHost composes Agents service/UI with existing EventStore, Conversations, Parties, Tenants, and provider adapter dependencies for local/dev/test. When the local topology includes EventStore-authenticated resources, the AppHost initializes security through `HexalithEventStoreSecurityExtensions.AddHexalithEventStoreSecurity()` and applies the returned resources through the shared EventStore Aspire helpers instead of duplicating Keycloak, JWT bearer, OIDC, or service-credential wiring.
 
 ### AD-17 - Contract And Test Gates
 
