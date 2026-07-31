@@ -7,7 +7,7 @@ paradigm: event-sourced hybrid agent-runtime hexagonal Hexalith domain module
 scope: Hexalith Agents module in the agents workspace
 status: final
 created: 2026-06-23
-updated: 2026-06-24
+updated: 2026-07-31
 binds:
   - PRD FR-1..FR-25
   - Hexalith Agents V1
@@ -30,7 +30,8 @@ sources:
   - https://www.nuget.org/packages/Microsoft.Agents.AI.Workflows/
   - https://docs.dapr.io/developing-applications/sdks/dotnet/dotnet-workflow/
   - https://docs.dapr.io/developing-applications/sdks/dotnet/dotnet-ai/
-companions: []
+companions:
+  - IMPLEMENTATION-CONVENTIONS.md
 ---
 
 # Architecture Spine - Hexalith Agents
@@ -263,6 +264,7 @@ sequenceDiagram
 
 | Concern | Convention |
 | --- | --- |
+| Command steps | A durable step decision dispatches at most one server-trusted command. Follow the [orchestrator to single-command to twin-policy convention](IMPLEMENTATION-CONVENTIONS.md) for permitted zero-dispatch exits, ordered multi-event results, visibility, and test obligations. |
 | Naming | Domain terms are `Agent`, `ProviderCatalog`, `AgentInteraction`, `ProposedAgentReply`, `VersionedProposalContent`, `ApproverPolicy`, `AgentCall`, `AgentResponse`, `AuditEvidence`. Use `hexa` only as the first configured Agent, not as a type name. |
 | Identity | Agents owns `AgentId`, `AgentInteractionId`, `ProposalVersionId`, `ProviderId`, `ModelId`. Parties owns `PartyId`; Conversations owns `ConversationId` and `MessageId`; Tenants owns tenant membership/roles. |
 | Mutation | Only EventStore commands mutate Agents state. External effects return through follow-up commands/events. |

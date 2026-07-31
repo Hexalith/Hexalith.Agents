@@ -92,7 +92,7 @@ action_items:
   - epic: 2
     action: "Codify the step-pattern as a written convention: orchestrator to single-command to twin-policy (Evaluate/Decide, InternalsVisibleTo Server not Server.Tests) so Epic 3 proposal commands reuse it without re-derivation."
     owner: "Winston (Architect)"
-    status: in-progress  # Epic 4 follow-through: pattern reused (4.4 mirrors 1.7 record-and-gate) but still only in per-story Dev Notes, no standalone convention note. See Epic 4 AI #6.
+    status: done  # Evidence: ../planning-artifacts/architecture/architecture-agents-2026-06-23-2/IMPLEMENTATION-CONVENTIONS.md
   - epic: 2
     action: "Reconcile architecture spine AD-4 with the shipped AgentInteractionSnapshot (add ContentSafetyPolicyVersion as an additive snapshot field). Completed during the Epic 2 retro doc audit."
     owner: "Paige (Tech Writer)"
