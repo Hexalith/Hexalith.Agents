@@ -394,6 +394,7 @@ Implementation status: implemented. Effectiveness remains open until two subsequ
 - 2026-07-31 — Adversarial review hardening added exact Git filename preservation, solution-membership proof, strict all-pass CTRF validation, safe marker placement, concurrent-edit protection, subprocess timeouts, and durable automator pause handling.
 - 2026-07-31 — Verification: Python compilation and all 39 tooling tests passed; customization resolution includes the preflight; all five existing Release test assemblies emitted fresh CTRF with 2,396 passing and zero failed/skipped/pending/other tests.
 - 2026-07-31 — Baseline blocker recorded: a fresh solution build currently fails before compilation on pre-existing dependency configuration (`AngleSharp` NU1902 advisory-as-error and FluentUI NU1109 central-version downgrade). The gate remains fail closed and will block review until that repository baseline is repaired; dependency changes were not absorbed into this process correction.
+- 2026-07-31 — Batch revalidation approved by Administrator. The implemented Minor change remains routed to Amelia for effectiveness follow-through; no duplicate implementation was authorized, and the consolidated action remains open pending a complete green gate plus two correction-free stories.
 
 ## 9. Implementation Result
 
@@ -417,3 +418,33 @@ Verification results:
 - Fresh Release solution build — blocked before compilation by the pre-existing NU1902/NU1109 dependency baseline described above.
 
 Tracking posture: the consolidated action remains `open` until the dependency baseline permits a green gate and the next two stories reach review without test-count or File List correction.
+
+## 10. Batch Revalidation
+
+The Administrator resubmitted the consolidated action on 2026-07-31 and
+selected Batch review mode. Repository inspection found that the requested
+change is already represented by this proposal and was implemented in commit
+`03900d9`. No duplicate epic, story, sprint action, gate, or workflow hook is
+proposed.
+
+Live revalidation:
+
+- `python3 -m py_compile tools/check-story-review-readiness.py tests/tooling/story_review_readiness/story_review_readiness_test.py` passed.
+- `python3 -m unittest discover -s tests/tooling/story_review_readiness -p '*_test.py' -v` passed all 39 tests.
+- The resolved `bmad-code-review` customization contains the fail-closed readiness activation step.
+- The story automator invokes the same gate after QA automation and before initializing a review cycle.
+- `dotnet build Hexalith.Agents.slnx --configuration Release -m:1` failed during restore before test execution. The current blocker is six `NU1010` Central Package Management errors across EventStore and Conversations project references, followed by a NuGet targets null-reference error. This supersedes the earlier observed `NU1902`/`NU1109` baseline symptoms but does not change the fail-closed disposition.
+- The root worktree was clean after validation and before this revalidation addendum was written.
+
+Batch disposition: preserve the implemented change and keep the consolidated
+sprint action `open`. Close it only after the dependency/package-catalog
+baseline permits a complete green gate and the next two stories reach review
+without test-count or File List correction.
+
+Batch revalidation approval: approved by Administrator on 2026-07-31.
+
+Handoff: Minor scope, routed to Amelia (Developer). No duplicate implementation
+is required. Amelia retains the open action, reruns the complete readiness gate
+after the dependency/package-catalog baseline is repaired, and records whether
+the next two gated stories enter review without a test-count or File List
+correction.
