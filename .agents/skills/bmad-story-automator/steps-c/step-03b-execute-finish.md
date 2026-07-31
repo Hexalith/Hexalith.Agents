@@ -15,7 +15,7 @@ outputFile: '{output_folder}/story-automator/orchestration-{epic_id}-{timestamp}
 
 ## Story Loop (Continue from Step 3)
 
-### E. Git Commit
+### F. Git Commit
 
 **Required:** Commit after every story (do not skip).
 
@@ -30,10 +30,10 @@ ok=$(echo "$commit" | jq -r '.ok')
   tmp_state=$(mktemp)
   sed "s/^| ${story_id} |.*$/| ${story_id} | done | done | done | done | done | in-progress |/" "{outputFile}" > "$tmp_state" && mv "$tmp_state" "{outputFile}"
   ```
-  → proceed to F
+  → proceed to G
 - If `ok == false` → log warning and escalate
 
-### F. Verify Sprint Status
+### G. Verify Sprint Status
 
 ```bash
 # Check sprint-status with story file fallback (v1.4.0)
@@ -49,10 +49,10 @@ if [ "$is_done" != "true" ]; then
 fi
 ```
 
-- If `is_done == false` → return to Code Review Loop (Step 3, section D)
-- If `is_done == true` → proceed to G
+- If `is_done == false` → return to Code Review Loop (Step 3a, section E)
+- If `is_done == true` → proceed to H
 
-### G. Story Complete
+### H. Story Complete
 Display: "**✅ Story {N} complete.**"
 ```bash
 "{scriptsDir}" orchestrator-helper state-update "{outputFile}" \
@@ -65,11 +65,11 @@ sed "s/^| ${story_id} |.*$/| ${story_id} | done | done | done | done | done | do
 ```
 Display: `[story {N}/{total}] finalize -> done`
 
-### H. Check Epic Completion & Trigger Retrospective (Multi-Epic Support)
+### I. Check Epic Completion & Trigger Retrospective (Multi-Epic Support)
 
 After each story completes, check if ALL stories in this epic are now done. Retrospective only triggers when every story in the epic has passed code review and sprint status confirms all are "done".
 
-#### H.1 Check All Stories Done
+#### I.1 Check All Stories Done
 
 ```bash
 # Run epic-level check in parallel with per-story checks
@@ -101,7 +101,7 @@ else
 fi
 ```
 
-#### H.2 Secondary Verification via Sprint Status
+#### I.2 Secondary Verification via Sprint Status
 
 ```bash
 # Double-check: use result from parallel epic-level check
@@ -120,7 +120,7 @@ else
 fi
 ```
 
-#### H.3 Trigger Retrospective (Only When Epic Fully Complete)
+#### I.3 Trigger Retrospective (Only When Epic Fully Complete)
 
 **IF trigger_retro == true:**
 

@@ -86,10 +86,6 @@ development_status:
 
 action_items:
   - epic: 2
-    action: "Automate Dev Agent Record accuracy: regenerate test counts from the latest run and diff the File List against git status before review (recurring stale-count/omission finding across all 6 stories)."
-    owner: "Amelia (Developer)"
-    status: open
-  - epic: 2
     action: "Track the deferred live-binding backlog explicitly: a living checklist pairing each Deferred* adapter with its target live binding (read-models, IAgentCommandDispatcher, provider adapter, content-safety engine, Conversations AddParticipant seam, AppHost topology) to de-risk Epic 4."
     owner: "Winston (Architect)"
     status: done  # Epic 4 follow-through: delivered (stronger than asked) via Story 4.5 governance report sections 5/6 + machine-checked traceability-manifest.json.
@@ -106,7 +102,7 @@ action_items:
     owner: "Winston (Architect)"
     status: open  # Epic 4 follow-through: still unaddressed. Re-committed as Epic 4 AI #5.
   - epic: 4
-    action: "Enforce Dev Agent Record accuracy mechanically (Epic 2 AI#1's checklist did not stop recurrence across 5 more stories): a pre-review script/hook or test that regenerates test counts from the latest Release run and diffs the File List against git status --short, failing the story if they drift."
+    action: "Implement one mechanical Dev Agent Record pre-review gate for manual and story-automator paths. The gate must regenerate the canonical test-count record from fresh Release test results, compare the story File List bidirectionally with git status, and fail before review on test failure, result-parsing failure, or any missing, extra, or stale record entry. This consolidates the duplicate Epic 2, 3, and 4 actions raised after recurring drift across all six Epic 2 stories and subsequent stories."
     owner: "Amelia (Developer)"
     status: open
   - epic: 4
@@ -140,10 +136,6 @@ action_items:
   - epic: 1
     action: "Create an Epic 2 seam map pairing every Epic 1 deferred setup seam (IAgentCommandDispatcher, IProviderCatalogReader, IApproverPolicyResolver, UI gateways, AppHost topology, and Conversations membership) with its live owner and fail-closed fallback."
     owner: "Winston (Architect) + Amelia (Developer)"
-    status: open
-  - epic: 3
-    action: "Replace the Dev Agent Record checklist with a mechanical pre-review gate that fails when recorded test counts or File List entries drift from actual test output and git status --short."
-    owner: "Amelia (Developer)"
     status: open
   - epic: 3
     action: "Publish a standalone proposal lifecycle convention covering orchestrator-to-command-to-twin-policy, proposal sub-state eligibility, terminal-state behavior, and hosted action-control boundaries."

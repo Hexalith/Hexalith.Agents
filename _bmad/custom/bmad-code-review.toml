@@ -1,0 +1,8 @@
+# Team-owned Dev Agent Record readiness guard. This override survives
+# generated BMad skill refreshes.
+
+[workflow]
+
+activation_steps_append = [
+  "DEV_AGENT_RECORD_READINESS_GATE: Before loading review context or launching review layers, resolve exactly one requested story file from the explicit request or recent conversation. If no single story is identifiable, ask for its path and halt. Run `python3 tools/check-story-review-readiness.py <story-file>`. Treat every non-zero exit as a fail-closed pre-review blocker: report the command's remediation output, leave the File List and story/sprint statuses unchanged, route repair to the Developer, and do not begin adversarial review. A validated test run may refresh only the managed evidence block before a later File List mismatch is reported. Do not waive or reinterpret missing, extra, or stale entries. On success, retain the command and final summary as review evidence; the green gate is a readiness floor, not proof that acceptance criteria or implementation quality are correct."
+]
