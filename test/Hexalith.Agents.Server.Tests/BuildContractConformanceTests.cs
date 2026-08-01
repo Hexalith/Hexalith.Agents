@@ -37,6 +37,19 @@ public sealed class BuildContractConformanceTests
     }
 
     [Fact]
+    public void RootBuildPropsShouldRequireSharedBuildCatalogSubmodule()
+    {
+        XDocument props = XDocument.Load(ModuleLayout.RootFile("Directory.Build.props"));
+
+        props
+            .Descendants()
+            .Any(element =>
+                string.Equals(element.Name.LocalName, "RequiredRootSubmodule", StringComparison.Ordinal)
+                && string.Equals(element.Attribute("Include")?.Value, "Hexalith.Builds", StringComparison.Ordinal))
+            .ShouldBeTrue("The shared package catalog must be guarded as a build-required root submodule.");
+    }
+
+    [Fact]
     public void GlobalJsonShouldPinTheSdk()
     {
         using JsonDocument global = JsonDocument.Parse(File.ReadAllText(ModuleLayout.RootFile("global.json")));

@@ -35,6 +35,7 @@
 
   <!-- Detect missing build-required root-declared git submodules (the Memories RequiredRootSubmodule/CheckSubmodules pattern). -->
   <ItemGroup>
+    <RequiredRootSubmodule Include="Hexalith.Builds" />
     <RequiredRootSubmodule Include="Hexalith.Commons" />
     <RequiredRootSubmodule Include="Hexalith.EventStore" />
     <RequiredRootSubmodule Include="Hexalith.AI.Tools" />
