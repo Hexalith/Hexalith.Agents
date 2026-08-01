@@ -7,7 +7,7 @@ paradigm: event-sourced hybrid agent-runtime hexagonal Hexalith domain module
 scope: Hexalith Agents module in the agents workspace
 status: final
 created: 2026-06-23
-updated: 2026-07-31
+updated: 2026-08-01
 binds:
   - PRD FR-1..FR-25
   - Hexalith Agents V1
@@ -90,8 +90,8 @@ flowchart LR
 ### AD-4 - Interaction Snapshot
 
 - **Binds:** FR-5, FR-6, FR-7, FR-13..FR-18, FR-24.
-- **Prevents:** pending interactions changing model, instructions, response mode, or approval authority when administrators edit configuration later.
-- **Rule:** `AgentInteraction` snapshots Agent configuration version, instructions version, response mode, approver policy version, `ProviderId`, `ModelId`, provider capability version, content-safety policy version, caller `PartyId`, source `ConversationId`, and context-build policy at request time. Later Agent or ProviderCatalog changes affect future interactions only.
+- **Prevents:** pending interactions changing model identity, instructions, response mode, or approval authority when administrators edit configuration later, without freezing stale provider safety constraints.
+- **Rule:** `AgentInteraction` snapshots Agent configuration version, instructions version, response mode, approver policy version, `ProviderId`, `ModelId`, provider capability version, content-safety policy version, caller `PartyId`, source `ConversationId`, and context-build policy at request time. Later Agent configuration and provider/model selection changes affect future interactions only. Current provider readiness and safe capability limits are re-evaluated under AD-10 and may tighten or block an in-flight interaction, but they never retarget it.
 - *Epic 2 reconciliation (2026-06-24): the shipped `AgentInteractionSnapshot` contract folds in `ContentSafetyPolicyVersion` (added to the list above) and carries the context-build policy as `ContextPolicyReference` (V1 default `full-conversation-v1`). Both were added additively during implementation, anticipating the Story 2.4 safety check and the Story 2.3 context policy, without a contract break.*
 
 ### AD-5 - Proposal Lifecycle
@@ -126,15 +126,16 @@ flowchart LR
 
 ### AD-10 - Provider Capability Floor
 
-- **Binds:** FR-4, FR-5, OQ-7.
-- **Prevents:** incompatible provider metadata shapes across admin UI, runtime checks, and audit.
-- **Rule:** `ProviderCatalog` V1 capability metadata includes `ProviderId`, `ModelId`, display label, enabled state, secret reference/configured state, text-generation capability, context-window token limit, max-output token limit, timeout policy, and optional safe capability flags. Provider-specific knobs stay adapter-local until promoted by a new architecture decision.
+- **Binds:** FR-4, FR-5, FR-9, FR-10, FR-16, FR-21, FR-24, OQ-7.
+- **Prevents:** incompatible provider metadata shapes, stale or disabled catalog state being trusted at runtime, snapshot/effective-version provenance being conflated, or retries reusing one attempt identity with changed provider inputs.
+- **Rule:** `ProviderCatalog` V1 capability metadata includes `ProviderId`, `ModelId`, display label, enabled state, secret reference/configured state, text-generation capability, context-window token limit, max-output token limit, timeout policy, optional safe capability flags, and a monotonic `CapabilityVersion`. The interaction's durable capability high-water mark starts at the snapshot `ProviderCapabilityVersion` and advances to every identified live version observed by context, generation, or regeneration, including a version whose entry later fails readiness or limit validation. Every provider-dependent step requires a trust-bearing fresh live entry for the snapshotted `ProviderId`/`ModelId` with `CapabilityVersion >=` that mark; it then advances the mark and independently requires `Status == Enabled`, `ConfigurationState == Configured`, text-generation capability, and the catalog contract's valid positive limits required by the step. Enable/disable does not bump `CapabilityVersion`, so version comparison never substitutes for readiness. Missing, stale, lower, or not-ready state fails closed. Context build reports `ModelBudgetUnavailable`; otherwise it uses current safe limits. The snapshot version remains request provenance; `EffectiveProviderCapabilityVersion` is the accepted live version consumed by a runtime step and is carried consistently through its internal request, provider request, outcome, and success/failure evidence. Exact equality is not required.
+- *Implementation gaps (2026-08-01): current context, generation, and regeneration paths do not maintain a durable capability high-water mark or a distinct effective-version contract. Context build neither compares the live version with the snapshot nor independently rejects disabled/unconfigured entries. Generation and regeneration consume current catalog limits while carrying the snapshot version as provider/evidence provenance. These paths are non-conformant until the runtime reconciliation follow-up implements fresh lower/equal/higher reads, current readiness, high-water/effective-version evidence, pre-invocation revalidation, and retry binding.*
 
 ### AD-11 - Conversation Context Bounds
 
 - **Binds:** FR-9, FR-10, OQ-10.
 - **Prevents:** silent truncation, summary substitution, or provider calls on stale/partial context.
-- **Rule:** V1 context is built only from authorized Conversations detail and visible timeline content. If full source context cannot be loaded fresh enough or cannot fit the selected model context budget after reserving configured output tokens, record context-blocked failure and create no provider call, proposal, or Conversation Message.
+- **Rule:** V1 context is built only from authorized Conversations detail and visible timeline content. If full source context cannot be loaded fresh enough or cannot fit the selected model context budget after reserving configured output tokens, record context-blocked failure and create no provider call, proposal, or Conversation Message. `ContextReady` authorizes progression but does not freeze a later provider input: immediately before generation or regeneration prepares a provider attempt, it repeats the authorized fresh content read, token measurement, AD-10 capability high-water/readiness check, and full budget calculation. The prepared input proceeds only if this revalidation passes; otherwise the step fails closed with no provider side effect.
 
 ### AD-12 - Authorization And Dependency Uncertainty
 
@@ -146,7 +147,7 @@ flowchart LR
 
 - **Binds:** FR-10..FR-18, FR-24.
 - **Prevents:** duplicate provider attempts, duplicate messages, or duplicate proposal versions during retry/replay.
-- **Rule:** External side effects are causally tied to deterministic Agents ids. Generation attempts use deterministic attempt ids. Conversation posting uses deterministic `MessageId` and idempotency key derived from `AgentInteractionId` plus approved/generated `VersionId`. Retries record outcomes without creating duplicate Conversation Messages or duplicate versions.
+- **Rule:** External side effects are causally tied to deterministic Agents ids. Before its first provider invocation, the durable owner checkpoints one prepared-attempt descriptor binding the deterministic attempt id to provider/model, `EffectiveProviderCapabilityVersion`, validated limits/timeout, and a canonical provider-request fingerprint. Only transient provider transport/timeout failures may retry before a terminal domain outcome; each retry rechecks current readiness and reuses the exact descriptor. Any capability version, readiness, or request-fingerprint change fails closed under that attempt id; the same interaction or regeneration action never substitutes a replacement attempt. Conversation posting uses deterministic `MessageId` and idempotency key derived from `AgentInteractionId` plus approved/generated `VersionId`. Retries record outcomes without creating duplicate provider requests, Conversation Messages, or proposal versions.
 
 ### AD-14 - Sensitive Content And Secret Safety
 
@@ -273,6 +274,7 @@ sequenceDiagram
 | Data planes | EventStore events/projections are domain truth. Workflow history, Agent Framework sessions/checkpoints, Dapr Agents memory, and retrieval indexes are execution/supporting state and never become business truth. |
 | Time | Expiry and time-based decisions use injected time and snapshotted policy; no aggregate wall-clock reads. |
 | Idempotency | API commands accept idempotency metadata. Provider attempts, version ids, and Conversation posts derive deterministic ids from interaction/version context. |
+| Provider attempt fingerprint | One shared canonicalizer hashes the length-prefixed, stable-order prepared provider request with SHA-256. The descriptor stores the digest and safe scalar inputs, never raw context; all retry paths compare through that canonicalizer. |
 | Errors | Business failures are typed rejection/status events or structured public errors. Provider errors are mapped to safe classes. |
 | Content | Prompt/generated/edited/context content is sensitive. No raw content in logs, telemetry dimensions, status badges, queue summaries, or provider errors. |
 | Authorization | Every API/UI/provider/post/proposal/audit path evaluates tenant, Party, Conversation, Agent, Provider, and ApproverPolicy gates before side effects. |
