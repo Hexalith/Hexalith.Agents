@@ -1,5 +1,5 @@
 # generated: 2026-06-23T21:28:59+02:00
-# last_updated: 2026-08-01
+# last_updated: 2026-08-01T10:25:37+02:00
 # project: agents
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-06-23T21:28:59+02:00
-last_updated: 2026-08-01
+last_updated: 2026-08-01T10:25:37+02:00
 project: agents
 # retrospectives: epic-1 retro completed 2026-06-26 (epic-1-retro-2026-06-26.md); epic-2 retro completed 2026-06-24 (epic-2-retro-2026-06-24.md); epic-3 retro completed 2026-06-26 (epic-3-retro-2026-06-26.md); epic-4 retro completed 2026-06-25 (epic-4-retro-2026-06-25.md)
 project_key: NOKEY
@@ -74,7 +74,7 @@ development_status:
   3-4-regenerate-proposed-reply-versions: done
   3-5-approve-a-selected-version-and-post-it: done
   3-6-reject-abandon-and-expire-proposals: done
-  3-7-proposal-detail-version-histopstory-and-accessibility: done
+  3-7-proposal-detail-version-history-and-accessibility: done
   epic-3-retrospective: done
   epic-4: done
   4-1-stable-api-and-client-contracts-for-agent-operations: done
