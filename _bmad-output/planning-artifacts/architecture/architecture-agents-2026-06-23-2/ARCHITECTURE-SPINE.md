@@ -18,11 +18,11 @@ sources:
   - ../../research/technical-dapr-ai-agents-research-2026-06-23.md
   - ../../ux-designs/ux-agents-2026-06-23/DESIGN.md
   - ../../ux-designs/ux-agents-2026-06-23/EXPERIENCE.md
-  - ../../../../Hexalith.Conversations/_bmad-output/project-context.md
-  - ../../../../Hexalith.EventStore/_bmad-output/project-context.md
-  - ../../../../Hexalith.Tenants/_bmad-output/project-context.md
-  - ../../../../Hexalith.Parties/_bmad-output/project-context.md
-  - ../../../../Hexalith.FrontComposer/_bmad-output/project-context.md
+  - ../../../../references/Hexalith.Conversations/_bmad-output/project-context.md
+  - ../../../../references/Hexalith.EventStore/_bmad-output/project-context.md
+  - ../../../../references/Hexalith.Tenants/_bmad-output/project-context.md
+  - ../../../../references/Hexalith.Parties/_bmad-output/project-context.md
+  - ../../../../references/Hexalith.FrontComposer/_bmad-output/project-context.md
   - https://docs.dapr.io/developing-ai/dapr-agents/
   - https://docs.dapr.io/developing-ai/mcp/mcp-server-resource/
   - https://learn.microsoft.com/en-us/agent-framework/overview/

@@ -8,14 +8,14 @@ sources:
   - ../../prds/prd-agents-2026-06-23/prd.md
   - ../../prds/prd-agents-2026-06-23/addendum.md
   - ../../prds/prd-agents-2026-06-23/reconcile-brief.md
-  - ../../../../Hexalith.Tenants/src/Hexalith.Tenants.UI/Composition/TenantsFrontComposerRegistration.cs
-  - ../../../../Hexalith.Tenants/src/Hexalith.Tenants.UI/Program.cs
-  - ../../../../Hexalith.Tenants/src/Hexalith.Tenants.UI/Components/Layout/MainLayout.razor
-  - ../../../../Hexalith.Tenants/_bmad-output/planning-artifacts/ux-designs/ux-tenants-2026-06-02/EXPERIENCE.md
-  - ../../../../Hexalith.FrontComposer/_bmad-output/project-context.md
-  - ../../../../Hexalith.FrontComposer/docs/reference/components/front-composer-shell.md
-  - ../../../../Hexalith.FrontComposer/docs/reference/components/navigation.md
-  - ../../../../Hexalith.FrontComposer/docs/reference/components/datagrid.md
+  - ../../../../references/Hexalith.Tenants/src/Hexalith.Tenants.UI/Composition/TenantsFrontComposerRegistration.cs
+  - ../../../../references/Hexalith.Tenants/src/Hexalith.Tenants.UI/Program.cs
+  - ../../../../references/Hexalith.Tenants/src/Hexalith.Tenants.UI/Components/Layout/MainLayout.razor
+  - ../../../../references/Hexalith.Tenants/_bmad-output/planning-artifacts/ux-designs/ux-tenants-2026-06-02/EXPERIENCE.md
+  - ../../../../references/Hexalith.FrontComposer/_bmad-output/project-context.md
+  - ../../../../references/Hexalith.FrontComposer/docs/reference/components/front-composer-shell.md
+  - ../../../../references/Hexalith.FrontComposer/docs/reference/components/navigation.md
+  - ../../../../references/Hexalith.FrontComposer/docs/reference/components/datagrid.md
 ---
 
 # Hexalith Agents - Experience Spine

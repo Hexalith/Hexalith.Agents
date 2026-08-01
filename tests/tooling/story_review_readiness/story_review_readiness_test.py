@@ -311,10 +311,10 @@ class CtrfTests(unittest.TestCase):
 
 class PorcelainTests(unittest.TestCase):
     def test_ordinary_untracked_spaces_unicode_and_submodule_paths(self):
-        payload = " M src/a.cs\0?? docs/a file.md\0 M docs/é.md\0 M Hexalith.Memories\0".encode()
+        payload = " M src/a.cs\0?? docs/a file.md\0 M docs/é.md\0 M references/Hexalith.Memories\0".encode()
         self.assertEqual(
             V.parse_porcelain_v1_z(payload),
-            {"src/a.cs", "docs/a file.md", "docs/é.md", "Hexalith.Memories"},
+            {"src/a.cs", "docs/a file.md", "docs/é.md", "references/Hexalith.Memories"},
         )
 
     def test_rename_and_copy_include_both_endpoints(self):
@@ -418,7 +418,7 @@ class GateOrchestrationTests(unittest.TestCase):
             f"<Solution>\n{solution_projects}\n</Solution>\n",
             encoding="utf-8",
         )
-        package_props = root / "Hexalith.Builds" / "Props" / "Directory.Packages.props"
+        package_props = root / "references" / "Hexalith.Builds" / "Props" / "Directory.Packages.props"
         package_props.parent.mkdir(parents=True)
         package_props.write_text("<Project />", encoding="utf-8")
         status = b" M _bmad-output/implementation-artifacts/story.md\0"

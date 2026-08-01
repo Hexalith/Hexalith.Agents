@@ -30,4 +30,4 @@ route: 'one-shot'
 **Gitlinks**
 
 - Validate the recorded submodule commits with `git submodule status`.
-  [`Hexalith.AI.Tools:1`](../../Hexalith.AI.Tools#L1)
+  [`Hexalith.AI.Tools:1`](../../references/Hexalith.AI.Tools#L1)

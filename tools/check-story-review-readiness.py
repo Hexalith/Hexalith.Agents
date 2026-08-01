@@ -400,12 +400,12 @@ def validate_solution_membership(root: Path, projects: Sequence[Path]) -> None:
 
 
 def shared_package_property_args(root: Path) -> tuple[str, ...]:
-    """Point nested root submodules at this workspace's root Builds checkout."""
-    package_props = (root / "Hexalith.Builds" / "Props" / "Directory.Packages.props").resolve()
+    """Point nested root submodules at this workspace's root-declared Builds checkout."""
+    package_props = (root / "references" / "Hexalith.Builds" / "Props" / "Directory.Packages.props").resolve()
     if not package_props.is_file():
         raise ValidationError(
             "Required root submodule package props are missing: "
-            "Hexalith.Builds/Props/Directory.Packages.props"
+            "references/Hexalith.Builds/Props/Directory.Packages.props"
         )
     return tuple(
         f"-property:Hexalith{index}BuildPackageProps={package_props}"

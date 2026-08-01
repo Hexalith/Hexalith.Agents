@@ -20,4 +20,4 @@ route: 'one-shot'
   [`.gitmodules:25`](../../.gitmodules#L25)
 
 - Validate the recorded gitlink with `git submodule status`.
-  [`Hexalith.Builds:1`](../../Hexalith.Builds#L1)
+  [`Hexalith.Builds:1`](../../references/Hexalith.Builds#L1)
