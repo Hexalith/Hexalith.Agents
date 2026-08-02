@@ -1,9 +1,9 @@
 ---
 name: Hexalith Agents
 description: FrontComposer web UI for governed AI participants in Hexalith Conversations. Fluent UI Blazor v5 is inherited; this spine specifies the Agents-specific semantic delta only.
-status: draft
+status: final
 created: 2026-06-23
-updated: 2026-06-23
+updated: 2026-08-01
 sources:
   - ../../briefs/brief-agents-2026-06-23/brief.md
   - ../../prds/prd-agents-2026-06-23/prd.md
@@ -26,7 +26,7 @@ colors:
   status-danger:
     note: 'Inherit Fluent BadgeColor.Danger. Used sparingly for rejected proposals, failed generation, failed posting, denied authorization, and provider/runtime failures.'
   status-important:
-    note: 'Inherit Fluent BadgeColor.Important. Used when state is uncertain or must be resolved before side effects: ambiguous Party identity, missing policy basis, oversized context decision pending.'
+    note: 'Inherit Fluent BadgeColor.Important. Used when state is uncertain or must be resolved before side effects: ambiguous Party identity, missing/stale policy basis, indeterminate budget reservation, or incomplete deletion confirmation.'
   status-subtle:
     note: 'Inherit Fluent BadgeColor.Subtle. Used for disabled but valid options, abandoned proposals, read-only inspection, no activity, and non-actionable history.'
   brand-accent:
@@ -94,8 +94,31 @@ components:
     timestamp: '{typography.mono}'
     rowGap: '{spacing.2}'
   conversation-agent-call:
-    base: 'Conversation-owned invocation affordance; exact pattern unresolved'
+    base: 'Conversation-owned Call hexa action plus Fluent prompt dialog/panel'
     selected: '{colors.brand-accent}'
+    gap: '{spacing.2}'
+  conversation-context-policy-panel:
+    base: 'Read-only FluentAccordion when two or more titled sections are present'
+    layout: 'Constrained page measure; effective full-or-blocked policy and model budget'
+    sectionGap: '{spacing.4}'
+  content-safety-policy-editor:
+    base: 'Fluent form primitives in FluentAccordion when two or more titled sections are present'
+    layout: 'Constrained page measure; fixed categories, restricted handling, version validation, publish'
+    sectionGap: '{spacing.4}'
+  cost-control-editor:
+    base: 'Fluent numeric form controls and status regions in FluentAccordion when two or more titled sections are present'
+    layout: 'Constrained authoring plus full-width usage and reservation evidence'
+    sectionGap: '{spacing.4}'
+  launch-readiness-panel:
+    base: 'FluentDataGrid plus FluentAccordion for titled metric and evidence groups'
+    layout: 'Full-width evidence view; blockers precede passing metrics'
+    sectionGap: '{spacing.4}'
+  audit-governance-panel:
+    base: 'Fluent form and status primitives in FluentAccordion when two or more titled sections are present'
+    layout: 'Constrained policy authoring plus full-width export/deletion evidence'
+    sectionGap: '{spacing.4}'
+  proposal-notification:
+    base: 'FrontComposer in-product status/notification entry with Fluent badge and accessible text'
     gap: '{spacing.2}'
   operational-status-panel:
     base: 'Fluent MessageBar / status region'
@@ -125,7 +148,7 @@ Colors inherit Fluent semantic roles by name. Bind meaning to role, never to hex
 - `{colors.status-warning}` means attention soon: proposal nearing expiry, provider degraded, context near model limit, cost/latency warning where a launch policy defines one.
 - `{colors.status-severe}` means blocked but not a runtime failure: disabled Agent, disabled provider/model, expired proposal, missing Party identity, missing Conversation access, unavailable dependency.
 - `{colors.status-danger}` means failure or denial: authorization denied, generation failed, posting failed, proposal rejected, provider error.
-- `{colors.status-important}` means state is uncertain and must be resolved before side effects: ambiguous identity, missing policy basis, oversized Conversation Context handling not decided.
+- `{colors.status-important}` means state is uncertain and must be resolved before side effects: ambiguous identity, missing/stale policy basis, indeterminate budget reservation, or incomplete restrictive deletion confirmation.
 - `{colors.status-subtle}` means quiet history or non-actionable state: abandoned proposal, disabled but valid option, no pending proposals, read-only inspection.
 
 No-color-only is mandatory. Every status appears as semantic color plus icon plus visible text. The icon vocabulary should be verified against the pinned Fluent UI package at build, following the Tenants precedent. Do not rely on provider logos or model brand colors to carry status.
@@ -201,7 +224,17 @@ Shows every generated, edited, and regenerated version with author/source, times
 
 ### conversation-agent-call
 
-The visual affordance for calling `hexa` from a Conversation is intentionally unresolved. Whether it becomes a mention, command, action button, participant affordance, or a combination, it must visibly name `hexa`, show the selected response mode when relevant, and avoid implying that a proposal is already a Conversation Message.
+The sole V1 invocation affordance is the Conversation-owned **Call hexa** action. It visibly names `hexa`, opens an accessible prompt surface, shows the effective response mode before submission, and never implies that generated or proposed content is already a Conversation Message. Mentions, commands, ambient triggers, and alternate entry points are out of V1.
+
+### policy and readiness surfaces
+
+The Conversation context policy is read-only and shows complete-context-or-blocked behavior, effective model budget, policy version, and why an oversized call cannot proceed. Content-safety authoring shows fixed blocked categories, restricted handling, policy version, validation, and an explicit publish action. Cost-control authoring shows monthly tenant budget, per-call caps, current usage/reservations, 80% warning, and 100% blocked state. Launch readiness shows latency targets, sample sufficiency, SM-2/SM-3 cohort/window, evidence levels, and every remaining blocker. Audit governance shows the 365-day rule, legal hold, encrypted time-limited export, deletion progress, projection purge, and restrictive partial-failure states. Each multi-section surface uses `FluentAccordion`; all controls use FrontComposer and Fluent UI Blazor v5 primitives.
+
+High-impact publish, export, legal-hold, and deletion actions require explicit confirmation, current authorization, future-only effect copy where applicable, keyboard/focus/live-region behavior, and projection/evidence-confirmed success. A pending or partially applied result never receives success styling.
+
+### proposal-notification
+
+V1 notifications are in-product only: an accessible pending-count badge and proposal queue/status entry link authorized Approvers to work needing attention. Notification copy includes state and expiry without exposing proposal content. Email, push, and external-channel delivery are out of scope.
 
 ### operational-status-panel
 

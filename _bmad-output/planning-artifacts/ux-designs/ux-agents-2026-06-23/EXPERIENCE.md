@@ -1,8 +1,8 @@
 ---
 name: Hexalith Agents
-status: draft
+status: final
 created: 2026-06-23
-updated: 2026-06-23
+updated: 2026-08-01
 sources:
   - ../../briefs/brief-agents-2026-06-23/brief.md
   - ../../prds/prd-agents-2026-06-23/prd.md
@@ -20,7 +20,7 @@ sources:
 
 # Hexalith Agents - Experience Spine
 
-> Draft spine distilled from the brief, PRD, FrontComposer references, and Tenants implementation reference. `DESIGN.md` owns visuals; this file owns behavior, surfaces, states, accessibility, and flows. The spines win on conflict with mockups, wireframes, imports, and source-derived sketches.
+> Final spine reconciled through the approved 2026-08-01 Correct Course decision. `DESIGN.md` owns visuals; this file owns behavior, surfaces, states, accessibility, and flows. The spines win on conflict with mockups, wireframes, imports, and source-derived sketches.
 
 ## Foundation
 
@@ -42,14 +42,19 @@ FrontComposer shell navigation should register an **Agents** domain/category. Ca
 | **`hexa` configuration** | Agents overview | Configure identity, display metadata, instructions, provider/model, response mode, approver policy, lifecycle, and activation blockers. |
 | **Provider catalog** | Agents nav or `hexa` configuration | Manage provider/model records, enabled state, capability metadata, and secret-backed configuration without exposing secrets. |
 | **Approver policy** | `hexa` configuration | Define who may edit, regenerate, approve, reject, abandon, or resolve proposals: conversation owner, caller, predefined Parties, tenant roles, or future confirmed policy sources. |
-| **Conversation invocation** | Source Conversation | Party explicitly calls `hexa` with a prompt/request. Exact UI pattern is open: mention, command, action button, participant membership, mention resolution, or combination. |
+| **Conversation context policy** | `hexa` configuration, readiness | Read the effective complete-context-or-blocked rule, model budget, policy version, and blocking reason; V1 exposes no bounded-context authoring. |
+| **Content safety policy** | Agents nav or `hexa` configuration | Author and publish versioned blocked/restricted handling, validate the policy, and inspect effective safety readiness. |
+| **Cost controls** | Agents nav, provider catalog, readiness | Configure monthly tenant budget and per-call caps; inspect usage, reservations, 80% warning, and 100% blocked state. |
+| **Conversation invocation** | Source Conversation | Party uses the sole Conversation-owned **Call hexa** action and submits a prompt through its accessible prompt surface. |
 | **Proposal queue** | Agents nav, notification entry, Conversation status | Authorized approvers discover Proposed Agent Replies waiting for action and historical proposals they may inspect. |
 | **Proposal detail/editor** | Proposal queue, notification, Conversation status | Review generated content, context metadata, version history, edits, regeneration, approval, rejection, abandonment, expiry, and posting outcome. |
-| **Operational status** | Agents overview, proposal detail, provider catalog | Distinguish readiness, configuration errors, authorization failures, provider failures, generation failures, pending approvals, posting failures, and successful posts. |
+| **Launch readiness** | Agents overview, operational status | Inspect latency gates, sample sufficiency, SM-2/SM-3 cohort and window, evidence levels, and every remaining blocker. |
+| **Operational status** | Agents overview, proposal detail, provider catalog | Distinguish readiness, configuration errors, authorization failures, safety/budget blocks, provider failures, generation failures, pending approvals, posting failures, and successful posts. |
+| **Audit governance** | Agents nav, audit evidence | Configure retention/legal hold and perform authorized export/deletion with restrictive progress and partial-failure states. |
 | **Audit evidence** | Agents overview, proposal detail, status entry, posted response reference | Inspect support-safe evidence for configuration, provider/model changes, calls, versions, approvals, rejections, expirations, automatic posts, and final Conversation Messages. |
 | **API/client contract reference** | Developer docs, not primary UI | Omar's integration journey needs stable public operations, but docs are not a FrontComposer admin screen unless product later asks for an in-app developer surface. |
 
-Surface closure status: admin/configuration, provider governance, proposal workflow, status, and audit are covered. Conversation-originated invocation cannot close until PRD OQ-1 resolves the entry pattern and how `hexa` appears in Conversation membership/mention resolution.
+Surface closure status: **final**. Admin/configuration, provider governance, full-context policy, safety, cost, **Call hexa**, in-product proposal notification, proposal workflow, launch readiness, audit governance, status, and evidence surfaces are defined. Implementation remains gated by Epic 5 and the external Conversations AI-membership prerequisite.
 
 ## Voice and Tone
 
@@ -91,7 +96,13 @@ Behavioral rules only. Visual specs live in `DESIGN.md.Components`.
 | **proposal-queue-grid** | Shows pending proposals and authorized historical proposals. Filters should support "needs my action", state, Agent, source Conversation, caller, and expiry where data exists. Empty and filtered-empty are distinct. |
 | **proposal-editor** | Lets authorized approvers edit content, request regeneration, approve selected version, reject, or abandon while non-authorized viewers see read-only state. Editing creates a new preserved version. |
 | **version-history** | Lists every generated, edited, and regenerated version. Approval identifies exactly which version was approved and posted. Regeneration never deletes earlier versions. |
-| **conversation-agent-call** | Exact Conversation entry pattern is unresolved. Any chosen pattern must capture Source Conversation, caller, Agent, prompt, response mode, authorization decision, and timestamp before provider invocation. |
+| **conversation-agent-call** | The Conversation-owned **Call hexa** action captures Source Conversation, caller, Agent, prompt, effective response mode, authorization decision, and timestamp. Mentions, commands, ambient triggers, and alternate V1 entry points are absent. |
+| **conversation-context-policy-panel** | Read-only full-or-blocked policy, effective context/output budget, policy version, and safe block reason. It never offers truncation, summarization, windowing, or retrieval controls. |
+| **content-safety-policy-editor** | Shows fixed blocked categories and restricted handling, validates draft versions, and requires authorized confirmation to publish a future-only version. Failed attempts cannot be retried through weaker policy. |
+| **cost-control-editor** | Authors numeric monthly tenant budget and per-call caps. It exposes safe usage/reservation evidence, an 80% warning, 100% block, and indeterminate-state block without revealing Provider secrets. |
+| **launch-readiness-panel** | Shows fixed latency/metric thresholds, cohort/window, at least-30-run sufficiency, Level 4/5 evidence, and blockers. Missing timestamps, insufficient samples, lower evidence, or skips cannot render as pass. |
+| **audit-governance-panel** | Supports the 365-day policy, legal holds, encrypted time-limited export, and cryptographic deletion/projection purge. Success appears only after authoritative evidence; partial failure stays restrictive and actionable. |
+| **proposal-notification** | In-product pending count and status entry only. It links authorized users to the queue, includes state/expiry without content, and never implies posting. Email, push, and external channels are absent. |
 | **operational-status-panel** | Groups readiness and runtime failures by recovery: configure provider, fix policy, wait for approval, retry generation, inspect audit, start a new call. Avoid raw subsystem labels as the primary message. |
 | **audit-evidence-panel** | Presents support-safe evidence and references. It links caller, Agent, Source Conversation, provider/model, response mode, versions, approver, approval/posting outcome, timestamps, and final Conversation Message where applicable. |
 
@@ -128,7 +139,7 @@ Canonical states should be used consistently across surfaces. Exact implementati
 | `authorized` | Call permission and Conversation access passed | Continue to context build. |
 | `denied` | Authorization failed | Stop before provider invocation; show safe reason. |
 | `context loading` | V1 full Conversation Context loading | Show progress; do not invoke provider yet. |
-| `context blocked` | Context cannot be loaded safely or is too large without a resolved policy | Fail closed; no partial response. |
+| `context blocked` | Complete context cannot be loaded safely or exceeds the selected model's effective budget | Fail closed before Provider invocation; no truncation, summary, proposal, or message. |
 | `generating` | Provider request in progress | Show in-flight state; no message/proposal yet. |
 | `generation failed` | Provider/runtime/policy failure | No Conversation Message; no approvable proposal unless complete generated content exists and is explicitly marked audit-only. |
 | `generated` | Complete Agent Response produced | Automatic mode proceeds to posting; confirmation mode creates Proposed Agent Reply. |
@@ -171,7 +182,9 @@ Every grid/list surface distinguishes: loading, empty, filtered-empty, error, pe
 - `Esc` closes transient UI without committing. Focus returns to the triggering proposal row/action.
 - Approval and rejection controls require keyboard reachability and clear focus order.
 - Hover may reveal secondary actions on desktop, but no required action or denial reason is hover-only.
-- Conversation invocation pattern is open. Until resolved, UX requirements for every candidate are: explicit Agent name, prompt capture, call permission check before provider invocation, visible response mode implication, and no unapproved message rendering.
+- **Call hexa** is the sole V1 invocation primitive. It shows the Agent name and effective response mode, captures the prompt, checks permission before Provider invocation, and never renders unapproved content as a Conversation Message.
+- High-impact policy publish, legal-hold, export, deletion, and approval actions require current authorization, explicit confirmation, and projection/evidence-confirmed success. Policy changes state their future-only effect.
+- Two or more titled sections use `FluentAccordion`; all custom surfaces remain FrontComposer/Fluent UI Blazor v5 components.
 
 ## Accessibility Floor
 
@@ -241,7 +254,7 @@ Failure path: no provider/model is enabled. Activation is blocked with a provide
 ### UJ-2 - Milan calls `hexa` from a Conversation and receives an automatic reply
 
 1. Milan is in a Source Conversation where he has access.
-2. He explicitly invokes `hexa` with a prompt. [ASSUMPTION: exact invocation affordance is unresolved by PRD OQ-1.]
+2. He selects the Conversation-owned **Call hexa** action and submits a prompt after reviewing the effective response mode.
 3. The system checks Conversation access and Agent call permission before provider invocation.
 4. The system loads V1 Conversation Context.
 5. Generation starts; Milan sees an in-flight state tied to the Source Conversation.
@@ -256,7 +269,7 @@ Failure path: Milan lacks permission. The call is rejected before provider invoc
 
 1. A participant invokes `hexa` in a Conversation configured for Confirmation Response Mode.
 2. The system creates a Proposed Agent Reply outside the Conversation after successful generation.
-3. Anika receives or discovers the pending proposal. [ASSUMPTION: notification path unresolved by PRD OQ-4.]
+3. Anika discovers the pending proposal through the authorized in-product pending count, queue, or Conversation status entry.
 4. She opens proposal detail/editor and reviews generated content, Source Conversation metadata, caller, Agent, provider/model, response mode, and expiry.
 5. She edits the draft, creating a preserved edited version.
 6. She requests regeneration once, creating a new generated version while preserving prior versions.
@@ -280,19 +293,24 @@ Failure path: the proposal expires before approval. It becomes terminal, cannot 
 
 Failure path: credentials lack tenant or Agent permissions. API responses fail closed with structured errors that do not reveal unrelated tenant records.
 
-## Open Questions For UX Closure
+### UJ-5 - Priya governs a production-like launch
 
-These are inherited from the PRD and should be resolved or explicitly carried into architecture/stories:
+1. Priya opens Launch readiness and sees every failed, insufficient, stale, and not-yet-evaluated gate before any passing summary.
+2. She verifies the read-only complete-context-or-blocked policy and effective model budget.
+3. She authors and validates a Content Safety policy version, confirms its future-only effect, and publishes it; the UI waits for authoritative projection evidence before showing success.
+4. She configures numeric monthly tenant budget and per-call caps, then verifies usage/reservations, the 80% warning, and the 100% blocked state.
+5. She inspects the 365-day retention rule, legal-hold status, and authorized export/deletion controls.
+6. She reviews latency samples, SM-2/SM-3 cohort/window, and Level 4–5 evidence.
+7. **Climax:** production-like callability appears only when every current gate is proven, sufficiently sampled, and version-linked.
+8. Resolution: Priya can identify the exact owner and recovery action for any later regression without exposing sensitive content.
 
-| ID | Question |
-|---|---|
-| OQ-1 | Exact Conversation invocation pattern: mention, command, action button, participant membership, mention resolution, or combination. |
-| OQ-2 | Module ownership for Proposed Agent Reply runtime state and storage boundaries. |
-| OQ-3 | Default and configurable proposal expiry behavior. |
-| OQ-4 | Approver notification path. |
-| OQ-5 | Latency target for automatic and confirmation modes. |
-| OQ-6 | Launch cost controls: quotas, budgets, or reporting only. |
-| OQ-7 | Provider capability metadata required in V1. |
-| OQ-8 | Audit retention, export, deletion, and legal hold behavior for generated proposal versions. |
-| OQ-9 | Safety filters, content policies, or prompt constraints required before launch. |
-| OQ-10 | Behavior when the Source Conversation is too large for the selected model. |
+Failure path: policy publication, budget reservation, export, deletion, or projection confirmation partially fails. The surface remains pending or restrictive, announces the failure accessibly, and never presents partial application as success.
+
+## UX Closure Decisions — 2026-08-01
+
+- The Conversation-owned **Call hexa** action is the only V1 invocation entry.
+- Proposal notification is in-product only through pending-count, queue, and status-entry surfaces.
+- Proposal expiry defaults to 24 hours and may be configured from 1 hour through 30 days for future proposals; existing `ExpiresAt` values do not move.
+- Complete Conversation Context is read-only policy: use all of it or fail closed. No bounded-context controls appear.
+- Safety, cost, launch-readiness, and audit-governance authoring/inspection surfaces are required and follow the policy/evidence rules above.
+- All high-impact outcomes remain pending or restrictive until authoritative projections/evidence confirm success.

@@ -1,5 +1,5 @@
 # generated: 2026-06-23T21:28:59+02:00
-# last_updated: 2026-08-01T10:25:37+02:00
+# last_updated: 2026-08-01T17:47:53+02:00
 # project: agents
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-06-23T21:28:59+02:00
-last_updated: 2026-08-01T10:25:37+02:00
+last_updated: 2026-08-01T17:47:53+02:00
 project: agents
 # retrospectives: epic-1 retro completed 2026-06-26 (epic-1-retro-2026-06-26.md); epic-2 retro completed 2026-06-24 (epic-2-retro-2026-06-24.md); epic-3 retro completed 2026-06-26 (epic-3-retro-2026-06-26.md); epic-4 retro completed 2026-06-25 (epic-4-retro-2026-06-25.md)
 project_key: NOKEY
@@ -83,6 +83,26 @@ development_status:
   4-4-define-and-enforce-launch-readiness-gates: done
   4-5-verify-end-to-end-governance-and-contract-conformance: done
   epic-4-retrospective: done
+  epic-5: backlog
+  5-1-correct-platform-hosting-boundary-and-quality-gates: backlog
+  5-2-enforce-complete-launch-readiness-before-callability: backlog
+  5-3-bind-eventstore-operations-and-setup-read-models: backlog
+  5-4-bind-tenant-access-party-identity-and-approver-resolution: backlog
+  5-5-persist-interaction-proposal-status-and-audit-read-models: backlog
+  5-6-reconcile-provider-capability-runtime-contracts: backlog
+  5-7-bind-dapr-workflow-as-the-sole-v1-durable-owner: backlog
+  5-8-bind-authorized-complete-conversation-context: backlog
+  5-9-bind-the-live-content-safety-engine: backlog
+  5-10-bind-provider-execution-and-atomic-cost-reservations: backlog
+  5-11-establish-ai-membership-and-post-idempotently: backlog
+  5-12-expose-the-conversation-owned-call-hexa-action: backlog
+  5-13-expose-pending-proposal-counts-and-needs-my-action-queue: backlog
+  5-14-expose-proposal-detail-actions-and-accessible-expiry: backlog
+  5-15-enforce-sensitive-retention-and-legal-holds: backlog
+  5-16-export-and-cryptographically-delete-agent-audit-content: backlog
+  5-17-operate-policies-metrics-budgets-and-launch-status: backlog
+  5-18-prove-live-conformance-and-reassess-readiness: backlog
+  epic-5-retrospective: optional
 
 action_items:
   - epic: 2
@@ -104,19 +124,19 @@ action_items:
   - epic: 4
     action: "Implement one mechanical Dev Agent Record pre-review gate for manual and story-automator paths. The gate must regenerate the canonical test-count record from fresh Release test results, compare the story File List bidirectionally with git status, and fail before review on test failure, result-parsing failure, or any missing, extra, or stale record entry. This consolidates the duplicate Epic 2, 3, and 4 actions raised after recurring drift across all six Epic 2 stories and subsequent stories."
     owner: "Amelia (Developer)"
-    status: open
+    status: open  # Tracked by Story 5.18.
   - epic: 4
     action: "Author the production / live-binding plan (de-facto Epic 5): convert the Story 4.5 report sections 5/6 enumeration into a real epic+story plan (durable runtime owner AD-18, read-model projections, Conversations AddParticipant seam AD-6/7, provider-SDK adapter, content-safety engine, AppHost topology), each gated on its prerequisite governance decision. The AppHost topology story must initialize shared EventStore security with builder.AddHexalithEventStoreSecurity() and apply EventStore Aspire security helpers to authenticated resources."
     owner: "Winston (Architect)"
-    status: open
+    status: done  # Superseded and completed by approved 2026-08-01 Correct Course proposal, corrected AD-16, and Epic 5. Platform-owned hosting replaces the historical module AppHost clause.
   - epic: 4
     action: "Drive the six named governance decisions to closure (OQ-5 latency SLOs, OQ-6 cost thresholds, OQ-8 audit retention/legal-hold/export/deletion, OQ-9 content-safety categories, OQ-10 bounded-context values, OQ-11 SM-2/SM-3 thresholds). Each fails closed and blocks production-like enablement by design."
     owner: "John (PM) + Winston (Architect)"
-    status: open
+    status: done  # Resolved in the PRD V1 Decision Register on 2026-08-01; implementation is tracked by Stories 5.2, 5.8-5.10, and 5.15-5.18.
   - epic: 4
     action: "Stand up the live integration-test tier when the first deferred seam binds (create Hexalith.Agents.IntegrationTests): each 'reverify on live binding' row in report section 6 gets a live integration test the day its seam goes live (session-restore replay, durable-owner ownership, tool-schema conformance, retry idempotency, projection freshness)."
     owner: "Murat (Test Architect)"
-    status: open
+    status: open  # Tracked across Stories 5.3-5.18; V1 excludes tool-schema conformance.
   - epic: 4
     action: "Close the still-open capability-version reconciliation (carries Epic 2 AI#5, Story 2.3): add the context-time floor re-check of catalog CapabilityVersion vs snapshot ProviderCapabilityVersion, or formally accept current behaviour in the spine."
     owner: "Winston (Architect)"
@@ -124,36 +144,36 @@ action_items:
   - epic: 4
     action: "Implement the AD-10/AD-11/AD-13 runtime reconciliation before live provider binding: persist a capability high-water mark initialized from the snapshot and advanced by every identified live version, require trust-bearing fresh lower/equal/higher reads plus current enabled/configured/text-generation readiness and valid limits, and carry EffectiveProviderCapabilityVersion consistently through runtime/provider/evidence contracts. Immediately before generation/regeneration, repeat the authorized context read, token measurement, capability check, and budget calculation. Checkpoint the canonical SHA-256 prepared-attempt descriptor before invocation; only transient transport/timeout retries may reuse its deterministic id, and any version/readiness/fingerprint change fails closed. Add focused tests for all clauses."
     owner: "Amelia (Developer)"
-    status: open
+    status: open  # Tracked by Stories 5.6, 5.8, and 5.10.
   - epic: 4
     action: "Write down the load-bearing patterns (carries Epic 2 AI#3): the orchestrator->single-command->twin-policy and the 1.7/4.4 record-and-gate patterns as a referenced convention note rather than per-story Dev Notes."
     owner: "Paige (Tech Writer) + Winston (Architect)"
-    status: open
+    status: open  # Tracked by Stories 5.1 and 5.7 using IMPLEMENTATION-CONVENTIONS.md.
   - epic: 1
     action: "Record the Epic 1 static-vs-live readiness contract: which facts come from durable Agent state, which blockers require live dependency verdicts, and which UI states must render as not evaluated until live read models are bound."
     owner: "Paige (Tech Writer) + Winston (Architect)"
-    status: open
+    status: open  # Tracked by Stories 5.2, 5.3, and 5.17.
   - epic: 1
     action: "Decide the module placement path for Hexalith.Agents: keep it as a workspace folder, promote it to its own submodule/repository, or document the current folder layout as the V1 production layout."
     owner: "Winston (Architect)"
-    status: open
+    status: open  # Repository placement remains separate; Story 5.1 owns the corrected platform-hosting boundary.
   - epic: 1
     action: "Create an Epic 2 seam map pairing every Epic 1 deferred setup seam (IAgentCommandDispatcher, IProviderCatalogReader, IApproverPolicyResolver, UI gateways, AppHost topology, and Conversations membership) with its live owner and fail-closed fallback."
     owner: "Winston (Architect) + Amelia (Developer)"
-    status: open
+    status: open  # Superseded seam ownership is explicit across Stories 5.1-5.11; close after story files bind exact contracts.
   - epic: 3
     action: "Publish a standalone proposal lifecycle convention covering orchestrator-to-command-to-twin-policy, proposal sub-state eligibility, terminal-state behavior, and hosted action-control boundaries."
     owner: "Winston (Architect) + Paige (Tech Writer)"
-    status: open
+    status: open  # Tracked by Stories 5.5, 5.7, and 5.14.
   - epic: 3
     action: "Close the edit-failed retryability trap: update edit eligibility to follow proposal sub-state after recorded failures, or document the accepted behavior with tests."
     owner: "Amelia (Developer) + Winston (Architect)"
-    status: open
+    status: open  # Tracked by Story 5.14.
   - epic: 3
     action: "Decide and record proposal expiry and active-notification policy (OQ-3 and OQ-4), including what in-product visibility only means for launch readiness."
     owner: "John (PM) + Winston (Architect)"
-    status: open
+    status: done  # Resolved 2026-08-01; implementation is tracked by Stories 5.7, 5.13, and 5.14.
   - epic: 3
     action: "When the live proposal read/projection seam binds, add integration tests for proposal queue/detail authorization, freshness, tenant non-disclosure, and content-safe rendering."
     owner: "Murat (Test Architect)"
-    status: open
+    status: open  # Tracked by Stories 5.5, 5.13, 5.14, and 5.18.
