@@ -3,12 +3,15 @@ name: Hexalith Agents
 description: FrontComposer web UI for governed AI participants in Hexalith Conversations. Fluent UI Blazor v5 is inherited; this spine specifies the Agents-specific semantic delta only.
 status: final
 created: 2026-06-23
-updated: 2026-08-01
+updated: 2026-08-02
 sources:
   - ../../briefs/brief-agents-2026-06-23/brief.md
   - ../../prds/prd-agents-2026-06-23/prd.md
   - ../../prds/prd-agents-2026-06-23/addendum.md
   - ../../prds/prd-agents-2026-06-23/reconcile-brief.md
+  - ../../sprint-change-proposal-2026-08-02.md
+  - ../../architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md
+  - ../../launch-readiness-register.md
   - ../../../../references/Hexalith.Tenants/_bmad-output/planning-artifacts/ux-designs/ux-tenants-2026-06-02/DESIGN.md
   - ../../../../references/Hexalith.FrontComposer/_bmad-output/project-context.md
   - ../../../../references/Hexalith.FrontComposer/docs/reference/components/front-composer-shell.md
@@ -16,11 +19,11 @@ sources:
   - ../../../../references/Hexalith.FrontComposer/docs/reference/components/datagrid.md
 colors:
   status-success:
-    note: 'Inherit Fluent BadgeColor.Success. Reserved for proven readiness, posted response, approved version, audit available, and active configuration.'
+    note: 'Inherit Fluent BadgeColor.Success. Reserved for authoritatively proven callable Agent readiness, posted Conversation Messages, current passing evidence, and projection-confirmed completed operations.'
   status-informative:
-    note: 'Inherit Fluent BadgeColor.Informative. Used for generation in progress, proposal pending, approval waiting, posting pending, readiness checking, and neutral operational progress.'
+    note: 'Inherit Fluent BadgeColor.Informative. Used for submitted or authoritative-pending commands, generation in progress, proposal pending, approved, posting pending, readiness checking, and other nonterminal progress.'
   status-warning:
-    note: 'Inherit Fluent BadgeColor.Warning. Used for expiring proposals, latency/cost warnings, degraded provider capacity, and states that need attention but remain recoverable.'
+    note: 'Inherit Fluent BadgeColor.Warning. Used for expiring proposals, latency/cost warnings, and Provider Degraded only when the architecture result also reports Callability == Callable.'
   status-severe:
     note: 'Inherit Fluent BadgeColor.Severe. Used for blocked readiness, disabled provider/model, disabled Agent, expired proposal, unavailable dependency, or fail-closed call state.'
   status-danger:
@@ -143,15 +146,15 @@ The surface is not classified as regulated UX, but it is governed operational UX
 
 Colors inherit Fluent semantic roles by name. Bind meaning to role, never to hex. `Brand` is chrome and eligible primary action only; it is not a state color.
 
-- `{colors.status-success}` means proven usable or complete: active Agent, enabled provider/model, approved version, posted response, audit available.
-- `{colors.status-informative}` means in progress or waiting: generation running, proposal pending, approval waiting, posting pending, readiness checking.
-- `{colors.status-warning}` means attention soon: proposal nearing expiry, provider degraded, context near model limit, cost/latency warning where a launch policy defines one.
+- `{colors.status-success}` means authoritatively proven or complete: current callable Agent readiness, `Ready / Callable / None` Provider readiness, `posted` Conversation Message, current passing evidence, or projection-confirmed completed operation.
+- `{colors.status-informative}` means in progress or waiting: submitted or authoritative-pending command, generation running, proposal pending, approval waiting, `approved`, `posting pending`, or readiness checking.
+- `{colors.status-warning}` means attention soon: proposal nearing expiry, `Degraded / Callable / NonBlockingOperationalWarning` Provider readiness, context near model limit, or cost/latency warning where a launch policy defines one.
 - `{colors.status-severe}` means blocked but not a runtime failure: disabled Agent, disabled provider/model, expired proposal, missing Party identity, missing Conversation access, unavailable dependency.
 - `{colors.status-danger}` means failure or denial: authorization denied, generation failed, posting failed, proposal rejected, provider error.
 - `{colors.status-important}` means state is uncertain and must be resolved before side effects: ambiguous identity, missing/stale policy basis, indeterminate budget reservation, or incomplete restrictive deletion confirmation.
 - `{colors.status-subtle}` means quiet history or non-actionable state: abandoned proposal, disabled but valid option, no pending proposals, read-only inspection.
 
-No-color-only is mandatory. Every status appears as semantic color plus icon plus visible text. The icon vocabulary should be verified against the pinned Fluent UI package at build, following the Tenants precedent. Do not rely on provider logos or model brand colors to carry status.
+No-color-only is mandatory under the binding WCAG 2.2 AA floor. Every status appears as a Fluent semantic role plus icon plus visible text and accessible name. The icon vocabulary should be verified against the pinned Fluent UI package at build, following the Tenants precedent. Do not rely on provider logos or model brand colors to carry status.
 
 ## Typography
 
@@ -159,7 +162,7 @@ Typography inherits Fluent. Use `{typography.heading}` for page and panel titles
 
 Generated reply content may be longer and more prose-like than the surrounding admin UI, but it should still use the inherited body role inside a bounded preview/editor region. Do not introduce editorial display typography for AI text; it would make generated content feel more authoritative than it is.
 
-All labels, states, denial reasons, expiry notices, provider/model names, approval actions, and audit references must be localizable whole strings. Do not assemble approval or audit sentences from fragments at runtime.
+All labels, states, denial reasons, expiry notices, provider/model names, approval actions, and audit references must be localizable whole strings. English and French resource keys must remain at exact parity. Do not assemble approval, posting, failure, readiness, or audit sentences from fragments at runtime. Missing keys or conditional localization skips are conformance failures, not acceptable fallback behavior.
 
 ## Layout & Spacing
 
@@ -171,6 +174,8 @@ Use FrontComposer page measures deliberately:
 Spacing follows the Fluent-compatible 4px rhythm in frontmatter. Use `{spacing.4}` between related form fields, `{spacing.6}` between major sections, and `{spacing.8}` only for page-level separation. Avoid decorative card grids. These are admin workflows; dense tables, forms, panels, split views, tabs, and inline status regions should do the work.
 
 Reserve stable space for status badges, action slots, expiry labels, and proposal state indicators so rows do not jump when a proposal changes state or a call transitions from generation to posting.
+
+A page, dialog, or detail panel with two or more sibling titled content sections uses one `FluentAccordion` with one `FluentAccordionItem` per section and the primary item expanded by default. Keep page titles, breadcrumbs, toolbars, navigation chrome, and a single primary content region outside the accordion. Never hide the only primary content behind an accordion interaction.
 
 ## Elevation & Depth
 
@@ -184,15 +189,15 @@ Inherit Fluent shapes. Do not add custom radii for Agent surfaces. Status badges
 
 ### agent-readiness-badge
 
-Shows whether `hexa` is callable. It combines Agent lifecycle, Party identity, provider/model readiness, instructions validity, response mode, and approver policy completeness into a readable readiness indicator. The badge must not collapse "active" and "callable" if dependencies are missing. Use `{colors.status-success}` only when all required readiness gates pass.
+Shows whether `hexa` is callable. It combines Agent lifecycle, Party identity, provider/model readiness, instructions validity, response mode, approver policy completeness, and authoritative gate evidence into a readable readiness indicator. Lifecycle `active` is not proof of callability. Use `{colors.status-success}` only when the current authoritative readiness projection proves the Agent callable; missing, blocked, stale, or `InsufficientEvidence` results never use Success.
 
 ### provider-status-badge
 
-Shows provider/model availability without exposing secrets. Enabled/usable is `{colors.status-success}`; disabled or unavailable is `{colors.status-severe}`; provider/runtime failure is `{colors.status-danger}`; degraded capacity or policy warning is `{colors.status-warning}`; disabled but valid historical selections can use `{colors.status-subtle}`.
+Shows the architecture-owned `ProviderReadinessResult` without exposing secrets. `Ready / Callable / None` may use `{colors.status-success}`. `Degraded / Callable / NonBlockingOperationalWarning` always uses `{colors.status-warning}` and remains callable only because the result says `Callability == Callable`; the UI never infers callability from `OperationalState`. `Blocked / Blocked / <defined blocker>` uses `{colors.status-severe}` or `{colors.status-danger}` according to the safe failure class. Disabled but valid historical selections can use `{colors.status-subtle}`.
 
 ### proposal-state-badge
 
-Renders the proposal lifecycle: generated, edited, regenerated, pending approval, approved, rejected, abandoned, expired, posting pending, posted, posting failed. Approved is not the same as posted. Expired and terminal states must be visually distinct from pending states.
+Renders the proposal lifecycle: generated, edited, regenerated, pending approval, approved, rejected, abandoned, expired, posting pending, posted, posting failed. `Approved` and `posting pending` use progress semantics; only `posted` uses `{colors.status-success}` and proves a Conversation Message exists. Rejected, abandoned, expired, and posting failed remain visually distinct non-success terminal states.
 
 ### response-mode-toggle
 
@@ -212,25 +217,45 @@ Full-width grid for provider/model administration. Provider name, enabled state,
 
 ### proposal-queue-grid
 
-Full-width grid for pending and historical proposals. Pinned columns should include proposal state, source conversation, caller, current approver responsibility, expiry, and age. The queue should make "needs my action" visually discoverable without hiding other authorized records.
+Full-width grid for pending and historical proposals created after successful generation. Pinned columns should include proposal state, source conversation, caller, current approver responsibility, expiry, and age. The queue should make "needs my action" visually discoverable without hiding other authorized records. Separate generation-failure records never appear as proposal rows.
 
 ### proposal-editor
 
-The editor is a bounded approval workspace. It shows the current selected version, editable content where authorized, source metadata, version actions, and approval controls. Generated content and edited content are labeled distinctly. A proposed reply is never styled like an already-posted Conversation Message.
+The editor is a bounded approval workspace created only after successful generation. It shows the current selected version, editable content where authorized, source metadata, version actions, and approval controls. Generated content and edited content are labeled distinctly. A proposed reply is never styled like an already-posted Conversation Message. Failed generation never opens this workspace; retained failure content belongs only to a separate non-approvable failure record.
 
 ### version-history
 
-Shows every generated, edited, and regenerated version with author/source, timestamp, provider/model where applicable, and approval/posting markers. Prior versions remain visible after edit or regeneration. Use `{typography.mono}` for timestamps and references.
+Shows every successfully generated, edited, and regenerated proposal version with author/source, timestamp, provider/model where applicable, and approval/posting markers. Prior versions remain visible after edit or regeneration. Retained generation-failure content is not a proposal version. Use `{typography.mono}` for timestamps and references.
 
 ### conversation-agent-call
 
-The sole V1 invocation affordance is the Conversation-owned **Call hexa** action. It visibly names `hexa`, opens an accessible prompt surface, shows the effective response mode before submission, and never implies that generated or proposed content is already a Conversation Message. Mentions, commands, ambient triggers, and alternate entry points are out of V1.
+The sole V1 invocation affordance is the Conversation-owned **Call hexa** action. It visibly names `hexa`, opens an accessible prompt surface, shows the effective response mode before submission, and presents `submitted`, `authoritative pending`, and `projection-confirmed terminal` as distinct states. It never implies that generated or proposed content is already a Conversation Message. Mentions, commands, ambient triggers, and alternate entry points are out of V1.
 
-### policy and readiness surfaces
+### conversation-context-policy-panel
 
-The Conversation context policy is read-only and shows complete-context-or-blocked behavior, effective model budget, policy version, and why an oversized call cannot proceed. Content-safety authoring shows fixed blocked categories, restricted handling, policy version, validation, and an explicit publish action. Cost-control authoring shows monthly tenant budget, per-call caps, current usage/reservations, 80% warning, and 100% blocked state. Launch readiness shows latency targets, sample sufficiency, SM-2/SM-3 cohort/window, evidence levels, and every remaining blocker. Audit governance shows the 365-day rule, legal hold, encrypted time-limited export, deletion progress, projection purge, and restrictive partial-failure states. Each multi-section surface uses `FluentAccordion`; all controls use FrontComposer and Fluent UI Blazor v5 primitives.
+Read-only complete-context-or-blocked behavior, effective model budget, policy version, and the safe reason an oversized call cannot proceed. The surface offers no truncation, summary, windowing, or retrieval control.
 
-High-impact publish, export, legal-hold, and deletion actions require explicit confirmation, current authorization, future-only effect copy where applicable, keyboard/focus/live-region behavior, and projection/evidence-confirmed success. A pending or partially applied result never receives success styling.
+### content-safety-policy-editor
+
+Fixed blocked categories, restricted handling, policy version, validation, and an explicit publish action. Publishing uses the pending-command treatment below and never permits a weaker retry.
+
+### cost-control-editor
+
+Monthly tenant budget, per-call caps, current usage/reservations, 80% warning, and 100% blocked state. Indeterminate reservations remain blocked and non-success.
+
+### launch-readiness-panel
+
+Shows `Pass`, `Block`, `InsufficientEvidence`, and `Stale`; exact NFR-14 thresholds; sample sufficiency; SM-2/SM-3 cohort/window; evidence levels; `ObservedAt` and exclusive `ValidUntil`; and every remaining blocker.
+
+NFR-14 visual evidence must expose the three exact gates without turning browser-local progress into server truth: page usability p95 <= 2.5 seconds, authoritative pending acknowledgement p95 <= 500 milliseconds, and terminal render/live-region announcement p95 <= 2 seconds. Each gate requires at least 30 qualifying production-like executions of its own sample kind. Any missing authoritative tick or reference, absent localized live-region mutation, mixed clock origin, failed correlation, conflicting duplicate, or undersized sample set renders `InsufficientEvidence`, never Success.
+
+### audit-governance-panel
+
+The 365-day rule, legal hold, encrypted time-limited export, deletion progress, projection purge, and restrictive partial-failure states remain visible and support-safe.
+
+Each multi-section policy, readiness, or governance surface follows the `FluentAccordion` rule above; all controls use FrontComposer and Fluent UI Blazor v5 primitives.
+
+High-impact proposal resolution, policy publication, tenant budget update, legal hold, export, and deletion actions require explicit confirmation, current authorization, future-only effect copy where applicable, keyboard/focus/live-region behavior, and projection/evidence-confirmed success. Pending styling and disabled action treatment apply only to the same resource and operation family in the current session; unrelated resources and families remain available. A pending or partially applied result never receives success styling.
 
 ### proposal-notification
 
@@ -238,11 +263,11 @@ V1 notifications are in-product only: an accessible pending-count badge and prop
 
 ### operational-status-panel
 
-Status region for readiness, recent call outcomes, generation failures, proposal bottlenecks, provider readiness, and posting outcomes. It uses MessageBar/status-region patterns and should group by recoverable action rather than raw subsystem.
+Status region for readiness, recent call outcomes, generation failures, proposal bottlenecks, provider readiness, and posting outcomes. A generation failure appears as a separate non-approvable failure record and never as a Proposed Agent Reply. The panel uses MessageBar/status-region patterns and groups by recoverable action rather than raw subsystem.
 
 ### audit-evidence-panel
 
-Support-safe evidence view linking caller, Agent, Source Conversation, provider/model, proposal versions, approver, approval timestamp, posted Conversation Message, and outcome. Never displays provider secrets, raw credentials, unrelated tenant data, raw payload dumps, or stack traces.
+Support-safe evidence view linking caller, Agent, Source Conversation, provider/model, proposal versions when generation succeeded, separate failure record when generation failed, approver, approval timestamp, authoritative pending identity/projection version, projection-confirmed terminal timestamp, posted Conversation Message, and outcome. Never displays provider secrets, raw credentials, unrelated tenant data, raw payload dumps, or stack traces.
 
 ## Do's and Don'ts
 
@@ -250,8 +275,11 @@ Support-safe evidence view linking caller, Agent, Source Conversation, provider/
 |---|---|
 | Inherit FrontComposer and Fluent visual defaults | Invent a custom Agents design system |
 | Make proposed replies visually distinct from Conversation Messages | Style generated draft content as if it has been posted |
-| Use Success only for active/callable/proven/posted/audit-available states | Use Success for generation started, proposal pending, or approval waiting |
+| Use Success only for authoritatively proven callable, posted, current-pass, or projection-confirmed complete states | Use Success for lifecycle active, submitted, authoritative pending, approved, or posting pending |
+| Render Provider Degraded as Warning and obey `Callability` from the readiness result | Infer callability from Provider enabled/degraded labels or UI policy |
+| Keep generation failure in a separate non-approvable failure record | Create a Proposed Agent Reply from failed or incomplete generation |
 | Show provider/model readiness without exposing secrets | Display provider credentials, raw secret values, or provider SDK details |
 | Preserve version labels, timestamps, and approval basis | Let edits overwrite or visually hide generated versions |
 | Keep `hexa` named and attributable | Make `hexa` a mascot or anonymous system voice |
-| Use whole localizable strings | Assemble approval/audit sentences from fragments |
+| Keep English/French keys at parity and use whole localizable strings | Assemble approval/audit sentences from fragments or accept missing locale keys |
+| Use Fluent semantic roles, Fluent v5 parameters, and Fluent 2 tokens | Define a custom theme, hard-code colors, or use Fluent v4/FAST tokens |
