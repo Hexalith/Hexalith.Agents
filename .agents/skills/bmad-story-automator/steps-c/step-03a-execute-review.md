@@ -63,75 +63,7 @@ result=$("$scripts" monitor-session "$session" --json --agent "$current_agent")
   Display: `[story {N}/{total}] automate -> skip (non-blocking)`
   → proceed to D
 
-### D. Dev Agent Record Readiness Gate
-
-Run this gate after Automate completes or is skipped, including when Automate
-exhausted its non-blocking retries. Do not initialize or increment a review
-cycle until the gate passes.
-
-Resolve exactly one story through the existing create-story success contract;
-the helper can return exit 0 with `verified=false`, so inspect its JSON result:
-
-```bash
-resolution=$("$scripts" validate-story-creation check "{story_id}" --state-file "{outputFile}")
-resolution_ok=$(printf '%s' "$resolution" | jq -r '.verified and ((.matches // []) | length == 1)')
-
-if [ "$resolution_ok" = "true" ]; then
-  story_file=$(printf '%s' "$resolution" | jq -r '.matches[0]')
-  if gate_output=$(python3 "{project-root}/tools/check-story-review-readiness.py" "$story_file" 2>&1); then
-    gate_rc=0
-  else
-    gate_rc=$?
-  fi
-else
-  story_file=""
-  gate_rc=1
-  gate_output="Story resolution failed: $(printf '%s' "$resolution" | jq -r '.reason // "expected exactly one story file"')"
-fi
-```
-
-**If `gate_rc == 0`:**
-
-```bash
-gate_summary=$(printf '%s\n' "$gate_output" | tail -n 1)
-echo "- **[$(date -u +%Y-%m-%dT%H:%M:%SZ)]** RECORD_READINESS_PASSED: $gate_summary" >> "{outputFile}"
-```
-
-Display: `[story {N}/{total}] record-readiness -> done`
-→ proceed to E
-
-**If `gate_rc != 0`:**
-
-1. Do not spawn a review session, consume a review-cycle retry, or change the
-   progress table's review cell.
-2. Preserve the story and sprint statuses so the Developer can correct the
-   reported record drift.
-3. Pause on this resumable step and remove the stop marker through the installed
-   helper rather than hard-coding its path.
-
-```bash
-timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-{
-  echo "- **[$timestamp]** RECORD_READINESS_BLOCKED (exit $gate_rc)"
-  printf '%s\n' "$gate_output" | sed 's/^/  /'
-} >> "{outputFile}"
-
-if "$scripts" orchestrator-helper state-update "{outputFile}" \
-  --set status=PAUSED \
-  --set currentStep=step-03a-execute-review \
-  --set lastUpdated="$timestamp"; then
-  "$scripts" orchestrator-helper marker remove
-else
-  echo "CRITICAL: Readiness failed and PAUSED state could not be persisted; stop marker retained." >&2
-fi
-```
-
-Display the concise remediation output and offer Developer correction followed
-by resume, or a manual pause. If the pause-state update fails, retain the stop
-marker and escalate the critical diagnostic. **HALT.** Never substitute a checklist assertion
-or reviewer judgment for a passing command.
-
-### E. Code Review Loop
+### D. Code Review Loop
 
 **See `{reviewLoop}` for complete script-based review cycle with v2.3 per-task agent configuration.**
 
@@ -170,7 +102,7 @@ Key points:
   sed "s/^| ${story_id} |.*$/| ${story_id} | done | done | done | done | - | in-progress |/" "{outputFile}" > "$tmp_state" && mv "$tmp_state" "{outputFile}"
   ```
   Display: `[story {N}/{total}] review -> done`
-  → Auto-Proceed to Finalization | `incomplete` → count as failed attempt, retry until maxCycles, then CRITICAL escalate (Trigger #8)
+  → E | `incomplete` → count as failed attempt, retry until maxCycles, then CRITICAL escalate (Trigger #8)
 - Exit loop when sprint-status shows "done"
 - If `review_summary.next_action` is ambiguous, ask one clarifying question before escalating.
 

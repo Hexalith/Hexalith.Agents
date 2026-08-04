@@ -1,49 +1,61 @@
 installation:
-  version: 6.9.0
+  version: 6.10.1-next.49
   installDate: 2026-06-23T05:31:35.283Z
-  lastUpdated: 2026-06-23T05:31:35.283Z
+  lastUpdated: 2026-08-04T07:13:33.756Z
 modules:
   - name: core
-    version: 6.9.0
+    version: 6.10.1-next.49
     installDate: 2026-06-23T05:31:34.749Z
-    lastUpdated: 2026-06-23T05:31:35.274Z
+    lastUpdated: 2026-08-04T07:13:33.743Z
     source: built-in
     npmPackage: null
     repoUrl: null
   - name: bmm
-    version: 6.9.0
+    version: 6.10.1-next.49
     installDate: 2026-06-23T05:31:34.715Z
-    lastUpdated: 2026-06-23T05:31:35.276Z
+    lastUpdated: 2026-08-04T07:13:33.745Z
     source: built-in
     npmPackage: null
     repoUrl: null
+  - name: cis
+    version: main
+    installDate: 2026-06-23T05:31:35.175Z
+    lastUpdated: 2026-08-04T07:13:33.747Z
+    source: external
+    npmPackage: bmad-creative-intelligence-suite
+    repoUrl: https://github.com/bmad-code-org/bmad-module-creative-intelligence-suite
+    channel: next
+    sha: 07a8dd03d196a762f21c241d985293fe5b0f90e7
   - name: tea
-    version: v1.19.0
+    version: main
     installDate: 2026-06-23T05:31:35.054Z
-    lastUpdated: 2026-06-23T05:31:35.278Z
+    lastUpdated: 2026-08-04T07:13:33.749Z
     source: external
     npmPackage: bmad-method-test-architecture-enterprise
     repoUrl: https://github.com/bmad-code-org/bmad-method-test-architecture-enterprise
-    channel: stable
-    sha: 8734d51f24071ddbcb3617390b5fcddb4128ef77
+    channel: next
+    sha: 34f3535b05389905825f725b4b42776bd5bff555
   - name: automator
     version: main
     installDate: 2026-06-23T05:31:35.150Z
-    lastUpdated: 2026-06-23T05:31:35.281Z
+    lastUpdated: 2026-08-04T07:13:33.752Z
     source: external
     npmPackage: bmad-story-automator
     repoUrl: https://github.com/bmad-code-org/bmad-automator
     channel: next
-    sha: f332173a692ffbabb24734c31dedadfcf78b9ed1
-  - name: cis
-    version: v0.2.1
-    installDate: 2026-06-23T05:31:35.175Z
-    lastUpdated: 2026-06-23T05:31:35.283Z
+    sha: 0b94fd7bec8672f5bc384123f1f76e1daae1dc2b
+  - name: bmad-loop
+    version: main
+    installDate: 2026-08-04T07:13:33.617Z
+    lastUpdated: 2026-08-04T07:13:33.756Z
     source: external
-    npmPackage: bmad-creative-intelligence-suite
-    repoUrl: https://github.com/bmad-code-org/bmad-module-creative-intelligence-suite
-    channel: stable
-    sha: 07a8dd03d196a762f21c241d985293fe5b0f90e7
+    npmPackage: null
+    repoUrl: https://github.com/bmad-code-org/bmad-loop
+    channel: next
+    sha: dfeead201e45dbe52f0a41d33a86742450cef5ff
 ides:
   - claude-code
   - codex
+  - cursor
+  - github-copilot
+  - opencode
