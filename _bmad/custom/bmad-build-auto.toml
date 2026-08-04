@@ -1,0 +1,9 @@
+[workflow]
+
+activation_steps_append = [
+  """
+Before Step 1 writes any file, run the version-control sanity check and require a clean working tree. Record that this preflight passed.
+
+If Step 1 subsequently compiles `epic-<N>-context.md`, treat only that exact newly generated context file as workflow-owned during Step 1's later clean-tree check. Any path that existed before preflight, or any additional modified/untracked path, must still halt as a dirty working tree. If a cached context was used instead of generated, require the tree to remain completely clean.
+""",
+]
