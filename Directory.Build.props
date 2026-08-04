@@ -5,15 +5,30 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Authors>Hexalith Contributors</Authors>
+    <Company>Hexalith</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Hexalith/Hexalith.Agents</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Hexalith/Hexalith.Agents</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(IsPackable)' == 'true'">
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
   <PropertyGroup>
-    <!-- Sibling-source resolution (mirrors the Hexalith*Root pattern used across the ecosystem).
-         The root `agents` workspace keeps its sibling modules under `references`, so the
-         `references\Hexalith.Xxx\...` branch resolves the normal layout. The `..\Hexalith.Xxx` branch supports a
-         future standalone checkout where dependencies sit beside the workspace directory.
-         No project references these roots yet (the buildable shell needs no cross-module source); they
-         are scaffolding for the Agent-setup stories (1.2-1.8) that will. -->
+    <!-- UseHexalithProjectReferences is the authoritative dependency mode. Ordinary Debug
+         work uses sibling source; Release and all other configurations use packages. -->
+    <UseHexalithProjectReferences Condition="'$(UseHexalithProjectReferences)' == '' and '$(UseNuGetDeps)' == '' and ('$(Configuration)' == '' or '$(Configuration)' == 'Debug')">true</UseHexalithProjectReferences>
+    <UseHexalithProjectReferences Condition="'$(UseHexalithProjectReferences)' == '' and '$(UseNuGetDeps)' == ''">false</UseHexalithProjectReferences>
+    <UseHexalithProjectReferences Condition="'$(UseHexalithProjectReferences)' == '' and '$(UseNuGetDeps)' == 'false'">true</UseHexalithProjectReferences>
+    <UseHexalithProjectReferences Condition="'$(UseHexalithProjectReferences)' == '' and '$(UseNuGetDeps)' == 'true'">false</UseHexalithProjectReferences>
+    <UseNuGetDeps Condition="'$(UseNuGetDeps)' == '' and '$(UseHexalithProjectReferences)' == 'true'">false</UseNuGetDeps>
+    <UseNuGetDeps Condition="'$(UseNuGetDeps)' == '' and '$(UseHexalithProjectReferences)' == 'false'">true</UseNuGetDeps>
+
+    <!-- Sibling-source resolution (mirrors the Hexalith*Root pattern used across the ecosystem). -->
     <HexalithEventStoreRoot Condition="'$(HexalithEventStoreRoot)' == '' and Exists('$(MSBuildThisFileDirectory)references\Hexalith.EventStore\src\Hexalith.EventStore.Contracts')">$(MSBuildThisFileDirectory)references\Hexalith.EventStore</HexalithEventStoreRoot>
     <HexalithEventStoreRoot Condition="'$(HexalithEventStoreRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.EventStore\src\Hexalith.EventStore.Contracts')">$(MSBuildThisFileDirectory)..\Hexalith.EventStore</HexalithEventStoreRoot>
 
@@ -31,23 +46,44 @@
 
     <HexalithCommonsRoot Condition="'$(HexalithCommonsRoot)' == '' and Exists('$(MSBuildThisFileDirectory)references\Hexalith.Commons\src\libraries\Hexalith.Commons.UniqueIds')">$(MSBuildThisFileDirectory)references\Hexalith.Commons</HexalithCommonsRoot>
     <HexalithCommonsRoot Condition="'$(HexalithCommonsRoot)' == '' and Exists('$(MSBuildThisFileDirectory)..\Hexalith.Commons\src\libraries\Hexalith.Commons.UniqueIds')">$(MSBuildThisFileDirectory)..\Hexalith.Commons</HexalithCommonsRoot>
+
+    <HexalithEventStoreFromSource Condition="'$(HexalithEventStoreFromSource)' == '' and '$(UseHexalithProjectReferences)' == 'true' and Exists('$(HexalithEventStoreRoot)\src\Hexalith.EventStore.DomainService\Hexalith.EventStore.DomainService.csproj')">true</HexalithEventStoreFromSource>
+    <HexalithConversationsFromSource Condition="'$(HexalithConversationsFromSource)' == '' and '$(UseHexalithProjectReferences)' == 'true' and Exists('$(HexalithConversationsRoot)\src\Hexalith.Conversations.Client\Hexalith.Conversations.Client.csproj')">true</HexalithConversationsFromSource>
+    <HexalithPartiesFromSource Condition="'$(HexalithPartiesFromSource)' == '' and '$(UseHexalithProjectReferences)' == 'true' and Exists('$(HexalithPartiesRoot)\src\Hexalith.Parties.Client\Hexalith.Parties.Client.csproj')">true</HexalithPartiesFromSource>
+    <HexalithTenantsFromSource Condition="'$(HexalithTenantsFromSource)' == '' and '$(UseHexalithProjectReferences)' == 'true' and Exists('$(HexalithTenantsRoot)\src\Hexalith.Tenants.Contracts\Hexalith.Tenants.Contracts.csproj')">true</HexalithTenantsFromSource>
+    <HexalithFrontComposerFromSource Condition="'$(HexalithFrontComposerFromSource)' == '' and '$(UseHexalithProjectReferences)' == 'true' and Exists('$(HexalithFrontComposerRoot)\src\Hexalith.FrontComposer.Shell\Hexalith.FrontComposer.Shell.csproj')">true</HexalithFrontComposerFromSource>
+    <HexalithCommonsFromSource Condition="'$(HexalithCommonsFromSource)' == '' and '$(UseHexalithProjectReferences)' == 'true' and Exists('$(HexalithCommonsRoot)\src\libraries\Hexalith.Commons.UniqueIds\Hexalith.Commons.UniqueIds.csproj')">true</HexalithCommonsFromSource>
   </PropertyGroup>
 
-  <!-- Detect missing build-required root-declared git submodules (the Memories RequiredRootSubmodule/CheckSubmodules pattern). -->
+  <Target Name="ValidateDependencyMode" BeforeTargets="Restore;Build;GenerateNuspec;Pack;Publish">
+    <Error Condition="'$(UseHexalithProjectReferences)' != 'true' and '$(UseHexalithProjectReferences)' != 'false'" Text="UseHexalithProjectReferences must be either true or false." />
+    <Error Condition="'$(UseNuGetDeps)' != 'true' and '$(UseNuGetDeps)' != 'false'" Text="UseNuGetDeps must be either true or false." />
+    <Error Condition="'$(UseHexalithProjectReferences)' == '$(UseNuGetDeps)'" Text="Contradictory dependency mode: UseHexalithProjectReferences and UseNuGetDeps must have opposite values." />
+    <Error Condition="'$(UseHexalithProjectReferences)' == 'false' and ('$(HexalithEventStoreFromSource)' == 'true' or '$(HexalithConversationsFromSource)' == 'true' or '$(HexalithPartiesFromSource)' == 'true' or '$(HexalithTenantsFromSource)' == 'true' or '$(HexalithFrontComposerFromSource)' == 'true' or '$(HexalithCommonsFromSource)' == 'true')" Text="Package dependency mode rejects forced Hexalith*FromSource=true properties." />
+  </Target>
+
+  <Target Name="CheckSourceDependencies" BeforeTargets="Restore;Build" DependsOnTargets="ValidateDependencyMode" Condition="'$(UseHexalithProjectReferences)' == 'true'">
+    <Error Condition="'$(HexalithEventStoreFromSource)' != 'true'" Text="Source dependency 'references/Hexalith.EventStore' is missing. Run: git submodule update --init -- references/Hexalith.EventStore from the repository root." />
+    <Error Condition="'$(HexalithConversationsFromSource)' != 'true'" Text="Source dependency 'references/Hexalith.Conversations' is missing. Run: git submodule update --init -- references/Hexalith.Conversations from the repository root." />
+    <Error Condition="'$(HexalithPartiesFromSource)' != 'true'" Text="Source dependency 'references/Hexalith.Parties' is missing. Run: git submodule update --init -- references/Hexalith.Parties from the repository root." />
+    <Error Condition="'$(HexalithTenantsFromSource)' != 'true'" Text="Source dependency 'references/Hexalith.Tenants' is missing. Run: git submodule update --init -- references/Hexalith.Tenants from the repository root." />
+    <Error Condition="'$(HexalithFrontComposerFromSource)' != 'true'" Text="Source dependency 'references/Hexalith.FrontComposer' is missing. Run: git submodule update --init -- references/Hexalith.FrontComposer from the repository root." />
+    <Error Condition="'$(HexalithCommonsFromSource)' != 'true'" Text="Source dependency 'references/Hexalith.Commons' is missing. Run: git submodule update --init -- references/Hexalith.Commons from the repository root." />
+  </Target>
+
   <ItemGroup>
     <RequiredRootSubmodule Include="Hexalith.Builds" />
-    <RequiredRootSubmodule Include="Hexalith.Commons" />
-    <RequiredRootSubmodule Include="Hexalith.EventStore" />
-    <RequiredRootSubmodule Include="Hexalith.AI.Tools" />
-    <RequiredRootSubmodule Include="Hexalith.Conversations" />
-    <RequiredRootSubmodule Include="Hexalith.Parties" />
-    <RequiredRootSubmodule Include="Hexalith.Tenants" />
-    <RequiredRootSubmodule Include="Hexalith.FrontComposer" />
   </ItemGroup>
 
-  <Target Name="CheckSubmodules" BeforeTargets="Restore;Build">
-    <Error
-      Condition="!Exists('$(MSBuildThisFileDirectory)references/%(RequiredRootSubmodule.Identity)/.git') and !Exists('$(MSBuildThisFileDirectory)../%(RequiredRootSubmodule.Identity)/.git')"
-      Text="Git submodule '%(RequiredRootSubmodule.Identity)' is missing. Run: git submodule update --init -- references/%(RequiredRootSubmodule.Identity) from the repository root." />
+  <Target Name="CheckBuildCatalog" BeforeTargets="Restore;Build">
+    <Error Condition="!Exists('$(MSBuildThisFileDirectory)references/Hexalith.Builds/.git')" Text="Build catalog submodule 'references/Hexalith.Builds' is missing. Run: git submodule update --init -- references/Hexalith.Builds from the repository root." />
+  </Target>
+
+  <Target Name="FailReleaseWithHexalithProjectReferences" BeforeTargets="Restore;Build" DependsOnTargets="ValidateDependencyMode" Condition="'$(Configuration)' != 'Debug' and '$(UseHexalithProjectReferences)' == 'true'">
+    <Error Text="Release builds must use package references for external Hexalith libraries. Set UseHexalithProjectReferences=false." />
+  </Target>
+
+  <Target Name="FailPackWithHexalithProjectReferences" BeforeTargets="GenerateNuspec;Pack;Publish" DependsOnTargets="ValidateDependencyMode" Condition="'$(UseHexalithProjectReferences)' == 'true'">
+    <Error Text="Package creation must not use external Hexalith project references. Set UseHexalithProjectReferences=false." />
   </Target>
 </Project>

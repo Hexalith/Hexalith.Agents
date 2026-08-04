@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: 'true'
+
+jobs:
+  package-build:
+    name: Release package-mode build
+    runs-on: ubuntu-latest
+    steps:
+      - &package-checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+          submodules: false
+      - &root-submodules
+        name: Initialize root-declared submodules
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t paths < <(git config -f .gitmodules --get-regexp path | awk '{print $2}')
+          git submodule update --init -- "${paths[@]}"
+      - &package-dotnet
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          global-json-file: global.json
+      - &package-restore
+        name: Restore package graph
+        run: dotnet restore Hexalith.Agents.slnx -p:Configuration=Release -p:UseHexalithProjectReferences=false /m:1 /nr:false
+      - &package-compile
+        name: Build package graph
+        run: dotnet build Hexalith.Agents.slnx -c Release --no-restore -warnaserror -p:UseHexalithProjectReferences=false /m:1 /nr:false
+
+  contracts-tests:
+    name: Contracts tests
+    runs-on: ubuntu-latest
+    steps:
+      - *package-checkout
+      - *root-submodules
+      - *package-dotnet
+      - *package-restore
+      - *package-compile
+      - run: dotnet test test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false /m:1 /nr:false
+
+  client-tests:
+    name: Client tests
+    runs-on: ubuntu-latest
+    steps:
+      - *package-checkout
+      - *root-submodules
+      - *package-dotnet
+      - *package-restore
+      - *package-compile
+      - run: dotnet test test/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false /m:1 /nr:false
+
+  domain-tests:
+    name: Domain tests
+    runs-on: ubuntu-latest
+    steps:
+      - *package-checkout
+      - *root-submodules
+      - *package-dotnet
+      - *package-restore
+      - *package-compile
+      - run: dotnet test test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false /m:1 /nr:false
+
+  server-tests:
+    name: Server tests
+    runs-on: ubuntu-latest
+    steps:
+      - *package-checkout
+      - *root-submodules
+      - *package-dotnet
+      - *package-restore
+      - *package-compile
+      - run: dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false /m:1 /nr:false
+
+  ui-tests:
+    name: UI tests
+    runs-on: ubuntu-latest
+    steps:
+      - *package-checkout
+      - *root-submodules
+      - *package-dotnet
+      - *package-restore
+      - *package-compile
+      - run: dotnet test test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false /m:1 /nr:false
+
+  boundary-checks:
+    name: Boundary checks
+    runs-on: ubuntu-latest
+    steps:
+      - *package-checkout
+      - *root-submodules
+      - *package-dotnet
+      - *package-restore
+      - *package-compile
+      - name: Run boundary suite
+        run: dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false /m:1 /nr:false
+
+  package-consumer:
+    name: Package consumer
+    runs-on: ubuntu-latest
+    steps:
+      - *package-checkout
+      - *root-submodules
+      - *package-dotnet
+      - *package-restore
+      - *package-compile
+      - name: Pack exact inventory
+        run: python3 scripts/pack-release-packages.py nupkgs 0.0.0-ci
+      - name: Inspect package metadata and assets
+        run: python3 scripts/validate-nuget-packages.py nupkgs
+      - name: Build isolated package consumer
+        run: python3 scripts/validate-consumer-package-references.py nupkgs

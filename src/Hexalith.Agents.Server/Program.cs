@@ -15,8 +15,8 @@ using Hexalith.Agents.Server;
 using Hexalith.Agents.Server.Api;
 using Hexalith.Agents.Server.Application.AgentInteractions;
 using Hexalith.Agents.Server.Application.Agents;
+using Hexalith.Agents.Server.Composition;
 using Hexalith.Agents.Server.Ports;
-using Hexalith.Conversations.Client;
 using Hexalith.EventStore.DomainService;
 using Hexalith.Parties.Client.Extensions;
 
@@ -110,25 +110,6 @@ builder.Services.AddScoped<AgentInteractionGateOrchestrator>();
 // complete and fails closed (ContextBlocked/ContextUnavailable). Token measurement stays deferred (no tokenizer bound),
 // and live command dispatch stays deferred behind DeferredAgentCommandDispatcher. No provider adapter, no Conversations
 // post, and no proposal is wired here (AC3), mirroring 1.2/1.4/1.5/1.6/1.7/2.1/2.2.
-builder.Services.AddSingleton<IConversationContextTokenMeasurer, DeferredConversationContextTokenMeasurer>();
-if (builder.Configuration.GetSection("Conversations").Exists())
-{
-    builder.Services.AddHexalithConversationsClient(o => o.Endpoint = new Uri(builder.Configuration["Conversations:BaseUrl"]!));
-    builder.Services.AddSingleton<IConversationContextReader, ConversationClientContextReader>();
-
-    // Story 2.5: the live Conversation posting + membership port reuses the same IConversationClient registered above.
-    builder.Services.AddSingleton<IConversationResponsePoster, ConversationClientResponsePoster>();
-}
-else
-{
-    builder.Services.AddSingleton<IConversationContextReader, DeferredConversationContextReader>();
-
-    // Story 2.5: no Conversations config → the deferred poster fails closed (membership SeamUnavailable, append unavailable).
-    builder.Services.AddSingleton<IConversationResponsePoster, DeferredConversationResponsePoster>();
-}
-
-builder.Services.AddScoped<AgentInteractionContextOrchestrator>();
-
 // Story 2.4: Agent-output generation + content-safety wiring. The generation aggregate handler auto-registers via the
 // existing AddEventStoreDomainService assembly scan (no host change needed). The generation orchestration re-reads the
 // Source Conversation content (reusing the Story 2.3 IConversationContextReader registered above — live behind the
@@ -143,7 +124,6 @@ builder.Services.AddScoped<AgentInteractionContextOrchestrator>();
 builder.Services.AddSingleton<IAgentGenerationProvider, DeferredAgentGenerationProvider>();
 builder.Services.AddSingleton<IContentSafetyEvaluator, DeferredContentSafetyEvaluator>();
 builder.Services.AddSingleton<IAgentContentSafetyPolicyReader, DeferredAgentContentSafetyPolicyReader>();
-builder.Services.AddScoped<AgentInteractionGenerationOrchestrator>();
 
 // Story 2.5: Automatic-response posting wiring. The posting aggregate handler auto-registers via the existing
 // AddEventStoreDomainService assembly scan (no host change needed). The posting orchestration reads the Agent's linked
@@ -159,7 +139,7 @@ builder.Services.AddScoped<AgentInteractionGenerationOrchestrator>();
 // DeferredAgentCommandDispatcher, mirroring 1.2/1.4/1.5/1.6/1.7/2.1/2.2/2.3/2.4.
 builder.Services.AddSingleton<IAgentPartyReader, DeferredAgentPartyReader>();
 builder.Services.AddSingleton<IAgentGeneratedVersionReader, DeferredAgentGeneratedVersionReader>();
-builder.Services.AddScoped<AgentInteractionPostingOrchestrator>();
+builder.Services.AddAgentsConversationServices(builder.Configuration);
 
 // Story 3.1: Confirmation-mode Proposed-Agent-Reply creation wiring. The new creation aggregate handler auto-registers via
 // the existing AddEventStoreDomainService assembly scan (no host change needed). The proposal orchestration reuses the
@@ -200,14 +180,10 @@ builder.Services.AddScoped<AgentInteractionProposalEditOrchestrator>();
 // seams keep the default graph fail-closed (no content-bearing regeneration). The live command dispatch / read-model bindings
 // and the audit-evidence projection remain deferred to the operational-topology / read-model story (Epic 4), mirroring
 // 1.2/1.4/1.5/1.6/1.7/2.1-2.5/3.1/3.3.
-builder.Services.AddScoped<AgentInteractionProposalRegenerationOrchestrator>();
-
 // Story 3.5: Confirmation-mode approval + posting wiring. The approval aggregate handler auto-registers via the existing
 // assembly scan. The approval orchestration reuses approver authorization, exact selected-version reads, Agent Party
 // identity, Conversations membership/posting, deterministic message identity, and command dispatch. The deferred default
 // graph fails closed and cannot post content until live readers/posters are wired.
-builder.Services.AddScoped<AgentInteractionProposalApprovalOrchestrator>();
-
 // Story 3.6: Confirmation-mode reject / abandon / expire wiring. The three new terminal-transition aggregate handlers (the
 // 9th-11th Handle on AgentInteraction) and their event types auto-register via the existing AddEventStoreDomainService
 // assembly scan (no host change needed). The reject/abandon orchestrators are minimal-deps terminal actions: they reuse the

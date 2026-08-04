@@ -6,9 +6,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Hexalith.Agents.UI\Hexalith.Agents.UI.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(HexalithFrontComposerFromSource)' == 'true'">
     <ProjectReference Include="$(HexalithFrontComposerRoot)\src\Hexalith.FrontComposer.Contracts\Hexalith.FrontComposer.Contracts.csproj" />
     <ProjectReference Include="$(HexalithFrontComposerRoot)\src\Hexalith.FrontComposer.Shell\Hexalith.FrontComposer.Shell.csproj" />
     <ProjectReference Include="$(HexalithFrontComposerRoot)\src\Hexalith.FrontComposer.Testing\Hexalith.FrontComposer.Testing.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(HexalithFrontComposerFromSource)' != 'true'">
+    <PackageReference Include="Hexalith.FrontComposer.Contracts" />
+    <PackageReference Include="Hexalith.FrontComposer.Shell" />
+    <PackageReference Include="Hexalith.FrontComposer.Testing" />
   </ItemGroup>
 
   <ItemGroup>

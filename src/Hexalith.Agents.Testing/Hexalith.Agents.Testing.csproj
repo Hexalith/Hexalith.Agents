@@ -7,10 +7,9 @@
     <PackageTags>hexalith;agents;testing</PackageTags>
   </PropertyGroup>
 
-  <!-- Dependency direction (AD-15): Testing -> Contracts (+ Server). -->
+  <!-- Public testing helpers depend only on the public contracts package graph. -->
   <ItemGroup>
     <ProjectReference Include="..\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
-    <ProjectReference Include="..\Hexalith.Agents.Server\Hexalith.Agents.Server.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    {
+      "id": "Hexalith.Agents.Contracts",
+      "project": "src/Hexalith.Agents.Contracts/Hexalith.Agents.Contracts.csproj"
+    },
+    {
+      "id": "Hexalith.Agents.Client",
+      "project": "src/Hexalith.Agents.Client/Hexalith.Agents.Client.csproj"
+    },
+    {
+      "id": "Hexalith.Agents",
+      "project": "src/Hexalith.Agents/Hexalith.Agents.csproj"
+    },
+    {
+      "id": "Hexalith.Agents.UI",
+      "project": "src/Hexalith.Agents.UI/Hexalith.Agents.UI.csproj"
+    },
+    {
+      "id": "Hexalith.Agents.Testing",
+      "project": "src/Hexalith.Agents.Testing/Hexalith.Agents.Testing.csproj"
+    }
+  ]
+}

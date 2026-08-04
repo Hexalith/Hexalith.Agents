@@ -12,7 +12,8 @@ using Shouldly;
 /// way: <c>Hexalith.Agents.Contracts</c> references nothing outward, and every other <c>src/</c> project only
 /// references projects allowed by the architecture direction matrix (client/UI/server/testing/apphost consume
 /// contracts, never the reverse). The compiled-assembly boundary test catches external leaks; this catches a
-/// wrong-direction <em>project</em> edge before it can introduce a cycle or invert the boundary.
+/// wrong-direction <em>project</em> edge before it can introduce a cycle or invert the boundary. Discovery and the
+/// allow-list must have exact key equality so a newly added source project cannot bypass this guard.
 /// </summary>
 public sealed class ProjectReferenceDirectionTests
 {
@@ -24,10 +25,7 @@ public sealed class ProjectReferenceDirectionTests
         ["Hexalith.Agents"] = ["Hexalith.Agents.Contracts"],                                          // domain library
         ["Hexalith.Agents.Server"] = ["Hexalith.Agents.Contracts", "Hexalith.Agents.Client", "Hexalith.Agents"], // + domain library (Story 1.2: aggregate discovery)
         ["Hexalith.Agents.UI"] = ["Hexalith.Agents.Contracts", "Hexalith.Agents.Client"],
-        ["Hexalith.Agents.Testing"] = ["Hexalith.Agents.Contracts", "Hexalith.Agents.Server"],
-        ["Hexalith.Agents.AppHost"] = ["Hexalith.Agents.Server", "Hexalith.Agents.UI"],
-        ["Hexalith.Agents.Aspire"] = [],
-        ["Hexalith.Agents.ServiceDefaults"] = [],
+        ["Hexalith.Agents.Testing"] = ["Hexalith.Agents.Contracts"],
     };
 
     [Fact]
@@ -42,14 +40,26 @@ public sealed class ProjectReferenceDirectionTests
     [Fact]
     public void EverySourceProjectShouldOnlyReferenceAllowedProjects()
     {
-        foreach ((string project, string[] allowed) in _allowedReferences)
+        string[] discoveredProjects = Directory.GetFiles(ModuleLayout.SourceRoot, "*.csproj", SearchOption.AllDirectories)
+            .Where(path => !ModuleLayout.IsUnderBuildOutput(path))
+            .Select(path => Path.GetFileNameWithoutExtension(path)!)
+            .OrderBy(project => project, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        string[] guardedProjects = _allowedReferences.Keys
+            .OrderBy(project => project, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        guardedProjects.ShouldBe(discoveredProjects, ignoreOrder: false);
+
+        foreach (string project in discoveredProjects)
         {
-            foreach (string reference in InModuleReferences(project))
-            {
-                allowed.ShouldContain(
-                    reference,
-                    $"'{project}' references in-module project '{reference}', which violates the AD-15 dependency direction.");
-            }
+            string[] actual = InModuleReferences(project)
+                .OrderBy(reference => reference, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            string[] expected = _allowedReferences[project]
+                .OrderBy(reference => reference, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            actual.ShouldBe(expected, ignoreOrder: false,
+                $"'{project}' must retain its exact AD-15 in-module project-reference boundary.");
         }
     }
 

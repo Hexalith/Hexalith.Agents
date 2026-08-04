@@ -1,88 +1,55 @@
 namespace Hexalith.Agents.Server.Tests;
 
 using System.IO;
-using System.Linq;
 using System.Xml.Linq;
 
 using Shouldly;
 
 /// <summary>
-/// Static guard for the live-binding AppHost security invariant from AD-16.
+/// Static guard for the platform-owned hosting boundary.
 /// </summary>
 public sealed class AppHostSecurityTopologyTests
 {
     [Fact]
-    public void AppHostShouldReferenceEventStoreAspireAsAHelperProjectOnly()
+    public void AgentsShouldNotOwnAnAppHostProgram()
     {
-        string appHostProject = ModuleLayout.SourceProjectFile("Hexalith.Agents.AppHost");
+        File.Exists(ModuleLayout.ResolveModulePath("src/Hexalith.Agents.AppHost/Program.cs"))
+            .ShouldBeFalse("The production-like resource graph belongs to EXT-HOST-1, not this domain module.");
+    }
 
-        XElement[] references = ProjectReferences(appHostProject)
-            .Where(reference => ReferenceInclude(reference).EndsWith(
-                "Hexalith.EventStore.Aspire.csproj",
-                StringComparison.OrdinalIgnoreCase))
+    [Fact]
+    public void ServerShouldRetainTheReusableEventStoreDomainServiceHost()
+    {
+        string program = File.ReadAllText(ModuleLayout.ResolveModulePath("src/Hexalith.Agents.Server/Program.cs"));
+
+        program.ShouldContain("AddEventStoreDomainService(");
+        program.ShouldContain("UseEventStoreDomainService()");
+    }
+
+    [Fact]
+    public void DomainServiceShouldRemainTheOnlyOwnedExecutableWebHost()
+    {
+        string[] webHosts = Directory.GetFiles(ModuleLayout.SourceRoot, "*.csproj", SearchOption.AllDirectories)
+            .Where(path => !ModuleLayout.IsUnderBuildOutput(path))
+            .Where(path => (XDocument.Load(path).Root?.Attribute("Sdk")?.Value ?? string.Empty)
+                .Equals("Microsoft.NET.Sdk.Web", StringComparison.OrdinalIgnoreCase))
+            .Select(path => Path.GetFileNameWithoutExtension(path)!)
             .ToArray();
 
-        references.Length.ShouldBe(1, "Expected Agents AppHost to reference Hexalith.EventStore.Aspire once.");
-        XElement reference = references[0];
-
-        ReferenceInclude(reference).ShouldContain("$(HexalithEventStoreRoot)");
-        AttributeValue(reference, "IsAspireProjectResource").ShouldBe("false");
+        webHosts.ShouldBe(["Hexalith.Agents.Server"]);
     }
 
     [Fact]
-    public void AppHostShouldInitializeSharedEventStoreSecurity()
+    public void ServerShouldNotAbsorbPlatformTopology()
     {
-        string program = File.ReadAllText(ModuleLayout.ResolveModulePath("src/Hexalith.Agents.AppHost/Program.cs"));
+        string program = File.ReadAllText(ModuleLayout.ResolveModulePath("src/Hexalith.Agents.Server/Program.cs"));
 
-        program.ShouldContain("using Hexalith.EventStore.Aspire;");
-        program.ShouldContain("AddHexalithEventStoreSecurity()");
-    }
-
-    [Fact]
-    public void EventStoreAspireReferenceShouldStayInAppHostTopologyOnly()
-    {
-        foreach (string projectFile in ModuleLayout.ProjectFiles.Where(IsProductionProject))
-        {
-            string projectName = Path.GetFileNameWithoutExtension(projectFile);
-            bool referencesEventStoreAspire = ProjectReferences(projectFile)
-                .Any(reference => ReferenceInclude(reference).EndsWith(
-                    "Hexalith.EventStore.Aspire.csproj",
-                    StringComparison.OrdinalIgnoreCase));
-
-            referencesEventStoreAspire.ShouldBe(
-                string.Equals(projectName, "Hexalith.Agents.AppHost", StringComparison.OrdinalIgnoreCase),
-                $"Only Hexalith.Agents.AppHost may reference Hexalith.EventStore.Aspire; found project '{projectName}'.");
-        }
-    }
-
-    [Fact]
-    public void AppHostShouldNotDuplicateEventStoreSecurityEnvironmentWiring()
-    {
-        string program = File.ReadAllText(ModuleLayout.ResolveModulePath("src/Hexalith.Agents.AppHost/Program.cs"));
-
+        program.ShouldNotContain("DistributedApplication.CreateBuilder");
+        program.ShouldNotContain("IDistributedApplicationBuilder");
+        program.ShouldNotContain("Aspire.Hosting");
+        program.ShouldNotContain("AddHexalithEventStoreSecurity");
         program.ShouldNotContain("Authentication__JwtBearer__");
         program.ShouldNotContain("Authentication__OpenIdConnect__");
         program.ShouldNotContain("EventStore__Authentication__");
     }
-
-    private static bool IsProductionProject(string projectFile)
-        => Path.GetFullPath(projectFile).StartsWith(
-            Path.GetFullPath(ModuleLayout.SourceRoot),
-            StringComparison.OrdinalIgnoreCase);
-
-    private static XElement[] ProjectReferences(string projectFile)
-        => XDocument.Load(projectFile)
-            .Descendants()
-            .Where(element => string.Equals(element.Name.LocalName, "ProjectReference", StringComparison.OrdinalIgnoreCase))
-            .ToArray();
-
-    private static string ReferenceInclude(XElement reference)
-        => AttributeValue(reference, "Include");
-
-    private static string AttributeValue(XElement element, string localName)
-        => element
-            .Attributes()
-            .Single(attribute => string.Equals(attribute.Name.LocalName, localName, StringComparison.OrdinalIgnoreCase))
-            .Value
-            .Replace('\\', '/');
 }

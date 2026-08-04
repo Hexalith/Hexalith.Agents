@@ -10,7 +10,12 @@
        test/Directory.Build.props. -->
   <ItemGroup>
     <ProjectReference Include="..\..\src\Hexalith.Agents\Hexalith.Agents.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(HexalithEventStoreFromSource)' == 'true'">
     <ProjectReference Include="$(HexalithEventStoreRoot)\src\Hexalith.EventStore.Contracts\Hexalith.EventStore.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(HexalithEventStoreFromSource)' != 'true'">
+    <PackageReference Include="Hexalith.EventStore.Contracts" />
   </ItemGroup>
 
 </Project>

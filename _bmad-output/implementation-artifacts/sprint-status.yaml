@@ -1,5 +1,5 @@
 # generated: 2026-06-23T21:28:59+02:00
-# last_updated: 2026-08-01T17:47:53+02:00
+# last_updated: 2026-08-04
 # project: agents
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-06-23T21:28:59+02:00
-last_updated: 2026-08-01T17:47:53+02:00
+last_updated: 2026-08-04
 project: agents
 # retrospectives: epic-1 retro completed 2026-06-26 (epic-1-retro-2026-06-26.md); epic-2 retro completed 2026-06-24 (epic-2-retro-2026-06-24.md); epic-3 retro completed 2026-06-26 (epic-3-retro-2026-06-26.md); epic-4 retro completed 2026-06-25 (epic-4-retro-2026-06-25.md)
 project_key: NOKEY
@@ -83,8 +83,8 @@ development_status:
   4-4-define-and-enforce-launch-readiness-gates: done
   4-5-verify-end-to-end-governance-and-contract-conformance: done
   epic-4-retrospective: done
-  epic-5: backlog
-  5-1-correct-platform-hosting-boundary-and-quality-gates: backlog
+  epic-5: in-progress
+  5-1-correct-platform-hosting-boundary-and-quality-gates: awaiting-operator
   5-2-enforce-complete-launch-readiness-before-callability: backlog
   5-3-bind-eventstore-operations-and-setup-read-models: backlog
   5-4-bind-tenant-access-party-identity-and-approver-resolution: backlog

@@ -9,17 +9,16 @@
     <InternalsVisibleTo Include="Hexalith.Agents.Server.Tests" />
   </ItemGroup>
 
-  <!-- Dependency direction (AD-15): Server -> Contracts + Client + the domain library (Hexalith.Agents, where
-       ProviderCatalogAggregate lives, scanned by AddEventStoreDomainService). The canonical EventStore
-       domain-service host (AddEventStoreDomainService / UseEventStoreDomainService) is provided by the
-       EventStore.DomainService SDK — referenced as sibling source via $(HexalithEventStoreRoot), never a NuGet
-       package. DAPR and the EventStore contracts arrive transitively through that SDK, so the Server declares
-       no provider-SDK, Dapr, or UI-shell dependency (Scope Guardrails). -->
   <ItemGroup>
     <ProjectReference Include="..\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
     <ProjectReference Include="..\Hexalith.Agents.Client\Hexalith.Agents.Client.csproj" />
     <ProjectReference Include="..\Hexalith.Agents\Hexalith.Agents.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(HexalithEventStoreFromSource)' == 'true'">
     <ProjectReference Include="$(HexalithEventStoreRoot)\src\Hexalith.EventStore.DomainService\Hexalith.EventStore.DomainService.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(HexalithEventStoreFromSource)' != 'true'">
+    <PackageReference Include="Hexalith.EventStore.DomainService" />
   </ItemGroup>
 
   <!-- Story 1.4: the Party validation/provisioning adapter consumes only the PUBLIC Hexalith.Parties client +
@@ -27,9 +26,13 @@
        discovery block in Directory.Build.props — never a NuGet PackageReference. These refs are out-of-module
        (Hexalith.Parties.*), so the in-module AD-15 direction guard does not flag them; they are added to the
        Server boundary ONLY (never Contracts/Client/domain), keeping Parties out of the public Agents surface. -->
-  <ItemGroup>
+  <ItemGroup Condition="'$(HexalithPartiesFromSource)' == 'true'">
     <ProjectReference Include="$(HexalithPartiesRoot)\src\Hexalith.Parties.Client\Hexalith.Parties.Client.csproj" />
     <ProjectReference Include="$(HexalithPartiesRoot)\src\Hexalith.Parties.Contracts\Hexalith.Parties.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(HexalithPartiesFromSource)' != 'true'">
+    <PackageReference Include="Hexalith.Parties.Client" />
+    <PackageReference Include="Hexalith.Parties.Contracts" />
   </ItemGroup>
 
   <!-- Story 2.3: the Conversation context-read adapter consumes only the PUBLIC Hexalith.Conversations client +
@@ -39,8 +42,18 @@
        discovery block in Directory.Build.props — never a NuGet PackageReference. These refs are out-of-module
        (Hexalith.Conversations.*), so the in-module AD-15 direction guard does not flag them; they are added to the
        Server boundary ONLY (never Contracts/Client/domain/UI), keeping Conversations out of the public Agents surface. -->
-  <ItemGroup>
+  <!-- Conversations has no committed public package yet. It is available only in the intentional Debug/source
+       lane; package mode removes the source-only adapter and retains the fail-closed deferred ports. -->
+  <ItemGroup Condition="'$(HexalithConversationsFromSource)' == 'true'">
     <ProjectReference Include="$(HexalithConversationsRoot)\src\Hexalith.Conversations.Client\Hexalith.Conversations.Client.csproj" />
   </ItemGroup>
+  <ItemGroup Condition="'$(HexalithConversationsFromSource)' != 'true'">
+    <Compile Remove="Ports\ConversationClientContextReader.cs" />
+    <Compile Remove="Ports\ConversationClientResponsePoster.cs" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(HexalithConversationsFromSource)' == 'true'">
+    <DefineConstants>$(DefineConstants);HEXALITH_CONVERSATIONS_SOURCE</DefineConstants>
+  </PropertyGroup>
 
 </Project>

@@ -7,13 +7,14 @@
     <PackageTags>hexalith;agents;domain</PackageTags>
   </PropertyGroup>
 
-  <!-- Inward dependency on its own contracts, plus the EventStore *client* (the EventStoreAggregate base and
-       [EventStoreDomain] attribute) consumed by the ProviderCatalog aggregate. The EventStore contracts arrive
-       transitively through the client. Sibling source reference via the $(HexalithEventStoreRoot) discovery
-       block in Directory.Build.props — never a NuGet package (Hexalith siblings stay source references). -->
   <ItemGroup>
     <ProjectReference Include="..\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(HexalithEventStoreFromSource)' == 'true'">
     <ProjectReference Include="$(HexalithEventStoreRoot)\src\Hexalith.EventStore.Client\Hexalith.EventStore.Client.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(HexalithEventStoreFromSource)' != 'true'">
+    <PackageReference Include="Hexalith.EventStore.Client" />
   </ItemGroup>
 
   <ItemGroup>

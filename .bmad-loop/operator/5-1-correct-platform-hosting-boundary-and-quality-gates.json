@@ -1,0 +1,11 @@
+{
+  "actions": [
+    "Record the platform-host repository and immutable target version or commit for EXT-HOST-1 in _bmad-output/planning-artifacts/external-dependency-register.md.",
+    "Record the target integration date and an executable clean-checkout compatibility verification command for EXT-HOST-1.",
+    "Change EXT-HOST-1 AcceptedStatus from Uncommitted only after the platform maintainer accepts the commitment and supplies the required evidence."
+  ],
+  "parked_at": "2026-08-04",
+  "run_id": "20260804-163903-57d8",
+  "spec_file": "_bmad-output/implementation-artifacts/spec-5-1-correct-platform-hosting-boundary-and-quality-gates.md",
+  "story_key": "5-1-correct-platform-hosting-boundary-and-quality-gates"
+}

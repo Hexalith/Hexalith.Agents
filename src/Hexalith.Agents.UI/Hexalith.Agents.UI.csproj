@@ -15,11 +15,14 @@
   <ItemGroup>
     <ProjectReference Include="..\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
     <ProjectReference Include="..\Hexalith.Agents.Client\Hexalith.Agents.Client.csproj" />
-    <!-- Out-of-module FrontComposer shell/contracts (sibling source via the resolved root MSBuild var).
-         These are intentionally outside the in-module direction guard (AD-15: UI calls the shell, never
-         Server/EventStore/provider internals). -->
+  </ItemGroup>
+  <ItemGroup Condition="'$(HexalithFrontComposerFromSource)' == 'true'">
     <ProjectReference Include="$(HexalithFrontComposerRoot)\src\Hexalith.FrontComposer.Contracts\Hexalith.FrontComposer.Contracts.csproj" />
     <ProjectReference Include="$(HexalithFrontComposerRoot)\src\Hexalith.FrontComposer.Shell\Hexalith.FrontComposer.Shell.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(HexalithFrontComposerFromSource)' != 'true'">
+    <PackageReference Include="Hexalith.FrontComposer.Contracts" />
+    <PackageReference Include="Hexalith.FrontComposer.Shell" />
   </ItemGroup>
 
   <ItemGroup>

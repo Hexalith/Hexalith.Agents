@@ -8,4 +8,9 @@
     <ProjectReference Include="..\..\src\Hexalith.Agents.Server\Hexalith.Agents.Server.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(HexalithConversationsFromSource)' != 'true'">
+    <Compile Remove="ConversationClientContextReaderTests.cs" />
+    <Compile Remove="ConversationClientResponsePosterTests.cs" />
+  </ItemGroup>
+
 </Project>

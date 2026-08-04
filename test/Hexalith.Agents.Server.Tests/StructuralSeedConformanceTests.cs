@@ -6,9 +6,8 @@ using Shouldly;
 
 /// <summary>
 /// Structural-seed conformance guard (AC1 / AC4). Asserts the module ships the architecture Structural Seed:
-/// the root build/solution files, the named <c>src/</c> + <c>test/</c> project set (extension points), and
-/// the empty <c>Hexalith.Agents.Server</c> extension folders. Required entries are checked as a subset so
-/// later stories may add projects/folders without breaking the guard.
+/// the root build/solution files, domain-centric <c>src/</c> + <c>test/</c> project set, and
+/// the <c>Hexalith.Agents.Server</c> extension folders.
 /// </summary>
 public sealed class StructuralSeedConformanceTests
 {
@@ -28,9 +27,6 @@ public sealed class StructuralSeedConformanceTests
         "Hexalith.Agents.Server",
         "Hexalith.Agents",                 // main domain library
         "Hexalith.Agents.UI",
-        "Hexalith.Agents.AppHost",
-        "Hexalith.Agents.Aspire",
-        "Hexalith.Agents.ServiceDefaults",
         "Hexalith.Agents.Testing",
     ];
 
@@ -80,6 +76,23 @@ public sealed class StructuralSeedConformanceTests
 
             File.Exists(projectFile)
                 .ShouldBeTrue($"Structural Seed requires the named extension-point project '{project}' (AC4).");
+        }
+    }
+
+    [Fact]
+    public void ModuleShouldNotOwnPlatformHostingProjects()
+    {
+        string[] forbiddenProjects =
+        [
+            "Hexalith.Agents.AppHost",
+            "Hexalith.Agents.Aspire",
+            "Hexalith.Agents.ServiceDefaults",
+        ];
+
+        foreach (string project in forbiddenProjects)
+        {
+            File.Exists(ModuleLayout.SourceProjectFile(project))
+                .ShouldBeFalse($"Agents is domain-centric and must not own hosting project '{project}'.");
         }
     }
 
