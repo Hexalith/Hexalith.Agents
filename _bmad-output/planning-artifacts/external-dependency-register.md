@@ -2,7 +2,7 @@
 title: Hexalith Agents External Dependency Register
 status: active
 created: 2026-08-02
-updated: 2026-08-02
+updated: 2026-08-09
 project: agents
 authority: sprint-change-proposal-2026-08-02.md
 ---
@@ -65,13 +65,13 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 | Commitment field | Value |
 | --- | --- |
 | `Owner` | Platform Maintainer |
-| `Repository` | `TBD` |
+| `Repository` | `Hexalith.Platform` |
 | `RequiredArtifact` | Platform-owned host composition for the Agents DomainService and UI with EventStore, Conversations, Parties, Tenants, Provider and safety adapters, Dapr Workflow, secrets, health, identity, and telemetry. The artifact replaces module-owned AppHost, Aspire, and ServiceDefaults ownership. |
-| `TargetVersionOrCommit` | `TBD` |
-| `TargetIntegrationDate` | `TBD` |
-| `CompatibilityContractAndVerificationCommand` | Contract: clean-checkout composition through the platform host without module-owned hosting infrastructure. Command: `TBD`. |
+| `TargetVersionOrCommit` | `a66cdf346e521ad147f442b686f301f0f59c525c` |
+| `TargetIntegrationDate` | `2026-09-30` |
+| `CompatibilityContractAndVerificationCommand` | Contract: clean-checkout composition through the platform host without module-owned hosting infrastructure. Command: `git clone https://github.com/Hexalith/Hexalith.Platform.git && cd Hexalith.Platform && git checkout a66cdf346e521ad147f442b686f301f0f59c525c && ./eng/verify-agents-host.sh`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
-| `AcceptedStatus` | `Uncommitted` |
+| `AcceptedStatus` | `Committed` |
 | `ConsumingStories` | 5.1, 5.6 onward; `RQ-1` |
 
 ### EXT-PROVIDER-1 — Provider Generation Adapter
@@ -146,4 +146,4 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 
 ## Current Blocking Summary
 
-All seven records are `Uncommitted`. Their consumers remain blocked from `ready-for-dev` until the fields required for `Committed` are accepted. `RQ-1` additionally requires each dependency used by its qualification profile to be `Available` with the required live evidence.
+`EXT-HOST-1` is `Committed` (scaffold + clean-checkout AppHost build gate). The remaining six records are `Uncommitted`; their consumers remain blocked from `ready-for-dev` until the fields required for `Committed` are accepted. `EXT-HOST-1` stays short of `Available` until Agents Story 5.6 wires live composition and the verify command is upgraded with Level 4 evidence. `RQ-1` additionally requires each dependency used by its qualification profile to be `Available` with the required live evidence.

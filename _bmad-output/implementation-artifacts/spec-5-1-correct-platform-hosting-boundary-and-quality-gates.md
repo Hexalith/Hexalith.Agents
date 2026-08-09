@@ -2,14 +2,11 @@
 title: '5.1 Correct Platform Hosting Boundary and Quality Gates'
 type: 'feature'
 created: '2026-08-04'
-status: 'awaiting-operator'
+status: 'done'
 baseline_revision: 'bc3fd4c4dd98cbd4a662c5d7e242343d1cf2985e'
 review_loop_iteration: 0
 followup_review_recommended: true
-operator_actions:
-  - 'Record the platform-host repository and immutable target version or commit for EXT-HOST-1 in _bmad-output/planning-artifacts/external-dependency-register.md.'
-  - 'Record the target integration date and an executable clean-checkout compatibility verification command for EXT-HOST-1.'
-  - 'Change EXT-HOST-1 AcceptedStatus from Uncommitted only after the platform maintainer accepts the commitment and supplies the required evidence.'
+operator_actions: []
 context:
   - '_bmad-output/implementation-artifacts/epic-5-context.md'
   - 'references/Hexalith.AI.Tools/hexalith-llm-instructions.md'
@@ -89,6 +86,11 @@ deferred:
 - Given all repository-local work is green and committed while `EXT-HOST-1` is still uncommitted, when the story is finalized, then its frontmatter is `status: awaiting-operator` with a non-empty imperative `operator_actions` list and is never marked blocked for that external action.
 
 ## Spec Change Log
+
+### 2026-08-09 — Operator EXT-HOST-1 commitment
+- Created `Hexalith/Hexalith.Platform` as the platform-owned host repository (no prior Agents platform host existed).
+- Accepted `EXT-HOST-1` as `Committed` at commit `a66cdf346e521ad147f442b686f301f0f59c525c`, target integration `2026-09-30`, verify command `./eng/verify-agents-host.sh` on that clean checkout.
+- Cleared `operator_actions` and set story + sprint status to `done`. Live Agents composition remains Story 5.6 (`Available` upgrade).
 
 ## Review Triage Log
 
