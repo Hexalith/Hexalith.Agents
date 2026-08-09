@@ -59,4 +59,19 @@ public sealed class AgentsClient : IAgentsClient
             new UnavailableProposalWorkflowOperations(),
             new UnavailableAgentStatusOperations(),
             new UnavailableAgentAuditOperations());
+
+    /// <summary>
+    /// Creates a client facade whose Agent administration group is live and whose remaining groups stay
+    /// fail-closed, for hosts that have bound the administration path but not yet the other operation groups.
+    /// </summary>
+    /// <param name="agentAdministration">The live Agent administration operations.</param>
+    /// <returns>A client with a live administration group.</returns>
+    public static IAgentsClient WithAdministration(IAgentAdministrationOperations agentAdministration)
+        => new AgentsClient(
+            new UnavailableProviderCatalogOperations(),
+            agentAdministration,
+            new UnavailableAgentInteractionOperations(),
+            new UnavailableProposalWorkflowOperations(),
+            new UnavailableAgentStatusOperations(),
+            new UnavailableAgentAuditOperations());
 }

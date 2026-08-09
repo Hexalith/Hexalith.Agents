@@ -15,4 +15,12 @@ public enum AgentInspectionStatus
 
     /// <summary>No Agent exists for the requested aggregate; no Agent data is returned.</summary>
     AgentNotFound,
+
+    /// <summary>
+    /// The read could not be served — the backing surface was unreachable or failed. No Agent data is returned, and
+    /// the outcome is deliberately distinct from <see cref="NotAuthorized"/> and <see cref="AgentNotFound"/>: a
+    /// transport failure must not be shown to an administrator as "denied" or "no such Agent", because both of
+    /// those are claims about state this read never established.
+    /// </summary>
+    Unavailable,
 }

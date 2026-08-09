@@ -59,6 +59,103 @@ public sealed class AgentsOperationEndpointsTests
     }
 
     [Fact]
+    public void Story_5_2_administration_routes_name_their_target_agent_in_the_path()
+    {
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Services.AddSingleton(AgentsClient.Unavailable());
+
+        WebApplication app = builder.Build();
+        app.MapAgentsOperationEndpoints();
+
+        (string Pattern, string Method)[] routes = ((IEndpointRouteBuilder)app).DataSources
+            .SelectMany(source => source.Endpoints)
+            .OfType<RouteEndpoint>()
+            .Select(endpoint => (
+                Pattern: endpoint.RoutePattern.RawText ?? string.Empty,
+                Method: endpoint.Metadata.GetMetadata<HttpMethodMetadata>()?.HttpMethods[0] ?? string.Empty))
+            .ToArray();
+
+        // The aggregate identity is routing information, never something the command body may assert (AC4).
+        routes.ShouldContain(("/api/agents/operations/agents/{agentId}", HttpMethods.Post));
+        routes.ShouldContain(("/api/agents/operations/agents/{agentId}", HttpMethods.Put));
+        routes.ShouldContain(("/api/agents/operations/agents/{agentId}/response-mode", HttpMethods.Post));
+        routes.ShouldContain(("/api/agents/operations/agents/{agentId}/activate", HttpMethods.Post));
+        routes.ShouldContain(("/api/agents/operations/agents/{agentId}/disable", HttpMethods.Post));
+        routes.ShouldContain(("/api/agents/operations/agents/{agentId}/status", HttpMethods.Get));
+        routes.ShouldContain(("/api/agents/operations/agents/{agentId}/configuration", HttpMethods.Get));
+    }
+
+    [Fact]
+    public async Task The_status_read_forwards_the_expected_configuration_version_to_the_client()
+    {
+        IAgentAdministrationOperations administration = StubbedSetupReads();
+
+        await using WebApplication app = BuildApp(AgentsClientWith(administration));
+        _ = await InvokeEndpointAsync(
+            app,
+            "/api/agents/operations/agents/{agentId}/status",
+            queryString: "?expectedConfigurationVersion=7",
+            ("agentId", "agent-1")).ConfigureAwait(true);
+
+        // Without the version reaching the client the caller can never tell submitted from projection-confirmed.
+        await administration.Received(1).GetStatusAsync("agent-1", 7, Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task The_configuration_read_forwards_the_expected_configuration_version_to_the_client()
+    {
+        IAgentAdministrationOperations administration = StubbedSetupReads();
+
+        await using WebApplication app = BuildApp(AgentsClientWith(administration));
+        _ = await InvokeEndpointAsync(
+            app,
+            "/api/agents/operations/agents/{agentId}/configuration",
+            queryString: "?expectedConfigurationVersion=7",
+            ("agentId", "agent-1")).ConfigureAwait(true);
+
+        await administration.Received(1).GetConfigurationAsync("agent-1", 7, Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_setup_read_without_a_version_asks_for_the_currently_projected_truth()
+    {
+        IAgentAdministrationOperations administration = StubbedSetupReads();
+
+        await using WebApplication app = BuildApp(AgentsClientWith(administration));
+        string json = await InvokeEndpointAsync(
+            app,
+            "/api/agents/operations/agents/{agentId}/configuration",
+            queryString: null,
+            ("agentId", "agent-1")).ConfigureAwait(true);
+
+        await administration.Received(1).GetConfigurationAsync("agent-1", null, Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>());
+
+        // A read the client could not satisfy still carries no setup payload over the wire (AC4).
+        json.ShouldContain("\"setup\":null");
+    }
+
+    private static IAgentAdministrationOperations StubbedSetupReads()
+    {
+        IAgentAdministrationOperations administration = Substitute.For<IAgentAdministrationOperations>();
+        administration
+            .GetStatusAsync("agent-1", Arg.Any<int?>(), Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentSetupResult>>(
+                AgentOperationResult<AgentSetupResult>.Succeeded(AgentSetupResult.NotFound())));
+        administration
+            .GetConfigurationAsync("agent-1", Arg.Any<int?>(), Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentSetupResult>>(
+                AgentOperationResult<AgentSetupResult>.Succeeded(AgentSetupResult.NotFound())));
+        return administration;
+    }
+
+    private static IAgentsClient AgentsClientWith(IAgentAdministrationOperations administration)
+    {
+        IAgentsClient client = Substitute.For<IAgentsClient>();
+        client.AgentAdministration.Returns(administration);
+        return client;
+    }
+
+    [Fact]
     public async Task Launch_readiness_status_endpoint_returns_client_result_json()
     {
         var view = new AgentLaunchReadinessView(
@@ -204,15 +301,23 @@ public sealed class AgentsOperationEndpointsTests
         return app;
     }
 
+    private static Task<string> InvokeEndpointAsync(
+        WebApplication app,
+        string routePattern,
+        params (string Key, string Value)[] routeValues)
+        => InvokeEndpointAsync(app, routePattern, queryString: null, routeValues);
+
     private static async Task<string> InvokeEndpointAsync(
         WebApplication app,
         string routePattern,
+        string? queryString,
         params (string Key, string Value)[] routeValues)
     {
         RouteEndpoint endpoint = ((IEndpointRouteBuilder)app).DataSources
             .SelectMany(source => source.Endpoints)
             .OfType<RouteEndpoint>()
-            .Single(endpoint => endpoint.RoutePattern.RawText == routePattern);
+            .Single(endpoint => endpoint.RoutePattern.RawText == routePattern
+                && endpoint.Metadata.GetMetadata<HttpMethodMetadata>()?.HttpMethods.Contains(HttpMethods.Get) == true);
 
         await using MemoryStream body = new();
         DefaultHttpContext context = new()
@@ -225,6 +330,11 @@ public sealed class AgentsOperationEndpointsTests
         };
 
         context.Request.Method = HttpMethods.Get;
+        if (queryString is { Length: > 0 })
+        {
+            context.Request.QueryString = new QueryString(queryString);
+        }
+
         foreach ((string key, string value) in routeValues)
         {
             context.Request.RouteValues[key] = value;

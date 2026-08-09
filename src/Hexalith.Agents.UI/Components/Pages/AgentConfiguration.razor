@@ -3,11 +3,12 @@
 @inject IStringLocalizer<AgentsResources> Localizer
 @inject IAgentSetupGateway Gateway
 
-@* hexa configuration (AC4, AC5, AC6): a constrained Fluent form (UX-DR15). Identity/instructions/provider/
-   content-safety surface presence/validity/version only — never the instruction text or policy content (AD-14).
-   The response mode uses a mutually-exclusive radio group whose copy states the change affects future Agent Calls
-   only. Activation is a distinct affordance shown after validity is visible; the activation command dispatch is
-   deferred (this screen renders readiness + the affordance only). *@
+@* hexa configuration (AC4, AC5, AC6; Story 5.2): a constrained Fluent form (UX-DR15). Identity/instructions/
+   provider/content-safety surface presence/validity/version only — never the instruction text or policy content
+   (AD-14). The response mode uses a mutually-exclusive radio group whose copy states the change affects future
+   Agent Calls only. Writes go through the live gateway and report the truth stage they actually reached:
+   submitted → authoritative-pending → projection-confirmed. Lifecycle Active is rendered as a lifecycle flag and
+   never as callability. *@
 <FcPageLayout Mode="FcPageLayoutMode.Constrained">
     <FcContentLabel LabelledBy="@HeadingId" />
     <FluentStack Orientation="Orientation.Vertical" VerticalGap="24px" Class="agents-config" data-testid="agents-config">
@@ -28,13 +29,18 @@
         {
             <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-config-state" />
         }
-        else if (_result.Status is AgentInspectionStatus.AgentNotFound || _result.Agent is null)
+        else if (_result.Status is AgentInspectionStatus.Unavailable)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Unavailable" TestId="agents-config-state" />
+        }
+        else if (_result.Status is AgentInspectionStatus.AgentNotFound || _result.Setup is null)
         {
             <AgentSurfaceState Kind="AgentSurfaceKind.Empty" TestId="agents-config-state" />
         }
         else
         {
-            AgentStatusView agent = _result.Agent;
+            AgentSetupView setup = _result.Setup;
+            AgentStatusView agent = setup.Agent;
 
             <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Identity"]">
                 <h2>@Localizer["Agents.Config.Section.Identity"]</h2>
@@ -58,6 +64,35 @@
                 </ul>
             </section>
 
+            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Edit"]">
+                @* The only write surface for identity and instructions. The instructions field always starts empty
+                   and is cleared after every submit: the current instruction text is never read back into the page,
+                   so a save reports presence/validity/version and nothing else (AD-14). *@
+                <h2>@Localizer["Agents.Config.Section.Edit"]</h2>
+                <FluentTextInput @bind-Value="_displayNameDraft"
+                                 Label="@Localizer["Agents.Config.DisplayName.Label"]"
+                                 AriaLabel="@Localizer["Agents.Config.DisplayName.Label"]"
+                                 data-testid="agents-config-display-name-input" />
+                <FluentTextInput @bind-Value="_descriptionDraft"
+                                 Label="@Localizer["Agents.Config.Description.Label"]"
+                                 AriaLabel="@Localizer["Agents.Config.Description.Label"]"
+                                 data-testid="agents-config-description-input" />
+                <FluentTextArea @bind-Value="_instructionsDraft"
+                                Label="@Localizer["Agents.Config.Instructions.Label"]"
+                                AriaLabel="@Localizer["Agents.Config.Instructions.Label"]"
+                                Required="true"
+                                data-testid="agents-config-instructions-input" />
+                <p class="agents-config__note" data-testid="agents-config-instructions-write-note">
+                    @Localizer["Agents.Config.Instructions.ReplaceNote"]
+                </p>
+                <FluentButton Appearance="ButtonAppearance.Primary"
+                              Disabled="@(_busy || string.IsNullOrWhiteSpace(_instructionsDraft))"
+                              OnClick="SubmitConfigurationAsync"
+                              data-testid="agents-config-submit">
+                    @Localizer["Agents.Config.Edit.Submit"]
+                </FluentButton>
+            </section>
+
             <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Provider"]">
                 <h2>@Localizer["Agents.Config.Section.Provider"]</h2>
                 <p data-testid="agents-config-provider">
@@ -72,9 +107,34 @@
                 </p>
             </section>
 
+            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Truth"]">
+                <h2>@Localizer["Agents.Config.Section.Truth"]</h2>
+                <dl>
+                    <dt>@Localizer["Agents.Config.Truth.Stage.Label"]</dt>
+                    <dd data-testid="agents-config-truth-stage">@Localizer[$"Agents.Config.Truth.Stage.{setup.TruthState}"]</dd>
+                    <dt>@Localizer["Agents.Config.Truth.ConfigurationVersion.Label"]</dt>
+                    <dd data-testid="agents-config-configuration-version">@setup.ConfigurationVersion</dd>
+                    <dt>@Localizer["Agents.Config.Truth.ProjectionVersion.Label"]</dt>
+                    <dd data-testid="agents-config-projection-version">@(setup.ProjectionVersion ?? Localizer["Agents.Common.None"].Value)</dd>
+                    <dt>@Localizer["Agents.Config.Truth.Freshness.Label"]</dt>
+                    <dd data-testid="agents-config-freshness">@Localizer[$"Agents.Config.Truth.Freshness.{setup.Freshness}"]</dd>
+                </dl>
+                @if (_pendingWrite is { } pending)
+                {
+                    <p data-testid="agents-config-write-state">@Localizer[$"Agents.Config.Write.{pending.Status}"]</p>
+                }
+            </section>
+
             <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.ResponseMode"]">
                 <h2>@Localizer["Agents.Config.Section.ResponseMode"]</h2>
                 <ResponseModeToggle Value="@_responseMode" ValueChanged="OnResponseModeChanged" Name="agents-config-response-mode" />
+                <p class="agents-config__note">@Localizer["Agents.Config.ResponseMode.FutureOnlyNote"]</p>
+                <FluentButton Appearance="ButtonAppearance.Primary"
+                              Disabled="@(_busy || _responseMode == agent.ResponseMode)"
+                              OnClick="SubmitResponseModeAsync"
+                              data-testid="agents-config-response-mode-submit">
+                    @Localizer["Agents.Config.ResponseMode.Submit"]
+                </FluentButton>
             </section>
 
             <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.ApproverPolicy"]">
@@ -133,13 +193,22 @@
             </section>
 
             <section class="agents-config__activation" aria-label="@Localizer["Agents.Config.Activation.Label"]">
-                @* Activation is a distinct action shown after validity is visible; the command dispatch is deferred
-                   to the write-path story, so the affordance is disabled with a visible reason (fail-closed). *@
-                <FluentButton Appearance="ButtonAppearance.Primary" Disabled="true" data-testid="agents-config-activate">
+                @* Activation is a distinct action shown after validity is visible. Activating sets a lifecycle
+                   flag; it never means the Agent can be called, and the note says so on every render. *@
+                <FluentButton Appearance="ButtonAppearance.Primary"
+                              Disabled="@(_busy || agent.Lifecycle == AgentLifecycleStatus.Active)"
+                              OnClick="ActivateAsync"
+                              data-testid="agents-config-activate">
                     @Localizer["Agents.Config.Activation.Label"]
                 </FluentButton>
+                <FluentButton Appearance="ButtonAppearance.Outline"
+                              Disabled="@(_busy || agent.Lifecycle == AgentLifecycleStatus.Disabled)"
+                              OnClick="DisableAsync"
+                              data-testid="agents-config-disable">
+                    @Localizer["Agents.Config.Disable.Label"]
+                </FluentButton>
                 <p class="agents-config__activation-note" data-testid="agents-config-activation-note">
-                    @Localizer["Agents.Config.Activation.Deferred"]
+                    @Localizer["Agents.Config.Activation.NotCallable"]
                 </p>
             </section>
         }
@@ -150,18 +219,17 @@
     private const string HeadingId = "agents-config-heading";
 
     private FcPageHeader? _header;
-    private AgentInspectionResult? _result;
+    private AgentSetupResult? _result;
+    private AgentSetupWriteResult? _pendingWrite;
     private AgentResponseMode _responseMode = AgentResponseMode.Unknown;
+    private string _displayNameDraft = string.Empty;
+    private string _descriptionDraft = string.Empty;
+    private string _instructionsDraft = string.Empty;
     private bool _focusHeadingPending = true;
+    private bool _busy;
 
     protected override async Task OnInitializedAsync()
-    {
-        _result = await Gateway.GetConfigurationAsync(CancellationToken.None).ConfigureAwait(false);
-        if (_result.Agent is { } agent)
-        {
-            _responseMode = agent.ResponseMode;
-        }
-    }
+        => await LoadAsync(expectedConfigurationVersion: null).ConfigureAwait(false);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -172,6 +240,97 @@
         }
     }
 
-    // Local UI selection only — the write path (ConfigureAgentResponseMode dispatch) is deferred.
+    // Selecting a mode only stages the choice; nothing changes until the administrator submits it, and even then
+    // the rendered state comes from the re-read rather than from the selection (never optimistic).
     private void OnResponseModeChanged(AgentResponseMode mode) => _responseMode = mode;
+
+    private async Task SubmitConfigurationAsync()
+    {
+        // Instructions are required by the command and are never read back into the page, so the draft is the
+        // whole text the administrator intends to store.
+        if (string.IsNullOrWhiteSpace(_instructionsDraft))
+        {
+            return;
+        }
+
+        UpdateAgentConfiguration command = new(
+            _displayNameDraft,
+            string.IsNullOrWhiteSpace(_descriptionDraft) ? null : _descriptionDraft,
+            _instructionsDraft);
+
+        await SubmitAsync(
+            ct => Gateway.UpdateConfigurationAsync(command, ct),
+            bumpsConfigurationVersion: true).ConfigureAwait(false);
+
+        // Whatever the outcome, the sensitive draft leaves the page: the saved instructions are only ever
+        // reported as presence, validity, and version (AD-14).
+        _instructionsDraft = string.Empty;
+    }
+
+    private Task SubmitResponseModeAsync()
+        => SubmitAsync(ct => Gateway.ConfigureResponseModeAsync(_responseMode, ct), bumpsConfigurationVersion: true);
+
+    private Task ActivateAsync()
+        => SubmitAsync(Gateway.ActivateAsync, bumpsConfigurationVersion: false);
+
+    private Task DisableAsync()
+        => SubmitAsync(Gateway.DisableAsync, bumpsConfigurationVersion: false);
+
+    // Every write follows the same truth flow: submit, record the accepted identity as Submitted, then re-read at
+    // the version that write is expected to produce. The re-read is what decides whether the page shows
+    // authoritative-pending or projection-confirmed — the write itself never claims durable truth.
+    private async Task SubmitAsync(
+        Func<CancellationToken, Task<AgentSetupWriteResult>> write,
+        bool bumpsConfigurationVersion)
+    {
+        if (_busy)
+        {
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            // Configuration writes bump the configuration version, so the catch-up read asks for current+1.
+            // Activation and disabling only move the lifecycle flag and leave the version alone: asking for
+            // current+1 there would report an up-to-date projection as permanently behind.
+            int? expectedVersion = _result?.Setup is { } setup
+                ? setup.ConfigurationVersion + (bumpsConfigurationVersion ? 1 : 0)
+                : null;
+
+            _pendingWrite = await write(CancellationToken.None).ConfigureAwait(false);
+            if (_pendingWrite.Status is AgentSetupWriteStatus.Submitted)
+            {
+                await LoadAsync(expectedVersion).ConfigureAwait(false);
+
+                // Once the catch-up read shows durable truth, the submitted notice has been superseded and would
+                // otherwise leave the page claiming a write is still in flight.
+                if (_result?.Setup is { TruthState: AgentSetupTruthState.ProjectionConfirmed })
+                {
+                    _pendingWrite = null;
+                }
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            // A gateway that throws is a failed write, not a silent one: report the fail-closed status instead of
+            // leaving the page on its pre-write state with no outcome (AD-12), and never surface the raw error.
+            _pendingWrite = AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task LoadAsync(int? expectedConfigurationVersion)
+    {
+        _result = await Gateway.GetSetupAsync(expectedConfigurationVersion, CancellationToken.None).ConfigureAwait(false);
+        if (_result.Setup is { } setup)
+        {
+            _responseMode = setup.Agent.ResponseMode;
+            _displayNameDraft = setup.Agent.DisplayName;
+            _descriptionDraft = setup.Agent.Description ?? string.Empty;
+        }
+    }
 }

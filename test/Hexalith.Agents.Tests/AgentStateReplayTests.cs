@@ -143,4 +143,39 @@ public sealed class AgentStateReplayTests
         state.PartyId.ShouldBeNull();
         state.IsCreated.ShouldBeFalse();
     }
+
+    [Fact]
+    public void Replaying_the_administration_stream_twice_reconstructs_identical_state_and_change_evidence()
+    {
+        // Story 5.2 AC1: the durable events are the only truth, so folding the same configure / response-mode /
+        // lifecycle stream a second time must land on the same state and the same safe status view.
+        AgentState first = Replay();
+        AgentState second = Replay();
+
+        second.ShouldBeEquivalentTo(first);
+        AgentInspection.GetStatus(second, isAgentsAdmin: true)
+            .ShouldBeEquivalentTo(AgentInspection.GetStatus(first, isAgentsAdmin: true));
+
+        second.Lifecycle.ShouldBe(AgentLifecycleStatus.Disabled);
+        second.ResponseMode.ShouldBe(AgentResponseMode.Confirmation);
+        second.ConfigurationVersion.ShouldBe(3);
+
+        static AgentState Replay()
+        {
+            var state = new AgentState();
+            state.Apply(CreatedEvent(ValidCreate()));
+            state.Apply(new AgentConfigurationUpdated(
+                AgentId,
+                "New Name",
+                "New description",
+                "You are hexa, a freshly updated assistant.",
+                InstructionsChanged: true,
+                ConfigurationVersion: 2,
+                InstructionsVersion: 2));
+            state.Apply(new AgentResponseModeConfigured(AgentId, AgentResponseMode.Confirmation, ConfigurationVersion: 3));
+            state.Apply(new AgentActivated(AgentId));
+            state.Apply(new AgentDisabled(AgentId));
+            return state;
+        }
+    }
 }

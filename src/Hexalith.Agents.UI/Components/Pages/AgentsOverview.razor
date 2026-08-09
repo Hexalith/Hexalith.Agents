@@ -26,6 +26,10 @@
         {
             <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-overview-state" />
         }
+        else if (_result.Status is AgentInspectionStatus.Unavailable)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Unavailable" TestId="agents-overview-state" />
+        }
         else if (_result.Status is AgentInspectionStatus.AgentNotFound || _result.Agent is null)
         {
             <AgentSurfaceState Kind="AgentSurfaceKind.Empty" TestId="agents-overview-state" />

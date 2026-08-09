@@ -199,6 +199,16 @@ builder.Services.AddScoped<AgentInteractionProposalRejectionOrchestrator>();
 builder.Services.AddScoped<AgentInteractionProposalAbandonmentOrchestrator>();
 builder.Services.AddScoped<AgentInteractionProposalExpiryOrchestrator>();
 
+// Story 5.2: live Agent configuration through EventStore. When "Agents:EventStore:BaseUrl" is configured the
+// deferred dispatcher is replaced by the live gateway submit, the administration orchestrations (create, update,
+// response mode, activate, disable) become reachable, and the public administration operations answer from the
+// projected Agent setup read model this story adds. Without that configuration the module keeps the fail-closed
+// deferred dispatcher and the Unavailable client: a host that cannot reach EventStore must never accept an
+// administration command it cannot persist. Out-of-scope administration commands (Party link, provider selection,
+// approver/content-safety policy, launch readiness) stay unavailable — each needs a dependency verdict that
+// belongs to its own story.
+builder.Services.AddAgentSetupServices(builder.Configuration);
+
 builder.Services.TryAddSingleton<IAgentsClient>(_ => AgentsClient.Unavailable());
 
 WebApplication app = builder.Build();

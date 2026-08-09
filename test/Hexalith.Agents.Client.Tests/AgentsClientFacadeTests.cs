@@ -57,7 +57,7 @@ public sealed class AgentsClientFacadeTests
         IAgentsClient client = AgentsClient.Unavailable();
 
         AssertUnavailable(await client.ProviderCatalog.ListEntriesAsync(includeDisabled: true).ConfigureAwait(true));
-        AssertUnavailable(await client.AgentAdministration.CreateAsync(new CreateAgent(
+        AssertUnavailable(await client.AgentAdministration.CreateAsync("agent-1", new CreateAgent(
             "tenant-1",
             "Hexa",
             "Assistant",
@@ -81,7 +81,7 @@ public sealed class AgentsClientFacadeTests
         IAgentsClient client = AgentsClient.Unavailable();
 
         await Should.ThrowAsync<ArgumentNullException>(async () =>
-            await client.AgentAdministration.CreateAsync(null!).ConfigureAwait(true));
+            await client.AgentAdministration.CreateAsync("agent-1", null!).ConfigureAwait(true));
         await Should.ThrowAsync<ArgumentNullException>(async () =>
             await client.AgentInteractions.RequestAsync(null!).ConfigureAwait(true));
     }

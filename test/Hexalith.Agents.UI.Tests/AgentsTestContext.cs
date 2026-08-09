@@ -6,6 +6,7 @@ using Bunit;
 using Bunit.TestDoubles;
 
 using Hexalith.Agents.Contracts.Agent;
+using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.UI.Resources;
@@ -35,6 +36,16 @@ public abstract class AgentsTestContext : FrontComposerTestBase
             .Returns(Task.FromResult(AgentInspectionResult.NotAuthorized()));
         SetupGateway.GetConfigurationAsync(Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(AgentInspectionResult.NotAuthorized()));
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentSetupResult.NotAuthorized()));
+        SetupGateway.UpdateConfigurationAsync(Arg.Any<UpdateAgentConfiguration>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.NotAuthorized)));
+        SetupGateway.ConfigureResponseModeAsync(Arg.Any<AgentResponseMode>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.NotAuthorized)));
+        SetupGateway.ActivateAsync(Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.NotAuthorized)));
+        SetupGateway.DisableAsync(Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.NotAuthorized)));
         CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogInspectionResult.NotAuthorized()));
         CallGateway.RequestCallAsync(Arg.Any<ConversationAgentCallRequest>(), Arg.Any<CancellationToken>())

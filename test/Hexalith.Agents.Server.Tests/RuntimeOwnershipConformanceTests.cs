@@ -194,12 +194,22 @@ public sealed class RuntimeOwnershipConformanceTests
     [Trait(RequirementTraits.Gate, RequirementTraits.Gates.RuntimeOwnership)]
     public void Exactly_one_durable_owner_no_live_workflow_or_background_worker()
     {
-        // (a) The Workflows + Projections extension points hold no compiled durable owner / live read-model binding.
+        // (a) The Workflows extension point holds no compiled durable owner.
         string serverRoot = Path.Combine(ModuleLayout.SourceRoot, "Hexalith.Agents.Server");
         Directory.GetFiles(Path.Combine(serverRoot, "Application", "Workflows"), "*.cs", SearchOption.AllDirectories)
             .ShouldBeEmpty("AD-18: Server/Application/Workflows must hold no compiled durable-owner type (the live workflow owner is deferred).");
+
+        // Story 5.2 landed the live Agent setup projection, so Projections is no longer empty. What AD-18 still
+        // forbids there is a second mutation owner: everything in the folder must be a platform projection handler
+        // or its supporting read-model/fold type, driven by the platform's dispatch — never a self-scheduling one.
         Directory.GetFiles(Path.Combine(serverRoot, "Projections"), "*.cs", SearchOption.AllDirectories)
-            .ShouldBeEmpty("AD-18: Server/Projections must hold no compiled read-model binding (the live projection owner is deferred).");
+            .ShouldNotBeEmpty("Story 5.2: Server/Projections owns the live Agent setup read model.");
+        foreach (Type type in typeof(DeferredAgentCommandDispatcher).Assembly.GetExportedTypes()
+            .Where(type => type.Namespace == "Hexalith.Agents.Server.Projections"))
+        {
+            type.GetInterfaces().Any(i => i.Name is "IHostedService" or "IHostedLifecycleService")
+                .ShouldBeFalse($"AD-18: projection type '{type.FullName}' is a background worker — projections are dispatched by the platform, never self-scheduled.");
+        }
 
         // (b) No exported type in the domain or Server surface is a durable-workflow owner ([Workflow] / workflow base
         //     type) or a second in-memory background worker (IHostedService / BackgroundService) that could mutate

@@ -53,22 +53,28 @@ public static class AgentsOperationEndpoints
     {
         RouteGroupBuilder agents = group.MapGroup("/agents");
 
-        agents.MapGet("/{agentId}/status", (string agentId, IAgentsClient client, CancellationToken cancellationToken) =>
-            client.AgentAdministration.GetStatusAsync(agentId, cancellationToken: cancellationToken));
-        agents.MapGet("/{agentId}/configuration", (string agentId, IAgentsClient client, CancellationToken cancellationToken) =>
-            client.AgentAdministration.GetConfigurationAsync(agentId, cancellationToken: cancellationToken));
-        agents.MapPost("/", (CreateAgent command, IAgentsClient client, CancellationToken cancellationToken) =>
-            client.AgentAdministration.CreateAsync(command, cancellationToken: cancellationToken));
-        agents.MapPut("/", (UpdateAgentConfiguration command, IAgentsClient client, CancellationToken cancellationToken) =>
-            client.AgentAdministration.UpdateConfigurationAsync(command, cancellationToken: cancellationToken));
+        // The Story 5.2 in-scope routes name their target Agent in the path: the aggregate identity is routing
+        // information, never something the command body may assert.
+        agents.MapGet("/{agentId}/status", (string agentId, int? expectedConfigurationVersion, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.AgentAdministration.GetStatusAsync(agentId, expectedConfigurationVersion, cancellationToken: cancellationToken));
+        agents.MapGet("/{agentId}/configuration", (string agentId, int? expectedConfigurationVersion, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.AgentAdministration.GetConfigurationAsync(agentId, expectedConfigurationVersion, cancellationToken: cancellationToken));
+        agents.MapPost("/{agentId}", (string agentId, CreateAgent command, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.AgentAdministration.CreateAsync(agentId, command, cancellationToken: cancellationToken));
+        agents.MapPut("/{agentId}", (string agentId, UpdateAgentConfiguration command, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.AgentAdministration.UpdateConfigurationAsync(agentId, command, cancellationToken: cancellationToken));
+        agents.MapPost("/{agentId}/response-mode", (string agentId, ConfigureAgentResponseMode command, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.AgentAdministration.ConfigureResponseModeAsync(agentId, command, cancellationToken: cancellationToken));
+        agents.MapPost("/{agentId}/activate", (string agentId, ActivateAgent command, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.AgentAdministration.ActivateAsync(agentId, command, cancellationToken: cancellationToken));
+        agents.MapPost("/{agentId}/disable", (string agentId, DisableAgent command, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.AgentAdministration.DisableAsync(agentId, command, cancellationToken: cancellationToken));
         agents.MapPost("/party-link", (LinkAgentPartyIdentity command, IAgentsClient client, CancellationToken cancellationToken) =>
             client.AgentAdministration.LinkPartyIdentityAsync(command, cancellationToken: cancellationToken));
         agents.MapPost("/party-link/replace", (ReplaceAgentPartyIdentity command, IAgentsClient client, CancellationToken cancellationToken) =>
             client.AgentAdministration.ReplacePartyIdentityAsync(command, cancellationToken: cancellationToken));
         agents.MapPost("/provider-selection", (SelectAgentProviderModel command, IAgentsClient client, CancellationToken cancellationToken) =>
             client.AgentAdministration.SelectProviderModelAsync(command, cancellationToken: cancellationToken));
-        agents.MapPost("/response-mode", (ConfigureAgentResponseMode command, IAgentsClient client, CancellationToken cancellationToken) =>
-            client.AgentAdministration.ConfigureResponseModeAsync(command, cancellationToken: cancellationToken));
         agents.MapPost("/approver-policy", (ConfigureAgentApproverPolicy command, IAgentsClient client, CancellationToken cancellationToken) =>
             client.AgentAdministration.ConfigureApproverPolicyAsync(command, cancellationToken: cancellationToken));
         agents.MapPost("/content-safety-policy", (ConfigureAgentContentSafetyPolicy command, IAgentsClient client, CancellationToken cancellationToken) =>
@@ -77,10 +83,6 @@ public static class AgentsOperationEndpoints
             client.AgentAdministration.RecordLaunchReadinessAsync(command, cancellationToken: cancellationToken));
         agents.MapPost("/enable-production-like-generation", (EnableProductionLikeGeneration command, IAgentsClient client, CancellationToken cancellationToken) =>
             client.AgentAdministration.EnableProductionLikeGenerationAsync(command, cancellationToken: cancellationToken));
-        agents.MapPost("/activate", (ActivateAgent command, IAgentsClient client, CancellationToken cancellationToken) =>
-            client.AgentAdministration.ActivateAsync(command, cancellationToken: cancellationToken));
-        agents.MapPost("/disable", (DisableAgent command, IAgentsClient client, CancellationToken cancellationToken) =>
-            client.AgentAdministration.DisableAsync(command, cancellationToken: cancellationToken));
     }
 
     private static void MapInteractions(RouteGroupBuilder group)

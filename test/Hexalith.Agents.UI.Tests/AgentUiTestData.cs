@@ -58,6 +58,25 @@ internal static class AgentUiTestData
             LaunchReadinessBlockers: launchReadinessBlockers ?? [],
             ProductionLikeGenerationEnabled: productionLikeGenerationEnabled);
 
+    /// <summary>Wraps a safe status view in the Story 5.2 authoritative setup view.</summary>
+    public static AgentSetupView Setup(
+        AgentStatusView? agent = null,
+        int configurationVersion = 1,
+        string? projectionVersion = "7",
+        AgentSetupFreshness freshness = AgentSetupFreshness.Current,
+        AgentSetupTruthState truthState = AgentSetupTruthState.ProjectionConfirmed)
+        => new(
+            agent ?? Status(),
+            configurationVersion,
+            projectionVersion,
+            ProjectedAt: new System.DateTimeOffset(2026, 6, 24, 12, 0, 0, System.TimeSpan.Zero),
+            freshness,
+            truthState);
+
+    /// <summary>Wraps a setup view in a successful setup read result.</summary>
+    public static AgentSetupResult SetupResult(AgentSetupView? setup = null)
+        => AgentSetupResult.Success(setup ?? Setup());
+
     public static ProviderCatalogEntryView Entry(
         string providerId = "openai",
         string modelId = "gpt-x",

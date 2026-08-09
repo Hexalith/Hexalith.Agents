@@ -160,6 +160,10 @@
   <data name="Agents.Config.Section.Lifecycle" xml:space="preserve"><value>Lifecycle and readiness</value></data>
   <data name="Agents.Config.Section.Blockers" xml:space="preserve"><value>Activation blockers</value></data>
   <data name="Agents.Config.Section.ContentSafety" xml:space="preserve"><value>Content safety</value></data>
+  <data name="Agents.Config.Section.Edit" xml:space="preserve"><value>Edit identity and instructions</value></data>
+  <data name="Agents.Config.Instructions.Label" xml:space="preserve"><value>Instructions</value></data>
+  <data name="Agents.Config.Instructions.ReplaceNote" xml:space="preserve"><value>Saving replaces the stored instructions with the text entered here. The stored text is never shown back on this screen — only its presence, validity, and version.</value></data>
+  <data name="Agents.Config.Edit.Submit" xml:space="preserve"><value>Save configuration</value></data>
   <data name="Agents.Config.DisplayName.Label" xml:space="preserve"><value>Display name</value></data>
   <data name="Agents.Config.Description.Label" xml:space="preserve"><value>Description</value></data>
   <data name="Agents.Config.Instructions.Present" xml:space="preserve"><value>Instructions are present.</value></data>
@@ -176,9 +180,31 @@
   <data name="Agents.Config.ContentSafety.ConfirmationOverride" xml:space="preserve"><value>Stricter Confirmation-mode override configured.</value></data>
   <data name="Agents.Config.ApproverPolicy.Link" xml:space="preserve"><value>Open approver policy</value></data>
   <data name="Agents.Config.Activation.Label" xml:space="preserve"><value>Activate hexa</value></data>
-  <data name="Agents.Config.Activation.Deferred" xml:space="preserve"><value>Activation is performed from the deferred command surface; this screen shows readiness only.</value></data>
+  <data name="Agents.Config.Activation.NotCallable" xml:space="preserve"><value>Activating sets the lifecycle state only. An active hexa is not necessarily callable — call readiness is decided separately.</value></data>
+  <data name="Agents.Config.Disable.Label" xml:space="preserve"><value>Disable hexa</value></data>
   <data name="Agents.Config.ResponseMode.Legend" xml:space="preserve"><value>Response mode</value></data>
   <data name="Agents.Config.ResponseMode.FutureOnlyNote" xml:space="preserve"><value>Changing the response mode affects future Agent Calls only; prior interactions are never rewritten.</value></data>
+  <data name="Agents.Config.ResponseMode.Submit" xml:space="preserve"><value>Save response mode</value></data>
+
+  <!-- Setup truth flow (Story 5.2) -->
+  <data name="Agents.Config.Section.Truth" xml:space="preserve"><value>Current truth</value></data>
+  <data name="Agents.Config.Truth.Stage.Label" xml:space="preserve"><value>Truth stage</value></data>
+  <data name="Agents.Config.Truth.Stage.Unknown" xml:space="preserve"><value>Unknown</value></data>
+  <data name="Agents.Config.Truth.Stage.Submitted" xml:space="preserve"><value>Submitted — accepted for processing, not yet durable evidence.</value></data>
+  <data name="Agents.Config.Truth.Stage.AuthoritativePending" xml:space="preserve"><value>Authoritative pending — accepted, but the projection has not caught up.</value></data>
+  <data name="Agents.Config.Truth.Stage.ProjectionConfirmed" xml:space="preserve"><value>Projection confirmed — the projected read model reflects this configuration version.</value></data>
+  <data name="Agents.Config.Truth.ConfigurationVersion.Label" xml:space="preserve"><value>Configuration version</value></data>
+  <data name="Agents.Config.Truth.ProjectionVersion.Label" xml:space="preserve"><value>Projection version</value></data>
+  <data name="Agents.Config.Truth.Freshness.Label" xml:space="preserve"><value>Freshness</value></data>
+  <data name="Agents.Config.Truth.Freshness.Unknown" xml:space="preserve"><value>Unknown</value></data>
+  <data name="Agents.Config.Truth.Freshness.Current" xml:space="preserve"><value>Current</value></data>
+  <data name="Agents.Config.Truth.Freshness.Stale" xml:space="preserve"><value>Stale</value></data>
+  <data name="Agents.Config.Write.Submitted" xml:space="preserve"><value>Change submitted. Re-reading the projected setup to confirm it.</value></data>
+  <data name="Agents.Config.Write.NotAuthorized" xml:space="preserve"><value>You are not authorized to change this hexa. Nothing was changed.</value></data>
+  <data name="Agents.Config.Write.NotFound" xml:space="preserve"><value>No matching hexa was found. Nothing was changed.</value></data>
+  <data name="Agents.Config.Write.ValidationFailed" xml:space="preserve"><value>The submitted values are not valid. Nothing was changed.</value></data>
+  <data name="Agents.Config.Write.Conflict" xml:space="preserve"><value>The change conflicted with a concurrent update. Nothing was changed.</value></data>
+  <data name="Agents.Config.Write.Unavailable" xml:space="preserve"><value>The configuration service is unavailable. Nothing was changed.</value></data>
 
   <!-- Approver policy builder (AC4) -->
   <data name="Agents.ApproverPolicy.Title" xml:space="preserve"><value>Approver policy</value></data>

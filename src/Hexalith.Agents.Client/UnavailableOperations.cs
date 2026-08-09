@@ -39,17 +39,26 @@ internal sealed class UnavailableProviderCatalogOperations : IProviderCatalogOpe
 
 internal sealed class UnavailableAgentAdministrationOperations : IAgentAdministrationOperations
 {
-    public ValueTask<AgentOperationResult<AgentInspectionResult>> GetStatusAsync(string agentId, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
-        => Agent(agentId);
+    public ValueTask<AgentOperationResult<AgentSetupResult>> GetStatusAsync(string agentId, int? expectedConfigurationVersion = null, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+        => Setup(agentId);
 
-    public ValueTask<AgentOperationResult<AgentInspectionResult>> GetConfigurationAsync(string agentId, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
-        => Agent(agentId);
+    public ValueTask<AgentOperationResult<AgentSetupResult>> GetConfigurationAsync(string agentId, int? expectedConfigurationVersion = null, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+        => Setup(agentId);
 
-    public ValueTask<AgentOperationResult> CreateAsync(CreateAgent command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
-        => Unavailable.Command(command);
+    public ValueTask<AgentOperationResult<AgentCommandAcceptance>> CreateAsync(string agentId, CreateAgent command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+        => Acceptance(agentId, command);
 
-    public ValueTask<AgentOperationResult> UpdateConfigurationAsync(UpdateAgentConfiguration command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
-        => Unavailable.Command(command);
+    public ValueTask<AgentOperationResult<AgentCommandAcceptance>> UpdateConfigurationAsync(string agentId, UpdateAgentConfiguration command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+        => Acceptance(agentId, command);
+
+    public ValueTask<AgentOperationResult<AgentCommandAcceptance>> ConfigureResponseModeAsync(string agentId, ConfigureAgentResponseMode command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+        => Acceptance(agentId, command);
+
+    public ValueTask<AgentOperationResult<AgentCommandAcceptance>> ActivateAsync(string agentId, ActivateAgent command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+        => Acceptance(agentId, command);
+
+    public ValueTask<AgentOperationResult<AgentCommandAcceptance>> DisableAsync(string agentId, DisableAgent command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+        => Acceptance(agentId, command);
 
     public ValueTask<AgentOperationResult> LinkPartyIdentityAsync(LinkAgentPartyIdentity command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
         => Unavailable.Command(command);
@@ -58,9 +67,6 @@ internal sealed class UnavailableAgentAdministrationOperations : IAgentAdministr
         => Unavailable.Command(command);
 
     public ValueTask<AgentOperationResult> SelectProviderModelAsync(SelectAgentProviderModel command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
-        => Unavailable.Command(command);
-
-    public ValueTask<AgentOperationResult> ConfigureResponseModeAsync(ConfigureAgentResponseMode command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
         => Unavailable.Command(command);
 
     public ValueTask<AgentOperationResult> ConfigureApproverPolicyAsync(ConfigureAgentApproverPolicy command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
@@ -75,16 +81,16 @@ internal sealed class UnavailableAgentAdministrationOperations : IAgentAdministr
     public ValueTask<AgentOperationResult> EnableProductionLikeGenerationAsync(EnableProductionLikeGeneration command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
         => Unavailable.Command(command);
 
-    public ValueTask<AgentOperationResult> ActivateAsync(ActivateAgent command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
-        => Unavailable.Command(command);
-
-    public ValueTask<AgentOperationResult> DisableAsync(DisableAgent command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
-        => Unavailable.Command(command);
-
-    private static ValueTask<AgentOperationResult<AgentInspectionResult>> Agent(string agentId)
+    private static ValueTask<AgentOperationResult<AgentSetupResult>> Setup(string agentId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
-        return Unavailable.Typed<AgentInspectionResult>();
+        return Unavailable.Typed<AgentSetupResult>();
+    }
+
+    private static ValueTask<AgentOperationResult<AgentCommandAcceptance>> Acceptance(string agentId, object command)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
+        return Unavailable.TypedCommand<AgentCommandAcceptance>(command);
     }
 }
 

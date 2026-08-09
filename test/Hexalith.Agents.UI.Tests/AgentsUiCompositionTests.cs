@@ -1,9 +1,13 @@
+using System.Collections.Generic;
 using System.Linq;
 
+using Hexalith.Agents.Client;
 using Hexalith.Agents.UI;
 using Hexalith.Agents.UI.Services.Gateways;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 using Shouldly;
 
@@ -56,4 +60,56 @@ public sealed class AgentsUiCompositionTests
 
         services.Count(d => d.ServiceType == typeof(IAgentSetupGateway)).ShouldBe(1);
     }
+
+    // ===== Story 5.2: the live setup composition =====
+
+    [Fact]
+    public void AddAgentsUiSetup_resolves_the_live_gateway_when_an_agent_target_is_configured()
+    {
+        ServiceCollection services = new();
+        services.AddSingleton(AgentsClient.Unavailable());
+
+        services.AddAgentsUiSetup(Configuration(("Agents:Ui:AgentId", "hexa")));
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        using IServiceScope scope = provider.CreateScope();
+
+        scope.ServiceProvider.GetRequiredService<IAgentSetupGateway>().ShouldBeOfType<AgentsClientSetupGateway>();
+        scope.ServiceProvider.GetRequiredService<IOptions<AgentSetupTargetOptions>>().Value.AgentId.ShouldBe("hexa");
+    }
+
+    [Fact]
+    public void AddAgentsUiSetup_stays_fail_closed_when_no_agent_target_is_configured()
+    {
+        ServiceCollection services = new();
+        services.AddSingleton(AgentsClient.Unavailable());
+
+        services.AddAgentsUiSetup(Configuration());
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        using IServiceScope scope = provider.CreateScope();
+
+        // An unnamed Agent must not produce unaddressed reads and writes — the deferred, denying gateway stands.
+        scope.ServiceProvider.GetRequiredService<IAgentSetupGateway>().ShouldBeOfType<DeferredAgentSetupGateway>();
+    }
+
+    [Fact]
+    public void AddAgentsUiSetup_still_completes_the_rest_of_the_gateway_graph()
+    {
+        ServiceCollection services = new();
+        services.AddSingleton(AgentsClient.Unavailable());
+
+        services.AddAgentsUiSetup(Configuration(("Agents:Ui:AgentId", "hexa")));
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        using IServiceScope scope = provider.CreateScope();
+
+        scope.ServiceProvider.GetRequiredService<IProviderCatalogGateway>().ShouldBeOfType<DeferredProviderCatalogGateway>();
+        scope.ServiceProvider.GetRequiredService<ILaunchReadinessGateway>().ShouldBeOfType<DeferredLaunchReadinessGateway>();
+    }
+
+    private static IConfiguration Configuration(params (string Key, string Value)[] values)
+        => new ConfigurationBuilder()
+            .AddInMemoryCollection(values.Select(pair => new KeyValuePair<string, string?>(pair.Key, pair.Value)))
+            .Build();
 }
