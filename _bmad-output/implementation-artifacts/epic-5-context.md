@@ -1,6 +1,6 @@
 # Epic 5 Context: Live Governed Setup And Honest Readiness
 
-<!-- Generated from planning artifacts. Regenerate with compile-epic-context if planning docs change. -->
+<!-- Compiled from planning artifacts. Edit freely. Regenerate with compile-epic-context if planning docs change. -->
 
 ## Goal
 
