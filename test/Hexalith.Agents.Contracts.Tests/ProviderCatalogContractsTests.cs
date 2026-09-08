@@ -95,7 +95,9 @@ public sealed class ProviderCatalogContractsTests
             new ProviderModelTimeoutPolicy(30_000, 3),
             ProviderModelCapabilityFlags.Streaming | ProviderModelCapabilityFlags.ToolCalling,
             ProviderConfigurationState.Configured,
-            "cfg-openai-gpt4o");
+            "cfg-openai-gpt4o",
+            new ProviderModelPricing("USD", 0.002m, 0.008m, 1),
+            CapabilityVersion: 1);
 
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(created);
 

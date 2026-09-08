@@ -1,11 +1,15 @@
 @page "/agents/providers"
 @attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsAdministratorPolicy)]
+@implements IDisposable
 @inject IStringLocalizer<AgentsResources> Localizer
 @inject IProviderCatalogGateway Gateway
+@inject TimeProvider TimeProvider
 
-@* Provider catalog (AC3, AC5, AC6): a full-width FluentDataGrid surface (UX-DR4/UX-DR15) showing safe capability
-   metadata, readiness, and configured/not-configured state — never secret values, the configuration reference id,
-   raw provider payloads, or SDK details (AD-9, AD-14). *@
+@using Hexalith.Agents.Contracts.ProviderCatalog.Commands
+
+@* Provider catalog (Story 5.3): a full-width FluentDataGrid surface showing safe capability, pricing,
+   enablement, configured-state, CapabilityVersion, and freshness — never secret values, the configuration
+   reference id, raw provider payloads, or SDK details. Writes follow submitted → pending → confirmed. *@
 <FcContentLabel LabelledBy="@HeadingId" />
 <FcAggregateListPage @ref="_listPage"
                      TItem="ProviderCatalogEntryView"
@@ -21,10 +25,103 @@
                      HeaderTestId="agents-provider-catalog-header">
     <Filters>
         <section aria-label="@Localizer["Agents.ProviderCatalog.ControlsLabel"]">
-            <FluentSwitch @bind-Value="_selectableOnly"
-                          Label="@Localizer["Agents.ProviderCatalog.Filter.SelectableOnly"]"
-                          data-testid="agents-provider-catalog-selectable-filter" />
+            <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="12px">
+                <FluentSwitch @bind-Value="_selectableOnly"
+                              Label="@Localizer["Agents.ProviderCatalog.Filter.SelectableOnly"]"
+                              data-testid="agents-provider-catalog-selectable-filter" />
+                <FluentButton Appearance="ButtonAppearance.Primary"
+                              Disabled="_busy"
+                              OnClick="BeginCreate"
+                              data-testid="agents-provider-catalog-create">
+                    @Localizer["Agents.ProviderCatalog.Action.Create"]
+                </FluentButton>
+            </FluentStack>
         </section>
+        @if (_pendingWrite is { Status: AgentSetupWriteStatus.Submitted })
+        {
+            <p data-testid="agents-provider-catalog-truth" aria-live="polite">
+                @Localizer[$"Agents.ProviderCatalog.Truth.Stage.{DisplayedWriteTruth}"]
+            </p>
+        }
+        else if (_pendingWrite is { } failedWrite)
+        {
+            <p data-testid="agents-provider-catalog-truth" aria-live="polite">
+                @Localizer[$"Agents.ProviderCatalog.Write.Status.{failedWrite.Status}"]
+            </p>
+        }
+        else if (_result is { TruthState: not AgentSetupTruthState.Unknown })
+        {
+            <p data-testid="agents-provider-catalog-freshness" aria-live="polite">
+                @Localizer[$"Agents.ProviderCatalog.Freshness.{_result.Freshness}"]
+            </p>
+        }
+        @if (_editorOpen)
+        {
+            <FluentAccordion>
+                <FluentAccordionItem Heading="@Localizer["Agents.ProviderCatalog.Editor.Title"]" Expanded="true">
+                    <FluentStack Orientation="Orientation.Vertical" VerticalGap="12px" data-testid="agents-provider-catalog-editor">
+                        <FluentTextInput @bind-Value="_providerId"
+                                         Label="@Localizer["Agents.ProviderCatalog.Column.Provider"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.Column.Provider"]"
+                                         Disabled="_editing"
+                                         data-testid="agents-provider-catalog-provider-input" />
+                        <FluentTextInput @bind-Value="_modelId"
+                                         Label="@Localizer["Agents.ProviderCatalog.Column.Model"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.Column.Model"]"
+                                         Disabled="_editing"
+                                         data-testid="agents-provider-catalog-model-input" />
+                        <FluentTextInput @bind-Value="_displayLabel"
+                                         Label="@Localizer["Agents.ProviderCatalog.Column.Label"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.Column.Label"]"
+                                         data-testid="agents-provider-catalog-label-input" />
+                        <FluentTextInput @bind-Value="_currency"
+                                         Label="@Localizer["Agents.ProviderCatalog.Column.Currency"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.Column.Currency"]"
+                                         data-testid="agents-provider-catalog-currency-input" />
+                        <FluentTextInput @bind-Value="_inputPrice"
+                                         Label="@Localizer["Agents.ProviderCatalog.Column.InputPrice"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.Column.InputPrice"]"
+                                         data-testid="agents-provider-catalog-input-price-input" />
+                        <FluentTextInput @bind-Value="_outputPrice"
+                                         Label="@Localizer["Agents.ProviderCatalog.Column.OutputPrice"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.Column.OutputPrice"]"
+                                         data-testid="agents-provider-catalog-output-price-input" />
+                        <FluentTextInput @bind-Value="_contextWindow"
+                                         Label="@Localizer["Agents.ProviderCatalog.Column.ContextWindow"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.Column.ContextWindow"]"
+                                         data-testid="agents-provider-catalog-context-window-input" />
+                        <FluentTextInput @bind-Value="_maxOutput"
+                                         Label="@Localizer["Agents.ProviderCatalog.Column.MaxOutput"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.Column.MaxOutput"]"
+                                         data-testid="agents-provider-catalog-max-output-input" />
+                        <FluentTextInput @bind-Value="_timeoutMs"
+                                         Label="@Localizer["Agents.ProviderCatalog.Editor.TimeoutMilliseconds"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.Editor.TimeoutMilliseconds"]"
+                                         data-testid="agents-provider-catalog-timeout-input" />
+                        <FluentTextInput @bind-Value="_maxRetries"
+                                         Label="@Localizer["Agents.ProviderCatalog.Editor.MaxRetries"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.Editor.MaxRetries"]"
+                                         data-testid="agents-provider-catalog-retries-input" />
+                        <FluentTextInput @bind-Value="_configurationReference"
+                                         Label="@Localizer["Agents.ProviderCatalog.Editor.ConfigurationReference"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.Editor.ConfigurationReference"]"
+                                         autocomplete="off"
+                                         data-testid="agents-provider-catalog-configuration-reference-input" />
+                        <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="8px">
+                            <FluentButton Appearance="ButtonAppearance.Primary"
+                                          Disabled="_busy"
+                                          OnClick="SubmitEditorAsync"
+                                          data-testid="agents-provider-catalog-save">
+                                @Localizer["Agents.ProviderCatalog.Action.Save"]
+                            </FluentButton>
+                            <FluentButton Disabled="_busy" OnClick="CancelEditor" data-testid="agents-provider-catalog-cancel">
+                                @Localizer["Agents.ProviderCatalog.Action.Cancel"]
+                            </FluentButton>
+                        </FluentStack>
+                    </FluentStack>
+                </FluentAccordionItem>
+            </FluentAccordion>
+        }
     </Filters>
     <States>
         @if (_result is null)
@@ -34,6 +131,10 @@
         else if (_result.Status is ProviderCatalogInspectionStatus.NotAuthorized)
         {
             <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-provider-catalog-state" />
+        }
+        else if (_result.Status is ProviderCatalogInspectionStatus.Unavailable)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Error" TestId="agents-provider-catalog-state" />
         }
         else if (_result.Status is ProviderCatalogInspectionStatus.EntryNotFound || _result.Entries.Count == 0)
         {
@@ -86,6 +187,15 @@
                 <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Timeout"]" ColumnId="timeout">
                     @Localizer["Agents.ProviderCatalog.Timeout.Value", context.TimeoutPolicy.RequestTimeoutMilliseconds, context.TimeoutPolicy.MaxRetries]
                 </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Pricing"]" ColumnId="pricing">
+                    <span data-testid="agents-provider-catalog-pricing">@PricingLabel(context)</span>
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.CapabilityVersion"]" ColumnId="capability-version">
+                    <span data-testid="agents-provider-catalog-capability-version">@context.CapabilityVersion</span>
+                </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Freshness"]" ColumnId="freshness">
+                    @Localizer[$"Agents.ProviderCatalog.Freshness.{_result!.Freshness}"]
+                </TemplateColumn>
                 <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Selectable"]" ColumnId="selectable">
                     @(context.IsSelectableForNewActiveUse
                         ? Localizer["Agents.ProviderCatalog.Selectable.Yes"]
@@ -94,6 +204,25 @@
                 <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Configured"]" ColumnId="configured">
                     <span data-testid="agents-provider-catalog-configured">@Localizer[$"Agents.ProviderCatalog.ConfigurationState.{context.ConfigurationState}"]</span>
                 </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Actions"]" ColumnId="actions">
+                    <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="8px">
+                        <FluentButton Disabled="_busy" OnClick="@(() => BeginEdit(context))" data-testid="agents-provider-catalog-edit">
+                            @Localizer["Agents.ProviderCatalog.Action.Edit"]
+                        </FluentButton>
+                        @if (context.Status is ProviderModelStatus.Enabled)
+                        {
+                            <FluentButton Disabled="_busy" OnClick="@(() => SubmitLifecycleAsync(context, enable: false))" data-testid="agents-provider-catalog-disable">
+                                @Localizer["Agents.ProviderCatalog.Action.Disable"]
+                            </FluentButton>
+                        }
+                        else
+                        {
+                            <FluentButton Disabled="_busy" OnClick="@(() => SubmitLifecycleAsync(context, enable: true))" data-testid="agents-provider-catalog-enable">
+                                @Localizer["Agents.ProviderCatalog.Action.Enable"]
+                            </FluentButton>
+                        }
+                    </FluentStack>
+                </TemplateColumn>
             </FluentDataGrid>
         }
     </Body>
@@ -101,14 +230,35 @@
 
 @code {
     private const string HeadingId = "agents-provider-catalog-heading";
+    private static readonly TimeSpan ProjectionPollingTimeout = TimeSpan.FromSeconds(8);
+    private static readonly TimeSpan ProjectionPollingInterval = TimeSpan.FromMilliseconds(200);
 
     private static readonly GridSort<ProviderCatalogEntryView> _sortByProvider =
         GridSort<ProviderCatalogEntryView>.ByAscending(entry => entry.ProviderId).ThenAscending(entry => entry.ModelId);
 
+    private readonly CancellationTokenSource _lifetimeCancellation = new();
     private FcAggregateListPage<ProviderCatalogEntryView>? _listPage;
     private ProviderCatalogInspectionResult? _result;
+    private ProviderCatalogWriteResult? _pendingWrite;
     private bool _selectableOnly;
     private bool _focusHeadingPending = true;
+    private bool _busy;
+    private bool _disposed;
+    private bool _editorOpen;
+    private bool _editing;
+    private int? _expectedCapabilityVersion;
+    private string _providerId = string.Empty;
+    private string _modelId = string.Empty;
+    private string _displayLabel = string.Empty;
+    private string _currency = "USD";
+    private string _inputPrice = "0";
+    private string _outputPrice = "0";
+    private string _contextWindow = "128000";
+    private string _maxOutput = "16000";
+    private string _timeoutMs = "30000";
+    private string _maxRetries = "3";
+    private string _configurationReference = string.Empty;
+    private ProviderCatalogEntryView? _editingEntry;
 
     private IReadOnlyList<ProviderCatalogEntryView> VisibleRows
         => _result is { Status: ProviderCatalogInspectionStatus.Success }
@@ -119,8 +269,23 @@
 
     private bool ShowGrid => VisibleRows.Count > 0;
 
+    private AgentSetupTruthState DisplayedWriteTruth
+        => _result is { TruthState: AgentSetupTruthState.AuthoritativePending or AgentSetupTruthState.ProjectionConfirmed }
+            ? _result.TruthState
+            : AgentSetupTruthState.Submitted;
+
     protected override async Task OnInitializedAsync()
-        => _result = await Gateway.ListEntriesAsync(includeDisabled: true, CancellationToken.None).ConfigureAwait(false);
+    {
+        try
+        {
+            _result = await Gateway
+                .ListEntriesAsync(includeDisabled: true, expectedProjectionVersion: null, _lifetimeCancellation.Token)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (_disposed)
+        {
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -133,7 +298,328 @@
 
     private void ResetFilters() => _selectableOnly = false;
 
-    // Safe capability labels only (AD-10 capability floor) — each a complete localizable whole string (UX-DR14).
+    private void BeginCreate()
+    {
+        _editing = false;
+        _editorOpen = true;
+        _editingEntry = null;
+        _providerId = string.Empty;
+        _modelId = string.Empty;
+        _displayLabel = string.Empty;
+        _currency = "USD";
+        _inputPrice = "0";
+        _outputPrice = "0";
+        _contextWindow = "128000";
+        _maxOutput = "16000";
+        _timeoutMs = "30000";
+        _maxRetries = "3";
+        _configurationReference = string.Empty;
+        _expectedCapabilityVersion = null;
+    }
+
+    private void BeginEdit(ProviderCatalogEntryView entry)
+    {
+        _editing = true;
+        _editorOpen = true;
+        _editingEntry = entry;
+        _providerId = entry.ProviderId;
+        _modelId = entry.ModelId;
+        _displayLabel = entry.DisplayLabel;
+        _currency = entry.Pricing?.Currency ?? "USD";
+        _inputPrice = (entry.Pricing?.InputTokenUnitPrice ?? 0m).ToString(CultureInfo.InvariantCulture);
+        _outputPrice = (entry.Pricing?.OutputTokenUnitPrice ?? 0m).ToString(CultureInfo.InvariantCulture);
+        _contextWindow = entry.ContextWindowTokenLimit.ToString(CultureInfo.InvariantCulture);
+        _maxOutput = entry.MaxOutputTokenLimit.ToString(CultureInfo.InvariantCulture);
+        _timeoutMs = entry.TimeoutPolicy.RequestTimeoutMilliseconds.ToString(CultureInfo.InvariantCulture);
+        _maxRetries = entry.TimeoutPolicy.MaxRetries.ToString(CultureInfo.InvariantCulture);
+        // Never prefill the stored configuration reference — the grid and editor must not render it.
+        _configurationReference = string.Empty;
+        _expectedCapabilityVersion = entry.CapabilityVersion;
+    }
+
+    private void CancelEditor()
+    {
+        _editorOpen = false;
+        _editing = false;
+        _editingEntry = null;
+    }
+
+    private Task SubmitEditorAsync()
+    {
+        string providerId = _providerId;
+        string modelId = _modelId;
+        int? expectedCapabilityVersion = _editing ? _expectedCapabilityVersion + 1 : 1;
+        return SubmitAsync(
+            async ct =>
+            {
+                if (!TryBuildPricing(out ProviderModelPricing? pricing) || pricing is null
+                    || !TryBuildLimits(out int contextWindow, out int maxOutput, out ProviderModelTimeoutPolicy? timeout)
+                    || timeout is null)
+                {
+                    return ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed);
+                }
+
+                string? configurationReference = string.IsNullOrWhiteSpace(_configurationReference)
+                    ? _editingEntry?.ConfigurationReferenceId
+                    : _configurationReference.Trim();
+                ProviderModelCapabilityFlags flags = _editingEntry?.SafeCapabilityFlags ?? ProviderModelCapabilityFlags.None;
+                bool supportsTextGeneration = _editingEntry?.SupportsTextGeneration ?? true;
+
+                if (_editing)
+                {
+                    return await Gateway.UpdateAsync(
+                        new UpdateProviderModelEntry(
+                            providerId,
+                            modelId,
+                            _displayLabel,
+                            supportsTextGeneration,
+                            contextWindow,
+                            maxOutput,
+                            timeout,
+                            flags,
+                            configurationReference,
+                            pricing,
+                            _expectedCapabilityVersion),
+                        ct).ConfigureAwait(false);
+                }
+
+                return await Gateway.CreateAsync(
+                    new CreateProviderModelEntry(
+                        providerId,
+                        modelId,
+                        _displayLabel,
+                        Enabled: true,
+                        supportsTextGeneration,
+                        contextWindow,
+                        maxOutput,
+                        timeout,
+                        flags,
+                        configurationReference,
+                        pricing),
+                    ct).ConfigureAwait(false);
+            },
+            providerId,
+            modelId,
+            expectedCapabilityVersion,
+            expectedStatus: null);
+    }
+
+    private Task SubmitLifecycleAsync(ProviderCatalogEntryView entry, bool enable)
+        => SubmitAsync(
+            ct => enable
+                ? Gateway.EnableAsync(new EnableProviderModelEntry(entry.ProviderId, entry.ModelId), ct)
+                : Gateway.DisableAsync(new DisableProviderModelEntry(entry.ProviderId, entry.ModelId), ct),
+            entry.ProviderId,
+            entry.ModelId,
+            expectedCapabilityVersion: null,
+            expectedStatus: enable ? ProviderModelStatus.Enabled : ProviderModelStatus.Disabled);
+
+    private async Task SubmitAsync(
+        Func<CancellationToken, Task<ProviderCatalogWriteResult>> write,
+        string providerId,
+        string modelId,
+        int? expectedCapabilityVersion,
+        ProviderModelStatus? expectedStatus)
+    {
+        if (_busy)
+        {
+            return;
+        }
+
+        _busy = true;
+        ProviderCatalogWriteResult? writeResult = null;
+        try
+        {
+            CancellationToken cancellationToken = _lifetimeCancellation.Token;
+            writeResult = await write(cancellationToken).WaitAsync(cancellationToken).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            _pendingWrite = writeResult;
+            if (_pendingWrite.Status is AgentSetupWriteStatus.Submitted)
+            {
+                _editorOpen = false;
+                await RequestRenderAsync(cancellationToken).ConfigureAwait(false);
+                bool confirmed = await RefreshAfterWriteAsync(
+                        providerId,
+                        modelId,
+                        expectedCapabilityVersion,
+                        expectedStatus,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+                if (confirmed && !_disposed)
+                {
+                    _pendingWrite = null;
+                }
+            }
+        }
+        catch (OperationCanceledException) when (_disposed)
+        {
+        }
+        catch (Exception)
+        {
+            if (!_disposed && writeResult is not { Status: AgentSetupWriteStatus.Submitted })
+            {
+                _pendingWrite = ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
+            }
+        }
+        finally
+        {
+            if (!_disposed)
+            {
+                _busy = false;
+            }
+        }
+    }
+
+    private async Task<bool> RefreshAfterWriteAsync(
+        string providerId,
+        string modelId,
+        int? expectedCapabilityVersion,
+        ProviderModelStatus? expectedStatus,
+        CancellationToken cancellationToken)
+    {
+        using CancellationTokenSource timeoutCancellation = new(ProjectionPollingTimeout, TimeProvider);
+        using CancellationTokenSource pollingCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+            cancellationToken,
+            timeoutCancellation.Token);
+        try
+        {
+            await LoadAfterWriteAsync(providerId, modelId, expectedCapabilityVersion, expectedStatus, pollingCancellation.Token)
+                .ConfigureAwait(false);
+            if (_result is not { TruthState: AgentSetupTruthState.AuthoritativePending })
+            {
+                return _result is { TruthState: AgentSetupTruthState.ProjectionConfirmed };
+            }
+
+            await RequestRenderAsync(pollingCancellation.Token).ConfigureAwait(false);
+            while (_result is { TruthState: AgentSetupTruthState.AuthoritativePending })
+            {
+                await Task.Delay(ProjectionPollingInterval, TimeProvider, pollingCancellation.Token).ConfigureAwait(false);
+                await LoadAfterWriteAsync(providerId, modelId, expectedCapabilityVersion, expectedStatus, pollingCancellation.Token)
+                    .ConfigureAwait(false);
+            }
+
+            return _result is { TruthState: AgentSetupTruthState.ProjectionConfirmed };
+        }
+        catch (OperationCanceledException) when (
+            timeoutCancellation.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+        {
+            return false;
+        }
+    }
+
+    private async Task LoadAfterWriteAsync(
+        string providerId,
+        string modelId,
+        int? expectedCapabilityVersion,
+        ProviderModelStatus? expectedStatus,
+        CancellationToken cancellationToken)
+    {
+        ProviderCatalogInspectionResult entry = await Gateway
+            .GetEntryAsync(providerId, modelId, expectedCapabilityVersion, cancellationToken)
+            .WaitAsync(cancellationToken)
+            .ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (entry.Status is ProviderCatalogInspectionStatus.NotAuthorized)
+        {
+            _result = entry;
+            return;
+        }
+
+        ProviderCatalogInspectionResult list = await Gateway
+            .ListEntriesAsync(includeDisabled: true, entry.ProjectionVersion, cancellationToken)
+            .WaitAsync(cancellationToken)
+            .ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (list.Status is not ProviderCatalogInspectionStatus.Success)
+        {
+            _result = list;
+            return;
+        }
+
+        bool caughtUp = IsCaughtUp(entry, providerId, modelId, expectedCapabilityVersion, expectedStatus);
+        _result = list with
+        {
+            Freshness = caughtUp ? AgentSetupFreshness.Current : AgentSetupFreshness.Stale,
+            TruthState = caughtUp ? AgentSetupTruthState.ProjectionConfirmed : AgentSetupTruthState.AuthoritativePending,
+            ProjectionVersion = entry.ProjectionVersion ?? list.ProjectionVersion,
+            ProjectedAt = entry.ProjectedAt ?? list.ProjectedAt,
+        };
+    }
+
+    private static bool IsCaughtUp(
+        ProviderCatalogInspectionResult entry,
+        string providerId,
+        string modelId,
+        int? expectedCapabilityVersion,
+        ProviderModelStatus? expectedStatus)
+    {
+        ProviderCatalogEntryView? row = entry.Entries.FirstOrDefault(item =>
+            string.Equals(item.ProviderId, providerId, StringComparison.Ordinal)
+            && string.Equals(item.ModelId, modelId, StringComparison.Ordinal));
+        if (row is null || entry.Status is not ProviderCatalogInspectionStatus.Success)
+        {
+            return false;
+        }
+
+        if (expectedCapabilityVersion is { } version && row.CapabilityVersion < version)
+        {
+            return false;
+        }
+
+        return expectedStatus is not { } status || row.Status == status;
+    }
+
+    private Task RequestRenderAsync(CancellationToken cancellationToken)
+        => InvokeAsync(() =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            StateHasChanged();
+        });
+
+    private bool TryBuildPricing(out ProviderModelPricing? pricing)
+    {
+        pricing = null;
+        string currency = _currency.Trim();
+        if (currency.Length != 3
+            || !char.IsAsciiLetter(currency[0])
+            || !char.IsAsciiLetter(currency[1])
+            || !char.IsAsciiLetter(currency[2])
+            || !decimal.TryParse(_inputPrice, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal input)
+            || !decimal.TryParse(_outputPrice, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal output)
+            || input < 0
+            || output < 0)
+        {
+            return false;
+        }
+
+        pricing = new ProviderModelPricing(currency, input, output, PricingVersion: 0);
+        return true;
+    }
+
+    private bool TryBuildLimits(out int contextWindow, out int maxOutput, out ProviderModelTimeoutPolicy? timeout)
+    {
+        contextWindow = 0;
+        maxOutput = 0;
+        timeout = null;
+        if (!int.TryParse(_contextWindow, NumberStyles.Integer, CultureInfo.InvariantCulture, out contextWindow)
+            || !int.TryParse(_maxOutput, NumberStyles.Integer, CultureInfo.InvariantCulture, out maxOutput)
+            || !int.TryParse(_timeoutMs, NumberStyles.Integer, CultureInfo.InvariantCulture, out int timeoutMs)
+            || !int.TryParse(_maxRetries, NumberStyles.Integer, CultureInfo.InvariantCulture, out int retries))
+        {
+            return false;
+        }
+
+        timeout = new ProviderModelTimeoutPolicy(timeoutMs, retries);
+        return true;
+    }
+
+    private string PricingLabel(ProviderCatalogEntryView entry)
+        => entry.Pricing is { } pricing
+            ? Localizer["Agents.ProviderCatalog.Pricing.Value", pricing.Currency, pricing.InputTokenUnitPrice, pricing.OutputTokenUnitPrice, pricing.PricingVersion]
+            : Localizer["Agents.ProviderCatalog.Pricing.Missing"];
+
     private IEnumerable<string> CapabilityLabels(ProviderCatalogEntryView entry)
     {
         if (entry.SupportsTextGeneration)
@@ -163,4 +649,17 @@
         ProviderModelCapabilityFlags.Vision,
         ProviderModelCapabilityFlags.StructuredOutput,
     ];
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        _lifetimeCancellation.Cancel();
+        _lifetimeCancellation.Dispose();
+    }
 }

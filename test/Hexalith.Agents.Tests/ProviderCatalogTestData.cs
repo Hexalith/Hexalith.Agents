@@ -45,12 +45,16 @@ internal static class ProviderCatalogTestData
                 ? new Dictionary<string, string> { [ProviderAdminExtensionKey] = "true" }
                 : null);
 
+    internal static ProviderModelPricing ValidPricing(int pricingVersion = 1)
+        => new("USD", 0.002m, 0.008m, pricingVersion);
+
     internal static CreateProviderModelEntry ValidCreate(
         bool enabled = true,
         string providerId = "openai",
         string modelId = "gpt-4o",
         string displayLabel = "OpenAI GPT-4o",
-        string? configurationReferenceId = "cfg-openai-gpt4o")
+        string? configurationReferenceId = "cfg-openai-gpt4o",
+        ProviderModelPricing? pricing = null)
         => new(
             providerId,
             modelId,
@@ -61,7 +65,29 @@ internal static class ProviderCatalogTestData
             MaxOutputTokenLimit: 16_000,
             new ProviderModelTimeoutPolicy(30_000, 3),
             ProviderModelCapabilityFlags.Streaming | ProviderModelCapabilityFlags.ToolCalling,
-            configurationReferenceId);
+            configurationReferenceId,
+            pricing ?? ValidPricing(0));
+
+    internal static UpdateProviderModelEntry ValidUpdate(
+        CreateProviderModelEntry? create = null,
+        string? displayLabel = null,
+        ProviderModelPricing? pricing = null,
+        int? expectedCapabilityVersion = null)
+    {
+        CreateProviderModelEntry source = create ?? ValidCreate();
+        return new(
+            source.ProviderId,
+            source.ModelId,
+            displayLabel ?? source.DisplayLabel,
+            source.SupportsTextGeneration,
+            source.ContextWindowTokenLimit,
+            source.MaxOutputTokenLimit,
+            source.TimeoutPolicy,
+            source.SafeCapabilityFlags,
+            source.ConfigurationReferenceId,
+            pricing ?? AssignPricing(source.Pricing),
+            expectedCapabilityVersion);
+    }
 
     internal static ProviderModelEntryCreated CreatedEvent(CreateProviderModelEntry create, string catalogId = CatalogId)
         => new(
@@ -78,7 +104,14 @@ internal static class ProviderCatalogTestData
             string.IsNullOrWhiteSpace(create.ConfigurationReferenceId)
                 ? ProviderConfigurationState.NotConfigured
                 : ProviderConfigurationState.Configured,
-            create.ConfigurationReferenceId);
+            create.ConfigurationReferenceId,
+            AssignPricing(create.Pricing),
+            CapabilityVersion: 1);
+
+    private static ProviderModelPricing AssignPricing(ProviderModelPricing pricing)
+        => pricing.PricingVersion > 0
+            ? pricing with { Currency = pricing.Currency.ToUpperInvariant() }
+            : pricing with { Currency = pricing.Currency.ToUpperInvariant(), PricingVersion = 1 };
 
     internal static ProviderCatalogState StateWith(params CreateProviderModelEntry[] creates)
     {
@@ -115,6 +148,9 @@ internal static class ProviderCatalogTestData
                 case ProviderModelEntryLifecycleStateAlreadySetRejection e: state.Apply(e); break;
                 case InvalidProviderModelMetadataRejection e: state.Apply(e); break;
                 case UnsafeProviderConfigurationInputRejection e: state.Apply(e); break;
+                case InvalidProviderModelPricingRejection e: state.Apply(e); break;
+                case ProviderModelCapabilityVersionRegressedRejection e: state.Apply(e); break;
+                case ProviderModelEntryStaleRevisionRejection e: state.Apply(e); break;
                 default: throw new InvalidOperationException($"Unhandled event type '{payload.GetType().Name}' in test apply dispatch.");
             }
         }

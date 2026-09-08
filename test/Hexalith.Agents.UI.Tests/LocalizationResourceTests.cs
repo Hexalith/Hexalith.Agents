@@ -82,6 +82,34 @@ public sealed class LocalizationResourceTests
 
         yield return "Agents.ProviderCatalog.Capability.TextGeneration";
 
+        foreach (AgentSetupTruthState truth in Enum.GetValues<AgentSetupTruthState>())
+        {
+            yield return $"Agents.ProviderCatalog.Truth.Stage.{truth}";
+        }
+
+        foreach (AgentSetupFreshness freshness in Enum.GetValues<AgentSetupFreshness>())
+        {
+            yield return $"Agents.ProviderCatalog.Freshness.{freshness}";
+        }
+
+        yield return "Agents.ProviderCatalog.Action.Create";
+        yield return "Agents.ProviderCatalog.Action.Edit";
+        yield return "Agents.ProviderCatalog.Action.Save";
+        yield return "Agents.ProviderCatalog.Action.Cancel";
+        yield return "Agents.ProviderCatalog.Action.Enable";
+        yield return "Agents.ProviderCatalog.Action.Disable";
+        yield return "Agents.ProviderCatalog.Editor.Title";
+        yield return "Agents.ProviderCatalog.Editor.ConfigurationReference";
+        yield return "Agents.ProviderCatalog.Editor.TimeoutMilliseconds";
+        yield return "Agents.ProviderCatalog.Editor.MaxRetries";
+        foreach (AgentSetupWriteStatus status in Enum.GetValues<AgentSetupWriteStatus>())
+        {
+            if (status is not AgentSetupWriteStatus.Submitted)
+            {
+                yield return $"Agents.ProviderCatalog.Write.Status.{status}";
+            }
+        }
+
         foreach (AgentSurfaceKind kind in Enum.GetValues<AgentSurfaceKind>())
         {
             yield return $"Agents.Surface.{kind}.Title";

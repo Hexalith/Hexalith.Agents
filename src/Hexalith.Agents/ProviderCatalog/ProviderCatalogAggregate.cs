@@ -44,12 +44,19 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
     /// <summary>Maximum length of the safe display label.</summary>
     internal const int MaxDisplayLabelLength = 256;
 
+    /// <summary>The kebab-case EventStore domain this aggregate owns.</summary>
+    public const string Domain = "provider-catalog";
+
     // SECURITY: server-populated only (patterned after Tenants' "actor:globalAdmin"). The command entry point
     // strips client-provided reserved extensions and repopulates this key from trusted claims only.
-    private const string ProviderAdminExtensionKey = "actor:agentsProviderAdmin";
+    /// <summary>The server-populated provider-catalog administration extension key (client-stripped).</summary>
+    public const string ProviderAdminExtensionKey = "actor:agentsProviderAdmin";
 
     private static readonly Regex _configurationReferenceRegex =
         new("^[A-Za-z0-9._:-]+$", RegexOptions.Compiled);
+
+    private static readonly Regex _currencyRegex =
+        new("^[A-Za-z]{3}$", RegexOptions.Compiled);
 
     /// <summary>Handles creation (or idempotent re-creation) of a provider/model catalog entry.</summary>
     /// <param name="command">The create command.</param>
@@ -90,13 +97,19 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
             return metaRejection;
         }
 
+        if (TryGetPricingRejection(catalogId, command.ProviderId, command.ModelId, command.Pricing, current: null, out DomainResult? pricingRejection))
+        {
+            return pricingRejection;
+        }
+
         ProviderConfigurationState configurationState = ResolveConfigurationState(command.ConfigurationReferenceId);
+        ProviderModelPricing pricing = AssignPricing(command.Pricing, current: null);
         ProviderModelEntryState? existing = FindEntry(state, command.ProviderId, command.ModelId);
         if (existing is not null)
         {
             // AC4: exact-duplicate create is a deterministic no-op; a conflicting payload is rejected and never
             // mutates state silently.
-            return CreateMatchesExisting(existing, command, configurationState)
+            return CreateMatchesExisting(existing, command, configurationState, pricing)
                 ? DomainResult.NoOp()
                 : DomainResult.Rejection([new ProviderModelEntryAlreadyExistsRejection(catalogId, command.ProviderId, command.ModelId)]);
         }
@@ -114,11 +127,13 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
                 command.TimeoutPolicy,
                 command.SafeCapabilityFlags,
                 configurationState,
-                command.ConfigurationReferenceId),
+                command.ConfigurationReferenceId,
+                pricing,
+                CapabilityVersion: 1),
         ]);
     }
 
-    /// <summary>Handles a safe-metadata update of an existing provider/model catalog entry.</summary>
+    /// <summary>Handles a safe-metadata or pricing update of an existing provider/model catalog entry.</summary>
     /// <param name="command">The update command.</param>
     /// <param name="state">The current catalog state.</param>
     /// <param name="envelope">The command envelope.</param>
@@ -158,14 +173,26 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
             return DomainResult.Rejection([new ProviderModelEntryNotFoundRejection(catalogId, command.ProviderId, command.ModelId)]);
         }
 
+        if (TryGetCapabilityVersionRejection(catalogId, command.ProviderId, command.ModelId, command.ExpectedCapabilityVersion, existing.CapabilityVersion, out DomainResult? versionRejection))
+        {
+            return versionRejection;
+        }
+
+        if (TryGetPricingRejection(catalogId, command.ProviderId, command.ModelId, command.Pricing, existing.Pricing, out DomainResult? pricingRejection))
+        {
+            return pricingRejection;
+        }
+
         ProviderConfigurationState configurationState = ResolveConfigurationState(command.ConfigurationReferenceId);
+        ProviderModelPricing pricing = AssignPricing(command.Pricing, existing.Pricing);
 
         // AC4: an update that changes nothing is a deterministic no-op.
-        if (UpdateMatchesExisting(existing, command, configurationState))
+        if (UpdateMatchesExisting(existing, command, configurationState, pricing))
         {
             return DomainResult.NoOp();
         }
 
+        int nextCapabilityVersion = existing.CapabilityVersion + 1;
         return DomainResult.Success([
             new ProviderModelEntryMetadataUpdated(
                 catalogId,
@@ -178,7 +205,9 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
                 command.TimeoutPolicy,
                 command.SafeCapabilityFlags,
                 configurationState,
-                command.ConfigurationReferenceId),
+                command.ConfigurationReferenceId,
+                pricing,
+                nextCapabilityVersion),
         ]);
     }
 
@@ -259,6 +288,12 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
             ? ProviderConfigurationState.NotConfigured
             : ProviderConfigurationState.Configured;
 
+    /// <summary>Returns whether the administrator-supplied pricing is present and valid.</summary>
+    /// <param name="pricing">The pricing to inspect.</param>
+    /// <returns><see langword="true"/> when currency and unit prices are valid.</returns>
+    internal static bool HasValidPricing(ProviderModelPricing? pricing)
+        => ValidatePricing(pricing, current: null) is null;
+
     private static bool IsProviderAdmin(CommandEnvelope envelope)
         => envelope.Extensions?.TryGetValue(ProviderAdminExtensionKey, out string? value) == true
             && string.Equals(value, "true", StringComparison.Ordinal);
@@ -332,6 +367,65 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
         return rejection is not null;
     }
 
+    private static bool TryGetPricingRejection(
+        string catalogId,
+        string providerId,
+        string modelId,
+        ProviderModelPricing? pricing,
+        ProviderModelPricing? current,
+        [NotNullWhen(true)] out DomainResult? rejection)
+    {
+        string? reason = ValidatePricing(pricing, current);
+        rejection = reason is null
+            ? null
+            : DomainResult.Rejection([new InvalidProviderModelPricingRejection(catalogId, providerId, modelId, reason)]);
+        return rejection is not null;
+    }
+
+    private static bool TryGetCapabilityVersionRejection(
+        string catalogId,
+        string providerId,
+        string modelId,
+        int? expectedCapabilityVersion,
+        int currentCapabilityVersion,
+        [NotNullWhen(true)] out DomainResult? rejection)
+    {
+        if (expectedCapabilityVersion is null)
+        {
+            rejection = null;
+            return false;
+        }
+
+        if (expectedCapabilityVersion.Value < currentCapabilityVersion)
+        {
+            rejection = DomainResult.Rejection([
+                new ProviderModelCapabilityVersionRegressedRejection(
+                    catalogId,
+                    providerId,
+                    modelId,
+                    expectedCapabilityVersion.Value,
+                    currentCapabilityVersion),
+            ]);
+            return true;
+        }
+
+        if (expectedCapabilityVersion.Value > currentCapabilityVersion)
+        {
+            rejection = DomainResult.Rejection([
+                new ProviderModelEntryStaleRevisionRejection(
+                    catalogId,
+                    providerId,
+                    modelId,
+                    expectedCapabilityVersion.Value,
+                    currentCapabilityVersion),
+            ]);
+            return true;
+        }
+
+        rejection = null;
+        return false;
+    }
+
     private static string? ValidateMetadata(
         string displayLabel,
         int contextWindowTokenLimit,
@@ -373,11 +467,63 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
             : null;
     }
 
+    private static string? ValidatePricing(ProviderModelPricing? pricing, ProviderModelPricing? current)
+    {
+        if (pricing is null || string.IsNullOrWhiteSpace(pricing.Currency))
+        {
+            return "Pricing units and currency are required.";
+        }
+
+        if (!_currencyRegex.IsMatch(pricing.Currency))
+        {
+            return "Pricing.Currency must be a three-letter ISO 4217 code.";
+        }
+
+        if (pricing.InputTokenUnitPrice < 0 || pricing.OutputTokenUnitPrice < 0)
+        {
+            return "Pricing unit prices must be non-negative.";
+        }
+
+        if (pricing.PricingVersion < 0)
+        {
+            return "Pricing.PricingVersion must not be negative.";
+        }
+
+        if (current is null && pricing.PricingVersion is not 0 and not 1)
+        {
+            return "Pricing.PricingVersion must be 1 on create.";
+        }
+
+        if (current is not null && pricing.PricingVersion > 0 && pricing.PricingVersion < current.PricingVersion)
+        {
+            return "Pricing.PricingVersion must not decrease or be reused.";
+        }
+
+        return null;
+    }
+
+    private static ProviderModelPricing AssignPricing(ProviderModelPricing pricing, ProviderModelPricing? current)
+    {
+        string currency = pricing.Currency.ToUpperInvariant();
+        bool unitsChanged = current is null
+            || !string.Equals(current.Currency, currency, StringComparison.Ordinal)
+            || current.InputTokenUnitPrice != pricing.InputTokenUnitPrice
+            || current.OutputTokenUnitPrice != pricing.OutputTokenUnitPrice;
+
+        int version = current is null
+            ? 1
+            : unitsChanged ? current.PricingVersion + 1 : current.PricingVersion;
+
+        return new ProviderModelPricing(currency, pricing.InputTokenUnitPrice, pricing.OutputTokenUnitPrice, version);
+    }
+
     private static bool CreateMatchesExisting(
         ProviderModelEntryState existing,
         CreateProviderModelEntry command,
-        ProviderConfigurationState configurationState)
+        ProviderConfigurationState configurationState,
+        ProviderModelPricing pricing)
         => existing.IsEnabled == command.Enabled
+            && existing.CapabilityVersion == 1
             && SafeMetadataMatches(
                 existing,
                 command.DisplayLabel,
@@ -387,12 +533,14 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
                 command.TimeoutPolicy,
                 command.SafeCapabilityFlags,
                 configurationState,
-                command.ConfigurationReferenceId);
+                command.ConfigurationReferenceId,
+                pricing);
 
     private static bool UpdateMatchesExisting(
         ProviderModelEntryState existing,
         UpdateProviderModelEntry command,
-        ProviderConfigurationState configurationState)
+        ProviderConfigurationState configurationState,
+        ProviderModelPricing pricing)
         => SafeMetadataMatches(
             existing,
             command.DisplayLabel,
@@ -402,7 +550,8 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
             command.TimeoutPolicy,
             command.SafeCapabilityFlags,
             configurationState,
-            command.ConfigurationReferenceId);
+            command.ConfigurationReferenceId,
+            pricing);
 
     private static bool SafeMetadataMatches(
         ProviderModelEntryState existing,
@@ -413,7 +562,8 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
         ProviderModelTimeoutPolicy timeoutPolicy,
         ProviderModelCapabilityFlags safeCapabilityFlags,
         ProviderConfigurationState configurationState,
-        string? configurationReferenceId)
+        string? configurationReferenceId,
+        ProviderModelPricing pricing)
         => existing.DisplayLabel == displayLabel
             && existing.SupportsTextGeneration == supportsTextGeneration
             && existing.ContextWindowTokenLimit == contextWindowTokenLimit
@@ -421,5 +571,12 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
             && existing.TimeoutPolicy == timeoutPolicy
             && existing.SafeCapabilityFlags == safeCapabilityFlags
             && existing.ConfigurationState == configurationState
-            && existing.ConfigurationReferenceId == configurationReferenceId;
+            && existing.ConfigurationReferenceId == configurationReferenceId
+            && PricingUnitsMatch(existing.Pricing, pricing);
+
+    private static bool PricingUnitsMatch(ProviderModelPricing? existing, ProviderModelPricing proposed)
+        => existing is not null
+            && string.Equals(existing.Currency, proposed.Currency, StringComparison.Ordinal)
+            && existing.InputTokenUnitPrice == proposed.InputTokenUnitPrice
+            && existing.OutputTokenUnitPrice == proposed.OutputTokenUnitPrice;
 }

@@ -108,7 +108,8 @@ public sealed class ProviderCatalogMetadataValidationTests
             MaxOutputTokenLimit: 16_000, // exceeds context window → invalid
             new ProviderModelTimeoutPolicy(30_000, 3),
             ProviderModelCapabilityFlags.None,
-            "cfg-openai-gpt4o");
+            "cfg-openai-gpt4o",
+            ValidPricing());
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 
@@ -132,7 +133,8 @@ public sealed class ProviderCatalogMetadataValidationTests
             MaxOutputTokenLimit: 16_000,
             new ProviderModelTimeoutPolicy(30_000, 3),
             ProviderModelCapabilityFlags.None,
-            "sk-live-not a safe reference!!");
+            "sk-live-not a safe reference!!",
+            ValidPricing());
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 

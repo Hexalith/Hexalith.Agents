@@ -112,6 +112,37 @@
   <data name="Agents.ProviderCatalog.Column.Timeout" xml:space="preserve"><value>Timeout policy</value></data>
   <data name="Agents.ProviderCatalog.Column.Selectable" xml:space="preserve"><value>Selectable</value></data>
   <data name="Agents.ProviderCatalog.Column.Configured" xml:space="preserve"><value>Configured</value></data>
+  <data name="Agents.ProviderCatalog.Column.Pricing" xml:space="preserve"><value>Pricing</value></data>
+  <data name="Agents.ProviderCatalog.Column.Currency" xml:space="preserve"><value>Currency</value></data>
+  <data name="Agents.ProviderCatalog.Column.InputPrice" xml:space="preserve"><value>Input unit price</value></data>
+  <data name="Agents.ProviderCatalog.Column.OutputPrice" xml:space="preserve"><value>Output unit price</value></data>
+  <data name="Agents.ProviderCatalog.Column.CapabilityVersion" xml:space="preserve"><value>Capability version</value></data>
+  <data name="Agents.ProviderCatalog.Column.Freshness" xml:space="preserve"><value>Freshness</value></data>
+  <data name="Agents.ProviderCatalog.Column.Actions" xml:space="preserve"><value>Actions</value></data>
+  <data name="Agents.ProviderCatalog.Pricing.Value" xml:space="preserve"><value>{0} input {1} / output {2} (pricing v{3})</value></data>
+  <data name="Agents.ProviderCatalog.Pricing.Missing" xml:space="preserve"><value>Unpriced</value></data>
+  <data name="Agents.ProviderCatalog.Action.Create" xml:space="preserve"><value>Add catalog entry</value></data>
+  <data name="Agents.ProviderCatalog.Action.Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Agents.ProviderCatalog.Action.Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Agents.ProviderCatalog.Action.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Agents.ProviderCatalog.Action.Enable" xml:space="preserve"><value>Enable</value></data>
+  <data name="Agents.ProviderCatalog.Action.Disable" xml:space="preserve"><value>Disable</value></data>
+  <data name="Agents.ProviderCatalog.Editor.Title" xml:space="preserve"><value>Add or update a catalog entry</value></data>
+  <data name="Agents.ProviderCatalog.Editor.ConfigurationReference" xml:space="preserve"><value>Configuration reference</value></data>
+  <data name="Agents.ProviderCatalog.Editor.TimeoutMilliseconds" xml:space="preserve"><value>Request timeout (ms)</value></data>
+  <data name="Agents.ProviderCatalog.Editor.MaxRetries" xml:space="preserve"><value>Max retries</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.ValidationFailed" xml:space="preserve"><value>The catalog write was rejected because the submitted fields are invalid.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.NotAuthorized" xml:space="preserve"><value>You are not authorized to change the provider catalog.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.NotFound" xml:space="preserve"><value>The catalog entry was not found.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.Conflict" xml:space="preserve"><value>The catalog write conflicted with a concurrent change.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.Unavailable" xml:space="preserve"><value>The catalog write path is unavailable.</value></data>
+  <data name="Agents.ProviderCatalog.Truth.Stage.Unknown" xml:space="preserve"><value>Catalog truth is not established.</value></data>
+  <data name="Agents.ProviderCatalog.Truth.Stage.Submitted" xml:space="preserve"><value>Submitted — accepted for processing, not yet durable evidence.</value></data>
+  <data name="Agents.ProviderCatalog.Truth.Stage.AuthoritativePending" xml:space="preserve"><value>Authoritative pending — accepted, but the projection has not caught up.</value></data>
+  <data name="Agents.ProviderCatalog.Truth.Stage.ProjectionConfirmed" xml:space="preserve"><value>Projection confirmed — the projected catalog reflects this change.</value></data>
+  <data name="Agents.ProviderCatalog.Freshness.Unknown" xml:space="preserve"><value>Freshness unknown</value></data>
+  <data name="Agents.ProviderCatalog.Freshness.Current" xml:space="preserve"><value>Current</value></data>
+  <data name="Agents.ProviderCatalog.Freshness.Stale" xml:space="preserve"><value>Stale</value></data>
   <data name="Agents.ProviderCatalog.Selectable.Yes" xml:space="preserve"><value>Selectable</value></data>
   <data name="Agents.ProviderCatalog.Selectable.No" xml:space="preserve"><value>Not selectable</value></data>
   <data name="Agents.ProviderCatalog.Filter.SelectableOnly" xml:space="preserve"><value>Selectable for new active use only</value></data>

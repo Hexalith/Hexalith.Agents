@@ -190,7 +190,8 @@ public sealed class ProviderCatalogLifecycleE2ETests
             MaxOutputTokenLimit: 32_000,
             new ProviderModelTimeoutPolicy(45_000, 2),
             ProviderModelCapabilityFlags.Streaming | ProviderModelCapabilityFlags.Vision,
-            "cfg-openai-gpt4o"));
+            "cfg-openai-gpt4o",
+            ValidPricing()));
         await Drive(new DisableProviderModelEntry("anthropic", "claude"));
 
         // Replay the captured stream into a brand-new state (the production Apply handlers).

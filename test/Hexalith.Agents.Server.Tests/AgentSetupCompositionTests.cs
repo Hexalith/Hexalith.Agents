@@ -43,6 +43,12 @@ public sealed class AgentSetupCompositionTests
         // The public client the API surface consumes must be the one backed by the live administration operations.
         scope.ServiceProvider.GetRequiredService<IAgentsClient>().AgentAdministration
             .ShouldBeOfType<EventStoreAgentAdministrationOperations>();
+        scope.ServiceProvider.GetRequiredService<IAgentsClient>().ProviderCatalog
+            .ShouldBeOfType<EventStoreProviderCatalogOperations>();
+        scope.ServiceProvider.GetRequiredService<IProviderCatalogOperations>()
+            .ShouldBeOfType<EventStoreProviderCatalogOperations>();
+        scope.ServiceProvider.GetRequiredService<IProviderCatalogReader>()
+            .ShouldBeOfType<ProjectedProviderCatalogReader>();
     }
 
     [Fact]

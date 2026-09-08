@@ -4,8 +4,8 @@ namespace Hexalith.Agents.ProviderCatalog;
 
 /// <summary>
 /// Replay state for a single governed provider/model catalog entry. Mutated only through
-/// <see cref="ProviderCatalogState"/>'s <c>Apply</c> methods (AD-3 pure aggregates). Holds only safe metadata
-/// and a safe configuration reference/state — never a secret value.
+/// <see cref="ProviderCatalogState"/>'s <c>Apply</c> methods (AD-3 pure aggregates). Holds only safe metadata,
+/// versioned pricing, and a safe configuration reference/state — never a secret value.
 /// </summary>
 public sealed class ProviderModelEntryState
 {
@@ -43,10 +43,12 @@ public sealed class ProviderModelEntryState
     public string? ConfigurationReferenceId { get; set; }
 
     /// <summary>
-    /// Gets or sets the replay-derived provider capability version (Story 1.5). Set to 1 on create and incremented
-    /// on each safe-metadata update; enable/disable do not change capability metadata, so they do not bump it. The
-    /// version is derived during replay only — no existing event payload carries it. A plain int — exposes nothing
-    /// secret (AC1; AD-9).
+    /// Gets or sets the provider capability version (Story 5.3). Set to 1 on create and incremented on each
+    /// safe-metadata or pricing update; enable/disable do not change it. The version is persisted on create/update
+    /// events and reconstructed during replay. A plain int — exposes nothing secret (AC1; AD-9).
     /// </summary>
     public int CapabilityVersion { get; set; }
+
+    /// <summary>Gets or sets the administrator-supplied versioned pricing, or <see langword="null"/> when unpriced.</summary>
+    public ProviderModelPricing? Pricing { get; set; }
 }

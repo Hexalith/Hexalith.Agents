@@ -2,7 +2,8 @@
 title: '5.3 Govern Provider Models And Pricing Through Live Operations'
 type: 'feature'
 created: '2026-09-08'
-status: 'draft'
+status: 'done'
+baseline_commit: 'a4003a9bbe9c2939ebafb35b19a3df3b0ed9403a'
 review_loop_iteration: 0
 context:
   - '_bmad-output/implementation-artifacts/epic-5-context.md'
@@ -57,11 +58,11 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/Hexalith.Agents/` + `src/Hexalith.Agents.Contracts/ProviderCatalog/` -- add versioned pricing units and currency to commands, events, state, and views; reject invalid or missing pricing and CapabilityVersion regression; eligibility includes configured, text-generation, limits, and pricing; add projection version and freshness on catalog reads.
-- [ ] `src/Hexalith.Agents.Server/` -- add catalog orchestrator, projection handler/fold/view factory/read model, query handlers, live `IProviderCatalogReader`, live operations, and composition gated on `Agents:EventStore:BaseUrl`; reuse the existing dispatcher; keep generation and selection-write deferred.
-- [ ] `src/Hexalith.Agents.Client/` + `AgentsOperationEndpoints` -- bind live `IProviderCatalogOperations`; return structured accepted identities; keep EventStore and SDK types off the public surface.
-- [ ] `src/Hexalith.Agents.UI/` -- bind a live gateway; support create, update, enable, and disable with submitted / pending / confirmed; render a safe grid (capability, pricing, enablement, configured-state, CapabilityVersion, freshness); keep EN/FR parity; keep secrets and configuration references out of markup and accessible names.
-- [ ] `test/` + `eng/verify-story-5.3.ps1` -- add aggregate/replay, live EventStore command-query-projection, duplicate/conflict/regression, cross-tenant auth and no-disclosure including selection-denied, UI truth-flow, and poison-secret sweep tests; assert persisted read-model end state; prove live catalog seams in DI composition.
+- [x] `src/Hexalith.Agents/` + `src/Hexalith.Agents.Contracts/ProviderCatalog/` -- add versioned pricing units and currency to commands, events, state, and views; reject invalid or missing pricing and CapabilityVersion regression; eligibility includes configured, text-generation, limits, and pricing; add projection version and freshness on catalog reads.
+- [x] `src/Hexalith.Agents.Server/` -- add catalog orchestrator, projection handler/fold/view factory/read model, query handlers, live `IProviderCatalogReader`, live operations, and composition gated on `Agents:EventStore:BaseUrl`; reuse the existing dispatcher; keep generation and selection-write deferred.
+- [x] `src/Hexalith.Agents.Client/` + `AgentsOperationEndpoints` -- bind live `IProviderCatalogOperations`; return structured accepted identities; keep EventStore and SDK types off the public surface.
+- [x] `src/Hexalith.Agents.UI/` -- bind a live gateway; support create, update, enable, and disable with submitted / pending / confirmed; render a safe grid (capability, pricing, enablement, configured-state, CapabilityVersion, freshness); keep EN/FR parity; keep secrets and configuration references out of markup and accessible names.
+- [x] `test/` + `eng/verify-story-5.3.ps1` -- add aggregate/replay, live EventStore command-query-projection, duplicate/conflict/regression, cross-tenant auth and no-disclosure including selection-denied, UI truth-flow, and poison-secret sweep tests; assert persisted read-model end state; prove live catalog seams in DI composition.
 
 **Acceptance Criteria:**
 - Given an authorized catalog administrator and valid capability and pricing metadata, when create, update, enable, or disable is accepted, then EventStore persists the catalog events with CapabilityVersion and a secret reference only, replay matches, and the response is a structured accepted identity.
@@ -82,3 +83,65 @@ Sprint-status slug `5-3-bind-eventstore-operations-and-setup-read-models` is arc
 
 **Manual checks (if no CLI):**
 - After an authorized catalog create, API, client, and `/agents/providers` show identical projection-confirmed safe state; the secret reference is absent from the grid; Success is not shown as callable.
+
+## Suggested Review Order
+
+**Live command path**
+
+- EventStore BaseUrl swaps deferred catalog ops and the projected reader.
+  [`AgentSetupServiceCollectionExtensions.cs:66`](../../src/Hexalith.Agents.Server/Composition/AgentSetupServiceCollectionExtensions.cs#L66)
+
+- Trusted `actor:agentsProviderAdmin` is stripped then repopulated before dispatch.
+  [`ProviderCatalogAdministrationOrchestrator.cs:24`](../../src/Hexalith.Agents.Server/Application/Agents/ProviderCatalogAdministrationOrchestrator.cs#L24)
+
+- Public writes return provider/model identity at Submitted only.
+  [`EventStoreProviderCatalogOperations.cs:180`](../../src/Hexalith.Agents.Server/Application/Agents/EventStoreProviderCatalogOperations.cs#L180)
+
+**Pricing and eligibility**
+
+- Administrator-supplied versioned pricing is the catalog truth type.
+  [`ProviderModelPricing.cs:14`](../../src/Hexalith.Agents.Contracts/ProviderCatalog/ProviderModelPricing.cs#L14)
+
+- Metadata and pricing updates bump CapabilityVersion; enable/disable do not.
+  [`ProviderCatalogAggregate.cs:187`](../../src/Hexalith.Agents/ProviderCatalog/ProviderCatalogAggregate.cs#L187)
+
+- Selectable means enabled, configured, text-gen, limits, and valid pricing.
+  [`ProviderCatalogInspection.cs:85`](../../src/Hexalith.Agents/ProviderCatalog/ProviderCatalogInspection.cs#L85)
+
+- Selection verdicts add Unpriced/Regressed with the same ISO-3 currency rule.
+  [`ProviderSelectionVerdict.cs:59`](../../src/Hexalith.Agents.Server/Application/Agents/ProviderSelectionVerdict.cs#L59)
+
+**Projection and queries**
+
+- Checkpointed catalog projection owns the durable read-model slot.
+  [`ProviderCatalogProjectionHandler.cs:18`](../../src/Hexalith.Agents.Server/Projections/ProviderCatalogProjectionHandler.cs#L18)
+
+- Empty or corrupt payloads do not advance the fold checkpoint.
+  [`ProviderCatalogProjectionFold.cs:90`](../../src/Hexalith.Agents.Server/Projections/ProviderCatalogProjectionFold.cs#L90)
+
+- Create catch-up treats a missing entry plus expected version as pending.
+  [`ProviderCatalogViewFactory.cs:88`](../../src/Hexalith.Agents.Server/Projections/ProviderCatalogViewFactory.cs#L88)
+
+- Query auth runs before the store; store faults return structured Unavailable.
+  [`ProviderCatalogQueryHandlerBase.cs:58`](../../src/Hexalith.Agents.Server/Application/Queries/ProviderCatalogQueryHandlerBase.cs#L58)
+
+**Authorization**
+
+- Unauthorized or cross-tenant selection never addresses the other tenant store.
+  [`ProjectedProviderCatalogReader.cs:45`](../../src/Hexalith.Agents.Server/Ports/ProjectedProviderCatalogReader.cs#L45)
+
+**Public client and UI**
+
+- Client composition can bind live catalog operations independently of setup.
+  [`AgentsClient.cs:85`](../../src/Hexalith.Agents.Client/AgentsClient.cs#L85)
+
+- Catalog writes poll submitted → pending → confirmed; lifecycle waits on Status.
+  [`ProviderCatalog.razor:473`](../../src/Hexalith.Agents.UI/Components/Pages/ProviderCatalog.razor#L473)
+
+- Configuration reference stays write-only and is never rendered on the grid.
+  [`ProviderCatalog.razor:108`](../../src/Hexalith.Agents.UI/Components/Pages/ProviderCatalog.razor#L108)
+
+**Verification**
+
+- Story verifier gates focused suites, owning projects, and live-seam anchors.
+  [`verify-story-5.3.ps1:33`](../../eng/verify-story-5.3.ps1#L33)

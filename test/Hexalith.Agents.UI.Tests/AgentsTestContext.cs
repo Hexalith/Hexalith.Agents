@@ -47,7 +47,9 @@ public abstract class AgentsTestContext : FrontComposerTestBase
             .Returns(Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.NotAuthorized)));
         SetupGateway.DisableAsync(Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.NotAuthorized)));
-        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProviderCatalogInspectionResult.NotAuthorized()));
+        CatalogGateway.GetEntryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogInspectionResult.NotAuthorized()));
         CallGateway.RequestCallAsync(Arg.Any<ConversationAgentCallRequest>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(AgentCallRequestResult.NotAuthorized()));

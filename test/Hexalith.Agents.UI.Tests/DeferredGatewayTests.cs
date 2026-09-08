@@ -5,6 +5,7 @@ using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.ProviderCatalog;
+using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 using Hexalith.Agents.UI.Services.Gateways;
 
 using Shouldly;
@@ -48,10 +49,50 @@ public sealed class DeferredGatewayTests
     {
         DeferredProviderCatalogGateway gateway = new();
 
-        ProviderCatalogInspectionResult result = await gateway.ListEntriesAsync(includeDisabled, CancellationToken.None);
+        ProviderCatalogInspectionResult result = await gateway.ListEntriesAsync(includeDisabled, expectedProjectionVersion: null, CancellationToken.None);
 
         result.Status.ShouldBe(ProviderCatalogInspectionStatus.NotAuthorized);
         result.Entries.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task DeferredProviderCatalogGateway_writes_fail_closed_with_not_authorized_and_no_acceptance()
+    {
+        DeferredProviderCatalogGateway gateway = new();
+        CreateProviderModelEntry create = new(
+            "openai",
+            "gpt-x",
+            "OpenAI GPT-x",
+            Enabled: true,
+            SupportsTextGeneration: true,
+            128_000,
+            16_000,
+            new ProviderModelTimeoutPolicy(30_000, 3),
+            ProviderModelCapabilityFlags.None,
+            null,
+            new ProviderModelPricing("USD", 0.002m, 0.008m, 0));
+        UpdateProviderModelEntry update = new(
+            "openai",
+            "gpt-x",
+            "OpenAI GPT-x",
+            SupportsTextGeneration: true,
+            128_000,
+            16_000,
+            new ProviderModelTimeoutPolicy(30_000, 3),
+            ProviderModelCapabilityFlags.None,
+            null,
+            new ProviderModelPricing("USD", 0.002m, 0.008m, 0));
+
+        ProviderCatalogWriteResult created = await gateway.CreateAsync(create, CancellationToken.None);
+        ProviderCatalogWriteResult updated = await gateway.UpdateAsync(update, CancellationToken.None);
+        ProviderCatalogWriteResult enabled = await gateway.EnableAsync(new EnableProviderModelEntry("openai", "gpt-x"), CancellationToken.None);
+        ProviderCatalogWriteResult disabled = await gateway.DisableAsync(new DisableProviderModelEntry("openai", "gpt-x"), CancellationToken.None);
+
+        foreach (ProviderCatalogWriteResult result in new[] { created, updated, enabled, disabled })
+        {
+            result.Status.ShouldBe(AgentSetupWriteStatus.NotAuthorized);
+            result.Acceptance.ShouldBeNull();
+        }
     }
 
     [Fact]

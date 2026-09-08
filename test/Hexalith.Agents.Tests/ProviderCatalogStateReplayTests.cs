@@ -50,7 +50,9 @@ public sealed class ProviderCatalogStateReplayTests
             new ProviderModelTimeoutPolicy(45_000, 1),
             ProviderModelCapabilityFlags.Vision,
             ProviderConfigurationState.Configured,
-            "cfg-new"));
+            "cfg-new",
+            ValidPricing(2),
+            CapabilityVersion: 2));
 
         ProviderModelEntryState entry = state.Entries[ProviderCatalogState.EntryKey("openai", "gpt-4o")];
         entry.DisplayLabel.ShouldBe("New Label");
@@ -76,11 +78,12 @@ public sealed class ProviderCatalogStateReplayTests
         state.Apply(new ProviderModelEntryEnabled(CatalogId, "openai", "gpt-4o"));
         state.Entries[key].CapabilityVersion.ShouldBe(1);
 
-        // Each metadata update bumps it by one.
-        state.Apply(MetadataUpdate("Label v2", contextWindowTokenLimit: 200_000));
+        // Each metadata update bumps it by one. Replay ignores a reused CapabilityVersion, so the second
+        // event must carry 3 — the same monotonic values the aggregate emits.
+        state.Apply(MetadataUpdate("Label v2", contextWindowTokenLimit: 200_000, capabilityVersion: 2));
         state.Entries[key].CapabilityVersion.ShouldBe(2);
 
-        state.Apply(MetadataUpdate("Label v3", contextWindowTokenLimit: 250_000));
+        state.Apply(MetadataUpdate("Label v3", contextWindowTokenLimit: 250_000, capabilityVersion: 3));
         state.Entries[key].CapabilityVersion.ShouldBe(3);
     }
 
@@ -98,12 +101,18 @@ public sealed class ProviderCatalogStateReplayTests
             CatalogId, "openai", "gpt-4o", ProviderModelStatus.Enabled, ProviderModelStatus.Enabled, "EnableProviderModelEntry"));
         state.Apply(new InvalidProviderModelMetadataRejection(CatalogId, "openai", "gpt-4o", "reason"));
         state.Apply(new UnsafeProviderConfigurationInputRejection(CatalogId, "openai", "gpt-4o", "reason"));
+        state.Apply(new InvalidProviderModelPricingRejection(CatalogId, "openai", "gpt-4o", "reason"));
+        state.Apply(new ProviderModelCapabilityVersionRegressedRejection(CatalogId, "openai", "gpt-4o", 0, 1));
+        state.Apply(new ProviderModelEntryStaleRevisionRejection(CatalogId, "openai", "gpt-4o", 3, 1));
 
         state.Entries.Count.ShouldBe(entryCountBefore);
         state.Entries[ProviderCatalogState.EntryKey("openai", "gpt-4o")].IsEnabled.ShouldBeTrue();
     }
 
-    private static ProviderModelEntryMetadataUpdated MetadataUpdate(string displayLabel, int contextWindowTokenLimit)
+    private static ProviderModelEntryMetadataUpdated MetadataUpdate(
+        string displayLabel,
+        int contextWindowTokenLimit,
+        int capabilityVersion)
         => new(
             CatalogId,
             "openai",
@@ -115,5 +124,7 @@ public sealed class ProviderCatalogStateReplayTests
             new ProviderModelTimeoutPolicy(30_000, 3),
             ProviderModelCapabilityFlags.Streaming,
             ProviderConfigurationState.Configured,
-            "cfg-openai-gpt4o");
+            "cfg-openai-gpt4o",
+            ValidPricing(capabilityVersion),
+            CapabilityVersion: capabilityVersion);
 }

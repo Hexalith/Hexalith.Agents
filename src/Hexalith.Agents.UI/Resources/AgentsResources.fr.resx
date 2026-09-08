@@ -112,6 +112,37 @@
   <data name="Agents.ProviderCatalog.Column.Timeout" xml:space="preserve"><value>Politique de délai</value></data>
   <data name="Agents.ProviderCatalog.Column.Selectable" xml:space="preserve"><value>Sélectionnable</value></data>
   <data name="Agents.ProviderCatalog.Column.Configured" xml:space="preserve"><value>Configuré</value></data>
+  <data name="Agents.ProviderCatalog.Column.Pricing" xml:space="preserve"><value>Tarification</value></data>
+  <data name="Agents.ProviderCatalog.Column.Currency" xml:space="preserve"><value>Devise</value></data>
+  <data name="Agents.ProviderCatalog.Column.InputPrice" xml:space="preserve"><value>Prix unitaire d'entrée</value></data>
+  <data name="Agents.ProviderCatalog.Column.OutputPrice" xml:space="preserve"><value>Prix unitaire de sortie</value></data>
+  <data name="Agents.ProviderCatalog.Column.CapabilityVersion" xml:space="preserve"><value>Version de capacité</value></data>
+  <data name="Agents.ProviderCatalog.Column.Freshness" xml:space="preserve"><value>Fraîcheur</value></data>
+  <data name="Agents.ProviderCatalog.Column.Actions" xml:space="preserve"><value>Actions</value></data>
+  <data name="Agents.ProviderCatalog.Pricing.Value" xml:space="preserve"><value>{0} entrée {1} / sortie {2} (tarification v{3})</value></data>
+  <data name="Agents.ProviderCatalog.Pricing.Missing" xml:space="preserve"><value>Non tarifé</value></data>
+  <data name="Agents.ProviderCatalog.Action.Create" xml:space="preserve"><value>Ajouter une entrée</value></data>
+  <data name="Agents.ProviderCatalog.Action.Edit" xml:space="preserve"><value>Modifier</value></data>
+  <data name="Agents.ProviderCatalog.Action.Save" xml:space="preserve"><value>Enregistrer</value></data>
+  <data name="Agents.ProviderCatalog.Action.Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Agents.ProviderCatalog.Action.Enable" xml:space="preserve"><value>Activer</value></data>
+  <data name="Agents.ProviderCatalog.Action.Disable" xml:space="preserve"><value>Désactiver</value></data>
+  <data name="Agents.ProviderCatalog.Editor.Title" xml:space="preserve"><value>Ajouter ou mettre à jour une entrée du catalogue</value></data>
+  <data name="Agents.ProviderCatalog.Editor.ConfigurationReference" xml:space="preserve"><value>Référence de configuration</value></data>
+  <data name="Agents.ProviderCatalog.Editor.TimeoutMilliseconds" xml:space="preserve"><value>Délai d'attente de la requête (ms)</value></data>
+  <data name="Agents.ProviderCatalog.Editor.MaxRetries" xml:space="preserve"><value>Tentatives maximales</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.ValidationFailed" xml:space="preserve"><value>L'écriture du catalogue a été rejetée car les champs soumis sont invalides.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.NotAuthorized" xml:space="preserve"><value>Vous n'êtes pas autorisé à modifier le catalogue des fournisseurs.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.NotFound" xml:space="preserve"><value>L'entrée du catalogue est introuvable.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.Conflict" xml:space="preserve"><value>L'écriture du catalogue est en conflit avec une modification concurrente.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.Unavailable" xml:space="preserve"><value>Le chemin d'écriture du catalogue est indisponible.</value></data>
+  <data name="Agents.ProviderCatalog.Truth.Stage.Unknown" xml:space="preserve"><value>La vérité du catalogue n'est pas établie.</value></data>
+  <data name="Agents.ProviderCatalog.Truth.Stage.Submitted" xml:space="preserve"><value>Soumise — acceptée pour traitement, sans preuve durable pour l'instant.</value></data>
+  <data name="Agents.ProviderCatalog.Truth.Stage.AuthoritativePending" xml:space="preserve"><value>En attente d'autorité — acceptée, mais la projection n'est pas encore à jour.</value></data>
+  <data name="Agents.ProviderCatalog.Truth.Stage.ProjectionConfirmed" xml:space="preserve"><value>Projection confirmée — le catalogue projeté reflète cette modification.</value></data>
+  <data name="Agents.ProviderCatalog.Freshness.Unknown" xml:space="preserve"><value>Fraîcheur inconnue</value></data>
+  <data name="Agents.ProviderCatalog.Freshness.Current" xml:space="preserve"><value>À jour</value></data>
+  <data name="Agents.ProviderCatalog.Freshness.Stale" xml:space="preserve"><value>Obsolète</value></data>
   <data name="Agents.ProviderCatalog.Selectable.Yes" xml:space="preserve"><value>Sélectionnable</value></data>
   <data name="Agents.ProviderCatalog.Selectable.No" xml:space="preserve"><value>Non sélectionnable</value></data>
   <data name="Agents.ProviderCatalog.Filter.SelectableOnly" xml:space="preserve"><value>Sélectionnable pour un nouvel usage actif uniquement</value></data>

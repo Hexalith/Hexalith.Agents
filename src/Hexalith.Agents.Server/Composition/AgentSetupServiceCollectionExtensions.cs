@@ -37,11 +37,13 @@ internal static class AgentSetupServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(configuration);
 
         services.Configure<AgentSetupReadModelOptions>(configuration.GetSection(AgentSetupReadModelOptions.SectionName));
+        services.Configure<ProviderCatalogReadModelOptions>(configuration.GetSection(ProviderCatalogReadModelOptions.SectionName));
         services.TryAddSingleton<IAgentCommandIdentityFactory, AgentCommandIdentityFactory>();
 
         // The projection handler is discovered by the domain-service assembly scan; the orchestrations are always
         // registered so the DI graph resolves whether or not the gateway is bound.
         services.AddScoped<AgentAdministrationOrchestrator>();
+        services.AddScoped<ProviderCatalogAdministrationOrchestrator>();
 
         string? baseUrl = configuration[$"{EventStoreSectionName}:BaseUrl"];
         if (string.IsNullOrWhiteSpace(baseUrl) || !Uri.TryCreate(baseUrl, UriKind.Absolute, out Uri? baseAddress))
@@ -61,8 +63,12 @@ internal static class AgentSetupServiceCollectionExtensions
         services.AddSingleton<IAgentCommandDispatcher, EventStoreAgentCommandDispatcher>();
 
         services.AddScoped<IAgentAdministrationOperations, EventStoreAgentAdministrationOperations>();
+        services.AddScoped<IProviderCatalogOperations, EventStoreProviderCatalogOperations>();
+        services.RemoveAll<IProviderCatalogReader>();
+        services.AddScoped<IProviderCatalogReader, ProjectedProviderCatalogReader>();
         services.RemoveAll<IAgentsClient>();
-        services.AddScoped<IAgentsClient>(provider => AgentsClient.WithAdministration(
+        services.AddScoped<IAgentsClient>(provider => AgentsClient.WithProviderCatalog(
+            provider.GetRequiredService<IProviderCatalogOperations>(),
             provider.GetRequiredService<IAgentAdministrationOperations>()));
 
         return services;

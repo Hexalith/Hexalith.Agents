@@ -2,8 +2,8 @@ namespace Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 
 /// <summary>
 /// Creates (or, when re-sent identically, idempotently acknowledges) a governed provider/model catalog entry
-/// (AC1). Carries only safe capability metadata and an optional safe configuration reference — never raw
-/// credentials, provider SDK options, or secret values (AD-9, AD-14).
+/// (AC1). Carries only safe capability metadata, administrator-supplied versioned pricing, and an optional safe
+/// configuration reference — never raw credentials, provider SDK options, or secret values (AD-9, AD-14).
 /// </summary>
 /// <param name="ProviderId">Stable provider identifier (non-empty; no provider-SDK object).</param>
 /// <param name="ModelId">Stable model identifier (non-empty).</param>
@@ -15,6 +15,7 @@ namespace Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 /// <param name="TimeoutPolicy">Safe timeout metadata.</param>
 /// <param name="SafeCapabilityFlags">Optional allow-listed safe capability flags.</param>
 /// <param name="ConfigurationReferenceId">Optional safe configuration reference identifier (never a secret value).</param>
+/// <param name="Pricing">Administrator-supplied versioned pricing units and currency (required).</param>
 public record CreateProviderModelEntry(
     string ProviderId,
     string ModelId,
@@ -25,4 +26,5 @@ public record CreateProviderModelEntry(
     int MaxOutputTokenLimit,
     ProviderModelTimeoutPolicy TimeoutPolicy,
     ProviderModelCapabilityFlags SafeCapabilityFlags,
-    string? ConfigurationReferenceId);
+    string? ConfigurationReferenceId,
+    ProviderModelPricing Pricing);

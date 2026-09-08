@@ -11,8 +11,9 @@ namespace Hexalith.Agents.Server.Application.Agents;
 /// </summary>
 /// <remarks>
 /// Precedence is top-to-bottom: existence → authorization → availability → enabled → text-gen → configured →
-/// capability metadata → <see cref="ProviderSelectionValidationStatus.Valid"/>. It reads only the safe projection
-/// and fails closed on any uncertainty (an unauthorized/unavailable/degraded read never resolves to <c>Valid</c>).
+/// capability metadata → pricing → capability-version floor → <see cref="ProviderSelectionValidationStatus.Valid"/>.
+/// It reads only the safe projection and fails closed on any uncertainty (an unauthorized/unavailable/degraded
+/// read never resolves to <c>Valid</c>).
 /// </remarks>
 internal static class ProviderSelectionVerdict
 {
@@ -50,9 +51,19 @@ internal static class ProviderSelectionVerdict
             return ProviderSelectionValidationStatus.NotConfigured;
         }
 
-        return HasValidCapabilityMetadata(entry)
+        if (!HasValidCapabilityMetadata(entry))
+        {
+            return ProviderSelectionValidationStatus.MissingCapabilityMetadata;
+        }
+
+        if (!HasValidPricing(entry.Pricing))
+        {
+            return ProviderSelectionValidationStatus.Unpriced;
+        }
+
+        return entry.CapabilityVersion >= 1
             ? ProviderSelectionValidationStatus.Valid
-            : ProviderSelectionValidationStatus.MissingCapabilityMetadata;
+            : ProviderSelectionValidationStatus.Regressed;
     }
 
     // The AD-10 capability floor: positive, internally-consistent context/output limits and a valid timeout policy.
@@ -61,4 +72,11 @@ internal static class ProviderSelectionVerdict
             && entry.MaxOutputTokenLimit > 0
             && entry.MaxOutputTokenLimit <= entry.ContextWindowTokenLimit
             && entry.TimeoutPolicy is { RequestTimeoutMilliseconds: > 0, MaxRetries: >= 0 };
+
+    private static bool HasValidPricing(ProviderModelPricing? pricing)
+        => pricing is { PricingVersion: >= 1, InputTokenUnitPrice: >= 0, OutputTokenUnitPrice: >= 0 }
+            && IsIso4217Currency(pricing.Currency);
+
+    private static bool IsIso4217Currency(string? currency)
+        => currency is { Length: 3 } && char.IsAsciiLetter(currency[0]) && char.IsAsciiLetter(currency[1]) && char.IsAsciiLetter(currency[2]);
 }

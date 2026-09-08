@@ -98,6 +98,16 @@ public sealed class AgentProviderSelectionOrchestratorTests
             .ShouldBe(ProviderSelectionValidationStatus.NotConfigured);
 
     [Fact]
+    public async Task Unpriced_entry_maps_to_unpriced()
+        => (await RunVerdict(SuccessRead(ValidEntry() with { Pricing = null })))
+            .ShouldBe(ProviderSelectionValidationStatus.Unpriced);
+
+    [Fact]
+    public async Task Regressed_capability_version_maps_to_regressed()
+        => (await RunVerdict(SuccessRead(ValidEntry(capabilityVersion: 0))))
+            .ShouldBe(ProviderSelectionValidationStatus.Regressed);
+
+    [Fact]
     public async Task Output_exceeding_context_window_maps_to_missing_capability_metadata()
         => (await RunVerdict(SuccessRead(ValidEntry() with { MaxOutputTokenLimit = 999_999 })))
             .ShouldBe(ProviderSelectionValidationStatus.MissingCapabilityMetadata);
@@ -316,7 +326,8 @@ public sealed class AgentProviderSelectionOrchestratorTests
             ProviderConfigurationState.Configured,
             "cfg-openai-gpt4o",
             IsSelectableForNewActiveUse: true,
-            capabilityVersion);
+            capabilityVersion,
+            new ProviderModelPricing("USD", 0.002m, 0.008m, 1));
 
     private static AgentProviderSelectionRequest Request(
         bool isAgentsAdmin = true,

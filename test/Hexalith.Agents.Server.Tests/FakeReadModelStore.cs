@@ -31,10 +31,14 @@ internal sealed class FakeReadModelStore : IReadModelStore, IReadModelBatchStore
     /// <summary>Gets the number of batch executions the fake has served.</summary>
     public int BatchCount { get; private set; }
 
+    /// <summary>Gets the number of <see cref="GetAsync{TValue}"/> lookups the fake has served.</summary>
+    public int GetCount { get; private set; }
+
     public Task<ReadModelEntry<TValue>> GetAsync<TValue>(string storeName, string key, CancellationToken cancellationToken = default)
         where TValue : class
     {
         cancellationToken.ThrowIfCancellationRequested();
+        GetCount++;
         return Task.FromResult(_entries.TryGetValue(Compose(storeName, key), out Entry? entry)
             ? new ReadModelEntry<TValue>(JsonSerializer.Deserialize<TValue>(entry.Bytes, _json), entry.ETag)
             : new ReadModelEntry<TValue>(null, null));

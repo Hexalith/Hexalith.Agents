@@ -74,4 +74,22 @@ public sealed class AgentsClient : IAgentsClient
             new UnavailableProposalWorkflowOperations(),
             new UnavailableAgentStatusOperations(),
             new UnavailableAgentAuditOperations());
+
+    /// <summary>
+    /// Creates a client facade whose provider-catalog group is live and whose remaining groups stay fail-closed
+    /// unless an administration implementation is also supplied.
+    /// </summary>
+    /// <param name="providerCatalog">The live provider-catalog operations.</param>
+    /// <param name="agentAdministration">The live Agent administration operations, or <see langword="null"/> to keep them unavailable.</param>
+    /// <returns>A client with a live provider-catalog group.</returns>
+    public static IAgentsClient WithProviderCatalog(
+        IProviderCatalogOperations providerCatalog,
+        IAgentAdministrationOperations? agentAdministration = null)
+        => new AgentsClient(
+            providerCatalog,
+            agentAdministration ?? new UnavailableAgentAdministrationOperations(),
+            new UnavailableAgentInteractionOperations(),
+            new UnavailableProposalWorkflowOperations(),
+            new UnavailableAgentStatusOperations(),
+            new UnavailableAgentAuditOperations());
 }

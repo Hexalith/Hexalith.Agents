@@ -99,7 +99,8 @@ internal static class AgentUiTestData
             ConfigurationState: configurationState,
             ConfigurationReferenceId: configurationReferenceId,
             IsSelectableForNewActiveUse: isSelectable,
-            CapabilityVersion: 1);
+            CapabilityVersion: 1,
+            Pricing: new ProviderModelPricing("USD", 0.002m, 0.008m, 1));
 
     public static PendingProposalView PendingProposal(
         string agentInteractionId = "interaction-1",

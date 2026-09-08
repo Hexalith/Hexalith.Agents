@@ -11,27 +11,48 @@ namespace Hexalith.Agents.Client;
 
 internal sealed class UnavailableProviderCatalogOperations : IProviderCatalogOperations
 {
-    public ValueTask<AgentOperationResult<ProviderCatalogInspectionResult>> ListEntriesAsync(bool includeDisabled, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+    public ValueTask<AgentOperationResult<ProviderCatalogInspectionResult>> ListEntriesAsync(
+        bool includeDisabled,
+        string? expectedProjectionVersion = null,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default)
         => Unavailable.Typed<ProviderCatalogInspectionResult>();
 
-    public ValueTask<AgentOperationResult<ProviderCatalogInspectionResult>> GetEntryAsync(string providerId, string modelId, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+    public ValueTask<AgentOperationResult<ProviderCatalogInspectionResult>> GetEntryAsync(
+        string providerId,
+        string modelId,
+        int? expectedCapabilityVersion = null,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default)
     {
         Validate(providerId);
         Validate(modelId);
         return Unavailable.Typed<ProviderCatalogInspectionResult>();
     }
 
-    public ValueTask<AgentOperationResult> CreateEntryAsync(CreateProviderModelEntry command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
-        => Unavailable.Command(command);
+    public ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>> CreateEntryAsync(
+        CreateProviderModelEntry command,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default)
+        => Unavailable.TypedCommand<ProviderCatalogCommandAcceptance>(command);
 
-    public ValueTask<AgentOperationResult> UpdateEntryAsync(UpdateProviderModelEntry command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
-        => Unavailable.Command(command);
+    public ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>> UpdateEntryAsync(
+        UpdateProviderModelEntry command,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default)
+        => Unavailable.TypedCommand<ProviderCatalogCommandAcceptance>(command);
 
-    public ValueTask<AgentOperationResult> EnableEntryAsync(EnableProviderModelEntry command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
-        => Unavailable.Command(command);
+    public ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>> EnableEntryAsync(
+        EnableProviderModelEntry command,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default)
+        => Unavailable.TypedCommand<ProviderCatalogCommandAcceptance>(command);
 
-    public ValueTask<AgentOperationResult> DisableEntryAsync(DisableProviderModelEntry command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
-        => Unavailable.Command(command);
+    public ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>> DisableEntryAsync(
+        DisableProviderModelEntry command,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default)
+        => Unavailable.TypedCommand<ProviderCatalogCommandAcceptance>(command);
 
     private static void Validate(string value)
         => ArgumentException.ThrowIfNullOrWhiteSpace(value);

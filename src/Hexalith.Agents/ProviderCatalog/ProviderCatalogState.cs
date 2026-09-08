@@ -49,19 +49,25 @@ public sealed class ProviderCatalogState
             SafeCapabilityFlags = e.SafeCapabilityFlags,
             ConfigurationState = e.ConfigurationState,
             ConfigurationReferenceId = e.ConfigurationReferenceId,
-
-            // Story 1.5: the replay-derived capability version starts at 1 on create.
-            CapabilityVersion = 1,
+            CapabilityVersion = e.CapabilityVersion > 0 ? e.CapabilityVersion : 1,
+            Pricing = e.Pricing,
         };
     }
 
-    /// <summary>Applies a safe-metadata update to an existing entry.</summary>
+    /// <summary>Applies a safe-metadata or pricing update to an existing entry.</summary>
     /// <param name="e">The event.</param>
     public void Apply(ProviderModelEntryMetadataUpdated e)
     {
         ArgumentNullException.ThrowIfNull(e);
         if (!Entries.TryGetValue(EntryKey(e.ProviderId, e.ModelId), out ProviderModelEntryState? entry))
         {
+            return;
+        }
+
+        int nextVersion = e.CapabilityVersion > 0 ? e.CapabilityVersion : entry.CapabilityVersion + 1;
+        if (nextVersion <= entry.CapabilityVersion)
+        {
+            // A reused or decreased CapabilityVersion must not overwrite current truth.
             return;
         }
 
@@ -73,10 +79,8 @@ public sealed class ProviderCatalogState
         entry.SafeCapabilityFlags = e.SafeCapabilityFlags;
         entry.ConfigurationState = e.ConfigurationState;
         entry.ConfigurationReferenceId = e.ConfigurationReferenceId;
-
-        // Story 1.5: a genuine capability-metadata change bumps the version. Story 1.2 emits this event only on a
-        // real change (exact-duplicate updates are NoOp), so the counter increments only on genuine changes.
-        entry.CapabilityVersion += 1;
+        entry.Pricing = e.Pricing;
+        entry.CapabilityVersion = nextVersion;
     }
 
     /// <summary>Applies an entry enablement.</summary>
@@ -144,6 +148,30 @@ public sealed class ProviderCatalogState
     /// <summary>No-op replay handler — rejection events carry no state change.</summary>
     /// <param name="e">The rejection event.</param>
     public void Apply(UnsafeProviderConfigurationInputRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>No-op replay handler — rejection events carry no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(InvalidProviderModelPricingRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>No-op replay handler — rejection events carry no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(ProviderModelCapabilityVersionRegressedRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>No-op replay handler — rejection events carry no state change.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(ProviderModelEntryStaleRevisionRejection e)
     {
         ArgumentNullException.ThrowIfNull(e);
         MarkReplayOnlyEventHandled();

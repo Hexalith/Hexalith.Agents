@@ -120,8 +120,22 @@ public sealed class AgentsUiCompositionTests
         using ServiceProvider provider = services.BuildServiceProvider();
         using IServiceScope scope = provider.CreateScope();
 
-        scope.ServiceProvider.GetRequiredService<IProviderCatalogGateway>().ShouldBeOfType<DeferredProviderCatalogGateway>();
+        scope.ServiceProvider.GetRequiredService<IProviderCatalogGateway>().ShouldBeOfType<AgentsClientProviderCatalogGateway>();
         scope.ServiceProvider.GetRequiredService<ILaunchReadinessGateway>().ShouldBeOfType<DeferredLaunchReadinessGateway>();
+    }
+
+    [Fact]
+    public void AddAgentsUiSetup_resolves_the_live_catalog_gateway()
+    {
+        ServiceCollection services = new();
+        services.AddSingleton(AgentsClient.Unavailable());
+
+        services.AddAgentsUiSetup(Configuration());
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        using IServiceScope scope = provider.CreateScope();
+
+        scope.ServiceProvider.GetRequiredService<IProviderCatalogGateway>().ShouldBeOfType<AgentsClientProviderCatalogGateway>();
     }
 
     private static IConfiguration Configuration(params (string Key, string Value)[] values)

@@ -14,11 +14,6 @@ namespace Hexalith.Agents.ProviderCatalog;
 /// in as <c>isProviderAdmin</c>; unauthorized inspection returns a structured fail-closed result rather than
 /// throwing or leaking which entries exist.
 /// </summary>
-/// <remarks>
-/// Binding this logic to the EventStore SDK <c>IDomainQueryHandler</c>/<c>IReadModelStore</c> DAPR read path is
-/// deferred to the dedicated read-model story (mirroring how sibling modules landed their DAPR-backed read path
-/// in a later story); Story 1.2 keeps the inspection logic pure so it is fully unit-testable here.
-/// </remarks>
 public static class ProviderCatalogInspection
 {
     /// <summary>
@@ -81,8 +76,31 @@ public static class ProviderCatalogInspection
         return ProviderCatalogInspectionResult.Success(views);
     }
 
-    private static ProviderCatalogEntryView ToView(ProviderModelEntryState entry)
-        => new(
+    /// <summary>
+    /// Returns whether the entry may be selected for new active Agent use: enabled, configured, text-generation
+    /// capable, valid limits, valid pricing, and a non-regressed capability version.
+    /// </summary>
+    /// <param name="entry">The catalog entry.</param>
+    /// <returns><see langword="true"/> when the entry is eligible for a new active selection.</returns>
+    public static bool IsSelectableForNewActiveUse(ProviderModelEntryState entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        return entry.IsEnabled
+            && entry.SupportsTextGeneration
+            && entry.ConfigurationState == ProviderConfigurationState.Configured
+            && HasValidLimits(entry)
+            && ProviderCatalogAggregate.HasValidPricing(entry.Pricing)
+            && entry.CapabilityVersion >= 1
+            && entry.Pricing is { PricingVersion: >= 1 };
+    }
+
+    /// <summary>Maps a replayed entry to the safe public view.</summary>
+    /// <param name="entry">The catalog entry.</param>
+    /// <returns>The safe view.</returns>
+    public static ProviderCatalogEntryView ToView(ProviderModelEntryState entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        return new(
             entry.ProviderId,
             entry.ModelId,
             entry.DisplayLabel,
@@ -94,6 +112,14 @@ public static class ProviderCatalogInspection
             entry.SafeCapabilityFlags,
             entry.ConfigurationState,
             entry.ConfigurationReferenceId,
-            IsSelectableForNewActiveUse: entry.IsEnabled,
-            entry.CapabilityVersion);
+            IsSelectableForNewActiveUse(entry),
+            entry.CapabilityVersion,
+            entry.Pricing);
+    }
+
+    private static bool HasValidLimits(ProviderModelEntryState entry)
+        => entry.ContextWindowTokenLimit > 0
+            && entry.MaxOutputTokenLimit > 0
+            && entry.MaxOutputTokenLimit <= entry.ContextWindowTokenLimit
+            && entry.TimeoutPolicy is { RequestTimeoutMilliseconds: > 0, MaxRetries: >= 0 };
 }

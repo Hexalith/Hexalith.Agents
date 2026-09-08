@@ -35,10 +35,10 @@ public static class AgentsOperationEndpoints
     {
         RouteGroupBuilder providers = group.MapGroup("/providers");
 
-        providers.MapGet("/", (bool includeDisabled, IAgentsClient client, CancellationToken cancellationToken) =>
-            client.ProviderCatalog.ListEntriesAsync(includeDisabled, cancellationToken: cancellationToken));
-        providers.MapGet("/{providerId}/{modelId}", (string providerId, string modelId, IAgentsClient client, CancellationToken cancellationToken) =>
-            client.ProviderCatalog.GetEntryAsync(providerId, modelId, cancellationToken: cancellationToken));
+        providers.MapGet("/", (bool includeDisabled, string? expectedProjectionVersion, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.ProviderCatalog.ListEntriesAsync(includeDisabled, expectedProjectionVersion, cancellationToken: cancellationToken));
+        providers.MapGet("/{providerId}/{modelId}", (string providerId, string modelId, int? expectedCapabilityVersion, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.ProviderCatalog.GetEntryAsync(providerId, modelId, expectedCapabilityVersion, cancellationToken: cancellationToken));
         providers.MapPost("/", (CreateProviderModelEntry command, IAgentsClient client, CancellationToken cancellationToken) =>
             client.ProviderCatalog.CreateEntryAsync(command, cancellationToken: cancellationToken));
         providers.MapPut("/", (UpdateProviderModelEntry command, IAgentsClient client, CancellationToken cancellationToken) =>

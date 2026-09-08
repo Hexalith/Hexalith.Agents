@@ -40,6 +40,12 @@ public enum ProviderSelectionValidationStatus
     /// <summary>The Provider/model lacks required context/output/timeout capability metadata.</summary>
     MissingCapabilityMetadata,
 
+    /// <summary>The Provider/model has no valid administrator-supplied pricing units and currency.</summary>
+    Unpriced,
+
+    /// <summary>The Provider/model capability version is missing, reused, or lower than the monotonic floor.</summary>
+    Regressed,
+
     /// <summary>The caller is outside the catalog's tenant scope or is not authorized to read it (AC4).</summary>
     Unauthorized,
 

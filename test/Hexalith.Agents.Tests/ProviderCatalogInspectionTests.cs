@@ -52,7 +52,9 @@ public sealed class ProviderCatalogInspectionTests
             new ProviderModelTimeoutPolicy(30_000, 3),
             ProviderModelCapabilityFlags.Streaming,
             ProviderConfigurationState.Configured,
-            "cfg-openai-gpt4o"));
+            "cfg-openai-gpt4o",
+            ValidPricing(2),
+            CapabilityVersion: 2));
 
         ProviderCatalogInspection.GetEntry(state, isProviderAdmin: true, "openai", "gpt-4o")
             .Entries.ShouldHaveSingleItem().CapabilityVersion.ShouldBe(2);
@@ -139,5 +141,39 @@ public sealed class ProviderCatalogInspectionTests
 
         result.Status.ShouldBe(ProviderCatalogInspectionStatus.Success);
         result.Entries.ShouldBeEmpty();
+        result.Freshness.ShouldBe(Hexalith.Agents.Contracts.Agent.AgentSetupFreshness.Unknown);
+        result.TruthState.ShouldBe(Hexalith.Agents.Contracts.Agent.AgentSetupTruthState.Unknown);
+    }
+
+    [Fact]
+    public void Enabled_unpriced_entry_is_not_selectable()
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        ProviderModelEntryState entry = state.Entries[ProviderCatalogState.EntryKey("openai", "gpt-4o")];
+        entry.Pricing = null;
+
+        ProviderCatalogInspection.GetEntry(state, isProviderAdmin: true, "openai", "gpt-4o")
+            .Entries.ShouldHaveSingleItem().IsSelectableForNewActiveUse.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Enabled_unconfigured_entry_is_not_selectable()
+    {
+        ProviderCatalogState state = StateWith(ValidCreate(configurationReferenceId: null));
+
+        ProviderCatalogEntryView view = ProviderCatalogInspection.GetEntry(state, isProviderAdmin: true, "openai", "gpt-4o")
+            .Entries.ShouldHaveSingleItem();
+        view.ConfigurationState.ShouldBe(ProviderConfigurationState.NotConfigured);
+        view.IsSelectableForNewActiveUse.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Enabled_entry_with_capability_version_zero_is_not_selectable()
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        state.Entries[ProviderCatalogState.EntryKey("openai", "gpt-4o")].CapabilityVersion = 0;
+
+        ProviderCatalogInspection.GetEntry(state, isProviderAdmin: true, "openai", "gpt-4o")
+            .Entries.ShouldHaveSingleItem().IsSelectableForNewActiveUse.ShouldBeFalse();
     }
 }

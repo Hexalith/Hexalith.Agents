@@ -138,6 +138,28 @@ public sealed class ProviderCatalogAggregateTests
     }
 
     [Theory]
+    [InlineData("", 0.002, 0.008, 1)]
+    [InlineData("USD", -1, 0.008, 1)]
+    [InlineData("USD", 0.002, -1, 1)]
+    [InlineData("US", 0.002, 0.008, 1)]
+    public void Create_with_invalid_pricing_produces_invalid_pricing_rejection(
+        string currency,
+        double input,
+        double output,
+        int version)
+    {
+        CreateProviderModelEntry command = ValidCreate() with
+        {
+            Pricing = new ProviderModelPricing(currency, (decimal)input, (decimal)output, version),
+        };
+
+        DomainResult result = ProviderCatalogAggregate.Handle(command, state: null, Envelope(command));
+
+        result.IsRejection.ShouldBeTrue();
+        _ = result.Events[0].ShouldBeOfType<InvalidProviderModelPricingRejection>();
+    }
+
+    [Theory]
     [InlineData(0, 3)]                                                       // non-positive timeout
     [InlineData(ProviderCatalogAggregate.MaxRequestTimeoutMilliseconds + 1, 3)] // over-long timeout
     [InlineData(30_000, ProviderCatalogAggregate.MaxRetryCount + 1)]         // too many retries
@@ -197,7 +219,8 @@ public sealed class ProviderCatalogAggregateTests
             MaxOutputTokenLimit: 32_000,
             new ProviderModelTimeoutPolicy(45_000, 2),
             ProviderModelCapabilityFlags.Streaming,
-            "cfg-openai-gpt4o");
+            "cfg-openai-gpt4o",
+            ValidPricing());
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 
@@ -206,6 +229,23 @@ public sealed class ProviderCatalogAggregateTests
         updated.DisplayLabel.ShouldBe("OpenAI GPT-4o (renamed)");
         updated.ContextWindowTokenLimit.ShouldBe(200_000);
         updated.MaxOutputTokenLimit.ShouldBe(32_000);
+    }
+
+    [Fact]
+    public void Update_that_changes_pricing_units_emits_the_next_pricing_version()
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        int currentPricingVersion = state.Entries[ProviderCatalogState.EntryKey("openai", "gpt-4o")].Pricing!.PricingVersion;
+        UpdateProviderModelEntry command = ValidUpdate(pricing: new ProviderModelPricing("EUR", 0.01m, 0.02m, 0));
+
+        DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
+
+        result.IsSuccess.ShouldBeTrue();
+        ProviderModelEntryMetadataUpdated updated = result.Events[0].ShouldBeOfType<ProviderModelEntryMetadataUpdated>();
+        updated.Pricing.Currency.ShouldBe("EUR");
+        updated.Pricing.InputTokenUnitPrice.ShouldBe(0.01m);
+        updated.Pricing.OutputTokenUnitPrice.ShouldBe(0.02m);
+        updated.Pricing.PricingVersion.ShouldBe(currentPricingVersion + 1);
     }
 
     [Fact]
@@ -220,7 +260,8 @@ public sealed class ProviderCatalogAggregateTests
             MaxOutputTokenLimit: 16_000,
             new ProviderModelTimeoutPolicy(30_000, 3),
             ProviderModelCapabilityFlags.None,
-            null);
+            null,
+            ValidPricing());
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, StateWith(ValidCreate()), Envelope(command));
 
@@ -242,7 +283,8 @@ public sealed class ProviderCatalogAggregateTests
             create.MaxOutputTokenLimit,
             create.TimeoutPolicy,
             create.SafeCapabilityFlags,
-            create.ConfigurationReferenceId);
+            create.ConfigurationReferenceId,
+            ValidPricing());
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 
@@ -262,7 +304,8 @@ public sealed class ProviderCatalogAggregateTests
             MaxOutputTokenLimit: 16_000,
             new ProviderModelTimeoutPolicy(30_000, 3),
             ProviderModelCapabilityFlags.None,
-            null);
+            null,
+            ValidPricing());
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command, isProviderAdmin: false));
 

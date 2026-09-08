@@ -14,4 +14,7 @@ public enum ProviderCatalogInspectionStatus
 
     /// <summary>The requested single entry does not exist in the catalog.</summary>
     EntryNotFound,
+
+    /// <summary>The catalog read path is unreachable or failed; no entry data is returned.</summary>
+    Unavailable,
 }

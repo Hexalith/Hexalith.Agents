@@ -31,7 +31,9 @@ public sealed class ProviderCatalogContractsRoundTripTests
             new ProviderModelTimeoutPolicy(45_000, 2),
             ProviderModelCapabilityFlags.Streaming | ProviderModelCapabilityFlags.Vision,
             ProviderConfigurationState.Configured,
-            "cfg-openai-gpt4o");
+            "cfg-openai-gpt4o",
+            new ProviderModelPricing("USD", 0.002m, 0.008m, 2),
+            CapabilityVersion: 2);
 
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(updated);
 
@@ -91,7 +93,8 @@ public sealed class ProviderCatalogContractsRoundTripTests
             ProviderConfigurationState.Configured,
             "cfg-openai-gpt4o",
             IsSelectableForNewActiveUse: true,
-            CapabilityVersion: 2);
+            CapabilityVersion: 2,
+            new ProviderModelPricing("USD", 0.002m, 0.008m, 2));
 
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(view);
 

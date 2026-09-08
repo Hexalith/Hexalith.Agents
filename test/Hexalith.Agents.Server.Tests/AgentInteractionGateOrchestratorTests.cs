@@ -740,7 +740,8 @@ public sealed class AgentInteractionGateOrchestratorTests
             ProviderConfigurationState.Configured,
             "cfg-openai-gpt4o",
             IsSelectableForNewActiveUse: selectable,
-            CapabilityVersion: 1);
+            CapabilityVersion: 1,
+            new ProviderModelPricing("USD", 0.002m, 0.008m, 1));
 
     private static AgentInteractionSnapshot SampleSnapshot()
         => new(

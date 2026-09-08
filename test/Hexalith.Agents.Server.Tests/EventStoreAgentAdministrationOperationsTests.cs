@@ -337,5 +337,6 @@ public sealed class EventStoreAgentAdministrationOperationsTests
             ProviderConfigurationState.Configured,
             "cfg-openai-gpt4o",
             IsSelectableForNewActiveUse: true,
-            CapabilityVersion: 1);
+            CapabilityVersion: 1,
+            new ProviderModelPricing("USD", 0.002m, 0.008m, 1));
 }

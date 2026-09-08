@@ -4,6 +4,7 @@ using Hexalith.Agents.Client;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Contracts.Operations;
+using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Server.Api;
 
 using Microsoft.AspNetCore.Builder;
@@ -117,6 +118,36 @@ public sealed class AgentsOperationEndpointsTests
     }
 
     [Fact]
+    public async Task The_catalog_list_forwards_the_expected_projection_version_to_the_client()
+    {
+        IProviderCatalogOperations catalog = StubbedCatalogReads();
+
+        await using WebApplication app = BuildApp(AgentsClientWith(catalog));
+        _ = await InvokeEndpointAsync(
+            app,
+            "/api/agents/operations/providers/",
+            queryString: "?includeDisabled=true&expectedProjectionVersion=9").ConfigureAwait(true);
+
+        await catalog.Received(1).ListEntriesAsync(true, "9", Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task The_catalog_get_forwards_the_expected_capability_version_to_the_client()
+    {
+        IProviderCatalogOperations catalog = StubbedCatalogReads();
+
+        await using WebApplication app = BuildApp(AgentsClientWith(catalog));
+        _ = await InvokeEndpointAsync(
+            app,
+            "/api/agents/operations/providers/{providerId}/{modelId}",
+            queryString: "?expectedCapabilityVersion=2",
+            ("providerId", "openai"),
+            ("modelId", "gpt-4o")).ConfigureAwait(true);
+
+        await catalog.Received(1).GetEntryAsync("openai", "gpt-4o", 2, Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task A_setup_read_without_a_version_asks_for_the_currently_projected_truth()
     {
         IAgentAdministrationOperations administration = StubbedSetupReads();
@@ -153,6 +184,27 @@ public sealed class AgentsOperationEndpointsTests
         IAgentsClient client = Substitute.For<IAgentsClient>();
         client.AgentAdministration.Returns(administration);
         return client;
+    }
+
+    private static IAgentsClient AgentsClientWith(IProviderCatalogOperations catalog)
+    {
+        IAgentsClient client = Substitute.For<IAgentsClient>();
+        client.ProviderCatalog.Returns(catalog);
+        return client;
+    }
+
+    private static IProviderCatalogOperations StubbedCatalogReads()
+    {
+        IProviderCatalogOperations catalog = Substitute.For<IProviderCatalogOperations>();
+        catalog
+            .ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<ProviderCatalogInspectionResult>>(
+                AgentOperationResult<ProviderCatalogInspectionResult>.Succeeded(ProviderCatalogInspectionResult.NotFound())));
+        catalog
+            .GetEntryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<ProviderCatalogInspectionResult>>(
+                AgentOperationResult<ProviderCatalogInspectionResult>.Succeeded(ProviderCatalogInspectionResult.NotFound())));
+        return catalog;
     }
 
     [Fact]

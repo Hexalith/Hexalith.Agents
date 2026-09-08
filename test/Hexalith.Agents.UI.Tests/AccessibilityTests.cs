@@ -161,7 +161,7 @@ public sealed class AccessibilityTests : AgentsTestContext
     [Fact]
     public void Provider_catalog_in_shell_exposes_a_focusable_heading()
     {
-        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success([AgentUiTestData.Entry()])));
 
         IRenderedComponent<FrontComposerShell> cut = RenderInShellWithNavigation<ProviderCatalog>();

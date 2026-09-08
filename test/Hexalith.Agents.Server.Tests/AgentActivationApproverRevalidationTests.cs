@@ -202,7 +202,8 @@ public sealed class AgentActivationApproverRevalidationTests
                 ProviderConfigurationState.Configured,
                 "cfg-openai-gpt4o",
                 IsSelectableForNewActiveUse: true,
-                1));
+                1,
+                new ProviderModelPricing("USD", 0.002m, 0.008m, 1)));
 
     private static ApproverPolicyResolutionResult AllResolved()
         => new(

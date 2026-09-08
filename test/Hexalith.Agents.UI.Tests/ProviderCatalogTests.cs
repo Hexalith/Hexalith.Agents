@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 using Bunit;
 
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.UI.Components.Pages;
 
@@ -23,7 +24,7 @@ public sealed class ProviderCatalogTests : AgentsTestContext
     [Fact]
     public void Grid_renders_entries_with_status_badges_and_configured_state()
     {
-        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success(
             [
                 AgentUiTestData.Entry("openai", "gpt-x", ProviderModelStatus.Enabled, ProviderConfigurationState.Configured, SentinelReference),
@@ -46,7 +47,7 @@ public sealed class ProviderCatalogTests : AgentsTestContext
     [Fact]
     public void Grid_never_renders_the_configuration_reference_value_or_any_secret()
     {
-        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success(
             [
                 AgentUiTestData.Entry("openai", "gpt-x", ProviderModelStatus.Enabled, ProviderConfigurationState.Configured, SentinelReference),
@@ -65,7 +66,7 @@ public sealed class ProviderCatalogTests : AgentsTestContext
     [Fact]
     public void Not_authorized_result_renders_the_permission_denied_surface()
     {
-        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogInspectionResult.NotAuthorized()));
 
         IRenderedComponent<ProviderCatalog> cut = RenderPage<ProviderCatalog>();
@@ -80,7 +81,7 @@ public sealed class ProviderCatalogTests : AgentsTestContext
     [Fact]
     public void Empty_success_result_renders_the_empty_surface_without_leaking_records()
     {
-        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success([])));
 
         IRenderedComponent<ProviderCatalog> cut = RenderPage<ProviderCatalog>();
@@ -91,7 +92,7 @@ public sealed class ProviderCatalogTests : AgentsTestContext
     [Fact]
     public void Grid_renders_only_safe_capability_labels_and_token_limits()
     {
-        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success(
             [
                 AgentUiTestData.Entry(
@@ -119,7 +120,7 @@ public sealed class ProviderCatalogTests : AgentsTestContext
     [Fact]
     public void Entry_without_any_capability_renders_the_none_label()
     {
-        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success(
             [
                 AgentUiTestData.Entry(
@@ -137,12 +138,12 @@ public sealed class ProviderCatalogTests : AgentsTestContext
     [Fact]
     public void List_entries_is_requested_with_include_disabled_so_inspection_is_complete()
     {
-        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success([AgentUiTestData.Entry()])));
 
         _ = RenderPage<ProviderCatalog>();
 
-        CatalogGateway.Received().ListEntriesAsync(true, Arg.Any<CancellationToken>());
+        CatalogGateway.Received().ListEntriesAsync(true, null, Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -150,7 +151,7 @@ public sealed class ProviderCatalogTests : AgentsTestContext
     {
         // Every entry is non-selectable: turning on the selectable-only filter must produce the distinct
         // filtered-empty state (offering a reset), never the no-records empty state (UX-DR30, AC6).
-        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success(
             [
                 AgentUiTestData.Entry("openai", "gpt-x", isSelectable: false),
@@ -172,5 +173,27 @@ public sealed class ProviderCatalogTests : AgentsTestContext
         cut.Find("[data-testid='agents-provider-catalog-state-reset']").Click();
 
         cut.WaitForAssertion(() => cut.Find("[data-testid='agents-provider-catalog-grid']"));
+    }
+
+    [Fact]
+    public void Grid_renders_pricing_capability_version_and_freshness_without_the_configuration_reference()
+    {
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success(
+                [AgentUiTestData.Entry("openai", "gpt-x", configurationReferenceId: SentinelReference)],
+                projectionVersion: "4",
+                projectedAt: new DateTimeOffset(2026, 6, 24, 12, 0, 0, TimeSpan.Zero),
+                freshness: AgentSetupFreshness.Current,
+                truthState: AgentSetupTruthState.ProjectionConfirmed)));
+
+        IRenderedComponent<ProviderCatalog> cut = RenderPage<ProviderCatalog>();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.Find("[data-testid='agents-provider-catalog-pricing']");
+            cut.Find("[data-testid='agents-provider-catalog-capability-version']").TextContent.ShouldBe("1");
+            cut.Markup.ShouldContain("Agents.ProviderCatalog.Freshness.Current");
+            cut.Markup.ShouldNotContain(SentinelReference);
+        });
     }
 }

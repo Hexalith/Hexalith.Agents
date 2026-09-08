@@ -1,3 +1,5 @@
+using System;
+
 using Hexalith.Agents.UI.Services.Gateways;
 
 using Microsoft.Extensions.Configuration;
@@ -63,6 +65,10 @@ public static class AgentsUiServiceCollectionExtensions
         {
             services.TryAddScoped<IAgentSetupGateway, AgentsClientSetupGateway>();
         }
+
+        // Catalog administration is tenant-scoped, not Agent-scoped: a host that opts into the live setup
+        // composition also binds the live catalog gateway. Plain AddAgentsUi keeps the deferred placeholder.
+        services.TryAddScoped<IProviderCatalogGateway, AgentsClientProviderCatalogGateway>();
 
         return services.AddAgentsUi();
     }
