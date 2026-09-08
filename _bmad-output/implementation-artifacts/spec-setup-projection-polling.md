@@ -2,7 +2,7 @@
 title: 'Poll Agent Setup Projection After Writes'
 type: 'feature'
 created: '2026-09-08'
-status: 'done'
+status: 'blocked'
 baseline_revision: 'dc75b145391a4fee4f2c53e5be8e4b98ced29627'
 review_loop_iteration: 0
 followup_review_recommended: true
@@ -129,36 +129,17 @@ Use `CancellationTokenSource(TimeSpan, TimeProvider)` linked with the component-
 - `dotnet test test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj -c Debug --no-build --filter FullyQualifiedName~AgentConfiguration -m:1` -- expected: all Agent configuration bUnit tests pass, including virtual-time polling cases.
 - `dotnet test test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj -c Debug --no-build -m:1` -- expected: the full owning UI test project passes.
 
+
 ## Auto Run Result
 
-Implemented a page-local, five-second post-write catch-up loop that reuses the exact expected configuration version, exposes Submitted and AuthoritativePending transitions, stops on confirmation or terminal outcomes, and remains cancellable through non-cooperative gateway tasks. Timeout and lifetime cancellation preserve the last successfully rendered truth rather than manufacturing confirmation.
+Status: blocked
+Blocking condition: dirty working tree
 
-Files changed:
+The run halted at the activation preflight. Both the activation append step and step-01's version-control sanity check require a clean working tree before any workflow write, and two paths were already modified at HEAD `a4003a9bbe9c2939ebafb35b19a3df3b0ed9403a` before this run started:
 
-- `Directory.Packages.props` — aligned Fluent UI/bUnit with the imported FrontComposer stack while retaining xUnit 3 and pinning its exact transitive packages for the established VSTest-compatible commands.
-- `src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor` — added the bounded polling loop, lifetime cancellation, explicit transition renders, fail-closed cancellation handling, safe draft behavior, and immediate sensitive-draft clearing.
-- `src/Hexalith.Agents.UI/Services/Gateways/AgentsUiServiceCollectionExtensions.cs` — registered `TimeProvider.System` as a non-overriding production default.
-- `test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj` — added the centrally versioned fake-time dependency.
-- `test/Hexalith.Agents.UI.Tests/AgentsTestContext.cs` — exposed and registered a per-test `FakeTimeProvider`.
-- `test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs` — covered immediate/delayed confirmation, the exact timeout boundary, disposal during delay and non-cooperative I/O, typed/throwing terminal outcomes, intermediate truth, draft preservation, and sensitive-data removal.
-- `test/Hexalith.Agents.UI.Tests/AgentsUiCompositionTests.cs` — verified default and host-supplied `TimeProvider` composition.
-- `test/Hexalith.Agents.UI.Tests/AccessibilityTests.cs` — retained the same skip-link fragment checks under bUnit 2.9 URI normalization.
-- `_bmad-output/implementation-artifacts/spec-setup-projection-polling.md` — recorded the frozen intent, implementation map, review triage, verification, and residual risks.
+- `_bmad-output/implementation-artifacts/deferred-work.md` -- uncommitted ledger edits (DW-3 closed by sweep bundle `dw-setup-projection-polling`; new open entries DW-4 and DW-5). Orchestrator-owned; this run did not read them as work input, modify them, or revert them.
+- `_bmad-output/implementation-artifacts/spec-setup-projection-polling.md` -- uncommitted deletion of the previous `## Auto Run Result` section, which is exactly the region a follow-up pass writes back to.
 
-Review findings breakdown:
+Because these are pre-existing modifications rather than workflow-owned output, a follow-up review pass could not attribute its own diff, so no investigation, implementation, or review was performed and no source file was touched.
 
-- Applied 11 grouped patches (high 0, medium 9, low 2): restored test-runner compatibility; bounded the initial read; rendered intermediate truth; preserved live drafts; removed submitted instructions immediately; guarded disposal races; mapped unrelated cancellation fail-closed; pinned the timeout boundary; exercised non-cooperative I/O; completed terminal-outcome coverage; and made polling tests use realizable version-bumping writes.
-- Deferred two items in this spec only: the pre-existing expected-version correlation limitation for lifecycle/concurrent writes (medium), and the unverified stronger reading that typed terminal failures must retain the prior pending view (medium if true). The deferred-work ledger was not edited.
-- Rejected the broader gateway/client/server placement finding because the verbatim intent explicitly assigns behavior to `AgentConfiguration`.
-- Rejected the dependency/accessibility scope finding because those changes preserve runtime behavior and were required to compile and execute the requested bUnit evidence against the imported FrontComposer stack.
-
-Follow-up review recommendation: `true`. This first pass patched nine medium-severity grouped entries; a follow-up should specifically re-check cancellation/render ordering around the newly bounded non-cooperative initial read and its exact timeout edge.
-
-Verification performed:
-
-- `dotnet build test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj -c Debug -p:UseHexalithProjectReferences=true -p:NuGetAudit=false -m:1` — passed with 0 warnings and 0 errors.
-- `dotnet test test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj -c Debug --no-build --filter FullyQualifiedName~AgentConfiguration -m:1` — passed 33/33.
-- `dotnet test test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj -c Debug --no-build -m:1` — passed 1,011/1,011.
-- `git diff --check` — passed.
-
-Residual risks are limited to the two deferred contract/intent questions recorded in frontmatter. No API, client, server projection, markup, localization, or deferred-work ledger contract was changed.
+Human decision required: commit or discard the two uncommitted paths above (in particular, decide whether the removal of the prior `## Auto Run Result` from this spec is intended), then re-dispatch this spec. Its recorded state before this halt was `status: done` with `followup_review_recommended: true`, so the intended next action is a fresh follow-up review pass -- specifically re-checking cancellation/render ordering around the bounded non-cooperative initial read and its exact timeout edge.
