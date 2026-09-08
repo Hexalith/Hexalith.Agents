@@ -60,6 +60,22 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 | `AcceptedStatus` | `Uncommitted` |
 | `ConsumingStories` | 6.6, 7.4; `RQ-1` |
 
+### EXT-CONV-UI-1 — Conversation Action Contribution For Call hexa
+
+| Commitment field | Value |
+| --- | --- |
+| `Owner` | `TBD` |
+| `Repository` | `Hexalith.Conversations` |
+| `RequiredArtifact` | A versioned Conversation action contribution and registration contract allowing Agents to contribute the Conversation-owned **Call hexa** action into a Conversation surface, with tenant-scoped authorization and typed failure when the action cannot be registered. |
+| `TargetVersionOrCommit` | `TBD` |
+| `TargetIntegrationDate` | `TBD` |
+| `CompatibilityContractAndVerificationCommand` | Contract: authorized, tenant-scoped action contribution with typed registration failure and no cross-tenant exposure. Command: `TBD`. |
+| `RequiredEvidenceLevel` | Levels 4 and 5 |
+| `AcceptedStatus` | `Uncommitted` |
+| `ConsumingStories` | `TBD`; `RQ-1` |
+
+*Added 2026-09-08 by the PRD update applying the approved 2026-08-03 sprint change proposal (PRD §8, AM-5). Commitment fields remain `TBD`, so under PRD FR-21 every consuming story stays blocked from `ready-for-dev` until an owner accepts them.*
+
 ### EXT-HOST-1 — Platform-Owned Agents Host Composition
 
 | Commitment field | Value |
@@ -146,4 +162,4 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 
 ## Current Blocking Summary
 
-`EXT-HOST-1` is `Committed` (scaffold + clean-checkout AppHost build gate). The remaining six records are `Uncommitted`; their consumers remain blocked from `ready-for-dev` until the fields required for `Committed` are accepted. `EXT-HOST-1` stays short of `Available` until Agents Story 5.6 wires live composition and the verify command is upgraded with Level 4 evidence. `RQ-1` additionally requires each dependency used by its qualification profile to be `Available` with the required live evidence.
+`EXT-HOST-1` is `Committed` (scaffold + clean-checkout AppHost build gate). The remaining seven records are `Uncommitted`; their consumers remain blocked from `ready-for-dev` until the fields required for `Committed` are accepted. `EXT-HOST-1` stays short of `Available` until Agents Story 5.6 wires live composition and the verify command is upgraded with Level 4 evidence. `RQ-1` additionally requires each dependency used by its qualification profile to be `Available` with the required live evidence.
