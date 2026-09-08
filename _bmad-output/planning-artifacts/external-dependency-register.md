@@ -2,7 +2,7 @@
 title: Hexalith Agents External Dependency Register
 status: active
 created: 2026-08-02
-updated: 2026-08-09
+updated: 2026-09-09
 project: agents
 authority: sprint-change-proposal-2026-08-02.md
 ---
@@ -52,13 +52,15 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 | --- | --- |
 | `Owner` | Conversations Maintainer |
 | `Repository` | `Hexalith.Conversations` |
-| `RequiredArtifact` | Public `IConversationClient.AddParticipantAsync` and `POST /api/v1/conversations/{conversationId}/participants`, plus the supported final-message append seam. Agents use is limited to stable AI Party identity, `ParticipantType.AiAgent` (`AIAgent`), and `ParticipantRole.Member`; exact retries are idempotent no-ops, conflicting type/role is a typed conflict, and cross-tenant or general participant management is denied. |
+| `RequiredArtifact` | Four seams. (1) Membership: public `IConversationClient.AddParticipantAsync` and `POST /api/v1/conversations/{conversationId}/participants`, limited for Agents to stable AI Party identity, `ParticipantType.AiAgent`, and `ParticipantRole.Member`; exact retries are idempotent no-ops, conflicting type/role is a typed conflict, and cross-tenant or general participant management is denied. (2) Posting: append a Conversation Message as the `AiAgent` participant with an Agents-supplied idempotency key and message metadata carrying the Agent Call trace reference and provenance flags (AI-generated; human-edited and by which Party), so restart or replay cannot duplicate a post. (3) Facilitator resolution: `ParticipantRole.Facilitator` on the participant read model. (4) Active-Conversation count per tenant and window for the PRD Eligible Conversation denominator. Final member names are owned by this record (PRD §8.1 assumptions A-1 through A-4). |
 | `TargetVersionOrCommit` | `TBD` |
 | `TargetIntegrationDate` | `TBD` |
-| `CompatibilityContractAndVerificationCommand` | Contract: typed idempotent membership and posting with focused cross-tenant denial. Command: `TBD`. |
+| `CompatibilityContractAndVerificationCommand` | Contract: typed idempotent membership, idempotent posting with trace and provenance metadata, Facilitator role exposure, and active-Conversation count, each with focused cross-tenant denial. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
 | `AcceptedStatus` | `Uncommitted` |
 | `ConsumingStories` | 6.6, 7.4; `RQ-1` |
+
+*Scope extended 2026-09-09 by the PRD validation reconciliation (PRD §8, findings H3/H4): the posting, Facilitator, and denominator seams were previously implied by PRD consequences but not named here. The record was already `Uncommitted`; the extension changes no status.*
 
 ### EXT-CONV-UI-1 — Conversation Action Contribution For Call hexa
 
@@ -66,7 +68,7 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 | --- | --- |
 | `Owner` | `TBD` |
 | `Repository` | `Hexalith.Conversations` |
-| `RequiredArtifact` | A versioned Conversation action contribution and registration contract allowing Agents to contribute the Conversation-owned **Call hexa** action into a Conversation surface, with tenant-scoped authorization and typed failure when the action cannot be registered. |
+| `RequiredArtifact` | A versioned Conversation action contribution and registration contract allowing Agents to contribute the Conversation-owned **Call hexa** action into a Conversation surface, with tenant-scoped authorization and typed failure when the action cannot be registered; plus rendering of the AI-generated and human-edited provenance markers carried in message metadata (PRD FR-11, FR-17) wherever a message's provenance is disclosed. |
 | `TargetVersionOrCommit` | `TBD` |
 | `TargetIntegrationDate` | `TBD` |
 | `CompatibilityContractAndVerificationCommand` | Contract: authorized, tenant-scoped action contribution with typed registration failure and no cross-tenant exposure. Command: `TBD`. |
@@ -74,7 +76,7 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 | `AcceptedStatus` | `Uncommitted` |
 | `ConsumingStories` | `TBD`; `RQ-1` |
 
-*Added 2026-09-08 by the PRD update applying the approved 2026-08-03 sprint change proposal (PRD §8, AM-5). Commitment fields remain `TBD`, so under PRD FR-21 every consuming story stays blocked from `ready-for-dev` until an owner accepts them.*
+*Added 2026-09-08 by the PRD update applying the approved 2026-08-03 sprint change proposal (PRD §8, AM-5); provenance-marker rendering added 2026-09-09 (PRD finding H4). Commitment fields remain `TBD`, so under PRD FR-21 every consuming story stays blocked from `ready-for-dev` until an owner accepts them.*
 
 ### EXT-HOST-1 — Platform-Owned Agents Host Composition
 
