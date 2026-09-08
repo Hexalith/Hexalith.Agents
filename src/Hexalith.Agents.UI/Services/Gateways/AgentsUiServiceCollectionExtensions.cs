@@ -25,6 +25,7 @@ public static class AgentsUiServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
 
+        services.TryAddSingleton<TimeProvider>(TimeProvider.System);
         services.TryAddScoped<IAgentSetupGateway, DeferredAgentSetupGateway>();
         services.TryAddScoped<IProviderCatalogGateway, DeferredProviderCatalogGateway>();
         services.TryAddScoped<IConversationAgentCallGateway, DeferredConversationAgentCallGateway>();

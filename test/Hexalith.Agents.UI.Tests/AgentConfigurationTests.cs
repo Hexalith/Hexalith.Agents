@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,6 +12,8 @@ using Hexalith.Agents.UI.Components.Pages;
 using Hexalith.Agents.UI.Components.Shared;
 using Hexalith.Agents.UI.Services.Gateways;
 using Hexalith.FrontComposer.Shell.Components.Layout;
+
+using Microsoft.AspNetCore.Components.Web;
 
 using NSubstitute;
 
@@ -312,14 +315,16 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     }
 
     [Fact]
-    public void A_catch_up_read_that_confirms_the_projection_stops_reporting_the_write_as_submitted()
+    public async Task An_immediately_confirmed_projection_stops_reporting_the_write_and_does_not_retry()
     {
         GivenSetup(AgentUiTestData.Setup(AgentUiTestData.Status(AgentLifecycleStatus.Draft), configurationVersion: 3));
         GivenAcceptedWrite(gateway => gateway.ActivateAsync(Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
         cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-activate']"));
-        cut.Find("[data-testid='agents-config-activate']").Click();
+        await cut.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
+        Clock.Advance(TimeSpan.FromSeconds(5));
+        await cut.InvokeAsync(() => Task.CompletedTask);
 
         cut.WaitForAssertion(() =>
         {
@@ -328,25 +333,348 @@ public sealed class AgentConfigurationTests : AgentsTestContext
 
             // Durable truth supersedes the in-flight notice; keeping both would say "still submitting" forever.
             cut.FindAll("[data-testid='agents-config-write-state']").ShouldBeEmpty();
+            SetupGateway.Received(1).GetSetupAsync(3, Arg.Any<CancellationToken>());
         });
     }
 
     [Fact]
-    public void A_catch_up_read_that_is_still_pending_keeps_reporting_the_submitted_write()
+    public async Task A_delayed_projection_confirmation_polls_the_same_version_and_clears_the_submitted_notice()
     {
-        GivenSetup(AgentUiTestData.Setup(
-            AgentUiTestData.Status(AgentLifecycleStatus.Draft),
+        AgentSetupView initial = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3);
+        AgentSetupView pending = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
             configurationVersion: 3,
             freshness: AgentSetupFreshness.Stale,
-            truthState: AgentSetupTruthState.AuthoritativePending));
-        GivenAcceptedWrite(gateway => gateway.ActivateAsync(Arg.Any<CancellationToken>()));
+            truthState: AgentSetupTruthState.AuthoritativePending);
+        AgentSetupView confirmed = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Confirmation),
+            configurationVersion: 4,
+            projectionVersion: "8");
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(
+            Task.FromResult(AgentSetupResult.Success(initial)),
+            Task.FromResult(AgentSetupResult.Success(pending)),
+            Task.FromResult(AgentSetupResult.Success(confirmed)));
+        GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(AgentResponseMode.Confirmation, Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
-        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-activate']"));
-        cut.Find("[data-testid='agents-config-activate']").Click();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(AgentResponseMode.Confirmation));
+        Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
+        cut.WaitForAssertion(() =>
+        {
+            SetupGateway.Received(1).GetSetupAsync(4, Arg.Any<CancellationToken>());
+            cut.Find("[data-testid='agents-config-write-state']").TextContent
+                .ShouldContain("Agents.Config.Write.Submitted");
+            cut.Find("[data-testid='agents-config-truth-stage']").TextContent
+                .ShouldContain("Agents.Config.Truth.Stage.AuthoritativePending");
+        });
 
-        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-write-state']").TextContent
-            .ShouldContain("Agents.Config.Write.Submitted"));
+        Clock.Advance(TimeSpan.FromMilliseconds(250));
+        await submission;
+
+        cut.Find("[data-testid='agents-config-truth-stage']").TextContent
+            .ShouldContain("Agents.Config.Truth.Stage.ProjectionConfirmed");
+        cut.Find("[data-testid='agents-config-projection-version']").TextContent.ShouldContain("8");
+        cut.FindAll("[data-testid='agents-config-write-state']").ShouldBeEmpty();
+        await SetupGateway.Received(2).GetSetupAsync(4, Arg.Any<CancellationToken>());
+        await SetupGateway.DidNotReceive().GetSetupAsync(
+            Arg.Is<int?>(version => version.HasValue && version.Value != 4),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Polling_retries_do_not_overwrite_drafts_edited_after_the_immediate_refresh()
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3);
+        AgentSetupView pending = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic) with
+            {
+                DisplayName = "pending authoritative name",
+                Description = "pending authoritative description",
+            },
+            configurationVersion: 3,
+            freshness: AgentSetupFreshness.Stale,
+            truthState: AgentSetupTruthState.AuthoritativePending);
+        AgentSetupView confirmed = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Confirmation) with
+            {
+                DisplayName = "confirmed authoritative name",
+                Description = "confirmed authoritative description",
+            },
+            configurationVersion: 4,
+            projectionVersion: "8");
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(
+            Task.FromResult(AgentSetupResult.Success(initial)),
+            Task.FromResult(AgentSetupResult.Success(pending)),
+            Task.FromResult(AgentSetupResult.Success(confirmed)));
+        GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
+            AgentResponseMode.Confirmation,
+            Arg.Any<CancellationToken>()));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
+        Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-display-name-input']")
+            .GetAttribute("value").ShouldBe("pending authoritative name"));
+        cut.Find("[data-testid='agents-config-display-name-input']").Change("administrator draft name");
+        cut.Find("[data-testid='agents-config-description-input']").Change("administrator draft description");
+
+        Clock.Advance(TimeSpan.FromMilliseconds(250));
+        await submission;
+
+        cut.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value")
+            .ShouldBe("administrator draft name");
+        cut.Find("[data-testid='agents-config-description-input']").GetAttribute("value")
+            .ShouldBe("administrator draft description");
+        cut.Find("[data-testid='agents-config-truth-stage']").TextContent
+            .ShouldContain("Agents.Config.Truth.Stage.ProjectionConfirmed");
+    }
+
+    [Fact]
+    public async Task Polling_exhaustion_preserves_pending_truth_and_stops_further_reads()
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3);
+        AgentSetupView pending = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3,
+            freshness: AgentSetupFreshness.Stale,
+            truthState: AgentSetupTruthState.AuthoritativePending);
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(call =>
+            Task.FromResult(AgentSetupResult.Success(call.ArgAt<int?>(0) is null ? initial : pending)));
+        GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
+            AgentResponseMode.Confirmation,
+            Arg.Any<CancellationToken>()));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
+        Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
+        cut.WaitForAssertion(() => SetupGateway.Received(1).GetSetupAsync(4, Arg.Any<CancellationToken>()));
+
+        for (int tick = 0; tick < 19; tick++)
+        {
+            Clock.Advance(TimeSpan.FromMilliseconds(250));
+            await cut.InvokeAsync(() => Task.CompletedTask);
+        }
+
+        Clock.Advance(TimeSpan.FromMilliseconds(249));
+        await cut.InvokeAsync(() => Task.CompletedTask);
+        submission.IsCompleted.ShouldBeFalse();
+        int readsImmediatelyBeforeTimeout = ExpectedVersionReadCount(4);
+        readsImmediatelyBeforeTimeout.ShouldBeGreaterThan(1);
+        cut.Find("[data-testid='agents-config-truth-stage']").TextContent
+            .ShouldContain("Agents.Config.Truth.Stage.AuthoritativePending");
+
+        Clock.Advance(TimeSpan.FromMilliseconds(1));
+        await submission;
+        ExpectedVersionReadCount(4).ShouldBe(readsImmediatelyBeforeTimeout);
+        Clock.Advance(TimeSpan.FromSeconds(5));
+        await cut.InvokeAsync(() => Task.CompletedTask);
+
+        ExpectedVersionReadCount(4).ShouldBe(readsImmediatelyBeforeTimeout);
+        cut.Find("[data-testid='agents-config-truth-stage']").TextContent
+            .ShouldContain("Agents.Config.Truth.Stage.AuthoritativePending");
+        cut.Find("[data-testid='agents-config-freshness']").TextContent
+            .ShouldContain("Agents.Config.Truth.Freshness.Stale");
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldContain("Agents.Config.Write.Submitted");
+        await SetupGateway.DidNotReceive().GetSetupAsync(
+            Arg.Is<int?>(version => version.HasValue && version.Value != 4),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Disposing_during_polling_cancels_the_lifetime_token_and_prevents_later_reads()
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3);
+        AgentSetupView pending = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3,
+            freshness: AgentSetupFreshness.Stale,
+            truthState: AgentSetupTruthState.AuthoritativePending);
+        CancellationToken pollingToken = default;
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(call =>
+        {
+            if (call.ArgAt<int?>(0) is null)
+            {
+                return Task.FromResult(AgentSetupResult.Success(initial));
+            }
+
+            pollingToken = call.ArgAt<CancellationToken>(1);
+            return Task.FromResult(AgentSetupResult.Success(pending));
+        });
+        GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
+            AgentResponseMode.Confirmation,
+            Arg.Any<CancellationToken>()));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
+        Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
+        cut.WaitForAssertion(() => ExpectedVersionReadCount(4).ShouldBe(1));
+
+        cut.Instance.Dispose();
+        await submission;
+        pollingToken.IsCancellationRequested.ShouldBeTrue();
+        Clock.Advance(TimeSpan.FromSeconds(10));
+
+        ExpectedVersionReadCount(4).ShouldBe(1);
+        cut.Dispose();
+    }
+
+    [Fact]
+    public async Task Disposal_cancels_a_non_cooperative_expected_version_read_without_later_mutation()
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3);
+        TaskCompletionSource<AgentSetupResult> stalledRead = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        CancellationToken readToken = default;
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(call =>
+        {
+            if (call.ArgAt<int?>(0) is null)
+            {
+                return Task.FromResult(AgentSetupResult.Success(initial));
+            }
+
+            readToken = call.ArgAt<CancellationToken>(1);
+            return stalledRead.Task;
+        });
+        GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
+            AgentResponseMode.Confirmation,
+            Arg.Any<CancellationToken>()));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
+        Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
+        cut.WaitForAssertion(() =>
+        {
+            ExpectedVersionReadCount(4).ShouldBe(1);
+            cut.Find("[data-testid='agents-config-write-state']").TextContent
+                .ShouldContain("Agents.Config.Write.Submitted");
+        });
+        string markupAtDisposal = cut.Markup;
+
+        cut.Instance.Dispose();
+        await submission;
+        readToken.IsCancellationRequested.ShouldBeTrue();
+        stalledRead.Task.IsCompleted.ShouldBeFalse();
+        Clock.Advance(TimeSpan.FromSeconds(10));
+
+        ExpectedVersionReadCount(4).ShouldBe(1);
+        cut.Markup.ShouldBe(markupAtDisposal);
+        cut.Dispose();
+    }
+
+    [Theory]
+    [InlineData(AgentInspectionStatus.Unavailable, "Agents.Surface.Unavailable.Title")]
+    [InlineData(AgentInspectionStatus.NotAuthorized, "Agents.Surface.PermissionDenied.Title")]
+    [InlineData(AgentInspectionStatus.AgentNotFound, "Agents.Surface.Empty.Title")]
+    [InlineData(AgentInspectionStatus.Success, "Agents.Surface.Empty.Title")]
+    public async Task A_terminal_retry_result_stops_polling_and_renders_the_typed_failure(
+        AgentInspectionStatus terminalStatus,
+        string expectedSurface)
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3);
+        AgentSetupView pending = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3,
+            freshness: AgentSetupFreshness.Stale,
+            truthState: AgentSetupTruthState.AuthoritativePending);
+        AgentSetupResult terminal = terminalStatus switch
+        {
+            AgentInspectionStatus.Unavailable => AgentSetupResult.Unavailable(),
+            AgentInspectionStatus.NotAuthorized => AgentSetupResult.NotAuthorized(),
+            AgentInspectionStatus.AgentNotFound => AgentSetupResult.NotFound(),
+            _ => new AgentSetupResult(AgentInspectionStatus.Success, Setup: null),
+        };
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(
+            Task.FromResult(AgentSetupResult.Success(initial)),
+            Task.FromResult(AgentSetupResult.Success(pending)),
+            Task.FromResult(terminal));
+        GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
+            AgentResponseMode.Confirmation,
+            Arg.Any<CancellationToken>()));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
+        Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
+        cut.WaitForAssertion(() => ExpectedVersionReadCount(4).ShouldBe(1));
+
+        Clock.Advance(TimeSpan.FromMilliseconds(250));
+        await submission;
+        int readsAtTerminalOutcome = ExpectedVersionReadCount(4);
+        Clock.Advance(TimeSpan.FromSeconds(5));
+        await cut.InvokeAsync(() => Task.CompletedTask);
+
+        readsAtTerminalOutcome.ShouldBe(2);
+        ExpectedVersionReadCount(4).ShouldBe(readsAtTerminalOutcome);
+        cut.Markup.ShouldContain(expectedSurface);
+        cut.FindAll("[data-testid='agents-config-write-state']").ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task A_thrown_retry_preserves_pending_truth_and_reports_write_unavailable()
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3);
+        AgentSetupView pending = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3,
+            freshness: AgentSetupFreshness.Stale,
+            truthState: AgentSetupTruthState.AuthoritativePending);
+        int readNumber = 0;
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            readNumber++;
+            return readNumber switch
+            {
+                1 => Task.FromResult(AgentSetupResult.Success(initial)),
+                2 => Task.FromResult(AgentSetupResult.Success(pending)),
+                _ => throw new InvalidOperationException("retry transport details"),
+            };
+        });
+        GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
+            AgentResponseMode.Confirmation,
+            Arg.Any<CancellationToken>()));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
+        Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
+        cut.WaitForAssertion(() => ExpectedVersionReadCount(4).ShouldBe(1));
+
+        Clock.Advance(TimeSpan.FromMilliseconds(250));
+        await submission;
+
+        cut.Find("[data-testid='agents-config-truth-stage']").TextContent
+            .ShouldContain("Agents.Config.Truth.Stage.AuthoritativePending");
+        cut.Find("[data-testid='agents-config-freshness']").TextContent
+            .ShouldContain("Agents.Config.Truth.Freshness.Stale");
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldContain("Agents.Config.Write.Unavailable");
+        cut.Markup.ShouldNotContain("retry transport details");
+        ExpectedVersionReadCount(4).ShouldBe(2);
     }
 
     [Fact]
@@ -368,6 +696,25 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             // Neither the exception text nor a busy-locked form survives the failure.
             cut.Markup.ShouldNotContain("transport blew up");
             cut.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeFalse();
+        });
+    }
+
+    [Fact]
+    public void A_non_lifetime_gateway_cancellation_reports_the_typed_unavailable_write_outcome()
+    {
+        GivenSetup(AgentUiTestData.Setup(AgentUiTestData.Status(AgentLifecycleStatus.Draft), configurationVersion: 3));
+        SetupGateway.ActivateAsync(Arg.Any<CancellationToken>())
+            .Returns<Task<AgentSetupWriteResult>>(_ => throw new OperationCanceledException("unrelated cancellation"));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-activate']"));
+        cut.Find("[data-testid='agents-config-activate']").Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.Find("[data-testid='agents-config-write-state']").TextContent
+                .ShouldContain("Agents.Config.Write.Unavailable");
+            cut.Markup.ShouldNotContain("unrelated cancellation");
         });
     }
 
@@ -417,27 +764,58 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     }
 
     [Fact]
-    public void The_saved_instructions_are_never_rendered_back_onto_the_page()
+    public async Task Sensitive_instructions_are_cleared_while_a_non_cooperative_immediate_refresh_is_in_flight()
     {
-        GivenSetup(AgentUiTestData.Setup(
+        AgentSetupView initial = AgentUiTestData.Setup(
             AgentUiTestData.Status(AgentLifecycleStatus.Draft, hasInstructions: true, instructionsValid: true),
-            configurationVersion: 3));
+            configurationVersion: 3);
+        TaskCompletionSource<AgentSetupResult> stalledRead = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        CancellationToken readToken = default;
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(call =>
+        {
+            if (call.ArgAt<int?>(0) is null)
+            {
+                return Task.FromResult(AgentSetupResult.Success(initial));
+            }
+
+            readToken = call.ArgAt<CancellationToken>(1);
+            return stalledRead.Task;
+        });
         SetupGateway.UpdateConfigurationAsync(Arg.Any<UpdateAgentConfiguration>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(Accepted()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
         cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-submit']"));
         cut.Find("[data-testid='agents-config-instructions-input']").Change("a very sensitive system prompt");
-        cut.Find("[data-testid='agents-config-submit']").Click();
+        Task submission = cut.Find("[data-testid='agents-config-submit']").ClickAsync(new MouseEventArgs());
 
         cut.WaitForAssertion(() =>
         {
-            // AD-14: after a save the page reports presence/validity/version, never the stored text.
+            ExpectedVersionReadCount(4).ShouldBe(1);
             cut.Markup.ShouldNotContain("a very sensitive system prompt");
+            cut.Find("[data-testid='agents-config-instructions-input']").GetAttribute("value")
+                .ShouldBeNullOrEmpty();
+            cut.Find("[data-testid='agents-config-write-state']").TextContent
+                .ShouldContain("Agents.Config.Write.Submitted");
             cut.Find("[data-testid='agents-config-instructions-presence']").TextContent
                 .ShouldContain("Agents.Config.Instructions.Present");
             cut.Find("[data-testid='agents-config-instructions-version']");
         });
+
+        Clock.Advance(TimeSpan.FromMilliseconds(4_999));
+        await cut.InvokeAsync(() => Task.CompletedTask);
+        submission.IsCompleted.ShouldBeFalse();
+
+        Clock.Advance(TimeSpan.FromMilliseconds(1));
+        await submission;
+
+        readToken.IsCancellationRequested.ShouldBeTrue();
+        stalledRead.Task.IsCompleted.ShouldBeFalse();
+        ExpectedVersionReadCount(4).ShouldBe(1);
+        cut.Find("[data-testid='agents-config-truth-stage']").TextContent
+            .ShouldContain("Agents.Config.Truth.Stage.ProjectionConfirmed");
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldContain("Agents.Config.Write.Submitted");
     }
 
     [Fact]
@@ -457,4 +835,9 @@ public sealed class AgentConfigurationTests : AgentsTestContext
 
     private void GivenAcceptedWrite(Func<IAgentSetupGateway, Task<AgentSetupWriteResult>> write)
         => write(SetupGateway).Returns(Task.FromResult(Accepted()));
+
+    private int ExpectedVersionReadCount(int expectedVersion)
+        => SetupGateway.ReceivedCalls().Count(call =>
+            call.GetMethodInfo().Name == nameof(IAgentSetupGateway.GetSetupAsync)
+            && Equals(call.GetArguments()[0], expectedVersion));
 }

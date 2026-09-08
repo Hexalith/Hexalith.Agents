@@ -1,7 +1,9 @@
 @page "/agents/configuration"
 @attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsAdministratorPolicy)]
+@implements IDisposable
 @inject IStringLocalizer<AgentsResources> Localizer
 @inject IAgentSetupGateway Gateway
+@inject TimeProvider TimeProvider
 
 @* hexa configuration (AC4, AC5, AC6; Story 5.2): a constrained Fluent form (UX-DR15). Identity/instructions/
    provider/content-safety surface presence/validity/version only — never the instruction text or policy content
@@ -217,7 +219,10 @@
 
 @code {
     private const string HeadingId = "agents-config-heading";
+    private static readonly TimeSpan ProjectionPollingInterval = TimeSpan.FromMilliseconds(250);
+    private static readonly TimeSpan ProjectionPollingTimeout = TimeSpan.FromSeconds(5);
 
+    private readonly CancellationTokenSource _lifetimeCancellation = new();
     private FcPageHeader? _header;
     private AgentSetupResult? _result;
     private AgentSetupWriteResult? _pendingWrite;
@@ -227,9 +232,22 @@
     private string _instructionsDraft = string.Empty;
     private bool _focusHeadingPending = true;
     private bool _busy;
+    private bool _disposed;
 
     protected override async Task OnInitializedAsync()
-        => await LoadAsync(expectedConfigurationVersion: null).ConfigureAwait(false);
+    {
+        try
+        {
+            await LoadAsync(
+                expectedConfigurationVersion: null,
+                _lifetimeCancellation.Token,
+                applyAuthoritativeDrafts: true).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (_disposed)
+        {
+            // Component disposal owns this cancellation. No post-navigation state or render is produced.
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -257,14 +275,11 @@
             _displayNameDraft,
             string.IsNullOrWhiteSpace(_descriptionDraft) ? null : _descriptionDraft,
             _instructionsDraft);
+        _instructionsDraft = string.Empty;
 
         await SubmitAsync(
             ct => Gateway.UpdateConfigurationAsync(command, ct),
             bumpsConfigurationVersion: true).ConfigureAwait(false);
-
-        // Whatever the outcome, the sensitive draft leaves the page: the saved instructions are only ever
-        // reported as presence, validity, and version (AD-14).
-        _instructionsDraft = string.Empty;
     }
 
     private Task SubmitResponseModeAsync()
@@ -291,6 +306,8 @@
         _busy = true;
         try
         {
+            CancellationToken cancellationToken = _lifetimeCancellation.Token;
+
             // Configuration writes bump the configuration version, so the catch-up read asks for current+1.
             // Activation and disabling only move the lifecycle flag and leave the version alone: asking for
             // current+1 there would report an up-to-date projection as permanently behind.
@@ -298,39 +315,125 @@
                 ? setup.ConfigurationVersion + (bumpsConfigurationVersion ? 1 : 0)
                 : null;
 
-            _pendingWrite = await write(CancellationToken.None).ConfigureAwait(false);
+            AgentSetupWriteResult writeResult = await write(cancellationToken)
+                .WaitAsync(cancellationToken)
+                .ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            _pendingWrite = writeResult;
             if (_pendingWrite.Status is AgentSetupWriteStatus.Submitted)
             {
-                await LoadAsync(expectedVersion).ConfigureAwait(false);
+                await RequestRenderAsync(cancellationToken).ConfigureAwait(false);
+                bool projectionConfirmed = await RefreshAfterWriteAsync(expectedVersion, cancellationToken)
+                    .ConfigureAwait(false);
 
                 // Once the catch-up read shows durable truth, the submitted notice has been superseded and would
                 // otherwise leave the page claiming a write is still in flight.
-                if (_result?.Setup is { TruthState: AgentSetupTruthState.ProjectionConfirmed })
+                if (projectionConfirmed)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     _pendingWrite = null;
                 }
             }
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (OperationCanceledException) when (_disposed)
+        {
+            // Navigation/disposal cancels the write, read, delay, or non-cooperative awaited task and exits quietly.
+        }
+        catch (Exception)
         {
             // A gateway that throws is a failed write, not a silent one: report the fail-closed status instead of
             // leaving the page on its pre-write state with no outcome (AD-12), and never surface the raw error.
-            _pendingWrite = AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
+            if (!_disposed)
+            {
+                _pendingWrite = AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
+            }
         }
         finally
         {
-            _busy = false;
+            if (!_disposed)
+            {
+                _busy = false;
+            }
         }
     }
 
-    private async Task LoadAsync(int? expectedConfigurationVersion)
+    private async Task<bool> RefreshAfterWriteAsync(
+        int? expectedConfigurationVersion,
+        CancellationToken cancellationToken)
     {
-        _result = await Gateway.GetSetupAsync(expectedConfigurationVersion, CancellationToken.None).ConfigureAwait(false);
-        if (_result.Setup is { } setup)
+        using CancellationTokenSource timeoutCancellation = new(ProjectionPollingTimeout, TimeProvider);
+        using CancellationTokenSource pollingCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+            cancellationToken,
+            timeoutCancellation.Token);
+
+        try
+        {
+            await LoadAsync(
+                expectedConfigurationVersion,
+                pollingCancellation.Token,
+                applyAuthoritativeDrafts: true).ConfigureAwait(false);
+            if (_result?.Setup is not { TruthState: AgentSetupTruthState.AuthoritativePending })
+            {
+                return _result?.Setup is { TruthState: AgentSetupTruthState.ProjectionConfirmed };
+            }
+
+            await RequestRenderAsync(pollingCancellation.Token).ConfigureAwait(false);
+            while (_result?.Setup is { TruthState: AgentSetupTruthState.AuthoritativePending })
+            {
+                await Task.Delay(ProjectionPollingInterval, TimeProvider, pollingCancellation.Token).ConfigureAwait(false);
+                await LoadAsync(
+                    expectedConfigurationVersion,
+                    pollingCancellation.Token,
+                    applyAuthoritativeDrafts: false).ConfigureAwait(false);
+            }
+
+            return _result?.Setup is { TruthState: AgentSetupTruthState.ProjectionConfirmed };
+        }
+        catch (OperationCanceledException) when (
+            timeoutCancellation.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+        {
+            // Exhaustion preserves the last authoritative-pending view and its Submitted notice.
+            return false;
+        }
+    }
+
+    private async Task LoadAsync(
+        int? expectedConfigurationVersion,
+        CancellationToken cancellationToken,
+        bool applyAuthoritativeDrafts)
+    {
+        AgentSetupResult result = await Gateway
+            .GetSetupAsync(expectedConfigurationVersion, cancellationToken)
+            .WaitAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        cancellationToken.ThrowIfCancellationRequested();
+        _result = result;
+        if (applyAuthoritativeDrafts && _result.Setup is { } setup)
         {
             _responseMode = setup.Agent.ResponseMode;
             _displayNameDraft = setup.Agent.DisplayName;
             _descriptionDraft = setup.Agent.Description ?? string.Empty;
         }
+    }
+
+    private Task RequestRenderAsync(CancellationToken cancellationToken)
+        => InvokeAsync(() =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            StateHasChanged();
+        });
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        _lifetimeCancellation.Cancel();
+        _lifetimeCancellation.Dispose();
     }
 }

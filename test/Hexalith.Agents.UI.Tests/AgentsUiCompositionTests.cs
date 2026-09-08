@@ -36,6 +36,7 @@ public sealed class AgentsUiCompositionTests
         services.Single(d => d.ServiceType == typeof(IAuditEvidenceGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
         // Story 4.4 — the launch-readiness read gateway is registered scoped + fail-closed.
         services.Single(d => d.ServiceType == typeof(ILaunchReadinessGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
+        services.Single(d => d.ServiceType == typeof(TimeProvider)).Lifetime.ShouldBe(ServiceLifetime.Singleton);
 
         using ServiceProvider provider = services.BuildServiceProvider();
         using IServiceScope scope = provider.CreateScope();
@@ -48,6 +49,7 @@ public sealed class AgentsUiCompositionTests
         scope.ServiceProvider.GetRequiredService<IOperationalStatusGateway>().ShouldBeOfType<DeferredOperationalStatusGateway>();
         scope.ServiceProvider.GetRequiredService<IAuditEvidenceGateway>().ShouldBeOfType<DeferredAuditEvidenceGateway>();
         scope.ServiceProvider.GetRequiredService<ILaunchReadinessGateway>().ShouldBeOfType<DeferredLaunchReadinessGateway>();
+        scope.ServiceProvider.GetRequiredService<TimeProvider>().ShouldBeSameAs(TimeProvider.System);
     }
 
     [Fact]
@@ -59,6 +61,20 @@ public sealed class AgentsUiCompositionTests
         services.AddAgentsUi();
 
         services.Count(d => d.ServiceType == typeof(IAgentSetupGateway)).ShouldBe(1);
+    }
+
+    [Fact]
+    public void AddAgentsUi_does_not_override_an_existing_time_provider_registration()
+    {
+        ServiceCollection services = new();
+        TimeProvider clock = new FixedTimeProvider(new DateTimeOffset(2026, 9, 8, 12, 0, 0, TimeSpan.Zero));
+        services.AddSingleton(clock);
+
+        services.AddAgentsUi();
+
+        services.Count(d => d.ServiceType == typeof(TimeProvider)).ShouldBe(1);
+        using ServiceProvider provider = services.BuildServiceProvider();
+        provider.GetRequiredService<TimeProvider>().ShouldBeSameAs(clock);
     }
 
     // ===== Story 5.2: the live setup composition =====

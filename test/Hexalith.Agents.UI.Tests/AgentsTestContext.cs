@@ -17,6 +17,7 @@ using Hexalith.FrontComposer.Testing;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Time.Testing;
 
 using NSubstitute;
 
@@ -130,8 +131,8 @@ public abstract class AgentsTestContext : FrontComposerTestBase
     /// <summary>The substituted launch-readiness read gateway (defaults to the fail-closed result; Story 4.4).</summary>
     protected ILaunchReadinessGateway LaunchReadinessGateway { get; } = Substitute.For<ILaunchReadinessGateway>();
 
-    /// <summary>The deterministic clock injected into the proposal queue so the rendered "age" bucket is stable.</summary>
-    protected FixedTimeProvider Clock { get; } = new(new DateTimeOffset(2026, 6, 24, 12, 0, 0, TimeSpan.Zero));
+    /// <summary>The deterministic clock injected into timer-driven pages.</summary>
+    protected FakeTimeProvider Clock { get; } = new(new DateTimeOffset(2026, 6, 24, 12, 0, 0, TimeSpan.Zero));
 
     /// <summary>The bUnit authorization context (default: unauthenticated).</summary>
     protected BunitAuthorizationContext Authorization { get; }

@@ -44,8 +44,8 @@ public sealed class AccessibilityTests : AgentsTestContext
         {
             IElement[] anchors = cut.FindAll("a[href]").Take(2).ToArray();
             anchors.Length.ShouldBe(2);
-            anchors[0].GetAttribute("href").ShouldBe("#fc-main-content");
-            anchors[1].GetAttribute("href").ShouldBe("#fc-nav");
+            anchors[0].GetAttribute("href").ShouldBe("/#fc-main-content");
+            anchors[1].GetAttribute("href").ShouldBe("/#fc-nav");
 
             IElement content = cut.Find("#fc-main-content");
             content.GetAttribute("role").ShouldBe("main");
