@@ -3,7 +3,7 @@ name: Hexalith Agents
 description: FrontComposer web UI for governed AI participants in Hexalith Conversations. Fluent UI Blazor v5 is inherited; this spine specifies the Agents-specific semantic delta only.
 status: final
 created: 2026-06-23
-updated: 2026-08-02
+updated: 2026-09-08
 sources:
   - ../../briefs/brief-agents-2026-06-23/brief.md
   - ../../prds/prd-agents-2026-06-23/prd.md
@@ -12,6 +12,9 @@ sources:
   - ../../sprint-change-proposal-2026-08-02.md
   - ../../architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md
   - ../../launch-readiness-register.md
+  - ../../external-dependency-register.md
+  - ../../epics.md
+  - ./reconcile-validation-2026-09-08.md
   - ../../../../references/Hexalith.Tenants/_bmad-output/planning-artifacts/ux-designs/ux-tenants-2026-06-02/DESIGN.md
   - ../../../../references/Hexalith.FrontComposer/_bmad-output/project-context.md
   - ../../../../references/Hexalith.FrontComposer/docs/reference/components/front-composer-shell.md
@@ -19,32 +22,32 @@ sources:
   - ../../../../references/Hexalith.FrontComposer/docs/reference/components/datagrid.md
 colors:
   status-success:
-    note: 'Inherit Fluent BadgeColor.Success. Reserved for authoritatively proven callable Agent readiness, posted Conversation Messages, current passing evidence, and projection-confirmed completed operations.'
+    note: 'Inherit Fluent BadgeColor.Success. Proven truth only; see Colors.'
   status-informative:
-    note: 'Inherit Fluent BadgeColor.Informative. Used for submitted or authoritative-pending commands, generation in progress, proposal pending, approved, posting pending, readiness checking, and other nonterminal progress.'
+    note: 'Inherit Fluent BadgeColor.Informative. In progress or waiting; see Colors.'
   status-warning:
-    note: 'Inherit Fluent BadgeColor.Warning. Used for expiring proposals, latency/cost warnings, and Provider Degraded only when the architecture result also reports Callability == Callable.'
+    note: 'Inherit Fluent BadgeColor.Warning. Attention soon; see Colors.'
   status-severe:
-    note: 'Inherit Fluent BadgeColor.Severe. Used for blocked readiness, disabled provider/model, disabled Agent, expired proposal, unavailable dependency, or fail-closed call state.'
+    note: 'Inherit Fluent BadgeColor.Severe. Blocked, not a runtime failure; see Colors.'
   status-danger:
-    note: 'Inherit Fluent BadgeColor.Danger. Used sparingly for rejected proposals, failed generation, failed posting, denied authorization, and provider/runtime failures.'
+    note: 'Inherit Fluent BadgeColor.Danger. Failure or denial; see Colors.'
   status-important:
-    note: 'Inherit Fluent BadgeColor.Important. Used when state is uncertain or must be resolved before side effects: ambiguous Party identity, missing/stale policy basis, indeterminate budget reservation, or incomplete deletion confirmation.'
+    note: 'Inherit Fluent BadgeColor.Important. Uncertain, must resolve before side effects; see Colors.'
   status-subtle:
-    note: 'Inherit Fluent BadgeColor.Subtle. Used for disabled but valid options, abandoned proposals, read-only inspection, no activity, and non-actionable history.'
+    note: 'Inherit Fluent BadgeColor.Subtle. Quiet history or non-actionable; see Colors.'
   brand-accent:
-    note: 'Inherit Fluent BadgeColor.Brand / FrontComposer theme accent. Used for primary eligible actions and selected navigation only, never as a status.'
+    note: 'Inherit Fluent BadgeColor.Brand / FrontComposer theme accent. Chrome and primary action only, never a status.'
 typography:
   body:
-    note: 'Inherit Fluent / system body ramp for operational copy and generated-response previews.'
+    note: 'Inherit Fluent / system body ramp.'
   label:
-    note: 'Inherit Fluent / system label ramp for field labels, policy labels, column headers, and status labels.'
+    note: 'Inherit Fluent / system label ramp.'
   heading:
-    note: 'Inherit Fluent / system heading ramp for page and panel titles. No hero/display scale in the admin surface.'
+    note: 'Inherit Fluent / system heading ramp. No hero/display scale.'
   caption:
-    note: 'Inherit Fluent / system caption ramp for secondary metadata, provider/model details, trace references, and help text.'
+    note: 'Inherit Fluent / system caption ramp.'
   mono:
-    note: 'Inherit Fluent / system monospace role for AgentId, PartyId, ConversationId, proposal references, provider/model identifiers, timestamps, and support-safe audit references.'
+    note: 'Inherit Fluent / system monospace role for identifiers, versions, and timestamps.'
 rounded:
   note: 'Inherit Fluent UI Blazor v5 and FrontComposer shape defaults. Do not invent custom radii.'
 spacing:
@@ -56,230 +59,310 @@ spacing:
   '8': 32px
 components:
   agent-readiness-badge:
-    color: '{colors.status-success} | {colors.status-informative} | {colors.status-warning} | {colors.status-severe} | {colors.status-important}'
+    color: '{colors.status-success} | {colors.status-informative} | {colors.status-severe} | {colors.status-important}'
+    appearance: 'FluentBadge BadgeAppearance.Tint; Filled for Severe'
     typography: '{typography.label}'
     gap: '{spacing.1}'
   provider-status-badge:
-    color: '{colors.status-success} | {colors.status-warning} | {colors.status-severe} | {colors.status-danger} | {colors.status-subtle}'
+    color: '{colors.status-success} | {colors.status-warning} | {colors.status-severe} | {colors.status-danger} | {colors.status-important} | {colors.status-subtle}'
+    appearance: 'FluentBadge BadgeAppearance.Tint; Filled for Danger and Severe'
     typography: '{typography.label}'
     gap: '{spacing.1}'
   proposal-state-badge:
-    color: '{colors.status-success} | {colors.status-informative} | {colors.status-warning} | {colors.status-severe} | {colors.status-danger} | {colors.status-subtle}'
+    color: '{colors.status-success} | {colors.status-informative} | {colors.status-warning} | {colors.status-severe} | {colors.status-danger} | {colors.status-important} | {colors.status-subtle}'
+    appearance: 'FluentBadge BadgeAppearance.Tint; Filled for Danger and Severe'
     typography: '{typography.label}'
     gap: '{spacing.1}'
   response-mode-toggle:
-    base: 'Fluent segmented control or radio group'
+    base: 'FluentRadioGroup with two FluentRadio options'
     selected: '{colors.brand-accent}'
     gap: '{spacing.2}'
   agent-config-form:
-    base: 'FrontComposer / Fluent form primitives'
-    layout: 'Constrained page measure'
+    base: 'FrontComposer / Fluent form primitives inside FcAggregateDetailPage'
+    layout: 'Constrained'
     fieldGap: '{spacing.4}'
     sectionGap: '{spacing.6}'
   approver-policy-builder:
-    base: 'Fluent form controls plus policy-source rows'
-    layout: 'Constrained page measure; row-based policy sources'
+    base: 'Fluent form controls plus policy-source rows with FluentButton move up/down'
+    layout: 'Constrained; row-based policy sources'
     rowGap: '{spacing.3}'
   provider-catalog-grid:
-    base: 'FrontComposer FC-TBL / FluentDataGrid'
-    pinnedColumns: 'Provider name, enabled state, capability status'
+    base: 'Hand-authored FluentDataGrid inside FcAggregateListPage'
+    pinnedColumns: 'Provider name, model, enabled state, configured state, readiness, pricing version, CapabilityVersion'
     rowPadding: '{spacing.3}'
   proposal-queue-grid:
-    base: 'FrontComposer FC-TBL / FluentDataGrid'
-    pinnedColumns: 'Proposal state, source conversation, caller, expiry'
+    base: 'Hand-authored FluentDataGrid inside FcAggregateListPage'
+    pinnedColumns: 'Proposal state, Source Conversation, caller, approver responsibility, expiry, age'
     rowPadding: '{spacing.3}'
   proposal-editor:
-    base: 'Fluent textarea/editor region with adjacent metadata'
-    layout: 'Constrained editor region with version and action rail'
+    base: 'FluentTextArea editor region with metadata and action rail'
+    layout: 'Constrained; stacked; editor is the primary region'
     padding: '{spacing.4}'
   version-history:
-    base: 'Fluent list or DataGrid detail panel'
+    base: 'FluentRadioGroup version list inside a FluentAccordionItem'
     timestamp: '{typography.mono}'
     rowGap: '{spacing.2}'
   conversation-agent-call:
-    base: 'Conversation-owned Call hexa action plus Fluent prompt dialog/panel'
+    base: 'Conversation-owned Call hexa FluentButton opening a FluentDialog prompt surface'
     selected: '{colors.brand-accent}'
     gap: '{spacing.2}'
+  agent-response-marker:
+    base: 'Inline FluentBadge rendered beside a posted hexa Conversation Message'
+    color: '{colors.status-subtle}'
+    appearance: 'FluentBadge BadgeAppearance.Tint'
+    typography: '{typography.caption}'
+    gap: '{spacing.1}'
   conversation-context-policy-panel:
-    base: 'Read-only FluentAccordion when two or more titled sections are present'
-    layout: 'Constrained page measure; effective full-or-blocked policy and model budget'
+    base: 'Read-only definition list inside FluentAccordion'
+    layout: 'Constrained; effective policy is the primary region'
     sectionGap: '{spacing.4}'
   content-safety-policy-editor:
-    base: 'Fluent form primitives in FluentAccordion when two or more titled sections are present'
-    layout: 'Constrained page measure; fixed categories, restricted handling, version validation, publish'
+    base: 'Fluent form primitives inside FluentAccordion'
+    layout: 'Constrained; current effective policy is the primary region'
     sectionGap: '{spacing.4}'
   cost-control-editor:
-    base: 'Fluent numeric form controls and status regions in FluentAccordion when two or more titled sections are present'
-    layout: 'Constrained authoring plus full-width usage and reservation evidence'
+    base: 'FluentNumberInput and FluentSelect controls with FluentBadge consumption rows inside FluentAccordion'
+    layout: 'Constrained; current caps and consumption are the primary region'
     sectionGap: '{spacing.4}'
   launch-readiness-panel:
-    base: 'FluentDataGrid plus FluentAccordion for titled metric and evidence groups'
-    layout: 'Full-width evidence view; blockers precede passing metrics'
+    base: 'FluentDataGrid of gate records plus FluentAccordion for metric and evidence groups'
+    layout: 'FullWidth; blockers precede passing records'
     sectionGap: '{spacing.4}'
   audit-governance-panel:
-    base: 'Fluent form and status primitives in FluentAccordion when two or more titled sections are present'
-    layout: 'Constrained policy authoring plus full-width export/deletion evidence'
+    base: 'Fluent form and FluentBadge status primitives inside FluentAccordion'
+    layout: 'Constrained; retention and hold state is the primary region'
     sectionGap: '{spacing.4}'
   proposal-notification:
-    base: 'FrontComposer in-product status/notification entry with Fluent badge and accessible text'
+    base: 'IBadgeCountService count on the Proposal queue nav entry, wrapped by a domain-named link'
+    color: '{colors.status-informative}'
+    appearance: 'FluentBadge BadgeAppearance.Tint'
     gap: '{spacing.2}'
   operational-status-panel:
-    base: 'Fluent MessageBar / status region'
+    base: 'FluentBadge rows grouped by recovery; FluentMessageBar for page-level notices only'
     padding: '{spacing.4}'
     itemGap: '{spacing.3}'
   audit-evidence-panel:
-    base: 'Fluent MessageBar or details panel'
+    base: 'Definition list and FluentBadge rows; FluentMessageBar for page-level notices only'
     timestamp: '{typography.mono}'
     reference: '{typography.mono}'
     padding: '{spacing.4}'
+  high-impact-confirmation:
+    base: 'Focus-trapped FluentDialog'
+    layout: 'Constrained dialog; one localized body string; cancel receives initial focus'
+    confirm: 'FluentButton Appearance.Accent using {colors.brand-accent}, never the default button'
+    padding: '{spacing.4}'
+  pending-command-indicator:
+    base: 'Activated FluentButton with aria-disabled plus adjacent FluentBadge status text'
+    color: '{colors.status-informative} | {colors.status-severe}'
+    appearance: 'FluentBadge BadgeAppearance.Tint'
+    typography: '{typography.label}'
+    gap: '{spacing.2}'
 ---
 
 ## Brand & Style
 
-Hexalith Agents is a governed operational tool, not a chat novelty and not a marketing surface. It should feel like the rest of the Hexalith admin ecosystem: calm, precise, dense enough for repeated use, and explicit about what the system knows before it allows side effects. The first visible Agent is `hexa`, but the visual system should not turn `hexa` into a mascot. The product signal is named, attributable AI participation inside Conversations.
+Hexalith Agents is a governed operational tool, not a chat novelty and not a marketing surface. It should feel like the rest of the Hexalith admin ecosystem: calm, precise, dense enough for repeated use, and explicit about what the system knows before it allows side effects. The first visible Agent is `hexa`, but the visual system does not turn `hexa` into a mascot. The product signal is named, attributable AI participation inside Conversations.
 
-This is a FrontComposer inheritance spec. Hexalith Agents inherits the FrontComposer shell and Microsoft Fluent UI Blazor v5 components. There is no bespoke palette, type ramp, shadow language, or custom shape system to invent. The delta is semantic: Agent readiness, provider readiness, proposal state, approval state, version history, posting outcome, and audit evidence need consistent meaning so administrators and approvers never confuse a draft with a Conversation Message.
+This is a FrontComposer inheritance spec. Hexalith Agents inherits the FrontComposer shell and Microsoft Fluent UI Blazor v5, pinned as `Microsoft.FluentUI.AspNetCore.Components` `5.0.0-rc.5-26219.1` and owned by `Directory.Packages.props`. Every inherit-by-name role below is verified against that pin at build and re-verified when the pin changes. There is no bespoke palette, type ramp, shadow language, or custom shape system. The delta is semantic: Agent readiness, Provider readiness, proposal state, approval state, version history, posting outcome, and audit evidence need consistent meaning so administrators and approvers never confuse a draft with a Conversation Message.
 
-The surface is not classified as regulated UX, but it is governed operational UX. That means provider secrets are never displayed, authorization failures are plain and safe, proposed replies remain visually distinct from Conversation Messages, and version/audit evidence is legible without adding compliance-heavy language beyond source requirements.
+Icons come from the curated inline-SVG `FcFluentIcons` factory only, never from the Fluent icons NuGet. Curated today: Apps, BuildingPeople, ChevronRight, DevMode, DeveloperBoard, Navigation, People, PersonBoard, Search, Settings. A glyph the curated set lacks becomes a FrontComposer request; it is never silently replaced by a nearby glyph.
+
+Icon requests:
+
+| Use | Glyph today | Request |
+|---|---|---|
+| Overview nav | `Regular.Size20.Apps` | none |
+| `hexa` configuration nav | `Regular.Size20.Settings` | none |
+| Provider catalog nav | `Regular.Size20.DevMode` | none |
+| Approver policy nav | `Regular.Size20.People` | none |
+| Proposal queue nav | `Regular.Size20.Navigation` | inbox or queue |
+| Operational status nav, Audit evidence nav | `Regular.Size20.Search` | history glyph for audit |
+| Conversation context policy nav | none | document |
+| Content safety policy nav | none | shield |
+| Cost controls nav | none | budget |
+| Launch readiness nav | none | launch |
+| Audit governance nav | none | history |
+| Status roles | see § Colors | checkmark circle, clock or progress ring, warning triangle, prohibited circle, dismiss circle, question circle |
+
+Until a request lands, the nav entry keeps the glyph listed under "Glyph today" or renders without a glyph; it never reuses another entry's glyph.
+
+The surface is governed operational UX, not regulated UX. Provider secrets are never displayed or entered, authorization failures are plain and safe, proposed replies stay visually distinct from Conversation Messages, and version and audit evidence is legible without compliance-heavy language beyond source requirements.
 
 ## Colors
 
-Colors inherit Fluent semantic roles by name. Bind meaning to role, never to hex. `Brand` is chrome and eligible primary action only; it is not a state color.
+Colors inherit Fluent semantic roles by name. Bind meaning to role, never to hex. `{colors.brand-accent}` is chrome and eligible primary action only; it is not a state color.
 
-- `{colors.status-success}` means authoritatively proven or complete: current callable Agent readiness, `Ready / Callable / None` Provider readiness, `posted` Conversation Message, current passing evidence, or projection-confirmed completed operation.
-- `{colors.status-informative}` means in progress or waiting: submitted or authoritative-pending command, generation running, proposal pending, approval waiting, `approved`, `posting pending`, or readiness checking.
-- `{colors.status-warning}` means attention soon: proposal nearing expiry, `Degraded / Callable / NonBlockingOperationalWarning` Provider readiness, context near model limit, or cost/latency warning where a launch policy defines one.
-- `{colors.status-severe}` means blocked but not a runtime failure: disabled Agent, disabled provider/model, expired proposal, missing Party identity, missing Conversation access, unavailable dependency.
-- `{colors.status-danger}` means failure or denial: authorization denied, generation failed, posting failed, proposal rejected, provider error.
-- `{colors.status-important}` means state is uncertain and must be resolved before side effects: ambiguous identity, missing/stale policy basis, indeterminate budget reservation, or incomplete restrictive deletion confirmation.
-- `{colors.status-subtle}` means quiet history or non-actionable state: abandoned proposal, disabled but valid option, no pending proposals, read-only inspection.
+- `{colors.status-success}` means proven: authoritatively callable Agent readiness at the current `RegistryRevision`, `Ready / Callable / None` Provider readiness within `ValidUntil`, `Posted`, current passing evidence, or a `ProjectionConfirmed` completed operation.
+- `{colors.status-informative}` means in progress or waiting: `Submitted`, `AuthoritativePending`, `awaiting projection`, `catching up`, generating, `Pending`, `Edited`, `Regenerated`, `Approved`, `PostingPending`, capacity queued, checking.
+- `{colors.status-warning}` means attention soon: nearing expiry, `Degraded / Callable / NonBlockingOperationalWarning`, 80% budget consumption, a zero-priced model, a latency warning defined by launch policy.
+- `{colors.status-severe}` means blocked but not a runtime failure: disabled Agent or Provider/model, `Expired`, `active, not proven callable`, context blocked, safety blocked, budget blocked, capacity rejected, unconfigured cap or rate limit, `Stale` evidence, missing Party identity, unavailable dependency, pending in another session.
+- `{colors.status-danger}` means failure or denial: denied, generation failed, `PostingFailed`, `Rejected`, Provider error, superseded by another decision.
+- `{colors.status-important}` means uncertain and must resolve before side effects: `authority unresolved`, ambiguous Party identity, missing or outdated policy basis, unknown outcome with a held reservation, pricing currency mismatch, incomplete restrictive deletion confirmation.
+- `{colors.status-subtle}` means quiet history or non-actionable: `Abandoned`, disabled but valid historical option, read-only inspection, existence only, deferred metric, no activity, and `Unknown` Provider readiness rendered before Story 5.5 ships `ProviderReadinessResult`.
 
-No-color-only is mandatory under the binding WCAG 2.2 AA floor. Every status appears as a Fluent semantic role plus icon plus visible text and accessible name. The icon vocabulary should be verified against the pinned Fluent UI package at build, following the Tenants precedent. Do not rely on provider logos or model brand colors to carry status.
+`Stale` is reserved for readiness or Provider evidence whose `ValidUntil` has passed. Projection lag is `catching up` in `{colors.status-informative}` and never borrows the `Stale` role.
+
+Contrast targets are WCAG 2.2 AA: 4.5:1 for text, 3:1 for non-text and focus indicators, in Light, Dark, and forced-colors. Inherited Fluent role pairs are assumed AA at the pinned package and re-verified when the pin changes; the Agents-owned axe lane in `EXPERIENCE.md § Accessibility Floor` proves it per route. In forced-colors the OS may override badge fill, so icon plus text carry the meaning alone.
+
+No-color-only is mandatory. Every status renders as a Fluent semantic role plus one glyph plus visible whole-string text and an accessible name. `BadgeAppearance.Tint` is the calm default; `BadgeAppearance.Filled` is reserved for Danger and Severe as emphasis and does not count toward no-color-only. Provider logos and model brand colors never carry status.
+
+One glyph per role, from `FcFluentIcons`; requests are listed under § Brand & Style:
+
+| Role | Glyph |
+|---|---|
+| `{colors.status-success}` | FrontComposer request: checkmark circle |
+| `{colors.status-informative}` | FrontComposer request: clock or progress ring |
+| `{colors.status-warning}` | FrontComposer request: warning triangle |
+| `{colors.status-severe}` | FrontComposer request: prohibited circle |
+| `{colors.status-danger}` | FrontComposer request: dismiss circle |
+| `{colors.status-important}` | FrontComposer request: question circle |
+| `{colors.status-subtle}` | `Regular.Size20.Navigation` (list marker for history and read-only) |
+
+`FluentMessageBar` carries only Success, Warning, Error, and Info, so it is restricted to page-level notices. Per-item state uses `FluentBadge`, which carries the full role palette.
 
 ## Typography
 
-Typography inherits Fluent. Use `{typography.heading}` for page and panel titles, `{typography.body}` for operational copy and preview text, `{typography.label}` for fields and state labels, `{typography.caption}` for metadata, and `{typography.mono}` for exact identifiers and timestamps.
+Typography inherits Fluent. Use `{typography.heading}` for page and panel titles, `{typography.body}` for operational copy and preview text, `{typography.label}` for fields and state labels, `{typography.caption}` for metadata, and `{typography.mono}` for identifiers, projection ids and versions, `RegistryRevision`, `CapabilityVersion`, pricing versions, and timestamps.
 
-Generated reply content may be longer and more prose-like than the surrounding admin UI, but it should still use the inherited body role inside a bounded preview/editor region. Do not introduce editorial display typography for AI text; it would make generated content feel more authoritative than it is.
+Generated reply content may be longer and more prose-like than the surrounding admin UI, but it uses the inherited body role inside a bounded preview or editor region. No editorial display typography for AI text; it would make generated content feel more authoritative than it is.
 
-All labels, states, denial reasons, expiry notices, provider/model names, approval actions, and audit references must be localizable whole strings. English and French resource keys must remain at exact parity. Do not assemble approval, posting, failure, readiness, or audit sentences from fragments at runtime. Missing keys or conditional localization skips are conformance failures, not acceptable fallback behavior.
+Every visible string is a localizable whole string with named placeholders; the resource type, key convention, parity gate, and formatting rules are in `EXPERIENCE.md § Voice and Tone`.
 
 ## Layout & Spacing
 
-Use FrontComposer page measures deliberately:
+One `FcPageLayoutMode` per route; hybrid measures do not exist in FC-LYT.
 
-- FullWidth for read-heavy grids: provider catalog, proposal queue, operational status lists, audit lists.
-- Constrained for forms and judgment-heavy flows: `hexa` configuration, provider edit, approver policy, proposal editor, approval confirmation.
+- FullWidth: Agents overview, Provider catalog, Proposal queue, Operational status, Launch readiness, Audit evidence list.
+- Constrained: `hexa` configuration, Approver policy, Conversation context policy, Content safety policy, Cost controls, Proposal detail/editor, Audit evidence detail, Audit governance. Evidence lists for cost and governance live on the FullWidth status and audit routes.
 
-Spacing follows the Fluent-compatible 4px rhythm in frontmatter. Use `{spacing.4}` between related form fields, `{spacing.6}` between major sections, and `{spacing.8}` only for page-level separation. Avoid decorative card grids. These are admin workflows; dense tables, forms, panels, split views, tabs, and inline status regions should do the work.
+Spacing follows the Fluent-compatible 4px rhythm in frontmatter: `{spacing.4}` between related fields, `{spacing.6}` between major sections, `{spacing.8}` only for page-level separation. No decorative card grids; dense tables, forms, panels, and inline status regions do the work.
 
-Reserve stable space for status badges, action slots, expiry labels, and proposal state indicators so rows do not jump when a proposal changes state or a call transitions from generation to posting.
+A route with two or more sibling titled content sections uses one `FluentAccordion` with one `FluentAccordionItem` per section, the primary item expanded. Page title, breadcrumbs, toolbar, navigation chrome, and the single primary content region stay outside the accordion; the primary content is never hidden behind an accordion interaction. Accordion titles are h2, in-panel sections h3.
 
-A page, dialog, or detail panel with two or more sibling titled content sections uses one `FluentAccordion` with one `FluentAccordionItem` per section and the primary item expanded by default. Keep page titles, breadcrumbs, toolbars, navigation chrome, and a single primary content region outside the accordion. Never hide the only primary content behind an accordion interaction.
+| Surface | Primary region (outside the accordion) | Accordion items |
+|---|---|---|
+| Agents overview | Readiness summary | Blockers; Recent activity |
+| Provider catalog | The grid | Editor |
+| Proposal detail | The editor | Metadata; Version history; Audit link |
+| Policy surfaces | The current effective policy | Draft; Authoring; History |
+
+Layout keeps focus reachable and mirrors correctly: sticky headers, pinned columns, and action rails never overlap the focused row, so scroll padding equals the sticky heights; rails, pinned columns, and version lists use logical `inline-start` and `inline-end` for RTL locales. Reflow, target size, and the other WCAG criteria are in `EXPERIENCE.md § Accessibility Floor`.
+
+Reserve stable space for status badges, action slots, expiry labels, and pending indicators so rows do not jump when a proposal changes state or a call moves from generating to posting.
 
 ## Elevation & Depth
 
-Inherit Fluent and FrontComposer. Elevation exists for transient overlays, popovers, dialogs, and focus-trapped confirmation surfaces. It should not be used to imply audit certainty or proposal importance. Hierarchy comes from layout, labels, state badges, and section grouping.
+Inherit Fluent and FrontComposer. Elevation exists for transient overlays, popovers, and the focus-trapped `high-impact-confirmation` dialog. It never implies audit certainty or proposal importance; hierarchy comes from layout, labels, state badges, and section grouping.
 
 ## Shapes
 
-Inherit Fluent shapes. Do not add custom radii for Agent surfaces. Status badges and chips follow Fluent badge shapes; forms, editors, panels, dialogs, and grids follow FrontComposer/Fluent defaults.
+Inherit Fluent shapes. No custom radii for Agent surfaces. Status badges and chips follow Fluent badge shapes; forms, editors, panels, dialogs, and grids follow FrontComposer and Fluent defaults.
 
 ## Components
 
+Each section is the visual binding only. Behavior, inputs, and events are in the matching `EXPERIENCE.md § Component Patterns` row.
+
 ### agent-readiness-badge
 
-Shows whether `hexa` is callable. It combines Agent lifecycle, Party identity, provider/model readiness, instructions validity, response mode, approver policy completeness, and authoritative gate evidence into a readable readiness indicator. Lifecycle `active` is not proof of callability. Use `{colors.status-success}` only when the current authoritative readiness projection proves the Agent callable; missing, blocked, stale, or `InsufficientEvidence` results never use Success.
+`FluentBadge` with `{typography.mono}` chips beside it for `EnvironmentProfile`, gate-set name, matrix version, and `RegistryRevision`. `callable` renders `{colors.status-success}`; `checking` renders `{colors.status-informative}`; `active, not proven callable` and `stale` render `{colors.status-severe}`; `authority unresolved` renders `{colors.status-important}`. Lifecycle `active` is a separate `{colors.status-subtle}` chip. Production enablement is a separate indicator, Success only when `RQ-1` records READY.
 
 ### provider-status-badge
 
-Shows the architecture-owned `ProviderReadinessResult` without exposing secrets. `Ready / Callable / None` may use `{colors.status-success}`. `Degraded / Callable / NonBlockingOperationalWarning` always uses `{colors.status-warning}` and remains callable only because the result says `Callability == Callable`; the UI never infers callability from `OperationalState`. `Blocked / Blocked / <defined blocker>` uses `{colors.status-severe}` or `{colors.status-danger}` according to the safe failure class. Disabled but valid historical selections can use `{colors.status-subtle}`.
+`FluentBadge` for the `ProviderReadinessResult` triple. `Ready / Callable / None` is `{colors.status-success}`; `Degraded / Callable / NonBlockingOperationalWarning` is `{colors.status-warning}`; `Blocked / Blocked / <ReasonCode>` is `{colors.status-severe}` or `{colors.status-danger}` by failure class; a pricing currency mismatch is `{colors.status-important}`; disabled but valid historical selections and the interim `Unknown` are `{colors.status-subtle}`; past `ValidUntil` is `Stale` in `{colors.status-severe}`.
 
 ### proposal-state-badge
 
-Renders the proposal lifecycle: generated, edited, regenerated, pending approval, approved, rejected, abandoned, expired, posting pending, posted, posting failed. `Approved` and `posting pending` use progress semantics; only `posted` uses `{colors.status-success}` and proves a Conversation Message exists. Rejected, abandoned, expired, and posting failed remain visually distinct non-success terminal states.
+`FluentBadge` for the ten `ProposedAgentReplyState` values (the PRD alias `PostFailed` maps to `PostingFailed`). Only `Posted` is `{colors.status-success}`; `Pending`, `Edited`, `Regenerated`, `Approved`, and `PostingPending` are `{colors.status-informative}`; `PostingFailed` and `Rejected` are `{colors.status-danger}`; `Expired` is `{colors.status-severe}`; `Abandoned` is `{colors.status-subtle}`; nearing expiry adds a `{colors.status-warning}` chip. Display-only outcomes (`superseded by another decision`, `authority unresolved`, `expired at approval`, `duplicate submission (idempotent)`, `existence only`) render as a second badge beside the state and never replace it.
 
 ### response-mode-toggle
 
-Displays Automatic Response Mode and Confirmation Response Mode as a clear mutually exclusive choice. The selected mode can use `{colors.brand-accent}` as selection chrome. The control must not make automatic mode look "better" by visual weight alone; mode choice is policy, not a product upsell.
+`FluentRadioGroup` with Automatic Response Mode and Confirmation Response Mode as equal-weight options. Selection chrome uses `{colors.brand-accent}`; neither option gets more visual weight. Helper text carries the future-only effect line.
 
 ### agent-config-form
 
-Constrained form for identity, display metadata, instructions, provider/model, response mode, approver policy, lifecycle, and readiness. Required fields and activation blockers are inline. Activation is a distinct action after validity is visible.
+Constrained form inside `FcAggregateDetailPage`. Field inventory per the EXPERIENCE row; blockers render inline beside the field in `{colors.status-severe}`. Activation is a distinct `FluentButton` after validity is visible and uses `pending-command-indicator`. Variants: `Submitted`, `AuthoritativePending`, `ProjectionConfirmed`, `awaiting projection`, read-only for non-administrators.
 
 ### approver-policy-builder
 
-Structured builder for policy sources: conversation owner, caller, predefined Parties, tenant roles, and any later source architecture confirms. Each source row carries a readable basis and availability state. Missing or ambiguous policy sources render as blocked, not as empty success.
+Row-based builder for the closed `ApproverPolicySourceKind` list; the `ConversationOwner` value is always labeled Conversation Facilitator. Each row shows its basis, disclosure category, and availability. Row order changes through move up/down `FluentButton`s. Rows that fail validation render `{colors.status-severe}` with the reason; nothing renders as empty success.
 
 ### provider-catalog-grid
 
-Full-width grid for provider/model administration. Provider name, enabled state, model options, capability metadata, and status are visible without exposing secrets. Secret fields use write-only or configured-state presentation.
+Hand-authored `FluentDataGrid` inside `FcAggregateListPage`, FullWidth. Pinned columns: Provider name, model, enabled state, configured state, `provider-status-badge`, pricing version, `CapabilityVersion`, in `{typography.mono}` where they are identifiers. The editor `FluentAccordionItem` uses an ISO 4217 `FluentSelect` for currency, `FluentNumberInput` for unit prices and capability limits, and a masked input with autocomplete off for the secret reference. Variants: loading, empty, filtered-empty, error, `catching up`, `superseded by another decision`.
 
 ### proposal-queue-grid
 
-Full-width grid for pending and historical proposals created after successful generation. Pinned columns should include proposal state, source conversation, caller, current approver responsibility, expiry, and age. The queue should make "needs my action" visually discoverable without hiding other authorized records. Separate generation-failure records never appear as proposal rows.
+Hand-authored `FluentDataGrid` inside `FcAggregateListPage`, FullWidth. Pinned columns: `proposal-state-badge`, Source Conversation, caller, approver responsibility, expiry as an absolute culture-formatted timestamp plus static relative label, age. Status cells show a visible text column plus glyph, never `FcStatusIcon` alone. Variants: loading, empty, filtered-empty, error, permission-denied, `catching up`.
 
 ### proposal-editor
 
-The editor is a bounded approval workspace created only after successful generation. It shows the current selected version, editable content where authorized, source metadata, version actions, and approval controls. Generated content and edited content are labeled distinctly. A proposed reply is never styled like an already-posted Conversation Message. Failed generation never opens this workspace; retained failure content belongs only to a separate non-approvable failure record.
+Constrained, stacked workspace whose primary region is a `FluentTextArea` holding the selected version, labeled generated or human-edited with author and timestamp. Metadata, `version-history`, and audit link are `FluentAccordionItem`s. The action rail holds Edit, Regenerate, Approve, Reject, Abandon as `FluentButton`s; Approve is the only accent button and uses `pending-command-indicator` when activated. A proposed reply never looks like a Conversation Message: no message bubble, no avatar treatment. Variants: dirty, regeneration ceiling reached, `authority unresolved`, `stale proposal`, terminal read-only, `existence only` (no content rendered).
 
 ### version-history
 
-Shows every successfully generated, edited, and regenerated proposal version with author/source, timestamp, provider/model where applicable, and approval/posting markers. Prior versions remain visible after edit or regeneration. Retained generation-failure content is not a proposal version. Use `{typography.mono}` for timestamps and references.
+`FluentRadioGroup` inside a `FluentAccordionItem`, one radio per version labeled with kind, author, and timestamp in `{typography.mono}`. Approval and posting markers sit beside the version they identify; the policy basis renders per its disclosure category.
 
 ### conversation-agent-call
 
-The sole V1 invocation affordance is the Conversation-owned **Call hexa** action. It visibly names `hexa`, opens an accessible prompt surface, shows the effective response mode before submission, and presents `submitted`, `authoritative pending`, and `projection-confirmed terminal` as distinct states. It never implies that generated or proposed content is already a Conversation Message. Mentions, commands, ambient triggers, and alternate entry points are out of V1.
+The Conversation-owned **Call hexa** `FluentButton`, contributed through `EXT-CONV-UI-1`, opening a focus-trapped `FluentDialog` with the Agent name, effective response mode, a required prompt `FluentTextArea`, and Submit. When `hexa` is not callable the button stays visible, `aria-disabled`, with the safe blocker text. Status renders as `FluentBadge` rows: `submitted`, `authoritative pending`, and the terminal outcome.
+
+### agent-response-marker
+
+Inline `FluentBadge` in `{colors.status-subtle}` beside every posted `hexa` Conversation Message, reading `AI-generated from Conversation Context, not human-verified` for automatic posts and `AI-generated, edited by {party}` when the posted version was human-edited. Rendered by Conversations, contributed by Agents.
 
 ### conversation-context-policy-panel
 
-Read-only complete-context-or-blocked behavior, effective model budget, policy version, and the safe reason an oversized call cannot proceed. The surface offers no truncation, summary, windowing, or retrieval control.
+Read-only definition list, Constrained; the effective rule is the primary region and the Safe Context Budget components, declared behaviors, and block reason are items. No control of any kind.
 
 ### content-safety-policy-editor
 
-Fixed blocked categories, restricted handling, policy version, validation, and an explicit publish action. Publishing uses the pending-command treatment below and never permits a weaker retry.
+Constrained `FluentAccordion`; the current effective policy is primary. Always-blocked categories render as a fixed read-only list; restricted categories render as editable rows; draft, validation, and Publish use `high-impact-confirmation` and `pending-command-indicator`. Category lists are in the EXPERIENCE row.
 
 ### cost-control-editor
 
-Monthly tenant budget, per-call caps, current usage/reservations, 80% warning, and 100% blocked state. Indeterminate reservations remain blocked and non-success.
+Constrained `FluentAccordion`; current caps and consumption are primary. `FluentNumberInput` fields with explicit units, currency shown by a `FluentSelect`; an unconfigured value renders `{colors.status-severe}`. Consumption rows are `FluentBadge`s for settled spend, outstanding reservations, and held unknown-outcome reservations; 80% is `{colors.status-warning}`, 100% is `{colors.status-severe}`. The audited override is a separate item. Variants: `Submitted`, `AuthoritativePending`, `ProjectionConfirmed`, `awaiting projection`, override active.
 
 ### launch-readiness-panel
 
-Shows `Pass`, `Block`, `InsufficientEvidence`, and `Stale`; exact NFR-14 thresholds; sample sufficiency; SM-2/SM-3 cohort/window; evidence levels; `ObservedAt` and exclusive `ValidUntil`; and every remaining blocker.
-
-NFR-14 visual evidence must expose the three exact gates without turning browser-local progress into server truth: page usability p95 <= 2.5 seconds, authoritative pending acknowledgement p95 <= 500 milliseconds, and terminal render/live-region announcement p95 <= 2 seconds. Each gate requires at least 30 qualifying production-like executions of its own sample kind. Any missing authoritative tick or reference, absent localized live-region mutation, mixed clock origin, failed correlation, conflicting duplicate, or undersized sample set renders `InsufficientEvidence`, never Success.
+FullWidth `FluentDataGrid` of gate records, blockers first, identifiers in `{typography.mono}`; `FluentAccordionItem`s group metric cohorts, sample sufficiency, and evidence references. The single UX-owned NFR-14 statement is in the EXPERIENCE row; thresholds and seams are per `launch-readiness-register.md § NFR-14 Browser Monotonic Timing Contract` and are never restated here.
 
 ### audit-governance-panel
 
-The 365-day rule, legal hold, encrypted time-limited export, deletion progress, projection purge, and restrictive partial-failure states remain visible and support-safe.
-
-Each multi-section policy, readiness, or governance surface follows the `FluentAccordion` rule above; all controls use FrontComposer and Fluent UI Blazor v5 primitives.
-
-High-impact proposal resolution, policy publication, tenant budget update, legal hold, export, and deletion actions require explicit confirmation, current authorization, future-only effect copy where applicable, keyboard/focus/live-region behavior, and projection/evidence-confirmed success. Pending styling and disabled action treatment apply only to the same resource and operation family in the current session; unrelated resources and families remain available. A pending or partially applied result never receives success styling.
+Constrained `FluentAccordion`; retention and legal-hold state is primary, with legal hold, export, and deletion as items. Partial failure renders `{colors.status-important}` or `{colors.status-severe}`.
 
 ### proposal-notification
 
-V1 notifications are in-product only: an accessible pending-count badge and proposal queue/status entry link authorized Approvers to work needing attention. Notification copy includes state and expiry without exposing proposal content. Email, push, and external-channel delivery are out of scope.
+`IBadgeCountService` count `FluentBadge` on the Proposal queue nav entry, policy-gated, wrapped by the domain-named link `{count} proposals pending approval`; where the shell exposes no label slot, the same count renders inside the Agents overview link.
 
 ### operational-status-panel
 
-Status region for readiness, recent call outcomes, generation failures, proposal bottlenecks, provider readiness, and posting outcomes. A generation failure appears as a separate non-approvable failure record and never as a Proposed Agent Reply. The panel uses MessageBar/status-region patterns and groups by recoverable action rather than raw subsystem.
+FullWidth `FluentBadge` rows grouped by recovery action. Deferred metrics render as a `{colors.status-subtle}` whole-string label. Every authoritative row shows projection id and version in `{typography.mono}`.
 
 ### audit-evidence-panel
 
-Support-safe evidence view linking caller, Agent, Source Conversation, provider/model, proposal versions when generation succeeded, separate failure record when generation failed, approver, approval timestamp, authoritative pending identity/projection version, projection-confirmed terminal timestamp, posted Conversation Message, and outcome. Never displays provider secrets, raw credentials, unrelated tenant data, raw payload dumps, or stack traces.
+Definition list plus `FluentBadge` rows; timestamps and references use `{typography.mono}`. Never displays secrets, raw payloads, unrelated tenant data, or stack traces.
+
+### high-impact-confirmation
+
+Focus-trapped `FluentDialog` with one localized body string. Cancel receives initial focus; Confirm is `FluentButton` `Appearance.Accent` in `{colors.brand-accent}` and is never the default button, so Enter on the body does not commit; Esc cancels. Padding `{spacing.4}`, no destructive red button.
+
+### pending-command-indicator
+
+The activated `FluentButton` switches to `aria-disabled="true"` and keeps focus while an adjacent `FluentBadge` in `{colors.status-informative}` reads `Submitted`, then `AuthoritativePending`, then `awaiting projection`. Variant `pending in another session` renders `{colors.status-severe}` on resolution controls in a second tab. It never becomes Success.
 
 ## Do's and Don'ts
 
 | Do | Don't |
 |---|---|
-| Inherit FrontComposer and Fluent visual defaults | Invent a custom Agents design system |
+| Inherit FrontComposer and Fluent visual defaults at the pinned package | Invent a custom Agents design system or a v4/FAST token |
 | Make proposed replies visually distinct from Conversation Messages | Style generated draft content as if it has been posted |
-| Use Success only for authoritatively proven callable, posted, current-pass, or projection-confirmed complete states | Use Success for lifecycle active, submitted, authoritative pending, approved, or posting pending |
-| Render Provider Degraded as Warning and obey `Callability` from the readiness result | Infer callability from Provider enabled/degraded labels or UI policy |
-| Keep generation failure in a separate non-approvable failure record | Create a Proposed Agent Reply from failed or incomplete generation |
-| Show provider/model readiness without exposing secrets | Display provider credentials, raw secret values, or provider SDK details |
-| Preserve version labels, timestamps, and approval basis | Let edits overwrite or visually hide generated versions |
-| Keep `hexa` named and attributable | Make `hexa` a mascot or anonymous system voice |
-| Keep English/French keys at parity and use whole localizable strings | Assemble approval/audit sentences from fragments or accept missing locale keys |
-| Use Fluent semantic roles, Fluent v5 parameters, and Fluent 2 tokens | Define a custom theme, hard-code colors, or use Fluent v4/FAST tokens |
+| Use Success only for callable, Posted, current-pass, or ProjectionConfirmed states | Use Success for lifecycle active, Submitted, AuthoritativePending, Approved, or PostingPending |
+| Render Provider Degraded as Warning and obey `Callability` | Infer callability from enabled or degraded labels |
+| Show `catching up` for projection lag | Borrow `Stale`, which means evidence past `ValidUntil` |
+| Label the Conversation-authority source Conversation Facilitator | Show or imply a Conversation owner anywhere |
+| Leave every pricing field empty until typed and pin the pricing version column | Default price or currency, or hide a zero price |
+| Accept a secret reference only, masked, operator-visible | Accept, echo, or display a secret value |
+| Reflow every route to 320 CSS px and keep actions operable | Lock out approval at narrow widths or high zoom |
+| Take icons from `FcFluentIcons` and request missing glyphs | Reuse a nearby glyph or pull the icons NuGet |
+| Use `FluentRadioGroup` for mode and version choice | Reference controls that do not exist in Fluent v5 |
+| Keep EN/FR keys at parity as whole strings | Assemble sentences from fragments or reuse shell dialogs with unlocalized literals |
