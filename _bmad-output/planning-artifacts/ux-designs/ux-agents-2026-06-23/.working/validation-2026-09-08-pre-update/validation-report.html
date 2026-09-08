@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>UX Design Validation: Hexalith Agents</title>
+<style>
+  :root {
+    --bg: #fafaf9; --surface: #ffffff; --border: #e7e5e4; --text: #1c1917; --muted: #78716c;
+    --verdict-strong: #16a34a; --verdict-adequate: #65a30d; --verdict-thin: #d97706; --verdict-broken: #dc2626;
+    --sev-low: #64748b; --sev-medium: #ca8a04; --sev-high: #ea580c; --sev-critical: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-size: 15px; }
+  code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.92em; background: rgba(0,0,0,0.04); padding: 0 3px; border-radius: 3px; }
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+  header.report-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .synthesis { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--muted); border-radius: 8px; padding: 18px 22px; margin-bottom: 24px; font-size: 15.5px; }
+  .synthesis p { margin: 0 0 10px; } .synthesis p:last-child { margin-bottom: 0; }
+  .sev-summary { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+  .sev-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; min-width: 120px; }
+  .sev-card .n { font-size: 22px; font-weight: 600; } .sev-card .l { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+  .dimension-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 24px; }
+  .dim-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .dim-card .dim-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; } .dim-card .dim-verdict { font-size: 14px; font-weight: 600; }
+  section.dimension, section.reviewer-section { margin-bottom: 14px; }
+  section.dimension details, section.reviewer-section details { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  section summary { padding: 14px 20px; cursor: pointer; user-select: none; list-style: none; display: flex; align-items: center; gap: 12px; }
+  section summary::-webkit-details-marker { display: none; }
+  section summary::before { content: "▸"; display: inline-block; color: var(--muted); transition: transform 0.15s ease; }
+  section details[open] summary::before { transform: rotate(90deg); }
+  section summary h2 { display: inline; margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.005em; flex: 1; }
+  .verdict-pill { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: white; }
+  .verdict-strong { background: var(--verdict-strong); } .verdict-adequate { background: var(--verdict-adequate); } .verdict-thin { background: var(--verdict-thin); } .verdict-broken { background: var(--verdict-broken); }
+  .dim-body { padding: 4px 20px 18px; } .dim-judgment { color: var(--text); font-size: 14.5px; } .dim-judgment p { margin: 0 0 10px; }
+  .findings-list { padding: 0 20px 4px; }
+  article.finding { padding: 14px 0; border-top: 1px solid var(--border); } article.finding:first-child { border-top: none; }
+  article.finding header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .badge { font-size: 10.5px; padding: 3px 8px; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.4; }
+  .badge-sev-low { background: rgba(100,116,139,0.12); color: var(--sev-low); } .badge-sev-medium { background: rgba(202,138,4,0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234,88,12,0.14); color: var(--sev-high); } .badge-sev-critical { background: rgba(220,38,38,0.14); color: var(--sev-critical); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 500; flex: 1; min-width: 200px; }
+  .finding-location { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; color: var(--muted); }
+  .finding-note, .finding-fix { margin-top: 6px; font-size: 14px; } .finding-fix strong { color: var(--muted); font-weight: 500; }
+  .reviewer-source { font-size: 12px; color: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .mechanical { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin-top: 24px; font-size: 14px; }
+  .mechanical h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mechanical ul { margin: 0; padding-left: 20px; } .mechanical li { margin-bottom: 4px; }
+  footer.report-footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="report-header">
+      <div class="title">
+        <h1>Hexalith Agents — UX Design Validation Report</h1>
+        <div class="subtitle">_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23/DESIGN.md<br>_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23/EXPERIENCE.md</div>
+      </div>
+    </header>
+    <div class="synthesis">
+      <p>The pair is a consumable contract. Every token reference resolves, all 19 component names are identical across both spines, all four PRD journeys are carried verbatim with protagonist, numbered steps, climax, and failure path, and the Fluent-by-name colour inheritance is a defensible application of the UI-system rule (all eight BadgeColor names verified against Fluent UI Blazor v5). Shape fit is strong. What keeps the rubric from strong is one uncommitted load-bearing surface, the high-impact confirmation and pending-command indicator used by six operation families, which has no named component and whose rules sit under an unrelated heading, plus a cluster of medium gaps a story-dev would otherwise decide alone: no home for proposal-expiry configuration, no offline or concurrency treatment, no pinned Fluent package or per-role icon and appearance statement, and NFR-14 thresholds restated in six places.</p>
+      <p>The three additional lenses shift the picture materially. The spines are strong on meaning (what Success may never mean, which states are terminal, what must never leak) and weak on binding and mechanics. Accessibility finds two critical blockers to a keyboard or low-vision approver completing UJ-3: the fail-closed viewport rule locks out 400% zoom, and disabling the activated control drops focus at the approval moment. Governance finds pricing has no UX rule at all (the shipped Story 5.3 editor defaults to 0 USD, which counts as priced) and that concurrent approvers, reload mid-pending, cross-tenant deep links, and provider disable are unspecified. Implementation readiness finds the sole V1 invocation entry, Call hexa, has no integration seam with the Conversations module while the codebase already shipped the forbidden admin-only alternate, and that four of fourteen IA surfaces have no route, nav entry, policy, or query. Several findings converge from independent lenses (expiry threshold and configuration surface, the unnamed confirmation component, projection-lag vocabulary colliding with Stale, unstated polling numbers, contrast delegated in a circle), which makes them the highest-confidence items to roll into an Update.</p>
+    </div>
+    <div class="sev-summary">
+      <div class="sev-card"><div class="n" style="color: var(--sev-critical)">4</div><div class="l">critical</div></div>
+      <div class="sev-card"><div class="n" style="color: var(--sev-high)">23</div><div class="l">high</div></div>
+      <div class="sev-card"><div class="n" style="color: var(--sev-medium)">38</div><div class="l">medium</div></div>
+      <div class="sev-card"><div class="n" style="color: var(--sev-low)">27</div><div class="l">low</div></div>
+      <div class="sev-card"><div class="n">92</div><div class="l">total · 4 lenses</div></div>
+    </div>
+    <div class="dimension-summary">
+      <div class="dim-card"><div class="dim-name">Flow coverage</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">Token completeness</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">Component coverage</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">State coverage</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">Visual reference coverage</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">Bloat &amp; overspecification</div><div class="dim-verdict" style="color: var(--verdict-thin)">thin</div></div>
+      <div class="dim-card"><div class="dim-name">Inheritance discipline</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">Shape fit</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+    </div>
+    <section class="dimension">
+      <details>
+        <summary><h2>Flow coverage</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Checked PRD journeys UJ-1..UJ-4 character-for-character, FR-1..FR-28, NFR-1..NFR-14, addendum, reconcile-brief, sprint change proposal, and readiness register gate inventory. Each UJ has a named protagonist, numbered steps, a bolded Climax, a Resolution, and at least one failure path. Every FR maps to a surface, component row, state table, or flow step.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">UJ-5 / Priya is not a PRD journey</h3>
+              <span class="finding-location">EXPERIENCE.md § Key Flows, line 347</span>
+            </header>
+            <div class="finding-note"><code>UJ-5 — Priya governs a production-like launch</code> is numbered as a PRD journey but PRD §2.3 stops at UJ-4 and no Priya persona exists. A consumer tracing UJ-5 to the PRD finds nothing.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Keep the flow, retitle it <code>UX-J5 (UX-derived)</code> and name the FRs it is grounded in (FR-26..FR-28, NFR-9..NFR-14, RQ-1).</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">FR-18 proposal-expiry configuration has no surface</h3>
+              <span class="finding-location">EXPERIENCE.md § UX Closure Decisions, line 365</span>
+            </header>
+            <div class="finding-note">The 24 h default, 1 h–30 d range, future-only rule is recorded but absent from the <code>hexa</code> configuration IA row, <code>agent-config-form</code> in both spines, and every flow step.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add 'proposal expiry duration' to the <code>hexa</code> configuration IA row and the <code>agent-config-form</code> field list in both spines; add a UJ-1 step or an explicit 'not in UJ-1' note.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">FR-7 disclosure category never rendered</h3>
+              <span class="finding-location">EXPERIENCE.md § Component Patterns › approver-policy-builder, audit-evidence-panel</span>
+            </header>
+            <div class="finding-note">The user-visible / operator-only / redacted / omitted category for policy basis appears nowhere in either spine.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One sentence per component: 'policy basis renders per its FR-7 disclosure category; redacted/omitted show a category label, never the source'.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Version comparison scope uncommitted</h3>
+              <span class="finding-location">EXPERIENCE.md § Accessibility Floor, line 231</span>
+            </header>
+            <div class="finding-note">PRD UJ-3 says Anika 'compares the versions'; the spine offers only 'compare metadata'. Whether V1 has side-by-side content comparison is open.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State it either way in <code>version-history</code> (e.g., 'V1: select-to-view one version at a time; no diff view').</div>
+          </article>
+        </div>
+      </details>
+    </section>
+    <section class="dimension">
+      <details>
+        <summary><h2>Token completeness</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Every frontmatter key (8 colours, 5 typography roles, rounded, 6 spacing steps, 19 components) checked against every {token} reference in both spines; all 19 references resolve. The eight 'Inherit Fluent BadgeColor.X' notes are a defensible inheritance under the spec's UI-system rule, not a gap, and every name exists in the Fluent UI Blazor v5 enum. The gaps are around what the inheritance leaves unanchored: no package pin, no contrast target, no per-role appearance or icon.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">No pinned Fluent UI Blazor package version</h3>
+              <span class="finding-location">DESIGN.md § Colors, line 157</span>
+            </header>
+            <div class="finding-note">'Verify against the pinned Fluent UI package' is stated but no pin is named. Tenants' DESIGN.md pins <code>5.0.0-rc.4-26180.1</code> inline. Without the pin, inherit-by-name has no fixed referent.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One line in <code>DESIGN.md § Brand &amp; Style</code>: the package/version or the central-package-management file that owns it.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">No contrast target and no per-role badge appearance</h3>
+              <span class="finding-location">DESIGN.md § Colors, line 157</span>
+            </header>
+            <div class="finding-note">WCAG 2.2 AA is mandated but 4.5:1 text / 3:1 non-text is never stated, nor which <code>BadgeAppearance</code> (Tint vs Filled) each role uses. Tenants specified Tint default, Filled for Danger and Severe.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add an <code>appearance</code> line per badge component and one sentence under § Colors: 'AA 4.5:1 text, 3:1 non-text; inherited Fluent pairs assumed AA at the pinned version and re-verified when the pin changes'.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Icon half of 'role + icon + text' unspecified</h3>
+              <span class="finding-location">DESIGN.md § Brand &amp; Style, § Colors</span>
+            </header>
+            <div class="finding-note">No icon is named for any of the seven status roles or the readiness/provider/proposal badge states. Downstream will pick eight icons ad hoc across three badge components.</div>
+            <div class="finding-fix"><strong>Fix:</strong> A role→icon table in <code>DESIGN.md § Colors</code> (Fluent icon names) or an explicit delegation naming the owning story and the one-icon-per-role rule.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Pipe-separated colour lists are not resolver-flattenable</h3>
+              <span class="finding-location">DESIGN.md lines 59, 63, 67</span>
+            </header>
+            <div class="finding-note"><code>components.*.color</code> values like <code>'{a} | {b} | {c}'</code> and free-text <code>base</code>/<code>layout</code> will not flatten mechanically. Same convention as Tenants; note only.</div>
+            <div class="finding-fix"><strong>Fix:</strong> None required; known convention.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+    <section class="dimension">
+      <details>
+        <summary><h2>Component coverage</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>All 19 component names are identical across DESIGN frontmatter, DESIGN Components, and EXPERIENCE Component Patterns. Each has a visual paragraph and a behavioural row with real rules. Inherited Fluent and FrontComposer primitives are correctly not given rows.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">High-impact confirmation and pending-command indicator have no named component</h3>
+              <span class="finding-location">DESIGN.md:258 under ### audit-governance-panel; EXPERIENCE.md § Interaction Primitives lines 215, 221</span>
+            </header>
+            <div class="finding-note">Six operation families (ProposalResolution, PolicyPublication, TenantBudgetUpdate, LegalHold, ExportRequest, DeletionRequest) depend on a confirmation surface and a pending lock whose rules exist only as prose under an unrelated heading. Nothing says whether it is a dialog or inline panel, what it contains, or how the lock renders. Six stories will each invent one.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add two components, <code>high-impact-confirmation</code> (action name, resource identity, future-only effect line, authorization basis, confirm/cancel; focus-trapped; Esc non-committing) and <code>pending-command-indicator</code>, with frontmatter entries, DESIGN.md sections, and EXPERIENCE.md rows; move the line-258 paragraph out of <code>audit-governance-panel</code>.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">conversation-agent-call: dialog vs panel unresolved</h3>
+              <span class="finding-location">DESIGN.md frontmatter line 100</span>
+            </header>
+            <div class="finding-note">'Fluent prompt dialog/panel' leaves focus, dismissal, and mobile behaviour open.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Commit to one.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">proposal-notification has no visual anatomy</h3>
+              <span class="finding-location">DESIGN.md § Components, line 262</span>
+            </header>
+            <div class="finding-note">Where the pending-count badge lives (shell nav entry, overview header) is not stated.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name the shell slot, e.g., 'count badge on the Agents › Proposal queue nav entry, policy-gated'.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+    <section class="dimension">
+      <details>
+        <summary><h2>State coverage</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Walked all 14 IA surfaces against empty, cold-load, focus, error, offline, permission-denied, stale-projection, and concurrency. Coverage is rich for readiness, provider, call, proposal, launch-evidence, and audit-availability state machines; grids and detail views get loading, empty, filtered-empty, error, permission-denied, and stale generically. Offline and concurrent-edit are absent.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">No offline / connection-lost / reconnecting state</h3>
+              <span class="finding-location">EXPERIENCE.md § State Patterns</span>
+            </header>
+            <div class="finding-note">The entire <code>submitted → authoritative pending → projection-confirmed</code> contract depends on receiving projections; the only treatment is 'a client timeout forces refresh'. Unstated: what the pending indicator shows while disconnected, whether Call hexa and the six high-impact actions are disabled, whether the advisory lock survives reconnect.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One global row: 'connection lost → status region notice, pending items stay pending, high-impact submit disabled with reason, lock re-evaluated from authoritative status on reconnect'.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">No concurrent-edit / stale-detail treatment for Proposal detail</h3>
+              <span class="finding-location">EXPERIENCE.md line 185</span>
+            </header>
+            <div class="finding-note">Two approvers on one proposal is the normal Confirmation-mode case; the spine says EventStore concurrency is authoritative but not what the UI does on version conflict or when the proposal goes terminal under the viewer.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a <code>stale proposal</code> row: preserve unsaved edit text, show authoritative state and who changed it, offer refresh; approve/reject disabled until refreshed.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Call hexa treatment when hexa is not callable unspecified</h3>
+              <span class="finding-location">EXPERIENCE.md lines 130–136, 220</span>
+            </header>
+            <div class="finding-note">Hidden, shown-disabled with reason, or shown and rejected on submit is not stated.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One clause: visible-but-disabled with the safe blocker text.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Prompt surface states unspecified</h3>
+              <span class="finding-location">EXPERIENCE.md § Component Patterns › conversation-agent-call</span>
+            </header>
+            <div class="finding-note">Empty prompt, over-length prompt, submit-disabled are not covered.</div>
+            <div class="finding-fix"><strong>Fix:</strong> 'Prompt required; no client-side length limit (context budget is server-owned)'.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+    <section class="dimension">
+      <details>
+        <summary><h2>Visual reference coverage</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>imports/ is empty and no mockups/ or wireframes/ exist, so there are no orphans and no unspecific references. The spines-win statement is present once in EXPERIENCE.md Foundation. The spine-only decision itself is not recorded.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Spine-only decision not recorded</h3>
+              <span class="finding-location">.memlog.md line 20; EXPERIENCE.md § Foundation</span>
+            </header>
+            <div class="finding-note">The memlog leaves 'mock coverage decision' pending and no later entry closes it. The spines assert precedence over mockups that do not exist but never say none were produced by decision.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One memlog <code>(decision)</code> line and one clause in Foundation: 'No mockups or wireframes; the spines are the sole reference (2026-08-02)'.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+    <section class="dimension">
+      <details open>
+        <summary><h2>Bloat &amp; overspecification</h2><span class="verdict-pill verdict-thin">thin</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>No pixel values beyond the 4 px spacing scale. DESIGN.md prose is tight and its editorial voice is tied to decisions. EXPERIENCE.md is mostly declarative but carries measurable duplication: NFR-14 thresholds restated in six places, a changelog section, and PRD non-goals restated twice.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">NFR-14 thresholds restated in six places</h3>
+              <span class="finding-location">DESIGN.md lines 248–250; EXPERIENCE.md lines 54, 108, 273–283, UJ-5 steps 6–7, line 373</span>
+            </header>
+            <div class="finding-note"><code>§ Browser Performance Evidence</code> is a near-verbatim copy of the readiness register's NFR-14 contract, which is already a listed source. One threshold change requires six edits.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Keep one UX-owned statement (what the panel shows, the three ticks, the live-region mutation rule) and replace the others with 'per <code>launch-readiness-register.md § NFR-14</code>'.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">UX Closure Decisions is a changelog</h3>
+              <span class="finding-location">EXPERIENCE.md § UX Closure Decisions</span>
+            </header>
+            <div class="finding-note">Every bullet is already normative elsewhere in the file and in the memlog.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Move to <code>.memlog.md</code> or keep as a 3-line pointer.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">PRD non-goals restated twice</h3>
+              <span class="finding-location">EXPERIENCE.md § Foundation para 4; § Inspiration &amp; Anti-patterns bullet 5</span>
+            </header>
+            <div class="finding-note">Both restate no memory, tools, project/folder, ambient triggers, external channels.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Keep one.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+    <section class="dimension">
+      <details>
+        <summary><h2>Inheritance discipline</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>All 16 sources paths resolve. UJ-1..UJ-4 titles are verbatim PRD. FC-LYT, FC-TBL, FC-A11Y, FC-L10N resolve to FrontComposer docs. Glossary terms, the six operation-family names, and the seven NFR-14 tick names match PRD, architecture, and register exactly. Drift: UJ-5 claims PRD provenance, 'conversation owner' never reconciled with AD-8 Facilitator, 'pending approval' absent from AD-5.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">'Conversation owner' never reconciled with AD-8 Facilitator</h3>
+              <span class="finding-location">EXPERIENCE.md § Information Architecture line 47; both spines › approver-policy-builder</span>
+            </header>
+            <div class="finding-note">Architecture AD-8 states Conversations exposes no owner and V1 resolves 'owner' as <code>ParticipantRole.Facilitator</code>. Neither spine mentions Facilitator.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One clause in <code>approver-policy-builder</code>: 'source label <code>Conversation owner</code> (resolved as Conversation Facilitator per AD-8 until Conversations adds an owner resolver)'.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">'pending approval' state absent from AD-5</h3>
+              <span class="finding-location">EXPERIENCE.md § Proposal Lifecycle line 168; DESIGN.md › proposal-state-badge line 200</span>
+            </header>
+            <div class="finding-note">Architecture's append-only state list has no such state; consumers find an eleventh state.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Mark it 'display state = any non-terminal version awaiting an approver; not persisted' or drop it.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">PRD term 'Global Providers Aggregate' absent</h3>
+              <span class="finding-location">EXPERIENCE.md § Information Architecture › Provider catalog</span>
+            </header>
+            <div class="finding-note">Spines say 'Provider catalog', architecture says <code>ProviderCatalog</code>, PRD says Global Providers Aggregate.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One parenthetical in the IA row naming all three.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Casing drift</h3>
+              <span class="finding-location">EXPERIENCE.md lines 96/370 vs 169/327; 297; 355 vs 108</span>
+            </header>
+            <div class="finding-note"><code>Approved</code>/<code>approved</code>, <code>Approver Policy</code>/<code>approver policy</code>, <code>Level 4–5</code>/<code>Level 4/5</code> vs PRD 'Levels 4 and 5'.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Normalise to PRD forms.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+    <section class="dimension">
+      <details>
+        <summary><h2>Shape fit</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>DESIGN.md has all eight canonical sections in order. EXPERIENCE.md has all eight required defaults, and both required-when-applicable sections (Inspiration &amp; Anti-patterns, Responsive &amp; Platform) are present and triggered. FrontComposer Readiness earns its place; UX Closure Decisions is marginal; Browser Performance Evidence does not earn its place as written.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Browser Performance Evidence adds no UX decision beyond its first paragraph</h3>
+              <span class="finding-location">EXPERIENCE.md § Browser Performance Evidence</span>
+            </header>
+            <div class="finding-note">Source restatement; see Bloat.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Shrink to the first paragraph plus a register reference.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">EXPERIENCE.md frontmatter lacks description</h3>
+              <span class="finding-location">EXPERIENCE.md frontmatter</span>
+            </header>
+            <div class="finding-note">DESIGN.md has one; the calibration examples omit it too. Cosmetic.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Optional.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+    <section class="reviewer-section">
+      <details>
+        <summary><h2>Accessibility review</h2><span class="reviewer-source">review-accessibility.md · 2 critical · 6 high · 9 medium · 4 low</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>The spines are strong on semantics (no-color-only, Success discipline, whole-string copy) and weak on mechanics: they delegate focus, live regions, and contrast to FrontComposer, but the cited docs only back skip links, shell shortcuts, nav landmarks, and shell-owned status surfaces. A Blazor developer would have to guess where focus goes when an Approve button disables itself and the row leaves the queue, who renders the aria-live node that announces 'Approved. Posting is pending.', what 'nearing expiry' means, and what the French strings are. The viewport fail-closed rule as written locks out desktop users at 400% zoom from governed approval, a WCAG 1.4.10 conflict the spines do not acknowledge. Two findings are critical because they block a keyboard or low-vision approver from completing UJ-3.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">Fail-closed viewport rule locks out approval at 400% zoom</h3>
+              <span class="finding-location">EXPERIENCE.md § Responsive &amp; Platform; DESIGN.md § Layout &amp; Spacing</span>
+            </header>
+            <div class="finding-note">A desktop user at 400% browser zoom (WCAG 1.4.10 Reflow, 320 CSS px) lands in the Phone tier and loses the ability to approve. The rule is written as a lockout, not a last resort, and no essential exception is claimed.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Require proposal detail, version history, and confirmation controls to stack to one column and remain operable at 320 CSS px; reserve unavailability for content that genuinely cannot render, with a visible reason. Add 1.4.10 evidence at 320 px to LR-UI-CONFORMANCE.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">Focus is lost at the approval moment</h3>
+              <span class="finding-location">EXPERIENCE.md § Interaction Primitives, § High-Risk Pending Commands, § Accessibility Floor</span>
+            </header>
+            <div class="finding-note">The pending-lock rule disables the activated control; a disabled FluentButton is unfocusable, so focus drops to body. Polling may re-sort or remove the row, the dialog return-focus contract has no target when the trigger is gone, and <code>approved</code> / <code>posting pending</code> are never announced.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Use <code>aria-disabled</code> or a replacement pending control that keeps focus; on resolution move focus deterministically (same-proposal status region, then next row, then page heading via <code>FcPageHeader.FocusHeadingAsync</code>); polite announcements for authoritative pending, approved, posting pending, regenerated; polled re-renders must not steal focus.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Live-region delegation not backed by FrontComposer docs</h3>
+              <span class="finding-location">EXPERIENCE.md § Accessibility Floor, § FrontComposer Readiness</span>
+            </header>
+            <div class="finding-note">front-composer-shell.md documents aria-live only for shell-owned surfaces; project-context.md tells adopters to keep their own sr-only aria-live div. The domain must build what the spine delegates. Politeness per event is unspecified.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Agents owns one page-level polite <code>role=status</code> node and one <code>role=alert</code> node; give a per-event table (alert: denied, generation failed, posting failed, expired; status: pending, created, approved, posting pending, posted, regenerated, context blocked, expiry warning). Note NFR-14 <code>LiveRegionAnnouncedTick</code> depends on this node.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">No route heading or post-navigation focus rule</h3>
+              <span class="finding-location">EXPERIENCE.md § Information Architecture, § Accessibility Floor</span>
+            </header>
+            <div class="finding-note"><code>FcPageHeader.FocusHeadingAsync()</code> is page-invoked and requires <code>HeadingTabIndex=-1</code>; the shell does not move focus on route change. No h1 per route, heading hierarchy inside accordions, or focus placement when the editor opens from the queue.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Every route renders <code>FcPageHeader</code> with a non-blank Heading, <code>HeadingTabIndex=-1</code>, and a localized PageTitle; focus the heading on navigation and on opening proposal detail; accordion titles h2, in-panel sections h3.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Forms have no error contract</h3>
+              <span class="finding-location">EXPERIENCE.md § Component Patterns; DESIGN.md § Components (five form components)</span>
+            </header>
+            <div class="finding-note">'Inline blockers' and 'validates' never specify error association (<code>aria-describedby</code>, <code>aria-invalid</code>), error summary and focus, numeric units, suggestion text, how a write-only secret field exposes its configured state, or accessible names for policy-source row controls (WCAG 3.3.1–3.3.3, 4.1.2).</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a Forms subsection to § Accessibility Floor: label every control, associate errors, focus the first error on submit, state units, name secret fields with their configured state, give policy-source rows an accessible name including their basis.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Contrast delegated in a circle and never verified</h3>
+              <span class="finding-location">EXPERIENCE.md § Accessibility Floor; DESIGN.md § Colors</span>
+            </header>
+            <div class="finding-note">EXPERIENCE points to DESIGN; DESIGN says only 'Inherit Fluent'. Load-bearing combinations unchecked: badge text on Warning/Severe/Important/Subtle in light and dark, caption and mono metadata, focus ring on the brand-accent toggle, forced-colors. FrontComposer's CI gate proves only its own specimen routes.</div>
+            <div class="finding-fix"><strong>Fix:</strong> DESIGN.md states AA targets explicitly; LR-UI-CONFORMANCE requires an Agents-owned axe lane over every interactive V1 route in Light/Dark/forced-colors plus the manual AT matrix (NVDA+Firefox, JAWS+Chrome, VoiceOver+Safari).</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">French does not exist in the spines</h3>
+              <span class="finding-location">EXPERIENCE.md § Voice and Tone; DESIGN.md § Typography</span>
+            </header>
+            <div class="finding-note">Parity is binding, yet every string and state name is English-only and FR is neither deferred nor delivered. No rules for pluralization, culture-formatted dates, currency/percent, or whether architecture tokens (Ready / Callable / None, InsufficientEvidence, Stale) display raw. <code>FcDestructiveConfirmationDialog</code> hard-codes <code>Cancel</code>.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the FR column or mark FR authoring a launch blocker with an owner; require per-count keys for plurals; require CultureInfo-formatted dates/numbers/currency via named placeholders; require a localized label for every architecture token; forbid reusing shell dialogs with unlocalized literals.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Expiry timing has no accommodation and an undefined trigger</h3>
+              <span class="finding-location">DESIGN.md § Colors; EXPERIENCE.md § UX Closure Decisions; proposal-queue-grid expiry column</span>
+            </header>
+            <div class="finding-note">'Nearing expiry' never defines threshold, presentation (static timestamp vs ticking countdown), or announcement. A live countdown in a grid cell is auto-updating content (2.2.2) and must not sit inside aria-live; 2.2.1 needs an essential-exception claim or warn-and-extend. The 1 h floor does not clear the 20-hour exception.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Define the threshold (10% of window or 1 h, whichever is smaller); render expiry as an absolute localized timestamp plus a static relative label refreshed at most once per minute outside live regions; announce once per proposal; record a 2.2.1 position with Product sign-off.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Proposal editor keyboard choreography stops at a capability list</h3>
+              <span class="finding-location">EXPERIENCE.md § Accessibility Floor; § Interaction Primitives</span>
+            </header>
+            <div class="finding-note">Version selection control, focus and announcement when regeneration replaces editor content, what 'compare metadata' is, and whether Esc in the textarea discards edits are unspecified.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Version selection is a radio group with kind/author/timestamp labels; regeneration keeps focus on Regenerate then announces 'Version N generated' with a go-to action; exit is an explicit button with unsaved-changes confirmation; Esc never discards editor content.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">High-risk confirmation dialogs under-specified</h3>
+              <span class="finding-location">DESIGN.md § Components; EXPERIENCE.md § Interaction Primitives</span>
+            </header>
+            <div class="finding-note">Initial focus on Cancel, Enter on the body must not commit, and what 'incomplete restrictive deletion confirmation' looks like are unstated.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Initial focus on the non-committing action; destructive action never the default button; body names resource and future-only effect in one localized string; note 3.3.7 security exception if type-to-confirm is chosen.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Grid status carrier contradicts DESIGN</h3>
+              <span class="finding-location">datagrid.md vs DESIGN.md § Colors; DESIGN.md § Components (two grids)</span>
+            </header>
+            <div class="finding-note">FC-TBL's <code>[ProjectionBadge]</code> renders <code>FcStatusIcon</code> (icon + accessible name + tooltip); DESIGN mandates role + icon + visible text for every status. Developer must choose without guidance.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Decide per grid: accept <code>FcStatusIcon</code> or require a visible text column; do not leave both rules standing.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Pending-count badge has no accessible name contract</h3>
+              <span class="finding-location">DESIGN.md › proposal-notification; navigation.md § Parameters</span>
+            </header>
+            <div class="finding-note">Shell badge labels come from <code>IBadgeCountService</code>; AT will read '3' unless the domain can name it.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Verify the shell exposes a localizable badge label or wrap the count in a domain-named link ('3 proposals pending approval').</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Hover-revealed row actions not required to reveal on focus</h3>
+              <span class="finding-location">EXPERIENCE.md § Interaction Primitives</span>
+            </header>
+            <div class="finding-note">Only required actions are guaranteed non-hover-only; secondary actions vanish for keyboard users (2.1.1, 1.4.13).</div>
+            <div class="finding-fix"><strong>Fix:</strong> Any hover-revealed action also renders on row focus-within and is dismissible; tooltips hoverable and Esc-dismissible.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">WCAG 2.5.8 Target Size unaddressed under density settings</h3>
+              <span class="finding-location">FrontComposer settings.md; DESIGN.md § Components</span>
+            </header>
+            <div class="finding-note">Compact density can drop chips, row-action icons, version rows, and badge triggers below 24×24 CSS px.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Require 24 px minimum (or spacing exception) for every actionable target in all three densities; add a Compact check to the conformance lane.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Forced refresh after timeout destroys context silently</h3>
+              <span class="finding-location">EXPERIENCE.md § High-Risk Pending Commands</span>
+            </header>
+            <div class="finding-note">Nothing about restoring focus or announcing what happened.</div>
+            <div class="finding-fix"><strong>Fix:</strong> After forced refresh, focus the route heading and announce 'Status refreshed. Approval is still pending.'</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Command palette entries not specified</h3>
+              <span class="finding-location">EXPERIENCE.md § Interaction Primitives</span>
+            </header>
+            <div class="finding-note">Whether Agents registers palette commands, how they are policy-gated, and that sequence shortcuts are subject to 2.1.4 are unstated.</div>
+            <div class="finding-fix"><strong>Fix:</strong> List Agents palette entries (or state none for V1) and their authorization behaviour.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Override diagnostics presented as coverage for hand-authored pages</h3>
+              <span class="finding-location">EXPERIENCE.md § FrontComposer Readiness</span>
+            </header>
+            <div class="finding-note">HFC1050–1055 apply only to FrontComposer customization overrides; plain Agents .razor pages get no build-time accessibility check.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State that diagnostics cover overrides only; hand-authored surfaces rely on the Agents axe/keyboard lane and manual AT matrix.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">WCAG 2.4.11 Focus Not Obscured</h3>
+              <span class="finding-location">DESIGN.md § Components (pinned columns, action rail, MessageBar regions)</span>
+            </header>
+            <div class="finding-note">Sticky elements could overlap focused rows.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Declare no sticky element overlaps the content scroll area, or set scroll-padding equal to sticky heights.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">WCAG 2.5.7 Dragging Movements</h3>
+              <span class="finding-location">EXPERIENCE.md § Component Patterns › approver-policy-builder</span>
+            </header>
+            <div class="finding-note">Policy-source row ordering is unspecified and could be drag-only.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Row order is edited with buttons or a menu, never drag-only.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">WCAG 3.2.6 and 3.3.8 not recorded as N/A</h3>
+              <span class="finding-location">EXPERIENCE.md § Accessibility Floor</span>
+            </header>
+            <div class="finding-note">Neither applies as written, but the conformance lane will report them as gaps.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Record both as N/A with the reason.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">RTL not described in logical terms</h3>
+              <span class="finding-location">DESIGN.md § Layout &amp; Spacing</span>
+            </header>
+            <div class="finding-note">'Version and action rail' and pinned columns should use inline-start/end.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One sentence in DESIGN.md § Layout &amp; Spacing.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+    <section class="reviewer-section">
+      <details>
+        <summary><h2>Governance &amp; audit review</h2><span class="reviewer-source">review-governance.md · 1 critical · 8 high · 8 medium · 4 low</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>The spines are disciplined about the one thing the 2026-08-02 correction targeted: Success is never rendered for anything short of proven callability or a projection-confirmed post, and failed generation never masquerades as a proposal. They are far weaker at the edges where governance actually fails in operation: two approvers on one proposal, a reload mid-pending, a deep link to another tenant's id, a pricing row that says 0 USD, and a provider disable with no confirmation. Story 5.3 has already demonstrated the cost of that silence: the story-dev invented an 8-second poll timeout, relabelled projection lag as Stale, defaulted pricing to zero, and shipped provider enable/disable with no confirmation or pending lock, all without violating a single sentence of the spines.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">Provider/model pricing has no UX rule</h3>
+              <span class="finding-location">DESIGN.md § Components › provider-catalog-grid, cost-control-editor; EXPERIENCE.md § Component Patterns › provider-catalog-grid, § Interaction Primitives</span>
+            </header>
+            <div class="finding-note">No validation (positive, non-zero, currency matches tenant budget), no confirmation, no future-only copy, no visible pricing version. The shipped Story 5.3 editor defaults to <code>0</code> / <code>USD</code>; a zero price is 'priced' under AD-10/AD-21, so reservations are 0 and the 80%/100% caps never fire while the grid reads healthy.</div>
+            <div class="finding-fix"><strong>Fix:</strong> No default values; units &gt; 0; currency must equal tenant budget currency or the row renders <code>status-important</code> with reservations blocked; pricing edits are <code>ProviderCatalogMutation</code> high-risk with confirmation showing old → new, effective version, and 'applies to attempts prepared after confirmation'; pin a pricing-version column.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Three register operation families outside the high-risk list</h3>
+              <span class="finding-location">EXPERIENCE.md § High-Risk Pending Commands, § Interaction Primitives; DESIGN.md › provider-catalog-grid</span>
+            </header>
+            <div class="finding-note"><code>ProviderCatalogMutation</code>, <code>AgentSetupMutation</code>, <code>AgentActivation</code> are in the register's OperationGateMatrix but get no confirmation, pending lock, or double-submit protection. Disabling a provider blocks every Agent selecting it (FR-4) yet the shipped page has no dialog or blast-radius display.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Extend the high-risk list to the register's full inventory or state which families are exempt and why; disable confirmation lists the Agents whose callability will be blocked; future-only copy for enable/disable.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Concurrent approver conflict has no UI state</h3>
+              <span class="finding-location">EXPERIENCE.md § Proposal Lifecycle, § Accessibility Floor</span>
+            </header>
+            <div class="finding-note">No <code>superseded</code>/<code>conflict</code> entry, the advisory lock is per-session so the second approver is never locked, and the live-region list omits 'state changed by another Party'. A dev shows a generic error or leaves a stale row with an enabled Approve.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a <code>superseded by another decision</code> outcome for every proposal action: render authoritative state, name the actor where disclosure allows, disable resolution controls, announce, never show the rejected local action as pending.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Approve-with-uncommitted-edits unspecified</h3>
+              <span class="finding-location">EXPERIENCE.md § Component Patterns › proposal-editor, § Key Flows › UJ-3; DESIGN.md › proposal-editor</span>
+            </header>
+            <div class="finding-note">Nothing forbids approving while the editor holds unsaved text, and the confirmation never has to show the exact VersionId, kind, author, and content that will post.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Approval disabled while the editor is dirty; the confirmation renders the selected version's id, kind, author, timestamp, and full content; the approved-version marker must match that id after projection confirmation.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Pending-lock survival across reload, navigation, and second tab undefined</h3>
+              <span class="finding-location">EXPERIENCE.md § High-Risk Pending Commands, § FrontComposer Readiness</span>
+            </header>
+            <div class="finding-note">'User session' is undefined, the timeout has no value, and there is no post-refresh rule. Story 5.3 invented an 8 s timeout and sets <code>Freshness = Stale</code> on lag, reusing the register's <code>Stale</code> (contract expired).</div>
+            <div class="finding-fix"><strong>Fix:</strong> Session = authenticated user + tab/circuit; on reload re-derive pending state from the authoritative status projection and re-arm the lock; a second tab renders 'pending in another session' with actions disabled; name the timeout and the post-timeout state (<code>awaiting projection</code>, not <code>Stale</code>); add a <code>duplicate submission (idempotent)</code> outcome.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">No 'approval authority indeterminate' state</h3>
+              <span class="finding-location">DESIGN.md § Colors, › proposal-state-badge, › proposal-editor; EXPERIENCE.md § Proposal Lifecycle</span>
+            </header>
+            <div class="finding-note">AD-12 resolves approver rights from the policy snapshot plus current dependency availability. <code>status-important</code> is reserved for stale policy basis but no proposal component includes it. When Tenants/Conversations are unavailable the UI fails open until the server rejects.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add <code>authority unresolved</code> to the editor/state table using <code>status-important</code>; all resolution controls disabled; copy names the unavailable dependency safely; add the colour to proposal-state-badge.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Deep links, command palette, and filters have no tenant-isolation rule</h3>
+              <span class="finding-location">EXPERIENCE.md § List And Detail Surfaces, § Interaction Primitives, § FrontComposer Readiness</span>
+            </header>
+            <div class="finding-note">'Empty must not leak unauthorized records' covers grids only. Foreign route ids, palette entries, search, and Party filter suggestions are not covered.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a 'Detail And Deep-Link Surfaces' rule: unauthorized or foreign ids render one <code>not available</code> state with identical copy, status class, and timing; palette/search obey the nav policy gate and never return records outside tenant scope.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Provider catalog scope undeclared</h3>
+              <span class="finding-location">EXPERIENCE.md § Information Architecture › Provider catalog; DESIGN.md › provider-catalog-grid, audit-evidence-panel</span>
+            </header>
+            <div class="finding-note">The catalog key is global (AD-10) and FR-19 allows platform-scoped records. The spines never say whether the grid, its audit trail, or the disable blast radius are tenant- or platform-scoped; Story 5.3 had to invent the no-disclosure rule.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State the scope; if platform-scoped, cross-tenant impact renders as an aggregate count or is omitted per disclosure category, never as tenant names.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Secret handling under-specified at the UI level</h3>
+              <span class="finding-location">DESIGN.md › provider-catalog-grid; EXPERIENCE.md › provider-catalog-grid, § Accessibility Floor</span>
+            </header>
+            <div class="finding-note">'Write-only or configured-state presentation' invites a secret-value input. No masking, never-echo, never-in-URL/error/clipboard rule, and no statement whether the secret reference is displayable. The shipped editor uses a plain text input for <code>ConfigurationReferenceId</code>.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Forbid secret-value entry in the Agents UI (reference only via EXT-SECRETS-1); reference id operator-only; masked input with autocomplete off if any secret-adjacent field is editable; validation and error copy never echo submitted values.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Pass and Ready/Callable can render Success past ValidUntil</h3>
+              <span class="finding-location">EXPERIENCE.md § Launch Readiness Evidence, § Provider And Model; DESIGN.md › provider-status-badge, launch-readiness-panel</span>
+            </header>
+            <div class="finding-note">No rule tells the client to re-evaluate validity on a cadence or demote when it lapses on an open page.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Re-evaluate on poll/focus; when T ≥ ValidUntil with no newer observation, show <code>Stale — re-observation required</code>, never the prior Success.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Qualification callability vs production enablement not distinguished</h3>
+              <span class="finding-location">EXPERIENCE.md § Agent Readiness, § UJ-5; DESIGN.md › agent-readiness-badge</span>
+            </header>
+            <div class="finding-note">A production-like profile can show <code>hexa is callable</code> in Success while the register says NOT READY.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Badge and overview carry EnvironmentProfile, gate-set name, matrix version, RegistryRevision; production enablement is a separate indicator never Success unless RQ-1 is READY.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Regeneration failure on an existing proposal undefined</h3>
+              <span class="finding-location">EXPERIENCE.md § Proposal Lifecycle, § Generation Failure Record</span>
+            </header>
+            <div class="finding-note">A dev may mark the proposal failed and strand approvable versions.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Regeneration failure leaves the proposal non-terminal with prior versions intact, records a linked failure record, announces it, and keeps approve/reject/abandon available.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">posting failed is unclassified</h3>
+              <span class="finding-location">EXPERIENCE.md § Proposal Lifecycle; DESIGN.md › proposal-state-badge, operational-status-panel</span>
+            </header>
+            <div class="finding-note">Not marked terminal; 'show recovery/status' never says whether an approver may retry, re-approve, or must start a new call.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Declare it terminal-for-this-approval; recovery is a new Agent Call or an explicit idempotent <code>retry posting</code> reusing the deterministic MessageId. Pick one.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Terminal-proposal enforcement is server-side only</h3>
+              <span class="finding-location">EXPERIENCE.md › proposal-editor, § Proposal Lifecycle</span>
+            </header>
+            <div class="finding-note">'Cannot post' is a treatment note; nothing says controls are removed on rejected/abandoned/expired/posted, and FR-16's regeneration block is not restated.</div>
+            <div class="finding-fix"><strong>Fix:</strong> On any terminal state the editor is read-only, resolution actions are absent, and the sole action is 'Start a new Agent Call'.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Expiry: threshold, race with approval, and configuration surface</h3>
+              <span class="finding-location">DESIGN.md § Colors, › agent-config-form; EXPERIENCE.md § IA, § UX Closure Decisions</span>
+            </header>
+            <div class="finding-note">'Nearing expiry' has no threshold (cannot be fixed when expiry ranges 1 h–30 d); expiry racing approval has no UI outcome; the FR-18 configuration surface is missing.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Nearing = percentage of the proposal's lifetime; add 'approval rejected — proposal expired at ExpiresAt'; add expiry duration to <code>hexa</code> configuration with future-only copy and ExpiresAt on every proposal.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">FR-7 disclosure category not carried into version-history or audit panel</h3>
+              <span class="finding-location">DESIGN.md › audit-evidence-panel, version-history; EXPERIENCE.md › approver-policy-builder</span>
+            </header>
+            <div class="finding-note">The audit panel lists approver and timestamp but not the policy basis that authorized the decision, and no component says how redacted/omitted renders.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Each approval decision row shows policy basis rendered by disclosure category with a whole-string placeholder for redacted/omitted; API and UI share the category.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Projection-lag vocabulary collides with register Stale</h3>
+              <span class="finding-location">EXPERIENCE.md § List And Detail Surfaces; DESIGN.md › operational-status-panel</span>
+            </header>
+            <div class="finding-note">Read surfaces never show projection version or 'as of'; 'stale/degraded where relevant' is undefined; the shipped page maps not-caught-up → <code>Freshness.Stale</code>.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Reserve <code>Stale</code> for expired evidence; use <code>catching up</code> for projection lag; every authoritative read surface exposes projection id + version in mono.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">agent-readiness-badge includes status-important with no mapped state</h3>
+              <span class="finding-location">DESIGN.md › agent-readiness-badge; EXPERIENCE.md § Agent Readiness</span>
+            </header>
+            <div class="finding-note">A dev has no trigger for it.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add <code>ambiguous Party identity</code> / <code>policy basis unresolved</code> rows mapped to Important, or drop the colour.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">'hide or deny' for policy-gated nav produces different disclosure profiles</h3>
+              <span class="finding-location">EXPERIENCE.md § FrontComposer Readiness</span>
+            </header>
+            <div class="finding-note">The two choices leak differently.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Hide unauthorized entries; deny-with-safe-copy on direct navigation.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Budget 80%/100% basis unspecified</h3>
+              <span class="finding-location">DESIGN.md › cost-control-editor</span>
+            </header>
+            <div class="finding-note">Usage only vs usage plus open reservations.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Thresholds evaluate usage plus outstanding reservations; label both figures.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Response-mode change copy silent on pending proposals</h3>
+              <span class="finding-location">EXPERIENCE.md › response-mode-toggle</span>
+            </header>
+            <div class="finding-note">Switching to Automatic does not say pending proposals remain proposals.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add that sentence to the confirmation copy.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+    <section class="reviewer-section">
+      <details>
+        <summary><h2>Implementation readiness review</h2><span class="reviewer-source">review-implementation-readiness.md · 1 critical · 8 high · 12 medium · 4 low</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>The spines are strong on meaning (what Success may never mean, which state is terminal, what must never leak) and weak on binding: they name surfaces without routes or policies, badges without the contract fields they read, and grids without deciding whether they are FC-TBL generated projections or hand-authored FluentDataGrids. Four of the fourteen IA surfaces have no route, no nav entry, no authorization policy, and no query. Worst of all, the one surface the spine calls the sole V1 invocation entry, the Conversation-owned Call hexa action, has no integration contract with the Conversations UI, and the code already shipped an admin-only alternate entry the spine explicitly forbids; the spine wins on conflict but gives the dev nothing to win with.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">Call hexa has no Conversations integration seam; code shipped the forbidden alternate entry</h3>
+              <span class="finding-location">EXPERIENCE.md § IA › Conversation invocation, › conversation-agent-call, § UX Closure Decisions</span>
+            </header>
+            <div class="finding-note">The spine says Call hexa is Conversation-owned and the sole V1 entry, but Conversations is a separate module and nothing names the extension point. <code>src</code> shipped <code>/agents/conversation-call</code> as an Administrator-gated admin nav entry, exactly what UX-DR24 forbids. Story 6.7 cannot be built from the spine.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a 'Conversation integration seam' subsection naming the Conversations-side extension point and the Agents-side artifact (exported Razor component + <code>IConversationAgentCallGateway</code>); state the admin route is a pre-integration harness to be de-listed before 6.7 closes; add a FrontComposer Readiness row for the seam.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">provider-status-badge binds to a contract that does not exist</h3>
+              <span class="finding-location">DESIGN.md › provider-status-badge; EXPERIENCE.md § Provider And Model</span>
+            </header>
+            <div class="finding-note"><code>ProviderReadinessResult</code> (OperationalState / Callability / ReasonCode) is defined only in Story 5.5 AC (backlog, blocked on EXT-PROVIDER-1). Contracts have <code>ProviderModelStatus</code> and <code>ProviderConfigurationState</code>; the built badge maps Enabled+Configured → Success with no Callability to obey.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name the owning story and target contract type in the component row; state the interim rule (render Unknown/Subtle, never Success, when no Callability field is present).</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">agent-readiness-badge has no named source of readiness proof</h3>
+              <span class="finding-location">EXPERIENCE.md § Agent Readiness; DESIGN.md › agent-readiness-badge</span>
+            </header>
+            <div class="finding-note">The spine forbids deriving callability from lifecycle but names no projection or field. Built <code>AgentReadiness.MapState</code> does exactly that: <code>Callable = Active &amp;&amp; no blockers</code>. No enum has 'active, not proven callable' or 'stale' despite UX-DR25.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Specify the readiness projection/field the badge reads (Story 5.5), add <code>ActiveNotProvenCallable</code> and <code>Stale</code> to the state table, and note the existing mapping must be replaced.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Four IA surfaces unbuildable as specified</h3>
+              <span class="finding-location">EXPERIENCE.md § IA rows 5–7 and 13; DESIGN.md › conversation-context-policy-panel, content-safety-policy-editor, cost-control-editor, audit-governance-panel</span>
+            </header>
+            <div class="finding-note">Conversation context policy, Content safety policy, Cost controls, Audit governance each lack route, nav entry, authorization policy, and read/write contract. Content safety never enumerates its fixed categories; Cost controls has no units; Audit governance names no commands. UX-DR1 lists 13 nav entries; the registration has 9.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Per surface add route, nav order, RequiredPolicy, FcPageLayoutMode, owning story, and contract types (or 'to be defined by Story N.N'); enumerate safety categories from <code>AgentContentSafetyPolicy</code>.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">No authorization-policy matrix</h3>
+              <span class="finding-location">EXPERIENCE.md § FrontComposer Readiness › Policy-gated nav</span>
+            </header>
+            <div class="finding-note">The spine never names a policy or maps surfaces to personas. <code>src</code> invented four (<code>Agents.Administrator</code>, <code>Approver</code>, <code>Operator</code>, <code>AuditOperator</code>) and gated Priya's Launch readiness as Administrator with an in-code apology.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a surface × policy table (persona, RequiredPolicy constant, page Authorize policy, fail-closed empty state) reconciled with the four existing constants.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Agent Call state table missing Story 6.7 states</h3>
+              <span class="finding-location">EXPERIENCE.md § Agent Call; epics.md Story 6.7</span>
+            </header>
+            <div class="finding-note">6.7 AC lists <code>safety blocked</code>, <code>budget blocked</code>, <code>capacity queued</code>, <code>capacity rejected</code>; neither the spine table nor <code>AgentCallOperationStatus</code> has them.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the four rows (all Severe, non-success, pre-Provider) with a 'start a new call' recovery note for capacity rejected; note the Contracts enum must grow.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">launch-readiness-panel binds to fields that do not exist</h3>
+              <span class="finding-location">DESIGN.md › launch-readiness-panel; EXPERIENCE.md § Launch Readiness Evidence</span>
+            </header>
+            <div class="finding-note">Spine requires Pass/Block/InsufficientEvidence/Stale, ObservedAt, exclusive ValidUntil, sample counts, cohorts, evidence levels. <code>AgentLaunchReadinessView</code> has Metrics, LatencyTargets, CostPosture, three bools, and string Blockers.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name the registry/projection contract (Story 5.5/8.7) the panel reads and mark the current page as superseded evidence.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">State Patterns give no numbers</h3>
+              <span class="finding-location">EXPERIENCE.md § State Patterns, § High-Risk Pending Commands</span>
+            </header>
+            <div class="finding-note">Polling cadence, catch-up timeout, retry, stale threshold, and what 'a client timeout forces refresh' means are absent. Two built write paths already diverge (250 ms/5 s vs 200 ms/8 s); DW-5 records a product ambiguity the spine should have answered; SignalR nudge subscription is unstated.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a 'Projection catch-up contract' block: interval, max wait, what renders on exhaustion, freshness threshold, and whether nudges shorten the poll.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">FC-TBL path undecided</h3>
+              <span class="finding-location">EXPERIENCE.md § Interaction Primitives, § FrontComposer Readiness › FC-TBL; DESIGN.md › provider-catalog-grid, proposal-queue-grid</span>
+            </header>
+            <div class="finding-note">'FC-TBL / FluentDataGrid' conflates the generated <code>[Projection]</code> lane (Fluxor ViewKey, FcStatusFilterChips, FcFilterSummary, FcFilterEmptyState) with a hand-authored grid. Every built grid is the latter in <code>FcAggregateListPage</code>, which neither spine mentions. 'Needs my action' has no FC-TBL slot mapping.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Decide per grid; for hand-authored grids list mandatory Fc components (FcFilterEmptyState, FcFilterResetButton, FcExpandInRowDetail) and how 'needs my action' maps to FcStatusFilterChips.AvailableSlots.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Generation-failure record has no schema owner</h3>
+              <span class="finding-location">EXPERIENCE.md § Generation Failure Record</span>
+            </header>
+            <div class="finding-note">The spine refuses to define it yet requires two panels to render it. No Contracts type exists.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name the owning story and the minimum safe fields (interaction id, failure class, timestamp, authorization gate).</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">FluentMessageBar cannot carry the DESIGN palette</h3>
+              <span class="finding-location">DESIGN.md › operational-status-panel, audit-evidence-panel; frontmatter colors</span>
+            </header>
+            <div class="finding-note">MessageBar Intent is Success/Warning/Error/Info/Custom only; Severe, Important, Subtle have no mapping.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State the mapping (Severe→Error + blocked icon, Important→Warning + question icon, Subtle→Info) or restrict MessageBar to page notices and use FluentBadge per item.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Hybrid page measure not expressible in FC-LYT</h3>
+              <span class="finding-location">DESIGN.md › cost-control-editor, audit-governance-panel; front-composer-shell.md § Layout</span>
+            </header>
+            <div class="finding-note">'Constrained authoring plus full-width evidence' vs one FcPageLayoutMode per page.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Pick one measure per page or split into two routes.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Pending-count notification seam not named</h3>
+              <span class="finding-location">DESIGN.md › proposal-notification; navigation.md</span>
+            </header>
+            <div class="finding-note">FrontComposer's rail renders count badges from <code>IBadgeCountService</code>; the spine never names it, so a dev hand-rolls a badge or never finds the seam.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name <code>IBadgeCountService</code> as the producer and the queue route as the status entry.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Accordion rule ambiguous where it matters and violated where clear</h3>
+              <span class="finding-location">DESIGN.md § Layout &amp; Spacing; EXPERIENCE.md § Interaction Primitives</span>
+            </header>
+            <div class="finding-note">Overview and Proposal detail each have 2+ titled sibling sections with no FluentAccordion; the spine never says whether the editor's editable region is the 'single primary content region'.</div>
+            <div class="finding-fix"><strong>Fix:</strong> List per surface which region is primary and which sections become FluentAccordionItems.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Icon source contradicts FrontComposer</h3>
+              <span class="finding-location">DESIGN.md § Colors 'icon vocabulary'</span>
+            </header>
+            <div class="finding-note">DESIGN says verify against the Fluent package; FrontComposer says use the curated <code>FcFluentIcons</code> factory, never the icons NuGet. The built registration reuses four glyphs across five nav entries because the curated set lacks them.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name <code>FcFluentIcons</code> as the only icon source and list required glyphs so missing ones become a FrontComposer request.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Proposal-expiry configuration has no surface</h3>
+              <span class="finding-location">EXPERIENCE.md § UX Closure Decisions</span>
+            </header>
+            <div class="finding-note">Same gap as Flow coverage and Governance; no IA row, component, or config field.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the field to <code>agent-config-form</code> with future-only copy.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Component rows are behavioural prose, not buildable specs</h3>
+              <span class="finding-location">EXPERIENCE.md § Component Patterns; DESIGN.md § Components</span>
+            </header>
+            <div class="finding-note">proposal-editor: no length limit, dirty state, confirmation surface, regenerate-while-pending rule. version-history: no selection control. proposal-queue-grid: no default sort, page size, age computation. cost-control-editor: no units.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a 'Props / events / variants' line per row, at minimum for the six high-impact families.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Localization mechanics under-specified</h3>
+              <span class="finding-location">EXPERIENCE.md § Voice and Tone; DESIGN.md § Typography</span>
+            </header>
+            <div class="finding-note">No resource type, key convention, or enforcement named. Built practice: <code>IStringLocalizer&lt;AgentsResources&gt;</code>, keys <code>Agents.&lt;Surface&gt;.&lt;Item&gt;</code>, resx at 599/599 parity, plus enum-keyed lookups the 'no fragments' rule neither allows nor forbids.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Codify resource type, key convention, the enum-keyed allowance, and <code>AgentsResourcesParityTests</code> as the conformance gate.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Pending-command pattern not chosen</h3>
+              <span class="finding-location">EXPERIENCE.md § FrontComposer Readiness</span>
+            </header>
+            <div class="finding-note">FrontComposer ships a pending-outcome resolver / FcPendingCommandSummary; Agents hand-rolls <code>AgentSetupTruthState</code> per page.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name the Agents truth-flow helper as the standard and state whether FrontComposer's resolver is in or out.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Flow-to-story mapping broken by the tracker</h3>
+              <span class="finding-location">EXPERIENCE.md § Key Flows; sprint-status.yaml</span>
+            </header>
+            <div class="finding-note">Epics say the 18-story Epic 5 is superseded by Epics 5–8; sprint-status.yaml still tracks the old slugs. Story 6.5 (capacity backpressure) has no flow.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a Story column to Key Flows and regenerate sprint-status against the replacement epics.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Proposal-state vocabulary mismatch with contract</h3>
+              <span class="finding-location">EXPERIENCE.md § Proposal Lifecycle; DESIGN.md › proposal-state-badge</span>
+            </header>
+            <div class="finding-note">Spine lists <code>generated</code> and <code>pending approval</code> as distinct; <code>ProposedAgentReplyState</code> collapses both into <code>Pending</code>.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Align the table to the contract enum or state that <code>generated</code> is the initial Pending version.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">'Fluent segmented control' does not exist</h3>
+              <span class="finding-location">DESIGN.md › response-mode-toggle; UX-DR23</span>
+            </header>
+            <div class="finding-note"><code>FluentRadioGroup</code> is what exists and what the code uses.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Say FluentRadioGroup.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">'Fluent list' and 'Fluent numeric form controls' are not component names</h3>
+              <span class="finding-location">DESIGN.md › version-history, cost-control-editor</span>
+            </header>
+            <div class="finding-note">Unverifiable against the package.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name FluentListbox (or custom listbox) and FluentNumberInput.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Side-by-side promise conflicts with Constrained editor</h3>
+              <span class="finding-location">EXPERIENCE.md § Responsive &amp; Platform</span>
+            </header>
+            <div class="finding-note">Desktop promises side-by-side metadata and version history while the editor is mandated 75 rem Constrained. Built stacks them.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Allow FullWidth for detail on wide desktop or drop the promise.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Overview 'Not available yet' stubs unsanctioned</h3>
+              <span class="finding-location">EXPERIENCE.md § State Patterns</span>
+            </header>
+            <div class="finding-note">A conformance reviewer cannot tell stub from defect.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a 'deferred metric' treatment (Subtle role, whole-string label).</div>
+          </article>
+        </div>
+      </details>
+    </section>
+    <div class="mechanical">
+      <h3>Mechanical notes</h3>
+      <ul>
+        <li>Misplaced general rules: DESIGN.md lines 256 and 258 (FluentAccordion rule; high-impact confirmation / pending-styling rule) sit under <code>### audit-governance-panel</code> although they apply to every component.</li>
+        <li>Contradictory wording: EXPERIENCE.md § Information Architecture opens with 'Candidate entries' (line 40) and closes with 'Surface closure status: final' (line 60).</li>
+        <li>Hedge in a final spine: EXPERIENCE.md line 116 'Exact implementation token names can be refined by architecture' while AD-5 and AD-10 already name them.</li>
+        <li>Frontmatter: both spines carry name, status: final, created, updated 2026-08-02, sources; all 16 paths resolve; DESIGN.md additionally carries description.</li>
+        <li>Cross-refs: all {colors.*}, {spacing.*}, {typography.*} references resolve; FC-LYT/FC-TBL/FC-A11Y/FC-L10N resolve; six operation-family names and seven NFR-14 tick names match architecture AD-25/AD-26 and the register; BadgeColor names verified 8/8 against Fluent UI Blazor v5.</li>
+        <li>Name inconsistencies: Approved/approved, Approver Policy/approver policy, Level 4–5 / Level 4/5; 'pending approval' absent from AD-5; 'conversation owner' vs AD-8 Facilitator; 'Global Providers Aggregate' absent from spines.</li>
+        <li>Mermaid: none used. The single ```text fence (EXPERIENCE.md lines 118–122) is correctly closed.</li>
+        <li>Visual references: none exist; spines-win statement present once (EXPERIENCE.md line 26); spine-only decision not explicitly recorded.</li>
+        <li>Fluent v5 fidelity: 'Fluent segmented control' does not exist; FluentMessageBar intents cannot express Severe/Important/Subtle; all 14 reference paths cited by EXPERIENCE.md exist on disk.</li>
+      </ul>
+    </div>
+    <footer class="report-footer">
+      <div class="meta">
+        <span>Rubric: review-rubric.md</span>
+        <span>Reviewers: review-accessibility.md · review-governance.md · review-implementation-readiness.md</span>
+        <span>Generated: 2026-09-08T18:13:16Z</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
