@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PRD Validation: Hexalith Agents</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+
+    --verdict-strong: #16a34a;
+    --verdict-adequate: #65a30d;
+    --verdict-thin: #d97706;
+    --verdict-broken: #dc2626;
+
+    --sev-low: #64748b;
+    --sev-medium: #ca8a04;
+    --sev-high: #ea580c;
+    --sev-critical: #dc2626;
+
+    --grade-exc: #16a34a;
+    --grade-good: #65a30d;
+    --grade-fair: #d97706;
+    --grade-poor: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  header.report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .grade {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: white;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .grade-excellent { background: var(--grade-exc); }
+  .grade-good { background: var(--grade-good); }
+  .grade-fair { background: var(--grade-fair); }
+  .grade-poor { background: var(--grade-poor); }
+
+  .synthesis {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--muted);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    font-size: 15.5px;
+  }
+  .synthesis p { margin: 0 0 10px; }
+  .synthesis p:last-child { margin-bottom: 0; }
+
+  .dimension-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .dim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .dim-card .dim-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .dim-card .dim-verdict { font-size: 14px; font-weight: 600; }
+
+  section.dimension, section.reviewer-section { margin-bottom: 14px; }
+  section.dimension details, section.reviewer-section details {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  section summary {
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  section summary::-webkit-details-marker { display: none; }
+  section summary::before {
+    content: "▸";
+    display: inline-block;
+    color: var(--muted);
+    transition: transform 0.15s ease;
+  }
+  section details[open] summary::before { transform: rotate(90deg); }
+  section summary h2 {
+    display: inline;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    flex: 1;
+  }
+  .verdict-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: white;
+  }
+  .verdict-strong { background: var(--verdict-strong); }
+  .verdict-adequate { background: var(--verdict-adequate); }
+  .verdict-thin { background: var(--verdict-thin); }
+  .verdict-broken { background: var(--verdict-broken); }
+
+  .dim-body { padding: 4px 20px 18px; }
+  .dim-judgment { color: var(--text); font-size: 14.5px; }
+  .dim-judgment p { margin: 0 0 10px; }
+
+  .findings-list { padding: 0 20px 4px; }
+  article.finding {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+  }
+  article.finding:first-child { border-top: none; }
+  article.finding header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+  }
+  .badge-sev-low { background: rgba(100, 116, 139, 0.12); color: var(--sev-low); }
+  .badge-sev-medium { background: rgba(202, 138, 4, 0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234, 88, 12, 0.14); color: var(--sev-high); }
+  .badge-sev-critical { background: rgba(220, 38, 38, 0.14); color: var(--sev-critical); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 500; flex: 1; min-width: 200px; }
+  .finding-location { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; color: var(--muted); }
+  .finding-note, .finding-fix { margin-top: 6px; font-size: 14px; }
+  .finding-fix strong { color: var(--muted); font-weight: 500; }
+
+  .reviewer-source {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  .mechanical {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  .mechanical h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mechanical ul { margin: 0; padding-left: 20px; }
+  .mechanical li { margin-bottom: 4px; color: var(--text); }
+
+  footer.report-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="report-header">
+      <div class="title">
+        <h1>Hexalith Agents — Validation Report</h1>
+        <div class="subtitle">_bmad-output/planning-artifacts/prds/prd-agents-2026-06-23/prd.md</div>
+      </div>
+      <div class="grade grade-poor">Poor</div>
+    </header>
+
+    <div class="synthesis">
+      <p><strong>Good.</strong> The PRD holds up as a governing requirements authority: the §1 thesis is specific and the metric set can falsify it (SM-7), §13 states 23 decisions with owners and what was given up, the FR-2 removal contradiction that was the only high finding at the gate is closed by a three-part membership step that detects an external removal before it would re-join, the configuration-time segregation predicate is now stated, and the 17 unconfirmed inferences are tagged, indexed, owned, and wired into <code>RQ-1</code>. What is at risk is a small cluster of rules an implementer will otherwise decide alone — four decidability gaps carried forward from the gate and one new state-machine ambiguity introduced by the FR-2 repair — plus a headline status line in §0 that no longer matches the register it cites. None of these blocks UX, architecture, or story extraction; the §0 count is the one a reader will notice first.</p>
+      <p>The three additional reviewers shift the picture, and the grade is Poor because any critical finding from any reviewer grades the run Poor; the rubric walk itself has no broken dimension and no critical finding. The adversarial and consistency reviewers place the criticals on the 2026-09-09 course-correction addition and on the state machines written for the last gate. PRD-side: <code>EXT-PROTECTION-1</code> landed in §8 without being wired into FR-21, FR-28, or the <code>RQ-1</code> input list — no FR requires a dependency to be <code>Available</code> before live content-bearing execution, the sentence that disables such execution has no requirement id, typed blocker, owner, or test, and the document now carries three different definitions of what <code>RQ-1</code> evaluates — while the §0 status line still says "seven of eight" against nine register entries with eight <code>Uncommitted</code>; the new FR-2 membership step can never re-admit <code>hexa</code> after a cleared block because its removal branch matches first; and the FR-7 scheduled re-check turns a transient Conversations outage into an irreversible <code>Abandoned</code> and can record <code>Abandoned</code> for content that was actually posted. Companion-artifact side: the launch-readiness register still gates <code>RQ-1</code> on real SM-1 through SM-6 attainment, contrary to FR-28 and OQ-22, and carries no SM-7 measurement contract; <code>epics.md</code> still inventories the retired caller source and has no rows for FR-29..FR-33; the Architecture Spine and the PRD disagree on who provisions <code>hexa</code>. Code side: the implementation-drift reviewer confirms that the four code-debt items recorded at the update gate are unchanged — readiness recording still accepts the prohibited cost postures (critical), configuration still accepts <code>BlockWithAuditableOverride</code> and <code>Caller</code>, <code>ProposalDetail.razor</code> still treats <code>PostingFailed</code> as terminal, and the nine additive members are still missing — and adds that the §8 sentence "disabled while its register entry is not <code>Available</code>" describes behaviour no code has: nothing in <code>src/</code> knows the register, <code>EXT-PROTECTION-1</code>, or the <code>Uncommitted</code>/<code>Committed</code>/<code>Available</code> vocabulary, and content execution is blocked today only because the default generation port is a fail-closed placeholder.</p>
+    </div>
+
+    <div class="dimension-summary">
+      <div class="dim-card">
+        <div class="dim-name">Decision-readiness</div>
+        <div class="dim-verdict" style="color: var(--verdict-strong)">strong</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Substance over theater</div>
+        <div class="dim-verdict" style="color: var(--verdict-strong)">strong</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Strategic coherence</div>
+        <div class="dim-verdict" style="color: var(--verdict-strong)">strong</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Done-ness clarity</div>
+        <div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Scope honesty</div>
+        <div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Downstream usability</div>
+        <div class="dim-verdict" style="color: var(--verdict-strong)">strong</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Shape fit</div>
+        <div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div>
+      </div>
+    </div>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Decision-readiness</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Decisions are stated as decisions. §13 carries 23 rows with owners and amendment dates; the three <em>Deferred</em> rows (OQ-15, OQ-18, OQ-23) each have a revisit condition, and OQ-18 has a date (A-14). Trade-offs name what was given up: OQ-10 ("<code>hexa</code> is unavailable in Conversations that outgrow the budget, in exchange for never sending a silently reduced context"), FR-7's last consequence ("That trade-off is accepted deliberately, on the same terms as OQ-10"), FR-6/OQ-20 ("a tenant that wants confirmation for sensitive Conversations runs Confirmation Response Mode for all of them"). §0 confronts the <code>status: final</code> objection head-on and §8 line 720 reports "only <code>EXT-HOST-1</code> is <code>Committed</code>" without softening.</p>
+            <p>The gate is decidable for a Release Operator: <code>RQ-1</code> (§3, FR-28, OQ-22) takes only pre-enablement evidence, <code>InsufficientEvidence</code> resolves to NOT READY (FR-28 last consequence), and the kill-switch triggers now have numbers (FR-28 line 622, A-17). The addendum's "Options Considered" list records the rejected repairs, which is exactly the pushback-acknowledgement the rubric asks for.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Readiness authority is a markdown register while FR-30 and §10 expose a callable readiness surface, and FR-28 now makes that surface depend on markdown edits</h3>
+              <span class="finding-location">FR-28 consequences 3 and 9, lines 614 and 621; FR-30 consequence 2, line 556; §10 line 796; §8.1 line 740</span>
+            </header>
+            <div class="finding-note">"The external dependency register's launch-readiness gate records are the readiness authority. Any per-Agent readiness record is transitional and must reconcile to that authority." FR-30 requires operators to "inspect launch-readiness state and its blockers" through a public contract, and FR-28 requires that contract to emit an <code>UnretiredAssumption</code> blocker "that names the row" — but §8.1 says "An assumption is retired by editing the keyed text and this index in the same change." So the runtime must know when a table row in <code>prd.md</code> was edited. Two sources of truth persist with "reconcile" as the only bridge, and the API reports whatever was last typed. Still open from 2026-09-08 and now slightly worse because of the assumption blocker.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Decide one way: readiness (including assumption retirement) is a governed runtime record that the register and §8.1 cite, or the API is a read-only mirror stamped "last synced from register on &lt;date&gt;" and explicitly non-authoritative. Say which in FR-28 consequence 9 and FR-30.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Whether <code>ARCH-A-1..ARCH-A-7</code> block <code>RQ-1</code> is stated three different ways</h3>
+              <span class="finding-location">§8.1 line 742; FR-28 consequence 3, line 614; OQ-22, line 878</span>
+            </header>
+            <div class="finding-note">§8.1 says "Any unretired Product, Architecture, or Governance assumption blocks <code>RQ-1</code>" immediately after delegating <code>ARCH-A-1..7</code> to the Architecture Spine, which reads as including them; FR-28 says "Any §8.1 assumption whose owner is Product, Architecture, or Governance", which excludes them; OQ-22 says "assumptions in §8.1", which also excludes them. The Spine does index seven <code>ARCH-A</code> rows (verified), so the question is real.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One sentence in §8.1: "Unretired <code>ARCH-A</code> rows block <code>RQ-1</code> on the same terms as <code>A-n</code> rows; the Spine's index is authoritative for their owner and retirement condition," and add "or an unretired <code>ARCH-A</code> row" to FR-28 consequence 3.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Substance over theater</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Every persona drives decisions: Nora → FR-1/FR-5/FR-7 and the FR-33 Tenant Agent Administrator rows; Milan → FR-8/FR-9 and A-11; Anika → the FR-7 four-moment segregation rule, carried inline in UJ-3 ("had no second Approver been resolvable ... the system would have refused her edit"); Omar → FR-23's deprecate-and-reject register and FR-29. The fifth JTBD role, Compliance Inspector, has no UJ but earns its glossary entry through FR-24, FR-33, and OQ-21. Four UJs, no padding.</p>
+            <p>The Vision is not swappable ("attributable to a durable Party identity rather than anonymous system output"; "without weakening the model's existing identity and governance guarantees"). NFRs carry product-specific numbers (NFR-9, NFR-10, NFR-11 "RPO 0 ... within 15 minutes", NFR-14) or product-specific invariants (NFR-8). SM-6 is a restated requirement and the PRD says so in place. The addendum's competitive notes are labelled contextual and are used only to justify what V1 defers.</p>
+            <p>No findings.</p>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Strategic coherence</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>The thesis (§1 line 24) is served by every feature group: identity (§4.1), governed Provider selection (§4.2), approval (§4.3, §4.6), fail-closed authorization (§4.7), safety before side effects (§4.10). §5 and §6.2 defer exactly what the addendum says competitors lead with. MVP scope kind is problem-solving with a deliberate platform seam (Approved Bounded Context Behavior, <code>ProposedAgentReplyState</code>), and the scope logic matches.</p>
+            <p>The metric set validates the thesis rather than activity: SM-7 is "the metric that could falsify the §1 thesis", SM-2 is demoted to secondary, and every primary has a counter-metric (SM-C2 for SM-3; SM-7's two-sided band is self-counterbalancing). The gate-run's low finding on SM-7 for an all-Automatic cohort is now addressed in place: §12 line 835 states SM-3/SM-7 "apply to Confirmation Response Mode tenants", names what covers Automatic tenants, and OQ-23 defers the retraction metric with a revisit condition tied to <code>EXT-CONV-AI-1</code>. That is a resolution, not a dodge.</p>
+            <p>No findings.</p>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Done-ness clarity</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>The FR set is unusually testable: every hard bound has a number (FR-9 margin, FR-16 ceiling, FR-18 expiry and retry, FR-28 hold, FR-32 caps with "no implicit default"), typed reasons are named wherever an engineer would otherwise invent one (<code>NoEligibleApprover</code>, <code>SourceConversationUnavailable</code>, <code>RemovedInConversations</code>, <code>MembershipUnavailable</code>, <code>MembershipRejected</code>, <code>NotInvoked</code>, <code>Indeterminate</code>, <code>Blocked</code>, <code>ProhibitedCostControlPosture</code>, <code>UnretiredAssumption</code>), FR-18 enumerates the proposal state machine with terminality and expiry-freeze semantics, and FR-8 fixes the pre-Provider check order. The gate-run's configuration-time predicate finding is <strong>resolved</strong>: FR-7 line 232 now states the rule ("names no Conversation-dependent source ... and names fewer than two predefined Parties") and decides the Facilitator-only case explicitly.</p>
+            <p>What keeps this from <em>strong</em> is a cluster of rules that read as testable but are not decidable as written. Four were deferred from the gate run "to the next validate run"; each is re-examined below. One is new, introduced by the FR-2 repair.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">"More restrictive of two policies" and "stricter mode-specific policy" are still not computable</h3>
+              <span class="finding-location">FR-26 consequences 4 and 7, lines 575 and 578; FR-26 preamble line 568; FR-33 row line 420</span>
+            </header>
+            <div class="finding-note"><strong>Still stands, unchanged.</strong> "each retry, approval-time check, and pre-post check uses the more restrictive of the initial attempt's policy and the then-current active policy." Two policy documents with different category sets, thresholds, and handling rules are not totally ordered; the only implementation is "must pass both", which the text never says. An implementer will choose between "pass both" and "pass the newer" and either choice is defensible from the page.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Replace with "the content must pass every applicable policy version — the initial attempt's and the then-current active policy; a mode-specific policy is applied in addition to, never instead of, the platform policy." Mirror in OQ-9's last sentence.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">FR-31's assertion category blocks the summaries UJ-2 exists for, and OQ-9 states a narrower rule than FR-31</h3>
+              <span class="finding-location">FR-31 consequence 2, line 587; OQ-9 line 865; UJ-2 line 56; FR-17 consequence 4, line 382</span>
+            </header>
+            <div class="finding-note"><strong>Still stands, and has acquired an internal drift.</strong> FR-31 blocks content "that asserts a decision, commitment, or approval on a Party's behalf"; OQ-9 says only "asserts a decision on a Party's behalf". Milan's job is "interpreting the prior discussion"; "Milan agreed to ship Friday" asserts a commitment on Milan's behalf, and because FR-17 scans human-edited versions "on the same terms", an Approver who writes "the team approved this plan" is blocked at approval time. No classifier separates reporting from asserting, so the rule is a no-op or blocks the core use.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Narrow both to first-person impersonation ("content written in the voice of a named Party or presented as that Party's own statement") and state that reporting a Party's position from Conversation content is permitted. Make FR-31 and OQ-9 say the same thing.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The Agent Call still has no public state contract, and the shipped code has two competing ones</h3>
+              <span class="finding-location">FR-8; FR-10; FR-12; FR-23 consequence 4; FR-25 consequence 2, line 544; §10 line 789 "Agent Call status"</span>
+            </header>
+            <div class="finding-note"><strong>Still stands, and is sharper for a brownfield PRD than the gate run recorded.</strong> FR-18 adopts the shipped <code>ProposedAgentReplyState</code> by name; nothing does the same for the call, yet FR-25 requires status to "distinguish configuration errors, authorization failures, context policy failures, content safety failures, Provider failures, generation failures, pending approvals, and posting failures" and §10 exposes "Agent Call status". <code>src/Hexalith.Agents.Contracts/AgentInteraction/AgentInteractionStatus.cs</code> declares 28 values (<code>Requested</code>, <code>Authorized</code>, <code>Denied</code>, <code>Blocked</code>, <code>ContextReady</code>, <code>ContextBlocked</code>, <code>Generated</code>, <code>GenerationFailed</code>, <code>SafetyFailed</code>, <code>Posted</code>, <code>PostingFailed</code>, plus 16 <code>Proposal*</code> values that duplicate FR-18's machine), <code>src/Hexalith.Agents.UI/Components/Shared/AgentCallStatus.cs</code> declares a different 14-value set with <code>Unknown</code> last rather than <code>= 0</code>, and <code>AgentInteractionContextMode</code> has <code>Unknown | Full | Bounded</code> with no <code>Blocked</code> (FR-9 says <code>Blocked</code> is additive, which is consistent). FR-9's <code>Blocked</code> and FR-12's <code>Indeterminate</code> name two values but not the set they belong to. UX will draw status chips and stories will write acceptance criteria against whichever enum they find first.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add an FR-8 consequence that names the public Agent Call state contract the way FR-18 does — either adopt <code>AgentInteractionStatus</code> minus the <code>Proposal*</code> duplicates, or declare a new set (accepted; blocked-by authorization / context / safety / cost / rate limit / approver / membership; generating; generated; <code>Indeterminate</code>; posted; posting failed) — mark which are terminal, and place the UI-only enum and the duplicated <code>Proposal*</code> values on the FR-23 non-conformance list.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">p99 over 30 executions is the sample maximum, stated in three places</h3>
+              <span class="finding-location">NFR-9 line 697; FR-28 consequence 6, line 617; OQ-5 line 861; §11 line 818</span>
+            </header>
+            <div class="finding-note"><strong>Still stands, unchanged.</strong> With n = 30 the 99th percentile is the largest sample or an interpolation between the top two, so "p99 ≤ 120 seconds" is either "no single run exceeds 120 s" or method-dependent, and §11 delegates the percentile method to a downstream measurement contract. The gate's meaning depends on a choice the PRD does not make.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Either keep p95 only in the <code>RQ-1</code> gate with n ≥ 30 and make p99 a launch-health observation, or raise the p99 minimum to a size that supports it (≥ 300) — and name the percentile method (nearest-rank or linear interpolation) in NFR-9. Apply the same edit to FR-28 and OQ-5 so the three stay in step.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">An external removal detected at the pre-post check has two different outcomes</h3>
+              <span class="finding-location">FR-2 consequences 4 and 9, lines 148 and 153; FR-18 consequence 2, line 392; FR-18 pre-post consequence, line 397; FR-28 kill-switch consequence, line 622</span>
+            </header>
+            <div class="finding-note"><strong>New; introduced by the FR-2 repair.</strong> FR-2 line 153: a removal performed directly in Conversations "is observed at the next membership step — at acceptance or before posting — and that step sets the block itself and fails the call or post closed with <code>RemovedInConversations</code>", and line 148 says the detecting step "abandon[s] non-terminal proposals for that Conversation". FR-18 line 392 lists <code>RemovedInConversations</code> as a system-abandonment reason. But FR-18 line 397 says a pre-post failure — including "<code>hexa</code> is still a member of and not blocked" — "moves the proposal to <code>PostingFailed</code> rather than posting stale content", and line 150 says <code>MembershipUnavailable</code>/<code>MembershipRejected</code> are the posting-failure reasons for that re-validation. So the proposal being posted when removal is detected ends either <code>Abandoned(RemovedInConversations)</code> or <code>PostingFailed(MembershipRejected)</code>, and the two states have different exits, different SM-3 treatment (<code>Abandoned</code> leaves the denominator; <code>PostingFailed</code> counts as decided), and different kill-switch handling (line 622 lets <code>Approved</code>/<code>PostingPending</code> "complete or fail on their own terms", which abandonment overrides).</div>
+            <div class="finding-fix"><strong>Fix:</strong> State in FR-18's pre-post consequence: "except that a detected removal or Agents-owned block moves the proposal to <code>Abandoned</code> with reason <code>RemovedInConversations</code> under FR-2, not to <code>PostingFailed</code>", and scope <code>MembershipUnavailable</code>/<code>MembershipRejected</code> in FR-2 line 150 to transient or authorization failures that are not a removal.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Residual adjective-only phrasing</h3>
+              <span class="finding-location">FR-1 consequence 3, line 137; FR-4 consequence 2, line 178; FR-20 consequence 3, line 456; FR-22 consequence 3, line 486; FR-25 consequence 3, line 545</span>
+            </header>
+            <div class="finding-note">FR-1 "prior value where safe to expose"; FR-4 "A documented migration state may allow temporary read-only inspection"; FR-20 "at a level sufficient to explain"; FR-22 "clearly distinguishes"; FR-25 "support launch monitoring of adoption and approval workflow metrics" — unchanged since the gate; each is bounded elsewhere or low-stakes.</div>
+            <div class="finding-fix"><strong>Fix:</strong> FR-1: "excluding secret references (NFR-6)". FR-4: name the migration state or delete the sentence. FR-25: "exposes the SM-2, SM-3, SM-7, SM-C4, and SM-C5 inputs defined in §12."</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Scope honesty</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Omissions are explicit and do real work: §5 (eleven non-goals), §6.2 with reasons, FR-27's "V1 provides no redaction or exclusion path for individual historical messages (OQ-18)" placed where an implementer reads it, and OQ-23 recording that Automatic-mode tenants have no retraction metric rather than letting the reader assume SM-7 covers them. §0 says what <code>final</code> does and does not mean. The Assumptions Index is real: 17 rows, each with location, owner, and retirement condition, and every inline tag round-trips (see Mechanical notes).</p>
+            <p>Open-items density: 17 <code>[ASSUMPTION]</code> rows (up from 14 at the gate; A-15, A-16, A-17 added by the same-day reconciliation), 3 <em>Deferred</em> register rows, 0 <code>[NOTE FOR PM]</code>, and 8 of 9 critical external dependencies <code>Uncommitted</code>. Eleven of the 17 assumptions are owned wholly or partly by Product/Architecture/Governance and therefore block <code>RQ-1</code>; nine of those retire only when "Product confirms or retunes before enablement" or "Product confirms the FR-33 row". For a <code>status: final</code> launch PRD that would be a blocker if the PRD claimed build readiness. It does not — §0 line 16 says "No consuming story is <code>ready-for-dev</code>" and routes the block through FR-21 and the register — so the density is honest and acceptable. It is, however, at the ceiling: the count grew between two same-day revisions, and nine Product confirmations with no date are one batch decision away from retiring. The PRD would be stronger if that batch had a date the way A-14 does.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The §0 status line no longer matches §8 or the register</h3>
+              <span class="finding-location">§0 line 16; §8 lines 718–720; <code>external-dependency-register.md</code> "Critical Dependency Records"</span>
+            </header>
+            <div class="finding-note">§0: "seven of eight critical external dependencies are <code>Uncommitted</code> (§8)". §8 line 718 lists nine IDs including <code>EXT-PROTECTION-1</code>, line 720 says "only <code>EXT-HOST-1</code> is <code>Committed</code>; the remaining entries are <code>Uncommitted</code>", and the register carries nine records with eight <code>Uncommitted</code>. The course-correction added the ninth entry to §8 without touching the sentence that summarises it, so the first status a reader meets is wrong by one and contradicts the section it cites. On a launch PRD the §0 status line is the sentence executives read.</div>
+            <div class="finding-fix"><strong>Fix:</strong> "eight of nine critical external dependencies are <code>Uncommitted</code> (§8)", and consider replacing the literal count with "all critical external dependencies except <code>EXT-HOST-1</code> are <code>Uncommitted</code> (§8)" so the sentence cannot drift again.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title"><code>Available</code> is a register status the PRD uses once and never defines</h3>
+              <span class="finding-location">§8 Hexalith.EventStore Payload Protection bullet, line 731; §8 preamble lines 706–720</span>
+            </header>
+            <div class="finding-note">The PRD's own status vocabulary is <code>Uncommitted</code>/<code>Committed</code> (§0, FR-21, §8); the new bullet gates "live content-bearing execution" on the entry being <code>Available</code>, a third status the register defines ("installed/consumable and its executable compatibility command passes with live Level 4 component evidence") but the PRD does not. The distinction is the right one — <code>Committed</code> permits story readiness, <code>Available</code> permits execution — but a reader of the PRD alone cannot tell that <code>EXT-PROTECTION-1</code> is held to a stricter bar than the other eight, or that the other eight are held to the same bar for execution (the register says they are).</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add one sentence to the §8 preamble: "<code>Committed</code> unblocks <code>ready-for-dev</code>; <code>Available</code> (target installed and its compatibility command passing at Level 4) is required before any runtime or qualification path executes the seam," and cite the register's status table.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Ten assumptions retire on a condition with no date</h3>
+              <span class="finding-location">§8.1 A-1 to A-4, A-9 to A-12, A-15, A-16</span>
+            </header>
+            <div class="finding-note">The Conversations-seam rows retire when <code>EXT-CONV-AI-1</code> reaches <code>Committed</code>, whose target date is <code>TBD</code> in the register; the FR-33 rows retire when "Product confirms the FR-33 row" with no date. Only A-14 has one.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Give the FR-33 confirmations a single due date (they are one Product decision), and cite the register's <code>TargetIntegrationDate</code> field for A-1..A-4, A-15, A-16 so the date lives in one place.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Downstream usability</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Chain-top obligations are met. The glossary is complete and is used identically across FRs, UJs, and SM definitions; every ID is unique and every cross-reference resolves (FR-1..FR-33, NFR-1..NFR-14, OQ-1..OQ-23, SM-1..SM-7, SM-C1..SM-C5, UJ-1..UJ-4, A-1..A-17, EXT-*-1 ×9 — verified). Each UJ has a named protagonist with inline context. Brownfield references are accurate where they name code: <code>ProposedAgentReplyState</code> (11 values incl. <code>Unknown</code>, matches FR-18), <code>ApproverPolicySourceKind.Caller</code>/<code>.ConversationOwner</code>, <code>CostControlPosture.ReportingOnlyMonitoring</code>/<code>.AcceptedLaunchRisk</code>, <code>ContentSafetyFailureHandling.BlockWithAuditableOverride</code>, <code>AgentSetupWriteStatus.Submitted = 0</code> — all verified in <code>src/Hexalith.Agents.Contracts</code>. The gate's high finding on FR-2 is closed: the three-part membership step (read state → detect absence → join only if never established or cleared) is exactly the "verify rather than re-join" option, and OQ-16 and §8 were updated to match.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Process gates remain inside FR-21</h3>
+              <span class="finding-location">FR-21 consequences 4–6, lines 467–469</span>
+            </header>
+            <div class="finding-note">"A story completed while a dependency it consumes was <code>Uncommitted</code> is recorded as non-conformant" is sprint governance, not system behavior; it has no implementing story and §8 line 720 already states it.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Move consequences 4–6 into §8 and keep a one-line cross-reference in FR-21.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Code names for the two central aggregates are absent from the glossary</h3>
+              <span class="finding-location">§3 "Agent Call", "Global Providers Aggregate"</span>
+            </header>
+            <div class="finding-note">The code's established names are <code>AgentInteraction</code> (<code>src/Hexalith.Agents.Contracts/AgentInteraction/</code>) and <code>ProviderCatalog</code> (<code>src/Hexalith.Agents.Server/Projections/ProviderCatalogReadModel.cs</code>); every route, event, and enum uses them.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add "(code: <code>AgentInteraction</code>)" and "(code: <code>ProviderCatalog</code>)" to the two entries.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title"><code>Draft</code> lifecycle state is never named</h3>
+              <span class="finding-location">FR-3; FR-22 consequence 3, line 486</span>
+            </header>
+            <div class="finding-note"><code>AgentLifecycleStatus</code> is <code>Unknown | Draft | Active | Disabled</code>; FR-22 asks the UI to distinguish "active, disabled, invalid", where "invalid" is a readiness classification, not a lifecycle state, and <code>Draft</code> is missing.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name <code>Draft</code> in FR-3 and write "invalid configuration (readiness)" in FR-22.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Shape fit</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>The shape fits a multi-stakeholder B2B governance capability with meaningful UX: UJs are load-bearing (UJ-3 is where FR-7 becomes legible), SMs are user-facing where the thesis needs them (SM-7) and operational where the gate needs them (SM-4, SM-5), and brownfield references are distinguished from new requirements (FR-23's deprecate-and-reject register; FR-18's explicit adoption of the shipped enum; FR-9's "additive" <code>Blocked</code>). What still strains the shape is release-process content interleaved with product behavior — FR-21 consequences 4–6, FR-28's gate mechanics and kill switch, §11's evidence taxonomy, NFR-11/NFR-12's drills and environment limits. §0 declares "normative evidence authority" as a deliberate choice, so this is recorded as a shape cost rather than a defect; a story writer must sort behavior from procedure.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Evidence retention and traceability still diverge at day 366</h3>
+              <span class="finding-location">§9 lines 773–774; FR-24 consequence 1, line 528; §8 Payload Protection bullet, line 731</span>
+            </header>
+            <div class="finding-note">§9 erases "protected sensitive payloads" 365 days after terminal state while posted messages "remain governed by Hexalith.Conversations retention"; FR-24 promises every posted Agent Response "can be traced back to ... generated content". The new <code>EXT-PROTECTION-1</code> bullet names "field-level <code>ProtectedContent</code>" and "typed <code>Erased</code> replay", which is the mechanism, but the PRD still never says which evidence fields are inside the protected envelope and which survive.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State in §9 that identities, versions, decisions, timestamps, policy versions, and content hashes survive erasure so the trace remains provable without content.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="reviewer-section">
+      <details>
+        <summary>
+          <h2>Adversarial review</h2>
+          <span class="reviewer-source">review-adversarial-general.md</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>I would not sign off. The 2026-09-09 update did what the previous gate asked: FR-7 is now one predicate, FR-2 is a three-part step, §8 registers six Conversations seams, cost reservation is ordered and released, SM-3 is decision latency, and unretired assumptions block <code>RQ-1</code>. But the course-correction that followed landed <code>EXT-PROTECTION-1</code> as an orphan: §0 still counts "seven of eight" dependencies against a nine-entry list, no FR requires a dependency to be <code>Available</code> (only <code>Committed</code>) before live content-bearing execution, the sentence that disables such execution has no requirement id, no typed blocker, no owner, and no test, and OQ-22's <code>RQ-1</code> "evaluates only" list excludes dependency status altogether — so the document now carries three different definitions of what <code>RQ-1</code> evaluates. The <code>ARCH-A-1..7</code> delegation hands seven <code>RQ-1</code> blockers to an unversioned document whose owner retires its own rows, and that document already diverges from the PRD on reservation settlement (<code>Unreconciled</code>, period close) and on the role matrix (Platform Operator provisions <code>hexa</code>). Below that, the state machines written to satisfy the last gate still have literal holes: the FR-2 step can never re-admit <code>hexa</code> after a cleared block because its first branch matches first; FR-7's scheduled re-check turns a transient Conversations outage into an irreversible <code>Abandoned</code>; a <code>PostingFailed</code> proposal can be abandoned after its post actually landed, leaving audit and Conversation in contradiction; and the kill switch is both a system-abandonment reason (FR-18) and a "humans may still reject or abandon" pause (FR-28), with a trigger a single hostile Participant can trip. Eleven of the thirteen deferred mediums stand untouched. One more pass, focused on wiring the new dependency and closing the state-transition gaps, is needed before this is an executable requirements authority.</p>
+            <p><strong>Deferred M-1..M-13 status</strong></p>
+            <ul>
+              <li><strong>M-1 (kill switch):</strong> Partially resolved — FR-33 row and FR-28 effect added; <strong>re-rate High</strong>: FR-18 lists "kill switch" as a <em>system</em> abandonment reason while FR-28 says pending proposals stay for humans to reject/abandon and <code>Approved</code>/<code>PostingPending</code> proceed; no release authority, no state (see H-5).</li>
+              <li><strong>M-2 (Release Operator tenant-scoped, no production-enablement row):</strong> Still stands, unchanged (FR-33 lines 421, 434; FR-28 line 613 says production enablement is "blocked until <code>RQ-1</code> records READY" but no row says who records READY or enables production).</li>
+              <li><strong>M-3 (discovery "previously resolved" is a write / late joiners):</strong> Still stands, unchanged (FR-13 line 338).</li>
+              <li><strong>M-4 (safety cache key ignores tenant mode-specific policy):</strong> Still stands (FR-27 line 602 keys one "Content Safety Policy version"; FR-26 line 575 still has a "stricter mode-specific policy"; OQ-18 still deferred).</li>
+              <li><strong>M-5 (no call-to-acceptance latency bound; scan budget has no number):</strong> Still stands (NFR-9 line 697, FR-27 line 604).</li>
+              <li><strong>M-6 (<code>RQ-1</code> input lists disagree):</strong> Still stands and widened — now three lists (§3 line 114, FR-28 lines 608–621, OQ-22 line 878); folded into C-1.</li>
+              <li><strong>M-7 (<code>AiAgent</code> Party can be Approver or caller):</strong> Still stands, unchanged.</li>
+              <li><strong>M-8 (editor identity exposed wherever provenance is shown):</strong> Still stands and is now baked into the <code>EXT-CONV-AI-1</code> posting metadata ("human-edited and by which Party") in the register.</li>
+              <li><strong>M-9 (regeneration re-runs Approver resolution?):</strong> Largely resolved by FR-16 line 371 ("re-runs the FR-9 ... and the FR-27 pre-Provider scan"); residual Low: say explicitly that the regenerating Approver is not "the caller" for the Eligible Approver predicate (L-1).</li>
+              <li><strong>M-10 (Conversation Context Policy has no FR-33 owner; §10 puts it under tenant Agent administration):</strong> Still stands, unchanged (§10 line 786).</li>
+              <li><strong>M-11 (<code>AgentSetupWriteStatus.Submitted = 0</code> cannot be fixed "additively"):</strong> Still stands, unchanged (FR-23 line 502).</li>
+              <li><strong>M-12 (no staleness bound on <code>Approved</code>/<code>PostingFailed</code>; administrative retry posts weeks-old content):</strong> Still stands, unchanged (FR-18 line 396).</li>
+              <li><strong>M-13 (FR-13 "Conversation status entry" not in <code>EXT-CONV-UI-1</code>):</strong> Still stands; the register's <code>EXT-CONV-UI-1</code> gained <code>GetCallabilityAsync</code> but no status-entry artifact (FR-13 line 336, §8 line 730).</li>
+            </ul>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">C-1. <code>EXT-PROTECTION-1</code> is an orphan, and its arrival exposes that <code>RQ-1</code> has three incompatible definitions</h3>
+              <span class="finding-location">§0 line 16; §8 lines 718, 720, 731; FR-21 lines 467–469; FR-28 lines 612–613, 621; §3 <code>RQ-1</code> line 114; OQ-22 line 878; §9 line 774; FR-30 line 555</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> §0: "seven of eight critical external dependencies are <code>Uncommitted</code>". §8: "The initial register scope includes <code>EXT-CONV-AI-1</code>, <code>EXT-CONV-UI-1</code>, <code>EXT-HOST-1</code>, <code>EXT-PROVIDER-1</code>, <code>EXT-SAFETY-1</code>, <code>EXT-TOKEN-1</code>, <code>EXT-SECRETS-1</code>, <code>EXT-PROTECTION-1</code>, and <code>EXT-TOPOLOGY-1</code>" — nine. §8 line 731: "Live content-bearing execution is disabled while its register entry is not <code>Available</code>; the shipped no-op protection implementation cannot satisfy production-like evidence." OQ-22: "<code>RQ-1</code> evaluates only evidence a qualification cohort can produce before enablement: live Evidence Levels 4 and 5, SM-1, SM-4, SM-5, SM-6, the NFR-9 and NFR-14 latency gates, and audit completeness." <strong>Attack:</strong> (a) The status line of a <code>final</code> document undercounts its own blockers; the register says "eight records are <code>Uncommitted</code>". (b) The only PRD gate that mentions dependency status is FR-21, and it gates <code>ready-for-dev</code> on <code>Committed</code>. Nothing in FR-21, FR-28, §3, or OQ-22 requires <code>Available</code>; FR-28 line 612 says qualification may collect live evidence once "external dependency commitments are active and recorded" — <code>Committed</code> is a commitment. The register's rule ("No runtime, test, or qualification path may execute a consumed external seam until the record is <code>Available</code>") lives only in the register, and OQ-22's "evaluates only" excludes dependency status from <code>RQ-1</code> entirely, so a literal reader of OQ-22 can record READY with the no-op protection engine in place. (c) The "disabled while not <code>Available</code>" sentence is the one place the PRD states the runtime bar, and it has no FR number, no typed blocker (compare <code>ProhibitedCostControlPosture</code>, <code>UnretiredAssumption</code>), no FR-33 owner, no A-index row, and no consequence an engineer can test — is it a runtime check in FR-28's readiness evaluation, or a process rule? (d) §9's "completion requires restrictive confirmation from payload protection", FR-30's legal hold/export/deletion operations, and the <code>Erased</code> replay semantics all depend on this engine and none cite it, so a story implementing FR-30 against the no-op default passes FR-21 as written (FR-30 is not among the register's consuming stories by FR id, only by story number). (e) Three <code>RQ-1</code> lists: §3 (Levels 4/5 + SM-1/4/5/6 + NFR-9/14), FR-28 (adds audit completeness, <code>UnretiredAssumption</code>, postures, caps, "NFR-11 through NFR-14", register readiness records), OQ-22 ("only" the §3 list + audit completeness + assumptions). NFR-11's recovery exercise and NFR-12's numeric limits appear in FR-28's first sentence and nowhere else (M-6).</div>
+            <div class="finding-fix"><strong>Fix:</strong> Correct §0 to "eight of nine". Add to FR-28 one enumerated <code>RQ-1</code> input list that all three locations cite by reference, including: every dependency in the qualification profile <code>Available</code> with a passing compatibility command (typed blocker <code>DependencyNotAvailable</code> naming the entry), the NFR-11 recovery exercise, and the NFR-12 limit records. Add a FR-21 consequence: "Content-bearing runtime paths (proposal versions, generated content, Conversation Context, Audit Evidence content fields) fail closed with a typed <code>PayloadProtectionUnavailable</code> outcome while <code>EXT-PROTECTION-1</code> is not <code>Available</code>; a no-op protection implementation is a readiness blocker, not a default." Cite <code>EXT-PROTECTION-1</code> from §9 and FR-30.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">C-2. The FR-2 membership step cannot re-admit <code>hexa</code> after a cleared block: its removal branch matches first, and the mirror's failure mode is undefined</h3>
+              <span class="finding-location">FR-2 lines 148, 152–153; FR-33 row line 417 ("Remove, block, and re-admit"); OQ-16 line 872</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "has three parts, in order: read <code>hexa</code>'s participant state in that Conversation; if Agents previously established membership there and <code>hexa</code> is now absent, treat it as an external removal — set the Agents-owned block ...; only if Agents has never established membership there, or the block was cleared by the named authority, add <code>hexa</code> as a participant." And: "Removal is an Agents-owned per-Conversation block that also removes <code>hexa</code> from the Conversation's participant list through the Conversations participant-removal seam". <strong>Attack:</strong> Removal mirrors to Conversations, so after any removal <code>hexa</code> is absent there. The authority clears the block. Next call: part two evaluates first — "Agents previously established membership" (true) "and <code>hexa</code> is now absent" (true, the mirror removed it) — so the step treats the clear as a fresh external removal, re-sets the block, abandons the proposals, and rejects. Part three's "or the block was cleared" is unreachable because the parts run "in order" and part two never consults the cleared flag. Re-admission is impossible under the literal text, and the FR-33 "re-admit" operation has no defined effect (does it clear the block, re-join immediately, or both?). Second hole: the block "also removes <code>hexa</code> ... through the ... seam". If the seam call fails (Conversations unavailable), either the block is set without the mirror — <code>hexa</code> remains listed "on the same terms as any other participant" while the PRD says removal "is visible to Participants and not only to Agents" — or removal fails when Conversations is down, which contradicts the block being "Agents-owned". Third: a Facilitator can clear a block the Tenant Agent Administrator set for tenant policy reasons, and vice versa; the row grants both symmetric authority over each other's decisions.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Replace the prose with a <code>ConversationAgentState</code> machine: <code>NeverJoined → Joined → (ExternallyRemoved | Blocked) → Cleared → Joined</code>. Clearing the block records <code>ReadmitPending</code>; the membership step adds <code>hexa</code> when state is <code>NeverJoined</code> or <code>ReadmitPending</code>, detects external removal only when state is <code>Joined</code> and the participant read says absent, and never abandons proposals from <code>ReadmitPending</code>. State that the block is authoritative and durable immediately, the mirror is an at-least-once outbox with typed <code>MirrorPending</code> status visible under FR-25, and calls are rejected while the mirror is pending. State whether a block set by the Tenant Agent Administrator can be cleared by a Facilitator (recommend: cleared only by the setting authority or a higher one).</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">C-3. The proposal lifecycle converts transient faults into irreversible terminal states, and can record <code>Abandoned</code> for content that was actually posted</h3>
+              <span class="finding-location">FR-7 line 236; FR-18 lines 392, 396–397; FR-21 line 460; §9 line 771; NFR-11 line 699; §8 seam 2 line 724</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> FR-7: "When any later action or scheduled re-check finds the Eligible Approver set empty, or finds the Source Conversation gone or inaccessible to the Agents Service Principal, the system moves the proposal to <code>Abandoned</code>". FR-18: "When the retry budget is exhausted, the proposal remains <code>PostingFailed</code> ... until ... an Eligible Approver abandons it; the Tenant Agent Administrator abandons it ...". §9: "Rejected, abandoned, and expired proposals remain audit records and cannot later be posted." <strong>Attack:</strong> (a) "Inaccessible to the Agents Service Principal" and "finds the Eligible Approver set empty" are both what a roster read returns during a Conversations outage or a stale-token window. FR-21 says fail closed on "unavailable" — but <code>Abandoned</code> is terminal and irreversible, so one sweep during a five-minute outage abandons every awaiting proposal in the tenant, versions preserved but decisions lost, and SM-3 excludes them from its denominator so the damage is invisible to the primary launch-health metric. FR-18's pre-post check goes to retryable <code>PostingFailed</code> for the same condition; FR-7 goes to terminal <code>Abandoned</code>. The scheduled re-check itself has no cadence, owner, or load bound. (b) Posting is at-least-once with an idempotency key (seam 2). A post whose acknowledgement is lost is <code>PostingFailed</code>; after three attempts over fifteen minutes of Conversations unavailability the proposal sits there, then an Approver or Administrator abandons it. The message is in the Conversation, attributed to <code>hexa</code>, while Agents records <code>Abandoned</code> and §9 says it "cannot later be posted". SM-5 audit completeness and FR-24 traceability are both broken for that message. Nothing requires a lookup by <code>MessageId</code> before abandoning or before retrying. (c) The state list gives no transition table: <code>Approved</code> is non-terminal, so FR-16's "blocked after a proposal reaches a terminal state" permits regeneration after approval, and FR-15's "before approval" is a description, not a rejection rule. What state does a proposal enter when regenerated while <code>Approved</code>?</div>
+            <div class="finding-fix"><strong>Fix:</strong> Distinguish <em>absent</em> from <em>unknown</em>: the scheduled re-check abandons only on an authoritative "Conversation deleted / Party removed" answer and marks <code>ResolutionUnavailable</code> (non-terminal, visible under FR-25) on any unavailable answer, with the sweep cadence stated (e.g., hourly) and bounded. Before any exit from <code>PostingFailed</code>, the system queries the message by its <code>MessageId</code>; if present, the proposal moves to <code>Posted</code> with a <code>LateConfirmed</code> flag; add that lookup to seam 2 as a required read. Add a transition table to FR-18 that names every allowed (from, to, actor, guard) tuple and states that edit and regeneration are rejected from <code>Approved</code>, <code>PostingPending</code>, and <code>PostingFailed</code>.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">H-1. Delegating <code>ARCH-A-1..ARCH-A-7</code> to "the current Architecture Spine" creates a governance hole the PRD's own change control cannot see</h3>
+              <span class="finding-location">§8.1 line 742; §0 lines 14, 16, 18; FR-28 line 614; OQ-22 line 878; Spine ARCH-A table lines 736–742, AD-21 (line 222), AD-30 (line 276)</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "Architecture assumptions <code>ARCH-A-1</code> through <code>ARCH-A-7</code> are normatively indexed and governed in the current Architecture Spine rather than duplicated here. Any unretired Product, Architecture, or Governance assumption blocks <code>RQ-1</code>". §0: "Any approved proposal listing <code>prd.md</code> under <code>amends_if_approved</code> is not landed until a PRD Update run applies it". <strong>Attack:</strong> (a) The reference is a closed range and an unversioned, unpathed document; the Spine is modified in the working tree today. If the Spine adds <code>ARCH-A-8</code> it is outside "1 through 7" and blocks nothing; if it retires a row, <code>RQ-1</code>'s blocker set changes with no PRD Update, contradicting §0's landing rule. (b) The Spine's owners retire their own rows: <code>ARCH-A-4</code> is retired when Story 5.6 "records a permanent override reason" — retirement by writing a sentence; <code>ARCH-A-3</code> (which gates are Platform-scoped) is a Product decision retired inside an Architecture document. (c) The Spine already diverges from the PRD in ways Product has not seen: AD-21 introduces an <code>Unreconciled</code> reservation state settled "at period close as <code>ChargedAtMaximum</code>" (<code>ARCH-A-6</code>) for a reservation "past its deadline with no authoritative outcome" — a case FR-28's outcome list (no-usage, usage, <code>Indeterminate</code>, <code>NotInvoked</code>) does not contain, so the tenant can be charged under a rule the PRD never states; AD-30 grants the Platform Operator a "create-only <code>AgentSetupMutation</code> that provisions <code>hexa</code> at tenant enablement", an operation absent from the FR-33 matrix the PRD calls "the authoritative role matrix for every authorization rule"; AD-21 says the <code>PostingFailed</code> retry bound "is fixed by AD-5, not configurable" while PRD A-7 says Architecture "confirms or retunes before enablement" — either A-7 is already retired and the index is stale, or the Spine pre-empted it. (d) FR-28's blocker rule reads "Any §8.1 assumption whose owner is ..." — an <code>ARCH-A</code> row is not a §8.1 assumption; it is referenced from §8.1. The blocker type <code>UnretiredAssumption</code> "names the row" — which table?</div>
+            <div class="finding-fix"><strong>Fix:</strong> Cite the Spine by path and the ARCH-A table by version; make the range open ("every <code>ARCH-A-n</code> row in that table at <code>RQ-1</code> evaluation"); require that an <code>ARCH-A</code> row whose retirement condition names Product, Governance, or the Release PM be retired only by a recorded confirmation from that party; add a reconciliation rule that any Spine rule granting a role an operation not in FR-33, or defining a reservation/proposal outcome not in FR-28/FR-18, is a PRD amendment pending, not an architecture detail. Bring <code>Unreconciled</code>/period-close settlement and the Platform Operator provisioning row into the PRD or reject them.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">H-2. The kill-switch trigger is gameable by one hostile Participant and has no minimum sample</h3>
+              <span class="finding-location">FR-28 line 622; SM-C4 line 846; FR-32 line 635; FR-33 row line 422</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "a blocked-call share (SM-C4) above 50% or a posting-failure rate above 10% sustained for seven days, on which the Release Operator pulls it". <strong>Attack:</strong> SM-C4 is a share of <em>Agent Calls</em>, per tenant, with no minimum sample, no distinct-Party or distinct-Conversation denominator, and no exclusion of calls that were rejected cheaply. Blocked calls are the cheapest outcome in the system: an oversized Conversation rejects at FR-8 step 5 in under two seconds and spends nothing. Rate limits are per Party <em>and</em> per Conversation, so one Participant with access to several oversized Conversations (or one Conversation the Participant deliberately inflates past the Safe Context Budget) generates blocked calls at the rate-limit ceiling for seven days; in a low-traffic tenant that is far above 50%. The sentence "on which the Release Operator pulls it" is mandatory, not a review — so the outcome is a tenant-wide denial of <code>hexa</code> caused by one user and executed by the operator. The "posting-failure rate" still has no numerator (predecessor L-4), so its 10% is not computable.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Define the trigger over distinct calling Parties and distinct Conversations with a minimum of N Parties and M calls, exclude rate-limit rejections and repeat rejections of the same (Party, Conversation, reason) tuple within the window, and make the threshold a mandatory <em>review</em> with the pull a recorded decision. Define the posting-failure numerator (proposals that entered <code>PostingFailed</code> at least once in the window over proposals that entered <code>Approved</code>).</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">H-3. Tenant isolation stops at the Provider boundary: every tenant's Conversation content goes to one platform-owned Provider account with no data-handling requirement</h3>
+              <span class="finding-location">FR-4 lines 173, 183; FR-19 line 445; FR-33 rows lines 412–413; §9 (no Provider clause); NFR-2 line 690; FR-26 line 576</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> FR-4: "Each model records its secret reference and whether the Provider is configured". FR-33: secret references are Platform-scoped. NFR-2: "Conversation Context, proposal content, and Audit Evidence must not leak across tenants or unauthorized Parties." <strong>Attack:</strong> The Global Providers Aggregate is <code>system</code>-scoped and secret references are per model, so all tenants' complete Source Conversations are sent under the same third-party credential. The PRD says nothing about Provider-side retention, training use, sub-processor region, or zero-data-retention terms; "cross-tenant ... data" is a blocked <em>output</em> category only. A compliance stakeholder will read §9 as a data-governance section that governs Agents' own store and forgets the one place tenant content leaves the platform in bulk on every call. Tenant enablement (A-10) records nothing the tenant agreed to.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add to FR-4 required capability metadata per Provider/model: data-retention term, training-use opt-out status, processing region, and a recorded contractual reference; to FR-33 tenant enablement: the tenant's recorded acceptance of those terms (or a per-tenant secret reference option); to §9: "Conversation Context sent to a Provider is governed by the recorded Provider data-handling terms; a model whose terms are unrecorded cannot be enabled for any tenant." Add the Provider terms record to Audit Evidence for each call.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">H-4. The compliance-inspection control approved for the last gate is the subject of the audit approving its own inspection, and "post-hoc review" makes the second party optional</h3>
+              <span class="finding-location">FR-24 line 531; FR-33 rows lines 424, 428; OQ-21 line 877; §9 line 777</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "Compliance inspection ... requires a recorded justification and either second-party approval or post-hoc review (both by the Tenant Agent Administrator)". FR-33: "Apply or release legal hold; request authorized export — Compliance Inspector — Tenant". <strong>Attack:</strong> The Tenant Agent Administrator configures <code>hexa</code>, its instructions, its Approver Policy, and the caps; the most likely compliance case is whether that Administrator misconfigured or abused the Agent. The inspection's second party is the Administrator. And the Inspector chooses "post-hoc review", so the inspection happens unilaterally at access time and the Administrator learns of it afterward — exactly the unilateral read the last gate's H-2 objected to, with a review bolted on. Export has no second-party control at all: one tenant-scoped role can request an encrypted, time-limited export of every retained Agent-derived record in the tenant. Legal hold and its release are the same single role.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Second party must be a Party that is not the subject of the case and not the Inspector; where the case names the Tenant Agent Administrator, the approver is the Platform Operator or a second Compliance Inspector. Post-hoc review is permitted only for inspections scoped to one proposal or one Conversation and must be completed within a stated window or the access is recorded as unreviewed on the audit surface. Export requires prior second-party approval; hold release is audited with a separate approver.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">H-5. FR-18 and FR-28 disagree about what the kill switch does to proposals, and nobody can release it (M-1 re-rated)</h3>
+              <span class="finding-location">FR-18 line 392; FR-28 line 622; FR-33 row line 422; FR-3 lines 161–163</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> FR-18: "A proposal abandoned by the system carries its typed reason (<code>NoEligibleApprover</code>, <code>SourceConversationUnavailable</code>, <code>RemovedInConversations</code>, or kill switch)". FR-28: "Pulling it ... lets proposals awaiting a decision be rejected or abandoned but not approved, lets <code>Approved</code> and <code>PostingPending</code> proposals complete or fail on their own terms". <strong>Attack:</strong> Under FR-18 the system abandons awaiting proposals when the switch is pulled; under FR-28 they remain for humans to reject or abandon. An engineer must pick one; a tester cannot write the test. <code>PostingFailed</code> is not mentioned: does its retry budget run down while the switch is on? Nothing says who releases the switch or what happens to proposals that were awaiting decision when it was pulled if it is released (are they still approvable — their <code>ExpiresAt</code> kept running). No lifecycle state distinguishes "suspended by kill switch" from "disabled" (FR-3), so the FR-25 status surface cannot tell an operator which one it is looking at.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Pick the FR-28 semantics, delete "kill switch" from the FR-18 system-abandonment list, add a <code>Suspended</code> Agent lifecycle state that FR-25 exposes, state that <code>PostingFailed</code> retry windows and <code>ExpiresAt</code> are frozen while suspended, and add the FR-33 row "Release the kill switch — Platform Operator — Tenant".</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M-1. Segregation of duties is Party-granular, and a Party can be an organization</h3>
+              <span class="finding-location">§3 "Party" line 107, "Eligible Approver" line 102; FR-7 line 235</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "<strong>Party</strong> - A stable Hexalith.Parties identity representing a human, organization, or AI participant." "the approving Party must itself be an Eligible Approver". <strong>Attack:</strong> The predicate compares Party identities, not authenticated principals. A human who can act as their personal Party and as an organization Party (or holds two Parties in the tenant) calls as one and approves as the other; every FR-7 check passes. Nothing says who may act for an organization Party or that organization Parties cannot be Approvers.</div>
+            <div class="finding-fix"><strong>Fix:</strong> "Parties of type organization or <code>AiAgent</code> are never resolved as Approvers or callers in V1 (closes predecessor M-7 too); the predicate additionally excludes any Party whose acting principal is the caller's principal or the last editor's principal."</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M-2. Unsafe human edits are stored unscanned, making the proposal store a durable dump for always-blocked content</h3>
+              <span class="finding-location">FR-15 line 359; FR-27 lines 601–602; FR-26 line 576; §9 line 773</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "The exact version being approved passes the then-current active policy at approval time. A human-edited version is scanned on the same terms as generated output". <strong>Attack:</strong> The scan is at approval time. An edit is recorded as an immutable version first (FR-14), retained 365 days, and visible to every Eligible Approver and Compliance Inspector. An Approver can therefore persist content the platform policy "always blocks" inside Agents' audit store without ever approving it.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Scan at edit time; a failing edit is a typed rejection and is not recorded as a version (only as a content-free safety outcome in Audit Evidence).</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M-3. A-14 can be retired by postponement, and OQ-18/OQ-23's "before enablement" conditions have no gate hook</h3>
+              <span class="finding-location">§8.1 A-14 line 759; OQ-18 line 874; OQ-23 line 879; FR-28 line 614</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> A-14 "Retired when: The decision lands or Product moves the date". OQ-23: "revisit ... before the first Automatic-mode tenant is enabled". <strong>Attack:</strong> A-14 is a Product-owned <code>RQ-1</code> blocker whose retirement condition includes "Product moves the date" — Product unblocks <code>RQ-1</code> by editing a date, with OQ-18 undecided. OQ-18's "in any case before production enablement" and OQ-23's "before the first Automatic-mode tenant is enabled" are not A-rows and not <code>RQ-1</code> inputs, so nothing enforces them; an Automatic-mode tenant can be enabled with no launch-health primary metric at all.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Make A-14's condition "the OQ-18 decision lands"; add <code>OpenDecision</code> as an <code>RQ-1</code> blocker type for any Deferred OQ row whose text says "before enablement"; make OQ-23 a blocker for enabling an Automatic-mode tenant specifically.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M-4. OQ-18's "no exclusion path" is false if Conversations lets a Participant delete a message, and undefined if it does not</h3>
+              <span class="finding-location">FR-27 lines 602–603; OQ-18 line 874; §8 seam 5 line 727 (A-15)</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "an edited or deleted message simply no longer matches its hash ... V1 provides no redaction or exclusion path for individual historical messages". <strong>Attack:</strong> If Conversations supports deletion, deleting the offending message is an exclusion path (and a tenant-actionable one the PRD says does not exist); if it supports soft deletion, A-15's content read may still return the deleted content and the block persists; if it forbids deletion, the Conversation is permanently unavailable to <code>hexa</code>. The seam does not say what the content read returns for edited or deleted messages.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add to seam 5: "the content read returns only messages a Participant would currently see, with edited content in its current form". Rewrite OQ-18 to say what the tenant can do (delete the message in Conversations, where permitted) rather than that nothing can be done.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M-5. The A-4 fallback depends on a Conversations event feed that no seam registers</h3>
+              <span class="finding-location">§8.1 A-4 line 749; §8 seam 4 line 726</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "An Agents-owned substitute is acceptable only if it counts Conversations from a Conversations-side event feed". <strong>Attack:</strong> The six seams contain no event feed. The fallback that retires A-4 therefore depends on an unregistered dependency, which is precisely what the FR-21 gate cannot see (the predecessor's C-4 pattern).</div>
+            <div class="finding-fix"><strong>Fix:</strong> Either register the feed as seam 7 or delete the fallback.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M-6. FR-8 runs the classifier before the free checks, and the latency gate then cannot see the checks that follow it</h3>
+              <span class="finding-location">FR-8 lines 254–263; NFR-9 line 697; FR-27 line 604</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "7. Pre-Provider Content Safety Policy (FR-27). 8. Eligible Approver resolution ... 9. Agent membership". NFR-9: "fast pre-Provider rejection latency is p95 ≤ 2 seconds for ... rejections that require no content safety classifier call". <strong>Attack:</strong> A Conversation with no Eligible Approver pays a classifier scan of its whole unscanned history on every first call before being rejected <code>NoEligibleApprover</code>; the same for a blocked Conversation. Because a classifier call occurred, that rejection is excluded from the 2-second gate, so steps 8 and 9 have no latency bound at all.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Order: approver resolution and membership read before the safety scan (membership <em>add</em> stays last); state that the fast-rejection gate covers every rejection reason other than a safety verdict, measured excluding classifier time.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M-7. Disabling the Agent, or disabling its Provider/model, leaves awaiting proposals in an undefined limbo</h3>
+              <span class="finding-location">FR-3 lines 161–163; FR-18 line 397; FR-4 line 178</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "Disabling an Agent does not delete existing Audit Evidence, Proposed Agent Replies, or Conversation Messages." FR-18 pre-post: "the Agent is active". <strong>Attack:</strong> Nothing blocks approving a proposal under a disabled Agent; the approval then fails pre-post re-validation, burns the retry budget in fifteen minutes, and lands in <code>PostingFailed</code> until an administrative retry after re-enable — content that was approved while the tenant had switched the Agent off. Regeneration under a disabled Agent is not blocked either (FR-16 re-runs FR-9/FR-27 only).</div>
+            <div class="finding-fix"><strong>Fix:</strong> "While the Agent is disabled or suspended, awaiting proposals accept reject and abandon only; approval and regeneration are rejected with a typed reason; <code>ExpiresAt</code> continues to run."</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M-8. Legal hold and cross-system erasure have no precedence rule</h3>
+              <span class="finding-location">§9 lines 773–774, 778; §8 seam 6 line 728; FR-30 line 555; FR-33 rows lines 428–429</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "An approved deletion of a Conversation in Hexalith.Conversations triggers FR-30 approved deletion of the derived Agent content". <strong>Attack:</strong> A Conversations-side data-subject erasure arrives while a legal hold pins the interaction's DEK (the register says hold pinning "rejects DEK destruction"). The PRD does not say which wins, whether the erasure is queued, or who is told. The reverse case — Agents' 365-day erasure of a proposal while the posted message and its "human-edited by which Party" metadata persist in Conversations — is also unaddressed.</div>
+            <div class="finding-fix"><strong>Fix:</strong> "A hold takes precedence over any deletion signal; the signal is recorded as <code>DeletionDeferredByHold</code>, visible to the Compliance Inspector, and executes on hold release." State that provenance metadata persisted into Conversations is governed by Conversations retention and contains no Agents-erasable content beyond Party identifiers.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M-9. SM-4 has no <code>InsufficientEvidence</code> condition, so an empty telemetry set passes the security gate</h3>
+              <span class="finding-location">SM-4 line 829; FR-28 line 623; §11 line 818</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "Authorization tests and qualification telemetry show zero successful cross-tenant or unauthorized Agent Calls". <strong>Attack:</strong> Zero successes out of zero attempts is zero. The metric passes on a cohort that never exercised a denial path. §11 promises a measurement contract elsewhere; the PRD gives no minimum count of attempted-and-denied operations per FR-33 row.</div>
+            <div class="finding-fix"><strong>Fix:</strong> "SM-4 is <code>InsufficientEvidence</code> unless every FR-33 row has at least one recorded denial in qualification telemetry and the forged-extension test named in the Spine has run."</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M-10. Compliance and administrative inspectors can see who called and what was generated, but the FR-25 status surface tells a caller nothing about why their own call was rejected <code>NoEligibleApprover</code> in a way they can act on</h3>
+              <span class="finding-location">FR-7 line 237; FR-25 line 546; FR-33 row line 427</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "a caller sees the outcome of their own Agent Calls only". <strong>Attack:</strong> The trade-off in FR-7 is "visible rather than silent" — to the operator. The Participant who was rejected gets a typed reason but no indication of what would make an Approver eligible (whose absence, which source), and the FR-7 disclosure category defaults to operator-only, so the caller cannot know whether to add a Facilitator or ask for a policy change. Adoption failure with no user-side recovery path.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Define a user-visible remediation hint for <code>NoEligibleApprover</code> that discloses only the source <em>kind</em> (not the members) at the configured disclosure category.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M-11. <code>PostingFailed</code> administrative retry does not state that it re-runs pre-post re-validation, and a safety-failed post is retried three times pointlessly</h3>
+              <span class="finding-location">FR-18 lines 396–397; FR-33 row line 426</span>
+            </header>
+            <div class="finding-note"><strong>Quoted:</strong> "a failed post moves the proposal to <code>PostingFailed</code> with a typed reason and a bounded audited retry of at most 3 attempts over 15 minutes". <strong>Attack:</strong> A pre-post content-safety failure (policy tightened after approval) is not transient; three automatic retries cannot change it, and an administrative retry is not stated to re-run the FR-18 checks, so it reads as a bypass of the safety re-check.</div>
+            <div class="finding-fix"><strong>Fix:</strong> "Retry, automatic or administrative, always re-runs the full pre-post re-validation; a <code>PostingFailed</code> proposal whose reason is a safety verdict is not retryable and accepts abandon only."</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L-1. Regeneration and "the caller" (M-9 residual)</h3>
+              <span class="finding-location">FR-16 line 371; §3 line 102</span>
+            </header>
+            <div class="finding-note">State that the requesting Approver of a regeneration is not "the caller of the Agent Call" for the Eligible Approver predicate.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the sentence to FR-16 and the §3 "Eligible Approver" entry.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L-2. A-7 is either already retired or pre-empted</h3>
+              <span class="finding-location">§8.1 line 752; Spine AD-21</span>
+            </header>
+            <div class="finding-note">§8.1 line 752 says Architecture "confirms or retunes"; Spine AD-21 says the bound "is fixed by AD-5, not configurable".</div>
+            <div class="finding-fix"><strong>Fix:</strong> Reconcile the index.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L-3. A-3's cardinality clause has no retirement condition</h3>
+              <span class="finding-location">§8.1 line 748</span>
+            </header>
+            <div class="finding-note">"a Conversation may have one or more Facilitators" is not retired by "<code>EXT-CONV-AI-1</code> reaches <code>Committed</code> with the role".</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add "and the register records Facilitator cardinality".</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L-4. The reused-verdict policy-version record is tautological</h3>
+              <span class="finding-location">FR-27 line 602</span>
+            </header>
+            <div class="finding-note">A verdict "is never reused under a policy version other than the one that produced it", so the recorded version is always the current one.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Either drop the sentence or record the scan timestamp instead.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L-5. Approval-to-post includes a classifier call with no separate budget</h3>
+              <span class="finding-location">NFR-9 line 697</span>
+            </header>
+            <div class="finding-note">NFR-9 budgets scan latency separately for the pre-Provider path only; the pre-post safety re-check sits inside the 10-second approval-to-post gate.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Budget the pre-post scan separately or state that it is included in the 10-second gate.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L-6. SM-3's "the Agent's configured expiry" is ambiguous</h3>
+              <span class="finding-location">§12 line 837</span>
+            </header>
+            <div class="finding-note">At creation or at measurement?</div>
+            <div class="finding-fix"><strong>Fix:</strong> Use the proposal's stored <code>ExpiresAt − CreatedAt</code>.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L-7. "Security approval" has no actor, record, or test</h3>
+              <span class="finding-location">FR-26 line 568; FR-33 line 420</span>
+            </header>
+            <div class="finding-note">The term is used in both places without an actor, a recorded artifact, or a test.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name the role or the recorded artifact.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L-8. Failure records and configuration audit have no retention clause</h3>
+              <span class="finding-location">§9 line 773; FR-10 line 290; FR-1 line 137</span>
+            </header>
+            <div class="finding-note">§9 line 773 covers "Sensitive Agent content ... after the interaction reaches a terminal state"; FR-10's separate failure record (line 290) and FR-1 configuration evidence (line 137) are neither interactions nor clearly "sensitive Agent content".</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a retention clause for failure records and configuration evidence to §9.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L-9. NFR-13 "fail closed for high-impact actions when the viewport cannot present required context" is untestable</h3>
+              <span class="finding-location">NFR-13 line 701</span>
+            </header>
+            <div class="finding-note">Untestable without a definition of required context per action.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Cite the UX spine rule id.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L-10. "Monthly" cap has no month definition in the PRD</h3>
+              <span class="finding-location">FR-28 line 616</span>
+            </header>
+            <div class="finding-note">The Spine says UTC calendar month of <code>EvaluatedAt</code>.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State it here, since the Tenant Agent Administrator reads the PRD.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L-11. Carried and still open from the predecessor's L-9</h3>
+              <span class="finding-location">FR-4; FR-26; FR-31; NFR-9; §9; FR-24; FR-29; NFR-14</span>
+            </header>
+            <div class="finding-note">FR-4 <code>CapabilityVersion</code> "below → regressed, above → stale" wording; FR-26 "more restrictive of" two policies undecidable; FR-31's impersonation category vs. summaries of stated positions; NFR-9 p99 over 30 executions is the sample maximum; §9 365-day erasure vs. FR-24 traceability with no structural/content field split; FR-29 <code>Submitted</code> vs. NFR-14's 500 ms authoritative acknowledgement.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Address each as recorded in the predecessor review; the rubric walker carries FR-26, FR-31, NFR-9, and §9/FR-24 as its own findings.</div>
+          </article>
+        </div>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p><strong>Notes</strong></p>
+            <p>Fixed since the last gate and not re-raised: the FR-7 predicate and four-moment application; the FR-2 three-part step's intent and the mirrored removal; seams 5 and 6 and A-15/A-16; FR-8's reservation ordering and <code>NotInvoked</code> release; <code>NoEligibleApprover</code>/<code>RemovedInConversations</code> in FR-25 and SM-C4; the <code>PostingFailed</code> exits; the frontmatter date; SM-3 as decision latency over every proposal; the <code>UnretiredAssumption</code> blocker; the A-4 fallback constraint (now with its own hole, M-5).</p>
+            <p>The two course-correction additions are the reason for the verdict rather than incidental: <code>EXT-PROTECTION-1</code> is the dependency that decides whether any content-bearing story can produce Level 4/5 evidence, and the <code>ARCH-A</code> delegation is the only place the PRD cedes its own blocker list to another document. Both need one more edit to be governed rather than merely mentioned.</p>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="reviewer-section">
+      <details>
+        <summary>
+          <h2>Implementation drift review</h2>
+          <span class="reviewer-source">review-implementation-drift.md</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>No code moved under the four recorded debt items, so all four remain <strong>open</strong> exactly as the baseline described them, and the pricing-version contradiction from the baseline is likewise unchanged. The new Payload Protection bullet is mostly an honest dependency statement, but one sentence is written as a description of current behaviour that the code does not exhibit: "Live content-bearing execution is disabled while its register entry is not <code>Available</code>". Nothing in <code>src/</code> knows the external dependency register, <code>EXT-PROTECTION-1</code>, or the <code>Uncommitted</code>/<code>Committed</code>/<code>Available</code> vocabulary; the only launch gate is <code>ProductionLikeGenerationEnabled</code>, whose eight blockers say nothing about protection, and content execution is blocked today only because the default generation port is a fail-closed placeholder — a host that binds a real Provider adapter lifts that block with no protection check in the way. That is the one High finding, and it is on both sides: the PRD should phrase the sentence as a requirement and name the mechanism, and the code needs the additive blocker. The bullet's other claims — field-level <code>ProtectedContent</code>, per-interaction DEK / per-tenant KEK, hold pinning, destruction receipts, typed <code>Erased</code> replay — have no footprint here or in the EventStore contracts surface this repository compiles against (which exposes <code>IEventPayloadProtectionService</code>, <code>PayloadProtectionState</code>, <code>PayloadUnprotectionOutcome</code>, not <code>ProtectedContent</code> or <code>Erased</code>); the register itself records them as the <em>required artifact</em> of an <code>Uncommitted</code> dependency, so they are NOT-YET-IMPLEMENTED and the PRD should key the two names as an assumption rather than present them as established identifiers. "The shipped no-op protection implementation" is real but lives in the EventStore checkout, not in this module, which is forbidden by two tests from registering any EventStore security at all; the PRD's conclusion stands, its attribution should be corrected. The identifier sweep found twelve backticked names with no code symbol; nine are the additive members the baseline already carries, two are <code>ProtectedContent</code>/<code>Erased</code> above, and the last, <code>InsufficientEvidence</code>, belongs with <code>UnretiredAssumption</code> and <code>RQ-1</code> to the readiness-registry vocabulary that no code models — acceptable if <code>RQ-1</code> is evaluated in the registers, which the PRD should say. <code>ParticipantType.AiAgent</code>, by contrast, is already the spelling the shipped Conversations contract uses, so half of assumption A-1 can be retired.</p>
+            <p><strong>Prior code debt status (owner: Agents Runtime Maintainer)</strong></p>
+            <ul>
+              <li><strong>Readiness recording still accepts <code>ReportingOnlyMonitoring</code> / <code>AcceptedLaunchRisk</code> — still open (Critical).</strong> <code>src/Hexalith.Agents/Agent/AgentAggregate.cs:1009-1012</code> rejects only <code>CostControlPosture.Unknown</code>; <code>src/Hexalith.Agents/Agent/AgentLaunchReadinessPolicy.cs:73-76</code> emits <code>MissingCostControlPosture</code> only for <code>Unknown</code>; <code>src/Hexalith.Agents.Contracts/Agent/AgentLaunchReadinessBlocker.cs:22-46</code> still ends at <code>UnresolvedAuditGovernance</code> with no <code>ProhibitedCostControlPosture</code>; <code>src/Hexalith.Agents.Contracts/Agent/CostControlPosture.cs:33-36</code> still declares both values without <code>[Obsolete]</code>. PRD FR-28 (line 619), FR-23 (line 501) unchanged. CONTRADICTED, code side.</li>
+              <li><strong>Configuration still accepts <code>ContentSafetyFailureHandling.BlockWithAuditableOverride</code> and <code>ApproverPolicySourceKind.Caller</code> — still open (High).</strong> <code>AgentAggregate.cs:852-855</code> (<code>ValidateAndNormalizePolicy</code>) rejects only <code>Unknown</code>; <code>src/Hexalith.Agents.Contracts/Agent/ContentSafetyFailureHandling.cs:26</code> still declares the override value un-deprecated. <code>AgentAggregate.cs:751-757</code> (<code>ValidateAndNormalizeApproverPolicy</code>) accepts <code>Caller</code> on the same branch as <code>ConversationOwner</code>, and <code>src/Hexalith.Agents.UI/Components/Pages/ApproverPolicy.razor:111-117</code> still offers <code>Caller</code> as one of "the four V1 approver-source kinds". The PRD register (line 501) says each value "is rejected server-side with a typed rejection wherever it is presented"; FR-7 (line 217) says the caller source "is retired". CONTRADICTED, code side. (The <code>Caller</code> half was implicit in the baseline's register finding; it is now verified explicitly, including the UI offering.)</li>
+              <li><strong><code>ProposalDetail.razor</code> still treats <code>PostingFailed</code>/<code>Posted</code> as terminal with no retry — still open (High).</strong> <code>src/Hexalith.Agents.UI/Components/Pages/ProposalDetail.razor:249-251</code> keeps <code>Posted</code> and <code>PostingFailed</code> in <code>_terminalStates</code>; <code>:245-246</code> (<code>_retryableStates</code> = <code>Pending</code>, <code>Edited</code>, <code>Regenerated</code>) and <code>:293</code> (<code>CanActOn</code>) exclude <code>PostingFailed</code>; <code>test/Hexalith.Agents.UI.Tests/ProposalDetailTests.cs:126-131</code> still locks it in; <code>ProposalQueue.razor:302-305</code> still uses the three-state set. Domain (<code>AgentInteractionAggregate.cs:504-509</code>, approval orchestrator <code>IsApprovableOrRetryable</code>) unchanged and still agrees with the PRD. CONTRADICTED (detail page) / IMPLEMENTED-DIFFERENTLY (queue), code side.</li>
+              <li><strong>Additive members — all still missing (Medium).</strong> Whole-word grep over <code>src/</code>+<code>test/</code> finds none of: <code>AgentInteractionContextMode.Blocked</code> (<code>src/Hexalith.Agents.Contracts/AgentInteraction/AgentInteractionContextMode.cs:20-26</code> is <code>Unknown | Full | Bounded</code>); <code>AgentGenerationOutcome.Indeterminate</code>; <code>NoEligibleApprover</code>; <code>RemovedInConversations</code>; <code>SourceConversationUnavailable</code>; <code>NotInvoked</code>; <code>UnretiredAssumption</code>; a <code>Membership</code> gate check (<code>src/Hexalith.Agents.Contracts/AgentInteraction/AgentInteractionGateCheck.cs:23-53</code> still has ten checks ending at <code>LaunchReadiness</code>); the Safe Context Budget terms (<code>src/Hexalith.Agents/AgentInteraction/AgentInteractionContextPolicy.cs:77</code> is still <code>ContextWindowTokenLimit - ReservedOutputTokenCount</code>; no <code>SafetyMargin</code>/<code>MarginPercent</code>/instruction/framing/prompt term exists). The only <code>Blocked</code> symbols are <code>AgentOperationErrorCode.Blocked</code>, <code>AgentOperationStatus.Blocked</code> and <code>AgentInteractionStatus.Blocked</code>, none of which is a context mode. ADDITIVE-REQUIRED / NOT-YET-IMPLEMENTED, code side; the PRD's declarations that these are additive remain accurate.</li>
+              <li><strong>Pricing-version rule (FR-4, line 174 area) — unchanged from the baseline and not re-argued.</strong> Remains CONTRADICTED on the PRD side — <code>a191d24</code> reworked <code>ProviderCatalogAggregate.cs</code> pricing (<code>ValidatePricing</code>, <code>AssignPricing</code>) but kept server-assigned, bump-on-unit-price-change semantics; the PRD text was not revised.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">§8 says live content-bearing execution "is disabled while its register entry is not <code>Available</code>"; no code gates on the register, <code>EXT-PROTECTION-1</code>, or any protection signal</h3>
+              <span class="finding-location">§8 Payload Protection bullet, line 731; §8 lines 718–720; FR-21 by reference</span>
+            </header>
+            <div class="finding-note">Code: the only enablement gate is <code>ProductionLikeGenerationEnabled</code>, computed by <code>src/Hexalith.Agents/Agent/AgentLaunchReadinessPolicy.cs:47-84</code> from eight blockers (<code>src/Hexalith.Agents.Contracts/Agent/AgentLaunchReadinessBlocker.cs:22-46</code>: safety policy, context policy, metrics, latency targets, cost posture, audit governance) — none concerns payload protection or an external dependency; the call-time gate <code>src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs:346-356</code> (<code>MapLaunchReadiness</code>) tests only that flag; <code>AgentInteractionGateCheck.cs:23-53</code> has no dependency or protection check. Grep for <code>EXT-</code>, <code>Uncommitted</code>, <code>Committed</code>, <code>Available</code> (as register status), <code>PayloadProtection</code>, <code>ProtectedData</code>, <code>IEventPayloadProtectionService</code> across <code>src/</code> returns nothing (the single <code>EXT-HOST-1</code> mention is a test assertion, <code>test/Hexalith.Agents.Server.Tests/AppHostSecurityTopologyTests.cs:17</code>). Content-bearing execution is blocked today only because <code>src/Hexalith.Agents.Server/Ports/DeferredAgentGenerationProvider.cs:12-21</code> returns <code>AgentGenerationProviderResult.Unavailable</code> — a host that binds a real adapter (the <code>EXT-PROVIDER-1</code> path) removes that block with no protection availability check in the way. <strong>Classification:</strong> CONTRADICTED (as a statement of shipped behaviour); NOT-YET-IMPLEMENTED (as a requirement). <strong>Side:</strong> PRD and code.</div>
+            <div class="finding-fix"><strong>Fix:</strong> (PRD) rewrite the sentence as a requirement — "Live content-bearing execution must remain disabled while its register entry is not <code>Available</code>" — and name the mechanism so it is testable: an additive <code>AgentLaunchReadinessBlocker</code> value (e.g. <code>PayloadProtectionUnavailable</code>) that <code>AgentLaunchReadinessPolicy</code> emits until the host reports a production protection engine, so <code>EnableProductionLikeGeneration</code> cannot succeed against the no-op default. (Code) add that blocker and a host-supplied protection-availability port (registration stays with the host, see the ownership tests in the next finding), and have <code>AgentLaunchReadinessPolicy.ComputeLaunchReadinessBlockers</code> consult it.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>ProtectedContent</code> and <code>Erased</code> are named as established identifiers; neither exists in this repository nor in the EventStore contracts surface it compiles against</h3>
+              <span class="finding-location">§8 line 731; FR-30 line 774 by reference</span>
+            </header>
+            <div class="finding-note">Code: no symbol in <code>src/</code>+<code>test/</code>. The EventStore contracts package documentation (<code>Hexalith.EventStore.Contracts</code> 3.99.0, namespace <code>Hexalith.EventStore.Contracts.Security</code>) exposes <code>IEventPayloadProtectionService</code>, <code>EventStorePayloadProtectionMetadata</code>, <code>PayloadProtectionState { Unprotected, Protected, ProviderOpaque }</code>, <code>PayloadUnprotectionOutcome</code>, <code>ProtectedDataReadabilityDecision</code> and <code>UnreadableProtectedDataProblem</code> — no <code>ProtectedContent</code> envelope and no <code>Erased</code> typed value. The dependency register (<code>_bmad-output/planning-artifacts/external-dependency-register.md:171</code>) lists both names under <code>RequiredArtifact</code> of <code>EXT-PROTECTION-1</code>, status <code>Uncommitted</code>, target <code>TBD</code> — they are target names for an uncommitted external deliverable, owned by the EventStore Maintainer. The plaintext fields the envelope would wrap are <code>src/Hexalith.Agents.Contracts/AgentInteraction/AgentGeneratedVersion.cs:40</code> (<code>GeneratedContent</code>), carried by the persisted events <code>Events/AgentOutputGenerated.cs</code>, <code>Events/ProposedAgentReplyEdited.cs</code>, <code>Events/ProposedAgentReplyRegenerated.cs</code>, and <code>Instructions</code> in <code>Agent/Events/AgentCreated.cs:27</code> / <code>AgentConfigurationUpdated.cs:27</code>. <strong>Classification:</strong> PRD-NAMES-NONEXISTENT-MEMBER (the names are not declared additive-in-Agents because they are not Agents members; ADDITIVE-REQUIRED in EventStore); NOT-YET-IMPLEMENTED for the Agents-side envelope adoption (Story 5.8 per the change proposal). <strong>Side:</strong> PRD (naming), code (adoption).</div>
+            <div class="finding-fix"><strong>Fix:</strong> (PRD) key the two names with a new assumption row (e.g. A-18: "EventStore publishes a field-level <code>ProtectedContent</code> envelope and an <code>Erased</code> unprotection value", owner EventStore Maintainer, retired when <code>EXT-PROTECTION-1</code> reaches <code>Committed</code> with those names) and, in FR-30, say which Agents fields are protected content so the envelope's scope is traceable.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">"The shipped no-op protection implementation" is not shipped by this repository; it is the EventStore default, and Agents is forbidden from registering any protector</h3>
+              <span class="finding-location">§8 line 731</span>
+            </header>
+            <div class="finding-note">Code: no type in <code>src/</code> implements, resolves or references <code>IEventPayloadProtectionService</code>; <code>test/Hexalith.Agents.Server.Tests/ForbiddenHostingOwnershipTests.cs:44-52</code> fails the build if any repository-owned text contains <code>AddHexalithEventStoreSecurity(</code>, and <code>test/Hexalith.Agents.Server.Tests/AppHostSecurityTopologyTests.cs:46-53</code> asserts <code>Program.cs</code> does not call it — security wiring is an <code>EXT-HOST-1</code> host concern by design. The register's own note (<code>external-dependency-register.md:179</code>) attributes the no-op to "the EventStore checkout". <strong>Classification:</strong> IMPLEMENTED-DIFFERENTLY (attribution; the substantive claim that the no-op cannot satisfy production-like evidence is accurate). <strong>Side:</strong> PRD.</div>
+            <div class="finding-fix"><strong>Fix:</strong> (PRD) reword to "the EventStore default protection service is a no-op, Agents registers no protector, and the host (<code>EXT-HOST-1</code>) must bind a production engine before production-like evidence can be recorded", so no reader searches this module for an implementation to replace.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Per-interaction DEK / per-tenant KEK, hold pinning and irreversible destruction receipts have no code footprint</h3>
+              <span class="finding-location">§8 line 731; FR-30 line 774; OQ rows on retention</span>
+            </header>
+            <div class="finding-note">Code: grep for <code>DEK</code>, <code>KEK</code>, <code>HoldPin</code>, <code>LegalHold</code>, <code>Destruction</code>, <code>Receipt</code>, <code>Tombstone</code>, <code>Encrypt</code>, <code>Cipher</code> across <code>src/</code>+<code>test/</code> finds nothing; the change proposal's <code>LegalHold</code> and <code>AuditExport</code> aggregates (<code>sprint-change-proposal-2026-09-09.md:262-263</code>) do not exist. The PRD phrases these as depending on <code>EXT-PROTECTION-1</code>, which is accurate. <strong>Classification:</strong> NOT-YET-IMPLEMENTED. <strong>Side:</strong> code (Stories 5.8, 8.1–8.3 per the register's consuming-story list).</div>
+            <div class="finding-fix"><strong>Fix:</strong> None for the PRD; optionally cite the owning stories next to the bullet so the dependency is traceable to the backlog.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title"><code>RQ-1</code> readiness-registry vocabulary (<code>UnretiredAssumption</code>, <code>InsufficientEvidence</code>) has no code footprint, and the PRD does not say where <code>RQ-1</code> is evaluated</h3>
+              <span class="finding-location">FR-28 line 614; FR-28 line 623; NFR-14 line 702</span>
+            </header>
+            <div class="finding-note">Code: no <code>RQ-1</code>, <code>UnretiredAssumption</code> or <code>InsufficientEvidence</code> symbol; <code>src/Hexalith.Agents/Agent/AgentLaunchReadinessInspection.cs</code> and <code>AgentLaunchReadinessBlocker.cs</code> model per-Agent blockers only. This is consistent with <code>RQ-1</code> being a register-evaluated release gate rather than an aggregate rule, but the PRD's typed-blocker phrasing ("an <code>RQ-1</code> blocker of type <code>UnretiredAssumption</code>") reads like a contract member. <strong>Classification:</strong> NOT-YET-IMPLEMENTED (if code is expected) / IMPLEMENTED-DIFFERENTLY (if register-evaluated). <strong>Side:</strong> PRD.</div>
+            <div class="finding-fix"><strong>Fix:</strong> (PRD) state that <code>RQ-1</code> is recorded in the launch-readiness register, not in the Agent aggregate, and that <code>UnretiredAssumption</code> / <code>InsufficientEvidence</code> are register vocabulary; or, if a code gate is intended, declare them additive <code>AgentLaunchReadinessBlocker</code> values.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title"><code>ParticipantType.AiAgent</code> is already the shipped Conversations spelling; the other A-1 names remain unreferenced</h3>
+              <span class="finding-location">§8 seam 1, line 723; A-1, line 746</span>
+            </header>
+            <div class="finding-note">Code: <code>src/Hexalith.Agents.Server/Ports/ConversationClientResponsePoster.cs:85</code> compiles against <code>ParticipantType.AiAgent</code>; <code>:88</code> comment records that <code>IConversationClient.AddParticipantAsync</code> is not yet exposed (establish → <code>SeamUnavailable</code>, as the baseline found); <code>ParticipantRole.Member</code> and <code>ParticipantRole.Facilitator</code> appear only in comments. <strong>Classification:</strong> IMPLEMENTED-AS-SPECIFIED (<code>AiAgent</code>); NOT-YET-IMPLEMENTED (membership call, roles). <strong>Side:</strong> PRD.</div>
+            <div class="finding-fix"><strong>Fix:</strong> (PRD) narrow A-1 to <code>AddParticipantAsync</code>, the participants route and <code>ParticipantRole.Member</code>; the <code>AiAgent</code> spelling is confirmed by the contract in use.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Identifier sweep — remaining backticked names verified</h3>
+              <span class="finding-location">51 unique backticked PascalCase identifiers across <code>prd.md</code></span>
+            </header>
+            <div class="finding-note">39 resolve to a whole-word symbol in <code>src/</code>+<code>test/</code> (all ten <code>ProposedAgentReplyState</code> values plus <code>Unknown</code>; <code>AgentSetupWriteStatus.Submitted</code>; <code>ApproverPolicySourceKind.Caller</code> / <code>.ConversationOwner</code>; the five <code>CostControlPosture</code> values; <code>ContentSafetyFailureHandling.BlockWithAuditableOverride</code>; <code>Full</code> / <code>Bounded</code>; <code>MembershipUnavailable</code> / <code>MembershipRejected</code>; <code>ExpiresAt</code>; <code>CapabilityVersion</code>; <code>AuthoritativePending</code>; <code>ProjectionConfirmed</code>; <code>AiAgent</code>). The twelve misses are exactly: the nine baseline additive members (<code>Blocked</code> as a context mode, <code>Indeterminate</code>, <code>NoEligibleApprover</code>, <code>NotInvoked</code>, <code>ProhibitedCostControlPosture</code>, <code>RemovedInConversations</code>, <code>SourceConversationUnavailable</code>, <code>UnretiredAssumption</code>, plus the <code>Membership</code> gate check), <code>ProtectedContent</code>, <code>Erased</code>, and <code>InsufficientEvidence</code>; <code>Committed</code> / <code>Uncommitted</code> / <code>Available</code> are register statuses, correctly defined in <code>external-dependency-register.md:32-45</code>, and are not expected in code. <strong>Classification:</strong> IMPLEMENTED-AS-SPECIFIED for the 39; the misses are covered by the findings above.</div>
+            <div class="finding-fix"><strong>Fix:</strong> No fix.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="reviewer-section">
+      <details>
+        <summary>
+          <h2>Consistency and companion-artifact review</h2>
+          <span class="reviewer-source">review-consistency.md</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Scope: Part 1 internal consistency of <code>prd.md</code> (879 lines) plus <code>addendum.md</code>; Part 2 alignment with <code>external-dependency-register.md</code>, <code>sprint-change-proposal-2026-09-09.md</code>, <code>ARCHITECTURE-SPINE.md</code>, <code>launch-readiness-register.md</code>, <code>epics.md</code>, and <code>sprint-status.yaml</code>. The 2026-09-09 update-gate review (<code>review-consistency-2026-09-09.md</code>) was used as a baseline; all fifteen of its findings were re-verified and are now applied in the text, so none is repeated here. 17 findings: 1 Critical, 3 High, 5 Medium, 8 Low. Internal to <code>prd.md</code>: 2, 5, 6, 10–16 (ten; 5 and 6 also touch companions). Cross-artifact only: 1, 3, 4, 7, 8, 9, 17 (seven). Documents that should change: <code>prd.md</code> (2, 5, 6, 10–16, and 4 pending Product), <code>launch-readiness-register.md</code> (1, 7), <code>epics.md</code> (3), <code>external-dependency-register.md</code> (8, 9), <code>update-report-2026-09-09.md</code> (17), Spine only if Product reverses 4.</p>
+            <p>Checked clean: every FR-1..FR-33, NFR-1..NFR-14, OQ-1..OQ-23, SM-1..SM-7, SM-C1..SM-C5, UJ-1..UJ-4, A-1..A-17, EXT-* and <code>RQ-1</code> identifier referenced anywhere in <code>prd.md</code> or <code>addendum.md</code> is defined, and each series is contiguous. All seventeen <code>[ASSUMPTION A-n]</code> keys appear inline and every §8.1 "Where" cell names exactly the sections that carry the key. The ten <code>ProposedAgentReplyState</code> values and the four-state terminal set are identical in FR-18, §6.1, UJ-3, §9, OQ-3, SM-3 and Spine AD-5; the expiry-freeze rule matches FR-18/OQ-3/AD-5. The six FR-33 roles are named identically across the PRD and Spine AD-30. Safe Context Budget terms, the 10 % / 5–25 % margin and <code>Full</code>/<code>Bounded</code>/<code>Blocked</code> agree in §3, FR-9, FR-24, NFR-8, OQ-10, A-5 and Spine AD-11. <code>RQ-1</code> inputs and the launch-health set agree in §3, §11, §12, FR-28, OQ-19, OQ-22 and Spine AD-17. Counts hold: six seams, three membership parts, nine FR-8 steps, four Eligible Approver moments, four safety application points, nine commitment fields, six roles, 3+3+4 states. The register carries <code>EXT-PROTECTION-1</code> with all nine fields, its <code>EXT-CONV-AI-1</code> seam list matches the PRD's six seams one-for-one, and its statuses (one <code>Committed</code>, eight <code>Uncommitted</code>) match §8 lines 718–720. Both PRD amendments the sprint change proposal specifies are present at lines 718/731 and 742; the Spine indexes <code>ARCH-A-1..ARCH-A-7</code> and every AD the register cites exists. <code>sprint-status.yaml</code> names exactly the 29 active stories <code>epics.md</code> declares, contains no <code>ready-for-dev</code> row, and the two <code>done</code> stories (5.1, 5.2) consume no <code>Uncommitted</code> record, so §0 line 16's last sentence and the "Downstream authority" paragraph hold.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">1. Launch-readiness register still gates <code>RQ-1</code> on SM-1 through SM-6 real attainment, which the PRD moved out of the gate (cross-artifact)</h3>
+              <span class="finding-location"><code>launch-readiness-register.md</code> lines 79, 139, 239; <code>prd.md</code> FR-28 lines 613, 615; OQ-22 line 878; §12 lines 826–839</span>
+            </header>
+            <div class="finding-note"><code>launch-readiness-register.md</code> line 79: "<code>LR-PRODUCT-METRICS</code> | Versioned SM-1 through SM-6 calculation and real rolling-window/cohort attainment"; line 239: "<code>product-metrics</code> | SM-1 through SM-6 rolling-window/cohort calculations"; line 139: "The <code>ReleaseQualificationGateSet</code> contains all 18 minimum GateIds. Only current <code>Pass</code> records for the complete set ... allow <code>RQ-1</code> READY". SM-7 does not appear in the register at all. <code>prd.md</code> FR-28 line 613: "Production enablement remains blocked until <code>RQ-1</code> records READY from ... SM-1, SM-4, SM-5, SM-6"; line 615: "SM-2, SM-3, and SM-7 are launch-health metrics. Only real usage can produce them, so they are not <code>RQ-1</code> inputs"; OQ-22 line 878 says the same; §12 lines 826–839 define SM-7. Impact: the register is the machine-testable authority <code>RQ-1</code> evaluates (Spine AD-17 line 198: "<code>launch-readiness-register.md</code> is the normative readiness authority for ... measurement contracts"). As written it requires real SM-2/SM-3 attainment before enablement, which is exactly the deadlock OQ-19 resolved, and it has no measurement contract for SM-7. <code>epics.md</code> Story 8.5 (2583–2584) and the <code>RQ-1</code> gate text (2780) already follow the PRD split, so the register is the odd one out.</div>
+            <div class="finding-fix"><strong>Fix:</strong> (<code>launch-readiness-register.md</code>) change <code>LR-PRODUCT-METRICS</code> and <code>product-metrics</code> to "pre-enablement gate metrics SM-1, SM-4, SM-5, SM-6 (gate inputs) plus launch-health SM-2, SM-3, SM-7 and SM-C1..SM-C5 (calculated and reported, never gate inputs)", and add the SM-7 measurement contract.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">2. §0 status line counts "seven of eight" dependencies; §8 and the register have nine, eight <code>Uncommitted</code> (internal; also cross-artifact)</h3>
+              <span class="finding-location"><code>prd.md</code> §0 line 16; §8 lines 718, 720; register line 183</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> §0 line 16: "Status as of 2026-09-09: seven of eight critical external dependencies are <code>Uncommitted</code> (§8)". <code>prd.md</code> §8 line 718 lists nine ids including <code>EXT-PROTECTION-1</code>; line 720: "only <code>EXT-HOST-1</code> is <code>Committed</code>; the remaining entries are <code>Uncommitted</code>". Register line 183: "The remaining eight records are <code>Uncommitted</code>." The line was written by the PRD Update run before the sprint change proposal's execution added <code>EXT-PROTECTION-1</code> (register line 179). A reader of the status line alone undercounts the blockers by one. (<code>review-rubric.md</code> line 63 already flags this as medium; it is High here because §0 is the summary readers act on.)</div>
+            <div class="finding-fix"><strong>Fix:</strong> (<code>prd.md</code> line 16) "eight of nine critical external dependencies are <code>Uncommitted</code> (§8)".</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">3. <code>epics.md</code> requirements inventory is stale against the PRD it decomposes: retired caller source, pre-2026-09-09 FR-18, and no FR-29..FR-33 (cross-artifact)</h3>
+              <span class="finding-location"><code>epics.md</code> lines 48, 70, 36–90, 260–314; <code>prd.md</code> FR-7 lines 217, 227; FR-18 line 387; OQ-3 line 859; FR-29..FR-33</span>
+            </header>
+            <div class="finding-note"><code>epics.md</code> line 48: "FR7: ... Approver Policy, including Conversation owner, caller, predefined Parties, or tenant roles"; line 70: "FR18: Authorized Approvers or system policy can move a Proposed Agent Reply to rejected, abandoned, or expired terminal states ... executed by a Dapr Workflow timer at or after stored <code>ExpiresAt</code>". The inventory (36–90) and the FR map (260–314) stop at FR28; <code>FR29</code>, <code>FR30</code>, <code>FR31</code>, <code>FR32</code>, <code>FR33</code> occur nowhere in the file. <code>prd.md</code> FR-7 line 217: "The caller source is retired: <code>ApproverPolicySourceKind.Caller</code> is on the FR-23 deprecate-and-reject register"; line 227: no text "may state or imply that a distinct Conversation owner was resolved"; FR-18 line 387: four terminal states including <code>Posted</code>; OQ-3 line 859: "Execution mechanism is an architecture concern, not a product requirement"; FR-29 (505), FR-30 (549), FR-31 (580), FR-32 (625), FR-33 (406) are binding requirements with no epic inventory row. Impact: §0 line 18 makes the epic set "the single executable backlog"; a story writer reading the inventory would implement a retired Approver source and has no traceability row for the role matrix, governance operations, untrusted-content rule, cost caps, or accepted-vs-confirmed writes. The sprint change proposal (line 140) required "Requirements inventory is stale ... Apply the detailed edits below, update counts/topology/maps"; the execution record (418–423) does not mention the inventory. Active stories (1353, 1901) already use the current sources, so only the inventory is wrong.</div>
+            <div class="finding-fix"><strong>Fix:</strong> (<code>epics.md</code>) rewrite FR7 and FR18 inventory rows from the current PRD text and add FR29–FR33 rows plus their epic map entries.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">4. Who creates <code>hexa</code>: PRD FR-1/FR-33 say the Tenant Agent Administrator; Spine AD-2/AD-30 say the Platform principal at tenant enablement (cross-artifact)</h3>
+              <span class="finding-location"><code>prd.md</code> FR-1 line 131; FR-33 lines 408, 414; OQ-21 line 877; <code>ARCHITECTURE-SPINE.md</code> AD-2 line 108, AD-30 line 276</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> FR-1 line 131: "Agent Administrators can create or enable <code>hexa</code>"; FR-33 row 414: "Configure <code>hexa</code>: identity, ... | Tenant Agent Administrator | Tenant"; FR-33 line 408: "Every authorization rule in this PRD resolves to one of six Agents roles"; OQ-21 (877): "FR-33 is the authoritative role matrix for every authorization rule". <code>ARCHITECTURE-SPINE.md</code> AD-2 line 108: "<code>hexa</code> is one <code>Agent</code> per tenant, created at tenant enablement under the <code>Platform</code> principal"; AD-30 line 276: <code>Platform</code> "may dispatch ... the create-only <code>AgentSetupMutation</code> that provisions <code>hexa</code> at tenant enablement". Impact: an implementer following the Spine denies tenant administrators the create path FR-1 grants, and FR-33 has no row for a Platform-Operator provisioning step, so the matrix is not the complete authority it claims to be.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Product decides. If the Spine's model stands (it was approved after the PRD text), amend <code>prd.md</code> FR-1 to "enable and configure <code>hexa</code>, which the Platform Operator provisions at tenant enablement" and add an FR-33 row "Provision <code>hexa</code> at tenant enablement | Platform Operator | Tenant"; otherwise amend Spine AD-2/AD-30.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">5. FR-18 lists "kill switch" as a typed system-abandonment reason; FR-28 and the Spine say the kill switch never system-abandons (internal; cross-artifact)</h3>
+              <span class="finding-location"><code>prd.md</code> FR-18 line 392; FR-28 line 622; FR-7 line 236; FR-2 line 153; Spine AD-5 line 126, AD-12 line 168</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> FR-18 line 392: "A proposal abandoned by the system carries its typed reason (<code>NoEligibleApprover</code>, <code>SourceConversationUnavailable</code>, <code>RemovedInConversations</code>, or kill switch)". <code>prd.md</code> FR-28 line 622: pulling the kill switch "lets proposals awaiting a decision be rejected or abandoned but not approved, lets <code>Approved</code> and <code>PostingPending</code> proposals complete or fail on their own terms, and deletes no proposal" — no system abandonment. FR-7 (236) and FR-2 (153) define only the three named reasons. Spine AD-5 line 126: "System abandonment carries a typed reason (<code>NoEligibleApprover</code>, <code>SourceConversationUnavailable</code>, <code>RemovedInConversations</code>)"; AD-12 line 168: the kill switch "never system-abandons or deletes anything".</div>
+            <div class="finding-fix"><strong>Fix:</strong> (<code>prd.md</code> line 392) drop "or kill switch"; the FR-28 effect (human reject/abandon only) already governs.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">6. FR-28 names the wrong register as the readiness authority; the PRD never names the launch-readiness register (internal; cross-artifact)</h3>
+              <span class="finding-location"><code>prd.md</code> FR-28 line 621; NFR-12 line 700; §0 line 14; <code>launch-readiness-register.md</code> lines 17, 247–266; Spine AD-17 line 198</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> FR-28 line 621: "The external dependency register's launch-readiness gate records are the readiness authority." <code>external-dependency-register.md</code> holds no gate records; they live in <code>launch-readiness-register.md</code> (frontmatter <code>release_gate: RQ-1</code>; lines 17, 247–266), which Spine AD-17 line 198 calls "the normative readiness authority". The PRD's only other pointer is NFR-12 line 700 "visible in the readiness registry", and §0 line 14 says "build readiness is owned by the external dependency register and the <code>RQ-1</code> gate".</div>
+            <div class="finding-fix"><strong>Fix:</strong> (<code>prd.md</code> line 621) "The launch readiness register's gate records are the readiness authority; the external dependency register is the commitment authority for <code>EXT-*</code> entries."</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">7. The launch-readiness register defines neither <code>UnretiredAssumption</code> nor <code>ProhibitedCostControlPosture</code>, which FR-28 requires <code>RQ-1</code> to record (cross-artifact)</h3>
+              <span class="finding-location"><code>prd.md</code> FR-28 lines 614, 619; Spine AD-17 line 198; <code>launch-readiness-register.md</code> lines 104, 247–266</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> FR-28 line 614: "an <code>RQ-1</code> blocker of type <code>UnretiredAssumption</code> that names the row"; line 619: "surfaced as the additive <code>ProhibitedCostControlPosture</code> blocker"; Spine AD-17 line 198: "<code>RQ-1</code> ... records an <code>UnretiredAssumption</code> blocker for every unretired ... assumption". <code>launch-readiness-register.md</code> blocker codes in use (lines 247–266) are only <code>EvidenceNotRecorded</code> and <code>DependencyUncommitted</code>; no gate, record, or blocker names assumptions or postures (grep for either code returns nothing; line 104 mentions one architecture assumption in prose only).</div>
+            <div class="finding-fix"><strong>Fix:</strong> (<code>launch-readiness-register.md</code>) add both codes to the blocker vocabulary and state which gate (or the <code>RQ-1</code> evaluation itself) emits them.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">8. PRD asserts a non-conformance record exists for any story completed against an <code>Uncommitted</code> entry; the register has none, though Story 5.3 qualifies (cross-artifact)</h3>
+              <span class="finding-location"><code>prd.md</code> §8 line 720; FR-21 line 469; OQ-17 line 873; <code>external-dependency-register.md</code> line 107; <code>sprint-change-proposal-2026-09-09.md</code> lines 47, 183</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> §8 line 720: "any story already completed against an <code>Uncommitted</code> entry carries a non-conformance record in the register"; FR-21 line 469: "recorded as non-conformant ... with the dependency, the story, and the date captured in the dependency register. Narrowing a story's scope to avoid executing the seam does not clear the non-conformance record"; OQ-17 (873): "rather than retroactively legitimized". <code>external-dependency-register.md</code> contains no non-conformance record (no occurrence of "non-conform"). Story 5.3 shipped (<code>sprint-change-proposal-2026-09-09.md</code> line 47) while <code>EXT-PROVIDER-1</code> was <code>Uncommitted</code> and listed it as a consumer (proposal line 183, OLD text: "<code>EXT-PROVIDER-1</code> is a story dependency"); the register instead narrowed the consumer list (line 107: "Story 5.3 published catalog truth adapter-free and is not a consumer").</div>
+            <div class="finding-fix"><strong>Fix:</strong> (<code>external-dependency-register.md</code>) add a "Non-Conformance Records" section with the 5.3 / <code>EXT-PROVIDER-1</code> / completion-date row (reopening 5.3 does not clear it per FR-21), or, if Product rules 5.3 never consumed the seam, say so explicitly there so §8's assertion is verifiable.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">9. Register consumer list for <code>EXT-CONV-AI-1</code> omits the stories that the PRD says depend on seams 4 and 5 (cross-artifact)</h3>
+              <span class="finding-location"><code>external-dependency-register.md</code> lines 14, 61; <code>prd.md</code> §8 lines 726–727; <code>sprint-status.yaml</code> lines 98, 106, 118</span>
+            </header>
+            <div class="finding-note"><code>external-dependency-register.md</code> line 61: "<code>ConsumingStories</code> | 6.6, 7.4; <code>RQ-1</code>". <code>prd.md</code> §8 line 727: seam 5 (tenant-scoped content, roster, existence reads) is what "every Agent Call, the FR-7 resolution, and the FR-18 pre-post re-validation depend on"; line 726: seam 4 feeds the SM-2 denominator. <code>sprint-status.yaml</code> names 6-2 "use-the-complete-authorized-conversation-or-block" (98), 7-1 "create-and-discover-a-pending-proposal" (106) and 8-5 "calculate-runtime-and-product-metrics" (118), none of which the register blocks. Impact: under the register's own entry gate (line 14) those stories could reach <code>ready-for-dev</code> while the seam they execute is <code>Uncommitted</code>, defeating FR-21.</div>
+            <div class="finding-fix"><strong>Fix:</strong> (<code>external-dependency-register.md</code>) extend <code>ConsumingStories</code> to at least 6.1, 6.2, 6.6, 7.1, 7.4, 8.5.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">10. FR-33 says two rows use the Conversation Facilitator as an authority; only one does</h3>
+              <span class="finding-location"><code>prd.md</code> line 408; matrix lines 410–429</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> line 408: "The Conversation Facilitator is a Conversations role that two rows use as an authority"; in the matrix (410–429) only row 417 names it.</div>
+            <div class="finding-fix"><strong>Fix:</strong> "one row" (or name the second row if the Approver row 416 is meant, since the Facilitator reaches it only through FR-7).</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">11. OQ-18 status omits the 2026-09-09 amendment the §13 preamble claims</h3>
+              <span class="finding-location"><code>prd.md</code> line 851; OQ-18 status cell line 874</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> line 851: the 2026-09-09 reconciliation "amended OQ-3, OQ-6, OQ-9, OQ-11, OQ-14, OQ-16, and OQ-18 in place"; OQ-18 status cell (874) reads "Deferred; decision due 2026-10-15 [ASSUMPTION A-14], and in any case before production enablement" with no "amended 2026-09-09", unlike the other six rows.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Append "amended 2026-09-09" to the OQ-18 status.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">12. A-3 index row carries a clause that no keyed text states</h3>
+              <span class="finding-location"><code>prd.md</code> line 748; OQ-14 line 870; FR-7 line 217; §3 line 99</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> line 748: "a Conversation may have one or more Facilitators (cited by OQ-14)"; OQ-14 (870), FR-7 (217) and §3 (99) say nothing about Facilitator multiplicity.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Either add the multiplicity to FR-7 or drop the clause from the row.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">13. Blocked-call category lists differ across §3, FR-25 and SM-C4</h3>
+              <span class="finding-location"><code>prd.md</code> §3 line 103; FR-25 line 546; SM-C4 line 846</span>
+            </header>
+            <div class="finding-note">§3 line 103: "Conversation Context Policy, Content Safety Policy, cost caps, rate limits, or Provider failure"; FR-25 line 546: "Conversation Context Policy, ... Content Safety Policy, ... cost caps, ... <code>NoEligibleApprover</code>, and ... <code>RemovedInConversations</code> or the Agents-owned block"; SM-C4 line 846: "Conversation Context Policy, Content Safety Policy, cost caps, <code>NoEligibleApprover</code>, or the Agents-owned block". Rate limits and Provider failure keep a Conversation eligible (§3) but are not in the SM-C4 share; <code>NoEligibleApprover</code> is in SM-C4 but not in §3's list.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Give SM-C4 the union and cite it from §3 and FR-25.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">14. Safety re-check policy: "then-current" versus "more restrictive of initial and then-current"</h3>
+              <span class="finding-location"><code>prd.md</code> FR-26 lines 574, 578; FR-17 line 382; FR-18 line 397; OQ-9 line 865; Spine AD-20 line 214</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> FR-26 line 574, FR-17 (382), FR-18 (397) and OQ-9 (865) say re-checks "always evaluate the then-current active policy"; FR-26 line 578 says each re-check "uses the more restrictive of the initial attempt's policy and the then-current active policy". Spine AD-20 (214) resolves it as the latter. Already deferred as a rubric medium (<code>update-report-2026-09-09.md</code> line 46); noted here because four locations state the looser rule.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Qualify line 574 and OQ-9 with "(never weaker than the initial attempt's policy, line 578)".</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">15. §10 groups Conversation Context Policy and the regeneration ceiling differently from FR-33</h3>
+              <span class="finding-location"><code>prd.md</code> §10 lines 786, 791; FR-33 row 414; FR-32 line 627; Spine AD-11 line 162</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> §10 line 786 lists "Conversation Context Policy" under Agent administration and line 791 lists "the regeneration ceiling" under Budget policy; FR-33 row 414 assigns the regeneration ceiling to "Configure <code>hexa</code>" (Tenant Agent Administrator, as FR-32 line 627 "separately configures") and has no row for Conversation Context Policy at all, though Spine AD-11 (162) makes it <code>Agent</code> configuration.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add "Conversation Context Policy" to FR-33 row 414 and move the regeneration ceiling in §10 to the Agent-administration bullet.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">16. <code>Available</code> is used once in the PRD without definition</h3>
+              <span class="finding-location"><code>prd.md</code> §8 line 731; §0 line 16; FR-21 line 468; §8 line 720; register line 41</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> §8 line 731: "disabled while its register entry is not <code>Available</code>"; the PRD's own vocabulary elsewhere is <code>Uncommitted</code>/<code>Committed</code> (§0 16, FR-21 468, §8 720). The register defines <code>Available</code> (line 41). (<code>review-rubric.md</code> line 64 also notes this.)</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add to §8 preamble "The register's third status, <code>Available</code>, means the committed target is consumable with passing Level 4 evidence."</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">17. The PRD-run record does not document the two proposal amendments the PRD now carries (cross-artifact)</h3>
+              <span class="finding-location"><code>prd.md</code> §0 line 18; <code>update-report-2026-09-09.md</code> lines 7–21; <code>sprint-change-proposal-2026-09-09.md</code> line 418</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> §0 line 18: an approved proposal "is not landed until a PRD Update run applies it"; <code>update-report-2026-09-09.md</code> (7–21) lists neither <code>EXT-PROTECTION-1</code> nor the <code>ARCH-A</code> cross-index, which only <code>sprint-change-proposal-2026-09-09.md</code> line 418 records as applied. The amendments are present, so this is a trail gap, not a content gap.</div>
+            <div class="finding-fix"><strong>Fix:</strong> (<code>update-report-2026-09-09.md</code>) add a line recording the two §8/§8.1 amendments applied under the 2026-09-09 proposal.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <div class="mechanical">
+      <h3>Mechanical notes</h3>
+      <ul>
+        <li><strong>ID continuity.</strong> FR-1..FR-33, NFR-1..NFR-14, OQ-1..OQ-23, SM-1..SM-7, SM-C1..SM-C5, UJ-1..UJ-4, A-1..A-17: all defined, all unique, every reference resolves. FR headings remain out of numeric order by design (FR-33 after FR-21; FR-29 after FR-23; FR-30 after FR-25; FR-31 after FR-26; FR-32 after FR-28); downstream tooling must key on IDs, not document order.</li>
+        <li><strong>Assumptions Index roundtrip.</strong> Passes. 27 <code>[ASSUMPTION</code> occurrences: 23 keyed inline tags mapping onto A-1..A-17 (A-3 ×3, A-4 ×2, A-9 ×2, A-13 ×3), three explanatory <code>A-n</code> mentions (§0, FR-33 preamble, §8.1 preamble), and one generic <code>[ASSUMPTION]</code> in OQ-21 referring to the FR-33 rows. Every index row's "Where" column names a location that carries the tag (A-17 → FR-28 line 622; A-15/A-16 → §8 lines 727–728; A-13 → §12 lines 824/837/838); no inline tag lacks an index row. A-6 and A-13 note their restatements (FR-32, OQ-11).</li>
+        <li><strong>§0 versus §8 count.</strong> Stale by one — see the Scope honesty finding. <code>EXT-PROTECTION-1</code> appears in §8 line 718 and the Payload Protection bullet; the register record exists and is <code>Uncommitted</code> with <code>TBD</code> target and date.</li>
+        <li><strong><code>ARCH-A-1..7</code>.</strong> All seven present in <code>ARCHITECTURE-SPINE.md</code> (lines 258–741). The PRD's delegation is sound; only the <code>RQ-1</code> blocking scope is ambiguous (low finding above).</li>
+        <li><strong>Frontmatter.</strong> <code>updated: 2026-09-09</code> now matches the body — the gate's medium finding is closed.</li>
+        <li><strong>Callout tags.</strong> Zero <code>[NOTE FOR PM]</code> and zero <code>[NON-GOAL for MVP]</code> inline; the <em>Deferred</em> rows, §5, §6.2, FR-27's OQ-18 sentence, and §12's OQ-23 sentence do the equivalent work.</li>
+        <li><strong>UJ protagonists.</strong> Nora, Milan, Anika, Omar, each with inline context; no floating UJs.</li>
+        <li><strong>Glossary drift (low).</strong> "Agent response(s)" lowercase ×7 (§2.2, UJ-2, UJ-3, FR-19, §6.2) versus "Agent Response"; "Agent call" ×3 and "Agent calling" ×1 versus "Agent Call"; glossary heading "Provider/Model Selection" versus "Provider/model selection" ×7; bare "Participant(s)" ×16 versus "Conversation Participant" (mostly harmless in context). The glossary "Approver" entry (line 89) still says Approvers may "otherwise resolve" proposals, a remnant of the deleted expiry-resolution action; delete the phrase. FR-31 says "decision, commitment, or approval" where OQ-9 says "decision" (see the medium finding).</li>
+        <li><strong>Untyped reason.</strong> FR-18 consequence 2 lists system-abandonment reasons as "<code>NoEligibleApprover</code>, <code>SourceConversationUnavailable</code>, <code>RemovedInConversations</code>, or kill switch" — three typed identifiers and one prose phrase. Give the kill switch a typed name (e.g. <code>KillSwitch</code>) so the FR-23 enum rule applies to all four.</li>
+        <li><strong>Brownfield references not verifiable in this repository.</strong> §8 line 731 cites "the shipped no-op protection implementation"; no payload-protection type exists under <code>src/</code> (it lives in <code>Hexalith.EventStore</code>, which was not descended into). Qualify the sentence with the owning repository so a reader does not search <code>src/</code> for it. <code>AgentCallStatus</code> (UI) places <code>Unknown</code> last, not at <code>= 0</code>; it is UI-internal, but FR-23's rule should say whether UI-only enums are in scope.</li>
+        <li><strong>Glossary carrying metric logic.</strong> The "Eligible Conversation" entry still holds SM-2/SM-C4 rationale; definition is fine, the rationale belongs in §12.</li>
+        <li><strong>Required sections.</strong> Present for a launch-level, chain-top, brownfield PRD: purpose, vision, users and journeys, glossary, features with FRs, non-goals, MVP scope, NFRs, dependencies with Assumptions Index, governance, API surface, evidence, success metrics with counter-metrics, decision register.</li>
+        <li><strong>Deferred items from the 2026-09-09 gate, disposition.</strong> FR-26 "more restrictive": still stands, medium. FR-31 commitment category: still stands, medium (now also drifts from OQ-9). Agent Call state enumeration: still stands, medium (sharpened by the two shipped enums). p99 at n = 30: still stands, medium. FR-7 configuration-time predicate: resolved. FR-2 removal (high): resolved, with one new medium on the pre-post outcome. SM-7 all-Automatic cohort (low): resolved via §12 line 835 and OQ-23. Frontmatter <code>updated:</code> (medium): resolved.</li>
+      </ul>
+    </div>
+
+    <footer class="report-footer">
+      <div class="meta">
+        <span>Rubric: .claude/skills/bmad-prd/assets/prd-validation-checklist.md</span>
+        <span>Generated: 2026-09-09T07:17:39Z</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

@@ -16,6 +16,7 @@ sources:
   - ../../epics.md
   - ./reconcile-validation-2026-09-08.md
   - ./reconcile-validation-2026-09-09.md
+  - ./reconcile-validation-2026-09-09-2.md
   - ../../../../references/Hexalith.Tenants/_bmad-output/planning-artifacts/ux-designs/ux-tenants-2026-06-02/DESIGN.md
   - ../../../../references/Hexalith.FrontComposer/_bmad-output/project-context.md
   - ../../../../references/Hexalith.FrontComposer/docs/reference/components/front-composer-shell.md
@@ -190,7 +191,9 @@ Nav-entry glyph requests (string contract only):
 | Audit evidence | none | history |
 | Audit governance | none | history |
 
-Until a request lands, the nav entry keeps the glyph listed under "Glyph today" or renders without a glyph; it never reuses another entry's glyph. Audit evidence and Audit governance therefore render label-only until the history glyph lands, rather than borrowing Operational status's `Search`.
+Until a request lands, the nav entry keeps the glyph listed under "Glyph today". **There is no no-glyph path**: `FrontComposerNavigation.ResolveNavEntryIcon` falls back to `Apps20` whenever `TryCreate` fails, including for an unset key, and `Apps20` is the Agents overview glyph — so the six entries listed with no glyph today render a duplicate of Overview, and in the icon-only rail seven Agents tiles are distinguishable only by their localized `aria-label`. The duplication is accepted until the requests land rather than papered over, because the alternative would be to hold those entries out of navigation entirely. What the spine forbids is a *deliberate* reuse of another entry's glyph. Audit evidence and Audit governance therefore render label-only until the history glyph lands, rather than borrowing Operational status's `Search`.
+
+**There is no mockup, wireframe, or other composition reference to look for.** By decision (2026-08-02, reaffirmed 2026-09-09), all 15 Information Architecture surfaces are spine-only: FrontComposer and Fluent v5 inheritance plus the per-surface primary-region and accordion tables below make layout derivable, and a visual reference would restate inherited chrome. These two spines are the sole reference, and they win on conflict with any mock, sketch, import, or shipped code.
 
 The surface is governed operational UX, not regulated UX. Provider secrets are never displayed or entered, authorization failures are plain and safe, proposed replies stay visually distinct from Conversation Messages, and version and audit evidence is legible without compliance-heavy language beyond source requirements.
 
@@ -238,10 +241,10 @@ Every visible string is a localizable whole string with named placeholders; the 
 
 One `FcPageLayoutMode` per route; hybrid measures do not exist in FC-LYT.
 
-- FullWidth: Agents overview, Provider catalog, Proposal queue, Operational status, Launch readiness, Audit evidence list. The Audit evidence list is an id-entry surface, not a grid: it takes an interaction, proposal, or governance-operation reference and routes to the detail. The mandatory FC-TBL component set therefore applies to the Provider catalog and Proposal queue grids only.
+- FullWidth: Agents overview, Provider catalog, Proposal queue, Operational status, Launch readiness, Audit evidence list. The Audit evidence list is an id-entry surface, not a grid: it takes an interaction, proposal, or governance-operation reference and routes to the detail. The Agents-owned required grid component set (FC-TBL itself defines a frozen public surface and generated-grid envelope rules, not a usage mandate) therefore applies to the Provider catalog and Proposal queue grids only.
 - Constrained: `hexa` configuration, Approver policy, Conversation context policy, Content safety policy, Cost controls, Proposal detail/editor, Audit evidence detail, Audit governance. Evidence lists for cost and governance live on the FullWidth status and audit routes.
 
-Spacing follows the Fluent-compatible 4px rhythm in frontmatter: `{spacing.4}` between related fields, `{spacing.6}` between major sections, `{spacing.8}` only for page-level separation. No decorative card grids; dense tables, forms, panels, and inline status regions do the work.
+Spacing follows the Fluent-compatible 4px rhythm in frontmatter: `{spacing.4}` between related fields, `{spacing.6}` between major sections, `{spacing.8}` only for page-level separation. Each step inherits by name rather than by value, so the scale binds like every other token group: `{spacing.1}`–`{spacing.8}` are `--spacingHorizontal`/`--spacingVerticalXS` through `XXL` on the Fluent 2 ramp, and a gap between siblings is expressed as a `FluentStack` `HorizontalGap`/`VerticalGap` in preference to a hand-authored `gap`. Per `hexalith-ux-instructions.md § No theme redefinition`, hand-authored CSS is allowed only for layout the design system does not own; since `src/Hexalith.Agents.UI` currently ships **no CSS at all** behind roughly 115 BEM class names, that inventory is a tracked divergence in `EXPERIENCE.md § Shipped-code corrections` with a named delivery decision and absorbing stories. No decorative card grids; dense tables, forms, panels, and inline status regions do the work.
 
 A route with two or more sibling titled content sections uses one `FluentAccordion` with one `FluentAccordionItem` per section, the primary item expanded. Page title, breadcrumbs, toolbar, navigation chrome, and the single primary content region stay outside the accordion; the primary content is never hidden behind an accordion interaction. Accordion titles are h2, in-panel sections h3.
 
@@ -250,7 +253,13 @@ A route with two or more sibling titled content sections uses one `FluentAccordi
 | Agents overview | Readiness summary | Blockers; Recent activity |
 | Provider catalog | The grid | Editor |
 | Proposal detail | The editor | Metadata; Version history; Audit link |
-| Policy surfaces | The current effective policy | Draft; Authoring; History |
+| Conversation context policy | The current effective policy (read-only; no control of any kind) | History |
+| Content safety policy | The current effective policy pair | Tenant stricter delta; Platform draft and publication; History |
+| Cost controls | Current caps, limits, and consumption | Lower-only editor; Operator editor; Overrides; History |
+| Operational status | Readiness and outcomes grouped by recovery | Blocked calls; Denials; Per-Conversation history and block; Cost consumption; Failure records |
+| Launch readiness | The gate grid | Kill switch; NFR-14 evidence; Consumed dependencies |
+| Audit governance | Hold and retention state | Export; Deletion; History |
+| Audit evidence detail | The evidence record | Versions; Safety decisions; Governance changes |
 
 Layout keeps focus reachable and mirrors correctly: sticky headers, pinned columns, and action rails never overlap the focused row, so scroll padding equals the sticky heights; rails, pinned columns, and version lists use logical `inline-start` and `inline-end` for RTL locales. Reflow, target size, and the other WCAG criteria are in `EXPERIENCE.md § Accessibility Floor`.
 
@@ -280,7 +289,7 @@ The 22 components are named and ordered identically in three places: this file's
 
 ### proposal-state-badge
 
-`FluentBadge` for the ten `ProposedAgentReplyState` values (the PRD alias `PostFailed` maps to `PostingFailed`). Only `Posted` is `{colors.status-success}`; `Pending`, `Edited`, `Regenerated`, `Approved`, and `PostingPending` are `{colors.status-informative}`; `PostingFailed` and `Rejected` are `{colors.status-danger}`; `Expired` is `{colors.status-severe}`; `Abandoned` is `{colors.status-subtle}`; nearing expiry adds a `{colors.status-warning}` chip. When nearing expiry begins is in `EXPERIENCE.md § Proposal lifecycle`. Display-only outcomes (`superseded by another decision`, `authority unresolved`, `expired at approval`, `duplicate submission (idempotent)`, `existence only`) render as a second badge beside the state and never replace it.
+`FluentBadge` for the ten `ProposedAgentReplyState` values (the PRD alias `PostFailed` maps to `PostingFailed`). The **nearing-expiry chip carries visible text**, not colour and a glyph alone: `Expires in {duration}`, culture-formatted, with `Warning16` decorative beside it, because this file's own rule is that every status renders as a semantic role plus one glyph plus visible whole-string text, and in forced-colors the icon and text carry the meaning by themselves. The announced string is worded separately from the chip and both live in `EXPERIENCE.md § Voice and Tone`. Only `Posted` is `{colors.status-success}`; `Pending`, `Edited`, `Regenerated`, `Approved`, and `PostingPending` are `{colors.status-informative}`; `PostingFailed` and `Rejected` are `{colors.status-danger}`; `Expired` is `{colors.status-severe}`; `Abandoned` is `{colors.status-subtle}`; nearing expiry adds a `{colors.status-warning}` chip. When nearing expiry begins is in `EXPERIENCE.md § Proposal lifecycle`. Display-only outcomes (`superseded by another decision`, `authority unresolved`, `expired at approval`, `duplicate submission (idempotent)`, `existence only`) render as a second badge beside the state and never replace it.
 
 ### response-mode-toggle
 
@@ -296,7 +305,7 @@ Row-based builder for the closed `ApproverPolicySourceKind` list; the `Conversat
 
 ### provider-catalog-grid
 
-Hand-authored `FluentDataGrid` inside `FcAggregateListPage`, FullWidth. Pinned columns: Provider name, model, enabled state, configured state, `provider-status-badge`, pricing version, `CapabilityVersion`, in `{typography.mono}` where they are identifiers. The editor `FluentAccordionItem` uses an ISO 4217 `FluentSelect` for currency, `FluentNumberInput` for unit prices and capability limits, and a masked input with autocomplete off for the secret reference. The pricing version is server-assigned and read-only; the confirmation renders it as `next pricing version {n}`. Mutation controls are absent, not disabled, for an administrator without the platform-scoped mutation policy. Variants: loading, empty, filtered-empty, error, `catching up`, `superseded by another decision`.
+Hand-authored `FluentDataGrid` inside `FcAggregateListPage`, FullWidth. Pinned columns: Provider name, model, enabled state, configured state, `provider-status-badge`, pricing version, `CapabilityVersion`, in `{typography.mono}` where they are identifiers. The editor `FluentAccordionItem` uses an ISO 4217 `FluentSelect` for currency, `FluentNumberInput` for unit prices and capability limits, and a masked input with autocomplete off for the secret reference. The pricing version is server-assigned and read-only; the confirmation renders it as `next pricing version {n}`. Authorization behavior is in `EXPERIENCE.md § Component Patterns`; its visual consequence is the **`read-only (no mutation policy)`** variant, in which the editor `FluentAccordionItem` is itself absent rather than present with hidden buttons, so the field inventory and the secret-reference control are never rendered. Variants: loading, empty, filtered-empty, error, `catching up`, `superseded by another decision`, `read-only (no mutation policy)`.
 
 ### proposal-queue-grid
 
@@ -316,7 +325,7 @@ The Conversation-owned **Call hexa** `FluentButton`, contributed through `EXT-CO
 
 ### agent-response-marker
 
-Inline `FluentBadge` in `{colors.status-subtle}` beside every posted `hexa` Conversation Message, reading `AI-generated from Conversation Context, not human-verified` for automatic posts and `AI-generated, edited by {party}` when the posted version was human-edited. Rendered by Conversations, contributed by Agents.
+Inline `FluentBadge` in `{colors.status-subtle}` beside every posted `hexa` Conversation Message, whose two copy strings live in `EXPERIENCE.md § Voice and Tone`, one for automatic posts and `AI-generated, edited by {party}` when the posted version was human-edited. Rendered by Conversations, contributed by Agents.
 
 ### conversation-context-policy-panel
 
@@ -356,7 +365,7 @@ Focus-trapped `FluentDialog`. Confirm is `FluentButton` `ButtonAppearance.Primar
 
 ### pending-command-indicator
 
-The activated `FluentButton` switches to `DisabledFocusable="true"`, which is the v5 binding that emits `aria-disabled` while keeping the control focusable; `Loading` and `Disabled` are forbidden on an activated control because both remove focusability. An adjacent `FluentBadge` in `{colors.status-informative}` reads `Submitted`, then `AuthoritativePending`, then `awaiting projection`. Variant `pending in another session` renders `{colors.status-severe}` on resolution controls in a second tab. It never becomes Success.
+The activated `FluentButton` switches to `DisabledFocusable="true"`; `Loading` and `Disabled` are forbidden on an activated control because both remove focusability. An adjacent `FluentBadge` in `{colors.status-informative}` reads `Submitted`, then `AuthoritativePending`, then `awaiting projection`. Variant `pending in another session` renders `{colors.status-severe}` on resolution controls in a second tab. It never becomes Success.
 
 ## Do's and Don'ts
 

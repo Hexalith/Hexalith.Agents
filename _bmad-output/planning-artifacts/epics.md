@@ -1357,7 +1357,7 @@ So that revoked, ambiguous, stale, or cross-tenant authority can never make **he
 
 **Given** any public Agents operation
 **When** trusted ingress derives authorization context
-**Then** it selects exactly one AD-30 principal kind from `User`, `Platform`, `Service`, or `System` according to the operation family, resolves a user `PartyId` from the authenticated subject plus fresh Parties/Tenants evidence, strips all client-supplied reserved extension keys, and issues only allowlisted scope-bound extensions with an HMAC tag
+**Then** it selects exactly one AD-30 principal kind from `User`, `Administrator`, `Platform`, or `Workflow` according to the operation family, resolves a user `PartyId` from the authenticated subject plus fresh Parties/Tenants evidence, strips all client-supplied reserved extension keys, and issues only allowlisted scope-bound extensions with an HMAC tag
 **And** the command pipeline verifies the tag before aggregate dispatch and rejects an untagged, forged, wrong-family, wrong-principal-kind, stale-role, or wrong-scope context. This closes DW-2.
 
 **Given** an authorization or trusted-context denial
