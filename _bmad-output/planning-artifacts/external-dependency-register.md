@@ -4,7 +4,7 @@ status: active
 created: 2026-08-02
 updated: 2026-09-09
 project: agents
-authority: sprint-change-proposal-2026-09-09.md
+authority: sprint-change-proposal-2026-09-09-prd-validation-follow-through.md
 ---
 
 # External Dependency Register
@@ -52,15 +52,15 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 | --- | --- |
 | `Owner` | Conversations Maintainer |
 | `Repository` | `Hexalith.Conversations` |
-| `RequiredArtifact` | Six seams. (1) Membership: public `IConversationClient.AddParticipantAsync` and `POST /api/v1/conversations/{conversationId}/participants`, limited for Agents to stable AI Party identity, `ParticipantType.AiAgent`, and `ParticipantRole.Member`; exact retries are idempotent no-ops, conflicting type/role is a typed conflict, and cross-tenant or general participant management is denied; plus a participant-state read for the AI participant and a participant removal limited to the AI participant, for the PRD FR-2 removal block. (2) Posting: append a Conversation Message as the `AiAgent` participant with an Agents-supplied deterministic `MessageId` and idempotency key, persisted verbatim or rejected (a differing returned id is a typed incompatibility that blocks posting), and message metadata carrying the Agent Call trace reference and provenance flags (AI-generated; human-edited and by which Party), so restart or replay cannot duplicate a post. (3) Facilitator resolution: `ParticipantRole.Facilitator` on the participant read model. (4) Active-Conversation count per tenant and window for the PRD Eligible Conversation denominator. (5) Tenant-scoped reads under the Agents service principal of complete Conversation content, the Participant roster with roles, and Conversation existence/accessibility. (6) A Conversation deletion signal so an approved deletion in Conversations triggers PRD FR-30 deletion of derived Agent content. Final member names are owned by this record (PRD §8.1 assumptions A-1 through A-4, A-15, A-16). |
+| `RequiredArtifact` | Six seams. (1) Membership: public `IConversationClient.AddParticipantAsync` and `POST /api/v1/conversations/{conversationId}/participants`, limited for Agents to stable AI Party identity, `ParticipantType.AiAgent`, and `ParticipantRole.Member`; exact retries are idempotent no-ops, conflicting type/role is a typed conflict, and cross-tenant or general participant management is denied; plus a participant-state read for the AI participant and a participant removal limited to the AI participant, for the PRD FR-2 removal block. (2) Posting: append a Conversation Message as the `AiAgent` participant with an Agents-supplied deterministic `MessageId` and idempotency key, persisted verbatim or rejected (a differing returned id is a typed incompatibility that blocks posting), and message metadata carrying the Agent Call trace reference and provenance flags (AI-generated; human-edited and by which Party), so restart or replay cannot duplicate a post; plus an existence read by `MessageId` returning a message, typed absence, `ConversationDeleted`, or `PrincipalRemovedFromConversation`, so an acknowledgement-loss retry or abandon cannot contradict an already-posted message. (3) Facilitator resolution: `ParticipantRole.Facilitator` on the participant read model. (4) Active-Conversation count per tenant and window for the PRD Eligible Conversation denominator, or a Conversations-side tenant event feed from which Agents derives the same count, never from Agent Calls. (5) Tenant-scoped reads under the Agents service principal of complete Conversation content, the Participant roster with roles, and Conversation existence/accessibility, including typed `ConversationDeleted` and `PrincipalRemovedFromConversation` answers distinct from transient unavailability. (6) A Conversation deletion signal so an approved deletion in Conversations triggers PRD FR-30 deletion of derived Agent content. Final member names are owned by this record (PRD §8.1 assumptions A-1 through A-4, A-15, A-16). |
 | `TargetVersionOrCommit` | `TBD` |
 | `TargetIntegrationDate` | `TBD` |
-| `CompatibilityContractAndVerificationCommand` | Contract: typed idempotent membership with participant-state read and AI-participant removal, idempotent posting with trace and provenance metadata, Facilitator role exposure, active-Conversation count, tenant-scoped content/roster/existence reads, and a deletion signal, each with focused cross-tenant denial. Command: `TBD`. |
+| `CompatibilityContractAndVerificationCommand` | Contract: typed idempotent membership with participant-state read and AI-participant removal, idempotent posting with trace/provenance metadata and a typed `MessageId` existence read, Facilitator role exposure, active-Conversation count or equivalent tenant event feed, tenant-scoped content/roster/existence/accessibility reads, and a deletion signal, each with focused cross-tenant denial. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
 | `AcceptedStatus` | `Uncommitted` |
-| `ConsumingStories` | 6.6, 7.4; `RQ-1` |
+| `ConsumingStories` | 5.4, 6.2, 6.6, 7.1–7.5, 7.7, 8.5, 8.8; `RQ-1` |
 
-*Scope extended 2026-09-09 by the PRD validation reconciliation (PRD §8, findings H3/H4): the posting, Facilitator, and denominator seams were previously implied by PRD consequences but not named here. The record was already `Uncommitted`; the extension changes no status.*
+*Scope extended 2026-09-09 by the PRD validation reconciliation and follow-through proposal: the posting existence read, Facilitator resolution, active-count/event-feed denominator, and tenant-scoped content/roster/existence/accessibility consumers are explicit. The record was already `Uncommitted`; the extension changes no status and blocks every newly listed consumer from `ready-for-dev` until accepted.*
 
 ### EXT-CONV-UI-1 — Conversation Action Contribution For Call hexa
 
@@ -177,6 +177,22 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 | `ConsumingStories` | 5.8, 6.1–6.4, 7.1–7.4, 8.1–8.3, 8.8; `RQ-1` |
 
 *Added 2026-09-09 by the architecture update: the 2026-09-09 verified-current review found that the EventStore checkout carries only the protection hooks and a no-op default, so the AD-22 key hierarchy has no owner without this record.*
+
+## Known Consumer Non-Conformance
+
+### NC-5.3-PLATFORM-CATALOG-SCOPE — Story 5.3 Platform Catalog Migration
+
+| Field | Value |
+| --- | --- |
+| `Status` | Open |
+| `Owner` | Agents Runtime Maintainer |
+| `AffectedStory` | 5.3 — Govern Provider Models And Pricing Through Live Operations |
+| `Finding` | The shipped implementation uses tenant-scoped Provider catalog streams and read models. It does not yet implement AD-2's platform `system` catalog plus tenant-scoped `TenantProviderEnablement` split. |
+| `Disposition` | Retain the shipped implementation as migration source; migrate idempotently into platform catalog and tenant-enablement streams with `MigratedFrom`; freeze legacy streams/read models without rewriting or deleting history. |
+| `ClosureEvidence` | Revised Story 5.3 verification passes platform/tenant aggregate, migration/replay, projection, authorization, and cross-tenant non-disclosure tests, with Story 5.6 live-seam evidence where assigned. |
+| `DependencyEffect` | This record does not make `EXT-PROVIDER-1` a Story 5.3 consumer, does not alter any dependency status, and cannot be cited as current architecture or release conformance. |
+
+The record closes only when its named evidence is accepted and this table is amended in the same change. A completed historical Story 5.3 specification or the existing tenant-scoped implementation does not close it.
 
 ## Current Blocking Summary
 

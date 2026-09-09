@@ -4,7 +4,7 @@ status: active
 created: 2026-08-02
 updated: 2026-09-09
 project: agents
-authority: sprint-change-proposal-2026-09-09.md
+authority: sprint-change-proposal-2026-09-09-prd-validation-follow-through.md
 release_gate: RQ-1
 ---
 
@@ -32,6 +32,26 @@ This register is the authoritative machine-testable inventory for Hexalith Agent
 | `EvidenceReference` | Immutable, access-controlled reference to the evidence manifest or result. |
 | `ConfigurationOrMeasurementContract` | Versioned configuration values or metric definition, including authoritative timestamps, calculation, sample/window/cohort, late/missing-data, and invalidation rules where measured. |
 | `BlockerCode` | Stable support-safe code; never raw content, secrets, exceptions, or Provider payloads. |
+
+### Blocker Code Vocabulary
+
+The following support-safe codes are the closed cross-gate vocabulary for V1. A gate-specific contract may name a narrower reason underneath one of these codes, but a consumer may not invent a peer code. An unknown code fails closed.
+
+| `BlockerCode` | Meaning and use |
+| --- | --- |
+| `GateRecordMissing` | No record exists for a required gate, scope, and profile. |
+| `EvidenceNotRecorded` | The gate has no accepted evidence observation yet. |
+| `DependencyUncommitted` | A dependency needed to begin compatibility work has not reached `Committed`. |
+| `DependencyNotAvailable` | A dependency consumed by the evaluated qualification profile has not reached `Available`, or its exact compatibility command does not pass. |
+| `InsufficientEvidence` | Required samples, timestamps, live evidence, manifest fields, or evidence level are absent. |
+| `UnretiredAssumption` | An unretired PRD `A-n` row or Architecture `ARCH-A-n` row blocks qualification; the blocker names the row, table, and evaluated index version. |
+| `OpenDecision` | A deferred PRD decision whose status requires resolution before enablement has not landed. |
+| `GateOutOfScope` | A demanded gate or evidence requirement is not derivable from the authoritative FR-28 input list and is void for `RQ-1` until reconciled. |
+| `TriggerReviewOverdue` | A required FR-28 kill-switch trigger review was not recorded within one business day. |
+| `PayloadProtectionUnavailable` | The host has not reported the production payload-protection engine required by FR-34 as available; this is also an additive `AgentLaunchReadinessBlocker`. |
+| `ProhibitedCostControlPosture` | A recorded posture is `ReportingOnlyMonitoring` or `AcceptedLaunchRisk`; this is also an additive `AgentLaunchReadinessBlocker` and is never collapsed into a missing-posture code. |
+
+`UnretiredAssumption`, `DependencyNotAvailable`, `OpenDecision`, and `InsufficientEvidence` are register vocabulary evaluated by `RQ-1`, not Agent aggregate members. `PayloadProtectionUnavailable` and `ProhibitedCostControlPosture` additionally cross the runtime readiness boundary because FR-30 and FR-34 require enablement to fail closed before a document/register lookup.
 
 ## State, Freshness, And Invalidation
 
@@ -76,7 +96,7 @@ The following IDs and meanings are normative and closed for V1: implementations 
 | `LR-UI-CONFORMANCE` | NFR-13 WCAG 2.2 AA behavior, whole-string English/French key parity, FrontComposer/Fluent V5 use, and restrictive-viewport blocking for high-impact actions. Invalidated by UI component, localization, route, interaction, or supported-viewport changes. |
 | `LR-RUNTIME-PERFORMANCE` | NFR-9 accepted-call/post/proposal, approval/post, and fast pre-Provider rejection percentile gates using at least 30 production-like executions each. Invalidated by runtime path, profile, timestamp source, percentile, cohort, or threshold changes. |
 | `LR-UI-PERFORMANCE` | NFR-14 browser-monotonic page usability, authoritative pending acknowledgement, and terminal render/live-region announcement gates using at least 30 production-like executions each. Invalidated by UI path, browser profile, instrumentation seam, threshold, percentile, or sample rules. |
-| `LR-PRODUCT-METRICS` | Versioned SM-1 through SM-6 calculation and real rolling-window/cohort attainment; deterministic fixtures prove formulas only. Invalidated by source event, formula, threshold, window, cohort, late-data, or insufficiency rules. |
+| `LR-PRODUCT-METRICS` | Versioned pre-enablement SM-1, SM-4, SM-5, and SM-6 calculation and real qualification attainment; SM-5 requires exactly 100% audit completeness. SM-2, SM-3, and SM-7 are launch-health metrics and never contribute to `RQ-1`. Deterministic fixtures prove formulas only. Invalidated by source event, formula, threshold, cohort, late-data, or insufficiency rules. |
 
 ### Gate Scope Kinds And Authorized Producers
 
@@ -136,7 +156,19 @@ Every controlled execution re-evaluates the applicable operation subset from `Op
 
 The matrix is additive and immutable per version. The readiness decision exposes the matrix version, evaluated `RegistryRevision`, applicable GateIds, and safe blockers so every surface renders the same outcome.
 
-The `ReleaseQualificationGateSet` contains all 18 minimum GateIds. Only current `Pass` records for the complete set plus `Available` consumed external dependencies allow `RQ-1` READY and production enablement. `LR-RECOVERY`, `LR-UI-CONFORMANCE`, `LR-RUNTIME-PERFORMANCE`, `LR-UI-PERFORMANCE`, and `LR-PRODUCT-METRICS` therefore qualify release without circularly blocking the controlled executions that produce their evidence.
+The `ReleaseQualificationGateSet` contains all 18 minimum GateIds. Only current `Pass` records for the complete set plus `Available` consumed external dependencies allow `RQ-1` READY and production enablement. Its metric slice is exactly pre-enablement SM-1, SM-4, SM-5, and SM-6 through `LR-PRODUCT-METRICS`, NFR-9 through `LR-RUNTIME-PERFORMANCE`, and NFR-14 through `LR-UI-PERFORMANCE`; SM-5 supplies the 100% audit-completeness threshold. SM-2, SM-3, and SM-7 are never `RQ-1` inputs. The remaining GateIds enforce the non-metric safety, context, dependency, recovery, capacity, accessibility, payload-protection, and governance inputs that FR-28 also names. `LR-RECOVERY`, `LR-UI-CONFORMANCE`, `LR-RUNTIME-PERFORMANCE`, `LR-UI-PERFORMANCE`, and `LR-PRODUCT-METRICS` therefore qualify release without circularly blocking the controlled executions that produce their evidence.
+
+## Launch Health Reviews
+
+Launch health is recorded separately from `RQ-1`. It consumes real post-enablement SM-2, SM-3, and SM-7 results at 30 days, 60 days, and monthly thereafter. It never changes which inputs produced an earlier READY/NOT READY decision and it cannot be used to fill a missing pre-enablement gate.
+
+| Metric | Launch-health contract |
+| --- | --- |
+| SM-2 | Eligible Conversation adoption over the PRD rolling window and cohort, using the `EXT-CONV-AI-1` active-Conversation count or Conversations-side event-feed seam; never an Agent Call denominator. |
+| SM-3 | Human proposal-decision timeliness and the associated posting-failure/audit-completeness reporting defined by the PRD. Audit completeness remains independently required at 100% before enablement through SM-5. |
+| SM-7 | Substantive human-review share for the PRD confirmation-mode cohort and band. |
+
+Missing samples or an ineligible cohort produce `InsufficientEvidence` in the launch-health review and never silently pass. Two consecutive SM-3 or SM-7 misses require the recorded Product disable-or-continue decision and feed the FR-28 kill-switch trigger review. `product-metrics` is the only trigger source.
 
 ## Live-Seam Matrix
 
@@ -236,7 +268,7 @@ These logical projection IDs are authoritative for readiness, deletion scope, an
 | `runtime-metrics` | NFR-9 runtime latency source observations and qualification results. |
 | `browser-ui-metrics` | NFR-14 browser-monotonic samples and qualification results. |
 | `workflow-execution-state` | Not a projection: the Dapr Workflow state-store scope for terminal interaction instances, carrying references only (architecture AD-27); a named purge scope item whose confirmation deletion completion requires. |
-| `product-metrics` | SM-1 through SM-6 rolling-window/cohort calculations and insufficiency state. |
+| `product-metrics` | Versioned SM-1 through SM-7 and SM-C1 through SM-C5 calculations and insufficiency state, partitioned into the pre-enablement `RQ-1` set (SM-1/4/5/6) and post-enablement launch-health set (SM-2/3/7). |
 
 Deletion completion names and confirms `provider-catalog` only when it contains protected content, `workflow-execution-state`, `agent-interaction-status`, `proposal-detail`, `proposal-version-history`, `pending-proposal-queue`, `pending-proposal-count`, `audit-evidence`, `retention`, `legal-hold`, `export`, `deletion`, and any content-bearing metric projection identified by its current projection contract. `agent-setup`, `tenant-provider-enablement`, `budget-reservation-usage`, `launch-readiness`, and non-content metric records retain only support-safe references required by policy.
 
@@ -263,7 +295,7 @@ No qualifying evidence was supplied when this register was created. The initial 
 | `LR-UI-CONFORMANCE` | `TBD` | `production-like` | `InsufficientEvidence` | UX Designer | `TBD` | `TBD` | `TBD` | Levels 4 and 5 | `TBD` | NFR-13 conformance contract in this register | `EvidenceNotRecorded` |
 | `LR-RUNTIME-PERFORMANCE` | `TBD` | `production-like` | `InsufficientEvidence` | Test Architect | `TBD` | `TBD` | `TBD` | Levels 4 and 5 | `TBD` | NFR-9 measurement contract required | `EvidenceNotRecorded` |
 | `LR-UI-PERFORMANCE` | `TBD` | `production-like` | `InsufficientEvidence` | Test Architect | `TBD` | `TBD` | `TBD` | Levels 4 and 5 | `TBD` | NFR-14 browser timing contract in this register | `EvidenceNotRecorded` |
-| `LR-PRODUCT-METRICS` | `TBD` | `production-like` | `InsufficientEvidence` | Test Architect | `TBD` | `TBD` | `TBD` | Levels 4 and 5 | `TBD` | Versioned SM-1 through SM-6 measurement contracts required | `EvidenceNotRecorded` |
+| `LR-PRODUCT-METRICS` | `TBD` | `production-like` | `InsufficientEvidence` | Test Architect | `TBD` | `TBD` | `TBD` | Levels 4 and 5 | `TBD` | Versioned SM-1/SM-4/SM-5/SM-6 measurement contracts and 100% SM-5 audit completeness required; SM-2/SM-3/SM-7 excluded | `EvidenceNotRecorded` |
 
 ## Current Release Decision
 

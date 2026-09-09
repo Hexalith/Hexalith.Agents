@@ -5,7 +5,7 @@ These notes are contextual only. They inform positioning and risk awareness, and
 ## Source Inputs
 
 - Product brief: `/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/briefs/brief-agents-2026-06-23/brief.md`
-- 2026-09-09 reconciliation inputs, in this folder: `change-extract-validation-2026-09-08.md`, `reconcile-validation-2026-09-09.md`, `review-consistency-2026-09-09.md`, `review-rubric.md`, `review-adversarial-general.md`, and `review-implementation-drift.md`
+- 2026-09-09 reconciliation inputs, in this folder: `change-extract-validation-2026-09-08.md`, `reconcile-validation-2026-09-09.md`, `review-consistency-2026-09-09.md`, `review-rubric-2026-09-08-validate.md`, `review-adversarial-general-2026-09-08-validate.md`, and `review-implementation-drift-2026-09-08-validate.md` (the unsuffixed names they carried at the time)
 - Second 2026-09-09 update input, in this folder: `validation-report.md` (run 2026-09-09T07:17Z, grade Poor) with its reviewer files archived as `review-rubric-2026-09-09-validate.md`, `review-adversarial-general-2026-09-09-validate.md`, `review-implementation-drift-2026-09-09-validate.md`, and `review-consistency-2026-09-09-validate.md`
 
 ## Discovery Research Notes

@@ -1,6 +1,6 @@
 # PRD Update Report — Hexalith Agents (second update, 2026-09-09)
 
-- **PRD:** `prd.md` (879 → 971 lines; `status: final`, `updated: 2026-09-09`)
+- **PRD:** `prd.md` (879 → 1000 lines after polish; `status: final`, `updated: 2026-09-09`)
 - **Change signal:** `validation-report.md` (validate run 2026-09-09T07:17Z, grade Poor: 4 critical / 9 high / 26 medium / 30 low)
 - **Scope given:** apply every critical and high finding whose fix targets the PRD; fold mediums and lows only where co-located; list register-, epics-, and Spine-targeted findings for correct-course; re-run the reviewer gate before finalize.
 - **Reconciliation of the signal:** `reconcile-validation-2026-09-09-2.md` — 38 applied, 2 partial, 3 diverged, 7 out of scope, 19 deferred.
