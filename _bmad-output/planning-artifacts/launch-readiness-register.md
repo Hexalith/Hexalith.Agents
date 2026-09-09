@@ -4,7 +4,7 @@ status: active
 created: 2026-08-02
 updated: 2026-09-09
 project: agents
-authority: sprint-change-proposal-2026-08-02.md
+authority: sprint-change-proposal-2026-09-09.md
 release_gate: RQ-1
 ---
 
@@ -144,13 +144,15 @@ The matrix is the home of the AD-17 bind-and-test atomicity rule (approved sprin
 
 | Seam | Authority | `BindingStatus` | Required integration test |
 | --- | --- | --- | --- |
-| EventStore dispatch and setup projections (`agent-setup`, `provider-catalog`) | AD-3, AD-15, AD-17 | `Live` (Stories 5.2, 5.3; coverage owed by 5.6) | `SetupProjectionLiveTests`, `ProviderCatalogProjectionLiveTests` |
+| EventStore dispatch and setup projections (`agent-setup`, `provider-catalog`, `tenant-provider-enablement`) | AD-2, AD-3, AD-15, AD-17 | `Live` for shipped setup/catalog source; platform catalog migration and tenant enablement are `Deferred` (reopened Story 5.3; coverage owed by 5.6) | `SetupProjectionLiveTests`, `ProviderCatalogMigrationLiveTests`, `TenantProviderEnablementProjectionLiveTests` |
 | Readiness observations and `launch-readiness` | AD-17 | `Deferred` (Story 5.5/5.6) | `LaunchReadinessProjectionLiveTests` |
 | Dapr Workflow durable owner and restart recovery | AD-18, AD-23, AD-27 | `Deferred` (Story 6.1) | `InteractionWorkflowRecoveryLiveTests` |
 | Provider invocation, reservation, admission | AD-13, AD-21, AD-24 | `Deferred` (Story 6.4, 6.5) | `ProviderAttemptProtocolLiveTests` |
 | Conversations membership and posting | AD-6, AD-7 | `Deferred` (Story 6.6) | `ConversationPostingLiveTests` |
 | Content safety adapter | AD-20 | `Deferred` (Story 6.3) | `ContentSafetyDecisionLiveTests` |
-| Payload protection, hold, export, deletion | AD-22 | `Deferred` (Stories 8.1 to 8.3) | `ProtectedDeletionLiveTests` |
+| EventStore payload protection, erased replay, and reference-only workflow state | AD-22, AD-27 | `Deferred` (Story 5.8) | `PayloadProtectionLiveTests`, `WorkflowContentSweepTests` |
+| Legal hold, export, and protected deletion | AD-22 | `Deferred` (Stories 8.1 to 8.3) | `LegalHoldLiveTests`, `AuditExportLiveTests`, `ProtectedDeletionLiveTests` |
+| Governed audit inspection | AD-22, AD-30 | `Deferred` (Story 8.8) | `AuditInspectionLiveTests` |
 | Tools, MCP, A2A, remote agents | AD-19 | `DeferredOutOfV1` | none until a separately approved scope |
 
 ## Provider Readiness Contract

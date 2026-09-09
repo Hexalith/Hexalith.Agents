@@ -715,7 +715,7 @@ A critical external dependency is implementation-ready only when its external de
 8. Accepted status.
 9. Consuming stories.
 
-An `Uncommitted` status, missing target, or missing compatibility verification command blocks every consuming story from `ready-for-dev`. The initial register scope includes `EXT-CONV-AI-1`, `EXT-CONV-UI-1`, `EXT-HOST-1`, `EXT-PROVIDER-1`, `EXT-SAFETY-1`, `EXT-TOKEN-1`, `EXT-SECRETS-1`, and `EXT-TOPOLOGY-1`; concrete ownership, targets, commands, status, and story mappings remain in the external dependency register.
+An `Uncommitted` status, missing target, or missing compatibility verification command blocks every consuming story from `ready-for-dev`. The initial register scope includes `EXT-CONV-AI-1`, `EXT-CONV-UI-1`, `EXT-HOST-1`, `EXT-PROVIDER-1`, `EXT-SAFETY-1`, `EXT-TOKEN-1`, `EXT-SECRETS-1`, `EXT-PROTECTION-1`, and `EXT-TOPOLOGY-1`; concrete ownership, targets, commands, status, and story mappings remain in the external dependency register.
 
 At the time of this revision, only `EXT-HOST-1` is `Committed`; the remaining entries are `Uncommitted`. Every consuming story therefore remains blocked from `ready-for-dev` under FR-21, and any story already completed against an `Uncommitted` entry carries a non-conformance record in the register.
 
@@ -728,6 +728,7 @@ At the time of this revision, only `EXT-HOST-1` is `Committed`; the remaining en
   6. A Conversation deletion signal so that an approved deletion in Conversations triggers FR-30 approved deletion of the derived Agent content, leaving only the non-content tombstone [ASSUMPTION A-16].
   No message edit or deletion notification is needed: the FR-27 verdict cache keys on an Agents-computed content hash taken on each load. Removal of `hexa` needs no notification either: the FR-2 membership step detects an external removal and sets the Agents-owned block. `EXT-CONV-AI-1` is subject to the same commitment rule as every critical external dependency. Hexalith Agents must not treat unapproved proposals as Conversation Messages or write Conversation streams directly.
 - **Hexalith.Conversations UI:** Rendering the Conversation-owned **Call hexa** action and rendering the provenance markers carried in message metadata are a separate prerequisite tracked as `EXT-CONV-UI-1`: a versioned Conversation action contribution and registration contract that lets Agents contribute the invocation action into a Conversation-owned surface, plus rendering of the AI-generated and human-edited markers wherever the message's provenance is disclosed. It carries the same nine-field commitment record and the same fail-closed `ready-for-dev` rule as every other critical external dependency.
+- **Hexalith.EventStore Payload Protection:** Field-level `ProtectedContent`, per-interaction DEK/per-tenant KEK handling, hold pinning, irreversible destruction receipts, and typed `Erased` replay depend on `EXT-PROTECTION-1`. Live content-bearing execution is disabled while its register entry is not `Available`; the shipped no-op protection implementation cannot satisfy production-like evidence.
 - **Hexalith.Parties:** Agent identity and Conversation Participant identity depend on Parties. `hexa` must post as a Party identity.
 - **Provider Infrastructure:** Provider/model availability depends on the Global Providers Aggregate and the underlying Provider integration selected per Agent.
 - **Tenant Access:** Tenant isolation and authorization must align with existing Hexalith tenant access patterns and fail closed when tenant state is missing or unavailable.
@@ -737,6 +738,8 @@ At the time of this revision, only `EXT-HOST-1` is `Committed`; the remaining en
 ### 8.1 Assumptions Index
 
 Every inline `[ASSUMPTION A-n]` key in this PRD resolves to a row here, which records the assumption's owner, provenance, and retirement condition. An assumption is retired by editing the keyed text and this index in the same change.
+
+Architecture assumptions `ARCH-A-1` through `ARCH-A-7` are normatively indexed and governed in the current Architecture Spine rather than duplicated here. Any unretired Product, Architecture, or Governance assumption blocks `RQ-1`; the PRD assumptions table below remains the authority for `A-1` through `A-17`.
 
 | # | Assumption | Where | Owner | Retired when |
 | --- | --- | --- | --- | --- |

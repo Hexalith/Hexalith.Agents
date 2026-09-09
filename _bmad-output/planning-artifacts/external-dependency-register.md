@@ -4,7 +4,7 @@ status: active
 created: 2026-08-02
 updated: 2026-09-09
 project: agents
-authority: sprint-change-proposal-2026-08-02.md
+authority: sprint-change-proposal-2026-09-09.md
 ---
 
 # External Dependency Register
@@ -146,7 +146,7 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 | `CompatibilityContractAndVerificationCommand` | Contract: platform-hosted secret access, rotation recovery, denied access, and proof that values do not enter events, projections, responses, logs, traces, or evidence. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
 | `AcceptedStatus` | `Uncommitted` |
-| `ConsumingStories` | 5.6, 6.4, 8.2, 8.3; `RQ-1` |
+| `ConsumingStories` | 5.6, 5.8, 6.4, 8.1, 8.2, 8.3; `RQ-1` |
 
 ### EXT-TOPOLOGY-1 — Production-Like Qualification Fixture
 
@@ -160,21 +160,21 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 | `CompatibilityContractAndVerificationCommand` | Contract: reproducible Level 5 topology and browser/runtime evidence collection without hidden manual setup or conditional skips. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
 | `AcceptedStatus` | `Uncommitted` |
-| `ConsumingStories` | 5.6, 6.1, 6.5, 8.5, 8.6, 8.7; `RQ-1` |
+| `ConsumingStories` | 5.6, 6.1, 6.5, 8.5, 8.6, 8.7, 8.8; `RQ-1` |
 
 ### EXT-PROTECTION-1 — EventStore Payload-Protection Engine
 
 | Commitment field | Value |
 | --- | --- |
-| `Owner` | `TBD` (EventStore Maintainer expected) |
+| `Owner` | EventStore Maintainer |
 | `Repository` | `Hexalith.EventStore` |
-| `RequiredArtifact` | A production payload-protection engine behind the existing EventStore hooks, applied field-level to a `ProtectedContent` envelope so every other event field stays plaintext and a destroyed-key field unprotects as the typed value `Erased` without breaking replay: per-aggregate data-encryption keys wrapped by a per-tenant key-encryption key custodied through `EXT-SECRETS-1`, the custodian operations `WrapDek`, `UnwrapDek`, `PinDek`, `UnpinDek`, and `DestroyDek` with an irreversible destruction receipt, cryptographic erasure by DEK destruction, redaction of read-model copies, hold pinning that rejects DEK destruction, sealed envelopes on the pub/sub broker and in read models, `PayloadUnprotectionOutcome` unreadable after erasure, and snapshot/replay caches inheriting the DEK (architecture AD-22, AD-27). The shipped default is a no-op service and is not acceptable for content-bearing workflows (AD-14). |
+| `RequiredArtifact` | A production payload-protection engine behind the existing EventStore hooks, applied field-level to a `ProtectedContent` envelope so every other event field stays plaintext and a destroyed-key field unprotects as the typed value `Erased` without breaking replay: one data-encryption key per `AgentInteraction` wrapped by a per-tenant key-encryption key custodied through `EXT-SECRETS-1`, the custodian operations `WrapDek`, `UnwrapDek`, `PinDek`, `UnpinDek`, and `DestroyDek` with an irreversible destruction receipt, cryptographic erasure by DEK destruction, redaction of read-model copies, hold pinning that rejects DEK destruction, sealed envelopes on the pub/sub broker and in read models, `PayloadUnprotectionOutcome` unreadable after erasure, and snapshot/replay caches inheriting the DEK (architecture AD-22, AD-27). The shipped default is a no-op service and is not acceptable for content-bearing workflows (AD-14). |
 | `TargetVersionOrCommit` | `TBD` |
 | `TargetIntegrationDate` | `TBD` |
 | `CompatibilityContractAndVerificationCommand` | Contract: protect, unprotect, erase, redact, hold-pin, and restore-cannot-revive behaviors with focused per-tenant key isolation. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
 | `AcceptedStatus` | `Uncommitted` |
-| `ConsumingStories` | 6.1, 6.4, 7.1, 8.1, 8.2, 8.3; `RQ-1` |
+| `ConsumingStories` | 5.8, 6.1–6.4, 7.1–7.4, 8.1–8.3, 8.8; `RQ-1` |
 
 *Added 2026-09-09 by the architecture update: the 2026-09-09 verified-current review found that the EventStore checkout carries only the protection hooks and a no-op default, so the AD-22 key hierarchy has no owner without this record.*
 
