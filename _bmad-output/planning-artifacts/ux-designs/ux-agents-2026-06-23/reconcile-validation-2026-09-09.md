@@ -1,0 +1,89 @@
+# Reconciliation — UX validation of 2026-09-09
+
+- **Input:** `validation-report.md` (run 2026-09-08T22:30:49Z), four lenses: rubric walker, accessibility, governance & audit, implementation readiness.
+- **Findings:** 84 — 0 critical, 17 high, 37 medium, 30 low.
+- **Applied to:** `DESIGN.md`, `EXPERIENCE.md` (both `updated: 2026-09-09`).
+- **Scope decision:** mirrors the 2026-09-08 Update. Every fix that could be made confidently was made, including revisions to prior decisions. Only items needing a Product, Architecture, Security, or Conversations decision are deferred, each with a named owner in § 4.
+
+## 1. Revisions to prior decisions
+
+These overturn or narrow decisions recorded earlier in `.memlog.md`.
+
+| Prior decision | Revision | Cause |
+|---|---|---|
+| Status glyphs are FrontComposer requests (2026-09-08 build bindings) | All seven status roles bind to existing `FcFluentIcons` 16 px factory methods. No status glyph is a request. | `FcFluentIcons.cs` already exposes `CheckmarkCircle16`, `ArrowSync16`, `Warning16`, `SubtractCircle16`, `DismissCircle16`, `QuestionCircle16`, `InfoCircle16`. Under the spine's own "no glyph until the request lands" rule, three badge components would have shipped text-only, breaking the no-colour-only promise. |
+| `IBadgeCountService` supplies the pending-proposal count (2026-09-08 build bindings) | Not used in V1. The count is domain-rendered inside the Agents overview link; the shell nav count is suppressed. | The contract is `IReadOnlyDictionary<Type,int>` over projection runtime types, shell-rendered without a label slot. Agents runs no generated projection lane, so there is no type to key. |
+| `FcStatusFilterChips` is mandatory on every grid, with a `needs my action` slot | Not mandatory on the proposal queue. State and `needs my action` render as Agents-owned `aria-pressed` toggles in a named `role="group"`. | `AvailableSlots` is typed on the closed `BadgeSlot` enum and chip text is `slot.ToString()` — an unlocalized English enum name, failing the whole-string parity gate. |
+| "Agents owns one `role="status"` and one `role="alert"` node per route" | "Agents owns one node of each politeness per route, and every event is announced by exactly one node," with a named carrier component and an explicit list of which Fc nodes may speak. | Mandatory Fc components render their own polite nodes, so the original rule was false on every grid page and corrupted the NFR-14 measurement. |
+| Every route renders `FcAggregateListPage` or `FcAggregateDetailPage` with `Heading`, `HeadingTabIndex`, `PageTitle` | `FcAggregateDetailPage` has no such parameters; the domain supplies `FcPageHeader` in every state slot on the eight Constrained detail routes. | Verified against `FcAggregateDetailPage.razor.cs`. Its non-ready slots replace the body, so `not available` had no h1 and no focus target. |
+| Response-mode change opens the confirmation | The radio group edits a draft; an explicit Apply opens the confirmation. Generalised to every "change opens confirmation" binding. | Radio selection moves on arrow keys, so reading the second option opened a modal for an `AgentSetupMutation`. |
+| `Agents.Administrator` gates the Provider catalog | Read is `Agents.Administrator`; every `ProviderCatalogMutation` requires the platform-scoped `Agents.PlatformProviderAdministrator`. | The catalog is platform-scoped; a tenant-scoped policy let a tenant admin reprice or disable a model every other tenant uses. Blast-radius disclosure is not authorization (FR-19). |
+| Currency must equal the tenant budget currency, validated on the catalog | The tenant budget currency on Cost controls is authoritative; the catalog validates ISO 4217 well-formedness only; mismatch renders on the tenant's readiness view. | The rule was circular on a platform-scoped record serving many tenants with many currencies. |
+| Terminal state is the only editor lock | `Approved`, once projection-confirmed, removes edit, regenerate, and approve and pins `ApprovedVersionId`. | The state is non-terminal, so a different version could be approved and posted after approval, against FR-17 and FR-18. |
+| Type-to-confirm for deletion left conditional | Decided: no type-to-confirm anywhere. | An undecided conditional is not a spine. Scope, counts, hold state, and required justification do the same work without the WCAG 3.3.7 cognitive-test question. |
+| `Appearance.Accent` on confirm and approve buttons | `ButtonAppearance.Primary`. | `Accent` is the Fluent v4 name the spine forbids elsewhere; `ButtonAppearance` at the pin is Default, Outline, Primary, Subtle, Transparent. |
+| Operational status and Audit evidence share `Regular.Size20.Search` | Audit evidence and Audit governance render label-only until the history glyph lands. | The spine's own no-reuse rule; the shipped registration reused it, so the spine was describing drift as decision. |
+
+## 2. Applied — high severity (17 of 17)
+
+| Finding | Disposition |
+|---|---|
+| Stale `FcFluentIcons` inventory (rubric + implementation readiness) | Applied. `DESIGN.md § Brand & Style` rewritten to the two access paths: twelve `TryCreate` string names, thirteen 16 px factory methods not reachable through it; `DevMode`/`DeveloperBoard` named as one glyph. Role→glyph table bound to factory methods. |
+| Route-heading rule unimplementable on Constrained detail routes | Applied. See § 1. Conformance lane gains "heading present and focused in the `not available` state". |
+| `needs my action` chip not expressible | Applied. See § 1. FrontComposer request recorded in § 4. |
+| One-status-node-per-route is false | Applied. See § 1. |
+| Nobody owns announcements or post-submit focus on the Conversation seam | Applied. `ConversationAgentCallPanel` is self-contained: its own polite and assertive nodes, status rows after Submit in DOM order, focus returns to **Call hexa**. Recorded as an `EXT-CONV-UI-1` requirement. |
+| `response-mode-toggle` fires the confirmation on the first arrow key | Applied. See § 1. |
+| `retry posting` has no surface, policy, family, bound, confirmation, or evidence | Applied. Added to the `proposal-editor` action rail for `Agents.Approver` with current Conversation read access, family `ProposalResolution`, with per-family confirmation contents, per-attempt version-history and audit rows, and the maximum as a `hexa` configuration field. |
+| `Approved` stays editable | Applied. See § 1. |
+| Hold release, export, deletion single-click and unjustified | Partially applied. Required justification, exact scope rendering, hold interlock, irreversibility line, and `EXT-SECRETS-1` fail-closed rendering are specified. The **two-person rule is deferred** to Product + Security (§ 4). |
+| Platform-scoped catalog behind a tenant-scoped policy | Applied. See § 1. |
+| Configuration and governance changes have no audit surface | Applied. `audit-evidence-panel` gains a configuration-and-governance-change evidence class satisfying FR-24 and FR-32. |
+| Conversations seam stated only in the spine; epics and register disagree | Applied in the spine (harness removal owned by Story 6.7: route unregistered, page deleted; `Start a new Agent Call` targets the Source Conversation). The epics and register correction is deferred with an owner (§ 4). |
+| `agent-response-marker` has no seam or provenance source | Applied. `EXT-CONV-UI-1` widened to two artifact kinds; a per-message decoration slot plus an Agents-side provenance accessor keyed by `MessageId`. |
+| Status glyphs requested but already exist; curated list wrong | Applied with the icon inventory rewrite. |
+| `IBadgeCountService` cannot carry the count | Applied. See § 1. |
+| `pending in another session` has no data source | Applied. Derived from authoritative pending with no local lock; the accepted-by session/actor reference is added to contracts-that-must-grow with owner 5.7, and until it lands the second tab renders the same-session variant. |
+| Call hexa must know readiness; no seam supplies it | Applied. `GetCallabilityAsync(tenant, conversation)` added to the seam table; Conversations owns the trigger, Agents owns the dialog body. |
+
+## 3. Applied — medium and low
+
+All 37 medium and 30 low findings are dispositioned. Applied in full except where noted.
+
+**Medium.** FR-3 disable/FR-1 create surface action (Disable and Enable in the `agent-config-form` rail as `AgentActivation`; `hexa` stated pre-provisioned per tenant). Regeneration ceiling numbers (default 3, range 1–10, flagged for Product sign-off). `Appearance.Accent` (both occurrences plus `brand-accent` note). `FcAggregateDetailState` mapping table with shell `Stale` explicitly unused. Nearing-expiry threshold — carried into both spines with an added **15-minute floor**, which the WCAG 2.2.1 essential-exception argument now rests on. Nav-glyph reuse. Expiry-announcement scaling on the queue. `IBadgeCountService` bare number. Focus target renamed to the item's status cell with `tabindex="-1"`, and live nodes stated never to receive focus. `ItemKey` binding plus deferred re-sort with an announced refresh. Version selection while dirty. `high-impact-confirmation` dialog mechanics (`AutoFocus`, domain focus restoration, `FixedHeaderFooter`, explicit Esc wiring, 320 px reachability). Currency circularity. `rate limited` call state. Automatic-path posting tokens on `AgentCallOperationStatus`. Restricted categories under Automatic Response Mode. Per-Conversation safety history disclosure. Harness removal strengthened to absence. Per-family confirmation contents (new § Confirmation contents by family). Approver-policy publication versus AD-12 snapshotting. Export/deletion fail-closed on `EXT-SECRETS-1`. `ViewKey` per grid. `FcAggregateDetailPage` heading params. Nearing-expiry contract flag. Regeneration-ceiling contract. Segregation-of-duties source (`CanCurrentUserApproveSelectedVersion`, Story 7.4). `ApproverPolicySource.DisclosureCategory` (owner 5.4). Tenant budget currency interim rule before Story 8.4. Live-region carrier named. SignalR nudge bound to `IProjectionChangeDetailNotifier`. `not available` copy keys. Story 6.2 and Operational status extras recorded as deferred epics items. Audit evidence list declared an id-entry surface. Provider disable blast-radius query named.
+
+**Low.** `Requested` → `authoritative pending`. `status-subtle` added to the `agent-readiness-badge` colour list. `ConversationAgentCallPanel` identified with `conversation-agent-call`. Production-enablement and accordion-heading duplication reduced to one statement per spine. PRD-versus-contract state fold explained (PRD alignment deferred). Parity-gate name drift. `DisabledFocusable` named, and generalised: a spine-wide rule that `aria-disabled` always means `DisabledFocusable` or a focusable hand-authored equivalent, never `Disabled`/`Loading`. Form error content, required marker, validation timing. Badge glyph decorative when visible text is present. 320 px column sets for both grids plus contained scrolling. Esc over any non-empty dialog text input. `BackLinkLabel` required. Language of parts. Regenerate double-activation guard. Type-to-confirm decided. Pointer cancellation and motion claimed. Override numeric ceiling and expiry, surfaced on Operational status. Pricing version server-assigned. `Expired` compared against server time, never the browser clock. `ConfigurationReferenceId` disclosure. `needs my action` defined as a state set. Shipped-code corrections mapped to stories (new § Shipped-code corrections).
+
+**Not applied, by decision.** Two low findings are noted only: `rounded` and `colors.*` as note objects rather than the spec's literal types (kept, matching the Tenants precedent this spine lists as a source; convert when Tenants converts), and Component Patterns cell density (the content is binding rules, and the column schema was left as-is by a prior decision; the new `### Confirmation contents by family` and `### Shipped-code corrections` subsections relieve the two densest cells). One low finding is informational: the Fluent MCP documents a different build than the pin, which the spine already states.
+
+**`ProposalResolution` reload re-derivation** (low, governance) is applied as the conservative half: `catching up` renders with resolution controls `DisabledFocusable` whenever the read's projection version is below the last accepted write's expected version. Naming a per-family pending projection is folded into the accepted-by reference deferred to Story 5.7.
+
+## 4. Deferred, with owners
+
+| Item | Owner | Note |
+|---|---|---|
+| Two-person rule (separate confirm stage by a different Party) on evidence deletion and legal-hold release | Product + Security | The spine specifies single-actor deletion with mandatory justification, scope rendering, and hold interlock until they rule. An explicit rejection is an acceptable outcome and should be recorded here. |
+| WCAG 2.2.1 essential-exception position on proposal expiry (no in-UI extension) | Product | Carried from 2026-09-08, now resting on the 15-minute nearing-expiry floor. |
+| OQ-18 unsafe historical content | Product + Security | Carried from 2026-09-08. UX shows blocked history only, now with an opaque Conversation reference unless the viewer holds current read access. |
+| Regeneration-ceiling default 3 and range 1–10 | Product | FR-32 documents neither; the UX-side numbers need sign-off or replacement. |
+| PRD FR-18 seven states versus the ten-value contract enum | Product | The spine follows the enum; the PRD text should follow or the fold should be stated there. |
+| `EXT-CONV-UI-1` commitment, widened to two artifact kinds (action contribution + per-message decoration slot) and a `GetCallabilityAsync` gateway method | Conversations | Status `Uncommitted`, owner `TBD`. Story 6.7 stays blocked. |
+| `epics.md` § Story 6.7 External line and `external-dependency-register.md` consuming-story field, both of which contradict the spine's blocking rule | Epics / register maintainer | A sprint planner reading either would mark 6.7 ready. |
+| Story 6.2 read model and route; Operational status per-tenant blocked counts, per-Conversation safety history, cost consumption, projection id/version | Epics | Named as owners in the spine with no acceptance-criteria coverage. |
+| Architecture: `ProviderReadinessResult` (5.5) with a by-Provider/model query; `AgentCallOperationStatus` growth (`SafetyBlocked`, `BudgetBlocked`, `RateLimited`, `CapacityQueued`, `CapacityRejected`, `UnknownOutcome`, `PostingPending`, `Posted`, `PostingFailed`); `AgentReadinessStatus` growth; the projection catch-up and `IProjectionChangeDetailNotifier` nudge contract | Architecture | The full list is the contracts-that-must-grow table in `EXPERIENCE.md § State Patterns`. |
+| FrontComposer requests: nav glyphs (inbox/queue, document, shield, budget, launch, history), domain-keyed `FcStatusFilterChips` slots with localized labels, a localizable label slot on the shell nav badge | FrontComposer | No status-glyph request remains; all seven roles bind to existing factories. |
+| `sprint-status.yaml` regeneration against Epics 5–8 | Sprint planning | Carried from 2026-09-08. |
+
+## 5. Doc standards
+
+`skill:bmad-review lenses=structure,prose` ran on both spines after the findings were applied, and its own findings were applied in turn.
+
+**Structure.** The lens confirmed that the 84-finding absorption had grown `EXPERIENCE.md` by duplication rather than by content: new material was added alongside the statements it replaced. Applied — a new `## Known gaps` section after Key Flows now holds both the "Contracts that must grow" table (lifted out of § State Patterns, where it buried the state machine) and § Shipped-code corrections, whose "Rule" column was reduced to section pointers; two new `###` subsections under Component Patterns, § Grid rules and § Proposal editor action rail, absorb the rules that were shared between the two grid cells and the 357-word `proposal-editor` cell; the nearing-expiry threshold, the `IBadgeCountService` rationale, the confirmation contents, the nine-family roster, and the seam's live-region rules are each stated once and pointed at from elsewhere; § Inspiration & Anti-patterns moved to follow § Foundation, where the mental model belongs. `DESIGN.md § high-impact-confirmation` and § proposal-notification were cut back to their visual delta after drifting into behavior that EXPERIENCE.md owns. A three-way parity rule for the 22 component names was added to the DESIGN.md § Components preamble.
+
+**Prose.** One finding was a real defect rather than a style point: the `FcAggregateDetailState` table had a three-cell row in a two-column table, so the tenant-scoping rule for search and filter suggestions and the no-palette-entries rule were dropped from rendered output entirely. Both are now a paragraph below the table. The rest were applied as written: sentences that argued for a review finding rather than stating a rule, several 55-word-plus table-cell sentences split, `Enable`/`Activate` reconciled between the peer documents, `hand-rendered` reconciled to `domain-rendered`, `Confirm enables` to `Confirm becomes available`, three British spellings, and the `old-to-new` compound modifier hyphenated.
+
+Verified after the pass: the 22 component names remain identical and identically ordered across the DESIGN.md frontmatter, the DESIGN.md sections, and the EXPERIENCE.md rows; every `{colors.*}`, `{spacing.*}`, and `{typography.*}` reference resolves; no table has a malformed row; every internal `§` reference resolves; DESIGN.md's canonical section order and EXPERIENCE.md's required eight are intact.
+
+## 6. Nothing dropped
+
+No qualitative idea from the validation input was discarded. The three unapplied items in § 3 are recorded there with their reasons; every other finding produced a spine change or a § 4 deferral with an owner.

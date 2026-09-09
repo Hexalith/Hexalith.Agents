@@ -2,7 +2,7 @@
 title: Hexalith Agents Launch Readiness Register
 status: active
 created: 2026-08-02
-updated: 2026-08-02
+updated: 2026-09-09
 project: agents
 authority: sprint-change-proposal-2026-08-02.md
 release_gate: RQ-1
@@ -49,13 +49,13 @@ At an evaluation instant `T`, a record can contribute `Pass` only when `Observed
 
 ### Record Authority And Supersession
 
-The EventStore `LaunchReadinessGate` aggregate is the sole readiness-record writer for each logical key (`GateId`, `TenantScope`, `EnvironmentProfile`). Evidence producers, the platform host, UI, and qualification runners submit server-trusted commands; none can assign `State` or update the projection directly. Each accepted immutable observation has a deterministic `ObservationId`, and EventStore optimistic concurrency serializes it at a stream revision exposed as `RegistryRevision`.
+The EventStore `LaunchReadinessGate` aggregate is the sole readiness-record writer for each logical key (`GateId`, `TenantScope`, `EnvironmentProfile`). Evidence producers, the platform host, UI, and qualification runners submit server-trusted commands; none can assign `State` or update the projection directly. Each accepted immutable observation has a deterministic `ObservationId = H(observation, GateId, TenantScope, EnvironmentProfile, SourceVersion, EvidenceReference, ObservedAt)` computed by the submitting orchestrator with the shared Agents identity canonicalizer (architecture AD-29) and recomputed by the aggregate, which rejects a mismatch; re-observation with an unchanged `SourceVersion` is legal and produces a new revision. EventStore optimistic concurrency serializes each observation at a stream revision exposed as `RegistryRevision`. `TenantScope` is the closed grammar `tenant:<TenantId>` or `platform`; each `GateId` declares a `ScopeKind` below, and evaluation for a tenant reads `platform` records for `Platform` gates and `tenant:<TenantId>` records for `Tenant` gates; no other cohort syntax exists in V1. `EnvironmentProfile` is `<name>@<ProfileVersion>`; a profile version change invalidates every record of the old profile. Each `GateId` binds an `AuthorizedProducer` role; a submission whose principal lacks it is rejected before append, and a `GateId` outside the minimum inventory is rejected at submission.
 
 The `launch-readiness` projection selects the observation at the greatest committed stream revision, never the greatest `ObservedAt`. That observation supersedes every lower revision. If it is incomplete, invalid, stale, or blocking, evaluation fails closed and never falls back to an older `Pass`. `RQ-1` reads every required logical key from one projection checkpoint; if the checkpoint changes during evaluation, it retries against one new checkpoint or returns NOT READY. Duplicate `ObservationId` with the same payload is an idempotent no-op; a conflicting payload is rejected and audited.
 
 ## Minimum Gate Inventory
 
-The following IDs and meanings are normative. Implementations may add stricter gates but may not remove, merge away, or weaken these entries for V1 qualification.
+The following IDs and meanings are normative and closed for V1: implementations may not add, remove, merge away, or weaken entries; a stricter control is expressed as stricter evidence under an existing GateId.
 
 | `GateId` | Governing contract and invalidation trigger |
 | --- | --- |
@@ -78,11 +78,36 @@ The following IDs and meanings are normative. Implementations may add stricter g
 | `LR-UI-PERFORMANCE` | NFR-14 browser-monotonic page usability, authoritative pending acknowledgement, and terminal render/live-region announcement gates using at least 30 production-like executions each. Invalidated by UI path, browser profile, instrumentation seam, threshold, percentile, or sample rules. |
 | `LR-PRODUCT-METRICS` | Versioned SM-1 through SM-6 calculation and real rolling-window/cohort attainment; deterministic fixtures prove formulas only. Invalidated by source event, formula, threshold, window, cohort, late-data, or insufficiency rules. |
 
+### Gate Scope Kinds And Authorized Producers
+
+| `GateId` | `ScopeKind` | `AuthorizedProducer` (architecture AD-30 principal kind) |
+| --- | --- | --- |
+| `LR-TOPOLOGY` | Platform | `Platform` |
+| `LR-EVENTSTORE` | Platform | `Platform` |
+| `LR-TENANT-ACCESS` | Tenant | `User` holding Release Operator, or `Platform` |
+| `LR-PARTY-IDENTITY` | Tenant | `User` holding Release Operator, or `Platform` |
+| `LR-CONVERSATION-CONTEXT` | Tenant | `User` holding Release Operator, or `Platform` |
+| `LR-CONVERSATIONS-MEMBERSHIP-POSTING` | Tenant | `User` holding Release Operator, or `Platform` |
+| `LR-PROVIDER` | Tenant | `User` holding Release Operator, or `Platform` |
+| `LR-TOKENIZER` | Tenant | `User` holding Release Operator, or `Platform` |
+| `LR-SAFETY` | Tenant | `User` holding Release Operator, or `Platform` |
+| `LR-SECRETS` | Platform | `Platform` |
+| `LR-COST` | Tenant | `User` holding Release Operator, or `Platform` |
+| `LR-AUDIT-PROTECTION-DELETION` | Tenant | `User` holding Release Operator, or `Platform` |
+| `LR-RECOVERY` | Platform | `Platform` |
+| `LR-CAPACITY-FAIRNESS` | Platform | `Platform` |
+| `LR-UI-CONFORMANCE` | Platform | `Platform` |
+| `LR-RUNTIME-PERFORMANCE` | Platform | `Platform` |
+| `LR-UI-PERFORMANCE` | Platform | `Platform` |
+| `LR-PRODUCT-METRICS` | Tenant | `User` holding Release Operator, or `Platform` |
+
+The `Platform` assignment of `LR-UI-CONFORMANCE`, `LR-RUNTIME-PERFORMANCE`, and `LR-UI-PERFORMANCE` is an architecture assumption (spine AD-17, 2026-09-09) confirmed or retuned by Product and the Release PM before enablement.
+
 ### Gate Sets And Non-Circular Evaluation
 
 The `QualificationExecutionGateSet` contains `LR-TOPOLOGY`, `LR-EVENTSTORE`, `LR-TENANT-ACCESS`, `LR-PARTY-IDENTITY`, `LR-CONVERSATION-CONTEXT`, `LR-CONVERSATIONS-MEMBERSHIP-POSTING`, `LR-PROVIDER`, `LR-TOKENIZER`, `LR-SAFETY`, `LR-SECRETS`, `LR-COST`, `LR-AUDIT-PROTECTION-DELETION`, and `LR-CAPACITY-FAIRNESS`. It permits only explicitly authorized controlled production-like executions used to collect evidence, and only when every external seam executed by that operation is `Available` and its compatibility command passes against the deployed target. `Committed` permits development/contract work but never execution of the seam. This set does not authorize production enablement.
 
-Every controlled execution re-evaluates the applicable operation subset from `OperationGateMatrixVersion = 1`. This matrix is the single contract consumed by API, BFF, UI, workflow, and the `launch-readiness` projection. A missing operation family, unknown matrix version, missing record, or GateId outside the minimum inventory blocks with a safe code; consumers may not maintain local subsets.
+Every controlled execution re-evaluates the applicable operation subset from `OperationGateMatrixVersion = 2` (version 1 rows are unchanged; version 2 appends the rows marked `v2`). Every public command and every workflow activity declares exactly one operation family in its contract; a command with no declared family fails contract tests. This matrix is the single contract consumed by API, BFF, UI, workflow, and the `launch-readiness` projection. A missing operation family, unknown matrix version, missing record, or GateId outside the minimum inventory blocks with a safe code; consumers may not maintain local subsets.
 
 | Operation family | Required GateIds |
 | --- | --- |
@@ -99,16 +124,40 @@ Every controlled execution re-evaluates the applicable operation subset from `Op
 | `ExportRequest` | `LR-TOPOLOGY`, `LR-EVENTSTORE`, `LR-TENANT-ACCESS`, `LR-SECRETS`, `LR-AUDIT-PROTECTION-DELETION` |
 | `DeletionRequest` | `LR-TOPOLOGY`, `LR-EVENTSTORE`, `LR-TENANT-ACCESS`, `LR-SECRETS`, `LR-AUDIT-PROTECTION-DELETION` |
 | `ReadinessInspection` | `LR-TOPOLOGY`, `LR-EVENTSTORE`, `LR-TENANT-ACCESS` |
+| `ProposalEdit` (v2) | `LR-TOPOLOGY`, `LR-EVENTSTORE`, `LR-TENANT-ACCESS`, `LR-AUDIT-PROTECTION-DELETION` |
+| `ProposalRegeneration` (v2) | same set as `ProviderInvocation` |
+| `SystemTimer` (v2) | `LR-EVENTSTORE`; used by expiry, retention-due, reservation-deadline, and queue-expiry activities, which need no human authorization but must not append when EventStore readiness is blocked |
+| `LegalHoldRelease` (v2) | same set as `LegalHold` |
+| `ExportDownload` (v2) | same set as `ExportRequest` |
+| `AuditInspection` (v2) | `LR-TOPOLOGY`, `LR-EVENTSTORE`, `LR-TENANT-ACCESS`, `LR-AUDIT-PROTECTION-DELETION`; covers posted-provenance and compliance inspection |
+| `TenantKillSwitch` (v2) | `LR-TOPOLOGY`, `LR-EVENTSTORE`, `LR-TENANT-ACCESS`, `LR-AUDIT-PROTECTION-DELETION` |
+| `ReadinessObservation` (v2) | `LR-EVENTSTORE`; the family every readiness-evidence submission declares, accepted only from the gate's `AuthorizedProducer` principal kind |
+| `TenantProviderEnablement` (v2) | `LR-TOPOLOGY`, `LR-EVENTSTORE`, `LR-TENANT-ACCESS`, `LR-PROVIDER`, `LR-AUDIT-PROTECTION-DELETION` |
 
 The matrix is additive and immutable per version. The readiness decision exposes the matrix version, evaluated `RegistryRevision`, applicable GateIds, and safe blockers so every surface renders the same outcome.
 
 The `ReleaseQualificationGateSet` contains all 18 minimum GateIds. Only current `Pass` records for the complete set plus `Available` consumed external dependencies allow `RQ-1` READY and production enablement. `LR-RECOVERY`, `LR-UI-CONFORMANCE`, `LR-RUNTIME-PERFORMANCE`, `LR-UI-PERFORMANCE`, and `LR-PRODUCT-METRICS` therefore qualify release without circularly blocking the controlled executions that produce their evidence.
 
+## Live-Seam Matrix
+
+The matrix is the home of the AD-17 bind-and-test atomicity rule (approved sprint change proposal of 2026-08-04). Every row maps one seam to its current authority, its `BindingStatus` (`Deferred`, `DeferredOutOfV1`, or `Live`), and the `Hexalith.Agents.IntegrationTests` lane that must pass in the same change that flips it to `Live`. Story 5.1 owns the verifier that enforces the matrix; Story 5.6 creates the project and covers the projection and query seams that Stories 5.2 and 5.3 bound before it existed.
+
+| Seam | Authority | `BindingStatus` | Required integration test |
+| --- | --- | --- | --- |
+| EventStore dispatch and setup projections (`agent-setup`, `provider-catalog`) | AD-3, AD-15, AD-17 | `Live` (Stories 5.2, 5.3; coverage owed by 5.6) | `SetupProjectionLiveTests`, `ProviderCatalogProjectionLiveTests` |
+| Readiness observations and `launch-readiness` | AD-17 | `Deferred` (Story 5.5/5.6) | `LaunchReadinessProjectionLiveTests` |
+| Dapr Workflow durable owner and restart recovery | AD-18, AD-23, AD-27 | `Deferred` (Story 6.1) | `InteractionWorkflowRecoveryLiveTests` |
+| Provider invocation, reservation, admission | AD-13, AD-21, AD-24 | `Deferred` (Story 6.4, 6.5) | `ProviderAttemptProtocolLiveTests` |
+| Conversations membership and posting | AD-6, AD-7 | `Deferred` (Story 6.6) | `ConversationPostingLiveTests` |
+| Content safety adapter | AD-20 | `Deferred` (Story 6.3) | `ContentSafetyDecisionLiveTests` |
+| Payload protection, hold, export, deletion | AD-22 | `Deferred` (Stories 8.1 to 8.3) | `ProtectedDeletionLiveTests` |
+| Tools, MCP, A2A, remote agents | AD-19 | `DeferredOutOfV1` | none until a separately approved scope |
+
 ## Provider Readiness Contract
 
-The public `ProviderReadinessResult` contains exactly `OperationalState`, `Callability`, `ReasonCode`, `CapabilityVersion`, `ObservedAt`, and exclusive `ValidUntil`. `CapabilityVersion` is a non-reusable unsigned monotonic sequence for the global (`ProviderId`, `ModelId`) catalog key. `ProviderReadinessReasonCode` is versioned and additive: `Unknown = 0`, `None`, `NonBlockingOperationalWarning`, `DependencyUnavailable`, `EntryMissing`, `Stale`, `Disabled`, `Unconfigured`, `Unpriced`, `InvalidLimits`, `SecretUnavailable`, `CapabilityVersionRegressed`, `AdapterUnavailable`, `ProviderHealthFailed`, and `Indeterminate`.
+The public `ProviderReadinessResult` contains exactly `OperationalState`, `Callability`, `ReasonCode`, `CapabilityVersion`, `ObservedAt`, exclusive `ValidUntil`, and the discriminated `Freshness` value (architecture AD-17). The catalog is platform-scoped: `CapabilityVersion` is a non-reusable unsigned monotonic sequence per (`ProviderId`, `ModelId`) entry in the `ProviderCatalog` aggregate stored under the reserved EventStore tenant `system`; comparisons across keys are undefined. A tenant reads the platform entry joined with its `TenantProviderEnablement`; a by-key query for an entry not enabled for the caller's tenant, or absent, returns the not-found response, and `EntryMissing` is reported only for the Agent's own selected entry inside `AgentReadinessStatus`. `ProviderReadinessReasonCode` is versioned and additive: `Unknown = 0`, `None`, `NonBlockingOperationalWarning`, `DependencyUnavailable`, `EntryMissing`, `Stale`, `Disabled`, `Unconfigured`, `Unpriced`, `InvalidLimits`, `SecretUnavailable`, `CapabilityVersionRegressed`, `AdapterUnavailable`, `ProviderHealthFailed`, `Indeterminate`, and (added 2026-09-09) `PlatformNotReady`, the code a tenant-facing surface reports in place of any platform-only blocker (`Unconfigured`, `Unpriced`, `InvalidLimits`, `SecretUnavailable`, `AdapterUnavailable`, `ProviderHealthFailed`) whose detail is disclosed to the Platform Operator only.
 
-Only (`Ready`, `Callable`, `None`), (`Degraded`, `Callable`, `NonBlockingOperationalWarning`), and (`Blocked`, `Blocked`, a defined blocker code) are valid. `Degraded` is callable only when `EXT-PROVIDER-1` is `Available` and verified and every hard gate passes: freshness, enabled/configured/text-generation state, current pricing, secret resolution, Provider health, non-regressed capability version, and valid positive limits. Unknown codes and missing, stale, disabled, unconfigured, unpriced, invalid, unavailable, failed, regressed, or indeterminate inputs are `Blocked`.
+Only (`Ready`, `Callable`, `None`), (`Degraded`, `Callable`, `NonBlockingOperationalWarning`), and (`Blocked`, `Blocked`, a defined blocker code) are valid. `Degraded` is callable only when `EXT-PROVIDER-1` is `Available` and verified and every hard gate passes: freshness, platform enabled state, tenant enablement, configured/text-generation state, current pricing, secret resolution, Provider health, non-regressed capability version, and valid positive limits. Unknown codes and missing, stale, disabled, unconfigured, unpriced, invalid, unavailable, failed, regressed, or indeterminate inputs are `Blocked`.
 
 ## NFR-11 Recovery Evidence Contract
 
@@ -153,7 +202,7 @@ Browser durations use one injected monotonic clock and one clock-origin identifi
 
 Every versioned sample has common fields `SampleId`, `QualificationSessionId`, `ExecutionId`, `SampleKind`, `ClockOriginId`, route/operation family, safe trace reference, authoritative projection ID/version where applicable, viewport/profile, locale, and outcome. `SampleId` is deterministically derived from (`QualificationSessionId`, `ExecutionId`, `SampleKind`). An exact duplicate is an idempotent no-op; a conflicting duplicate is rejected and makes the evidence insufficient.
 
-| `SampleKind` | Required ticks | Forbidden ticks |
+| `SampleKind` (`SampleId = H(sample, TenantScope, QualificationSessionId, ExecutionId, SampleKind)` per architecture AD-29) | Required ticks | Forbidden ticks |
 | --- | --- | --- |
 | `PageUsability` | `NavigationStartedTick`, `PageUsableTick` | pending and terminal ticks |
 | `AuthoritativePending` | `CommandSubmittedTick`, `AuthoritativePendingRenderedTick` | page-usability and terminal ticks |
@@ -167,8 +216,9 @@ These logical projection IDs are authoritative for readiness, deletion scope, an
 
 | Projection ID | Owned truth exposed |
 | --- | --- |
-| `agent-setup-readiness` | Agent identity/configuration/lifecycle plus gate-derived callability. |
-| `provider-capability-pricing` | Provider/model capability, readiness, pricing, secret-configured state, freshness, and effective version. |
+| `agent-setup` | Agent identity/configuration/lifecycle, kill-switch state, and gate-derived callability (shipped id, ratified 2026-09-09). |
+| `provider-catalog` | Platform Provider/model capability, readiness, pricing, secret-configured state, freshness, and effective version (shipped id, ratified 2026-09-09). |
+| `tenant-provider-enablement` | Per-tenant enabled entries joined with the platform catalog for tenant-facing readiness. |
 | `agent-interaction-status` | Current interaction state, safe failure class, attempt/posting outcome, and authoritative version. |
 | `proposal-detail` | Current proposal state, selected version, expiry, and authorized detail metadata. |
 | `proposal-version-history` | Immutable generated, edited, and regenerated version history. |
@@ -183,9 +233,10 @@ These logical projection IDs are authoritative for readiness, deletion scope, an
 | `launch-readiness` | Current gate records and aggregate callability/READY blockers by scope/profile. |
 | `runtime-metrics` | NFR-9 runtime latency source observations and qualification results. |
 | `browser-ui-metrics` | NFR-14 browser-monotonic samples and qualification results. |
+| `workflow-execution-state` | Not a projection: the Dapr Workflow state-store scope for terminal interaction instances, carrying references only (architecture AD-27); a named purge scope item whose confirmation deletion completion requires. |
 | `product-metrics` | SM-1 through SM-6 rolling-window/cohort calculations and insufficiency state. |
 
-Deletion completion names and confirms `provider-capability-pricing` only when it contains protected content, `agent-interaction-status`, `proposal-detail`, `proposal-version-history`, `pending-proposal-queue`, `pending-proposal-count`, `audit-evidence`, `retention`, `legal-hold`, `export`, `deletion`, and any content-bearing metric projection identified by its current projection contract. `agent-setup-readiness`, `budget-reservation-usage`, `launch-readiness`, and non-content metric records retain only support-safe references required by policy.
+Deletion completion names and confirms `provider-catalog` only when it contains protected content, `workflow-execution-state`, `agent-interaction-status`, `proposal-detail`, `proposal-version-history`, `pending-proposal-queue`, `pending-proposal-count`, `audit-evidence`, `retention`, `legal-hold`, `export`, `deletion`, and any content-bearing metric projection identified by its current projection contract. `agent-setup`, `tenant-provider-enablement`, `budget-reservation-usage`, `launch-readiness`, and non-content metric records retain only support-safe references required by policy.
 
 ## Initial Gate Records
 

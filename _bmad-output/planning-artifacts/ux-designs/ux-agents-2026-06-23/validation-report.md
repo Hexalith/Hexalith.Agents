@@ -1,400 +1,324 @@
-# Validation Report — Hexalith Agents
+# Validation Report — agents (Hexalith Agents)
 
 - **DESIGN.md:** `_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23/DESIGN.md`
 - **EXPERIENCE.md:** `_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23/EXPERIENCE.md`
-- **Run at:** 2026-09-08T22:30:49Z
-- **Lenses:** rubric walker, accessibility, governance & audit, implementation readiness
+- **Run at:** 2026-09-09
+- **Lenses:** rubric walker · accessibility · governance · implementation readiness (all with regression duty)
+- **Findings:** 96 filings — 7 critical, 35 high, 33 medium, 21 low. FR-33 was filed independently by two lenses, so the criticals are **6 distinct issues**; they are consolidated into one entry below.
+- **Regression** against the pre-Update run (84 prior findings): 57 resolved · 23 partial · 2 unresolved · **0 regressed** · 2 unchanged by prior decision
 
 ## Overall verdict
 
-The pair is a consumable contract: the 22 component names are identical across the DESIGN.md frontmatter, the DESIGN.md sections, and the EXPERIENCE.md Component Patterns table; every token reference in both files resolves; all 33 source paths resolve; UJ-1 to UJ-4 are carried verbatim with protagonist, numbered steps, climax, and failure paths; and 26 of the 28 prior rubric findings are verifiably closed in the text. What keeps it from strong is one high finding, the `FcFluentIcons` inventory in DESIGN.md being stale against its own listed source so that six status glyphs the spine tells downstream to request already exist and three badge components would ship text-only under the spine's own rule, plus six medium gaps a story-dev would otherwise decide alone: a v4 `Appearance.Accent` on the confirm button, a nav-glyph reuse that contradicts the spine's rule, no binding of detail routes to `FcAggregateDetailState`, the `nearing expiry` threshold committed in the reconcile but not carried, regeneration-ceiling numbers pointing at an FR that has none, and no surface action for disabling `hexa`. No critical findings.
+Mechanically this is the cleanest state the pair has been in. The 22 component names are identical *and identically ordered* across the DESIGN frontmatter, the DESIGN sections, and the EXPERIENCE Component Patterns rows (diff-verified, so the three-way parity rule holds under test); all 19 distinct `{path.to.token}` references resolve across 154 occurrences; all 36 source paths resolve on disk; every internal `§` cross-reference resolves; the `FcFluentIcons` inventory now matches its source member-for-member; and the repo's UX law is respected throughout.
 
-The three additional lenses confirm the 2026-09-08 update landed: every one of the 92 prior findings is resolved or partially resolved, none is unresolved, and all four prior criticals are closed. What remains is seam-shaped rather than meaning-shaped. Accessibility finds the spine delegating to FrontComposer surfaces that do not provide what it assumes: `FcAggregateDetailPage` has no heading parameters, `FcStatusFilterChips` cannot express a localized `needs my action` chip, the one-status-node-per-route rule is false the moment a mandatory Fc component renders, nobody owns announcements on the Conversation seam, and the response-mode radio fires a modal on the first arrow key. Governance finds the second side effect and evidence removal under-specified: `retry posting` has no surface or policy, an `Approved` proposal stays editable, hold release and deletion are one role and one click with no justification, and a platform-scoped Provider catalog sits behind a tenant-scoped policy. Implementation readiness finds the FrontComposer services cited by name but not by shape (`IBadgeCountService` is `Type`-keyed, the FC-TBL components need a `ViewKey`), the Conversations seam missing a callability query and a message-marker slot, and the epics and register disagreeing with the spine on whether Story 6.7 is blocked. Findings that converge from independent lenses (the nearing-expiry threshold from all four, the icon inventory, the detail-page heading, the badge count, the live-region duplication, the Conversations seam, `Appearance.Accent`, `DisabledFocusable`) are the highest-confidence items to roll into an Update.
+**What breaks the run is source freshness, not mechanics.** Both spines declare themselves "reconciled to the PRD of 2026-09-08". `prd.md`, which both list as a source, now carries a 2026-09-09 reconciliation whose centrepiece is **FR-33, a thirteen-row authorization matrix over six named roles that OQ-21 declares authoritative for every authorization rule in the product**. The rubric and governance lenses converged on this independently. FR-33, Platform Operator, Release Operator, Compliance Inspector, the kill switch, the Agents-owned per-Conversation block, `NoEligibleApprover` and `SourceConversationUnavailable` do not occur in either spine, in `.memlog.md`, or in either reconciliation. Built strictly from these two files, a tenant administrator holding `Agents.Administrator` publishes the platform Content Safety Policy — and may *relax* it — raises their own cost caps, and grants themselves an audited override of a reached cap. `prd.md:418` says of exactly these acts "so the boundary is not self-set" and "never the Tenant Agent Administrator".
+
+**Separately, the two rewrites the last Update was proudest of each bought their tidiness with a mechanism that does not exist.** The live-region rewrite hands the entire post-submit announcement set for the product's only V1 invocation path to a pair of nodes living inside a dialog the same sentence closes on Submit. The `aria-disabled` rule is stated spine-wide as `FluentButton.DisabledFocusable` and then applied to version radios, where that parameter does not exist. The editor's new dirty-state rules block Approve and the version radios "until you save or discard" while the action rail contains neither control. And `retry posting`, the one new Conversation write, was filed under the one operation family that skips the membership and safety gates. These are defects the Update *introduced*, and each reads as solved.
+
+The honest summary of that Update: it closed the mechanics it aimed at, and closed them accurately — 57 of 84 prior findings are verifiably resolved, **nothing regressed**, and the areas the lenses attacked hardest (provider secrets, the currency circularity, terminal-state and double-post integrity, tenant isolation, the expiry/approval race) held under re-attack. But "every finding dispositioned" is true in form: 23 findings are partial, and several of those are fixes that read as closed yet cannot be built as written.
 
 ## Category verdicts
 
-- Flow coverage — adequate
-- Token completeness — adequate
-- Component coverage — strong
-- State coverage — adequate
-- Visual reference coverage — strong
-- Bloat & overspecification — adequate
-- Inheritance discipline — adequate
-- Shape fit — strong
+- Flow coverage — **adequate**
+- Token completeness — **strong**
+- Component coverage — **strong** (no findings)
+- State coverage — **adequate**
+- Visual reference coverage — **strong**
+- Bloat & overspecification — **adequate**
+- Inheritance discipline — **thin**
+- Shape fit — **strong** (no findings)
 
 ## Findings by severity
 
-| Severity | Rubric | Accessibility | Governance & audit | Implementation readiness | Total |
-|---|---|---|---|---|---|
-| critical | 0 | 0 | 0 | 0 | 0 |
-| high | 1 | 5 | 5 | 6 | 17 |
-| medium | 6 | 7 | 10 | 14 | 37 |
-| low | 8 | 10 | 6 | 6 | 30 |
-| **total** | 15 | 22 | 21 | 26 | 84 |
+### Critical (6 distinct, 7 filings)
 
-Prior run (2026-09-08, pre-update): 92 findings, 4 critical, 23 high, 38 medium, 27 low. Regression: 85 resolved, 14 partially resolved, 0 not resolved across the four lenses.
+**[Inheritance discipline / Governance]** — PRD FR-33, the authoritative role matrix, is absent from both spines and the spines' authorization model contradicts it on six rows (§ prd.md:406-436, OQ-21 at :874 · EXPERIENCE.md:31, :59-80)
+FR-33 resolves *every* authorization rule in the PRD to one of six roles at a stated scope. Grepping both spines for `FR-33`, `Platform Operator`, `Release Operator`, `Tenant Agent Administrator` and `Compliance Inspector` returns zero hits. The IA table's five `RequiredPolicy` constants contradict FR-33 on cost caps/rate limits, cost-cap override, Content Safety Policy publication, per-tenant Provider/model enablement, approved deletion, and the two administrative `PostingFailed` rows. FR-33 also requires every authorized operation to record its role basis, which the audit field list does not carry.
+Fix: add an § Authorization roles section mapping the six roles to policy constants with scopes; re-derive the `RequiredPolicy` column row by row, splitting read from write per surface; state that every confirmation's authorization-basis line and every audit record names the role and scope; add `UnretiredAssumption` as a readiness blocker class; update both header lines to name the PRD revision actually reconciled to.
 
-### Critical (0)
+**[Governance]** — Cost controls put the cap boundary and the cap override in the hands of the party they bound (§ EXPERIENCE.md:67, :187 vs prd.md:418-419, FR-32 at :625)
+The tenant-scoped surface authors caps, rate limits and the audited override. The PRD reserves configuration to Platform or Release Operator with the tenant able only to *lower*, and the override to "Platform Operator only". No monotonicity rule exists anywhere in the spine, so a tenant at 100% fail-closed raises its own cap or grants itself an override, both rendering as a normal `TenantBudgetUpdate` with a justification the same actor typed.
+Fix: split the surface; give `Agents.Administrator` a lower-only editor that rejects any value above the current one with a typed reason, with the override item absent rather than disabled.
 
-None.
+**[Governance]** — The Content Safety Policy is published from a tenant-scoped surface, and the spine lets a tenant *relax* it (§ EXPERIENCE.md:66, :186 vs prd.md:420)
+The PRD assigns publication to "Platform Operator with Security approval" at Platform scope and permits a tenant only to add restrictions through a stricter mode-specific policy. Permitting a restricted category is a relaxation. The Security-approval condition has no surface, no confirmation line and no pending state, so one tenant administrator publishes a policy permitting hate or sexual content with no second party involved.
+Fix: platform surface is Platform Operator plus a rendered Security-approval stage; the tenant surface publishes only a stricter delta and cannot move a category toward permitted; the confirmation states the direction of change and refuses a relaxation on the tenant surface.
 
-### High (17)
+**[Governance]** — The two-person rule on deletion is deferred to a decision the PRD has already taken (§ EXPERIENCE.md:189, :73 vs prd.md:428-429, A-12)
+`prd.md:429` already states "Platform Operator with Compliance Inspector approval", and puts legal hold and export with the Compliance Inspector — a different role from the deletion requester. The spine collapses all three onto one `Agents.AuditOperator` on one route and defers the question, so V1 as specified ships single-actor evidence deletion against a written requirement.
+Fix: remove the deferral; `DeletionRequest` requires Platform Operator plus a separately authorized Compliance Inspector approval stage, the requester's own approval refused with a typed reason, and both justifications rendered on every deletion row.
 
-**[Inheritance discipline]** — `FcFluentIcons` inventory is stale; six status glyphs filed as requests already exist (§ DESIGN.md:168, :211-219; FcFluentIcons.cs:66-90)  
-The role→glyph table marks six of seven status roles as FrontComposer requests, but the source already exposes `CheckmarkCircle16`, `ArrowSync16`, `Warning16`, `SubtractCircle16`, `DismissCircle16`, `QuestionCircle16`, `InfoCircle16`. Under the spine's own rule (no glyph until a request lands) three badge components ship text-only for six roles, degrading the no-colour-only promise. `DevMode`/`DeveloperBoard` are one glyph, and the `status-subtle` row binds a Size20 nav glyph beside Size16 status glyphs.  
-Fix: Rewrite the role→glyph table to the factory methods; restate the curated inventory as it is in the source (ten Size20 nav glyphs by `TryCreate` name, thirteen Size16 glyphs by method); keep only genuinely missing glyphs as requests.
+**[Governance]** — `retry posting` is filed under the operation family that omits the two gates a Conversation write needs (§ EXPERIENCE.md:222, :231 vs launch-readiness-register.md § Gate Sets · prd.md:397)
+`ProposalResolution` requires neither `LR-CONVERSATIONS-MEMBERSHIP-POSTING` nor `LR-SAFETY`; a separate `ConversationPosting` family requires both. The register states the matrix is the single contract consumed by API, BFF, UI, workflow and projection, and that consumers may not maintain local subsets. The spine identifies retry posting as a Conversation write "governed as one" and then assigns it the family that governs it as something else, so every retry is admitted with the membership and safety gates unevaluated. Introduced by the Update that added the feature.
+Fix: `retry posting` is family `ConversationPosting`; the confirmation's authorization-basis line names both families where resolution and write differ.
 
-**[Accessibility]** — Route-heading rule cannot be implemented on Constrained detail routes as written (§ EXPERIENCE.md:345, :407; DESIGN.md:81, :236; FcAggregateDetailPage.razor.cs)  
-`FcAggregateDetailPage` has no `Heading`, `HeadingTabIndex`, or `PageTitle` parameter; the domain supplies all headers. Its non-ready slots render caller content in place of the body, so `not available` and loading states have no h1, no page title, and no focus target after navigation. Eight of twelve routes are Constrained.  
-Fix: State that on detail routes the domain renders `FcPageHeader` above `FcAggregateDetailPage` or as the first child of every state slot; add "heading present and focused in the `not available` state" to the conformance lane.
+**[Accessibility]** — The `ConversationAgentCallPanel` live-region pair is destroyed by the very event it exists to announce (§ EXPERIENCE.md:183, :95, :92 · DESIGN.md:315)
+Both live nodes and every `FluentBadge` status row sit inside the panel, which *is* the dialog body, and the dialog closes on Submit. Every outcome of the call — including `denied` and `generation failed` — announces into a node that no longer exists, for every user, on the product's only V1 invocation path; the status disappears visually too. `EXT-CONV-UI-1`'s two declared artifact kinds can host no persistent region beside the trigger. Recorded as applied and closed in both the spine and the reconciliation.
+Fix: split the artifact — a separate persistent Agents-owned status region contributed to the Conversation surface next to **Call hexa**, mounted for the lifetime of the Conversation view, added as a third artifact kind on `EXT-CONV-UI-1` alongside a focus-return contract for the Conversations-owned trigger.
 
-**[Accessibility]** — The mandatory `needs my action` chip is not expressible with `FcStatusFilterChips` (§ EXPERIENCE.md:154-155, :134, :367; FcStatusFilterChips)  
-`AvailableSlots` is typed on the closed `BadgeSlot` enum and the visible chip text is `slot.ToString()`, the raw English enum name. A screen-reader user would hear "Accent, filter inactive" for the chip meaning needs my action, and a French tenant would see an untranslated English word, violating the whole-string parity gate.  
-Fix: Raise a FrontComposer request for domain-keyed slots with a localized label; until it lands, render state and `needs my action` filters as Agents-owned `aria-pressed` toggle buttons in a named `role="group"`, or drop `FcStatusFilterChips` from the mandatory list.
+### High (35)
 
-**[Accessibility]** — "One `role="status"` node per route" is false once mandatory Fc components render; duplication is unmanaged (§ EXPERIENCE.md:336, :154, :340; DESIGN.md:221)  
-`FcFilterEmptyState` and `FcExpandInRowDetail` render their own polite status nodes inside every Agents grid page; `FluentMessageBar` carries an intent-driven `AriaLive` default so page notices announce twice; the shell's `FcProjectionConnectionStatus` already announces connection loss while Agents adds an assertive alert. NFR-14 evidence measures the Agents node, so duplicates muddy it.  
-Fix: Replace with "one Agents-owned node of each politeness per route, and every event is announced by exactly one node": `FluentMessageBar` with `AriaLive="Off"` when its text is pushed to the Agents node; `connection lost` shell-announced with Agents carrying the consequence; list which Fc status nodes may speak.
+**[Governance]** — A caller can approve the reply to their own Agent Call (§ EXPERIENCE.md:181, :617 vs prd.md:91, :234, :501)
+The spine blocks approval when the Approver "is the sole Approver of their own call"; the PRD says the caller is never an Eligible Approver. The word "sole" inverts the rule: with two or more resolvable Approvers — the normal case — the caller is let through. No laundering is needed, because the Provider authors the text so the last-editor test never fires. `CanCurrentUserApproveSelectedVersion` is specified to carry the spine's predicate, so the server-side rule named is the wrong rule.
+Fix: replace with the glossary predicate in full — resolved by the current Approver Policy, current Participant with read access, not the caller, not the last editor of the selected version.
 
-**[Accessibility]** — Nobody owns announcements or post-submit focus on the Conversation seam (§ EXPERIENCE.md:336, :63, :81, :87; DESIGN.md:307)  
-The live-region rule is per Agents route, but Call hexa, `submitted`, `denied`, `capacity queued`, `generation failed`, and `Posted` all happen on a Conversation-owned surface with no Agents route. The exported panel is not told to carry status nodes, and the dialog says nothing about what happens after Submit. A blind participant in UJ-2 presses Submit and hears nothing.  
-Fix: Make `ConversationAgentCallPanel` self-contained: it owns one polite and one assertive node with the same politeness table; on Submit the dialog closes and focus returns to Call hexa (`aria-disabled` while pending); status rows sit after the button in DOM order. Record the same as an `EXT-CONV-UI-1` requirement.
+**[Governance]** — There is no edit-time eligibility check, so a self-inflicted deadlock is reachable (§ EXPERIENCE.md:216 vs prd.md:235, :66)
+The PRD rejects an edit "unless at least one Eligible Approver would remain after it, the editor and the caller both excluded". Under the spine, a lone Approver edits, cannot approve her own edit, and the proposal sits until `Expired` — and the audit record reads as an expiry, not a governance refusal.
+Fix: Edit is `DisabledFocusable` with the typed reason whenever no Eligible Approver would remain; the reason names that a second Approver is required.
 
-**[Accessibility]** — `response-mode-toggle` fires the confirmation on change, which is the first arrow key (§ EXPERIENCE.md:151; DESIGN.md:279)  
-Radio semantics move selection with arrow keys, so a keyboard user pressing Down to read the second option is already in a modal with Cancel focused; on Cancel the spine does not say the radio reverts. This is the only control for an `AgentSetupMutation`.  
-Fix: The radio group changes a draft value only; the confirmation opens from an explicit Apply button `aria-disabled` until the draft differs; Cancel reverts and announces `Response mode unchanged: {mode}`. Apply the rule to every "change opens confirmation" binding.
+**[Governance / Inheritance discipline]** — `Caller` is retained as a live Approver Policy source though FR-7 retired it (§ EXPERIENCE.md:178 · DESIGN.md:295 vs prd.md:215, :501, OQ-14 at :867)
+The builder offers a source on the FR-23 deprecate-and-reject register that every server must refuse, so an administrator can publish a policy that silently contributes no Approver. DESIGN calls the list "the closed `ApproverPolicySourceKind` list".
+Fix: drop `Caller` from the buildable list; if it must stay visible for legacy policies, render it read-only with the typed retirement reason and block publication while present.
 
-**[Governance & audit]** — `retry posting` is a Conversation write with no surface, policy, family, bound, confirmation, or evidence rule (§ EXPERIENCE.md:258, :184, :166, :156, :105)  
-The lifecycle promises a bounded audited retry reusing the deterministic `MessageId` and Voice offers the copy, but `proposal-editor` lists only edit, regenerate, approve, reject, abandon. A story-dev will put a bare Retry button on the status page for `Agents.Operator`, who is not an Approver, and FR-18's pre-post re-checks will be invisible.  
-Fix: Add `retry posting` to the `proposal-editor` action rail for `Agents.Approver` with current Conversation read access; family `ProposalResolution`; the confirmation renders `ApprovedVersionId`, the typed failure reason, attempts used of the configured maximum, and the re-check statement; each attempt is a row in version history and audit; exhaustion leaves only `Start a new Agent Call`; the maximum is a `hexa` configuration field.
+**[Governance]** — `Agents.PlatformProviderAdministrator` does not exist, and the spine states its registration as fact (§ EXPERIENCE.md:80 vs AgentsFrontComposerRegistration.cs)
+The shipped file declares exactly four constants and gates `/agents/providers` on `AgentsAdministratorPolicy`. The corrections table catches nine smaller divergences and misses this one, so the single new authorization constant in the whole Update has no owning story and reads as already done.
+Fix: add two corrections rows (the missing constant, the tenant-scoped `RequiredPolicy`) with absorbing story 5.3 or 5.7, and state that the constant is *to be* registered.
 
-**[Governance & audit]** — `Approved`, `PostingPending`, and `PostingFailed` are non-terminal, so edit, regenerate, and approve remain available after approval (§ EXPERIENCE.md:156, :250-258; DESIGN.md:299)  
-The editor's only terminal rule is read-only in a terminal state; the regenerate lock covers only the same session. A version other than the approved `VersionId` can be approved and posted, or an edit lands while posting is pending, against FR-17 and FR-18.  
-Fix: Once `Approved` is projection-confirmed, edit, regenerate, and approve are absent; the editor pins `ApprovedVersionId` read-only; the only actions are `retry posting`, abandon where permitted, and audit; a new decision requires a new Agent Call.
+**[Governance]** — The Provider catalog read path shows a tenant administrator what FR-33 reserves to the Platform Operator (§ EXPERIENCE.md:63, :179, :292 vs prd.md:417, A-10)
+FR-33 states a tenant sees only Providers/models enabled for it, with secret references and configured state visible only to the Platform Operator. The spine scopes the *mutation* correctly and never scopes the *read* — no per-tenant enablement filter, no suppression of configured state — and the status badge's reason vocabulary includes `Unconfigured` and `SecretUnavailable`, disclosing secret-configuration state even where the reference is masked.
+Fix: filter the tenant read to enabled models; collapse configured state, `ConfigurationReferenceId` and secret-derived reason codes to one undifferentiated `Blocked` for non-Platform-Operator readers.
 
-**[Governance & audit]** — Hold release, export, and deletion are single-role, single-click, unjustified, and confirmed by one generic sentence (§ EXPERIENCE.md:62, :164, :168; DESIGN.md:331; PRD FR-30; epics.md Story 8.3)  
-FR-30 requires every governance operation audited with actor and justification and Story 8.3 distinguishes request, confirm, and cancel, yet the spine has one `request deletion` action, no justification input, no scope rendering, no hold interplay. An operator who wants a mistake gone releases the hold and requests deletion in two dialogs.  
-Fix: Required justification on `LegalHold` release, `ExportRequest`, `DeletionRequest`, `PolicyPublication`, `TenantBudgetUpdate`; the deletion confirmation renders exact scope, hold state, confirming projections, and an irreversibility line; deletion is `aria-disabled` while a matching hold is active or `EXT-SECRETS-1` is not Available; a separate confirm stage by a different Party, or an explicit Product plus Security deferral if a two-person rule is rejected.
+**[Governance]** — A zero-priced model turns budget enforcement off, and the spine treats it as a warning (§ EXPERIENCE.md:179 · DESIGN.md:203 vs prd.md:616, :620)
+A model priced at zero reserves zero, settles zero, and never reaches 80% or 100% on any cap, so `BudgetBlocked` becomes unreachable for every tenant using it — from one platform-scoped edit, with no readiness consequence. The budget bypass is one field.
+Fix: a zero unit price is a Provider readiness blocker, not a warning; the mutation confirmation names the affected tenant count; Cost controls renders "cost enforcement inactive for {model}".
 
-**[Governance & audit]** — The platform-scoped Provider catalog is gated by the tenant-scoped `Agents.Administrator` policy (§ EXPERIENCE.md:52, :154; PRD FR-19, FR-4)  
-A hostile tenant admin can disable or reprice a model every other tenant uses; the confirmation shows them the cross-tenant blast radius as a count, which is disclosure control, not authorization. FR-19 permits cross-tenant reach only when explicitly platform-scoped and authorized; the spine states the scope and never the authorization.  
-Fix: Split read from mutation policy: `Agents.Administrator` reads; `ProviderCatalogMutation` requires a platform-scoped policy constant registered in `AgentsFrontComposerRegistration`; the confirmation names the platform scope; tenant admins see mutation controls absent.
+**[Flow coverage / Governance]** — PRD FR-28's per-tenant kill switch has no surface, no state, no copy, and no flow (§ prd.md:625, :422, :622 · zero grep hits in both spines)
+FR-28 specifies UI-visible semantics precisely: proposals awaiting a decision may be rejected or abandoned but *not* approved, `Approved` and `PostingPending` complete on their own terms, nothing is deleted. It is a Platform/Release Operator gesture with three named triggers, and FR-18 names it as one of four typed system-abandon reasons.
+Fix: add a kill-switch control under the Release/Platform Operator role with its own confirmation family and justification; a `kill switch active` readiness state; a proposal-editor variant with Approve absent for this reason while Reject and Abandon remain.
 
-**[Governance & audit]** — Configuration and governance changes have no audit surface (§ EXPERIENCE.md:61, :152, :167; DESIGN.md:247, :341; PRD FR-24, FR-32)  
-`audit-evidence-panel` enumerates interaction evidence only; FR-24 requires evidence for Agent and Provider configuration and every override, FR-32 requires prior and new cap values. No component defines a configuration-change record or where a `ProviderCatalogMutation`, `PolicyPublication`, `TenantBudgetUpdate`, or `AgentActivation` is inspectable end to end.  
-Fix: Add a configuration-change evidence class to `/agents/audit` and each write surface's History item: actor, family, resource identity, old to new values where safe, published version, concurrency token, projection id and version, justification, acceptance stages; overrides show scope and expiry.
+**[Flow coverage / Governance]** — OQ-16 inverts the ownership the seam section pins, and the spine describes the design the PRD rejected (§ EXPERIENCE.md:104 vs prd.md:869, FR-2, :428 · addendum.md § Options Considered)
+The addendum records that Conversations-notifies-Agents was *rejected* in favour of an Agents-owned per-Conversation block, set and cleared by the Tenant Agent Administrator or Conversation Facilitator with every transition audited. The spine specifies the rejected alternative and has no surface, control, state, confirmation family, audit rendering or copy for the block it should own. OQ-16's three-part membership step is also uncarried.
+Fix: add block/re-admit as governed writes under the FR-33 authorities with justification and audit; restate the seam paragraph.
 
-**[Implementation readiness]** — The Conversations seam rule is stated only in the spine; epics and register disagree; harness de-listing has no owner (§ EXPERIENCE.md:82, :68; epics.md:1841-1843; external-dependency-register.md:75; AgentsFrontComposerRegistration.cs (order 4))  
-The spine blocks Story 6.7 while `EXT-CONV-UI-1` is Uncommitted; `epics.md` says 6.7 has no new external seam and the register's consuming stories are TBD, so a sprint planner will mark 6.7 ready. "Delisted now" has no owning story while the harness stays registered.  
-Fix: Name the story that de-lists the harness in the IA rules; file the epics and register correction as a deferred item with owner so 6.7's External line and the register's consuming-story field match the spine.
+**[Governance]** — A denied or unauthorized attempt leaves no visible evidence anywhere (§ EXPERIENCE.md:191, :192 vs prd.md:826 SM-4, :622, :454 FR-20)
+The `not available` state is correct as isolation, but nothing renders the other side of it: Operational status counts calls blocked by context, safety, cost, rate limit and capacity but not authorization denials, and the audit panel enumerates only acts that happened. SM-4 requires zero unauthorized actions to be *demonstrable*, and a confirmed unauthorized action is the immediate kill-switch trigger. A trigger nobody can observe is not a control.
+Fix: add a denied-attempt evidence class (actor, tenant, operation family, resource class, denial reason code, timestamp — without the inaccessible resource's identity) and a per-tenant denial count to Operational status.
 
-**[Implementation readiness]** — `agent-response-marker` has no seam or provenance source (§ DESIGN.md:309-311; EXPERIENCE.md:90, :159; external-dependency-register.md:69)  
-The register's artifact is an action contribution; rendering a badge beside a posted Message is a message-decoration extension, and no contract maps `MessageId` to posted-by-hexa, generated vs edited, and editing Party. Story 6.7 owns the attribution and cannot satisfy it.  
-Fix: Widen the `EXT-CONV-UI-1` artifact to a per-message contribution slot with an Agents-side provenance gateway keyed by `MessageId`, or state the marker is rendered from Conversation-side message metadata written at posting and name the story that writes it.
+**[Governance / Inheritance discipline]** — Compliance inspection is absent, and the fail-closed rule makes retained evidence permanently uninspectable — which FR-24 forbids in terms (§ EXPERIENCE.md:192 vs prd.md FR-24, :94, :424, OQ-21 at :874)
+FR-24: "Retained evidence is never made uninspectable by the loss of its Conversation." It requires inspection scoped to a named Conversation or case identifier, a recorded justification, second-party approval or post-hoc review, rate-visibility on an administrator-readable surface, and the inspection itself recorded as Audit Evidence. None of the five mechanics appears. The failure runs both ways: a legitimate inspection is blocked, and the one read path meant to be audited as a read is not.
+Fix: add a compliance-inspection flow to `/agents/audit` with all five mechanics, and a rule that evidence whose Source Conversation is gone renders under compliance inspection only, never as `not available`.
 
-**[Implementation readiness]** — Status glyphs are requested from FrontComposer but already exist, and the curated list is wrong (§ DESIGN.md:168, :187, :207, :213-218; FcFluentIcons.cs)  
-`FcFluentIcons` exposes the six status factories today; `DeveloperBoard` is not a name; the string `TryCreate` contract used by nav entries accepts only 12 names. Following "until a request lands, renders without a glyph" ships every badge without an icon, failing the no-colour-only rule and `LR-UI-CONFORMANCE`.  
-Fix: Replace the role→glyph table with the factory names, keep only nav-entry glyphs (string contract) as requests, and note that 16 px factories are not reachable through `TryCreate`.
+**[Governance]** — The queue's listing rule is wider than FR-13's, so a never-resolved Approver sees and counts proposals (§ EXPERIENCE.md:180, :190 vs prd.md:338)
+FR-13 adds the part the spine dropped: "Proposals on which the requester was never resolved as an Approver are not listed, counted, or otherwise disclosed." Since `Agents.Approver` is tenant-wide and read access is a Conversations fact, any holder who happens to be a Conversation participant sees, counts and opens proposals the Approver Policy never resolved them for. The pending count inherits the same rule.
+Fix: the predicate is resolution under the proposal's Approver Policy snapshot **and** current read access; never-resolved requesters get `not available`, no row, no count, no filter suggestion.
 
-**[Implementation readiness]** — `IBadgeCountService` cannot carry the pending-proposal count as specified (§ DESIGN.md:335; EXPERIENCE.md:165, :404; IBadgeCountService.cs; BadgeCountService.cs:132-202; navigation.md:62)  
-Its contract is `IReadOnlyDictionary<Type,int>` populated over the projection catalog's action-queue types, rendered on domain tiles and projection flyouts, not on a nav entry. Agents uses no generated projection lane, so there is no `Type` to key and no slot to render into.  
-Fix: State the mechanism: register a read-model type for `pending-proposal-count` with the badge catalog so the count lands on the Agents domain tile, or declare the count hand-rendered inside the overview link and drop the `IBadgeCountService` claim.
+**[State coverage / Governance]** — Approval freezes expiry is not carried, and the spine's rule contradicts it (§ EXPERIENCE.md:334 vs prd.md:395, OQ-3)
+The spine renders `Expired` "whenever `ExpiresAt` has passed on any read" with no state carve-out; the PRD says `Approved`, `PostingPending` and `PostingFailed` never expire. Implemented literally, an `Approved` proposal whose window lapses during a slow post renders `Expired`, the rail collapses to "Start a new Agent Call", the retry path and administrative exits vanish, and audit reports a decision that expired rather than a post that failed.
+Fix: scope the rule to `Pending`, `Edited`, `Regenerated`; state the freeze in the three post-decision rows.
 
-**[Implementation readiness]** — `pending in another session` has no data source (§ EXPERIENCE.md:284-293; DESIGN.md:351)  
-The advisory lock lives in the submitting tab; `AgentSetupTruthState` carries no submitter or session identity, so a second tab sees only `AuthoritativePending`, which the spine renders as the same-session variant. All nine families hit this.  
-Fix: State that the second-tab variant is derived from authoritative pending without a local lock, or add an accepted-by session/actor reference to the contracts-must-grow list with an owning story.
+**[State coverage / Governance]** — The exits from an exhausted `PostingFailed` contradict FR-18, stranding a proposal the PRD guarantees always has an exit (§ EXPERIENCE.md:219, :331, :69, :222 vs prd.md:396, :425-426)
+FR-18 gives four exits so that "a `PostingFailed` proposal therefore always has an exit and always reaches the §9 retention clock"; the spine gives one. Since detail is `Agents.Approver` only and retry requires *current* Conversation read access, a proposal whose Source Conversation became inaccessible is unreachable by anyone and never reaches retention.
+Fix: replace the row with the four exits; add administrative abandon (no Conversation read access required) and administrative retry as actions under a second policy with their own confirmation contents.
 
-**[Implementation readiness]** — The Conversation-owned Call hexa button must know Agents readiness, and no seam supplies it (§ EXPERIENCE.md:87, :158, :81; DESIGN.md:306; IConversationAgentCallGateway.cs)  
-The gateway exposes `RequestCallAsync` and `GetCallStatusAsync` only, yet the button must render `aria-disabled` with the safe blocker whenever `hexa` is not proven callable. Whether the exported panel or the Conversations-side button owns the dialog is also unstated.  
-Fix: Add `GetCallabilityAsync(tenant, conversation)` returning the Story 5.5 readiness result and safe blocker to the seam table; state the exported panel is the dialog body and Conversations owns the trigger button.
+**[Governance / State coverage]** — The retry bound was moved from Architecture to tenant configuration and lost its time window (§ EXPERIENCE.md:222, :177 vs prd.md:396, A-7 at :749)
+The PRD fixes it at "at most 3 attempts over 15 minutes", owner Architecture. A tenant-configurable attempt count with no upper bound and no window is a retry storm against Conversations with an audit trail saying every attempt was authorized. The spine also invents a configuration field on a form whose inventory does not list it.
+Fix: 3 attempts within 15 minutes of the first failure, not tenant-configurable; render attempts-used and time remaining read-only; window expiry is a distinct exhaustion reason.
 
-### Medium (37)
+**[Accessibility]** — The editor blocks Approve and version selection "until you save or discard", and neither control exists (§ EXPERIENCE.md:216, :182, :212 · DESIGN.md:307)
+The action rail is enumerated three times as Edit, Regenerate, Approve, Reject, Abandon, Retry posting. There is no Save and no Discard; the only stated way out of the dirty state is to leave the page. A user who types one character faces a blocked Approve pointing at a Save that is not there. A functional dead end before it is an accessibility one, created by the Update's own dirty-state rules.
+Fix: put Save and Discard in the rail in all three enumerations, give each an announcement, and state where focus lands after each.
 
-**[Flow coverage]** — FR-3 disable and FR-1 create/enable have no surface action (§ EXPERIENCE.md:51, :152, :212; DESIGN.md:283)  
-The `hexa` configuration IA row says only "Configure `hexa` and activate it"; `agent-config-form` names Activation and other writes but never a Disable control, its family, or its confirmation content, and the readiness state `disabled` exists with no way to reach it. The overview assumes `hexa` already exists.  
-Fix: Add Disable/Enable to the `agent-config-form` action rail as a named high-risk family (`AgentActivation` covers both directions, or say so), give `high-impact-confirmation` its content line, and state once whether `hexa` is pre-provisioned per tenant or has a not-yet-created state.
+**[Accessibility]** — No blocked control anywhere in the spine is programmatically associated with its reason (§ EXPERIENCE.md:413, :101, :189, :216, :397 · DESIGN.md:291, :359)
+Every blocked state renders its explanation as an *adjacent* element; there is no `aria-describedby` anywhere. A screen-reader user tabs to Approve, hears "Approve, unavailable", and must explore the region to learn whether they are blocked by a dirty editor, segregation of duties, expiry, a lost connection or another Approver — five different recoveries. Spans nine confirmation families, six rail actions, the version radios, **Call hexa**, export and deletion.
+Fix: wherever a control is `aria-disabled`, its reason is a localized whole string referenced by `aria-describedby` from the control itself, and the same string is the visible adjacent text; assert it in the `LR-UI-CONFORMANCE` lane and the AT matrix.
 
-**[Flow coverage]** — Regeneration ceiling points at FR-32, which gives no numbers (§ EXPERIENCE.md:152; prd.md:566)  
-The row says "documented default and valid range from FR-32", but FR-32 says only "a documented default and a valid range". The reference dangles while the proposal-expiry sibling on the same row carries its numbers.  
-Fix: Commit UX-side numbers flagged for Product sign-off, or mark the field "default/range: deferred (owner: Product)" and add it to the reconcile file § 8.
+**[Accessibility]** — `DisabledFocusable` does not exist on `FluentRadio`, so the version-radio rule cannot be built as written (§ EXPERIENCE.md:182, :216, :413 · DESIGN.md:311)
+At the pin the parameter is declared on `FluentButton` and `FluentCompoundButton` only. The spine's hand-authored escape hatch means building a radiogroup with roving `tabindex` — which the repo UX law forbids when a Fluent component exists, and which reintroduces the original hazard, since in a radiogroup the arrow key *is* the selection. The shipped code has the opposite defect (a custom listbox), so Story 7.2 will be told to move *to* a component that cannot express the rule.
+Fix: choose a buildable binding and say which — a `FluentButton`-per-version selection, or keep `FluentRadioGroup` and handle dirtiness through the unsaved-changes confirmation on selection change.
 
-**[Token completeness]** — `FluentButton Appearance.Accent` does not exist in Fluent v5 (§ DESIGN.md:152, :347, :39)  
-At the pinned rc.5, `FluentButton.Appearance` is `ButtonAppearance` {Default, Outline, Primary, Subtle, Transparent}. This is the confirm button of all nine high-risk families and contradicts the spine's own Don't. The `brand-accent` note inherits `BadgeColor.Brand`, but its two uses are a button and radio selection chrome, neither of which consumes `BadgeColor`.  
-Fix: Replace with `ButtonAppearance.Primary`; reword the `brand-accent` note to the Fluent theme brand tokens as rendered by `ButtonAppearance.Primary` and radio selection, with `BadgeColor.Brand` for badges only.
+**[Accessibility]** — Nothing re-focuses the heading when a detail route changes state slot, and the previous heading element is destroyed (§ EXPERIENCE.md:442, :444 vs FcAggregateDetailPage.razor)
+Each non-ready state is a *separate* caller-supplied `RenderFragment`, so the loading slot's `FcPageHeader` and the ready slot's are two instances with two `h1`s. The focus rule covers navigation, queue-to-detail and forced refresh — not a slot swap, which is exactly what the ordinary cold load of all eight Constrained routes is. Focus is lost to `document.body` with no announcement, likewise on Ready→`Unavailable` and Ready→`NotFound`. `FocusHeadingAsync()` also throws when `HeadingTabIndex` is null, so a slot omitting it fails in production on the error path.
+Fix: add the transition to the focus rule and require `HeadingTabIndex="-1"` on the header in *every* slot.
 
-**[State coverage]** — Detail routes are never bound to `FcAggregateDetailState`; shell `Stale` collides with reserved `Stale` (§ EXPERIENCE.md:345, :308, :198)  
-The shell's detail page has states {Loading, Ready, Stale, Degraded, Unauthorized, NotFound, Unavailable}. The spine's one `not available` state spans three shell states, the shell's `Stale` collides with the spine's reserved meaning (evidence past `ValidUntil`), and `catching up` has no shell-state home.  
-Fix: A five-row mapping under § List, detail, and deep-link surfaces: `Loading` → cold load; `Unauthorized`/`NotFound`/`Unavailable` → the single `not available` content; shell `Stale` unused, `catching up` renders in `Ready` with the freshness badge; `Degraded` → dependency unavailable.
-
-**[State coverage]** — `nearing expiry` has no start threshold in either spine (§ DESIGN.md:197, :275; EXPERIENCE.md:155, :341; reconcile § 3; .memlog.md:34)  
-It is a Warning role, a chip, a grid rendering rule, and a once-per-proposal announcement, but nothing says when it begins. The reconcile committed 10 % of the configured window or 1 h before `ExpiresAt`, whichever is smaller; the spines did not carry it. All four lenses flag this.  
-Fix: Add the threshold to the `proposal-state-badge` row or a `nearing expiry` row in § Proposal lifecycle.
-
-**[Inheritance discipline]** — Nav glyph `Search` is reused for two entries, contradicting the no-reuse rule (§ DESIGN.md:179 vs :187; AgentsFrontComposerRegistration.cs:171, :184)  
-Operational status and Audit evidence both get `Regular.Size20.Search` while the spine says an entry never reuses another entry's glyph. The shipped registration does the same, so the spine describes drift as if it were the decision.  
-Fix: One of the two renders without a glyph until the history glyph request lands; say which.
-
-**[Accessibility]** — The nearing-expiry threshold is a decision without a spine (§ EXPERIENCE.md:150, :341, :365; DESIGN.md:197, :275)  
-The badge takes a nearing-expiry flag nothing defines. With a 1-hour window the reconcile rule gives a 6-minute warning for a governed approval, and the timing that the WCAG 2.2.1 essential-exception argument depends on is unstated.  
-Fix: Put the threshold sentence in `proposal-queue-grid`, `proposal-state-badge`, and the Timing bullet, and state an explicit floor so a 1-hour window does not produce a warning too short to act on.
-
-**[Accessibility]** — Expiry and warning announcements do not scale on the queue (§ EXPERIENCE.md:340-341, :261, :155)  
-`expired` is an alert and the warning is a status event; `Expired` is derived on any read; the queue polls 25 rows sorted nearest-expiry-first. An Approver on the queue at the top of the hour can receive a burst of assertive alerts and up to 25 polite warnings.  
-Fix: Scope per-proposal alerts to proposal detail; on the queue announce an aggregate at most once per poll cycle in the status node, never as `role="alert"` unless the focused row is the one that expired.
-
-**[Accessibility]** — `IBadgeCountService` count renders as a bare number; the label rule stays conditional (§ EXPERIENCE.md:165; DESIGN.md:335; FrontComposerNavigation.razor:128-130, :166-168)  
-The shell emits the count as an unlabeled `FluentBadge`; `navigation.md` confirms badge labels are shell-owned. The spine's "if the shell exposes no label slot" fallback is the actual V1 behaviour, and a screen-reader user still hears "Agents, 3" on the rail.  
-Fix: State the fallback as the V1 rule, say whether Agents suppresses the shell count until the localizable label lands, and keep the FrontComposer request as the deferred item it is.
-
-**[Accessibility]** — The deterministic focus target "status region" shares its name with the live region (§ EXPERIENCE.md:289, :169, :336; DESIGN.md:351)  
-A developer can reasonably focus the live-region div, the one element that must never receive focus. The rule also does not require the target to be focusable.  
-Fix: Name the target as the item's status cell or badge container with `tabindex="-1"` and an accessible name including item identity and new state; state that the page-level live nodes never receive focus.
-
-**[Accessibility]** — "Polled re-renders never steal focus" is a promise without a mechanism (§ EXPERIENCE.md:155)  
-The queue sorts nearest-`ExpiresAt`-first and polls; `FluentDataGrid` keeps a focused cell only when rows are keyed and does nothing to stop a focused row moving to page 2 or off the filter.  
-Fix: Bind `ItemKey` to `AgentInteractionId` on both grids; while focus is inside the grid body, defer re-sort and page shifts and announce `{count} proposals changed. Refresh list` with an explicit refresh action.
-
-**[Accessibility]** — Selecting another version while the editor is dirty is unspecified and one keystroke away (§ EXPERIENCE.md:157, :156, :327; DESIGN.md:303, :299)  
-Version selection is a radio group whose value changes on arrow keys; nothing says what that does to unsaved edits (overwrite, block, or preserve), and a version change updates the textarea silently.  
-Fix: While dirty, version radios are `aria-disabled` with the reason, or the change opens the unsaved-changes confirmation; on change the textarea's accessible name is the version identity and the status node announces `Showing version {n}`.
-
-**[Accessibility]** — `high-impact-confirmation` relies on dialog behaviours Fluent v5 does not document (§ EXPERIENCE.md:168; DESIGN.md:347)  
-Fluent documents modal inertness and `PreventDismissOnEscape` but no initial-focus placement or focus restoration, and warns that custom action buttons disable the default Enter and Escape shortcuts. For approval the body renders the full version content, so at 320 px Confirm and Cancel can sit below the fold.  
-Fix: State the domain implements initial focus (`AutoFocus` on Cancel) and focus restoration; require `FluentDialogBody FixedHeaderFooter="true"` with a focusable, named scroll region; add Esc-with-custom-actions and Confirm-reachable-at-320-px to the conformance lane.
+**[Accessibility]** — Events that no node owns, on the exact states users wait in (§ EXPERIENCE.md:433-436, :265, :363-367, :346-349, :397, :424)
+The politeness table is presented as exhaustive, yet `Submitted`, **`awaiting projection`** (the catch-up-exhaustion outcome after an 8-second wait on every high-risk write), `pending in another session`, `safety blocked at approval`, `stale proposal`, `regeneration ceiling reached`, `duplicate submission (idempotent)` and the *recovery* half of connection loss are announced by nobody. In each case the change is carried by an adjacent badge whose text mutates — and the spine forbids that badge from being a live region.
+Fix: add the missing events to the table, or state explicitly which are deliberately silent and what carries them instead.
 
-**[Governance & audit]** — The currency rule is circular on a platform-scoped record (§ EXPERIENCE.md:154, :162)  
-The catalog says currency must equal the tenant budget currency; Cost controls say cap currency equals catalog pricing currency. A platform-scoped model has one currency while tenants have many, so "must equal" is evaluated against whichever tenant the operator is in.  
-Fix: The tenant budget currency on Cost controls is authoritative; the catalog validates only ISO 4217 well-formedness; a per-tenant mismatch renders `status-important` on that tenant's readiness view and blocks reservations; changing the budget currency after settled spend is a `TenantBudgetUpdate` whose confirmation states settled spend is not converted.
+**[Accessibility / Implementation readiness]** — The Shipped-code corrections inventory undercounts the drift for both new rules (§ EXPERIENCE.md:635, :636 vs 15 `role="status"` sites across 13 files; zero `DisabledFocusable` in `src/`)
+The table names five badge components; the shipped tree carries live regions in twenty files, including a private polite/assertive node per resolution command — on the exact controls whose announcements `AgentsPageStatusRegion` now owns. Double announcement at the approval moment is the defect the rewrite exists to prevent, and it survives a story-dev who works the table honestly. Same for the `Disabled` row, which names one control where eleven pages diverge.
+Fix: restate both rows as classes of divergence with site counts, or split into per-story rows so each story pays its own share.
 
-**[Governance & audit]** — Rate-limit refusal has no Agent-call state (§ EXPERIENCE.md:178, :237-239, :166; PRD FR-32)  
-FR-32 requires the reason when a call is refused for a per-Party or per-Conversation rate limit, but the table maps only `budget blocked` and `capacity rejected`. A story-dev will fold it into `budget blocked` and point users at a cap that is not the problem.  
-Fix: Add `rate limited` (`RateLimited`) with window and scope in the safe reason, `status-severe`, recovery "wait for the window", counted on Operational status; add the value to the must-grow list.
+**[Accessibility]** — The justification gate does not say which binding it uses, and the wrong one empties the dialog's tab cycle (§ EXPERIENCE.md:189, :193, :413 · DESIGN.md:355)
+An empty justification is a blocked-but-explicable state, so the spine's own rule requires `DisabledFocusable` — but the confirmation rows never say so. A developer reaching for `Disabled` produces a focus-trapped dialog whose only reachable controls are the textarea and Cancel, with nothing explaining that Confirm exists.
+Fix: state that Confirm is `DisabledFocusable` while the justification is empty or whitespace, with an `aria-describedby` reason, and that the same rule governs every gated Confirm.
 
-**[Governance & audit]** — The automatic path borrows proposal tokens for posting outcomes (§ EXPERIENCE.md:177-178, :242-244, :439-444; AgentCallOperationStatus.cs)  
-UJ-2 says the call enters `PostingPending` and renders `Posted`, but those are `ProposedAgentReplyState` values; `AgentCallOperationStatus` ends at `Generated` and the must-grow list omits the posting tokens Story 6.7 requires.  
-Fix: Add `PostingPending`, `Posted`, `PostingFailed` (typed reason, same bounded retry rule) to the `AgentCallOperationStatus` must-grow list and the Agent call table; name the status field carrying the posted `MessageId`.
+**[Accessibility]** — `superseded by another decision` and the action-rail table give opposite answers, and the loser loses focus (§ EXPERIENCE.md:342 vs :217, :364)
+One rule says resolution controls become `aria-disabled` on a concurrency rejection; the other says Edit/Regenerate/Approve are *absent* once `Approved` is projection-confirmed. For a second Approver sitting on the polling detail page, the two disagree. If the control vanishes while focused, focus falls to `document.body` silently, because the deterministic focus rule is scoped to the resolution *this* session submitted.
+Fix: rule for the non-actor explicitly — focus moves per the deterministic rule and the polite node announces the authoritative state; `aria-disabled` with the `superseded` reason wins for a viewer who did not act, absence is reserved for a fresh render.
 
-**[Governance & audit]** — The nearing-expiry threshold is not in the spines (§ EXPERIENCE.md:150, :155; DESIGN.md:197, :275; reconcile § 3)  
-Both spines render the chip and pass the flag; the 10 % or 1 hour rule lives only in the reconciliation and memlog.  
-Fix: State in the `proposal-state-badge` row: nearing expiry begins at 10 % of the configured window or 1 hour before `ExpiresAt`, whichever is smaller; the flag is server-computed against `ExpiresAt`.
+**[Accessibility]** — `FcStatusFilterChips` is still mandatory on the Provider catalog, where its label contract can never be satisfied (§ EXPERIENCE.md:203, :180 vs FcStatusFilterChips.razor)
+In source the label is `slot.ToString()` — always an unlocalized English enum name, for every slot, on every grid — so "where its label contract allows" describes an empty set. A developer honouring the mandate ships readiness filters visibly reading `Success`, `Warning`, `Danger` on a French tenant, breaking the parity gate, announced as "Success, filter inactive": a colour name where a readiness meaning belongs.
+Fix: extend the queue's disposition to both grids and delete "where its label contract allows", which currently reads as permission.
 
-**[Governance & audit]** — Restricted safety categories are unaddressed when the mode switches to Automatic (§ EXPERIENCE.md:151, :161; PRD FR-26)  
-Restricted categories are permitted only with Confirmation Response Mode, but switching to Automatic is a separate `AgentSetupMutation` whose confirmation says nothing about them: restricted content either posts automatically or every call fails safety with no visible cause.  
-Fix: The `response-mode-toggle` confirmation states any permitted restricted category is blocked while Automatic is active, or the mode change is blocked with a named blocker; `content-safety-policy-editor` shows the effective mode beside each restricted row.
+**[Implementation readiness]** — The mandated `FcFilterResetButton` cannot reset the filters the spine actually applies (§ FcFilterResetButton.razor.cs:52 · FilterEffects.cs:140-146 vs § Grid rules)
+Reset dispatches into the shell's Fluxor `DataGridNavigationState` snapshot, while the 09-09 revision moved the queue's filters into Agents-owned `aria-pressed` toggles holding their own state. Nobody is told to read the snapshot back or dispatch the shell's filter actions from the toggles. Both grids get a Reset that clears a snapshot nothing reads while the applied filters survive — and the mandated filtered-empty state is unrecoverable.
+Fix: choose one and say it in § Grid rules — the Agents filter state *is* the shell snapshot, or `FcFilterResetButton` comes off the mandatory list and Agents owns the reset control.
 
-**[Governance & audit]** — Per-Conversation `safety blocked` history is shown to `Agents.Operator` with no Conversation-access rule (§ EXPERIENCE.md:166 vs :167; PRD OQ-18, FR-24)  
-Conversation identity plus "permanently blocked for unsafe historical content" is Conversation-derived information about a specific Conversation, visible to an operator who may not be a participant, while `audit-evidence-panel` requires current read access for the same class.  
-Fix: The history row shows an opaque Conversation reference and count; name or link renders only with current read access; otherwise `existence only`.
+**[Implementation readiness]** — Twelfth divergence, unlisted: the shipped UI has no CSS at all behind ~115 BEM class names (§ src/Hexalith.Agents.UI vs DESIGN.md § Layout & Spacing)
+No `.css`, no `.razor.css`, no `wwwroot`, no style block, no inline style. Every layout instruction — the spacing rhythm, `scroll-padding`, logical RTL rails, reserved stable space for badges — and `{typography.mono}` has no delivery mechanism, no owning story and no corrections row. The single largest unowned build decision in the pair. Positive: zero legacy v4/FAST tokens anywhere in `src/`, so there is no migration backlog to allowlist.
+Fix: add a row naming the delivery decision — Fluent component parameters plus Fluent 2 tokens per the repo law, versus one Agents stylesheet for layout the design system does not own — with an absorbing story.
 
-**[Governance & audit]** — The harness removal condition is weaker than Story 6.7's absence requirement (§ EXPERIENCE.md:68, :156, :261; AgentsFrontComposerRegistration.cs:139-147; ProposalDetail.razor:227)  
-"Removes or blocks" leaves a blocked route as an alternate entry with an `[Authorize]` surface, which `AlternateInvocationGuardTests` must prove absent. The shipped `Start a new Agent Call` link targets the harness, and the spine never says where it goes once the harness is gone or what policy guards it meanwhile.  
-Fix: "Removed: route unregistered and page deleted before Story 6.7 closes"; while it exists the harness carries `Agents.Administrator`, is excluded from `LR-UI-CONFORMANCE`, and writes nothing in production-like profiles; `Start a new Agent Call` navigates to the Source Conversation.
+**[Implementation readiness]** — Twelfth divergence, unlisted: the two `not available` keys do not exist and the keys they replace do (§ AgentsResources.resx / .fr.resx vs § Voice and Tone)
+The resx files carry no `Agents.Surface.NotAvailable.*` key at all, and do carry exactly the per-cause set the rule calls "a conformance failure, because differing copy is itself a disclosure channel". Worse, the section ends "the resource file wins" — read literally, the shipped per-cause copy wins over the rule that forbids it, reopening a disclosure channel the spine believes it closed.
+Fix: add a corrections row for the per-cause copy with an absorbing story, and narrow the enforced-source sentence to *wording of existing keys*, not key inventory.
 
-**[Governance & audit]** — `high-impact-confirmation` defines required contents for only three of nine families (§ EXPERIENCE.md:168, :161-164, :152)  
-Approval, pricing, and Provider disable get explicit contents; `PolicyPublication`, `TenantBudgetUpdate`, `AgentActivation`, `AgentSetupMutation`, `LegalHold`, `ExportRequest` get the generic sentence, although FR-32 requires prior and new cap values and activation must show the evaluated gate set.  
-Fix: Add a per-family required-contents table to the `high-impact-confirmation` row; the rendered contents are the values the audit record will carry.
+**[Implementation readiness]** — The register's `EXT-CONV-UI-1` describes a seam the spine no longer wants (§ external-dependency-register.md vs § Conversation Integration Seam)
+The spine requires two artifact kinds, an Agents-side provenance accessor and `GetCallabilityAsync(tenant, conversation)`. The register carries only the action contribution plus provenance markers "carried in message metadata" — Conversations rendering from its own data, an incompatible design for the same marker. Neither the decoration slot nor the callability query appears in the register. A Conversations maintainer accepting the register's fields would deliver something Story 6.7 cannot consume.
+Fix: amend the register to the spine's additions, or adopt the metadata-carried design in the spine and delete the Agents-side accessor. Do not leave both standing.
 
-**[Governance & audit]** — Approver-policy publication is future-only while AD-12 snapshots policy per interaction (§ EXPERIENCE.md:153, :330; ARCHITECTURE-SPINE.md AD-12)  
-A revoked approver keeps authority over every pending proposal, and the admin who just published the revocation is told the opposite.  
-Fix: The `PolicyPublication` confirmation states pending proposals keep the policy they were created under; the surface shows the count of pending proposals under each prior version with a link to the queue filtered by policy version.
+**[Implementation readiness]** — `epics.md` Story 6.7 still says there is no external seam, so two of three documents call it ready (§ epics.md:1841 · register `ConsumingStories: TBD` vs § Conversation Integration Seam)
+The spine blocks 6.7 from `ready-for-dev` under FR-21; the epics file and the register both read as unblocked. Two of the three documents a sprint planner reads say 6.7 is ready. The governance lens rates this blocking rather than clerical: a dev ships the invocation path without the contributed action.
+Fix: land the two-line edit before Epic 6 planning; until then the spine's own rule is the only thing holding the gate.
 
-**[Governance & audit]** — Export and deletion have no fail-closed rendering while `EXT-SECRETS-1` is Uncommitted (§ EXPERIENCE.md:164; DESIGN.md:331; external-dependency-register.md § EXT-SECRETS-1)  
-Stories 8.2 and 8.3 are blocked on the seam; the panel as written lets a story-dev render enabled Export and Delete buttons that submit into a dependency that cannot resolve keys, and never states artifact expiry or that no plaintext is rendered.  
-Fix: Export and deletion render `aria-disabled` with `authority unresolved` treatment naming the dependency while it is not Available; export rows show manifest state, expiry, and download availability; the panel never renders artifact contents or keys.
+**[Implementation readiness]** — The Provider-disable blast-radius query has no home and no interim, and the consuming story ships first (§ § Known gaps vs epics.md:1374-1391 · ARCHITECTURE-SPINE.md:151)
+The spine assigns the by-Provider/model query to Story 5.5; 5.5's ACs specify an *operation-family* readiness request and no such query, and Architecture has none either. The disable action ships in Story 5.3, **before** 5.5. Every other 5.5-dependent rendering has an interim; this one has none, so a 5.3 dev must invent the query or ship a confirmation the spine forbids as incomplete.
+Fix: add the interim to the `provider-catalog-grid` row (platform scope named, in-scope-Agents list and cross-tenant count as a deferred metric), or move the query's ownership to 5.3.
 
-**[Implementation readiness]** — The mandatory FC-TBL components require a `ViewKey` the spine never assigns (§ EXPERIENCE.md:154-155; datagrid.md:43, :90)  
-`FcFilterEmptyState`, `FcFilterResetButton`, `FcExpandInRowDetail`, and `FcStatusFilterChips` all take a `ViewKey`; view-key mismatches fail closed, and Agents has no generated lane to inherit one from.  
-Fix: Assign one `ViewKey` per grid (`agents.provider-catalog`, `agents.pending-proposals`) and the `BadgeSlot` mapping for status chips.
+### Medium (33)
 
-**[Implementation readiness]** — `Appearance.Accent` does not exist in Fluent v5 (§ DESIGN.md:152, :347, :357, :367)  
-`ButtonAppearance` is Default, Outline, Primary, Subtle, Transparent; `Accent` is the v4 name the spine forbids elsewhere. Every `high-impact-confirmation` and the Approve button reference it.  
-Fix: `ButtonAppearance.Primary`.
+**[State coverage]** — Four of the 13 routes have no page-component binding and therefore no state-slot mapping (§ EXPERIENCE.md:442, :501 · DESIGN.md:120-135). Agents overview, Operational status, Launch readiness and the Audit evidence list are FullWidth non-grid routes with no page component named, so their loading, error, `not available` and `Degraded` slots and their heading/focus mechanism are unspecified — against the section's own "every route" rule. Agents overview also has no empty or cold-load treatment. *Fix:* name the page component and the state-slot rule, or state they are hand-authored and carry the domain `FcPageHeader` pattern directly.
 
-**[Implementation readiness]** — `FcAggregateDetailPage` has no `Heading`, `HeadingTabIndex`, or `PageTitle` (§ EXPERIENCE.md:345, :407; FcAggregateDetailPage.razor:10; ProposalDetail.razor:15-19)  
-Those parameters live on `FcPageHeader`, which the detail page expects the domain to supply; the shipped proposal detail already does it that way.  
-Fix: Reword the route-heading rule to "`FcAggregateListPage`, or `FcAggregateDetailPage` with a domain-supplied `FcPageHeader`", focus via `FocusHeadingAsync()`.
+**[State coverage / Governance]** — `Abandoned` reasons are incomplete and untyped (§ EXPERIENCE.md:333 vs prd.md:391-392, :236). FR-18 names four *typed* reasons carried in status and audit and requires system-abandoned proposals to be excluded from the SM-3 denominator and reported separately. Two reasons are missing, none is typed, and the separate-reporting requirement reaches no Operational status row; four missing tokens are four missing resource keys. *Fix:* enumerate the four with a localized label each and add system-abandoned as a separate count.
 
-**[Implementation readiness]** — The nearing-expiry threshold is not in the spines and no contract carries the flag (§ EXPERIENCE.md:150, :155, :341; DESIGN.md:275; PendingProposalView; ProposalDetailView)  
-The rule exists only in the reconcile file and memlog; the views carry no flag, so the client computes it from nothing.  
-Fix: Add the threshold sentence to the `proposal-state-badge` row and say it is client-computed from `ExpiresAt` and the configured window.
+**[State coverage]** — The pre-post re-validation set is reduced to its safety third (§ EXPERIENCE.md:231 vs prd.md:397-398). FR-18 requires four checks immediately before posting, including that `hexa` is still a member of and not blocked in that Conversation. Three of the four failure causes have no typed reason, no copy row and no confirmation line. *Fix:* enumerate the four checks in the retry confirmation and give each failure cause a `PostingFailed` typed reason.
 
-**[Implementation readiness]** — Regeneration ceiling default and range are undocumented and have no contract (§ EXPERIENCE.md:152; prd.md:565; ProposalDetailView; epics.md Story 5.2)  
-The field has no contract, no Story 5.2 acceptance criterion, and the detail view has no regeneration count for the editor's ceiling check.  
-Fix: State the numbers in the row (decision or Product deferred item with placeholder); add `RegenerationCount`/`RegenerationCeiling` to the contracts-must-grow list with owner 7.3.
+**[Inheritance discipline]** — The regeneration-ceiling deferral is stale and quotes its own source wrongly (§ EXPERIENCE.md:177 vs prd.md:634, A-6 at :752). The spine flags the numbers for Product sign-off "because FR-32 states only 'a documented default and a valid range'"; FR-32 now states 3 and 1–10, and A-6 owns them. The numbers are right; the stated reason is false against its own source. This is the run's one *partial* regression. *Fix:* cite FR-32 and A-6, drop the clause, and replace the deferral with a pointer to A-6.
 
-**[Implementation readiness]** — Segregation-of-duties checks need the viewer's Party id; no seam is named (§ EXPERIENCE.md:156)  
-Blocking approval when the Approver last edited the version or is the sole Approver of their own call requires comparing `EditorPartyId`/`CallerPartyId` with the current user; the server rejects anyway, but the `aria-disabled` pre-state cannot render.  
-Fix: Name the source: a per-version `CanCurrentUserApproveSelectedVersion` flag from Story 7.4, or a current-Party accessor.
+**[Bloat & overspecification]** — Eight of the 22 DESIGN component sections carry behavior EXPERIENCE already owns, against that section's own preamble (§ DESIGN.md:269 vs :287, :291, :299, :307, :315, :319, :339, :359). Two-place statements drift — and the reconcile file records this exact cleanup being performed on two sections in this run, so the other eight were missed. `agent-response-marker` additionally carries two literal copy strings, which is § Voice and Tone content. *Fix:* cut each to its visual delta and point at the matching EXPERIENCE row.
 
-**[Implementation readiness]** — Approver policy disclosure category is per row in the spine and per policy in the contract (§ EXPERIENCE.md:153; prd.md:210; AgentApproverPolicy; ApproverPolicySource)  
-`AgentApproverPolicy(Sources, DisclosureCategory)` carries one category per policy; `ApproverPolicySource` has none, and Story 5.4 has no instruction to move it.  
-Fix: Add `ApproverPolicySource.DisclosureCategory` to "Contracts that must grow" with owner 5.4.
+**[Governance]** — `CanCurrentUserApproveSelectedVersion` carries two of the five Eligible Approver conditions (§ EXPERIENCE.md:181, :617 vs prd.md:91). The glossary names five conjuncts including current Participant membership and read access, both of which FR-7 requires re-checked at seven moments. A pre-state narrower than the server rule produces an enabled Approve the server refuses, training approvers to treat refusal as a glitch. *Fix:* state that the flag returns the full predicate with one typed reason per failing conjunct.
 
-**[Implementation readiness]** — Tenant budget currency has no source before Story 8.4 (§ EXPERIENCE.md:154)  
-The pricing mismatch rule cannot be evaluated by Story 5.3, which ships first.  
-Fix: Interim rule: before 8.4 render currency as entered with no mismatch state; after 8.4 the budget policy read model supplies the comparison value.
+**[Governance]** — "Absent, not disabled" is stated three times and contradicted by the layout contract (§ EXPERIENCE.md:80, :179 · DESIGN.md:299 vs :248). The layout table maps the Provider catalog to an Editor accordion item unconditionally and the component has no no-mutation variant, so a dev renders the Editor and hides its buttons — "disabled" with extra steps, leaking the field inventory including the secret-reference control. *Fix:* add a `read-only (no mutation policy)` variant and state that the Editor accordion item itself is absent in it.
 
-**[Implementation readiness]** — Live-region ownership contradicts shipped components and names no carrier (§ EXPERIENCE.md:336, :310; shipped badge components; FrontComposerShell.razor:146)  
-Five shipped badge components each render `role="status"` and panels carry their own regions, so a route has 5 to 10 live regions today; the shell already announces connection loss. No component is named for the two Agents nodes.  
-Fix: Name the carrier component, say badges must not carry `role="status"`, and state whether `connection lost` is shell-announced or Agents-announced.
+**[Governance / Accessibility]** — `/agents/audit` as an id-entry surface removes the ability to ask whether anything is missing (§ EXPERIENCE.md:72 · DESIGN.md:241 vs FR-24, SM-5 at prd.md:827). FR-24 requires compliance inspection to be "rate-visible" — a rate is a list property — and SM-5 requires completeness across a population. On a surface where you must already know each identifier, the inverse question cannot be asked. Defensible for *content* surfaces; not for the configuration-and-governance evidence class, which contains no Conversation content. *Fix:* keep id entry for interaction and proposal evidence; add an enumerable tenant-scoped list for governance evidence and compliance-inspection records.
 
-**[Implementation readiness]** — The SignalR nudge has no seam (§ EXPERIENCE.md:195; ARCHITECTURE-SPINE.md; FrontComposer Contracts/Communication)  
-The Architecture Spine has no SignalR or polling text, `src/` has no hub client, and FrontComposer exposes `IProjectionChangeDetailNotifier` and `PendingCommandPollingCoordinator`. A dev either ignores the nudge or invents a hub.  
-Fix: Name `IProjectionChangeDetailNotifier.ProjectionChangedDetail` as the nudge source filtered by the authoritative projection ids; keep the Architecture pin as the deferred item it is.
+**[Governance]** — The governance evidence contract names the actor but not the tenant, the role basis, or the outcome (§ EXPERIENCE.md:192 vs prd.md:434, :441). "The acceptance stages the command passed" describes progress, not outcome. *Fix:* add tenant, FR-33 role basis and typed outcome (accepted / rejected on concurrency / denied on authorization), and render the role basis in the confirmation so the confirmation set and the audit record still match.
 
-**[Implementation readiness]** — The single `not available` deep-link state has no copy key (§ EXPERIENCE.md:69, :308; AgentsResources.resx:32-39)  
-Identical copy, status class, and timing are required for unauthorized, foreign-tenant, and non-existent ids; the Voice table has no row and the shipped keys carry different copy per case.  
-Fix: Add `Agents.Surface.NotAvailable.Title/Message` EN/FR to the Voice table and bind the detail-page `Unauthorized`/`NotFound` states to it.
+**[Governance]** — The launch-readiness panel cannot render the blocker class that the deferred items produce (§ EXPERIENCE.md:188 vs prd.md:614). Any unretired §8.1 Product/Architecture/Governance assumption is an `RQ-1` blocker `UnretiredAssumption`, and every deferral in the reconciliation maps to such a row (A-14, A-6, A-7, A-12, A-13) — so the spine's own deferred list is precisely what blocks `RQ-1`, and the panel has no row class for it. *Fix:* add `UnretiredAssumption` as a blocker class with assumption id, owner and retirement condition.
 
-**[Implementation readiness]** — Story 6.2 and the Operational status extras are named as owners without acceptance-criteria coverage (§ EXPERIENCE.md:54, :160, :166; epics.md:1571-1620)  
-Story 6.2's criteria never mention a UI read model or route; per-tenant blocked counts, per-Conversation safety-blocked history, cost consumption, and projection id/version have no contract and only the 6.1 failure record is named.  
-Fix: Record both as deferred items for the epics skill so the owner is a story acceptance criterion, not a spine assertion.
+**[Accessibility]** — The essential-exception argument for proposal expiry is not a 2.2.1 argument, and it will be cited as one (§ EXPERIENCE.md:468, :177). The spine rests the exception on the 15-minute nearing-expiry floor. That conflates two independent allowances: the *warning* allowance requires 20 seconds' notice **and** ten extensions, which the spine explicitly lacks; the *essential* exception requires no warning at all, so a floor neither strengthens nor is required by it. The window is also administrator-configurable and not adjustable by the Approver who meets it, so "Adjust" is unavailable too, and the essential claim itself is asserted rather than argued. Product is being asked to sign a conformance position stated on the wrong ground. *Fix:* rewrite as an essential-exception claim on its own merits, state the floor as a usability commitment, and record that none of Turn off / Adjust / Extend is satisfied.
 
-**[Implementation readiness]** — The audit evidence list route is unspecified (§ EXPERIENCE.md:61, :167; DESIGN.md:236; AuditEvidenceResult)  
-`/agents/audit` is FullWidth and a list, and also hosts evidence lists for cost and governance, but no list contract, columns, filters, or sort exist; the mandatory grid components cannot apply to a grid with no columns.  
-Fix: Declare the list an id-entry surface with no grid, or give it a list contract and owning story.
+**[Accessibility]** — The nearing-expiry chip is the one status in the system with no text (§ DESIGN.md:283, :213, :211 · EXPERIENCE.md:336). No visible string is defined and none exists in the Voice and Tone table, while DESIGN mandates "a Fluent semantic role plus one glyph plus visible whole-string text" — so a colour-plus-triangle chip breaks the spine's own no-colour-only rule at the one place a time limit is communicated, and in forced-colors the triangle carries it alone. *Fix:* define the chip's whole string and French form, and the announcement string separately.
 
-**[Implementation readiness]** — Provider disable blast radius has no query (§ EXPERIENCE.md:154)  
-The confirmation lists in-scope Agents whose callability will be blocked and a cross-tenant count; nothing returns Agents by Provider/model.  
-Fix: Name the query, or say the Story 5.5 readiness result supplies it.
+**[Accessibility]** — The allow-list of FrontComposer speakers is written as if closed but is not (§ EXPERIENCE.md:426). Eight more Shell nodes can speak on a grid page without violating any spine rule, including `FcMaxItemsCapNotice` (the queue's page size is 25, precisely the cap case), `FcNewItemIndicator` (which would defeat the aggregated change announcement) and `FcStatusBadge`, whose `role="status"` would silently re-create the per-badge defect Story 8.6 is removing — including on the deterministic focus target. *Fix:* make the list closed and name `FcStatusBadge` and `FcNewItemIndicator` as forbidden.
 
-### Low (30)
+**[Accessibility]** — Most announced strings have no key, and the parity gate cannot catch it (§ EXPERIENCE.md:433-436 vs :112-138, :159). Roughly twenty-four announced events; whole strings for about eight. The gate enforces parity of *keys that exist*, so a hard-coded English announcement passes. For these states the announced string is the only UI a screen-reader user has. *Fix:* require a named key per politeness-table event and add the missing rows with French forms.
 
-**[Flow coverage]** — `AgentCallOperationStatus.Requested` has no row in the Agent call table (§ EXPERIENCE.md:228-244)  
-`submitted` is local only and `authoritative pending` is accepted identity plus projection reference, so which UX state the shipped `Requested` value renders as is unstated.  
-Fix: One clause: `Requested` renders as `authoritative pending`.
+**[Accessibility]** — The deterministic focus target may be nameless to AT (§ EXPERIENCE.md:364). A bare `div`/`td` has the generic role, and ARIA prohibits an accessible name on `role="generic"` — so the identity-plus-state string the whole pattern turns on can be silently dropped. *Fix:* use `role="group"` or a visually-hidden name node, and assert the announcement in the AT matrix.
 
-**[Token completeness]** — `agent-readiness-badge` colour list omits `status-subtle` (§ DESIGN.md:62, :267)  
-The frontmatter lists four roles, but the section also renders lifecycle `active` as a `{colors.status-subtle}` chip.  
-Fix: Add `{colors.status-subtle}` to the list.
+**[Accessibility]** — Read literally, the every-state-slot rule puts two `h1`s and two `PageTitle`s on the Degraded state (§ EXPERIENCE.md:442 vs FcAggregateDetailPage.razor). `Degraded` is not a slot: the banner renders *above the ready body*, which already has the ready header. *Fix:* enumerate the five real slots and state that the stale/degraded banners carry no heading.
 
-**[Token completeness]** — `rounded` and `colors.*` are note objects, not the spec's literal types (§ DESIGN.md frontmatter)  
-Neither is resolver-flattenable. Same convention as the Tenants precedent the spine lists as a source.  
-Fix: Note only; keep the convention or convert when Tenants does.
+**[Accessibility]** — "Renders without a glyph" is not reachable through the registration contract (§ DESIGN.md:193, :180 vs FrontComposerNavigation.ResolveNavEntryIcon). The shell returns `Apps20` whenever `TryCreate` fails, including for a null key — and `Apps20` is Overview's own glyph. So the six entries listed "Glyph today: none" all render Overview's glyph, making seven Agents tiles identical in the icon-only rail. The spine's assertion is false against the shell it inherits, and it is the assertion that was supposed to prevent glyph reuse. *Fix:* state the truth and decide — accept the duplication with the requests raised, hold those entries out of the icon-only rail, or request a null-icon path.
 
-**[Component coverage]** — `ConversationAgentCallPanel` and `conversation-agent-call` are not stated to be the same artifact (§ EXPERIENCE.md:81, :158; DESIGN.md:305)  
-The seam names an exported panel while the component carries a kebab name; nothing links them.  
-Fix: One clause in the `conversation-agent-call` row: shipped as `ConversationAgentCallPanel`.
+**[Accessibility]** — The audit-evidence id-entry surface has no accessibility contract at all (§ EXPERIENCE.md:72 · DESIGN.md:241). Removing it from FC-TBL removed its state contract and nothing replaced it: no visible label, no statement of which reference kinds it accepts, no behavior for an unrecognised or unauthorized reference, and no announcing node. This is the entry point to every audit investigation and it is one unspecified text box. *Fix:* specify it as a form under the existing Forms rules, with `not available` on an unresolvable reference and that outcome added to the politeness table.
 
-**[Bloat & overspecification]** — Component Patterns cells run to 150 to 200 words of unbroken prose (§ EXPERIENCE.md:154, :156, :161, :168)  
-The content is real rules, so this is extraction friction, not bloat; the memlog records the column schema as left by decision.  
-Fix: Optional: a `### name` subsection with a bullet list per high-density component.
+**[Implementation readiness]** — "The mandatory FC-TBL component set" misattributes an Agents decision to FrontComposer (§ fc-tbl contract vs three places in the pair). FC-TBL defines a frozen 14-type surface plus generated-grid envelope rules; it does not define a four-component usage mandate. A dev who opens the contract will not find it, and will not know whether the envelope rules bind a hand-authored grid. *Fix:* relabel the four as Agents-owned and state which envelope rules carry over.
 
-**[Bloat & overspecification]** — Two rules are stated in both spines (§ EXPERIENCE.md:148, :215, :492 and DESIGN.md:267; DESIGN.md:240 and EXPERIENCE.md:346)  
-The production-enablement indicator rule appears four times; the accordion heading level rule twice.  
-Fix: Keep one statement per spine and reference it.
+**[Implementation readiness]** — `FcExpandInRowDetail` has three `[EditorRequired]` parameters the spine never supplies (§ FcExpandInRowDetail.razor.cs:40-71). `DetailPanelAriaLabel` and `HasExpanded` are unassigned. *Fix:* add the label to the localization inventory as a per-grid whole string and name `HasExpanded`'s source.
 
-**[Inheritance discipline]** — PRD FR-18 names seven proposal states; the spine has ten (§ EXPERIENCE.md:248; prd.md:355)  
-`Edited`, `Regenerated`, `PostingPending` follow the contract enum but the PRD does not name them; only the `PostFailed`/`PostingFailed` alias is noted.  
-Fix: One sentence explaining the fold, and raise PRD/contract alignment with Product.
+**[Implementation readiness]** — Launch readiness is a third `FluentDataGrid` governed by nothing (§ DESIGN.md § launch-readiness-panel vs § Grid rules · LaunchReadiness.razor:100-127). No wrapper, no `ViewKey`, no `ItemKey`, no distinguished states, no 320 px surviving-column set — while every other grid rule exists because those things were needed. Shipped as a raw `<table>`. *Fix:* bring it under § Grid rules, or state it is a plain read-only grid and give it the 320 px column list.
 
-**[Inheritance discipline]** — `AgentsResourcesParityTests` is named as the enforced gate but does not exist (§ EXPERIENCE.md:134; test/Hexalith.Agents.UI.Tests/LocalizationResourceTests.cs)  
-The shipped gate is `LocalizationResourceTests`; the spine reads as if the named class exists.  
-Fix: Say "`AgentsResourcesParityTests` (today `LocalizationResourceTests`; rename or add)" with the owning story.
+**[Implementation readiness]** — Two page-like surfaces with sibling titled sections are outside the accordion table the repo law requires (§ DESIGN.md § operational-status-panel, § audit-evidence-panel). Six recovery-action groups and two evidence classes respectively; the table naming the primary item covers only four surfaces. *Fix:* extend the table to every multi-section route, or state that the component rows are authoritative.
 
-**[Accessibility]** — The `aria-disabled` pending control is an attribute, not the Fluent binding that produces it (§ DESIGN.md:351; EXPERIENCE.md:169)  
-`FluentButton` exposes `DisabledFocusable="true"` for exactly this; `Loading="true"` removes focusability and would reintroduce the prior critical.  
-Fix: Bind `pending-command-indicator` to `DisabledFocusable="true"` and forbid `Loading`/`Disabled` on the activated control.
+**[Implementation readiness]** — Two superseded shipped types are named in behavioral rows but have no absorbing story (§ AgentReadiness.cs `MapState`, `ProviderReadinessState` at :48-70). The UI-local enum has no `OperationalState`, `Callability`, `ReasonCode`, `CapabilityVersion`, `ObservedAt` or `ValidUntil`. *Fix:* one corrections row mapping both to Story 5.5.
 
-**[Accessibility]** — Forms state error association but not error content, required marker, or validation timing (§ EXPERIENCE.md:349-354)  
-WCAG 3.3.1 and 3.3.3 need each error to name field, fault, and fix; nothing says required fields carry a visible marker or whether validation runs on submit or on blur.  
-Fix: Three sentences: error text is field plus fault plus fix as one localized string; required fields show a visible marker; validation on submit with per-field re-validation on blur only after first submit.
+**[Implementation readiness]** — `AgentCallOperationStatus` and `AgentReadinessStatus` growth is specified nowhere but the spine, and the additive rule is unstated (§ src/Hexalith.Agents.Contracts/Operations vs ARCHITECTURE-SPINE.md). Architecture mentions neither enum, though it specifies a versioned additive reason code whose unknown values fail closed. No Epic 6 story is blocked, but the enums carry no counterpart of that rule. *Fix:* state that both are versioned additive and an unknown value renders `authoritative pending`, never Success, never a terminal.
 
-**[Accessibility]** — Status badges will be read twice if the icon also carries a label (§ DESIGN.md:207)  
-`FluentBadge.IconLabel` sets `aria-label` on the icon, so "checkmark circle, Posted" is the likely output.  
-Fix: When visible text is present the glyph is decorative; the accessible name is the text.
+**[Implementation readiness]** — The projection nudge binding is correct but incomplete, and Architecture still has nothing (§ IProjectionChangeNotifier.cs:49 · EventStoreServiceExtensions.cs:88). The member exists and is DI-registered, so the row is buildable — but the spine does not say the registration arrives through the EventStore extension (a host that skipped it gives a DI failure at first render), and Architecture has zero occurrences of poll / nudge / SignalR / `catching up` while the two shipped paths run 250 ms/5 s and 200 ms/8 s. *Fix:* name the registration extension and keep the Architecture deferral visible at the point of use.
 
-**[Accessibility]** — The proposal queue at 320 px has six pinned columns and no stated minimum set (§ DESIGN.md:295; EXPERIENCE.md:385)  
-WCAG 1.4.10 allows contained two-dimensional scrolling for data tables, but the spine should claim it and name the surviving columns.  
-Fix: Name the 320 px column set (state, expiry, open action) and state the grid scrolls inside its own container, never the page.
+**[Implementation readiness]** — `IBadgeCountService` suppression is real but it is not a switch (§ IBadgeCountService.cs:29 · FrontComposerNavigation.razor:128-130 · ServiceCollectionExtensions.cs:338). No label member, no parameter slot, no `[Parameter]` on the navigation component, registered `AddScoped` with a required consumer — so there is no domain opt-out. The count stays suppressed *only* because Agents declares no `ActionQueue` projection, leaving the `count > 0` gate closed. The claim holds by construction, not by configuration. *Fix:* state the mechanism as a standing constraint — the day any Agents projection is marked `ActionQueue`, an unlabelled number appears in the rail and cannot be turned off.
 
-**[Accessibility]** — Esc in the Call hexa dialog discards a typed prompt (§ EXPERIENCE.md:327; DESIGN.md:307)  
-The Esc rule protects the proposal editor, not the required prompt textarea.  
-Fix: Extend the rule to any non-empty text input inside a dialog: confirm before discarding, or keep the draft per session.
+**[Implementation readiness]** — Story 6.2 owns a route its acceptance criteria never mention (§ epics.md:1585-1607 vs § Information Architecture). No UI read model, no route, and none of the tokenizer basis, reserved output allowance, safety margin or Agent Instructions size the panel renders. The route is unbuildable and the owning story does not know it owns it. Same for the Operational status extras. *Fix (Epics):* one AC clause each.
 
-**[Accessibility]** — `FcAggregateDetailPage` back link needs a localized `BackLinkLabel` (§ FcAggregateDetailPage (ShowBackLink default true))  
-An unset label yields an anchor with no accessible name; HFC1050 does not fire on framework components.  
-Fix: Require a localized `BackLinkLabel` or `ShowBackLink="false"` on every detail route.
+**[Implementation readiness]** — `sprint-status.yaml` is still not regenerated and is now a full epic-set behind (§ _bmad-output/implementation-artifacts/sprint-status.yaml). It tracks superseded `5-1 … 5-18` slugs and **stops at `epic-5`; Epics 6, 7 and 8 are absent entirely**, so no story in Epics 6–8 can be picked up, sequenced or reported. The brownfield-drift review already cites stories the file does not contain. *Fix:* regenerate against Epics 5–8 before Epic 6 planning.
 
-**[Accessibility]** — No language-of-parts rule for generated and Conversation-derived text (§ EXPERIENCE.md § Accessibility Floor)  
-The editor textarea, preview, and evidence show text whose language is the Conversation's, not the UI culture; nothing sets `lang`.  
-Fix: Content regions carry `lang` from the Provider result or Conversation language when known; otherwise inherit.
+### Low (21)
 
-**[Accessibility]** — Regenerate is chargeable but has no double-activation guard (§ EXPERIENCE.md:156, :284)  
-Regeneration is not in the nine high-risk families, so it has no pending indicator; Enter twice can queue two chargeable generations.  
-Fix: Apply `DisabledFocusable` plus a local pending badge to Regenerate while in flight, without adding it to the confirmation families.
+**[Token completeness]** — `spacing` is the one token group given as literal px with no Fluent equivalence named (§ DESIGN.md § Layout & Spacing). A dev reading `{spacing.4}` has no signal whether to write `FluentStack Gap`, `--spacingVerticalL`, or `gap: 16px`. Compounds the no-CSS-delivery finding. *Fix:* one clause giving the Fluent 2 token or `FluentStack Gap` equivalent per step.
 
-**[Accessibility]** — Type-to-confirm for deletion is left as an undecided conditional (§ EXPERIENCE.md:168)  
-"If type-to-confirm is used ... the 3.3.7 exception is recorded" is a conditional with no decision.  
-Fix: Decide (recommended: no type-to-confirm; the `DeletionRequest` confirmation names scope and count) and delete the "if".
+**[Visual reference coverage]** — The spine-only decision lives in one spine and carries a stale date and a stale count (§ EXPERIENCE.md:43 · .memlog.md:38). Dated "2026-08-02, reaffirmed 2026-09-08" on files updated 2026-09-09, over "14 IA surfaces" against a 15-row table, and absent from DESIGN.md entirely. *Fix:* reaffirm with the current date, align the count, and add one clause to DESIGN § Brand & Style.
 
-**[Accessibility]** — Pointer cancellation and motion are inherited without being claimed (§ EXPERIENCE.md § Accessibility Floor)  
-Fluent buttons activate on click and `FluentMessageBar` animation is opt-in, so both pass by default, but a developer can drift.  
-Fix: Add "no custom `pointerdown`/`mousedown` activation; no `MessageBarAnimation`" to the floor.
+**[Bloat & overspecification]** — `## FrontComposer Readiness` is a pure cross-index carrying no decision of its own (§ EXPERIENCE.md:485-503). All 13 rows resolve elsewhere. *Fix (optional):* fold the four rows carrying a real constraint into their owning sections and drop the table.
 
-**[Governance & audit]** — The override is "bounded" with no bound (§ EXPERIENCE.md:162, :489)  
-Actor, justification, scope, and expiry are recorded, but not the amount or maximum, nor where the active override is visible to the Operator.  
-Fix: The override carries a numeric ceiling and an expiry shown in the confirmation; Operational status shows the active override with remaining amount and time.
+**[Bloat & overspecification]** — A handful of EXPERIENCE sentences argue for a review finding rather than stating a rule (§ EXPERIENCE.md:176, :181, :194). DESIGN prose may carry editorial voice; EXPERIENCE prose should not. *Fix:* state the rule; the rationale belongs in the memlog.
 
-**[Governance & audit]** — Pricing version authorship is unspecified (§ EXPERIENCE.md:154, :168; ProviderCatalog.razor:597)  
-FR-4 makes a decreased or reused version a typed rejection; the spine never says whether the operator types it or the server assigns it. The shipped client sends `0`.  
-Fix: Server-assigned, displayed as "next pricing version {n}" in the confirmation; a rejection renders `superseded by another decision` with the current version.
+**[Inheritance discipline]** — The cost-control posture vocabulary is missing from the localized token list and from the readiness panel (§ EXPERIENCE.md:163, :188 vs FR-28 / OQ-6). Five postures and the `ProhibitedCostControlPosture` blocker code are unlisted, and the panel renders `BlockerCode` generically — so it would arrive as a raw token against the spine's own "raw tokens never display" rule. *Fix:* add them to the architecture-token row and name posture as a rendered field on the gate record.
 
-**[Governance & audit]** — `Expired` on read does not name the clock (§ EXPERIENCE.md:261, :270)  
-A client-clock comparison shows `Expired` early or late and lets Approve stay enabled until `expired at approval`.  
-Fix: Compare against the server time carried on the read; the client never uses its own wall clock for governance state.
+**[Governance]** — `budget blocked` recovery copy points the user at an action FR-33 forbids them (§ EXPERIENCE.md:306 vs prd.md:418-419). *Fix:* name the role that can act ("A Platform or Release Operator must raise this cap") rather than the surface.
 
-**[Governance & audit]** — "Operator-only visible" for `ConfigurationReferenceId` is a disclosure category, not a policy (§ EXPERIENCE.md:154, :352)  
-The page's only policy is `Agents.Administrator`.  
-Fix: Name the policy that may see the masked reference and confirm it is a subset of whoever may mutate.
+**[Governance]** — *No fix: terminal-state integrity is airtight under re-attack* (§ EXPERIENCE.md:217, :328, :331, :183, :346, :368, :334, :345). `ApprovedVersionId` pinned read-only so no second version can be approved; double-posting closed three ways (deterministic `MessageId` reused across attempts, duplicate submission blocked per session/resource/family, idempotent duplicate showing the existing pending state) with EventStore optimistic concurrency authoritative across tabs, sessions, retries, replay and restarts; the expiry/approval race server-timed on both sides.
 
-**[Governance & audit]** — `needs my action` has no state definition (§ EXPERIENCE.md:155, :165)  
-A proposal another Approver already moved to `Approved` or `PostingFailed` may still be counted and listed.  
-Fix: Define it as `Pending`, `Edited`, `Regenerated` where the viewer is an authorized Approver who did not last edit the selected version, plus `PostingFailed` with retries remaining.
+**[Governance]** — *No fix: tenant isolation is the strongest part of the spine and could not be opened* (§ EXPERIENCE.md:140, :383, :81, :395, :344, :179, :80). One indistinguishable `not available` state with the rule that per-cause copy is itself a disclosure channel; identical status class and timing; `[Authorize(Policy=…)]` on every page with nav hiding demoted to disclosure; tenant- and readability-scoped search; `existence only` rendering state and expiry with no content; cross-tenant impact as an aggregate count, never tenant names. The residual exposure is the catalog read scope, filed as high.
 
-**[Governance & audit]** — `ProposalResolution` reload re-derivation names no projection (§ EXPERIENCE.md:290, :188)  
-No projection carries a pending-command notion for proposals; if `proposal-detail` has not caught up the lock is not re-armed and the row looks idle. EventStore concurrency protects the outcome.  
-Fix: Name the projection and field per family, or render `catching up` with resolution controls `aria-disabled` whenever the read's projection version is below the last accepted write's expected version.
+**[Governance]** — *No separate fix: provider secrets are airtight but for the reason-code channel already filed* (§ EXPERIENCE.md:179, :455, :467, :189, :241, :150 · DESIGN.md:351, :339). The UI never accepts a secret value; the reference is masked, autocomplete off, never echoed in validation, errors, URLs, clipboard or diagnostics; accessible names are by configured state; the audit panel never shows secrets, payloads or stack traces; export never renders contents or keys and states no plaintext secret is included; export and deletion fail closed on `EXT-SECRETS-1`.
 
-**[Implementation readiness]** — `aria-disabled` while keeping focus is `FluentButton.DisabledFocusable` in v5; the spine never names it (§ DESIGN.md:155, :351; ProposalRegenerator.razor:25)  
-Shipped code uses `Disabled`.  
-Fix: Name `DisabledFocusable`.
+**[Governance]** — *No fix: the pricing/currency circularity is genuinely gone with no residual loop* (§ EXPERIENCE.md:179, :187, :306-307, :313, :593-601). One direction of authority, ISO 4217 well-formedness only, per-tenant mismatch on that tenant's readiness view, the pre-8.4 interim stated so the rule is not evaluated against an absent operand, server-assigned pricing version, separate `BudgetBlocked` and `rate limited` states, thresholds over settled plus outstanding reservations, `Unknown` outcomes holding their reservation and never retried.
 
-**[Implementation readiness]** — Parity gate name drift: `AgentsResourcesParityTests` vs shipped `LocalizationResourceTests` (§ EXPERIENCE.md:134; epics.md)  
-The spine and epics name a class that does not exist.  
-Fix: Say "`AgentsResourcesParityTests` (today `LocalizationResourceTests`; rename or add)".
+**[Accessibility]** — The carrier's nodes must exist before their content changes; the spine does not say so (§ EXPERIENCE.md:424). A node inserted at the same commit as its text is not announced by most AT. The shipped `ProposalTransitionAnnouncer.razor` gets this right; the spine should pin it. *Fix:* one sentence — both nodes render on first paint, empty, and only their text mutates.
 
-**[Implementation readiness]** — Shipped drift is overridden without naming the absorbing story (§ reconcile-validation-2026-09-08.md; EXPERIENCE.md § IA rules)  
-Polling constants, Launch readiness policy, harness nav entry, queue default sort, version listbox, inline confirmations, `USD`/`0` pricing defaults, per-badge `role="status"` are all correct per spines-win, but a dev cannot tell which story pays.  
-Fix: One "Shipped-code corrections" list mapping each item to 5.3 / 5.7 / 7.1 / 7.2 / 8.6.
+**[Accessibility]** — An embedded panel's pair can collide with a host route's carrier on exactly one surface (§ EXPERIENCE.md:79). The harness route hosts the panel until Story 6.7 deletes it, so it can hold two polite and two assertive nodes. Delisted and excluded from `LR-UI-CONFORMANCE`, but developers use it. *Fix:* state that the panel suppresses its own pair on an Agents route, or that the harness renders no carrier.
 
-**[Implementation readiness]** — The Fluent MCP documents a different build than the pin (§ DESIGN.md:166)  
-Enum names used in this review were cross-checked against shipped code; any further API claim must be re-verified against `5.0.0-rc.5-26219.1` at build.  
-Fix: Note only; the spine already says this.
+**[Accessibility]** — Three loose ends around the detail-route chrome (§ EXPERIENCE.md:140, :443 · FcPageHeader / FcAggregateDetailPage.razor). The `not available` slot's `h1` string is unbound and a blank heading makes `FocusHeadingAsync()` throw; `BackHref` is unspecified and defaults to empty, yielding a named self-referential link rendered outside the state slots; and `HeadingId` + the shell's `ContentLabelledBy` are unused, so every Agents route ships an unnamed `main` landmark. *Fix:* bind the heading string, require a non-empty `BackHref` per detail route, and set `HeadingId`.
 
-**[Implementation readiness]** — UJ-1 step 2 "confirms or links the Agent Party identity" has no field or command (§ EXPERIENCE.md:419; agent-config-form inventory)  
-Only `HasPartyIdentity`/`MissingPartyIdentity` exist.  
-Fix: State it is a read-only status with a blocker, or name the command.
+**[Accessibility]** — Three Constrained routes are bound to no page component at all (§ EXPERIENCE.md:501 · DESIGN.md:120-135). Conversation context policy, Content safety, Cost controls and Audit governance are bound only to "Fluent form primitives inside `FluentAccordion`"; which component carries their `h1`, `PageTitle` and focus target is unstated. *Fix:* name `FcPageHeader` (or `FcAggregateDetailPage`) explicitly.
 
-**[Implementation readiness]** — `PricingVersion` assignment is unspecified (§ EXPERIENCE.md:154; ProviderCatalog.razor:597)  
-Client-supplied vs server-assigned is unstated; the shipped client sends `0`.  
-Fix: Say server-assigned; the client sends none.
+**[Implementation readiness]** — Two raw-HTML classes violate the repo UX law and are absent from the corrections table (§ LaunchReadiness.razor:100-127 · AgentConfiguration.razor). A full `<table>` where DESIGN mandates `FluentDataGrid`, and eleven `<section>` with ten `<h2>` sibling titled sections with no `FluentAccordion`. *Fix:* one corrections row per class, absorbed by 8.7 and 5.2/5.7.
+
+**[Implementation readiness]** — The registration's own XML doc undercounts its nav entries (§ AgentsFrontComposerRegistration.cs `RegisterDomain`). Says "eight" where nine are registered; the spine's row correctly says nine. *Fix:* note that the code comment is wrong so a dev does not reconcile the spine down to eight.
+
+**[Implementation readiness]** — The accordion table's "Policy surfaces" row collapses three routes with different section sets (§ DESIGN.md § Layout & Spacing). `conversation-context-policy-panel` is read-only with "no control of any kind", so it has no Draft and no Authoring item. *Fix:* split into the three named routes.
+
+**[Implementation readiness]** — The reconciliation's "full list" claim for Architecture's items is inaccurate (§ reconcile-validation-2026-09-09.md § 4). The contracts-that-must-grow table contains neither `IProjectionChangeDetailNotifier` (nothing must grow) nor `EXT-CONV-UI-1` (in the seam table instead). *Fix:* add both as pointer rows or drop the claim.
+
+**[Implementation readiness]** — PRD FR-18's seven-versus-ten misalignment blocks no story today (§ ProposedAgentReplyState.cs · § Proposal lifecycle). The enum ships all ten plus `Unknown`, both spines render all ten with a colour role, and the fold and the `PostFailed` alias are explicit. The governance lens calls the deferral obsolete, since the PRD now enumerates ten states with `Unknown` as the FR-23 sentinel. *Fix:* say plainly that no story is blocked and the enum governs, so the Product deferral is not read as a gate.
+
+**[Implementation readiness]** — The pending-count plural inventory contradicts the zero-renders-nothing variant (§ proposal-notification row · AgentsResources.resx). No `Agents.Overview.PendingProposals.*` key exists yet, and the plural rule requires `.Zero`/`.One`/`.Other` while the variants say "zero (no badge), count". *Fix:* state that `.One` and `.Other` are the whole inventory, or the parity gate will demand a `.Zero` string nothing can render.
+
+**[Implementation readiness]** — Two IA rows have no single named owning story, and harness removal has no derivable AC (§ § Information Architecture; epics.md:1846-1876). `/agents/audit` ("7.x, 8.x") and `/agents/audit-governance` ("8.1 to 8.3") name no builder; and Story 6.7's ACs say only that "alternate invocation entries are absent" where the spine requires the `Order: 4` registration entry unregistered and `ConversationCall.razor` deleted. *Fix:* name the story that builds the id-entry surface, and name both harness artifacts in the spine's rule so the AC writes itself.
+
+## What is genuinely closed
+
+Verified against source, not against the reconciliation's claims.
+
+- **The icon contract is now exact** — twelve `TryCreate` names and no others, thirteen no-arg 16 px factories matching item for item, none reachable through `TryCreate` as stated, all seven status roles bound to real methods so **no status glyph is a FrontComposer request**, and the seven glyphs visually distinct enough to survive forced-colors.
+- **The route-heading split is right** — `FcAggregateListPage` has the three parameters and `FocusHeadingAsync()`; `FcAggregateDetailPage` has 18 parameters and none heading-related; `FcPageHeader` renders a real `h1`, suppresses a blank heading, emits `role="presentation"`, and throws rather than silently no-oping.
+- **The `FcAggregateDetailState` mapping matches the component** — one slot per state, a degraded banner over the ready body, failing closed to `UnavailableContent`.
+- **Every Fluent v5 name in the pair exists under that name.** `Appearance.Accent` does not exist and has zero occurrences in either spine or anywhere in `src/` — that prior finding is fully closed.
+- **Shell ownership of connection loss is real** — `FcProjectionConnectionStatus` is rendered inside `FrontComposerShell`, not by the domain.
+- **"A confirmation is never opened by a selection event"** closes the whole arrow-key-opens-a-modal class in one sentence.
+- **Localization is already the shipped practice** — 599 keys at exact EN/FR parity, the `Agents.<Surface>.<Item>` convention, and the parity gate at the path the spine names.
+- **Terminal-state and double-post integrity, tenant isolation, provider-secret handling and the pricing/currency circularity all held under adversarial re-attack.**
+- **Reflow at 320 px / 400%** is a positive obligation on every route including the confirmation, with evidence in the launch lane.
+- **Every story named anywhere in the pair exists in `epics.md`** — every IA owning story, Key Flows list, Known gaps owner and corrections absorbing story resolves to a real heading. That was not true two runs ago.
+- **Repo UX law compliance:** zero legacy v4/FAST tokens anywhere in `src/` or the spines except as named prohibitions, so there is no migration backlog to allowlist.
 
 ## Mechanical notes
 
-- Both spines carry `name`, `description`, `status: final`, `created`, `updated: 2026-09-08`, `sources`; all 33 source paths resolve. DESIGN.md lists `./reconcile-validation-2026-09-08.md` as a source; it is a decision record, not a product source.
-- All `{colors.*}`, `{spacing.*}`, `{typography.*}` references resolve (DESIGN 19 distinct, EXPERIENCE 7 distinct). Every FrontComposer name cited resolves in the submodule; `RegistryRevision` and `EnvironmentProfile` resolve only in the readiness register, consistent with the contracts-that-must-grow block.
-- Every Fluent v5 component type and enum cited exists at the pin, except `FluentButton Appearance.Accent` (v4 name; should be `ButtonAppearance.Primary`).
-- Reconcile § 3 commitments not carried into the spines: the `nearing expiry` threshold (flagged by all four lenses) and "pricing version increases strictly".
-- Shipped-code drift the spines supersede (documented, not a spine defect): harness route still registered at nav order 4; nine entries instead of twelve; Launch readiness still under `Agents.Administrator`; polling 250 ms/5 s and 200 ms/8 s; queue default sort `CreatedAt` desc; version list as a custom listbox; inline confirmations; `USD`/`0` pricing defaults; per-badge `role="status"`.
-- Name splits: `DevMode`/`DeveloperBoard` (one glyph); `ConversationAgentCallPanel`/`conversation-agent-call`; `AgentsResourcesParityTests`/`LocalizationResourceTests`. `Conversation Facilitator`, `PostingFailed`, the freshness vocabulary, and the ten `ProposedAgentReplyState` values are consistent across spines, PRD, reconcile, and shipped enums.
-- No Mermaid used; the single text fence is closed. No mockups, wireframes, or imports exist; spine-only and spines-win are each stated once.
-- Regression against the 2026-09-08 pre-update run: 85 prior findings resolved, 14 partially resolved, 0 not resolved (rubric 26/1/0, accessibility 18/3/0, governance 21/5/0, implementation readiness 20/5/0). All four prior criticals are closed. The prior run's files are archived under `.working/validation-2026-09-08-pre-update/`.
+- **Frontmatter.** Both spines carry the required keys; all 36 source paths resolve (16 + 20, grown from 15 + 18 by the two reconcile files and the shipped registration). DESIGN.md carries `colors`, `typography`, `rounded`, `spacing`, `components` per spec.
+- **Cross-references.** All 19 distinct `{path.to.token}` references resolve (154 occurrences); all 25 distinct `§` internal references resolve, including the two external ones.
+- **Stale self-description.** `EXPERIENCE.md:31` claims reconciliation to "the PRD of 2026-09-08" — accurate as history, misleading as currency, since `prd.md`'s body carries 2026-09-09 content while its own frontmatter `updated:` still reads 2026-09-08. The PRD frontmatter is arguably the upstream defect.
+- **Surface counts disagree across three places** — 15 IA rows, "14 IA surfaces" in the memlog, and a 6 FullWidth / 8 Constrained DESIGN split with Audit evidence counted twice. All defensible, no two using the same denominator.
+- **Tables.** No malformed rows; the three-cell-row defect fixed last run has not recurred.
+- **Mermaid.** None used. The single `text` fence is opened and closed correctly.
+- **Reviewer-file arithmetic.** `review-governance.md`'s closing line states 15 high / 31 total; the findings as filed count 14 high / 30. The counts in this report are the counted values.
+- **FrontComposer trivia, not findings.** `FcFluentIcons.InfoCircle16()` returns `Size16.Info()` and `DocumentSearch48` delegates to `DocumentSearch32` — quirks in FrontComposer, not in the spine, which cites the method names correctly.
+
+## Regression detail
+
+| Lens | Prior | Resolved | Partial | Unresolved | Regressed | Unchanged by decision |
+|---|---|---|---|---|---|---|
+| Rubric walker | 15 | 12 | 1 | 0 | 0 | 2 |
+| Accessibility | 22 | 16 | 6 | 0 | 0 | — |
+| Governance | 21 | 14 | 6 | 1 | 0 | — |
+| Implementation readiness | 26 | 15 | 10 | 1 | 0 | — |
+| **Total** | **84** | **57** | **23** | **2** | **0** | **2** |
+
+The two unresolved: "operator-only visible" is still a disclosure category with no policy behind it (governance #19, listed as applied in the reconciliation but unchanged in the spine), and Story 6.2's missing UI read model (implementation #18, deferred to the Epics maintainer with nothing landed).
 
 ## Reviewer files
 
-- `review-rubric.md`
-- `review-accessibility.md`
-- `review-governance.md`
-- `review-implementation-readiness.md`
-- prior run archived under `.working/validation-2026-09-08-pre-update/`
+- `review-rubric.md` — 19 findings (1 critical, 5 high, 8 medium, 5 low)
+- `review-accessibility.md` — 22 findings (1 critical, 9 high, 8 medium, 4 low)
+- `review-governance.md` — 30 findings (5 critical, 14 high, 6 medium, 5 low)
+- `review-implementation-readiness.md` — 25 findings (0 critical, 7 high, 11 medium, 7 low)
+- Prior run archived at `.working/validation-2026-09-09-pre-update/`
