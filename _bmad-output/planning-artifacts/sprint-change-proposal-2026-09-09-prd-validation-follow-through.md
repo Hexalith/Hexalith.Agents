@@ -12,7 +12,7 @@ approval_required: false
 approval_status: approved
 approved_by: Administrator
 approved_on: 2026-09-09
-execution_status: in-progress
+execution_status: complete
 routed_to:
   - Product Owner
   - Developer
@@ -305,13 +305,13 @@ Extend seam 2 to include the `MessageId` existence read and seam 4 to allow eith
 
 **NEW consumers**
 
-> 5.4, 6.2, 6.6, 7.1–7.5, 7.7, 8.5, 8.8; `RQ-1`
+> 5.4, 6.2, 6.6, 6.8, 7.1–7.5, 7.7, 8.5, 8.8; `RQ-1`
 
 Consumer rationale:
 
 - 5.4 and 7.1–7.5/7.7 consume Facilitator/roster/existence/access resolution;
 - 6.2 consumes complete content and accessibility reads;
-- 6.6 and 7.4/7.7 consume membership, posting, and `MessageId` lookup;
+- 6.6/6.8 and 7.4/7.7 consume membership, posting, and `MessageId` lookup or its additive runtime vocabulary;
 - 8.5 consumes the active-Conversation count/event-feed denominator;
 - 8.8 consumes current read access and Conversation existence for protected inspection.
 
@@ -347,7 +347,7 @@ Also align AD-12's trigger review with FR-28: confirmed SM-4 breach causes immed
 
 #### Versioned ARCH-A index
 
-Add `architecture_assumption_index_version: 1` to frontmatter and render `ARCH-A-INDEX-1` immediately above the Architecture Assumptions table. Any row addition, retirement, owner/condition change, or target-date change increments the version. An `RQ-1` record cites the exact index version it evaluated; `UnretiredAssumption` names the row and index version. Keep the open range semantics: every unretired row in the cited index blocks.
+Retain the now-current `architecture_assumption_index_version: 2` frontmatter and rendered `ARCH-A-INDEX-2` immediately above the Architecture Assumptions table. Version 1 was established before execution; an intervening Architecture Spine reconciliation advanced the index for its own assumption-row changes, so this follow-through must not regress it. Any later row addition, retirement, owner/condition change, or target-date change increments the version. An `RQ-1` record cites the exact index version it evaluated; `UnretiredAssumption` names the row and index version. Keep the open range semantics: every unretired row in the cited index blocks.
 
 Update the spine frontmatter/bindings to include FR-34 where payload protection is already governed. No existing assumption is silently retired by this change.
 
@@ -362,7 +362,7 @@ Update the spine frontmatter/bindings to include FR-34 where payload protection 
 | Recipient | Responsibility |
 | --- | --- |
 | Product Owner / planning owner | Apply requirements/coverage updates, add four stories, and keep 33-story tracker parity |
-| Solution Architect | Amend AD-2, AD-12, AD-30, FR-34 binding, and `ARCH-A-INDEX-1` governance |
+| Solution Architect | Amend AD-2, AD-12, AD-30, FR-34 binding, and current `ARCH-A-INDEX-2` governance |
 | Agents Runtime Maintainer | Own Stories 5.9, 5.10, 6.8, and 7.7 and the open Story 5.3 non-conformance |
 | Conversations Maintainer | Accept or correct the expanded `EXT-CONV-AI-1` seams, consumer set, target, and compatibility command |
 | Release Operator / Test Architect | Implement the RQ-1 versus launch-health split, blocker-code tests, and evidence classification |
@@ -383,7 +383,7 @@ Update the spine frontmatter/bindings to include FR-34 where payload protection 
 4. FR-29 through FR-34 have inventory and coverage rows, and active epic/story manifests resolve their references.
 5. `EXT-CONV-AI-1` names all six current seams and every exact consuming story; Story 5.3 has an open non-conformance record.
 6. AD-2/AD-30 distinguish Platform provisioning from tenant administration; AD-12 holds `Approved` during suspension and preserves all other PRD effects.
-7. `ARCH-A-INDEX-1` is explicit and `RQ-1` can cite the exact version evaluated.
+7. The current `ARCH-A-INDEX-2` is explicit and `RQ-1` can cite the exact version evaluated.
 8. `epics.md` and `sprint-status.yaml` have exact parity over 33 active stories; all four new stories are `backlog` and owned by Agents Runtime Maintainer.
 9. Markdown link/reference checks, YAML parsing, story-count/parity checks, stale-vocabulary sweeps, and `git diff --check` pass after implementation.
 
@@ -399,9 +399,22 @@ Update the spine frontmatter/bindings to include FR-34 where payload protection 
 | 6.1 Proposal review | [x] | Cross-artifact story counts, owners, metric split, and authority boundaries reviewed. |
 | 6.2 Proposal accuracy | [x] | Changes are derived from the final updated PRD and the named validation/drift evidence. |
 | 6.3 User approval | [x] | Administrator explicitly approved the proposal on 2026-09-09. |
-| 6.4 Sprint-status update | [!] | Must occur only after approval and after `epics.md` lands. |
-| 6.5 Handoff | [!] | Recipients are identified; routing begins after approval. |
+| 6.4 Sprint-status update | [x] | The four approved story slugs were added as `backlog` after `epics.md`; active story parity is 33. |
+| 6.5 Handoff | [x] | The completed artifacts route the four implementation stories to Agents Runtime Maintainer and retain the named architecture, dependency, release, test, and UX responsibilities. |
 
 ## Approval Gate
 
 Administrator approved this proposal on 2026-09-09. The coordinated changes listed under `amends_if_approved` are authorized for implementation.
+
+## Execution Record — 2026-09-09
+
+Execution completed after explicit Administrator approval:
+
+- verified the approved `RQ-1` SM-1/SM-4/SM-5/SM-6, NFR-9/NFR-14, audit-completeness, launch-health, and blocker-vocabulary reconciliation in `launch-readiness-register.md`;
+- reconciled `epics.md` to FR-1 through FR-34, the ten-state FR-18 lifecycle, the three supported Approver sources, the Story 5.3 non-conformance reference, and all direct `EXT-CONV-AI-1` consumers;
+- added Stories 5.9, 5.10, 6.8, and 7.7 with owner Agents Runtime Maintainer and matching `backlog` rows in `sprint-status.yaml`;
+- aligned AD-2/AD-30 provisioning and AD-12 kill-switch behavior while preserving the intervening Architecture Spine assumption update at `ARCH-A-INDEX-2`;
+- verified `NC-5.3-PLATFORM-CATALOG-SCOPE` remains open and added Story 6.8 to the dependency register's exact consumer set;
+- passed YAML parsing, 33-story count and exact epic/tracker slug parity, required-owner, FR coverage, proposal-state, retired-vocabulary, metric-partition, blocker-code, dependency-consumer, provisioning, kill-switch, assumption-index, local Markdown-link, and whitespace-error checks.
+
+No PRD or UX artifact was changed. Implementation of the four newly opened stories remains future development work under their recorded dependencies and evidence manifests.

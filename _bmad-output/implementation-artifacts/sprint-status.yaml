@@ -85,13 +85,15 @@ development_status:
   epic-4-retrospective: done
   epic-5: in-progress
   5-1-establish-build-package-boundary-and-basic-ci-gates: done
-  5-2-configure-hexa-through-live-eventstore-operations: done
+  5-2-configure-hexa-through-live-eventstore-operations: in-progress  # Corrected 2026-09-09 (architecture update pass, C-7): amended AC require the ConfigurationVersion lifecycle bump and AgentLifecycleConfigurationVersionTests, neither of which exist in code (DW-4); was incorrectly marked done.
   5-3-govern-provider-models-and-pricing-through-live-operations: backlog
   5-4-prove-trusted-principal-tenant-party-and-approver-readiness: backlog
   5-5-publish-authoritative-readiness-and-provider-state-contracts: backlog
   5-6-compose-agents-in-the-platform-owned-production-like-host: backlog
   5-7-activate-hexa-only-when-setup-gates-pass: backlog
   5-8-protect-sensitive-agent-content-at-the-eventstore-boundary: backlog
+  5-9-reject-prohibited-cost-control-postures-at-readiness-recording: backlog
+  5-10-retire-prohibited-safety-and-caller-policy-inputs: backlog
   epic-5-retrospective: optional
   epic-6: backlog
   6-1-start-and-recover-an-automatic-interaction: backlog
@@ -101,6 +103,7 @@ development_status:
   6-5-enforce-capacity-backpressure-and-tenant-fairness: backlog
   6-6-join-and-post-exactly-once-as-hexa: backlog
   6-7-call-hexa-and-follow-automatic-status-accessibly: backlog
+  6-8-add-missing-fail-closed-runtime-contract-members: backlog
   epic-6-retrospective: optional
   epic-7: backlog
   7-1-create-and-discover-a-pending-proposal: backlog
@@ -109,6 +112,7 @@ development_status:
   7-4-approve-and-post-one-selected-version: backlog
   7-5-reject-or-abandon-a-proposal: backlog
   7-6-expire-a-proposal-deterministically: backlog
+  7-7-restore-posting-failed-recovery-and-proposal-state-parity: backlog
   epic-7-retrospective: optional
   epic-8: backlog
   8-1-retain-sensitive-content-and-apply-legal-holds: backlog

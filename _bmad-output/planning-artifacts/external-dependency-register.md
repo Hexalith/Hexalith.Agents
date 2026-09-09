@@ -58,7 +58,7 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 | `CompatibilityContractAndVerificationCommand` | Contract: typed idempotent membership with participant-state read and AI-participant removal, idempotent posting with trace/provenance metadata and a typed `MessageId` existence read, Facilitator role exposure, active-Conversation count or equivalent tenant event feed, tenant-scoped content/roster/existence/accessibility reads, and a deletion signal, each with focused cross-tenant denial. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
 | `AcceptedStatus` | `Uncommitted` |
-| `ConsumingStories` | 5.4, 6.2, 6.6, 7.1–7.5, 7.7, 8.5, 8.8; `RQ-1` |
+| `ConsumingStories` | 5.4, 6.2, 6.6, 6.8, 7.1–7.5, 7.7, 8.5, 8.8; `RQ-1` |
 
 *Scope extended 2026-09-09 by the PRD validation reconciliation and follow-through proposal: the posting existence read, Facilitator resolution, active-count/event-feed denominator, and tenant-scoped content/roster/existence/accessibility consumers are explicit. The record was already `Uncommitted`; the extension changes no status and blocks every newly listed consumer from `ready-for-dev` until accepted.*
 
