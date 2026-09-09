@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>UX Design Validation: Hexalith Agents</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+
+    --verdict-strong: #16a34a;
+    --verdict-adequate: #65a30d;
+    --verdict-thin: #d97706;
+    --verdict-broken: #dc2626;
+
+    --sev-low: #64748b;
+    --sev-medium: #ca8a04;
+    --sev-high: #ea580c;
+    --sev-critical: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  header.report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+
+  .synthesis {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--muted);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    font-size: 15.5px;
+  }
+  .synthesis p { margin: 0 0 10px; }
+  .synthesis p:last-child { margin-bottom: 0; }
+
+  .dimension-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .dim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .dim-card .dim-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .dim-card .dim-verdict { font-size: 14px; font-weight: 600; }
+
+  section.dimension, section.reviewer-section { margin-bottom: 14px; }
+  section.dimension details, section.reviewer-section details {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  section summary {
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  section summary::-webkit-details-marker { display: none; }
+  section summary::before {
+    content: "▸";
+    display: inline-block;
+    color: var(--muted);
+    transition: transform 0.15s ease;
+  }
+  section details[open] summary::before { transform: rotate(90deg); }
+  section summary h2 {
+    display: inline;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    flex: 1;
+  }
+  .verdict-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: white;
+  }
+  .verdict-strong { background: var(--verdict-strong); }
+  .verdict-adequate { background: var(--verdict-adequate); }
+  .verdict-thin { background: var(--verdict-thin); }
+  .verdict-broken { background: var(--verdict-broken); }
+
+  .dim-body { padding: 4px 20px 18px; }
+  .dim-judgment { color: var(--text); font-size: 14.5px; }
+  .dim-judgment p { margin: 0 0 10px; }
+
+  .findings-list { padding: 0 20px 4px; }
+  article.finding {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+  }
+  article.finding:first-child { border-top: none; }
+  article.finding header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+  }
+  .badge-sev-low { background: rgba(100, 116, 139, 0.12); color: var(--sev-low); }
+  .badge-sev-medium { background: rgba(202, 138, 4, 0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234, 88, 12, 0.14); color: var(--sev-high); }
+  .badge-sev-critical { background: rgba(220, 38, 38, 0.14); color: var(--sev-critical); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 500; flex: 1; min-width: 200px; }
+  .finding-location { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; color: var(--muted); }
+  .finding-note, .finding-fix { margin-top: 6px; font-size: 14px; }
+  .finding-fix strong { color: var(--muted); font-weight: 500; }
+
+  .reviewer-source {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  .mechanical {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  .mechanical h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mechanical ul { margin: 0; padding-left: 20px; }
+  .mechanical li { margin-bottom: 4px; color: var(--text); }
+
+  footer.report-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="report-header">
+      <div class="title">
+        <h1>Hexalith Agents &mdash; UX Design Validation Report</h1>
+        <div class="subtitle">_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23/ &middot; DESIGN.md + EXPERIENCE.md &middot; four lenses with regression duty</div>
+      </div>
+    </header>
+
+    <div class="synthesis">
+      <p>The FR-33 Update landed the authorization <strong>model</strong> and left the <strong>plumbing</strong> describing the world before it. That sentence is the governance lens's, and the other three arrived at it independently. What the Update set out to do, it did: &sect; Authorization roles binds all six PRD roles to the five AD-30 policy constants; all 15 IA <code>RequiredPolicy</code> cells are re-derived from FR-33 rows; the caller can no longer approve their own call; the <code>Caller</code> source is retired; cost caps are a two-tier lower-only editor with a Platform-Operator-only override; content safety splits into platform publication and a stricter-only tenant delta; deletion carries the A-12 two-person rule. <strong>58 of the baseline's 96 findings are verifiably closed</strong>, and the pair is mechanically the cleanest it has been.</p>
+      <p>The answer to this run's question is nonetheless <strong>no, it did not land cleanly</strong>, and it failed in the same shape as the Update before it: <em>a set, rule, or name was changed and the counts, rosters, cross-references and downstream statements that described the old state were left standing.</em> The pattern is confirmed at least a dozen times &mdash; &ldquo;the four FR-18 exits&rdquo; against six, &ldquo;the six-part eligibility set&rdquo; against seven, &ldquo;this four-name list&rdquo; against two, and &ldquo;the ten families&rdquo; against a roster the Update itself grew past: it declared four operations to be <code>high-impact-confirmation</code> families and added a contents row for none, so four justification-gated dialogs have no specified body and, since the rendered set <em>is</em> the audit record, no specified audit record either.</p>
+      <p>Three consequences are severe. <strong>The platform tier has no reachable surface</strong> &mdash; no route is gated on <code>Agents.PlatformOperator</code>, and in shipped code the constant is unregistered, so platform operations fall back to <code>Agents.Administrator</code>, recorded two lines after &sect; Authorization roles forbids falling back to a more permissive row. <strong>The emergency stop misdescribes itself</strong> &mdash; the kill-switch confirmation promises that <code>Approved</code> proposals &ldquo;complete or fail on their own terms&rdquo; where FR-28 and AD-12 hold them without posting, and the Update then listed the kill switch as an <code>Abandoned</code> reason FR-18 states it can never be. <strong>Segregation of duties reached deletion and stopped</strong> &mdash; one Compliance Inspector still releases the hold protecting the evidence and exports it, and the new compliance-inspection rule lets the Tenant Agent Administrator post-hoc-review an inspection of which they are the subject.</p>
+      <p>Two causes sit underneath. The Update <strong>reconciled the FR-33 table and treated it as the whole 2026-09-09 PRD revision</strong>, which also rewrote FR-3, FR-4, FR-18, FR-28 and FR-30 and added OQ-24 through OQ-30 &mdash; all seven return zero hits in both spines, and 16 of the rubric lens's 20 new findings trace to it. The mirror image sits in the epics: <code>epics.md</code> carries <strong>33 stories and the pair names 28</strong>, and three of the five it never names own precisely what the Update added. The invented-constant failure the <code>Agents.AuditOperator</code> revert corrected before this run was not the only one of its kind &mdash; it was the visible one. The Update also invented <code>KillSwitchActive</code>, a token in no source, where Architecture's token is <code>Suspended</code>, which has no row anywhere. Both spines say <code>status: final</code>; on authorization, lifecycle vocabulary and story ownership, they are not.</p>
+      <p><strong>Three baseline findings regressed</strong>, all the same failure: a rendering that was <em>missing</em> became a rendering that is <em>wrong</em>. The <code>Abandoned</code> enumeration landed with a fourth value FR-18 forbids; the Audit evidence IA cell landed granting posted provenance to three role constants without membership; and the version-radio fix, having correctly established that <code>DisabledFocusable</code> is absent on <code>FluentRadio</code>, replaced it with a rule that opens a modal on every arrow keypress in a native radiogroup.</p>
+    </div>
+
+    <div class="dimension-summary">
+      <div class="dim-card"><div class="dim-name">Flow coverage</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">Token completeness</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Component coverage</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">State coverage</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">Visual reference coverage</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Bloat &amp; overspecification</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">Inheritance discipline</div><div class="dim-verdict" style="color: var(--verdict-thin)">thin</div></div>
+      <div class="dim-card"><div class="dim-name">Shape fit</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+    </div>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Flow coverage</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body"><div class="dim-judgment"><p>UJ-1 to UJ-4 titles are verbatim against <code>prd.md</code>; each carries a named protagonist, numbered steps, a climax and a failure path, and every story cited exists in <code>epics.md</code>. The gap is not missing flows &mdash; the Update re-gated the surfaces and left the flows describing the pre-FR-33 world.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">UX-J5 has one protagonist performing three FR-33 roles, and no step names a role</h3>
+              <span class="finding-location">EXPERIENCE.md:672-681</span>
+            </header>
+            <div class="finding-note">Priya opens Launch readiness (<code>Agents.Operator</code>), publishes a safety policy (Platform Operator with Security approval), configures caps and applies an override (Platform or Release Operator; override Platform only), and inspects Audit governance (<code>Agents.AuditOperator</code>). Step 3 omits the Security approval stage the Update added; step 4 omits the lower-only rule. A dev calibrating from the only end-to-end governance flow builds a single-role surface set.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name Priya's role in the header, split or mark the steps that are not hers, and add the Security approval stage and the lower-only refusal as visible beats.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">UJ-1 step 3 carries the stale six-part eligibility set</h3>
+              <span class="finding-location">EXPERIENCE.md:606</span>
+            </header>
+            <div class="finding-note"><code>prd.md:209</code> now lists seven, adding <em>enabled for this tenant</em> (FR-33) and <em>data-handling record accepted</em> (FR-4). Both are new blockers with UI consequences.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Restate the set from <code>prd.md:209</code> in both places and stop numbering it, or number it seven.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">No flow reaches the <code>DataHandlingVersion</code> acceptance step</h3>
+              <span class="finding-location">&sect; Key Flows</span>
+            </header>
+            <div class="finding-note">FR-33 assigns it to the Tenant Agent Administrator before first activation and on each change, with a 30-day grace after which the model cannot be called (OQ-29).</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add it to UJ-1 between Provider selection and activation.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Token completeness</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Every frontmatter key checked against every brace reference: 8 colors, 5 typography roles, one <code>rounded</code> note, 6 spacing steps, 22 component objects. 19 distinct <code>{path.to.token}</code> references, all resolving (script-verified against the parsed YAML). The eleven non-dotted braces are localization or route placeholders that cannot collide with a resolver. No legacy v4/FAST token appears except as a named prohibition and a zero-hit inventory. The baseline's one finding is closed: the spacing scale now inherits by name onto the Fluent 2 ramp.</p></div></div>
+        <div class="findings-list">
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Component coverage</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body"><div class="dim-judgment"><p>The component-name sets from the DESIGN frontmatter, the DESIGN <code>###</code> headings and the EXPERIENCE Component Patterns rows are identical and identically ordered, 22 each &mdash; the three-way parity rule holds under test. Every component has a real visual spec and a real behavioral row. What slipped is not coverage but agreement: two visual specs were not updated when their behavioral rows were re-gated.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title"><code>provider-catalog-grid</code>'s visual spec contradicts its own scoped-read rule</h3>
+              <span class="finding-location">DESIGN.md components + &sect; Components</span>
+            </header>
+            <div class="finding-note">The pinned column list pins <em>configured state</em> &mdash; Platform-Operator-only under the new rule &mdash; for every reader, and omits per-tenant enablement, which the Update made a first-class column and filter. The stated visual consequence is still only the editor delta.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Split the pinned set into tenant-reader and Platform-Operator sets, add per-tenant enablement, and add a <code>tenant-scoped read</code> variant.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>cost-control-editor</code>'s two DESIGN statements disagree</h3>
+              <span class="finding-location">DESIGN.md &sect; Layout &amp; Spacing vs &sect; Components</span>
+            </header>
+            <div class="finding-note">The layout table gives Cost controls four accordion items including a lower-only and an operator editor; the component section describes a single editor with no tenant/platform split and no absent-override variant.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Carry the two editors into the component section and add the absent-override and lower-only-refusal variants.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title"><code>audit-governance-panel</code> omits the new A-12 second-person approval blocker</h3>
+              <span class="finding-location">DESIGN.md &sect; audit-governance-panel</span>
+            </header>
+            <div class="finding-note">The EXPERIENCE row makes it a third <code>DisabledFocusable</code> cause with its own reason string.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add it to the variant list.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>State coverage</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Walked all 15 IA rows against empty, cold-load, focus, error, offline, permission-denied, stale, blocked, pending, suspended and concurrency. The Update did real work: &sect; Agent call grew from 17 rows to 21, approval-freezes-expiry is carried on four rows, the <code>PostingFailed</code> exhaustion row has exits, and five of six baseline state findings are closed. What is missing is the state vocabulary the <em>rest</em> of the 2026-09-09 PRD introduced alongside the kill switch.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">The kill-switch confirmation contradicts FR-28 and OQ-27 on the one point an operator most needs</h3>
+              <span class="finding-location">EXPERIENCE.md:317 and :206</span>
+            </header>
+            <div class="finding-note">The confirmation says <code>Approved</code> and <code>PostingPending</code> proposals &ldquo;complete or fail on their own terms&rdquo;. FR-28, OQ-27 and AD-12 say an <code>Approved</code> proposal is <em>held</em> without starting a post and without consuming a retry attempt; only an in-flight <code>PostingPending</code> completes. The sentence also drops &ldquo;edited, or regenerated&rdquo;, the paused retry clock, and <code>ExpiredWhileSuspended</code>. OQ-27 records this as a deliberate correction. The identical defect sits in the Disable confirmation.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Replace both confirmation bodies with FR-28/AD-12 semantics verbatim, add the paused retry clock and <code>ExpiredWhileSuspended</code> to &sect; Proposal lifecycle, and state that approve, edit and regenerate are all refused while either condition holds.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title"><code>Suspended</code> and <code>Draft</code> have no state, no badge role, and no copy</h3>
+              <span class="finding-location">&sect; Agent readiness; DESIGN.md &sect; Colors</span>
+            </header>
+            <div class="finding-note">FR-3 as revised makes the public lifecycle <code>Draft</code>/<code>Active</code>/<code>Disabled</code> and makes <code>Suspended</code> an additive FR-25 status reported while the switch is pulled; AD-12 requires both surfaces to expose it distinctly. Neither appears anywhere.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add both to &sect; Agent readiness with role, treatment and localized label, and add <code>Suspended</code> to the <code>AgentReadinessStatus</code> growth row.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The launch-readiness blocker vocabulary stops at two of seven</h3>
+              <span class="finding-location">&sect; Launch readiness rules</span>
+            </header>
+            <div class="finding-note"><code>PayloadProtectionUnavailable</code>, <code>GateOutOfScope</code>, <code>TriggerReviewOverdue</code>, <code>OpenDecision</code> and <code>DependencyNotAvailable</code> return zero hits. Under the spine's own rule that raw tokens never display, each is a missing resource key on a surface a Release Operator reads during the launch decision.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name the six blocker codes as rendered rows with their recovery owner, and add them to the token localization row.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>ExpiredWhileSuspended</code> and the paused retry clock are absent from &sect; Proposal lifecycle</h3>
+              <span class="finding-location">EXPERIENCE.md:415, :412</span>
+            </header>
+            <div class="finding-note">The <code>Expired</code> row has no suspension carve-out and the <code>PostingFailed</code> row states the bound with no pause, so the attempts-used-and-time-remaining figure the confirmation promises is wrong under suspension.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the typed outcome to <code>Expired</code> and state the paused-window arithmetic beside the A-7 bound.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The block state machine's UI-visible fields are missing</h3>
+              <span class="finding-location">&sect; Operational status rules</span>
+            </header>
+            <div class="finding-note"><code>BlockVersion</code>, <code>MirrorPending</code> and <code>ReadmitPending</code> return zero hits, though OQ-25 and AD-7 make the block versioned and outbox-mirrored with a visible pending flag, and make a clear record <code>ReadmitPending</code> rather than re-joining.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add <code>MirrorPending</code> and <code>ReadmitPending</code> as rendered states beside the per-Conversation row and give the refused-clear its own typed reason.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title"><code>kill switch active</code> is missing from the blocked-count list</h3>
+              <span class="finding-location">&sect; Operational status rules</span>
+            </header>
+            <div class="finding-note">The list enumerates context policy, safety, cost cap, rate limit, capacity, <code>NoEligibleApprover</code> and <code>RemovedInConversations</code>.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add it, or state why suspension is counted as <code>Suspended</code> rather than as a blocked-call reason.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Visual reference coverage</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body"><div class="dim-judgment"><p><code>imports/</code> is empty; <code>mockups/</code> and <code>wireframes/</code> do not exist. Grepped both spines for every visual-asset term: zero dangling references, no orphans, no unspecific &ldquo;see the mockup&rdquo;. The recorded no-visual-reference decision is now stated in both spines and carried in full in <code>DESIGN.md &sect; Brand &amp; Style</code>, with spines-win-on-conflict extended to shipped code.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">The same decision is dated differently in the two spines</h3>
+              <span class="finding-location">DESIGN.md &sect; Brand &amp; Style vs EXPERIENCE.md:44</span>
+            </header>
+            <div class="finding-note">DESIGN says 2026-09-09 over 15 surfaces; EXPERIENCE says 2026-09-08 with no count; the memlog still says 14 against a 15-row table.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One wording, one date, one denominator, stated in DESIGN and pointed at from EXPERIENCE.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Bloat &amp; overspecification</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body"><div class="dim-judgment"><p>The Update added roughly 1,400 words and every one is content &mdash; the roles table, the two-tier cost and safety rules, four new call states, the pre-post checks, the FR-18 exits, the compliance-inspection rules. No persona or FR text is restated; non-goals appear once. The user's declined items (DESIGN behavioural leakage, EXPERIENCE duplication, cell density, the Inspiration cut, the 2.2.1 argument) were classified in the regression table and not re-filed.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">&sect; FrontComposer Readiness remains a pure cross-index</h3>
+              <span class="finding-location">EXPERIENCE.md &sect; FrontComposer Readiness</span>
+            </header>
+            <div class="finding-note">All 13 rows resolve to a rule stated elsewhere and only four carry a constraint of their own; the Update added no row and updated one, so it now also has to be maintained in step with &sect; Authorization roles.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Optional and unchanged from the baseline: fold the four constraint-bearing rows into their owning sections and drop the table.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Four argue-don't-state sentences survive because they were not on the prose lens's list</h3>
+              <span class="finding-location">&sect; Component Patterns; &sect; Proposal editor rules</span>
+            </header>
+            <div class="finding-note">Carried for the ledger, not re-filed as new.</div>
+            <div class="finding-fix"><strong>Fix:</strong> None required.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details open>
+        <summary>
+          <h2>Inheritance discipline</h2>
+          <span class="verdict-pill verdict-thin">thin</span>
+        </summary>
+        <div class="dim-body"><div class="dim-judgment"><p>All 37 <code>sources:</code> paths resolve. UJ titles verbatim. Glossary consistent across spines and sources; the policy-constant model is correct against AD-30 and the shipped registration, verified member by member; <code>FcFluentIcons</code> matches its source. The mechanics are strong and the FR-33 table is faithfully inherited. What is thin is the <em>boundary</em> of the inheritance: the Update read one section of a revision that rewrote seven, and left three of its own counts pointing at superseded sets.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">Export and legal-hold release lost the second-party approval FR-30 and FR-33 require, while deletion gained it</h3>
+              <span class="finding-location">EXPERIENCE.md:100, :320</span>
+            </header>
+            <div class="finding-note">The IA gates hold and export on <code>Agents.AuditOperator</code> alone and gives only deletion the two-person rule. FR-30: &ldquo;Export requires prior second-party approval and hold release a separate approver (FR-33)&rdquo;; FR-33's rows name a second Compliance Inspector or the Platform Operator for a release, and a second party &ldquo;never post hoc&rdquo; for an export. One Inspector releases the hold protecting the evidence and exports it in two dialogs.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Give <code>ExportRequest</code> and a new <code>LegalHoldRelease</code> the same request/approve/execute staging <code>DeletionRequest</code> has, add the approver identity and the never-post-hoc rule to their confirmation contents, and correct the IA cell.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">The compliance-inspection approver contradicts OQ-21 and names the party OQ-21 excludes</h3>
+              <span class="finding-location">EXPERIENCE.md:314</span>
+            </header>
+            <div class="finding-note">The spine allows &ldquo;a declared post-hoc review by the Tenant Agent Administrator&rdquo;. OQ-21 requires a second party who is neither the Inspector nor a subject of the case, post-hoc only for single-proposal or single-Conversation scopes within the A-19 window, and Platform Operator approval for anything wider than one Conversation.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State the three-part rule and render scope and approver identity in the inspection's confirmation.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">The two families the Update declared do not exist in the roster, and &ldquo;ten&rdquo; is a stale count of its own making</h3>
+              <span class="finding-location">EXPERIENCE.md:110, :222, :442, :480, :496</span>
+            </header>
+            <div class="finding-note">&sect; Authorization roles calls the kill switch and the block/re-admit control <code>high-impact-confirmation</code> families; the contents table carries ten rows and neither. AD-12 already owns the vocabulary, so the names exist and the spine does not use them. The affected operations have no specified audit record.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add <code>TenantKillSwitch</code> and the block/clear rows with their required contents, name them in &sect; High-risk pending commands, and correct every &ldquo;ten&rdquo;.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title"><code>DataHandlingVersion</code> acceptance has no surface anywhere in the pair</h3>
+              <span class="finding-location">both spines</span>
+            </header>
+            <div class="finding-note">Zero hits for <code>DataHandling</code>. FR-4, the FR-33 row, the eligibility set and OQ-29 make this a TAA action with a rendered record, a version, acceptance before first activation and on change, a 30-day grace after which the model cannot be called, an activation blocker, and an audit field.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the record as a read-only block on Provider selection with an accept control and its own confirmation family, add <code>DataHandlingNotAccepted</code> as an activation blocker, and add the version to the audit field list.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">&sect; Accessibility Floor contradicts itself about which routes use <code>FcAggregateDetailPage</code></h3>
+              <span class="finding-location">EXPERIENCE.md:528, :533</span>
+            </header>
+            <div class="finding-note">One bullet names &ldquo;the eight Constrained detail routes&rdquo;; four bullets later the four form surfaces &mdash; four of those eight &mdash; are hand-authored with no <code>Fc*</code> page component. The baseline's medium reopened in a new shape: the mechanism bullet was added without correcting the count it contradicts.</div>
+            <div class="finding-fix"><strong>Fix:</strong> List the routes bound to <code>FcAggregateDetailPage</code> by name and drop the &ldquo;eight Constrained detail routes&rdquo; phrasing.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">&ldquo;The four FR-18 exits&rdquo; is short by two, and the safety-verdict no-retry rule is missing</h3>
+              <span class="finding-location">&sect; Proposal editor action rail; &sect; Proposal lifecycle</span>
+            </header>
+            <div class="finding-note">FR-18 adds two further exits (the <code>MessageId</code> lookup finds the post &rarr; <code>Posted</code>, <code>LateConfirmed</code>; a removal or block is detected) and states that a safety-verdict failure accepts abandon only. <code>LateConfirmed</code> has zero hits.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State six exits, add the <code>LateConfirmed</code> display-only outcome, and add a safety-verdict variant to the two <code>PostingFailed</code> rail rows.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Administrative abandon is stated unconditionally where FR-33 conditions it</h3>
+              <span class="finding-location">EXPERIENCE.md:96, :249</span>
+            </header>
+            <div class="finding-note">FR-33 reads &ldquo;Abandon a <code>PostingFailed</code> proposal whose Source Conversation is gone or inaccessible&rdquo;. As written the spine grants a tenant administrator a unilateral abandon of any failed proposal.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Carry the condition into both places and give the unmet case its typed refusal reason.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The regeneration-ceiling deferral is still stale and still quotes its source wrongly</h3>
+              <span class="finding-location">EXPERIENCE.md:204</span>
+            </header>
+            <div class="finding-note"><code>prd.md</code> states a default of 3 and a range of 1 to 10, and A-6 owns the numbers. The spine's numbers are right; its stated reason for flagging them is false against its own source. The one baseline finding on which nothing moved.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Cite FR-32 and A-6 and drop the &ldquo;FR-32 states only&rdquo; clause.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The seam bullet still asserts the ownership the Update replaced two paragraphs earlier</h3>
+              <span class="finding-location">EXPERIENCE.md:131</span>
+            </header>
+            <div class="finding-note">&ldquo;Removal of <code>hexa</code> is a Conversation-owned action &hellip; reason <code>Agent removed from Conversation</code>&rdquo;, against &sect; Information Architecture's Agents-owned control and the typed <code>RemovedInConversations</code> reason.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Rewrite the bullet to the AD-7/OQ-16 three-part membership step with the typed reason, and point at the Operational status control.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The block-clear authority is stated as symmetric; FR-33 makes it asymmetric</h3>
+              <span class="finding-location">&sect; Operational status rules</span>
+            </header>
+            <div class="finding-note">FR-33 has two rows &mdash; set is TAA or Facilitator; clear is the setting authority re-evaluated, or the TAA, and &ldquo;a Conversation Facilitator cannot clear an Administrator's block&rdquo;. Three clear authorities collapse to one.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Split set and clear into two rows with the three clear cases and their refusal reasons.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The spine's own statement of what it reconciled to is short by seven open questions</h3>
+              <span class="finding-location">EXPERIENCE.md:32</span>
+            </header>
+            <div class="finding-note">The same <code>prd.md</code> revision carries OQ-24 through OQ-30, all Resolved or amended 2026-09-09, and all seven return zero hits. This is the baseline's critical recurring one revision later at a smaller radius.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Run the reconciliation over OQ-24 to OQ-30 and FR-3/FR-4/FR-30 as revised, and state the revision by commit or content hash rather than a hand-listed row set.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The architecture-token localization row is nine tokens against a vocabulary the Update roughly tripled</h3>
+              <span class="finding-location">&sect; Voice and Tone</span>
+            </header>
+            <div class="finding-note">Every new token becomes a required resource key with EN/FR parity under the spine's own raw-tokens-never-display rule, enforced by a gate that fails on a missing key.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Make the row a pointer to a per-enum inventory rather than a hand-maintained list.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">&ldquo;This four-name list&rdquo; names two components</h3>
+              <span class="finding-location">&sect; Grid rules</span>
+            </header>
+            <div class="finding-note">Verified in <code>git show HEAD</code> that the phrasing predates the Update &mdash; an inherited miss, not a regression, but the same species.</div>
+            <div class="finding-fix"><strong>Fix:</strong> &ldquo;This list&rdquo;.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">The header points at the superseded reconcile file</h3>
+              <span class="finding-location">EXPERIENCE.md:32</span>
+            </header>
+            <div class="finding-note">Names <code>reconcile-validation-2026-09-09.md</code> where <code>-2</code> is current and is listed in both frontmatters.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Point at <code>-2</code> and demote the other to the predecessor slot.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">&sect; Key Flows opens with a stale date</h3>
+              <span class="finding-location">EXPERIENCE.md:596</span>
+            </header>
+            <div class="finding-note">&ldquo;UJ-1 to UJ-4 mirror the PRD of 2026-09-08&rdquo; against a header claiming the 2026-09-09 revision. The titles are verbatim against current <code>prd.md</code>, so it is a stale date rather than a stale claim.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Drop the date or match the header.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">The typed-16px inventory lists thirteen factories against fourteen declared</h3>
+              <span class="finding-location">DESIGN.md &sect; Brand &amp; Style</span>
+            </header>
+            <div class="finding-note"><code>Play16</code> is the fourteenth and is correctly listed under the string contract instead, so the characterisation is accurate. Recorded so the next verifier does not read it as drift.</div>
+            <div class="finding-fix"><strong>Fix:</strong> None required.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Shape fit</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body"><div class="dim-judgment"><p><code>DESIGN.md</code> carries all eight canonical body sections in canonical order with nothing interleaved. <code>EXPERIENCE.md</code> carries all eight required defaults with nothing dropped, and both required-when-applicable sections present and genuinely triggered. Four invented sections all earn their place &mdash; &sect; Authorization roles is the strongest, and placing it before Information Architecture is right because the IA table cannot be read without it. Repo law compliant throughout.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The per-surface accordion table has no row for <code>hexa</code> configuration or Approver policy</h3>
+              <span class="finding-location">DESIGN.md &sect; Layout &amp; Spacing</span>
+            </header>
+            <div class="finding-note">The table lists ten surfaces against 15 IA rows. It matters because &sect; Shipped-code corrections cites this very rule against <code>AgentConfiguration.razor</code> (eleven <code>&lt;section&gt;</code>, ten sibling <code>&lt;h2&gt;</code>, no <code>FluentAccordion</code>) &mdash; so the correction points at a rule that never says which section is the primary region.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add rows for <code>hexa</code> configuration and Approver policy, and state once that a surface absent from the table has one content region and needs no accordion.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="reviewer-section">
+      <details>
+        <summary>
+          <h2>Accessibility review</h2>
+          <span class="reviewer-source">review-accessibility.md &middot; 2 critical &middot; 10 high &middot; 7 medium &middot; 3 low &middot; regression 12 resolved / 9 partial / 1 regressed</span>
+        </summary>
+        <div class="dim-body"><div class="dim-judgment"><p>The Update landed most of what it claimed, and several fixes are unambiguously correct &mdash; the <code>aria-describedby</code> rule closes the baseline's largest structural hole in one paragraph, the state-slot focus rule is exactly right against <code>FcAggregateDetailPage</code>'s five real slots and two banners, and the 2.2.1 argument is re-founded on the essential exception. Twelve of twenty-two baseline findings are genuinely closed. But it repeated its predecessor's signature failure twice, and underneath both sits an unfinished census: the politeness table is now the spine's central accessibility artifact and it asserts its own completeness while omitting four of the seven outcomes the sentence above it enumerates. Every v5 API claim was verified through the Fluent MCP server; eight hold, one has no binding at all.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">The <code>ConversationAgentCallPanel</code> critical is closed in two of three places, and the place a developer builds from still describes the destroyed nodes</h3>
+              <span class="finding-location">EXPERIENCE.md:212; DESIGN.md:324</span>
+            </header>
+            <div class="finding-note">The seam table and Accessibility Floor correctly reassign every post-submit outcome to the persistent contributed region. The component row still gives the panel both nodes and routes seven announcements &mdash; <code>submitted</code>, <code>authoritative pending</code>, <code>denied</code>, <code>capacity queued</code>, <code>generation failed</code>, <code>PostingPending</code>, <code>Posted</code> &mdash; through them, in the same sentence that closes the panel. Component Patterns and &sect; Components are the two rows Story 6.7 is written from.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Rewrite the component row so the panel announces only in-dialog validation and <code>submitted</code>; rewrite <code>DESIGN.md &sect; conversation-agent-call</code> to render the status badges in the persistent region beside <strong>Call hexa</strong>, not in the dialog body.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">The version-selection fix reopens arrow-key-opens-a-modal on a native radiogroup, and the mechanism it relies on does not exist</h3>
+              <span class="finding-location">EXPERIENCE.md:209</span>
+            </header>
+            <div class="finding-note">MCP-confirmed that <code>FluentRadioGroup</code> offers only <code>Disabled</code>, <code>RadioDisabled</code> and <code>ReadOnly</code>, so the spine's premise is right. The replacement opens the unsaved-changes confirmation on every selection change while dirty: arrowing from version 1 to 4 fires it three times, each yanking focus into a focus trap, and &ldquo;the selection moves only after Save or Discard resolves&rdquo; requires reverting a selection the browser has already committed. WCAG 3.2.2 On Input. The dialog carries no family, so the focus trap, <code>AutoFocus</code> Cancel, <code>Esc</code> wiring and focus-return rules do not reach it.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Adopt the shape that already fixed <code>response-mode-toggle</code>: the radio group edits a draft selection and an explicit View version command applies it. Or bind <code>FluentRadioGroup.ReadOnly</code> while dirty &mdash; it exists at the pin and keeps the group focusable. Either way give the dialog an explicit contract row.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">The politeness table omits four of the seven outcomes the paragraph above it says are all announced</h3>
+              <span class="finding-location">EXPERIENCE.md:515, :522</span>
+            </header>
+            <div class="finding-note"><code>stale proposal</code>, <code>regeneration ceiling reached</code>, <code>duplicate submission (idempotent)</code> and <code>authority unresolved</code> appear nowhere in it, and the spine's own clause says an omission &ldquo;is a defect in the table, not a deliberate silence&rdquo;. All four are carried on an adjacent badge whose text changes beside a control that becomes <code>aria-disabled</code> without its label changing &mdash; and badges are banned from being live regions. <code>authority unresolved</code> fires when a dependency drops mid-session and silently disables every resolution control on the page.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the four rows, and disambiguate <code>expired at approval</code> and <code>safety blocked at approval</code> from the call states of similar name.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">No confirmation family except the two proposal ones has an announced terminal outcome</h3>
+              <span class="finding-location">&sect; Accessibility Floor politeness table</span>
+            </header>
+            <div class="finding-note">Nothing announces the <code>ProjectionConfirmed</code> success of eight families, including the kill switch and the per-Conversation block. The pending sequence announces <code>Submitted</code> then <code>AuthoritativePending</code> and goes quiet. Priya publishing a safety policy or pulling a tenant kill switch is told the command was accepted and never told it completed. Five severe Agent-call rejections and the audit form's own outcome are missing on the same grounds.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add one generic row &mdash; every family's <code>ProjectionConfirmed</code> result announces in the polite node as a localized whole string naming the operation and resource &mdash; plus the five call rejections as assertive and the audit-form outcome.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Two polite and two assertive Agents-owned nodes co-exist on the Conversation surface while the dialog is open</h3>
+              <span class="finding-location">EXPERIENCE.md:508, :210, :119</span>
+            </header>
+            <div class="finding-note">The one-node-per-politeness rule is stated; the panel has a pair and the Conversation view has a persistent contributed pair. The Accessibility Floor closes only the harness-route collision and says nothing about the case that actually ships.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Say which pair speaks while the dialog is open. The cleanest reading is that the panel owns no nodes and pushes its in-dialog text into the contributed region, which is mounted throughout.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">The shipped live-region inventory is wrong in both directions and omits a file the baseline named</h3>
+              <span class="finding-location">EXPERIENCE.md:726</span>
+            </header>
+            <div class="finding-note">The row claims 15 sites across 13 files; the tree holds <strong>29 sites across 20 files</strong>, and the row's own enumeration lists 19 files &mdash; so the header contradicts its own body before it contradicts the code. <code>ProviderCatalog.razor</code> (three <code>aria-live</code> regions) is absent entirely. A Story 8.6 dev leaves the Provider catalog announcing three ways.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Replace the count with the verifiable predicate the row half-states &mdash; every such occurrence outside <code>AgentsPageStatusRegion</code>, 29 in 20 files at the 2026-09-09 tree &mdash; and add <code>ProviderCatalog.razor</code>.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Save and Discard return focus to a control that has just unrendered</h3>
+              <span class="finding-location">EXPERIENCE.md:242</span>
+            </header>
+            <div class="finding-note">Both render only while dirty; Save and Discard both clear the dirty state. The sentence's first clause removes the controls at the exact commit its last clause focuses one of them. Focus falls to <code>document.body</code> on the two controls the Update added to close a dead end.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Send focus to Approve, which the dirty state was blocking and which becomes activatable at the same commit; or keep both rendered and <code>DisabledFocusable</code> when clean.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Four operations are declared <code>high-impact-confirmation</code> families and the closed ten-family table has a row for none</h3>
+              <span class="finding-location">EXPERIENCE.md:109, :249, :300, :306</span>
+            </header>
+            <div class="finding-note">The kill switch, the block/re-admit, administrative abandon and administrative retry. Since the rendered set is what the audit record carries, four justification-gated dialogs have unspecified body content and unspecified audit records, and the gated-Confirm rule binds <code>aria-describedby</code> to a per-family reason string that does not exist for them. <code>administrative retry</code> cannot be <code>ConversationPosting</code> &mdash; that family requires Conversation read access and administrative retry explicitly does not.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add four rows and correct the count, or state which existing family each maps to and its additional required contents.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">The Security approval stage has no state, no announcement, and the pending contract mislabels it</h3>
+              <span class="finding-location">EXPERIENCE.md:213, :444</span>
+            </header>
+            <div class="finding-note">After the 8-second catch-up budget the control renders <code>awaiting projection</code> with a refresh action. The write is not awaiting a projection &mdash; it is awaiting a different human being, possibly for days. Contrast the structurally identical deletion case, which the spine gets right.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Give the stage a UX state alongside <code>AuthoritativePending</code> &mdash; awaiting security approval, with its own label, polite announcement and a statement of who must act &mdash; and exempt it from catch-up exhaustion.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">The deterministic focus rule emits invalid ARIA on both interactive grids</h3>
+              <span class="finding-location">EXPERIENCE.md:445</span>
+            </header>
+            <div class="finding-note">The rationale for <code>role=&quot;group&quot;</code> is right for a bare <code>div</code> and wrong for the target it is applied to: a <code>role=&quot;row&quot;</code> may own only cell, gridcell, columnheader or rowheader, so overriding the status cell to <code>group</code> invalidates the row's owned-element contract and strips the cell from grid navigation at the moment of a resolution. It is also unnecessary &mdash; <code>gridcell</code> is name-from-author.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Scope the rule: on a grid, the status <strong>gridcell</strong> with <code>tabindex=&quot;-1&quot;</code> and <code>aria-label</code>, role untouched; on a detail route, wrap the badge container in <code>role=&quot;group&quot;</code>.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Shipped code removes Approve and the Agent-call action entirely at constrained viewports, and the drift table does not record it</h3>
+              <span class="finding-location">ProposalApprover.razor:11-31; AgentCallStatusFeedback.razor:30-42</span>
+            </header>
+            <div class="finding-note">Both branch on a <code>Constrained</code> parameter and replace the action with a paragraph, commented UX-DR40. That is the exact Don't at <code>DESIGN.md:382</code>, forbidden by the 320 CSS px rule, and permitted only when the decision context cannot render &mdash; which a viewport width is not. A 1.4.10 failure on the product's highest-consequence action, in the tree today, with no drift row; the <code>Disabled</code> row does not reach it because the control is absent rather than disabled. Both files also carry a self-referential <code>aria-describedby</code>.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a drift row naming the <code>Constrained</code> branch with 7.3 and 6.7 absorbing, and name the self-referential <code>aria-describedby</code> in the same row.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">A second content-imposed time limit exists and 2.2.1 is never claimed for it</h3>
+              <span class="finding-location">EXPERIENCE.md:252, :412</span>
+            </header>
+            <div class="finding-note">The A-7 bound &mdash; 3 attempts within 15 minutes &mdash; is a time limit set by the content within which the user must act. None of the four allowances is met: it cannot be turned off, it is explicitly not configurable, there is no extension, and unlike expiry there is no warning at all, because the remaining time is rendered only inside the retry confirmation. An Approver loses the retry exit at 15 minutes with no nearing-window chip and no announcement.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Extend the 2.2.1 bullet to the A-7 window with its own essential argument, add a nearing-window flag and announcement on the same terms as nearing expiry, and record window expiry in the politeness table.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The closed speaker list is closed against the components the baseline named, not against the shell</h3>
+              <span class="finding-location">EXPERIENCE.md:510</span>
+            </header>
+            <div class="finding-note"><code>FcDensityAnnouncer</code>, and inside the <code>main</code> landmark <code>FcProjectionConnectionStatus</code> and <code>FcPendingCommandSummary</code>, render on every Agents route with no Agents-side parameter to silence them; <code>FcCommandPalette</code> is a fourth. <code>FcPendingCommandSummary</code> is declared &ldquo;out for V1&rdquo;, which reads as absence but is only non-use &mdash; it speaks whenever the shell's pending state is non-empty, which is precisely when <code>AgentsPageStatusRegion</code> announces <code>Submitted</code>.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name all four as shell-owned permitted speakers Agents does not duplicate and cannot silence, and state that Agents dispatches no shell pending-command action, which is the real mechanism behind &ldquo;out for V1&rdquo;.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Nine politeness-table events still have no localized string in either language</h3>
+              <span class="finding-location">&sect; Voice and Tone</span>
+            </header>
+            <div class="finding-note"><code>Version {n} generated</code>, <code>awaiting projection</code>, <code>catching up</code>, <code>pending in another session</code>, <code>connection restored</code>, <code>draft saved</code>, <code>draft discarded</code>, the nearing-expiry warning, and the domain consequence of connection loss. The parity gate enforces parity of keys that exist, so a hard-coded English announcement passes. For a screen-reader user the announced string is the only UI those states have.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State that every event in the politeness table has a named key, and add the nine rows with their French forms.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The <code>Disabled</code> drift row miscounts and omits the control the original finding was about</h3>
+              <span class="finding-location">EXPERIENCE.md:727</span>
+            </header>
+            <div class="finding-note">Says &ldquo;across eleven pages&rdquo;, then enumerates four files; the tree holds 15 sites across 5 files. The missing one is <code>ProposalRegenerator.razor:25</code> &mdash; the regenerate-while-in-flight case the spine explicitly requires to be <code>DisabledFocusable</code>, and the single control the baseline's finding named.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Correct to five files / fifteen sites and add <code>ProposalRegenerator.razor</code>, with 7.3 in the absorbing-story list.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The <code>aria-describedby</code> rule names no v5 binding while every neighbouring rule does</h3>
+              <span class="finding-location">EXPERIENCE.md:494</span>
+            </header>
+            <div class="finding-note">At the served build no Fluent component in the relevant set exposes <code>AriaDescribedBy</code>: <code>FluentButton</code>, <code>FluentCompoundButton</code>, <code>FluentBadge</code>, <code>FluentRadioGroup</code> and <code>FluentMessageBar</code> have none, and no <code>AdditionalAttributes</code> splat could be confirmed. This is the spine's most load-bearing new accessibility rule and the one rule with no verified binding.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Verify attribute splatting on <code>FluentButton</code> at the pin and state the binding the way the neighbouring rule states <code>DisabledFocusable</code>; if splatting is unavailable, specify a wrapper that carries the description.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>Esc</code>-confirms-before-discarding requires a dialog opened from a dialog</h3>
+              <span class="finding-location">EXPERIENCE.md:497</span>
+            </header>
+            <div class="finding-note">The rule reaches every justification-gated confirmation, since each contains a required <code>FluentTextArea</code>. Fluent v5's guidance is explicit: don't open a <code>FluentDialog</code> from a <code>FluentDialog</code>. Nesting also breaks the outer trap's inertness and leaves focus return undefined between two traps.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Replace the nested dialog with a non-modal in-dialog confirm strip, or make keep-for-session the only behaviour for text inside a dialog.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The lower-only cost input contradicts the Forms validation-timing rule</h3>
+              <span class="finding-location">EXPERIENCE.md:214, :542</span>
+            </header>
+            <div class="finding-note">&ldquo;The input rejects any value above the current one&rdquo; against &ldquo;Validation runs on submit &hellip; before it, typing never produces an error&rdquo;. A field that rejects as you type either errors before first submit or silently clamps &mdash; the second being worse, since a screen-reader user gets no indication their entry was altered.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State that the bound is a <code>Max</code> plus a submit-time validation error carrying the current boundary, and that no value is silently rewritten.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The nearing-expiry chip's strings are cross-referenced to a table that does not contain them</h3>
+              <span class="finding-location">DESIGN.md:292; &sect; Voice and Tone</span>
+            </header>
+            <div class="finding-note">The chip text and the announced string are both pointed at &sect; Voice and Tone, which has no expiry-warning row at all, and neither key exists in the resx. The shipped tree carries <code>Agents.ProposalQueue.Expiry.ExpiringSoon</code> = &ldquo;Expiring soon&rdquo;, a third wording with no duration. The one status the Update fixed for no-colour-only still has no string, and the fix reads as complete because it points somewhere.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add both rows with their French forms, and record the <code>ExpiringSoon</code> divergence in &sect; Shipped-code corrections.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">The deterministic focus ladder's middle rung does not exist where most resolutions happen</h3>
+              <span class="finding-location">EXPERIENCE.md:445</span>
+            </header>
+            <div class="finding-note">The ladder is status cell, then the next row, then the page heading &mdash; but every proposal resolution is submitted from a Constrained detail route with no rows.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Say the ladder is status cell, then next row <em>on a grid</em>, then the page heading.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">The politeness table's <code>expired</code> row and the queue aggregate rule read as if both could fire</h3>
+              <span class="finding-location">EXPERIENCE.md:521, :524</span>
+            </header>
+            <div class="finding-note">They agree, but a developer reading only the table will not know the aggregate exists.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One cross-reference in the table cell.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title"><code>FluentDialogBody.FixedHeaderFooter</code> already defaults to true at the pin</h3>
+              <span class="finding-location">EXPERIENCE.md:220; DESIGN.md:364</span>
+            </header>
+            <div class="finding-note">Three sites specify a default. Harmless and arguably good practice, but recorded so the next run does not re-derive it as a change a developer must make.</div>
+            <div class="finding-fix"><strong>Fix:</strong> None required.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="reviewer-section">
+      <details>
+        <summary>
+          <h2>Governance &amp; audit review</h2>
+          <span class="reviewer-source">review-governance.md &middot; 6 critical &middot; 7 high &middot; 6 medium &middot; 2 low &middot; regression 20 resolved / 5 partial / 1 unresolved / 2 regressed</span>
+        </summary>
+        <div class="dim-body"><div class="dim-judgment"><p>The FR-33 Update did the hard part and did it well. &sect; Authorization roles is real, correct and traceable, and twenty of the baseline's thirty findings are closed in ways this lens could not reopen. What it did not do is finish: it changed the <em>roles</em> and left the <em>plumbing</em> describing the old world, in the same pattern as the Update before it. Adversary assumed throughout &mdash; a story-dev who builds exactly what the spines say; a tenant administrator who wants the platform tier's powers; a Compliance Inspector who is also the subject of the case; an operator pulling an emergency stop and relying on the confirmation to tell them what it does.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">The Platform Operator has no route it can enter, and the spine records a fallback its own rule forbids</h3>
+              <span class="finding-location">EXPERIENCE.md:73, :77, :96, :731</span>
+            </header>
+            <div class="finding-note">&sect; Authorization roles forbids falling back to a more permissive row; &sect; Shipped-code corrections records that every platform-scoped row falls back to <code>Agents.Administrator</code>, verified against a registration file that declares four constants and gates <code>/agents/providers</code> on the tenant one. A whole scope tier failing <em>open</em>, on a shipped page, with no interim &mdash; unlike <code>EXT-SECRETS-1</code>, where the fail-closed interim is stated. The design side matches: Launch readiness is gated <code>Agents.Operator</code> while carrying a control only the Platform Operator may pull, so under the spine's own <code>[Authorize]</code> rule that role is denied the page. Provider catalog, Content safety and Cost controls share the shape; Operational status and Audit evidence show the spine can write a disjunctive cell.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State that a surface carrying two tiers is gated on the disjunction with each control on its own constant, and rewrite those routes accordingly; add the interim to the drift row &mdash; until the constant is registered, every platform-scoped mutation control is absent and every platform-scoped route renders <code>not available</code>.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">The kill-switch confirmation states the wrong semantics, and the wrong ones are the permissive ones</h3>
+              <span class="finding-location">EXPERIENCE.md:306</span>
+            </header>
+            <div class="finding-note">FR-28 and AD-12 state four things the confirmation drops or inverts: awaiting proposals may not be approved <em>nor edited nor regenerated</em>; an <code>Approved</code> proposal is held without starting a post or consuming an attempt; the retry clock is paused with <code>PausedDuration</code> accrued; and <code>ExpiresAt</code> keeps running, recording <code>ExpiredWhileSuspended</code>. <code>Suspended</code> is a distinct <code>agent-setup</code> state under AD-12 and appears nowhere in either spine. Built from this spine, pulling the emergency stop still lets an Approver edit and regenerate, still starts posts, and still burns retry attempts.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Restate the confirmation to FR-28/AD-12 in full, and add <code>Suspended</code> as a readiness state distinct from <code>disabled</code> plus <code>ExpiredWhileSuspended</code> on the <code>Expired</code> row.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">The <code>Abandoned</code> reason set names the kill switch, which FR-18 says can never be a reason</h3>
+              <span class="finding-location">EXPERIENCE.md:414</span>
+            </header>
+            <div class="finding-note">FR-18: the kill switch &ldquo;is never a system-abandonment reason: while it is pulled, proposals awaiting a decision remain for humans to reject or abandon&rdquo;; AD-12 repeats it. The Update added the requested typed enumeration and invented a fourth value where three exist. A rendered fourth reason is a rendered claim that the emergency stop destroys pending decisions &mdash; the one thing FR-28 promises it does not do. <strong>Regression:</strong> a missing rendering became a wrong one.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Three typed reasons; state on the <code>Abandoned</code> row that the kill switch is never an abandonment reason.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">Legal-hold release and export still have no second party, on a surface where deletion now has one</h3>
+              <span class="finding-location">EXPERIENCE.md:98, :318</span>
+            </header>
+            <div class="finding-note">FR-33 requires a second Compliance Inspector or the Platform Operator for a release, and a second party &ldquo;never post hoc&rdquo; for an export; AD-22 adds the computed-subject-set and anti-collusion terms and notes the export envelope key goes to the requesting principal. <code>prd.md</code> already flags this as an open Spine defect and the UX spine inherits it rather than correcting it. One Inspector releases the hold protecting the evidence and exports it in two dialogs &mdash; the same single-actor chain the baseline named for deletion.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Render a second, separately authorized approval stage before either operation is submitted, refuse the requester's own approval with a typed reason, and show requester, approver and both justifications on every release and export row.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">The Audit evidence IA cell grants posted provenance to three role constants, contradicting its own rules section</h3>
+              <span class="finding-location">EXPERIENCE.md:97 vs :312</span>
+            </header>
+            <div class="finding-note">The cell hands posted provenance to every tenant administrator, Release Operator and Platform Operator without membership or read access. FR-33's row and AD-22 both scope it to &ldquo;a current Participant with read access&rdquo;, and the spine's own &sect; Audit evidence rules says so two hundred lines later. Posted provenance is Conversation-derived content; this is exactly the ambient-participation route Story 8.8 exists to prevent. <strong>Regression</strong>, and the FR-33-in-three-places redundancy failing in the direction that matters.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Operational evidence to the three roles; posted provenance to a current Participant with read access only; unposted protected content to Eligible Approver authority or the Story 8.8 inspection &mdash; matching the rules section verbatim.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">The compliance-inspection second-party rule is materially weaker than OQ-21 and AD-22, and permits self-review</h3>
+              <span class="finding-location">EXPERIENCE.md:312</span>
+            </header>
+            <div class="finding-note">OQ-21 requires a second party who is neither the Inspector nor a subject of the case, post-hoc only for single-proposal or single-Conversation scopes within the A-19 window, and Platform Operator approval for anything wider than one Conversation. AD-22 computes the subject set, makes an approver inside it a typed rejection, bars two Inspectors approving each other within 30 days, and flags an unreviewed inspection persistently. The spine permits a case-wide inspection to proceed on the post-hoc review of the very administrator whose configuration is under examination.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Render the four constraints as mechanics: computed subject set with typed refusal; post-hoc offered only at single-proposal or single-Conversation scope with the window shown; Platform Operator approval before the first content read at case scope; an <code>UnreviewedInspection</code> signal on the surfaces the TAA and Platform Operator read.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">The ten-family confirmation roster is a local subset of a matrix that forbids local subsets</h3>
+              <span class="finding-location">EXPERIENCE.md:220, :296, :440, :478, :494</span>
+            </header>
+            <div class="finding-note"><code>launch-readiness-register.md</code> at <code>OperationGateMatrixVersion = 2</code> states that consumers may not maintain local subsets, and carries <code>TenantKillSwitch</code>, <code>TenantProviderEnablement</code>, <code>LegalHoldRelease</code>, <code>ExportDownload</code>, <code>AuditInspection</code> and others as families in their own right. The Update added governed writes for five of them with no family, gate set or contents row &mdash; so those five operations have no specified audit record.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Raise the roster to the matrix v2 families the UI issues, add a contents row for each, and replace every &ldquo;the ten families&rdquo; with a reference to the register's matrix version rather than a count.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Justification is required on five families; AD-22 requires it on nine with no exemption</h3>
+              <span class="finding-location">EXPERIENCE.md:318</span>
+            </header>
+            <div class="finding-note">The four the spine omits are exactly those whose confirmation contents it specifies without a justification field &mdash; proposal approval and rejection, a catalog mutation, a setup mutation, an activation. The server will reject those submissions and the UI as specified offers no field to satisfy them.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State the justification rule once over the AD-22 lock-bearing set rather than over FR-30's subset, and add the line to the four contents rows.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Block and re-admit are stated with symmetric authority the sources deny, on a route the named authority cannot enter</h3>
+              <span class="finding-location">EXPERIENCE.md:109, :300</span>
+            </header>
+            <div class="finding-note">FR-33 splits the transitions &mdash; clear is the setting authority re-evaluated at clear time or the TAA, and &ldquo;a Conversation Facilitator cannot clear an Administrator's block&rdquo;; <code>epics.md</code> carries the same rule as a Story 6.6 AC. The spine lets a Facilitator undo a tenant administrator's governance decision. Compounding it, the controls sit on a route whose policy set excludes the Facilitator entirely, while Release and Platform Operators &mdash; whom that FR-33 row does not name &mdash; can operate the control.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State clear authority as the setting authority re-evaluated or the TAA, with a Facilitator refused on an Administrator-set block; render <code>ReadmitPending</code> and the distinct <code>ExternallyRemoved</code> path; and either give the Facilitator a Conversation-scoped surface or state that they act through Conversations.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Retry posting is offered on every <code>PostingFailed</code> with attempts remaining, including a safety-verdict failure</h3>
+              <span class="finding-location">EXPERIENCE.md:248</span>
+            </header>
+            <div class="finding-note">FR-18: such a proposal &ldquo;is not retryable and accepts abandon only&rdquo;, and <code>epics.md</code> carries it as an acceptance criterion. Under the spine an Approver retries a post the then-current Content Safety Policy refused, three times.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Retry posting absent or <code>DisabledFocusable</code> with the typed reason when the failure reason is a safety verdict; same exclusion on administrative retry.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">No <code>MessageId</code> existence lookup and no <code>LateConfirmed</code>, so the spine can record <code>Abandoned</code> over a message that posted</h3>
+              <span class="finding-location">&sect; Proposal lifecycle; &sect; Proposal editor action rail</span>
+            </header>
+            <div class="finding-note">FR-18 requires the lookup before every retry <em>and before any exit including abandonment by any actor</em>, with a found message moving the proposal to <code>Posted</code> with <code>LateConfirmed</code> and rejecting the request. <code>LateConfirmed</code> occurs nowhere in either spine, though AD-15 names it as public contract and <code>epics.md</code> owns it. The audit record would say the reply was withdrawn while it sits in the Conversation.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the pre-exit lookup with its three outcomes to the retry and both administrative-exit confirmations, add <code>LateConfirmed</code> to &sect; Contracts that must grow, and give it a display treatment.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Three FR-33 rows have no surface, under a closure statement that says every stated need has one</h3>
+              <span class="finding-location">EXPERIENCE.md:111</span>
+            </header>
+            <div class="finding-note">Missing: <code>DataHandlingVersion</code> acceptance with its 30-day grace; confirming an SM-4 cross-tenant or unauthorized event, which FR-28 makes the immediate kill-switch trigger (the Update added the denial <em>count</em> but not the confirmation act); and convening and recording the trigger review, with AD-12's <code>TriggerReviewOverdue</code>, which blocks qualification and has no row class on the readiness panel.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the three, then re-state closure or scope it to what is actually closed.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">The Disable confirmation tells the administrator the opposite of AD-12, and the editor has no rendering for either stop</h3>
+              <span class="finding-location">EXPERIENCE.md:204</span>
+            </header>
+            <div class="finding-note">&ldquo;Pending proposals stay resolvable&rdquo; over-promises by exactly the three operations that matter: AD-12 permits reject and abandon only, and bars approval, edit and regeneration. &sect; Proposal editor action rail has no variant in which Approve, Edit and Regenerate are absent for a disabled Agent or a pulled kill switch, so the editor renders Approve and the server refuses it.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Correct the confirmation copy, and add one action-rail variant covering both stops in which Approve, Edit and Regenerate are absent with the typed reason while Reject and Abandon remain.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The two spines disagree on what the audit id-entry surface accepts, and the disagreement is the compliance-inspection path</h3>
+              <span class="finding-location">EXPERIENCE.md:97 vs DESIGN.md:244</span>
+            </header>
+            <div class="finding-note">EXPERIENCE accepts five reference kinds including an inspection case; DESIGN still says three. A dev building the form from DESIGN ships three kinds and the Story 8.8 inspection has no entry point.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Update the DESIGN line to five kinds, or drop the enumeration there and defer to the EXPERIENCE row.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>DESIGN.md</code>'s colour inventory does not carry the four call states the FR-33/FR-28 work added</h3>
+              <span class="finding-location">DESIGN.md:207</span>
+            </header>
+            <div class="finding-note"><code>rate limited</code>, <code>no eligible approver</code>, <code>kill switch active</code> and <code>conversation blocked</code> are all assigned <code>{colors.status-severe}</code> in EXPERIENCE and named in none of the severe list in the file that owns colour roles.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the four states to the severe inventory.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">&ldquo;Absent, not disabled&rdquo; was applied to one component and not to the two the Update created</h3>
+              <span class="finding-location">DESIGN.md:340, :336, :258</span>
+            </header>
+            <div class="finding-note"><code>cost-control-editor</code> has no lower-only or no-override variant and <code>content-safety-policy-editor</code> no tenant-delta-only variant, while the layout table lists three cost items with no statement that two are absent for a tenant administrator. A dev renders all three and hides the buttons &mdash; the field-inventory leak the provider-catalog fix exists to prevent.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the two variants and state the absent items in the layout table.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>/agents/audit</code> remains id-entry only, so the FR-24 rate-visibility requirement the Update added to it has no surface</h3>
+              <span class="finding-location">EXPERIENCE.md:97, :312</span>
+            </header>
+            <div class="finding-note">A rate is a list property, and AD-22 requires the inspection rate and every unreviewed inspection to be visible on a projection the TAA and Platform Operator can read. Id entry is defensible for Conversation-derived content and indefensible for the configuration-and-governance and inspection-record classes, which carry no Conversation content.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Keep id entry for interaction and proposal evidence; add an enumerable tenant-scoped list for governance evidence and inspection records including the unreviewed flag.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The six-part Provider eligibility set is stale against the PRD's own list</h3>
+              <span class="finding-location">EXPERIENCE.md:204, :606</span>
+            </header>
+            <div class="finding-note"><code>prd.md:209</code> enumerates seven, and two of them are exactly what the FR-33 Update introduced elsewhere &mdash; per-tenant enablement, now a first-class catalog column, and data-handling acceptance. Neither reached the activation blocker list.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Restate the set to the PRD's, with both as named activation blockers.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>ConversationAgentState</code>'s five states are invisible, so the block the Update added cannot be read back</h3>
+              <span class="finding-location">&sect; Operational status rules</span>
+            </header>
+            <div class="finding-note"><code>NeverJoined</code>, <code>Joined</code>, <code>ExternallyRemoved</code>, <code>Blocked</code>, <code>ReadmitPending</code>, <code>BlockVersion</code> and <code>MirrorPending</code> all return zero hits, though <code>epics.md</code> and AD-15's parity list make them public contract. <code>MirrorPending</code> is precisely the &ldquo;the block has not yet reached Conversations&rdquo; condition an operator must see before trusting that calls have stopped. &sect; Contracts that must grow does not name them either, so the gap is unowned.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Render the five membership states and <code>MirrorPending</code> beside the block control, and add them to &sect; Contracts that must grow against Story 6.6.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Agents overview is narrower than the FR-33 status row without saying so</h3>
+              <span class="finding-location">EXPERIENCE.md:86</span>
+            </header>
+            <div class="finding-note"><code>/agents</code> is gated <code>Agents.Administrator</code> alone while FR-33's inspection row grants operational status to three roles. Narrowing fails closed and is defensible, but it is undeclared, so a reader cannot tell it from the drift the other cells carry.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One clause stating the narrowing is deliberate, or widen it to the same three constants.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">What holds, having tried to break it</h3>
+              <span class="finding-location">&mdash;</span>
+            </header>
+            <div class="finding-note">The role-to-constant binding is correct against AD-30 including the <code>Agents.AuditOperator</code>/Compliance Inspector split; the five-conjunct Eligible Approver predicate is stated once in full and never contradicted where referenced; the FR-13 listing predicate matches AD-8 exactly; the cost two-tier split, lower-only rejection, Platform-only override and zero-price blocker close every self-set-boundary path constructible; the content-safety direction rule refuses to render a relaxation on the tenant surface; the single two-key <code>not available</code> state leaves no per-cause disclosure channel; provider secrets remain unenterable and the reason-code channel is closed.</div>
+            <div class="finding-fix"><strong>Fix:</strong> None.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="reviewer-section">
+      <details>
+        <summary>
+          <h2>Implementation readiness review</h2>
+          <span class="reviewer-source">review-implementation-readiness.md &middot; 1 critical &middot; 11 high &middot; 11 medium &middot; 3 low &middot; regression 17 resolved / 4 partial / 2 unresolved / 0 regressed</span>
+        </summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Read as the story-dev agent that must build any story in Epics 5&ndash;8 from the pair plus the named sources, with <code>src/Hexalith.Agents.UI</code> as the starting codebase and no one to ask. The baseline's list is largely closed &mdash; 17 of 25, including every finding filed against the register and <code>epics.md</code> &mdash; and all sixteen &sect; Shipped-code corrections rows are true against the code today. Nothing here is a vocabulary error: a dev can build the badges, the grids and the dialogs. What a dev cannot do without inventing decisions is build the kill switch, the Security approval stage, the retry lane, or the per-Conversation block &mdash; four of the Update's own additions.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">Five <code>epics.md</code> stories are named nowhere in either spine, and they own contracts the spine declares unowned</h3>
+              <span class="finding-location">&sect; Information Architecture; &sect; Contracts that must grow; &sect; Key Flows</span>
+            </header>
+            <div class="finding-note"><code>epics.md</code> carries 33 stories; the pair names 28. Stories 5.8, 5.9, 5.10, 6.8 and 7.7 return zero hits across both spines and are live <code>backlog</code> rows in <code>sprint-status.yaml</code>. Story 6.8 owns the additive runtime reasons the spine assigns to 6.3/6.4/6.5; Story 7.7 owns the entire <code>PostingFailed</code> recovery lane the Update's new rail rows describe, including the pre-retry existence read, <code>Posted (LateConfirmed)</code>, and the kill-switch pause of the very window the spine tells the confirmation to count down; Story 5.10 owns the <code>Caller</code> retirement assigned to 5.4 alone. The pair's own promise &mdash; &ldquo;Every row names the story that closes it, so a correction is never unowned&rdquo; &mdash; is false for a sixth of the backlog.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Re-derive every owning-story cell against the current 33-story list and against <code>epics.md</code> &sect; Second-Update Story Criteria And Dependencies, which is the authoritative map of what each late story owns.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">&sect; Contracts that must grow assigns the three new pre-Provider rejections to the wrong stories</h3>
+              <span class="finding-location">&sect; Contracts that must grow</span>
+            </header>
+            <div class="finding-note">Stories 6.3, 6.4 and 6.5 own <code>SafetyBlocked</code>, <code>BudgetBlocked</code>, <code>RateLimited</code>, <code>CapacityQueued</code>, <code>CapacityRejected</code> and nothing else. Story 6.8's first AC names <code>NoEligibleApprover</code>, <code>RemovedInConversations</code>, <code>SourceConversationUnavailable</code> and <code>NotInvoked</code>; Story 7.1 additionally owns <code>NoEligibleApprover</code>. The Update appended three tokens to an existing row and left the owner column describing the old set.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Split the row &mdash; the five capacity/safety/budget tokens to 6.3/6.4/6.5; <code>NoEligibleApprover</code> and <code>RemovedInConversations</code> to 6.8 with 7.1 for the approver-resolution half.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title"><code>KillSwitchActive</code> exists in no source artifact and contradicts the one that does</h3>
+              <span class="finding-location">&sect; Agent call; &sect; Contracts that must grow</span>
+            </header>
+            <div class="finding-note">Zero occurrences in <code>epics.md</code>, <code>ARCHITECTURE-SPINE.md</code>, <code>prd.md</code> and both registers. AD-12 states the runtime consequence under a different name &mdash; <code>agent-setup</code> and <code>launch-readiness</code> expose <strong><code>Suspended</code></strong> distinctly from Agent <code>Disabled</code> &mdash; and Story 7.7's fourth AC is written entirely against &ldquo;the tenant becomes <code>Suspended</code>&rdquo;. Story 6.8's closing AC bars inventing further additive members. Meanwhile <code>Suspended</code>, the token a dev will actually receive, has no row in &sect; Agent readiness, &sect; Agent call or &sect; Proposal lifecycle, so the state that disables an entire tenant renders as an unknown value.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Replace <code>KillSwitchActive</code> with <code>Suspended</code>, give it rows in &sect; Agent readiness and &sect; Agent call, and cite AD-12 rather than proposing a new enum member Story 6.8 forbids.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Story 7.7 owns the <code>PostingFailed</code> lane the Update wrote, and the pair points at 7.2&ndash;7.6</h3>
+              <span class="finding-location">EXPERIENCE.md:94, :636</span>
+            </header>
+            <div class="finding-note">Story 7.7 <em>Restore Posting-Failed Recovery And Proposal-State Parity</em> owns <code>FR18.PostingFailed-nonterminal-recovery</code>, <code>FR18.MessageId-before-exit</code>, <code>FR18.LateConfirmed</code> and <code>FR18.kill-switch-transition-behavior</code>, with <code>ProposalDetailPostingFailedRecoveryTests</code> and <code>KillSwitchProposalStateTests</code> as its artifacts. Every rule the Update added to the two <code>PostingFailed</code> rail rows is 7.7's, and the spine sends the dev to a story set that excludes it.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add 7.7 to both cells and to the &sect; Proposal editor action rail preamble.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">The retry confirmation counts down a window the server pauses, and skips the mandatory pre-retry existence read</h3>
+              <span class="finding-location">&sect; Proposal editor action rail</span>
+            </header>
+            <div class="finding-note">AD-12 pauses the retry-window clock under suspension, accruing <code>PausedDuration</code>, with the deadline computed as origin plus window plus that duration. A dev computing <code>now &minus; firstFailure</code> against 15 minutes ships a countdown that expires while the server's window is still open. Separately, Stories 7.4 and 7.7 both require a typed <code>MessageId</code> existence read before every retry or exit, with a found message recording <code>Posted</code> with <code>LateConfirmed</code> and rejecting the request &mdash; none of which appears anywhere. A 7.7 dev building the rail from this spine ships a Retry button that posts twice.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add <code>PausedDuration</code> to the rendered window, and add <code>Posted (LateConfirmed)</code> to the display-only outcomes table with the three lookup outcomes.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">The per-tenant kill switch has no story with an acceptance criterion that would build it</h3>
+              <span class="finding-location">EXPERIENCE.md:96, :306</span>
+            </header>
+            <div class="finding-note">Story 8.7 is <em>Inspect Launch Evidence And Blockers</em>: its Primary Demonstrable Outcome is one tenant/profile inspection, every AC is a read, and the string &ldquo;kill&rdquo; does not occur in the story. Story 8.4 mentions the tenant kill switch only as a field its aggregate owns &mdash; no command, no confirmation, no justification, no trigger-condition AC &mdash; and 8.4 is not named on the Launch readiness row. The spine mandates a governed write on a route whose two owning stories are an inspection and a contract publisher.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name the owning story for the pull/release command and its confirmation, and file the missing AC as an epics deferral at the point of use, as &sect; Operational status rules already does for the 6.2 read model.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Per-Conversation block and re-admit is Story 6.6's, and the spine names 6.7 and 8.7 and renders none of 6.6's vocabulary</h3>
+              <span class="finding-location">EXPERIENCE.md:95</span>
+            </header>
+            <div class="finding-note">Story 6.6 is bound to expose exactly the five membership states, <code>BlockVersion</code>, <code>MirrorPending</code>, the non-terminal proposal index, clear-time authority, <code>ReadmitPending</code> and the next-accepted-step rejoin. Not one has a rendering rule, colour role or announcement in either spine &mdash; a re-admit that is <code>ReadmitPending</code> rather than cleared has nothing to render.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add 6.6 to the Operational status owning-story cell and give <code>ReadmitPending</code> and <code>MirrorPending</code> treatments.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Two families were declared by the Update and neither was named or given required contents</h3>
+              <span class="finding-location">EXPERIENCE.md:109, :220, :440, :478, :494</span>
+            </header>
+            <div class="finding-note">The family name is load-bearing three ways: the advisory lock is keyed per (session, resource, family), the register keys required GateIds per family, and the rendered contents set is what the audit record carries. Both tokens already exist in the cited sources &mdash; <code>TenantKillSwitch (v2)</code> with its four gates in the register, and the block/clear commands under <code>AgentSetupMutation</code>'s lock in AD-12.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a <code>TenantKillSwitch</code> row and a block/clear row (or state the <code>AgentSetupMutation</code> folding explicitly), and correct &ldquo;ten&rdquo; at all four sites.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">&ldquo;The ten families&rdquo; contradicts the lock-bearing set the lock rule is derived from</h3>
+              <span class="finding-location">&sect; High-risk pending commands</span>
+            </header>
+            <div class="finding-note">AD-12 defines the lock-bearing subset as nine and states that <code>AgentCallAcceptance</code>, <code>ProposalEdit</code> and <code>ProposalRegeneration</code> are <em>not</em> lock-bearing. <code>ConversationPosting</code>, the family the Update added, is in neither list, so a 7.7 dev cannot tell whether Retry posting takes a lock &mdash; and &sect; Confirmation contents by family gives it one anyway.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State whether <code>ConversationPosting</code> is lock-bearing and reconcile the count against AD-12; if the Architecture Spine is mid-edit here, say so at the point of use rather than asserting ten.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">The Security approval stage is invented against the Architecture Spine and no story builds it</h3>
+              <span class="finding-location">EXPERIENCE.md:69, :213</span>
+            </header>
+            <div class="finding-note">AD-30 makes it &ldquo;a recorded Security approval reference in the <code>PolicyPublication</code> command&rdquo; &mdash; a field on the single command, nearer to the checkbox the spine forbids than to a stage. <code>prd.md</code> and <code>epics.md</code> both call it a <em>condition</em>. Story 8.4's ACs describe one command with the standard three-stage sequence and never mention it. So the spine mandates a pending stage with no token in <code>AgentCommandAcceptance</code>, no authorization constant, no contents row, and no AC.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Bind the spine to the reference-on-the-command design and drop &ldquo;acceptance stage&rdquo;, or file the stage as a contracts-that-must-grow row with an owner and mark it deferred at the point of use.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">The Launch readiness grid is told to use <code>FcExpandInRowDetail</code> and given no <code>ViewKey</code>, which is <code>[EditorRequired]</code> and fails closed</h3>
+              <span class="finding-location">&sect; Grid rules</span>
+            </header>
+            <div class="finding-note">The <code>ViewKey</code> row assigns exactly two keys and states that view-key mismatches fail closed; <code>FcExpandInRowDetail.razor.cs</code> marks <code>ViewKey</code>, <code>HasExpanded</code>, <code>ChildContent</code> and <code>DetailPanelAriaLabel</code> all <code>[EditorRequired]</code>. A dev has no key to pass and no localized panel label for a third grid.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add <code>agents.launch-readiness</code> to the <code>ViewKey</code> row and its <code>DetailPanelAriaLabel</code> to the localization inventory.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">The seam's &ldquo;Consuming story&rdquo; cell asserts two corrections as outstanding that have both landed, and blocks Story 6.7 on them</h3>
+              <span class="finding-location">EXPERIENCE.md:123</span>
+            </header>
+            <div class="finding-note"><code>epics.md</code> Story 6.7 now declares <code>EXT-CONV-UI-1</code> in its Dependencies and names it in the Evidence Manifest; the register reads <code>ConsumingStories: 6.7; RQ-1</code>; and <code>RequiredArtifact</code> now carries three artifact kinds naming both the decoration slot and <code>GetCallabilityAsync</code>. A planner reading this spine holds 6.7 for clerical work already done.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Rewrite the cell to the one correction that remains: the persistent status region and the focus-return contract are still absent from the register.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>ExpiredWhileSuspended</code> has no rendering</h3>
+              <span class="finding-location">&sect; Proposal lifecycle</span>
+            </header>
+            <div class="finding-note">Stories 7.6 and 8.5 own it with its SM-3/SM-C5 exclusion; AD-12 records it. The <code>Expired</code> row states the opposite emphasis and its only metric-exclusion sentence sits on <code>Abandoned</code>.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One clause on the <code>Expired</code> row.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>Abandoned</code>'s fourth reason is untyped where the other three are</h3>
+              <span class="finding-location">EXPERIENCE.md:414</span>
+            </header>
+            <div class="finding-note">Three are contract tokens; the fourth is English prose, and the spine's own rule is that every architecture token has a localized label and raw tokens never display &mdash; a dev cannot key <code>Agents.ProposalAbandonReason.kill switch</code>. AD-12 in fact says the switch never system-abandons a proposal, so the fourth value may not exist at all.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name the token or delete the fourth reason.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">&ldquo;This four-name list&rdquo; now names two</h3>
+              <span class="finding-location">&sect; Grid rules</span>
+            </header>
+            <div class="finding-note">The Update correctly moved <code>FcStatusFilterChips</code> and <code>FcFilterResetButton</code> into their own &ldquo;Not used&rdquo; rows and left the count describing the old set. Both remaining components verified present in the FrontComposer submodule.</div>
+            <div class="finding-fix"><strong>Fix:</strong> &ldquo;This two-name set, previously a four-name list attributed to FC-TBL&rdquo;.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>DESIGN.md</code> and &sect; Grid rules disagree on which grids the required set covers</h3>
+              <span class="finding-location">DESIGN.md &sect; Layout &amp; Spacing</span>
+            </header>
+            <div class="finding-note">DESIGN says the set applies to the Provider catalog and Proposal queue &ldquo;only&rdquo;; &sect; Grid rules gives the Launch readiness grid <code>FcExpandInRowDetail</code>, which is half that set. Both files are <code>final</code> and the pair wins on conflict with everything except itself.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Rewrite the DESIGN sentence to scope the filter rules to two grids while letting <code>FcExpandInRowDetail</code> govern the third.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>launch-readiness-panel</code> has no kill switch in its component section</h3>
+              <span class="finding-location">DESIGN.md &sect; launch-readiness-panel</span>
+            </header>
+            <div class="finding-note">The accordion table row lists &ldquo;Kill switch; NFR-14 evidence; Consumed dependencies&rdquo;; the component section still lists the pre-Update three items. There is no visual binding for the highest-impact control on the surface.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Align the component section to the table.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>operational-status-panel</code> has no block or re-admit control</h3>
+              <span class="finding-location">DESIGN.md &sect; operational-status-panel</span>
+            </header>
+            <div class="finding-note">Its accordion row now lists &ldquo;Per-Conversation history and block&rdquo; and &sect; Operational status rules puts two governed write controls there. The component section is unchanged: badge rows, deferred metrics, projection id. No buttons, no confirmation, no pending indicator, no variants.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the control binding and the opaque-Conversation-reference variant the rules section requires.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>content-safety-policy-editor</code> has no Security approval stage</h3>
+              <span class="finding-location">DESIGN.md &sect; content-safety-policy-editor</span>
+            </header>
+            <div class="finding-note">The section describes a one-stage draft/validate/publish sequence where the EXPERIENCE row demands a second separately authorized stage, and omits the tenant/platform split's visual consequence.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add the stage and a <code>tenant stricter-only</code> variant.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The rail's two new buttons have no acceptance criterion behind the behaviour that makes them necessary</h3>
+              <span class="finding-location">&sect; Proposal editor action rail</span>
+            </header>
+            <div class="finding-note">The rule is correct and closes the baseline's finding, but Story 7.2 has no AC for a dirty state, for Discard, for Approve being blocked while dirty, or for the unsaved-changes confirmation the <code>version-history</code> row makes the one permitted selection-event confirmation.</div>
+            <div class="finding-fix"><strong>Fix:</strong> One AC clause on 7.2, filed as an epics deferral at the point of use.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The <code>Agents.PlatformOperator</code> drift row is absorbed by two stories whose criteria would not close it</h3>
+              <span class="finding-location">&sect; Shipped-code corrections</span>
+            </header>
+            <div class="finding-note">Neither Story 5.3 nor 5.7 has an AC that registers a policy constant or converts a platform-scoped surface off the fallback. It is the only row in the table whose divergence is a security posture rather than a styling or vocabulary drift, and it carries no <code>RQ-1</code> or <code>LR-TENANT-ACCESS</code> linkage.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Name the AC &mdash; constant registration plus per-surface regating &mdash; and cross-reference <code>LR-TENANT-ACCESS</code>, so the row is not read as cosmetic.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Both documents say &ldquo;three artifact kinds&rdquo; and disagree about the third, and the focus-return contract is in neither</h3>
+              <span class="finding-location">&sect; Conversation Integration Seam</span>
+            </header>
+            <div class="finding-note">The spine's third is the persistent Agents-owned status region; the register's third is <code>GetCallabilityAsync</code>. The status region &mdash; which the spine argues is the difference between every post-submit outcome being announced and being lost &mdash; and the focus-return contract appear nowhere in the register.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Amend <code>RequiredArtifact</code> to four kinds plus the focus-return contract, and make this the single named outstanding correction in the seam row.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">The provenance design is still double-specified</h3>
+              <span class="finding-location">external-dependency-register.md</span>
+            </header>
+            <div class="finding-note">The register renders provenance markers &ldquo;carried in message metadata&rdquo; backed by an Agents-side accessor; the spine specifies the accessor as the source. The metadata clause belongs to the other posting seam and survived the amendment.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Strike the metadata clause from the register, or drop the accessor here.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">A gate-set claim a dev can falsify in one grep</h3>
+              <span class="finding-location">&sect; Proposal editor action rail</span>
+            </header>
+            <div class="finding-note">&ldquo;Only that family's gate set requires <code>LR-CONVERSATIONS-MEMBERSHIP-POSTING</code> and <code>LR-SAFETY</code>&rdquo; &mdash; the register shows <code>LR-SAFETY</code> is also required by four other families. The conclusion is right; the premise is not.</div>
+            <div class="finding-fix"><strong>Fix:</strong> &ldquo;Unlike <code>ProposalResolution</code>'s gate set, which requires neither&rdquo;.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title"><code>cost-control-editor</code> has no lower-only variant</h3>
+              <span class="finding-location">DESIGN.md &sect; cost-control-editor</span>
+            </header>
+            <div class="finding-note">Its variants omit both <code>lower-only</code> and <code>override absent</code>, and Story 8.4's budget AC records caps and validation but never the raise/lower asymmetry.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add both variants and file the missing 8.4 AC as a deferral.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">The code's own doc comment says eight where nine are registered</h3>
+              <span class="finding-location">AgentsFrontComposerRegistration.cs</span>
+            </header>
+            <div class="finding-note">The <code>RegisterDomain</code> XML doc says &ldquo;eight ordered, policy-gated nav entries&rdquo;; nine <code>AddNavEntry</code> calls follow. The spine's row correctly says nine; the code comment will send a dev the other way.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Note the stale comment on the row.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <div class="mechanical">
+      <h3>Mechanical notes</h3>
+      <ul>
+        <li><strong>Component parity.</strong> The 22 names are byte-identical <em>and identically ordered</em> across the DESIGN frontmatter, the DESIGN <code>###</code> sections and the EXPERIENCE Component Patterns rows. The three-way rule the spines declare holds under test.</li>
+        <li><strong>Cross-references.</strong> All 19 distinct <code>{path.to.token}</code> references resolve, script-verified against the parsed YAML. Every internal <code>&sect;</code> reference resolves to a heading in the named file, and all six external ones resolve to real headings in the registers and the repo UX instructions.</li>
+        <li><strong>Frontmatter.</strong> All 37 source paths resolve on disk (17 DESIGN, 20 EXPERIENCE). <code>status: final</code> should be <code>draft</code> until the criticals are closed.</li>
+        <li><strong>Policy constants.</strong> The five AD-30 constants are used consistently and no sixth is invented; zero <code>Agents.ComplianceInspector</code> hits anywhere in the repo. <code>AgentsFrontComposerRegistration.cs</code> declares four and omits <code>Agents.PlatformOperator</code>, exactly as &sect; Shipped-code corrections records.</li>
+        <li><strong>Name consistency.</strong> Conversation Facilitator, Compliance Inspector, <code>PostingFailed</code>, the <code>Stale</code>/<code>catching up</code>/<code>awaiting projection</code> triple and the Provider-catalog name triple are consistent throughout. Zero &ldquo;Conversation owner&rdquo; hits outside the sentences forbidding it. No casing drift.</li>
+        <li><strong>Icons.</strong> <code>FcFluentIcons</code> verified against source: twelve <code>TryCreate</code> names match exactly; all thirteen listed Size16 factories exist and all seven status roles bind to one.</li>
+        <li><strong>Tables.</strong> No malformed rows in either file. The single fenced block is opened and closed correctly. No Mermaid.</li>
+        <li><strong>Repo UX law.</strong> Compliant &mdash; FrontComposer plus Fluent v5 only, no theme redefinition, no legacy v4/FAST token except as a named prohibition and a zero-hit inventory, and the single-<code>FluentAccordion</code> grouping rule carried per surface (with one coverage gap filed under Shape fit).</li>
+        <li><strong>MCP caveat.</strong> The Fluent documentation server serves <code>5.0.0.26180</code> against a pin of <code>5.0.0-rc.5-26219.1</code>, so every v5 API fact is true at the served build and re-verification is owed when the pin moves &mdash; which <code>DESIGN.md</code> already commits to.</li>
+        <li><strong>Denominators.</strong> The IA table holds 15 rows and DESIGN now says 15; the memlog still says 14. The DESIGN layout split counts Audit evidence twice, correct for routes and confusing beside a surface count.</li>
+      </ul>
+    </div>
+
+    <footer class="report-footer">
+      <div class="meta">
+        <span>Rubric: review-rubric.md</span>
+        <span>Reviewers: review-accessibility.md &middot; review-governance.md &middot; review-implementation-readiness.md</span>
+        <span>Baseline: .working/validation-2026-09-09-post-fr33/</span>
+        <span>Generated: 2026-09-09</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

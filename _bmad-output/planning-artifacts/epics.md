@@ -2731,6 +2731,11 @@ So that approved evidence can be transferred without exposing secrets, unrelated
 **Then** EventStore records one deterministic export identity and authoritative pending state before work begins, and the manifest names the authorized scope, immutable source revisions, item counts, hashes, encryption method reference, created time, exclusive expiry, and safe audit reference
 **And** the request never expands beyond the approved tenant, time range, content class, or current authorization.
 
+**Given** an export request is otherwise authorized
+**When** FR-24 second-party governance is evaluated
+**Then** the eligible second party records approval before any export content is read
+**And** post-hoc approval is never accepted for export selection, materialization, or key delivery.
+
 **Given** `EXT-SECRETS-1` is Available and key access succeeds through the platform host
 **When** the export is materialized
 **Then** `AuditExport(TenantId, ExportId)` encrypts the artifact under an export envelope key wrapped by the tenant KEK, appends `ManifestSealed` with manifest hash, signature reference, item hashes, stream/projection revision ranges, and key versions, and the `export` projection reaches completed only after artifact and manifest verification
@@ -2760,8 +2765,8 @@ So that approved evidence can be transferred without exposing secrets, unrelated
 
 | Field | Story 8.2 evidence |
 | --- | --- |
-| Requirements | FR19-FR24, FR28; NFR1-NFR6, NFR13; UX-DR1, UX-DR9-UX-DR18, UX-DR29-UX-DR33, UX-DR36-UX-DR41, UX-DR46, UX-DR50; AD-2, AD-8, AD-12, AD-13, AD-17, AD-20, AD-22, AD-23, AD-25, AD-26; EXT-PROTECTION-1; EXT-SECRETS-1 |
-| OwnedClauses | FR19.export-tenant-isolation; FR20.export-authorization-before-selection; FR23.export-public-contract; FR24.export-audit; FR28.audit-governance-active; PRD-OQ8.authorized-encrypted-time-limited-export; NFR2.no-unauthorized-audit-content; NFR6.secret-never-exposed; UX-DR31.ExportRequest-lock-scope; UX-DR40.ExportRequest-restrictive-viewport-block; UX-DR46.encrypted-time-limited-export; AD-2.AuditExport; AD-20.protected-content-and-secret-boundary; AD-22.manifest-sealing-and-key-delivery; AD-23.export-projection |
+| Requirements | FR19-FR24, FR28; OQ-30; NFR1-NFR6, NFR13; UX-DR1, UX-DR9-UX-DR18, UX-DR29-UX-DR33, UX-DR36-UX-DR41, UX-DR46, UX-DR50; AD-2, AD-8, AD-12, AD-13, AD-17, AD-20, AD-22, AD-23, AD-25, AD-26; EXT-PROTECTION-1; EXT-SECRETS-1 |
+| OwnedClauses | FR19.export-tenant-isolation; FR20.export-authorization-before-selection; FR23.export-public-contract; FR24.export-audit; FR24.export-prior-second-party-approval; FR28.audit-governance-active; PRD-OQ8.authorized-encrypted-time-limited-export; OQ30.no-post-hoc-export-approval; NFR2.no-unauthorized-audit-content; NFR6.secret-never-exposed; UX-DR31.ExportRequest-lock-scope; UX-DR40.ExportRequest-restrictive-viewport-block; UX-DR46.encrypted-time-limited-export; AD-2.AuditExport; AD-20.protected-content-and-secret-boundary; AD-22.manifest-sealing-and-key-delivery; AD-23.export-projection |
 | Dependencies | Story 8.1; EXT-PROTECTION-1 and EXT-SECRETS-1 Available with accepted exact targets and passing compatibility commands |
 | EvidenceLevel | Levels 2, 4, and 5: export logic, live secret/export components, and production-like encrypted-artifact proof |
 | TestOrArtifact | AuditExportAggregateTests; EncryptedExportIntegrationTests; ExportExpiryAndReplayTests; ExportUiContractTests; encrypted export manifest and no-leak scan |
@@ -3073,7 +3078,12 @@ So that sensitive content can be examined without granting ambient Conversation 
 **Given** a request for unposted content or context metadata
 **When** disclosure is evaluated
 **Then** it requires either the Party durably recorded as Eligible Approver for that proposal or `AuditInspection(TenantId, InspectionId)` scoped to a named Conversation or case with a nonblank justification
-**And** the compliance path records a distinct Tenant Agent Administrator's pre-approval before content read or a required post-hoc review within the configured tenant window.
+**And** the compliance path computes the subject set from callers, editors, Approvers, decision actors, Facilitators in scope, and the Tenant Agent Administrator whose configuration was in force; the second party must be outside that set and not the Inspector, using the current Tenant Agent Administrator when eligible and otherwise the Platform Operator or a second Compliance Inspector.
+
+**Given** a second party is eligible for an inspection
+**When** pre-approval or post-hoc review is recorded
+**Then** two Compliance Inspectors cannot approve each other within 30 days, any scope wider than one Conversation requires Platform Operator approval, and post-hoc review is allowed only for a single proposal or single Conversation and must finish within 7 days
+**And** a missed post-hoc deadline is recorded as unreviewed and remains visible with inspection rate to the Tenant Agent Administrator and Platform Operator.
 
 **Given** an AuditInspection is accepted
 **When** content reads and review transitions occur
@@ -3094,8 +3104,8 @@ So that sensitive content can be examined without granting ambient Conversation 
 
 | Field | Story 8.8 evidence |
 | --- | --- |
-| Requirements | FR19-FR25, FR28-FR30, FR33, FR34; NFR1-NFR7, NFR11, NFR13; UX-DR9-UX-DR18, UX-DR29-UX-DR41, UX-DR46, UX-DR50; AD-2, AD-8, AD-12, AD-14, AD-17, AD-22, AD-27, AD-30; EXT-CONV-AI-1; EXT-PROTECTION-1; EXT-TOPOLOGY-1 |
-| OwnedClauses | FR20.audit-inspection-authorization; FR23.audit-inspection-public-contract; FR24.inspection-self-audit; NFR2.protected-evidence-disclosure; AD-2.AuditInspection; AD-22.two-level-inspection-and-surviving-evidence; AD-30.compliance-principal; matrix-v2.AuditInspection |
+| Requirements | FR19-FR25, FR28-FR30, FR33, FR34; OQ-30; NFR1-NFR7, NFR11, NFR13; UX-DR9-UX-DR18, UX-DR29-UX-DR41, UX-DR46, UX-DR50; AD-2, AD-8, AD-12, AD-14, AD-17, AD-22, AD-27, AD-30; EXT-CONV-AI-1; EXT-PROTECTION-1; EXT-TOPOLOGY-1 |
+| OwnedClauses | FR20.audit-inspection-authorization; FR23.audit-inspection-public-contract; FR24.inspection-self-audit; FR24.computed-subject-set-and-second-party; OQ30.inspector-anti-collusion-and-seven-day-review; NFR2.protected-evidence-disclosure; AD-2.AuditInspection; AD-22.two-level-inspection-and-surviving-evidence; AD-30.compliance-principal; matrix-v2.AuditInspection |
 | Dependencies | Stories 5.4, 5.8, 7.1, and 8.1; EXT-PROTECTION-1, EXT-TOPOLOGY-1, and EXT-CONV-AI-1 Available |
 | EvidenceLevel | Levels 2, 4, and 5: aggregate/authorization behavior, live protected disclosure, and production-like isolation/review proof |
 | TestOrArtifact | AuditInspectionAggregateTests; AuditInspectionApiUiParityTests; AuditInspectionLiveTests; InspectionReviewWindowTests; inspection evidence manifest |
