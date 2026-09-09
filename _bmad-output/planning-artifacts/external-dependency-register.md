@@ -42,7 +42,7 @@ Unknown values remain `TBD` and the record remains `Uncommitted`. They are block
 
 Changing an owner, artifact, target, compatibility behavior, verification command, or required evidence level invalidates prior acceptance and returns the record to `Uncommitted` until the changed commitment is accepted. A failed compatibility command makes the dependency unavailable and blocks consumers even if the record was previously `Available`.
 
-`Committed` permits story readiness and contract/package work only. No runtime, test, or qualification path may execute a consumed external seam until the record is `Available` and its compatibility command passes against the exact target used by that execution.
+`Committed` permits story readiness and contract/package work only. The register owner's compatibility command against the exact committed target is the sole permitted execution of a `Committed` seam, and only to establish `Available`; it does not authorize any consuming runtime, test, or qualification path. No other runtime, test, or qualification path may execute the seam until the record is `Available` and that command has passed against the exact target used by the execution.
 
 A runtime, test, or qualification path that would execute a seam whose record is not `Available` fails closed with the typed outcome `DependencyNotAvailable` naming the record (PRD FR-21). `RQ-1` records the same code for every record in its qualification profile that is not `Available` (PRD FR-28).
 
@@ -92,7 +92,7 @@ A runtime, test, or qualification path that would execute a seam whose record is
 | `CompatibilityContractAndVerificationCommand` | Contract: clean-checkout composition through the platform host without module-owned hosting infrastructure, including production protection-engine binding and the complete FR-34 canary/identity/version attestation. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
 | `AcceptedStatus` | `Uncommitted` |
-| `ConsumingStories` | 5.1, 5.6 onward; `RQ-1` |
+| `ConsumingStories` | 5.1, 5.6; `RQ-1` |
 
 *Historical prior commitment only: target `a66cdf346e521ad147f442b686f301f0f59c525c`, integration date `2026-09-30`, and `./eng/verify-agents-host.sh` covered the earlier clean-checkout host artifact. The expanded protection binding and attestation artifact has not been re-accepted by the Platform Maintainer, so those values are not current commitment fields.*
 
@@ -122,7 +122,7 @@ A runtime, test, or qualification path that would execute a seam whose record is
 | `CompatibilityContractAndVerificationCommand` | Contract: fresh deterministic safety decisions before Provider and before proposal/posting side effects, including fail-closed missing, stale, unversioned, and indeterminate outcomes. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
 | `AcceptedStatus` | `Uncommitted` |
-| `ConsumingStories` | 6.3, 7.3, 7.4; `RQ-1` |
+| `ConsumingStories` | 6.3, 6.8, 7.3, 7.4, 7.7; `RQ-1` |
 
 ### EXT-TOKEN-1 — Provider/Model Tokenizer
 
@@ -136,7 +136,7 @@ A runtime, test, or qualification path that would execute a seam whose record is
 | `CompatibilityContractAndVerificationCommand` | Contract: deterministic token counts for the exact prepared request; missing or unsupported Provider/model tokenization fails closed before Provider invocation. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
 | `AcceptedStatus` | `Uncommitted` |
-| `ConsumingStories` | 6.2, 7.3; `RQ-1` |
+| `ConsumingStories` | 6.2, 6.8, 7.3; `RQ-1` |
 
 ### EXT-SECRETS-1 — Platform Secret Resolution
 
@@ -150,7 +150,7 @@ A runtime, test, or qualification path that would execute a seam whose record is
 | `CompatibilityContractAndVerificationCommand` | Contract: platform-hosted secret access, rotation recovery, denied access, and proof that values do not enter events, projections, responses, logs, traces, or evidence. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
 | `AcceptedStatus` | `Uncommitted` |
-| `ConsumingStories` | 5.6, 5.8, 6.4, 8.1, 8.2, 8.3; `RQ-1` |
+| `ConsumingStories` | 5.6, 5.8, 6.4, 7.3, 8.1, 8.2, 8.3; `RQ-1` |
 
 ### EXT-TOPOLOGY-1 — Production-Like Qualification Fixture
 
@@ -178,7 +178,7 @@ A runtime, test, or qualification path that would execute a seam whose record is
 | `CompatibilityContractAndVerificationCommand` | Contract: an owner-supplied executable command must prove at minimum (1) seal with plaintext-absence proof, (2) unseal with payload equality, (3) irreversible erase with typed `Erased` replay, (4) hold pin rejecting erase until authorized unpin, and (5) engine identity/version reporting equal to the exact committed target, with focused per-tenant key isolation and restore-cannot-revive behavior. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
 | `AcceptedStatus` | `Uncommitted` |
-| `ConsumingStories` | 5.8, 6.1–6.4, 7.1–7.4, 8.1–8.3, 8.8; `RQ-1` |
+| `ConsumingStories` | 5.6, 5.8, 6.1–6.4, 6.8, 7.1–7.4, 7.7, 8.1–8.3, 8.8; `RQ-1` |
 
 *Added 2026-09-09 by the architecture update: the 2026-09-09 verified-current review found that the EventStore checkout carries only the protection hooks and a no-op default, so the AD-22 key hierarchy has no owner without this record.*
 
