@@ -4,7 +4,7 @@ status: active
 created: 2026-08-02
 updated: 2026-09-09
 project: agents
-authority: sprint-change-proposal-2026-09-09-prd-validation-follow-through.md
+authority: sprint-change-proposal-2026-09-09-2.md
 ---
 
 # External Dependency Register
@@ -44,6 +44,8 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 
 `Committed` permits story readiness and contract/package work only. No runtime, test, or qualification path may execute a consumed external seam until the record is `Available` and its compatibility command passes against the exact target used by that execution.
 
+A runtime, test, or qualification path that would execute a seam whose record is not `Available` fails closed with the typed outcome `DependencyNotAvailable` naming the record (PRD FR-21). `RQ-1` records the same code for every record in its qualification profile that is not `Available` (PRD FR-28).
+
 ## Critical Dependency Records
 
 ### EXT-CONV-AI-1 — Conversations AI Membership And Posting
@@ -52,13 +54,13 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 | --- | --- |
 | `Owner` | Conversations Maintainer |
 | `Repository` | `Hexalith.Conversations` |
-| `RequiredArtifact` | Six seams. (1) Membership: public `IConversationClient.AddParticipantAsync` and `POST /api/v1/conversations/{conversationId}/participants`, limited for Agents to stable AI Party identity, `ParticipantType.AiAgent`, and `ParticipantRole.Member`; exact retries are idempotent no-ops, conflicting type/role is a typed conflict, and cross-tenant or general participant management is denied; plus a participant-state read for the AI participant and a participant removal limited to the AI participant, for the PRD FR-2 removal block. (2) Posting: append a Conversation Message as the `AiAgent` participant with an Agents-supplied deterministic `MessageId` and idempotency key, persisted verbatim or rejected (a differing returned id is a typed incompatibility that blocks posting), and message metadata carrying the Agent Call trace reference and provenance flags (AI-generated; human-edited and by which Party), so restart or replay cannot duplicate a post; plus an existence read by `MessageId` returning a message, typed absence, `ConversationDeleted`, or `PrincipalRemovedFromConversation`, so an acknowledgement-loss retry or abandon cannot contradict an already-posted message. (3) Facilitator resolution: `ParticipantRole.Facilitator` on the participant read model. (4) Active-Conversation count per tenant and window for the PRD Eligible Conversation denominator, or a Conversations-side tenant event feed from which Agents derives the same count, never from Agent Calls. (5) Tenant-scoped reads under the Agents service principal of complete Conversation content, the Participant roster with roles, and Conversation existence/accessibility, including typed `ConversationDeleted` and `PrincipalRemovedFromConversation` answers distinct from transient unavailability. (6) A Conversation deletion signal so an approved deletion in Conversations triggers PRD FR-30 deletion of derived Agent content. Final member names are owned by this record (PRD §8.1 assumptions A-1 through A-4, A-15, A-16). |
+| `RequiredArtifact` | Six seams. (1) Membership: public `IConversationClient.AddParticipantAsync` and `POST /api/v1/conversations/{conversationId}/participants`, limited for Agents to stable AI Party identity, `ParticipantType.AiAgent`, and `ParticipantRole.Member`; exact retries are idempotent no-ops, conflicting type/role is a typed conflict, and cross-tenant or general participant management is denied; plus a participant-state read for the AI participant and a participant removal limited to the AI participant for the PRD FR-2 removal block. Before accepting AI membership, Conversations verifies through Hexalith.Parties that the participant Party is AI type; the record owner supplies the final member and typed failure names (A-21). (2) Posting: append a Conversation Message as the `AiAgent` participant with an Agents-supplied deterministic `MessageId` and idempotency key, persisted verbatim or rejected (a differing returned id is a typed incompatibility that blocks posting), and message metadata carrying the Agent Call trace reference and provenance flags (AI-generated; human-edited and by which Party), so restart or replay cannot duplicate a post; plus an existence read by `MessageId` returning the message, typed absence, typed `ConversationDeleted`, typed `PrincipalRemovedFromConversation`, or unavailable, so Agents can check before retry or abandonment after a lost acknowledgement and record `LateConfirmed` rather than contradict an already-posted message. (3) Facilitator resolution: `ParticipantRole.Facilitator` on the participant read model. (4) The Eligible Conversation denominator is supplied either as an active-Conversation count per tenant/window or as a Conversations-side tenant event feed from which Agents computes the same count, never from Agent Calls (A-4). (5) Tenant-scoped reads under the Agents Service Principal of complete Conversation content, the Participant roster with roles, and Conversation existence/accessibility; they return typed `ConversationDeleted` and `PrincipalRemovedFromConversation` distinctly from transient denial or error, and content contains the messages a Participant would currently see, including current edit/delete state (A-15). (6) The Conversation deletion signal remains unchanged so an approved deletion in Conversations triggers PRD FR-30 deletion of derived Agent content. Final member and typed failure names are owned by this record (PRD §8.1 assumptions A-1 through A-4, A-15, A-16, A-21). |
 | `TargetVersionOrCommit` | `TBD` |
 | `TargetIntegrationDate` | `TBD` |
-| `CompatibilityContractAndVerificationCommand` | Contract: typed idempotent membership with participant-state read and AI-participant removal, idempotent posting with trace/provenance metadata and a typed `MessageId` existence read, Facilitator role exposure, active-Conversation count or equivalent tenant event feed, tenant-scoped content/roster/existence/accessibility reads, and a deletion signal, each with focused cross-tenant denial. Command: `TBD`. |
+| `CompatibilityContractAndVerificationCommand` | Contract: typed idempotent membership with participant-state read, AI-participant removal, and Hexalith.Parties AI-type verification; idempotent posting with trace/provenance metadata and a typed `MessageId` existence read covering message, absence, deletion, principal removal, and unavailable; Facilitator role exposure; active-Conversation count or equivalent Conversations-side tenant event feed; tenant-scoped current content/roster/existence/accessibility reads that distinguish deletion/removal from transient denial/error; and a deletion signal, each with focused cross-tenant denial. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
 | `AcceptedStatus` | `Uncommitted` |
-| `ConsumingStories` | 5.4, 6.2, 6.6, 6.8, 7.1–7.5, 7.7, 8.5, 8.8; `RQ-1` |
+| `ConsumingStories` | 5.4, 6.1, 6.2, 6.6, 6.8, 7.1–7.5, 7.7, 8.5, 8.8; `RQ-1` |
 
 *Scope extended 2026-09-09 by the PRD validation reconciliation and follow-through proposal: the posting existence read, Facilitator resolution, active-count/event-feed denominator, and tenant-scoped content/roster/existence/accessibility consumers are explicit. The record was already `Uncommitted`; the extension changes no status and blocks every newly listed consumer from `ready-for-dev` until accepted.*
 
@@ -84,13 +86,15 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 | --- | --- |
 | `Owner` | Platform Maintainer |
 | `Repository` | `Hexalith.Platform` |
-| `RequiredArtifact` | Platform-owned host composition for the Agents DomainService and UI with EventStore, Conversations, Parties, Tenants, Provider and safety adapters, Dapr Workflow, secrets, health, identity, and telemetry. The artifact replaces module-owned AppHost, Aspire, and ServiceDefaults ownership. |
-| `TargetVersionOrCommit` | `a66cdf346e521ad147f442b686f301f0f59c525c` |
-| `TargetIntegrationDate` | `2026-09-30` |
-| `CompatibilityContractAndVerificationCommand` | Contract: clean-checkout composition through the platform host without module-owned hosting infrastructure. Command: `git clone https://github.com/Hexalith/Hexalith.Platform.git && cd Hexalith.Platform && git checkout a66cdf346e521ad147f442b686f301f0f59c525c && ./eng/verify-agents-host.sh`. |
+| `RequiredArtifact` | Platform-owned host composition for the Agents DomainService and UI with EventStore, Conversations, Parties, Tenants, Provider and safety adapters, Dapr Workflow, secrets, health, identity, and telemetry. It additionally binds the production `EXT-PROTECTION-1` engine and exposes the FR-34 attestation port used at startup and every readiness evaluation. The port lets Agents seal a canary, prove persisted bytes contain no plaintext, unseal it, destroy its DEK, replay `Erased`, and obtain engine identity/version for comparison with the committed protection target; the host fails closed against both the no-op default and a self-reporting wrapper around it. The artifact replaces module-owned AppHost, Aspire, and ServiceDefaults ownership. |
+| `TargetVersionOrCommit` | `TBD` |
+| `TargetIntegrationDate` | `TBD` |
+| `CompatibilityContractAndVerificationCommand` | Contract: clean-checkout composition through the platform host without module-owned hosting infrastructure, including production protection-engine binding and the complete FR-34 canary/identity/version attestation. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
-| `AcceptedStatus` | `Committed` |
+| `AcceptedStatus` | `Uncommitted` |
 | `ConsumingStories` | 5.1, 5.6 onward; `RQ-1` |
+
+*Historical prior commitment only: target `a66cdf346e521ad147f442b686f301f0f59c525c`, integration date `2026-09-30`, and `./eng/verify-agents-host.sh` covered the earlier clean-checkout host artifact. The expanded protection binding and attestation artifact has not been re-accepted by the Platform Maintainer, so those values are not current commitment fields.*
 
 ### EXT-PROVIDER-1 — Provider Generation Adapter
 
@@ -171,7 +175,7 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 | `RequiredArtifact` | A production payload-protection engine behind the existing EventStore hooks, applied field-level to a `ProtectedContent` envelope so every other event field stays plaintext and a destroyed-key field unprotects as the typed value `Erased` without breaking replay: one data-encryption key per `AgentInteraction` wrapped by a per-tenant key-encryption key custodied through `EXT-SECRETS-1`, the custodian operations `WrapDek`, `UnwrapDek`, `PinDek`, `UnpinDek`, and `DestroyDek` with an irreversible destruction receipt, cryptographic erasure by DEK destruction, redaction of read-model copies, hold pinning that rejects DEK destruction, sealed envelopes on the pub/sub broker and in read models, `PayloadUnprotectionOutcome` unreadable after erasure, and snapshot/replay caches inheriting the DEK (architecture AD-22, AD-27). The shipped default is a no-op service and is not acceptable for content-bearing workflows (AD-14). |
 | `TargetVersionOrCommit` | `TBD` |
 | `TargetIntegrationDate` | `TBD` |
-| `CompatibilityContractAndVerificationCommand` | Contract: protect, unprotect, erase, redact, hold-pin, and restore-cannot-revive behaviors with focused per-tenant key isolation. Command: `TBD`. |
+| `CompatibilityContractAndVerificationCommand` | Contract: an owner-supplied executable command must prove at minimum (1) seal with plaintext-absence proof, (2) unseal with payload equality, (3) irreversible erase with typed `Erased` replay, (4) hold pin rejecting erase until authorized unpin, and (5) engine identity/version reporting equal to the exact committed target, with focused per-tenant key isolation and restore-cannot-revive behavior. Command: `TBD`. |
 | `RequiredEvidenceLevel` | Levels 4 and 5 |
 | `AcceptedStatus` | `Uncommitted` |
 | `ConsumingStories` | 5.8, 6.1–6.4, 7.1–7.4, 8.1–8.3, 8.8; `RQ-1` |
@@ -179,6 +183,15 @@ Changing an owner, artifact, target, compatibility behavior, verification comman
 *Added 2026-09-09 by the architecture update: the 2026-09-09 verified-current review found that the EventStore checkout carries only the protection hooks and a no-op default, so the AD-22 key hierarchy has no owner without this record.*
 
 ## Known Consumer Non-Conformance
+
+### Story 5.3 / EXT-PROVIDER-1 Historical Consumption — Open Product Approval
+
+OQ-17 settles the rule for consumption of an `Uncommitted` seam but does not establish whether Story 5.3 actually executed `EXT-PROVIDER-1`. The inspected Story 5.3 specification and fail-closed deferred provider show that no live adapter shipped, but they are insufficient evidence for a dated Product ruling. Until Product selects one evidence-backed branch, neither disposition is recorded:
+
+- Branch A — seam was consumed: `Story 5.3 | EXT-PROVIDER-1 | <verified completion date> | completed while Uncommitted; reopened by sprint-change-proposal-2026-09-09; reopening does not clear this record (PRD FR-21)`.
+- Branch B — seam was never consumed: `None: Story 5.3 executed no EXT-PROVIDER-1 seam (Product ruling <date>)`.
+
+This open approval condition is blocking provenance, not a fabricated non-conformance finding or dependency commitment.
 
 ### NC-5.3-PLATFORM-CATALOG-SCOPE — Story 5.3 Platform Catalog Migration
 
@@ -196,4 +209,4 @@ The record closes only when its named evidence is accepted and this table is ame
 
 ## Current Blocking Summary
 
-`EXT-HOST-1` is `Committed` (scaffold + clean-checkout AppHost build gate; at `a66cdf34` the artifact is an empty file-based AppHost on Aspire 13.4.6 without Dapr, so composition remains future work under Story 5.6). The remaining eight records are `Uncommitted`; their consumers remain blocked from `ready-for-dev` until the fields required for `Committed` are accepted. `EXT-HOST-1` stays short of `Available` until Agents Story 5.6 wires live composition and the verify command is upgraded with Level 4 evidence. `RQ-1` additionally requires each dependency used by its qualification profile to be `Available` with the required live evidence.
+All nine dependency records are `Uncommitted`; every consumer remains blocked from `ready-for-dev` until the fields required for `Committed` are accepted. `EXT-HOST-1`'s earlier target/date/command are historical only because the required artifact now includes the production `EXT-PROTECTION-1` binding and FR-34 attestation port. `RQ-1` additionally requires every dependency in its qualification profile to be `Available` with the exact compatibility command passing against the target used by the run.

@@ -118,6 +118,22 @@ Operational status gains a **per-tenant authorization-denial count** and audit g
 - The surface-count denominators (15 IA rows, the DESIGN FullWidth/Constrained split counting Audit evidence twice) are each internally defensible; one stated count is deferred.
 - Component Patterns cell density is unchanged by decision, per the Tenants precedent.
 
+## 4b. Corrected after the fact: the Compliance Inspector policy constant
+
+Section 1 above records `Agents.ComplianceInspector` as a **new** constant and `Agents.AuditOperator` as **retired** on the grounds that FR-33 has no role for it. **That was wrong, and it is reverted.**
+
+AD-30 is the naming authority for FrontComposer policy constants and states: "FR-33 roles map one-to-one to FrontComposer policies `Agents.PlatformOperator` (Platform Operator), `Agents.Administrator` (Tenant Agent Administrator), `Agents.Approver`, `Agents.AuditOperator` (Compliance Inspector), and `Agents.Operator` (Release Operator)." The Compliance Inspector **role** was renamed; its **wire identifier** was not. This is the same convention AD-8 applies to `ApproverPolicySourceKind.ConversationOwner`, which UX already renders correctly as Conversation Facilitator, and it is what AD-30's own *Prevents* clause — "two role vocabularies for one matrix" — exists to stop.
+
+Three findings settle it:
+
+- `prd.md` FR-33 names the six roles and **no policy constant anywhere**. Constant naming is AD-30's alone, so this Update had no PRD basis for coining one.
+- `Agents.ComplianceInspector` occurs nowhere in the Architecture Spine, the PRD, the epics, the registers, or `src/`. Outside these UX files its only occurrence is a proposed fix in `prd-agents-2026-06-23/review-implementation-drift-2026-09-09-update-gate.md`, which also proposes `Agents.ReleaseOperator` — a name neither AD-30 nor the shipped registration adopts. An unadopted review recommendation was promoted to authoritative.
+- The shipped `AgentsFrontComposerRegistration.cs` declares Administrator, Approver, Operator, AuditOperator: **four of the five correct constants**, not four wrong ones.
+
+Applied: `Agents.AuditOperator` restored in § Authorization roles, the register-constants bullet, the Audit evidence and Audit governance IA rows, § Audit evidence rules, and § Shipped-code corrections; "Compliance Inspector" kept as the rendered role label throughout, with a note binding the identifier to AD-30. The § Shipped-code corrections row was inverted by the same error and now records the one real divergence — `Agents.PlatformOperator` is not registered, so every platform-scoped row falls back to `Agents.Administrator`.
+
+Deferred to Product/PM: add a role-to-policy-name column to the FR-33 table, so a PRD-only reader can reach the constant vocabulary AD-30 owns. That gap is how this collision was reachable.
+
 ## 5. What this run did not do
 
 Doc standards (`bmad-review` structure and prose lenses) and the Reviewer Gate were **not** run. This Update rewrote the authorization model across both spines and grew EXPERIENCE.md substantially; a structure pass is likely to find lifted duplication, and a re-validation is the right next step once Architecture and Conversations absorb the deferred items. Neither was skipped for lack of relevance.

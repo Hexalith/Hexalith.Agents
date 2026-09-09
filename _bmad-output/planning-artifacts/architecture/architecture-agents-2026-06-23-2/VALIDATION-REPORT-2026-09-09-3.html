@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hexalith Agents — Architecture Spine Validation (Round 3)</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+
+    --verdict-pass: #16a34a;
+    --verdict-partial: #d97706;
+    --verdict-fail: #dc2626;
+
+    --sev-low: #64748b;
+    --sev-medium: #ca8a04;
+    --sev-high: #ea580c;
+    --sev-critical: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container { max-width: 980px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  header.report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .grade {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: white;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .grade-fail { background: var(--verdict-fail); }
+
+  .synthesis {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--sev-critical);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    font-size: 15px;
+  }
+  .synthesis p { margin: 0 0 10px; }
+  .synthesis p:last-child { margin-bottom: 0; }
+  .synthesis ol { margin: 8px 0 10px; padding-left: 22px; }
+  .synthesis li { margin-bottom: 8px; }
+  .synthesis code { background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; font-size: 0.92em; }
+
+  .lens-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .lens-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .lens-card .lens-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .lens-card .lens-verdict { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .lens-card .lens-counts { font-size: 12px; color: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .v-fail { color: var(--verdict-fail); }
+  .v-partial { color: var(--verdict-partial); }
+  .v-pass { color: var(--verdict-pass); }
+
+  table.total-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 13.5px;
+  }
+  table.total-table th, table.total-table td {
+    padding: 8px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  table.total-table th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+  table.total-table tr:last-child td { border-bottom: none; font-weight: 600; }
+  table.total-table code { font-size: 12px; color: var(--muted); }
+
+  section.tier { margin-bottom: 16px; }
+  section.tier > h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tier-note { font-weight: 400; color: var(--muted); font-size: 13px; }
+
+  article.finding {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+  }
+  article.finding header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .badge-sev-low { background: rgba(100, 116, 139, 0.12); color: var(--sev-low); }
+  .badge-sev-medium { background: rgba(202, 138, 4, 0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234, 88, 12, 0.14); color: var(--sev-high); }
+  .badge-sev-critical { background: rgba(220, 38, 38, 0.14); color: var(--sev-critical); }
+  .badge-lens { background: rgba(28,25,23,0.06); color: var(--muted); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 600; flex: 1; min-width: 200px; }
+  .finding blockquote {
+    margin: 8px 0;
+    padding: 8px 14px;
+    background: var(--bg);
+    border-left: 3px solid var(--border);
+    font-size: 13.5px;
+    color: var(--text);
+  }
+  .finding blockquote code { font-size: 0.95em; }
+  .finding p { margin: 6px 0; font-size: 14px; }
+  .finding .fix { margin-top: 10px; font-size: 14px; }
+  .finding .fix strong { color: var(--muted); font-weight: 600; }
+  .finding code { background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; font-size: 0.92em; }
+
+  .rollup {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 14px;
+  }
+  .rollup ul { margin: 6px 0 0; padding-left: 20px; }
+  .rollup li { margin-bottom: 8px; }
+  .rollup code { background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; font-size: 0.92em; }
+
+  .closed-box {
+    background: rgba(22,163,74,0.06);
+    border: 1px solid rgba(22,163,74,0.25);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 14px;
+    margin-top: 24px;
+  }
+  .closed-box h2 { margin: 0 0 8px; font-size: 15px; color: #15803d; }
+  .closed-box code { background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; font-size: 0.92em; }
+
+  .recommendation {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  .recommendation h2 { margin: 0 0 10px; font-size: 15px; }
+  .recommendation ol { margin: 0; padding-left: 20px; }
+  .recommendation li { margin-bottom: 10px; }
+  .recommendation code { background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; font-size: 0.92em; }
+
+  footer.report-footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="report-header">
+    <div class="title">
+      <h1>Architecture Spine Validation — Round 3</h1>
+      <div class="subtitle">_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md</div>
+    </div>
+    <div class="grade grade-fail">FAIL</div>
+  </header>
+
+  <div class="synthesis">
+    <p><strong>Gate verdict: FAIL.</strong> Deterministic lint is clean (0 findings). This round independently re-derived — rather than trusted — every fix the prior round-5 gate claimed had closed. Most held: the AD-5 illegal-transition Critical, the AD-22 unreachable-TAA-branch High, the AD-15 bare-enum residue, and an AD-5 prose redundancy are all confirmed genuinely fixed. But this round's real news is a recurring pattern — <strong>fixing the citation, not the defect</strong> — plus two fresh, self-contained contradictions the prior round never touched:</p>
+    <ol>
+      <li><strong>Two "fixes" only close one level up.</strong> AD-7's fix for <code>hexa</code>'s own Party-deactivation detection asserts AD-12 "explicitly" re-checks Party state on every side-effecting step — but AD-12's own operative enumeration (Agent lifecycle, tenant enablement, per-Conversation block, kill switch) never mentions Party state. Separately, AD-22 claims the Conversations-posted-copy erasure gap is "tracked inside <code>LR-AUDIT-PROTECTION-DELETION</code>'s evidence contract" — but the register itself was never edited and still asks only for <code>LegalHold</code> evidence, not the symmetric <code>DeletionRequest</code> evidence the spine claims it now requires.</li>
+      <li>A stale <code>Deferred Beyond V1</code> table row directly contradicts AD-22's own current rule on <code>LegalHoldRelease</code>'s second-party approval.</li>
+      <li>AD-7's block-clear rule is under-restrictive against FR-2, the FR-33 role/scope table, and OQ-25 alike — none of which let a Conversation Facilitator clear a block the Tenant Agent Administrator set; AD-7 currently does.</li>
+      <li>A new AD-12/AD-5 gap: disabled-Agent semantics for <code>PostingFailed</code> retries are unstated, unlike the parallel kill-switch clause.</li>
+    </ol>
+    <p>Brownfield drift is otherwise clean news: the one tracking-integrity defect this lens exists to catch — <code>sprint-status.yaml</code> falsely marking Story 5.2 "done" — is now correctly corrected, and no source code has changed. All previously-tracked implementation debt remains open exactly as expected, with one item newly logged as a formal non-conformance record.</p>
+  </div>
+
+  <div class="lens-summary">
+    <div class="lens-card">
+      <div class="lens-name">Rubric walker</div>
+      <div class="lens-verdict v-fail">FAIL</div>
+      <div class="lens-counts">2 / 0 / 0 / 1</div>
+    </div>
+    <div class="lens-card">
+      <div class="lens-name">Verified-current</div>
+      <div class="lens-verdict v-partial">PASS WITH FINDINGS</div>
+      <div class="lens-counts">0 / 0 / 1 / 4</div>
+    </div>
+    <div class="lens-card">
+      <div class="lens-name">Adversarial divergence</div>
+      <div class="lens-verdict v-fail">FAIL</div>
+      <div class="lens-counts">0 / 2 / 1 / 1</div>
+    </div>
+    <div class="lens-card">
+      <div class="lens-name">Brownfield drift</div>
+      <div class="lens-verdict v-partial">FAILS TO RATIFY, fixable</div>
+      <div class="lens-counts">0† / 5 / 3 / 2</div>
+    </div>
+    <div class="lens-card">
+      <div class="lens-name">Security / data integrity</div>
+      <div class="lens-verdict v-partial">PASS WITH FINDINGS</div>
+      <div class="lens-counts">1 / 1 / 2 / 1</div>
+    </div>
+  </div>
+
+  <table class="total-table">
+    <tr><th>Lens</th><th>Verdict</th><th>C / H / M / L</th><th>Review file</th></tr>
+    <tr><td>Rubric walker</td><td class="v-fail">FAIL</td><td>2 / 0 / 0 / 1</td><td><code>reviews/review-2026-09-09-rubric-v6.md</code></td></tr>
+    <tr><td>Verified-current</td><td class="v-partial">PASS WITH FINDINGS</td><td>0 / 0 / 1 / 4</td><td><code>reviews/review-2026-09-09-verified-current-v6.md</code></td></tr>
+    <tr><td>Adversarial divergence</td><td class="v-fail">FAIL</td><td>0 / 2 / 1 / 1</td><td><code>reviews/review-2026-09-09-adversarial-divergence-v6.md</code></td></tr>
+    <tr><td>Brownfield drift</td><td class="v-partial">FAILS TO RATIFY, fixable</td><td>0† / 5 / 3 / 2</td><td><code>reviews/review-2026-09-09-brownfield-drift-v6.md</code></td></tr>
+    <tr><td>Security / data integrity</td><td class="v-partial">PASS WITH FINDINGS</td><td>1 / 1 / 2 / 1</td><td><code>reviews/review-2026-09-09-security-data-integrity-v6.md</code></td></tr>
+    <tr><td>Total</td><td></td><td>3 / 8 / 7 / 9 (27)</td><td></td></tr>
+  </table>
+  <p style="font-size:12.5px;color:var(--muted);margin-top:-14px;margin-bottom:24px;">† Brownfield's one Critical (the <code>sprint-status.yaml</code> tracking-integrity problem) was resolved this round and is not counted as open. Brownfield's 5 Highs are already-tracked implementation debt requiring no spine amendment. Deterministic lint (<code>lint_spine.py</code>): 0 findings.</p>
+
+  <section class="tier">
+    <h2><span class="badge badge-sev-critical">Critical</span> close before any new command handler is built against AD-7, AD-22, or the readiness register</h2>
+
+    <article class="finding">
+      <header>
+        <span class="badge badge-lens">Rubric</span>
+        <h3 class="finding-title">C-1 — <code>Deferred Beyond V1</code> table contradicts AD-22's own current <code>LegalHoldRelease</code> second-party rule</h3>
+      </header>
+      <p>The Deferred table still says V1 releases a hold with a single Compliance Inspector command:</p>
+      <blockquote>"Two-person rule on legal-hold release | Product and Security own it; V1 releases a hold with a single Compliance Inspector command carrying typed justification, while deletion already requires two roles under AD-22."</blockquote>
+      <p>AD-22's own Rule, in the same document, says the opposite:</p>
+      <blockquote>"<code>LegalHoldRelease</code> requires the audited approval of a second Compliance Inspector or the Platform Operator on the same subject-set and anti-collusion terms."</blockquote>
+      <p>A team scoping the legal-hold release story from the Deferred table alone would ship a single-approver path that AD-22 — and PRD OQ-30 — forbid.</p>
+      <div class="fix"><strong>Fix:</strong> remove the Deferred-table row (AD-22 already resolves it), or rewrite it to name a genuinely narrower residual gap.</div>
+    </article>
+
+    <article class="finding">
+      <header>
+        <span class="badge badge-lens">Rubric</span>
+        <h3 class="finding-title">C-2 — AD-7's block-clear rule omits the setting-authority restriction FR-2, FR-33, and OQ-25 all state</h3>
+      </header>
+      <p>Current AD-7: <em>"...is cleared only by the first two [Tenant Agent Administrator or Conversation Facilitator], is audited, and is mirrored..."</em> — with no restriction on <em>which</em> Facilitator.</p>
+      <p>FR-2, the FR-33 role/scope table, and OQ-25 all instead say clear authority is tied to the specific authority that set the block (re-evaluated at clear time), and explicitly that a Conversation Facilitator can never clear a block the Tenant Agent Administrator set. AD-7 binds both FR-2 and FR-33 by number, so this is a gap inside its own declared scope — a security-relevant authorization boundary, not a wording nit.</p>
+      <div class="fix"><strong>Fix:</strong> amend AD-7 to state the setting-authority-bound rule verbatim; a Facilitator can never clear a TAA-set block. Consider naming it in AD-2's <code>ConversationAgentState</code> description too.</div>
+    </article>
+
+    <article class="finding">
+      <header>
+        <span class="badge badge-lens">Security</span>
+        <h3 class="finding-title">C-3 — the spine claims the readiness register covers <code>DeletionRequest</code> symmetrically with <code>LegalHold</code>; the register itself was never edited</h3>
+      </header>
+      <p>AD-22 and <code>ARCH-A-10</code> both assert the erasure/Conversations-posted-copy residual risk is "tracked inside <code>LR-AUDIT-PROTECTION-DELETION</code>'s evidence contract" symmetrically with the <code>LegalHold</code> case. The actual register text (confirmed unchanged via <code>git log</code>/<code>git diff</code>) still names only <code>LegalHold</code> propagation/waiver evidence — nothing about <code>DeletionRequest</code>.</p>
+      <p>Security Engineering, the register's named evidence owner, would build exactly what the register's own text asks for, record <code>Pass</code>, and the erasure-direction residual risk — the exact gap a prior round rated Critical — would be disclosed in prose but never enforced as an actual gate requirement.</p>
+      <div class="fix"><strong>Fix:</strong> edit <code>launch-readiness-register.md</code>'s <code>LR-AUDIT-PROTECTION-DELETION</code> row to add the symmetric <code>DeletionRequest</code>/erased-content clause, or correct the spine's cross-reference to say the register update is still pending.</div>
+    </article>
+  </section>
+
+  <section class="tier">
+    <h2><span class="badge badge-sev-high">High</span> <span class="tier-note">8 findings</span></h2>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Adversarial</span><h3 class="finding-title">H-1 — AD-7's Party-deactivation fix cites an AD-12 re-check AD-12's own text never states</h3></header>
+      <p>AD-7 claims AD-12 "explicitly" re-checks Party state (caller's and <code>hexa</code>'s own) on every side-effecting step. AD-12's own four-item enumerated re-read list — Agent lifecycle, tenant enablement, per-Conversation block, kill switch — never names Party state. A literal, compliant implementation of AD-12's own words never detects a deactivated <code>hexa</code> identity, reproducing the exact attribution-integrity gap the fix claimed to close.</p>
+      <div class="fix"><strong>Fix:</strong> add Party state (caller and <code>hexa</code>'s own linked <code>PartyId</code>) to AD-12's enumerated list.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Adversarial</span><h3 class="finding-title">H-2 — AD-12's disabled-Agent clause is silent on <code>PostingFailed</code>; retry-pause semantics unstated</h3></header>
+      <p>AD-12's disabled-Agent consequence clause names awaiting-decision, <code>Approved</code>, and <code>PostingPending</code> states but omits <code>PostingFailed</code> — unlike the parallel kill-switch clause, which explicitly pauses the retry-window clock. AD-5's <code>PausedDuration</code> formula names only the kill switch. A routine Agent disable/enable cycle's effect on in-flight <code>PostingFailed</code> retries is unstated: one literal reading silently exhausts the retry budget, another lets a disabled Agent keep posting.</p>
+      <div class="fix"><strong>Fix:</strong> state the <code>PostingFailed</code> consequence of Agent disablement explicitly, on the same terms as the kill-switch clause.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Security</span><h3 class="finding-title">H-3 — AD-30's <code>Platform</code> freshness re-check reuses tenant-scoped wording for the one non-tenant-scoped role</h3></header>
+      <p>AD-30's new fix names "the Tenants-projection" as the source for the <code>Platform</code> principal's role re-check — the same wording used for tenant-scoped <code>User</code>/<code>Administrator</code> roles — for a role FR-19 explicitly defines as the one platform-wide, non-tenant-scoped role in the system. This reintroduces the exact ambiguity a prior round's fix recommendation asked to be resolved by naming an explicit authoritative source.</p>
+      <div class="fix"><strong>Fix:</strong> name the source unambiguously as the <code>system</code>-tenant Tenants-projection record, never the envelope's target <code>TenantId</code>'s projection.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Brownfield · already-tracked</span><h3 class="finding-title">H-4 — AD-2's platform-scoped <code>ProviderCatalog</code>/<code>TenantProviderEnablement</code> split still absent in code</h3></header>
+      <p><code>ProviderCatalogAggregate.cs</code> still documents itself as "tenant-scoped." Now also formally logged as <code>NC-5.3-PLATFORM-CATALOG-SCOPE</code> in <code>external-dependency-register.md</code> — a tracking-hygiene improvement, not new drift. Tracked by Story 5.3; no spine amendment needed.</p>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Brownfield · already-tracked</span><h3 class="finding-title">H-5 — AD-4's <code>ConfigurationVersion</code> still not bumped by <code>AgentActivated</code>/<code>AgentDisabled</code></h3></header>
+      <p>Unchanged since the prior round. Tracked by DW-4 and Story 5.2 (now correctly marked <code>in-progress</code>); no spine amendment needed.</p>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Brownfield · already-tracked</span><h3 class="finding-title">H-6 — AD-29's single <code>AgentsIdentity</code> canonicalizer still absent</h3></header>
+      <p>Five separate identity helper classes remain. Tracked by Stories 6.4/7.1–7.3; no spine amendment needed.</p>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Brownfield · already-tracked</span><h3 class="finding-title">H-7 — Structural seed placeholders and missing <code>IntegrationTests</code> project</h3></header>
+      <p><code>Server/Aggregates</code> and <code>Application/Tools</code> placeholders still present; <code>Hexalith.Agents.IntegrationTests</code> still absent from <code>test/</code>. Tracked by Story 5.6; no spine amendment needed.</p>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Brownfield · already-tracked</span><h3 class="finding-title">H-8 — AD-30's HMAC-tagged trusted-extension gate and <code>Agents.PlatformOperator</code> policy still absent in code</h3></header>
+      <p>Provider-admin gate remains plain string equality; no HMAC. <code>Agents.PlatformOperator</code> FrontComposer policy absent. Tracked by Stories 5.3/5.4/5.5; no spine amendment needed.</p>
+    </article>
+  </section>
+
+  <section class="tier">
+    <h2><span class="badge badge-sev-medium">Medium</span> <span class="tier-note">7 findings — see review files for full detail</span></h2>
+    <div class="rollup">
+      <ul>
+        <li>Stack table's <code>Hexalith.EventStore</code> gitlink (<code>1b6f08d4</code>) is stale against the actual committed submodule (<code>12d2dfc1</code>, bumped the same day as the spine's own <code>updated</code> stamp); the other four gitlink rows are exact matches. <em>(Verified-current)</em></li>
+        <li>AD-10's widened <code>EntryMissing</code> carve-out claims exact equivalence with AD-2's carve-out while adding an "in-flight interaction's" restriction AD-2's own unqualified wording doesn't contain. <em>(Adversarial)</em></li>
+        <li>The Consistency Conventions table's Provider-attempt fingerprint row states plain SHA-256 while AD-29's blanket rule requires HMAC-SHA-256 for "evidence fingerprints"/"per-message digests" — unresolved ambiguity over whether the embedded per-message digests are separately keyed. <em>(Security)</em></li>
+        <li>Keyed digests/fingerprints of erased content survive erasure indefinitely under a long-lived, non-rotated per-tenant <code>DigestKey</code>, with no stated key-lifecycle bound. <em>(Security)</em></li>
+        <li>This round's three targeted prose edits (AD-16 composite-wrapper cross-ref, AD-22 case-scope/TAA historical-fact clarification, SDK-band dating) are internally consistent — confirmed, no residual defect. <em>(Brownfield)</em></li>
+        <li><code>EXT-CONV-AI-1</code> is more architecturally scaffolded in Conversations than "Uncommitted" suggests, but removal/typed-deletion-signal seam pieces are genuinely absent — matches its correctly-<code>Uncommitted</code> status. <em>(Brownfield)</em></li>
+        <li>Sibling module <code>project-context.md</code> files carry no conflicting Agents-specific seam content; <code>EXT-SECRETS-1</code> correctly Platform-owned. <em>(Brownfield)</em></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tier">
+    <h2><span class="badge badge-sev-low">Low</span> <span class="tier-note">9 findings</span></h2>
+    <div class="rollup">
+      <ul>
+        <li><code>AuditInspection</code>'s class-diagram <code>Mode</code> attribute is an orphaned leftover with no corresponding concept in AD-22's prose — replace with <code>Scope</code>. <em>(Rubric)</em></li>
+        <li>Stack-table rows for <code>Microsoft.NET.Test.Sdk</code>/<code>xunit.runner.visualstudio</code> still omit version-pair detail (<code>18.6.0</code>→<code>18.9.0</code> catalog, <code>3.1.5</code>→<code>4.0.0</code> catalog); SDK-servicing claim's supporting URLs still uncited in frontmatter; MediatR's now-commercial license unremarked (unused, no action needed); <code>bunit</code> one more patch behind (<code>2.9.0</code> vs. <code>2.10.3</code>). <em>(Verified-current, 4 items)</em></li>
+        <li><code>AuditInspection</code>'s "case" now has a prose definition but still no <code>Scope</code>/<code>Case</code> field in the classDiagram or Naming table. <em>(Adversarial)</em></li>
+        <li>AD-22's "the tenant's FR-24 review window" isn't inline-tagged <code>[ASSUMPTION A-19]</code>, unlike every other PRD-sourced numeric bound. <em>(Security)</em></li>
+        <li>Confirmed unchanged/no-new-drift entries (submodule pins beyond EventStore, gate ids, matrix version; code byte-identical since the last check). <em>(Brownfield, 2 items)</em></li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="closed-box">
+    <h2>✓ What's already closed (re-verified, not re-litigated)</h2>
+    <p>This round independently re-derived, rather than trusted, every claim the prior round-5 gate made: AD-5's illegal <code>Approved → PostingFailed</code> transition fix, AD-22's previously-unreachable TAA-turnover branch, AD-15's bare-enum-styled <code>AgentReadinessStatus</code> language, AD-5's redundant system-abandon phrasing, the .NET SDK servicing-lapse date and its <code>ARCH-A-4</code> mirroring, and the <code>sprint-status.yaml</code> Story 5.2 tracking-integrity correction — all confirmed genuinely closed against the live text.</p>
+    <p style="margin-bottom:0;">Two of these closures (AD-7's Party-deactivation claim and AD-22's erasure/register claim) are reopened above at H-1/C-3 because the fix's own cited authority — a sibling AD or an external register — doesn't actually say what the fix now claims it says. This is a distinct, narrower defect than the original gap, not a regression back to it.</p>
+  </div>
+
+  <div class="recommendation">
+    <h2>Recommendation</h2>
+    <p>Roll this report into an Update pass. Priority order:</p>
+    <ol>
+      <li><strong>C-1 / C-2 / C-3</strong> — the Deferred-table/AD-22 contradiction, AD-7's block-clear authority gap, and the <code>launch-readiness-register.md</code> edit. All spine-text-only or register-only fixes, no PRD dependency, no fresh design work.</li>
+      <li><strong>H-1 / H-2 (adversarial)</strong> and <strong>H-3 (security)</strong> — close the "fixed the citation, not the defect" pattern: add Party state to AD-12's enumerated re-read list, state the <code>PostingFailed</code> consequence of Agent disablement, name AD-30's <code>Platform</code> role source unambiguously.</li>
+      <li><strong>H-4 .. H-8 (brownfield)</strong> — implementation debt already tracked in Stories 5.2–5.6 and DW-4; no spine amendment needed, only code catching up.</li>
+      <li>Medium-tier items, same pass — especially the AD-13/AD-29 fingerprint-keying ambiguity (a live security question, not a documentation nit) and the <code>DigestKey</code> rotation/lifecycle gap.</li>
+    </ol>
+  </div>
+
+  <footer class="report-footer">
+    <div class="meta">
+      <span>Target: ARCHITECTURE-SPINE.md (AD-1..AD-31, status: final)</span>
+      <span>Repository: main @ 4ec626d (2026-09-09), uncommitted spine/memlog edits</span>
+      <span>Date: 2026-09-09</span>
+      <span>Lint: 0 findings</span>
+      <span>Spine and memlog were NOT modified by this run (Validate intent)</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

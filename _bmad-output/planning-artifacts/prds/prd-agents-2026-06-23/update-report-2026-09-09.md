@@ -6,6 +6,10 @@
 
 ## What changed
 
+**Proposal-amendment trail:** The two PRD amendments authorized by `sprint-change-proposal-2026-09-09.md` were applied: `EXT-PROTECTION-1` was added to §8 and the `ARCH-A` cross-index to §8.1. The second 2026-09-09 update then aligned FR-1/FR-33 to Spine AD-2/AD-30 under OQ-28 and brought `Unreconciled` into FR-28 from ARCH-A-6.
+
+The downstream synchronization preserves the later approved 33-story backlog and leaves the Story 5.3 / `EXT-PROVIDER-1` historical-consumption ruling open for Product.
+
 All 21 critical and high findings were applied, plus 17 co-located medium and low findings. Reconciliation against the extract: 31 fully addressed, 4 deliberately diverged from the reviewer's wording (H2 status label, H13 transitional membership clause, H14 blocked-mode naming, H15 outcome name), 3 partials then closed. Details in `reconcile-validation-2026-09-09.md`.
 
 Structural additions:

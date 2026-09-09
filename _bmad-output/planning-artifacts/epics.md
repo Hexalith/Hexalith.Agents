@@ -14,6 +14,7 @@ inputDocuments:
   - /home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-08-02.md
   - /home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-09.md
   - /home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-09-prd-validation-follow-through.md
+  - /home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-09-2.md
 ---
 
 # Hexalith Agents - Epic Breakdown
@@ -24,7 +25,7 @@ This document provides the complete epic and story breakdown for Hexalith Agents
 
 ## Replacement Authority — 2026-09-09
 
-The approved `/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-09.md`, its approved PRD-validation follow-through proposal, current PRD, Architecture Spine, UX spines, external-dependency register, launch-readiness register, and active Epics 5–8 are the machine-visible implementation authority. The 2026-08-02 proposal remains historical replacement evidence where it does not conflict with this correction.
+The approved `/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-09.md`, its approved PRD-validation follow-through proposal, approved `/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-09-2.md`, current PRD, Architecture Spine, UX spines, external-dependency register, launch-readiness register, and active Epics 5–8 are the machine-visible implementation authority. The 2026-08-02 proposal remains historical replacement evidence where it does not conflict with this correction. The second proposal's superseded 29-story count is historical; the later approved additions 5.9, 5.10, 6.8, and 7.7 remain active, for exactly 33 stories.
 
 Epics 1–4 and every completed story beneath them remain unchanged historical delivery evidence with status `completed`. Their completion proves only the evidence recorded at the time; it does not establish live production conformance, current callability, or release readiness. Any conflicting historical criterion is `mustNotImplement` and resolves through the replacement-authority map in `epic-5-superseded-2026-08-01.md` without rewriting the completed story text.
 
@@ -34,7 +35,7 @@ The former 18-story Epic 5 is superseded and non-executable. Active forward work
 
 ### Functional Requirements
 
-FR1: The Platform Operator provisions `hexa` exactly once per tenant at tenant enablement as a create-only operation establishing its stable Agent identity, tenant scope, and immutable AI-type Party identity; Tenant Agent Administrators then configure, activate, disable, and inspect it, while no tenant role can create a second Agent, delete `hexa`, or replace its Party identity.
+FR1: The Platform Operator provisions `hexa` once per tenant at tenant enablement through an idempotent create-only operation that establishes tenant scope and an immutable AI-type Party identity owned by the Agents Service Principal; Tenant Agent Administrators configure and activate it, and no tenant role may create a second Agent, delete `hexa`, or change its Party identity.
 
 FR2: The provisioned Agent Party identity lets `hexa` participate as a known AI member; `ConversationAgentState` uses `NeverJoined`, `Joined`, `ExternallyRemoved`, `Blocked`, and `ReadmitPending`, mirrors block/removal through an at-least-once outbox with visible `MirrorPending`, and prevents silent rejoin or posting when identity, membership, access, or block state is invalid.
 
@@ -46,7 +47,7 @@ FR5: Agent Administrators can select a Provider and model for `hexa` from the Gl
 
 FR6: Agent Administrators can configure `hexa` for Automatic Response Mode or Confirmation Response Mode; automatic mode posts successful responses directly after authorization and generation, confirmation mode creates Proposed Agent Replies outside the Conversation, and response mode changes affect only future Agent Calls.
 
-FR7: Tenant Agent Administrators define Approvers through exactly three source kinds: Conversation Facilitator (legacy wire value `ConversationOwner`), predefined Parties, and tenant roles. The caller source is retired and rejected; every discovery/action re-resolves the Eligible Approver predicate with current Conversation access, records its basis, and fails closed on absent, stale, ambiguous, revoked, or unavailable authority.
+FR7: Tenant Agent Administrators configure Approver Policy from Conversation Facilitator, predefined Parties, and tenant roles; `Caller` is deprecate-and-reject. One Eligible Approver predicate — current participant/read access, policy-resolved, not caller, not last editor — applies at configuration, call, edit, action, and scheduled re-check. Empty or unavailable resolution uses the typed PRD outcomes and never strands or abandons on absent evidence.
 
 FR8: Authorized Conversation Participants can explicitly call `hexa` from a Source Conversation with a prompt or request; calls require Source Conversation access and Agent call permission, unauthorized calls fail before provider invocation, and each call records caller, Agent, Source Conversation, request timestamp, and response mode.
 
@@ -68,13 +69,13 @@ FR16: Authorized Approvers can request regeneration of a Proposed Agent Reply be
 
 FR17: Authorized Approvers can approve a selected proposal version, causing exactly that version to be posted to the Source Conversation as `hexa`; the message is attributed to the Agent's Party identity and Audit Evidence links the approved version, Approver, approval timestamp, and posted Conversation Message.
 
-FR18: A Proposed Agent Reply records exactly one of ten states: `Pending`, `Edited`, `Regenerated`, `Approved`, `PostingPending`, `PostingFailed`, `Posted`, `Rejected`, `Abandoned`, or `Expired`; `Unknown` is a never-recorded sentinel. Only `Posted`, `Rejected`, `Abandoned`, and `Expired` are terminal. `PostingFailed` supports bounded audited recovery and a `MessageId` existence check can record `Posted` with `LateConfirmed`; all transitions, suspension effects, expiry, actors, and guards follow the PRD transition table while every version remains preserved.
+FR18: A proposal uses exactly the ten recorded states `Pending`, `Edited`, `Regenerated`, `Approved`, `PostingPending`, `PostingFailed`, `Posted`, `Rejected`, `Abandoned`, and `Expired`; only the last four are terminal. `PostingPending` is uninterruptible, approval freezes expiry, retries are bounded and audited, removal may system-abandon `Approved` or `PostingFailed`, and the `MessageId` read produces `LateConfirmed` before any retry or exit from `PostingFailed`.
 
 FR19: The system enforces tenant isolation across Agent configuration, Provider selection, Agent Calls, Conversation Context, Proposed Agent Replies, Conversation posting, and Audit Evidence; cross-tenant call/inspect/approve/post actions are impossible, provider and Agent configuration does not leak across tenants unless explicitly platform-scoped and authorized, and audit/status queries return only tenant-authorized records.
 
 FR20: The system enforces authorization for Agent administration, provider administration, Agent calling, proposal discovery, editing, regeneration, approval, rejection, abandonment, posting, and audit inspection; authorization failures happen before provider invocation or Conversation posting, admin UI and API/client contracts use the same rules, and authorization decisions are auditable without sensitive leakage.
 
-FR21: The system fails closed when required Party, Conversation, Provider, Agent, tenant access, or approval policy state is missing, stale, ambiguous, disabled, or unavailable; missing or stale Conversation access blocks calls and approval posting, missing or disabled Agent Party identity blocks posting, and missing Provider/model state blocks generation. A critical external dependency is not implementation-ready until every PRD §8 commitment field is accepted; an `Uncommitted` record, missing target, or missing executable compatibility command blocks every consuming story from `ready-for-dev`.
+FR21: Dependency uncertainty fails closed. `Uncommitted` blocks consuming stories from `ready-for-dev`; completed consumption is recorded as non-conformance; `Committed` permits contract work only; runtime, test, or qualification seam execution requires `Available` and its exact compatibility command, otherwise `DependencyNotAvailable`; content-bearing paths additionally fail with `PayloadProtectionUnavailable` under FR34.
 
 FR22: The admin UI allows authorized administrators to manage Global Providers Aggregate entries, configure `hexa`, inspect lifecycle state, configure response and approver policy, and view Agent operation/proposal status; UI actions enforce the same authorization rules as API/client contracts, never expose Provider secrets, distinguish active, disabled, invalid, pending proposal, failed call, and expired proposal states, and satisfy NFR-13 accessibility/localization/responsive safety plus NFR-14 interaction-performance evidence.
 
@@ -84,7 +85,7 @@ FR24: The system captures Audit Evidence for Agent configuration, Provider/model
 
 FR25: The system exposes status for Agent readiness, Provider/model readiness, recent Agent Call outcomes, proposal queues, generation failures, approval completion, and posting outcomes; authorized administrators can identify whether `hexa` is callable, distinguish key failure classes, and monitor launch adoption and approval workflow metrics.
 
-FR26: Authorized administrators or release operators can define and publish the versioned Content Safety Policy for `hexa`; production or production-like validation cannot enable `hexa` without one. The policy binds always-blocked and restricted categories, prompt/context and output gates, failure/audit treatment, no Approver override, future-only changes, and no weaker retry.
+FR26: The Platform Operator with Security approval publishes the versioned Content Safety Policy; a Tenant Agent Administrator may add restrictions only. Production or production-like enablement requires the active policy, all four safety application points use current/no-weaker rules, and Approver override remains prohibited.
 
 FR27: The system applies Content Safety Policy to prompt plus complete Conversation Context before Provider invocation and to generated output before any proposal or Conversation side effect; failed content cannot be posted or approved, safety failures create authorized status and Audit Evidence without forbidden disclosure, and Approvers cannot override failures.
 
@@ -256,7 +257,7 @@ UX-DR43: Implement Content Safety authoring for fixed blocked categories, restri
 
 UX-DR44: Implement cost-control authoring/status for monthly tenant budget, per-call caps, usage/reservations, 80% warning, 100% block, and indeterminate fail-closed state.
 
-UX-DR45: Implement Launch readiness showing `Pass`, `Block`, `InsufficientEvidence`, and `Stale`; current `ObservedAt`/exclusive `ValidUntil`; exact NFR-9 and NFR-14 gates; SM-2/SM-3 cohorts/windows; sample sufficiency; Levels 4–5; and all safe blockers. Lower evidence, skips, missing timestamps/references, invalid browser samples, and insufficient samples cannot render as Pass.
+UX-DR45: Implement Launch readiness showing `Pass`, `Block`, `InsufficientEvidence`, and `Stale`; current `ObservedAt`/exclusive `ValidUntil`; exact NFR-9 and NFR-14 gates; SM-1/SM-4/SM-5/SM-6 gate results; SM-2/SM-3/SM-7 launch-health results reported, not gated; SM-C1..SM-C5; sample sufficiency; Levels 4–5; and all safe blockers. Lower evidence, skips, missing timestamps/references, invalid browser samples, and insufficient samples cannot render as Pass.
 
 UX-DR46: Implement audit governance for 365-day retention, legal hold, encrypted time-limited export, deletion/projection purge, and restrictive partial-failure state; high-impact actions require confirmation and authoritative evidence before success.
 
@@ -337,6 +338,45 @@ FR32: Epics 6 and 8 - Configure and enforce numeric caps, rate/concurrency bound
 FR33: Epics 5–8 - Enforce the six-role operation/scope matrix, current authority resolution, trusted principals, and role-basis audit across API, UI, workflow, and governance.
 
 FR34: Epics 5–8 - Gate every content-bearing path on attested payload protection, preserve sealed execution boundaries, and support hold-safe cryptographic erasure.
+
+### OQ-24..OQ-30 Coverage Map
+
+| OQ | Story references |
+| --- | --- |
+| OQ-24 | 5.5, 5.8, 8.7, and the RQ-1 section |
+| OQ-25 | 5.2/5.4 identity deprecation and 6.6 state/mirroring |
+| OQ-26 | 6.6, 7.4, and 7.5 lifecycle/existence-read behavior |
+| OQ-27 | 5.5/5.7 readiness/suspension, 7.6 expiry, and 8.5 trigger metrics |
+| OQ-28 | 5.2 provisioning and immutable Party identity |
+| OQ-29 | 5.3 `DataHandlingVersion` governance |
+| OQ-30 | 8.1 hold release, 8.2 export, and 8.8 inspection second party |
+
+### Second-Update Story Criteria And Dependencies
+
+These criteria are normative additions to the named story sections and preserve the later approved stories 5.9, 5.10, 6.8, and 7.7. They add no story and change no active-story order.
+
+| Story | Required addition |
+| --- | --- |
+| 5.2 | Keep Party link/replace wire members additive, mark them obsolete, reject every request, and prove FR1 provisioning is the only identity-creation/link path. |
+| 5.3 | Own `DataHandlingVersion`; keep the Story 5.3 / `EXT-PROVIDER-1` historical-consumption fact an open Product decision without selecting either branch. |
+| 5.4 | Use predefined Party, tenant-role, or Conversation Facilitator sources; keep `ApproverPolicySourceKind.Caller` declared/deserializable but obsolete and server-rejected. |
+| 5.5 and 5.7 | Reject `ReportingOnlyMonitoring` and `AcceptedLaunchRisk`, emit `ProhibitedCostControlPosture`, and refuse activation or enablement while it stands. |
+| 5.6 and 5.8 | Own the host protection port/binding, `PayloadProtectionUnavailable`, canary self-test, engine identity/version check, no-op/pass-through-wrapper rejection, and content-path fail-closed evidence; consume `EXT-PROTECTION-1` according to its register status. |
+| 6.1 | Add `EXT-CONV-AI-1` as the exact live Conversation-context consumer; content-bearing work refuses execution while payload protection is unavailable. |
+| 6.2 | Own `AgentInteractionContextMode.Blocked`, Safe Context Budget terms, and prove `ContextUnavailable` exists on the exact required public surface; consume `EXT-CONV-AI-1`. |
+| 6.4 | Own `AgentGenerationOutcome.Indeterminate` and `NotInvoked`. |
+| 6.6 | Consume `EXT-CONV-AI-1`; expose exactly the five membership states, `BlockVersion`, `MirrorPending`, and the non-terminal proposal index; implement every FR2 state/read pair, at-least-once versioned removal mirror, clear-time authority, `ReadmitPending`, next-accepted-step rejoin, and delayed reconciliation of `PostingPending`. |
+| 7.1 | Consume `EXT-CONV-AI-1`; own `NoEligibleApprover`, `ApproverResolutionUnavailable`, `ResolutionEmptyPending`, and `ResolutionUnavailable`. |
+| 7.4 | Consume `EXT-CONV-AI-1` and own seam-2 lookup. Before every retry or `PostingFailed` exit: present records `Posted(LateConfirmed)` and rejects the action; unavailable refuses and remains `PostingFailed`; typed absence permits retry after full re-validation; deleted/removed permits an authorized abandon only. |
+| 7.5 | Depend on Story 7.4's lookup capability; add `PostingFailed` abandon paths, own `SourceConversationUnavailable` and `LateConfirmed`, and never record `Abandoned` when the message is present. |
+| 7.6 and 8.5 | Own `ExpiredWhileSuspended` and its SM-3/SM-C5 exclusion; Story 8.5 consumes `EXT-CONV-AI-1` for its Conversations event-feed measurements. |
+| 8.1 | A Compliance Inspector submits release, but unpin/release waits for audited approval by a distinct second Compliance Inspector or Platform Operator; the same actor cannot satisfy both steps and partial approval/unpin remains restrictive. |
+| 8.2 | Require prior second-party approval under FR24 before any export content read; never use post-hoc approval. |
+| 8.4 | Retain `BlockWithAuditableOverride` additively but obsolete and server-reject it at every presentation; no Approver override is possible. |
+| 8.7 | Own `UnretiredAssumption`, `GateOutOfScope`, `TriggerReviewOverdue`, and all register-defined blocker rendering alongside Story 5.5. |
+| 8.8 | Compute the inspection subject set and eligible second party under FR24/OQ30, enforce the 30-day Inspector anti-collusion window and Platform approval for scope wider than one Conversation. |
+
+Every debt row is owned by the **Agents Runtime Maintainer**. All additions preserve existing enum ordinals and serialized names; an existing narrower value is not duplicated, but its owning story proves the required public surface, semantics, serialization, UI/API parity, and fail-closed use.
 
 ## Epic List
 
@@ -1272,6 +1312,11 @@ So that the durable Agent state I see is replayable, current, and safe to automa
 **Then** `ConfigurationVersion` increments exactly once and the evolved `AgentActivated`/`AgentDisabled` schemas carry the new version
 **And** legacy lifecycle events replay deterministically, exact duplicate commands do not increment, and a later interaction snapshots the updated version. This closes DW-4.
 
+**Given** a Party-link or Party-replacement wire member is presented after `hexa` has been provisioned
+**When** any old or current client, migration, replay, API/client, UI, or direct command path handles it
+**Then** the member remains declared and deserializable but obsolete and every request is server-rejected with a typed reason
+**And** FR-1 provisioning remains the only identity creation/link path and no tenant role can change the immutable AI-type Party identity.
+
 **Given** a caller from another tenant or without Agent-administration authority
 **When** the caller commands or queries Agent configuration
 **Then** authorization denies before mutation or disclosure and produces no Provider, Party, Conversation, or secret side effect
@@ -1281,8 +1326,8 @@ So that the durable Agent state I see is replayable, current, and safe to automa
 
 | Field | Story 5.2 evidence |
 | --- | --- |
-| Requirements | FR1, FR3, FR6, FR19-FR25; NFR1-NFR5; UX-DR1-UX-DR3, UX-DR11-UX-DR17, UX-DR20, UX-DR23, UX-DR25, UX-DR30, UX-DR41, UX-DR50; AD-1-AD-5, AD-12, AD-15, AD-17 |
-| OwnedClauses | FR1.live-configure-and-query; FR3.lifecycle-preserves-history; FR6.future-only-response-mode; FR19.agent-config-isolation; FR20.admin-authorization; FR23.structured-public-result; FR24.configuration-change-evidence; FR25.setup-status; NFR1.authorization-before-mutation; NFR3.replay-determinism; NFR4.current-status; NFR5.safe-change-audit; UX-DR20.lifecycle-not-callability; UX-DR50.command-truth-flow; AD-3.pure-aggregate; AD-4.lifecycle-configuration-version; AD-15.api-ui-parity; DW-4 |
+| Requirements | FR1, FR3, FR6, FR19-FR25; OQ-25, OQ-28; NFR1-NFR5; UX-DR1-UX-DR3, UX-DR11-UX-DR17, UX-DR20, UX-DR23, UX-DR25, UX-DR30, UX-DR41, UX-DR50; AD-1-AD-5, AD-12, AD-15, AD-17 |
+| OwnedClauses | FR1.live-configure-and-query; FR1.immutable-provisioned-party-identity; FR3.lifecycle-preserves-history; FR6.future-only-response-mode; FR19.agent-config-isolation; FR20.admin-authorization; FR23.structured-public-result; FR23.party-link-replace-deprecate-and-reject; FR24.configuration-change-evidence; FR25.setup-status; NFR1.authorization-before-mutation; NFR3.replay-determinism; NFR4.current-status; NFR5.safe-change-audit; UX-DR20.lifecycle-not-callability; UX-DR50.command-truth-flow; AD-3.pure-aggregate; AD-4.lifecycle-configuration-version; AD-15.api-ui-parity; DW-4 |
 | Dependencies | Story 5.1 |
 | EvidenceLevel | Levels 2 and 4: aggregate/replay behavior plus live EventStore command-query-projection path |
 | TestOrArtifact | AgentConfigurationAggregateTests; AgentLifecycleConfigurationVersionTests; AgentConfigurationEventStoreIntegrationTests; AgentSetupQueryTests; AgentConfigurationUiTests; persisted read-model fixture |
@@ -1303,6 +1348,7 @@ So that catalog truth is administered once while every tenant sees and selects o
 - **Prior stories:** 5.1.
 - **External:** None. Catalog governance and migration do not invoke the Provider; runtime use remains gated by `EXT-PROVIDER-1` in consuming stories.
 - **Non-conformance:** `NC-5.3-PLATFORM-CATALOG-SCOPE` remains open in the external-dependency register until the shipped tenant-scoped catalog is migrated and frozen as historical evidence.
+- **Open Product decision:** Current evidence does not conclusively establish whether completed historical Story 5.3 executed `EXT-PROVIDER-1`; the register's Branch A/Branch B disposition remains open and this story does not select one.
 - **Forward dependencies:** None; this story publishes catalog truth but does not invoke the Provider.
 
 **Acceptance Criteria:**
@@ -1311,6 +1357,11 @@ So that catalog truth is administered once while every tenant sees and selects o
 **When** a create, update, enable, or disable command is accepted
 **Then** the command targets reserved tenant `system` and one `ProviderCatalog` stream per (`ProviderId`, `ModelId`) and durably records label, platform enablement, text-generation capability, positive context/output/timeout limits, secret reference/configured state, versioned pricing units/currency, and a non-reusable monotonic CapabilityVersion
 **And** tenant principals cannot mutate platform catalog state and replay and duplicate delivery produce the same state.
+
+**Given** Provider/model data-handling terms are created or changed
+**When** platform catalog governance accepts the change
+**Then** the catalog owns and advances `DataHandlingVersion` with the governed capability/pricing record
+**And** replay, migration, API/client, UI, and evidence surfaces preserve that version without inferring Provider behavior or consuming `EXT-PROVIDER-1`.
 
 **Given** an authorized Platform Operator and a tenant
 **When** a Provider/model entry is enabled or disabled for that tenant
@@ -1341,8 +1392,8 @@ So that catalog truth is administered once while every tenant sees and selects o
 
 | Field | Story 5.3 evidence |
 | --- | --- |
-| Requirements | FR4, FR5, FR19-FR25, FR28; NFR1, NFR4, NFR6, NFR10; UX-DR4, UX-DR11-UX-DR17, UX-DR21, UX-DR26, UX-DR30, UX-DR41; AD-2, AD-9, AD-10, AD-14, AD-15, AD-17, AD-21 |
-| OwnedClauses | FR4.live-provider-catalog; FR4.disabled-not-usable; FR5.future-only-selection; FR21.missing-provider-blocks; FR24.provider-change-evidence; NFR6.secret-nondisclosure; NFR10.current-pricing-input; UX-DR4.safe-provider-grid; UX-DR21.provider-result-not-inferred; AD-2.platform-catalog-and-tenant-enablement; AD-9.adapter-boundary; AD-10.capability-version-and-limits; AD-14.secret-safety; AD-30.platform-principal |
+| Requirements | FR4, FR5, FR19-FR25, FR28; OQ-29; NFR1, NFR4, NFR6, NFR10; UX-DR4, UX-DR11-UX-DR17, UX-DR21, UX-DR26, UX-DR30, UX-DR41; AD-2, AD-9, AD-10, AD-14, AD-15, AD-17, AD-21 |
+| OwnedClauses | FR4.live-provider-catalog; FR4.disabled-not-usable; FR5.future-only-selection; FR21.missing-provider-blocks; FR24.provider-change-evidence; OQ29.DataHandlingVersion; NFR6.secret-nondisclosure; NFR10.current-pricing-input; UX-DR4.safe-provider-grid; UX-DR21.provider-result-not-inferred; AD-2.platform-catalog-and-tenant-enablement; AD-9.adapter-boundary; AD-10.capability-version-and-limits; AD-14.secret-safety; AD-30.platform-principal |
 | Dependencies | Story 5.1; no external dependency; closes `NC-5.3-PLATFORM-CATALOG-SCOPE` |
 | EvidenceLevel | Levels 2 and 4: catalog aggregate behavior and live EventStore/query/UI component path |
 | TestOrArtifact | ProviderCatalogMigrationTests; ProviderCatalogAggregateTests; TenantProviderEnablementAggregateTests; ProviderCatalogEventStoreIntegrationTests; ProviderCatalogQueryTests; ProviderCatalogUiTests; secret poison-sweep report |
@@ -1381,6 +1432,11 @@ So that revoked, ambiguous, stale, or cross-tenant authority can never make **he
 **Then** the exact current basis and disclosure category are recorded, API/UI report the same safe basis, and dependency loss revokes readiness
 **And** JWT-only, UI-only, or historical role evidence cannot grant authority.
 
+**Given** `ApproverPolicySourceKind.Caller` is presented by an old or current client, migration, replay, API/client, or UI path
+**When** policy validation runs
+**Then** the member remains declared and deserializable for compatibility but is obsolete and server-rejected before mutation
+**And** Caller is absent from new configuration choices and can never become an Eligible Approver of the same call.
+
 **Given** any public Agents operation
 **When** trusted ingress derives authorization context
 **Then** it selects exactly one AD-30 principal kind from `User`, `Administrator`, `Platform`, or `Workflow` according to the operation family, resolves a user `PartyId` from the authenticated subject plus fresh Parties/Tenants evidence, strips all client-supplied reserved extension keys, and issues only allowlisted scope-bound extensions with an HMAC tag
@@ -1400,8 +1456,8 @@ So that revoked, ambiguous, stale, or cross-tenant authority can never make **he
 
 | Field | Story 5.4 evidence |
 | --- | --- |
-| Requirements | FR2, FR7, FR19-FR21, FR23-FR25, FR33; NFR1, NFR2; UX-DR5, UX-DR20, UX-DR25, UX-DR30; AD-4, AD-7, AD-8, AD-12, AD-17, AD-30; EXT-CONV-AI-1 |
-| OwnedClauses | FR2.exactly-one-party; FR7.current-approver-basis; FR19.cross-tenant-denial; FR20.policy-authorization; FR21.stale-ambiguous-unavailable-block; NFR1.pre-side-effect-authorization; NFR2.no-cross-tenant-disclosure; UX-DR5.blocked-policy-source; AD-7.party-reference-only; AD-8.approver-resolution; AD-12.current-fail-closed-gates; AD-30.principal-kind-and-ingress-HMAC; AD-2.SecurityEventLog; DW-2 |
+| Requirements | FR2, FR7, FR19-FR21, FR23-FR25, FR33; OQ-25; NFR1, NFR2; UX-DR5, UX-DR20, UX-DR25, UX-DR30; AD-4, AD-7, AD-8, AD-12, AD-17, AD-30; EXT-CONV-AI-1 |
+| OwnedClauses | FR2.exactly-one-party; FR7.current-approver-basis; FR7.caller-source-deprecate-and-reject; FR19.cross-tenant-denial; FR20.policy-authorization; FR21.stale-ambiguous-unavailable-block; NFR1.pre-side-effect-authorization; NFR2.no-cross-tenant-disclosure; UX-DR5.blocked-policy-source; AD-7.party-reference-only; AD-8.approver-resolution; AD-12.current-fail-closed-gates; AD-30.principal-kind-and-ingress-HMAC; AD-2.SecurityEventLog; DW-2 |
 | Dependencies | Stories 5.1 and 5.2; existing Tenants and Parties read contracts; EXT-CONV-AI-1 Available |
 | EvidenceLevel | Levels 2 and 4: projection/unit behavior and live dependency-backed authorization/identity reads |
 | TestOrArtifact | TrustedPrincipalIngressTests; ReservedExtensionHmacVerificationTests; SecurityEventLogAggregateTests; TenantAccessProjectionTests; PartyReadinessIntegrationTests; ApproverPolicyResolutionIntegrationTests; revocation evidence manifest |
@@ -1479,7 +1535,7 @@ So that the domain service and UI run with their real platform dependencies with
 **Dependencies:**
 
 - **Prior stories:** 5.1 and 5.5.
-- **External:** EXT-HOST-1, EXT-SECRETS-1, and EXT-TOPOLOGY-1 must be Available and their exact compatibility commands must pass before live execution.
+- **External:** EXT-HOST-1, EXT-SECRETS-1, EXT-PROTECTION-1, and EXT-TOPOLOGY-1 must be Available and their exact compatibility commands must pass before live execution.
 - **Forward dependencies:** None; unavailable Provider, tokenizer, or safety execution remains blocked through readiness and is not simulated as available.
 
 **Acceptance Criteria:**
@@ -1488,6 +1544,11 @@ So that the domain service and UI run with their real platform dependencies with
 **When** the fixture resets, seeds, and starts
 **Then** the platform host composes Agents DomainService and UI with EventStore, Conversations, Parties, Tenants, Dapr Workflow, readiness registry, shared capacity seam, telemetry, health, identity, evidence ingress, and fail-closed Provider/safety ports
 **And** component versions, endpoints, app IDs, Dapr resources, reset procedure, and capture procedure are recorded immutably.
+
+**Given** the exact Available EXT-HOST-1 and EXT-PROTECTION-1 targets
+**When** the platform-owned host binds the production payload-protection port
+**Then** startup and every readiness evaluation can seal a canary, prove persisted plaintext absence, unseal it, destroy its DEK, replay typed `Erased`, and compare engine identity/version with the accepted protection target
+**And** a missing port, no-op default, self-reporting pass-through wrapper, target mismatch, or failed attestation keeps `PayloadProtectionUnavailable` active and content-bearing execution disabled.
 
 **Given** platform secret resolution through the exact Available EXT-SECRETS-1 target
 **When** configured, denied, missing, and rotated-secret cases run
@@ -1513,9 +1574,9 @@ So that the domain service and UI run with their real platform dependencies with
 
 | Field | Story 5.6 evidence |
 | --- | --- |
-| Requirements | FR19-FR23, FR25, FR28; NFR1, NFR2, NFR4, NFR6, NFR11; UX-DR1, UX-DR12, UX-DR41; AD-1, AD-14, AD-16, AD-17, AD-18, AD-31 |
-| OwnedClauses | FR21.platform-dependency-uncertainty; FR23.platform-host-public-boundary; FR25.topology-status; NFR6.secret-no-leak; NFR11.production-like-recovery-fixture-prerequisite; UX-DR41.FrontComposer-platform-composition; AD-16.platform-host-composition; AD-17.EXT-TOPOLOGY-fixture; AD-18.dapr-workflow-runtime-presence |
-| Dependencies | Stories 5.1 and 5.5; EXT-HOST-1, EXT-SECRETS-1, EXT-TOPOLOGY-1 Available |
+| Requirements | FR19-FR23, FR25, FR28, FR34; NFR1, NFR2, NFR4, NFR6, NFR11; UX-DR1, UX-DR12, UX-DR41; AD-1, AD-14, AD-16, AD-17, AD-18, AD-31; EXT-PROTECTION-1 |
+| OwnedClauses | FR21.platform-dependency-uncertainty; FR23.platform-host-public-boundary; FR25.topology-status; FR34.host-protection-binding-and-attestation; NFR6.secret-no-leak; NFR11.production-like-recovery-fixture-prerequisite; UX-DR41.FrontComposer-platform-composition; AD-16.platform-host-composition; AD-17.EXT-TOPOLOGY-fixture; AD-18.dapr-workflow-runtime-presence |
+| Dependencies | Stories 5.1 and 5.5; EXT-HOST-1, EXT-SECRETS-1, EXT-PROTECTION-1, EXT-TOPOLOGY-1 Available |
 | EvidenceLevel | Levels 4 and 5: live component composition and reproducible production-like topology |
 | TestOrArtifact | StructuralSeedConformanceTests; Hexalith.Agents.IntegrationTests; LiveSeamMatrixParityTests; PlatformHostTopologyTests; DaprAccessControlRouteTests; PlatformSecretResolutionTests; topology version/reset/seed/capture manifest; LR-TOPOLOGY observation |
 | VerificationCommand | pwsh ./eng/verify-story-5.6.ps1 |
@@ -1755,7 +1816,7 @@ So that restart and replay preserve EventStore truth without duplicating executi
 **Dependencies:**
 
 - **Prior stories:** 5.5 through 5.8.
-- **External:** EXT-PROTECTION-1 and EXT-TOPOLOGY-1 must be Available for live content-bearing and production-like restart evidence; deterministic no-content component tests may run without executing an unavailable external seam.
+- **External:** EXT-PROTECTION-1, EXT-CONV-AI-1, and EXT-TOPOLOGY-1 must be Available for live content-bearing, live Conversation-context, and production-like restart evidence; deterministic no-content component tests may run without executing an unavailable external seam.
 - **Forward dependencies:** None; deterministic context, safety, generation, and posting activities prove orchestration before their live adapters are introduced.
 
 **Acceptance Criteria:**
@@ -1789,9 +1850,9 @@ So that restart and replay preserve EventStore truth without duplicating executi
 
 | Field | Story 6.1 evidence |
 | --- | --- |
-| Requirements | FR8, FR10, FR19-FR21, FR24, FR25, FR28; NFR1-NFR5, NFR11; UX-DR27, UX-DR48, UX-DR50; AD-3, AD-4, AD-13, AD-17, AD-18, AD-22, AD-23, AD-27; EXT-PROTECTION-1 |
+| Requirements | FR8, FR10, FR19-FR21, FR24, FR25, FR28, FR34; NFR1-NFR5, NFR11; UX-DR27, UX-DR48, UX-DR50; AD-3, AD-4, AD-13, AD-17, AD-18, AD-22, AD-23, AD-27; EXT-PROTECTION-1; EXT-CONV-AI-1 |
 | OwnedClauses | FR8.one-explicit-accepted-interaction; FR10.safe-workflow-failure; FR24.workflow-linked-audit; NFR3.no-duplicate-business-state; NFR11.RPO-zero-and-restart; UX-DR27.authoritative-interaction-states; UX-DR48.failure-is-not-proposal; AD-18.single-durable-owner; AD-23.frozen-cohort-monotonic-recovery |
-| Dependencies | Stories 5.5-5.8; EXT-PROTECTION-1 and EXT-TOPOLOGY-1 Available for live content-bearing Level 4/5 evidence |
+| Dependencies | Stories 5.5-5.8; EXT-PROTECTION-1, EXT-CONV-AI-1, and EXT-TOPOLOGY-1 Available for live content-bearing and Conversation-context Level 4/5 evidence |
 | EvidenceLevel | Levels 2, 4, and 5: replay-safe logic, live Dapr Workflow component, production-like failure injection |
 | TestOrArtifact | AutomaticInteractionWorkflowTests; AutomaticInteractionRestartIntegrationTests; RecoveryCohortManifest; LR-RECOVERY partial observation for workflow-owned identities |
 | VerificationCommand | pwsh ./eng/verify-story-6.1.ps1 |
@@ -2037,8 +2098,13 @@ So that the Conversation contains one attributable AI message and no membership 
 
 **Given** a Tenant Agent Administrator or Conversation Facilitator sets or clears an Agents-owned block
 **When** Conversations removal/addition mirroring is unavailable
-**Then** the authoritative Agents state commits with `MirrorPending` and an idempotent at-least-once outbox retries the mirror
+**Then** the authoritative Agents state increments monotonic `BlockVersion`, commits with `MirrorPending`, and an idempotent at-least-once outbox retries the versioned mirror
 **And** mirror success clears the flag, mirror failure cannot roll back authority, and FR-25 status exposes the pending mirror without leaking membership.
+
+**Given** any combination of the five membership states and a fresh participant existence result of present, typed absence, typed `ConversationDeleted`, typed `PrincipalRemovedFromConversation`, or unavailable
+**When** acceptance, pre-post validation, block clearing, or delayed reconciliation executes
+**Then** every FR-2 state/read pair has one deterministic fail-closed transition or rejection, clear authority is re-evaluated at clear time, and clearing records `ReadmitPending` without rejoining immediately
+**And** rejoin occurs only at the next accepted membership step, while `PostingPending` remains uninterruptible and applies a pending removal or block on exit when no message was posted.
 
 **Given** current membership, output safety, authorization, capacity, and posting gates pass
 **When** the workflow appends the automatic response
@@ -2059,8 +2125,8 @@ So that the Conversation contains one attributable AI message and no membership 
 
 | Field | Story 6.6 evidence |
 | --- | --- |
-| Requirements | FR2, FR11, FR12, FR18-FR21, FR24, FR25, FR28, FR30, FR33; NFR1-NFR5, NFR11; UX-DR22, UX-DR27, UX-DR50; AD-2, AD-6, AD-7, AD-12-AD-14, AD-17, AD-18, AD-23, AD-31 |
-| OwnedClauses | FR2.five-state-membership; FR2.MirrorPending-outbox; FR2.agent-party-attribution; FR11.one-automatic-message; FR12.no-message-on-failed-gate; FR18.external-removal-abandons-nonterminal-proposals; FR19.membership-posting-isolation; FR24.final-message-link; NFR3.no-partial-or-duplicate-message; NFR11.no-duplicate-conversation-post; UX-DR22.posted-only-success; AD-2.ConversationAgentState; AD-6.conversations-client-only; AD-7.limited-ai-membership; AD-13.deterministic-message-id; AD-31.removal-block-and-readmission |
+| Requirements | FR2, FR11, FR12, FR18-FR21, FR24, FR25, FR28, FR30, FR33; OQ-25, OQ-26; NFR1-NFR5, NFR11; UX-DR22, UX-DR27, UX-DR50; AD-2, AD-6, AD-7, AD-12-AD-14, AD-17, AD-18, AD-23, AD-31 |
+| OwnedClauses | FR2.five-state-membership; FR2.BlockVersion; FR2.MirrorPending-outbox; FR2.state-read-pair-reconciliation; FR2.clear-time-authority-and-readmission; FR2.agent-party-attribution; FR11.one-automatic-message; FR12.no-message-on-failed-gate; FR18.external-removal-abandons-nonterminal-proposals; FR18.PostingPending-delayed-reconciliation; FR19.membership-posting-isolation; FR24.final-message-link; NFR3.no-partial-or-duplicate-message; NFR11.no-duplicate-conversation-post; UX-DR22.posted-only-success; AD-2.ConversationAgentState; AD-6.conversations-client-only; AD-7.limited-ai-membership; AD-13.deterministic-message-id; AD-31.removal-block-and-readmission |
 | Dependencies | Story 5.4; Stories 6.3-6.5; EXT-CONV-AI-1 Available |
 | EvidenceLevel | Levels 2, 4, and 5: deterministic identity, live Conversations compatibility, production-like membership/post/recovery path |
 | TestOrArtifact | ConversationAgentStateAggregateTests; ExternalRemovalAndReadmissionTests; MembershipMirrorOutboxTests; AiMembershipCompatibilityTests; AutomaticPostingIntegrationTests; ConversationPostingRecoveryTests; AutomaticResponseAuditCompletenessTests; LR-CONVERSATIONS-MEMBERSHIP-POSTING observation |
@@ -2377,6 +2443,11 @@ So that only the reviewed response becomes a Conversation Message attributed to 
 **Then** EventStore concurrency chooses one valid ordering, terminal or invalid state cannot post, authoritative Conversations outcome prevents duplicate messages, and failure remains distinct from approval
 **And** no alternate version, caller-authored fallback, or direct Conversation stream write occurs.
 
+**Given** a `PostingFailed` proposal before any retry or other exit
+**When** Story 7.4's seam-2 lookup reads the deterministic `MessageId`
+**Then** a present message records `Posted` with `LateConfirmed` and rejects the requested action; unavailable refuses the exit and leaves `PostingFailed`; typed absence permits retry only after full current re-validation
+**And** typed `ConversationDeleted` or `PrincipalRemovedFromConversation` counts as no post only for an authorized abandon path.
+
 **Given** tenant B or an unauthorized Party targets tenant A proposal
 **When** approve, membership, posting, status, or audit paths execute
 **Then** every path denies before mutation or disclosure
@@ -2386,8 +2457,8 @@ So that only the reviewed response becomes a Conversation Message attributed to 
 
 | Field | Story 7.4 evidence |
 | --- | --- |
-| Requirements | FR2, FR7, FR14, FR17, FR19-FR25, FR27, FR28; NFR1-NFR7, NFR9, NFR11, NFR13, NFR14; UX-DR7, UX-DR8, UX-DR11, UX-DR12, UX-DR22, UX-DR28, UX-DR31-UX-DR40, UX-DR50; AD-4-AD-8, AD-12-AD-15, AD-17, AD-18, AD-20, AD-22, AD-23, AD-25, AD-26; EXT-PROTECTION-1 |
-| OwnedClauses | FR17.approve-exact-selected-version; FR17.agent-attribution; FR17.complete-approval-post-link; FR20.current-approval-authorization; NFR3.no-partial-or-duplicate-post; NFR5.approval-path-audit; NFR11.no-duplicate-post-on-recovery; UX-DR22.approved-not-posted; UX-DR50.approved-posting-posted-truth; AD-13.deterministic-selected-version-post |
+| Requirements | FR2, FR7, FR14, FR17, FR19-FR25, FR27, FR28; OQ-26; NFR1-NFR7, NFR9, NFR11, NFR13, NFR14; UX-DR7, UX-DR8, UX-DR11, UX-DR12, UX-DR22, UX-DR28, UX-DR31-UX-DR40, UX-DR50; AD-4-AD-8, AD-12-AD-15, AD-17, AD-18, AD-20, AD-22, AD-23, AD-25, AD-26; EXT-PROTECTION-1; EXT-SAFETY-1; EXT-CONV-AI-1 |
+| OwnedClauses | FR17.approve-exact-selected-version; FR17.agent-attribution; FR17.complete-approval-post-link; FR18.MessageId-check-before-postingfailed-exit; FR18.LateConfirmed; FR20.current-approval-authorization; NFR3.no-partial-or-duplicate-post; NFR5.approval-path-audit; NFR11.no-duplicate-post-on-recovery; UX-DR22.approved-not-posted; UX-DR50.approved-posting-posted-truth; AD-13.deterministic-selected-version-post |
 | Dependencies | Stories 5.8 and 7.1; optional earlier versions from 7.2-7.3; EXT-PROTECTION-1, EXT-SAFETY-1 and EXT-CONV-AI-1 Available |
 | EvidenceLevel | Levels 2, 4, and 5: approval transition, live membership/posting, production-like race/recovery proof |
 | TestOrArtifact | ProposalApprovalAggregateTests; ApprovedVersionPostingIntegrationTests; ApprovalPostingRecoveryTests; ApprovalUiStateTests; approval/post audit-completeness manifest |
@@ -2405,7 +2476,7 @@ So that rejected or intentionally abandoned content becomes terminal and can nev
 
 **Dependencies:**
 
-- **Prior stories:** 7.1.
+- **Prior stories:** 7.1 and Story 7.4's seam-2 `MessageId` lookup capability.
 - **External:** `EXT-CONV-AI-1` must be Available for current Approver roster/access resolution and, when a `PostingFailed` abandon is requested after any post attempt, the typed `MessageId` existence read.
 - **Forward dependencies:** None.
 
@@ -2420,6 +2491,11 @@ So that rejected or intentionally abandoned content becomes terminal and can nev
 **When** the Approver abandons it
 **Then** EventStore records one Abandoned terminal decision with actor, policy basis, timestamp, and protected evidence
 **And** the outcome is distinct from Rejected, Expired, generation failure, and posting failure.
+
+**Given** an authorized abandon request for a `PostingFailed` proposal
+**When** the Story 7.4 seam-2 lookup reads its deterministic `MessageId`
+**Then** a present message records `Posted` with `LateConfirmed` and never `Abandoned`; unavailable refuses the exit and leaves `PostingFailed`; typed absence or a typed deleted/removed result permits only the PRD-authorized abandon path
+**And** every permitted exit re-runs current authorization, membership, safety, and operation gates before the terminal transition.
 
 **Given** duplicate, stale-revision, concurrent approval/expiry, or already terminal resolution
 **When** reject or abandon executes
@@ -2440,9 +2516,9 @@ So that rejected or intentionally abandoned content becomes terminal and can nev
 
 | Field | Story 7.5 evidence |
 | --- | --- |
-| Requirements | FR7, FR14, FR18-FR25, FR29, FR33, FR34; NFR1-NFR5, NFR13, NFR14; UX-DR7, UX-DR8, UX-DR11, UX-DR12, UX-DR22, UX-DR28, UX-DR31-UX-DR40, UX-DR50; AD-5, AD-8, AD-12-AD-15, AD-17, AD-25, AD-26; EXT-CONV-AI-1 |
+| Requirements | FR7, FR14, FR18-FR25, FR29, FR33, FR34; OQ-26; NFR1-NFR5, NFR13, NFR14; UX-DR7, UX-DR8, UX-DR11, UX-DR12, UX-DR22, UX-DR28, UX-DR31-UX-DR40, UX-DR50; AD-5, AD-8, AD-12-AD-15, AD-17, AD-25, AD-26; EXT-CONV-AI-1 |
 | OwnedClauses | FR18.rejected-terminal; FR18.abandoned-terminal; FR18.MessageId-check-before-postingfailed-exit; FR18.terminal-cannot-post; FR24.non-posting-resolution-evidence; NFR3.versions-preserved; NFR5.terminal-audit; NFR13.accessible-confirmed-resolution; UX-DR22.distinct-terminal-states; AD-5.single-terminal-order |
-| Dependencies | Story 7.1; EXT-CONV-AI-1 Available |
+| Dependencies | Stories 7.1 and 7.4 lookup capability; EXT-CONV-AI-1 Available |
 | EvidenceLevel | Levels 2 and 4: terminal/concurrency behavior and live public-contract/UI path |
 | TestOrArtifact | ProposalNonPostingResolutionTests; ProposalResolutionConcurrencyTests; ProposalResolutionUiTests; terminal evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-7.5.ps1 |
@@ -2480,6 +2556,11 @@ So that stale generated content becomes terminal predictably and cannot later po
 **Then** exactly one valid EventStore ordering wins, any losing command receives a typed authoritative outcome, and no duplicate version, terminal decision, Provider attempt, reservation, or Conversation Message is created
 **And** pre-existing terminal decisions remain immutable through recovery.
 
+**Given** an awaiting-decision proposal reaches `ExpiresAt` while the tenant kill switch is pulled
+**When** the durable expiry transition wins
+**Then** it records `Expired` with `ExpiredWhileSuspended`
+**And** that proposal is excluded from the SM-3 and SM-C5 denominators exactly as the PRD measurement contract requires.
+
 **Given** expiry status renders
 **When** API/UI, queue, Conversation status, and audit projections catch up
 **Then** Expired is a non-success terminal state with stored deadline, safe evidence, localized live-region announcement, and a route to start a new Agent Call
@@ -2494,8 +2575,8 @@ So that stale generated content becomes terminal predictably and cannot later po
 
 | Field | Story 7.6 evidence |
 | --- | --- |
-| Requirements | FR18-FR25, FR28; NFR1-NFR5, NFR11, NFR13, NFR14; UX-DR6-UX-DR8, UX-DR22, UX-DR28, UX-DR32-UX-DR40, UX-DR47, UX-DR50; AD-3-AD-5, AD-8, AD-12, AD-13, AD-17, AD-18, AD-23, AD-25, AD-26 |
-| OwnedClauses | FR18.default-configurable-future-only-expiry; FR18.durable-timer-at-or-after-ExpiresAt; FR18.expired-cannot-post; NFR3.versions-survive-expiry; NFR11.no-duplicate-timer-or-terminal-decision; NFR13.accessible-localized-expiry; UX-DR22.expired-distinct-terminal; AD-5.expiry-state; AD-23.timer-recovery-inventory |
+| Requirements | FR18-FR25, FR28; OQ-27; NFR1-NFR5, NFR11, NFR13, NFR14; UX-DR6-UX-DR8, UX-DR22, UX-DR28, UX-DR32-UX-DR40, UX-DR47, UX-DR50; AD-3-AD-5, AD-8, AD-12, AD-13, AD-17, AD-18, AD-23, AD-25, AD-26 |
+| OwnedClauses | FR18.default-configurable-future-only-expiry; FR18.durable-timer-at-or-after-ExpiresAt; FR18.expired-cannot-post; FR18.ExpiredWhileSuspended-and-metric-exclusion; NFR3.versions-survive-expiry; NFR11.no-duplicate-timer-or-terminal-decision; NFR13.accessible-localized-expiry; UX-DR22.expired-distinct-terminal; AD-5.expiry-state; AD-23.timer-recovery-inventory |
 | Dependencies | Stories 6.1 and 7.1; existing platform Dapr Workflow/topology |
 | EvidenceLevel | Levels 2, 4, and 5: timer/concurrency logic, live Dapr Workflow, production-like restart/race proof |
 | TestOrArtifact | ProposalExpiryPolicyTests; ProposalExpiryWorkflowIntegrationTests; ProposalExpiryRaceTests; ProposalExpiryUiTests; timer/recovery evidence manifest |
@@ -2591,15 +2672,15 @@ So that protected evidence remains available exactly while policy requires and c
 **Then** the `retention` projection records an immutable deadline exactly 365 days after that terminal timestamp, the governing policy version, protected scope, and safe evidence references
 **And** posted Conversation Messages remain under Hexalith.Conversations retention rather than Agents retention.
 
-**Given** an authorized operator submits a legal hold for a named tenant-scoped protected scope
+**Given** an authorized Compliance Inspector submits a legal hold for a named tenant-scoped protected scope
 **When** EventStore accepts the deterministic `LegalHold` command
 **Then** `LegalHold(TenantId, HoldId)` accepts only `interaction:<id>` or `class:<class>` with an explicit UTC range, records expected source/protection revisions, resolves the scope to explicit interaction keys at a checkpoint, pins every DEK, and becomes `Active` only after all pins are confirmed
 **And** the append-only `legal-hold` projection and high-impact UI follow `submitted -> authoritative pending -> projection-confirmed terminal`, while exact duplicate submission is idempotent and a divergent duplicate conflicts.
 
-**Given** a Compliance Inspector releases an active hold at its expected revision
-**When** every named DEK is unpinned successfully
-**Then** `LegalHold` appends a release transition carrying actor, role basis, justification, scope, checkpoint, expected revision, and key outcomes
-**And** history is never edited or deleted and partial unpin failure remains restrictive.
+**Given** a Compliance Inspector submits release of an active hold at its expected revision
+**When** a distinct second Compliance Inspector or the Platform Operator records audited approval under the AD-30 principal and role rules
+**Then** only that approved release may unpin every named DEK and append a release transition carrying submitter, approver, role bases, justification, scope, checkpoint, expected revision, and key outcomes
+**And** the same actor cannot satisfy both steps, history is never edited or deleted, and partial approval or unpin failure remains restrictive.
 
 **Given** a retention timer becomes due while an active matching hold exists
 **When** the durable expiry workflow rechecks current hold state
@@ -2620,8 +2701,8 @@ So that protected evidence remains available exactly while policy requires and c
 
 | Field | Story 8.1 evidence |
 | --- | --- |
-| Requirements | FR18-FR25, FR28; NFR1-NFR5, NFR11, NFR13; UX-DR1, UX-DR9-UX-DR18, UX-DR29-UX-DR33, UX-DR36-UX-DR41, UX-DR46, UX-DR50; AD-1-AD-5, AD-8, AD-12, AD-13, AD-17, AD-20, AD-22, AD-23, AD-25, AD-26; EXT-PROTECTION-1; EXT-SECRETS-1 |
-| OwnedClauses | FR18.terminal-evidence-retained; FR19.retention-hold-tenant-isolation; FR20.current-governance-authorization; FR24.retention-hold-audit; FR28.audit-governance-active; PRD-OQ8.365-day-terminal-retention; PRD-OQ8.legal-hold-suspends-expiry; NFR11.timer-replay-no-duplicate-effect; UX-DR31.LegalHold-lock-scope; UX-DR40.LegalHold-restrictive-viewport-block; UX-DR46.retention-and-hold; AD-2.LegalHold; AD-22.two-phase-DEK-pinning; AD-23.retention-legal-hold-projections |
+| Requirements | FR18-FR25, FR28, FR30, FR33, FR34; OQ-30; NFR1-NFR5, NFR11, NFR13; UX-DR1, UX-DR9-UX-DR18, UX-DR29-UX-DR33, UX-DR36-UX-DR41, UX-DR46, UX-DR50; AD-1-AD-5, AD-8, AD-12, AD-13, AD-17, AD-20, AD-22, AD-23, AD-25, AD-26, AD-30; EXT-PROTECTION-1; EXT-SECRETS-1 |
+| OwnedClauses | FR18.terminal-evidence-retained; FR19.retention-hold-tenant-isolation; FR20.current-governance-authorization; FR24.retention-hold-audit; FR24.legal-hold-release-second-party; FR28.audit-governance-active; PRD-OQ8.365-day-terminal-retention; PRD-OQ8.legal-hold-suspends-expiry; OQ30.distinct-release-approval; NFR11.timer-replay-no-duplicate-effect; UX-DR31.LegalHold-lock-scope; UX-DR40.LegalHold-restrictive-viewport-block; UX-DR46.retention-and-hold; AD-2.LegalHold; AD-22.two-phase-DEK-pinning; AD-30.platform-release-approval |
 | Dependencies | Stories 5.2, 5.8, and 7.6; EXT-PROTECTION-1 and EXT-SECRETS-1 Available |
 | EvidenceLevel | Levels 2 and 4: deterministic retention/hold behavior and live EventStore/Dapr component evidence |
 | TestOrArtifact | RetentionPolicyTests; LegalHoldAggregateTests; RetentionHoldWorkflowIntegrationTests; RetentionLegalHoldUiContractTests; retention/hold evidence manifest |
