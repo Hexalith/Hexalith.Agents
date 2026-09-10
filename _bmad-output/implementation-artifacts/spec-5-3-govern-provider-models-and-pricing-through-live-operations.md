@@ -72,6 +72,8 @@ context:
 
 ## Spec Change Log
 
+- 2026-09-10: Product ruled that Story 5.3 executed no `EXT-PROVIDER-1` seam. Substituted or deferred generation-provider ports did not constitute execution of a live external Provider adapter; Branch B is recorded in the external dependency register without changing the dependency's `Uncommitted` status.
+
 ## Design Notes
 
 Sprint-status slug `5-3-bind-eventstore-operations-and-setup-read-models` is archived Agent-setup numbering; numeric Story 5.3 in `epics.md` is authority. EXT-PROVIDER-1 stays Uncommitted: this story publishes catalog truth only and must not invent or invoke the generation adapter. Pricing is administrator-supplied catalog truth, not a Provider SDK quote. Mirror Agent-setup freshness (`IReadModelFreshness`) rather than inventing catalog-only metadata.

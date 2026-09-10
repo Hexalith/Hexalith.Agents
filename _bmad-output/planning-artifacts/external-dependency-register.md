@@ -2,7 +2,7 @@
 title: Hexalith Agents External Dependency Register
 status: active
 created: 2026-08-02
-updated: 2026-09-09
+updated: 2026-09-10
 project: agents
 authority: sprint-change-proposal-2026-09-09-2.md
 ---
@@ -184,14 +184,13 @@ A runtime, test, or qualification path that would execute a seam whose record is
 
 ## Known Consumer Non-Conformance
 
-### Story 5.3 / EXT-PROVIDER-1 Historical Consumption — Open Product Approval
+### Story 5.3 / EXT-PROVIDER-1 Historical Consumption — Resolved Branch B
 
-OQ-17 settles the rule for consumption of an `Uncommitted` seam but does not establish whether Story 5.3 actually executed `EXT-PROVIDER-1`. The inspected Story 5.3 specification and fail-closed deferred provider show that no live adapter shipped, but they are insufficient evidence for a dated Product ruling. Until Product selects one evidence-backed branch, neither disposition is recorded:
+`None: Story 5.3 executed no EXT-PROVIDER-1 seam (Product ruling 2026-09-10)`.
 
-- Branch A — seam was consumed: `Story 5.3 | EXT-PROVIDER-1 | <verified completion date> | completed while Uncommitted; reopened by sprint-change-proposal-2026-09-09; reopening does not clear this record (PRD FR-21)`.
-- Branch B — seam was never consumed: `None: Story 5.3 executed no EXT-PROVIDER-1 seam (Product ruling <date>)`.
+Product approved Branch B on 2026-09-10 from the inspected Story 5.3 specification, implementation history, verification scope, and fail-closed deferred provider. Story 5.3 published Provider catalog truth through its EventStore, API/client, and UI paths; substituted `IAgentGenerationProvider` test ports and the deferred provider returning `Unavailable` did not execute a live external Provider adapter or real Provider transport. No Story 5.3 / `EXT-PROVIDER-1` non-conformance record is therefore created under PRD FR-21.
 
-This open approval condition is blocking provenance, not a fabricated non-conformance finding or dependency commitment.
+This historical ruling does not commit `EXT-PROVIDER-1`, advance its status, or change its current consumers.
 
 ### NC-5.3-PLATFORM-CATALOG-SCOPE — Story 5.3 Platform Catalog Migration
 

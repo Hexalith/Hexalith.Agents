@@ -86,7 +86,7 @@ development_status:
   epic-5: in-progress
   5-1-establish-build-package-boundary-and-basic-ci-gates: done
   5-2-configure-hexa-through-live-eventstore-operations: in-progress  # Corrected 2026-09-09 (architecture update pass, C-7): amended AC require the ConfigurationVersion lifecycle bump and AgentLifecycleConfigurationVersionTests, neither of which exist in code (DW-4); was incorrectly marked done.
-  5-3-govern-provider-models-and-pricing-through-live-operations: backlog
+  5-3-govern-provider-models-and-pricing-through-live-operations: backlog  # Noted 2026-09-09 (round-5 spine validation, brownfield M1): a completed, fully-tested prior implementation (2569/2569 tests passing) exists underneath this backlog status; not promoted to done/in-progress here because AD-2's platform/tenant ProviderCatalog split (NC-5.3-PLATFORM-CATALOG-SCOPE) is still unreconciled in code.
   5-4-prove-trusted-principal-tenant-party-and-approver-readiness: backlog
   5-5-publish-authoritative-readiness-and-provider-state-contracts: backlog
   5-6-compose-agents-in-the-platform-owned-production-like-host: backlog

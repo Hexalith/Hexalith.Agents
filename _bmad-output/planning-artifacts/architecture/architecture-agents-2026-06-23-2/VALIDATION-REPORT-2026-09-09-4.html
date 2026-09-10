@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hexalith Agents — Architecture Spine Validation (Round 5)</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+
+    --verdict-pass: #16a34a;
+    --verdict-partial: #d97706;
+    --verdict-fail: #dc2626;
+
+    --sev-low: #64748b;
+    --sev-medium: #ca8a04;
+    --sev-high: #ea580c;
+    --sev-critical: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container { max-width: 980px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  header.report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .grade {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: white;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .grade-fail { background: var(--verdict-fail); }
+
+  .synthesis {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--sev-critical);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    font-size: 15px;
+  }
+  .synthesis p { margin: 0 0 10px; }
+  .synthesis p:last-child { margin-bottom: 0; }
+  .synthesis ol { margin: 8px 0 10px; padding-left: 22px; }
+  .synthesis li { margin-bottom: 8px; }
+  .synthesis code { background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; font-size: 0.92em; }
+
+  .lens-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .lens-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .lens-card .lens-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .lens-card .lens-verdict { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .lens-card .lens-counts { font-size: 12px; color: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .v-fail { color: var(--verdict-fail); }
+  .v-partial { color: var(--verdict-partial); }
+  .v-pass { color: var(--verdict-pass); }
+
+  table.total-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 13.5px;
+  }
+  table.total-table th, table.total-table td {
+    padding: 8px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  table.total-table th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+  table.total-table tr:last-child td { border-bottom: none; font-weight: 600; }
+  table.total-table code { font-size: 12px; color: var(--muted); }
+
+  section.tier { margin-bottom: 16px; }
+  section.tier > h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tier-note { font-weight: 400; color: var(--muted); font-size: 13px; }
+
+  article.finding {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+  }
+  article.finding header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .badge-sev-low { background: rgba(100, 116, 139, 0.12); color: var(--sev-low); }
+  .badge-sev-medium { background: rgba(202, 138, 4, 0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234, 88, 12, 0.14); color: var(--sev-high); }
+  .badge-sev-critical { background: rgba(220, 38, 38, 0.14); color: var(--sev-critical); }
+  .badge-lens { background: rgba(28,25,23,0.06); color: var(--muted); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 600; flex: 1; min-width: 200px; }
+  .finding blockquote {
+    margin: 8px 0;
+    padding: 8px 14px;
+    background: var(--bg);
+    border-left: 3px solid var(--border);
+    font-size: 13.5px;
+    color: var(--text);
+  }
+  .finding blockquote code { font-size: 0.95em; }
+  .finding p { margin: 6px 0; font-size: 14px; }
+  .finding .fix { margin-top: 10px; font-size: 14px; }
+  .finding .fix strong { color: var(--muted); font-weight: 600; }
+  .finding code { background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; font-size: 0.92em; }
+
+  .rollup {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 14px;
+  }
+  .rollup ul { margin: 6px 0 0; padding-left: 20px; }
+  .rollup li { margin-bottom: 8px; }
+  .rollup code { background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; font-size: 0.92em; }
+
+  .closed-box {
+    background: rgba(22,163,74,0.06);
+    border: 1px solid rgba(22,163,74,0.25);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 14px;
+    margin-top: 24px;
+  }
+  .closed-box h2 { margin: 0 0 8px; font-size: 15px; color: #15803d; }
+  .closed-box code { background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; font-size: 0.92em; }
+
+  .recommendation {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  .recommendation h2 { margin: 0 0 10px; font-size: 15px; }
+  .recommendation ol { margin: 0; padding-left: 20px; }
+  .recommendation li { margin-bottom: 10px; }
+  .recommendation code { background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; font-size: 0.92em; }
+
+  footer.report-footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="report-header">
+    <div class="title">
+      <h1>Architecture Spine Validation — Round 5</h1>
+      <div class="subtitle">_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md</div>
+    </div>
+    <div class="grade grade-fail">FAIL</div>
+  </header>
+
+  <div class="synthesis">
+    <p><strong>Gate verdict: FAIL.</strong> This round independently re-derived — rather than trusted — every claim the round-4 Update pass and its own v7 gate made about what it had closed. The headline result: the Spine's own binding PRD (§8.1) lists seven AD-level divergences between the PRD and the Spine text. All seven were re-verified and are <strong>still present</strong>, despite four prior rubric-review rounds (v4, v6, v7, now v8) touching this document today. Three are Critical because they describe runtime behavior that directly contradicts a normative FR-18/FR-8/FR-28 transition table or formula:</p>
+    <ol>
+      <li><strong>AD-5 contradicts FR-18 on three points</strong> — forbids a human abandon from <code>Approved</code> that FR-33/FR-18 explicitly grant, requires a <code>MessageId</code> lookup FR-18 says must be skipped there (risking a permanent deadlock), and has no <code>PostingWindowElapsed</code> bound or <code>PostingPending</code> attempt deadline at all.</li>
+      <li><strong>AD-12's kill-switch trigger formula uses exactly the flat-20/tuple rule the PRD addendum records as rejected</strong>, instead of FR-28/A-17's distinct-calling-Party ratio with a 3-Party convening floor — a safety-critical miscalculation.</li>
+      <li><strong>AD-13 misorders FR-8's acceptance steps and requires Eligible Approver resolution in Automatic mode</strong>, contradicting FR-8/FR-11 and risking incorrect rejection of valid Automatic-mode calls.</li>
+    </ol>
+    <p>Independently, the adversarial lens found two fresh, self-contained Critical contradictions inside the Spine's own text: AD-30 states a fixed and a per-attempt-varying <code>OnBehalfOfPartyId</code> for the <code>Workflow</code> principal in the same paragraph, and <code>ContextPolicyReference</code> (AD-11) points at a versioned/published record that AD-2's closed aggregate list never defines. The security lens found that the round-4 fix which made <code>DigestKey</code> rotation actually work never binds a stored digest to the key version that produced it — undermining idempotency-conflict correctness and, more seriously, long-horizon audit-trail verifiability after a rotation.</p>
+    <p style="margin-bottom:0;">Brownfield drift is clean news on its own terms: no source code has changed since the last pass, the one previously-fixed tracking defect is still fixed, and every other open item is pre-existing, already-tracked debt. Verified-current independently confirmed the live CVE-2026-69522 exposure claim is accurate, but found the Stack table's EventStore gitlink already 2h11m stale and the "immediate" SDK remediation not yet applied to <code>global.json</code>.</p>
+  </div>
+
+  <div class="lens-summary">
+    <div class="lens-card">
+      <div class="lens-name">Rubric walker</div>
+      <div class="lens-verdict v-fail">FAIL</div>
+      <div class="lens-counts">3 / 4 / 4 / 0</div>
+    </div>
+    <div class="lens-card">
+      <div class="lens-name">Verified-current</div>
+      <div class="lens-verdict v-partial">PASS WITH FINDINGS</div>
+      <div class="lens-counts">0 / 0 / 2 / 2</div>
+    </div>
+    <div class="lens-card">
+      <div class="lens-name">Adversarial divergence</div>
+      <div class="lens-verdict v-partial">PASS WITH FINDINGS</div>
+      <div class="lens-counts">2 / 2 / 1 / 1</div>
+    </div>
+    <div class="lens-card">
+      <div class="lens-name">Brownfield drift</div>
+      <div class="lens-verdict v-partial">FAILS TO RATIFY, fixable</div>
+      <div class="lens-counts">0 / 7‡ / 2 / 2</div>
+    </div>
+    <div class="lens-card">
+      <div class="lens-name">Security / data integrity</div>
+      <div class="lens-verdict v-partial">PASS WITH FINDINGS</div>
+      <div class="lens-counts">1 / 0 / 0 / 1</div>
+    </div>
+  </div>
+
+  <table class="total-table">
+    <tr><th>Lens</th><th>Verdict</th><th>C / H / M / L</th><th>Review file</th></tr>
+    <tr><td>Rubric walker</td><td class="v-fail">FAIL</td><td>3 / 4 / 4 / 0</td><td><code>reviews/review-2026-09-09-rubric-v8.md</code></td></tr>
+    <tr><td>Verified-current</td><td class="v-partial">PASS WITH FINDINGS</td><td>0 / 0 / 2 / 2</td><td><code>reviews/review-2026-09-09-verified-current-v8.md</code></td></tr>
+    <tr><td>Adversarial divergence</td><td class="v-partial">PASS WITH FINDINGS</td><td>2 / 2 / 1 / 1</td><td><code>reviews/review-2026-09-09-adversarial-divergence-v8.md</code></td></tr>
+    <tr><td>Brownfield drift</td><td class="v-partial">FAILS TO RATIFY, fixable</td><td>0 / 7‡ / 2 / 2</td><td><code>reviews/review-2026-09-09-brownfield-drift-v8.md</code></td></tr>
+    <tr><td>Security / data integrity</td><td class="v-partial">PASS WITH FINDINGS</td><td>1 / 0 / 0 / 1</td><td><code>reviews/review-2026-09-09-security-data-integrity-v8.md</code></td></tr>
+    <tr><td>Total</td><td></td><td>6 / 13 / 9 / 6 (34)</td><td></td></tr>
+  </table>
+  <p style="font-size:12.5px;color:var(--muted);margin-top:-14px;margin-bottom:24px;">‡ Brownfield's 7 Highs (H1–H7 below) are all already-tracked implementation debt with named backlog stories — confirmed unchanged, not new spine defects. Deterministic lint (<code>lint_spine.py</code>): 10 findings, all pre-existing <code>TBD</code> placeholders in the Architecture Assumptions table (known tool/reporting discrepancy, not a regression).</p>
+
+  <section class="tier">
+    <h2><span class="badge badge-sev-critical">Critical</span> close before any new command handler is built against AD-5, AD-12, AD-13, AD-30, AD-11, or the DigestKey scheme</h2>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Rubric</span><h3 class="finding-title">C-1 — AD-5 contradicts FR-18's transition table on three points</h3></header>
+      <p>AD-5 forbids a human abandon from <code>Approved</code> that FR-33/FR-18 explicitly grant (actor: <em>"Eligible Approver; Tenant Agent Administrator"</em>, no restriction). It also requires a <code>MessageId</code> lookup before that transition that FR-18 says must be <em>skipped</em> for this exact case — <code>addendum.md</code> records the rejection verbatim — risking a proposal stuck in <code>Approved</code> forever if the lookup is unavailable. And <code>PostingWindowElapsed</code> plus a stored <code>PostingPending</code> attempt deadline, both normative FR-18 rows, are grep-confirmed absent from the entire document.</p>
+      <p>This is the core proposal-lifecycle state machine — the single most implementation-critical aggregate in the module.</p>
+      <div class="fix"><strong>Fix:</strong> rewrite AD-5's abandon/lookup clause to match FR-18 verbatim; add <code>PostingWindowElapsed</code> and the <code>PostingPending</code> stored deadline as first-class rule text.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Rubric</span><h3 class="finding-title">C-2 — AD-12's kill-switch trigger formula uses exactly the rule the PRD addendum records as rejected</h3></header>
+      <p>AD-12's Second-update paragraph uses a flat-20-call floor over <code>(Party, Conversation, reason)</code> tuples. FR-28/A-17 define a distinct-calling-Party ratio with a 3-Party convening floor and a bounded small-tenant sample; <code>addendum.md</code> records the flat-20 rule's rejection verbatim ("rejected for the discontinuity it produced at 5 Parties"). AD-12 never mentions the 3-Party convening floor at all.</p>
+      <p>This formula decides when the tenant-wide kill switch's mandatory trigger review convenes — a safety-critical control.</p>
+      <div class="fix"><strong>Fix:</strong> replace the formula with FR-28/A-17's distinct-calling-Party ratio, the 3-Party floor, and the bounded sample, verbatim.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Rubric</span><h3 class="finding-title">C-3 — AD-13 misorders FR-8's acceptance steps and requires Eligible Approver resolution in Automatic mode</h3></header>
+      <p>Current FR-8 places Eligible Approver resolution at step 6, Confirmation mode only; AD-13 places it after context measurement/reservation/safety and claims it runs in every response mode, rejecting a zero-Approver Automatic-mode Agent — contradicting FR-11, which forbids resolving an Approver in Automatic mode at all. AD-13 also drops FR-8 step 3 (the local <code>Blocked</code> check) entirely.</p>
+      <div class="fix"><strong>Fix:</strong> replace AD-13's opening sentence with the current ten-step FR-8 order; scope Eligible Approver resolution to Confirmation mode only.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Adversarial</span><h3 class="finding-title">C-4 — AD-30's <code>Workflow</code> principal envelope states two contradictory rules for <code>OnBehalfOfPartyId</code> in the same paragraph</h3></header>
+      <p>AD-21 cites AD-30 for the rule that <code>OnBehalfOfPartyId</code> varies per attempt (caller for the first generation, requesting Approver for a regeneration). But AD-30's own <code>Workflow</code>-envelope clause fixes it to <em>"the snapshot caller"</em> — a lifecycle constant — then restates the per-step-varying rule three sentences later in the same paragraph.</p>
+      <p>Team A implements the envelope clause literally: every Workflow-dispatched reserve command, including a regeneration's, charges the original caller. Team B implements AD-21's rule literally: a regeneration's reserve command charges the requesting Approver. Both are literal readings of live text; the two systems charge rate limits and cost-cap consumption to different Parties for the same event.</p>
+      <div class="fix"><strong>Fix:</strong> delete or qualify the envelope's fixed clause; state explicitly that <code>Workflow</code>'s <code>OnBehalfOfPartyId</code> is not a lifecycle constant.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Adversarial</span><h3 class="finding-title">C-5 — <code>ConversationContextPolicy</code> is referenced as an independently versioned record with no aggregate to own it</h3></header>
+      <p>AD-2's aggregate list is closed ("V1 aggregates are <strong>exactly</strong>...") with no <code>ConversationContextPolicy</code> row. AD-11 nonetheless describes it as something that "publishes... version[s]," snapshotted via a <code>*Reference</code> field — the same pattern AD-2 uses for the one entity that does get its own aggregate, <code>ContentSafetyPolicy</code>.</p>
+      <p>Team A embeds context-policy content inline in <code>Agent</code>. Team B adds a fifteenth, <code>system</code>-scoped aggregate with its own stream and revision. The two builds have structurally incompatible EventStore topologies, and neither AD names an owner for the context-budget margin (10%, range 5–25) either way.</p>
+      <div class="fix"><strong>Fix:</strong> either add <code>ConversationContextPolicy</code> as a fifteenth AD-2 aggregate, or strike the "publishes... version[s]" framing from AD-11 and state plainly it's a self-versioned field on <code>Agent</code>.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Security</span><h3 class="finding-title">C-6 — The versioned <code>DigestKey</code> model never binds a stored digest to the key version that produced it</h3></header>
+      <p>The round-4 fix made <code>DigestKey</code> rotation genuinely usable (versioned, retained indefinitely, unrestricted and content-free). But no record carrying a sensitive-content digest carries the <code>DigestKeyVersion</code> it was computed under — HMAC-SHA-256 is one-way, so nothing can tell which retained version to recompute against after a rotation.</p>
+      <p><strong>Idempotency false-conflict:</strong> a retried command after a rotation recomputes against the current key, producing a different fingerprint than the original — a legitimate retry is misclassified as a conflict. <strong>Audit-evidence unverifiability (the more serious component):</strong> a reviewer reconstructing an inspection years later, after content is legitimately erased, has no way to know which key version to recompute against without brute-forcing every version — quietly breaking the tamper-evidence guarantee the digest scheme exists to provide.</p>
+      <p>This is a direct, foreseeable consequence of the round-4 fix, not a leftover of the bug it replaced.</p>
+      <div class="fix"><strong>Fix:</strong> tag every persisted digest with the <code>DigestKeyVersion</code> used to compute it, alongside the digest value.</div>
+    </article>
+  </section>
+
+  <section class="tier">
+    <h2><span class="badge badge-sev-high">High</span> <span class="tier-note">13 findings — 6 new, 7 already-tracked implementation debt</span></h2>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Rubric</span><h3 class="finding-title">H-1 — AD-6 says <code>EXT-CONV-AI-1</code> has six seams; the PRD's third update added a seventh</h3></header>
+      <p>Message retraction (<code>[ASSUMPTION A-28]</code>) is missing from AD-6's list. The "Deferred Beyond V1" table still says the seam "does not yet name" retraction — now stale, since the PRD has named it as pending.</p>
+      <div class="fix"><strong>Fix:</strong> update AD-6 to seven seams incl. A-28; reword the Deferred row.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Rubric</span><h3 class="finding-title">H-2 — Two undocumented, non-cross-referenced status contracts</h3></header>
+      <p>The Spine cites <code>AgentCallOperationStatus</code> (AD-5, AD-15) while FR-8 defines the PRD's actual public write-path contract as <code>AgentInteractionStatus</code> — zero matches anywhere in the Spine. The enums share only two members and are otherwise disjoint, with no stated relationship.</p>
+      <div class="fix"><strong>Fix:</strong> reconcile the names, or state explicitly why they're distinct.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Rubric</span><h3 class="finding-title">H-3 — AD-7's "Second-update membership reconciliation" still diverges from FR-2 on three points</h3></header>
+      <p>Re-admits <code>ExternallyRemoved</code> on bare presence with no A-22 gate (FR-2 blocks this while A-22 is unretired); omits the outbound re-admission mirror call FR-2 requires on clear; omits FR-2's roster-freshness condition for detecting external removal entirely.</p>
+      <div class="fix"><strong>Fix:</strong> add all three conditions to AD-7's Second-update paragraph.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Rubric</span><h3 class="finding-title">H-4 — AD-14's attestation paragraph omits FR-34's signed-identity pin</h3></header>
+      <p>Describes only a canary plus self-reported identity/version — exactly the "pass-through-wrapper" case FR-34's reviewer gate designed the signed-identity pin to prevent.</p>
+      <div class="fix"><strong>Fix:</strong> state the <code>EXT-SECRETS-1</code>-sourced signed identity, the pin-and-verify-on-every-call requirement, and the canary as liveness-only.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Adversarial</span><h3 class="finding-title">H-5 — AD-2's literal membership state-machine graph contradicts AD-7's own reconciliation table</h3></header>
+      <p>AD-2: <code>ExternallyRemoved</code> can only reach <code>Joined</code> via <code>ReadmitPending</code> (an authorized clear). AD-7's Second-update table: <code>ExternallyRemoved</code> + present → <code>Joined</code> directly, no clear step. One build enforces the clearing-authority gate; the other silently bypasses it.</p>
+      <div class="fix"><strong>Fix:</strong> explicitly supersede the transition graph in AD-2, or fix AD-7's table to route through <code>ReadmitPending</code>.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Adversarial</span><h3 class="finding-title">H-6 — AD-8's Eligible Approver predicate doesn't exclude the regeneration-requesting Approver</h3></header>
+      <p>Opens a self-approval path for <code>Regenerated</code> (not <code>Edited</code>) versions: the predicate excludes only "the caller" and "the last editor," neither of which literally covers an Approver who triggered a regeneration.</p>
+      <div class="fix"><strong>Fix:</strong> add the regeneration-requesting Approver as a fourth explicit exclusion.</div>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Brownfield · already-tracked</span><h3 class="finding-title">H-7 — AD-2's platform/tenant <code>ProviderCatalog</code> split still absent in code</h3></header>
+      <p>Formally logged as <code>NC-5.3-PLATFORM-CATALOG-SCOPE</code>; tracked by Story 5.3. No spine amendment needed.</p>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Brownfield · already-tracked</span><h3 class="finding-title">H-8 — AD-4's <code>ConfigurationVersion</code> still not bumped by lifecycle events</h3></header>
+      <p>Tracked by DW-4; Story 5.2 correctly remains <code>in-progress</code>. No spine amendment needed.</p>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Brownfield · already-tracked</span><h3 class="finding-title">H-9 — No shared <code>AgentsIdentity</code> canonicalizer</h3></header>
+      <p>Tracked by Stories 6.4/7.1–7.3. No spine amendment needed.</p>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Brownfield · already-tracked</span><h3 class="finding-title">H-10 — Structural seed gaps</h3></header>
+      <p><code>Aggregates/</code>, <code>Application/Tools/</code> empty; <code>Hexalith.Agents.IntegrationTests</code> absent. Owned by Story 5.6.</p>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Brownfield · already-tracked</span><h3 class="finding-title">H-11 — AD-30's HMAC-tagged extensions and <code>Agents.PlatformOperator</code> policy absent</h3></header>
+      <p>Shipped authorization gate remains transitional (plain string equality). Tracked by Stories 5.3–5.5.</p>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Brownfield · already-tracked</span><h3 class="finding-title">H-12 — AD-7's "retired" Party link/replace commands still succeed live</h3></header>
+      <p>Explicitly tracked as Story 5.2's unmet AC in both the PRD and <code>epics.md</code>.</p>
+    </article>
+
+    <article class="finding">
+      <header><span class="badge badge-lens">Brownfield · already-tracked</span><h3 class="finding-title">H-13 — Legacy <code>EnableProductionLikeGeneration</code> gate bypasses the readiness register system entirely</h3></header>
+      <p>Independently classified identically by the PRD's own validation report ("CONTRADICTED as a statement of shipped behaviour"); Story 5.7 (<code>backlog</code>) is the named fix.</p>
+    </article>
+  </section>
+
+  <section class="tier">
+    <h2><span class="badge badge-sev-medium">Medium</span> <span class="tier-note">9 findings — see review files for full detail</span></h2>
+    <div class="rollup">
+      <ul>
+        <li>Frontmatter <code>binds:</code> still cites <code>PRD OQ-1..OQ-30</code>; the PRD now runs through <code>OQ-31</code>. <em>(Rubric)</em></li>
+        <li>AD-17's "Second-update blocker emission" paragraph omits <code>SuspensionReviewOverdue</code> and <code>DeferredAssumption</code>, both defined in PRD FR-28/FR-30. <em>(Rubric)</em></li>
+        <li>AD-22 defines no post-hoc compliance-inspection aggregation bound (the PRD's 5-Conversation/30-day "wide inspection" guardrail, A-23/FR-24, is absent). <em>(Rubric)</em></li>
+        <li>AD-21 cites a stale "FR-8 step 4" for the rate-limit/concurrency check; current FR-8 step 4 is Provider eligibility, step 5 is rate limits. <em>(Rubric)</em></li>
+        <li>Stack table's <code>Hexalith.EventStore</code> gitlink (<code>e302432c</code>) is stale — actual committed pin is now <code>0994c378</code>, moved ~2h11m before this review, same calendar day. <em>(Verified-current)</em></li>
+        <li><code>ARCH-A-4</code>'s "immediate" SDK remediation has not landed: <code>global.json</code> still pins <code>10.0.301</code>, still in the abandoned, CVE-2026-69522-exposed <code>10.0.3xx</code> band. <em>(Verified-current)</em></li>
+        <li>AD-10's widened <code>EntryMissing</code> carve-out isn't as exact a match to AD-2's carve-out as claimed. <em>(Adversarial)</em></li>
+        <li><code>sprint-status.yaml</code>'s Story 5.3 line (<code>backlog</code>) carries no inline annotation explaining a completed, fully-tested prior implementation exists underneath it — safe-direction gap, easy fix. <em>(Brownfield, new)</em></li>
+        <li><em>(Confirmed still fixed, not open)</em> — <code>LR-AUDIT-PROTECTION-DELETION</code> <code>DeletionRequest</code>/<code>LegalHold</code> symmetry, re-verified against the live register text. <em>(Brownfield)</em></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tier">
+    <h2><span class="badge badge-sev-low">Low</span> <span class="tier-note">6 findings</span></h2>
+    <div class="rollup">
+      <ul>
+        <li>AD-22's stated rationale for exempting <code>DigestKey</code> rotation from AD-12 session locking contradicts its own premise that it is "the per-tenant <code>DigestKey</code>" — the exemption is likely still correct, for a different unstated reason. <em>(Security)</em></li>
+        <li>"The Agents service principal" (AD-2/AD-6/AD-7) is never placed inside AD-30's otherwise-closed four-member principal taxonomy. <em>(Adversarial)</em></li>
+        <li>AD-17's register-deferred <code>AuthorizedProducer</code> per <code>GateId</code> isn't constrained to match AD-30's blanket producer rule by <code>ScopeKind</code>. <em>(Adversarial)</em></li>
+        <li>Stack-table version-pair detail gaps and a <code>bunit</code> patch-behind note; no functional impact. <em>(Verified-current)</em></li>
+        <li>AppHost-free claim (AD-16) re-verified by an actual passing test run (<code>ForbiddenHostingOwnershipTests</code>, 5/5). <em>(Brownfield, confirmed)</em></li>
+        <li>Epics 1–4 "done" status confirmed explicitly historical-only per <code>epics.md</code>'s own reconciliation language, not a live-conformance claim. <em>(Brownfield, confirmed)</em></li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="closed-box">
+    <h2>✓ What's already closed (re-verified, not re-litigated)</h2>
+    <p>This round independently re-derived, rather than trusted, every claim the round-4 Update pass and its v7 gate made: the AD-7 block-clearing authority rewrite, the <code>launch-readiness-register.md</code> <code>DeletionRequest</code> symmetry, the AD-30 <code>Platform</code> freshness source correction, AD-12's <code>PostingFailed</code> disabled-Agent suspension and its <code>PausedDuration</code> union-not-sum merge rule, AD-13's HMAC-SHA-256 fingerprint algorithm specification, and the <code>sprint-status.yaml</code> Story 5.2 tracking-integrity correction — <strong>all confirmed genuinely closed</strong> against the live text.</p>
+    <p style="margin-bottom:0;">The <code>DigestKey</code> rotation redesign itself is also confirmed genuinely closed on its own narrow terms (rotation now actually works for a live tenant) — it is reopened above at C-6 only because the fix, while correct as far as it goes, left a new gap the redesign itself introduces (key-version binding), not because the original defect resurfaced.</p>
+  </div>
+
+  <div class="recommendation">
+    <h2>Recommendation</h2>
+    <p>Roll this report into an Update pass. Priority order:</p>
+    <ol>
+      <li><strong>C-1 / C-2 / C-3 (rubric — PRD alignment)</strong> — the highest-confidence, highest-impact findings: three core runtime rules directly contradict the PRD they're bound to and have survived four prior rounds. Fix by adopting the PRD's own FR-18/FR-28/FR-8/FR-11 text verbatim — reconciliation, not new design.</li>
+      <li><strong>C-4 / C-5 (adversarial — internal self-contradiction)</strong> — resolve the <code>OnBehalfOfPartyId</code> envelope contradiction and decide <code>ConversationContextPolicy</code>'s ownership; both are genuine design decisions.</li>
+      <li><strong>C-6 (security — DigestKeyVersion binding)</strong> — a small, additive schema change completing the versioned-key model the round-4 fix already adopted.</li>
+      <li><strong>H-1 .. H-6</strong> — remaining PRD/Spine and internal-consistency gaps; all spine-text-only fixes.</li>
+      <li><strong>H-7 .. H-13</strong> — already-tracked implementation debt; no spine amendment needed, only code catching up per its named backlog story.</li>
+      <li><strong>Medium tier</strong>, same pass — especially the OQ-31/binds-list refresh, the blocker-vocabulary gap, and re-pulling the <code>Hexalith.EventStore</code> gitlink immediately before finalizing (this spine is churning same-day).</li>
+      <li>Separately from the spine text: bump <code>global.json</code>'s SDK pin past the exposed <code>10.0.3xx</code> band — <code>ARCH-A-4</code> already calls this urgent, but the fix has not actually landed.</li>
+    </ol>
+  </div>
+
+  <footer class="report-footer">
+    <div class="meta">
+      <span>Target: ARCHITECTURE-SPINE.md (AD-1..AD-31, status: final)</span>
+      <span>Repository: main @ c4121b0 (2026-09-09), uncommitted spine/memlog edits</span>
+      <span>Date: 2026-09-09</span>
+      <span>Lint: 10 findings (pre-existing TBD placeholders, not a regression)</span>
+      <span>Spine and memlog were NOT modified by this run (Validate intent)</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

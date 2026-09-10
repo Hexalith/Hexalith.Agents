@@ -3,7 +3,7 @@ name: Hexalith Agents
 description: FrontComposer web UI for governed AI participants in Hexalith Conversations. Fluent UI Blazor v5 is inherited; this spine specifies the Agents-specific semantic delta only.
 status: final
 created: 2026-06-23
-updated: 2026-09-09
+updated: 2026-09-10
 sources:
   - ../../briefs/brief-agents-2026-06-23/brief.md
   - ../../prds/prd-agents-2026-06-23/prd.md
@@ -17,6 +17,7 @@ sources:
   - ./reconcile-validation-2026-09-08.md
   - ./reconcile-validation-2026-09-09.md
   - ./reconcile-validation-2026-09-09-2.md
+  - ./reconcile-validation-2026-09-10.md
   - ../../../../references/Hexalith.Tenants/_bmad-output/planning-artifacts/ux-designs/ux-tenants-2026-06-02/DESIGN.md
   - ../../../../references/Hexalith.FrontComposer/_bmad-output/project-context.md
   - ../../../../references/Hexalith.FrontComposer/docs/reference/components/front-composer-shell.md
@@ -90,7 +91,7 @@ components:
     rowGap: '{spacing.3}'
   provider-catalog-grid:
     base: 'Hand-authored FluentDataGrid inside FcAggregateListPage'
-    pinnedColumns: 'Provider name, model, enabled state, configured state, readiness, pricing version, CapabilityVersion'
+    pinnedColumns: 'Split by reader tier; see the provider-catalog-grid section'
     rowPadding: '{spacing.3}'
   proposal-queue-grid:
     base: 'Hand-authored FluentDataGrid inside FcAggregateListPage'
@@ -204,7 +205,8 @@ Colors inherit Fluent semantic roles by name. Bind meaning to role, never to hex
 - `{colors.status-success}` means proven: authoritatively callable Agent readiness at the current `RegistryRevision`, `Ready / Callable / None` Provider readiness within `ValidUntil`, `Posted`, current passing evidence, or a `ProjectionConfirmed` completed operation.
 - `{colors.status-informative}` means in progress or waiting: `Submitted`, `AuthoritativePending`, `awaiting projection`, `catching up`, generating, `Pending`, `Edited`, `Regenerated`, `Approved`, `PostingPending`, capacity queued, checking.
 - `{colors.status-warning}` means attention soon: nearing expiry, `Degraded / Callable / NonBlockingOperationalWarning`, 80% budget consumption, a zero-priced model, a latency warning defined by launch policy.
-- `{colors.status-severe}` means blocked but not a runtime failure: disabled Agent or Provider/model, `Expired`, `active, not proven callable`, context blocked, safety blocked, budget blocked, capacity rejected, unconfigured cap or rate limit, `Stale` evidence, missing Party identity, unavailable dependency, pending in another session.
+- `{colors.status-severe}` means blocked but not a runtime failure: disabled Agent or Provider/model, tenant `Suspended`, `Expired`, `active, not proven callable`, context blocked, safety blocked, budget blocked, **rate limited**, capacity rejected, **`NoEligibleApprover`**, **conversation blocked (`RemovedInConversations`)**, **`MirrorRefused`**, **`DataHandlingAcceptanceLapsed`**, **`TriggerReviewOverdue`**, unconfigured cap or rate limit, `Stale` evidence, missing Party identity, unavailable dependency, pending in another session.
+- `{colors.status-subtle}` also carries lifecycle **`Draft`** — provisioned, not yet valid for activation — which is never Success and never a blocker.
 - `{colors.status-danger}` means failure or denial: denied, generation failed, `PostingFailed`, `Rejected`, Provider error, superseded by another decision.
 - `{colors.status-important}` means uncertain and must resolve before side effects: `authority unresolved`, ambiguous Party identity, missing or outdated policy basis, unknown outcome with a held reservation, pricing currency mismatch, incomplete restrictive deletion confirmation.
 - `{colors.status-subtle}` means quiet history or non-actionable: `Abandoned`, disabled but valid historical option, read-only inspection, existence only, deferred metric, no activity, and `Unknown` Provider readiness rendered before Story 5.5 ships `ProviderReadinessResult`.
@@ -241,7 +243,7 @@ Every visible string is a localizable whole string with named placeholders; the 
 
 One `FcPageLayoutMode` per route; hybrid measures do not exist in FC-LYT.
 
-- FullWidth: Agents overview, Provider catalog, Proposal queue, Operational status, Launch readiness, Audit evidence list. The Audit evidence list is an id-entry surface, not a grid: it takes an interaction, proposal, or governance-operation reference and routes to the detail. The Agents-owned required grid component set (FC-TBL itself defines a frozen public surface and generated-grid envelope rules, not a usage mandate) therefore applies to the Provider catalog and Proposal queue grids only.
+- FullWidth: Agents overview, Provider catalog, Proposal queue, Operational status, Launch readiness, Audit evidence list. The Audit evidence list is an id-entry surface, not a grid: it takes **five** reference kinds — interaction, proposal, governance-operation, Conversation, and inspection-case — and routes to the authorized detail. Its visible label names all five and its `aria-describedby` format hint states how the kinds are distinguished, since one input accepting five heterogeneous formats is otherwise unusable. The Agents-owned required **filter** component set (FC-TBL itself defines a frozen public surface and generated-grid envelope rules, not a usage mandate) therefore applies to the Provider catalog and Proposal queue grids only; **`FcExpandInRowDetail` additionally governs the Launch readiness gate grid**, which is a third `FluentDataGrid` with its own `agents.launch-readiness` view key and localized detail-panel label.
 - Constrained: `hexa` configuration, Approver policy, Conversation context policy, Content safety policy, Cost controls, Proposal detail/editor, Audit evidence detail, Audit governance. Evidence lists for cost and governance live on the FullWidth status and audit routes.
 
 Spacing follows the Fluent-compatible 4px rhythm in frontmatter: `{spacing.4}` between related fields, `{spacing.6}` between major sections, `{spacing.8}` only for page-level separation. Each step inherits by name rather than by value, so the scale binds like every other token group: `{spacing.1}`–`{spacing.8}` are `--spacingHorizontal`/`--spacingVerticalXS` through `XXL` on the Fluent 2 ramp, and a gap between siblings is expressed as a `FluentStack` `HorizontalGap`/`VerticalGap` in preference to a hand-authored `gap`. Per `hexalith-ux-instructions.md § No theme redefinition`, hand-authored CSS is allowed only for layout the design system does not own; since `src/Hexalith.Agents.UI` currently ships **no CSS at all** behind roughly 115 BEM class names, that inventory is a tracked divergence in `EXPERIENCE.md § Shipped-code corrections` with a named delivery decision and absorbing stories. No decorative card grids; dense tables, forms, panels, and inline status regions do the work.
@@ -255,7 +257,9 @@ A route with two or more sibling titled content sections uses one `FluentAccordi
 | Proposal detail | The editor | Metadata; Version history; Audit link |
 | Conversation context policy | The current effective policy (read-only; no control of any kind) | History |
 | Content safety policy | The current effective policy pair | Tenant stricter delta; Platform draft and publication; History |
-| Cost controls | Current caps, limits, and consumption | Lower-only editor; Operator editor; Overrides; History |
+| Cost controls | Current caps, limits, and consumption | Lower-only editor; Operator editor; Overrides; History. **The Operator editor and Overrides items are absent for a Tenant Agent Administrator**, not rendered with hidden buttons |
+| `hexa` configuration | The configuration form | Instructions; Provider and model with its data-handling record and `DataHandlingVersion` acceptance; response mode and Approver policy; expiry and regeneration ceiling; lifecycle and activation |
+| Approver policy | The source list | Validation results; pending proposals by prior policy version |
 | Operational status | Readiness and outcomes grouped by recovery | Blocked calls; Denials; Per-Conversation history and block; Cost consumption; Failure records |
 | Launch readiness | The gate grid | Kill switch; NFR-14 evidence; Consumed dependencies |
 | Audit governance | Hold and retention state | Export; Deletion; History |
@@ -305,7 +309,7 @@ Row-based builder for the closed `ApproverPolicySourceKind` list; the `Conversat
 
 ### provider-catalog-grid
 
-Hand-authored `FluentDataGrid` inside `FcAggregateListPage`, FullWidth. Pinned columns: Provider name, model, enabled state, configured state, `provider-status-badge`, pricing version, `CapabilityVersion`, in `{typography.mono}` where they are identifiers. The editor `FluentAccordionItem` uses an ISO 4217 `FluentSelect` for currency, `FluentNumberInput` for unit prices and capability limits, and a masked input with autocomplete off for the secret reference. The pricing version is server-assigned and read-only; the confirmation renders it as `next pricing version {n}`. Authorization behavior is in `EXPERIENCE.md` § Provider catalog rules; its visual consequence is the **`read-only (no mutation policy)`** variant, in which the editor `FluentAccordionItem` is itself absent rather than present with hidden buttons, so the field inventory and the secret-reference control are never rendered. Variants: loading, empty, filtered-empty, error, `catching up`, `superseded by another decision`, `read-only (no mutation policy)`.
+Hand-authored `FluentDataGrid` inside `FcAggregateListPage`, FullWidth. Pinned columns are **split by reader tier**, because configured state is Platform-Operator-only and per-tenant enablement is a first-class column. A **tenant reader** sees Provider name, model, **per-tenant enablement**, `provider-status-badge`, pricing version, and `CapabilityVersion`; a secret-derived readiness reason collapses to one undifferentiated `Blocked` for that reader, and platform configuration problems surface solely as the `PlatformNotReady` readiness code. A **Platform Operator** additionally sees platform enabled state, configured state, the masked `ConfigurationReferenceId`, and the data-handling record with its `DataHandlingVersion`. Identifiers render in `{typography.mono}`. The editor `FluentAccordionItem` uses an ISO 4217 `FluentSelect` for currency, `FluentNumberInput` for unit prices and capability limits, and a masked input with autocomplete off for the secret reference. The pricing version is server-assigned and read-only; the confirmation renders it as `next pricing version {n}`. Authorization behavior is in `EXPERIENCE.md` § Provider catalog rules; its visual consequence is the **`read-only (no mutation policy)`** variant, in which the editor `FluentAccordionItem` is itself absent rather than present with hidden buttons, so the field inventory and the secret-reference control are never rendered. Variants: loading, empty, filtered-empty, error, `catching up`, `superseded by another decision`, `read-only (no mutation policy)`, and **`tenant-scoped read`**, in which the Platform-Operator-only columns are absent rather than blank.
 
 ### proposal-queue-grid
 
@@ -321,7 +325,7 @@ Constrained, stacked workspace whose primary region is a `FluentTextArea` holdin
 
 ### conversation-agent-call
 
-The Conversation-owned **Call hexa** `FluentButton`, contributed through `EXT-CONV-UI-1`, opening a focus-trapped `FluentDialog` with the Agent name, effective response mode, a required prompt `FluentTextArea`, and Submit. When `hexa` is not callable the button stays visible, `aria-disabled`, with the safe blocker text. Status renders as `FluentBadge` rows: `submitted`, `authoritative pending`, and the terminal outcome.
+The Conversation-owned **Call hexa** `FluentButton`, contributed through `EXT-CONV-UI-1`, opening a focus-trapped `FluentDialog` with the Agent name, effective response mode, a required prompt `FluentTextArea`, and Submit. When `hexa` is not callable the button stays visible, `aria-disabled`, with the safe blocker text. Status renders as `FluentBadge` rows **in the persistent contributed region beside Call hexa, never inside the dialog body**: `submitted`, `authoritative pending`, and the terminal outcome. The dialog closes on Submit, so a badge rendered inside it would be destroyed at the moment it has something to say.
 
 ### agent-response-marker
 
@@ -333,19 +337,19 @@ Read-only definition list, Constrained; the effective rule is the primary region
 
 ### content-safety-policy-editor
 
-Constrained `FluentAccordion`; the current effective policy is primary. Always-blocked categories render as a fixed read-only list; restricted categories render as editable rows; draft, validation, and Publish use `high-impact-confirmation` and `pending-command-indicator`. Category lists are in the EXPERIENCE row.
+Constrained `FluentAccordion`; the current effective policy is primary. Always-blocked categories render as a fixed read-only list; restricted categories render as editable rows; draft, validation, and Publish use `high-impact-confirmation` and `pending-command-indicator`, with Publish `DisabledFocusable` until the required **Security approval reference** is present. Category lists are in the EXPERIENCE row. Variants: **`tenant delta only`**, in which the platform draft and publication item is absent rather than present and disabled, and the editor renders no control that could move a category from blocked to restricted.
 
 ### cost-control-editor
 
-Constrained `FluentAccordion`; current caps and consumption are primary. `FluentNumberInput` fields with explicit units, currency shown by a `FluentSelect`; an unconfigured value renders `{colors.status-severe}`. Consumption rows are `FluentBadge`s for settled spend, outstanding reservations, and held unknown-outcome reservations; 80% is `{colors.status-warning}`, 100% is `{colors.status-severe}`. The audited override is a separate item carrying its numeric ceiling and expiry; while one is active, Operational status shows it with remaining amount and remaining time. Variants: `Submitted`, `AuthoritativePending`, `ProjectionConfirmed`, `awaiting projection`, override active.
+Constrained `FluentAccordion`; current caps and consumption are primary. `FluentNumberInput` fields with explicit units, currency shown by a `FluentSelect`; an unconfigured value renders `{colors.status-severe}`. The surface carries **two editors, not one**, matching its two authorization tiers: an Operator editor for initial configuration and raises, and a tenant lower-only editor. Consumption rows are `FluentBadge`s, one per reservation disposition; 80% is `{colors.status-warning}` and 100% is `{colors.status-severe}`. The dispositions and the basis both figures are evaluated on are in the `cost-control-editor` row of `EXPERIENCE.md § Component Patterns`. The audited override is a separate item carrying its numeric ceiling and expiry, lapsing at the earlier of the two; while one is active, Operational status shows it with remaining amount and remaining time. Variants: `Submitted`, `AuthoritativePending`, `ProjectionConfirmed`, `awaiting projection`, override active, **`read-only (lower-only)`** — the Operator editor and the Overrides item are **absent**, not present with hidden buttons, so the field inventory never leaks — and **`raise refused`**, which renders the submit-time validation error carrying the current boundary rather than silently clamping the typed value.
 
 ### launch-readiness-panel
 
-FullWidth `FluentDataGrid` of gate records, blockers first, identifiers in `{typography.mono}`; `FluentAccordionItem`s group metric cohorts, sample sufficiency, and evidence references. The single UX-owned NFR-14 statement is in the EXPERIENCE row; thresholds and seams are per `launch-readiness-register.md § NFR-14 Browser Monotonic Timing Contract` and are never restated here.
+FullWidth `FluentDataGrid` of gate records, blockers first, identifiers in `{typography.mono}`; `FluentAccordionItem`s group the **kill switch**, NFR-14 evidence, and consumed dependencies, matching the per-surface accordion table. Blocker chips render in visually distinguishable provenance classes, with a visible qualifier on the PRD-declared ones; the classes, their codes and the per-chip field sets are in `EXPERIENCE.md § Launch readiness rules`. The single UX-owned NFR-14 statement is in the EXPERIENCE row; thresholds and seams are per `launch-readiness-register.md § NFR-14 Browser Monotonic Timing Contract` and are never restated here.
 
 ### audit-governance-panel
 
-Constrained `FluentAccordion`; retention and legal-hold state is primary, with legal hold, export, and deletion as items. Each governance write carries a required justification `FluentTextArea` inside its confirmation. Export and deletion render `DisabledFocusable` with `authority unresolved` treatment naming `EXT-SECRETS-1` while that dependency is not `Available`, and deletion is additionally blocked while a matching legal hold is active. Export rows show manifest state, artifact expiry, and download availability; the panel never renders artifact contents or keys. Partial failure renders `{colors.status-important}` or `{colors.status-severe}`.
+Constrained `FluentAccordion`; retention and legal-hold state is primary, with legal hold, export, and deletion as items. Each governance write carries a required justification `FluentTextArea` inside its confirmation. Export and deletion render `DisabledFocusable` with `authority unresolved` treatment naming `EXT-SECRETS-1` while that dependency is not `Available`, and deletion is additionally blocked while a matching legal hold is active, or while its recorded second-party approval is absent — a third `DisabledFocusable` cause with its own reason string, which hold release and export carry too. The staging and its tokens are in `EXPERIENCE.md § Audit governance rules`. Export rows show manifest state, artifact expiry, and download availability; the panel never renders artifact contents or keys. Partial failure renders `{colors.status-important}` or `{colors.status-severe}`.
 
 ### proposal-notification
 
@@ -353,7 +357,7 @@ A domain-rendered `FluentBadge` in `{colors.status-informative}` inside the Agen
 
 ### operational-status-panel
 
-FullWidth `FluentBadge` rows grouped by recovery action. Deferred metrics render as a `{colors.status-subtle}` whole-string label. Every authoritative row shows projection id and version in `{typography.mono}`.
+FullWidth `FluentBadge` rows grouped by recovery action. The per-Conversation rows carry the **block and clear command controls**, each opening a `high-impact-confirmation` and then a `pending-command-indicator`, plus the Conversation Agent State badge and the `MirrorPending` / `MirrorRefused` flags. Deferred metrics render as a `{colors.status-subtle}` whole-string label. Every authoritative row shows projection id and version in `{typography.mono}`. Variants: `opaque Conversation reference` — a reference and a count only, for a viewer without current Conversation read access — and `MirrorRefused`, which renders the two remediation controls.
 
 ### audit-evidence-panel
 

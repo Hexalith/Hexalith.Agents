@@ -2,7 +2,7 @@
 title: Sprint Change Proposal - Second 2026-09-09 PRD Downstream Reconciliation
 status: approved
 created: 2026-09-09
-updated: 2026-09-09
+updated: 2026-09-10
 mode: Batch
 change_scope: moderate
 recommended_path: direct-adjustment
@@ -228,9 +228,9 @@ Add the section and resolve it through one of these mutually exclusive Product-o
 
 **Branch B — seam was never consumed**
 
-> None: Story 5.3 executed no `EXT-PROVIDER-1` seam (Product ruling `<date>`).
+> None: Story 5.3 executed no `EXT-PROVIDER-1` seam (Product ruling `2026-09-10`).
 
-OQ-17 settles the rule but not the historical fact. Until Product selects a branch from implementation evidence, the non-conformance section remains an open approval condition; this proposal does not decide it.
+At proposal approval on 2026-09-09, OQ-17 settled the rule but not the historical fact, so the non-conformance section remained an open approval condition. Product subsequently approved Branch B on 2026-09-10 from the implementation evidence. Substituted or deferred generation-provider ports were not treated as execution of a live external seam.
 
 #### `EXT-HOST-1`
 
@@ -445,7 +445,7 @@ Add this trail line under “What changed” or immediately before “Reviewer g
 
 ### Sequencing
 
-1. Product resolves the Story 5.3 / `EXT-PROVIDER-1` historical-consumption fact.
+1. [x] Product resolved the Story 5.3 / `EXT-PROVIDER-1` historical-consumption fact as Branch B on 2026-09-10.
 2. Architecture owners provide target retirement dates and amend the Spine.
 3. Register owners amend both registers. `EXT-HOST-1` becomes `Uncommitted` immediately when its expanded artifact is recorded.
 4. Product Owner updates the requirements inventory, coverage/OQ maps, targeted ACs, UX-DR45, and debt ownership in `epics.md`.
@@ -480,9 +480,9 @@ Add this trail line under “What changed” or immediately before “Reviewer g
 
 ## 6. Open Items And Boundaries
 
-### Product decision required
+### Product decision resolved
 
-1. **Story 5.3 / `EXT-PROVIDER-1` historical fact.** OQ-17 settles what happens if an uncommitted seam was consumed, but OQ-24..OQ-30 do not establish whether Story 5.3 actually executed that seam. Product must select Branch A or Branch B in §4.2 from implementation evidence. This proposal does not decide it.
+1. **Story 5.3 / `EXT-PROVIDER-1` historical fact.** Product approved Branch B on 2026-09-10: Story 5.3 executed no `EXT-PROVIDER-1` seam. The evidence distinguishes substituted and fail-closed deferred provider ports from execution of a live external Provider adapter. No non-conformance record is required for Story 5.3 under FR-21.
 
 ### Owner commitments required, not Product scope decisions
 
@@ -527,7 +527,7 @@ Add this trail line under “What changed” or immediately before “Reviewer g
 
 ## Approval Gate
 
-Administrator explicitly approved this proposal on 2026-09-09. The coordinated changes listed under `amends_if_approved` are authorized for implementation through the handoff in §5. The Story 5.3 historical-consumption fact and the owner commitments in §6 remain unresolved blockers; approval does not fabricate their answers or permit a dependency status to advance without its owner accepting every required field.
+Administrator explicitly approved this proposal on 2026-09-09. The coordinated changes listed under `amends_if_approved` are authorized for implementation through the handoff in §5. At that approval, the Story 5.3 historical-consumption fact and the owner commitments in §6 remained unresolved blockers; approval did not fabricate their answers or permit a dependency status to advance without its owner accepting every required field. Product subsequently resolved the Story 5.3 fact as Branch B on 2026-09-10; the external-owner commitments remain unresolved.
 
 ## 8. Approval And Workflow Execution Log
 
@@ -537,7 +537,8 @@ Administrator explicitly approved this proposal on 2026-09-09. The coordinated c
 - 2026-09-09 — The complete Sprint Change Proposal was presented to Administrator without amending `prd.md` or applying downstream implementation changes.
 - 2026-09-09 — Administrator continued the complete-proposal review and explicitly approved the proposal.
 - 2026-09-09 — Moderate-scope handoff routed to Product Owner, Solution Architect, Release Operator, Agents Runtime Maintainer, Conversations Maintainer, Platform Maintainer, EventStore Maintainer, and Test Architect.
+- 2026-09-10 — Administrator, acting as Product authority, approved Branch B: Story 5.3 executed no `EXT-PROVIDER-1` seam. The ruling was recorded without changing the dependency's `Uncommitted` status.
 
 ### Handoff Completion
 
-The approved handoff package is §4's exact register, Spine, epics, update-trail, and implementation-debt edit set, sequenced by §5 and bounded by §6. Product first determines the Story 5.3 historical-consumption fact; Architecture and external owners then supply the retirement dates and dependency commitments that the proposal deliberately leaves open. Implementation may begin only under the register's `Committed`/`Available` rules and must satisfy all nine success criteria before the course correction is complete.
+The approved handoff package is §4's exact register, Spine, epics, update-trail, and implementation-debt edit set, sequenced by §5 and bounded by §6. Product determined the Story 5.3 historical-consumption fact as Branch B on 2026-09-10. Architecture and external owners must still supply the retirement dates and dependency commitments that the proposal deliberately leaves open. Implementation may begin only under the register's `Committed`/`Available` rules and must satisfy all nine success criteria before the course correction is complete.

@@ -35,6 +35,10 @@ context:
 
 </frozen-after-approval>
 
+## Post-Completion Product Resolution
+
+On 2026-09-10, Product approved Branch B: Story 5.3 executed no `EXT-PROVIDER-1` seam. The ruling distinguishes substituted `IAgentGenerationProvider` test ports and the fail-closed deferred provider from execution of a live external Provider adapter or real Provider transport. It resolves the open historical-consumption approval condition without creating a non-conformance record, changing `EXT-PROVIDER-1` from `Uncommitted`, or changing its current consumers. The original frozen intent and implementation notes below remain the historical record of the synchronization task before Product supplied the ruling.
+
 ## Code Map
 
 - `_bmad-output/planning-artifacts/launch-readiness-register.md` -- reuse the existing 18-gate and metric split; add blocker emitters, exact SM-7 contract, counter-metric/cadence language, and the complete initial measurement placeholder.
@@ -74,6 +78,7 @@ context:
 
 ## Spec Change Log
 
+- 2026-09-10: Product approved Story 5.3 / `EXT-PROVIDER-1` historical-consumption Branch B; the external dependency register and proposal provenance were updated without modifying `prd.md` or runtime code.
 - 2026-09-09: Approved planning synchronization implemented and focused verification completed.
 
 ## Review Triage Log
@@ -81,7 +86,7 @@ context:
 - PASS: five requested planning artifacts contain the approved readiness, dependency, Spine, backlog, and audit-trail updates.
 - PASS: YAML loads; Markdown fence/heading/table checks pass; the 18-gate inventory remains unique; all nine dependency records remain `Uncommitted`; stale proposal vocabulary checks pass.
 - PASS: `epics.md` and `sprint-status.yaml` have exact bidirectional parity for 33 active stories with distribution 10/8/7/8.
-- OPEN: Product must select the evidence-backed Story 5.3 / `EXT-PROVIDER-1` historical-consumption branch.
+- RESOLVED 2026-09-10: Product selected Branch B; Story 5.3 executed no `EXT-PROVIDER-1` seam, and substituted/deferred provider ports were not live external seam execution.
 - OPEN: dependency owners must supply and accept every commitment/availability field before any status advances.
 - OPEN: Architecture/co-owners must provide accepted calendar retirement dates for unretired Architecture-owned assumptions; proposal historical count 29 remains inconsistent with the later approved 33-story authority and was not forced onto the backlog.
 
