@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hexalith Agents — Architecture Spine Validation — 2026-09-12</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --surface-alt: #f4f4f1;
+    --text: #1c1917;
+    --muted: #625c56;
+    --border: #d9d6d1;
+    --critical: #b42318;
+    --critical-bg: #fff1f0;
+    --high: #b54708;
+    --high-bg: #fff7ed;
+    --medium: #846500;
+    --medium-bg: #fffbea;
+    --low: #475569;
+    --low-bg: #f1f5f9;
+    --good: #147d3f;
+    --focus: #175cd3;
+    --shadow: 0 1px 2px rgba(28, 25, 23, .05), 0 8px 24px rgba(28, 25, 23, .04);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.58 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  a { color: #175cd3; text-underline-offset: 2px; }
+  a:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 3px; }
+  code { font: .91em ui-monospace, SFMono-Regular, Consolas, monospace; background: #eeece8; padding: .08em .32em; border-radius: 4px; overflow-wrap: anywhere; }
+  .skip { position: absolute; left: -9999px; top: 8px; z-index: 10; background: var(--text); color: white; padding: 8px 12px; }
+  .skip:focus { left: 8px; }
+  .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 64px; }
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: start;
+    padding: 26px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 5px solid var(--critical);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+  }
+  .eyebrow { margin: 0 0 5px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { margin: 0; font-size: clamp(25px, 4vw, 39px); line-height: 1.12; letter-spacing: -.025em; }
+  .target { margin: 10px 0 0; color: var(--muted); font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; }
+  .verdict { display: inline-flex; align-items: center; gap: 8px; background: var(--critical); color: white; padding: 9px 15px; border-radius: 999px; font-weight: 800; letter-spacing: .04em; }
+  .lead { margin: 22px 0 0; font-size: 17px; max-width: 900px; }
+  .lead strong { color: var(--critical); }
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
+  .metric { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 15px 17px; box-shadow: var(--shadow); }
+  .metric b { display: block; font-size: 25px; line-height: 1.1; }
+  .metric span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+  .metric.critical b { color: var(--critical); }
+  .metric.high b { color: var(--high); }
+  .metric.medium b { color: var(--medium); }
+  .metric.low b { color: var(--low); }
+  nav.toc { margin: 0 0 24px; padding: 13px 17px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+  nav.toc ul { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0; padding: 0; }
+  nav.toc a { font-weight: 650; font-size: 13px; }
+  section { margin: 30px 0; }
+  h2 { margin: 0 0 12px; font-size: 21px; line-height: 1.25; }
+  h3 { margin: 0; font-size: 16px; line-height: 1.35; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; box-shadow: var(--shadow); }
+  .panel p:first-child { margin-top: 0; }
+  .panel p:last-child { margin-bottom: 0; }
+  .lint { border-left: 5px solid var(--good); }
+  .lint strong { color: var(--good); }
+  .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; min-width: 760px; }
+  caption { text-align: left; padding: 14px 16px 8px; font-weight: 750; }
+  th, td { padding: 10px 13px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; background: var(--surface-alt); }
+  tr:last-child td { border-bottom: 0; }
+  .tier-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 9px; }
+  .tier-head .count { color: var(--muted); font-size: 13px; font-weight: 500; }
+  .badge { display: inline-block; flex: none; padding: 3px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+  .badge.critical { color: var(--critical); background: var(--critical-bg); border: 1px solid #f6c7c2; }
+  .badge.high { color: var(--high); background: var(--high-bg); border: 1px solid #fed7aa; }
+  .badge.medium { color: var(--medium); background: var(--medium-bg); border: 1px solid #ecdb83; }
+  .badge.low { color: var(--low); background: var(--low-bg); border: 1px solid #cbd5e1; }
+  .badge.lens { color: #344054; background: #f2f4f7; border: 1px solid #d0d5dd; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin: 10px 0; box-shadow: var(--shadow); break-inside: avoid; }
+  .finding.critical { border-left: 5px solid var(--critical); }
+  .finding.high { border-left: 5px solid var(--high); }
+  .finding.medium { border-left: 5px solid var(--medium); }
+  .finding.low { border-left: 5px solid var(--low); }
+  .finding header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .finding p { margin: 7px 0; font-size: 14px; }
+  .label { color: var(--muted); font-weight: 750; }
+  .disposition { margin-top: 11px !important; padding: 10px 12px; background: var(--surface-alt); border-radius: 7px; }
+  .classification { margin: 7px 0 0; color: var(--muted); font-size: 12px; font-weight: 650; }
+  .tail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .order ol { margin: 8px 0 0; padding-left: 22px; }
+  .order li { margin: 7px 0; }
+  .note { color: var(--muted); font-size: 13px; }
+  footer { margin-top: 34px; border-top: 1px solid var(--border); padding-top: 16px; color: var(--muted); font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; }
+  @media (max-width: 760px) {
+    .shell { width: min(100% - 20px, 1120px); padding-top: 10px; }
+    .hero { grid-template-columns: 1fr; padding: 20px; }
+    .verdict { justify-self: start; }
+    .summary-grid, .tail-grid { grid-template-columns: 1fr 1fr; }
+    .finding { padding: 15px; }
+  }
+  @media (max-width: 430px) { .summary-grid, .tail-grid { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  @media print {
+    @page { margin: 14mm; }
+    body { background: white; font-size: 10.5pt; }
+    .shell { width: 100%; padding: 0; }
+    .hero, .metric, .panel, .table-wrap, .finding { box-shadow: none; }
+    nav.toc { display: none; }
+    a { color: inherit; text-decoration: none; }
+    .finding { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#report">Skip to report</a>
+<main id="report" class="shell">
+  <header class="hero">
+    <div>
+      <p class="eyebrow">BMad Architecture · Validate intent · Read-only</p>
+      <h1>Hexalith Agents Architecture Spine Validation</h1>
+      <p class="target">ARCHITECTURE-SPINE.md · status: final · updated: 2026-09-12</p>
+    </div>
+    <div class="verdict" aria-label="Gate verdict: fail">FAIL</div>
+  </header>
+
+  <p class="lead"><strong>Gate verdict: FAIL.</strong> Despite a clean deterministic lint pass, the spine is not a safe convergence contract: three Critical defects can weaken active content-safety policy, make bootstrap and repair operations impossible, or irreversibly violate legal-hold and deletion guarantees.</p>
+
+  <div class="summary-grid" aria-label="Deduplicated severity counts">
+    <div class="metric critical"><b>3</b><span>Critical</span></div>
+    <div class="metric high"><b>12</b><span>High</span></div>
+    <div class="metric medium"><b>4</b><span>Medium</span></div>
+    <div class="metric low"><b>1</b><span>Low</span></div>
+  </div>
+
+  <nav class="toc" aria-label="Report sections">
+    <ul>
+      <li><a href="#method">Method</a></li>
+      <li><a href="#lenses">Lens matrix</a></li>
+      <li><a href="#critical">Critical</a></li>
+      <li><a href="#high">High</a></li>
+      <li><a href="#tail">Medium &amp; Low</a></li>
+      <li><a href="#debt">Tracked debt</a></li>
+      <li><a href="#order">Update order</a></li>
+    </ul>
+  </nav>
+
+  <section id="method" aria-labelledby="method-title">
+    <h2 id="method-title">Methodology and scope</h2>
+    <div class="panel">
+      <p>Validation followed the BMad Architecture Reviewer Gate: deterministic lint, good-spine rubric, the two configured current-reality and adversarial lenses, and ad-hoc security/data-integrity and brownfield-ratification lenses. The synthesis merged overlaps and retained the strongest severity.</p>
+      <p><strong>Read-only:</strong> the spine, memlog, registers, sources, code, and existing artifacts were not changed. No new build or test success is claimed. The current-technology reviewer records that SDK <code>10.0.401</code> is not installed in this environment.</p>
+    </div>
+    <div class="panel lint" style="margin-top:10px">
+      <p><strong>Deterministic lint: PASS.</strong> <code>ok=true</code>; <code>total_findings=0</code>. Mechanical validity does not offset semantic Critical and High findings.</p>
+    </div>
+  </section>
+
+  <section id="lenses" aria-labelledby="lenses-title">
+    <h2 id="lenses-title">Lens and source-review matrix</h2>
+    <div class="table-wrap">
+      <table>
+        <caption>Five independent reviews; raw counts precede deduplication.</caption>
+        <thead><tr><th>Lens</th><th>Evidence stance</th><th>C / H / M / L</th><th>Contribution</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td>Rubric walker</td><td>Checklist, PRD, registers, memlog, conventions, focused code</td><td>1 / 3 / 1 / 0</td><td>C-1; H-1–H-3; M-1</td><td><a href="reviews/review-2026-09-12-rubric-v2.md">review</a></td></tr>
+          <tr><td>Verified-current</td><td>Manifests, exact gitlinks, official docs and registries</td><td>0 / 1 / 0 / 1</td><td>H-10; L-1</td><td><a href="reviews/review-2026-09-12-verified-current-v2.md">review</a></td></tr>
+          <tr><td>Adversarial divergence</td><td>Literal, independently-built unit pairs</td><td>2 / 4 / 2 / 0</td><td>C-2, C-3; H-4–H-7; M-2, M-3</td><td><a href="reviews/review-2026-09-12-adversarial-divergence-v2.md">review</a></td></tr>
+          <tr><td>Security / data integrity</td><td>Authorization, protection, deletion, audit/export, replay</td><td>2 / 3 / 0 / 0</td><td>Corroborates C-1, C-2, H-5; adds H-8, H-9</td><td><a href="reviews/review-2026-09-12-security-data-integrity-v2.md">review</a></td></tr>
+          <tr><td>Brownfield drift</td><td>Code, tests, epics, sprint and dependency/evidence state</td><td>0 / 2 / 1 / 0</td><td>H-11, H-12; M-4</td><td><a href="reviews/review-2026-09-12-brownfield-drift-v2.md">review</a></td></tr>
+          <tr><td><strong>Deduplicated</strong></td><td>Maximum severity retained</td><td><strong>3 / 12 / 4 / 1</strong></td><td><strong>20 findings</strong></td><td>this report</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="critical" aria-labelledby="critical-title">
+    <h2 id="critical-title" class="tier-head"><span class="badge critical">Critical</span><span>Must close before implementation handoff</span><span class="count">3 deduplicated</span></h2>
+
+    <article class="finding critical">
+      <header><span class="badge lens">Rubric + Security</span><h3>C-1 — AD-20 permits weaker safety evaluation than the binding Product/Security contract</h3></header>
+      <p><span class="label">Location / evidence:</span> AD-20 selects snapshot-only behavior for transport retry and incomparable policy pairs (<code>ARCHITECTURE-SPINE.md:292–296</code>); PRD FR-26/FR-27 require snapshot and current policy at retry, approval, and pre-post (<code>prd.md:672–708</code>), and <code>LR-SAFETY</code> promises no-weaker retry.</p>
+      <p><span class="label">Divergence / impact:</span> Spine-following workflow/safety code can ignore a newly tightened category, while PRD-following code blocks. Unsafe content can reach the Provider or Conversation and Audit Evidence can under-report required checks.</p>
+      <p class="disposition"><span class="label">AUTOFIX:</span> require conjunctive snapshot-plus-current evaluation, plus stricter mode policy. Allow a dominance optimization only when formally equivalent and tested; reconcile AD-13 retry fingerprint behavior.</p>
+    </article>
+
+    <article class="finding critical">
+      <header><span class="badge lens">Adversarial + Security</span><h3>C-2 — Legal hold and class deletion cannot deliver “rejected in full”</h3></header>
+      <p><span class="label">Location / evidence:</span> AD-2 separates hold, deletion, and interaction streams; AD-22 combines multi-record pinning, irreversible <code>DestroyDek</code>, and all-or-nothing class rejection (<code>ARCHITECTURE-SPINE.md:140–144, 304–308</code>). The command convention has no common transaction or fence.</p>
+      <p><span class="label">Divergence / impact:</span> Deletion can erase A, a concurrent hold can pin B, then deletion must reject after irreversible partial work. The hold cannot become Active. Per-stream revisions cannot repair the set-level invariant.</p>
+      <p class="disposition"><span class="label">DISCUSS, THEN BIND:</span> either introduce a shared prepare/fence barrier before any destruction, with hold contention and recovery evidence, or explicitly permit partial completion and define its legal/result semantics.</p>
+    </article>
+
+    <article class="finding critical">
+      <header><span class="badge lens">Adversarial</span><h3>C-3 — Operation gates deadlock bootstrap/repair and mis-scope platform mutations</h3></header>
+      <p><span class="label">Location / evidence:</span> Mandatory matrix v3 gates <code>ProvisionHexa</code> on existing Party identity, budget/catalog setup on existing cost/secret readiness, and tenant enablement on existing Provider readiness (<code>ARCHITECTURE-SPINE.md:276, 362</code>; <code>launch-readiness-register.md:141–171</code>). Platform-global writes also require a Tenant-scoped gate although <code>tenant:system</code> is invalid.</p>
+      <p><span class="label">Divergence / impact:</span> Strict evaluation makes fresh tenants and blocked resources unrecoverable; permissive implementations invent exceptions and cease consuming the single normative matrix.</p>
+      <p class="disposition"><span class="label">AUTOFIX:</span> define target-aware bootstrap/recovery subsets and explicit family scopes. A command must be allowed to clear its own blocker while unrelated controls remain fail-closed. Add empty-state and repair fixtures.</p>
+    </article>
+  </section>
+
+  <section id="high" aria-labelledby="high-title">
+    <h2 id="high-title" class="tier-head"><span class="badge high">High</span><span>Blocking convergence defects</span><span class="count">12 deduplicated</span></h2>
+
+    <article class="finding high">
+      <header><span class="badge lens">Rubric</span><h3>H-1 — Scheduled Eligible-Approver re-check has no lifecycle protocol</h3></header>
+      <p><span class="label">Evidence:</span> AD-5/8/15 expose reasons and tokens but omit scheduler owner, cadence, freshness, two-empty-pass guard, and state-specific consequences (<code>ARCHITECTURE-SPINE.md:168, 198–202, 262–264</code>); PRD FR-7 defines them.</p>
+      <p><span class="label">Impact:</span> Units may abandon on one empty/unavailable read, mark only, wait twice, or never scan—prematurely destroying or indefinitely stranding proposals.</p>
+      <p class="disposition"><span class="label">AUTOFIX:</span> adopt the FR-7 protocol, retaining <code>A-20</code> for cadence, and bind owner, single-flight, evidence, transitions, markers, and unavailable retry.</p>
+    </article>
+
+    <article class="finding high">
+      <header><span class="badge lens">Rubric</span><h3>H-2 — Verdict-cache invalidation lacks distributed re-scan ownership</h3></header>
+      <p><span class="label">Evidence:</span> AD-20 names invalidation but not cache durability, worker owner, tenant concurrency, or calls during rebuild; public text is coarse while PRD FR-27 requires <code>ContextReadUnavailable(RescanPending)</code> (<code>ARCHITECTURE-SPINE.md:234, 262, 296</code>; <code>prd.md:708</code>).</p>
+      <p><span class="label">Impact:</span> Process-local, shared, and EventStore-backed units unblock differently; stale verdict use, indefinite blocking, and API/metric vocabulary drift are all plausible.</p>
+      <p class="disposition"><span class="label">DISCUSS:</span> select authoritative cache/re-scan ownership and cross-replica invalidation; bind worker bounds and exact public/metric mapping, preserving current coarse code as migration debt.</p>
+    </article>
+
+    <article class="finding high">
+      <header><span class="badge lens">Rubric</span><h3>H-3 — Eligible Approvers are not constrained to human Parties</h3></header>
+      <p><span class="label">Evidence:</span> AD-8 accepts Party/role/Facilitator sources without a human-type rule (<code>ARCHITECTURE-SPINE.md:198</code>); PRD FR-7 requires typed rejection of organization/AI Parties (<code>prd.md:254</code>).</p>
+      <p><span class="label">Impact:</span> Configuration, runtime, UI, and audit can disagree whether a non-human Party is valid, permitting non-human approval authority.</p>
+      <p class="disposition"><span class="label">AUTOFIX:</span> require a fail-closed Parties-owned human-type/liveness check at configuration and every resolution point with one safe typed result.</p>
+    </article>
+
+    <article class="finding high">
+      <header><span class="badge lens">Adversarial</span><h3>H-4 — <code>BudgetLedger</code> conflates three incompatible lifetimes</h3></header>
+      <p><span class="label">Evidence:</span> It is monthly-partitioned yet owns rolling rates and open-interaction concurrency; AD-21 releases at Provider-attempt terminal while AD-5 holds concurrency through posting (<code>ARCHITECTURE-SPINE.md:144, 168, 302</code>).</p>
+      <p><span class="label">Impact:</span> Units disagree at Provider completion, rolling-window expiry, and month rollover, producing different admission decisions for identical traffic.</p>
+      <p class="disposition"><span class="label">DISCUSS, THEN TIGHTEN:</span> separate rolling consumption, tenant-wide concurrency leases, and monthly money; bind partition, owner, and release/expiry event for each.</p>
+    </article>
+
+    <article class="finding high">
+      <header><span class="badge lens">Adversarial + Security</span><h3>H-5 — Principal envelopes discard person identity needed for separation of duties</h3></header>
+      <p><span class="label">Evidence:</span> <code>Administrator</code>/<code>Platform</code> carry no PartyId, while AD-22 requires person-level subject/requester/approver comparison and AD-30 permits Platform second approval (<code>ARCHITECTURE-SPINE.md:184, 304–308, 358–364, 542</code>).</p>
+      <p><span class="label">Impact:</span> The same human can appear as Inspector P and anonymous Platform; one unit accepts self-approval, another rejects every Platform approval because distinctness is unprovable.</p>
+      <p class="disposition"><span class="label">AUTOFIX:</span> carry and authenticate a stable human actor id independent of role/target. Give automation a separate kind and explicitly govern whether it can satisfy a human second-party rule.</p>
+    </article>
+
+    <article class="finding high">
+      <header><span class="badge lens">Adversarial</span><h3>H-6 — Non-terminal proposal index is not crash-consistent</h3></header>
+      <p><span class="label">Evidence:</span> Proposal truth and the Conversation index live in separate aggregates and are maintained only “idempotently alongside” transitions; no outbox, acknowledgement, or repair protocol is named (<code>ARCHITECTURE-SPINE.md:144, 156, 184, 244</code>).</p>
+      <p><span class="label">Impact:</span> Interaction-first can leave an unindexed live proposal that a removal sweep misses; index-first can leave a phantom after conflict/crash.</p>
+      <p class="disposition"><span class="label">AUTOFIX:</span> bind one truth source plus revisioned outbox/index acknowledgement and reconciliation before removal completion, or an explicit recoverable saga; failure-inject both write boundaries.</p>
+    </article>
+
+    <article class="finding high">
+      <header><span class="badge lens">Adversarial</span><h3>H-7 — Deferred seam 7 blocks the indivisible V1 Conversations record</h3></header>
+      <p><span class="label">Evidence:</span> AD-6 treats seams 1–6 as V1 and seam 7 retraction as deferred; the dependency register has only whole-record status and says seam 7 keeps all consumers Uncommitted (<code>ARCHITECTURE-SPINE.md:178, 825, 870</code>; <code>external-dependency-register.md:35–67</code>).</p>
+      <p><span class="label">Impact:</span> One unit blocks all V1 Conversations behavior for a beyond-V1 metric seam; another invents partial availability the authority cannot express.</p>
+      <p class="disposition"><span class="label">AUTOFIX:</span> split <code>EXT-CONV-RETRACTION-1</code> or version/status sub-seams. Core V1 consumes 1–6; retraction is conditional on the OQ-23 branch.</p>
+    </article>
+
+    <article class="finding high">
+      <header><span class="badge lens">Security</span><h3>H-8 — Trusted-envelope HMAC has no canonical input, replay rule, or lifecycle</h3></header>
+      <p><span class="label">Evidence:</span> AD-30 requires HMAC but omits authenticated fields, audience, issuance/expiry, replay, key version, rotation, revocation, and compromise response (<code>ARCHITECTURE-SPINE.md:358–362</code>); <code>EXT-SECRETS-1</code> does not supply them.</p>
+      <p><span class="label">Impact:</span> MAC-only-actor permits cut-and-paste; full-envelope MAC rejects it. Immediate old-key rejection strands workflows, while indefinite acceptance preserves compromised authority.</p>
+      <p class="disposition"><span class="label">AUTOFIX:</span> bind canonical envelope/payload/audience/time/key input and replay, skew, overlap, revocation, constant-time verification; extend Secrets and Tenant Access tests.</p>
+    </article>
+
+    <article class="finding high">
+      <header><span class="badge lens">Security</span><h3>H-9 — Export-package bytes lack custody, hold/deletion, and signature contracts</h3></header>
+      <p><span class="label">Evidence:</span> AD-22 defines an encrypted time-limited manifest but not byte-store ownership, exact expiry/purge, restore/hold behavior, contained-interaction lookup, or canonical signature verification (<code>ARCHITECTURE-SPINE.md:304–310</code>). Readiness inventories only the projection.</p>
+      <p><span class="label">Impact:</span> Blob, stream, and projection units can report completion while retaining different readable copies; holds and deletions diverge, and signatures are not interoperable.</p>
+      <p class="disposition"><span class="label">DISCUSS, THEN BIND:</span> specify artifact store/owner, immutable keys, AEAD, expiry/purge acknowledgement, restore/hold behavior, interaction index, canonical manifest bytes, algorithm/key version and trust anchor.</p>
+    </article>
+
+    <article class="finding high">
+      <header><span class="badge lens">Verified-current</span><h3>H-10 — Dapr is already transitive, contrary to the future-adoption premise</h3></header>
+      <p><span class="label">Evidence:</span> Stack/ARCH-A-15 say no Dapr references until Story 6.1 (<code>ARCHITECTURE-SPINE.md:562–563, 860</code>), but adopted EventStore Client and DomainService transitively reference <code>Dapr.Client</code>/<code>Dapr.AspNetCore</code> at the authoritative gitlink. Only Workflow remains future.</p>
+      <p><span class="label">Impact:</span> Security/build ownership can defer action beyond actual compiled exposure and conflate present dependencies with future Workflow adoption.</p>
+      <p class="disposition"><span class="label">DISCUSS (BLOCKING), THEN AUTOFIX:</span> decide atomic <code>1.18.7+</code> upgrade or bounded exception now; state current Client/ASP.NET transitivity separately from future Workflow.</p>
+    </article>
+
+    <article class="finding high">
+      <header><span class="badge lens">Brownfield</span><h3>H-11 — “Current parity” asserts backlog contract vocabulary is shipped</h3></header>
+      <p class="classification">Spine defect, not implementation debt.</p>
+      <p><span class="label">Evidence:</span> AD-15 assigns contract growth to stories, then says the current surface already carries those membership/readiness/resolution/capacity values (<code>ARCHITECTURE-SPINE.md:256–264</code>); code lacks them and epics assign them to later stories.</p>
+      <p><span class="label">Impact:</span> Builders can skip owned migrations or integrate against nonexistent types.</p>
+      <p class="disposition"><span class="label">AUTOFIX WORDING:</span> describe required completion parity and cite owning work; do not accelerate implementation.</p>
+    </article>
+
+    <article class="finding high">
+      <header><span class="badge lens">Brownfield</span><h3>H-12 — Sprint state contradicts dependency/evidence authority for Stories 5.1 and 5.2</h3></header>
+      <p class="classification">Tracking/evidence defect; architecture rule is clear.</p>
+      <p><span class="label">Evidence:</span> <code>EXT-HOST-1</code> is Uncommitted; Story 5.1 says backlog and names a missing verification script, yet <code>sprint-status.yaml:86–89</code> marks 5.1 done and 5.2 in progress; 5.2 depends on 5.1 and its evidence says not run/backlog.</p>
+      <p><span class="label">Impact:</span> The tracker can authorize downstream work against unexecuted evidence and is not a trustworthy readiness ledger.</p>
+      <p class="disposition"><span class="label">DISCUSS:</span> roll statuses back, or record an owner-approved historical/dependency exception, provide an executable replacement, and reconcile story evidence. Do not infer broad implementation catch-up.</p>
+    </article>
+  </section>
+
+  <section id="tail" aria-labelledby="tail-title">
+    <h2 id="tail-title" class="tier-head"><span class="badge medium">Medium</span><span>and</span><span class="badge low">Low</span><span class="count">5 findings</span></h2>
+    <div class="tail-grid">
+      <article class="finding medium"><header><span class="badge medium">M-1</span><h3>Historical correction layers remain</h3></header><p><span class="label">Evidence:</span> superseded mirror shape, nine-to-ten family corrections, and update-round labels remain in AD-2/12/14/17/22.</p><p><span class="label">Impact:</span> builders can implement obsolete first clauses.</p><p class="disposition"><span class="label">AUTOFIX:</span> re-distill to one present-tense rule; retain history in memlog.</p></article>
+      <article class="finding medium"><header><span class="badge medium">M-2</span><h3><code>ReadmitPending</code> lacks initiation/confirmation ownership</h3></header><p><span class="label">Evidence:</span> AD-2/7 say clear creates pending Readmit and the next accepted membership step joins, without naming who starts or confirms it.</p><p><span class="label">Impact:</span> immediate-worker and next-call implementations expose different status/recovery timing.</p><p class="disposition"><span class="label">AUTOFIX:</span> bind trigger, owner, outcome command, transition, and lost-ack recovery.</p></article>
+      <article class="finding medium"><header><span class="badge medium">M-3</span><h3>Posting timeout remains a known divergence</h3></header><p><span class="label">Evidence:</span> AD-5 allows any timeout at least as long as the seam; ARCH-A-14 names no duration/date.</p><p><span class="label">Impact:</span> workflow and recovery transition at different times.</p><p class="disposition"><span class="label">DISCUSS or DEFER AS HARD PRE-STORY GATE:</span> choose duration authority, snapshot and seam constraint.</p></article>
+      <article class="finding medium"><header><span class="badge medium">M-4</span><h3>Legacy tests prove superseded semantics</h3></header><p class="classification">Already-tracked implementation debt.</p><p><span class="label">Evidence:</span> conformance tests still require old folders/host/tool semantics; Story 5.6 owns replacement.</p><p><span class="label">Impact:</span> green legacy tests can be misreported as current proof.</p><p class="disposition"><span class="label">DEFER:</span> label evidence partial/legacy until Story 5.6 replaces it.</p></article>
+      <article class="finding low"><header><span class="badge low">L-1</span><h3>bUnit 2.9.0 trails stable 2.10.3</h3></header><p><span class="label">Evidence:</span> repository pins are accurate; official NuGet lists 2.10.3 with a parser-teardown fix.</p><p><span class="label">Impact:</span> non-blocking test reliability/maintenance drift.</p><p class="disposition"><span class="label">DEFER:</span> align with focused tests or record an owner/revisit alongside Story 5.6.</p></article>
+    </div>
+  </section>
+
+  <section id="debt" aria-labelledby="debt-title">
+    <h2 id="debt-title">Already-tracked implementation debt</h2>
+    <div class="panel">
+      <p>The brownfield lens verified these as assigned work, not hidden spine findings; they do not inflate counts:</p>
+      <ul>
+        <li>platform/tenant ProviderCatalog split — Story 5.3 / <code>NC-5.3-PLATFORM-CATALOG-SCOPE</code>;</li>
+        <li>versioned <code>/api/v1/agents/...</code> routes — Story 5.5;</li>
+        <li>lifecycle version bump and Party-link rejection — Story 5.2;</li>
+        <li>Dapr Workflow/live IntegrationTests — Stories 5.6 and 6.1;</li>
+        <li>coarse context status and legacy deterministic identities — Stories 6.2, 6.4, 7.1, 7.3.</li>
+      </ul>
+      <p class="note">Uncommitted protection/secrets seams and existing <code>ARCH-A-*</code> assumptions remain visible delivery/RQ-1 blockers, not newly discovered contradictions.</p>
+    </div>
+  </section>
+
+  <section id="order" class="order" aria-labelledby="order-title">
+    <h2 id="order-title">Recommended update order</h2>
+    <div class="panel">
+      <ol>
+        <li><strong>Safety:</strong> correct C-1 and reconcile retry fingerprint semantics.</li>
+        <li><strong>Irreversible governance:</strong> decide C-2; then close H-5, H-8 and H-9 as one identity/envelope/export pass.</li>
+        <li><strong>Administrative viability:</strong> repair C-3 with scoped bootstrap/recovery fixtures.</li>
+        <li><strong>Approval and safety coordination:</strong> land H-1 through H-3.</li>
+        <li><strong>State ownership:</strong> separate H-4 lifetimes and bind H-6 index delivery.</li>
+        <li><strong>External/current reality:</strong> split H-7, resolve H-10, correct H-11 wording, reconcile H-12 history.</li>
+        <li><strong>Polish/debt:</strong> close M-1–M-3 before their stories; retain M-4/L-1 with owners; rerun lint and all five lenses.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section aria-labelledby="decision-title">
+    <h2 id="decision-title">Validation decision</h2>
+    <div class="panel">
+      <p><strong>Do not use the current spine as the authoritative implementation handoff.</strong> Roll the findings into a BMad Architecture Update, preserving AD ids, then rerun the full Reviewer Gate. This validation offers that update and applies none.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div>Generated: 2026-09-12 · Intent: validate · Lint: PASS (0 findings) · Deduplicated: 3 Critical / 12 High / 4 Medium / 1 Low</div>
+    <div>Read-only: ARCHITECTURE-SPINE.md, .memlog.md, sources, code, registers, and existing artifacts were not modified.</div>
+  </footer>
+</main>
+</body>
+</html>

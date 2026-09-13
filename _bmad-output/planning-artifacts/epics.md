@@ -35,9 +35,9 @@ The former 18-story Epic 5 is superseded and non-executable. Active forward work
 
 ### Functional Requirements
 
-FR1: The Platform Operator provisions `hexa` once per tenant at tenant enablement through an idempotent create-only operation that establishes tenant scope and an immutable AI-type Party identity owned by the Agents Service Principal; Tenant Agent Administrators configure and activate it, and no tenant role may create a second Agent, delete `hexa`, or change its Party identity.
+FR1: The Platform Operator provisions `hexa` once per tenant at tenant enablement through an idempotent create-only operation that establishes tenant scope and an immutable Party identity owned by the Agents Service Principal and verified by id; `EXT-PARTIES-1` selects either Branch A with additional AI Party-type creation/verification or Branch B with the Product/Parties-approved Organization identity-by-id contract. Tenant Agent Administrators configure and activate `hexa`, and no tenant role may create a second Agent, delete it, or change its Party identity.
 
-FR2: The provisioned Agent Party identity lets `hexa` participate as a known AI member; `ConversationAgentState` uses `NeverJoined`, `Joined`, `ExternallyRemoved`, `Blocked`, and `ReadmitPending`, mirrors block/removal through an at-least-once outbox with visible `MirrorPending`, and prevents silent rejoin or posting when identity, membership, access, or block state is invalid.
+FR2: The provisioned Agent Party identity lets `hexa` participate as a known AI member; `ConversationAgentState` uses `NeverJoined`, `Joined`, `ExternallyRemoved`, `Blocked`, and `ReadmitPending`, and one versioned `CurrentMirror(BlockVersion, Direction, Outcome, AttemptId)` whose mutually exclusive current-outcome derivations are `MirrorPending` and `MirrorRefused`. Direction-aware remove/readmit mirroring is at least once, successor attempts supersede lower versions, and identity, membership, access, or block uncertainty prevents silent rejoin or posting.
 
 FR3: Agent Administrators can activate, disable, and inspect `hexa` lifecycle state; disabled Agents cannot be called, disabling preserves prior evidence and messages, and lifecycle changes are auditable and visible through admin UI and API/client contracts.
 
@@ -47,7 +47,7 @@ FR5: Agent Administrators can select a Provider and model for `hexa` from the Gl
 
 FR6: Agent Administrators can configure `hexa` for Automatic Response Mode or Confirmation Response Mode; automatic mode posts successful responses directly after authorization and generation, confirmation mode creates Proposed Agent Replies outside the Conversation, and response mode changes affect only future Agent Calls.
 
-FR7: Tenant Agent Administrators configure Approver Policy from Conversation Facilitator, predefined Parties, and tenant roles; `Caller` is deprecate-and-reject. One Eligible Approver predicate — current participant/read access, policy-resolved, not caller, not last editor — applies at configuration, call, edit, action, and scheduled re-check. Empty or unavailable resolution uses the typed PRD outcomes and never strands or abandons on absent evidence.
+FR7: Tenant Agent Administrators configure Approver Policy from Conversation Facilitator, predefined Parties, and tenant roles; `Caller` is deprecate-and-reject. One Eligible Approver predicate — current participant/read access, policy-resolved, not caller, not last editor, and not the requester of a regenerated version under decision — applies at configuration, call, edit, regeneration, approval, and scheduled re-check. Empty or unavailable resolution uses the typed PRD outcomes, and an edit or regeneration that would leave no other eligible Approver is refused before changing content or invoking a Provider.
 
 FR8: Authorized Conversation Participants can explicitly call `hexa` from a Source Conversation with a prompt or request; calls require Source Conversation access and Agent call permission, unauthorized calls fail before provider invocation, and each call records caller, Agent, Source Conversation, request timestamp, and response mode.
 
@@ -136,14 +136,14 @@ NFR10: Cost Control - Hard numeric per-tenant monthly and per-call caps warn at 
 ### Additional Requirements
 
 - Architecture specifies no external starter template. The forward baseline must use the corrected Structural Seed: `.slnx`, root build/package files, `Contracts`, `Client`, `Server`, `UI`, `Testing`, and focused test projects, with module-owned `AppHost`, `Aspire`, and `ServiceDefaults` absent.
-- Hexalith Agents is a full EventStore-backed domain module. The V1 durable aggregate inventory is `Agent`, platform-scoped `ProviderCatalog` in reserved tenant `system`, `TenantProviderEnablement`, `AgentInteraction`, `BudgetLedger`, `TenantGovernancePolicy`, platform-scoped `ContentSafetyPolicy`, `ConversationAgentState`, `AuditInspection`, `SecurityEventLog`, `LaunchReadinessGate`, `LegalHold`, `AuditExport`, and `ProtectedDeletion`. Dapr Workflow history and optional framework session state never become business truth.
+- Hexalith Agents is a full EventStore-backed domain module. The V1 durable aggregate inventory is `Agent`, platform-scoped `ProviderCatalog` in reserved tenant `system`, `TenantProviderEnablement`, `AgentInteraction`, `RateLimitLedger`, `OpenInteractionLedger`, `BudgetLedger`, `TenantGovernancePolicy`, `ConversationAgentState`, `AuditInspection`, routed `SecurityEventLog`, reserved-system `TrustedEnvelopeReplay`, platform-scoped `ContentSafetyPolicy`, `SafetyVerdictEpoch`, `SafetyVerdictIndex`, `LaunchReadinessGate`, reserved-system `ArchitectureDecisionCatalog` and `ArchitectureDecisionRecord`, `LegalHold`, `ProtectionFence`, `AuditExport`, and `ProtectedDeletion`. Dapr Workflow history, the content-free operational security-audit spool, and optional framework session state never become business truth.
 - Aggregate handlers are pure and emit events only. Provider calls, Conversations reads/posts, Parties validation, Tenants projection reads, safety checks, admission, expiry timers, notifications, and secret access execute outside aggregates and return through deterministic commands.
 - `AgentInteraction` snapshots Agent/configuration/instructions/response/approver/provider/model/context/safety/caller/source versions at request time, while current provider readiness and safety may tighten or block later steps without retargeting the interaction.
-- Proposal content is append-only and immutable across generated, edited, and regenerated versions. Approval selects exactly one version; rejected, abandoned, and expired proposals cannot later post; generation failures create only a separate non-approvable failure record.
+- Proposal content is append-only and immutable across generated, edited, and regenerated versions. Approval selects exactly one version; rejected, abandoned, and expired proposals cannot later post. Provider/timeout failures create content-free `GenerationFailed` status and Audit Evidence on `AgentInteraction`; output-safety failure uses the Product-selected `OD-INITIAL-OUTPUT-SAFETY-STATUS-1` status. Failed/incomplete bytes are not retained in the V1 live path and no live `GenerationFailureRecord` exists; any future retention requires Product approval and a separate non-approvable owner/permit/protection/deletion protocol.
 - Conversations context, AI membership, and final posting use supported Conversations client/API seams only. Direct stream writes are forbidden, and a Proposed Agent Reply is never a Conversation Message.
-- Agent identity stores stable Party references only. Posting requires one valid current Agent Party identity plus limited Conversations membership as `ParticipantType.AiAgent`/`AIAgent` and `ParticipantRole.Member` through `EXT-CONV-AI-1`.
+- Agent identity stores stable Party references only. Posting requires one valid current Agent Party identity verified by immutable id under `EXT-PARTIES-1`'s selected branch, plus limited Conversations membership as `ParticipantType.AiAgent`/`AIAgent` and `ParticipantRole.Member` through `EXT-CONV-AI-1`; AI Party-type verification is additional only under Branch A.
 - Approver authority resolves from the snapshotted Agents policy plus current predefined-Party, tenant-role, and Conversation Facilitator evidence. `ApproverPolicySourceKind.Caller` is retired and rejected wherever presented. Missing, stale, ambiguous, revoked, or unavailable authority fails closed.
-- Provider SDK and credential details remain adapter-local. `ProviderReadinessResult` exposes exactly `OperationalState`, `Callability`, `ReasonCode`, `CapabilityVersion`, `ObservedAt`, and exclusive `ValidUntil`; only the three architecture-valid state triples are accepted, and unknown or invalid combinations block.
+- Provider SDK and credential details remain adapter-local. `ProviderReadinessResult` exposes exactly `OperationalState`, `Callability`, `ReasonCode`, `CapabilityVersion`, `CurrentDataHandlingVersion`, `InForceDataHandlingVersion`, optional exclusive `GraceExpiresAt`, `ObservedAt`, exclusive `ValidUntil`, and discriminated `Freshness`; only the three architecture-valid state triples are accepted, and unknown or invalid combinations block.
 - Every provider-dependent step maintains and advances the interaction's durable capability high-water mark, records the accepted `EffectiveProviderCapabilityVersion`, and rechecks live readiness and limits. Snapshot version remains provenance rather than current authority.
 - Complete Conversation Context is freshly authorized and measured with the `EXT-TOKEN-1` provider/model tokenizer before initial generation and regeneration. No truncation, summary, window, sampling, substitute retrieval, or stale context reuse is permitted.
 - Two-stage safety through `EXT-SAFETY-1` evaluates prompt plus complete context before Provider invocation and generated output before proposal/posting. Missing, stale, unversioned, indeterminate, always-blocked, or weaker-retry outcomes fail closed with no Approver override.
@@ -156,15 +156,15 @@ NFR10: Cost Control - Hard numeric per-tenant monthly and per-call caps warn at 
 - The platform-owned host in `EXT-HOST-1` composes the Agents DomainService/UI with EventStore, Conversations, Parties, Tenants, Provider and safety adapters, Dapr Workflow, readiness, capacity, secrets, identity, health, telemetry, and browser-evidence ingress.
 - Dapr Workflow is the sole V1 durable execution owner. Microsoft Agent Framework may exist only inside a generation activity after `EXT-PROVIDER-1` commits it. Python DurableAgent, MCP, A2A, tools, and alternate workflow owners are out of V1.
 - The EventStore `LaunchReadinessGate` aggregate is the sole readiness-record writer. The `launch-readiness` projection selects greatest committed revision, never greatest `ObservedAt`, and never falls back to an older Pass when the newest record is invalid, incomplete, stale, or blocking.
-- `OperationGateMatrixVersion = 2` is the single additive gate mapping consumed by API, BFF, UI, workflow, and readiness projection. Every observation carries exact `ScopeKind` and an `AuthorizedProducer`; a missing operation family, unknown/old version where current is required, invalid scope/producer, missing record, or non-inventory gate blocks. The Live-Seam Matrix names the integration test required for every live claim.
-- The authoritative projection inventory is: `agent-setup-readiness`, `provider-capability-pricing`, `agent-interaction-status`, `proposal-detail`, `proposal-version-history`, `pending-proposal-queue`, `pending-proposal-count`, `audit-evidence`, `budget-reservation-usage`, `retention`, `legal-hold`, `export`, `deletion`, `launch-readiness`, `runtime-metrics`, `browser-ui-metrics`, and `product-metrics`.
+- `OperationGateMatrixVersion = 7` is the single additive gate mapping consumed by API, BFF, UI, workflow, replay admission, and readiness projection; version 7 retains the v6 target-aware bootstrap/repair, split kill-switch, replay-admission, closed governance-workflow, and deletion-integrity variants, adds stable pre-seal destruction identity and replacement-key activation arbitration while retaining protection-owner block/reserve/re-attestation activation, signed-but-unissued recovery, and the non-public compromise registrar, and forbids code-local exceptions. Every observation carries exact `ScopeKind` and an `AuthorizedProducer`; a missing family/variant, unknown/old version where current is required, invalid scope/producer, missing record, or non-inventory gate blocks. The Live-Seam Matrix names the integration test required for every live claim.
+- The authoritative projection/scope inventory is: `agent-setup`, `provider-catalog`, `tenant-provider-enablement`, `agent-interaction-status`, `proposal-detail`, `proposal-version-history`, `pending-proposal-queue`, `pending-proposal-count`, `audit-evidence`, `rate-limit-usage`, `open-interaction-leases`, `budget-reservation-usage`, `safety-verdict-status`, content-free `safety-verdict-directory`, `retention`, `legal-hold`, `export`, `export-artifact-index`, `export-artifact-store`, `deletion`, `launch-readiness`, `runtime-metrics`, `browser-ui-metrics`, `workflow-execution-state`, and `product-metrics`; the register marks the two non-projection scope items explicitly.
 - NFR-11 recovery freezes the pre-fault eligible nonterminal cohort, uses one monotonic clock origin, proves EventStore RPO 0, restores processing within 15 minutes, preserves terminal decisions, and inventories duplicate-sensitive external effects.
 - NFR-12 evidence records all numeric concurrency/queue values and proves exact weighted fairness, fencing, no starvation, replica/crash/cancel/expiry recovery, and coexistence with cost caps in the `EXT-TOPOLOGY-1` fixture.
 - NFR-13 evidence covers every interactive V1 route and high-impact state for WCAG 2.2 AA, keyboard/focus/semantic/live-region behavior, whole-string English/French parity, FrontComposer/Fluent V5 inheritance, and restrictive-viewport blocking.
 - NFR-14 uses authenticated browser-monotonic, kind-discriminated samples correlated to safe server evidence; each sample kind requires at least 30 production-like executions and missing/invalid ticks, correlation, localized live-region mutation, or samples yields `InsufficientEvidence`.
 - Public contracts are versioned and additive-first. Evidence Levels retain PRD meanings: Level 1 structure, Level 2 pure behavior, Level 3 fail-closed deferred seam, Level 4 live component, and Level 5 production-like cross-system evidence.
-- The local stack baseline is SDK `10.0.301` with `latestPatch`, `net10.0`, C# 14, `.slnx`, Central Package Management, Aspire `13.4.6`, Dapr/Workflow `1.18.5`, CommunityToolkit Aspire Dapr `13.4.1-beta.687`, MediatR `14.2.0`, FluentValidation `12.1.1`, Fluent UI `5.0.0-rc.4-26180.1`, xUnit v3 `3.2.2`, Shouldly `4.3.0`, and unselected Provider/Agent Framework SDKs until `EXT-PROVIDER-1` commits them.
-- The external-dependency register is the only commitment authority for `EXT-CONV-AI-1`, `EXT-CONV-UI-1`, `EXT-HOST-1`, `EXT-PROVIDER-1`, `EXT-SAFETY-1`, `EXT-TOKEN-1`, `EXT-SECRETS-1`, `EXT-PROTECTION-1`, and `EXT-TOPOLOGY-1`; any `Uncommitted` record blocks its consuming stories from `ready-for-dev`.
+- The active stack baseline is the Architecture Spine's current Stack table: SDK `10.0.401` with `latestPatch`, `net10.0`, C# 14, `.slnx`, Central Package Management, FluentValidation `12.1.1`, OpenTelemetry `1.18.0`, Fluent UI Blazor `5.0.0-rc.5-26219.1`, xUnit v3 `3.2.2`, Shouldly `4.3.0`, and bunit `2.9.0`; Hosting plus Provider/Agent Framework SDKs remain unselected until their dependency records commit them, and MediatR `14.2.0` is catalog-visible but absent from the current Agents runtime graph. The imported Dapr .NET/Workflow `1.18.5` family may not be adopted while ARCH-A-15 is open: the catalog and host must upgrade the family atomically to upstream `1.18.7` or later with compatibility evidence, or Security must record the bounded exception ARCH-A-15 defines.
+- The external-dependency register is the only commitment authority for all twelve records: `EXT-CONV-AI-1`, `EXT-CONV-UI-1`, optional `EXT-CONV-RETRACTION-1`, `EXT-HOST-1`, `EXT-PROVIDER-1`, `EXT-SAFETY-1`, `EXT-TOKEN-1`, `EXT-SECRETS-1`, `EXT-EXPORT-STORE-1`, `EXT-PROTECTION-1`, `EXT-TOPOLOGY-1`, and `EXT-PARTIES-1`; any `Uncommitted` record blocks launch evidence for its consuming stories. Optional retraction has no consumer unless Product selects OQ-23's branch. The register's `EXT-PARTIES-1` development allowance permits its fourteen direct human/identity consumers — Stories 5.2, 5.4, 5.5, 6.6, 7.1–7.5, 8.1–8.4, and 8.8 — to build against Branch-B-compatible identity-by-id behavior where applicable, but cannot establish human actor-binding, separation-of-duty, launch evidence, or `RQ-1` until the record is `Available` and its compatibility command passes.
 - The launch-readiness register is the machine-testable callability and qualification authority. `RQ-1` is a non-estimated release gate outside the development backlog and currently returns NOT READY.
 
 ### UX Design Requirements
@@ -229,7 +229,7 @@ UX-DR29: Preserve audit availability states across surfaces: audit pending, audi
 
 UX-DR30: Every grid/list surface must distinguish loading, empty, filtered-empty, error, permission-denied, and stale/degraded where relevant; empty states must not leak unauthorized records and filtered-empty states must offer filter reset.
 
-UX-DR31: Editing is explicit, regeneration is distinct, and approval applies only to a selected version. The advisory pending lock permits at most one command for `(user session, resource identity, operation family)` across `ProposalResolution`, `PolicyPublication`, `TenantBudgetUpdate`, `LegalHold`, `ExportRequest`, and `DeletionRequest`; unrelated resources/families remain available and EventStore concurrency/idempotency remain authoritative.
+UX-DR31: Editing is explicit, regeneration is distinct, and approval applies only to a selected version. The advisory pending lock permits at most one command for `(user session, resource identity, operation family)` across every lock-bearing family in `OperationGateMatrixVersion = 7`: `ProposalResolution`, `PolicyPublication`, `TenantBudgetUpdate`, `LegalHold`, `ExportRequest`, `DeletionRequest`, `ProviderCatalogMutation`, `AgentSetupMutation`, `AgentActivation`, and `DataHandlingAcceptance`; unrelated resources/families remain available and EventStore concurrency/idempotency remain authoritative.
 
 UX-DR32: Keyboard and focus behavior must support `Esc` closing transient UI without committing, focus returning to the trigger, approval/rejection controls being keyboard reachable, and no required action or denial reason being hover-only.
 
@@ -247,7 +247,7 @@ UX-DR38: Reduced-motion users must not depend on animation to perceive generatio
 
 UX-DR39: Responsive behavior must be desktop-first; phone may support read-only status/proposal reference/lightweight review, tablet stacks metadata/editor/version history and prioritizes grid columns, desktop is the primary mode, and wide desktop uses extra width for split views rather than decoration.
 
-UX-DR40: At the most restrictive supported viewport, `ProposalResolution`, `PolicyPublication`, `TenantBudgetUpdate`, `LegalHold`, `ExportRequest`, and `DeletionRequest` are unavailable with a visible reason whenever required decision context cannot be presented safely; review-only access remains available.
+UX-DR40: At the most restrictive supported viewport, every lock-bearing family in `OperationGateMatrixVersion = 7` is unavailable with a visible reason whenever required decision context cannot be presented safely; the shared matrix fixture proves the same behavior for all ten families and review-only access remains available.
 
 UX-DR41: Use FrontComposer capabilities intentionally: FC-LYT for FullWidth and Constrained layouts, FC-TBL for grids/filter summaries/row detail/empty/error states, FC-A11Y for shell and custom override accessibility, FC-L10N for domain labels and workflow copy, policy-gated navigation for authorization-safe entry visibility, and pending command/status patterns for generation/approval/posting transitions without promoting pending to success.
 
@@ -358,14 +358,14 @@ These criteria are normative additions to the named story sections and preserve 
 | Story | Required addition |
 | --- | --- |
 | 5.2 | Keep Party link/replace wire members additive, mark them obsolete, reject every request, and prove FR1 provisioning is the only identity-creation/link path. |
-| 5.3 | Own `DataHandlingVersion`; keep the Story 5.3 / `EXT-PROVIDER-1` historical-consumption fact an open Product decision without selecting either branch. |
+| 5.3 | Own `DataHandlingVersion`; preserve the 2026-09-10 Product ruling that historical Story 5.3 executed no `EXT-PROVIDER-1` seam, created no dependency non-conformance, and did not commit or advance that dependency. |
 | 5.4 | Use predefined Party, tenant-role, or Conversation Facilitator sources; keep `ApproverPolicySourceKind.Caller` declared/deserializable but obsolete and server-rejected. |
 | 5.5 and 5.7 | Reject `ReportingOnlyMonitoring` and `AcceptedLaunchRisk`, emit `ProhibitedCostControlPosture`, and refuse activation or enablement while it stands. |
 | 5.6 and 5.8 | Own the host protection port/binding, `PayloadProtectionUnavailable`, canary self-test, engine identity/version check, no-op/pass-through-wrapper rejection, and content-path fail-closed evidence; consume `EXT-PROTECTION-1` according to its register status. |
 | 6.1 | Add `EXT-CONV-AI-1` as the exact live Conversation-context consumer; content-bearing work refuses execution while payload protection is unavailable. |
 | 6.2 | Own `AgentInteractionContextMode.Blocked`, Safe Context Budget terms, and prove `ContextUnavailable` exists on the exact required public surface; consume `EXT-CONV-AI-1`. |
 | 6.4 | Own `AgentGenerationOutcome.Indeterminate` and `NotInvoked`. |
-| 6.6 | Consume `EXT-CONV-AI-1`; expose exactly the five membership states, `BlockVersion`, `MirrorPending`, and the non-terminal proposal index; implement every FR2 state/read pair, at-least-once versioned removal mirror, clear-time authority, `ReadmitPending`, next-accepted-step rejoin, and delayed reconciliation of `PostingPending`. |
+| 6.6 | Consume `EXT-CONV-AI-1` and the selected `EXT-PARTIES-1` branch; expose exactly the five membership states, `BlockVersion`, `CurrentMirror(BlockVersion, Direction, Outcome, AttemptId)`, its mutually exclusive `MirrorPending`/`MirrorRefused` derivations, and the non-terminal proposal index; implement every FR2 state/read pair, direction-aware at-least-once mirroring, supersession and late-outcome rules, refused-remove/refused-readmit remediation, clear-time authority, `ReadmitPending`, next-accepted-step rejoin, and delayed reconciliation of `PostingPending`. |
 | 7.1 | Consume `EXT-CONV-AI-1`; own `NoEligibleApprover`, `ApproverResolutionUnavailable`, `ResolutionEmptyPending`, and `ResolutionUnavailable`. |
 | 7.4 | Consume `EXT-CONV-AI-1` and own seam-2 lookup. Before every retry or `PostingFailed` exit: present records `Posted(LateConfirmed)` and rejects the action; unavailable refuses and remains `PostingFailed`; typed absence permits retry after full re-validation; deleted/removed permits an authorized abandon only. |
 | 7.5 | Depend on Story 7.4's lookup capability; add `PostingFailed` abandon paths, own `SourceConversationUnavailable` and `LateConfirmed`, and never record `Abandoned` when the message is present. |
@@ -1225,7 +1225,7 @@ Agent Administrators can configure **hexa** through live public operations and r
 
 **Story count:** 10.
 
-**Dependency topology:** 5.1 establishes the build/package/boundary baseline; 5.2 and reopened 5.3 add independently usable Agent and platform-catalog/tenant-enablement operations; 5.4 binds trusted principals, identity, authorization, and security evidence; 5.5 publishes matrix-v2 readiness truth and versioned routes; 5.6 proves the platform-hosted topology and live integration tier; 5.7 consumes only prior setup stories to gate activation; 5.8 binds payload protection after the integration tier and becomes the content-bearing prerequisite for Epics 6–8; 5.9 rejects prohibited cost-control postures after readiness contracts exist; 5.10 retires prohibited safety and caller-policy inputs after authority contracts exist. No story depends on a later story.
+**Dependency topology:** 5.1 establishes the build/package/boundary baseline; 5.2 and reopened 5.3 add independently usable Agent and platform-catalog/tenant-enablement operations; 5.4 binds trusted principals, identity, authorization, and security evidence; 5.5 publishes matrix-v7 readiness truth and versioned routes; 5.6 proves the platform-hosted topology and live integration tier; 5.7 consumes only prior setup stories to gate activation; 5.8 binds payload protection after the integration tier and becomes the content-bearing prerequisite for Epics 6–8; 5.9 rejects prohibited cost-control postures after readiness contracts exist; 5.10 retires prohibited safety and caller-policy inputs after authority contracts exist. No story depends on a later story.
 
 ### Story 5.1: Establish Build Package Boundary And Basic CI Gates
 
@@ -1287,7 +1287,7 @@ So that the durable Agent state I see is replayable, current, and safe to automa
 **Dependencies:**
 
 - **Prior stories:** 5.1.
-- **External:** None beyond existing package/source dependencies; authorization fails closed through the current tenant-access seam.
+- **External:** `EXT-PARTIES-1` remains `Uncommitted`. This story may develop the create-only provisioner against Branch-B-compatible immutable identity-by-id behavior, but that work is not launch evidence and cannot satisfy `RQ-1`; no selected branch may be claimed until the register records owner acceptance.
 - **Forward dependencies:** None; activation and integrated identity readiness are not claimed by this story.
 
 **Acceptance Criteria:**
@@ -1315,7 +1315,7 @@ So that the durable Agent state I see is replayable, current, and safe to automa
 **Given** a Party-link or Party-replacement wire member is presented after `hexa` has been provisioned
 **When** any old or current client, migration, replay, API/client, UI, or direct command path handles it
 **Then** the member remains declared and deserializable but obsolete and every request is server-rejected with a typed reason
-**And** FR-1 provisioning remains the only identity creation/link path and no tenant role can change the immutable AI-type Party identity.
+**And** FR-1 provisioning remains the only identity creation/link path, no tenant role can change the immutable Party identity, identity-by-id is required under both `EXT-PARTIES-1` branches, and AI Party-type creation/verification is required only under selected Branch A.
 
 **Given** a caller from another tenant or without Agent-administration authority
 **When** the caller commands or queries Agent configuration
@@ -1326,14 +1326,14 @@ So that the durable Agent state I see is replayable, current, and safe to automa
 
 | Field | Story 5.2 evidence |
 | --- | --- |
-| Requirements | FR1, FR3, FR6, FR19-FR25; OQ-25, OQ-28; NFR1-NFR5; UX-DR1-UX-DR3, UX-DR11-UX-DR17, UX-DR20, UX-DR23, UX-DR25, UX-DR30, UX-DR41, UX-DR50; AD-1-AD-5, AD-12, AD-15, AD-17 |
+| Requirements | FR1, FR3, FR6, FR19-FR25; OQ-25, OQ-28; NFR1-NFR5; UX-DR1-UX-DR3, UX-DR11-UX-DR17, UX-DR20, UX-DR23, UX-DR25, UX-DR30, UX-DR41, UX-DR50; AD-1-AD-5, AD-12, AD-15, AD-17; EXT-PARTIES-1 |
 | OwnedClauses | FR1.live-configure-and-query; FR1.immutable-provisioned-party-identity; FR3.lifecycle-preserves-history; FR6.future-only-response-mode; FR19.agent-config-isolation; FR20.admin-authorization; FR23.structured-public-result; FR23.party-link-replace-deprecate-and-reject; FR24.configuration-change-evidence; FR25.setup-status; NFR1.authorization-before-mutation; NFR3.replay-determinism; NFR4.current-status; NFR5.safe-change-audit; UX-DR20.lifecycle-not-callability; UX-DR50.command-truth-flow; AD-3.pure-aggregate; AD-4.lifecycle-configuration-version; AD-15.api-ui-parity; DW-4 |
-| Dependencies | Story 5.1 |
+| Dependencies | Story 5.1; `EXT-PARTIES-1` selected branch for launch evidence, with Branch-B-compatible identity-by-id development allowed while Uncommitted |
 | EvidenceLevel | Levels 2 and 4: aggregate/replay behavior plus live EventStore command-query-projection path |
 | TestOrArtifact | AgentConfigurationAggregateTests; AgentLifecycleConfigurationVersionTests; AgentConfigurationEventStoreIntegrationTests; AgentSetupQueryTests; AgentConfigurationUiTests; persisted read-model fixture |
 | VerificationCommand | pwsh ./eng/verify-story-5.2.ps1 |
 | NegativeEvidence | AgentConfigurationAuthorizationTests.CrossTenantCommandIsDeniedBeforeMutation; AgentConfigurationAuthorizationTests.CrossTenantQueryDisclosesNothing; duplicate/conflict/replay cases |
-| Result | Not run — backlog; requires Story 5.1 |
+| Result | Not run — backlog; requires Story 5.1, and `EXT-PARTIES-1` remains Uncommitted for launch evidence and `RQ-1` |
 
 ### Story 5.3: Govern Provider Models And Pricing Through Live Operations
 
@@ -1348,7 +1348,7 @@ So that catalog truth is administered once while every tenant sees and selects o
 - **Prior stories:** 5.1.
 - **External:** None. Catalog governance and migration do not invoke the Provider; runtime use remains gated by `EXT-PROVIDER-1` in consuming stories.
 - **Non-conformance:** `NC-5.3-PLATFORM-CATALOG-SCOPE` remains open in the external-dependency register until the shipped tenant-scoped catalog is migrated and frozen as historical evidence.
-- **Open Product decision:** Current evidence does not conclusively establish whether completed historical Story 5.3 executed `EXT-PROVIDER-1`; the register's Branch A/Branch B disposition remains open and this story does not select one.
+- **Resolved historical-consumption ruling:** Product selected Branch B on 2026-09-10: completed historical Story 5.3 executed no `EXT-PROVIDER-1` seam, so no dependency non-conformance was created. This ruling does not commit `EXT-PROVIDER-1`, advance its status, or change its current consumers.
 - **Forward dependencies:** None; this story publishes catalog truth but does not invoke the Provider.
 
 **Acceptance Criteria:**
@@ -1362,6 +1362,16 @@ So that catalog truth is administered once while every tenant sees and selects o
 **When** platform catalog governance accepts the change
 **Then** the catalog owns and advances `DataHandlingVersion` with the governed capability/pricing record
 **And** replay, migration, API/client, UI, and evidence surfaces preserve that version without inferring Provider behavior or consuming `EXT-PROVIDER-1`.
+
+**Given** an enabled Provider/model has a current data-handling record whose four governed fields are presented to an authorized Tenant Agent Administrator
+**When** the administrator accepts or declines the named `DataHandlingVersion` with a non-whitespace justification at the expected tenant-enablement revision
+**Then** one lock-bearing `DataHandlingAcceptance` command records the decision, actor and role basis, version, exact rendered confirmation set, and authoritative pending/projection-confirmed references without changing platform catalog truth
+**And** a stale or superseded version, missing justification, unauthorized actor, duplicate divergent submission, or cross-tenant target is rejected before mutation or Provider work.
+
+**Given** the Provider/model publishes a newer data-handling version
+**When** its declared and structurally verified change is a tightening relative to the tenant's last accepted version
+**Then** one cumulative grace deadline is derived from the first unaccepted tightening version, later unaccepted versions cannot extend it, and the tenant remains callable only until `EvaluatedAt >= GraceExpiresAt`
+**And** a neutral/loosening change, explicit decline, lapsed grace, or missing current/in-force version blocks readiness and Provider invocation with the defined safe reason.
 
 **Given** an authorized Platform Operator and a tenant
 **When** a Provider/model entry is enabled or disabled for that tenant
@@ -1392,13 +1402,13 @@ So that catalog truth is administered once while every tenant sees and selects o
 
 | Field | Story 5.3 evidence |
 | --- | --- |
-| Requirements | FR4, FR5, FR19-FR25, FR28; OQ-29; NFR1, NFR4, NFR6, NFR10; UX-DR4, UX-DR11-UX-DR17, UX-DR21, UX-DR26, UX-DR30, UX-DR41; AD-2, AD-9, AD-10, AD-14, AD-15, AD-17, AD-21 |
-| OwnedClauses | FR4.live-provider-catalog; FR4.disabled-not-usable; FR5.future-only-selection; FR21.missing-provider-blocks; FR24.provider-change-evidence; OQ29.DataHandlingVersion; NFR6.secret-nondisclosure; NFR10.current-pricing-input; UX-DR4.safe-provider-grid; UX-DR21.provider-result-not-inferred; AD-2.platform-catalog-and-tenant-enablement; AD-9.adapter-boundary; AD-10.capability-version-and-limits; AD-14.secret-safety; AD-30.platform-principal |
+| Requirements | FR4, FR5, FR19-FR25, FR28; OQ-29; NFR1, NFR4, NFR6, NFR10; UX-DR4, UX-DR11-UX-DR17, UX-DR21, UX-DR26, UX-DR30, UX-DR41; AD-2, AD-9, AD-10, AD-12, AD-14, AD-15, AD-17, AD-21, AD-22, AD-28 |
+| OwnedClauses | FR4.live-provider-catalog; FR4.disabled-not-usable; FR4.data-handling-version-and-governed-record; FR5.future-only-selection; FR5.tenant-data-handling-accept-decline; FR21.missing-or-unaccepted-provider-blocks; FR24.provider-and-acceptance-change-evidence; OQ29.DataHandlingVersion; NFR6.secret-nondisclosure; NFR10.current-pricing-input; UX-DR4.safe-provider-grid; UX-DR21.provider-result-not-inferred; AD-2.platform-catalog-and-tenant-enablement; AD-9.adapter-boundary; AD-10.capability-version-limits-and-data-handling-readiness; AD-12.DataHandlingAcceptance-lock; AD-14.secret-safety; AD-22.acceptance-audit; AD-28.grace-deadline-authority; AD-30.platform-principal |
 | Dependencies | Story 5.1; no external dependency; closes `NC-5.3-PLATFORM-CATALOG-SCOPE` |
 | EvidenceLevel | Levels 2 and 4: catalog aggregate behavior and live EventStore/query/UI component path |
-| TestOrArtifact | ProviderCatalogMigrationTests; ProviderCatalogAggregateTests; TenantProviderEnablementAggregateTests; ProviderCatalogEventStoreIntegrationTests; ProviderCatalogQueryTests; ProviderCatalogUiTests; secret poison-sweep report |
+| TestOrArtifact | ProviderCatalogMigrationTests; ProviderCatalogAggregateTests; TenantProviderEnablementAggregateTests; DataHandlingAcceptanceAggregateTests; DataHandlingGraceDeadlineTests; ProviderCatalogEventStoreIntegrationTests; ProviderCatalogQueryTests; ProviderCatalogUiTests; DataHandlingAcceptanceUiTests; secret poison-sweep report |
 | VerificationCommand | pwsh ./eng/verify-story-5.3.ps1 |
-| NegativeEvidence | ProviderCatalogAuthorizationTests.CrossTenantSelectionIsDenied; ProviderCatalogAuthorizationTests.TenantPrincipalCannotMutatePlatformCatalogOrEnablement; ProviderCatalogVersionRegressionTests; ProviderCatalogMigrationConflictTests; ProviderSecretLeakTests; invalid pricing/limit cases |
+| NegativeEvidence | ProviderCatalogAuthorizationTests.CrossTenantSelectionIsDenied; ProviderCatalogAuthorizationTests.TenantPrincipalCannotMutatePlatformCatalogOrEnablement; DataHandlingAcceptanceIsolationTests; StaleSupersededOrUnjustifiedDataHandlingDecisionTests; GraceCannotExtendAcrossUnacceptedVersionsTests; ProviderCatalogVersionRegressionTests; ProviderCatalogMigrationConflictTests; ProviderSecretLeakTests; invalid pricing/limit cases |
 | Result | Reopened — backlog under `NC-5.3-PLATFORM-CATALOG-SCOPE`; shipped tenant-scoped implementation is migration source and historical evidence, not final conformance |
 
 ### Story 5.4: Prove Trusted Principal Tenant Party And Approver Readiness
@@ -1412,7 +1422,7 @@ So that revoked, ambiguous, stale, or cross-tenant authority can never make **he
 **Dependencies:**
 
 - **Prior stories:** 5.1 and 5.2.
-- **External:** `EXT-CONV-AI-1` must be `Available` for its Facilitator, roster, existence, and accessibility reads; the membership mutation seam is not used here. Existing Tenants and Parties read contracts remain required.
+- **External:** `EXT-CONV-AI-1` must be `Available` for its Facilitator, roster, existence, and accessibility reads; the membership mutation seam is not used here. `EXT-SECRETS-1` must be `Available` for live trusted-envelope issuance, verification, rotation/revocation, replay-retention, and system security-digest evidence. `EXT-HOST-1` must be `Available` for the platform-owned replicated operational security-audit spool and its recovery worker. `EXT-PARTIES-1` remains `Uncommitted`: Branch-B-compatible identity-by-id readiness may be developed, but neither Party branch can provide launch evidence or satisfy `RQ-1` before owner acceptance and availability.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
@@ -1422,10 +1432,10 @@ So that revoked, ambiguous, stale, or cross-tenant authority can never make **he
 **Then** duplicate handling is idempotent, ordering/gap/freshness is explicit, and unknown, stale, disabled, unavailable, non-member, insufficient-role, or revoked state blocks readiness
 **And** no downstream Provider, membership, posting, export, or deletion side effect is attempted.
 
-**Given** an Agent Party link
+**Given** the provisioned Agent Party identity
 **When** the Parties adapter resolves it
 **Then** exactly one stable tenant-scoped active Party reference with current posting eligibility is accepted and no Party PII is persisted
-**And** missing, disabled, ambiguous, unavailable, unauthorized, or multiple identity state blocks setup with a typed safe reason.
+**And** identity-by-id is mandatory under both `EXT-PARTIES-1` branches, AI Party type is additionally required only under selected Branch A, and missing, disabled, ambiguous, unavailable, unauthorized, wrong-branch, or multiple identity state blocks setup with a typed safe reason.
 
 **Given** predefined Party, tenant-role, or Conversation Facilitator approver sources
 **When** an Approver Policy basis is resolved
@@ -1442,10 +1452,20 @@ So that revoked, ambiguous, stale, or cross-tenant authority can never make **he
 **Then** it selects exactly one AD-30 principal kind from `User`, `Administrator`, `Platform`, or `Workflow` according to the operation family, resolves a user `PartyId` from the authenticated subject plus fresh Parties/Tenants evidence, strips all client-supplied reserved extension keys, and issues only allowlisted scope-bound extensions with an HMAC tag
 **And** the command pipeline verifies the tag before aggregate dispatch and rejects an untagged, forged, wrong-family, wrong-principal-kind, stale-role, or wrong-scope context. This closes DW-2.
 
+**Given** cryptographic/time verification succeeds for a trusted envelope
+**When** replay admission runs before target-command construction
+**Then** only the platform-composed non-public `TrustedEnvelopeVerifier` capability can conditionally create/read `TrustedEnvelopeReplay` in reserved tenant `system` keyed by (`Issuer`, `DeliveryNonce`), binding the authenticated target tenant and exact canonical/tag digest; exact lost-ack replay proceeds only to AD-29 idempotency, while changed-field or cross-tenant nonce reuse rejects and audits
+**And** later equality compares only authenticated envelope fields and reuses the stored first-seen/retention times rather than recomputing verifier-local time; the registrar credential can append only the exact replay event/stream, carries no recursive Agents envelope or principal, fails closed when unavailable, and is inaccessible to API, human, Workflow, target-handler, or general-dispatcher paths.
+
 **Given** an authorization or trusted-context denial
 **When** the pipeline rejects the operation
-**Then** a content-free record is appended to `SecurityEventLog(TenantId, UTC day)` with safe principal, family, scope, reason, and correlation evidence
-**And** no prompt, context, generated content, secret, Party PII, or target-tenant existence signal is recorded.
+**Then** the non-public security observation recorder computes `SecurityObservationId`, routes a User/Administrator/authenticated API subject to the actor tenant, Workflow to the authenticated target tenant, and Platform or no trusted actor to reserved tenant `system`; a cross-tenant request never writes the claimed target tenant's stream
+**And** it durably accepts the content-free safe envelope into the replicated `security-audit-spool` before the denial is reported as processed, later appends exactly once to `SecurityEventLog(RoutingTenantId, UTC day)`, and records the exact EventStore acknowledgement before removing the spool item.
+
+**Given** EventStore, replay admission, or security-log append is unavailable during a denial
+**When** the denial and recorder recover
+**Then** no target command is constructed, the stable observation stays pending in the spool, and the least-privilege recovery worker retries the same identity without any Agents principal or recursive envelope
+**And** if the spool itself is unavailable, the pipeline fails closed before target-command construction and readiness/health remains blocked; no prompt, context, generated content, secret, Party PII, claimed target-tenant existence signal, or duplicate security record is emitted.
 
 **Given** a caller from tenant B targets tenant A Agent, Party, policy, status, or audit data
 **When** each focused public and application path is exercised
@@ -1456,14 +1476,14 @@ So that revoked, ambiguous, stale, or cross-tenant authority can never make **he
 
 | Field | Story 5.4 evidence |
 | --- | --- |
-| Requirements | FR2, FR7, FR19-FR21, FR23-FR25, FR33; OQ-25; NFR1, NFR2; UX-DR5, UX-DR20, UX-DR25, UX-DR30; AD-4, AD-7, AD-8, AD-12, AD-17, AD-30; EXT-CONV-AI-1 |
-| OwnedClauses | FR2.exactly-one-party; FR7.current-approver-basis; FR7.caller-source-deprecate-and-reject; FR19.cross-tenant-denial; FR20.policy-authorization; FR21.stale-ambiguous-unavailable-block; NFR1.pre-side-effect-authorization; NFR2.no-cross-tenant-disclosure; UX-DR5.blocked-policy-source; AD-7.party-reference-only; AD-8.approver-resolution; AD-12.current-fail-closed-gates; AD-30.principal-kind-and-ingress-HMAC; AD-2.SecurityEventLog; DW-2 |
-| Dependencies | Stories 5.1 and 5.2; existing Tenants and Parties read contracts; EXT-CONV-AI-1 Available |
+| Requirements | FR2, FR7, FR19-FR21, FR23-FR25, FR33; OQ-25; NFR1, NFR2, NFR6, NFR11; UX-DR5, UX-DR20, UX-DR25, UX-DR30; AD-2-AD-4, AD-7, AD-8, AD-12, AD-17, AD-29, AD-30; EXT-CONV-AI-1, EXT-HOST-1, EXT-PARTIES-1, EXT-SECRETS-1 |
+| OwnedClauses | FR2.exactly-one-party; FR7.current-approver-basis; FR7.caller-source-deprecate-and-reject; FR19.cross-tenant-denial; FR20.policy-authorization; FR21.stale-ambiguous-unavailable-block; NFR1.pre-side-effect-authorization; NFR2.no-cross-tenant-disclosure; NFR11.replay-first-seen-recovery; UX-DR5.blocked-policy-source; AD-7.party-reference-only; AD-8.approver-resolution; AD-12.current-fail-closed-gates; AD-30.principal-kind-ingress-HMAC-and-Story5.4-owned-replay-and-security-recorder-pre-command-capabilities; AD-2.SecurityEventLog-and-TrustedEnvelopeReplay; DW-2 |
+| Dependencies | Stories 5.1 and 5.2; existing Tenants and Parties read contracts; EXT-CONV-AI-1, EXT-HOST-1, and EXT-SECRETS-1 Available; `EXT-PARTIES-1` selected branch for launch evidence, with Branch-B-compatible development allowed while Uncommitted |
 | EvidenceLevel | Levels 2 and 4: projection/unit behavior and live dependency-backed authorization/identity reads |
-| TestOrArtifact | TrustedPrincipalIngressTests; ReservedExtensionHmacVerificationTests; SecurityEventLogAggregateTests; TenantAccessProjectionTests; PartyReadinessIntegrationTests; ApproverPolicyResolutionIntegrationTests; revocation evidence manifest |
+| TestOrArtifact | TrustedPrincipalIngressTests; ReservedExtensionHmacVerificationTests; TrustedEnvelopeReplayAggregateTests; ReplayRegistrarLeastPrivilegeIntegrationTests; SecurityEventLogAggregateTests; SecurityObservationRoutingTests; SecurityAuditSpoolRecoveryIntegrationTests; TenantAccessProjectionTests; PartyReadinessIntegrationTests; ApproverPolicyResolutionIntegrationTests; revocation/replay/security-spool evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-5.4.ps1 |
-| NegativeEvidence | TrustedPrincipalIngressTests.ClientReservedKeysAreStripped; ReservedExtensionHmacVerificationTests.ForgedUntaggedWrongFamilyAndWrongScopeAreDenied; TenantPartyApproverIsolationTests.CrossTenantIdentifiersAreDeniedBeforeSideEffects; TenantAccessRevocationTests.RevocationImmediatelyBlocksReadiness; gap/stale/ambiguous/PII poison cases |
-| Result | Blocked — backlog; requires Stories 5.1 and 5.2 and EXT-CONV-AI-1 is currently Uncommitted |
+| NegativeEvidence | TrustedPrincipalIngressTests.ClientReservedKeysAreStripped; ReservedExtensionHmacVerificationTests.ForgedUntaggedWrongFamilyAndWrongScopeAreDenied; ReplayRegistrarCannotMutateOtherStreamsOrBeCalledByPublicHumanWorkflowOrHandlerTests; CrossTenantChangedFieldNonceReuseTests; ReplayExactDuplicateReusesStoredFirstSeenAndRetentionTests; ReplayLedgerUnavailableFailsTargetDispatchTests; CrossTenantDenialNeverWritesClaimedTargetSecurityStreamTests; SecurityRecorderCannotMutateOtherStreamsOrDispatchCommandsTests; SecuritySpoolUnavailableFailsBeforeTargetCommandTests; TenantPartyApproverIsolationTests.CrossTenantIdentifiersAreDeniedBeforeSideEffects; TenantAccessRevocationTests.RevocationImmediatelyBlocksReadiness; gap/stale/ambiguous/PII poison cases |
+| Result | Blocked — backlog; requires Stories 5.1 and 5.2, and EXT-CONV-AI-1, EXT-HOST-1, EXT-PARTIES-1, plus EXT-SECRETS-1 are currently Uncommitted |
 
 ### Story 5.5: Publish Authoritative Readiness And Provider-State Contracts
 
@@ -1476,7 +1496,7 @@ So that callability, Provider degradation, evidence freshness, and blockers cann
 **Dependencies:**
 
 - **Prior stories:** 5.2, 5.3, and 5.4.
-- **External:** EXT-PROVIDER-1 must be at least Committed.
+- **External:** EXT-PROVIDER-1 must be at least Committed. `EXT-SECRETS-1` must be `Available` before publishing or projecting any runtime architecture decision because it supplies only the independent decision authority's verification anchors and trust profile; approval signing keys remain outside Agents and outside the recorder path. `EXT-PARTIES-1` is required if the Product-selected recorder authority remains a Party-bearing tenant Release Operator; `OD-RELEASE-RECORDER-SCOPE-1` is Open and no recorder path is currently authorized.
 - **Forward dependencies:** None; later stories add evidence records but do not define alternative readiness semantics.
 
 **Acceptance Criteria:**
@@ -1492,9 +1512,44 @@ So that callability, Provider degradation, evidence freshness, and blockers cann
 **And** missing, stale, unconfigured, unpriced, invalid-limit, unavailable, failed, regressed, unknown, or indeterminate state is Blocked.
 
 **Given** an operation-family readiness request
-**When** API, BFF, UI, workflow, or readiness projection evaluates OperationGateMatrixVersion 2
+**When** API, BFF, UI, workflow, or readiness projection evaluates OperationGateMatrixVersion 7
 **Then** all use the same authoritative GateIds, one consistent registry checkpoint, matrix version, applicable records, and safe blockers
 **And** a missing family, old or unknown matrix version, invalid `ScopeKind`, unauthorized producer, missing record, non-inventory gate, or checkpoint change blocks or retries without local fallback.
+
+**Given** an Architecture Spine `OD-*` decision or binding deferred PRD decision is proposed, approved, superseded, or evaluated for readiness
+**When** its authorized publication command executes
+**Then** reserved-system `ArchitectureDecisionRecord(DecisionId)` appends an immutable pending contract or effective decision version with its predecessor/genesis governance reference, allowed outcomes, approver roles and quorum, `AffectedEvaluations`, effective instant, approver actor/role evidence, and exact independently signed decision-authority manifest digest/version verified through `EXT-SECRETS-1`
+**And** only the Release Operator may record the exact package, the recorder may never approve or mint authority evidence, and unauthorized/unsigned/wrong-role/mismatched-manifest publication fails before append.
+
+**Given** the fixed reserved-system `ArchitectureDecisionCatalog` stream is absent, invalid, or has a pending successor
+**When** a decision-dependent operation or `RQ-1` is evaluated
+**Then** absence/invalid effective authorization emits the existing `OpenDecision` blocker with safe detail `CatalogAbsentOrInvalid`; otherwise the effective/pending catalog union enumerates stable literal DecisionIds, minimum contract versions, and baseline affected evaluations and emits `OpenDecision` for every listed missing/mismatched record
+**And** removal/narrowing requires explicit predecessor authorization and no runtime planning-document parse.
+
+**Given** an independently authorized pending catalog and every required decision record at or above its exact minimum contract
+**When** `ArchitectureDecision:ActivateCatalog` executes at the expected catalog revision
+**Then** it records one immutable complete manifest of DecisionIds, record revisions, contract versions, and digests and appends `CatalogActivated` as the sole transition to effective
+**And** an incomplete, extra, conflicting, unauthorized, wrong-minimum, or changed manifest fails without activation; exact replay or lost acknowledgement resolves from the catalog stream, while a concurrent changed activation conflicts.
+
+**Given** a pending successor would narrow allowed outcomes, approver roles, quorum, or affected evaluations
+**When** decision readiness or activation is evaluated
+**Then** the still-effective predecessor contract governs authorization and explicitly approves the narrowing; pending state never supersedes effective state by itself
+**And** the launch-readiness projection evaluates the union of effective and pending affected evaluations until independently authorized approval and activation, so a decision version cannot weaken its own gate.
+
+**Given** deferred PRD rows OQ-18, OQ-23, and OQ-31 remain unresolved
+**When** runtime eligibility is evaluated
+**Then** `OD-PRD-OQ18-HISTORICAL-SAFETY-1` and `OD-PRD-OQ31-INSTRUCTION-PROTECTION-1` block `RQ-1`, while `OD-PRD-OQ23-AUTOMATIC-RETRACTION-1` blocks only `AutomaticModeEnablementEligibility`
+**And** no planning-document parse, absent record, or story-local default can select an outcome.
+
+**Given** `OD-RELEASE-RECORDER-SCOPE-1` remains Open
+**When** catalog publication/activation, contract publication, or approval recording is attempted
+**Then** every tenant Release Operator and every Platform principal is denied because Product has not selected the authoritative tenant/source assignment for this Platform-scoped operation
+**And** no actor is inferred; these four normal operations remain blocked after Product decides until the exact choice is effective in runtime state.
+
+**Given** Product + Release PM + Governance have independently signed an exact resolution of `OD-RELEASE-RECORDER-SCOPE-1`
+**When** `ArchitectureDecision:BootstrapRecorderScope` is submitted by a Release Operator freshly proven under that exact proposed source
+**Then** the target is only the fixed reserved-system recorder-scope decision stream and one expected-revision append records the externally decided effective contract/outcome with source/version, recorder actor, contract digest, exactly one initial catalog version/digest commitment, nonempty root authorization/approvals, expiry/revocation evidence, and recorder/approver/custodian separation
+**And** the operation cannot choose the source, publish or activate a catalog, or touch another decision; exact replay/lost acknowledgement reads that stream, changed evidence conflicts, the first `PublishCatalog` must match and consume that exact initial version/digest, and only later successors use ordinary effective-predecessor authority.
 
 **Given** public Agents routes or legacy Agent-owned launch-readiness state
 **When** the versioned public contract and readiness migration are applied
@@ -1504,7 +1559,7 @@ So that callability, Provider degradation, evidence freshness, and blockers cann
 **Given** tenant Provider readiness is evaluated
 **When** the current catalog and enablement projections are read
 **Then** system-scoped `ProviderCatalog` state is joined with that tenant's `TenantProviderEnablement`
-**And** platform and tenant blockers are evaluated at their declared matrix-v2 `ScopeKind` without leaking another tenant's enablement.
+**And** platform and tenant blockers are evaluated at their declared matrix-v7 `ScopeKind` without leaking another tenant's enablement.
 
 **Given** a tenant-scoped readiness or Provider-state query
 **When** an unauthorized or cross-tenant caller requests it
@@ -1515,14 +1570,14 @@ So that callability, Provider degradation, evidence freshness, and blockers cann
 
 | Field | Story 5.5 evidence |
 | --- | --- |
-| Requirements | FR4, FR5, FR19-FR21, FR23, FR25, FR28; NFR1, NFR2, NFR4, NFR6, NFR12; UX-DR2, UX-DR20, UX-DR21, UX-DR25, UX-DR26, UX-DR45; AD-2, AD-10, AD-12, AD-15, AD-17, AD-24, AD-29, AD-31 |
-| OwnedClauses | FR25.authoritative-callability-status; FR28.machine-readable-gates; NFR4.safe-actionable-blockers; NFR12.profile-visible-in-registry; UX-DR20.current-callability-only; UX-DR21.valid-provider-triples; UX-DR45.pass-block-insufficient-stale; AD-2.LaunchReadinessGate; AD-10.provider-readiness-contract; AD-17.registry-revision-supersession-and-matrix-v2; AD-29.observation-identity; AD-31.api-v1-route |
-| Dependencies | Stories 5.2-5.4; EXT-PROVIDER-1 at Committed or Available |
+| Requirements | FR4, FR5, FR19-FR21, FR23, FR25, FR28, FR33; OQ-33; NFR1, NFR2, NFR4, NFR6, NFR12; UX-DR2, UX-DR20, UX-DR21, UX-DR25, UX-DR26, UX-DR45; AD-2, AD-10, AD-12, AD-15, AD-17, AD-24, AD-29, AD-31; EXT-PROVIDER-1; EXT-SECRETS-1; conditional EXT-PARTIES-1; OD-RELEASE-RECORDER-SCOPE-1 |
+| OwnedClauses | FR25.authoritative-callability-status; FR28.machine-readable-gates-and-runtime-decision-inputs; NFR4.safe-actionable-blockers; NFR12.profile-visible-in-registry; UX-DR20.current-callability-only; UX-DR21.valid-provider-triples; UX-DR45.pass-block-insufficient-stale; AD-2.LaunchReadinessGate-and-ArchitectureDecisionRecord; AD-10.provider-readiness-contract; AD-17.registry-revision-decision-supersession-and-matrix-v7; AD-29.observation-and-decision-identity; AD-31.api-v1-route |
+| Dependencies | Stories 5.2-5.4; EXT-PROVIDER-1 at Committed or Available; EXT-SECRETS-1 Available for decision catalog/publication/projection. Bootstrap contract/test development requires no selected recorder outcome; executing the bootstrap requires an independently signed Product + Release PM + Governance resolution and its proposed authority source Available, and every normal recording/activation operation requires the resulting effective OD-RELEASE-RECORDER-SCOPE-1 version. |
 | EvidenceLevel | Levels 1, 2, and 4: public contract, deterministic aggregate/projection logic, and live EventStore/API/UI path |
-| TestOrArtifact | LaunchReadinessGateAggregateTests; LaunchReadinessMigrationTests; LaunchReadinessProjectionTests; ProviderReadinessContractTests; ApiV1AgentsRouteTests; OperationGateMatrixV2ParityTests; readiness UI contract snapshot |
+| TestOrArtifact | LaunchReadinessGateAggregateTests; ArchitectureDecisionCatalogAggregateTests; ArchitectureDecisionCatalogActivationTests; ArchitectureDecisionRecordAggregateTests; ArchitectureDecisionRecorderScopeBootstrapTests; ArchitectureDecisionAuthorityManifestIntegrationTests; ArchitectureDecisionPredecessorGovernanceTests; ArchitectureDecisionReadinessProjectionTests; RequiredDecisionMissingStreamTests; PrdDeferredDecisionMaterializationTests; LaunchReadinessMigrationTests; LaunchReadinessProjectionTests; ProviderReadinessContractTests; ApiV1AgentsRouteTests; OperationGateMatrixV7ParityTests; readiness UI contract snapshot |
 | VerificationCommand | pwsh ./eng/verify-story-5.5.ps1 |
-| NegativeEvidence | ReadinessIsolationTests.CrossTenantRegistryQueryDisclosesNothing; StaleNewestObservationDoesNotFallBackTests; UnknownProviderReasonAndOldMatrixVersionBlockTests; UnauthorizedProducerAndWrongScopeKindTests |
-| Result | Not run — backlog; EXT-PROVIDER-1 is currently Uncommitted |
+| NegativeEvidence | ReadinessIsolationTests.CrossTenantRegistryQueryDisclosesNothing; StaleNewestObservationDoesNotFallBackTests; UnknownProviderReasonAndOldMatrixVersionBlockTests; UnauthorizedProducerAndWrongScopeKindTests; MissingDecisionCatalogEmitsOpenDecisionCatalogDetailTests; MissingCatalogListedDecisionEmitsOpenDecisionTests; IncompleteWrongMinimumOrConflictingCatalogManifestCannotActivateTests; CatalogActivationLostAckAndConcurrentSuccessorTests; OpenRecorderScopeDeniesEveryNormalDecisionPrincipalTests; BootstrapCannotChooseSourcePublishCatalogOrTouchAnotherDecisionTests; BootstrapWrongProposedSourceSameActorChangedDigestAndLostAckTests; FirstCatalogMustEqualBootstrapCommittedVersionAndDigestTests; PlatformPrincipalCannotRecordArchitectureDecisionTests; ReleaseRecorderActorCannotAppearInAnyApprovalEvidenceTests; SuccessorCannotSelfReduceQuorumApproversOrAffectedEvaluationsTests; PendingDecisionCannotRemoveEffectiveBlockerTests; PendingSuccessorCannotBlockRecordedBranchRecoveryTests; UnsignedWrongRoleAndMismatchedDecisionManifestTests; PlanningDocumentCannotSupplyRuntimeDecisionTests |
+| Result | Blocked — backlog; EXT-PROVIDER-1 and EXT-SECRETS-1 are currently Uncommitted, OD-RELEASE-RECORDER-SCOPE-1 is Open, and the selected identity dependency is unresolved |
 
 ### Story 5.6: Compose Agents In The Platform-Owned Production-Like Host
 
@@ -1600,7 +1655,7 @@ So that **hexa** can be active only under explicit policy and can never be prese
 **Acceptance Criteria:**
 
 **Given** an authorized activation request
-**When** AgentActivation evaluates OperationGateMatrixVersion 2 at one RegistryRevision
+**When** AgentActivation evaluates OperationGateMatrixVersion 7 at one RegistryRevision
 **Then** it checks the complete applicable setup gate set using exact `ScopeKind` and producer-valid observations and records lifecycle decision, callability, matrix version, registry revision, current safe blockers, and authoritative pending/terminal projection references
 **And** lifecycle active and callability remain separate public/UI states.
 
@@ -1632,7 +1687,7 @@ So that **hexa** can be active only under explicit policy and can never be prese
 | OwnedClauses | FR1.activation-blockers; FR3.lifecycle-not-callability; FR21.current-dependency-fail-closed; FR25.callability-and-blockers; FR28.RQ-1-separation; NFR1.activation-authorization; NFR12.capacity-gate-visible; NFR13.accessible-localized-restrictive-activation; UX-DR20.authoritative-success-only; UX-DR50.pending-to-terminal-truth; AD-17.consistent-checkpoint; AD-17.release-gate-separation |
 | Dependencies | Stories 5.2-5.6; profile-specific external status from the authoritative register |
 | EvidenceLevel | Levels 2 and 4 for decision and live setup surfaces; deterministic fixtures never claim live attainment |
-| TestOrArtifact | AgentActivationDecisionTests; AgentActivationEventStoreIntegrationTests; OperationGateMatrixV2ActivationTests; CallabilityRevocationTests; AgentActivationUiTests; fixture-vs-live evidence classification manifest |
+| TestOrArtifact | AgentActivationDecisionTests; AgentActivationEventStoreIntegrationTests; OperationGateMatrixV7ActivationTests; CallabilityRevocationTests; AgentActivationUiTests; fixture-vs-live evidence classification manifest |
 | VerificationCommand | pwsh ./eng/verify-story-5.7.ps1 |
 | NegativeEvidence | AgentActivationIsolationTests.CrossTenantActivationAndInspectionAreDenied; MissingStaleInsufficientOldMatrixWrongScopeAndProducerCases; SyntheticFixtureCannotSetRq1ReadyTests |
 | Result | Not run — backlog; prior stories and external commitments are incomplete |
@@ -1648,7 +1703,7 @@ So that erasure is enforceable without breaking EventStore replay.
 **Dependencies:**
 
 - **Prior stories:** 5.1 and 5.6 for the package boundary, integration tier, and production-like host.
-- **External:** `EXT-PROTECTION-1` and `EXT-SECRETS-1` must both be `Available` with their exact compatibility commands passing before live content-bearing execution.
+- **External:** `EXT-PROTECTION-1` and `EXT-SECRETS-1` must both be `Available` with their exact compatibility commands passing before live content-bearing execution. `OD-PRD-OQ31-INSTRUCTION-PROTECTION-1` must be approved before Agent Instructions or their audit history are classified, sealed, disclosed, or erased by this story.
 - **Forward dependencies:** Content-bearing Stories 6.1–6.4, 7.1–7.4, 8.1–8.3, and 8.8 consume this foundation.
 
 **Acceptance Criteria:**
@@ -1657,6 +1712,11 @@ So that erasure is enforceable without breaking EventStore replay.
 **When** the orchestrator prepares an EventStore write
 **Then** only sensitive fields are sealed in `ProtectedContent` with a per-`AgentInteraction` DEK wrapped by the tenant KEK while all non-sensitive event fields remain plaintext
 **And** a different tenant's keys, envelope metadata, or digests cannot unprotect or correlate the content.
+
+**Given** `OD-PRD-OQ31-INSTRUCTION-PROTECTION-1` is open or its recorded version does not match the deployed protection contract
+**When** Agent Instructions or their configuration audit would cross a protection, authorization, disclosure, or erasure boundary
+**Then** the operation blocks without treating Instructions as either protected interaction content or exempt configuration content
+**And** no implementation default chooses whether they move under an Agent-level key.
 
 **Given** a sealed envelope
 **When** it crosses pub/sub, read models, adapters, caches, or Dapr Workflow orchestration
@@ -1678,18 +1738,23 @@ So that erasure is enforceable without breaking EventStore replay.
 **Then** protection, unprotection, sealed transport, hold pins, deletion, erased replay, restore, tenant isolation, and every workflow state shape are covered
 **And** poison plaintext is absent from EventStore-visible non-envelope fields, state store, broker, projections, responses, logs, traces, metrics, and browser evidence.
 
+**Given** a pre-cutover EventStore inventory may contain legacy content-bearing AgentInteraction or generation-failure events written before `ProtectedContent`
+**When** payload-protection readiness is evaluated
+**Then** no retroactive envelope or erasability is inferred: the finite checkpoint must prove zero such streams or prove every sensitive field already protected under the exact accepted engine/key contract; any legacy plaintext keeps `PayloadProtectionUnavailable`, call/directory/deletion readiness, and `RQ-1` blocked
+**And** `OD-LEGACY-PLAINTEXT-DISPOSITION-1` materializes the unresolved Product + Governance + Security + EventStore-maintainer choice; removing the blocker requires its approved outcome plus an architecture-amended authorize/effect/result/recovery procedure with EventStore/snapshot/cache/backup receipts and replay/no-content verification. Exact-empty and already-protected inventories remain evaluable; this architecture update does not invent migration, eradication, an immutable-history exception, or an unsupported-deployment outcome.
+
 **Evidence Manifest:**
 
 | Field | Story 5.8 evidence |
 | --- | --- |
-| Requirements | FR10, FR14, FR19-FR21, FR23, FR24, FR28, FR30, FR34; NFR1-NFR7, NFR11; AD-14, AD-17, AD-22, AD-27; EXT-PROTECTION-1; EXT-SECRETS-1 |
-| OwnedClauses | FR34.host-supplied-canary-attestation; FR34.PayloadProtectionUnavailable-runtime-blocker; AD-22.field-level-protected-content; AD-22.per-interaction-DEK-and-tenant-KEK; AD-22.typed-erased-replay; AD-27.workflow-reference-only-state; NFR2.tenant-protected-content-isolation; NFR3.replay-after-erasure; NFR6.no-secret-or-content-leak |
-| Dependencies | Stories 5.1 and 5.6; EXT-PROTECTION-1 and EXT-SECRETS-1 Available |
+| Requirements | FR10, FR14, FR19-FR21, FR23, FR24, FR28, FR30, FR34; OQ-31; NFR1-NFR7, NFR11; AD-14, AD-17, AD-22, AD-27; EXT-PROTECTION-1; EXT-SECRETS-1; OD-PRD-OQ31-INSTRUCTION-PROTECTION-1; conditional OD-LEGACY-PLAINTEXT-DISPOSITION-1 |
+| OwnedClauses | FR34.host-supplied-canary-attestation; FR34.PayloadProtectionUnavailable-runtime-blocker; AD-22.field-level-protected-content; AD-22.per-interaction-DEK-and-tenant-KEK; AD-22.typed-erased-replay; AD-22.legacy-plaintext-fail-closed-cutover; AD-27.workflow-reference-only-state; NFR2.tenant-protected-content-isolation; NFR3.replay-after-erasure; NFR6.no-secret-or-content-leak |
+| Dependencies | Stories 5.1 and 5.6; EXT-PROTECTION-1 and EXT-SECRETS-1 Available; approved OD-PRD-OQ31-INSTRUCTION-PROTECTION-1 version matches the deployed protection contract; when the deployment inventory contains legacy plaintext, OD-LEGACY-PLAINTEXT-DISPOSITION-1 remains an additional blocker until an outcome-specific architecture procedure and all-copy receipts exist |
 | EvidenceLevel | Levels 4 and 5: live EventStore protection plus production-like transport, restore, and workflow-state evidence |
-| TestOrArtifact | PayloadProtectionAvailabilityAttestationTests; PayloadProtectionLiveTests; ProtectedContentReplayTests; HoldPinProtectionTests; WorkflowContentSweepTests; protection evidence manifest |
+| TestOrArtifact | PayloadProtectionAvailabilityAttestationTests; PayloadProtectionLiveTests; ProtectedContentReplayTests; LegacyPlaintextInventoryAndCutoverBlockTests; HoldPinProtectionTests; WorkflowContentSweepTests; protection evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-5.8.ps1 |
-| NegativeEvidence | PayloadProtectionIsolationTests.CrossTenantKeysCannotUnprotectOrCorrelate; NoOpProtectionCannotSatisfyLiveEvidenceTests; PlaintextPoisonSweepTests; HeldDekCannotBeDestroyedTests |
-| Result | Blocked — backlog; EXT-PROTECTION-1 and EXT-SECRETS-1 are Uncommitted |
+| NegativeEvidence | PayloadProtectionIsolationTests.CrossTenantKeysCannotUnprotectOrCorrelate; OpenOrMismatchedInstructionProtectionDecisionTests; NoOpProtectionCannotSatisfyLiveEvidenceTests; PlaintextPoisonSweepTests; HeldDekCannotBeDestroyedTests |
+| Result | Blocked — backlog; EXT-PROTECTION-1 and EXT-SECRETS-1 are Uncommitted, OD-PRD-OQ31-INSTRUCTION-PROTECTION-1 is Open, and any nonempty legacy-plaintext deployment is additionally blocked by Open OD-LEGACY-PLAINTEXT-DISPOSITION-1 |
 
 ### Story 5.9: Reject Prohibited Cost-Control Postures At Readiness Recording
 
@@ -1816,15 +1881,29 @@ So that restart and replay preserve EventStore truth without duplicating executi
 **Dependencies:**
 
 - **Prior stories:** 5.5 through 5.8.
-- **External:** EXT-PROTECTION-1, EXT-CONV-AI-1, and EXT-TOPOLOGY-1 must be Available for live content-bearing, live Conversation-context, and production-like restart evidence; deterministic no-content component tests may run without executing an unavailable external seam.
+- **External:** EXT-HOST-1, EXT-PROTECTION-1, EXT-SECRETS-1, EXT-PARTIES-1, EXT-CONV-AI-1, and EXT-TOPOLOGY-1 must be Available for live Dapr composition, EventStore migration-write fencing and protected content, trusted capabilities/key alias custody, caller/Agent Party verification and membership, live Conversation context, and production-like restart evidence; deterministic no-content component tests may run without executing an unavailable external seam and cannot satisfy live evidence. `OD-DAPR-SECURITY-1` and `OD-INITIAL-OUTPUT-SAFETY-STATUS-1` must be approved at the exact runtime-bound decision versions before any live Dapr/Provider workload is enabled. A deployment inventory containing legacy plaintext is additionally blocked by `OD-LEGACY-PLAINTEXT-DISPOSITION-1` and the absence of an outcome-specific procedure.
 - **Forward dependencies:** None; deterministic context, safety, generation, and posting activities prove orchestration before their live adapters are introduced.
 
 **Acceptance Criteria:**
 
-**Given** an authorized automatic Agent Call accepted at an expected EventStore revision
-**When** the platform starts the deterministic interaction workflow
-**Then** Dapr Workflow is the sole durable execution owner, EventStore records the request/snapshot as business truth, and workflow identity is derived deterministically from AgentInteractionId
-**And** Microsoft Agent Framework workflows, Python DurableAgent, MCP, A2A, in-memory workers, and alternate durable owners are absent.
+**Given** an automatic Agent Call candidate has passed pre-creation authorization, readiness, Source Conversation access, and payload-protection gates at their exact revisions, with no membership read or mutation yet performed
+**When** the platform registers durable intake and starts the interaction-owned acceptance sequence
+**Then** `AgentCallAcceptance:RegisterInteractionPermit` conditionally appends one content-free permit plus a target-limited durable creation outbox on the source `ConversationAgentState`; this is the directory-registration cut, not `AgentCallAccepted`. The permit names the deterministic AgentInteractionId/logical command, request fingerprint, source revision, outbox id, protection-key alias, and monotonic permit high-water, while the outbox payload is only the sealed AD-22 `ProtectedContent` request under that interaction's DEK and never a plaintext/directory projection field
+**And** incomplete directory migration/write-fence readiness or a Closing/Effective Conversation-deletion barrier rejects before any interaction/workflow/provider content; otherwise the creation outbox idempotently creates exactly that `AgentInteraction`, whose first append stores the request/snapshot as business truth and atomically emits the directory acknowledgement plus the sole workflow-start outbox. Consuming that outbox reserves then same-owner commits `WorkflowStart`; if Closing wins, it atomically cancels the reservation, normal start is suppressed, and the interaction terminalizes safely, while a committed lease starts only the exact instance and reaches `Settled` at its first durable checkpoint
+**And** the one AD-13 sequence preserves Product-fixed FR-8: joint rate/open admission is step 5, a committed `ApproverResolution` lease encloses Confirmation-only Conversations/Parties Eligible Approver resolution at step 6, a committed Context lease is step 7, descriptor/Budget reservation is step 8, prompt/context safety is step 9, and a separately reserved/committed `ConversationMembership` roster read/idempotent join is step 10 immediately before `AgentCallAccepted`. A failure through step 9 proves no membership effect occurred; any pre-acceptance failure records its typed owner outcome and aborts/settles every preparation and committed lease without removing the directory permit
+**And** every effect lease follows `Reserved -> CommittedToEffect -> Settled` or `Reserved -> CancelledBeforeCommit` on the same `ConversationAgentState`; only the commit revision authorizes its exact recoverable target step, Closing races with commit at the same expected revision, and a stale worker cannot act after cancellation
+**And** Budget reservation and capacity acquire/queue begin only from their exact interaction-owned `BudgetReservationAuthorized` and `CapacityAdmissionAuthorized` revisions; their results/acknowledgements are distinct, and the deletion admission or migration-repair fence serializes every such phase start. After capacity admission is durably recorded, the generic Provider lease commits using owner-local evidence only, without reading the non-owner output-status decision. The next interaction step records exactly one branch: an effective exact authority appends `ProviderInvocationAuthorized` binding the lease commit plus exact decision revision, contract digest, selected status/reason/metric/open-lease mapping, catalog activation, and observation before Provider work; Open/missing/malformed/unavailable authority appends content-free `ProviderInvocationNotAuthorized` plus exact NotInvoked Budget and CancelNoInvocation capacity dispositions, whose releases/acknowledgements and negative target result settle the committed lease without Provider work. A later decision/catalog successor cannot relabel or strand either recorded branch. Provider error/timeout records content-free `GenerationFailed`; output-safety denial/unavailability uses only the authorized branch's phase-pinned mapping. Both branches have proposal/version/content/failure-record identity fields absent
+**And** if Closing wins after capacity queue/admission but before Provider authorization, exact allocator lookup plus proof of no authorization, begin, or active invocation permits only `PreProviderCapacityDispositionDecided(CancelNoInvocation)`, release of that existing identity, and acknowledgement; it never invents no-use or acquires/invokes. Only safety-allowed complete output requires a separate committed `ProposalMutation(RecordGeneratedVersion)` lease before persistence; if Closing wins, returned content is discarded while only the content-free Provider outcome, Budget/capacity settlement, and Provider-lease settlement are recorded. No current Product requirement authorizes retaining failed or incomplete output bytes in V1
+**And** exact permit/outbox/interaction/workflow-start/lease retry or lost acknowledgement reads the owner streams/instance, changed payload conflicts, no permit disappears because a projection lags, and Microsoft Agent Framework workflows, Python DurableAgent, MCP, A2A, in-memory workers, and alternate durable owners are absent.
+
+**Given** the current repository may contain legacy directly-created AgentInteraction or generation-failure streams
+**When** Story 6.1 enables the Conversation interaction directory
+**Then** a fresh Platform Operator starts one deterministic tenant-targeted `InteractionDirectoryMigration` Workflow; Begin retains `LR-TOPOLOGY`, `LR-EVENTSTORE`, `LR-TENANT-ACCESS`, and `LR-SECRETS`, explicitly omits only the circular `LR-AUDIT-PROTECTION-DELETION` record, and directly proves exact principal, protection/attestation, audit-spool, topology, tenant, EventStore, inventory, and expected-revision evidence
+**And** the Workflow quiesces call and legacy interaction writers, freezes the finite tenant checkpoint/count/hash/high-water inventory, installs the authoritative EventStore namespace migration-epoch guard, revokes the legacy direct-write credential/epoch, idempotently materializes every legacy stream as content-free `MigratedFrom(StreamId, Revision)` plus current owner/protection outcome, and requires two identical post-fence scans before `DirectoryReady`
+**And** every later create or content-bearing append requires the current epoch plus an exact directory permit or committed-effect capability, so stale, disconnected, queued, and restored writers are rejected at the EventStore boundary. A rejected attempt is containment evidence; any accepted post-fence write invalidates readiness and proves the write-fence gate cannot pass
+**And** repair first records only the old/successor epoch plan. Its committed authorization then lets `EXT-HOST-1` atomically install the directory-repair fence, revoke new permit, creation/workflow-start/User-action-intent outbox, lease-acquire/commit, and rate/open/Budget/capacity phase-authorization capability at EventStore, and return a directory/effect-authorization checkpoint; exact lookup resolves a lost acknowledgement. Only after recording that receipt may the Workflow freeze every pre-fence directory/effect high-water plus every active deletion admission ordinal, owner/ordinal cycle, continuous content-guard binding plus ordered invalidation-gap chain, legal-hold contender, barrier/containment observed-guard-revision authorization and stale result, destruction seal, and batch identity/capability-key/guard-issued state plus referenced protection-owner consumed-or-revoked outcome. A pre-fence winner is included; a stale/disconnected/restored post-fence append writes nothing
+**And** the old-epoch bridge is limited to that finite cohort while preserving all those guard facts. It delivers pending creation outboxes, starts only an already-committed start, consumes reserved starts/intents after cancellation, drives committed User actions and unleased phases only to their exact result/acknowledgement, and never cancels/rebinds committed work. It then compares every checkpoint/high-water, atomically installs a successor epoch preserving and acknowledging every deletion/hold guard, compare-token, and batch guard-issued and protection-owner outcome fact, and revokes the old epoch, repair fence, and bridge before full reconciliation and two successor scans may restore `DirectoryReady`
+**And** completion requires every legacy sensitive field already protected under the exact engine/key contract or a signed independently verified exact-empty checkpoint. Plaintext is a negative fixture that remains `PayloadProtectionUnavailable` under Open `OD-LEGACY-PLAINTEXT-DISPOSITION-1`; this story selects no migration, eradication, immutable-history exception, or unsupported-deployment outcome.
 
 **Given** deterministic activity outcomes for context, safety, generation, and posting
 **When** an activity succeeds, blocks, fails, times out, or is replayed
@@ -1850,14 +1929,14 @@ So that restart and replay preserve EventStore truth without duplicating executi
 
 | Field | Story 6.1 evidence |
 | --- | --- |
-| Requirements | FR8, FR10, FR19-FR21, FR24, FR25, FR28, FR34; NFR1-NFR5, NFR11; UX-DR27, UX-DR48, UX-DR50; AD-3, AD-4, AD-13, AD-17, AD-18, AD-22, AD-23, AD-27; EXT-PROTECTION-1; EXT-CONV-AI-1 |
-| OwnedClauses | FR8.one-explicit-accepted-interaction; FR10.safe-workflow-failure; FR24.workflow-linked-audit; NFR3.no-duplicate-business-state; NFR11.RPO-zero-and-restart; UX-DR27.authoritative-interaction-states; UX-DR48.failure-is-not-proposal; AD-18.single-durable-owner; AD-23.frozen-cohort-monotonic-recovery |
-| Dependencies | Stories 5.5-5.8; EXT-PROTECTION-1, EXT-CONV-AI-1, and EXT-TOPOLOGY-1 Available for live content-bearing and Conversation-context Level 4/5 evidence |
+| Requirements | FR8, FR10, FR19-FR21, FR24, FR25, FR28, FR30, FR34; NFR1-NFR5, NFR11; UX-DR27, UX-DR48, UX-DR50; AD-2-AD-4, AD-7, AD-12, AD-13, AD-17, AD-18, AD-22, AD-23, AD-27, AD-29, AD-30; EXT-HOST-1; EXT-PROTECTION-1; EXT-SECRETS-1; EXT-PARTIES-1; EXT-CONV-AI-1; EXT-TOPOLOGY-1; OD-DAPR-SECURITY-1; OD-INITIAL-OUTPUT-SAFETY-STATUS-1; conditional OD-LEGACY-PLAINTEXT-DISPOSITION-1 |
+| OwnedClauses | FR8.fixed-step-5-through-10-order-and-one-explicit-accepted-interaction; FR10.safe-workflow-failure; FR24.workflow-linked-audit; FR30.complete-Conversation-interaction-directory; NFR3.no-duplicate-business-state; NFR11.RPO-zero-and-restart; UX-DR27.authoritative-interaction-states; UX-DR48.failure-is-not-proposal; AD-2.ConversationAgentState-interaction-directory-and-effect-cutover; AD-2.InteractionDirectoryMigration-write-and-directory-repair-fences; AD-7.interaction-permit-create/start-and-step-10-membership-lease; AD-12.same-owner-effect-commit; AD-13.output-safety-phase-pin-and-pre-Provider-capacity-disposition; AD-18.single-durable-owner; AD-23.frozen-cohort-monotonic-recovery; AD-29.deterministic-interaction-id; AD-30.migration-principal-and-effect-capabilities |
+| Dependencies | Stories 5.5-5.8; EXT-HOST-1, EXT-PROTECTION-1, EXT-SECRETS-1, EXT-PARTIES-1, EXT-CONV-AI-1, and EXT-TOPOLOGY-1 Available for live Level 4/5 evidence; approved OD-DAPR-SECURITY-1 and OD-INITIAL-OUTPUT-SAFETY-STATUS-1 versions exactly match the deployed runtime/status contract; when the frozen deployment inventory contains legacy plaintext, OD-LEGACY-PLAINTEXT-DISPOSITION-1 plus an outcome-specific architecture procedure remain mandatory blockers |
 | EvidenceLevel | Levels 2, 4, and 5: replay-safe logic, live Dapr Workflow component, production-like failure injection |
-| TestOrArtifact | AutomaticInteractionWorkflowTests; AutomaticInteractionRestartIntegrationTests; RecoveryCohortManifest; LR-RECOVERY partial observation for workflow-owned identities |
+| TestOrArtifact | ConversationInteractionDirectoryAggregateTests; InteractionDirectoryMigrationBootstrapPrincipalAndWriteFenceTests; InteractionDirectoryMigrationCutoverTests; InteractionDirectoryRepairFenceCheckpointRaceTests; InteractionDirectoryMigrationRepairEpochBridgeTests; InteractionDirectoryMigrationActiveDeletionScopeFencePreservationTests; InteractionPermitCreationOutboxTests; ConversationEffectLeaseCommitRaceTests; WorkflowStartOutboxTests; Fr8OrderedAcceptanceApproverResolutionAndMembershipLeaseTests; UserProposalActionIntentOutboxRecoveryTests; ProviderOutputSafetyDecisionPhasePinTests; PreProviderCapacityDeletionDispositionTests; GeneratedProposalMutationLeaseTests; GenerationFailureProviderLeaseTests; AutomaticInteractionWorkflowTests; AutomaticInteractionRestartIntegrationTests; RecoveryCohortManifest; LR-RECOVERY partial observation for workflow-owned identities |
 | VerificationCommand | pwsh ./eng/verify-story-6.1.ps1 |
-| NegativeEvidence | AutomaticInteractionIsolationTests.CrossTenantCallStartsNoWorkflow; AlternateDurableOwnerGuardTests; DuplicateCommandTimerAndVersionRecoveryTests |
-| Result | Not run — backlog; EXT-TOPOLOGY-1 is currently Uncommitted |
+| NegativeEvidence | AutomaticInteractionIsolationTests.CrossTenantCallStartsNoWorkflow; ConversationDeletionBarrierRejectsBeforePermitInteractionWorkflowAndProviderTests; PermitAndCreationOutboxLostAckTests; WorkflowStartImmediatelyBeforeAndAfterLeaseCommitAndBarrierClosingTests; ApproverResolutionImmediatelyBeforeAndAfterLeaseCommitAndBarrierClosingTests; UserActionIntentImmediatelyBeforeAndAfterCommitClosingAndApiCrashTests; StaleReservedWorkerCannotActAfterClosingTests; Fr8RateApproverContextBudgetAndSafetyFailuresCreateNoMembershipEffectTests; MembershipCommitImmediatelyBeforeAndAfterClosingEffectiveTests; ProviderCannotStartWithoutPhasePinnedOutputSafetyDecisionTests; OutputSafetySuccessorCannotRelabelAuthorizedAttemptTests; PreProviderCapacityCannotRemainQueuedOrAdmittedAfterClosingTests; GeneratedOutputDiscardedWhenProposalMutationCommitLosesTests; GenerationFailureCannotInventProposalVersionOrRetainOutputTests; LegacyMigrationWrongPrincipalWrongTenantWrongStreamAndCircularGateTests; LegacyDirectoryMigrationStaleDisconnectedRestoredWriterAndProvedEmptyTests; MigrationRepairFenceMustPrecedeCohortFreezeTests; MigrationRepairOldEpochOutboxUserIntentCommittedLeaseReservedLeaseActiveDeletionFenceAndRestoreTests; LegacyPlaintextCannotReachDirectoryReadyTests; CrossTenantProtectionKeyAliasSubstitutionTests; ProjectionLagCannotErasePermitTests; AlternateDurableOwnerGuardTests; DuplicateCommandTimerAndVersionRecoveryTests; OpenOrMismatchedDaprSecurityDecisionBlocksWorkloadTests |
+| Result | Blocked — backlog; EXT-HOST-1, EXT-PROTECTION-1, EXT-SECRETS-1, EXT-PARTIES-1, EXT-CONV-AI-1, and EXT-TOPOLOGY-1 are currently Uncommitted; OD-DAPR-SECURITY-1 and OD-INITIAL-OUTPUT-SAFETY-STATUS-1 are Open; any nonempty legacy-plaintext deployment is additionally blocked by OD-LEGACY-PLAINTEXT-DISPOSITION-1 and the absent outcome-specific procedure |
 
 ### Story 6.2: Use The Complete Authorized Conversation Or Block
 
@@ -1914,12 +1993,12 @@ As a Security Operator,
 I want fresh versioned safety decisions before Provider and Conversation side effects,
 So that unsafe or unauthorized content cannot enter generation, proposal, or posting paths.
 
-**Primary Demonstrable Outcome:** Versioned safety fixtures prove prompt/context denial prevents Provider work and output denial creates only a non-approvable failure record with no proposal or message.
+**Primary Demonstrable Outcome:** Versioned safety fixtures prove prompt/context denial prevents Provider work and output denial creates only the approved `OD-INITIAL-OUTPUT-SAFETY-STATUS-1` content-free status/Audit Evidence with no proposal, message, retained bytes, or failure-content record.
 
 **Dependencies:**
 
 - **Prior stories:** 5.8, 6.1, and 6.2.
-- **External:** EXT-PROTECTION-1 and EXT-SAFETY-1 must be Available before protected content or live safety execution.
+- **External:** EXT-PROTECTION-1, EXT-SAFETY-1, EXT-SECRETS-1, and EXT-CONV-AI-1 must be Available before protected content, live safety execution, HMAC digest-key rotation/rescan evidence, or complete Conversation-index initialization. `OD-INITIAL-OUTPUT-SAFETY-STATUS-1` must be approved before the story or live Provider path is authorized; no story-local status mapping is permitted.
 - **Forward dependencies:** None; deterministic generated-output fixtures exercise the second stage without requiring the later Provider story.
 
 **Acceptance Criteria:**
@@ -1932,7 +2011,7 @@ So that unsafe or unauthorized content cannot enter generation, proposal, or pos
 **Given** deterministic complete generated output
 **When** the live output-safety adapter evaluates it
 **Then** a fresh versioned Allow is required before any proposal or Conversation side effect
-**And** a Block creates no Proposed Agent Reply, proposal version, queue entry, notification, editor, approval action, or Conversation Message.
+**And** the generic Provider lease commits before the output-status decision read. Open/missing/malformed/unavailable authority records `ProviderInvocationNotAuthorized`, settles existing pre-invocation Budget/capacity obligations and the lease, and performs no Provider work. Otherwise `ProviderInvocationAuthorized` phase-pins the exact effective `OD-INITIAL-OUTPUT-SAFETY-STATUS-1` decision revision, contract digest, selected status/reason/metric/open-lease mapping, catalog activation, and observation. A Block or unavailable output result creates no Proposed Agent Reply, proposal version, queue entry, notification, editor, approval action, Conversation Message, retained failed bytes, or live `GenerationFailureRecord`; it records only that pinned content-free `GenerationFailed` or `SafetyFailed` status/reason and Audit Evidence under the committed Provider lease, and no later catalog/decision successor relabels either recorded branch.
 
 **Given** restricted hate, harassment, sexual, violent, illegal-activity, or sensitive-personal content
 **When** policy evaluates the tenant use case and response mode
@@ -1944,18 +2023,38 @@ So that unsafe or unauthorized content cannot enter generation, proposal, or pos
 **Then** the retry uses a policy at least as restrictive as its initial attempt, an Approver cannot override a Block, and a failed attempt is never resurrected
 **And** every always-blocked and restricted category is covered without storing prohibited raw content in diagnostics or evidence.
 
+**Given** a new Content Safety Policy version or the `EXT-SECRETS-1` per-tenant digest-key version is published
+**When** safety-verdict activation begins
+**Then** EventStore appends `SafetyVerdictEpoch(PendingActivation)` with the new policy/key versions and a frozen global EventStore position; the active Agent cohort is enumerated from provision events at or before that position in deterministic (`TenantId`, `AgentId`) order with count, hash, and high-water evidence
+**And** each tenant freezes its existing-Conversation cohort from content-free `safety-verdict-directory` keys at or before the same position, after that projection catches up, with its own count, hash, and high-water evidence; a per-tenant fenced coordinator lease processes deterministic bounded batches using positive versioned concurrency, batch-size, lease, and wait limits.
+
+**Given** a tenant is provisioned or a Conversation is first encountered during a pending or active epoch
+**When** `ProvisionHexa` or Agent Call evaluates current safety state
+**Then** `ProvisionHexa` records the exact Content Safety Policy revision and re-reads or initializes the newest pending/active epoch before callability, so a concurrent tenant is either in the frozen cohort or owns a newer initialization
+**And** an unindexed Conversation uses conditional create followed by a complete `EXT-CONV-AI-1` read and scan before the call; no absent directory key or checkpoint race is treated as already scanned.
+
+**Given** an epoch is pending, the coordinator crashes, loses an acknowledgement, or its lease expires
+**When** recovery resumes
+**Then** a successor fence replays only unacknowledged deterministic batch identities, conflicting results fail closed, and the epoch becomes Active only after the finite active-tenant manifest and each tenant's finite indexed-Conversation manifest are durably acknowledged
+**And** a tenant provisioned after the global checkpoint completes its own version-pinned handshake before local callability, while a Conversation absent from its tenant manifest initializes on demand before that Conversation's first call; neither post-checkpoint path extends or reopens the finite activation barrier, and status/projection evidence cannot infer completion from missing manifest work.
+
+**Given** an Agent Call arrives while its Conversation lacks a current Active-epoch verdict
+**When** the configured monotonic wait bound is exercised
+**Then** the call never uses the old epoch, waits only within the frozen positive profile, and then fails closed as `ContextReadUnavailable(RescanPending)` if the exact current verdict is still unavailable
+**And** no Provider, proposal, posting, or weaker-policy side effect occurs before the current verdict exists.
+
 **Evidence Manifest:**
 
 | Field | Story 6.3 evidence |
 | --- | --- |
-| Requirements | FR10, FR12, FR19-FR21, FR24-FR28; NFR1, NFR2, NFR4, NFR7; UX-DR27, UX-DR36, UX-DR43, UX-DR48, UX-DR50; AD-12, AD-14, AD-17, AD-20 |
-| OwnedClauses | FR26.versioned-active-safety-policy; FR27.prompt-context-before-provider; FR27.output-before-side-effect; FR27.no-approver-override; NFR7.active-safety-before-side-effects; UX-DR43.no-weaker-retry; UX-DR48.separate-failure-record; AD-20.always-blocked-restricted-two-stage |
-| Dependencies | Stories 5.8 and 6.1-6.2; EXT-PROTECTION-1 and EXT-SAFETY-1 Available |
+| Requirements | FR10, FR12, FR19-FR21, FR24-FR28; NFR1, NFR2, NFR4, NFR7, NFR11; UX-DR27, UX-DR36, UX-DR43, UX-DR48, UX-DR50; AD-2, AD-12, AD-14, AD-17, AD-20, AD-23, AD-29; EXT-SECRETS-1; EXT-CONV-AI-1; OD-INITIAL-OUTPUT-SAFETY-STATUS-1 |
+| OwnedClauses | FR26.versioned-active-safety-policy; FR27.prompt-context-before-provider; FR27.output-before-side-effect; FR27.no-approver-override; FR27.policy-and-digest-key-rotation-rescan; NFR7.active-safety-before-side-effects; NFR11.rescan-fenced-recovery; UX-DR43.no-weaker-retry; UX-DR48.no-proposal-and-content-free-failure-status; AD-2.SafetyVerdictEpoch-and-SafetyVerdictIndex; AD-20.always-blocked-restricted-two-stage-and-rescan-activation-barrier |
+| Dependencies | Stories 5.8 and 6.1-6.2; EXT-PROTECTION-1, EXT-SAFETY-1, EXT-SECRETS-1, and EXT-CONV-AI-1 Available; OD-INITIAL-OUTPUT-SAFETY-STATUS-1 approved at the runtime-bound version |
 | EvidenceLevel | Levels 2 and 4: policy matrix behavior and live safety-adapter compatibility |
-| TestOrArtifact | TwoStageSafetyPolicyTests; ContentSafetyAdapterIntegrationTests; NoWeakerRetryTests; GenerationFailureRecordTests; content-safe evidence manifest |
+| TestOrArtifact | TwoStageSafetyPolicyTests; ContentSafetyAdapterIntegrationTests; SafetyVerdictEpochAggregateTests; SafetyVerdictIndexAggregateTests; SafetyVerdictDirectoryProjectionTests; ActiveTenantCohortManifestTests; ProvisionDuringSafetyEpochTests; UnindexedConversationSafetyInitializationTests; SafetyVerdictRescanRecoveryLiveTests; DigestKeyRotationRescanTests; NoWeakerRetryTests; ProviderAuthorizationOutputSafetyDecisionPhasePinTests; OutputSafetyDecisionSelectedStatusAndNoRetainedContentTests; content-safe rescan evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-6.3.ps1 |
-| NegativeEvidence | SafetyTenantIsolationTests.CrossTenantAndUnauthorizedDataAreAlwaysBlocked; ApproverOverrideDoesNotExistTests; AlwaysBlockedRestrictedCategoryMatrixTests; raw-content poison sweep |
-| Result | Not run — backlog; EXT-SAFETY-1 is currently Uncommitted |
+| NegativeEvidence | SafetyTenantIsolationTests.CrossTenantAndUnauthorizedDataAreAlwaysBlocked; OldEpochVerdictCannotAuthorizeCallTests; MissingLostOrConflictingRescanAckTests; ProjectionNotCaughtUpCannotActivateEpochTests; ConcurrentTenantCannotEscapeSafetyInitializationTests; AbsentDirectoryKeyCannotAuthorizeUnscannedConversationTests; ExpiredLeaseCannotActivateEpochTests; UnboundedOrInvalidRescanProfileTests; OpenOrMismatchedOutputSafetyDecisionBlocksBeforeProviderTests; DecisionSuccessorCannotRelabelAuthorizedOutputSafetyFailureTests; ApproverOverrideDoesNotExistTests; AlwaysBlockedRestrictedCategoryMatrixTests; raw-content poison sweep |
+| Result | Blocked — backlog; EXT-SAFETY-1, EXT-SECRETS-1, and EXT-CONV-AI-1 are currently Uncommitted, and OD-INITIAL-OUTPUT-SAFETY-STATUS-1 is Open |
 
 ### Story 6.4: Generate Within Hard Cost Reservations
 
@@ -1975,15 +2074,25 @@ So that retries and crashes cannot overspend or duplicate Provider work.
 
 **Given** fresh context/safety/readiness and current pricing, monthly budget, per-call cap, and Provider limits
 **When** the interaction prepares an attempt
-**Then** the aggregate assigns the next `AttemptOrdinal`, the shared `AgentsIdentity` canonicalizer derives `AttemptId`, `ReservationId`, `AdmissionId`, and `QueueId` exactly per AD-29, and one deterministic descriptor binds them with ProviderId, ModelId, EffectiveProviderCapabilityVersion, limits, timeout, policy versions, maximum estimated cost, and the shared canonical request fingerprint
+**Then** the aggregate assigns the next `AttemptOrdinal`, the shared `AgentsIdentity` canonicalizer derives `AttemptId`, `ReservationId`, `AdmissionId`, and `QueueId` exactly per AD-29, and one deterministic descriptor binds them with ProviderId, ModelId, EffectiveProviderCapabilityVersion, `CurrentDataHandlingVersion`, `InForceDataHandlingVersion`, limits, timeout, policy versions, maximum estimated cost, and the shared canonical request fingerprint
 **And** the descriptor contains no raw prompt, context, generated content, secret, or Provider payload.
 
-**Given** a trusted current admission identity and fence supplied by the focused test contract
-**When** budget authorization runs
-**Then** `BudgetLedger(TenantId, UTC BudgetPeriod)` atomically owns rate admission, open-interaction bounds, reservation of maximum estimated attempt cost under deterministic ReservationId, release, settlement, `Unreconciled`, period close, and recovery against both caps before Provider invocation
-**And** missing/stale pricing or budget, indeterminate ledger state, per-call excess, 100% monthly exhaustion, changed descriptor, or invalid admission blocks; 80% emits only an authorized warning.
+**Given** an interaction reaches rolling-rate, original-caller concurrency, and monetary admission
+**When** its owners prepare and recover the decisions
+**Then** `RateLimitLedger(TenantId, ScopeKind, ScopeId)` owns immutable per-Party/per-Conversation rolling consumption through one `RateAdmissionAuthorized` deadline and mutually exclusive interaction-owned commit/abort decision, `OpenInteractionLedger(TenantId, CallerPartyId)` owns the original caller's nonterminal lease through its authorization/commit-or-abort/release decisions, and `BudgetLedger(TenantId, UTC BudgetPeriod)` owns only monetary reserve/release/settlement, `Unreconciled`, and period close
+**And** every command carries its exact interaction decision revision, each owner acknowledges it idempotently, missing/conflicting evidence changes no state, and failure injection proves recovery cannot split the rate scopes, strand a pre-acceptance `SafetyFailed` lease, release money from absence, or let a released reservation authorize Provider invocation.
 
-**Given** reservation and durable ProviderInvocationAuthorized evidence
+**Given** `OD-RATE-CONCURRENCY-CONSUMPTION-1` is Open or its recorded version does not match the admission implementation
+**When** original call acceptance reaches joint rate/concurrency admission
+**Then** the interaction blocks before either `RateLimitLedger` or `OpenInteractionLedger` is contacted and before any budget or Provider effect, with no inferred default about whether a concurrency rejection consumes rolling rate
+**And** after Product and Architecture approve it, the exact recorded common owner order, consumption choice, and FR-25 attribution are applied under that DecisionVersion and no alternative sequence is accepted.
+
+**Given** the current pricing, budget, rate, concurrency, and positive versioned admission-preparation profile plus a trusted current capacity identity/fence supplied by the focused test contract
+**When** admission and budget authorization run
+**Then** `RateAdmissionAuthorized` plus `OpenInteractionLeaseAuthorized` record the joint ledger capabilities, `AdmissionEvaluatedAt`, `PartyResetAt`, `ConversationResetAt`, preparation deadline/profile, and DecisionVersion; `BudgetReservationAuthorized` separately records the sole capability for the exact descriptor/period/amount. Both reset times derive once from `AdmissionEvaluatedAt` plus their frozen window definitions rather than receipt time, rate/open deadlines derive once from the same interaction/profile instant, and only the exact Budget authorization revision lets `BudgetLedger` reserve maximum estimated attempt cost under deterministic `ReservationId` before Provider invocation
+**And** the preparation timeout is positive and strictly less than both frozen Party and Conversation rolling-window durations, `PreparationDeadline` is strictly earlier than both reset instants, and reaching either reset before both rate/open acknowledgements drives the same durable abort; missing/stale pricing, budget, or profile, deadline mismatch, indeterminate owner state, per-call excess, 100% monthly exhaustion, changed descriptor, or invalid admission blocks, while 80% emits only an authorized warning.
+
+**Given** reservation, a generic committed Provider lease, and durable `ProviderInvocationAuthorized` evidence
 **When** the committed Provider adapter is called
 **Then** `AttemptId` is used verbatim as the Provider idempotency key, safe availability/error/timeout/usage contracts remain adapter-local, and a transport retry reuses the exact descriptor, ordinal, reservation, admission identity/fence, and policy floor
 **And** any changed capability, limit, price, fingerprint, readiness, or admission evidence fails closed under that AttemptId.
@@ -1992,6 +2101,16 @@ So that retries and crashes cannot overspend or duplicate Provider work.
 **When** recovery queries the authoritative Provider outcome by AttemptId
 **Then** actual usage is reconciled exactly once, unused reservation is released only after authoritative no-usage evidence, and eligible retries never double-charge or duplicate Provider work
 **And** secret poison values and raw Provider errors appear nowhere outside the adapter.
+
+**Given** an earlier transport attempt already fixed `BudgetDispositionDecided(InvocationSettlement)` and authoritative lookup confirms no usage
+**When** the mandatory safety re-check blocks the otherwise eligible transport retry
+**Then** the retry terminalizes without transport, preserves the existing `InvocationSettlement` disposition, and releases money only through the confirmed-no-use outcome revision already required by that disposition
+**And** it never appends or infers `NotInvokedRelease`, because historical invocation authorization makes that branch permanently unavailable for the attempt.
+
+**Given** reservation succeeded and the generic Provider lease committed but Provider invocation was not yet authorized
+**When** the output-status authority is Open, missing, malformed, or unavailable, another pre-Provider decision fails, or recovery resumes concurrently
+**Then** `AgentInteraction` records exactly one mutually exclusive authorization branch and `BudgetDispositionDecided(NotInvokedRelease|InvocationSettlement)`: `ProviderInvocationNotAuthorized` is batched with the NotInvoked disposition and exact pre-Provider capacity cancellation decision, while `ProviderInvocationAuthorized` is batched with `InvocationSettlement`
+**And** only those exact decision revisions drive Budget/capacity release or settlement and Provider-lease result/settlement. Absence of either branch, timeout, or a recovery observation never releases money, and a recorded branch never re-reads a successor decision.
 
 **Given** no trusted admission grant exists
 **When** any application, workflow, API, or test attempts live transport
@@ -2007,14 +2126,14 @@ So that retries and crashes cannot overspend or duplicate Provider work.
 
 | Field | Story 6.4 evidence |
 | --- | --- |
-| Requirements | FR4, FR5, FR10, FR12, FR19-FR21, FR24, FR25, FR28; NFR1, NFR3, NFR4, NFR6, NFR9-NFR11; UX-DR21, UX-DR26, UX-DR44; AD-2, AD-9, AD-10, AD-13, AD-14, AD-18, AD-21, AD-22, AD-29; EXT-PROTECTION-1 |
-| OwnedClauses | FR10.provider-timeout-safe-failure; FR19.budget-reservation-tenant-isolation; FR20.budget-authorization-before-ledger-or-provider; FR28.atomic-reserve-reconcile-retry; NFR1.budget-authorization-before-side-effect; NFR6.provider-secret-boundary; NFR9.generation-latency-source-events; NFR10.hard-caps-and-reservation; NFR11.no-duplicate-provider-attempt-or-reservation; UX-DR44.warning-block-indeterminate-cost; AD-2.BudgetLedger; AD-13.prepared-attempt-order; AD-21.budget-ledger-authority; AD-29.attempt-reservation-admission-queue-identities |
-| Dependencies | Stories 5.8 and 6.1-6.3; EXT-PROTECTION-1, EXT-PROVIDER-1, and EXT-SECRETS-1 Available; injected trusted admission contract for focused proof |
+| Requirements | FR4, FR5, FR10, FR12, FR19-FR21, FR24, FR25, FR28; OQ-32; NFR1, NFR3, NFR4, NFR6, NFR9-NFR11; UX-DR21, UX-DR26, UX-DR44; AD-2, AD-9, AD-10, AD-13, AD-14, AD-18, AD-21, AD-22, AD-29; EXT-PROTECTION-1; OD-RATE-CONCURRENCY-CONSUMPTION-1 |
+| OwnedClauses | FR5.provider-attempt-current-and-in-force-data-handling-versions; FR10.provider-timeout-safe-failure; FR19.ledger-tenant-isolation; FR20.admission-and-budget-authorization-before-ledger-or-provider; FR24.provider-attempt-data-handling-evidence; FR28.atomic-rate-open-budget-decisions-and-reconcile-retry; OQ32.no-inferred-rate-concurrency-consumption; NFR1.authorization-before-side-effect; NFR6.provider-secret-boundary; NFR9.generation-latency-source-events; NFR10.hard-caps-and-reservation; NFR11.no-duplicate-admission-lease-attempt-or-reservation; UX-DR44.warning-block-indeterminate-cost; AD-2.RateLimitLedger-OpenInteractionLedger-BudgetLedger; AD-13.prepared-attempt-and-joint-rate-open-decision-protocol; AD-21.rate-reset-and-budget-decision-protocols; AD-29.rate-attempt-reservation-admission-queue-identities |
+| Dependencies | Stories 5.8 and 6.1-6.3; EXT-PROTECTION-1, EXT-PROVIDER-1, and EXT-SECRETS-1 Available; approved OD-RATE-CONCURRENCY-CONSUMPTION-1 version exactly matches the injected trusted admission contract for focused proof |
 | EvidenceLevel | Levels 2 and 4: ledger/descriptor behavior and live Provider/secret adapter compatibility; no production callability claim |
-| TestOrArtifact | AgentsIdentityAttemptTests; PreparedProviderAttemptTests; BudgetLedgerAggregateTests; BudgetLedgerConcurrencyTests; BudgetReservationIsolationTests; ProviderAdapterIdempotencyIntegrationTests; ProviderOutcomeRecoveryTests; usage/reconciliation manifest |
+| TestOrArtifact | AgentsIdentityAttemptTests; PreparedProviderAttemptTests; ProviderAttemptDataHandlingVersionEvidenceTests; JointRateConcurrencyDecisionVersionTests; RateAdmissionTwoScopeDecisionTests; RatePreparationBoundTests; RateResetDerivationTests; OpenInteractionLeaseDecisionTests; BudgetDispositionDecisionTests; RetryTimeSafetyFailurePreservesInvocationSettlementTests; BudgetLedgerAggregateTests; BudgetLedgerConcurrencyTests; BudgetReservationIsolationTests; ProviderAdapterIdempotencyIntegrationTests; ProviderOutcomeRecoveryTests; decision/ack failure-injection and usage/reconciliation manifests |
 | VerificationCommand | pwsh ./eng/verify-story-6.4.ps1 |
-| NegativeEvidence | BudgetReservationIsolationTests.CrossTenantPrepareReserveReconcileReleaseAndStatusAreDenied; ProviderInvocationWithoutAdmissionTests; ConcurrentBudgetOverspendTests; RetryDoubleChargeAndChangedFingerprintTests; ProviderSecretAndRawErrorPoisonSweepTests |
-| Result | Not run — backlog; EXT-PROVIDER-1 and EXT-SECRETS-1 are currently Uncommitted |
+| NegativeEvidence | LedgerIsolationTests.CrossTenantRateOpenBudgetPrepareCommitAbortReleaseSettleAndStatusAreDenied; OpenOrMismatchedRateConcurrencyDecisionTouchesNoLedgerTests; RateDeadlineMismatchTests; PreparationDeadlineAtOrAfterEitherResetTests; EitherResetBeforeBothAcknowledgementsAbortsTests; RateResetCannotUseLedgerReceiptTimeTests; PreAcceptanceSafetyFailedLeaseAbortTests; RetryTimeSafetyFailureCannotChangeBudgetDispositionTests; RecoveryCannotReleaseBudgetFromAbsentInvocationTests; ReleasedReservationCannotAuthorizeInvocationTests; ProviderInvocationWithoutAdmissionTests; ConcurrentBudgetOverspendTests; RetryDoubleChargeAndChangedFingerprintTests; ProviderSecretAndRawErrorPoisonSweepTests |
+| Result | Blocked — backlog; EXT-PROVIDER-1 and EXT-SECRETS-1 are currently Uncommitted and OD-RATE-CONCURRENCY-CONSUMPTION-1 is Open |
 
 ### Story 6.5: Enforce Capacity Backpressure And Tenant Fairness
 
@@ -2037,9 +2156,9 @@ So that overload cannot breach limits, starve a tenant, or bypass cost controls.
 **Then** positive PerTenantConcurrencyLimit, SystemConcurrencyLimit, PerTenantQueueDepthLimit, SystemQueueDepthLimit, Queue-or-Reject overflow, WeightedRoundRobinV1, and each tenant weight from 1 through 100 are explicit, test-visible, and readiness-recorded
 **And** missing, zero, negative, unbounded, hidden host-only, unknown-version, or process-local configuration blocks callability.
 
-**Given** a reserved deterministic AttemptId
-**When** the shared allocator acquires capacity
-**Then** one linearizable operation atomically enforces tenant and system scopes and returns Admitted with AdmissionId/fence, Queued with durable QueueId, or Rejected before ProviderInvocationAuthorized
+**Given** a reserved deterministic AttemptId and its interaction-owned `CapacityAdmissionAuthorized` revision
+**When** the shared allocator acquires capacity using that sole phase capability
+**Then** one linearizable operation atomically enforces tenant and system scopes and returns Admitted with AdmissionId/fence, Queued with durable QueueId, or Rejected before `ProviderInvocationAuthorized`; `CapacityAdmissionRecorded` binds the exact result and a deletion/migration-repair fence rejects a losing authorization append before allocator contact
 **And** retries retain QueueId/position and receive no extra fairness weight.
 
 **Given** ProviderInvocationAuthorized binds an admission fence
@@ -2081,15 +2200,15 @@ So that the Conversation contains one attributable AI message and no membership 
 **Dependencies:**
 
 - **Prior stories:** 5.4 and 6.3 through 6.5.
-- **External:** EXT-CONV-AI-1 must be Available and its exact membership/posting compatibility command must pass.
+- **External:** EXT-CONV-AI-1 must be Available and its exact membership/posting compatibility command must pass. `EXT-PARTIES-1`'s selected branch must be Available for launch evidence; Branch-B-compatible identity-by-id development is permitted while it is Uncommitted but cannot satisfy `RQ-1`.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
 
-**Given** the current Agent Party identity, source Conversation authorization, allowed generated version, and Available EXT-CONV-AI-1 target
+**Given** the current Agent Party identity under the selected `EXT-PARTIES-1` branch, source Conversation authorization, allowed generated version, and Available EXT-CONV-AI-1 target
 **When** Agents establishes membership
-**Then** `ConversationAgentState(TenantId, ConversationId)` owns the five states `NeverJoined`, `Joined`, `ExternallyRemoved`, `Blocked`, and `ReadmitPending`, the block authority, any `MirrorPending` flag, and the index of non-terminal proposals
-**And** `NeverJoined` or `ReadmitPending` adds `hexa` through the limited EXT-CONV-AI-1 membership seam and records `Joined`; `Joined` verifies current presence; `ExternallyRemoved` or `Blocked` rejects; exact retries are idempotent no-ops and general participant administration is unavailable.
+**Then** `ConversationAgentState(TenantId, ConversationId)` owns the five states `NeverJoined`, `Joined`, `ExternallyRemoved`, `Blocked`, and `ReadmitPending`, the block authority, `BlockVersion`, one `CurrentMirror(BlockVersion, Direction, Outcome, AttemptId)`, and the index of non-terminal proposals
+**And** identity is always verified by immutable id and additionally by AI Party type only under Branch A; `NeverJoined` or `ReadmitPending` adds `hexa` through the limited EXT-CONV-AI-1 membership seam and records `Joined`; `Joined` verifies current presence; `ExternallyRemoved` or `Blocked` rejects; exact retries are idempotent no-ops and general participant administration is unavailable.
 
 **Given** Conversations has externally removed the Agent participant
 **When** acceptance or the mandatory pre-post revalidation detects the removal
@@ -2098,8 +2217,13 @@ So that the Conversation contains one attributable AI message and no membership 
 
 **Given** a Tenant Agent Administrator or Conversation Facilitator sets or clears an Agents-owned block
 **When** Conversations removal/addition mirroring is unavailable
-**Then** the authoritative Agents state increments monotonic `BlockVersion`, commits with `MirrorPending`, and an idempotent at-least-once outbox retries the versioned mirror
-**And** mirror success clears the flag, mirror failure cannot roll back authority, and FR-25 status exposes the pending mirror without leaking membership.
+**Then** the authoritative Agents state changes at the expected revision, increments monotonic `BlockVersion`, and creates a deterministic current mirror with `Direction = Remove` for set or `Readmit` for clear and `Outcome = Pending`; `MirrorPending` is the derived UI/status value while an idempotent at-least-once outbox retries that attempt
+**And** a successor set or authorized clear/re-clear supersedes every lower-version attempt, whose late success or refusal is audit-only and cannot change current state.
+
+**Given** the current remove or readmit mirror receives a typed permanent refusal
+**When** the outcome is recorded
+**Then** `Outcome = Refused` derives `MirrorRefused` and ends retry only for that attempt; refused remove leaves `Blocked`, refused readmit leaves `ReadmitPending`, and `MirrorPending` and `MirrorRefused` can never both render
+**And** re-set starts a fresh remove, authorized clear starts or repeats readmit, no standalone action clears the error, and SM-C4 counts only the current Refused outcome.
 
 **Given** any combination of the five membership states and a fresh participant existence result of present, typed absence, typed `ConversationDeleted`, typed `PrincipalRemovedFromConversation`, or unavailable
 **When** acceptance, pre-post validation, block clearing, or delayed reconciliation executes
@@ -2125,14 +2249,14 @@ So that the Conversation contains one attributable AI message and no membership 
 
 | Field | Story 6.6 evidence |
 | --- | --- |
-| Requirements | FR2, FR11, FR12, FR18-FR21, FR24, FR25, FR28, FR30, FR33; OQ-25, OQ-26; NFR1-NFR5, NFR11; UX-DR22, UX-DR27, UX-DR50; AD-2, AD-6, AD-7, AD-12-AD-14, AD-17, AD-18, AD-23, AD-31 |
-| OwnedClauses | FR2.five-state-membership; FR2.BlockVersion; FR2.MirrorPending-outbox; FR2.state-read-pair-reconciliation; FR2.clear-time-authority-and-readmission; FR2.agent-party-attribution; FR11.one-automatic-message; FR12.no-message-on-failed-gate; FR18.external-removal-abandons-nonterminal-proposals; FR18.PostingPending-delayed-reconciliation; FR19.membership-posting-isolation; FR24.final-message-link; NFR3.no-partial-or-duplicate-message; NFR11.no-duplicate-conversation-post; UX-DR22.posted-only-success; AD-2.ConversationAgentState; AD-6.conversations-client-only; AD-7.limited-ai-membership; AD-13.deterministic-message-id; AD-31.removal-block-and-readmission |
-| Dependencies | Story 5.4; Stories 6.3-6.5; EXT-CONV-AI-1 Available |
+| Requirements | FR2, FR11, FR12, FR18-FR21, FR24, FR25, FR28, FR30, FR33; OQ-25, OQ-26; NFR1-NFR5, NFR11; UX-DR22, UX-DR27, UX-DR50; AD-2, AD-6, AD-7, AD-12-AD-14, AD-17, AD-18, AD-23, AD-31; EXT-PARTIES-1 |
+| OwnedClauses | FR2.five-state-membership; FR2.BlockVersion; FR2.CurrentMirror-direction-outcome-attempt; FR2.mutually-exclusive-derived-mirror-status; FR2.mirror-supersession-and-late-outcome; FR2.direction-specific-refusal-remediation; FR2.current-refusal-metric; FR2.state-read-pair-reconciliation; FR2.clear-time-authority-and-readmission; FR2.agent-party-attribution; FR11.one-automatic-message; FR12.no-message-on-failed-gate; FR18.external-removal-abandons-nonterminal-proposals; FR18.PostingPending-delayed-reconciliation; FR19.membership-posting-isolation; FR24.final-message-link; NFR3.no-partial-or-duplicate-message; NFR11.no-duplicate-conversation-post; UX-DR22.posted-only-success; AD-2.ConversationAgentState; AD-6.conversations-client-only; AD-7.branch-selected-membership-and-current-mirror; AD-13.deterministic-message-id; AD-31.removal-block-and-readmission |
+| Dependencies | Story 5.4; Stories 6.3-6.5; EXT-CONV-AI-1 Available; `EXT-PARTIES-1` selected branch Available for launch evidence, with Branch-B-compatible development allowed while Uncommitted |
 | EvidenceLevel | Levels 2, 4, and 5: deterministic identity, live Conversations compatibility, production-like membership/post/recovery path |
-| TestOrArtifact | ConversationAgentStateAggregateTests; ExternalRemovalAndReadmissionTests; MembershipMirrorOutboxTests; AiMembershipCompatibilityTests; AutomaticPostingIntegrationTests; ConversationPostingRecoveryTests; AutomaticResponseAuditCompletenessTests; LR-CONVERSATIONS-MEMBERSHIP-POSTING observation |
+| TestOrArtifact | ConversationAgentStateAggregateTests; ExternalRemovalAndReadmissionTests; CurrentMirrorDirectionOutcomeTests; MirrorSupersessionAndLateOutcomeTests; MirrorRefusalRemediationTests; MembershipMirrorOutboxTests; PartyIdentityBranchCompatibilityTests; AiMembershipCompatibilityTests; AutomaticPostingIntegrationTests; ConversationPostingRecoveryTests; AutomaticResponseAuditCompletenessTests; LR-CONVERSATIONS-MEMBERSHIP-POSTING observation |
 | VerificationCommand | pwsh ./eng/verify-story-6.6.ps1 |
 | NegativeEvidence | ConversationsPostingIsolationTests.CrossTenantMembershipAndAppendAreDenied; DuplicateMembershipAndMessageRetryTests; DirectConversationStreamWriteGuardTests |
-| Result | Not run — backlog; EXT-CONV-AI-1 is currently Uncommitted |
+| Result | Not run — backlog; EXT-CONV-AI-1 and EXT-PARTIES-1 are currently Uncommitted for launch evidence |
 
 ### Story 6.7: Call hexa And Follow Automatic Status Accessibly
 
@@ -2155,6 +2279,11 @@ So that I can request help and understand the exact outcome without mistaking pr
 **Then** the sole V1 invocation entry is a Conversation-owned **Call hexa** action that names the Agent, opens an accessible prompt surface, shows effective response mode, and captures Source Conversation/caller/Agent/prompt/timestamp/idempotency exactly once
 **And** mentions, commands, ambient triggers, project/folder triggers, external channels, and alternate invocation entries are absent.
 
+**Given** `EXT-CONV-UI-1` is bound
+**When** the Conversations-owned host composes the Agents contribution
+**Then** it consumes all four versioned artifact kinds: the action contribution with typed registration failure, the per-message decoration slot keyed by `MessageId` and sourced only from the Agents provenance accessor, `GetCallabilityAsync(tenant, conversation)`, and the Agents-owned persistent status region beside the trigger
+**And** the persistent region is the sole live-region owner, the dialog panel owns no live-region node, and the seam returns focus to the trigger or its deterministic successor when that trigger no longer exists.
+
 **Given** the pre-integration `/agents/conversation-call` harness
 **When** Story 6.7 completes
 **Then** the route is unregistered and its page, navigation entry, and harness-specific tests are removed
@@ -2172,7 +2301,7 @@ So that I can request help and understand the exact outcome without mistaking pr
 
 **Given** generation fails
 **When** operational status and audit render
-**Then** no proposal, proposal version, queue item, notification, editor, or approval/posting control is created; authorized users may reach only the separate non-approvable failure record
+**Then** no proposal, proposal version, queue item, notification, editor, approval/posting control, retained failed bytes, or live failure-content record is created; authorized users may reach only the content-free failure status/reason and Audit Evidence on `AgentInteraction`, with output-safety status supplied by the approved Product decision
 **And** raw prompt/context/output, Provider payloads, secrets, Party PII, stack traces, and unrelated tenant data remain absent.
 
 **Given** keyboard, screen-reader, reduced-motion, English/French, and restrictive viewport variants
@@ -2190,10 +2319,10 @@ So that I can request help and understand the exact outcome without mistaking pr
 | Field | Story 6.7 evidence |
 | --- | --- |
 | Requirements | FR8, FR10-FR13, FR19-FR25, FR28; NFR1-NFR4, NFR13, NFR14; UX-DR1, UX-DR11-UX-DR19, UX-DR22, UX-DR24, UX-DR27, UX-DR30-UX-DR41, UX-DR48-UX-DR50; AD-6, AD-12, AD-15, AD-17, AD-25, AD-26, AD-31; EXT-CONV-UI-1 |
-| OwnedClauses | FR8.sole-call-action; FR10.failure-status-no-proposal; FR11.posted-attribution-visible; FR22.call-ui-parity; NFR13.call-accessibility-localization-responsive; NFR14.instrumentation-seams-for-call-status; UX-DR24.sole-entry; UX-DR27.authoritative-states; UX-DR36.localized-live-region; UX-DR40.restrictive-viewport; UX-DR48.failure-record-only; UX-DR50.truth-flow; AD-26.browser-timing-seams |
+| OwnedClauses | FR8.sole-call-action; FR10.failure-status-no-proposal; FR11.posted-attribution-visible; FR22.call-ui-parity; NFR13.call-accessibility-localization-responsive; NFR14.instrumentation-seams-for-call-status; UX-DR24.sole-entry; UX-DR27.authoritative-states; UX-DR32.focus-return; UX-DR36.localized-live-region; UX-DR40.restrictive-viewport; UX-DR48.content-free-failure-status-only; UX-DR50.truth-flow; AD-26.browser-timing-seams; AD-31.four-artifact-conversation-ui-seam; AD-31.persistent-region-sole-live-region-owner |
 | Dependencies | Stories 6.1-6.6; EXT-CONV-UI-1 Available |
 | EvidenceLevel | Levels 2 and 4: component behavior and live public-contract/UI integration; performance attainment remains Story 8.6 |
-| TestOrArtifact | CallHexaComponentTests; AutomaticCallStatusIntegrationTests; CallHexaAccessibilityTests; AgentsResourcesParityTests; AlternateInvocationGuardTests; browser timing instrumentation contract tests |
+| TestOrArtifact | CallHexaComponentTests; ConversationUiFourArtifactContractTests; MessageProvenanceDecorationTests; ConversationCallabilityIntegrationTests; PersistentStatusLiveRegionTests; FocusReturnContractTests; AutomaticCallStatusIntegrationTests; CallHexaAccessibilityTests; AgentsResourcesParityTests; AlternateInvocationGuardTests; browser timing instrumentation contract tests |
 | VerificationCommand | pwsh ./eng/verify-story-6.7.ps1 |
 | NegativeEvidence | CallHexaIsolationTests.CrossTenantActionAndStatusAreDenied; AlternateInvocationGuardTests; OptimisticPendingOrPostedStateTests; generation-failure proposal-absence tests |
 | Result | Blocked — backlog; requires Stories 6.1-6.6 and EXT-CONV-UI-1 is Uncommitted |
@@ -2219,7 +2348,7 @@ So that structural unavailability fails closed without generic fallbacks or inco
 **Given** the public runtime contracts
 **When** additive compatibility is inspected
 **Then** they include `AgentInteractionContextMode.Blocked`, `AgentGenerationOutcome.Indeterminate`, the safe reasons `NoEligibleApprover`, `RemovedInConversations`, `SourceConversationUnavailable`, and `NotInvoked`, and a `Membership` gate check
-**And** the Story 5.8/6.6 values `PayloadProtectionUnavailable`, `NeverJoined`, `Joined`, `ExternallyRemoved`, `ReadmitPending`, and `MirrorPending` are carried wherever their owning contract requires them.
+**And** the Story 5.8/6.6 values `PayloadProtectionUnavailable`, `NeverJoined`, `Joined`, `ExternallyRemoved`, `ReadmitPending`, `CurrentMirror(BlockVersion, Direction, Outcome, AttemptId)`, and its mutually exclusive `MirrorPending`/`MirrorRefused` derivations are carried wherever their owning contract requires them.
 
 **Given** a complete authorized context is measured
 **When** Safe Context Budget evidence is recorded
@@ -2242,10 +2371,10 @@ So that structural unavailability fails closed without generic fallbacks or inco
 | --- | --- |
 | Owner | Agents Runtime Maintainer |
 | Requirements | FR2, FR7, FR9, FR10, FR12, FR18, FR21, FR23-FR25, FR28, FR30, FR31, FR34; NFR1-NFR8, NFR11; UX-DR25-UX-DR30, UX-DR42, UX-DR48; AD-7, AD-8, AD-11-AD-15, AD-17, AD-21, AD-27 |
-| OwnedClauses | FR9.Blocked-context-mode; FR10.Indeterminate-and-failure-record; FR12.additive-safe-reasons; FR21.fail-closed-membership; FR28.register-vs-runtime-vocabulary; AD-11.complete-safe-context-budget |
+| OwnedClauses | FR2.current-mirror-public-contract; FR9.Blocked-context-mode; FR10.Indeterminate-and-content-free-failure-status; FR12.additive-safe-reasons; FR21.fail-closed-membership; FR28.register-vs-runtime-vocabulary; AD-7.current-mirror-additive-contract; AD-11.complete-safe-context-budget |
 | Dependencies | Stories 5.8, 6.2, 6.3, and 6.6; EXT-CONV-AI-1, EXT-TOKEN-1, EXT-SAFETY-1, and EXT-PROTECTION-1 Available |
 | EvidenceLevel | Levels 2 and 4: additive compatibility/policy behavior and live fail-closed integration paths |
-| TestOrArtifact | RuntimeContractAdditiveMemberTests; SafeContextBudgetEvidenceTests; MembershipGateContractTests; UnknownValueFailClosedTests; RegisterRuntimeVocabularyBoundaryTests |
+| TestOrArtifact | RuntimeContractAdditiveMemberTests; CurrentMirrorContractCompatibilityTests; SafeContextBudgetEvidenceTests; MembershipGateContractTests; UnknownValueFailClosedTests; RegisterRuntimeVocabularyBoundaryTests |
 | VerificationCommand | pwsh ./eng/verify-story-6.8.ps1 |
 | NegativeEvidence | MissingBudgetTermCannotBecomeContextReadyTests; UnknownRuntimeValueCannotPassTests; RegisterOnlyBlockerDoesNotLeakIntoAgentAggregateTests |
 | Result | Blocked — backlog; required external seams are currently Uncommitted |
@@ -2271,7 +2400,7 @@ So that generated content can wait outside the Conversation for authorized revie
 **Dependencies:**
 
 - **Prior stories:** 5.4, 5.8, 6.1 through 6.5, and 6.8.
-- **External:** `EXT-PROTECTION-1` plus consumed Provider, tokenizer, safety, secret, and topology seams must be Available for live generation; `EXT-CONV-AI-1` must be Available for Facilitator/roster/existence/access discovery, although no posting seam is used.
+- **External:** `EXT-PROTECTION-1` plus consumed Provider, tokenizer, safety, secret, and topology seams must be Available for live generation; `EXT-CONV-AI-1` must be Available for Facilitator/roster/existence/access discovery, although no posting seam is used; `EXT-PARTIES-1` must be Available for current human/liveness classification and historical `PartyId`-to-`AuthenticatedHumanActorId` binding.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
@@ -2289,25 +2418,25 @@ So that generated content can wait outside the Conversation for authorized revie
 **Given** generation fails, is incomplete, times out, or fails output safety
 **When** confirmation-mode orchestration completes
 **Then** no proposal, version, pending count, queue row, notification, editor, approval action, or posting action is created
-**And** authorized operational/audit surfaces may expose only the separate non-approvable failure record.
+**And** no failed bytes or live failure-content record is retained; authorized operational/audit surfaces expose only the content-free interaction status/reason and Audit Evidence, with output-safety status supplied by the approved Product decision.
 
 **Given** current approval authority is missing, stale, ambiguous, revoked, unavailable, or belongs to another tenant
 **When** proposal discovery executes
 **Then** records and counts fail closed without disclosing proposal existence, content, source Conversation, caller, expiry, or policy basis
-**And** no status or accessible name leaks a target-tenant value.
+**And** every Party-bearing Approver principal resolves through `EXT-PARTIES-1` to one current human Party and the same stable authenticated actor, with the durable binding version recorded; missing, stale, ambiguous, overlapping, non-human, or mismatched evidence denies without leaking a target-tenant value.
 
 **Evidence Manifest:**
 
 | Field | Story 7.1 evidence |
 | --- | --- |
-| Requirements | FR7, FR13, FR14, FR18-FR25, FR27-FR29, FR33, FR34; NFR1-NFR5, NFR11, NFR13; UX-DR1, UX-DR2, UX-DR6, UX-DR9, UX-DR22, UX-DR28-UX-DR30, UX-DR34, UX-DR36, UX-DR47, UX-DR48, UX-DR50; AD-4, AD-5, AD-8, AD-12-AD-15, AD-17, AD-18, AD-22, AD-29; EXT-PROTECTION-1, EXT-CONV-AI-1 |
+| Requirements | FR7, FR13, FR14, FR18-FR25, FR27-FR29, FR33, FR34; NFR1-NFR5, NFR11, NFR13; UX-DR1, UX-DR2, UX-DR6, UX-DR9, UX-DR22, UX-DR28-UX-DR30, UX-DR34, UX-DR36, UX-DR47, UX-DR48, UX-DR50; AD-4, AD-5, AD-8, AD-12-AD-15, AD-17, AD-18, AD-22, AD-29; EXT-PROTECTION-1, EXT-CONV-AI-1, EXT-PARTIES-1 |
 | OwnedClauses | FR13.success-only-proposal; FR13.in-product-discovery; FR14.initial-immutable-version; FR18.stored-expiry; FR20.discovery-authorization; NFR3.no-lost-or-duplicate-version; NFR13.accessible-localized-queue; UX-DR47.in-product-only-notification; UX-DR48.failed-generation-no-proposal; AD-5.append-only-proposal-state |
-| Dependencies | Stories 5.4 and 5.8; Stories 6.1-6.5 and 6.8; EXT-PROTECTION-1, EXT-CONV-AI-1, and all executed external seams Available |
+| Dependencies | Stories 5.4 and 5.8; Stories 6.1-6.5 and 6.8; EXT-PROTECTION-1, EXT-CONV-AI-1, EXT-PARTIES-1, and all executed external seams Available |
 | EvidenceLevel | Levels 2 and 4: proposal/projection behavior and live confirmation-generation-to-queue path |
-| TestOrArtifact | AgentsIdentityProposalTests; ProposalCreationAggregateTests; PendingProposalProjectionTests; ConfirmationProposalIntegrationTests; ProposalQueueComponentTests; initial proposal evidence manifest |
+| TestOrArtifact | AgentsIdentityProposalTests; ProposalCreationAggregateTests; ProposalDiscoveryHumanActorBindingIntegrationTests; PendingProposalProjectionTests; ConfirmationProposalIntegrationTests; ProposalQueueComponentTests; initial proposal evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-7.1.ps1 |
-| NegativeEvidence | ProposalDiscoveryIsolationTests.CrossTenantCountsRowsAndStatusDiscloseNothing; FailedGenerationCreatesNoProposalTests; DuplicateProposalAndVersionReplayTests |
-| Result | Blocked — backlog; requires prior runtime stories and EXT-PROTECTION-1/EXT-CONV-AI-1 plus all executed seams Available |
+| NegativeEvidence | ProposalDiscoveryIsolationTests.CrossTenantCountsRowsAndStatusDiscloseNothing; MissingStaleNonHumanOrMismatchedProposalActorBindingTests; FailedGenerationCreatesNoProposalTests; DuplicateProposalAndVersionReplayTests |
+| Result | Blocked — backlog; requires prior runtime stories and EXT-PROTECTION-1/EXT-CONV-AI-1/EXT-PARTIES-1 plus all executed seams Available |
 
 ### Story 7.2: Edit An Immutable Proposal Version
 
@@ -2320,15 +2449,21 @@ So that I can correct the draft without overwriting what **hexa** generated.
 **Dependencies:**
 
 - **Prior stories:** 5.8 and 7.1.
-- **External:** `EXT-PROTECTION-1` remains required wherever protected content is materialized, and `EXT-CONV-AI-1` must be Available for current Approver roster/access resolution before edit.
+- **External:** `EXT-PROTECTION-1` remains required wherever protected content is materialized, `EXT-CONV-AI-1` must be Available for current Approver roster/access resolution before edit, and `EXT-PARTIES-1` must be Available for current human/liveness classification and historical actor binding.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
 
 **Given** a pending nonterminal proposal and current edit authority
 **When** the Approver submits edited content at the expected proposal revision
-**Then** the aggregate assigns the next `VersionOrdinal` and `AgentsIdentity` derives one immutable edited `ProposalVersionId` from (`AgentInteractionId`, `VersionOrdinal`, edited kind), with editor PartyId, timestamp, source VersionId, policy basis, and protected content
-**And** every prior generated/edited/regenerated version remains unchanged and addressable to authorized users.
+**Then** after closed content-free ingress/owner checks, `ProposalMutation:ReserveUserActionIntent` atomically records the deterministic `Reserved` lease plus a target-limited immutable action-intent outbox carrying original signed human evidence, operation/source version/idempotency/revisions, and edited bytes sealed under the interaction DEK; same-owner commit wins before any protected version, current Approver roster/access, Parties, or other target dependency read
+**And** only that committed intent permits the edit or its typed failure to append. The aggregate assigns the next `VersionOrdinal` and `AgentsIdentity` derives one immutable edited `ProposalVersionId` from (`AgentInteractionId`, `VersionOrdinal`, edited kind), with editor PartyId, timestamp, source VersionId, policy basis, and protected content
+**And** `EXT-PARTIES-1` must resolve the Party-bearing Approver to one current human Party and the same stable authenticated actor, record its durable binding version, and fail closed on missing, stale, ambiguous, overlapping, non-human, or mismatched evidence; every prior generated/edited/regenerated version remains unchanged and addressable to authorized users.
+
+**Given** the edit API crashes after intent commit but before target acknowledgement
+**When** the exact Interaction Workflow recovers the outbox
+**Then** it re-evaluates the same current action dependencies, records only the intent-bound edit or typed negative result, preserves the original human as initiator and itself as recovery executor, acknowledges the outbox, and settles that lease
+**And** it cannot change content, source version, actor, operation, idempotency identity, or expected revisions, impersonate fresh human authority, or create a second version.
 
 **Given** duplicate submission, stale expected revision, concurrent edit, empty/invalid content, or a proposal already approved, rejected, abandoned, expired, posted, or otherwise terminal
 **When** the edit command runs
@@ -2349,14 +2484,14 @@ So that I can correct the draft without overwriting what **hexa** generated.
 
 | Field | Story 7.2 evidence |
 | --- | --- |
-| Requirements | FR7, FR14, FR15, FR19-FR24, FR29, FR33, FR34; NFR1-NFR5, NFR13; UX-DR7, UX-DR8, UX-DR22, UX-DR28, UX-DR31-UX-DR35, UX-DR37-UX-DR40, UX-DR50; AD-4, AD-5, AD-8, AD-12-AD-15, AD-22, AD-29; EXT-PROTECTION-1, EXT-CONV-AI-1 |
+| Requirements | FR7, FR14, FR15, FR19-FR24, FR29, FR33, FR34; NFR1-NFR5, NFR13; UX-DR7, UX-DR8, UX-DR22, UX-DR28, UX-DR31-UX-DR35, UX-DR37-UX-DR40, UX-DR50; AD-4, AD-5, AD-8, AD-12-AD-15, AD-22, AD-29; EXT-PROTECTION-1, EXT-CONV-AI-1, EXT-PARTIES-1 |
 | OwnedClauses | FR14.preserve-all-versions; FR15.authorized-edit-only; FR15.edit-remains-outside-conversation; FR20.current-edit-authority; FR24.edit-authorship-evidence; NFR3.version-not-overwritten; UX-DR8.complete-version-history; UX-DR35.keyboard-editor; AD-5.immutable-edit-version |
-| Dependencies | Stories 5.8 and 7.1; EXT-PROTECTION-1 and EXT-CONV-AI-1 Available |
+| Dependencies | Stories 5.8 and 7.1; EXT-PROTECTION-1, EXT-CONV-AI-1, and EXT-PARTIES-1 Available |
 | EvidenceLevel | Levels 2 and 4: aggregate/concurrency behavior plus live editor/public-contract path |
-| TestOrArtifact | AgentsIdentityProposalVersionTests; ProposalEditAggregateTests; ProposalEditConcurrencyTests; ProposalVersionHistoryQueryTests; ProposalEditorComponentTests; edit evidence manifest |
+| TestOrArtifact | AgentsIdentityProposalVersionTests; ProposalEditAggregateTests; ProposalEditHumanActorBindingIntegrationTests; ProposalEditIntentOutboxRecoveryTests; ProposalEditConcurrencyTests; ProposalVersionHistoryQueryTests; ProposalEditorComponentTests; edit evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-7.2.ps1 |
-| NegativeEvidence | ProposalEditIsolationTests.CrossTenantEditAndHistoryAreDenied; TerminalProposalEditTests; PriorVersionOverwriteGuardTests; raw-content telemetry poison sweep |
-| Result | Blocked — backlog; requires Story 7.1 and EXT-PROTECTION-1/EXT-CONV-AI-1 are currently Uncommitted |
+| NegativeEvidence | ProposalEditIsolationTests.CrossTenantEditAndHistoryAreDenied; MissingStaleNonHumanOrMismatchedEditActorBindingTests; ProtectedEditReadCannotPrecedeIntentLeaseCommitTests; EditApiCrashCannotLoseOrChangeCommittedIntentTests; ClosingBeforeAfterEditIntentCommitTests; TerminalProposalEditTests; PriorVersionOverwriteGuardTests; raw-content telemetry poison sweep |
+| Result | Blocked — backlog; requires Story 7.1 and EXT-PROTECTION-1/EXT-CONV-AI-1/EXT-PARTIES-1 are currently Uncommitted |
 
 ### Story 7.3: Regenerate Under Fresh Gates
 
@@ -2369,20 +2504,22 @@ So that a new version cannot reuse stale authority or changed inputs under an ol
 **Dependencies:**
 
 - **Prior stories:** 5.8, 7.1, and 7.2.
-- **External:** EXT-PROTECTION-1, EXT-PROVIDER-1, EXT-TOKEN-1, EXT-SAFETY-1, EXT-SECRETS-1, EXT-CONV-AI-1, and the production-like capacity seam must be Available when executed.
+- **External:** EXT-PROTECTION-1, EXT-PROVIDER-1, EXT-TOKEN-1, EXT-SAFETY-1, EXT-SECRETS-1, EXT-CONV-AI-1, EXT-PARTIES-1, and the production-like capacity seam must be Available when executed.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
 
 **Given** a pending proposal and current regeneration authority
 **When** regeneration is requested
-**Then** the workflow repeats current tenant/Conversation authorization, complete Conversation read, exact token measurement, Provider capability high-water/readiness, prompt/context safety, pricing/budget reservation, shared capacity admission, and prepared-attempt authorization
+**Then** after closed content-free ingress/owner checks, `ProposalMutation:ReserveUserActionIntent` atomically records the deterministic `Reserved` lease plus an immutable target-limited regeneration intent/outbox with original signed human evidence, base version, operation/idempotency identity, and expected revisions; same-owner commit wins before the first current Approver/Conversation/Parties or protected-version read. The original request or exact Interaction Workflow recovery consumes only that committed intent, records the original human plus recovery executor separately, and must acknowledge the outbox and settle the lease after the intent-bound positive/negative result
+**And** before Provider work the aggregate resolves at least one currently eligible Approver other than the caller, last editor, and requesting Party; if none exists, regeneration is rejected without an attempt, reservation, admission, or Provider call
+**And** `EXT-PARTIES-1` classifies each Party-bearing requester/candidate as current human, binds it to the same stable authenticated actor with a durable binding version, and rejects missing, stale, ambiguous, overlapping, non-human, or mismatched evidence; at the expected revision the aggregate atomically appends `RegenerationAuthorized` carrying `RequestingPartyId`, `BaseVersionId`, `AttemptId`, approver-policy version, and the resolved eligible Party set, and only that fact permits the workflow to repeat current tenant/Conversation authorization, complete Conversation read, exact token measurement, Provider capability high-water/readiness, prompt/context safety, pricing/budget reservation, shared capacity admission, and prepared-attempt authorization
 **And** the aggregate assigns the next `AttemptOrdinal`, `AgentsIdentity` derives the new `AttemptId`, and no client-provided seed or local identity helper can affect it.
 
 **Given** every fresh gate passes and the Provider output passes current output safety
 **When** the result is recorded
 **Then** the aggregate assigns the next `VersionOrdinal` and `AgentsIdentity` derives one immutable regenerated `ProposalVersionId` from (`AgentInteractionId`, `VersionOrdinal`, regenerated kind), with attempt, Provider/model/effective version, safety, cost, and source references
-**And** all earlier generated and edited versions remain intact and no Conversation Message is created.
+**And** the version records `RegenerationRequestedByPartyId`, all earlier generated and edited versions remain intact, and no Conversation Message is created.
 
 **Given** any authorization, context, tokenizer, safety, Provider, secret, pricing, budget, capacity, timeout, or output gate blocks or changes the prepared fingerprint
 **When** regeneration executes or retries
@@ -2398,13 +2535,13 @@ So that a new version cannot reuse stale authority or changed inputs under an ol
 
 | Field | Story 7.3 evidence |
 | --- | --- |
-| Requirements | FR7, FR9, FR10, FR14, FR16, FR19-FR21, FR24-FR29, FR31-FR34; NFR1-NFR12; UX-DR7, UX-DR8, UX-DR22, UX-DR27, UX-DR28, UX-DR31, UX-DR36, UX-DR43, UX-DR48, UX-DR50; AD-4, AD-5, AD-8-AD-14, AD-17, AD-18, AD-20-AD-22, AD-24, AD-29; EXT-PROTECTION-1, EXT-CONV-AI-1 |
-| OwnedClauses | FR16.same-source-and-snapshot-provenance; FR16.new-version-preserves-history; FR16.terminal-block; FR27.fresh-no-weaker-safety; NFR8.complete-context-revalidation; NFR10.regeneration-reservation-reuse; NFR11.no-duplicate-attempt-or-version; UX-DR48.failed-regeneration-not-version; AD-10.high-water-recheck; AD-13.changed-input-fails-attempt |
-| Dependencies | Stories 5.8 and 7.1-7.2; EXT-PROTECTION-1, EXT-PROVIDER-1, EXT-TOKEN-1, EXT-SAFETY-1, EXT-SECRETS-1, EXT-CONV-AI-1 and capacity seam Available |
+| Requirements | FR7, FR9, FR10, FR14, FR16, FR19-FR21, FR24-FR29, FR31-FR34; NFR1-NFR12; UX-DR7, UX-DR8, UX-DR22, UX-DR27, UX-DR28, UX-DR31, UX-DR36, UX-DR43, UX-DR48, UX-DR50; AD-4, AD-5, AD-8-AD-14, AD-17, AD-18, AD-20-AD-22, AD-24, AD-29; EXT-PROTECTION-1, EXT-CONV-AI-1, EXT-PARTIES-1 |
+| OwnedClauses | FR7.regeneration-requester-ineligible-for-resulting-version; FR7.second-eligible-approver-guard-before-provider; FR16.same-source-and-snapshot-provenance; FR16.new-version-preserves-history; FR16.terminal-block; FR27.fresh-no-weaker-safety; NFR8.complete-context-revalidation; NFR10.regeneration-reservation-reuse; NFR11.no-duplicate-attempt-or-version; UX-DR48.failed-regeneration-not-version; AD-8.atomic-regeneration-authorization; AD-10.high-water-recheck; AD-13.changed-input-fails-attempt |
+| Dependencies | Stories 5.8 and 7.1-7.2; EXT-PROTECTION-1, EXT-PROVIDER-1, EXT-TOKEN-1, EXT-SAFETY-1, EXT-SECRETS-1, EXT-CONV-AI-1, EXT-PARTIES-1, and capacity seam Available |
 | EvidenceLevel | Levels 2, 4, and 5: transition logic, live adapters, production-like retry/concurrency path |
-| TestOrArtifact | AgentsIdentityRegenerationTests; ProposalRegenerationAggregateTests; RegenerationFreshGateIntegrationTests; RegenerationRetryRecoveryTests; ProposalVersionHistoryTests; regeneration evidence manifest |
+| TestOrArtifact | AgentsIdentityRegenerationTests; ProposalRegenerationAggregateTests; RegenerationHumanActorBindingIntegrationTests; RegenerationUserActionIntentOutboxTests; RegenerationApproverSegregationTests; RegenerationAuthorizationAtomicityTests; RegenerationFreshGateIntegrationTests; RegenerationRetryRecoveryTests; ProposalVersionHistoryTests; regeneration evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-7.3.ps1 |
-| NegativeEvidence | RegenerationIsolationTests.CrossTenantRegenerationIsDeniedBeforeProvider; StaleChangedFingerprintAndWeakerPolicyTests; TerminalExpiryRaceAndDuplicateVersionTests |
+| NegativeEvidence | RegenerationIsolationTests.CrossTenantRegenerationIsDeniedBeforeProvider; MissingStaleNonHumanOrMismatchedRegenerationActorBindingTests; RegenerationDependencyReadCannotPrecedeIntentLeaseCommitTests; RegenerationApiCrashCannotLoseOrChangeCommittedIntentTests; ClosingBeforeAfterRegenerationIntentCommitTests; RegenerationRequesterCannotApproveGeneratedVersionTests; NoSecondEligibleApproverBlocksBeforeProviderTests; MissingRegenerationAuthorizedFactBlocksProviderTests; StaleChangedFingerprintAndWeakerPolicyTests; TerminalExpiryRaceAndDuplicateVersionTests |
 | Result | Not run — backlog; required external seams are currently Uncommitted |
 
 ### Story 7.4: Approve And Post One Selected Version
@@ -2418,20 +2555,30 @@ So that only the reviewed response becomes a Conversation Message attributed to 
 **Dependencies:**
 
 - **Prior stories:** 5.8 and 7.1; 7.2 and 7.3 versions are supported when present.
-- **External:** EXT-PROTECTION-1, EXT-SAFETY-1, and EXT-CONV-AI-1 must be Available for live approval/posting.
+- **External:** EXT-PROTECTION-1, EXT-SAFETY-1, EXT-CONV-AI-1, and EXT-PARTIES-1 must be Available for live approval/posting and current/historical human actor binding. `ARCH-A-14` must be retired by a configured posting timeout no shorter than the exact committed seam-2 timeout before this story can become ready-for-dev.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
 
 **Given** a pending proposal, selected existing VersionId, and current approval authority
 **When** approval executes at the expected EventStore revision
-**Then** current tenant, Party, approver-policy basis, Conversation access, output-safety floor, Agent identity, and operation-gate records are re-evaluated before side effects
-**And** exactly one approval event binds selected VersionId, Approver PartyId, policy basis, timestamp, and posting-pending state; no other version is eligible.
+**Then** closed content-free ingress and owner-local identity/shape/revision/barrier checks run first, after which `ProposalMutation:ReserveUserActionIntent` atomically appends a deterministic `Reserved` lease plus immutable target-limited approval intent/outbox with original signed human evidence, selected VersionId, operation/idempotency identity, and expected revisions. Same-owner commit wins before any protected version read, approval-safety call, current Conversation/Parties read, or other target dependency read. Current tenant, Party, approver-policy basis, Conversation access, output-safety floor, Agent identity, and operation-gate results are bound to that committed lease before the mutation or its typed failure is recorded
+**And** `EXT-PARTIES-1` classifies the Party-bearing Approver as current human and binds it to the same stable authenticated actor with a durable binding version; missing, stale, ambiguous, overlapping, non-human, or mismatched evidence fails closed, a Party recorded as `RegenerationRequestedByPartyId` on the selected version is ineligible to approve it, and exactly one approval event binds selected VersionId, Approver PartyId, policy basis, timestamp, and `Approved` state only; no other version is eligible and this event never emits `PostingPending`.
+
+**Given** the approval API crashes after the User-action intent commit and before the target result or directory acknowledgement
+**When** the exact Interaction Workflow recovers
+**Then** it re-evaluates the same current approval dependencies and records only that intent-bound `Approved` or typed negative result, preserving the original human as initiator and the Workflow as recovery executor; target acknowledgement then consumes the intent outbox and permits only that ProposalMutation lease to settle
+**And** recovery cannot select another version, actor, action, safety result, idempotency identity, or expected revision, cannot manufacture fresh human eligibility, and never begins posting before the separately committed `PostingPending` protocol.
 
 **Given** approval is accepted
 **When** UI/API render the result
 **Then** approved and posting pending remain non-success authoritative progress with accepted identity and projection/version
 **And** only a later authoritative posted projection may use Success or claim a Conversation Message.
+
+**Given** `Approved` is committed at the expected proposal revision
+**When** the workflow is ready to validate and attempt the Conversations append
+**Then** after closed content-free owner-local checks it first reserves and commits the deterministic `ConversationPosting` lease; full pre-post safety plus Conversation existence/access/membership reads occur only inside that committed lease and bind either a state-legal no-post result or permission to continue. When validation passes, a separate deterministic `BeginPosting` command commits `PostingPending` with `PostingAttemptId`, deterministic `MessageId`, immutable approved VersionId, stored deadline, and lease commit revision at the expected interaction revision
+**And** only that committed fact authorizes `AppendMessage`; a later command records success/failure or the exact `MessageId` lost-ack lookup outcome, and no command or policy may emit approval, posting-pending, and result as one batch.
 
 **Given** current limited AI membership and posting gates pass through EXT-CONV-AI-1
 **When** the workflow appends the selected version
@@ -2457,14 +2604,14 @@ So that only the reviewed response becomes a Conversation Message attributed to 
 
 | Field | Story 7.4 evidence |
 | --- | --- |
-| Requirements | FR2, FR7, FR14, FR17, FR19-FR25, FR27, FR28; OQ-26; NFR1-NFR7, NFR9, NFR11, NFR13, NFR14; UX-DR7, UX-DR8, UX-DR11, UX-DR12, UX-DR22, UX-DR28, UX-DR31-UX-DR40, UX-DR50; AD-4-AD-8, AD-12-AD-15, AD-17, AD-18, AD-20, AD-22, AD-23, AD-25, AD-26; EXT-PROTECTION-1; EXT-SAFETY-1; EXT-CONV-AI-1 |
-| OwnedClauses | FR17.approve-exact-selected-version; FR17.agent-attribution; FR17.complete-approval-post-link; FR18.MessageId-check-before-postingfailed-exit; FR18.LateConfirmed; FR20.current-approval-authorization; NFR3.no-partial-or-duplicate-post; NFR5.approval-path-audit; NFR11.no-duplicate-post-on-recovery; UX-DR22.approved-not-posted; UX-DR50.approved-posting-posted-truth; AD-13.deterministic-selected-version-post |
-| Dependencies | Stories 5.8 and 7.1; optional earlier versions from 7.2-7.3; EXT-PROTECTION-1, EXT-SAFETY-1 and EXT-CONV-AI-1 Available |
+| Requirements | FR2, FR7, FR14, FR17, FR19-FR25, FR27, FR28; OQ-26; NFR1-NFR7, NFR9, NFR11, NFR13, NFR14; UX-DR7, UX-DR8, UX-DR11, UX-DR12, UX-DR22, UX-DR28, UX-DR31-UX-DR40, UX-DR50; AD-4-AD-8, AD-12-AD-15, AD-17, AD-18, AD-20, AD-22, AD-23, AD-25, AD-26; EXT-PROTECTION-1; EXT-SAFETY-1; EXT-CONV-AI-1; EXT-PARTIES-1 |
+| OwnedClauses | FR7.regeneration-requester-exclusion-at-approval; FR17.approve-exact-selected-version; FR17.agent-attribution; FR17.complete-approval-post-link; FR18.MessageId-check-before-postingfailed-exit; FR18.LateConfirmed; FR20.current-approval-authorization; NFR3.no-partial-or-duplicate-post; NFR5.approval-path-audit; NFR11.no-duplicate-post-on-recovery; UX-DR22.approved-not-posted; UX-DR50.approved-posting-posted-truth; AD-8.version-specific-eligible-approver; AD-13.deterministic-selected-version-post |
+| Dependencies | Stories 5.8 and 7.1; optional earlier versions from 7.2-7.3; EXT-PROTECTION-1, EXT-SAFETY-1, EXT-CONV-AI-1, and EXT-PARTIES-1 Available |
 | EvidenceLevel | Levels 2, 4, and 5: approval transition, live membership/posting, production-like race/recovery proof |
-| TestOrArtifact | ProposalApprovalAggregateTests; ApprovedVersionPostingIntegrationTests; ApprovalPostingRecoveryTests; ApprovalUiStateTests; approval/post audit-completeness manifest |
+| TestOrArtifact | ProposalApprovalAggregateTests; ProposalApprovalHumanActorBindingIntegrationTests; ProposalApprovalIntentOutboxRecoveryTests; DurableBeforePostOrderingTests; ApprovalAndPostingEffectLeaseSequenceParityTests; BeginPostingAggregateTests; RegenerationRequesterApprovalExclusionTests; ApprovedVersionPostingIntegrationTests; ApprovalPostingRecoveryTests; ApprovalUiStateTests; approval/post audit-completeness manifest |
 | VerificationCommand | pwsh ./eng/verify-story-7.4.ps1 |
-| NegativeEvidence | ProposalApprovalIsolationTests.CrossTenantApprovalPostingAndAuditAreDenied; WrongVersionAndDuplicatePostTests; ApprovalExpiryConcurrencyTests; ApprovedIsNotPostedUiTests |
-| Result | Blocked — backlog; EXT-PROTECTION-1, EXT-SAFETY-1 and EXT-CONV-AI-1 are currently Uncommitted |
+| NegativeEvidence | ProposalApprovalIsolationTests.CrossTenantApprovalPostingAndAuditAreDenied; MissingStaleNonHumanOrMismatchedApprovalActorBindingTests; ApprovalApiCrashCannotLoseOrChangeCommittedIntentTests; ClosingEffectiveImmediatelyBeforeAndAfterApprovalIntentApprovalSafetyPrePostSafetyConversationReadBeginPostingAndAppendTests; ProtectedDependencyReadCannotPrecedeEffectCommitTests; ExternalAppendBeforePostingPendingTests; ApprovalPostingResultCannotShareOneCommandTests; TerminalRaceAfterPostingPendingTests; WrongVersionAndDuplicatePostTests; ApprovalExpiryConcurrencyTests; ApprovedIsNotPostedUiTests |
+| Result | Blocked — backlog; EXT-PROTECTION-1, EXT-SAFETY-1, EXT-CONV-AI-1, and EXT-PARTIES-1 are currently Uncommitted, and ARCH-A-14 is unretired |
 
 ### Story 7.5: Reject Or Abandon A Proposal
 
@@ -2477,25 +2624,30 @@ So that rejected or intentionally abandoned content becomes terminal and can nev
 **Dependencies:**
 
 - **Prior stories:** 7.1 and Story 7.4's seam-2 `MessageId` lookup capability.
-- **External:** `EXT-CONV-AI-1` must be Available for current Approver roster/access resolution and, when a `PostingFailed` abandon is requested after any post attempt, the typed `MessageId` existence read.
+- **External:** `EXT-CONV-AI-1` must be Available for current Approver roster/access resolution and, when a `PostingFailed` abandon is requested after any post attempt, the typed `MessageId` existence read; `EXT-PARTIES-1` must be Available for current/historical human actor binding.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
 
 **Given** a pending proposal and current resolution authority
 **When** the Approver rejects it with policy-required safe rationale metadata
-**Then** EventStore records one Rejected terminal decision with actor, policy basis, timestamp, and protected evidence
-**And** all proposal versions remain preserved while edit, regenerate, approve, membership, and posting become impossible.
+**Then** after closed content-free ingress/owner checks, `ProposalMutation:ReserveUserActionIntent` atomically records the deterministic `Reserved` lease and immutable target-limited rejection intent/outbox with original signed human evidence, sealed protected rationale, operation/idempotency identity, and expected revisions; same-owner commit precedes current roster/access/Parties or protected-content reads, and EventStore then records one intent-bound Rejected terminal decision with actor, policy basis, timestamp, and protected evidence
+**And** `EXT-PARTIES-1` classifies the Party-bearing actor as current human and binds it to the same stable authenticated actor with a durable binding version, failing closed on missing, stale, ambiguous, overlapping, non-human, or mismatched evidence; all proposal versions remain preserved while edit, regenerate, approve, membership, and posting become impossible.
 
 **Given** a pending proposal and current resolution authority
 **When** the Approver abandons it
-**Then** EventStore records one Abandoned terminal decision with actor, policy basis, timestamp, and protected evidence
+**Then** the same reserve-intent/commit protocol records an immutable abandonment intent before dependency reads, and EventStore records one intent-bound Abandoned terminal decision with actor, policy basis, timestamp, and protected evidence
 **And** the outcome is distinct from Rejected, Expired, generation failure, and posting failure.
+
+**Given** the resolution API crashes after intent commit but before the target result or acknowledgement
+**When** the exact Interaction Workflow recovers
+**Then** it may record only the original intent-bound Rejected, Abandoned, or typed negative result, records original human initiator and Workflow executor separately, acknowledges that outbox, and settles only that lease
+**And** it cannot switch reject to abandon, change rationale/actor/version/revisions, impersonate current human authority, bypass the `MessageId` lookup, or create a second terminal outcome.
 
 **Given** an authorized abandon request for a `PostingFailed` proposal
 **When** the Story 7.4 seam-2 lookup reads its deterministic `MessageId`
 **Then** a present message records `Posted` with `LateConfirmed` and never `Abandoned`; unavailable refuses the exit and leaves `PostingFailed`; typed absence or a typed deleted/removed result permits only the PRD-authorized abandon path
-**And** every permitted exit re-runs current authorization, membership, safety, and operation gates before the terminal transition.
+**And** a reject or abandon re-validates the actor against the current `ProposalResolution` authorization contract and expected aggregate revision, but membership loss, a safety failure, disabled Agent, or pulled kill switch is evidence supporting a no-post terminal resolution rather than a success gate that can strand it; full Conversation-posting membership/safety revalidation applies only to a retry or post attempt.
 
 **Given** duplicate, stale-revision, concurrent approval/expiry, or already terminal resolution
 **When** reject or abandon executes
@@ -2516,14 +2668,14 @@ So that rejected or intentionally abandoned content becomes terminal and can nev
 
 | Field | Story 7.5 evidence |
 | --- | --- |
-| Requirements | FR7, FR14, FR18-FR25, FR29, FR33, FR34; OQ-26; NFR1-NFR5, NFR13, NFR14; UX-DR7, UX-DR8, UX-DR11, UX-DR12, UX-DR22, UX-DR28, UX-DR31-UX-DR40, UX-DR50; AD-5, AD-8, AD-12-AD-15, AD-17, AD-25, AD-26; EXT-CONV-AI-1 |
+| Requirements | FR7, FR14, FR18-FR25, FR29, FR33, FR34; OQ-26; NFR1-NFR5, NFR13, NFR14; UX-DR7, UX-DR8, UX-DR11, UX-DR12, UX-DR22, UX-DR28, UX-DR31-UX-DR40, UX-DR50; AD-5, AD-8, AD-12-AD-15, AD-17, AD-25, AD-26; EXT-CONV-AI-1; EXT-PARTIES-1 |
 | OwnedClauses | FR18.rejected-terminal; FR18.abandoned-terminal; FR18.MessageId-check-before-postingfailed-exit; FR18.terminal-cannot-post; FR24.non-posting-resolution-evidence; NFR3.versions-preserved; NFR5.terminal-audit; NFR13.accessible-confirmed-resolution; UX-DR22.distinct-terminal-states; AD-5.single-terminal-order |
-| Dependencies | Stories 7.1 and 7.4 lookup capability; EXT-CONV-AI-1 Available |
+| Dependencies | Stories 7.1 and 7.4 lookup capability; EXT-CONV-AI-1 and EXT-PARTIES-1 Available |
 | EvidenceLevel | Levels 2 and 4: terminal/concurrency behavior and live public-contract/UI path |
-| TestOrArtifact | ProposalNonPostingResolutionTests; ProposalResolutionConcurrencyTests; ProposalResolutionUiTests; terminal evidence manifest |
+| TestOrArtifact | ProposalNonPostingResolutionTests; ProposalResolutionHumanActorBindingIntegrationTests; ProposalResolutionIntentOutboxRecoveryTests; ProposalResolutionConcurrencyTests; ProposalResolutionUiTests; SafetyFailureAbandonmentTests; MembershipLossAbandonmentTests; terminal evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-7.5.ps1 |
-| NegativeEvidence | ProposalResolutionIsolationTests.CrossTenantRejectAbandonAndHistoryAreDenied; TerminalMutationGuardTests; ConcurrentApproveRejectAbandonTests |
-| Result | Blocked — backlog; requires Story 7.1 and EXT-CONV-AI-1 is currently Uncommitted |
+| NegativeEvidence | ProposalResolutionIsolationTests.CrossTenantRejectAbandonAndHistoryAreDenied; MissingStaleNonHumanOrMismatchedResolutionActorBindingTests; ResolutionDependencyReadCannotPrecedeIntentLeaseCommitTests; ResolutionApiCrashCannotLoseOrChangeCommittedIntentTests; ClosingBeforeAfterResolutionIntentCommitTests; TerminalMutationGuardTests; ConcurrentApproveRejectAbandonTests; SafetyOrMembershipFailureCannotStrandAbandonTests; RetryStillRequiresFullPostingRevalidationTests |
+| Result | Blocked — backlog; requires Story 7.1 and EXT-CONV-AI-1/EXT-PARTIES-1 are currently Uncommitted |
 
 ### Story 7.6: Expire A Proposal Deterministically
 
@@ -2608,9 +2760,14 @@ So that a failed post can be resolved without misreporting a confirmed post or a
 **And** only `Posted`, `Rejected`, `Abandoned`, and `Expired` are terminal; the queue/detail terminal sets and pending/non-terminal indexes derive from the same source.
 
 **Given** a `PostingFailed` proposal whose failure permits retry
-**When** an Eligible Approver or authorized Tenant Agent Administrator requests retry
-**Then** the action first performs the typed `MessageId` existence read, re-runs full current pre-post validation, and consumes one audited attempt within the three-attempt/15-minute bound
-**And** a safety-verdict failure is abandon-only, a pulled kill switch suspends retry and pauses its clock, and unknown/unavailable lookup or validation leaves `PostingFailed` unchanged.
+**When** an authorized Tenant Agent Administrator requests administrative retry
+**Then** API, BFF, and UI consume one server `CanAdministrativeRetry` verdict covering a remaining shared attempt, the adjusted 15-minute deadline, `PostingWindowElapsed`, non-safety failure reason, active Agent, unsuspended tenant, and usable latest `MessageId` lookup; a permitted action re-runs full current pre-post validation and consumes one audited attempt
+**And** an administrator may consume any remaining shared attempt without waiting for an automatic sub-budget, while safety verdict, exhausted or elapsed bounds, disabled/suspended state, or unknown/unavailable lookup or validation leaves `PostingFailed` unchanged.
+
+**Given** automatic and administrative retry are submitted concurrently
+**When** both name the same expected proposal revision
+**Then** EventStore concurrency accepts at most one retry authorization and only that winner consumes one shared attempt
+**And** every loser consumes no attempt, performs no Conversation post, and refreshes `CanAdministrativeRetry` from authoritative state.
 
 **Given** a retry or abandon after a post may have been attempted
 **When** the existence read finds the deterministic `MessageId`
@@ -2633,10 +2790,10 @@ So that a failed post can be resolved without misreporting a confirmed post or a
 | --- | --- |
 | Owner | Agents Runtime Maintainer |
 | Requirements | FR7, FR13-FR25, FR27-FR31, FR33, FR34; NFR1-NFR7, NFR9, NFR11, NFR13, NFR14; UX-DR6-UX-DR8, UX-DR22, UX-DR28, UX-DR31-UX-DR40, UX-DR47, UX-DR50; AD-5, AD-8, AD-12-AD-15, AD-17, AD-20, AD-22, AD-25, AD-26; EXT-CONV-AI-1 |
-| OwnedClauses | FR18.ten-recorded-states; FR18.PostingFailed-nonterminal-recovery; FR18.MessageId-before-exit; FR18.LateConfirmed; FR18.kill-switch-transition-behavior; UX-DR22.posted-only-success |
+| OwnedClauses | FR18.ten-recorded-states; FR18.PostingFailed-nonterminal-recovery; FR18.shared-automatic-administrative-retry-bound; FR18.server-CanAdministrativeRetry-verdict; FR18.concurrent-retry-single-winner; FR18.MessageId-before-exit; FR18.LateConfirmed; FR18.kill-switch-transition-behavior; UX-DR22.posted-only-success |
 | Dependencies | Story 6.8 and Stories 7.1-7.6; EXT-CONV-AI-1, EXT-SAFETY-1, and EXT-PROTECTION-1 Available |
 | EvidenceLevel | Levels 2, 4, and 5: transition/UI behavior, live Conversations lookup/posting, and production-like suspension/recovery proof |
-| TestOrArtifact | ProposedAgentReplyTransitionTableTests; ProposalDetailPostingFailedRecoveryTests; ProposalQueueStateParityTests; LateConfirmedMessageLookupTests; KillSwitchProposalStateTests; ProposalStateApiUiParityTests |
+| TestOrArtifact | ProposedAgentReplyTransitionTableTests; ProposalDetailPostingFailedRecoveryTests; CanAdministrativeRetryContractTests; AutomaticAdministrativeRetryConcurrencyTests; ProposalQueueStateParityTests; LateConfirmedMessageLookupTests; KillSwitchProposalStateTests; ProposalStateApiUiParityTests |
 | VerificationCommand | pwsh ./eng/verify-story-7.7.ps1 |
 | NegativeEvidence | PostingFailedIsNotTerminalTests; PostedCannotRetryOrAbandonTests; MissingOrUnavailableMessageLookupCannotExitTests; CrossTenantProposalRecoveryDisclosesNothingTests |
 | Result | Blocked — backlog; required external seams are currently Uncommitted |
@@ -2649,7 +2806,7 @@ Authorized governance and release operators can retain, hold, export, delete, an
 
 **Story count:** 8.
 
-**Dependency topology:** Stories 8.1 and 8.4 begin from completed active capabilities in Epics 5–7; Stories 8.2 and 8.3 branch independently from 8.1; Story 8.5 consumes prior runtime/product evidence; Story 8.6 consumes the completed interactive surfaces; Story 8.7 inspects the bounded evidence produced through 8.6; Story 8.8 owns durable compliance inspection over protected evidence. `EXT-PROTECTION-1` gates 8.1–8.3 and 8.8, `EXT-SECRETS-1` gates 8.1–8.3, and `EXT-TOPOLOGY-1` gates 8.5–8.8. No Epic 8 story depends on `RQ-1`.
+**Dependency topology:** Stories 8.1 and 8.4 begin from completed active capabilities in Epics 5–7; Stories 8.2 and 8.3 branch independently from 8.1; Story 8.5 consumes prior runtime/product evidence; Story 8.6 consumes the completed interactive surfaces; Story 8.7 inspects the bounded evidence produced through 8.6; Story 8.8 owns durable compliance inspection over protected evidence. `EXT-PROTECTION-1` gates 8.1–8.3 and 8.8, `EXT-SECRETS-1` gates 8.1–8.4, and `EXT-PARTIES-1` gates the human-identity evidence in 8.1–8.4 and 8.8. `EXT-CONV-AI-1` gates Story 8.3's mandatory Conversation-deletion propagation. `EXT-EXPORT-STORE-1` always gates Story 8.2 and gates Stories 8.1/8.3 only when their frozen sets contain committed/export lifecycle artifacts or copies; `EXT-TOPOLOGY-1` gates 8.5–8.8. No Epic 8 story depends on `RQ-1`.
 
 ### Story 8.1: Retain Sensitive Content And Apply Legal Holds
 
@@ -2662,7 +2819,7 @@ So that protected evidence remains available exactly while policy requires and c
 **Dependencies:**
 
 - **Prior stories:** 5.2 and 5.8 for authorized protected EventStore operations and 7.6 for deterministic proposal terminal timestamps.
-- **External:** `EXT-PROTECTION-1` and `EXT-SECRETS-1` must be `Available` for live DEK pin/unpin and protected retention execution.
+- **External:** `EXT-HOST-1`, `EXT-PROTECTION-1`, `EXT-SECRETS-1`, and `EXT-PARTIES-1` must be `Available` for tenant scope-guard registration/release, live DEK pin/unpin, protected retention execution, and current/historical human actor-binding evidence. `GovernanceScopeV1:ClassUtcRange` additionally requires approved `OD-GOVERNANCE-CLASS-RANGE-SCOPE-1`; human-origin `ExactConversation` additionally requires approved `OD-HUMAN-EXACT-CONVERSATION-SCOPE-1`; exact-interaction scope remains evaluable. Only a frozen set containing committed export artifacts additionally requires `EXT-EXPORT-STORE-1` Available plus the exact approved `OD-EXPORT-LIFECYCLE-1` version for artifact pin/unpin; an armed-deletion overlap requires the exact approved `OD-HOLD-DELETION-PRECEDENCE-1` version.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
@@ -2674,13 +2831,33 @@ So that protected evidence remains available exactly while policy requires and c
 
 **Given** an authorized Compliance Inspector submits a legal hold for a named tenant-scoped protected scope
 **When** EventStore accepts the deterministic `LegalHold` command
-**Then** `LegalHold(TenantId, HoldId)` accepts only `interaction:<id>` or `class:<class>` with an explicit UTC range, records expected source/protection revisions, resolves the scope to explicit interaction keys at a checkpoint, pins every DEK, and becomes `Active` only after all pins are confirmed
-**And** the append-only `legal-hold` projection and high-impact UI follow `submitted -> authoritative pending -> projection-confirmed terminal`, while exact duplicate submission is idempotent and a divergent duplicate conflicts.
+**Then** `LegalHold(TenantId, HoldId)` accepts canonical `GovernanceScopeV1` plus its predicate digest. Exact sorted interaction ids are computable from authoritative stream/directory owner facts; missing, malformed, cross-tenant, or unverifiable proof rejects. Human-origin `ExactConversation` rejects while `OD-HUMAN-EXACT-CONVERSATION-SCOPE-1` is Open because this story chooses no point-in-time/prospective cut, later-content treatment, fence lifetime, or public meaning. `ClassUtcRange` rejects while `OD-GOVERNANCE-CLASS-RANGE-SCOPE-1` is Open because this story chooses no class owner/vocabulary or time semantics. The hold appends a target-limited guard-registration authorization; only it may call `EXT-HOST-1` to conditionally record `HoldContenderRegistered` on `GovernanceScopeGuard(TenantId)`, serialized with every overlapping deletion seal. That guard commit—not request arrival or a projection—is the hold-contention instant. Exact lookup resolves loss and `RecordLegalHoldScopeGuardRegistration` mirrors either the registered contender or `DestructionAlreadySealed` to `ProtectionFence`
+**And** a registered contender is immediately restrictive even while its mirror is missing. If no armed deletion overlaps, the hold resolves explicit interaction keys plus every committed artifact/key/index member, pins them, and becomes `Active` only after every acknowledgement. From the guard instant, expiry, purge, key destruction, provider TTL, backup expiry, and restore cleanup require current authority and retain bytes/keys on unavailable evidence; the append-only projection/UI follows `submitted -> authoritative pending -> projection-confirmed terminal`, exact duplicate is idempotent, and divergent duplicate conflicts.
+
+**Given** the frozen hold set contains a committed export or overlaps `DeletionArmed`
+**When** hold prepare or recovery is authorized
+**Then** committed-artifact preparation requires the exact approved `OD-EXPORT-LIFECYCLE-1` version and exact `EXT-EXPORT-STORE-1` target, while a guard-registered armed-deletion overlap requires the exact approved `OD-HOLD-DELETION-PRECEDENCE-1` outcome and fence transition
+**And** an open, missing, or mismatched decision leaves the guard contender restrictive and advances neither branch. A deletion-allowed outcome is consumed only in the same guard commit as `DestructionSealed`; a hold-allowed outcome leaves the contender in place. If sealing wins first, registration returns `DestructionAlreadySealed` and only the approved post-start outcome may advance. No story or adapter chooses precedence.
+
+**Given** a hold attempt overlaps a deletion after `DestructionSealed` but before completion
+**When** its guard registration executes
+**Then** the guard appends authenticated `PostStartHoldContenderObserved(..., DestructionAlreadySealed)` at its expected revision and exact lookup/mirroring cannot turn that durable fact into absence
+**And** while the exact post-start outcome/version of `OD-HOLD-DELETION-PRECEDENCE-1` is Open, missing, mismatched, unavailable, or not explicitly deletion-allowed for the step, every unconsumed accepted batch, new containment issue/consume, purge, and successful completion remains blocked. Already-consumed vectors remain immutable. A hold-allowed outcome grants no new destruction; no story chooses either Product result.
 
 **Given** a Compliance Inspector submits release of an active hold at its expected revision
 **When** a distinct second Compliance Inspector or the Platform Operator records audited approval under the AD-30 principal and role rules
-**Then** only that approved release may unpin every named DEK and append a release transition carrying submitter, approver, role bases, justification, scope, checkpoint, expected revision, and key outcomes
-**And** the same actor cannot satisfy both steps, history is never edited or deleted, and partial approval or unpin failure remains restrictive.
+**Then** only that approved release may unpin every named DEK and committed export artifact and append a release transition carrying submitter, approver, role bases, justification, scope, checkpoint, expected revision, and key outcomes. After every unpin and fence-release receipt is exact, a target-limited authorize/effect/result sequence releases the original `HoldContenderRegistered` fact at the same tenant guard; exact lookup resolves loss, and overlapping deletion remains blocked until `RecordLegalHoldScopeGuardReleased` mirrors the receipt
+**And** the Party-bearing Compliance Inspector resolves through `EXT-PARTIES-1`; the only alternative approver is a `Platform` Operator proving current or historically recorded Hexalith.Tenants global-administrator authority without inventing a tenant Party. A Tenant Agent Administrator has no hold-release grant. Separation compares stable `AuthenticatedHumanActorId`; missing, stale, ambiguous, overlapping, non-human where a Party is required, unavailable, incompatible, same-actor, or wrong-role evidence blocks before approval or unpin, and partial failure remains restrictive.
+
+**Given** a human hold-release decision is durable and one or more DEK/artifact unpin acknowledgements are missing after crash or lost acknowledgement
+**When** recovery resumes
+**Then** it is phase-pinned to the release decision revision, frozen set/token, and the effective `OD-EXPORT-LIFECYCLE-1` version plus exact store target recorded by that decision when committed artifacts overlap
+**And** later pending/effective decision successors cannot strand, reopen, or retarget the release; direct dependency unavailability keeps the remaining members restrictive and retrying until exact outcome lookup and acknowledgements converge.
+
+**Given** hold preparation remains reversible after crash or lost acknowledgement
+**When** recovery is requested
+**Then** the original still-valid hold intent, exact owner revision, same frozen set/token/versions, and absence of an authorized cancellation permit the owner to append only `PrepareRecoveryDispositionDecided(Resume)` and continue exact acknowledgements
+**And** `Abort` requires the exact approved `OD-HOLD-PREPARE-CANCELLATION-1` version plus its recorded authorized cancellation fact; a pin, store, protection, timeout, or permanent failure leaves the hold restrictive pending and cannot unpin or release the fence.
 
 **Given** a retention timer becomes due while an active matching hold exists
 **When** the durable expiry workflow rechecks current hold state
@@ -2701,14 +2878,17 @@ So that protected evidence remains available exactly while policy requires and c
 
 | Field | Story 8.1 evidence |
 | --- | --- |
-| Requirements | FR18-FR25, FR28, FR30, FR33, FR34; OQ-30; NFR1-NFR5, NFR11, NFR13; UX-DR1, UX-DR9-UX-DR18, UX-DR29-UX-DR33, UX-DR36-UX-DR41, UX-DR46, UX-DR50; AD-1-AD-5, AD-8, AD-12, AD-13, AD-17, AD-20, AD-22, AD-23, AD-25, AD-26, AD-30; EXT-PROTECTION-1; EXT-SECRETS-1 |
+| Requirements | FR18-FR25, FR28, FR30, FR33, FR34; OQ-30, OQ-34; NFR1-NFR5, NFR11, NFR13; UX-DR1, UX-DR9-UX-DR18, UX-DR29-UX-DR33, UX-DR36-UX-DR41, UX-DR46, UX-DR50; AD-1-AD-5, AD-8, AD-12, AD-13, AD-17, AD-20, AD-22, AD-23, AD-25, AD-26, AD-30; EXT-HOST-1; EXT-PROTECTION-1; EXT-SECRETS-1; EXT-PARTIES-1; conditional OD-GOVERNANCE-CLASS-RANGE-SCOPE-1 for class/range; conditional OD-HUMAN-EXACT-CONVERSATION-SCOPE-1 for human exact-Conversation; conditional EXT-EXPORT-STORE-1 and OD-EXPORT-LIFECYCLE-1 on committed-artifact overlap; conditional OD-HOLD-DELETION-PRECEDENCE-1 for either post-arm pre-seal contention or a post-start hold before completion; OD-HOLD-PREPARE-CANCELLATION-1 only for Abort |
 | OwnedClauses | FR18.terminal-evidence-retained; FR19.retention-hold-tenant-isolation; FR20.current-governance-authorization; FR24.retention-hold-audit; FR24.legal-hold-release-second-party; FR28.audit-governance-active; PRD-OQ8.365-day-terminal-retention; PRD-OQ8.legal-hold-suspends-expiry; OQ30.distinct-release-approval; NFR11.timer-replay-no-duplicate-effect; UX-DR31.LegalHold-lock-scope; UX-DR40.LegalHold-restrictive-viewport-block; UX-DR46.retention-and-hold; AD-2.LegalHold; AD-22.two-phase-DEK-pinning; AD-30.platform-release-approval |
-| Dependencies | Stories 5.2, 5.8, and 7.6; EXT-PROTECTION-1 and EXT-SECRETS-1 Available |
+| Dependencies | Stories 5.2, 5.8, and 7.6; EXT-HOST-1, EXT-PROTECTION-1, EXT-SECRETS-1, and EXT-PARTIES-1 Available; tenant scope-guard registration/release exact lookup; OD-GOVERNANCE-CLASS-RANGE-SCOPE-1 only for class/range scope; OD-HUMAN-EXACT-CONVERSATION-SCOPE-1 only for human exact-Conversation scope; EXT-EXPORT-STORE-1 plus OD-EXPORT-LIFECYCLE-1 only when committed artifacts overlap; OD-HOLD-DELETION-PRECEDENCE-1 for post-arm pre-seal contention and every post-start hold branch through completion; OD-HOLD-PREPARE-CANCELLATION-1 only for Abort/unwind |
 | EvidenceLevel | Levels 2 and 4: deterministic retention/hold behavior and live EventStore/Dapr component evidence |
-| TestOrArtifact | RetentionPolicyTests; LegalHoldAggregateTests; RetentionHoldWorkflowIntegrationTests; RetentionLegalHoldUiContractTests; retention/hold evidence manifest |
+| TestOrArtifact | RetentionPolicyTests; LegalHoldAggregateTests; LegalHoldScopeGuardAuthorizeEffectResultTests; HoldDeletionScopeGuardLinearizationTests; HoldCommittedExportArtifactPinIntegrationTests; HoldExpiryLinearizationFailureInjectionTests; HoldPrepareRecoveryDispositionTests; HoldReleasePhasePinnedRecoveryTests; LegalHoldScopeGuardReleaseRecoveryTests; GovernanceHumanActorBindingIntegrationTests; RetentionHoldWorkflowIntegrationTests; RetentionLegalHoldUiContractTests; retention/hold actor-binding and scope-guard receipt manifest |
+| AdditionalV21Tests | PostStartHoldGuardFactAndExactLookupTests; PostStartHoldDispositionBoundaryTests; post-start hold before/at/after accepted-batch consume, containment issue/consume, purge, and completion; migration/restore preservation of post-start fact and applied decision version |
+| V22DecisionScope | The runtime decision catalog includes StoryAuthorization 8.1 and every post-start deletion evaluation that this story can block; Open/missing/mismatched/hold-allowed evidence stays restrictive, and the story selects no Product outcome. |
 | VerificationCommand | pwsh ./eng/verify-story-8.1.ps1 |
-| NegativeEvidence | RetentionLegalHoldIsolationTests.CrossTenantInspectCreateReleaseAreDenied; RevokedGovernanceRoleTests; HoldExpiryReleaseRaceTests; DuplicateRetentionTimerTests |
-| Result | Blocked — backlog; requires Stories 5.2, 5.8, 7.6 and Available protection/secret dependencies |
+| NegativeEvidence | RetentionLegalHoldIsolationTests.CrossTenantInspectCreateReleaseAreDenied; GovernanceScopeMalformedUnknownCrossTenantAndUnverifiableMembershipTests; HumanExactConversationHoldCannotExecuteWhileDecisionOpenTests; ClassUtcRangeCannotExecuteWhileDecisionOpenTests; HoldCannotPrepareBeforeScopeGuardRegistrationTests; HoldRegistrationLostAckCannotDisappearFromBarrierTests; HoldRegistrationAndDestructionSealHaveExactlyOneWinnerTests; HoldAfterBarrierAuthorizationBeforeSealMakesStaleAuthorizationLoseTests; OpenArmedContentionAdvancesNeitherBranchTests; HoldCannotActivateWithUnpinnedCommittedArtifactTests; HoldIntentBeforeOrAtExpiryCannotLoseArtifactTests; FenceOrStoreControlOutageRetainsArtifactAndKeyTests; AutonomousTtlBackupAndRestoreCannotBypassFenceTests; OpenOrMismatchedHoldOverlapDecisionTests; HoldFailureCannotAuthorizeAbortOrUnpinTests; HoldCrashResumesOriginalIntentTests; HoldRecoveryCannotChooseOrSwitchDispositionTests; HoldGuardCannotReleaseBeforeEveryUnpinAndFenceReceiptTests; PendingLifecycleSuccessorCannotStrandRecordedHoldReleaseTests; HoldReleaseRecoveryCannotRetargetStoreOrDecisionVersionTests; TenantAdministratorCannotApproveHoldReleaseTests; MissingStaleNonHumanOrUnavailableHoldActorBindingTests; SameActorHoldReleaseApprovalTests; PlatformApproverDoesNotRequireInventedTenantPartyTests; RevokedGovernanceRoleTests; HoldExpiryReleaseRaceTests; DuplicateRetentionTimerTests |
+| AdditionalV21NegativeEvidence | PostStartDestructionAlreadySealedCannotBeReadOnlyOrDisappearTests; OpenMissingMismatchedOrHoldAllowedPostStartOutcomeCannotGrantDestructionTests; PostStartHoldCannotBeBypassedByStaleContainmentOrCompletionAuthorizationTests |
+| Result | Blocked — backlog; requires Stories 5.2, 5.8, 7.6 and Available host scope-guard, protection, secret, and Parties dependencies; human exact-Conversation, class/range, export-store, armed-deletion, and cancellation decisions apply only to their named branches |
 
 ### Story 8.2: Export Authorized Audit Content Securely
 
@@ -2721,29 +2901,35 @@ So that approved evidence can be transferred without exposing secrets, unrelated
 **Dependencies:**
 
 - **Prior stories:** 8.1 for governed protected scope and current legal-hold/retention status.
-- **External:** `EXT-PROTECTION-1` and `EXT-SECRETS-1` must be `Available` with exact targets and compatibility commands passing before protected-content selection, encryption-key resolution, or live export execution.
+- **External:** `EXT-PROTECTION-1`, `EXT-SECRETS-1`, `EXT-EXPORT-STORE-1`, and `EXT-PARTIES-1` must be `Available` with exact targets and compatibility commands passing, and the store evidence must bind the approved `OD-EXPORT-LIFECYCLE-1` decision version, before protected-content selection, encryption-key resolution, second-party approval, or live export execution. `GovernanceScopeV1:ClassUtcRange` additionally requires approved `OD-GOVERNANCE-CLASS-RANGE-SCOPE-1`; human-origin `ExactConversation` additionally requires approved `OD-HUMAN-EXACT-CONVERSATION-SCOPE-1`; exact-interaction scope remains evaluable.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
 
-**Given** an authorized export operator selects an allowed tenant scope, content classes, and time range
+**Given** an authorized export operator selects a canonical exact-interaction or human exact-Conversation scope, or requests the reserved class/range variant
 **When** the request is accepted
-**Then** EventStore records one deterministic export identity and authoritative pending state before work begins, and the manifest names the authorized scope, immutable source revisions, item counts, hashes, encryption method reference, created time, exclusive expiry, and safe audit reference
-**And** the request never expands beyond the approved tenant, time range, content class, or current authorization.
+**Then** EventStore records one deterministic export identity, canonical `GovernanceScopeV1` and predicate digest, freezes the authoritative interaction set, and acquires `ExportPreparing` on the tenant `ProtectionFence` with the exact approved lifecycle DecisionVersion, store target/contract version, frozen set, and partial-output inventory before any content read or artifact/key/index write. Unknown/malformed/cross-tenant membership rejects; human exact-Conversation rejects while its Product decision is Open; and `ClassUtcRange` rejects while its Product decision is Open
+**And** the manifest names the canonical scope, immutable source revisions, item counts, hashes, encryption method reference, created time, exclusive expiry, and safe audit reference. Prepare-time lifecycle/store values phase-pin every byte, acknowledgement, commit, recovery lookup, and key delivery; a successor governs only a new prepare and switching requires cleanup-complete Abort plus a new preparation. The request never expands beyond its predicate or current authorization.
 
 **Given** an export request is otherwise authorized
 **When** FR-24 second-party governance is evaluated
 **Then** the eligible second party records approval before any export content is read
-**And** post-hoc approval is never accepted for export selection, materialization, or key delivery.
+**And** the Party-bearing Compliance Inspector requester resolves through `EXT-PARTIES-1`; a Party-bearing tenant approver uses the same seam, an `Administrator` alternative proves current tenant role plus durable actor/role evidence, and a `Platform` alternative proves current or historically recorded Hexalith.Tenants global-administrator authority without inventing a tenant Party. Separation compares stable `AuthenticatedHumanActorId`; missing, stale, ambiguous, overlapping, incompatible, non-human where a Party is required, unavailable, or same-actor evidence blocks before selection, while post-hoc approval is never accepted.
 
 **Given** `EXT-SECRETS-1` is Available and key access succeeds through the platform host
 **When** the export is materialized
-**Then** `AuditExport(TenantId, ExportId)` encrypts the artifact under an export envelope key wrapped by the tenant KEK, appends `ManifestSealed` with manifest hash, signature reference, item hashes, stream/projection revision ranges, and key versions, and the `export` projection reaches completed only after artifact and manifest verification
+**Then** `AuditExport(TenantId, ExportId)` encrypts the artifact under an export envelope key wrapped by the tenant KEK, appends `ManifestSealed` with manifest hash, signature reference, item hashes, stream/projection revision ranges, and key versions, and the `export` projection reaches the explicitly nonterminal `MaterializedAwaitingCommit` state only after artifact and manifest verification
 **And** exact replay reuses the export identity rather than producing an untracked second artifact.
+
+**Given** the immutable artifact, sealed manifest, and content-free interaction index have acknowledged the exact frozen inventory and no export key has been delivered
+**When** export commit is decided
+**Then** `GovernanceProtection:ExportCommitDecision` requires the lifecycle DecisionVersion, store target/contract version, frozen set, and inventory to equal `ExportPreparing`, appends `ExportCommitDecided`, and advances the committed-export index high-water in the same expected-revision `ProtectionFence` append, making that fence event the sole commit decision; any successor-version/target mismatch conflicts and never relabels prepared bytes
+**And** `AuditExport` idempotently acknowledges the exact decision before state becomes `ExportCommitted` or key delivery is eligible; a crash before the fence decision retries after exact outcome lookup, a crash or lost acknowledgement after it completes only the secondary acknowledgement, and later deletion uses the fence high-water even while that acknowledgement is pending.
 
 **Given** an authorized Compliance Inspector requests the sealed export key
 **When** delivery is approved and unexpired
-**Then** the `EXT-SECRETS-1` custodian delivers it directly to that principal outside Agents responses
+**Then** `ExportDownload:AuthorizeKeyDelivery` revalidates current Inspector authority and appends `ExportKeyDeliveryAuthorized` on `AuditExport` with deterministic `DeliveryId`, exact `ExportCommitAcknowledged` revision, requester `AuthenticatedHumanActorId`, purpose/audience, exclusive expiry, and prepare-pinned lifecycle/store/secrets contract versions before any custodian call
+**And** only that fact permits `EXT-SECRETS-1` to deliver idempotently by `DeliveryId` directly to the authenticated principal and expose exact `Delivered(ObservedAt)`, `NotDelivered(Reason)`, or `Unknown/Unavailable` lookup; `RecordOrRecoverKeyDelivery` records only the safe result, never key material. Lost acknowledgement looks up the same id first; Delivered stays authoritative after later expiry/revocation, NotDelivered retries only while current actor authority and expiry still pass, expired/revoked records terminal non-delivery requiring a new audited export request, and unknown/unavailable remains pending without a second identity or inferred success
 **And** no key or secret appears in an Agents response, manifest, projection, event, log, trace, metric, or browser surface.
 
 **Given** the download authorization or artifact lifetime has expired
@@ -2756,6 +2942,11 @@ So that approved evidence can be transferred without exposing secrets, unrelated
 **Then** it fails closed before plaintext artifact publication, records only safe error classification and references, and can resume idempotently after an authorized recovery
 **And** logs, traces, UI, API responses, events, and evidence contain no raw secret, prompt, context, proposal, Provider payload, or stack trace.
 
+**Given** export preparation wrote no output or only part of its frozen artifact/manifest/index/key inventory
+**When** abort or recovery runs
+**Then** the original still-valid prepare intent at its exact revision and absence of cancellation/abort permit only `PrepareRecoveryDispositionDecided(Resume)`; an explicitly authorized cancellation or closed failure class mapped to Abort by the already-recorded recovery profile permits only `PrepareRecoveryDispositionDecided(Abort)`, which moves the fence to `ExportCleanupPending` until authenticated lookup proves each member never existed or durable physical-purge, index-removal, and irreversible key-destruction receipts prove every written and lifecycle-covered backup/restore copy is unreadable, with no key delivered before commit
+**And** unknown/unavailable lookup cannot append `ExportAborted`, release the fence, or let overlapping deletion arm or complete; failure injection covers every write, acknowledgement, cleanup, lost-ack, and fence-release boundary.
+
 **Given** an unauthorized Party or another tenant attempts to request, inspect, download, cancel, or replay an export
 **When** any public or internal export path executes
 **Then** current authorization denies before content selection, manifest disclosure, key resolution, or artifact access
@@ -2765,14 +2956,14 @@ So that approved evidence can be transferred without exposing secrets, unrelated
 
 | Field | Story 8.2 evidence |
 | --- | --- |
-| Requirements | FR19-FR24, FR28; OQ-30; NFR1-NFR6, NFR13; UX-DR1, UX-DR9-UX-DR18, UX-DR29-UX-DR33, UX-DR36-UX-DR41, UX-DR46, UX-DR50; AD-2, AD-8, AD-12, AD-13, AD-17, AD-20, AD-22, AD-23, AD-25, AD-26; EXT-PROTECTION-1; EXT-SECRETS-1 |
-| OwnedClauses | FR19.export-tenant-isolation; FR20.export-authorization-before-selection; FR23.export-public-contract; FR24.export-audit; FR24.export-prior-second-party-approval; FR28.audit-governance-active; PRD-OQ8.authorized-encrypted-time-limited-export; OQ30.no-post-hoc-export-approval; NFR2.no-unauthorized-audit-content; NFR6.secret-never-exposed; UX-DR31.ExportRequest-lock-scope; UX-DR40.ExportRequest-restrictive-viewport-block; UX-DR46.encrypted-time-limited-export; AD-2.AuditExport; AD-20.protected-content-and-secret-boundary; AD-22.manifest-sealing-and-key-delivery; AD-23.export-projection |
-| Dependencies | Story 8.1; EXT-PROTECTION-1 and EXT-SECRETS-1 Available with accepted exact targets and passing compatibility commands |
+| Requirements | FR19-FR24, FR28; OQ-30; NFR1-NFR6, NFR11, NFR13; UX-DR1, UX-DR9-UX-DR18, UX-DR29-UX-DR33, UX-DR36-UX-DR41, UX-DR46, UX-DR50; AD-2, AD-8, AD-12, AD-13, AD-17, AD-20, AD-22, AD-23, AD-25, AD-26, AD-30; EXT-PROTECTION-1; EXT-SECRETS-1; EXT-EXPORT-STORE-1; EXT-PARTIES-1; OD-EXPORT-LIFECYCLE-1; conditional OD-GOVERNANCE-CLASS-RANGE-SCOPE-1 for class/range; conditional OD-HUMAN-EXACT-CONVERSATION-SCOPE-1 for human exact-Conversation |
+| OwnedClauses | FR19.export-tenant-isolation; FR20.export-authorization-before-selection; FR23.export-public-contract; FR24.export-audit; FR24.export-prior-second-party-approval; FR28.audit-governance-active; PRD-OQ8.authorized-encrypted-time-limited-export; OQ30.no-post-hoc-export-approval; NFR2.no-unauthorized-audit-content; NFR6.secret-never-exposed; UX-DR31.ExportRequest-lock-scope; UX-DR40.ExportRequest-restrictive-viewport-block; UX-DR46.encrypted-time-limited-export; AD-2.AuditExport; AD-20.protected-content-and-secret-boundary; AD-22.manifest-sealing-and-durable-key-delivery; AD-23.export-projection; OperationGateMatrixV7.ExportDownload-authorize-effect-result-recovery |
+| Dependencies | Story 8.1; EXT-PROTECTION-1, EXT-SECRETS-1, EXT-EXPORT-STORE-1, and EXT-PARTIES-1 Available with accepted exact targets and passing compatibility commands; approved OD-EXPORT-LIFECYCLE-1 DecisionVersion exactly matches the deployed store; OD-GOVERNANCE-CLASS-RANGE-SCOPE-1 only for class/range scope; OD-HUMAN-EXACT-CONVERSATION-SCOPE-1 only for human exact-Conversation scope |
 | EvidenceLevel | Levels 2, 4, and 5: export logic, live secret/export components, and production-like encrypted-artifact proof |
-| TestOrArtifact | AuditExportAggregateTests; EncryptedExportIntegrationTests; ExportExpiryAndReplayTests; ExportUiContractTests; encrypted export manifest and no-leak scan |
+| TestOrArtifact | AuditExportAggregateTests; GovernanceScopeV1CanonicalPredicateTests; ExportHumanActorBindingIntegrationTests; ExportPrepareRecoveryDispositionTests; ExportPrepareLifecycleVersionPinTests; EncryptedExportIntegrationTests; ExportProtectionFenceTests; ExportCommitDecisionAndAcknowledgementTests; ExportKeyDeliveryAuthorizeEffectResultRecoveryTests; ExportAbortCleanupFailureInjectionTests; ExportExpiryAndReplayTests; ExportUiContractTests; encrypted export manifest, actor-binding evidence, key-delivery outcome evidence, partial-output cleanup receipts, and no-leak scan |
 | VerificationCommand | pwsh ./eng/verify-story-8.2.ps1 |
-| NegativeEvidence | AuditExportIsolationTests.CrossTenantRequestInspectDownloadAndReplayAreDenied; RevokedExportRoleTests; SecretResolutionFailureTests; PlaintextArtifactPoisonScan; ManifestMismatchAndExpiredDownloadTests |
-| Result | Blocked — backlog; EXT-PROTECTION-1 and EXT-SECRETS-1 are Uncommitted and Story 8.1 is required |
+| NegativeEvidence | AuditExportIsolationTests.CrossTenantRequestInspectDownloadAndReplayAreDenied; GovernanceScopeMalformedUnknownCrossTenantAndUnverifiableMembershipTests; HumanExactConversationExportCannotExecuteWhileDecisionOpenTests; ClassUtcRangeCannotExecuteWhileDecisionOpenTests; MissingStaleNonHumanUnavailableOrSameActorExportApprovalTests; PlatformApproverDoesNotRequireInventedTenantPartyTests; RevokedExportRoleTests; OpenOrMismatchedExportLifecycleDecisionTests; LifecycleSuccessorCannotRelabelPreparedArtifactTests; LifecycleSwitchRequiresCleanupCompleteAbortAndNewPrepareTests; ExportRecoveryCannotChooseOrSwitchDispositionTests; ExportCannotReadBeforeFencePrepareTests; ExportCannotDeliverKeyBeforeFenceDecisionAndAuditExportAcknowledgementTests; ExportKeyDeliveryCrossTenantChangedIdentityExpiryRevocationAndLostAckTests; ExportKeyNeverTraversesAgentsTests; MissingAuditExportAcknowledgementCannotHideFenceCommittedCopyFromDeletionTests; ExportCommitLostAckAndConcurrentRevisionTests; PartialArtifactUnknownOrCleanupFailureRetainsFenceTests; SecretResolutionFailureTests; PlaintextArtifactPoisonScan; ManifestMismatchAndExpiredDownloadTests |
+| Result | Blocked — backlog; EXT-PROTECTION-1, EXT-SECRETS-1, EXT-EXPORT-STORE-1, and EXT-PARTIES-1 are Uncommitted, OD-EXPORT-LIFECYCLE-1 is Open, Story 8.1 is required, and human exact-Conversation/class-range scopes retain only their named conditional blockers |
 
 ### Story 8.3: Delete Protected Content And Purge Projections
 
@@ -2785,25 +2976,74 @@ So that immutable history retains only a support-safe tombstone and no content-b
 **Dependencies:**
 
 - **Prior stories:** 8.1 for retention eligibility, legal-hold enforcement, and protected scope.
-- **External:** `EXT-PROTECTION-1` and `EXT-SECRETS-1` must be `Available` with exact targets and compatibility commands passing for cryptographic erasure/key operations.
-- **Forward dependencies:** None; export is an independent authorized operation and is not a deletion prerequisite.
+- **External:** `EXT-HOST-1`, `EXT-PROTECTION-1`, `EXT-SECRETS-1`, `EXT-PARTIES-1`, and `EXT-CONV-AI-1` must be `Available` with exact targets and compatibility commands passing. Story authorization is blocked unconditionally while `OD-PRD-OQ31-INSTRUCTION-PROTECTION-1` is Open, as bound by PRD OQ-31. Both deletion origins require Story 6.1's current migration guard plus `EXT-HOST-1` ordinal admission fences, immutable owner cycles, one continuous predicate content guard with successor bindings, separate ledgers, and tenant scope-guard hold/seal serialization; `EXT-PROTECTION-1` must provide atomic single-use `DestroyDekManifest` consumption, ordered per-target receipts, exact lookup, and revocation. A deployment containing legacy plaintext is additionally blocked by its named decision. Human operator exact-Conversation, class/range, operator nonterminal convergence, and operator Abort remain blocked only by their named Open decisions; exact-interaction operator scope and PRD-fixed source deletion remain evaluable. Export lifecycle applies only to export-bearing sets. `OD-HOLD-DELETION-PRECEDENCE-1` applies conditionally both to a contender that registers after `DeletionArmed` but before `DestructionSealed` and to every post-start hold branch through completion; ordinary no-contender deletion remains evaluable, and this story chooses no outcome.
+- **Forward dependencies:** None. A prior export request is not required, but every deletion must fence against and account for all overlapping committed, preparing, or cleanup-pending exports and every lifecycle-covered artifact copy.
 
 **Acceptance Criteria:**
 
-**Given** a deletion request for sensitive Agent content
+**Given** a hold, export, or deletion scope is submitted
+**When** Story 8.3 validates and persists it
+**Then** the scope is one versioned `GovernanceScopeV1` plus `ScopePredicateDigest = SHA-256(canonical length-prefixed scope bytes)`: either tenant-bound sorted-distinct exact interaction ids or one exact tenant Conversation. Membership is computed only from target stream identity, immutable first-event/directory-permit `SourceConversationId`, and permit/action/lease owner facts; caller metadata never classifies a resource, and missing, malformed, cross-tenant, or unverifiable proof fails closed
+**And** `ClassUtcRange` is rejected before admission-fence, candidate, inventory, or effect while `OD-GOVERNANCE-CLASS-RANGE-SCOPE-1` is Open. This story chooses no content-class vocabulary, classification owner, clock field, range boundary, or public meaning.
+
+**Given** the exact approved `OD-PRD-OQ31-INSTRUCTION-PROTECTION-1` version and a deletion request for sensitive Agent content
 **When** current tenant authorization, deletion policy, retention eligibility, and legal-hold state are evaluated
-**Then** `ProtectedDeletion(TenantId, DeletionId)` accepts a request only from a Platform Operator and becomes executable only after a distinct Compliance Inspector approval; it rejects before erasure when scope is ambiguous, authority is missing/stale, expected revisions differ, or any active hold protects the content
-**And** acceptance stores one deterministic request identity, immutable scope, expected source revisions, and authoritative pending state.
+**Then** `ProtectedDeletion(TenantId, DeletionId)` accepts a request only from a Platform Operator and becomes executable only after a distinct Compliance Inspector approval; the Platform requester proves current or historically recorded Hexalith.Tenants global-administrator authority without a tenant Party, the Party-bearing Inspector proves current/historical identity through `EXT-PARTIES-1`, and stable `AuthenticatedHumanActorId` separation fails closed on missing, stale, ambiguous, overlapping, incompatible, or same-actor evidence
+**And** invalid or ambiguous scope, missing/stale authority, or an expected-revision mismatch rejects without state; otherwise the command stores one deterministic request identity, canonical predicate, and workflow-start revision. The target-limited `GovernanceProtection` Workflow has only the common admission/effect-cut grants and, after their global receipt, candidate/refreeze, acceptance/acknowledgement, content-fence, containment, preparation, and recovery grants bound to that request, requester, approval, tenant, predicate, and expected revisions. Refreeze may add newly discovered authoritative resources inside that predicate but can never expand it. `ProtectionFence:AcceptDeletionInventory` is the sole immutable-set decision for either origin and requires the global cut receipt; it compares the current hold/export/copy, migration, and namespace owners and records the accepted set/token/predicate/cut. A concurrent winner requires a superseding candidate under the same id and predicate; an export already `Preparing` or `CleanupPending` prevents acceptance/preparation until its branch closes.
+**And** after first acceptance/acknowledgement but before preparation, either origin authorizes and installs one persistent content guard identified by `(DeletionRequestId, ScopePredicateDigest)` plus its first ordinal/global-cut/token binding. Conflict or migration invalidation installs nothing and permits only same-request/predicate supersession/refreeze; exact lookup resolves loss. If a later pre-seal admission recut produces a new accepted token, a separate successor-binding authorize/effect/result sequence proves the original fence was continuously installed, predecessor token invalidated, predicate unchanged, and current ordinal/zero proof exact, then appends the new binding without removal/reinstall. Prepare and barrier require that current binding; the guard rejects every later matching content write and survives migration repair.
+
+**Given** that valid fence-owned accepted deletion set overlaps an active or preparing legal hold before `DeletionArmed`
+**When** `GovernanceProtection:DeletionDeferByHold` wins its expected fence/owner revision
+**Then** the gate-minimal deferral reads only recorded origin and fence owners and durably appends `DeletionDeferredByHold` with its origin/request revision, whole accepted set, exact hold ids/revisions, fence revision, and deterministic reconsideration identity; unrelated topology, secrets, audit, or lifecycle unavailability cannot hide that content-free fact, and it performs no preparation, erasure, purge, or key destruction
+**And** release of the last overlapping hold triggers idempotent re-evaluation at a successor fence revision; a new hold or competing arm is serialized there, while a hold that first contends after `DeletionArmed` follows only the unresolved `OD-HOLD-DELETION-PRECEDENCE-1` branch and no story-local rule chooses its outcome.
+
+**Given** `OD-PRD-OQ31-INSTRUCTION-PROTECTION-1` is open, missing, or mismatched
+**When** Story 8.3 authorization or any deletion request/signal handling is attempted
+**Then** it blocks before request acceptance, scope enumeration, or preparation, without classifying Agent Instructions/audit as either interaction-key protected or exempt configuration state
+**And** no reduced interaction-only story completion, projection, protection adapter, or deletion worker chooses an Agent-level key placement; after approval, the exact decision version governs the complete deletion inventory even when one particular request contains no Agent Instructions.
+
+**Given** the exact approved instruction-protection decision and an authenticated tenant-scoped `EXT-CONV-AI-1` Conversation-deletion signal with its source identity/revision
+**When** the signal references a Conversation with derived Agent interactions
+**Then** Conversations atomically owns a durable outbox/feed entry with the deletion approval, binds one immutable `ConversationDeletionSignalId` one-to-one to that logical decision and stable source revision, retains it through ordered reconnect/backfill and target rollover, and retries it until authenticated Agents acknowledgement; a delivery-attempt id may vary but never changes the logical signal or Agents deletion identity
+**And** the closed signal envelope carries that id, `TenantId`, `ConversationId`, source stream/revision, approval reference, and source-contract version; platform composition derives a target-limited `ConversationDeletionPropagation` Workflow principal for `Intake` only, which verifies the committed source/target, recomputes `DeletionRequestId = H(conversation-deletion, TenantId, ConversationId, ConversationDeletionSignalId, SourceRevision)`, and records only `ConversationApprovedDeletion` plus its sole workflow-start outbox on the signal-derived `ProtectedDeletion` before returning `DeletionSignalAccepted` with the exact target revision
+**And** exact retry/lost acknowledgement returns the same result, changed authenticated fields conflict and remain quarantined/unacknowledged without skipping the feed checkpoint, while unauthorized, cross-tenant, stale, forged, or unavailable evidence changes no state or disclosure and is retried by the durable source.
+
+**Given** either the operator-approved or Conversation-approved deletion origin is durable with its canonical scope
+**When** its origin-matching Workflow begins the common pre-candidate effect cut
+**Then** it records `DeletionScopeAdmissionFenceAuthorized`; only that revision may call `EXT-HOST-1` to atomically install the canonical EventStore predicate at the current migration epoch and directory/effect-authorization high-waters. The guard rejects every later matching permit, protected User-action-intent, lease acquire/commit, `RateAdmissionAuthorized`, `OpenInteractionLeaseAuthorized`, `BudgetReservationAuthorized`, or `CapacityAdmissionAuthorized` append under old, bridged, current, restored, or successor authority, while exact lookup resolves a lost acknowledgement. A pre-fence winner precedes the authenticated checkpoint; a post-fence loser appends nothing
+**And** from that receipt it freezes the finite authoritative `ConversationAgentState` cohort—one owner for source-approved exact Conversation, or exact interactions grouped by their stored source Conversation. Each owner appends a separately keyed `(DeletionRequestId, ScopePredicateDigest, AdmissionFenceOrdinal)` Closing cycle with the matching permit, creation/workflow-start/User-action-intent outbox, lease, rate/open/Budget/capacity phase authorization, decision, result, posting, and acknowledgement count/hash/high-water manifest. A successor ordinal carries every prior still-restrictive obligation plus each newly visible or violating winner into a new cycle; it never reopens, overwrites, or relabels an earlier Effective fact. Closing cancels and consumes reserved work, retains committed/authorized work as non-revocable, and permits only exact result/lookup/settlement/acknowledgement convergence. Queued creation may materialize its permitted owner; a cancelled start records `StartSuppressedByDeletion`; committed Provider/posting work reaches authenticated outcome. If capacity was queued/admitted before a Provider authorization branch, allocator lookup plus proof of no authorization/begin/active state records only `PreProviderCapacityDispositionDecided(CancelNoInvocation)`, releases the existing identity, and acknowledges it—never invocation or invented no-use
+**And** an owner reaches `DeletionEffectCutEffective(AdmissionFenceOrdinal)` only after every carried-forward/current obligation and acknowledgement is exact. Operator nonterminal work stays Closing while its Product decision is Open. The append-only violation ledger is partitioned by request/ordinal: prior violations stay visible and only the current installed ordinal may attest `ZeroAcceptedViolationsSinceInstall`. Every same-ordinal owner receipt plus that proof is required for its global cut; candidate, acceptance, content binding, prepare, and barrier recheck it. Initial ordinal-one authorization explicitly requires no containment receipt or prior evidence. If an accepted violation appears before the first cut, containment explicitly proves no cut/candidate/token exists, records the violation, and assigns the next ordinal once; after a cut it invalidates only each exact artifact that exists. Concurrent detection/replay/lost acknowledgement returns the same receipt and ordinal. After the continuous content guard exists, every such receipt is an ordered invalidation-gap link; a binding authorization overtaken by a later violation terminates as `ObsoleteBindingAuthorization` without appending, and the next authorization starts at the latest installed binding plus the complete gap-free chain. No projection scan, request-lifetime “zero,” or absence proves completion.
+**And** the EventStore guard assigns `AcceptedAtAdmissionFenceOrdinal` and `AcceptedAtGuardHighWater` at each matching accepted append's own linearization and atomically contaminates the partition current at that instant. Caller-presented stale ordinals are diagnostic only; successor installation serializes with assignment. Delayed detection uses that receipt, while missing/unverifiable acceptance-time evidence records `AdmissionIntegrityUnattributable`, invalidates current clean proof, and blocks deletion rather than guessing a partition.
+
+**Given** an EventStore-accepted matching permit, intent, lease, or phase authorization is discovered after the admission-fence checkpoint
+**When** `ContainDeletionScopeAdmissionFenceViolation` verifies its exact owner revision and canonical-scope membership
+**Then** before `DestructionSealed` it uses the explicit no-artifact or exact-existing-artifact containment branch, preserves every fence/cycle, assigns one successor ordinal, and permits only that ordinal's admission-fence and separately keyed complete owner/global recut carrying prior obligations and the violator. If the content guard already exists, deletion cannot prepare until its continuous successor binding records the new token from the latest installed binding and complete gap-free invalidation chain. Another violation may extend the chain without waiting for an invalid token to bind; the overtaken authorization records terminal obsolete and exact lookup resolves it
+**And** after sealing it records `DeletionIntegrityCompromised` and invokes `BlockDeletionBatchConsumption` for the deletion request/batch set to race `ReserveAndConsumeDeletionBatchEffect` at the protection owner. The exact blocked, reserved, revoked, or consumed result is mirrored; new batches, remaining destruction, purge, and completion block, and no possibly begun effect becomes content-only containment.
+
+**Given** a source-approved deletion is preparing or recovering
+**When** cancellation, failure, or an Abort disposition is proposed
+**Then** no local operator, Inspector, workflow, timeout, or recovery profile can cancel or Abort it because seam 6 defines no authenticated source supersession; failures remain restrictive pending and permit only Resume/retry
+**And** a future cancellation path requires a separately committed Conversations supersession signal and Product/Governance authority rather than borrowing the operator-origin branch; an active/preparing pre-arm hold instead records `DeletionDeferredByHold` with the complete set and deterministic reconsideration identity.
+
+**Given** reversible operator-origin deletion preparation is interrupted before `DestructionStarted`
+**When** recovery or cancellation is requested
+**Then** while `OD-OPERATOR-DELETION-CANCELLATION-1` is Open, missing, mismatched, or forbids Abort, only the original exact prepare intent may Resume/retry; no timeout, dependency failure, operator, Inspector, Workflow, or recovery profile may infer Abort, unwind, remove an EventStore fence ordinal, release an owner/ordinal cycle, or publish cancellation
+**And** only if an approved decision explicitly permits Abort may its named requester/approver evidence record that disposition. Cleanup of every reversible protection/export effect must complete first; then a `ProtectionFence` authorization that wins before any destruction-start authorization fixes the complete removal manifest. Its committed EventStore effect removes every admission-fence ordinal plus the continuous content guard and all ordinal/token bindings, exact lookup resolves the result, every owner/ordinal cycle records `ReleasedAfterApprovedAbort`, and only all those receipts permit final `DeletionAborted`. The guard rejects a destruction barrier after removal authorization; no step replays cancelled work or applies to Conversation-origin deletion.
 
 **Given** an eligible accepted request and Available secret/erasure seam
-**When** deletion executes
-**Then** the protection engine destroys every in-scope interaction DEK and returns an irreversible receipt, EventStore replay produces typed `Erased` without rewriting history, and a support-safe non-content tombstone records policy, scope reference, requester, approver, timestamps, and result
+**When** every reversible preparation acknowledges and deletion executes
+**Then** before `DeletionPrepare`, the fence-owned accepted inventory either proves `NoLifecycleCoveredExportOrCopyInFrozenSet` without reading a lifecycle decision or binds the exact approved `OD-EXPORT-LIFECYCLE-1` version plus Available `EXT-EXPORT-STORE-1` target/contract; an export-bearing prepare phase-pins those values
+**And** every authorized legal hold first registers its canonical scope on `GovernanceScopeGuard(TenantId)`; registration and deletion sealing serialize there. `AuthorizeDeletionDestructionStartBarrier` first observes and records the exact `GovernanceScopeGuard` revision/compare token; a contender registration, release, or other guard mutation after authorization makes its conditional seal append return authenticated stale. Only after that result is mirrored may a new authorization bind the returned current revision. While armed precedence is Open neither branch advances; only an exact effective deletion-allowed disposition may be consumed inside the seal commit, and a hold-allowed disposition remains restrictive. The accepted inventory assigns and persists one stable `DestructionSealId` from the accepted token, predicate digest, and accepted-manifest digest before the first barrier authorization; retries never derive it from a guard revision. The authorization binds that seal id, the accepted token, current ordinal/zero proof, continuous content binding/checkpoint, migration/fence receipts, sorted `(TenantId, AgentInteractionId, TargetProtectionKeyAlias)` manifest/digest, phase-pinned values, and any required disposition. `CommitDeletionDestructionStartBarrierEffect` conditionally appends at the observed guard revision and atomically rechecks those facts with admissions and hold registrations/releases, then commits `DestructionSealed`; that instant is `DestructionStarted`. It returns one deterministic non-expiring, revocable, single-use `DestroyDekManifest` capability for the exact accepted manifest, never a reusable barrier token. It has no `ExpiresAt` or renewal branch, its capability-key version remains verifiable for the full retention of the batch identity and terminal outcome, including exact retry/lookup after consumption or revocation, and outage/migration/restore reuse the same seal and batch ids. The authenticated successful guard result records its actual `CommittedDestructionSealGuardRevision` separately. `RecordDeletionDestructionStarted` mirrors it; `EXT-PROTECTION-1` atomically consumes the batch and destroys every target or none, returns the ordered per-target irreversible vector, and resolves loss by exact batch lookup. Changed manifests conflict and no second batch is minted. Each authoritative post-seal content violation is serialized on `ProtectionFence`, assigns one monotonic containment ordinal to its immutable singleton target manifest, then uses `AuthorizeDeletionContainmentBatch` → guard-revision-conditional `CommitDeletionContainmentBatchEffect` → `RecordDeletionContainmentBatchIssued` or `RecordDeletionContainmentBatchIssuanceStale` before protection consumption. Exact duplicates reuse the ordinal/result, distinct targets receive distinct ordinals, stale/lost issuance uses exact guard lookup, and no manifest is mutated or second batch minted. Unknown evidence starts nothing. EventStore replay produces typed `Erased` without rewriting history, and the support-safe tombstone records exact batch/vector evidence plus exactly one origin without Provider secrets, raw content, or invented human fields
+**And** every accepted or containment batch carries a `DeletionBatchCapabilityV1` ES256 detached JWS over the closed RFC 8785 canonical issuer/audience/tenant/request/stable-destruction-seal-id/batch/manifest/guard/attestation/signing-attempt/intended-issue-revision/key-version fields; the actual successful issue revision is result evidence excluded from signed bytes and identity derivation. A target-limited authorize/sign/result step uses only the per-tenant `EXT-SECRETS-1` key family before guard issue; protection verifies the committed public anchor/audience and exact current guard-issued state, never a signature alone. A signed attempt whose issue loses terminalizes only after exact no-issue proof as `SignedAttestationObsoleteUnissued`; a successor retains seal id/batch/manifest/attestation ordinal, increments the signing attempt, and binds the new guard revision. Routine rotation retains old verifiers. Emergency compromise enters only through the non-public registrar and may replace only the attestation of the same actually issued protection-owner-blocked batch, with one active credential and no second batch.
+**And** batch issue is followed by `AuthorizeDeletionBatchDispatch` → guard-revision-conditional `CommitDeletionBatchDispatchEffect` → issued-or-stale mirror before protection. The guard commit serializes with post-start hold and compromise facts; an earlier unresolved hold or intervening mutation produces stale and no dispatch. A winning `DeletionBatchDispatchAuthorized` is uninterruptible only against a later hold on that batch. Admission-integrity/key-compromise blocking and `ReserveAndConsumeDeletionBatchEffect` race the same `EXT-PROTECTION-1` state; `ConsumptionReserved` is their irreversible instant. Re-attestation requires a protection-owned capability-compromise block and stays blocked through guard replacement and successor dispatch. Exact protection-owner activation binds the replacement key, attestation, dispatch, expected batch revision, and tenant-key block-set revision and reopens only when that replacement key is unblocked in the same transaction; if its compromise exists or wins, activation returns a typed new-key-blocked outcome and leaves/places the batch in that exact block for another same-batch re-attestation.
+**And** a post-seal violation is deduplicated by complete `(TenantId, AgentInteractionId, TargetProtectionKeyAlias)`. If the target already belongs to the accepted or a containment batch, the fence appends non-authorizing `ViolationCoveredByDeletionBatch` and links the resource to the original per-target outcome, including `AlreadyDestroyedByBatch` after consumption; it allocates no new ordinal/capability. Only an uncovered target gets a singleton containment ordinal. Same-target races converge, different uncovered targets remain distinct, and every new copy still requires purge evidence. Post-start hold facts and their exact applied disposition are checked at containment authorization, guard issue, protection consumption, purge, and completion.
 **And** Provider secrets, raw payloads, Party PII, and deleted content never appear in the tombstone, status, audit, log, trace, or evidence.
 
 **Given** projection purge begins
 **When** each affected contract reports its restrictive result
-**Then** completion explicitly names `provider-capability-pricing` when content-bearing, `agent-interaction-status`, `proposal-detail`, `proposal-version-history`, `pending-proposal-queue`, `pending-proposal-count`, `audit-evidence`, `retention`, `legal-hold`, `export`, `deletion`, and every content-bearing metric projection identified by its current contract
-**And** `agent-setup-readiness`, `budget-reservation-usage`, `launch-readiness`, and non-content metric records retain only policy-required support-safe references.
+**Then** completion explicitly accounts for every content-bearing member of the authoritative current inventory, including `agent-interaction-status`, `proposal-detail`, `proposal-version-history`, `pending-proposal-queue`, `pending-proposal-count`, `audit-evidence`, `retention`, `legal-hold`, `export`, `export-artifact-index`, every matching `export-artifact-store` and lifecycle-covered backup/restore copy, `deletion`, content-bearing metrics, and `workflow-execution-state`, with physical purge/destruction receipts
+**And** `agent-setup`, `provider-catalog`, the content-free `conversation-interaction-directory` permit/tombstone/barrier evidence, `tenant-provider-enablement`, `rate-limit-usage`, `open-interaction-leases`, `budget-reservation-usage`, `safety-verdict-status`, content-free `safety-verdict-directory`, `launch-readiness`, and non-content metric records retain only policy-required support-safe references; deletion cannot complete while any matching committed, preparing, or cleanup-pending export is unaccounted for
+**And** an exact export-free inventory neither reads nor fabricates lifecycle authority; an export-bearing set waits for its exact version/target/receipts. A content write after guard installation forces refreeze before sealing; after sealing an authoritative same-predicate resource is either linked through existing exact target coverage or receives its one new guard-issued containment batch. Unknown or outside-scope proof blocks without widening scope. Admission violations follow only ordinal recut/integrity-compromise recovery. Final success requires `AuthorizeDeletionCompletionBarrier` to freeze every admission acceptance/high-water, immutable owner cycle, continuous content binding/checkpoint, post-start hold disposition, target-coverage link, capability attestation/status, batch vector, and copy receipt plus the observed guard revision. `CommitDeletionCompletionBarrierEffect` conditionally appends at that revision and atomically rechecks the guard; any late admission/content/hold/release/coverage/containment/capability mutation returns authenticated stale and must be mirrored before reauthorization. Only `DeletionCompletionSealed` exact lookup may be mirrored as completed, and it rejects all later matching writes. No direct clean-read completion is legal.
 
 **Given** any named payload or projection step fails, times out, returns unknown, or cannot prove its expected revision
 **When** deletion status is calculated
@@ -2819,14 +3059,21 @@ So that immutable history retains only a support-safe tombstone and no content-b
 
 | Field | Story 8.3 evidence |
 | --- | --- |
-| Requirements | FR18-FR24, FR28; NFR1-NFR6, NFR11, NFR13; UX-DR1, UX-DR9-UX-DR18, UX-DR29-UX-DR33, UX-DR36-UX-DR41, UX-DR46, UX-DR50; AD-2-AD-4, AD-8, AD-12, AD-13, AD-17, AD-20, AD-22, AD-23, AD-25, AD-26; EXT-PROTECTION-1; EXT-SECRETS-1 |
-| OwnedClauses | FR18.terminal-history-preserved-after-protection; FR19.deletion-tenant-isolation; FR20.deletion-authorization-before-effect; FR23.deletion-status-contract; FR24.safe-deletion-audit; FR28.audit-governance-active; PRD-OQ8.cryptographic-erasure-or-redaction; PRD-OQ8.named-projection-purge; PRD-OQ8.safe-tombstone; NFR11.restart-no-duplicate-erasure; UX-DR31.DeletionRequest-lock-scope; UX-DR40.DeletionRequest-restrictive-viewport-block; UX-DR46.restrictive-partial-failure; AD-2.ProtectedDeletion; AD-22.two-role-approval-and-DEK-destruction; AD-23.explicit-deletion-inventory |
-| Dependencies | Story 8.1; EXT-PROTECTION-1 and EXT-SECRETS-1 Available with accepted exact targets and passing compatibility commands |
+| Requirements | FR18-FR24, FR28, FR30; OQ-31; A-16; NFR1-NFR6, NFR11, NFR13; UX-DR1, UX-DR9-UX-DR18, UX-DR29-UX-DR33, UX-DR36-UX-DR41, UX-DR46, UX-DR50; AD-2-AD-4, AD-6, AD-8, AD-12, AD-13, AD-17, AD-20, AD-22, AD-23, AD-25, AD-26, AD-29, AD-30; EXT-HOST-1; EXT-PROTECTION-1; EXT-SECRETS-1; EXT-PARTIES-1; EXT-CONV-AI-1; unconditional StoryAuthorization:8.3 OD-PRD-OQ31-INSTRUCTION-PROTECTION-1; conditional OD-GOVERNANCE-CLASS-RANGE-SCOPE-1 for class/range scope; conditional OD-HUMAN-EXACT-CONVERSATION-SCOPE-1 for human operator exact-Conversation scope; conditional OD-OPERATOR-DELETION-NONTERMINAL-DISPOSITION-1 for operator-origin nonterminal convergence; conditional OD-OPERATOR-DELETION-CANCELLATION-1 only for operator Abort/removal; conditional OD-LEGACY-PLAINTEXT-DISPOSITION-1 for nonempty legacy plaintext; conditional EXT-EXPORT-STORE-1 and OD-EXPORT-LIFECYCLE-1 for export-bearing accepted sets; conditional OD-HOLD-DELETION-PRECEDENCE-1 for post-arm pre-seal contention and every post-start hold branch through completion |
+| OwnedClauses | FR18.terminal-history-preserved-after-protection; FR19.deletion-tenant-isolation; FR20.deletion-authorization-before-effect; FR23.deletion-status-contract; FR24.safe-deletion-audit; FR28.audit-governance-active; FR30.Conversation-deletion-derived-content-propagation; A16.Conversations-deletion-signal; PRD-OQ8.cryptographic-erasure-or-redaction; PRD-OQ8.named-projection-purge; PRD-OQ8.safe-tombstone; OQ31.complete-story-authorization-blocker; NFR11.restart-no-duplicate-erasure; UX-DR31.DeletionRequest-lock-scope; UX-DR40.DeletionRequest-restrictive-viewport-block; UX-DR46.restrictive-partial-failure; AD-2.canonical-scope-common-both-origin-admission-and-effect-cut; AD-6.durable-Conversation-deletion-delivery; AD-13.pre-Provider-capacity-disposition; AD-22.fence-owned-deletion-inventory-and-phase-pinned-destruction; AD-23.explicit-deletion-inventory; AD-29.signal-derived-deletion-id; AD-30.manifest-bound-both-origin-settlement-authority; OperationGateMatrixV7.acceptance-attribution-post-start-hold-target-coverage-capability-trust-owner-linearization-and-completion-barrier |
+| Dependencies | Story 8.1 and Story 6.1 directory/migration/repair-fence contract for both deletion origins; EXT-HOST-1, EXT-PROTECTION-1, EXT-SECRETS-1, EXT-PARTIES-1, and EXT-CONV-AI-1 Available with passing ordinal admission, explicit pre/post-cut recovery, immutable owner cycles, repeated-recut gap-chain continuous content binding, revision-bound tenant scope-guard hold/seal serialization with stale recovery, separate ledgers, non-expiring accepted capability recovery, guard-owned target-deduplicated containment-batch issuance, stable destruction-seal/batch identity across signed-but-unissued retries, non-public compromise registration, and protection-owner block/reserve/re-attestation activation with replacement-key block arbitration; approved OD-PRD-OQ31-INSTRUCTION-PROTECTION-1 unconditionally; OD-GOVERNANCE-CLASS-RANGE-SCOPE-1 only for class/range variants; OD-HUMAN-EXACT-CONVERSATION-SCOPE-1 only for human operator exact-Conversation; OD-OPERATOR-DELETION-NONTERMINAL-DISPOSITION-1 only when operator-origin manifested work lacks an ordinary terminal transition; OD-OPERATOR-DELETION-CANCELLATION-1 only for operator Abort/removal; OD-LEGACY-PLAINTEXT-DISPOSITION-1 only for nonempty legacy plaintext; EXT-EXPORT-STORE-1/OD-EXPORT-LIFECYCLE-1 only at initial prepare for export-bearing accepted sets; OD-HOLD-DELETION-PRECEDENCE-1 for post-arm pre-seal contention and every post-start hold branch through completion |
 | EvidenceLevel | Levels 2, 4, and 5: deletion state logic, live payload/projection components, and production-like erasure/purge proof |
-| TestOrArtifact | ProtectedDeletionAggregateTests; CryptographicErasureIntegrationTests; NamedProjectionPurgeTests; DeletionRecoveryAndUiTests; deletion completion manifest and forensic no-content scan |
+| TestOrArtifact | ProtectedDeletionAggregateTests; GovernanceScopeV1CanonicalPredicateTests; ConversationInteractionDirectoryAggregateTests; DeletionHumanActorBindingIntegrationTests; OperatorDeletionWorkflowCandidateAuthorityTests; ConversationDeletionDurableSourceFeedIntegrationTests; ConversationDeletionSignalIntakeMatrixTests; BothOriginDeletionAdmissionFenceRaceTests; AdmissionFencePhaseAuthorizationRaceTests; AdmissionFenceAcceptedViolationRecutTests; AdmissionFencePreGlobalCutSuccessorTests; AdmissionFenceOrdinalPartitionAndCarryForwardTests; AdmissionFencePostDestructionIntegrityCompromisedTests; BothOriginDeletionOwnerCutFixedPointTests; ImmutableOwnerOrdinalCutCycleTests; ConversationDeletionDerivedInteractionConvergenceTests; OperatorNonterminalDeletionDispositionDecisionTests; DeletionManifestBoundRateOpenBudgetCapacitySettlementTests; PreProviderCapacityDeletionDispositionTests; ConversationDeletionPostingPendingLookupTests; DeletionCandidateRefreezeAndFenceAcceptanceTests; DeletionScopeWriteFenceAuthorizeEffectResultTests; ContinuousContentFenceSuccessorBindingTests; RepeatedAdmissionRecutGapChainAndObsoleteBindingTests; HoldDeletionScopeGuardLinearizationTests; DeletionDestructionStartBarrierAuthorizeEffectResultTests; DeletionDestructionStartBarrierAdmissionAndHoldRaceTests; GovernanceScopeGuardBarrierCompareTokenStaleReauthorizationTests; MultiInteractionDestroyDekManifestTests; NonExpiringDeletionBatchRestoreTests; GuardOwnedContainmentBatchIssuanceRecoveryTests; DeletionBatchRevocationRaceTests; DeletionScopeFenceMigrationRepairPreservationTests; DeletionScopeFenceViolationContainmentTests; OperatorDeletionCancellationDecisionAndFenceRemovalTests; ConversationDeletionSignalRecoveryTests; DeletionOriginTombstoneContractTests; DeletionPrepareRecoveryDispositionTests; DeletionDeferredByHoldTests; HoldReleaseDeletionReevaluationTests; ExportFreeDeletionCompletionTests; ExportBearingDeletionLifecyclePinTests; InstructionProtectionDecisionTests; CryptographicErasureIntegrationTests; ProtectionFenceExportDeletionRaceTests; NamedProjectionAndAllCopiesPurgeTests; DeletionRecoveryAndUiTests; deletion completion manifest, every fence-ordinal and continuous-binding receipt, owner/ordinal/global cut manifests, scope-guard contender/compare-authorization/stale/seal receipts, every accepted/containment capability-state and batch vector, physical purge/backup/restore receipts, immutable separate ledger checkpoints, and forensic no-content scan |
+| AdditionalV21Tests | AdmissionAcceptanceTimeOrdinalAttributionRaceTests; AdmissionIntegrityUnattributableBlocksDeletionTests; PostStartHoldEveryDestructiveBoundaryTests; DeletionBatchDispatchGuardLinearizationTests; SameProtectionAliasViolationCoverageTests; DeletionBatchCapabilityCanonicalJwsTrustTests; DeletionBatchCapabilityRotationCompromiseReattestationTests; DeletionCompletionBarrierRaceAndRecoveryTests; migration/restore preservation of acceptance receipts, post-start holds/dispositions, target coverage, attestations/revocations/dispatch receipts, stale completion attempts, and completion seal |
+| V21DecisionAndDependencyScope | `OD-HOLD-DELETION-PRECEDENCE-1` applies both to a contender registered after `DeletionArmed` but before seal and to a hold observed after seal but before completion; the story binds an approved result but selects none. `EXT-HOST-1`, `EXT-SECRETS-1`, and `EXT-PROTECTION-1` must satisfy their v21 admission-attribution, post-start-hold, target-coverage, signing/attestation, online validation, and completion-barrier extensions. |
+| AdditionalV22Tests | ProtectionOwnerAdmissionCompromiseBlockVsReserveConsumeTests; ProtectionOwnerCapabilityKeyBlockVsReserveConsumeTests; CapabilityCompromiseRegistrarAuthorityReplayTenantAndLostAckTests; ReattestationRequiresProtectionOwnedBlockTests; ReattestationGuardReplacementSuccessorDispatchAndProtectionActivationTests; SignedAttestationObsoleteUnissuedAcceptedAndContainmentTests; SigningAttemptRevisionRotationCompromiseAndRestoreTests; migration/restore preservation of signing attempts, obsolete-unissued receipts, registrar deliveries, block-pending facts, and every protection-owner blocked/reserved/re-attested/terminal state |
+| V22DecisionAndDependencyScope | `OD-HOLD-DELETION-PRECEDENCE-1` is present in the runtime catalog affected set for both pre-seal contention and every post-start containment, dispatch, protection-reservation, purge, completion, and StoryAuthorization 8.1/8.3 branch that consumes it; the story selects no outcome. `EXT-HOST-1`, `EXT-SECRETS-1`, and `EXT-PROTECTION-1` must satisfy their v22 signed-unissued, registrar, and protection-owner state-machine extensions. |
+| AdditionalV23Tests | StableDestructionSealIdentityAcrossMultipleSignedObsoleteAttemptsTests; ActualCommittedSealAndContainmentIssueRevisionExcludedFromCapabilityIdentityTests; ReplacementKeySecondCompromiseBeforeReattestDispatchActivationAndReserveTests; ActivationBlockedByReplacementKeyCompromiseLostAckMigrationRestoreTests; activation identity and restore manifests preserve the replacement key, attestation, successor dispatch, expected batch revision, expected tenant-key block-set revision, and exact activated-or-new-key-blocked result |
+| V23DecisionAndDependencyScope | Matrix v7 changes only technical identity and protection-owner ordering: one pre-seal `DestructionSealId` survives every stale signing retry, actual issue revisions are result evidence, and activation cannot clear a replacement-key block. `OD-HOLD-DELETION-PRECEDENCE-1` remains Open for both post-arm/pre-seal contention and every post-start branch; ordinary no-contender deletion remains evaluable and this story selects no Product outcome. |
 | VerificationCommand | pwsh ./eng/verify-story-8.3.ps1 |
-| NegativeEvidence | ProtectedDeletionIsolationTests.CrossTenantRequestConfirmInspectAndReplayAreDenied; LegalHoldBypassTests; PartialProjectionFailureTests; DuplicateDeletionDeliveryTests; DeletedContentForensicScan |
-| Result | Blocked — backlog; EXT-PROTECTION-1 and EXT-SECRETS-1 are Uncommitted and Story 8.1 is required |
+| NegativeEvidence | ProtectedDeletionIsolationTests.CrossTenantRequestConfirmInspectAndReplayAreDenied; GovernanceScopeMalformedUnknownCrossTenantAndUnverifiableMembershipTests; HumanExactConversationOperatorDeletionCannotExecuteWhileDecisionOpenTests; ClassUtcRangeCannotExecuteWhileDecisionOpenTests; OperatorDeletionWorkflowWrongRequestActorScopeCandidateOrdinalAndRevisionTests; OperatorDeletionRefreezeCannotExpandApprovedScopeTests; OperatorNonterminalOwnerCannotReachEffectiveWhileDispositionOpenTests; ConversationDeletionSourceOutageBackfillPoisonAndAckLossTests; ConversationDeletionSignalCrossTenantStaleChangedReplayAndLostAckTests; ConversationDeletionSignalCannotMintSecondLogicalIdTests; BothOriginPermitIntentAcquireCommitAndRateOpenBudgetCapacityAuthorizationImmediatelyBeforeAndAfterAdmissionFenceTests; PreGlobalCutViolationCannotWedgeOrInventArtifactInvalidationTests; ConcurrentViolationDetectionCannotAssignTwoSuccessorOrdinalsTests; MultipleViolationsBeforeSuccessorBindingCannotWedgeOrSkipGapTests; AcceptedAdmissionViolationRequiresHigherOrdinalFullOwnerRecutTests; SuccessorAdmissionOrdinalCannotHidePriorViolationOrReopenEffectiveTests; ExistingContentFenceCannotBeSilentlyReusedReinstalledOrLeftOnOldTokenTests; PostDestructionAdmissionViolationCannotEnterContentContainmentOrCompleteTests; CandidateCannotBuildBeforeEverySameOrdinalOwnerCutAndZeroSinceInstallProofTests; ApproverResolutionAndUserActionIntentImmediatelyBeforeAndAfterClosingTests; StaleCancelledWorkerCannotStartEffectTests; PreProviderCapacityCannotRemainManifestedAfterEffectiveTests; MembershipAndGeneratedOutputImmediatelyBeforeAndAfterEffectiveTests; CreationOutboxAndInteractionAppendLostAckTests; CommittedEffectLeaseAckLossAndUnknownOutcomeTests; ProjectionLagCannotOmitInteractionTests; DeletionWorkflowCannotReserveAcquireInvokeOrInventSettlementTests; CandidateCannotPrepareBeforeCurrentContentBindingTests; HoldAfterBarrierAuthorizationBeforeSealMakesAuthorizationLoseTests; BarrierAuthorizationWithoutExactGuardCompareTokenRejectedTests; BarrierReauthorizationBeforeStaleResultRecordedRejectedTests; OpenArmedHoldContenderAdvancesNeitherBranchTests; HoldRegistrationLostAckCannotDisappearTests; DirectLedgerReadThenProtectionFenceAppendCannotAuthorizeDestructionTests; AdmissionAppendRacingBarrierCommitHasExactlyOneWinnerTests; MultiKeyDeletionCannotReuseBarrierReceiptPerKeyTests; DestroyDekManifestCannotPartiallySucceedOrMintSecondBatchTests; LostManifestBatchOutcomeUsesExactLookupTests; SealedBatchCannotExpireOrRenewIntoSecondAuthorityTests; ContainmentProtectionEffectWithoutGuardIssuedCapabilityRejectedTests; ContainmentDuplicateConcurrentAndLostIssuanceTests; CompromiseRevocationAndBatchConsumptionHaveExactlyOneWinnerTests; FenceRemovalAuthorizationAndDestructionBarrierCannotBothWinTests; MigrationSuccessorCannotDropAdmissionOrdinalGapChainOwnerCycleContentBindingHoldContenderCompareAuthorizationStaleResultSealBatchGuardIssuedStateOrProtectionOwnerOutcomeTests; PostStartInScopeContentViolationRequiresDistinctContainmentBatchTests; OutsideScopeOrUnresolvableViolationBlocksCompletionTests; ConversationDeletionCannotUseLocalAbortOrHumanOriginFieldsTests; OperatorAbortFenceRemovalAndCutReleaseBlockedWhileDecisionOpenTests; MissingStaleOrSameActorDeletionApprovalTests; ActiveOrPreparingHoldCannotBeRejectedOrBypassedTests; DeferredDeletionCannotPrepareBeforeLastHoldGuardReleaseTests; OpenOrMismatchedInstructionProtectionDecisionBlocksAllStoryAuthorizationTests; LegacyPlaintextCannotEnterDeletionInventoryTests; ReducedInteractionOnlyDeletionCannotBypassOq31Tests; ExportFreeDeletionCannotReadOrFabricateLifecycleDecisionTests; ExportBearingDeletionCannotPrepareOrDestroyWithoutPhasePinnedLifecycleStoreTests; PreparingOrCleanupPendingExportBlocksDeletionTests; PartialProjectionFailureTests; DuplicateDeletionDeliveryTests; DeletedContentForensicScan |
+| AdditionalV21NegativeEvidence | CallerPresentedStaleOrdinalCannotChooseViolationPartitionTests; MissingAcceptanceReceiptCannotLeaveCurrentZeroCleanTests; PostStartHoldOpenOrMismatchedCannotDispatchAcceptedBatchTests; PostStartHoldCannotIssueOrDispatchContainmentBatchOrCompleteTests; StaleOrBatchIssueOnlyCannotReachProtectionTests; SameAliasDistinctResourceCannotMintSecondCapabilityTests; WrongTenantAliasCannotUseAlreadyDestroyedReceiptTests; SignatureWithoutExactGuardIssuedStateRejectedTests; WrongAudienceOrRevokedCapabilityKeyRejectedTests; CompromisedKeyCannotRaceReattestationIntoTwoActiveCredentialsTests; DirectCompletionAppendRejectedTests; LateAdmissionContentHoldCoverageDispatchOrCapabilityMutationMakesCompletionAuthorizationStaleTests |
+| Result | Blocked — backlog; common dependencies remain Uncommitted and OD-PRD-OQ31-INSTRUCTION-PROTECTION-1 blocks all Story 8.3 authorization. Class/range scope, human operator exact-Conversation scope, operator nonterminal convergence, and operator cancellation remain safely blocked only at their named Open decisions; exact-interaction and source-approved exact-Conversation eligible Resume/retry paths stay evaluable. Nonempty legacy plaintext and optional export/armed-contention branches retain their conditional blockers. Stories 8.1 and 6.1 plus the common admission/effect-cut/content-fence implementation are required |
 
 ### Story 8.4: Operate Safety Cost And Governance Policies
 
@@ -2839,7 +3086,7 @@ So that future Agent Calls use explicit current controls and no UI or API path c
 **Dependencies:**
 
 - **Prior stories:** 5.3 and 5.5 for Provider/pricing/readiness contracts, 6.3 for enforced live safety, and 6.4 for hard budget reservation behavior.
-- **External:** No new external commitment; live adapter behavior remains proven by the dependencies declared in Stories 6.3 and 6.4.
+- **External:** `EXT-SECRETS-1` must be `Available` for digest-key rotation and the policy/key-version safety activation barrier. `EXT-PARTIES-1` must be Available for the Party-bearing Release Operator review/pull branch. Other live adapter behavior remains proven by the dependencies declared in Stories 6.3 and 6.4.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
@@ -2849,10 +3096,25 @@ So that future Agent Calls use explicit current controls and no UI or API path c
 **Then** platform-scoped `ContentSafetyPolicy(system)` appends a new immutable policy version defining prompt/context and output gates, fixed always-blocked categories, explicitly permitted restricted handling, failure/audit treatment, no Approver override, future-only effect, and no-weaker retry
 **And** safety configuration is removed from `Agent`; each interaction snapshots the platform/tenant policy version pair and retains a safety high-water mark at least as restrictive as its initial pair.
 
+**Given** a Content Safety Policy publication or per-tenant `EXT-SECRETS-1` digest-key rotation is durably accepted
+**When** the new safety version is prepared for runtime use
+**Then** publication/rotation starts the Story 6.3 `SafetyVerdictEpoch(PendingActivation)` protocol, binds the exact policy/key versions and rescan profile, and does not expose the version as Active until the finite active-tenant manifest and each tenant's finite indexed-Conversation manifest are complete
+**And** post-checkpoint tenants and Conversations use local version-pinned initialization before their own callability and never extend that barrier; API/UI show authoritative pending with content-free epoch/checkpoint progress, while a crash, unavailable key/safety seam, lost acknowledgement, invalid bound, or incomplete manifest keeps the old version from authorizing affected calls and causes them to wait then fail `ContextReadUnavailable(RescanPending)` under the recorded bound.
+
 **Given** an authorized tenant governance administrator publishes tenant restrictions
 **When** validation succeeds
-**Then** `TenantGovernancePolicy(TenantId)` owns only stricter safety restrictions, monthly/per-call caps, rate limits, calling restrictions, concurrency limit, and tenant kill switch
+**Then** `TenantGovernancePolicy(TenantId)` owns only stricter safety restrictions, monthly/per-call caps, rate limits, calling restrictions, concurrency limit, durable SM-4 confirmations, trigger-review decisions, and tenant kill-switch state on one serialized governance revision
 **And** `Agent` retains only proposal expiry, regeneration ceiling, context policy, response mode, and approver configuration.
+
+**Given** a content-free `SecurityEventLog` observation classifies a target-tenant event as `CrossTenant` or `UnauthorizedAction`
+**When** the Platform Operator confirms the event and immediately pulls containment
+**Then** `TenantGovernancePolicy(TenantId)` first appends `Sm4IncidentConfirmed` with AD-29 `Sm4IncidentId`, exact `SecurityObservationId`/source revision, classification, confirming actor, and evidence digest, and a subsequent expected-revision command appends `TenantKillSwitchPulled` binding that confirmation
+**And** both containment commands use their direct fail-closed EventStore paths without readiness dependencies, exact replay is idempotent, conflicting or missing evidence changes no state, and failure before or after either append can be retried without losing the confirmed fact or creating an ungrounded pull.
+
+**Given** a launch-health trigger review reaches a Release Operator decision
+**When** the reviewed branch pulls or a later authorized operator releases the switch
+**Then** the Party-bearing Release Operator records `TriggerReviewDecisionRecorded` with the exact metric contract/window/cohort and may append `TenantKillSwitchPulled` only from that current decision; release appends `TenantKillSwitchReleased` only from the recorded containment/review basis and audited justification
+**And** `EXT-PARTIES-1` binds the Release Operator Party to the same stable human actor, while a Platform principal uses Hexalith.Tenants global-authority evidence without an invented tenant Party; stale, cross-tenant, same-revision-conflicting, unavailable, or wrong-branch evidence is denied.
 
 **Given** an authorized tenant budget administrator publishes monthly and per-call controls
 **When** the command is accepted
@@ -2878,14 +3140,14 @@ So that future Agent Calls use explicit current controls and no UI or API path c
 
 | Field | Story 8.4 evidence |
 | --- | --- |
-| Requirements | FR4-FR7, FR19-FR28; NFR1-NFR7, NFR10, NFR13; UX-DR1-UX-DR5, UX-DR9-UX-DR18, UX-DR23, UX-DR26, UX-DR29-UX-DR33, UX-DR36-UX-DR46, UX-DR50; AD-2-AD-5, AD-8-AD-10, AD-12, AD-13, AD-17, AD-20-AD-22, AD-25, AD-26 |
-| OwnedClauses | FR26.versioned-policy-publication; FR26.always-blocked-and-restricted-rules; FR26.future-only-and-no-weaker-retry; FR27.no-override-policy-use; FR20.policy-admin-authorization; FR22.policy-authoring-parity; FR24.policy-change-audit; FR28.audit-governance-active; NFR7.active-safety-governance; NFR10.numeric-cap-policy; UX-DR31.PolicyPublication-and-TenantBudgetUpdate-lock-scope; UX-DR40.policy-and-budget-restrictive-viewport-block; UX-DR43.safety-authoring; UX-DR44.cost-authoring; AD-2.ContentSafetyPolicy-and-TenantGovernancePolicy; AD-12.advisory-command-scope; AD-13.current-gates-may-tighten |
-| Dependencies | Stories 5.3, 5.5, 6.3, and 6.4; no new external dependency |
+| Requirements | FR4-FR7, FR19-FR28, FR33; NFR1-NFR7, NFR10, NFR11, NFR13; UX-DR1-UX-DR5, UX-DR9-UX-DR18, UX-DR23, UX-DR26, UX-DR29-UX-DR33, UX-DR36-UX-DR46, UX-DR50; AD-2-AD-5, AD-8-AD-10, AD-12, AD-13, AD-17, AD-20-AD-23, AD-25, AD-26, AD-29, AD-30; EXT-SECRETS-1; EXT-PARTIES-1 |
+| OwnedClauses | FR26.versioned-policy-publication; FR26.always-blocked-and-restricted-rules; FR26.future-only-and-no-weaker-retry; FR27.no-override-policy-use; FR27.policy-and-digest-key-rotation-activation-barrier; FR20.policy-admin-authorization; FR22.policy-authoring-parity; FR24.policy-change-audit; FR28.audit-governance-active; NFR7.active-safety-governance; NFR10.numeric-cap-policy; NFR11.safety-rescan-recovery; UX-DR31.PolicyPublication-and-TenantBudgetUpdate-lock-scope; UX-DR40.policy-and-budget-restrictive-viewport-block; UX-DR43.safety-authoring; UX-DR44.cost-authoring; AD-2.ContentSafetyPolicy-TenantGovernancePolicy-and-SafetyVerdictEpoch; AD-12.advisory-command-scope; AD-13.current-gates-may-tighten; AD-20.activation-barrier |
+| Dependencies | Stories 5.3, 5.5, 6.3, and 6.4; EXT-SECRETS-1 Available; EXT-PARTIES-1 Available for the Release-Operator review/pull branch |
 | EvidenceLevel | Levels 2 and 4: policy/concurrency logic and live EventStore/API/UI component evidence over already-proven runtime seams |
-| TestOrArtifact | ContentSafetyPolicyAggregateTests; TenantGovernancePolicyAggregateTests; AgentSafetyConfigurationRemovalTests; GovernancePolicyApiUiParityTests; PolicyHighWaterMarkTests; governance-policy evidence manifest |
+| TestOrArtifact | ContentSafetyPolicyAggregateTests; TenantGovernancePolicyAggregateTests; AgentSafetyConfigurationRemovalTests; GovernancePolicyApiUiParityTests; PolicyActivationAndSafetyEpochTests; SafetyVerdictRescanRecoveryLiveTests; DigestKeyRotationRescanTests; PolicyHighWaterMarkTests; Sm4IncidentConfirmationAndContainmentTests; TriggerReviewDecisionAndPullTests; KillSwitchRecoveryTests; governance-policy activation evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-8.4.ps1 |
-| NegativeEvidence | GovernancePolicyIsolationTests.CrossTenantCreatePublishInspectAndReplayAreDenied; RevokedPolicyAdminTests; WeakerRetryAndApproverOverrideTests; InvalidBudgetPolicyTests; ConflictingPendingCommandTests |
-| Result | Not run — backlog; requires Stories 5.3, 5.5, 6.3, and 6.4 |
+| NegativeEvidence | GovernancePolicyIsolationTests.CrossTenantCreatePublishInspectAndReplayAreDenied; RevokedPolicyAdminTests; PolicyCannotActivateWithMissingFiniteManifestAckOrInvalidRescanProfileTests; PostCheckpointTenantOrConversationCannotExtendActivationBarrierTests; RotatedKeyCannotReuseOldVerdictTests; WeakerRetryAndApproverOverrideTests; InvalidBudgetPolicyTests; ConflictingPendingCommandTests; Sm4PullWithoutExactConfirmationIsDeniedTests; ReviewPullWithoutCurrentDecisionIsDeniedTests; PlatformAuthorityDoesNotInventTenantPartyTests; KillSwitchLostAckAndWrongRevisionTests |
+| Result | Blocked — backlog; requires Stories 5.3, 5.5, 6.3, and 6.4, EXT-SECRETS-1 is currently Uncommitted, and the Release-Operator branch additionally needs EXT-PARTIES-1 |
 
 ### Story 8.5: Calculate Runtime And Product Metrics Deterministically
 
@@ -2962,15 +3224,15 @@ So that accessibility, English/French parity, responsive safety, and interaction
 **Then** every interactive route and high-impact state proves WCAG 2.2 AA behavior, skip links, landmarks, semantic labels/table relationships, keyboard/focus order, non-hover access, safe dialog escape/focus return, localized live regions, reduced-motion behavior, and color-plus-icon-plus-text status
 **And** all surfaces inherit FrontComposer and Fluent UI Blazor V5 without conditional skips or custom semantics that weaken the spine.
 
-**Given** the OperationGateMatrixVersion 2 operation-family inventory
+**Given** the OperationGateMatrixVersion 7 operation-family inventory
 **When** route/state and parity coverage is enumerated
-**Then** it covers `ProviderCatalogMutation`, `AgentSetupMutation`, `AgentActivation`, `AgentCallAcceptance`, `ProviderInvocation`, `ConversationPosting`, `ProposalResolution`, `PolicyPublication`, `TenantBudgetUpdate`, `LegalHold`, `ExportRequest`, `DeletionRequest`, `ReadinessInspection`, `ProposalEdit`, `ProposalRegeneration`, `SystemTimer`, `LegalHoldRelease`, `ExportDownload`, `AuditInspection`, `TenantKillSwitch`, `ReadinessObservation`, and `TenantProviderEnablement`
-**And** no v2 family, exact `ScopeKind`, producer rule, route, or high-impact state can be omitted or covered only by an older matrix fixture.
+**Then** its public/UI-bearing family inventory covers `ProviderCatalogMutation`, `AgentSetupMutation`, `AgentActivation`, `AgentCallAcceptance`, `ConversationPosting`, `ProposalResolution`, `PolicyPublication`, `TenantBudgetUpdate`, `LegalHold`, `ExportRequest`, `DeletionRequest`, `ReadinessInspection`, `ProposalEdit`, `ProposalRegeneration`, `LegalHoldRelease`, `ExportDownload`, `AuditInspection`, `TenantKillSwitch`, `TenantProviderEnablement`, and `DataHandlingAcceptance`
+**And** no public/UI-bearing v4 family/variant, exact `ScopeKind`, producer rule, route, or high-impact state can be omitted or covered only by an older matrix fixture; internal-only `ProviderInvocation`, `SystemTimer`, `ReadinessObservation`, replay/security recording, decision publication, and governance recovery variants remain exhaustively owned and tested by Stories 5.4, 5.5, 6.4, and 8.1-8.3 and are not invented as UI routes here.
 
 **Given** English and French resources and supported desktop, tablet, phone, and wide-desktop profiles
 **When** localization and responsive suites run
 **Then** every label, state, denial, expiry, action, and announcement has whole-string key parity with named placeholders, tablet/desktop layouts preserve decision context, and phone/lightweight review follows the declared restrictions
-**And** ProposalResolution, PolicyPublication, TenantBudgetUpdate, LegalHold, ExportRequest, and DeletionRequest fail closed with a visible localized reason at the most restrictive viewport whenever required context cannot be presented safely.
+**And** all ten matrix-v7 lock-bearing families — `ProposalResolution`, `PolicyPublication`, `TenantBudgetUpdate`, `LegalHold`, `ExportRequest`, `DeletionRequest`, `ProviderCatalogMutation`, `AgentSetupMutation`, `AgentActivation`, and `DataHandlingAcceptance` — fail closed with a visible localized reason at the most restrictive viewport whenever required context cannot be presented safely.
 
 **Given** an authenticated `EXT-TOPOLOGY-1` qualification session and one injected browser-monotonic clock origin
 **When** timing evidence is collected
@@ -2992,7 +3254,7 @@ So that accessibility, English/French parity, responsive safety, and interaction
 | Field | Story 8.6 evidence |
 | --- | --- |
 | Requirements | FR19-FR25, FR28; NFR1, NFR2, NFR4, NFR13, NFR14; UX-DR1-UX-DR50; AD-8, AD-12, AD-17, AD-20, AD-22, AD-24-AD-26; EXT-TOPOLOGY-1; LR-UI-CONFORMANCE; LR-UI-PERFORMANCE |
-| OwnedClauses | FR22.NFR13-and-NFR14-launch-evidence; FR23.UI-API-contract-parity; FR28.normative-Level4-5-UI-evidence; NFR13.WCAG2.2AA-every-interactive-route-and-state; NFR13.whole-string-EN-FR-parity; NFR13.restrictive-viewport-high-impact-block; NFR14.page-p95-2.5s; NFR14.pending-p95-500ms; NFR14.terminal-render-announcement-p95-2s; NFR14.30-per-kind-and-InsufficientEvidence; UX-DR33-UX-DR41.accessibility-responsive-contract; UX-DR45.readiness-rendering; UX-DR49.kind-discriminated-browser-samples; UX-DR50.authoritative-truth-flows; AD-17.complete-matrix-v2-family-conformance; AD-24.browser-ingress-and-sample-contract |
+| OwnedClauses | FR22.NFR13-and-NFR14-launch-evidence; FR23.UI-API-contract-parity; FR28.normative-Level4-5-UI-evidence; NFR13.WCAG2.2AA-every-interactive-route-and-state; NFR13.whole-string-EN-FR-parity; NFR13.restrictive-viewport-high-impact-block; NFR14.page-p95-2.5s; NFR14.pending-p95-500ms; NFR14.terminal-render-announcement-p95-2s; NFR14.30-per-kind-and-InsufficientEvidence; UX-DR33-UX-DR41.accessibility-responsive-contract; UX-DR45.readiness-rendering; UX-DR49.kind-discriminated-browser-samples; UX-DR50.authoritative-truth-flows; AD-17.complete-public-UI-matrix-v7-family-conformance; AD-24.browser-ingress-and-sample-contract |
 | Dependencies | Completed interactive routes/states from Stories 5.2-8.4; EXT-TOPOLOGY-1 Available with authenticated browser qualification fixture |
 | EvidenceLevel | Levels 4 and 5: live component/browser conformance and production-like cross-system timing evidence; deterministic component checks alone cannot close the story |
 | TestOrArtifact | V1RouteStateInventory; Wcag22AaBrowserSuite; EnglishFrenchParityTests; RestrictiveViewportMatrix; BrowserMonotonicTimingSuite; UI conformance/performance evidence manifests |
@@ -3045,7 +3307,7 @@ So that I can identify missing, stale, insufficient, or failing evidence without
 
 | Field | Story 8.7 evidence |
 | --- | --- |
-| Requirements | FR19-FR25, FR28; NFR1-NFR14; UX-DR1, UX-DR2, UX-DR9-UX-DR14, UX-DR20-UX-DR30, UX-DR33, UX-DR36, UX-DR39-UX-DR41, UX-DR45, UX-DR47-UX-DR50; AD-8, AD-10, AD-17, AD-22-AD-26; EXT-CONV-AI-1, EXT-CONV-UI-1, EXT-HOST-1, EXT-PROVIDER-1, EXT-SAFETY-1, EXT-TOKEN-1, EXT-SECRETS-1, EXT-PROTECTION-1, EXT-TOPOLOGY-1; LR-TOPOLOGY through LR-PRODUCT-METRICS |
+| Requirements | FR19-FR25, FR28; NFR1-NFR14; UX-DR1, UX-DR2, UX-DR9-UX-DR14, UX-DR20-UX-DR30, UX-DR33, UX-DR36, UX-DR39-UX-DR41, UX-DR45, UX-DR47-UX-DR50; AD-8, AD-10, AD-17, AD-22-AD-26; EXT-CONV-AI-1, EXT-CONV-UI-1, EXT-HOST-1, EXT-PROVIDER-1, EXT-SAFETY-1, EXT-TOKEN-1, EXT-SECRETS-1, EXT-PROTECTION-1, EXT-TOPOLOGY-1, EXT-PARTIES-1; LR-TOPOLOGY through LR-PRODUCT-METRICS |
 | OwnedClauses | FR25.authoritative-launch-status-and-safe-blockers; FR28.inspect-fixed-controls-dependencies-and-evidence; launch-register.all-18-gates-at-one-checkpoint; launch-register.greatest-committed-revision-no-fallback; launch-register.missing-stale-block-insufficient-remain-blockers; launch-register.dependency-status-visible; NFR1-NFR14.evidence-inspection-only-not-implementation; UX-DR45.Pass-Block-InsufficientEvidence-Stale; UX-DR45.exact-gates-levels-samples-and-safe-blockers; AD-17.registry-schema-inventory-freshness; AD-22.single-readiness-writer; AD-26.RQ1-remains-separate |
 | Dependencies | Story 5.5 and bounded outputs from Stories 5.1-8.6; EXT-TOPOLOGY-1 Available for production-like inspection |
 | EvidenceLevel | Levels 2, 4, and 5: registry evaluation logic plus inspection of existing live component and production-like evidence; the story does not manufacture those levels |
@@ -3065,7 +3327,7 @@ So that sensitive content can be examined without granting ambient Conversation 
 **Dependencies:**
 
 - **Prior stories:** 5.4 for trusted principals, 5.8 for protected content, 7.1 for proposal evidence, and 8.1 for hold-aware audit governance.
-- **External:** `EXT-PROTECTION-1`, `EXT-TOPOLOGY-1`, and `EXT-CONV-AI-1` must be `Available` for live disclosure, production-like isolation/review evidence, and current Conversation access/existence decisions.
+- **External:** `EXT-PROTECTION-1`, `EXT-TOPOLOGY-1`, `EXT-CONV-AI-1`, and `EXT-PARTIES-1` must be `Available` for live disclosure, production-like isolation/review evidence, current Conversation access/existence decisions, and current/historical human actor-binding evidence.
 - **Forward dependencies:** None. `RQ-1` may consume its bounded evidence but Story 8.8 does not execute the release gate.
 
 **Acceptance Criteria:**
@@ -3083,7 +3345,7 @@ So that sensitive content can be examined without granting ambient Conversation 
 **Given** a second party is eligible for an inspection
 **When** pre-approval or post-hoc review is recorded
 **Then** two Compliance Inspectors cannot approve each other within 30 days, any scope wider than one Conversation requires Platform Operator approval, and post-hoc review is allowed only for a single proposal or single Conversation and must finish within 7 days
-**And** a missed post-hoc deadline is recorded as unreviewed and remains visible with inspection rate to the Tenant Agent Administrator and Platform Operator.
+**And** the Party-bearing Inspector and Party-bearing tenant reviewer resolve current human/liveness and historical actor binding through `EXT-PARTIES-1`; an `Administrator` reviewer proves current tenant role plus durable actor/role evidence, and a `Platform` reviewer proves current or historically recorded Hexalith.Tenants global-administrator authority without inventing a tenant Party. Separation compares stable `AuthenticatedHumanActorId`; missing, stale, ambiguous, overlapping, non-human where a Party is required, unavailable, same-actor, or incompatible evidence blocks approval/disclosure, while a missed post-hoc deadline remains recorded and visible.
 
 **Given** an AuditInspection is accepted
 **When** content reads and review transitions occur
@@ -3104,14 +3366,14 @@ So that sensitive content can be examined without granting ambient Conversation 
 
 | Field | Story 8.8 evidence |
 | --- | --- |
-| Requirements | FR19-FR25, FR28-FR30, FR33, FR34; OQ-30; NFR1-NFR7, NFR11, NFR13; UX-DR9-UX-DR18, UX-DR29-UX-DR41, UX-DR46, UX-DR50; AD-2, AD-8, AD-12, AD-14, AD-17, AD-22, AD-27, AD-30; EXT-CONV-AI-1; EXT-PROTECTION-1; EXT-TOPOLOGY-1 |
-| OwnedClauses | FR20.audit-inspection-authorization; FR23.audit-inspection-public-contract; FR24.inspection-self-audit; FR24.computed-subject-set-and-second-party; OQ30.inspector-anti-collusion-and-seven-day-review; NFR2.protected-evidence-disclosure; AD-2.AuditInspection; AD-22.two-level-inspection-and-surviving-evidence; AD-30.compliance-principal; matrix-v2.AuditInspection |
-| Dependencies | Stories 5.4, 5.8, 7.1, and 8.1; EXT-PROTECTION-1, EXT-TOPOLOGY-1, and EXT-CONV-AI-1 Available |
+| Requirements | FR19-FR25, FR28-FR30, FR33, FR34; OQ-30; NFR1-NFR7, NFR11, NFR13; UX-DR9-UX-DR18, UX-DR29-UX-DR41, UX-DR46, UX-DR50; AD-2, AD-8, AD-12, AD-14, AD-17, AD-22, AD-27, AD-30; EXT-CONV-AI-1; EXT-PROTECTION-1; EXT-TOPOLOGY-1; EXT-PARTIES-1 |
+| OwnedClauses | FR20.audit-inspection-authorization; FR23.audit-inspection-public-contract; FR24.inspection-self-audit; FR24.computed-subject-set-and-second-party; OQ30.inspector-anti-collusion-and-seven-day-review; NFR2.protected-evidence-disclosure; AD-2.AuditInspection; AD-22.two-level-inspection-and-surviving-evidence; AD-30.compliance-principal; matrix-v7.AuditInspection |
+| Dependencies | Stories 5.4, 5.8, 7.1, and 8.1; EXT-PROTECTION-1, EXT-TOPOLOGY-1, EXT-CONV-AI-1, and EXT-PARTIES-1 Available |
 | EvidenceLevel | Levels 2, 4, and 5: aggregate/authorization behavior, live protected disclosure, and production-like isolation/review proof |
-| TestOrArtifact | AuditInspectionAggregateTests; AuditInspectionApiUiParityTests; AuditInspectionLiveTests; InspectionReviewWindowTests; inspection evidence manifest |
+| TestOrArtifact | AuditInspectionAggregateTests; AuditInspectionHumanActorBindingIntegrationTests; AuditInspectionApiUiParityTests; AuditInspectionLiveTests; InspectionReviewWindowTests; inspection actor-binding evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-8.8.ps1 |
-| NegativeEvidence | AuditInspectionIsolationTests.CrossTenantWrongRoleUnapprovedAndOverRateReadsAreDenied; ForgedCompliancePrincipalTests; ErasedContentCannotBeRevivedTests; InspectionSurvivesSourceDeletionTests |
-| Result | Blocked — backlog; EXT-PROTECTION-1, EXT-TOPOLOGY-1, and EXT-CONV-AI-1 are Uncommitted |
+| NegativeEvidence | AuditInspectionIsolationTests.CrossTenantWrongRoleUnapprovedAndOverRateReadsAreDenied; MissingStaleNonHumanUnavailableOrSameActorInspectionApprovalTests; PlatformApproverDoesNotRequireInventedTenantPartyTests; ForgedCompliancePrincipalTests; ErasedContentCannotBeRevivedTests; InspectionSurvivesSourceDeletionTests |
+| Result | Blocked — backlog; EXT-PROTECTION-1, EXT-TOPOLOGY-1, EXT-CONV-AI-1, and EXT-PARTIES-1 are Uncommitted |
 
 ## Release Gate RQ-1 — Outside The Story Backlog
 
