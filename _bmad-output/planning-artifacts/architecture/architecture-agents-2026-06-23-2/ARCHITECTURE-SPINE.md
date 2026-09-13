@@ -917,7 +917,7 @@ sequenceDiagram
 | NSubstitute | `5.3.0` root override; catalog `6.2.0`; same deviation as xUnit |
 | Microsoft.NET.Test.Sdk | root override diverging from the workspace catalog; same Microsoft Testing Platform v2 deviation as xUnit, accepted until Story 5.6 [ASSUMPTION ARCH-A-4] |
 | xunit.runner.visualstudio | root override diverging from the workspace catalog; same deviation as xUnit, accepted until Story 5.6 [ASSUMPTION ARCH-A-4] |
-| bunit | `2.9.0` root pin |
+| bunit | `2.10.3` root pin matching the current workspace catalog |
 | Provider SDK | `Unselected` until `EXT-PROVIDER-1` is committed |
 | Agent Framework SDK | `Unselected` until `EXT-PROVIDER-1` is committed |
 
@@ -1351,7 +1351,7 @@ The amended rules above are the convergence contract; they do not claim current 
 | Public readiness, interaction, mirror, resolution, capacity, and blocker vocabulary is incomplete. | Stories 5.6, 6.2, 6.6, 7.1, 7.4 through 7.6, and 8.5 |
 | The root-authoritative Builds gitlink still pins transitive Dapr Client/ASP.NET `1.18.5`; the parent-modified but internally clean Builds checkout at `cf52f74` has a `1.18.7` catalog but is not a committed root upgrade. Dapr Workflow remains unreferenced. | Builds/Security decision, root gitlink update or exception, compatibility evidence, then Story 6.1 |
 | Sprint status says Story 5.1 is done and 5.2 is in progress while `EXT-HOST-1` is `Uncommitted`, story evidence says backlog/not run, and `eng/verify-story-5.1.ps1` is absent. | `OD-SPRINT-5.1-5.2-1`; tracking/evidence correction, not an AD change |
-| Legacy conformance tests still assert superseded structure/runtime semantics, and bUnit remains at `2.9.0`. | Story 5.6/build maintenance; no build success is claimed by this document update |
+| Legacy conformance tests still assert superseded structure/runtime semantics. | Story 5.6/build maintenance; no build success is claimed by this document update |
 
 ## External V1 Prerequisites
 

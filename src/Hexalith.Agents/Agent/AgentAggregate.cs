@@ -264,10 +264,12 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
                 hasContentSafetyPolicy: state.ContentSafety is not null);
         return blockers.Count > 0
             ? DomainResult.Rejection([new AgentActivationBlockedRejection(agentId, blockers)])
-            : DomainResult.Success([new AgentActivated(agentId)]);
+            : DomainResult.Success([
+                new AgentActivated(agentId) { ConfigurationVersion = state.ConfigurationVersion + 1 },
+            ]);
     }
 
-    /// <summary>Handles disabling an existing Agent (lifecycle flag flip only; history preserved, AC3).</summary>
+    /// <summary>Handles disabling an existing Agent while preserving configuration content and history (AC3).</summary>
     /// <param name="command">The disable command.</param>
     /// <param name="state">The current Agent state.</param>
     /// <param name="envelope">The command envelope.</param>
@@ -295,7 +297,9 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
                     AgentLifecycleStatus.Disabled,
                     AgentLifecycleStatus.Disabled,
                     nameof(DisableAgent))])
-            : DomainResult.Success([new AgentDisabled(agentId)]);
+            : DomainResult.Success([
+                new AgentDisabled(agentId) { ConfigurationVersion = state.ConfigurationVersion + 1 },
+            ]);
     }
 
     /// <summary>Handles linking the Agent's single active Party identity (AC1, AC2, AC3; FR-2).</summary>

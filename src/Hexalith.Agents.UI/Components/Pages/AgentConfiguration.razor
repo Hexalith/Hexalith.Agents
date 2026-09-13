@@ -277,26 +277,22 @@
             _instructionsDraft);
         _instructionsDraft = string.Empty;
 
-        await SubmitAsync(
-            ct => Gateway.UpdateConfigurationAsync(command, ct),
-            bumpsConfigurationVersion: true).ConfigureAwait(false);
+        await SubmitAsync(ct => Gateway.UpdateConfigurationAsync(command, ct)).ConfigureAwait(false);
     }
 
     private Task SubmitResponseModeAsync()
-        => SubmitAsync(ct => Gateway.ConfigureResponseModeAsync(_responseMode, ct), bumpsConfigurationVersion: true);
+        => SubmitAsync(ct => Gateway.ConfigureResponseModeAsync(_responseMode, ct));
 
     private Task ActivateAsync()
-        => SubmitAsync(Gateway.ActivateAsync, bumpsConfigurationVersion: false);
+        => SubmitAsync(Gateway.ActivateAsync);
 
     private Task DisableAsync()
-        => SubmitAsync(Gateway.DisableAsync, bumpsConfigurationVersion: false);
+        => SubmitAsync(Gateway.DisableAsync);
 
     // Every write follows the same truth flow: submit, record the accepted identity as Submitted, then re-read at
     // the version that write is expected to produce. The re-read is what decides whether the page shows
     // authoritative-pending or projection-confirmed — the write itself never claims durable truth.
-    private async Task SubmitAsync(
-        Func<CancellationToken, Task<AgentSetupWriteResult>> write,
-        bool bumpsConfigurationVersion)
+    private async Task SubmitAsync(Func<CancellationToken, Task<AgentSetupWriteResult>> write)
     {
         if (_busy)
         {
@@ -308,11 +304,9 @@
         {
             CancellationToken cancellationToken = _lifetimeCancellation.Token;
 
-            // Configuration writes bump the configuration version, so the catch-up read asks for current+1.
-            // Activation and disabling only move the lifecycle flag and leave the version alone: asking for
-            // current+1 there would report an up-to-date projection as permanently behind.
+            // Every accepted setup write, including a lifecycle transition, bumps the configuration version once.
             int? expectedVersion = _result?.Setup is { } setup
-                ? setup.ConfigurationVersion + (bumpsConfigurationVersion ? 1 : 0)
+                ? setup.ConfigurationVersion + 1
                 : null;
 
             AgentSetupWriteResult writeResult = await write(cancellationToken)

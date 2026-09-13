@@ -66,7 +66,7 @@ internal static class AgentUiTestData
         AgentSetupFreshness freshness = AgentSetupFreshness.Current,
         AgentSetupTruthState truthState = AgentSetupTruthState.ProjectionConfirmed)
         => new(
-            agent ?? Status(),
+            (agent ?? Status()) with { ConfigurationVersion = configurationVersion },
             configurationVersion,
             projectionVersion,
             ProjectedAt: new System.DateTimeOffset(2026, 6, 24, 12, 0, 0, System.TimeSpan.Zero),

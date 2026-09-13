@@ -23,7 +23,7 @@ public sealed class AgentInspectionTests
         // A realistic active agent is linked to a Party (1.4 AC4) and has a selected Provider/model (1.5 AC1)
         // before it can activate.
         AgentState state = StateWithSelectedProvider(ValidCreate());
-        state.Apply(new AgentActivated(AgentId));
+        state.Apply(new AgentActivated(AgentId) { ConfigurationVersion = state.ConfigurationVersion + 1 });
 
         AgentInspectionResult result = AgentInspection.GetStatus(state, isAgentsAdmin: true);
 

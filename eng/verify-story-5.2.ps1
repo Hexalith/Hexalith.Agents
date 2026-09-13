@@ -39,13 +39,13 @@ $testProjects = @(
 $focusedSuites = @(
     @{
         Project = 'test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj'
-        Filter  = 'FullyQualifiedName~AgentStateReplay'
-        Gate    = 'AC1 aggregate replay determinism'
+        Filter  = 'FullyQualifiedName~AgentStateReplay|FullyQualifiedName~AgentLifecycleConfigurationVersion'
+        Gate    = 'AC1 aggregate replay and lifecycle configuration-version determinism'
     },
     @{
         Project = 'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj'
-        Filter  = 'FullyQualifiedName~AgentAdministrationOrchestrator|FullyQualifiedName~EventStoreAgentCommandDispatcher|FullyQualifiedName~EventStoreAgentAdministrationOperations'
-        Gate    = 'AC1/AC4 authorize-then-dispatch over the live command path'
+        Filter  = 'FullyQualifiedName~AgentAdministrationOrchestrator|FullyQualifiedName~EventStoreAgentCommandDispatcher|FullyQualifiedName~EventStoreAgentAdministrationOperations|FullyQualifiedName~AgentInteractionRequestOrchestrator'
+        Gate    = 'AC1/AC4 live command dispatch and later interaction snapshot propagation'
     },
     @{
         Project = 'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj'

@@ -156,20 +156,34 @@ public sealed class AgentState
     public void Apply(AgentActivated e)
     {
         ArgumentNullException.ThrowIfNull(e);
-        if (IsCreated)
+        if (!IsCreated)
         {
-            Lifecycle = AgentLifecycleStatus.Active;
+            return;
+        }
+
+        ArgumentOutOfRangeException.ThrowIfNegative(e.ConfigurationVersion);
+        Lifecycle = AgentLifecycleStatus.Active;
+        if (e.ConfigurationVersion > 0)
+        {
+            ConfigurationVersion = e.ConfigurationVersion;
         }
     }
 
-    /// <summary>Applies a disable (lifecycle flag flip only; all prior state preserved, AC3).</summary>
+    /// <summary>Applies a disable, preserving configuration content while advancing its version for current events.</summary>
     /// <param name="e">The event.</param>
     public void Apply(AgentDisabled e)
     {
         ArgumentNullException.ThrowIfNull(e);
-        if (IsCreated)
+        if (!IsCreated)
         {
-            Lifecycle = AgentLifecycleStatus.Disabled;
+            return;
+        }
+
+        ArgumentOutOfRangeException.ThrowIfNegative(e.ConfigurationVersion);
+        Lifecycle = AgentLifecycleStatus.Disabled;
+        if (e.ConfigurationVersion > 0)
+        {
+            ConfigurationVersion = e.ConfigurationVersion;
         }
     }
 

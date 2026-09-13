@@ -358,7 +358,7 @@ internal static class AgentTestData
     internal static AgentState ActiveStateWith(CreateAgent create)
     {
         AgentState state = StateWith(create);
-        state.Apply(new AgentActivated(AgentId));
+        state.Apply(new AgentActivated(AgentId) { ConfigurationVersion = state.ConfigurationVersion + 1 });
         return state;
     }
 
@@ -368,7 +368,7 @@ internal static class AgentTestData
     internal static AgentState DisabledStateWith(CreateAgent create)
     {
         AgentState state = StateWith(create);
-        state.Apply(new AgentDisabled(AgentId));
+        state.Apply(new AgentDisabled(AgentId) { ConfigurationVersion = state.ConfigurationVersion + 1 });
         return state;
     }
 

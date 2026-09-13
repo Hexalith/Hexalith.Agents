@@ -7,4 +7,11 @@ namespace Hexalith.Agents.Contracts.Agent.Events;
 /// carried (AD-3); occurrence time comes from EventStore event metadata.
 /// </summary>
 /// <param name="AgentId">Stable Agent identifier (the aggregate id).</param>
-public record AgentActivated(string AgentId) : IEventPayload;
+public record AgentActivated(string AgentId) : IEventPayload
+{
+    /// <summary>
+    /// Gets the configuration version after activation, or zero when replaying a legacy event that predates
+    /// lifecycle versioning.
+    /// </summary>
+    public int ConfigurationVersion { get; init; }
+}

@@ -279,11 +279,9 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     }
 
     [Fact]
-    public void Activating_rereads_at_the_unchanged_configuration_version()
+    public void Activating_rereads_at_the_next_configuration_version()
     {
-        // AgentActivated does not bump the configuration version, so demanding current+1 would leave the page
-        // permanently claiming the projection is behind.
-        GivenSetup(AgentUiTestData.Setup(AgentUiTestData.Status(AgentLifecycleStatus.Draft), configurationVersion: 3));
+        GivenLifecycleTransition(AgentLifecycleStatus.Draft, AgentLifecycleStatus.Active);
         GivenAcceptedWrite(gateway => gateway.ActivateAsync(Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
@@ -292,15 +290,17 @@ public sealed class AgentConfigurationTests : AgentsTestContext
 
         cut.WaitForAssertion(() =>
         {
-            SetupGateway.Received().GetSetupAsync(3, Arg.Any<CancellationToken>());
-            SetupGateway.DidNotReceive().GetSetupAsync(4, Arg.Any<CancellationToken>());
+            SetupGateway.Received().GetSetupAsync(4, Arg.Any<CancellationToken>());
+            SetupGateway.DidNotReceive().GetSetupAsync(3, Arg.Any<CancellationToken>());
+            cut.Find("[data-testid='agents-config-lifecycle']").TextContent
+                .ShouldContain("Agents.Lifecycle.Active");
         });
     }
 
     [Fact]
-    public void Disabling_rereads_at_the_unchanged_configuration_version()
+    public void Disabling_rereads_at_the_next_configuration_version()
     {
-        GivenSetup(AgentUiTestData.Setup(AgentUiTestData.Status(AgentLifecycleStatus.Active), configurationVersion: 3));
+        GivenLifecycleTransition(AgentLifecycleStatus.Active, AgentLifecycleStatus.Disabled);
         GivenAcceptedWrite(gateway => gateway.DisableAsync(Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
@@ -309,15 +309,17 @@ public sealed class AgentConfigurationTests : AgentsTestContext
 
         cut.WaitForAssertion(() =>
         {
-            SetupGateway.Received().GetSetupAsync(3, Arg.Any<CancellationToken>());
-            SetupGateway.DidNotReceive().GetSetupAsync(4, Arg.Any<CancellationToken>());
+            SetupGateway.Received().GetSetupAsync(4, Arg.Any<CancellationToken>());
+            SetupGateway.DidNotReceive().GetSetupAsync(3, Arg.Any<CancellationToken>());
+            cut.Find("[data-testid='agents-config-lifecycle']").TextContent
+                .ShouldContain("Agents.Lifecycle.Disabled");
         });
     }
 
     [Fact]
     public async Task An_immediately_confirmed_projection_stops_reporting_the_write_and_does_not_retry()
     {
-        GivenSetup(AgentUiTestData.Setup(AgentUiTestData.Status(AgentLifecycleStatus.Draft), configurationVersion: 3));
+        GivenLifecycleTransition(AgentLifecycleStatus.Draft, AgentLifecycleStatus.Active);
         GivenAcceptedWrite(gateway => gateway.ActivateAsync(Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
@@ -333,7 +335,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
 
             // Durable truth supersedes the in-flight notice; keeping both would say "still submitting" forever.
             cut.FindAll("[data-testid='agents-config-write-state']").ShouldBeEmpty();
-            SetupGateway.Received(1).GetSetupAsync(3, Arg.Any<CancellationToken>());
+            SetupGateway.Received(1).GetSetupAsync(4, Arg.Any<CancellationToken>());
         });
     }
 
@@ -835,6 +837,19 @@ public sealed class AgentConfigurationTests : AgentsTestContext
 
     private void GivenAcceptedWrite(Func<IAgentSetupGateway, Task<AgentSetupWriteResult>> write)
         => write(SetupGateway).Returns(Task.FromResult(Accepted()));
+
+    private void GivenLifecycleTransition(AgentLifecycleStatus initialLifecycle, AgentLifecycleStatus confirmedLifecycle)
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(
+            AgentUiTestData.Status(initialLifecycle),
+            configurationVersion: 3);
+        AgentSetupView confirmed = AgentUiTestData.Setup(
+            AgentUiTestData.Status(confirmedLifecycle),
+            configurationVersion: 4);
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(
+            Task.FromResult(AgentSetupResult.Success(initial)),
+            Task.FromResult(AgentSetupResult.Success(confirmed)));
+    }
 
     private int ExpectedVersionReadCount(int expectedVersion)
         => SetupGateway.ReceivedCalls().Count(call =>

@@ -158,7 +158,7 @@ public sealed class AgentLifecycleE2ETests
 
         (await ProcessAndApplyAsync(aggregate, state, new ActivateAgent(), SelectEnvelope(new ActivateAgent()))).IsSuccess.ShouldBeTrue();
 
-        // Disable: a lifecycle flag flip only.
+        // Disable changes lifecycle while preserving prior configuration values and history.
         (await ProcessAndApplyAsync(aggregate, state, new DisableAgent())).IsSuccess.ShouldBeTrue();
 
         // AC3: the disabled state is visible through the public status path...
@@ -167,7 +167,7 @@ public sealed class AgentLifecycleE2ETests
 
         // ...and prior identity/instructions/configuration are not deleted or rewritten by the disable.
         disabledView.DisplayName.ShouldBe(create.DisplayName);
-        disabledView.ConfigurationVersion.ShouldBe(5); // create (1) + party link (2) + provider selection (3) + response mode (4) + content safety (5)
+        disabledView.ConfigurationVersion.ShouldBe(7); // five setup versions + activate (6) + disable (7)
         disabledView.HasInstructions.ShouldBeTrue();
         disabledView.HasPartyIdentity.ShouldBeTrue(); // the link survives the disable (history preserved, AC3)
         disabledView.HasProviderSelection.ShouldBeTrue(); // the selection survives the disable too (AC3)
@@ -292,7 +292,7 @@ public sealed class AgentLifecycleE2ETests
         replayedView.Lifecycle.ShouldBe(liveView.Lifecycle);
         replayedView.Lifecycle.ShouldBe(AgentLifecycleStatus.Disabled);
         replayedView.ConfigurationVersion.ShouldBe(liveView.ConfigurationVersion);
-        replayedView.ConfigurationVersion.ShouldBe(6); // create (1) + update (2) + party link (3) + provider selection (4) + response mode (5) + content safety (6)
+        replayedView.ConfigurationVersion.ShouldBe(8); // six setup versions + activate (7) + disable (8)
         replayedView.HasInstructions.ShouldBe(liveView.HasInstructions);
         replayedView.InstructionsValid.ShouldBe(liveView.InstructionsValid);
         replayedView.InstructionsVersion.ShouldBe(liveView.InstructionsVersion);

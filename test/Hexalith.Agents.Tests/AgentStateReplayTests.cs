@@ -25,18 +25,18 @@ public sealed class AgentStateReplayTests
         state.IsCreated.ShouldBeTrue();
         state.Lifecycle.ShouldBe(AgentLifecycleStatus.Draft);
 
-        state.Apply(new AgentActivated(AgentId));
+        state.Apply(new AgentActivated(AgentId) { ConfigurationVersion = 2 });
         state.Lifecycle.ShouldBe(AgentLifecycleStatus.Active);
 
-        state.Apply(new AgentDisabled(AgentId));
+        state.Apply(new AgentDisabled(AgentId) { ConfigurationVersion = 3 });
         state.Lifecycle.ShouldBe(AgentLifecycleStatus.Disabled);
 
-        // AC3: disabling is a lifecycle flag flip only — identity, instructions, and configuration are preserved.
+        // AC3: disabling preserves identity and configuration content while advancing the stream configuration version.
         state.AgentId.ShouldBe(AgentId);
         state.TenantId.ShouldBe(TenantId);
         state.DisplayName.ShouldBe("Hexa Assistant");
         state.Instructions.ShouldBe(ValidInstructions);
-        state.ConfigurationVersion.ShouldBe(1);
+        state.ConfigurationVersion.ShouldBe(3);
         state.InstructionsVersion.ShouldBe(1);
     }
 
@@ -45,7 +45,7 @@ public sealed class AgentStateReplayTests
     {
         AgentState state = DisabledStateWith(ValidCreate());
 
-        state.Apply(new AgentActivated(AgentId));
+        state.Apply(new AgentActivated(AgentId) { ConfigurationVersion = state.ConfigurationVersion + 1 });
 
         state.Lifecycle.ShouldBe(AgentLifecycleStatus.Active);
         state.Instructions.ShouldBe(ValidInstructions); // history intact across the disable/reactivate cycle
@@ -88,7 +88,7 @@ public sealed class AgentStateReplayTests
 
         state.Lifecycle.ShouldBe(AgentLifecycleStatus.Active);
         state.DisplayName.ShouldBe("Hexa Assistant");
-        state.ConfigurationVersion.ShouldBe(1);
+        state.ConfigurationVersion.ShouldBe(2);
     }
 
     [Fact]
@@ -158,7 +158,7 @@ public sealed class AgentStateReplayTests
 
         second.Lifecycle.ShouldBe(AgentLifecycleStatus.Disabled);
         second.ResponseMode.ShouldBe(AgentResponseMode.Confirmation);
-        second.ConfigurationVersion.ShouldBe(3);
+        second.ConfigurationVersion.ShouldBe(5);
 
         static AgentState Replay()
         {
@@ -173,8 +173,8 @@ public sealed class AgentStateReplayTests
                 ConfigurationVersion: 2,
                 InstructionsVersion: 2));
             state.Apply(new AgentResponseModeConfigured(AgentId, AgentResponseMode.Confirmation, ConfigurationVersion: 3));
-            state.Apply(new AgentActivated(AgentId));
-            state.Apply(new AgentDisabled(AgentId));
+            state.Apply(new AgentActivated(AgentId) { ConfigurationVersion = 4 });
+            state.Apply(new AgentDisabled(AgentId) { ConfigurationVersion = 5 });
             return state;
         }
     }

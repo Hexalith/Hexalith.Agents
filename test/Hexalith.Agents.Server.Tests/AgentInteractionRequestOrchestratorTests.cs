@@ -82,6 +82,24 @@ public sealed class AgentInteractionRequestOrchestratorTests
     }
 
     [Fact]
+    public async Task LaterInteractionFreezesTheBumpedLifecycleConfigurationVersion()
+    {
+        const int bumpedConfigurationVersion = 8;
+        ReaderReturns(AgentConfigurationSnapshot.Available(Snapshot(bumpedConfigurationVersion)));
+        CaptureDispatch();
+
+        _ = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        RequestAgentInteraction command = JsonSerializer.Deserialize<RequestAgentInteraction>(dispatched.Payload)!;
+        command.Snapshot.ShouldNotBeNull().ConfigurationVersion.ShouldBe(bumpedConfigurationVersion);
+
+        DomainResult result = AgentInteractionAggregate.Handle(command, state: null, dispatched);
+        result.Events.Single().ShouldBeOfType<InteractionRequested>()
+            .Snapshot.ConfigurationVersion.ShouldBe(bumpedConfigurationVersion);
+    }
+
+    [Fact]
     public async Task Returns_a_safe_reference_carrying_only_the_id_and_status()
     {
         ReaderReturns(AgentConfigurationSnapshot.Available(Snapshot()));
@@ -331,9 +349,11 @@ public sealed class AgentInteractionRequestOrchestratorTests
     private static string ExpectedId()
         => AgentInteractionIdentity.Derive(TenantId, AgentId, SourceConversationId, CallerPartyId, IdempotencyKey);
 
-    private static AgentInteractionSnapshot Snapshot(string? contextPolicyReference = null)
+    private static AgentInteractionSnapshot Snapshot(
+        int configurationVersion = 3,
+        string? contextPolicyReference = null)
         => new(
-            ConfigurationVersion: 3,
+            ConfigurationVersion: configurationVersion,
             InstructionsVersion: 2,
             AgentResponseMode.Automatic,
             ApproverPolicyVersion: 1,

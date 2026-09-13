@@ -84,7 +84,7 @@ public sealed class AgentAdministrationOrchestrator
         CancellationToken ct)
         => DispatchAsync(request, nameof(UpdateAgentConfiguration), command, ct);
 
-    /// <summary>Authorizes and dispatches the disable command (a lifecycle flag flip; all prior state preserved).</summary>
+    /// <summary>Authorizes and dispatches the disable command, preserving configuration content and history.</summary>
     /// <param name="request">The sanitized orchestration request.</param>
     /// <param name="command">The disable payload.</param>
     /// <param name="ct">The cancellation token.</param>

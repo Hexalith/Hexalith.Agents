@@ -294,7 +294,7 @@ public sealed class AgentAggregateTests
         // A disabled agent that has a linked Party (1.4 AC4), a selected Provider/model (1.5 AC1), and valid config
         // re-activates when its gates pass (the provider is re-validated Valid on the envelope).
         AgentState state = StateWithSelectedProvider(ValidCreate());
-        state.Apply(new AgentDisabled(AgentId));
+        state.Apply(new AgentDisabled(AgentId) { ConfigurationVersion = state.ConfigurationVersion + 1 });
 
         DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, SelectEnvelope(new ActivateAgent()));
 

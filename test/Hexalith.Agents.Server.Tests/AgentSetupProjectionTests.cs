@@ -81,6 +81,8 @@ public sealed class AgentSetupProjectionTests
         await ProjectAsync(ResponseMode(sequence: 2, AgentResponseMode.Confirmation));
         await ProjectAsync(Disabled(sequence: 3));
         AgentSetupReadModel incremental = Persisted();
+        incremental.ConfigurationVersion.ShouldBe(3);
+        incremental.Lifecycle.ShouldBe(AgentLifecycleStatus.Disabled);
 
         var replayed = new FakeReadModelStore();
         AgentSetupReadModel fromReplay = AgentSetupProjectionFold.Fold(
@@ -89,6 +91,34 @@ public sealed class AgentSetupProjectionTests
         replayed.Seed(StoreName, Key, fromReplay);
 
         replayed.Snapshot<AgentSetupReadModel>(StoreName, Key).ShouldBeEquivalentTo(incremental);
+    }
+
+    [Fact]
+    public async Task A_legacy_lifecycle_event_changes_lifecycle_without_renumbering_configuration_history()
+    {
+        await ProjectAsync(Created(), ResponseMode(sequence: 2, AgentResponseMode.Confirmation));
+
+        DomainProjectionHandlerResult result = await ProjectAsync(LegacyDisabled(sequence: 3));
+
+        result.Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        AgentSetupReadModel persisted = Persisted();
+        persisted.Lifecycle.ShouldBe(AgentLifecycleStatus.Disabled);
+        persisted.ConfigurationVersion.ShouldBe(2);
+        persisted.LastSequenceNumber.ShouldBe(3);
+    }
+
+    [Fact]
+    public async Task Activation_projects_the_payload_configuration_version_not_the_stream_sequence()
+    {
+        await ProjectAsync(Created(), LegacyDisabled(sequence: 2));
+
+        DomainProjectionHandlerResult result = await ProjectAsync(Activated(sequence: 3, configurationVersion: 2));
+
+        result.Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        AgentSetupReadModel persisted = Persisted();
+        persisted.Lifecycle.ShouldBe(AgentLifecycleStatus.Active);
+        persisted.ConfigurationVersion.ShouldBe(2);
+        persisted.LastSequenceNumber.ShouldBe(3);
     }
 
     [Fact]
@@ -215,6 +245,18 @@ public sealed class AgentSetupProjectionTests
         => Event(nameof(AgentResponseModeConfigured), sequence, new AgentResponseModeConfigured(AgentId, mode, (int)sequence));
 
     private static ProjectionEventDto Disabled(long sequence)
+        => Event(
+            nameof(AgentDisabled),
+            sequence,
+            new AgentDisabled(AgentId) { ConfigurationVersion = (int)sequence });
+
+    private static ProjectionEventDto Activated(long sequence, int configurationVersion)
+        => Event(
+            nameof(AgentActivated),
+            sequence,
+            new AgentActivated(AgentId) { ConfigurationVersion = configurationVersion });
+
+    private static ProjectionEventDto LegacyDisabled(long sequence)
         => Event(nameof(AgentDisabled), sequence, new AgentDisabled(AgentId));
 
     private static ProjectionEventDto Event<T>(string eventTypeName, long sequence, T payload)

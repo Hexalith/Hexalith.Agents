@@ -59,7 +59,7 @@ public sealed class AgentContractsRoundTripTests
     [Fact]
     public void Activated_event_round_trips_through_system_text_json()
     {
-        var activated = new AgentActivated("hexa");
+        var activated = new AgentActivated("hexa") { ConfigurationVersion = 4 };
 
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(activated);
 
@@ -69,11 +69,20 @@ public sealed class AgentContractsRoundTripTests
     [Fact]
     public void Disabled_event_round_trips_through_system_text_json()
     {
-        var disabled = new AgentDisabled("hexa");
+        var disabled = new AgentDisabled("hexa") { ConfigurationVersion = 5 };
 
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(disabled);
 
         JsonSerializer.Deserialize<AgentDisabled>(bytes).ShouldBe(disabled);
+    }
+
+    [Fact]
+    public void Legacy_lifecycle_events_without_a_configuration_version_deserialize_with_the_zero_sentinel()
+    {
+        const string json = "{\"AgentId\":\"hexa\"}";
+
+        JsonSerializer.Deserialize<AgentActivated>(json).ShouldNotBeNull().ConfigurationVersion.ShouldBe(0);
+        JsonSerializer.Deserialize<AgentDisabled>(json).ShouldNotBeNull().ConfigurationVersion.ShouldBe(0);
     }
 
     // ===== Rejection events =====
