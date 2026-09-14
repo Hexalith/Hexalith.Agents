@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -15,7 +17,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// deserializes to a concrete blocker. The enum is <em>additively extensible</em> (ordinals stable; AD-17).
 /// <see cref="Unknown"/> (ordinal 0) is the unrecognized sentinel.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentLaunchReadinessBlocker>))]
 public enum AgentLaunchReadinessBlocker
 {
     /// <summary>Absent/unrecognized blocker sentinel.</summary>

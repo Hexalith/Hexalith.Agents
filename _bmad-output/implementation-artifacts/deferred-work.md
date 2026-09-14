@@ -128,3 +128,32 @@ status: open
   on `Hexalith.Agents.Client.Tests`, whose 6 tests finish in 0.14 s when the identical command is run directly.
   Workaround: `dotnet build-server shutdown` and run the gate with `MSBUILDDISABLENODEREUSE=1`. A durable fix is to
   set that variable inside `default_runner` for `dotnet` commands.
+
+## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2 (2026-09-14, round 2)
+
+- The idempotency key is not bound to the payload it was first used with. `AgentOperationOptions` documents that
+  "An exact retry must reuse the same correlation ID, idempotency key, and payload", but nothing in the Contracts
+  or domain layer enforces the payload half. A retry that reuses the key with a changed payload could be shown the
+  first command's effect and target version. Unverified — settled by inspecting EventStore's idempotency-record
+  handling in `references/Hexalith.EventStore` for whether a replayed key with a different payload is rejected.
+  Would be medium if confirmed.
+
+- Caller-supplied `CorrelationId` may be echoed on read paths without canonical-ULID validation.
+  `EventStoreAgentAdministrationOperations.cs:210,222` were cited; the write paths do validate via
+  `IsCanonicalUlid`, and the read paths fall outside the Contracts/domain chunk reviewed here. Unverified —
+  settled by the Group 3 (Server) chunk review. Would be medium if confirmed.
+
+- `AgentSetupWriteStatus` reserves zero for `Submitted` rather than `Unknown`, so a default or absent value reads
+  as "accepted for processing" — fail-open, against the `Unknown = 0` convention every neighbouring operations
+  enum follows. Pre-existing: `Submitted = 0` was already declared inside `AgentSetupWriteResult.cs` at
+  `baseline_commit`; the current round only split the enum into its own file and appended three members. It is
+  UI-internal today (the client gateway maps into it; it never crosses HTTP), so the fail-open default is not
+  currently reachable from a wire payload. Revisit if the status is ever serialized.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Map `AgentOperationStatus.Rejected` to a terminal Agent setup write status before the live `IAgentCommandStatusReader` is registered.
+  evidence: `AgentsClientSetupGateway.ToWriteStatus` has no `Rejected` arm, so a rejection falls through to `Unavailable`, which `IsTerminalWriteFailure` excludes; the page would keep the attempt and offer a Retry that replays the same idempotency key against the same rejection forever. Unreachable today because only `DeferredAgentCommandStatusReader` is registered and it always answers `null`, so this must land with — and no later than — the single registration change that binds the live reader, together with the localized wording a rejection should show.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Extend the `Unknown = 0` fallback converter to the remaining public contract enums on Epic 2/3/4 payloads.
+  evidence: About 45 `Unknown = 0` enums in `Hexalith.Agents.Contracts` (the `AgentInteraction` and `ProviderCatalog` families, plus `OperationalStatusInspectionStatus`) still declare the throwing `JsonStringEnumConverter`, so an additive member still fails a whole response for an older client on those routes. Story 5.2 closes this for its own setup payload only; the rest is the same latent defect on payloads outside this story's reach and should be swept once, with `AgentInspectionStatus` deliberately excluded because its zero is `Success = 0` and the fallback would fail open.

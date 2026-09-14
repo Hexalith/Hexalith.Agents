@@ -6,9 +6,11 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Hexalith.Agents.Agent;
 using Hexalith.Agents.Client;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
+using Hexalith.Agents.Contracts.Agent.Events;
 using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Server.Application.Agents;
@@ -17,6 +19,7 @@ using Hexalith.Agents.Server.Projections;
 
 using Hexalith.EventStore.Client.Gateway;
 using Hexalith.EventStore.Contracts.Commands;
+using Hexalith.EventStore.Contracts.Results;
 
 using Microsoft.Extensions.Options;
 
@@ -270,6 +273,43 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         result.Setup.ShouldBeNull();
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task TheRealDomainResultPayloadIsUnderstoodAtTheOperationsBoundary(bool alreadyApplied)
+    {
+        // The payload is written by the aggregate in Hexalith.Agents and read back in Hexalith.Agents.Server, so
+        // fixtures hand-built on either side would keep agreeing with themselves after a one-sided rename. This
+        // drives the genuine DomainResult.ResultPayload string through the genuine receipt path instead.
+        CreateAgent create = new(TenantId, "Hexa Assistant", "Tenant governed assistant", RealInstructions);
+        DomainResult domainResult = AgentAggregate.Handle(
+            create,
+            alreadyApplied ? CreatedState(create) : null,
+            AdminEnvelope(create));
+
+        domainResult.ResultPayload.ShouldNotBeNull();
+        using JsonDocument payload = JsonDocument.Parse(domainResult.ResultPayload);
+        JsonElement element = payload.RootElement.Clone();
+        _gateway
+            .SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call => new SubmitCommandResponse(
+                call.ArgAt<SubmitCommandRequest>(0).CorrelationId!,
+                element,
+                call.ArgAt<SubmitCommandRequest>(0).MessageId));
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(AgentId, new DisableAgent());
+
+        result.IsSuccess.ShouldBeTrue();
+        AgentCommandAcceptance acceptance = result.Value.ShouldNotBeNull();
+        acceptance.Effect.ShouldBe(alreadyApplied
+            ? AgentSetupWriteEffect.AlreadyApplied
+            : AgentSetupWriteEffect.Applied);
+        acceptance.TargetConfigurationVersion.ShouldBe(1);
+        acceptance.TruthState.ShouldBe(alreadyApplied
+            ? AgentSetupTruthState.ProjectionConfirmed
+            : AgentSetupTruthState.AuthoritativePending);
+    }
+
     [Fact]
     public async Task A_gateway_conflict_is_reported_as_a_typed_failure_and_leaves_the_read_model_untouched()
     {
@@ -383,6 +423,10 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     [InlineData("unknown-effect")]
     [InlineData("undefined-effect")]
     [InlineData("wrong-case-effect")]
+    [InlineData("string-version")]
+    [InlineData("null-version")]
+    [InlineData("bool-version")]
+    [InlineData("object-version")]
     public async Task An_unverifiable_gateway_receipt_fails_closed(string scenario)
     {
         _gateway
@@ -412,6 +456,25 @@ public sealed class EventStoreAgentAdministrationOperationsTests
                     "undefined-effect" => new SubmitCommandResponse(
                         request.CorrelationId!,
                         SetupPayload("Undefined", 4),
+                        request.MessageId),
+
+                    // JsonElement.TryGetInt32 throws on a non-number element, so a version that is not a JSON
+                    // number must be rejected by a ValueKind check rather than surfacing as an exception.
+                    "string-version" => new SubmitCommandResponse(
+                        request.CorrelationId!,
+                        NonNumericVersionPayload("\"4\""),
+                        request.MessageId),
+                    "null-version" => new SubmitCommandResponse(
+                        request.CorrelationId!,
+                        NonNumericVersionPayload("null"),
+                        request.MessageId),
+                    "bool-version" => new SubmitCommandResponse(
+                        request.CorrelationId!,
+                        NonNumericVersionPayload("true"),
+                        request.MessageId),
+                    "object-version" => new SubmitCommandResponse(
+                        request.CorrelationId!,
+                        NonNumericVersionPayload("{\"value\":4}"),
                         request.MessageId),
                     _ => new SubmitCommandResponse(
                         request.CorrelationId!,
@@ -509,8 +572,53 @@ public sealed class EventStoreAgentAdministrationOperationsTests
             SetupPayload("AlreadyApplied", configurationVersion),
             request.MessageId);
 
+    private const string RealInstructions = "You are hexa, a helpful and concise enterprise assistant.";
+
+    private static AgentState CreatedState(CreateAgent create)
+    {
+        AgentState state = new();
+        state.Apply(new AgentCreated(
+            AgentId,
+            create.TenantId,
+            create.DisplayName ?? string.Empty,
+            create.Description,
+            create.Instructions ?? string.Empty,
+            ConfigurationVersion: 1,
+            InstructionsVersion: 1));
+        return state;
+    }
+
+    private static CommandEnvelope AdminEnvelope<T>(T command)
+        where T : notnull
+        => new(
+            MessageId,
+            TenantId,
+            "agent",
+            AgentId,
+            typeof(T).Name,
+            JsonSerializer.SerializeToUtf8Bytes(command),
+            CorrelationId,
+            null,
+            "admin-user",
+            new Dictionary<string, string>
+            {
+                [AgentProviderSelectionOrchestrator.AgentAdminExtensionKey] = "true",
+            });
+
+    private static JsonElement NonNumericVersionPayload(string versionJson)
+        => JsonDocument.Parse(
+                $$"""{"{{AgentSetupResultPayload.EffectProperty}}":"Applied","{{AgentSetupResultPayload.ConfigurationVersionProperty}}":{{versionJson}} }""")
+            .RootElement
+            .Clone();
+
+    // Keyed by the shared constants, so a renamed property fails here instead of degrading every write to
+    // UnableToVerify at run time.
     private static JsonElement SetupPayload(string effect, int configurationVersion)
-        => JsonSerializer.SerializeToElement(new { effect, configurationVersion });
+        => JsonSerializer.SerializeToElement(new Dictionary<string, object>
+        {
+            [AgentSetupResultPayload.EffectProperty] = effect,
+            [AgentSetupResultPayload.ConfigurationVersionProperty] = configurationVersion,
+        });
 
     private IAgentAdministrationOperations Operations()
     {

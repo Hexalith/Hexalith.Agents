@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -12,7 +14,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// Serialized by name so an absent value never deserializes to a concrete category. <see cref="Unknown"/>
 /// (ordinal 0) is the sentinel — a configured policy must record an explicit disclosure category.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<ApproverPolicyBasisDisclosure>))]
 public enum ApproverPolicyBasisDisclosure
 {
     /// <summary>Absent/unrecognized disclosure-category sentinel.</summary>

@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using Hexalith.Agents.Agent;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Events;
+using Hexalith.Agents.Contracts.Serialization;
 
 using Hexalith.EventStore.Contracts.Projections;
 
@@ -33,7 +34,10 @@ public static class AgentSetupProjectionFold
 
     private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web)
     {
-        Converters = { new JsonStringEnumConverter() },
+        // The fallback factory must precede the string converter: options.Converters wins over a type-level
+        // [JsonConverter], so without it every contract enum declaring the Unknown = 0 degradation would be
+        // silently downgraded back to the throwing converter here.
+        Converters = { new UnknownFallbackEnumConverterFactory(), new JsonStringEnumConverter() },
     };
 
     private static readonly AgentContentSafetyPolicy _contentSafetyStandIn = new(

@@ -1,3 +1,7 @@
+using System.Text.Json.Serialization;
+
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -5,6 +9,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// (Story 5.2 AC2). Mirrors the EventStore read-model freshness convention rather than inventing Agents-only
 /// metadata.
 /// </summary>
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentSetupFreshness>))]
 public enum AgentSetupFreshness
 {
     /// <summary>Freshness could not be established (the fail-closed default).</summary>

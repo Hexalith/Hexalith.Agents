@@ -5,6 +5,7 @@ using Hexalith.Agents.AgentInteraction;
 using Hexalith.Agents.Contracts.AgentInteraction.Queries;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.Operations;
+using Hexalith.Agents.Contracts.Serialization;
 using Hexalith.Agents.Server.Ports;
 using Hexalith.EventStore.Contracts.Queries;
 using Hexalith.EventStore.DomainService;
@@ -18,7 +19,10 @@ public abstract class AgentInteractionAuditQueryHandlerBase(
 {
     private static readonly JsonSerializerOptions s_jsonOptions = new(JsonSerializerDefaults.Web)
     {
-        Converters = { new JsonStringEnumConverter() },
+        // The fallback factory must precede the string converter: options.Converters wins over a type-level
+        // [JsonConverter], so without it every contract enum declaring the Unknown = 0 degradation would be
+        // silently downgraded back to the throwing converter here.
+        Converters = { new UnknownFallbackEnumConverterFactory(), new JsonStringEnumConverter() },
     };
 
     private readonly IAgentInteractionAuditStateReader _reader = reader ?? throw new ArgumentNullException(nameof(reader));

@@ -408,7 +408,8 @@
             // leaving the page on its pre-write state with no outcome (AD-12), and never surface the raw error.
             if (!_disposed)
             {
-                _pendingWrite = AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
+                _pendingWrite = RetainedAwaitingProjection()
+                    ?? AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
             }
         }
         finally
@@ -462,7 +463,8 @@
         {
             if (!_disposed)
             {
-                _pendingWrite = AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
+                _pendingWrite = RetainedAwaitingProjection()
+                    ?? AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
             }
         }
         finally
@@ -473,6 +475,15 @@
             }
         }
     }
+
+    // A read that throws says nothing about the write that was already accepted. Collapsing to Unavailable would
+    // relabel that accepted write as a service outage and, because the Refresh action is gated on a known target
+    // version, would also strip the one read-only recovery the retained attempt still has. Keeping the acceptance
+    // leaves the attempt exactly where it was: awaiting projection, with Refresh, Retry and Abandon available.
+    private AgentSetupWriteResult? RetainedAwaitingProjection()
+        => _pendingWrite is { Acceptance: { } acceptance, TargetConfigurationVersion: not null }
+            ? AgentSetupWriteResult.AwaitingProjection(acceptance)
+            : null;
 
     private void AbandonAttempt()
     {

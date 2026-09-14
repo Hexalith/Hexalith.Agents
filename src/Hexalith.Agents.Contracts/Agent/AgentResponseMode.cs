@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -15,7 +17,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// choice before <c>hexa</c> can be activated. Serialized by name so an absent value never deserializes to a
 /// concrete mode.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentResponseMode>))]
 public enum AgentResponseMode
 {
     /// <summary>Not-yet-configured sentinel — fails the activation gate so no mode is ever assumed.</summary>

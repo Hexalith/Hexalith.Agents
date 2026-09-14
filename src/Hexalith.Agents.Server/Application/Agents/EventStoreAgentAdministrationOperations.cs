@@ -26,10 +26,10 @@ namespace Hexalith.Agents.Server.Application.Agents;
 /// <remarks>
 /// <para>
 /// A write answers with a structured accepted identity — the Agent, the command message, the correlation, and the
-    /// <see cref="AgentSetupTruthState.AuthoritativePending"/> stage, the safe applied/no-op effect, and the exact
-    /// resulting configuration version. Acceptance is deliberately not projection success: no stream, revision,
-    /// aggregate type, workflow, projection address, or Provider SDK detail crosses the boundary. The caller re-reads
-    /// the setup with the command-derived version to learn whether the projection has confirmed it.
+/// <see cref="AgentSetupTruthState.AuthoritativePending"/> stage, the safe applied/no-op effect, and the exact
+/// resulting configuration version. Acceptance is deliberately not projection success: no stream, revision,
+/// aggregate type, workflow, projection address, or Provider SDK detail crosses the boundary. The caller re-reads
+/// the setup with the command-derived version to learn whether the projection has confirmed it.
 /// </para>
 /// <para>
 /// Authorization runs first on every operation. An unauthorized or cross-tenant caller gets the same shaped
@@ -414,6 +414,10 @@ public sealed class EventStoreAgentAdministrationOperations(
             || !value.TryGetProperty(AgentSetupResultPayload.EffectProperty, out JsonElement effectElement)
             || effectElement.ValueKind != JsonValueKind.String
             || !value.TryGetProperty(AgentSetupResultPayload.ConfigurationVersionProperty, out JsonElement versionElement)
+
+            // TryGetInt32 throws rather than returning false when the element is not a number, and this runs
+            // outside the dispatch try/catch, so a quoted version would escape instead of failing closed.
+            || versionElement.ValueKind != JsonValueKind.Number
             || !versionElement.TryGetInt32(out configurationVersion)
             || configurationVersion <= 0)
         {

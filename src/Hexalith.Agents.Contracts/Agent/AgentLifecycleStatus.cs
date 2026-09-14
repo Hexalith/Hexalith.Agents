@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -15,7 +17,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// same aggregate. The lifecycle state and the (future, fuller) readiness/blocker set are intentionally distinct
 /// concepts so the later <c>agent-readiness-badge</c> never collapses "active lifecycle" with "callable".
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentLifecycleStatus>))]
 public enum AgentLifecycleStatus
 {
     /// <summary>Absent/unrecognized state sentinel — never callable.</summary>

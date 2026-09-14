@@ -85,7 +85,7 @@ development_status:
   epic-4-retrospective: done
   epic-5: in-progress
   5-1-establish-build-package-boundary-and-basic-ci-gates: done
-  5-2-configure-hexa-through-live-eventstore-operations: in-progress  # Code review 2026-09-14 found the no-op ResultPayload drop that made AlreadyApplied unreachable; fixed in the Hexalith.EventStore submodule (uncommitted, pointer bump pending). Domain-rejection binding blocked on an EventStore package release; immutable ProvisionHexa/link retirement remains open.
+  5-2-configure-hexa-through-live-eventstore-operations: review  # Code review 2026-09-14 found the no-op ResultPayload drop that made AlreadyApplied unreachable; fixed in the Hexalith.EventStore submodule together with IEventStoreGatewayClient.GetCommandStatusAsync, both committed there and the submodule pointer bumped to 555c904. Domain-rejection binding still uses DeferredAgentCommandStatusReader and stays blocked on an EventStore package release, because Release builds resolve Hexalith libraries by package reference; immutable ProvisionHexa/link retirement remains open.
   5-3-govern-provider-models-and-pricing-through-live-operations: backlog  # Noted 2026-09-09 (round-5 spine validation, brownfield M1): a completed, fully-tested prior implementation (2569/2569 tests passing) exists underneath this backlog status; not promoted to done/in-progress here because AD-2's platform/tenant ProviderCatalog split (NC-5.3-PLATFORM-CATALOG-SCOPE) is still unreconciled in code.
   5-4-prove-trusted-principal-tenant-party-and-approver-readiness: backlog
   5-5-publish-authoritative-readiness-and-provider-state-contracts: backlog

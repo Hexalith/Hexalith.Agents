@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -14,7 +16,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// carry the raw Agent Instructions text (AD-14). Serialized by name so an absent value never deserializes to a
 /// concrete blocker. <see cref="Unknown"/> (ordinal 0) is the unrecognized sentinel.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentActivationBlocker>))]
 public enum AgentActivationBlocker
 {
     /// <summary>Absent/unrecognized blocker sentinel.</summary>

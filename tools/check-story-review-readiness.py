@@ -762,7 +762,10 @@ def resolve_baseline_commit(root: Path, baseline: str, runner: Runner) -> str:
 
 def git_diff_paths(root: Path, baseline: str, runner: Runner) -> set[str]:
     result = runner(
-        ("git", "diff", "--name-status", "-z", "--find-renames", f"{baseline}...HEAD"),
+        # Two dots, not three: the gate's contract is "the diff since baseline_commit". Three-dot semantics
+        # diff from the merge base instead, so a HEAD that has diverged from the declared baseline would
+        # silently shrink the change set and let a File-List omission pass a fail-closed gate.
+        ("git", "diff", "--name-status", "-z", "--find-renames", f"{baseline}..HEAD"),
         root,
         None,
     )

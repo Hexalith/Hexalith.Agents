@@ -1,9 +1,11 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Operations;
 
 /// <summary>Canonical public provider/model readiness terms.</summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<ProviderModelReadinessStatus>))]
 public enum ProviderModelReadinessStatus
 {
     /// <summary>Absent or unrecognized provider/model status sentinel.</summary>

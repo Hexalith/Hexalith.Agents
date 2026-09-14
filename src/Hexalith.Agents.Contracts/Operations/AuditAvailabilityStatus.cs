@@ -1,9 +1,11 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Operations;
 
 /// <summary>Canonical public audit availability terms.</summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AuditAvailabilityStatus>))]
 public enum AuditAvailabilityStatus
 {
     /// <summary>Absent or unrecognized audit status sentinel.</summary>

@@ -666,7 +666,9 @@ class BaselineGateTests(unittest.TestCase):
         self.assertEqual(len(summaries), 1)
         self.assertEqual(changed_count, 3)
         diff_call = next(command for command in runner.commands if command[:2] == ("git", "diff"))
-        self.assertIn("599208dd40efadef728363c227a0f75ebd888337...HEAD", diff_call)
+        # Two-dot: the diff since the declared baseline, not since the merge base with it.
+        self.assertIn("599208dd40efadef728363c227a0f75ebd888337..HEAD", diff_call)
+        self.assertNotIn("599208dd40efadef728363c227a0f75ebd888337...HEAD", diff_call)
 
     def test_path_committed_since_baseline_but_absent_from_file_list_still_fails(self):
         root, story_path = self.fixture(("_bmad-output/implementation-artifacts/story.md",))

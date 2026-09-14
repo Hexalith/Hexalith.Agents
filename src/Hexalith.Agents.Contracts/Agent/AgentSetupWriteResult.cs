@@ -4,8 +4,14 @@ namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
 /// Structured result of an Agent setup write (Story 5.2 AC1). Submitted, already-applied, and awaiting-projection
-/// outcomes retain verified acceptance evidence; denied and unverifiable outcomes carry none.
+/// outcomes carry the acceptance evidence a retry and a catch-up read need; denied and unverifiable outcomes carry
+/// none.
 /// </summary>
+/// <remarks>
+/// These factories record an outcome; they do not establish one. Verifying that the acceptance actually carries a
+/// known <see cref="AgentSetupWriteEffect"/> and a target version is the gateway's job, and a gateway that cannot
+/// must report <see cref="AgentSetupWriteStatus.UnableToVerify"/> rather than construct a success-like result.
+/// </remarks>
 /// <param name="Status">The write outcome.</param>
 /// <param name="Acceptance">The structured accepted identity and exact target version, when verified.</param>
 public record AgentSetupWriteResult(
@@ -24,9 +30,12 @@ public record AgentSetupWriteResult(
     public int? TargetConfigurationVersion
         => Acceptance?.TargetConfigurationVersion;
 
-    /// <summary>Creates a submitted result carrying the structured accepted identity.</summary>
+    /// <summary>Creates an accepted result carrying the structured accepted identity.</summary>
     /// <param name="acceptance">The accepted identity.</param>
-    /// <returns>A submitted result.</returns>
+    /// <returns>
+    /// An <see cref="AgentSetupWriteStatus.AlreadyApplied"/> result when the acceptance reports a no-op, otherwise
+    /// an <see cref="AgentSetupWriteStatus.Submitted"/> result.
+    /// </returns>
     public static AgentSetupWriteResult Submitted(AgentCommandAcceptance acceptance)
     {
         ArgumentNullException.ThrowIfNull(acceptance);

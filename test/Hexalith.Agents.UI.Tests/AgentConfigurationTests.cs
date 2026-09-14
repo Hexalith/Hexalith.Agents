@@ -791,7 +791,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     }
 
     [Fact]
-    public async Task A_thrown_retry_preserves_pending_truth_and_reports_write_unavailable()
+    public async Task A_thrown_catch_up_read_preserves_pending_truth_and_the_accepted_write()
     {
         AgentSetupView initial = AgentUiTestData.Setup(
             AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
@@ -831,8 +831,13 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             .ShouldContain("Agents.Config.Truth.Stage.AuthoritativePending");
         cut.Find("[data-testid='agents-config-freshness']").TextContent
             .ShouldContain("Agents.Config.Truth.Freshness.Stale");
+        // The read failed, but the write was already accepted: reporting it as a service outage would be wrong,
+        // and would drop the Refresh action that is gated on the still-known target version.
         cut.Find("[data-testid='agents-config-write-state']").TextContent
-            .ShouldContain("Agents.Config.Write.Unavailable");
+            .ShouldContain("Agents.Config.Write.AwaitingProjection");
+        cut.Find("[data-testid='agents-config-write-refresh']");
+        cut.Find("[data-testid='agents-config-write-retry']");
+        cut.Find("[data-testid='agents-config-write-abandon']");
         cut.Markup.ShouldNotContain("retry transport details");
         ExpectedVersionReadCount(4).ShouldBe(2);
     }
@@ -1164,6 +1169,75 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         cut.Find("[data-testid='agents-config-write-refresh']");
         cut.Find("[data-testid='agents-config-write-retry']");
         cut.Find("[data-testid='agents-config-write-abandon']");
+    }
+
+    [Fact]
+    public async Task A_throwing_refresh_keeps_the_retained_attempt_and_its_recovery_actions()
+    {
+        // The Refresh action is gated on a known target version, so collapsing a throwing read to Unavailable
+        // would both relabel an accepted write as a service outage and remove the only read-only recovery the
+        // retained attempt has. A transient read failure must leave the attempt exactly where it was.
+        AgentSetupView initial = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3);
+        AgentSetupView pending = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3,
+            freshness: AgentSetupFreshness.Stale,
+            truthState: AgentSetupTruthState.AuthoritativePending);
+        bool readThrows = false;
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(call =>
+            readThrows
+                ? throw new InvalidOperationException("transient read failure")
+                : Task.FromResult(AgentSetupResult.Success(call.ArgAt<int?>(0) is null ? initial : pending)));
+        GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
+            AgentResponseMode.Confirmation,
+            Arg.Any<AgentOperationOptions>(),
+            Arg.Any<CancellationToken>()));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
+        Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
+
+        // Run the bounded catch-up out so the attempt settles on awaiting-projection with its recovery actions.
+        for (int tick = 0; tick < 33; tick++)
+        {
+            Clock.Advance(TimeSpan.FromMilliseconds(250));
+            await cut.InvokeAsync(() => Task.CompletedTask);
+        }
+
+        await submission;
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldContain("Agents.Config.Write.AwaitingProjection");
+        int readsBeforeRefresh = ExpectedVersionReadCount(4);
+
+        readThrows = true;
+        await cut.Find("[data-testid='agents-config-write-refresh']").ClickAsync(new MouseEventArgs());
+
+        // The read was attempted and failed, and the attempt survived it unchanged.
+        ExpectedVersionReadCount(4).ShouldBe(readsBeforeRefresh + 1);
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldContain("Agents.Config.Write.AwaitingProjection");
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldNotContain("Agents.Config.Write.Unavailable");
+        cut.Find("[data-testid='agents-config-write-refresh']");
+        cut.Find("[data-testid='agents-config-write-retry']");
+        cut.Find("[data-testid='agents-config-write-abandon']");
+
+        // An unresolved attempt still blocks a competing write, and the page is not left busy.
+        cut.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeTrue();
+        cut.Find("[data-testid='agents-config-disable']").HasAttribute("disabled").ShouldBeTrue();
+        cut.Find("[data-testid='agents-config-response-mode-submit']").HasAttribute("disabled").ShouldBeTrue();
+        cut.Find("[data-testid='agents-config-write-refresh']").HasAttribute("disabled").ShouldBeFalse();
+        cut.Find("[data-testid='agents-config-write-abandon']").HasAttribute("disabled").ShouldBeFalse();
+
+        // Only the original write was ever submitted; a failed read never resubmits.
+        await SetupGateway.Received(1).ConfigureResponseModeAsync(
+            AgentResponseMode.Confirmation,
+            Arg.Any<AgentOperationOptions>(),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]

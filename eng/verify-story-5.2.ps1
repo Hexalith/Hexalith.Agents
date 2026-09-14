@@ -57,9 +57,10 @@ $focusedSuites = @(
             'Hexalith.Agents.Server.Tests.AgentAdministrationOrchestratorTests',
             'Hexalith.Agents.Server.Tests.EventStoreAgentCommandDispatcherTests',
             'Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests',
-            'Hexalith.Agents.Server.Tests.AgentInteractionRequestOrchestratorTests'
+            'Hexalith.Agents.Server.Tests.AgentInteractionRequestOrchestratorTests',
+            'Hexalith.Agents.Server.Tests.ServerSerializationConformanceTests'
         )
-        Gate = 'AC1/AC4 live command dispatch and later interaction snapshot propagation'
+        Gate = 'AC1/AC4 live command dispatch, enum-compatibility wiring, and later interaction snapshot propagation'
     },
     @{
         Assembly = 'test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll'
@@ -151,7 +152,35 @@ function Invoke-TestClasses {
         $arguments += @('-class', $class)
     }
 
-    Invoke-Gate -Name $Name -Arguments $arguments
+    Write-Host "Gate: $Name"
+    $output = & dotnet @arguments
+    if ($null -ne $output) {
+        $output | ForEach-Object { Write-Host $_ }
+    }
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Gate '$Name' failed with exit code $LASTEXITCODE."
+    }
+
+    # A -class selector that matches nothing runs zero tests and still exits 0, which would silently turn a
+    # renamed or deleted suite into a passing no-op gate. The runner has no -minimumExpectedTests, so the
+    # executed count is read back from its own summary and required to be non-zero.
+    $executed = 0
+    $sawSummary = $false
+    foreach ($line in $output) {
+        foreach ($match in [regex]::Matches([string] $line, 'Total:\s*(\d+)')) {
+            $sawSummary = $true
+            $executed += [int] $match.Groups[1].Value
+        }
+    }
+
+    if (-not $sawSummary) {
+        throw "Gate '$Name' produced no test summary, so the focused selection cannot be trusted."
+    }
+
+    if ($executed -le 0) {
+        throw "Gate '$Name' executed 0 tests; the -class selection matched nothing: $($Classes -join ', ')."
+    }
 }
 
 Push-Location $root

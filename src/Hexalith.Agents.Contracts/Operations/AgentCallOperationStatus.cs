@@ -1,9 +1,11 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Operations;
 
 /// <summary>Canonical public Agent call status terms.</summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentCallOperationStatus>))]
 public enum AgentCallOperationStatus
 {
     /// <summary>Absent or unrecognized call status sentinel.</summary>

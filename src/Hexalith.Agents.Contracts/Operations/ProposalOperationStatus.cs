@@ -1,9 +1,11 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Operations;
 
 /// <summary>Canonical public proposal workflow status terms.</summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<ProposalOperationStatus>))]
 public enum ProposalOperationStatus
 {
     /// <summary>Absent or unrecognized proposal status sentinel.</summary>
