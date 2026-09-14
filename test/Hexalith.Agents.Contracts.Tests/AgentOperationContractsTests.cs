@@ -99,6 +99,25 @@ public sealed class AgentOperationContractsTests
     }
 
     [Fact]
+    public void LegacyAgentCommandAcceptanceConstructorAndDeconstructShapesRemainAvailable()
+    {
+        var acceptance = new AgentCommandAcceptance(
+            "hexa",
+            "message-1",
+            "correlation-1",
+            AgentSetupTruthState.Submitted);
+
+        (string agentId, string messageId, string correlationId, AgentSetupTruthState truthState) = acceptance;
+
+        agentId.ShouldBe("hexa");
+        messageId.ShouldBe("message-1");
+        correlationId.ShouldBe("correlation-1");
+        truthState.ShouldBe(AgentSetupTruthState.Submitted);
+        acceptance.Effect.ShouldBe(AgentSetupWriteEffect.Unknown);
+        acceptance.TargetConfigurationVersion.ShouldBeNull();
+    }
+
+    [Fact]
     public void Operation_contract_members_do_not_include_sensitive_names()
     {
         string[] forbiddenNameParts =

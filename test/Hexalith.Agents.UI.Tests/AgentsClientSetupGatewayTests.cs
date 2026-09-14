@@ -184,6 +184,30 @@ public sealed class AgentsClientSetupGatewayTests
         await _administration.DidNotReceiveWithAnyArgs().DisableAsync(default!, default!, default, default);
     }
 
+    [Fact]
+    public async Task LegacyGatewayImplementationsFailClosedForRetainedMetadataOverloads()
+    {
+        IAgentSetupGateway gateway = new LegacyAgentSetupGateway();
+        var options = new AgentOperationOptions(
+            CorrelationId: "01ARZ3NDEKTSV4RRFFQ69G5FAW",
+            IdempotencyKey: "01ARZ3NDEKTSV4RRFFQ69G5FAV");
+
+        AgentSetupWriteResult update = await gateway.UpdateConfigurationAsync(
+            new UpdateAgentConfiguration("hexa", null, "instructions long enough to be valid"),
+            options,
+            CancellationToken.None);
+        AgentSetupWriteResult mode = await gateway.ConfigureResponseModeAsync(
+            AgentResponseMode.Automatic,
+            options,
+            CancellationToken.None);
+        AgentSetupWriteResult activate = await gateway.ActivateAsync(options, CancellationToken.None);
+        AgentSetupWriteResult disable = await gateway.DisableAsync(options, CancellationToken.None);
+
+        new[] { update, mode, activate, disable }
+            .ShouldAllBe(result => result.Status == AgentSetupWriteStatus.Unavailable
+                && result.Acceptance == null);
+    }
+
     private void GivenRead(AgentOperationResult<AgentSetupResult> result)
         => _administration
             .GetConfigurationAsync(AgentId, Arg.Any<int?>(), Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())

@@ -35,46 +35,65 @@ $testProjects = @(
     'test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj'
 )
 
-# The focused Story 5.2 evidence: each filter names the suites that prove one acceptance criterion.
+# The focused Story 5.2 evidence: each class list names the suites that prove one acceptance criterion.
 $focusedSuites = @(
     @{
-        Project = 'test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj'
-        Filter  = 'FullyQualifiedName~AgentOperationContracts'
-        Gate    = 'AC1 additive receipt contracts, named effects, and legacy payload compatibility'
+        Assembly = 'test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.dll'
+        Classes  = @('Hexalith.Agents.Contracts.Tests.AgentOperationContractsTests')
+        Gate     = 'AC1 additive receipt contracts, named effects, and legacy payload compatibility'
     },
     @{
-        Project = 'test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj'
-        Filter  = 'FullyQualifiedName~AgentStateReplay|FullyQualifiedName~AgentLifecycleConfigurationVersion|FullyQualifiedName~AgentSetupDomainResult'
-        Gate    = 'AC1 aggregate replay, result payload, and configuration-version determinism'
+        Assembly = 'test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.dll'
+        Classes  = @(
+            'Hexalith.Agents.Tests.AgentStateReplayTests',
+            'Hexalith.Agents.Tests.AgentLifecycleConfigurationVersionTests',
+            'Hexalith.Agents.Tests.AgentSetupDomainResultTests'
+        )
+        Gate = 'AC1 aggregate replay, result payload, and configuration-version determinism'
     },
     @{
-        Project = 'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj'
-        Filter  = 'FullyQualifiedName~AgentAdministrationOrchestrator|FullyQualifiedName~EventStoreAgentCommandDispatcher|FullyQualifiedName~EventStoreAgentAdministrationOperations|FullyQualifiedName~AgentInteractionRequestOrchestrator'
-        Gate    = 'AC1/AC4 live command dispatch and later interaction snapshot propagation'
+        Assembly = 'test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll'
+        Classes  = @(
+            'Hexalith.Agents.Server.Tests.AgentAdministrationOrchestratorTests',
+            'Hexalith.Agents.Server.Tests.EventStoreAgentCommandDispatcherTests',
+            'Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests',
+            'Hexalith.Agents.Server.Tests.AgentInteractionRequestOrchestratorTests'
+        )
+        Gate = 'AC1/AC4 live command dispatch and later interaction snapshot propagation'
     },
     @{
-        Project = 'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj'
-        Filter  = 'FullyQualifiedName~AgentSetupProjection|FullyQualifiedName~AgentSetupQueryHandler'
-        Gate    = 'AC2/AC3 projected setup truth and persisted read-model end state'
+        Assembly = 'test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll'
+        Classes  = @(
+            'Hexalith.Agents.Server.Tests.AgentSetupProjectionTests',
+            'Hexalith.Agents.Server.Tests.AgentSetupQueryHandlerTests'
+        )
+        Gate = 'AC2/AC3 projected setup truth and persisted read-model end state'
     },
     @{
-        Project = 'test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj'
-        Filter  = 'FullyQualifiedName~AgentConfiguration|FullyQualifiedName~AgentsClientSetupGateway'
-        Gate    = 'AC2 FrontComposer truth flow without callability inference'
+        Assembly = 'test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll'
+        Classes  = @(
+            'Hexalith.Agents.UI.Tests.AgentConfigurationTests',
+            'Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests'
+        )
+        Gate = 'AC2 FrontComposer truth flow without callability inference'
     }
 )
 
 # Gate 4a: the composition suites that resolve the real containers. A deferred-only host must fail these.
 $compositionSuites = @(
     @{
-        Project = 'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj'
-        Filter  = 'FullyQualifiedName~AgentSetupComposition|FullyQualifiedName~HttpAgentAdministrationContextProvider|FullyQualifiedName~AgentsOperationEndpoints'
-        Gate    = 'the server container resolves the live dispatcher, operations, and trusted context provider'
+        Assembly = 'test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll'
+        Classes  = @(
+            'Hexalith.Agents.Server.Tests.AgentSetupCompositionTests',
+            'Hexalith.Agents.Server.Tests.HttpAgentAdministrationContextProviderTests',
+            'Hexalith.Agents.Server.Tests.AgentsOperationEndpointsTests'
+        )
+        Gate = 'the server container resolves the live dispatcher, operations, and trusted context provider'
     },
     @{
-        Project = 'test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj'
-        Filter  = 'FullyQualifiedName~AgentsUiComposition'
-        Gate    = 'the FrontComposer container resolves the live setup gateway only when an Agent target is named'
+        Assembly = 'test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll'
+        Classes  = @('Hexalith.Agents.UI.Tests.AgentsUiCompositionTests')
+        Gate     = 'the FrontComposer container resolves the live setup gateway only when an Agent target is named'
     }
 )
 
@@ -120,6 +139,21 @@ function Invoke-Gate {
     }
 }
 
+function Invoke-TestClasses {
+    param(
+        [Parameter(Mandatory = $true)] [string] $Name,
+        [Parameter(Mandatory = $true)] [string] $Assembly,
+        [Parameter(Mandatory = $true)] [string[]] $Classes
+    )
+
+    $arguments = @($Assembly)
+    foreach ($class in $Classes) {
+        $arguments += @('-class', $class)
+    }
+
+    Invoke-Gate -Name $Name -Arguments $arguments
+}
+
 Push-Location $root
 try {
     if (-not $SkipBuild) {
@@ -134,10 +168,10 @@ try {
     }
 
     foreach ($suite in $focusedSuites) {
-        Invoke-Gate -Name "story-5.2 focused — $($suite.Gate)" -Arguments @(
-            'test', $suite.Project, '-c', 'Debug', '--no-build',
-            '--filter', $suite.Filter, '/m:1', '/nr:false'
-        )
+        Invoke-TestClasses `
+            -Name "story-5.2 focused — $($suite.Gate)" `
+            -Assembly $suite.Assembly `
+            -Classes $suite.Classes
     }
 
     foreach ($testProject in $testProjects) {
@@ -147,10 +181,10 @@ try {
     }
 
     foreach ($suite in $compositionSuites) {
-        Invoke-Gate -Name "story-5.2 composition — $($suite.Gate)" -Arguments @(
-            'test', $suite.Project, '-c', 'Debug', '--no-build',
-            '--filter', $suite.Filter, '/m:1', '/nr:false'
-        )
+        Invoke-TestClasses `
+            -Name "story-5.2 composition — $($suite.Gate)" `
+            -Assembly $suite.Assembly `
+            -Classes $suite.Classes
     }
 
     Write-Host 'Gate: in-scope administration seams are still present in source'

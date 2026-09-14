@@ -306,6 +306,9 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     [InlineData("malformed-payload")]
     [InlineData("mismatched-message")]
     [InlineData("mismatched-correlation")]
+    [InlineData("unknown-effect")]
+    [InlineData("undefined-effect")]
+    [InlineData("wrong-case-effect")]
     public async Task An_unverifiable_gateway_receipt_fails_closed(string scenario)
     {
         _gateway
@@ -324,7 +327,22 @@ public sealed class EventStoreAgentAdministrationOperationsTests
                         request.CorrelationId!,
                         SetupPayload("Applied", 4),
                         MessageId),
-                    _ => new SubmitCommandResponse(CorrelationId, SetupPayload("Applied", 4), request.MessageId),
+                    "mismatched-correlation" => new SubmitCommandResponse(
+                        CorrelationId,
+                        SetupPayload("Applied", 4),
+                        request.MessageId),
+                    "unknown-effect" => new SubmitCommandResponse(
+                        request.CorrelationId!,
+                        SetupPayload("Unknown", 4),
+                        request.MessageId),
+                    "undefined-effect" => new SubmitCommandResponse(
+                        request.CorrelationId!,
+                        SetupPayload("Undefined", 4),
+                        request.MessageId),
+                    _ => new SubmitCommandResponse(
+                        request.CorrelationId!,
+                        SetupPayload("applied", 4),
+                        request.MessageId),
                 };
             });
 
@@ -363,6 +381,26 @@ public sealed class EventStoreAgentAdministrationOperationsTests
 
         result.Status.ShouldBe(AgentOperationStatus.ValidationFailed);
         result.CorrelationId.ShouldBe(CorrelationId);
+        _lastSubmit.ShouldBeNull();
+        await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
+    }
+
+    [Theory]
+    [InlineData("correlation")]
+    [InlineData("idempotency")]
+    public async Task ParseableButNonCanonicalCallerUlidsAreRejectedBeforeDispatch(string field)
+    {
+        CaptureSubmit();
+        var options = new AgentOperationOptions(
+            CorrelationId: field == "correlation" ? CorrelationId.ToLowerInvariant() : CorrelationId,
+            IdempotencyKey: field == "idempotency" ? MessageId.ToLowerInvariant() : MessageId);
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(
+            AgentId,
+            new DisableAgent(),
+            options);
+
+        result.Status.ShouldBe(AgentOperationStatus.ValidationFailed);
         _lastSubmit.ShouldBeNull();
         await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
     }

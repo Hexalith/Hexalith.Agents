@@ -68,7 +68,8 @@ public interface IAgentSetupGateway
     Task<AgentSetupWriteResult> UpdateConfigurationAsync(
         UpdateAgentConfiguration command,
         AgentOperationOptions options,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken)
+        => Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable));
 
     /// <summary>Submits a Response Mode change, which affects future Agent Calls only.</summary>
     /// <param name="mode">The chosen Response Mode.</param>
@@ -84,7 +85,8 @@ public interface IAgentSetupGateway
     Task<AgentSetupWriteResult> ConfigureResponseModeAsync(
         AgentResponseMode mode,
         AgentOperationOptions options,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken)
+        => Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable));
 
     /// <summary>Submits an activation. Acceptance is a lifecycle transition, never a callability claim.</summary>
     /// <param name="cancellationToken">Cancellation token for the in-flight write.</param>
@@ -95,7 +97,8 @@ public interface IAgentSetupGateway
     /// <param name="options">The retained idempotency and correlation identities.</param>
     /// <param name="cancellationToken">Cancellation token for the in-flight write.</param>
     /// <returns>The fail-closed write result.</returns>
-    Task<AgentSetupWriteResult> ActivateAsync(AgentOperationOptions options, CancellationToken cancellationToken);
+    Task<AgentSetupWriteResult> ActivateAsync(AgentOperationOptions options, CancellationToken cancellationToken)
+        => Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable));
 
     /// <summary>Submits a disable.</summary>
     /// <param name="cancellationToken">Cancellation token for the in-flight write.</param>
@@ -106,5 +109,6 @@ public interface IAgentSetupGateway
     /// <param name="options">The retained idempotency and correlation identities.</param>
     /// <param name="cancellationToken">Cancellation token for the in-flight write.</param>
     /// <returns>The fail-closed write result.</returns>
-    Task<AgentSetupWriteResult> DisableAsync(AgentOperationOptions options, CancellationToken cancellationToken);
+    Task<AgentSetupWriteResult> DisableAsync(AgentOperationOptions options, CancellationToken cancellationToken)
+        => Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable));
 }

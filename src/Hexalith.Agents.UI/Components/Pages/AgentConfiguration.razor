@@ -36,7 +36,7 @@
                 </FluentText>
                 @if (_activeAttempt is not null)
                 {
-                    <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="8px">
+                    <FluentStack Orientation="Orientation.Vertical" VerticalGap="8px">
                         @if (pending.Status == AgentSetupWriteStatus.AwaitingProjection
                             && pending.TargetConfigurationVersion is not null)
                         {
@@ -372,7 +372,10 @@
                 && writeResult.TargetConfigurationVersion is int targetVersion)
             {
                 await RequestRenderAsync(cancellationToken).ConfigureAwait(false);
-                AgentSetupTruthState refreshState = await RefreshAfterWriteAsync(targetVersion, cancellationToken)
+                AgentSetupTruthState refreshState = await RefreshAfterWriteAsync(
+                        targetVersion,
+                        cancellationToken,
+                        applyAuthoritativeDrafts: false)
                     .ConfigureAwait(false);
 
                 if (refreshState == AgentSetupTruthState.ProjectionConfirmed)

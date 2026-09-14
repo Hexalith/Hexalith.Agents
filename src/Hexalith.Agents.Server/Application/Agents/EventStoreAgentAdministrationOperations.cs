@@ -263,14 +263,14 @@ public sealed class EventStoreAgentAdministrationOperations(
             string? deniedCorrelation = options?.CorrelationId;
             return AgentOperationResult<AgentCommandAcceptance>.Failed(
                 AgentOperationErrorCode.NotAuthorized,
-                IsUlid(deniedCorrelation) ? deniedCorrelation : null);
+                IsCanonicalUlid(deniedCorrelation) ? deniedCorrelation : null);
         }
 
         string correlationId = options?.CorrelationId is { Length: > 0 } suppliedCorrelation
             ? suppliedCorrelation
             : _identityFactory.NewCorrelationId();
 
-        if (!IsUlid(correlationId))
+        if (!IsCanonicalUlid(correlationId))
         {
             return AgentOperationResult<AgentCommandAcceptance>.Failed(AgentOperationErrorCode.ValidationFailed);
         }
@@ -278,7 +278,7 @@ public sealed class EventStoreAgentAdministrationOperations(
         // The idempotency key doubles as the command message id, so re-submitting the same caller key is an exact
         // duplicate at the gateway rather than a second appended event.
         string messageId = options?.IdempotencyKey is { Length: > 0 } key ? key : _identityFactory.NewMessageId();
-        if (!IsUlid(messageId))
+        if (!IsCanonicalUlid(messageId))
         {
             return AgentOperationResult<AgentCommandAcceptance>.Failed(
                 AgentOperationErrorCode.ValidationFailed,
@@ -318,8 +318,8 @@ public sealed class EventStoreAgentAdministrationOperations(
 
         SubmitCommandResponse? receipt = outcome.Receipt;
         if (receipt is null
-            || !IsUlid(receipt.CorrelationId)
-            || !IsUlid(receipt.MessageId)
+            || !IsCanonicalUlid(receipt.CorrelationId)
+            || !IsCanonicalUlid(receipt.MessageId)
             || !string.Equals(receipt.CorrelationId, correlationId, StringComparison.Ordinal)
             || !string.Equals(receipt.MessageId, messageId, StringComparison.Ordinal)
             || !TryParseSetupResult(receipt.ResultPayload, out AgentSetupWriteEffect effect, out int targetVersion))
@@ -377,8 +377,10 @@ public sealed class EventStoreAgentAdministrationOperations(
         return new AgentAdministrationOutcome(outcome.Authorized, outcome.Dispatched, outcome.Receipt);
     }
 
-    private static bool IsUlid(string? value)
-        => !string.IsNullOrWhiteSpace(value) && NUlid.Ulid.TryParse(value, out _);
+    private static bool IsCanonicalUlid(string? value)
+        => !string.IsNullOrWhiteSpace(value)
+            && NUlid.Ulid.TryParse(value, out NUlid.Ulid parsed)
+            && string.Equals(parsed.ToString(), value, StringComparison.Ordinal);
 
     private static bool TryParseSetupResult(
         JsonElement? payload,

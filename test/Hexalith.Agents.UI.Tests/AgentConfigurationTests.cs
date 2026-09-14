@@ -478,10 +478,14 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     }
 
     [Fact]
-    public async Task Polling_retries_do_not_overwrite_drafts_edited_after_the_immediate_refresh()
+    public async Task Automatic_catch_up_preserves_drafts_through_the_immediate_and_later_projection_reads()
     {
         AgentSetupView initial = AgentUiTestData.Setup(
-            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic) with
+            {
+                DisplayName = "initial name",
+                Description = "initial description",
+            },
             configurationVersion: 3);
         AgentSetupView pending = AgentUiTestData.Setup(
             AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic) with
@@ -511,21 +515,33 @@ public sealed class AgentConfigurationTests : AgentsTestContext
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
         cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        cut.Find("[data-testid='agents-config-display-name-input']").Change("submitted administrator name");
+        cut.Find("[data-testid='agents-config-description-input']").Change("submitted administrator description");
         await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
             AgentResponseMode.Confirmation));
         Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
-        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-display-name-input']")
-            .GetAttribute("value").ShouldBe("pending authoritative name"));
-        cut.Find("[data-testid='agents-config-display-name-input']").Change("administrator draft name");
-        cut.Find("[data-testid='agents-config-description-input']").Change("administrator draft description");
+        cut.WaitForAssertion(() =>
+        {
+            SetupGateway.Received(1).GetSetupAsync(4, Arg.Any<CancellationToken>());
+            cut.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value")
+                .ShouldBe("submitted administrator name");
+            cut.Find("[data-testid='agents-config-description-input']").GetAttribute("value")
+                .ShouldBe("submitted administrator description");
+            cut.FindComponent<ResponseModeToggle>().Instance.Value.ShouldBe(AgentResponseMode.Confirmation);
+        });
+        cut.Find("[data-testid='agents-config-display-name-input']").Change("edited during catch-up name");
+        cut.Find("[data-testid='agents-config-description-input']").Change("edited during catch-up description");
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Automatic));
 
         Clock.Advance(TimeSpan.FromMilliseconds(250));
         await submission;
 
         cut.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value")
-            .ShouldBe("administrator draft name");
+            .ShouldBe("edited during catch-up name");
         cut.Find("[data-testid='agents-config-description-input']").GetAttribute("value")
-            .ShouldBe("administrator draft description");
+            .ShouldBe("edited during catch-up description");
+        cut.FindComponent<ResponseModeToggle>().Instance.Value.ShouldBe(AgentResponseMode.Automatic);
         cut.Find("[data-testid='agents-config-truth-stage']").TextContent
             .ShouldContain("Agents.Config.Truth.Stage.ProjectionConfirmed");
     }
@@ -977,6 +993,67 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         await SetupGateway.Received(1).GetSetupAsync(4, Arg.Any<CancellationToken>());
         cut.FindAll("[data-testid='agents-config-write-state']").ShouldBeEmpty();
         cut.Markup.ShouldNotContain("sensitive exact payload");
+    }
+
+    [Fact]
+    public async Task Unable_to_verify_retains_and_blocks_the_exact_attempt_until_retry_or_abandon()
+    {
+        GivenSetup(AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3));
+        var commands = new List<UpdateAgentConfiguration>();
+        var options = new List<AgentOperationOptions>();
+        SetupGateway.UpdateConfigurationAsync(
+                Arg.Any<UpdateAgentConfiguration>(),
+                Arg.Any<AgentOperationOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                commands.Add(call.ArgAt<UpdateAgentConfiguration>(0));
+                options.Add(call.ArgAt<AgentOperationOptions>(1));
+                return Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify));
+            });
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-submit']"));
+        cut.Find("[data-testid='agents-config-display-name-input']").Change("hexa unverifiable");
+        cut.Find("[data-testid='agents-config-instructions-input']").Change("exact unverifiable payload");
+        cut.Find("[data-testid='agents-config-submit']").Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.Find("[data-testid='agents-config-write-state']").TextContent
+                .ShouldContain("Agents.Config.Write.UnableToVerify");
+            cut.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeTrue();
+            cut.Find("[data-testid='agents-config-disable']").HasAttribute("disabled").ShouldBeTrue();
+            cut.Find("[data-testid='agents-config-write-retry']");
+            cut.Find("[data-testid='agents-config-write-abandon']");
+        });
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
+        cut.Find("[data-testid='agents-config-response-mode-submit']").HasAttribute("disabled").ShouldBeTrue();
+
+        await cut.Find("[data-testid='agents-config-write-retry']").ClickAsync(new MouseEventArgs());
+
+        commands.Count.ShouldBe(2);
+        commands[1].ShouldBeSameAs(commands[0]);
+        commands[0].DisplayName.ShouldBe("hexa unverifiable");
+        commands[0].Instructions.ShouldBe("exact unverifiable payload");
+        options.Count.ShouldBe(2);
+        options[1].ShouldBeSameAs(options[0]);
+        await SetupGateway.DidNotReceive().GetSetupAsync(Arg.Any<int>(), Arg.Any<CancellationToken>());
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldContain("Agents.Config.Write.UnableToVerify");
+
+        cut.Find("[data-testid='agents-config-write-abandon']").Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.FindAll("[data-testid='agents-config-write-state']").ShouldBeEmpty();
+            cut.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeFalse();
+            cut.Find("[data-testid='agents-config-disable']").HasAttribute("disabled").ShouldBeFalse();
+            cut.Find("[data-testid='agents-config-response-mode-submit']").HasAttribute("disabled").ShouldBeFalse();
+        });
     }
 
     [Fact]

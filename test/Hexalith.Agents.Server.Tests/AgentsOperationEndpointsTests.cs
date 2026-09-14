@@ -1,6 +1,7 @@
 namespace Hexalith.Agents.Server.Tests;
 
 using System.Net.Http.Json;
+using System.Reflection;
 using System.Text.Json;
 
 using Hexalith.Agents.Client;
@@ -13,6 +14,7 @@ using Hexalith.Agents.Server.Api;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -126,24 +128,53 @@ public sealed class AgentsOperationEndpointsTests
     }
 
     [Fact]
-    public async Task A_setup_write_binds_correlation_and_idempotency_headers_to_command_options()
+    public async Task Every_setup_write_binds_correlation_and_idempotency_headers_to_command_options()
     {
         IAgentAdministrationOperations administration = Substitute.For<IAgentAdministrationOperations>();
+        var acceptance = new AgentCommandAcceptance(
+            "agent-1",
+            MessageId,
+            CorrelationId,
+            AgentSetupTruthState.AuthoritativePending,
+            AgentSetupWriteEffect.Applied,
+            4);
+        AgentOperationResult<AgentCommandAcceptance> accepted =
+            AgentOperationResult<AgentCommandAcceptance>.Succeeded(acceptance);
+        administration
+            .CreateAsync(
+                "agent-1",
+                Arg.Any<CreateAgent>(),
+                Arg.Any<AgentOperationOptions?>(),
+                Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(accepted));
         administration
             .UpdateConfigurationAsync(
                 "agent-1",
                 Arg.Any<UpdateAgentConfiguration>(),
                 Arg.Any<AgentOperationOptions?>(),
                 Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(
-                AgentOperationResult<AgentCommandAcceptance>.Succeeded(
-                    new AgentCommandAcceptance(
-                        "agent-1",
-                        MessageId,
-                        CorrelationId,
-                        AgentSetupTruthState.AuthoritativePending,
-                        AgentSetupWriteEffect.Applied,
-                        4))));
+            .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(accepted));
+        administration
+            .ConfigureResponseModeAsync(
+                "agent-1",
+                Arg.Any<ConfigureAgentResponseMode>(),
+                Arg.Any<AgentOperationOptions?>(),
+                Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(accepted));
+        administration
+            .ActivateAsync(
+                "agent-1",
+                Arg.Any<ActivateAgent>(),
+                Arg.Any<AgentOperationOptions?>(),
+                Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(accepted));
+        administration
+            .DisableAsync(
+                "agent-1",
+                Arg.Any<DisableAgent>(),
+                Arg.Any<AgentOperationOptions?>(),
+                Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(accepted));
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.WebHost.UseTestServer();
@@ -152,26 +183,94 @@ public sealed class AgentsOperationEndpointsTests
         app.MapAgentsOperationEndpoints();
         await app.StartAsync().ConfigureAwait(true);
         using HttpClient client = app.GetTestClient();
-        using var request = new HttpRequestMessage(HttpMethod.Put, "/api/agents/operations/agents/agent-1")
-        {
-            Content = JsonContent.Create(new UpdateAgentConfiguration(
-                "hexa",
-                null,
-                "instructions long enough to be valid")),
-        };
-        request.Headers.Add("Idempotency-Key", MessageId);
-        request.Headers.Add("X-Correlation-ID", CorrelationId);
+        await SendWriteAsync(
+            client,
+            HttpMethod.Post,
+            "/api/agents/operations/agents/agent-1",
+            new CreateAgent("tenant-from-body", "hexa", null, "instructions long enough to be valid"));
+        await SendWriteAsync(
+            client,
+            HttpMethod.Put,
+            "/api/agents/operations/agents/agent-1",
+            new UpdateAgentConfiguration("hexa", null, "instructions long enough to be valid"));
+        await SendWriteAsync(
+            client,
+            HttpMethod.Post,
+            "/api/agents/operations/agents/agent-1/response-mode",
+            new ConfigureAgentResponseMode(AgentResponseMode.Confirmation));
+        await SendWriteAsync(
+            client,
+            HttpMethod.Post,
+            "/api/agents/operations/agents/agent-1/activate",
+            new ActivateAgent());
+        await SendWriteAsync(
+            client,
+            HttpMethod.Post,
+            "/api/agents/operations/agents/agent-1/disable",
+            new DisableAgent());
 
-        using HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(true);
-        response.EnsureSuccessStatusCode();
-
+        await administration.Received(1).CreateAsync(
+            "agent-1",
+            Arg.Any<CreateAgent>(),
+            Arg.Is<AgentOperationOptions?>(options => HasExpectedCommandOptions(options)),
+            Arg.Any<CancellationToken>());
         await administration.Received(1).UpdateConfigurationAsync(
             "agent-1",
             Arg.Any<UpdateAgentConfiguration>(),
-            Arg.Is<AgentOperationOptions?>(options => options != null
-                && options.IdempotencyKey == MessageId
-                && options.CorrelationId == CorrelationId),
+            Arg.Is<AgentOperationOptions?>(options => HasExpectedCommandOptions(options)),
             Arg.Any<CancellationToken>());
+        await administration.Received(1).ConfigureResponseModeAsync(
+            "agent-1",
+            Arg.Any<ConfigureAgentResponseMode>(),
+            Arg.Is<AgentOperationOptions?>(options => HasExpectedCommandOptions(options)),
+            Arg.Any<CancellationToken>());
+        await administration.Received(1).ActivateAsync(
+            "agent-1",
+            Arg.Any<ActivateAgent>(),
+            Arg.Is<AgentOperationOptions?>(options => HasExpectedCommandOptions(options)),
+            Arg.Any<CancellationToken>());
+        await administration.Received(1).DisableAsync(
+            "agent-1",
+            Arg.Any<DisableAgent>(),
+            Arg.Is<AgentOperationOptions?>(options => HasExpectedCommandOptions(options)),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public void Setup_write_handlers_declare_both_optional_retry_headers_for_endpoint_metadata()
+    {
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Services.AddSingleton(AgentsClient.Unavailable());
+        WebApplication app = builder.Build();
+        app.MapAgentsOperationEndpoints();
+
+        string[] writePatterns =
+        [
+            "/api/agents/operations/agents/{agentId}",
+            "/api/agents/operations/agents/{agentId}/response-mode",
+            "/api/agents/operations/agents/{agentId}/activate",
+            "/api/agents/operations/agents/{agentId}/disable",
+        ];
+        RouteEndpoint[] endpoints = ((IEndpointRouteBuilder)app).DataSources
+            .SelectMany(source => source.Endpoints)
+            .OfType<RouteEndpoint>()
+            .Where(endpoint => writePatterns.Contains(endpoint.RoutePattern.RawText))
+            .ToArray();
+
+        endpoints.Length.ShouldBe(5);
+        foreach (RouteEndpoint endpoint in endpoints)
+        {
+            MethodInfo handler = endpoint.Metadata.OfType<MethodInfo>().Single();
+            string[] headerNames = handler
+                .GetParameters()
+                .Select(parameter => parameter.GetCustomAttribute<FromHeaderAttribute>())
+                .Where(attribute => attribute is not null)
+                .Select(attribute => attribute!.Name!)
+                .ToArray();
+
+            headerNames.ShouldContain("X-Correlation-ID", endpoint.RoutePattern.RawText);
+            headerNames.ShouldContain("Idempotency-Key", endpoint.RoutePattern.RawText);
+        }
     }
 
     [Fact]
@@ -262,6 +361,26 @@ public sealed class AgentsOperationEndpointsTests
             .Returns(new ValueTask<AgentOperationResult<ProviderCatalogInspectionResult>>(
                 AgentOperationResult<ProviderCatalogInspectionResult>.Succeeded(ProviderCatalogInspectionResult.NotFound())));
         return catalog;
+    }
+
+    private static bool HasExpectedCommandOptions(AgentOperationOptions? options)
+        => options is
+        {
+            IdempotencyKey: MessageId,
+            CorrelationId: CorrelationId,
+        };
+
+    private static async Task SendWriteAsync(HttpClient client, HttpMethod method, string path, object command)
+    {
+        using var request = new HttpRequestMessage(method, path)
+        {
+            Content = JsonContent.Create(command),
+        };
+        request.Headers.Add("Idempotency-Key", MessageId);
+        request.Headers.Add("X-Correlation-ID", CorrelationId);
+
+        using HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(true);
+        response.EnsureSuccessStatusCode();
     }
 
     [Fact]
