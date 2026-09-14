@@ -157,8 +157,16 @@ public sealed class AgentsClientSetupGateway(
 
         AgentOperationResult<AgentCommandAcceptance> result = await write(agentId, cancellationToken).ConfigureAwait(false);
 
-        return result is { IsSuccess: true, Value: { } acceptance }
-            ? AgentSetupWriteResult.Submitted(acceptance)
-            : AgentSetupWriteResult.Failed(ToWriteStatus(result.Status));
+        if (result is not { IsSuccess: true, Value: { } acceptance })
+        {
+            return AgentSetupWriteResult.Failed(ToWriteStatus(result.Status));
+        }
+
+        // A legacy server returns an acceptance with no effect and no target version. That is unverifiable, not
+        // progress: without a command-derived target the caller has nothing to poll for and must not be told the
+        // write is under way. Enforcing it here keeps the invariant in the gateway rather than in one consumer.
+        return acceptance.Effect is AgentSetupWriteEffect.Unknown || acceptance.TargetConfigurationVersion is null
+            ? AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify)
+            : AgentSetupWriteResult.Submitted(acceptance);
     }
 }

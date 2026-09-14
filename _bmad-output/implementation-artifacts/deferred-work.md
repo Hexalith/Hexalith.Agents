@@ -104,3 +104,27 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Prove exact setup result payload replay and projection through the production-like EventStore topology.
   evidence: Unit and component evidence covers the platform contract, but the Story 5.6 production-like host fixture is required to establish whether the payload survives the real EventStore completion, idempotency replay, and persisted projection path end to end.
+
+## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2 (2026-09-14)
+
+- Eventful `ResultPayload` is dropped whenever the durable advisory status read is not `Completed`.
+  `references/Hexalith.EventStore/src/Hexalith.EventStore.Server/Pipeline/SubmitCommandHandler.cs:538` gates
+  payload forwarding on `finalStatus?.Status == CommandStatus.Completed` and otherwise logs `ResultPayloadDropped`.
+  The gating is deliberate and separately tested in EventStore, and it lives in a different repository boundary,
+  so it is not actionable from this story. Story 5.2's new fail-closed correlation is what makes it visible:
+  a write that genuinely appended its event is reported to the administrator as `UnableToVerify` whenever the
+  advisory status write has not landed by the time it is read. Revisit alongside the no-op payload fix.
+
+- Domain-rejection correlation is seamed but not bound. `IAgentCommandStatusReader` and the mapping of a rejected
+  command to `AgentOperationErrorCode.Rejected` are implemented and tested, but the live reader is absent because it
+  needs `IEventStoreGatewayClient.GetCommandStatusAsync`, which is added in the submodule and not yet released.
+  Release builds resolve Hexalith libraries by package reference, so Agents cannot bind to it until that package
+  ships. Until then a domain rejection still renders as retryable `UnableToVerify`. Going live is a single
+  registration change in `AgentSetupServiceCollectionExtensions`.
+
+- `tools/check-story-review-readiness.py` can hang for its full 900 s timeout on a test project. `default_runner`
+  uses `subprocess.run(capture_output=True)`, which waits for the stdout pipe to reach EOF rather than for the child
+  to exit, so a persistent MSBuild node that inherited that pipe keeps it open and the gate times out. Observed twice
+  on `Hexalith.Agents.Client.Tests`, whose 6 tests finish in 0.14 s when the identical command is run directly.
+  Workaround: `dotnet build-server shutdown` and run the gate with `MSBUILDDISABLENODEREUSE=1`. A durable fix is to
+  set that variable inside `default_runner` for `dotnet` commands.

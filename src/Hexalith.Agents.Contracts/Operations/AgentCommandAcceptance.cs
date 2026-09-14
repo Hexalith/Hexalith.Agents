@@ -1,6 +1,6 @@
-using Hexalith.Agents.Contracts.Agent;
-
 using System.Text.Json.Serialization;
+
+using Hexalith.Agents.Contracts.Agent;
 
 namespace Hexalith.Agents.Contracts.Operations;
 
@@ -13,7 +13,8 @@ namespace Hexalith.Agents.Contracts.Operations;
 /// <param name="AgentId">The Agent the command targeted.</param>
 /// <param name="MessageId">The accepted command message identity.</param>
 /// <param name="CorrelationId">The correlation identity for tracing the accepted command.</param>
-/// <param name="TruthState">The truth stage reached by acceptance; it never claims projection confirmation.</param>
+/// <param name="TruthState">The truth stage reached by acceptance. An applied write is authoritative but not
+/// yet projected; a no-op is already projection-confirmed because it appended nothing to reach.</param>
 /// <param name="Effect">The safe effect reported by the completed domain command.</param>
 /// <param name="TargetConfigurationVersion">The authoritative configuration version produced or retained by the command.</param>
 [method: JsonConstructor]

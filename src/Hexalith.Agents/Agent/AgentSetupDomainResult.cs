@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Text.Json;
 
 using Hexalith.Agents.Contracts.Agent;
@@ -22,8 +21,8 @@ internal sealed record AgentSetupDomainResult : DomainResult
     {
         ResultPayload = JsonSerializer.Serialize(new Dictionary<string, object>
         {
-            ["effect"] = effect.ToString(),
-            ["configurationVersion"] = configurationVersion,
+            [AgentSetupResultPayload.EffectProperty] = effect.ToString(),
+            [AgentSetupResultPayload.ConfigurationVersionProperty] = configurationVersion,
         });
     }
 

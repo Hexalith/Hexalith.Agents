@@ -21,27 +21,93 @@ namespace Hexalith.Agents.Tests;
 /// </summary>
 public sealed class AgentSetupDomainResultTests
 {
-    [Fact]
-    public void EveryEventfulSetupHandlerCarriesAppliedEffectAndItsEmittedVersion()
+    public static TheoryData<string> EventfulCommandNames()
     {
-        foreach ((string commandName, DomainResult result, int expectedVersion) in EventfulCases())
+        TheoryData<string> names = [];
+        foreach ((string commandName, DomainResult _, int _) in EventfulCases())
         {
-            result.IsSuccess.ShouldBeTrue(commandName);
-            IEventPayload emitted = result.Events.Single();
-            int emittedVersion = ConfigurationVersionOf(emitted);
-            emittedVersion.ShouldBe(expectedVersion, commandName);
-            AssertPayload(result, "Applied", emittedVersion, commandName);
+            names.Add(commandName);
         }
+
+        return names;
     }
 
-    [Fact]
-    public void EveryNoOpCapableSetupHandlerCarriesAlreadyAppliedEffectAndItsUnchangedVersion()
+    public static TheoryData<string> NoOpCommandNames()
     {
-        foreach ((string commandName, DomainResult result, int unchangedVersion) in NoOpCases())
+        TheoryData<string> names = [];
+        foreach ((string commandName, DomainResult _, int _) in NoOpCases())
         {
-            result.IsNoOp.ShouldBeTrue(commandName);
-            AssertPayload(result, "AlreadyApplied", unchangedVersion, commandName);
+            names.Add(commandName);
         }
+
+        return names;
+    }
+
+    [Theory]
+    [MemberData(nameof(EventfulCommandNames))]
+    public void EveryEventfulSetupHandlerCarriesAppliedEffectAndItsEmittedVersion(string commandName)
+    {
+        (DomainResult result, int expectedVersion) = EventfulCase(commandName);
+
+        result.IsSuccess.ShouldBeTrue(commandName);
+        IEventPayload emitted = result.Events.Single();
+        int emittedVersion = ConfigurationVersionOf(emitted);
+        emittedVersion.ShouldBe(expectedVersion, commandName);
+        AssertPayload(result, "Applied", emittedVersion, commandName);
+    }
+
+    [Theory]
+    [MemberData(nameof(NoOpCommandNames))]
+    public void EveryNoOpCapableSetupHandlerCarriesAlreadyAppliedEffectAndItsUnchangedVersion(string commandName)
+    {
+        (DomainResult result, int unchangedVersion) = NoOpCase(commandName);
+
+        result.IsNoOp.ShouldBeTrue(commandName);
+        AssertPayload(result, "AlreadyApplied", unchangedVersion, commandName);
+    }
+
+    [Theory]
+    [MemberData(nameof(NoOpCommandNames))]
+    public void NoOpResultPayloadSurvivesTheDomainServiceWireContract(string commandName)
+    {
+        // The wire result is the first hop out of the aggregate. It preserves the payload for IsNoOp as well as
+        // IsSuccess, which is what makes an AlreadyApplied receipt correlatable at the operations boundary.
+        (DomainResult result, int unchangedVersion) = NoOpCase(commandName);
+
+        DomainServiceWireResult wire = DomainServiceWireResult.FromDomainResult(result);
+
+        wire.Events.ShouldBeEmpty(commandName);
+        wire.IsRejection.ShouldBeFalse(commandName);
+        wire.ResultPayload.ShouldBe(result.ResultPayload, commandName);
+        using JsonDocument payload = JsonDocument.Parse(wire.ResultPayload.ShouldNotBeNull(commandName));
+        payload.RootElement.GetProperty("effect").GetString().ShouldBe("AlreadyApplied", commandName);
+        payload.RootElement.GetProperty("configurationVersion").GetInt32().ShouldBe(unchangedVersion, commandName);
+    }
+
+    private static (DomainResult Result, int Version) EventfulCase(string commandName)
+    {
+        foreach ((string name, DomainResult result, int version) in EventfulCases())
+        {
+            if (name == commandName)
+            {
+                return (result, version);
+            }
+        }
+
+        throw new InvalidOperationException($"Unknown eventful case '{commandName}'.");
+    }
+
+    private static (DomainResult Result, int Version) NoOpCase(string commandName)
+    {
+        foreach ((string name, DomainResult result, int version) in NoOpCases())
+        {
+            if (name == commandName)
+            {
+                return (result, version);
+            }
+        }
+
+        throw new InvalidOperationException($"Unknown no-op case '{commandName}'.");
     }
 
     [Fact]

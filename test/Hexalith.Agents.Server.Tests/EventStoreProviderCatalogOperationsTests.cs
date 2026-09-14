@@ -160,7 +160,8 @@ public sealed class EventStoreProviderCatalogOperationsTests
                 new EventStoreAgentCommandDispatcher(_gateway)),
             _store,
             Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }),
-            new AgentCommandIdentityFactory());
+            new AgentCommandIdentityFactory(),
+            new DeferredAgentCommandStatusReader());
 
         AgentOperationResult result = await administration.SelectProviderModelAsync(
             new Hexalith.Agents.Contracts.Agent.Commands.SelectAgentProviderModel("openai", "gpt-4o", 1));

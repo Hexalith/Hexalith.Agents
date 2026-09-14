@@ -1,11 +1,13 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Operations;
 
 /// <summary>
 /// Canonical outer status for public Agents automation operations.
 /// </summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentOperationStatus>))]
 public enum AgentOperationStatus
 {
     /// <summary>Absent or unrecognized status sentinel.</summary>

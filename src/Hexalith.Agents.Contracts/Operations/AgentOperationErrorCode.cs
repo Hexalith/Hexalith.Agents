@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Operations;
 
 /// <summary>
@@ -9,7 +11,7 @@ namespace Hexalith.Agents.Contracts.Operations;
 /// These values deliberately classify failures without carrying exception type names, stack traces, raw provider
 /// payloads, EventStore stream names, tenant fingerprints, prompt/generated content, or secrets.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentOperationErrorCode>))]
 public enum AgentOperationErrorCode
 {
     /// <summary>Absent or unrecognized error sentinel.</summary>

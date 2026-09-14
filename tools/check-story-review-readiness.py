@@ -51,6 +51,10 @@ COUNT_PATTERNS = (
         re.IGNORECASE,
     ),
 )
+FRONTMATTER_DELIMITER = "---"
+BASELINE_KEY_PATTERN = re.compile(r"^baseline_commit:[ \t]*(.*)$")
+COMMIT_ID_PATTERN = re.compile(r"^[0-9a-fA-F]{7,40}$")
+DIFF_STATUS_PATTERN = re.compile(r"^[ABCDMRTUX]\d*$")
 
 
 class ValidationError(Exception):
@@ -198,6 +202,48 @@ def read_story(path: Path) -> tuple[str, StoryEncoding, bytes]:
     newline = "\r\n" if has_crlf else "\r" if has_cr else "\n"
     normalized = decoded.replace("\r\n", "\n").replace("\r", "\n")
     return normalized, StoryEncoding(bom=bom, newline=newline, mode=mode), raw
+
+
+def _frontmatter_scalar(raw: str) -> str:
+    value = raw.strip()
+    if value[:1] in ("'", '"'):
+        quote = value[0]
+        end = value.find(quote, 1)
+        if end == -1:
+            raise ValidationError(f"Story frontmatter baseline_commit is not closed: {raw.strip()!r}")
+        return value[1:end]
+    return value.split("#", 1)[0].strip()
+
+
+def parse_baseline_commit(text: str) -> str | None:
+    """Return the commit a story declares as its diff baseline, or None when absent."""
+    lines = text.split("\n")
+    if not lines or lines[0].strip() != FRONTMATTER_DELIMITER:
+        return None
+    values: list[str] = []
+    terminated = False
+    for line in lines[1:]:
+        if line.strip() == FRONTMATTER_DELIMITER:
+            terminated = True
+            break
+        match = BASELINE_KEY_PATTERN.match(line)
+        if match:
+            values.append(match.group(1))
+    if not terminated:
+        raise ValidationError("Story frontmatter is not terminated by '---'")
+    if not values:
+        return None
+    if len(values) > 1:
+        raise ValidationError(
+            f"Story frontmatter declares baseline_commit {len(values)} times; expected at most one"
+        )
+    baseline = _frontmatter_scalar(values[0])
+    if not COMMIT_ID_PATTERN.match(baseline):
+        raise ValidationError(
+            "Story frontmatter baseline_commit must be a 7-40 character hexadecimal commit id: "
+            f"{values[0].strip()!r}"
+        )
+    return baseline
 
 
 def markdown_headings(text: str) -> list[Heading]:
@@ -671,17 +717,71 @@ def git_status_paths(root: Path, runner: Runner) -> set[str]:
     return parse_porcelain_v1_z(result.stdout)
 
 
-def mismatch_message(file_list: set[str], changed: set[str]) -> str | None:
+def parse_diff_name_status_z(payload: bytes) -> set[str]:
+    if not payload:
+        return set()
+    if not payload.endswith(b"\0"):
+        raise ValidationError("Git diff output is truncated (missing NUL terminator)")
+    records = payload.split(b"\0")[:-1]
+    paths: set[str] = set()
+    index = 0
+    while index < len(records):
+        try:
+            status_text = records[index].decode("ascii")
+        except UnicodeDecodeError as exc:
+            raise ValidationError("Git diff output contains a non-ASCII status") from exc
+        if not DIFF_STATUS_PATTERN.match(status_text):
+            raise ValidationError(f"Git diff output contains an invalid status: {status_text!r}")
+        endpoints = 2 if status_text[0] in ("R", "C") else 1
+        if index + endpoints >= len(records):
+            raise ValidationError(f"Git diff record {status_text!r} is missing a path")
+        for offset in range(1, endpoints + 1):
+            try:
+                candidate = records[index + offset].decode("utf-8")
+            except UnicodeDecodeError as exc:
+                raise ValidationError("Git diff path is not valid UTF-8") from exc
+            paths.add(validate_repository_path(candidate, "Git diff"))
+        index += endpoints + 1
+    return paths
+
+
+def resolve_baseline_commit(root: Path, baseline: str, runner: Runner) -> str:
+    result = runner(("git", "rev-parse", "--verify", "--quiet", f"{baseline}^{{commit}}"), root, None)
+    if result.returncode != 0:
+        raise ValidationError(
+            f"Story baseline_commit does not resolve to a commit in this repository: {baseline}"
+        )
+    try:
+        resolved = result.stdout.decode("utf-8").strip()
+    except UnicodeDecodeError as exc:
+        raise ValidationError("Git returned an invalid baseline commit id") from exc
+    if not COMMIT_ID_PATTERN.match(resolved):
+        raise ValidationError(f"Git returned an invalid baseline commit id: {resolved!r}")
+    return resolved
+
+
+def git_diff_paths(root: Path, baseline: str, runner: Runner) -> set[str]:
+    result = runner(
+        ("git", "diff", "--name-status", "-z", "--find-renames", f"{baseline}...HEAD"),
+        root,
+        None,
+    )
+    if result.returncode != 0:
+        raise ValidationError(f"Unable to read Git diff since {baseline}: {command_detail(result)}")
+    return parse_diff_name_status_z(result.stdout)
+
+
+def mismatch_message(file_list: set[str], changed: set[str], scope: str = "Git status") -> str | None:
     missing = sorted(changed - file_list)
     extra = sorted(file_list - changed)
     if not missing and not extra:
         return None
-    lines = ["File List does not match Git status."]
+    lines = [f"File List does not match {scope}."]
     if missing:
         lines.append("Missing from File List:")
         lines.extend(f"  + {path}" for path in missing)
     if extra:
-        lines.append("Not present in Git status:")
+        lines.append(f"Not present in {scope}:")
         lines.extend(f"  - {path}" for path in extra)
     return "\n".join(lines)
 
@@ -695,6 +795,9 @@ def execute_gate(
     text, encoding, original_raw = read_story(story_path)
     layout = parse_story_layout(text)
     file_list = parse_file_list(text, layout)
+    baseline = parse_baseline_commit(text)
+    if baseline is not None:
+        baseline = resolve_baseline_commit(root, baseline, runner)
     claims = unmanaged_count_claims(text, layout)
     if claims:
         details = "\n".join(f"  line {line}: {content}" for line, content in claims)
@@ -709,7 +812,11 @@ def execute_gate(
     atomic_write_story(story_path, updated, encoding, expected_bytes=original_raw)
 
     changed = git_status_paths(root, runner)
-    mismatch = mismatch_message(file_list, changed)
+    scope = "Git status"
+    if baseline is not None:
+        changed |= git_diff_paths(root, baseline, runner)
+        scope = f"Git status or the diff since baseline_commit {baseline[:7]}"
+    mismatch = mismatch_message(file_list, changed, scope)
     if mismatch:
         raise ValidationError(mismatch)
     return summaries, len(changed)

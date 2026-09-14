@@ -47,7 +47,7 @@ public record AgentSetupWriteResult(
     }
 
     /// <summary>Creates a fail-closed result with no acceptance.</summary>
-    /// <param name="status">The non-submitted outcome.</param>
+    /// <param name="status">The denied or unverifiable outcome, which carries no acceptance evidence.</param>
     /// <returns>A failed result.</returns>
     public static AgentSetupWriteResult Failed(AgentSetupWriteStatus status)
         => new(status, null);

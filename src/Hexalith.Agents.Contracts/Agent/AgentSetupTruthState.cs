@@ -1,3 +1,7 @@
+using System.Text.Json.Serialization;
+
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -11,6 +15,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// caught up with the accepted configuration version. None of the stages says anything about callability —
 /// lifecycle <c>Active</c> is a lifecycle flag, not a callability claim.
 /// </remarks>
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentSetupTruthState>))]
 public enum AgentSetupTruthState
 {
     /// <summary>No truth stage has been established (the fail-closed default).</summary>

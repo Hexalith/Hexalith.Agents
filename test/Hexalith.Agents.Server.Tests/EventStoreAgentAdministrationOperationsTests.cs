@@ -39,6 +39,8 @@ public sealed class EventStoreAgentAdministrationOperationsTests
 
     private readonly FakeReadModelStore _store = new();
     private readonly IEventStoreGatewayClient _gateway = Substitute.For<IEventStoreGatewayClient>();
+
+    private readonly IAgentCommandStatusReader _statusReader = Substitute.For<IAgentCommandStatusReader>();
     private readonly IAgentAdministrationContextProvider _contextProvider = Substitute.For<IAgentAdministrationContextProvider>();
     private readonly IProviderCatalogReader _catalogReader = Substitute.For<IProviderCatalogReader>();
     private readonly IApproverPolicyResolver _approverPolicyResolver = Substitute.For<IApproverPolicyResolver>();
@@ -301,6 +303,78 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         acceptance.TargetConfigurationVersion.ShouldBe(7);
     }
 
+    [Fact]
+    public async Task A_noop_acceptance_is_projection_confirmed_because_it_appended_nothing_to_reach()
+    {
+        _gateway
+            .SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call => AlreadyAppliedReceipt(call.ArgAt<SubmitCommandRequest>(0), configurationVersion: 7));
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().UpdateConfigurationAsync(
+            AgentId,
+            new UpdateAgentConfiguration("hexa", null, "instructions long enough to be valid"));
+
+        result.Value.ShouldNotBeNull().TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
+    }
+
+    [Fact]
+    public async Task An_applied_acceptance_is_authoritative_but_not_yet_projected()
+    {
+        _gateway
+            .SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call => AppliedReceipt(call.ArgAt<SubmitCommandRequest>(0), configurationVersion: 4));
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(AgentId, new DisableAgent());
+
+        result.Value.ShouldNotBeNull().TruthState.ShouldBe(AgentSetupTruthState.AuthoritativePending);
+    }
+
+    [Fact]
+    public async Task A_domain_rejection_is_reported_as_rejected_rather_than_retryable_unverifiable()
+    {
+        SeedProjectedSetup(configurationVersion: 2);
+        _gateway
+            .SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                SubmitCommandRequest request = call.ArgAt<SubmitCommandRequest>(0);
+                return new SubmitCommandResponse(request.CorrelationId!, null, request.MessageId);
+            });
+        _statusReader
+            .WasRejectedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<bool?>(true));
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(AgentId, new ActivateAgent());
+
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.Rejected);
+        result.Value.ShouldBeNull();
+
+        // Prior setup is preserved.
+        _store.Snapshot<AgentSetupReadModel>(StoreName, AgentSetupReadModelAddresses.Detail(TenantId, AgentId))
+            .ShouldNotBeNull().ConfigurationVersion.ShouldBe(2);
+    }
+
+    [Theory]
+    [InlineData("not-rejected")]
+    [InlineData("no-status-recorded")]
+    public async Task A_payload_less_receipt_that_is_not_a_rejection_stays_unverifiable(string scenario)
+    {
+        _gateway
+            .SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                SubmitCommandRequest request = call.ArgAt<SubmitCommandRequest>(0);
+                return new SubmitCommandResponse(request.CorrelationId!, null, request.MessageId);
+            });
+        _statusReader
+            .WasRejectedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(scenario == "not-rejected" ? false : (bool?)null));
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(AgentId, new DisableAgent());
+
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.UnableToVerify);
+    }
+
     [Theory]
     [InlineData("missing-payload")]
     [InlineData("malformed-payload")]
@@ -451,7 +525,8 @@ public sealed class EventStoreAgentAdministrationOperationsTests
                 dispatcher),
             _store,
             Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }),
-            new AgentCommandIdentityFactory());
+            new AgentCommandIdentityFactory(),
+            _statusReader);
     }
 
     private void SeedProjectedSetup(

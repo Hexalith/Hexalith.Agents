@@ -1,11 +1,13 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
 /// Safe effect evidence returned for a completed Agent setup command.
 /// </summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentSetupWriteEffect>))]
 public enum AgentSetupWriteEffect
 {
     /// <summary>No recognized command effect was supplied.</summary>

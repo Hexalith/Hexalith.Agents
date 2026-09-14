@@ -73,6 +73,7 @@ public sealed class AgentOperationContractsTests
             typeof(ProposalOperationStatus),
             typeof(AuditAvailabilityStatus),
             typeof(AgentSetupWriteEffect),
+            typeof(AgentSetupTruthState),
         ];
 
         foreach (Type enumType in enumTypes)
@@ -83,6 +84,45 @@ public sealed class AgentOperationContractsTests
             string json = JsonSerializer.Serialize(nonZero, enumType);
             json.ShouldBe($"\"{nonZero}\"", $"{enumType.Name} must serialize by enum name.");
         }
+    }
+
+    [Theory]
+    [InlineData("\"SomeMemberAddedLater\"")]
+    [InlineData("9999")]
+    [InlineData("null")]
+    public void UnrecognizedOperationEnumValuesDegradeToUnknownInsteadOfThrowing(string json)
+    {
+        // An older client must survive additive enum members. A plain JsonStringEnumConverter throws on an
+        // unrecognized name, which would fail the whole response instead of honouring the Unknown = 0 contract.
+        JsonSerializer.Deserialize<AgentOperationStatus>(json).ShouldBe(AgentOperationStatus.Unknown);
+        JsonSerializer.Deserialize<AgentOperationErrorCode>(json).ShouldBe(AgentOperationErrorCode.Unknown);
+        JsonSerializer.Deserialize<AgentSetupWriteEffect>(json).ShouldBe(AgentSetupWriteEffect.Unknown);
+        JsonSerializer.Deserialize<AgentSetupTruthState>(json).ShouldBe(AgentSetupTruthState.Unknown);
+    }
+
+    [Fact]
+    public void AcceptanceEnumsShareOneEncodingAndStillReadTheNumericLegacyForm()
+    {
+        var acceptance = new AgentCommandAcceptance(
+            "hexa",
+            "01K50HTM6DK2F7CXEXAMPLE01",
+            "01K50HTM6DK2F7CXEXAMPLE02",
+            AgentSetupTruthState.ProjectionConfirmed,
+            AgentSetupWriteEffect.AlreadyApplied,
+            7);
+
+        string json = JsonSerializer.Serialize(acceptance);
+
+        // Both enums in the record now serialize by name; neither is written as a bare ordinal.
+        json.ShouldContain("\"TruthState\":\"ProjectionConfirmed\"");
+        json.ShouldContain("\"Effect\":\"AlreadyApplied\"");
+
+        // A payload written by a peer that serialized numerically still round-trips.
+        AgentCommandAcceptance legacy = JsonSerializer.Deserialize<AgentCommandAcceptance>(
+            """
+            {"AgentId":"hexa","MessageId":"01K50HTM6DK2F7CXEXAMPLE01","CorrelationId":"01K50HTM6DK2F7CXEXAMPLE02","TruthState":2}
+            """).ShouldNotBeNull();
+        legacy.TruthState.ShouldBe(AgentSetupTruthState.AuthoritativePending);
     }
 
     [Fact]

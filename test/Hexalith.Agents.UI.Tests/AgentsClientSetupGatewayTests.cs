@@ -122,6 +122,57 @@ public sealed class AgentsClientSetupGatewayTests
         result.TargetConfigurationVersion.ShouldBe(7);
     }
 
+    [Theory]
+    [InlineData(AgentSetupWriteEffect.Unknown, 7)]
+    [InlineData(AgentSetupWriteEffect.Applied, null)]
+    [InlineData(AgentSetupWriteEffect.Unknown, null)]
+    public async Task An_acceptance_without_verified_effect_and_target_is_unverifiable_not_submitted(
+        AgentSetupWriteEffect effect,
+        int? targetConfigurationVersion)
+    {
+        // A legacy server returns exactly this shape. Without a command-derived target there is nothing to poll
+        // for, so reporting progress would strand the caller waiting on a version that may never arrive.
+        var acceptance = new AgentCommandAcceptance(
+            AgentId,
+            "01ARZ3NDEKTSV4RRFFQ69G5FAW",
+            "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            AgentSetupTruthState.AuthoritativePending,
+            effect,
+            targetConfigurationVersion);
+        _administration
+            .ActivateAsync(AgentId, Arg.Any<ActivateAgent>(), Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(
+                AgentOperationResult<AgentCommandAcceptance>.Succeeded(acceptance)));
+
+        AgentSetupWriteResult result = await Gateway().ActivateAsync(CancellationToken.None);
+
+        result.Status.ShouldBe(AgentSetupWriteStatus.UnableToVerify);
+        result.Acceptance.ShouldBeNull();
+        result.TargetConfigurationVersion.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task A_verified_noop_acceptance_reads_as_already_applied()
+    {
+        var acceptance = new AgentCommandAcceptance(
+            AgentId,
+            "01ARZ3NDEKTSV4RRFFQ69G5FAW",
+            "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            AgentSetupTruthState.ProjectionConfirmed,
+            AgentSetupWriteEffect.AlreadyApplied,
+            7);
+        _administration
+            .ActivateAsync(AgentId, Arg.Any<ActivateAgent>(), Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(
+                AgentOperationResult<AgentCommandAcceptance>.Succeeded(acceptance)));
+
+        AgentSetupWriteResult result = await Gateway().ActivateAsync(CancellationToken.None);
+
+        result.Status.ShouldBe(AgentSetupWriteStatus.AlreadyApplied);
+        result.TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
+        result.TargetConfigurationVersion.ShouldBe(7);
+    }
+
     [Fact]
     public async Task A_write_forwards_the_exact_correlation_and_idempotency_options()
     {

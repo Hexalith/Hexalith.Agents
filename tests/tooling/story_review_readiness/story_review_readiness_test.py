@@ -43,10 +43,12 @@ def story_text(
     paths: tuple[str, ...] = ("_bmad-output/implementation-artifacts/story.md",),
     record_text: str = "No manually recorded totals.\n",
     block: str = "",
+    frontmatter: str = "",
 ) -> str:
     listed = "".join(f"- `{path}`\n" for path in paths)
     managed = f"{block}\n\n" if block else ""
     return (
+        f"{frontmatter}"
         "# Story 9.9: Fixture\n\n"
         "Status: review\n\n"
         "## Dev Agent Record\n\n"
@@ -93,9 +95,13 @@ class FakeRunner:
         build_returncode: int = 0,
         test_returncode: int = 0,
         report: dict[str, object] | str | None = None,
+        diff_payload: bytes = b"",
+        baseline_returncode: int = 0,
     ) -> None:
         self.root = root
         self.git_payload = git_payload
+        self.diff_payload = diff_payload
+        self.baseline_returncode = baseline_returncode
         self.build_returncode = build_returncode
         self.test_returncode = test_returncode
         self.report = ctrf_payload() if report is None else report
@@ -124,6 +130,12 @@ class FakeRunner:
             return V.CommandResult(self.test_returncode, stderr=b"runner failed" if self.test_returncode else b"")
         if values[:2] == ("git", "status"):
             return V.CommandResult(0, stdout=self.git_payload)
+        if values[:2] == ("git", "rev-parse"):
+            if self.baseline_returncode:
+                return V.CommandResult(self.baseline_returncode)
+            return V.CommandResult(0, stdout=b"599208dd40efadef728363c227a0f75ebd888337\n")
+        if values[:2] == ("git", "diff"):
+            return V.CommandResult(0, stdout=self.diff_payload)
         raise AssertionError(f"Unexpected command: {values}")
 
 
@@ -535,6 +547,166 @@ class GateOrchestrationTests(unittest.TestCase):
         self.assertIn(V.BEGIN_MARKER, updated)
         self.assertIn(original_file_list, updated)
         self.assertIn("Not present in Git status", str(raised.exception))
+
+
+class BaselineCommitParsingTests(unittest.TestCase):
+    def test_missing_frontmatter_or_key_declares_no_baseline(self):
+        cases = (
+            story_text(),
+            story_text(frontmatter="---\ntitle: 'Fixture'\nstatus: 'review'\n---\n\n"),
+        )
+        for story in cases:
+            with self.subTest(story=story[:20]):
+                self.assertIsNone(V.parse_baseline_commit(story))
+
+    def test_quoted_unquoted_and_commented_values_are_read(self):
+        cases = (
+            ("---\nbaseline_commit: '599208d'\n---\n\n", "599208d"),
+            ('---\nbaseline_commit: "599208dd40efadef728363c227a0f75ebd888337"\n---\n\n',
+             "599208dd40efadef728363c227a0f75ebd888337"),
+            ("---\nbaseline_commit: 599208d\n---\n\n", "599208d"),
+            ("---\nbaseline_commit: 599208d  # slice baseline\n---\n\n", "599208d"),
+        )
+        for frontmatter, expected in cases:
+            with self.subTest(frontmatter=frontmatter):
+                self.assertEqual(V.parse_baseline_commit(story_text(frontmatter=frontmatter)), expected)
+
+    def test_nested_key_is_not_mistaken_for_the_top_level_baseline(self):
+        frontmatter = "---\ncontext:\n  baseline_commit: 599208d\n---\n\n"
+        self.assertIsNone(V.parse_baseline_commit(story_text(frontmatter=frontmatter)))
+
+    def test_duplicate_unterminated_and_non_commit_values_fail_closed(self):
+        cases = (
+            "---\nbaseline_commit: 599208d\nbaseline_commit: 4d6c3c0\n---\n\n",
+            "---\nbaseline_commit: 599208d\n\n",
+            "---\nbaseline_commit: main\n---\n\n",
+            "---\nbaseline_commit: 599208\n---\n\n",
+            "---\nbaseline_commit: ''\n---\n\n",
+            "---\nbaseline_commit: '599208d\n---\n\n",
+        )
+        for frontmatter in cases:
+            with self.subTest(frontmatter=frontmatter):
+                with self.assertRaises(V.ValidationError):
+                    V.parse_baseline_commit(story_text(frontmatter=frontmatter))
+
+
+class DiffNameStatusTests(unittest.TestCase):
+    def test_ordinary_statuses_unicode_and_submodule_paths(self):
+        payload = "M\0src/a.cs\0A\0docs/é.md\0D\0src/gone.cs\0M\0references/Hexalith.EventStore\0".encode()
+        self.assertEqual(
+            V.parse_diff_name_status_z(payload),
+            {"src/a.cs", "docs/é.md", "src/gone.cs", "references/Hexalith.EventStore"},
+        )
+
+    def test_rename_and_copy_include_both_endpoints(self):
+        payload = b"R100\0src/old.cs\0src/new.cs\0C075\0src/source.cs\0src/copy.cs\0"
+        self.assertEqual(
+            V.parse_diff_name_status_z(payload),
+            {"src/old.cs", "src/new.cs", "src/source.cs", "src/copy.cs"},
+        )
+
+    def test_empty_diff_is_an_empty_set(self):
+        self.assertEqual(V.parse_diff_name_status_z(b""), set())
+
+    def test_truncated_invalid_status_missing_path_and_invalid_utf8_fail(self):
+        cases = (
+            b"M\0src/a.cs",
+            b"Z\0src/a.cs\0",
+            b"M\0",
+            b"R100\0src/old.cs\0",
+            b"M\0\xff\0",
+            b"M\0/absolute.cs\0",
+        )
+        for payload in cases:
+            with self.subTest(payload=payload):
+                with self.assertRaises(V.ValidationError):
+                    V.parse_diff_name_status_z(payload)
+
+
+class BaselineGateTests(unittest.TestCase):
+    FRONTMATTER = "---\ntitle: 'Fixture'\nbaseline_commit: '599208d'\n---\n\n"
+
+    def fixture(self, paths: tuple[str, ...]):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        story_path = root / "_bmad-output" / "implementation-artifacts" / "story.md"
+        story_path.parent.mkdir(parents=True)
+        story_path.write_text(
+            story_text(paths=paths, frontmatter=self.FRONTMATTER), encoding="utf-8"
+        )
+        project_dir = root / "test" / "Demo0.Tests"
+        project_dir.mkdir(parents=True)
+        (project_dir / "Demo0.Tests.csproj").write_text("<Project />", encoding="utf-8")
+        (root / V.SOLUTION).write_text(
+            '<Solution>\n  <Project Path="test/Demo0.Tests/Demo0.Tests.csproj" />\n</Solution>\n',
+            encoding="utf-8",
+        )
+        package_props = root / "references" / "Hexalith.Builds" / "Props" / "Directory.Packages.props"
+        package_props.parent.mkdir(parents=True)
+        package_props.write_text("<Project />", encoding="utf-8")
+        return root, story_path
+
+    def test_committed_baseline_changes_join_the_working_tree_change_set(self):
+        root, story_path = self.fixture(
+            (
+                "_bmad-output/implementation-artifacts/story.md",
+                "src/Committed.cs",
+                "references/Hexalith.EventStore",
+            )
+        )
+        runner = FakeRunner(
+            root,
+            git_payload=b" M _bmad-output/implementation-artifacts/story.md\0",
+            diff_payload=b"M\0src/Committed.cs\0M\0references/Hexalith.EventStore\0",
+        )
+
+        summaries, changed_count = V.execute_gate(root, story_path, runner, lambda: FIXED_NOW)
+
+        self.assertEqual(len(summaries), 1)
+        self.assertEqual(changed_count, 3)
+        diff_call = next(command for command in runner.commands if command[:2] == ("git", "diff"))
+        self.assertIn("599208dd40efadef728363c227a0f75ebd888337...HEAD", diff_call)
+
+    def test_path_committed_since_baseline_but_absent_from_file_list_still_fails(self):
+        root, story_path = self.fixture(("_bmad-output/implementation-artifacts/story.md",))
+        runner = FakeRunner(
+            root,
+            git_payload=b" M _bmad-output/implementation-artifacts/story.md\0",
+            diff_payload=b"M\0src/Committed.cs\0",
+        )
+
+        with self.assertRaisesRegex(V.ValidationError, "Missing from File List") as raised:
+            V.execute_gate(root, story_path, runner, lambda: FIXED_NOW)
+
+        self.assertIn("+ src/Committed.cs", str(raised.exception))
+        self.assertIn("baseline_commit 599208d", str(raised.exception))
+
+    def test_stale_file_list_path_in_neither_source_still_fails(self):
+        root, story_path = self.fixture(
+            ("_bmad-output/implementation-artifacts/story.md", "src/Retired.cs")
+        )
+        runner = FakeRunner(
+            root,
+            git_payload=b" M _bmad-output/implementation-artifacts/story.md\0",
+            diff_payload=b"",
+        )
+
+        with self.assertRaisesRegex(V.ValidationError, "Not present in") as raised:
+            V.execute_gate(root, story_path, runner, lambda: FIXED_NOW)
+
+        self.assertIn("- src/Retired.cs", str(raised.exception))
+
+    def test_unresolvable_baseline_stops_before_the_release_build(self):
+        root, story_path = self.fixture(("_bmad-output/implementation-artifacts/story.md",))
+        original = story_path.read_bytes()
+        runner = FakeRunner(root, git_payload=b"", baseline_returncode=1)
+
+        with self.assertRaisesRegex(V.ValidationError, "does not resolve to a commit"):
+            V.execute_gate(root, story_path, runner, lambda: FIXED_NOW)
+
+        self.assertEqual(story_path.read_bytes(), original)
+        self.assertTrue(all(command[:2] != ("dotnet", "build") for command in runner.commands))
 
 
 if __name__ == "__main__":

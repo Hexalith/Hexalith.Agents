@@ -45,6 +45,11 @@ internal static class AgentSetupServiceCollectionExtensions
         services.AddScoped<AgentAdministrationOrchestrator>();
         services.AddScoped<ProviderCatalogAdministrationOrchestrator>();
 
+        // The status-read seam must always resolve, with or without a gateway. TryAdd leaves a host that already
+        // registered a live reader untouched; the deferred reader answers "unknown", which keeps an uncorrelatable
+        // outcome unverifiable instead of claiming a rejection.
+        services.TryAddSingleton<IAgentCommandStatusReader, DeferredAgentCommandStatusReader>();
+
         string? baseUrl = configuration[$"{EventStoreSectionName}:BaseUrl"];
         if (string.IsNullOrWhiteSpace(baseUrl) || !Uri.TryCreate(baseUrl, UriKind.Absolute, out Uri? baseAddress))
         {

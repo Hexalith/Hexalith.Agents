@@ -2,10 +2,10 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'done'
+status: 'in-progress'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
-review_loop_iteration: 0
+review_loop_iteration: 1
 context:
   - '_bmad-output/implementation-artifacts/epic-5-context.md'
   - 'references/Hexalith.AI.Tools/hexalith-llm-instructions.md'
@@ -65,10 +65,71 @@ context:
 - Given no-op, rejection, malformed legacy payload, lost acknowledgement, or concurrent write, when handled, then the attempt terminates or remains fail-closed without false confirmation or duplication.
 - Given projection lag, when bounded polling expires, then localized `awaiting projection` retains the attempt and exposes accessible recovery.
 
+### Review Findings
+
+Code review of Group 1 (Domain + Contracts), 2026-09-14. Four layers, none failed.
+
+**Decision needed**
+
+- [x] [Review][Decision] No-op `ResultPayload` is dropped by `AggregateActor`, so `AlreadyApplied` is unreachable end to end — `AgentSetupDomainResult.AlreadyApplied` always passes `[]`, so `DomainResult.IsNoOp` (`DomainResult.cs:54`) is true and `AggregateActor.cs:1082` calls `CompleteTerminalAsync` without the optional `resultPayload:` argument that the eventful branch at `:1358` does pass. `TryParseSetupResult` then fails and every no-op returns `UnableToVerify`. Worse, the idempotency record stores the null payload, so the exact-key retry the UI is built around replays that null forever and can never resolve. All four review layers found this independently. Defeats the frozen matrix no-op row and AC2. The fix belongs in `references/Hexalith.EventStore`, a separate repository boundary, so it cannot land in this story's commit.
+- [x] [Review][Decision] A domain rejection cannot be distinguished from a missing payload — `SubmitCommandResponse` carries only `CorrelationId`, `ResultPayload` and `MessageId`; rejection detail lives in `CommandStatusRecord.RejectionEventType`, which Agents never reads. `EventStoreAgentAdministrationOperations.cs:320` has no rejection branch, so a rejected `ActivateAgent` or duplicate `CreateAgent` surfaces as retryable `UnableToVerify` instead of the terminal mapped failure the frozen matrix requires. The only conflict test (`EventStoreAgentAdministrationOperationsTests.cs:272`) simulates an HTTP-level `EventStoreGatewayException(409)`, not a domain rejection, so nothing covers this seam. Resolution depends on the intended EventStore rejection contract.
+- [x] [Review][Decision] Every accepted write now reports `AuthoritativePending`, including no-ops — baseline `599208d` returned `AgentSetupTruthState.Submitted` at this call site; HEAD returns `AuthoritativePending` for all accepted writes (`EventStoreAgentAdministrationOperations.cs:337`). The enum's own doc defines that as "the projected read model has not caught up", which is false for a no-op where no event was appended. This changes the value of an existing V1 field rather than only adding fields, and no contract test pins it. The correct value for the no-op case is a product call.
+- [x] [Review][Decision] `AgentCommandAcceptance` ships two enum encodings in one JSON object — `AgentSetupWriteEffect` carries `[JsonConverter(typeof(JsonStringEnumConverter))]`; `AgentSetupTruthState` does not. The diff's own tests prove it: `AgentOperationContractsTests.cs:83` serializes with no options, and the legacy fixture at `:92` pins `"TruthState":1` while `Effect` serializes as `"Applied"`. Both fields cross the HTTP boundary in the same packable record. Either fix changes the wire format for deployed clients.
+- [x] [Review][Decision] `AgentSetupWriteResult.Submitted(acceptance)` accepts unverified evidence, and a supported path reaches it — the diff's own `LegacyAgentCommandAcceptanceDeserializesWithUnknownEffectAndNoTargetVersion` test establishes `Effect = Unknown, TargetConfigurationVersion = null` as a supported deserialization outcome, and `AgentsClientSetupGateway.WriteAsync` calls `Submitted(acceptance)` on any `IsSuccess` without checking either field. It is rescued only downstream in one consumer (`AgentConfiguration.razor:392`), so the contract-level invariant lives in exactly one caller and a second will diverge. This supersedes the two prior triage rows that rejected it as reachable only by "a custom gateway bypassing the trusted boundary" — that refutation is contradicted by the new test.
+- [x] [Review][Decision] New members on string-serialized enums break older deployed clients — `AgentOperationErrorCode.UnableToVerify` and the new `AgentOperationStatus` member are added to enums using a plain `JsonStringEnumConverter`, which throws `JsonException` on an unrecognized name instead of degrading to the documented `Unknown = 0` sentinel. This is the compatibility guarantee the spec names under **Always**. A tolerant converter is a public contract change.
+
+**Patch**
+
+- [x] [Review][Patch] No test drives the result payload through a real command pipeline [test/Hexalith.Agents.Tests/AgentSetupDomainResultTests.cs:38]
+- [x] [Review][Patch] Result-payload wire format is duplicated across assemblies with no shared constant or round-trip test [src/Hexalith.Agents/Agent/AgentSetupDomainResult.cs:23]
+- [x] [Review][Patch] Stale `<param name="status">The non-submitted outcome.</param>` doc after three non-submitted statuses became legal [src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteResult.cs:52]
+- [x] [Review][Patch] Table tests assert inside `foreach`, so the first failing command hides the rest; use `[Theory]` with `MemberData` [test/Hexalith.Agents.Tests/AgentSetupDomainResultTests.cs:38]
+- [x] [Review][Patch] `using System.Text.Json.Serialization;` ordered after a project using, violating `.editorconfig:49`; plus a redundant `using System.Collections.Generic;` under `ImplicitUsings` [src/Hexalith.Agents.Contracts/Operations/AgentCommandAcceptance.cs:1]
+
+**Deferred**
+
+- [x] [Review][Defer] Eventful payload is dropped whenever the advisory status read is not `Completed` [references/Hexalith.EventStore/src/Hexalith.EventStore.Server/Pipeline/SubmitCommandHandler.cs:538] — deferred: pre-existing, deliberate and separately tested EventStore gating, in a different repository boundary. This story's fail-closed correlation is what makes it operator-visible: a write that genuinely appended its event is reported as `UnableToVerify` when the advisory status write has not landed by the time it is read.
+
+**Rejected**
+
+- `AgentOperationOptions` documents a ULID requirement no code enforces — `false`. The guard exists immediately after the cited line: `EventStoreAgentAdministrationOperations.cs:281` runs `IsCanonicalUlid(messageId)` and returns `ValidationFailed`, with `:272` doing the same for the correlation id. Tests at `:359-391` cover both, including parseable-but-non-canonical values.
+- `AgentsClientProviderCatalogGateway.ToWriteStatus` mislabels `UnableToVerify` as `Unavailable` — `false`. `ProviderCatalogAdministrationOrchestrator` never produces `UnableToVerify`, so that status cannot reach the catalog mapping. Raised by two layers and refuted by a third; the latent divergence only matters if catalog writes later adopt the same correlation.
+- `AgentSetupWriteResult.Failed` accepts `Submitted`/`AlreadyApplied`/`AwaitingProjection` — `low`. No production caller passes a success-like status to `Failed`, and the fix adds an invariant branch for a path the implementation never exercises. Consistent with the two prior triage rows.
+- `AgentSetupDomainResult.Applied` drops the empty-events guard and does not validate the version — `low`. Every current caller supplies a non-empty event list and a positive version, and the fix adds guards to an internal factory for a case not reachable today.
+- `AlreadyApplied` returned while the projection still lags renders stale setup as confirmed — `false` in the sense that matters: the frozen I/O matrix explicitly requires a no-op to complete without polling ("Never poll for an unreachable version"). Changing it means editing the approved intent, which triage does not do.
+
 ## Implementation Notes
+
+- Added the canonical `## Dev Agent Record` and nested `### File List` this story was missing, so the
+  fail-closed readiness gate can run at all.
+- The gate previously compared the File List against `git status` alone, which is empty for a story whose
+  work is already committed. `tools/check-story-review-readiness.py` now reads the story's own
+  `baseline_commit` frontmatter and unions the diff since that commit into the change set. Bidirectional
+  exact equality is unchanged -- no exclusions, no bypass, and the File List is still never auto-edited.
+- The last two File List entries are that gate repair itself; every other entry is Story 5.2 work committed
+  between `599208d` and `e5857a7`.
+
+**Resolutions applied 2026-09-14**
+
+All six decision-needed items were resolved by the product owner and applied, together with all five patches.
+
+| Finding | Resolution |
+| --- | --- |
+| No-op payload dropped | Patched `AggregateActor` to forward `resultPayload` on the no-op branch, plus an actor-level regression test. Verified the test fails without the fix and passes with it. |
+| Domain rejection indistinguishable | Added `GetCommandStatusAsync` to `IEventStoreGatewayClient` and a new `IAgentCommandStatusReader` seam. A payload-less but identity-verified receipt now consults the recorded status and maps a rejection to `AgentOperationErrorCode.Rejected`; anything else stays `UnableToVerify`. The rejection event type is never surfaced. |
+| `TruthState` for no-ops | `AlreadyApplied` now reports `ProjectionConfirmed`; applied writes keep `AuthoritativePending`. Both pinned by tests. |
+| Mixed enum encodings + version skew | Added `UnknownFallbackEnumConverter<T>`, applied to `AgentSetupTruthState`, `AgentSetupWriteEffect`, `AgentOperationStatus` and `AgentOperationErrorCode`. Writes are by name; reads accept both name and ordinal, so the numeric legacy form still round-trips. |
+| `Submitted(acceptance)` unverified evidence | The invariant moved up into `AgentsClientSetupGateway.WriteAsync`, which now returns `UnableToVerify` when effect or target version is missing rather than claiming progress. |
+| Payload key duplication, docs, table tests, usings | Keys hoisted to `AgentSetupResultPayload`; stale `<param>` corrected; both table tests converted to `[Theory]`/`MemberData`; using order and a redundant using fixed. |
+
+Note: the rejection fix required a second EventStore change. The originally chosen option was presented as needing none, which was wrong -- `IEventStoreGatewayClient` had no status-read method -- and the corrected choice was confirmed before it was applied.
+
+Two changes live in the `references/Hexalith.EventStore` submodule and are uncommitted there; they must be committed in that repository and the pointer bumped here before this story can ship.
 
 ## Spec Change Log
 
+- 2026-09-14: Added the mandatory Dev Agent Record and File List, and taught the readiness gate to include
+  changes committed since `baseline_commit`. Intent and acceptance criteria are unchanged.
 - 2026-09-14: Corrected the verification lanes to use project references only for Debug development builds and package references for Release builds, as required by the loaded repository instructions. Intent and acceptance criteria are unchanged.
 
 ## Review Triage Log
@@ -121,3 +182,95 @@ A later projected version confirms a command-derived target because ordered proj
 - `dotnet build Hexalith.Agents.slnx --configuration Debug -warnaserror -p:UseHexalithProjectReferences=true -p:NuGetAudit=false` -- expected: warning-free source-mode development build with additive contracts.
 - `dotnet build Hexalith.Agents.slnx --configuration Release -warnaserror -p:UseHexalithProjectReferences=false -p:NuGetAudit=false` -- expected: warning-free package-mode release build.
 - `git diff --check` in each owning repository -- expected: no whitespace errors.
+
+## Dev Agent Record
+
+<!-- dev-agent-test-evidence:start -->
+### Latest Release Test Evidence
+
+Run (UTC): 2026-09-14T15:21:43Z
+
+| Test project | Total | Passed | Failed | Skipped | Pending | Other |
+|---|---:|---:|---:|---:|---:|---:|
+| Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Contracts.Tests | 334 | 334 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 482 | 482 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Tests | 777 | 777 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.UI.Tests | 1066 | 1066 | 0 | 0 | 0 | 0 |
+| **Total** | 2665 | 2665 | 0 | 0 | 0 | 0 |
+
+Result: PASS
+<!-- dev-agent-test-evidence:end -->
+### File List
+
+- `Directory.Packages.props`
+- `_bmad-output/implementation-artifacts/deferred-work.md`
+- `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+- `_bmad-output/implementation-artifacts/sprint-status.yaml`
+- `eng/verify-story-5.2.ps1`
+- `references/Hexalith.Conversations`
+- `references/Hexalith.EventStore`
+- `references/Hexalith.FrontComposer`
+- `src/Hexalith.Agents.Contracts/Agent/AgentSetupResultPayload.cs`
+- `src/Hexalith.Agents.Contracts/Agent/AgentSetupTruthState.cs`
+- `src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteEffect.cs`
+- `src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteResult.cs`
+- `src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteStatus.cs`
+- `src/Hexalith.Agents.Contracts/Operations/AgentCommandAcceptance.cs`
+- `src/Hexalith.Agents.Contracts/Operations/AgentOperationError.cs`
+- `src/Hexalith.Agents.Contracts/Operations/AgentOperationErrorCode.cs`
+- `src/Hexalith.Agents.Contracts/Operations/AgentOperationOptions.cs`
+- `src/Hexalith.Agents.Contracts/Operations/AgentOperationResult.cs`
+- `src/Hexalith.Agents.Contracts/Operations/AgentOperationStatus.cs`
+- `src/Hexalith.Agents.Contracts/Serialization/UnknownFallbackEnumConverter.cs`
+- `src/Hexalith.Agents.Server/Api/AgentsOperationEndpoints.cs`
+- `src/Hexalith.Agents.Server/Application/Agents/AgentActivationProviderRevalidation.cs`
+- `src/Hexalith.Agents.Server/Application/Agents/AgentActivationRevalidationOutcome.cs`
+- `src/Hexalith.Agents.Server/Application/Agents/AgentActivationRevalidationRequest.cs`
+- `src/Hexalith.Agents.Server/Application/Agents/AgentAdministrationOrchestrator.cs`
+- `src/Hexalith.Agents.Server/Application/Agents/AgentAdministrationOutcome.cs`
+- `src/Hexalith.Agents.Server/Application/Agents/AgentAdministrationRequest.cs`
+- `src/Hexalith.Agents.Server/Application/Agents/AgentResponseModeOrchestrator.cs`
+- `src/Hexalith.Agents.Server/Application/Agents/AgentResponseModeOutcome.cs`
+- `src/Hexalith.Agents.Server/Application/Agents/AgentResponseModeRequest.cs`
+- `src/Hexalith.Agents.Server/Application/Agents/EventStoreAgentAdministrationOperations.cs`
+- `src/Hexalith.Agents.Server/Application/Agents/ProviderCatalogAdministrationOrchestrator.cs`
+- `src/Hexalith.Agents.Server/Composition/AgentSetupServiceCollectionExtensions.cs`
+- `src/Hexalith.Agents.Server/Hexalith.Agents.Server.csproj`
+- `src/Hexalith.Agents.Server/Ports/AgentCommandIdentityFactory.cs`
+- `src/Hexalith.Agents.Server/Ports/DeferredAgentCommandDispatcher.cs`
+- `src/Hexalith.Agents.Server/Ports/DeferredAgentCommandStatusReader.cs`
+- `src/Hexalith.Agents.Server/Ports/EventStoreAgentCommandDispatcher.cs`
+- `src/Hexalith.Agents.Server/Ports/IAgentCommandDispatcher.cs`
+- `src/Hexalith.Agents.Server/Ports/IAgentCommandIdentityFactory.cs`
+- `src/Hexalith.Agents.Server/Ports/IAgentCommandStatusReader.cs`
+- `src/Hexalith.Agents.Server/Program.cs`
+- `src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor`
+- `src/Hexalith.Agents.UI/Components/_Imports.razor`
+- `src/Hexalith.Agents.UI/Resources/AgentsResources.fr.resx`
+- `src/Hexalith.Agents.UI/Resources/AgentsResources.resx`
+- `src/Hexalith.Agents.UI/Services/Gateways/AgentsClientSetupGateway.cs`
+- `src/Hexalith.Agents.UI/Services/Gateways/DeferredAgentSetupGateway.cs`
+- `src/Hexalith.Agents.UI/Services/Gateways/IAgentSetupGateway.cs`
+- `src/Hexalith.Agents.UI/State/AgentSetupAttempt.cs`
+- `src/Hexalith.Agents/Agent/AgentAggregate.cs`
+- `src/Hexalith.Agents/Agent/AgentSetupDomainResult.cs`
+- `test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs`
+- `test/Hexalith.Agents.Server.Tests/AgentActivationApproverRevalidationTests.cs`
+- `test/Hexalith.Agents.Server.Tests/AgentAdministrationOrchestratorTests.cs`
+- `test/Hexalith.Agents.Server.Tests/AgentProviderSelectionOrchestratorTests.cs`
+- `test/Hexalith.Agents.Server.Tests/AgentResponseModeOrchestratorTests.cs`
+- `test/Hexalith.Agents.Server.Tests/AgentSetupQueryHandlerTests.cs`
+- `test/Hexalith.Agents.Server.Tests/AgentsOperationEndpointsTests.cs`
+- `test/Hexalith.Agents.Server.Tests/EventStoreAgentAdministrationOperationsTests.cs`
+- `test/Hexalith.Agents.Server.Tests/EventStoreAgentCommandDispatcherTests.cs`
+- `test/Hexalith.Agents.Server.Tests/EventStoreProviderCatalogOperationsTests.cs`
+- `test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj`
+- `test/Hexalith.Agents.Tests/AgentSetupDomainResultTests.cs`
+- `test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs`
+- `test/Hexalith.Agents.UI.Tests/AgentsClientSetupGatewayTests.cs`
+- `test/Hexalith.Agents.UI.Tests/AgentsTestContext.cs`
+- `test/Hexalith.Agents.UI.Tests/LegacyAgentSetupGateway.cs`
+- `test/Hexalith.Agents.UI.Tests/LocalizationResourceTests.cs`
+- `tests/tooling/story_review_readiness/story_review_readiness_test.py`
+- `tools/check-story-review-readiness.py`

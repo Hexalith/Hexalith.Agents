@@ -44,10 +44,14 @@ public sealed class EventStoreAgentAdministrationOperations(
     AgentActivationProviderRevalidation activation,
     IReadModelStore readModelStore,
     IOptions<AgentSetupReadModelOptions> options,
-    IAgentCommandIdentityFactory identityFactory) : IAgentAdministrationOperations
+    IAgentCommandIdentityFactory identityFactory,
+    IAgentCommandStatusReader statusReader) : IAgentAdministrationOperations
 {
     private readonly IAgentAdministrationContextProvider _contextProvider = contextProvider
         ?? throw new ArgumentNullException(nameof(contextProvider));
+
+    private readonly IAgentCommandStatusReader _statusReader = statusReader
+        ?? throw new ArgumentNullException(nameof(statusReader));
 
     private readonly AgentAdministrationOrchestrator _administration = administration
         ?? throw new ArgumentNullException(nameof(administration));
@@ -317,13 +321,28 @@ public sealed class EventStoreAgentAdministrationOperations(
         }
 
         SubmitCommandResponse? receipt = outcome.Receipt;
-        if (receipt is null
-            || !IsCanonicalUlid(receipt.CorrelationId)
-            || !IsCanonicalUlid(receipt.MessageId)
-            || !string.Equals(receipt.CorrelationId, correlationId, StringComparison.Ordinal)
-            || !string.Equals(receipt.MessageId, messageId, StringComparison.Ordinal)
-            || !TryParseSetupResult(receipt.ResultPayload, out AgentSetupWriteEffect effect, out int targetVersion))
+        bool identityVerified = receipt is not null
+            && IsCanonicalUlid(receipt.CorrelationId)
+            && IsCanonicalUlid(receipt.MessageId)
+            && string.Equals(receipt.CorrelationId, correlationId, StringComparison.Ordinal)
+            && string.Equals(receipt.MessageId, messageId, StringComparison.Ordinal);
+
+        if (!identityVerified
+            || !TryParseSetupResult(receipt!.ResultPayload, out AgentSetupWriteEffect effect, out int targetVersion))
         {
+            // A completed success or no-op always carries a result payload, so its absence on an identity-verified
+            // receipt may mean the command was domain-rejected instead. The recorded command status is the only
+            // evidence that separates a terminal rejection from an outcome that genuinely cannot be correlated;
+            // without it a blocked activation would be offered a retry that can never succeed. Only the coarse
+            // answer is used: every rejection maps to one safe code, so no caller learns which rule fired.
+            if (identityVerified
+                && await _statusReader.WasRejectedAsync(receipt!.MessageId!, cancellationToken).ConfigureAwait(false) is true)
+            {
+                return AgentOperationResult<AgentCommandAcceptance>.Failed(
+                    AgentOperationErrorCode.Rejected,
+                    correlationId);
+            }
+
             return AgentOperationResult<AgentCommandAcceptance>.Failed(
                 AgentOperationErrorCode.UnableToVerify,
                 correlationId);
@@ -334,7 +353,9 @@ public sealed class EventStoreAgentAdministrationOperations(
                 agentId,
                 receipt.MessageId!,
                 receipt.CorrelationId,
-                AgentSetupTruthState.AuthoritativePending,
+                effect == AgentSetupWriteEffect.AlreadyApplied
+                    ? AgentSetupTruthState.ProjectionConfirmed
+                    : AgentSetupTruthState.AuthoritativePending,
                 effect,
                 targetVersion),
             correlationId: receipt.CorrelationId);
@@ -390,9 +411,9 @@ public sealed class EventStoreAgentAdministrationOperations(
         effect = AgentSetupWriteEffect.Unknown;
         configurationVersion = 0;
         if (payload is not { ValueKind: JsonValueKind.Object } value
-            || !value.TryGetProperty("effect", out JsonElement effectElement)
+            || !value.TryGetProperty(AgentSetupResultPayload.EffectProperty, out JsonElement effectElement)
             || effectElement.ValueKind != JsonValueKind.String
-            || !value.TryGetProperty("configurationVersion", out JsonElement versionElement)
+            || !value.TryGetProperty(AgentSetupResultPayload.ConfigurationVersionProperty, out JsonElement versionElement)
             || !versionElement.TryGetInt32(out configurationVersion)
             || configurationVersion <= 0)
         {
