@@ -360,7 +360,12 @@ public sealed class AgentProviderSelectionOrchestratorTests
     private CommandEnvelope? _lastDispatched;
 
     private void CaptureDispatch()
-        => _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
+        => _dispatcher
+            .DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>())
+            .Returns(call => new SubmitCommandResponse(
+                call.ArgAt<CommandEnvelope>(0).CorrelationId,
+                null,
+                call.ArgAt<CommandEnvelope>(0).MessageId));
 
     private CommandEnvelope? LastDispatched() => _lastDispatched;
 }

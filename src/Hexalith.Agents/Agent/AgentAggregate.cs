@@ -135,12 +135,12 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             // Exact-duplicate re-create is a deterministic no-op; a conflicting payload is rejected and never
             // mutates state silently.
             return CreateMatchesExisting(state, tenantId, displayName, description, instructions)
-                ? DomainResult.NoOp()
+                ? AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion)
                 : DomainResult.Rejection([new AgentAlreadyExistsRejection(agentId)]);
         }
 
         int instructionsVersion = AgentConfigurationPolicy.HasInstructions(instructions) ? 1 : 0;
-        return DomainResult.Success([
+        return AgentSetupDomainResult.Applied([
             new AgentCreated(
                 agentId,
                 tenantId,
@@ -149,7 +149,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
                 instructions,
                 ConfigurationVersion: 1,
                 instructionsVersion),
-        ]);
+        ], configurationVersion: 1);
     }
 
     /// <summary>Handles a safe-metadata/instructions update of an existing Agent.</summary>
@@ -190,11 +190,11 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         // An update that changes nothing is a deterministic no-op.
         if (!displayNameChanged && !descriptionChanged && !instructionsChanged)
         {
-            return DomainResult.NoOp();
+            return AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion);
         }
 
         int instructionsVersion = instructionsChanged ? state.InstructionsVersion + 1 : state.InstructionsVersion;
-        return DomainResult.Success([
+        return AgentSetupDomainResult.Applied([
             new AgentConfigurationUpdated(
                 agentId,
                 displayName,
@@ -203,7 +203,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
                 instructionsChanged,
                 ConfigurationVersion: state.ConfigurationVersion + 1,
                 instructionsVersion),
-        ]);
+        ], state.ConfigurationVersion + 1);
     }
 
     /// <summary>Handles an activation request, re-evaluating this story's activation gates (AC2).</summary>
@@ -264,9 +264,9 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
                 hasContentSafetyPolicy: state.ContentSafety is not null);
         return blockers.Count > 0
             ? DomainResult.Rejection([new AgentActivationBlockedRejection(agentId, blockers)])
-            : DomainResult.Success([
+            : AgentSetupDomainResult.Applied([
                 new AgentActivated(agentId) { ConfigurationVersion = state.ConfigurationVersion + 1 },
-            ]);
+            ], state.ConfigurationVersion + 1);
     }
 
     /// <summary>Handles disabling an existing Agent while preserving configuration content and history (AC3).</summary>
@@ -297,9 +297,9 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
                     AgentLifecycleStatus.Disabled,
                     AgentLifecycleStatus.Disabled,
                     nameof(DisableAgent))])
-            : DomainResult.Success([
+            : AgentSetupDomainResult.Applied([
                 new AgentDisabled(agentId) { ConfigurationVersion = state.ConfigurationVersion + 1 },
-            ]);
+            ], state.ConfigurationVersion + 1);
     }
 
     /// <summary>Handles linking the Agent's single active Party identity (AC1, AC2, AC3; FR-2).</summary>
@@ -336,7 +336,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         // rejected — changing identity requires the explicit ReplaceAgentPartyIdentity (AC3).
         if (string.Equals(state.PartyId, command.PartyId, StringComparison.Ordinal))
         {
-            return DomainResult.NoOp();
+            return AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion);
         }
 
         if (state.PartyId is not null)
@@ -346,9 +346,9 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
 
         // Linking is a configuration change → bump ConfigurationVersion (AD-4 snapshot). Lifecycle is unchanged:
         // a linked Party clears MissingPartyIdentity but does not auto-activate (Story 1.3 lifecycle invariant).
-        return DomainResult.Success([
+        return AgentSetupDomainResult.Applied([
             new AgentPartyIdentityLinked(agentId, command.PartyId, state.ConfigurationVersion + 1),
-        ]);
+        ], state.ConfigurationVersion + 1);
     }
 
     /// <summary>Handles explicitly replacing the Agent's linked Party identity with a different one (AC2, AC3; FR-2).</summary>
@@ -382,13 +382,13 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         // Re-asserting the already-linked id is a deterministic no-op (AD-13).
         if (string.Equals(state.PartyId, command.PartyId, StringComparison.Ordinal))
         {
-            return DomainResult.NoOp();
+            return AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion);
         }
 
         // Replace deterministically sets the single active identity, so there is always at most one PartyId (AC3).
-        return DomainResult.Success([
+        return AgentSetupDomainResult.Applied([
             new AgentPartyIdentityReplaced(agentId, state.PartyId, command.PartyId, state.ConfigurationVersion + 1),
-        ]);
+        ], state.ConfigurationVersion + 1);
     }
 
     /// <summary>Handles selecting an enabled Provider/model from the governed catalog for the Agent (AC1, AC2, AC3; FR-5).</summary>
@@ -428,21 +428,21 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             && string.Equals(state.ModelId, command.ModelId, StringComparison.Ordinal)
             && state.ProviderCapabilityVersion == command.ProviderCapabilityVersion)
         {
-            return DomainResult.NoOp();
+            return AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion);
         }
 
         // Valid verdict, new/changed selection: selecting/changing the provider is a configuration change → bump
         // ConfigurationVersion (needed for the AD-4 interaction snapshot in Epic 2). A changed selection
         // deterministically overwrites the single recorded selection; prior events are append-only and never
         // rewritten (AC3). Lifecycle is unchanged (Story 1.3 invariant) — readiness is surfaced through the blocker.
-        return DomainResult.Success([
+        return AgentSetupDomainResult.Applied([
             new AgentProviderModelSelected(
                 agentId,
                 command.ProviderId,
                 command.ModelId,
                 command.ProviderCapabilityVersion,
                 state.ConfigurationVersion + 1),
-        ]);
+        ], state.ConfigurationVersion + 1);
     }
 
     /// <summary>Handles choosing the Agent's Response Mode (AC1; FR-6).</summary>
@@ -475,14 +475,14 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         // Re-asserting the recorded mode is a deterministic no-op (AD-13) — no duplicate event, no version bump.
         if (state.ResponseMode == command.Mode)
         {
-            return DomainResult.NoOp();
+            return AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion);
         }
 
         // Choosing/changing the mode is a configuration change → bump ConfigurationVersion (AD-4 snapshot). Lifecycle
         // is unchanged (Story 1.3 invariant) and the change applies only to future Agent Calls (AC1).
-        return DomainResult.Success([
+        return AgentSetupDomainResult.Applied([
             new AgentResponseModeConfigured(agentId, command.Mode, state.ConfigurationVersion + 1),
-        ]);
+        ], state.ConfigurationVersion + 1);
     }
 
     /// <summary>Handles configuring the Agent's Approver Policy for Confirmation mode (AC2, AC4; FR-7).</summary>
@@ -520,18 +520,18 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             && state.ApproverPolicyDisclosure == normalized.DisclosureCategory
             && state.ApproverPolicySources.SequenceEqual(normalized.Sources))
         {
-            return DomainResult.NoOp();
+            return AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion);
         }
 
         // A genuine policy change bumps both the policy version (AC4) and the configuration version (AD-4). Lifecycle
         // is unchanged; prior events are append-only and never rewritten, so the change is future-only (AC4).
-        return DomainResult.Success([
+        return AgentSetupDomainResult.Applied([
             new AgentApproverPolicyConfigured(
                 agentId,
                 normalized,
                 state.ApproverPolicyVersion + 1,
                 state.ConfigurationVersion + 1),
-        ]);
+        ], state.ConfigurationVersion + 1);
     }
 
     /// <summary>Handles defining the Agent's Content Safety Policy — the final Epic 1 activation gate (AC1, AC3; FR-26).</summary>
@@ -569,18 +569,18 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         // element-wise explicitly (mirroring the approver-policy SequenceEqual idempotency check).
         if (state.ContentSafety is not null && ContentSafetyConfigurationsEqual(state.ContentSafety, normalized))
         {
-            return DomainResult.NoOp();
+            return AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion);
         }
 
         // A genuine change bumps both the content-safety policy version (AC1) and the configuration version (AD-4).
         // Lifecycle is unchanged; prior events are append-only and never rewritten, so the change is future-only (AC1).
-        return DomainResult.Success([
+        return AgentSetupDomainResult.Applied([
             new AgentContentSafetyPolicyConfigured(
                 agentId,
                 normalized,
                 state.ContentSafetyPolicyVersion + 1,
                 state.ConfigurationVersion + 1),
-        ]);
+        ], state.ConfigurationVersion + 1);
     }
 
     /// <summary>Handles recording the Agent's launch-readiness decision (Story 4.4 AC1, AC2, AC3; FR-28).</summary>
@@ -618,19 +618,19 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         // members, so the lists are compared element-wise explicitly (mirroring ContentSafetyConfigurationsEqual).
         if (state.LaunchReadiness is not null && LaunchReadinessEqual(state.LaunchReadiness, normalized))
         {
-            return DomainResult.NoOp();
+            return AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion);
         }
 
         // A genuine change bumps both the launch-readiness version (AC1) and the configuration version (AD-4) so future
         // AgentInteraction snapshots pick up the new posture. Lifecycle is unchanged; prior events are append-only and
         // never rewritten, so the change is future-only (AC1).
-        return DomainResult.Success([
+        return AgentSetupDomainResult.Applied([
             new AgentLaunchReadinessRecorded(
                 agentId,
                 normalized,
                 state.LaunchReadinessVersion + 1,
                 state.ConfigurationVersion + 1),
-        ]);
+        ], state.ConfigurationVersion + 1);
     }
 
     /// <summary>Handles enabling production-like generation behind the launch-readiness gate (Story 4.4 AC1, AC4; FR-28).</summary>
@@ -657,7 +657,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         // Re-enabling an already-enabled Agent is a deterministic no-op (AD-13) — no duplicate event, no version bump.
         if (state.ProductionLikeGenerationEnabled)
         {
-            return DomainResult.NoOp();
+            return AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion);
         }
 
         // The launch-readiness gate is a pure state check (AD-3): content safety, the in-force context policy, launch
@@ -674,7 +674,9 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
                 auditGovernanceResolved: ReadAuditGovernanceResolved(envelope));
         return blockers.Count > 0
             ? DomainResult.Rejection([new AgentProductionLikeGenerationBlockedRejection(agentId, blockers)])
-            : DomainResult.Success([new AgentProductionLikeGenerationEnabled(agentId, state.ConfigurationVersion + 1)]);
+            : AgentSetupDomainResult.Applied(
+                [new AgentProductionLikeGenerationEnabled(agentId, state.ConfigurationVersion + 1)],
+                state.ConfigurationVersion + 1);
     }
 
     private static bool IsAgentAdmin(CommandEnvelope envelope)

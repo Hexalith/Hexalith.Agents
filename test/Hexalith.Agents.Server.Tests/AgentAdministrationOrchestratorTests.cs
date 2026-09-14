@@ -43,6 +43,7 @@ public sealed class AgentAdministrationOrchestratorTests
 
         outcome.Authorized.ShouldBeTrue();
         outcome.Dispatched.ShouldBeTrue();
+        outcome.Receipt.ShouldNotBeNull().MessageId.ShouldBe("msg-1");
 
         CommandEnvelope envelope = _dispatched.ShouldNotBeNull();
         envelope.CommandType.ShouldBe(nameof(UpdateAgentConfiguration));
@@ -151,5 +152,7 @@ public sealed class AgentAdministrationOrchestratorTests
             clientExtensions);
 
     private void CaptureDispatch()
-        => _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(envelope => _dispatched = envelope), Arg.Any<CancellationToken>());
+        => _dispatcher
+            .DispatchAsync(Arg.Do<CommandEnvelope>(envelope => _dispatched = envelope), Arg.Any<CancellationToken>())
+            .Returns(new SubmitCommandResponse("corr-1", null, "msg-1"));
 }

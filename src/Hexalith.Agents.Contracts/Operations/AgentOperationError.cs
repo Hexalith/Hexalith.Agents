@@ -31,6 +31,7 @@ public sealed record AgentOperationError(
             AgentOperationErrorCode.Unavailable => "The operation is currently unavailable.",
             AgentOperationErrorCode.Rejected => "The operation was rejected.",
             AgentOperationErrorCode.Blocked => "The operation is blocked.",
+            AgentOperationErrorCode.UnableToVerify => "The operation outcome could not be verified.",
             _ => "The operation failed.",
         };
 }

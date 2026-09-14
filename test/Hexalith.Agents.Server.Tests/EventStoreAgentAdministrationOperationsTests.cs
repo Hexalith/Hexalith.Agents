@@ -34,6 +34,8 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     private const string TenantId = "acme";
     private const string AgentId = "hexa";
     private const string StoreName = "statestore";
+    private const string MessageId = "01ARZ3NDEKTSV4RRFFQ69G5FAV";
+    private const string CorrelationId = "01ARZ3NDEKTSV4RRFFQ69G5FAW";
 
     private readonly FakeReadModelStore _store = new();
     private readonly IEventStoreGatewayClient _gateway = Substitute.For<IEventStoreGatewayClient>();
@@ -46,7 +48,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "admin-user", IsAgentsAdmin: true));
         _ = _gateway
             .SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new SubmitCommandResponse("corr-1", null, "msg-1"));
+            .Returns(call => AppliedReceipt(call.ArgAt<SubmitCommandRequest>(0), configurationVersion: 4));
     }
 
     [Fact]
@@ -61,9 +63,12 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         acceptance.AgentId.ShouldBe(AgentId);
         acceptance.MessageId.ShouldNotBeNullOrWhiteSpace();
         acceptance.CorrelationId.ShouldNotBeNullOrWhiteSpace();
+        NUlid.Ulid.TryParse(acceptance.MessageId, out _).ShouldBeTrue();
+        NUlid.Ulid.TryParse(acceptance.CorrelationId, out _).ShouldBeTrue();
 
-        // Acceptance is not success: the command was taken, nothing yet claims it is durable.
-        acceptance.TruthState.ShouldBe(AgentSetupTruthState.Submitted);
+        acceptance.TruthState.ShouldBe(AgentSetupTruthState.AuthoritativePending);
+        acceptance.Effect.ShouldBe(AgentSetupWriteEffect.Applied);
+        acceptance.TargetConfigurationVersion.ShouldBe(4);
     }
 
     [Fact]
@@ -86,19 +91,22 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         AgentOperationResult<AgentCommandAcceptance> first = await Operations().DisableAsync(
             AgentId,
             new DisableAgent(),
-            new AgentOperationOptions(IdempotencyKey: "same-key"));
+            new AgentOperationOptions(IdempotencyKey: MessageId));
         SubmitCommandRequest firstSubmit = _lastSubmit.ShouldNotBeNull();
 
         AgentOperationResult<AgentCommandAcceptance> second = await Operations().DisableAsync(
             AgentId,
             new DisableAgent(),
-            new AgentOperationOptions(IdempotencyKey: "same-key"));
+            new AgentOperationOptions(IdempotencyKey: MessageId));
 
         // Two identical submissions carry one identity, so the gateway can collapse them instead of appending twice.
-        first.Value.ShouldNotBeNull().MessageId.ShouldBe("same-key");
-        second.Value.ShouldNotBeNull().MessageId.ShouldBe("same-key");
-        firstSubmit.IdempotencyKey.ShouldBe("same-key");
-        _lastSubmit.ShouldNotBeNull().IdempotencyKey.ShouldBe("same-key");
+        first.Value.ShouldNotBeNull().MessageId.ShouldBe(MessageId);
+        second.Value.ShouldNotBeNull().MessageId.ShouldBe(MessageId);
+        first.Value.Effect.ShouldBe(AgentSetupWriteEffect.Applied);
+        second.Value.Effect.ShouldBe(first.Value.Effect);
+        second.Value.TargetConfigurationVersion.ShouldBe(first.Value.TargetConfigurationVersion);
+        firstSubmit.IdempotencyKey.ShouldBe(MessageId);
+        _lastSubmit.ShouldNotBeNull().IdempotencyKey.ShouldBe(MessageId);
     }
 
     [Fact]
@@ -154,7 +162,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(AgentId, new ActivateAgent());
 
         result.IsSuccess.ShouldBeTrue();
-        result.Value.ShouldNotBeNull().TruthState.ShouldBe(AgentSetupTruthState.Submitted);
+        result.Value.ShouldNotBeNull().TruthState.ShouldBe(AgentSetupTruthState.AuthoritativePending);
 
         // The recorded selection is what gets re-validated — the caller never names the provider it wants checked.
         await _catalogReader.Received(1).GetEntryAsync(TenantId, "openai", "gpt-4o", Arg.Any<CancellationToken>());
@@ -221,6 +229,21 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     }
 
     [Fact]
+    public async Task Authorization_precedes_even_invalid_caller_metadata()
+    {
+        _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "intruder", IsAgentsAdmin: false));
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(
+            AgentId,
+            new DisableAgent(),
+            new AgentOperationOptions(CorrelationId: "not-a-ulid", IdempotencyKey: "not-a-ulid"));
+
+        result.Status.ShouldBe(AgentOperationStatus.NotAuthorized);
+        result.CorrelationId.ShouldBeNull();
+        await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
+    }
+
+    [Fact]
     public async Task An_unauthorized_read_reveals_nothing_about_the_agent()
     {
         SeedProjectedSetup(configurationVersion: 2);
@@ -263,6 +286,88 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     }
 
     [Fact]
+    public async Task A_noop_receipt_returns_the_unchanged_authoritative_version_without_projection_guessing()
+    {
+        _gateway
+            .SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call => AlreadyAppliedReceipt(call.ArgAt<SubmitCommandRequest>(0), configurationVersion: 7));
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().UpdateConfigurationAsync(
+            AgentId,
+            new UpdateAgentConfiguration("hexa", null, "instructions long enough to be valid"));
+
+        AgentCommandAcceptance acceptance = result.Value.ShouldNotBeNull();
+        acceptance.Effect.ShouldBe(AgentSetupWriteEffect.AlreadyApplied);
+        acceptance.TargetConfigurationVersion.ShouldBe(7);
+    }
+
+    [Theory]
+    [InlineData("missing-payload")]
+    [InlineData("malformed-payload")]
+    [InlineData("mismatched-message")]
+    [InlineData("mismatched-correlation")]
+    public async Task An_unverifiable_gateway_receipt_fails_closed(string scenario)
+    {
+        _gateway
+            .SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                SubmitCommandRequest request = call.ArgAt<SubmitCommandRequest>(0);
+                return scenario switch
+                {
+                    "missing-payload" => new SubmitCommandResponse(request.CorrelationId!, null, request.MessageId),
+                    "malformed-payload" => new SubmitCommandResponse(
+                        request.CorrelationId!,
+                        JsonSerializer.SerializeToElement(new { effect = "Applied", configurationVersion = 0 }),
+                        request.MessageId),
+                    "mismatched-message" => new SubmitCommandResponse(
+                        request.CorrelationId!,
+                        SetupPayload("Applied", 4),
+                        MessageId),
+                    _ => new SubmitCommandResponse(CorrelationId, SetupPayload("Applied", 4), request.MessageId),
+                };
+            });
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(
+            AgentId,
+            new DisableAgent());
+
+        result.Status.ShouldBe(AgentOperationStatus.UnableToVerify);
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.UnableToVerify);
+        result.Value.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task NonUlidCallerCommandMetadataIsRejectedBeforeDispatch()
+    {
+        CaptureSubmit();
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(
+            AgentId,
+            new DisableAgent(),
+            new AgentOperationOptions(CorrelationId: "not-a-ulid", IdempotencyKey: "not-a-ulid"));
+
+        result.Status.ShouldBe(AgentOperationStatus.ValidationFailed);
+        _lastSubmit.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task NonUlidIdempotencyKeyIsRejectedAfterAValidCorrelationWithoutDispatch()
+    {
+        CaptureSubmit();
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(
+            AgentId,
+            new DisableAgent(),
+            new AgentOperationOptions(CorrelationId: CorrelationId, IdempotencyKey: "not-a-ulid"));
+
+        result.Status.ShouldBe(AgentOperationStatus.ValidationFailed);
+        result.CorrelationId.ShouldBe(CorrelationId);
+        _lastSubmit.ShouldBeNull();
+        await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
+    }
+
+    [Fact]
     public async Task Out_of_scope_administration_commands_stay_fail_closed()
     {
         AgentOperationResult result = await Operations().SelectProviderModelAsync(
@@ -278,7 +383,22 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     private void CaptureSubmit()
         => _gateway
             .SubmitCommandAsync(Arg.Do<SubmitCommandRequest>(request => _lastSubmit = request), Arg.Any<CancellationToken>())
-            .Returns(new SubmitCommandResponse("corr-1", null, "msg-1"));
+            .Returns(call => AppliedReceipt(call.ArgAt<SubmitCommandRequest>(0), configurationVersion: 4));
+
+    private static SubmitCommandResponse AppliedReceipt(SubmitCommandRequest request, int configurationVersion)
+        => new(
+            request.CorrelationId!,
+            SetupPayload("Applied", configurationVersion),
+            request.MessageId);
+
+    private static SubmitCommandResponse AlreadyAppliedReceipt(SubmitCommandRequest request, int configurationVersion)
+        => new(
+            request.CorrelationId!,
+            SetupPayload("AlreadyApplied", configurationVersion),
+            request.MessageId);
+
+    private static JsonElement SetupPayload(string effect, int configurationVersion)
+        => JsonSerializer.SerializeToElement(new { effect, configurationVersion });
 
     private IAgentAdministrationOperations Operations()
     {

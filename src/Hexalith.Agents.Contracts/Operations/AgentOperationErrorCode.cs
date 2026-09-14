@@ -38,4 +38,7 @@ public enum AgentOperationErrorCode
 
     /// <summary>The operation was blocked by policy or dependency readiness gates.</summary>
     Blocked,
+
+    /// <summary>The operation completed without enough trusted evidence to verify its exact outcome.</summary>
+    UnableToVerify,
 }

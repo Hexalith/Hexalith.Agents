@@ -115,9 +115,9 @@ public sealed class AgentActivationProviderRevalidation
             request.ActorUserId,
             BuildTrustedExtensions(request.ClientSuppliedExtensions, providerVerdict, approverVerdict));
 
-        await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
+        SubmitCommandResponse receipt = await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
 
-        return AgentActivationRevalidationOutcome.FromDispatch(providerVerdict, approverVerdict);
+        return AgentActivationRevalidationOutcome.FromDispatch(providerVerdict, approverVerdict, receipt);
     }
 
     private static Dictionary<string, string> BuildTrustedExtensions(

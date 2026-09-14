@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ using Hexalith.Agents.Server.Ports;
 using Hexalith.Agents.Server.Projections;
 
 using Hexalith.EventStore.Client.Projections;
+using Hexalith.EventStore.Contracts.Commands;
 
 using Microsoft.Extensions.Options;
 
@@ -24,10 +26,10 @@ namespace Hexalith.Agents.Server.Application.Agents;
 /// <remarks>
 /// <para>
 /// A write answers with a structured accepted identity — the Agent, the command message, the correlation, and the
-/// <see cref="AgentSetupTruthState.Submitted"/> stage. Acceptance is deliberately not success: no stream, revision,
-/// aggregate type, workflow, projection address, or Provider SDK detail crosses the boundary, and nothing in the
-/// answer says the change is durable. The caller re-reads the setup with the version it is waiting for to learn
-/// whether the projection has confirmed it.
+    /// <see cref="AgentSetupTruthState.AuthoritativePending"/> stage, the safe applied/no-op effect, and the exact
+    /// resulting configuration version. Acceptance is deliberately not projection success: no stream, revision,
+    /// aggregate type, workflow, projection address, or Provider SDK detail crosses the boundary. The caller re-reads
+    /// the setup with the command-derived version to learn whether the projection has confirmed it.
 /// </para>
 /// <para>
 /// Authorization runs first on every operation. An unauthorized or cross-tenant caller gets the same shaped
@@ -136,7 +138,7 @@ public sealed class EventStoreAgentAdministrationOperations(
                             command.Mode),
                         ct)
                     .ConfigureAwait(false);
-                return new AgentAdministrationOutcome(outcome.Authorized, outcome.Dispatched);
+                return new AgentAdministrationOutcome(outcome.Authorized, outcome.Dispatched, outcome.Receipt);
             },
             cancellationToken);
     }
@@ -256,20 +258,32 @@ public sealed class EventStoreAgentAdministrationOperations(
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
 
         AgentAdministrationContext context = _contextProvider.GetContext();
-        string correlationId = options?.CorrelationId is { Length: > 0 } supplied
-            ? supplied
-            : _identityFactory.NewCorrelationId();
-
         if (!context.IsAuthorized)
         {
+            string? deniedCorrelation = options?.CorrelationId;
             return AgentOperationResult<AgentCommandAcceptance>.Failed(
                 AgentOperationErrorCode.NotAuthorized,
-                correlationId);
+                IsUlid(deniedCorrelation) ? deniedCorrelation : null);
+        }
+
+        string correlationId = options?.CorrelationId is { Length: > 0 } suppliedCorrelation
+            ? suppliedCorrelation
+            : _identityFactory.NewCorrelationId();
+
+        if (!IsUlid(correlationId))
+        {
+            return AgentOperationResult<AgentCommandAcceptance>.Failed(AgentOperationErrorCode.ValidationFailed);
         }
 
         // The idempotency key doubles as the command message id, so re-submitting the same caller key is an exact
         // duplicate at the gateway rather than a second appended event.
         string messageId = options?.IdempotencyKey is { Length: > 0 } key ? key : _identityFactory.NewMessageId();
+        if (!IsUlid(messageId))
+        {
+            return AgentOperationResult<AgentCommandAcceptance>.Failed(
+                AgentOperationErrorCode.ValidationFailed,
+                correlationId);
+        }
 
         AgentAdministrationOutcome outcome;
         try
@@ -292,14 +306,38 @@ public sealed class EventStoreAgentAdministrationOperations(
                 correlationId);
         }
 
-        return outcome switch
+        if (outcome is { Authorized: false })
         {
-            { Authorized: false } => AgentOperationResult<AgentCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized, correlationId),
-            { Dispatched: false } => AgentOperationResult<AgentCommandAcceptance>.Failed(AgentOperationErrorCode.Unavailable, correlationId),
-            _ => AgentOperationResult<AgentCommandAcceptance>.Succeeded(
-                new AgentCommandAcceptance(agentId, messageId, correlationId, AgentSetupTruthState.Submitted),
-                correlationId: correlationId),
-        };
+            return AgentOperationResult<AgentCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized, correlationId);
+        }
+
+        if (!outcome.Dispatched)
+        {
+            return AgentOperationResult<AgentCommandAcceptance>.Failed(AgentOperationErrorCode.Unavailable, correlationId);
+        }
+
+        SubmitCommandResponse? receipt = outcome.Receipt;
+        if (receipt is null
+            || !IsUlid(receipt.CorrelationId)
+            || !IsUlid(receipt.MessageId)
+            || !string.Equals(receipt.CorrelationId, correlationId, StringComparison.Ordinal)
+            || !string.Equals(receipt.MessageId, messageId, StringComparison.Ordinal)
+            || !TryParseSetupResult(receipt.ResultPayload, out AgentSetupWriteEffect effect, out int targetVersion))
+        {
+            return AgentOperationResult<AgentCommandAcceptance>.Failed(
+                AgentOperationErrorCode.UnableToVerify,
+                correlationId);
+        }
+
+        return AgentOperationResult<AgentCommandAcceptance>.Succeeded(
+            new AgentCommandAcceptance(
+                agentId,
+                receipt.MessageId!,
+                receipt.CorrelationId,
+                AgentSetupTruthState.AuthoritativePending,
+                effect,
+                targetVersion),
+            correlationId: receipt.CorrelationId);
     }
 
     // Activation re-validates the recorded provider selection and (in Confirmation mode) the recorded approver
@@ -336,6 +374,37 @@ public sealed class EventStoreAgentAdministrationOperations(
                 cancellationToken)
             .ConfigureAwait(false);
 
-        return new AgentAdministrationOutcome(outcome.Authorized, outcome.Dispatched);
+        return new AgentAdministrationOutcome(outcome.Authorized, outcome.Dispatched, outcome.Receipt);
+    }
+
+    private static bool IsUlid(string? value)
+        => !string.IsNullOrWhiteSpace(value) && NUlid.Ulid.TryParse(value, out _);
+
+    private static bool TryParseSetupResult(
+        JsonElement? payload,
+        out AgentSetupWriteEffect effect,
+        out int configurationVersion)
+    {
+        effect = AgentSetupWriteEffect.Unknown;
+        configurationVersion = 0;
+        if (payload is not { ValueKind: JsonValueKind.Object } value
+            || !value.TryGetProperty("effect", out JsonElement effectElement)
+            || effectElement.ValueKind != JsonValueKind.String
+            || !value.TryGetProperty("configurationVersion", out JsonElement versionElement)
+            || !versionElement.TryGetInt32(out configurationVersion)
+            || configurationVersion <= 0)
+        {
+            return false;
+        }
+
+        string? effectName = effectElement.GetString();
+        if (!Enum.TryParse(effectName, ignoreCase: false, out effect)
+            || !string.Equals(Enum.GetName(effect), effectName, StringComparison.Ordinal))
+        {
+            effect = AgentSetupWriteEffect.Unknown;
+            return false;
+        }
+
+        return effect is AgentSetupWriteEffect.Applied or AgentSetupWriteEffect.AlreadyApplied;
     }
 }

@@ -105,7 +105,9 @@ public sealed class AgentResponseModeOrchestratorTests
     private CommandEnvelope? _lastDispatched;
 
     private void CaptureDispatch()
-        => _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
+        => _dispatcher
+            .DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>())
+            .Returns(new SubmitCommandResponse("corr-1", null, "msg-1"));
 
     private CommandEnvelope? LastDispatched() => _lastDispatched;
 }

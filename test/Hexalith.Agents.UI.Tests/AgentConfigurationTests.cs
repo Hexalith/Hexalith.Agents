@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -246,9 +247,18 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         GivenSetup(AgentUiTestData.Setup(
             AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
             configurationVersion: 3));
-        SetupGateway.ConfigureResponseModeAsync(Arg.Any<AgentResponseMode>(), Arg.Any<CancellationToken>())
+        SetupGateway.ConfigureResponseModeAsync(
+                Arg.Any<AgentResponseMode>(),
+                Arg.Any<AgentOperationOptions>(),
+                Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(AgentSetupWriteResult.Submitted(
-                new AgentCommandAcceptance("agent-1", "message-1", "correlation-1", AgentSetupTruthState.Submitted))));
+                new AgentCommandAcceptance(
+                    "agent-1",
+                    "message-1",
+                    "correlation-1",
+                    AgentSetupTruthState.AuthoritativePending,
+                    AgentSetupWriteEffect.Applied,
+                    7))));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
         cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
@@ -256,14 +266,14 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         cut.Find("[data-testid='agents-config-response-mode-submit']").Click();
 
         // The re-read asks for the configuration version the acceptance implies, never the one already shown.
-        cut.WaitForAssertion(() => SetupGateway.Received().GetSetupAsync(4, Arg.Any<CancellationToken>()));
+        cut.WaitForAssertion(() => SetupGateway.Received().GetSetupAsync(7, Arg.Any<CancellationToken>()));
     }
 
     [Fact]
     public void A_rejected_write_reports_its_typed_status_and_triggers_no_reread()
     {
         GivenSetup(AgentUiTestData.Setup(AgentUiTestData.Status(AgentLifecycleStatus.Draft), configurationVersion: 3));
-        SetupGateway.ActivateAsync(Arg.Any<CancellationToken>())
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.NotAuthorized)));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
@@ -279,10 +289,88 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     }
 
     [Fact]
+    public void An_already_applied_receipt_reports_the_no_op_without_polling()
+    {
+        GivenSetup(AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3));
+        SetupGateway.ConfigureResponseModeAsync(
+                AgentResponseMode.Confirmation,
+                Arg.Any<AgentOperationOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentSetupWriteResult.Submitted(
+                new AgentCommandAcceptance(
+                    "agent-1",
+                    "message-1",
+                    "correlation-1",
+                    AgentSetupTruthState.AuthoritativePending,
+                    AgentSetupWriteEffect.AlreadyApplied,
+                    3))));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
+        cut.Find("[data-testid='agents-config-response-mode-submit']").Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.Find("[data-testid='agents-config-write-state']").TextContent
+                .ShouldContain("Agents.Config.Write.AlreadyApplied");
+            cut.FindAll("[data-testid='agents-config-write-retry']").ShouldBeEmpty();
+            cut.FindAll("[data-testid='agents-config-write-refresh']").ShouldBeEmpty();
+        });
+        SetupGateway.DidNotReceive().GetSetupAsync(Arg.Any<int>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Starting_a_later_attempt_clears_a_prior_terminal_outcome_while_the_new_write_is_in_flight()
+    {
+        GivenSetup(AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3));
+        SetupGateway.ConfigureResponseModeAsync(
+                AgentResponseMode.Confirmation,
+                Arg.Any<AgentOperationOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentSetupWriteResult.Submitted(
+                new AgentCommandAcceptance(
+                    "agent-1",
+                    "message-1",
+                    "correlation-1",
+                    AgentSetupTruthState.AuthoritativePending,
+                    AgentSetupWriteEffect.AlreadyApplied,
+                    3))));
+        var stalledWrite = new TaskCompletionSource<AgentSetupWriteResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(stalledWrite.Task);
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
+        await cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldContain("Agents.Config.Write.AlreadyApplied");
+
+        Task activation = cut.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.FindAll("[data-testid='agents-config-write-state']").ShouldBeEmpty();
+            cut.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeTrue();
+        });
+        stalledWrite.SetResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed));
+        await activation;
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldContain("Agents.Config.Write.ValidationFailed");
+    }
+
+    [Fact]
     public void Activating_rereads_at_the_next_configuration_version()
     {
         GivenLifecycleTransition(AgentLifecycleStatus.Draft, AgentLifecycleStatus.Active);
-        GivenAcceptedWrite(gateway => gateway.ActivateAsync(Arg.Any<CancellationToken>()));
+        GivenAcceptedWrite(gateway => gateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
         cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-activate']"));
@@ -301,7 +389,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     public void Disabling_rereads_at_the_next_configuration_version()
     {
         GivenLifecycleTransition(AgentLifecycleStatus.Active, AgentLifecycleStatus.Disabled);
-        GivenAcceptedWrite(gateway => gateway.DisableAsync(Arg.Any<CancellationToken>()));
+        GivenAcceptedWrite(gateway => gateway.DisableAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
         cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-disable']"));
@@ -320,7 +408,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     public async Task An_immediately_confirmed_projection_stops_reporting_the_write_and_does_not_retry()
     {
         GivenLifecycleTransition(AgentLifecycleStatus.Draft, AgentLifecycleStatus.Active);
-        GivenAcceptedWrite(gateway => gateway.ActivateAsync(Arg.Any<CancellationToken>()));
+        GivenAcceptedWrite(gateway => gateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
         cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-activate']"));
@@ -358,7 +446,10 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             Task.FromResult(AgentSetupResult.Success(initial)),
             Task.FromResult(AgentSetupResult.Success(pending)),
             Task.FromResult(AgentSetupResult.Success(confirmed)));
-        GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(AgentResponseMode.Confirmation, Arg.Any<CancellationToken>()));
+        GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
+            AgentResponseMode.Confirmation,
+            Arg.Any<AgentOperationOptions>(),
+            Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
         cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
@@ -415,6 +506,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             Task.FromResult(AgentSetupResult.Success(confirmed)));
         GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
             AgentResponseMode.Confirmation,
+            Arg.Any<AgentOperationOptions>(),
             Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
@@ -442,17 +534,36 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     public async Task Polling_exhaustion_preserves_pending_truth_and_stops_further_reads()
     {
         AgentSetupView initial = AgentUiTestData.Setup(
-            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic) with
+            {
+                DisplayName = "initial name",
+                Description = "initial description",
+            },
             configurationVersion: 3);
         AgentSetupView pending = AgentUiTestData.Setup(
-            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic) with
+            {
+                DisplayName = "pending name",
+                Description = "pending description",
+            },
             configurationVersion: 3,
             freshness: AgentSetupFreshness.Stale,
             truthState: AgentSetupTruthState.AuthoritativePending);
+        AgentSetupView confirmed = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Confirmation) with
+            {
+                DisplayName = "confirmed name",
+                Description = "confirmed description",
+            },
+            configurationVersion: 4);
+        bool confirmManualRefresh = false;
         SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(call =>
-            Task.FromResult(AgentSetupResult.Success(call.ArgAt<int?>(0) is null ? initial : pending)));
+            Task.FromResult(AgentSetupResult.Success(call.ArgAt<int?>(0) is null
+                ? initial
+                : confirmManualRefresh ? confirmed : pending)));
         GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
             AgentResponseMode.Confirmation,
+            Arg.Any<AgentOperationOptions>(),
             Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
@@ -462,7 +573,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
         cut.WaitForAssertion(() => SetupGateway.Received(1).GetSetupAsync(4, Arg.Any<CancellationToken>()));
 
-        for (int tick = 0; tick < 19; tick++)
+        for (int tick = 0; tick < 31; tick++)
         {
             Clock.Advance(TimeSpan.FromMilliseconds(250));
             await cut.InvokeAsync(() => Task.CompletedTask);
@@ -488,10 +599,34 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         cut.Find("[data-testid='agents-config-freshness']").TextContent
             .ShouldContain("Agents.Config.Truth.Freshness.Stale");
         cut.Find("[data-testid='agents-config-write-state']").TextContent
-            .ShouldContain("Agents.Config.Write.Submitted");
+            .ShouldContain("Agents.Config.Write.AwaitingProjection");
+        cut.Find("[data-testid='agents-config-write-refresh']");
+        cut.Find("[data-testid='agents-config-write-retry']");
+        cut.Find("[data-testid='agents-config-write-abandon']");
         await SetupGateway.DidNotReceive().GetSetupAsync(
             Arg.Is<int?>(version => version.HasValue && version.Value != 4),
             Arg.Any<CancellationToken>());
+
+        cut.Find("[data-testid='agents-config-display-name-input']").Change("unsaved administrator name");
+        cut.Find("[data-testid='agents-config-description-input']").Change("unsaved administrator description");
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Automatic));
+        confirmManualRefresh = true;
+        await cut.Find("[data-testid='agents-config-write-refresh']").ClickAsync(new MouseEventArgs());
+
+        ExpectedVersionReadCount(4).ShouldBe(readsImmediatelyBeforeTimeout + 1);
+        await SetupGateway.Received(1).ConfigureResponseModeAsync(
+            AgentResponseMode.Confirmation,
+            Arg.Any<AgentOperationOptions>(),
+            Arg.Any<CancellationToken>());
+        cut.FindAll("[data-testid='agents-config-write-state']").ShouldBeEmpty();
+        cut.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value")
+            .ShouldBe("unsaved administrator name");
+        cut.Find("[data-testid='agents-config-description-input']").GetAttribute("value")
+            .ShouldBe("unsaved administrator description");
+        cut.FindComponent<ResponseModeToggle>().Instance.Value.ShouldBe(AgentResponseMode.Automatic);
+        cut.Find("[data-testid='agents-config-truth-stage']").TextContent
+            .ShouldContain("Agents.Config.Truth.Stage.ProjectionConfirmed");
     }
 
     [Fact]
@@ -518,6 +653,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         });
         GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
             AgentResponseMode.Confirmation,
+            Arg.Any<AgentOperationOptions>(),
             Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
@@ -556,6 +692,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         });
         GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
             AgentResponseMode.Confirmation,
+            Arg.Any<AgentOperationOptions>(),
             Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
@@ -612,6 +749,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             Task.FromResult(terminal));
         GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
             AgentResponseMode.Confirmation,
+            Arg.Any<AgentOperationOptions>(),
             Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
@@ -630,7 +768,10 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         readsAtTerminalOutcome.ShouldBe(2);
         ExpectedVersionReadCount(4).ShouldBe(readsAtTerminalOutcome);
         cut.Markup.ShouldContain(expectedSurface);
-        cut.FindAll("[data-testid='agents-config-write-state']").ShouldBeEmpty();
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldContain("Agents.Config.Write.Submitted");
+        cut.Find("[data-testid='agents-config-write-retry']");
+        cut.Find("[data-testid='agents-config-write-abandon']");
     }
 
     [Fact]
@@ -657,6 +798,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         });
         GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
             AgentResponseMode.Confirmation,
+            Arg.Any<AgentOperationOptions>(),
             Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
@@ -680,14 +822,17 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     }
 
     [Fact]
-    public void A_gateway_that_throws_reports_a_typed_write_failure_and_leaves_the_page_usable()
+    public void A_gateway_that_throws_blocks_conflicting_changes_until_the_attempt_is_explicitly_abandoned()
     {
         GivenSetup(AgentUiTestData.Setup(AgentUiTestData.Status(AgentLifecycleStatus.Draft), configurationVersion: 3));
-        SetupGateway.ActivateAsync(Arg.Any<CancellationToken>())
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
             .Returns<Task<AgentSetupWriteResult>>(_ => throw new InvalidOperationException("transport blew up"));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
         cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-activate']"));
+        cut.Find("[data-testid='agents-config-instructions-input']").Change("instructions long enough to be valid");
+        cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
         cut.Find("[data-testid='agents-config-activate']").Click();
 
         cut.WaitForAssertion(() =>
@@ -695,9 +840,25 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             cut.Find("[data-testid='agents-config-write-state']").TextContent
                 .ShouldContain("Agents.Config.Write.Unavailable");
 
-            // Neither the exception text nor a busy-locked form survives the failure.
+            // The exception is not disclosed, and the unresolved attempt blocks a different write.
             cut.Markup.ShouldNotContain("transport blew up");
+            cut.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeTrue();
+            cut.Find("[data-testid='agents-config-disable']").HasAttribute("disabled").ShouldBeTrue();
+            cut.Find("[data-testid='agents-config-submit']").HasAttribute("disabled").ShouldBeTrue();
+            cut.Find("[data-testid='agents-config-response-mode-submit']").HasAttribute("disabled").ShouldBeTrue();
+            cut.Find("[data-testid='agents-config-write-retry']");
+            cut.Find("[data-testid='agents-config-write-abandon']");
+        });
+
+        cut.Find("[data-testid='agents-config-write-abandon']").Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.FindAll("[data-testid='agents-config-write-state']").ShouldBeEmpty();
             cut.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeFalse();
+            cut.Find("[data-testid='agents-config-disable']").HasAttribute("disabled").ShouldBeFalse();
+            cut.Find("[data-testid='agents-config-submit']").HasAttribute("disabled").ShouldBeFalse();
+            cut.Find("[data-testid='agents-config-response-mode-submit']").HasAttribute("disabled").ShouldBeFalse();
         });
     }
 
@@ -705,7 +866,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     public void A_non_lifetime_gateway_cancellation_reports_the_typed_unavailable_write_outcome()
     {
         GivenSetup(AgentUiTestData.Setup(AgentUiTestData.Status(AgentLifecycleStatus.Draft), configurationVersion: 3));
-        SetupGateway.ActivateAsync(Arg.Any<CancellationToken>())
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
             .Returns<Task<AgentSetupWriteResult>>(_ => throw new OperationCanceledException("unrelated cancellation"));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
@@ -717,6 +878,8 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             cut.Find("[data-testid='agents-config-write-state']").TextContent
                 .ShouldContain("Agents.Config.Write.Unavailable");
             cut.Markup.ShouldNotContain("unrelated cancellation");
+            cut.Find("[data-testid='agents-config-write-retry']");
+            cut.Find("[data-testid='agents-config-write-abandon']");
         });
     }
 
@@ -745,6 +908,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         SetupGateway
             .UpdateConfigurationAsync(
                 Arg.Do<UpdateAgentConfiguration>(command => submitted = command),
+                Arg.Any<AgentOperationOptions>(),
                 Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(Accepted()));
 
@@ -766,6 +930,105 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     }
 
     [Fact]
+    public async Task Retrying_after_a_lost_acknowledgment_resubmits_the_exact_payload_and_ulid_pair()
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft),
+            configurationVersion: 3);
+        AgentSetupView confirmed = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft),
+            configurationVersion: 4);
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(call =>
+            Task.FromResult(AgentSetupResult.Success(call.ArgAt<int?>(0) is null ? initial : confirmed)));
+        var commands = new List<UpdateAgentConfiguration>();
+        var options = new List<AgentOperationOptions>();
+        int submissions = 0;
+        SetupGateway.UpdateConfigurationAsync(
+                Arg.Any<UpdateAgentConfiguration>(),
+                Arg.Any<AgentOperationOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                commands.Add(call.ArgAt<UpdateAgentConfiguration>(0));
+                options.Add(call.ArgAt<AgentOperationOptions>(1));
+                submissions++;
+                return submissions == 1
+                    ? throw new InvalidOperationException("acknowledgment lost")
+                    : Task.FromResult(Accepted());
+            });
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-submit']"));
+        cut.Find("[data-testid='agents-config-display-name-input']").Change("hexa renamed");
+        cut.Find("[data-testid='agents-config-instructions-input']").Change("sensitive exact payload");
+        cut.Find("[data-testid='agents-config-submit']").Click();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-write-retry']"));
+
+        await cut.Find("[data-testid='agents-config-write-retry']").ClickAsync(new MouseEventArgs());
+
+        commands.Count.ShouldBe(2);
+        commands[1].ShouldBeSameAs(commands[0]);
+        commands[0].DisplayName.ShouldBe("hexa renamed");
+        commands[0].Instructions.ShouldBe("sensitive exact payload");
+        options.Count.ShouldBe(2);
+        options[1].ShouldBeSameAs(options[0]);
+        options[0].CorrelationId.ShouldNotBeNull().ShouldMatch("^[0-9A-HJKMNP-TV-Z]{26}$");
+        options[0].IdempotencyKey.ShouldNotBeNull().ShouldMatch("^[0-9A-HJKMNP-TV-Z]{26}$");
+        await SetupGateway.Received(1).GetSetupAsync(4, Arg.Any<CancellationToken>());
+        cut.FindAll("[data-testid='agents-config-write-state']").ShouldBeEmpty();
+        cut.Markup.ShouldNotContain("sensitive exact payload");
+    }
+
+    [Fact]
+    public async Task Response_mode_retry_reuses_the_original_mode_and_options_after_the_visible_selection_changes()
+    {
+        GivenSetup(AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3));
+        var submittedModes = new List<AgentResponseMode>();
+        var submittedOptions = new List<AgentOperationOptions>();
+        int submissions = 0;
+        SetupGateway.ConfigureResponseModeAsync(
+                Arg.Any<AgentResponseMode>(),
+                Arg.Any<AgentOperationOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                submittedModes.Add(call.ArgAt<AgentResponseMode>(0));
+                submittedOptions.Add(call.ArgAt<AgentOperationOptions>(1));
+                submissions++;
+                return submissions == 1
+                    ? throw new InvalidOperationException("acknowledgment lost")
+                    : Task.FromResult(AgentSetupWriteResult.Submitted(
+                        new AgentCommandAcceptance(
+                            "agent-1",
+                            "message-1",
+                            "correlation-1",
+                            AgentSetupTruthState.AuthoritativePending,
+                            AgentSetupWriteEffect.AlreadyApplied,
+                            3)));
+            });
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
+        cut.Find("[data-testid='agents-config-response-mode-submit']").Click();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-write-retry']"));
+
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Automatic));
+        cut.FindComponent<ResponseModeToggle>().Instance.Value.ShouldBe(AgentResponseMode.Automatic);
+        await cut.Find("[data-testid='agents-config-write-retry']").ClickAsync(new MouseEventArgs());
+
+        submittedModes.ShouldBe([AgentResponseMode.Confirmation, AgentResponseMode.Confirmation]);
+        submittedOptions.Count.ShouldBe(2);
+        submittedOptions[1].ShouldBeSameAs(submittedOptions[0]);
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldContain("Agents.Config.Write.AlreadyApplied");
+    }
+
+    [Fact]
     public async Task Sensitive_instructions_are_cleared_while_a_non_cooperative_immediate_refresh_is_in_flight()
     {
         AgentSetupView initial = AgentUiTestData.Setup(
@@ -783,7 +1046,10 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             readToken = call.ArgAt<CancellationToken>(1);
             return stalledRead.Task;
         });
-        SetupGateway.UpdateConfigurationAsync(Arg.Any<UpdateAgentConfiguration>(), Arg.Any<CancellationToken>())
+        SetupGateway.UpdateConfigurationAsync(
+                Arg.Any<UpdateAgentConfiguration>(),
+                Arg.Any<AgentOperationOptions>(),
+                Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(Accepted()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
@@ -804,7 +1070,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             cut.Find("[data-testid='agents-config-instructions-version']");
         });
 
-        Clock.Advance(TimeSpan.FromMilliseconds(4_999));
+        Clock.Advance(TimeSpan.FromMilliseconds(7_999));
         await cut.InvokeAsync(() => Task.CompletedTask);
         submission.IsCompleted.ShouldBeFalse();
 
@@ -817,7 +1083,10 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         cut.Find("[data-testid='agents-config-truth-stage']").TextContent
             .ShouldContain("Agents.Config.Truth.Stage.ProjectionConfirmed");
         cut.Find("[data-testid='agents-config-write-state']").TextContent
-            .ShouldContain("Agents.Config.Write.Submitted");
+            .ShouldContain("Agents.Config.Write.AwaitingProjection");
+        cut.Find("[data-testid='agents-config-write-refresh']");
+        cut.Find("[data-testid='agents-config-write-retry']");
+        cut.Find("[data-testid='agents-config-write-abandon']");
     }
 
     [Fact]
@@ -833,7 +1102,13 @@ public sealed class AgentConfigurationTests : AgentsTestContext
 
     private static AgentSetupWriteResult Accepted()
         => AgentSetupWriteResult.Submitted(
-            new AgentCommandAcceptance("agent-1", "message-1", "correlation-1", AgentSetupTruthState.Submitted));
+            new AgentCommandAcceptance(
+                "agent-1",
+                "message-1",
+                "correlation-1",
+                AgentSetupTruthState.AuthoritativePending,
+                AgentSetupWriteEffect.Applied,
+                4));
 
     private void GivenAcceptedWrite(Func<IAgentSetupGateway, Task<AgentSetupWriteResult>> write)
         => write(SetupGateway).Returns(Task.FromResult(Accepted()));

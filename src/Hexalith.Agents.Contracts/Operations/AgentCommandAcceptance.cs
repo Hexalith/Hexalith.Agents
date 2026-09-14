@@ -11,9 +11,13 @@ namespace Hexalith.Agents.Contracts.Operations;
 /// <param name="AgentId">The Agent the command targeted.</param>
 /// <param name="MessageId">The accepted command message identity.</param>
 /// <param name="CorrelationId">The correlation identity for tracing the accepted command.</param>
-/// <param name="TruthState">The truth stage reached by acceptance — always <see cref="AgentSetupTruthState.Submitted"/>, never a projection claim.</param>
+/// <param name="TruthState">The truth stage reached by acceptance; it never claims projection confirmation.</param>
+/// <param name="Effect">The safe effect reported by the completed domain command.</param>
+/// <param name="TargetConfigurationVersion">The authoritative configuration version produced or retained by the command.</param>
 public record AgentCommandAcceptance(
     string AgentId,
     string MessageId,
     string CorrelationId,
-    AgentSetupTruthState TruthState);
+    AgentSetupTruthState TruthState,
+    AgentSetupWriteEffect Effect = AgentSetupWriteEffect.Unknown,
+    int? TargetConfigurationVersion = null);

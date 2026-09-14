@@ -99,6 +99,21 @@ public sealed class AgentSetupQueryHandlerTests
     }
 
     [Fact]
+    public async Task A_later_projected_version_confirms_the_original_command_derived_target()
+    {
+        Seed(configurationVersion: 5, lastSequence: 8);
+
+        AgentSetupView setup = (await ExecuteAsync(
+            StatusHandler(),
+            Query(GetAgentStatusQuery.QueryType, new GetAgentStatusQuery(ExpectedConfigurationVersion: 4)))).Setup.ShouldNotBeNull();
+
+        // Ordered projection cannot reach version 5 without applying the original command-derived version 4.
+        setup.TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
+        setup.ConfigurationVersion.ShouldBe(5);
+        setup.Freshness.ShouldBe(AgentSetupFreshness.Current);
+    }
+
+    [Fact]
     public async Task Lifecycle_active_is_reported_as_a_lifecycle_flag_and_never_as_callability()
     {
         Seed(configurationVersion: 3, lastSequence: 5, lifecycle: AgentLifecycleStatus.Active);

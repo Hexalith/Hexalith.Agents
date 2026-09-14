@@ -34,7 +34,7 @@ public sealed class EventStoreAgentCommandDispatcher : IAgentCommandDispatcher
     }
 
     /// <inheritdoc />
-    public async Task DispatchAsync(CommandEnvelope envelope, CancellationToken ct)
+    public async Task<SubmitCommandResponse> DispatchAsync(CommandEnvelope envelope, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(envelope);
 
@@ -54,6 +54,6 @@ public sealed class EventStoreAgentCommandDispatcher : IAgentCommandDispatcher
             // duplicate submission is idempotent at the gateway rather than appending a second event.
             envelope.MessageId);
 
-        _ = await _gateway.SubmitCommandAsync(request, ct).ConfigureAwait(false);
+        return await _gateway.SubmitCommandAsync(request, ct).ConfigureAwait(false);
     }
 }

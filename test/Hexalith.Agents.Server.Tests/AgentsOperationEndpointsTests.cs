@@ -1,5 +1,8 @@
 namespace Hexalith.Agents.Server.Tests;
 
+using System.Net.Http.Json;
+using System.Text.Json;
+
 using Hexalith.Agents.Client;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
@@ -8,8 +11,10 @@ using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Server.Api;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 
 using NSubstitute;
@@ -20,6 +25,9 @@ using Shouldly;
 /// </summary>
 public sealed class AgentsOperationEndpointsTests
 {
+    private const string MessageId = "01ARZ3NDEKTSV4RRFFQ69G5FAV";
+    private const string CorrelationId = "01ARZ3NDEKTSV4RRFFQ69G5FAW";
+
     private static readonly string[] _poisonValues =
     [
         "DeferredAgentCommandDispatcher",
@@ -115,6 +123,55 @@ public sealed class AgentsOperationEndpointsTests
             ("agentId", "agent-1")).ConfigureAwait(true);
 
         await administration.Received(1).GetConfigurationAsync("agent-1", 7, Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_setup_write_binds_correlation_and_idempotency_headers_to_command_options()
+    {
+        IAgentAdministrationOperations administration = Substitute.For<IAgentAdministrationOperations>();
+        administration
+            .UpdateConfigurationAsync(
+                "agent-1",
+                Arg.Any<UpdateAgentConfiguration>(),
+                Arg.Any<AgentOperationOptions?>(),
+                Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(
+                AgentOperationResult<AgentCommandAcceptance>.Succeeded(
+                    new AgentCommandAcceptance(
+                        "agent-1",
+                        MessageId,
+                        CorrelationId,
+                        AgentSetupTruthState.AuthoritativePending,
+                        AgentSetupWriteEffect.Applied,
+                        4))));
+
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+        builder.Services.AddSingleton(AgentsClientWith(administration));
+        await using WebApplication app = builder.Build();
+        app.MapAgentsOperationEndpoints();
+        await app.StartAsync().ConfigureAwait(true);
+        using HttpClient client = app.GetTestClient();
+        using var request = new HttpRequestMessage(HttpMethod.Put, "/api/agents/operations/agents/agent-1")
+        {
+            Content = JsonContent.Create(new UpdateAgentConfiguration(
+                "hexa",
+                null,
+                "instructions long enough to be valid")),
+        };
+        request.Headers.Add("Idempotency-Key", MessageId);
+        request.Headers.Add("X-Correlation-ID", CorrelationId);
+
+        using HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(true);
+        response.EnsureSuccessStatusCode();
+
+        await administration.Received(1).UpdateConfigurationAsync(
+            "agent-1",
+            Arg.Any<UpdateAgentConfiguration>(),
+            Arg.Is<AgentOperationOptions?>(options => options != null
+                && options.IdempotencyKey == MessageId
+                && options.CorrelationId == CorrelationId),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]

@@ -1,5 +1,3 @@
-using System;
-
 namespace Hexalith.Agents.Server.Ports;
 
 /// <summary>
@@ -16,17 +14,4 @@ public interface IAgentCommandIdentityFactory
     /// <summary>Creates a new correlation identity for tracing.</summary>
     /// <returns>The correlation identity.</returns>
     string NewCorrelationId();
-}
-
-/// <summary>
-/// Default identity factory. Values are opaque lowercase-hex GUIDs — they carry no tenant, user, or timing
-/// information a caller could mine, and they satisfy the EventStore identifier charset.
-/// </summary>
-public sealed class AgentCommandIdentityFactory : IAgentCommandIdentityFactory
-{
-    /// <inheritdoc />
-    public string NewMessageId() => Guid.NewGuid().ToString("n");
-
-    /// <inheritdoc />
-    public string NewCorrelationId() => Guid.NewGuid().ToString("n");
 }

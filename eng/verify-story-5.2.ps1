@@ -38,9 +38,14 @@ $testProjects = @(
 # The focused Story 5.2 evidence: each filter names the suites that prove one acceptance criterion.
 $focusedSuites = @(
     @{
+        Project = 'test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj'
+        Filter  = 'FullyQualifiedName~AgentOperationContracts'
+        Gate    = 'AC1 additive receipt contracts, named effects, and legacy payload compatibility'
+    },
+    @{
         Project = 'test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj'
-        Filter  = 'FullyQualifiedName~AgentStateReplay|FullyQualifiedName~AgentLifecycleConfigurationVersion'
-        Gate    = 'AC1 aggregate replay and lifecycle configuration-version determinism'
+        Filter  = 'FullyQualifiedName~AgentStateReplay|FullyQualifiedName~AgentLifecycleConfigurationVersion|FullyQualifiedName~AgentSetupDomainResult'
+        Gate    = 'AC1 aggregate replay, result payload, and configuration-version determinism'
     },
     @{
         Project = 'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj'

@@ -3,6 +3,7 @@ namespace Hexalith.Agents.Contracts.Tests;
 using System.Reflection;
 using System.Text.Json;
 
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Operations;
 
 using Shouldly;
@@ -71,6 +72,7 @@ public sealed class AgentOperationContractsTests
             typeof(AgentCallOperationStatus),
             typeof(ProposalOperationStatus),
             typeof(AuditAvailabilityStatus),
+            typeof(AgentSetupWriteEffect),
         ];
 
         foreach (Type enumType in enumTypes)
@@ -81,6 +83,19 @@ public sealed class AgentOperationContractsTests
             string json = JsonSerializer.Serialize(nonZero, enumType);
             json.ShouldBe($"\"{nonZero}\"", $"{enumType.Name} must serialize by enum name.");
         }
+    }
+
+    [Fact]
+    public void LegacyAgentCommandAcceptanceDeserializesWithUnknownEffectAndNoTargetVersion()
+    {
+        const string Json = """
+            {"AgentId":"hexa","MessageId":"01K50HTM6DK2F7CXEXAMPLE01","CorrelationId":"01K50HTM6DK2F7CXEXAMPLE02","TruthState":1}
+            """;
+
+        AgentCommandAcceptance acceptance = JsonSerializer.Deserialize<AgentCommandAcceptance>(Json).ShouldNotBeNull();
+
+        acceptance.Effect.ShouldBe(AgentSetupWriteEffect.Unknown);
+        acceptance.TargetConfigurationVersion.ShouldBeNull();
     }
 
     [Fact]

@@ -101,7 +101,13 @@ public sealed class AgentsClientSetupGatewayTests
     [Fact]
     public async Task An_accepted_write_carries_the_servers_acceptance_and_the_submitted_stage()
     {
-        var acceptance = new AgentCommandAcceptance(AgentId, "message-1", "correlation-1", AgentSetupTruthState.Submitted);
+        var acceptance = new AgentCommandAcceptance(
+            AgentId,
+            "message-1",
+            "correlation-1",
+            AgentSetupTruthState.AuthoritativePending,
+            AgentSetupWriteEffect.Applied,
+            7);
         _administration
             .ActivateAsync(AgentId, Arg.Any<ActivateAgent>(), Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
             .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(
@@ -111,7 +117,38 @@ public sealed class AgentsClientSetupGatewayTests
 
         result.Status.ShouldBe(AgentSetupWriteStatus.Submitted);
         result.Acceptance.ShouldBe(acceptance);
-        result.TruthState.ShouldBe(AgentSetupTruthState.Submitted);
+        result.TruthState.ShouldBe(AgentSetupTruthState.AuthoritativePending);
+        result.Effect.ShouldBe(AgentSetupWriteEffect.Applied);
+        result.TargetConfigurationVersion.ShouldBe(7);
+    }
+
+    [Fact]
+    public async Task A_write_forwards_the_exact_correlation_and_idempotency_options()
+    {
+        var acceptance = new AgentCommandAcceptance(
+            AgentId,
+            "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "01ARZ3NDEKTSV4RRFFQ69G5FAW",
+            AgentSetupTruthState.AuthoritativePending,
+            AgentSetupWriteEffect.AlreadyApplied,
+            4);
+        var options = new AgentOperationOptions(
+            CorrelationId: acceptance.CorrelationId,
+            IdempotencyKey: acceptance.MessageId);
+        _administration
+            .DisableAsync(AgentId, Arg.Any<DisableAgent>(), Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(
+                AgentOperationResult<AgentCommandAcceptance>.Succeeded(acceptance)));
+
+        AgentSetupWriteResult result = await Gateway().DisableAsync(options, CancellationToken.None);
+
+        result.Status.ShouldBe(AgentSetupWriteStatus.AlreadyApplied);
+        result.Acceptance.ShouldBeSameAs(acceptance);
+        await _administration.Received(1).DisableAsync(
+            AgentId,
+            Arg.Any<DisableAgent>(),
+            Arg.Is<AgentOperationOptions?>(actual => ReferenceEquals(actual, options)),
+            Arg.Any<CancellationToken>());
     }
 
     [Theory]
@@ -120,6 +157,7 @@ public sealed class AgentsClientSetupGatewayTests
     [InlineData(AgentOperationErrorCode.ValidationFailed, AgentSetupWriteStatus.ValidationFailed)]
     [InlineData(AgentOperationErrorCode.Conflict, AgentSetupWriteStatus.Conflict)]
     [InlineData(AgentOperationErrorCode.Unavailable, AgentSetupWriteStatus.Unavailable)]
+    [InlineData(AgentOperationErrorCode.UnableToVerify, AgentSetupWriteStatus.UnableToVerify)]
     public async Task A_failed_write_keeps_its_typed_status_and_carries_no_acceptance(
         AgentOperationErrorCode code,
         AgentSetupWriteStatus expected)

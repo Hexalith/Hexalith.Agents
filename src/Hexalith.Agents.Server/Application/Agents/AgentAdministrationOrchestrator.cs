@@ -123,9 +123,9 @@ public sealed class AgentAdministrationOrchestrator
             request.ActorUserId,
             BuildTrustedExtensions(request.ClientSuppliedExtensions));
 
-        await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
+        SubmitCommandResponse receipt = await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
 
-        return AgentAdministrationOutcome.FromDispatch();
+        return AgentAdministrationOutcome.FromDispatch(receipt);
     }
 
     private static Dictionary<string, string> BuildTrustedExtensions(IReadOnlyDictionary<string, string>? clientSupplied)

@@ -110,6 +110,15 @@ public sealed class LocalizationResourceTests
             }
         }
 
+        foreach (AgentSetupWriteStatus status in Enum.GetValues<AgentSetupWriteStatus>())
+        {
+            yield return $"Agents.Config.Write.{status}";
+        }
+
+        yield return "Agents.Config.Write.Refresh";
+        yield return "Agents.Config.Write.Retry";
+        yield return "Agents.Config.Write.Abandon";
+
         foreach (AgentSurfaceKind kind in Enum.GetValues<AgentSurfaceKind>())
         {
             yield return $"Agents.Surface.{kind}.Title";

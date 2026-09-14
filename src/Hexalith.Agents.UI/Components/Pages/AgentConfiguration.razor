@@ -4,6 +4,7 @@
 @inject IStringLocalizer<AgentsResources> Localizer
 @inject IAgentSetupGateway Gateway
 @inject TimeProvider TimeProvider
+@inject IUlidFactory UlidFactory
 
 @* hexa configuration (AC4, AC5, AC6; Story 5.2): a constrained Fluent form (UX-DR15). Identity/instructions/
    provider/content-safety surface presence/validity/version only — never the instruction text or policy content
@@ -22,6 +23,46 @@
                       Eyebrow="@Localizer["Agents.Config.Eyebrow"]"
                       Description="@Localizer["Agents.Config.Description"]"
                       TestId="agents-config-header" />
+
+        @if (_pendingWrite is { } pending)
+        {
+            <FluentStack Orientation="Orientation.Vertical"
+                         VerticalGap="8px"
+                         role="status"
+                         aria-live="polite"
+                         data-testid="agents-config-write-recovery">
+                <FluentText data-testid="agents-config-write-state">
+                    @Localizer[$"Agents.Config.Write.{pending.Status}"]
+                </FluentText>
+                @if (_activeAttempt is not null)
+                {
+                    <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="8px">
+                        @if (pending.Status == AgentSetupWriteStatus.AwaitingProjection
+                            && pending.TargetConfigurationVersion is not null)
+                        {
+                            <FluentButton Appearance="ButtonAppearance.Outline"
+                                          Disabled="@_busy"
+                                          OnClick="RefreshPendingAsync"
+                                          data-testid="agents-config-write-refresh">
+                                @Localizer["Agents.Config.Write.Refresh"]
+                            </FluentButton>
+                        }
+                        <FluentButton Appearance="ButtonAppearance.Outline"
+                                      Disabled="@_busy"
+                                      OnClick="RetryAttemptAsync"
+                                      data-testid="agents-config-write-retry">
+                            @Localizer["Agents.Config.Write.Retry"]
+                        </FluentButton>
+                        <FluentButton Appearance="ButtonAppearance.Subtle"
+                                      Disabled="@_busy"
+                                      OnClick="AbandonAttempt"
+                                      data-testid="agents-config-write-abandon">
+                            @Localizer["Agents.Config.Write.Abandon"]
+                        </FluentButton>
+                    </FluentStack>
+                }
+            </FluentStack>
+        }
 
         @if (_result is null)
         {
@@ -88,7 +129,7 @@
                     @Localizer["Agents.Config.Instructions.ReplaceNote"]
                 </p>
                 <FluentButton Appearance="ButtonAppearance.Primary"
-                              Disabled="@(_busy || string.IsNullOrWhiteSpace(_instructionsDraft))"
+                              Disabled="@(_busy || HasUnresolvedAttempt || string.IsNullOrWhiteSpace(_instructionsDraft))"
                               OnClick="SubmitConfigurationAsync"
                               data-testid="agents-config-submit">
                     @Localizer["Agents.Config.Edit.Submit"]
@@ -121,10 +162,6 @@
                     <dt>@Localizer["Agents.Config.Truth.Freshness.Label"]</dt>
                     <dd data-testid="agents-config-freshness">@Localizer[$"Agents.Config.Truth.Freshness.{setup.Freshness}"]</dd>
                 </dl>
-                @if (_pendingWrite is { } pending)
-                {
-                    <p data-testid="agents-config-write-state">@Localizer[$"Agents.Config.Write.{pending.Status}"]</p>
-                }
             </section>
 
             <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.ResponseMode"]">
@@ -132,7 +169,7 @@
                 <ResponseModeToggle Value="@_responseMode" ValueChanged="OnResponseModeChanged" Name="agents-config-response-mode" />
                 <p class="agents-config__note">@Localizer["Agents.Config.ResponseMode.FutureOnlyNote"]</p>
                 <FluentButton Appearance="ButtonAppearance.Primary"
-                              Disabled="@(_busy || _responseMode == agent.ResponseMode)"
+                              Disabled="@(_busy || HasUnresolvedAttempt || _responseMode == agent.ResponseMode)"
                               OnClick="SubmitResponseModeAsync"
                               data-testid="agents-config-response-mode-submit">
                     @Localizer["Agents.Config.ResponseMode.Submit"]
@@ -198,13 +235,13 @@
                 @* Activation is a distinct action shown after validity is visible. Activating sets a lifecycle
                    flag; it never means the Agent can be called, and the note says so on every render. *@
                 <FluentButton Appearance="ButtonAppearance.Primary"
-                              Disabled="@(_busy || agent.Lifecycle == AgentLifecycleStatus.Active)"
+                              Disabled="@(_busy || HasUnresolvedAttempt || agent.Lifecycle == AgentLifecycleStatus.Active)"
                               OnClick="ActivateAsync"
                               data-testid="agents-config-activate">
                     @Localizer["Agents.Config.Activation.Label"]
                 </FluentButton>
                 <FluentButton Appearance="ButtonAppearance.Outline"
-                              Disabled="@(_busy || agent.Lifecycle == AgentLifecycleStatus.Disabled)"
+                              Disabled="@(_busy || HasUnresolvedAttempt || agent.Lifecycle == AgentLifecycleStatus.Disabled)"
                               OnClick="DisableAsync"
                               data-testid="agents-config-disable">
                     @Localizer["Agents.Config.Disable.Label"]
@@ -220,12 +257,13 @@
 @code {
     private const string HeadingId = "agents-config-heading";
     private static readonly TimeSpan ProjectionPollingInterval = TimeSpan.FromMilliseconds(250);
-    private static readonly TimeSpan ProjectionPollingTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan ProjectionPollingTimeout = TimeSpan.FromSeconds(8);
 
     private readonly CancellationTokenSource _lifetimeCancellation = new();
     private FcPageHeader? _header;
     private AgentSetupResult? _result;
     private AgentSetupWriteResult? _pendingWrite;
+    private AgentSetupAttempt? _activeAttempt;
     private AgentResponseMode _responseMode = AgentResponseMode.Unknown;
     private string _displayNameDraft = string.Empty;
     private string _descriptionDraft = string.Empty;
@@ -233,6 +271,8 @@
     private bool _focusHeadingPending = true;
     private bool _busy;
     private bool _disposed;
+
+    private bool HasUnresolvedAttempt => _activeAttempt is not null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -277,11 +317,14 @@
             _instructionsDraft);
         _instructionsDraft = string.Empty;
 
-        await SubmitAsync(ct => Gateway.UpdateConfigurationAsync(command, ct)).ConfigureAwait(false);
+        await SubmitAsync((options, ct) => Gateway.UpdateConfigurationAsync(command, options, ct)).ConfigureAwait(false);
     }
 
     private Task SubmitResponseModeAsync()
-        => SubmitAsync(ct => Gateway.ConfigureResponseModeAsync(_responseMode, ct));
+    {
+        AgentResponseMode mode = _responseMode;
+        return SubmitAsync((options, ct) => Gateway.ConfigureResponseModeAsync(mode, options, ct));
+    }
 
     private Task ActivateAsync()
         => SubmitAsync(Gateway.ActivateAsync);
@@ -292,41 +335,64 @@
     // Every write follows the same truth flow: submit, record the accepted identity as Submitted, then re-read at
     // the version that write is expected to produce. The re-read is what decides whether the page shows
     // authoritative-pending or projection-confirmed — the write itself never claims durable truth.
-    private async Task SubmitAsync(Func<CancellationToken, Task<AgentSetupWriteResult>> write)
+    private Task SubmitAsync(Func<AgentOperationOptions, CancellationToken, Task<AgentSetupWriteResult>> write)
     {
-        if (_busy)
+        if (_busy || _activeAttempt is not null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
+        var options = new AgentOperationOptions(
+            CorrelationId: UlidFactory.NewUlid(),
+            IdempotencyKey: UlidFactory.NewUlid());
+        var attempt = new AgentSetupAttempt(options, write);
+        _pendingWrite = null;
+        _activeAttempt = attempt;
+        return ExecuteAttemptAsync(attempt);
+    }
+
+    private async Task ExecuteAttemptAsync(AgentSetupAttempt attempt)
+    {
         _busy = true;
         try
         {
             CancellationToken cancellationToken = _lifetimeCancellation.Token;
 
-            // Every accepted setup write, including a lifecycle transition, bumps the configuration version once.
-            int? expectedVersion = _result?.Setup is { } setup
-                ? setup.ConfigurationVersion + 1
-                : null;
-
-            AgentSetupWriteResult writeResult = await write(cancellationToken)
+            AgentSetupWriteResult writeResult = await attempt.Submit(attempt.Options, cancellationToken)
                 .WaitAsync(cancellationToken)
                 .ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
             _pendingWrite = writeResult;
-            if (_pendingWrite.Status is AgentSetupWriteStatus.Submitted)
+            if (writeResult.Status == AgentSetupWriteStatus.AlreadyApplied)
+            {
+                _activeAttempt = null;
+            }
+            else if (writeResult.Status == AgentSetupWriteStatus.Submitted
+                && writeResult.Acceptance is { } acceptance
+                && writeResult.TargetConfigurationVersion is int targetVersion)
             {
                 await RequestRenderAsync(cancellationToken).ConfigureAwait(false);
-                bool projectionConfirmed = await RefreshAfterWriteAsync(expectedVersion, cancellationToken)
+                AgentSetupTruthState refreshState = await RefreshAfterWriteAsync(targetVersion, cancellationToken)
                     .ConfigureAwait(false);
 
-                // Once the catch-up read shows durable truth, the submitted notice has been superseded and would
-                // otherwise leave the page claiming a write is still in flight.
-                if (projectionConfirmed)
+                if (refreshState == AgentSetupTruthState.ProjectionConfirmed)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     _pendingWrite = null;
+                    _activeAttempt = null;
                 }
+                else if (refreshState == AgentSetupTruthState.AuthoritativePending)
+                {
+                    _pendingWrite = AgentSetupWriteResult.AwaitingProjection(acceptance);
+                }
+            }
+            else if (writeResult.Status == AgentSetupWriteStatus.Submitted)
+            {
+                _pendingWrite = AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify);
+            }
+            else if (IsTerminalWriteFailure(writeResult.Status))
+            {
+                _activeAttempt = null;
             }
         }
         catch (OperationCanceledException) when (_disposed)
@@ -351,9 +417,81 @@
         }
     }
 
-    private async Task<bool> RefreshAfterWriteAsync(
+    private Task RetryAttemptAsync()
+        => _activeAttempt is { } attempt && !_busy
+            ? ExecuteAttemptAsync(attempt)
+            : Task.CompletedTask;
+
+    private async Task RefreshPendingAsync()
+    {
+        if (_busy
+            || _pendingWrite?.Acceptance is not { } acceptance
+            || _pendingWrite.TargetConfigurationVersion is not int targetVersion)
+        {
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            CancellationToken cancellationToken = _lifetimeCancellation.Token;
+            AgentSetupTruthState refreshState = await RefreshAfterWriteAsync(
+                    targetVersion,
+                    cancellationToken,
+                    applyAuthoritativeDrafts: false)
+                .ConfigureAwait(false);
+            if (refreshState == AgentSetupTruthState.ProjectionConfirmed)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                _pendingWrite = null;
+                _activeAttempt = null;
+            }
+            else if (refreshState == AgentSetupTruthState.AuthoritativePending)
+            {
+                _pendingWrite = AgentSetupWriteResult.AwaitingProjection(acceptance);
+            }
+        }
+        catch (OperationCanceledException) when (_disposed)
+        {
+            // Component disposal owns this cancellation.
+        }
+        catch (Exception)
+        {
+            if (!_disposed)
+            {
+                _pendingWrite = AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
+            }
+        }
+        finally
+        {
+            if (!_disposed)
+            {
+                _busy = false;
+            }
+        }
+    }
+
+    private void AbandonAttempt()
+    {
+        if (_busy)
+        {
+            return;
+        }
+
+        _activeAttempt = null;
+        _pendingWrite = null;
+    }
+
+    private static bool IsTerminalWriteFailure(AgentSetupWriteStatus status)
+        => status is AgentSetupWriteStatus.NotAuthorized
+            or AgentSetupWriteStatus.NotFound
+            or AgentSetupWriteStatus.ValidationFailed
+            or AgentSetupWriteStatus.Conflict;
+
+    private async Task<AgentSetupTruthState> RefreshAfterWriteAsync(
         int? expectedConfigurationVersion,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool applyAuthoritativeDrafts = true)
     {
         using CancellationTokenSource timeoutCancellation = new(ProjectionPollingTimeout, TimeProvider);
         using CancellationTokenSource pollingCancellation = CancellationTokenSource.CreateLinkedTokenSource(
@@ -365,10 +503,10 @@
             await LoadAsync(
                 expectedConfigurationVersion,
                 pollingCancellation.Token,
-                applyAuthoritativeDrafts: true).ConfigureAwait(false);
+                applyAuthoritativeDrafts).ConfigureAwait(false);
             if (_result?.Setup is not { TruthState: AgentSetupTruthState.AuthoritativePending })
             {
-                return _result?.Setup is { TruthState: AgentSetupTruthState.ProjectionConfirmed };
+                return _result?.Setup?.TruthState ?? AgentSetupTruthState.Unknown;
             }
 
             await RequestRenderAsync(pollingCancellation.Token).ConfigureAwait(false);
@@ -381,13 +519,13 @@
                     applyAuthoritativeDrafts: false).ConfigureAwait(false);
             }
 
-            return _result?.Setup is { TruthState: AgentSetupTruthState.ProjectionConfirmed };
+            return _result?.Setup?.TruthState ?? AgentSetupTruthState.Unknown;
         }
         catch (OperationCanceledException) when (
             timeoutCancellation.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
         {
             // Exhaustion preserves the last authoritative-pending view and its Submitted notice.
-            return false;
+            return AgentSetupTruthState.AuthoritativePending;
         }
     }
 

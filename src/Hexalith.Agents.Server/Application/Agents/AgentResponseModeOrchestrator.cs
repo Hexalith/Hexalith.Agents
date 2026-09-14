@@ -74,9 +74,9 @@ public sealed class AgentResponseModeOrchestrator
             request.ActorUserId,
             BuildTrustedExtensions(request.ClientSuppliedExtensions));
 
-        await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
+        SubmitCommandResponse receipt = await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
 
-        return AgentResponseModeOutcome.FromDispatch();
+        return AgentResponseModeOutcome.FromDispatch(receipt);
     }
 
     // Copies the client-supplied extensions with the reserved keys removed, then repopulates only the trusted

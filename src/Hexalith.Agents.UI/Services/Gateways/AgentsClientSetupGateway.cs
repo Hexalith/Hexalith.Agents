@@ -59,30 +59,66 @@ public sealed class AgentsClientSetupGateway(
 
     /// <inheritdoc />
     public Task<AgentSetupWriteResult> UpdateConfigurationAsync(UpdateAgentConfiguration command, CancellationToken cancellationToken)
+        => UpdateConfigurationAsync(command, new AgentOperationOptions(), cancellationToken);
+
+    /// <inheritdoc />
+    public Task<AgentSetupWriteResult> UpdateConfigurationAsync(
+        UpdateAgentConfiguration command,
+        AgentOperationOptions options,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(options);
         return WriteAsync(
-            (agentId, ct) => _client.AgentAdministration.UpdateConfigurationAsync(agentId, command, cancellationToken: ct),
+            (agentId, ct) => _client.AgentAdministration.UpdateConfigurationAsync(agentId, command, options, ct),
             cancellationToken);
     }
 
     /// <inheritdoc />
     public Task<AgentSetupWriteResult> ConfigureResponseModeAsync(AgentResponseMode mode, CancellationToken cancellationToken)
-        => WriteAsync(
-            (agentId, ct) => _client.AgentAdministration.ConfigureResponseModeAsync(agentId, new ConfigureAgentResponseMode(mode), cancellationToken: ct),
+        => ConfigureResponseModeAsync(mode, new AgentOperationOptions(), cancellationToken);
+
+    /// <inheritdoc />
+    public Task<AgentSetupWriteResult> ConfigureResponseModeAsync(
+        AgentResponseMode mode,
+        AgentOperationOptions options,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        return WriteAsync(
+            (agentId, ct) => _client.AgentAdministration.ConfigureResponseModeAsync(
+                agentId,
+                new ConfigureAgentResponseMode(mode),
+                options,
+                ct),
             cancellationToken);
+    }
 
     /// <inheritdoc />
     public Task<AgentSetupWriteResult> ActivateAsync(CancellationToken cancellationToken)
-        => WriteAsync(
-            (agentId, ct) => _client.AgentAdministration.ActivateAsync(agentId, new ActivateAgent(), cancellationToken: ct),
+        => ActivateAsync(new AgentOperationOptions(), cancellationToken);
+
+    /// <inheritdoc />
+    public Task<AgentSetupWriteResult> ActivateAsync(AgentOperationOptions options, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        return WriteAsync(
+            (agentId, ct) => _client.AgentAdministration.ActivateAsync(agentId, new ActivateAgent(), options, ct),
             cancellationToken);
+    }
 
     /// <inheritdoc />
     public Task<AgentSetupWriteResult> DisableAsync(CancellationToken cancellationToken)
-        => WriteAsync(
-            (agentId, ct) => _client.AgentAdministration.DisableAsync(agentId, new DisableAgent(), cancellationToken: ct),
+        => DisableAsync(new AgentOperationOptions(), cancellationToken);
+
+    /// <inheritdoc />
+    public Task<AgentSetupWriteResult> DisableAsync(AgentOperationOptions options, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        return WriteAsync(
+            (agentId, ct) => _client.AgentAdministration.DisableAsync(agentId, new DisableAgent(), options, ct),
             cancellationToken);
+    }
 
     private string? AgentId => string.IsNullOrWhiteSpace(_options.Value.AgentId) ? null : _options.Value.AgentId;
 
@@ -106,6 +142,7 @@ public sealed class AgentsClientSetupGateway(
             AgentOperationStatus.NotFound => AgentSetupWriteStatus.NotFound,
             AgentOperationStatus.ValidationFailed => AgentSetupWriteStatus.ValidationFailed,
             AgentOperationStatus.Conflict or AgentOperationStatus.Stale => AgentSetupWriteStatus.Conflict,
+            AgentOperationStatus.UnableToVerify => AgentSetupWriteStatus.UnableToVerify,
             _ => AgentSetupWriteStatus.Unavailable,
         };
 

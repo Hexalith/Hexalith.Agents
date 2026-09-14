@@ -2,8 +2,9 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'ready-for-dev'
+status: 'done'
 route: 'dispatch'
+baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
 review_loop_iteration: 0
 context:
   - '_bmad-output/implementation-artifacts/epic-5-context.md'
@@ -54,10 +55,10 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/Hexalith.Agents/Agent/` -- emit bounded applied/no-op result payloads for every live setup mutation.
-- [ ] `src/Hexalith.Agents.Contracts/`, `Server/`, and `Client/` -- preserve canonical receipts and expose only identity, target version, and safe effect.
-- [ ] `src/Hexalith.Agents.UI/` -- implement retained-key exact-intent handling, bounded catch-up, no-op termination, and accessible recovery.
-- [ ] `test/` and `eng/verify-story-5.2.ps1` -- prove the matrix, no-disclosure, compatible serialization, replay, and persisted end state.
+- [x] `src/Hexalith.Agents/Agent/` -- emit bounded applied/no-op result payloads for every live setup mutation.
+- [x] `src/Hexalith.Agents.Contracts/`, `Server/`, and `Client/` -- preserve canonical receipts and expose only identity, target version, and safe effect.
+- [x] `src/Hexalith.Agents.UI/` -- implement retained-key exact-intent handling, bounded catch-up, no-op termination, and accessible recovery.
+- [x] `test/` and `eng/verify-story-5.2.ps1` -- prove the matrix, no-disclosure, compatible serialization, replay, and persisted end state.
 
 **Acceptance Criteria:**
 - Given an applied setup command, when EventStore completes it, then public acceptance carries its canonical receipt and authoritative resulting version.
@@ -68,7 +69,21 @@ context:
 
 ## Spec Change Log
 
+- 2026-09-14: Corrected the verification lanes to use project references only for Debug development builds and package references for Release builds, as required by the loaded repository instructions. Intent and acceptance criteria are unchanged.
+
 ## Review Triage Log
+
+| Reviewer | Finding | Verdict | Route | Evidence |
+| --- | --- | --- | --- | --- |
+| edge-case | A previous terminal/no-op write remains visible while a new attempt is awaiting its receipt. | medium | patch | `SubmitAsync` creates `_activeAttempt` without clearing `_pendingWrite`; after a terminal/no-op result clears only the attempt, a later slow submission can display the earlier outcome as current. |
+| edge-case | `AgentSetupWriteResult.Failed` accepts `AlreadyApplied` without acceptance evidence. | low | reject | No production caller passes a success-like status to `Failed`; guarding this hypothetical public-factory misuse would add an invariant branch for a path not exercised by the implementation. |
+| edge-case | `ConfigurationVersion + 1` can overflow at `int.MaxValue`. | low | reject | The theoretical overflow predates this story across the aggregate's versioned events and requires more than two billion setup mutations; a new exhaustion policy is disproportionate to this slice. |
+| verification-gap | Live setup handlers are not individually verified to emit matching effect/version result payloads. | medium | patch | Only `UpdateAgentConfiguration` currently asserts `ResultPayload`; another handler could retain the correct event version while returning a stale command target and falsely confirm an older projection. |
+| verification-gap | The invalid-idempotency test exits at invalid correlation validation first. | medium | patch | No authorized test reaches the message-id branch with a valid correlation ULID and malformed idempotency key, so that guard could regress unnoticed. |
+| verification-gap | Manual awaiting-projection refresh is rendered but never exercised. | medium | patch | Tests assert only that the refresh button exists; they do not prove it reads the retained target, avoids resubmission, and clears recovery after confirmation. |
+| verification-gap | Response-mode retry does not verify retention of the original mode. | medium | patch | Exact payload/ULID retry is tested only for configuration updates; closing over mutable `_responseMode` would reuse one key for two intents without failing current tests. |
+| verification-gap | Real localization tests omit the new configuration recovery keys. | low | patch | Component tests use a permissive stub, while real-resource enumeration does not resolve `Agents.Config.Write.*` or the three recovery actions in both languages. |
+| verification-gap-other | Manual refresh overwrites unsaved drafts after polling exhaustion. | medium | patch | `RefreshPendingAsync` reaches `RefreshAfterWriteAsync`, whose first read applies authoritative drafts; editable draft fields can therefore be silently reset by the new recovery action. |
 
 ## Design Notes
 
@@ -80,5 +95,6 @@ A later projected version confirms a command-derived target because ordered proj
 
 **Commands:**
 - `pwsh ./eng/verify-story-5.2.ps1` -- expected: all named Story 5.2 domain, contract, server, UI, replay, and persisted read-model gates pass.
-- `dotnet build Hexalith.Agents.slnx --configuration Release -warnaserror -p:UseHexalithProjectReferences=true` -- expected: warning-free source-mode build with additive contracts.
+- `dotnet build Hexalith.Agents.slnx --configuration Debug -warnaserror -p:UseHexalithProjectReferences=true -p:NuGetAudit=false` -- expected: warning-free source-mode development build with additive contracts.
+- `dotnet build Hexalith.Agents.slnx --configuration Release -warnaserror -p:UseHexalithProjectReferences=false -p:NuGetAudit=false` -- expected: warning-free package-mode release build.
 - `git diff --check` in each owning repository -- expected: no whitespace errors.

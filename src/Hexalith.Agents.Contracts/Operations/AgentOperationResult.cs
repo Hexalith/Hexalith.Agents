@@ -41,6 +41,7 @@ public sealed record AgentOperationResult(
             AgentOperationErrorCode.Unavailable => AgentOperationStatus.Unavailable,
             AgentOperationErrorCode.Rejected => AgentOperationStatus.Rejected,
             AgentOperationErrorCode.Blocked => AgentOperationStatus.Blocked,
+            AgentOperationErrorCode.UnableToVerify => AgentOperationStatus.UnableToVerify,
             _ => AgentOperationStatus.Unknown,
         };
 }

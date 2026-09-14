@@ -31,7 +31,7 @@ public sealed class EventStoreAgentCommandDispatcherTests
     {
         CaptureSubmit();
 
-        await Dispatcher().DispatchAsync(Envelope(), CancellationToken.None);
+        SubmitCommandResponse receipt = await Dispatcher().DispatchAsync(Envelope(), CancellationToken.None);
 
         SubmitCommandRequest request = _submitted.ShouldNotBeNull();
         request.MessageId.ShouldBe("msg-1");
@@ -41,6 +41,8 @@ public sealed class EventStoreAgentCommandDispatcherTests
         request.AggregateId.ShouldBe("hexa");
         request.CommandType.ShouldBe("DisableAgent");
         request.Extensions.ShouldNotBeNull()["actor:agentsAdmin"].ShouldBe("true");
+        receipt.MessageId.ShouldBe("msg-1");
+        receipt.CorrelationId.ShouldBe("corr-1");
     }
 
     [Fact]

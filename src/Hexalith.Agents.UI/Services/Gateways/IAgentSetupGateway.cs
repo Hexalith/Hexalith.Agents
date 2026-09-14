@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
+using Hexalith.Agents.Contracts.Operations;
 
 namespace Hexalith.Agents.UI.Services.Gateways;
 
@@ -59,19 +60,51 @@ public interface IAgentSetupGateway
     /// <returns>The fail-closed write result.</returns>
     Task<AgentSetupWriteResult> UpdateConfigurationAsync(UpdateAgentConfiguration command, CancellationToken cancellationToken);
 
+    /// <summary>Submits a safe configuration metadata change with retained command metadata.</summary>
+    /// <param name="command">The exact update payload.</param>
+    /// <param name="options">The retained idempotency and correlation identities.</param>
+    /// <param name="cancellationToken">Cancellation token for the in-flight write.</param>
+    /// <returns>The fail-closed write result.</returns>
+    Task<AgentSetupWriteResult> UpdateConfigurationAsync(
+        UpdateAgentConfiguration command,
+        AgentOperationOptions options,
+        CancellationToken cancellationToken);
+
     /// <summary>Submits a Response Mode change, which affects future Agent Calls only.</summary>
     /// <param name="mode">The chosen Response Mode.</param>
     /// <param name="cancellationToken">Cancellation token for the in-flight write.</param>
     /// <returns>The fail-closed write result.</returns>
     Task<AgentSetupWriteResult> ConfigureResponseModeAsync(AgentResponseMode mode, CancellationToken cancellationToken);
 
+    /// <summary>Submits a Response Mode change with retained command metadata.</summary>
+    /// <param name="mode">The exact chosen Response Mode.</param>
+    /// <param name="options">The retained idempotency and correlation identities.</param>
+    /// <param name="cancellationToken">Cancellation token for the in-flight write.</param>
+    /// <returns>The fail-closed write result.</returns>
+    Task<AgentSetupWriteResult> ConfigureResponseModeAsync(
+        AgentResponseMode mode,
+        AgentOperationOptions options,
+        CancellationToken cancellationToken);
+
     /// <summary>Submits an activation. Acceptance is a lifecycle transition, never a callability claim.</summary>
     /// <param name="cancellationToken">Cancellation token for the in-flight write.</param>
     /// <returns>The fail-closed write result.</returns>
     Task<AgentSetupWriteResult> ActivateAsync(CancellationToken cancellationToken);
 
+    /// <summary>Submits an activation with retained command metadata.</summary>
+    /// <param name="options">The retained idempotency and correlation identities.</param>
+    /// <param name="cancellationToken">Cancellation token for the in-flight write.</param>
+    /// <returns>The fail-closed write result.</returns>
+    Task<AgentSetupWriteResult> ActivateAsync(AgentOperationOptions options, CancellationToken cancellationToken);
+
     /// <summary>Submits a disable.</summary>
     /// <param name="cancellationToken">Cancellation token for the in-flight write.</param>
     /// <returns>The fail-closed write result.</returns>
     Task<AgentSetupWriteResult> DisableAsync(CancellationToken cancellationToken);
+
+    /// <summary>Submits a disable with retained command metadata.</summary>
+    /// <param name="options">The retained idempotency and correlation identities.</param>
+    /// <param name="cancellationToken">Cancellation token for the in-flight write.</param>
+    /// <returns>The fail-closed write result.</returns>
+    Task<AgentSetupWriteResult> DisableAsync(AgentOperationOptions options, CancellationToken cancellationToken);
 }

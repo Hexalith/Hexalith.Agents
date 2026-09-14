@@ -136,6 +136,9 @@
   <data name="Agents.ProviderCatalog.Write.Status.NotFound" xml:space="preserve"><value>The catalog entry was not found.</value></data>
   <data name="Agents.ProviderCatalog.Write.Status.Conflict" xml:space="preserve"><value>The catalog write conflicted with a concurrent change.</value></data>
   <data name="Agents.ProviderCatalog.Write.Status.Unavailable" xml:space="preserve"><value>The catalog write path is unavailable.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.AlreadyApplied" xml:space="preserve"><value>No catalog change was needed because the exact entry state was already applied.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.AwaitingProjection" xml:space="preserve"><value>The catalog command completed and is awaiting projection.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.UnableToVerify" xml:space="preserve"><value>The exact catalog command outcome could not be verified.</value></data>
   <data name="Agents.ProviderCatalog.Truth.Stage.Unknown" xml:space="preserve"><value>Catalog truth is not established.</value></data>
   <data name="Agents.ProviderCatalog.Truth.Stage.Submitted" xml:space="preserve"><value>Submitted — accepted for processing, not yet durable evidence.</value></data>
   <data name="Agents.ProviderCatalog.Truth.Stage.AuthoritativePending" xml:space="preserve"><value>Authoritative pending — accepted, but the projection has not caught up.</value></data>
@@ -235,7 +238,13 @@
   <data name="Agents.Config.Write.NotFound" xml:space="preserve"><value>No matching hexa was found. Nothing was changed.</value></data>
   <data name="Agents.Config.Write.ValidationFailed" xml:space="preserve"><value>The submitted values are not valid. Nothing was changed.</value></data>
   <data name="Agents.Config.Write.Conflict" xml:space="preserve"><value>The change conflicted with a concurrent update. Nothing was changed.</value></data>
-  <data name="Agents.Config.Write.Unavailable" xml:space="preserve"><value>The configuration service is unavailable. Nothing was changed.</value></data>
+  <data name="Agents.Config.Write.Unavailable" xml:space="preserve"><value>The configuration service is unavailable, so the command outcome is unknown. Retry this exact attempt or abandon it before submitting a different change.</value></data>
+  <data name="Agents.Config.Write.AlreadyApplied" xml:space="preserve"><value>No change was needed. This exact setup was already applied.</value></data>
+  <data name="Agents.Config.Write.AwaitingProjection" xml:space="preserve"><value>The command completed, but its exact outcome is still awaiting projection.</value></data>
+  <data name="Agents.Config.Write.UnableToVerify" xml:space="preserve"><value>The command outcome could not be verified. Retry the same attempt or abandon it before submitting a different change.</value></data>
+  <data name="Agents.Config.Write.Refresh" xml:space="preserve"><value>Refresh projected setup</value></data>
+  <data name="Agents.Config.Write.Retry" xml:space="preserve"><value>Retry this exact attempt</value></data>
+  <data name="Agents.Config.Write.Abandon" xml:space="preserve"><value>Abandon this attempt</value></data>
 
   <!-- Approver policy builder (AC4) -->
   <data name="Agents.ApproverPolicy.Title" xml:space="preserve"><value>Approver policy</value></data>

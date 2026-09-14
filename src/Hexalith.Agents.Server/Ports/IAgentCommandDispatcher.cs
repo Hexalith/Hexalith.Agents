@@ -16,6 +16,6 @@ public interface IAgentCommandDispatcher
     /// <summary>Dispatches the command envelope through the EventStore command path.</summary>
     /// <param name="envelope">The fully-built command envelope (with server-populated trusted extensions).</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task that completes when the command has been dispatched.</returns>
-    Task DispatchAsync(CommandEnvelope envelope, CancellationToken ct);
+    /// <returns>The canonical EventStore receipt for the completed submission.</returns>
+    Task<SubmitCommandResponse> DispatchAsync(CommandEnvelope envelope, CancellationToken ct);
 }

@@ -16,7 +16,7 @@ namespace Hexalith.Agents.Server.Ports;
 public sealed class DeferredAgentCommandDispatcher : IAgentCommandDispatcher
 {
     /// <inheritdoc />
-    public Task DispatchAsync(CommandEnvelope envelope, CancellationToken ct)
+    public Task<SubmitCommandResponse> DispatchAsync(CommandEnvelope envelope, CancellationToken ct)
         => throw new NotSupportedException(
             "The live Agents command dispatcher is not wired yet (Story 1.4 defers the DAPR/EventStore command-path "
             + "binding, mirroring Story 1.2/1.3). Register a concrete IAgentCommandDispatcher in the operational-topology story.");

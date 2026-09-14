@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
+using Hexalith.Agents.Contracts.Operations;
 
 namespace Hexalith.Agents.UI.Services.Gateways;
 
@@ -37,7 +38,21 @@ public sealed class DeferredAgentSetupGateway : IAgentSetupGateway
         => Unavailable();
 
     /// <inheritdoc />
+    public Task<AgentSetupWriteResult> UpdateConfigurationAsync(
+        UpdateAgentConfiguration command,
+        AgentOperationOptions options,
+        CancellationToken cancellationToken)
+        => Unavailable();
+
+    /// <inheritdoc />
     public Task<AgentSetupWriteResult> ConfigureResponseModeAsync(AgentResponseMode mode, CancellationToken cancellationToken)
+        => Unavailable();
+
+    /// <inheritdoc />
+    public Task<AgentSetupWriteResult> ConfigureResponseModeAsync(
+        AgentResponseMode mode,
+        AgentOperationOptions options,
+        CancellationToken cancellationToken)
         => Unavailable();
 
     /// <inheritdoc />
@@ -45,7 +60,15 @@ public sealed class DeferredAgentSetupGateway : IAgentSetupGateway
         => Unavailable();
 
     /// <inheritdoc />
+    public Task<AgentSetupWriteResult> ActivateAsync(AgentOperationOptions options, CancellationToken cancellationToken)
+        => Unavailable();
+
+    /// <inheritdoc />
     public Task<AgentSetupWriteResult> DisableAsync(CancellationToken cancellationToken)
+        => Unavailable();
+
+    /// <inheritdoc />
+    public Task<AgentSetupWriteResult> DisableAsync(AgentOperationOptions options, CancellationToken cancellationToken)
         => Unavailable();
 
     private static Task<AgentSetupWriteResult> Unavailable()

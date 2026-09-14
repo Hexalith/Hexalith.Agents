@@ -21,6 +21,10 @@
     <PackageReference Include="Hexalith.EventStore.DomainService" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NUlid" />
+  </ItemGroup>
+
   <!-- Story 1.4: the Party validation/provisioning adapter consumes only the PUBLIC Hexalith.Parties client +
        contracts (server/projection internals stay off-limits). Sibling source via the $(HexalithPartiesRoot)
        discovery block in Directory.Build.props — never a NuGet PackageReference. These refs are out-of-module

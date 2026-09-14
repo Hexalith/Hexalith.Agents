@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Hexalith.Agents.Server\Hexalith.Agents.Server.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(HexalithConversationsFromSource)' != 'true'">

@@ -136,6 +136,9 @@
   <data name="Agents.ProviderCatalog.Write.Status.NotFound" xml:space="preserve"><value>L'entrée du catalogue est introuvable.</value></data>
   <data name="Agents.ProviderCatalog.Write.Status.Conflict" xml:space="preserve"><value>L'écriture du catalogue est en conflit avec une modification concurrente.</value></data>
   <data name="Agents.ProviderCatalog.Write.Status.Unavailable" xml:space="preserve"><value>Le chemin d'écriture du catalogue est indisponible.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.AlreadyApplied" xml:space="preserve"><value>Aucune modification du catalogue n'était nécessaire, car l'état exact de l'entrée était déjà appliqué.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.AwaitingProjection" xml:space="preserve"><value>La commande du catalogue est terminée et attend sa projection.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.UnableToVerify" xml:space="preserve"><value>Le résultat exact de la commande du catalogue n'a pas pu être vérifié.</value></data>
   <data name="Agents.ProviderCatalog.Truth.Stage.Unknown" xml:space="preserve"><value>La vérité du catalogue n'est pas établie.</value></data>
   <data name="Agents.ProviderCatalog.Truth.Stage.Submitted" xml:space="preserve"><value>Soumise — acceptée pour traitement, sans preuve durable pour l'instant.</value></data>
   <data name="Agents.ProviderCatalog.Truth.Stage.AuthoritativePending" xml:space="preserve"><value>En attente d'autorité — acceptée, mais la projection n'est pas encore à jour.</value></data>
@@ -235,7 +238,13 @@
   <data name="Agents.Config.Write.NotFound" xml:space="preserve"><value>Aucun hexa correspondant n'a été trouvé. Rien n'a été modifié.</value></data>
   <data name="Agents.Config.Write.ValidationFailed" xml:space="preserve"><value>Les valeurs soumises ne sont pas valides. Rien n'a été modifié.</value></data>
   <data name="Agents.Config.Write.Conflict" xml:space="preserve"><value>La modification est entrée en conflit avec une mise à jour concurrente. Rien n'a été modifié.</value></data>
-  <data name="Agents.Config.Write.Unavailable" xml:space="preserve"><value>Le service de configuration est indisponible. Rien n'a été modifié.</value></data>
+  <data name="Agents.Config.Write.Unavailable" xml:space="preserve"><value>Le service de configuration est indisponible ; le résultat de la commande est donc inconnu. Relancez exactement cette tentative ou abandonnez-la avant de soumettre une autre modification.</value></data>
+  <data name="Agents.Config.Write.AlreadyApplied" xml:space="preserve"><value>Aucune modification n'était nécessaire. Cette configuration exacte était déjà appliquée.</value></data>
+  <data name="Agents.Config.Write.AwaitingProjection" xml:space="preserve"><value>La commande est terminée, mais son résultat exact est toujours en attente de projection.</value></data>
+  <data name="Agents.Config.Write.UnableToVerify" xml:space="preserve"><value>Le résultat de la commande n'a pas pu être vérifié. Relancez exactement la même tentative ou abandonnez-la avant de soumettre une autre modification.</value></data>
+  <data name="Agents.Config.Write.Refresh" xml:space="preserve"><value>Actualiser la configuration projetée</value></data>
+  <data name="Agents.Config.Write.Retry" xml:space="preserve"><value>Relancer exactement cette tentative</value></data>
+  <data name="Agents.Config.Write.Abandon" xml:space="preserve"><value>Abandonner cette tentative</value></data>
 
   <!-- Approver policy builder (AC4) -->
   <data name="Agents.ApproverPolicy.Title" xml:space="preserve"><value>Politique d'approbation</value></data>
