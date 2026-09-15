@@ -157,3 +157,35 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Extend the `Unknown = 0` fallback converter to the remaining public contract enums on Epic 2/3/4 payloads.
   evidence: About 45 `Unknown = 0` enums in `Hexalith.Agents.Contracts` (the `AgentInteraction` and `ProviderCatalog` families, plus `OperationalStatusInspectionStatus`) still declare the throwing `JsonStringEnumConverter`, so an additive member still fails a whole response for an older client on those routes. Story 5.2 closes this for its own setup payload only; the rest is the same latent defect on payloads outside this story's reach and should be swept once, with `AgentInspectionStatus` deliberately excluded because its zero is `Success = 0` and the fallback would fail open.
+
+## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2 (2026-09-15, round 4)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Complete the provider-catalog write path to the Story 5.2 acceptance contract.
+  evidence: `ProviderCatalogAdministrationOrchestrator` now returns `AgentAdministrationOutcome.FromDispatch(receipt)`, but `EventStoreProviderCatalogOperations.WriteAsync` discards `outcome.Receipt`, reports `AgentSetupTruthState.Submitted` with no effect and no target version, never verifies receipt identity, and accepts any caller string as `IdempotencyKey`/`CorrelationId` while the sibling Agent path requires a canonical ULID. One public surface answers two contradictory acceptance contracts. Completing it belongs to Story 5.3.
+  status: open
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Propagate the zero-test guard to `eng/verify-story-5.3.ps1`.
+  evidence: That script still selects its focused and composition gates with `--filter`, which prints "No test matches the given testcase filter" and exits 0, so a renamed or deleted suite silently turns a gate into a no-op — the defect `Invoke-TestClasses` was written to close in the 5.2 verifier. Pre-existing and outside this story's diff.
+  status: open
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Map every write outcome code to an HTTP status instead of returning 200 with a failure body.
+  evidence: The write handlers return `AgentOperationResult<AgentCommandAcceptance>` directly, so `ValidationFailed`, `NotAuthorized`, `Rejected` and `UnableToVerify` all arrive as 200; `SendWriteAsync` only calls `EnsureSuccessStatusCode()`, so no test would notice. Pre-existing module-wide pattern, not introduced by this story.
+  status: open
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Decide whether the page must signal that a local draft diverges from confirmed authoritative setup.
+  evidence: Both post-write read call sites now pass `applyAuthoritativeDrafts: false`, so a concurrent administrator's `DisplayName`/`Description` change never surfaces while `agents-config-truth-stage` renders `ProjectionConfirmed`. Unverified at `medium`: whether this is a defect or the intended precedence is a UX decision. What would settle it: a product call on draft-versus-authority precedence.
+  status: open
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Group the ten sibling titled sections of `AgentConfiguration.razor` into a single `FluentAccordion`.
+  evidence: `hexalith-ux-instructions.md` requires two or more sibling titled content sections to be grouped in one `FluentAccordion`; the page renders ten with raw `<dl>`, `<ul>`, `<p>` and no accordion. Pre-existing — this story adds no titled section.
+  status: open
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Establish whether the command-status seam is reachable through the live EventStore gateway at all.
+  evidence: `SubmitCommandHandler` calls `ThrowDeterministicFailure` for every `!Accepted` processing result, so a domain rejection throws `DomainCommandRejectedException` (409/422) and is already mapped by the existing dispatch `try/catch` to `Conflict`/`ValidationFailed`; an accepted-but-payload-less receipt may therefore never correspond to a rejection, and the test that proves the `Rejected` branch fabricates that shape rather than producing it. The same shape is produced for a genuine success whenever the advisory status read is not `Completed`, which is what makes the question open rather than settled. If the shape is unreachable, `IAgentCommandStatusReader`, `IEventStoreGatewayClient.GetCommandStatusAsync` and the `Rejected` branch are public surface added to a shared technical module for a path the pipeline never produces, against the frozen Never clause. Unverified at medium by product-owner decision (2026-09-15). What would settle it: a production-like EventStore topology run, i.e. Story 5.6's host fixture.
+  status: open
