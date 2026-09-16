@@ -84,7 +84,7 @@ development_status:
   4-5-verify-end-to-end-governance-and-contract-conformance: done
   epic-4-retrospective: done
   epic-5: in-progress
-  5-1-establish-build-package-boundary-and-basic-ci-gates: done
+  5-1-establish-build-package-boundary-and-basic-ci-gates: backlog  # Reopened by approved 2026-09-16 course correction: consume Hexalith.Builds as the sole package-version authority and strengthen the shared-catalog gates.
   5-2-configure-hexa-through-live-eventstore-operations: review
   # Round-6 replanned implementation is source-green. The story remains in progress by design: Release/CI still consume HexalithEventStoreVersion 3.104.0, so the Story 5.2 verifier fails closed until 3.105.0 or later is published/imported (DW-20); the external Platform gateway must also consume Hexalith.Agents.EventStore and explicitly register it (DW-21). The deferred status reader remains host-overridable until Story 5.6 proves reachability. Immutable ProvisionHexa/link retirement also remains deferred.
   5-3-govern-provider-models-and-pricing-through-live-operations: backlog  # Noted 2026-09-09 (round-5 spine validation, brownfield M1): a completed, fully-tested prior implementation (2569/2569 tests passing) exists underneath this backlog status; not promoted to done/in-progress here because AD-2's platform/tenant ProviderCatalog split (NC-5.3-PLATFORM-CATALOG-SCOPE) is still unreconciled in code.
