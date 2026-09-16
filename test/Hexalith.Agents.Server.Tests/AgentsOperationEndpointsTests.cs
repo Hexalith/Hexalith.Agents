@@ -305,6 +305,48 @@ public sealed class AgentsOperationEndpointsTests
             default);
     }
 
+    [Theory]
+    [InlineData("X-Correlation-ID", CorrelationId, AgentSetupCommandHeadersFilter.InvalidIdentityProblemType)]
+    [InlineData("Idempotency-Key", MessageId, AgentSetupCommandHeadersFilter.InvalidIdentityProblemType)]
+    [InlineData("X-Expected-Configuration-Version", "3", AgentSetupCommandHeadersFilter.InvalidActivationVersionProblemType)]
+    public async Task Duplicate_canonical_setup_headers_return_stable_problem_details_without_invoking_the_operation(
+        string duplicateHeader,
+        string canonicalValue,
+        string expectedProblemType)
+    {
+        IAgentAdministrationOperations administration = Substitute.For<IAgentAdministrationOperations>();
+        await using WebApplication app = BuildHttpApp(AgentsClientWith(administration));
+        await app.StartAsync().ConfigureAwait(true);
+        using HttpClient client = app.GetTestClient();
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/agents/operations/agents/agent-1/activate")
+        {
+            Content = JsonContent.Create(new ActivateAgent()),
+        };
+        request.Headers.TryAddWithoutValidation(
+            "X-Correlation-ID",
+            duplicateHeader == "X-Correlation-ID" ? [CorrelationId, CorrelationId] : [CorrelationId]).ShouldBeTrue();
+        request.Headers.TryAddWithoutValidation(
+            "Idempotency-Key",
+            duplicateHeader == "Idempotency-Key" ? [MessageId, MessageId] : [MessageId]).ShouldBeTrue();
+        request.Headers.TryAddWithoutValidation(
+            "X-Expected-Configuration-Version",
+            duplicateHeader == "X-Expected-Configuration-Version" ? [canonicalValue, canonicalValue] : ["3"]).ShouldBeTrue();
+
+        using HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(true);
+
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
+        response.Content.Headers.ContentType?.MediaType.ShouldBe("application/problem+json");
+        string problem = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+        problem.ShouldContain(expectedProblemType);
+        problem.ShouldContain("canonical_value_required");
+        problem.ShouldContain(duplicateHeader);
+        await administration.DidNotReceiveWithAnyArgs().ActivateAsync(
+            default!,
+            default!,
+            default,
+            default);
+    }
+
     [Fact]
     public void Setup_write_handlers_declare_both_optional_retry_headers_for_endpoint_metadata()
     {

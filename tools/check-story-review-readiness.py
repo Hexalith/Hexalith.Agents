@@ -51,6 +51,11 @@ SUITE_COUNT_PATTERN = re.compile(
     r"\s*(?::|=|->|→)?\s*\d[\d,]*\b",
     re.IGNORECASE,
 )
+SUITE_COUNT_LINE_PATTERN = re.compile(
+    r"^[ \t]*(?:[-*+][ \t]+)?(?:[A-Za-z0-9.]+\.Tests|domain|server|contracts|client|ui)"
+    r"\s*(?::|=|->|→)?\s*\d[\d,]*[.!]?[ \t]*$",
+    re.IGNORECASE,
+)
 FRONTMATTER_DELIMITER = "---"
 BASELINE_KEY_PATTERN = re.compile(r"^baseline_commit:[ \t]*(.*)$")
 COMMIT_ID_PATTERN = re.compile(r"^[0-9a-fA-F]{7,40}$")
@@ -124,9 +129,9 @@ def default_runner(
     environment: Mapping[str, str] | None = None,
 ) -> CommandResult:
     env = os.environ.copy()
-    env.setdefault("MSBUILDDISABLENODEREUSE", "1")
     if environment:
         env.update(environment)
+    env["MSBUILDDISABLENODEREUSE"] = "1"
     try:
         completed = subprocess.run(
             list(command),
@@ -399,6 +404,7 @@ def parse_file_list(text: str, layout: StoryLayout) -> set[str]:
 
 def unmanaged_count_claims(text: str, layout: StoryLayout) -> list[tuple[int, str]]:
     failures: list[tuple[int, str]] = []
+    pending_suite_count: tuple[int, str] | None = None
     offset = 0
     for number, line in enumerate(text.splitlines(keepends=True), start=1):
         content = line.rstrip("\r\n")
@@ -416,6 +422,18 @@ def unmanaged_count_claims(text: str, layout: StoryLayout) -> list[tuple[int, st
             suite_counts = SUITE_COUNT_PATTERN.findall(candidate)
             if any(pattern.search(candidate) for pattern in COUNT_PATTERNS) or len(suite_counts) >= 2:
                 failures.append((number, content.strip()))
+                pending_suite_count = None
+            elif SUITE_COUNT_LINE_PATTERN.fullmatch(candidate):
+                current = (number, content.strip())
+                if pending_suite_count is not None and pending_suite_count[0] == number - 1:
+                    if not failures or failures[-1][0] != pending_suite_count[0]:
+                        failures.append(pending_suite_count)
+                    failures.append(current)
+                pending_suite_count = current
+            else:
+                pending_suite_count = None
+        else:
+            pending_suite_count = None
         offset += len(line)
     return failures
 
@@ -767,6 +785,11 @@ def resolve_baseline_commit(root: Path, baseline: str, runner: Runner) -> str:
     equality = runner(("git", "merge-base", "--is-ancestor", "HEAD", resolved), root, None)
     if equality.returncode == 0:
         raise ValidationError(f"Story baseline_commit must precede HEAD, not equal it: {baseline}")
+    if equality.returncode != 1:
+        raise ValidationError(
+            "Unable to verify that story baseline_commit precedes HEAD: "
+            f"{command_detail(equality)}"
+        )
     return resolved
 
 

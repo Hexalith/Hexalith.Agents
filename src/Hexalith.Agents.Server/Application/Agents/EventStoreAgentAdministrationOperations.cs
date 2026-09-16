@@ -237,7 +237,9 @@ public sealed class EventStoreAgentAdministrationOperations(
         if ((correlationId is not null && !IsCanonicalUlid(correlationId))
             || expectedConfigurationVersion is <= 0)
         {
-            return AgentOperationResult<AgentSetupResult>.Failed(AgentOperationErrorCode.ValidationFailed);
+            return AgentOperationResult<AgentSetupResult>.Failed(
+                AgentOperationErrorCode.ValidationFailed,
+                IsCanonicalUlid(correlationId) ? correlationId : null);
         }
 
         ReadModelEntry<AgentSetupReadModel> entry;

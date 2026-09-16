@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Server.Application.Agents;
 using Hexalith.Agents.Server.Ports;
@@ -107,6 +108,7 @@ public sealed class AgentAdministrationOrchestratorTests
                 ["actor:agentsAdmin"] = "true",
                 ["provider:selectionValidation"] = "Valid",
                 ["approver:policyValidation"] = "Valid",
+                [AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion] = "7",
                 ["trace"] = "abc-123",
             }),
             new UpdateAgentConfiguration("hexa", null, "instructions long enough to be valid"),
@@ -116,6 +118,7 @@ public sealed class AgentAdministrationOrchestratorTests
         extensions["actor:agentsAdmin"].ShouldBe("true");
         extensions.ContainsKey("provider:selectionValidation").ShouldBeFalse();
         extensions.ContainsKey("approver:policyValidation").ShouldBeFalse();
+        extensions.ContainsKey(AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion).ShouldBeFalse();
         extensions["trace"].ShouldBe("abc-123");
     }
 

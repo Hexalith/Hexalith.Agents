@@ -145,6 +145,18 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     }
 
     [Fact]
+    public async Task An_invalid_expected_read_version_preserves_a_canonical_correlation_id()
+    {
+        AgentOperationResult<AgentSetupResult> result = await Operations().GetStatusAsync(
+            AgentId,
+            expectedConfigurationVersion: 0,
+            options: new AgentOperationOptions(CorrelationId: CorrelationId));
+
+        result.Status.ShouldBe(AgentOperationStatus.ValidationFailed);
+        result.CorrelationId.ShouldBe(CorrelationId);
+    }
+
+    [Fact]
     public async Task The_status_and_configuration_reads_serve_identical_truth()
     {
         SeedProjectedSetup(configurationVersion: 2);

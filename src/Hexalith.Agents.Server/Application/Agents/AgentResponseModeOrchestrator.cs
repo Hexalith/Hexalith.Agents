@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Server.Ports;
 
@@ -20,7 +21,8 @@ namespace Hexalith.Agents.Server.Application.Agents;
 /// </summary>
 /// <remarks>
 /// <b>Trust model (CRITICAL):</b> the reserved extension keys (<c>actor:agentsAdmin</c>, and the activation-path
-/// verdict keys <c>provider:selectionValidation</c> / <c>approver:policyValidation</c>) are server-populated only.
+/// verdict keys <c>provider:selectionValidation</c> / <c>approver:policyValidation</c> and the activation version
+/// fence) are server-populated only.
 /// Any client-supplied value for them is stripped at this entry point; only <c>actor:agentsAdmin</c> is repopulated
 /// from the trusted authorization decision, so a client can neither forge admin nor smuggle an activation verdict
 /// onto a configuration command. Binding <see cref="IAgentCommandDispatcher"/> to the live command gateway is
@@ -35,6 +37,7 @@ public sealed class AgentResponseModeOrchestrator
         AgentProviderSelectionOrchestrator.AgentAdminExtensionKey,
         AgentProviderSelectionOrchestrator.ProviderSelectionValidationExtensionKey,
         AgentActivationProviderRevalidation.ApproverPolicyValidationExtensionKey,
+        AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion,
     ];
 
     private readonly IAgentCommandDispatcher _dispatcher;

@@ -207,6 +207,10 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
 
     [Theory]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ConfigureAgentResponseMode), AgentSetupTrustedExtensions.AgentAdministrator, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(CreateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(DisableAgent), AgentSetupTrustedExtensions.AgentAdministrator, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(UpdateAgentConfiguration), AgentSetupTrustedExtensions.AgentAdministrator, "true", true)]
     [InlineData("Bearer", AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "true", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, "other-app", "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "true", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "other-domain", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "true", false)]

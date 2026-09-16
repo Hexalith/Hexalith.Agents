@@ -2,6 +2,8 @@ namespace Hexalith.Agents.Server.Tests;
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Text;
 
 using Hexalith.Agents.Client;
 using Hexalith.Agents.Server.Application.Agents;
@@ -10,6 +12,8 @@ using Hexalith.Agents.Server.Ports;
 using Hexalith.Agents.Server.Projections;
 
 using Hexalith.EventStore.Client.Projections;
+using Hexalith.EventStore.Client.Gateway;
+using Hexalith.EventStore.Contracts.Commands;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,6 +55,35 @@ public sealed class AgentSetupCompositionTests
             .ShouldBeOfType<EventStoreProviderCatalogOperations>();
         scope.ServiceProvider.GetRequiredService<IProviderCatalogReader>()
             .ShouldBeOfType<ProjectedProviderCatalogReader>();
+    }
+
+    [Fact]
+    public async Task Configured_Dapr_identity_reaches_the_outbound_gateway_request()
+    {
+        var handler = new CapturingHandler();
+        using ServiceProvider provider = BuildWithHandler(
+            handler,
+            ("Agents:EventStore:BaseUrl", "https://eventstore.example"),
+            ("Agents:EventStore:AppId", "eventstore-runtime"),
+            ("Agents:EventStore:DaprApiToken", "secret-token"));
+
+        IAgentCommandDispatcher dispatcher = provider.GetRequiredService<IAgentCommandDispatcher>();
+        _ = await dispatcher.DispatchAsync(
+            new CommandEnvelope(
+                "message-1",
+                "tenant-a",
+                "agent",
+                "agent-a",
+                "DisableAgent",
+                [],
+                "correlation-1",
+                null,
+                "system:agents",
+                null),
+            CancellationToken.None);
+
+        handler.DaprAppId.ShouldBe("eventstore-runtime");
+        handler.DaprApiToken.ShouldBe("secret-token");
     }
 
     [Fact]
@@ -103,6 +136,16 @@ public sealed class AgentSetupCompositionTests
     }
 
     private static ServiceProvider Build(params (string Key, string Value)[] settings)
+        => BuildCore(null, settings);
+
+    private static ServiceProvider BuildWithHandler(
+        HttpMessageHandler handler,
+        params (string Key, string Value)[] settings)
+        => BuildCore(handler, settings);
+
+    private static ServiceProvider BuildCore(
+        HttpMessageHandler? handler,
+        params (string Key, string Value)[] settings)
     {
         ServiceCollection services = new();
         IConfiguration configuration = new ConfigurationBuilder()
@@ -119,11 +162,39 @@ public sealed class AgentSetupCompositionTests
         services.AddScoped<AgentActivationProviderRevalidation>();
 
         _ = services.AddAgentSetupServices(configuration);
+        if (handler is not null)
+        {
+            _ = services
+                .AddHttpClient<IEventStoreGatewayClient, EventStoreGatewayClient>()
+                .ConfigurePrimaryHttpMessageHandler(() => handler);
+        }
 
         return services.BuildServiceProvider(new ServiceProviderOptions
         {
             ValidateScopes = true,
             ValidateOnBuild = false,
         });
+    }
+
+    private sealed class CapturingHandler : HttpMessageHandler
+    {
+        internal string? DaprAppId { get; private set; }
+
+        internal string? DaprApiToken { get; private set; }
+
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            DaprAppId = request.Headers.GetValues("dapr-app-id").Single();
+            DaprApiToken = request.Headers.GetValues("dapr-api-token").Single();
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.Accepted)
+            {
+                Content = new StringContent(
+                    "{\"correlationId\":\"correlation-1\",\"messageId\":\"message-1\"}",
+                    Encoding.UTF8,
+                    "application/json"),
+            });
+        }
     }
 }

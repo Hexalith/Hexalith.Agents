@@ -148,6 +148,23 @@ class FakeRunner:
 
 
 class CommandRunnerTests(unittest.TestCase):
+    def test_msbuild_node_reuse_is_disabled_even_when_the_parent_or_override_enables_it(self):
+        completed = subprocess.CompletedProcess(
+            args=["git", "status"],
+            returncode=0,
+            stdout=b"",
+            stderr=b"",
+        )
+        with mock.patch.dict(os.environ, {"MSBUILDDISABLENODEREUSE": "0"}):
+            with mock.patch.object(V.subprocess, "run", return_value=completed) as run:
+                V.default_runner(
+                    ("git", "status"),
+                    REPO_ROOT,
+                    {"MSBUILDDISABLENODEREUSE": "0"},
+                )
+
+        self.assertEqual(run.call_args.kwargs["env"]["MSBUILDDISABLENODEREUSE"], "1")
+
     def test_timeout_and_process_os_errors_are_actionable_validation_failures(self):
         cases = (
             subprocess.TimeoutExpired(["git", "status"], 30),
@@ -244,6 +261,13 @@ class StoryParsingTests(unittest.TestCase):
         text = story_text(record_text="Domain 5 uses a 16/9 layout.")
 
         self.assertEqual(V.unmanaged_count_claims(text, V.parse_story_layout(text)), [])
+
+    def test_adjacent_single_suite_count_lines_are_reported_as_unmanaged_evidence(self):
+        text = story_text(record_text="Server: 545\nDomain: 787")
+
+        failures = V.unmanaged_count_claims(text, V.parse_story_layout(text))
+
+        self.assertEqual([content for _, content in failures], ["Server: 545", "Domain: 787"])
 
     def test_ratio_after_test_related_prose_is_not_test_count_evidence(self):
         text = story_text(record_text="A ratio without test-result context, such as 16/9, is ordinary prose.")
@@ -760,6 +784,17 @@ class BaselineGateTests(unittest.TestCase):
         runner = FakeRunner(root, git_payload=b"", baseline_is_head_returncode=0)
 
         with self.assertRaisesRegex(V.ValidationError, "must precede HEAD"):
+            V.execute_gate(root, story_path, runner, lambda: FIXED_NOW)
+
+        self.assertEqual(story_path.read_bytes(), original)
+        self.assertTrue(all(command[:2] != ("dotnet", "build") for command in runner.commands))
+
+    def test_reverse_ancestry_probe_error_stops_before_the_release_build(self):
+        root, story_path = self.fixture(("_bmad-output/implementation-artifacts/story.md",))
+        original = story_path.read_bytes()
+        runner = FakeRunner(root, git_payload=b"", baseline_is_head_returncode=2)
+
+        with self.assertRaisesRegex(V.ValidationError, "Unable to verify"):
             V.execute_gate(root, story_path, runner, lambda: FIXED_NOW)
 
         self.assertEqual(story_path.read_bytes(), original)
