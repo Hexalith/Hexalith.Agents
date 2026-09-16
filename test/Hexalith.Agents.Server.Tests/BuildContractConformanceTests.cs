@@ -1,5 +1,6 @@
 namespace Hexalith.Agents.Server.Tests;
 
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -9,10 +10,8 @@ using Shouldly;
 
 /// <summary>
 /// Build-contract conformance guard (AC1). The root <c>Directory.Build.props</c>,
-/// <c>Directory.Packages.props</c>, and <c>global.json</c> must keep enforcing the module's build contract:
-/// <c>net10.0</c>, C# 14, nullable, implicit usings, warnings-as-errors, Central Package Management, and a
-/// pinned SDK. Guards against a silent regression (e.g. someone disabling warnings-as-errors) that a clean
-/// build alone would not surface.
+/// <c>Directory.Packages.props</c>, and <c>global.json</c> must keep enforcing the module's build contract,
+/// including import-only shared-catalog ownership in root, sibling, and parent layouts.
 /// </summary>
 public sealed class BuildContractConformanceTests
 {
@@ -29,15 +28,30 @@ public sealed class BuildContractConformanceTests
     }
 
     [Fact]
-    public void RootPackagesPropsShouldEnableCentralPackageManagement()
+    public void RootPackagesPropsShouldBeAnImportOnlySharedCatalogWrapper()
     {
         XDocument props = XDocument.Load(ModuleLayout.RootFile("Directory.Packages.props"));
 
         PropertyValue(props, "ManagePackageVersionsCentrally").ShouldBe("true");
+        PropertyValue(props, "CentralPackageTransitivePinningEnabled").ShouldBe("true");
+        props.Descendants().ShouldNotContain(
+            element => string.Equals(element.Name.LocalName, "PackageVersion", StringComparison.OrdinalIgnoreCase));
+        PropertyValue(props, "HexalithEventStoreVersion").ShouldBeNull();
+        XElement[] imports = props
+            .Descendants()
+            .Where(element => string.Equals(element.Name.LocalName, "Import", StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+        imports.ShouldNotBeEmpty();
+        foreach (XElement import in imports)
+        {
+            (import.Attribute("Project")?.Value ?? string.Empty).ShouldContain("BuildPackageProps");
+        }
+
+        props.Root!.Value.ShouldContain("Hexalith.Builds/Props/Directory.Packages.props");
     }
 
     [Fact]
-    public void RootBuildPropsShouldRequireSharedBuildCatalogSubmodule()
+    public void RootBuildPropsShouldRequireTheLoadedSharedCatalogMarker()
     {
         XDocument props = XDocument.Load(ModuleLayout.RootFile("Directory.Build.props"));
 
@@ -47,6 +61,74 @@ public sealed class BuildContractConformanceTests
                 string.Equals(element.Name.LocalName, "RequiredRootSubmodule", StringComparison.Ordinal)
                 && string.Equals(element.Attribute("Include")?.Value, "Hexalith.Builds", StringComparison.Ordinal))
             .ShouldBeTrue("The shared package catalog must be guarded as a build-required root submodule.");
+
+        XElement checkTarget = props
+            .Descendants()
+            .Single(element =>
+                string.Equals(element.Name.LocalName, "Target", StringComparison.Ordinal)
+                && string.Equals(element.Attribute("Name")?.Value, "CheckBuildCatalog", StringComparison.Ordinal));
+        checkTarget.Attribute("BeforeTargets")?.Value.ShouldContain("GenerateNuspec;Pack;Publish");
+        XElement error = checkTarget
+            .Elements()
+            .Single(element => string.Equals(element.Name.LocalName, "Error", StringComparison.Ordinal));
+        error.Attribute("Condition")?.Value.ShouldContain("HexalithVersionsLoaded");
+        error.Attribute("Text")?.Value.ShouldContain("Hexalith.Builds");
+        error.Attribute("Text")?.Value.ShouldContain("git submodule update --init -- references/Hexalith.Builds");
+    }
+
+    [Fact]
+    public void RootCheckoutShouldLoadTheSharedEventStoreVersion()
+    {
+        using JsonDocument evaluation = EvaluateMsBuild(
+            ModuleLayout.SourceProjectFile("Hexalith.Agents.EventStore"),
+            "-getProperty:HexalithVersionsLoaded",
+            "-getProperty:HexalithEventStoreVersion",
+            "-p:Configuration=Release",
+            "-p:UseHexalithProjectReferences=false",
+            "-p:NuGetAudit=false",
+            "/nr:false");
+
+        JsonElement properties = evaluation.RootElement.GetProperty("Properties");
+        properties.GetProperty("HexalithVersionsLoaded").GetString().ShouldBe("true");
+        properties.GetProperty("HexalithEventStoreVersion").GetString().ShouldBe("3.106.0");
+    }
+
+    [Fact]
+    public void WrapperShouldLoadTheSharedCatalogFromASiblingCheckout()
+        => AssertWrapperLayoutLoadsCatalog("../Hexalith.Builds/Props/Directory.Packages.props");
+
+    [Fact]
+    public void WrapperShouldLoadTheSharedCatalogFromAParentReferencesLayout()
+        => AssertWrapperLayoutLoadsCatalog("../references/Hexalith.Builds/Props/Directory.Packages.props");
+
+    [Fact]
+    public void WrapperShouldLoadTheSharedCatalogFromANestedParentReferencesLayout()
+        => AssertWrapperLayoutLoadsCatalog(
+            "../../references/Hexalith.Builds/Props/Directory.Packages.props",
+            "host/references/Hexalith.Agents");
+
+    [Fact]
+    public void MissingSharedCatalogShouldFailWithRootOnlyInitializationGuidance()
+    {
+        string missingPath = Path.Combine(
+            Path.GetTempPath(),
+            $"missing-hexalith-builds-{Guid.NewGuid():N}",
+            "Directory.Packages.props");
+        string output = RunDotNet(
+            out int exitCode,
+            "msbuild",
+            ModuleLayout.SourceProjectFile("Hexalith.Agents.Contracts"),
+            "-nologo",
+            "-t:CheckBuildCatalog",
+            $"-p:Hexalith1BuildPackageProps={missingPath}",
+            $"-p:Hexalith2BuildPackageProps={missingPath}",
+            $"-p:Hexalith3BuildPackageProps={missingPath}",
+            $"-p:Hexalith4BuildPackageProps={missingPath}",
+            "/nr:false");
+
+        exitCode.ShouldNotBe(0);
+        output.ShouldContain("Hexalith.Builds package catalog was not loaded.");
+        output.ShouldContain("git submodule update --init -- references/Hexalith.Builds");
     }
 
     [Fact]
@@ -66,4 +148,79 @@ public sealed class BuildContractConformanceTests
             .FirstOrDefault(element => string.Equals(element.Name.LocalName, localName, StringComparison.OrdinalIgnoreCase))?
             .Value
             .Trim();
+
+    private static void AssertWrapperLayoutLoadsCatalog(
+        string catalogRelativePath,
+        string repositoryRelativePath = "Hexalith.Agents")
+    {
+        DirectoryInfo fixture = Directory.CreateTempSubdirectory("hexalith-agents-catalog-layout-");
+        try
+        {
+            string repositoryRoot = Path.Combine(fixture.FullName, repositoryRelativePath);
+            Directory.CreateDirectory(repositoryRoot);
+            string wrapperPath = Path.Combine(repositoryRoot, "Directory.Packages.props");
+            File.Copy(ModuleLayout.RootFile("Directory.Packages.props"), wrapperPath);
+
+            string catalogPath = Path.GetFullPath(Path.Combine(repositoryRoot, catalogRelativePath));
+            Directory.CreateDirectory(Path.GetDirectoryName(catalogPath)!);
+            File.WriteAllText(
+                catalogPath,
+                """
+                <Project>
+                  <PropertyGroup>
+                    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+                    <CentralPackageVersionOverrideEnabled>false</CentralPackageVersionOverrideEnabled>
+                    <HexalithVersionsLoaded>true</HexalithVersionsLoaded>
+                    <HexalithEventStoreVersion>3.106.0</HexalithEventStoreVersion>
+                  </PropertyGroup>
+                </Project>
+                """);
+
+            using JsonDocument evaluation = EvaluateMsBuild(
+                wrapperPath,
+                "-getProperty:HexalithVersionsLoaded",
+                "-getProperty:HexalithEventStoreVersion",
+                "/nr:false");
+            JsonElement properties = evaluation.RootElement.GetProperty("Properties");
+            properties.GetProperty("HexalithVersionsLoaded").GetString().ShouldBe("true");
+            properties.GetProperty("HexalithEventStoreVersion").GetString().ShouldBe("3.106.0");
+        }
+        finally
+        {
+            fixture.Delete(true);
+        }
+    }
+
+    private static JsonDocument EvaluateMsBuild(string projectPath, params string[] arguments)
+    {
+        string output = RunDotNet(
+            out int exitCode,
+            new[] { "msbuild", projectPath, "-nologo" }.Concat(arguments).ToArray());
+
+        exitCode.ShouldBe(0, output);
+        return JsonDocument.Parse(output);
+    }
+
+    private static string RunDotNet(out int exitCode, params string[] arguments)
+    {
+        ProcessStartInfo startInfo = new()
+        {
+            FileName = "dotnet",
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+        foreach (string argument in arguments)
+        {
+            startInfo.ArgumentList.Add(argument);
+        }
+
+        using Process process = new() { StartInfo = startInfo };
+        process.Start().ShouldBeTrue("The .NET SDK must be available to evaluate the package wrapper.");
+        Task<string> standardOutput = process.StandardOutput.ReadToEndAsync();
+        Task<string> standardError = process.StandardError.ReadToEndAsync();
+        process.WaitForExit();
+        exitCode = process.ExitCode;
+        return standardOutput.GetAwaiter().GetResult() + standardError.GetAwaiter().GetResult();
+    }
 }

@@ -3,13 +3,14 @@ name: Hexalith Agents
 description: FrontComposer web UI for governed AI participants in Hexalith Conversations. Fluent UI Blazor v5 is inherited; this spine specifies the Agents-specific semantic delta only.
 status: final
 created: 2026-06-23
-updated: 2026-09-12
+updated: 2026-09-16
 sources:
   - ../../briefs/brief-agents-2026-06-23/brief.md
   - ../../prds/prd-agents-2026-06-23/prd.md
   - ../../prds/prd-agents-2026-06-23/addendum.md
   - ../../prds/prd-agents-2026-06-23/reconcile-brief.md
   - ../../sprint-change-proposal-2026-08-02.md
+  - ../../sprint-change-proposal-2026-09-16.md
   - ../../architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md
   - ../../launch-readiness-register.md
   - ../../external-dependency-register.md
@@ -169,7 +170,7 @@ components:
 
 Hexalith Agents is a governed operational tool, not a chat novelty and not a marketing surface. It should feel like the rest of the Hexalith admin ecosystem: calm, precise, dense enough for repeated use, and explicit about what the system knows before it allows side effects. The first visible Agent is `hexa`, but the visual system does not turn `hexa` into a mascot. The product signal is named, attributable AI participation inside Conversations.
 
-This is a FrontComposer inheritance spec. Hexalith Agents inherits the FrontComposer shell and Microsoft Fluent UI Blazor v5, pinned as `Microsoft.FluentUI.AspNetCore.Components` `5.0.0-rc.5-26219.1` and owned by `Directory.Packages.props`. Every inherit-by-name role below is verified against that pin at build and re-verified when the pin changes. There is no bespoke palette, type ramp, shadow language, or custom shape system. The delta is semantic: Agent readiness, Provider readiness, proposal state, approval state, version history, posting outcome, and audit evidence need consistent meaning so administrators and approvers never confuse a draft with a Conversation Message.
+This is a FrontComposer inheritance spec. Hexalith Agents inherits the FrontComposer shell and Microsoft Fluent UI Blazor v5, selected as `Microsoft.FluentUI.AspNetCore.Components` `5.0.0-rc.5-26219.1` by the Hexalith.Builds catalog imported through the Agents `Directory.Packages.props`; Agents owns no local Fluent package version. Every inherit-by-name role below is verified against that shared selection at build and re-verified when it changes. There is no bespoke palette, type ramp, shadow language, or custom shape system. The delta is semantic: Agent readiness, Provider readiness, proposal state, approval state, version history, posting outcome, and audit evidence need consistent meaning so administrators and approvers never confuse a draft with a Conversation Message.
 
 Icons come from the curated inline-SVG `FcFluentIcons` factory only, never from the Fluent icons NuGet. The factory has two access paths and they are not interchangeable.
 

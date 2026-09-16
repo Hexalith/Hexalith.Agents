@@ -163,7 +163,7 @@ NFR10: Cost Control - Hard numeric per-tenant monthly and per-call caps warn at 
 - NFR-13 evidence covers every interactive V1 route and high-impact state for WCAG 2.2 AA, keyboard/focus/semantic/live-region behavior, whole-string English/French parity, FrontComposer/Fluent V5 inheritance, and restrictive-viewport blocking.
 - NFR-14 uses authenticated browser-monotonic, kind-discriminated samples correlated to safe server evidence; each sample kind requires at least 30 production-like executions and missing/invalid ticks, correlation, localized live-region mutation, or samples yields `InsufficientEvidence`.
 - Public contracts are versioned and additive-first. Evidence Levels retain PRD meanings: Level 1 structure, Level 2 pure behavior, Level 3 fail-closed deferred seam, Level 4 live component, and Level 5 production-like cross-system evidence.
-- The active stack baseline is the Architecture Spine's current Stack table: SDK `10.0.401` with `latestPatch`, `net10.0`, C# 14, `.slnx`, Central Package Management, FluentValidation `12.1.1`, OpenTelemetry `1.18.0`, Fluent UI Blazor `5.0.0-rc.5-26219.1`, xUnit v3 `3.2.2`, Shouldly `4.3.0`, and bunit `2.10.3`; Hosting plus Provider/Agent Framework SDKs remain unselected until their dependency records commit them, and MediatR `14.2.0` is catalog-visible but absent from the current Agents runtime graph. The imported Dapr .NET/Workflow `1.18.5` family may not be adopted while ARCH-A-15 is open: the catalog and host must upgrade the family atomically to upstream `1.18.7` or later with compatibility evidence, or Security must record the bounded exception ARCH-A-15 defines.
+- The active stack baseline is the Architecture Spine's current Stack table. The root SDK `10.0.401` with `latestPatch`, `net10.0`, C# 14, and `.slnx` selections remain explicit; every NuGet version comes exclusively from the root-recorded Hexalith.Builds catalog. At Builds commit `000abf867abc3a99cfa74d39b6e73af05c78a602`, the effective selections include EventStore `3.106.0`, the Dapr .NET/Workflow family `1.18.7`, FluentValidation `12.1.1`, OpenTelemetry `1.18.0`, Fluent UI Blazor `5.0.0-rc.5-26219.1`, xUnit v3 `4.0.1`, Microsoft.NET.Test.Sdk `18.10.0`, Shouldly `4.3.0`, NSubstitute `6.2.0`, and bunit `2.11.3`. Story compatibility floors may constrain the shared selection but may not create an Agents-local pin. Hosting plus Provider/Agent Framework SDKs remain unselected until their dependency records commit them, and MediatR `14.2.0` is catalog-visible but absent from the current Agents runtime graph.
 - The external-dependency register is the only commitment authority for all twelve records: `EXT-CONV-AI-1`, `EXT-CONV-UI-1`, optional `EXT-CONV-RETRACTION-1`, `EXT-HOST-1`, `EXT-PROVIDER-1`, `EXT-SAFETY-1`, `EXT-TOKEN-1`, `EXT-SECRETS-1`, `EXT-EXPORT-STORE-1`, `EXT-PROTECTION-1`, `EXT-TOPOLOGY-1`, and `EXT-PARTIES-1`; any `Uncommitted` record blocks launch evidence for its consuming stories. Optional retraction has no consumer unless Product selects OQ-23's branch. The register's `EXT-PARTIES-1` development allowance permits its fourteen direct human/identity consumers — Stories 5.2, 5.4, 5.5, 6.6, 7.1–7.5, 8.1–8.4, and 8.8 — to build against Branch-B-compatible identity-by-id behavior where applicable, but cannot establish human actor-binding, separation-of-duty, launch evidence, or `RQ-1` until the record is `Available` and its compatibility command passes.
 - The launch-readiness register is the machine-testable callability and qualification authority. `RQ-1` is a non-estimated release gate outside the development backlog and currently returns NOT READY.
 
@@ -1248,14 +1248,24 @@ So that every later Agents change is built and consumed through the corrected pl
 **Then** Hexalith.Agents.AppHost, Hexalith.Agents.Aspire, and Hexalith.Agents.ServiceDefaults projects, references, packages, and tests that enforce their ownership are absent
 **And** Contracts, Client, Server, UI, Testing, and focused test projects retain the architecture dependency direction and build without warnings.
 
+**Given** the root `Directory.Packages.props` is evaluated in a standalone checkout or a supported parent/submodule layout
+**When** Central Package Management resolves package versions
+**Then** the file contains only Central Package Management policy plus path/import plumbing for `Hexalith.Builds/Props/Directory.Packages.props`, and the effective evaluation records `HexalithVersionsLoaded=true`
+**And** the Agents wrapper contains no `PackageVersion` item, package-specific version property, `VersionOverride`, or fallback package-version list.
+
+**Given** a package version used by Agents must change
+**When** the change is implemented
+**Then** the version is changed and validated in the Hexalith.Builds owning repository first, and Agents consumes the resulting root-declared Builds gitlink
+**And** an Agents-local override cannot satisfy package-floor, clean-checkout, package-consumer, or CI acceptance evidence.
+
 **Given** source-mode development and package-mode consumption
 **When** the story verification lane runs
-**Then** Debug/source use resolves only intentional local project references, while Release/package validation consumes the produced public packages without reverse references or Provider, workflow, Dapr-hosting, or UI implementation types in Contracts
-**And** package inventory, public API, central package version, and solution-format checks fail on any drift.
+**Then** Debug/source use resolves only intentional local project references, while Release/package validation consumes the produced public packages and every effective package version comes from the imported Builds catalog
+**And** package inventory, public API, shared-catalog ownership, effective central versions, solution format, and source/package dependency mode checks fail on any drift.
 
 **Given** the root CI workflow
-**When** a change introduces a forbidden project/reference, inline package version, legacy solution, missing package consumer, or source-only Release dependency
-**Then** a named source/package/boundary/basic test gate fails with a support-safe diagnostic
+**When** a change introduces a forbidden project/reference, inline project version, any Agents-local `PackageVersion`, any package-specific version override, a missing/unloaded Builds catalog, a legacy solution, a missing package consumer, or a source-only Release dependency
+**Then** a named source/package/boundary/basic test gate fails with a support-safe diagnostic that identifies Hexalith.Builds as the package-version owner
 **And** the gate never weakens warnings-as-errors or initializes nested submodules.
 
 **Given** EXT-HOST-1 is Uncommitted, missing an immutable target, date, or executable compatibility command
@@ -1272,7 +1282,7 @@ So that every later Agents change is built and consumed through the corrected pl
 | Dependencies | EXT-HOST-1 at Committed or Available; no prior story |
 | EvidenceLevel | Levels 1-3: structure, package-consumer behavior, and fail-closed deferred host seam |
 | TestOrArtifact | ModuleBoundaryTests; PackageConsumerTests; CentralPackageAndSolutionFormatTests; clean-checkout CI transcript; produced package inventory |
-| VerificationCommand | pwsh ./eng/verify-story-5.1.ps1 |
+| VerificationCommand | pwsh -NoProfile -File ./eng/verify-story.ps1 -Story 5.1 |
 | NegativeEvidence | ForbiddenHostingOwnershipTests; ReleaseSourceReferenceLeakTests; NestedSubmoduleInitializationGuardTests |
 | Result | Not run — backlog; EXT-HOST-1 is currently Uncommitted |
 
@@ -1289,6 +1299,8 @@ So that the durable Agent state I see is replayable, current, and safe to automa
 - **Prior stories:** 5.1.
 - **External:** `EXT-PARTIES-1` remains `Uncommitted`. This story may develop the create-only provisioner against Branch-B-compatible immutable identity-by-id behavior, but that work is not launch evidence and cannot satisfy `RQ-1`; no selected branch may be claimed until the register records owner acceptance.
 - **Forward dependencies:** None; activation and integrated identity readiness are not claimed by this story.
+
+**Package promotion evidence:** The `>=3.105.0` EventStore floor is satisfied only by the effective value imported from Hexalith.Builds. The current shared catalog selects published `3.106.0`; an Agents-local version property or `PackageVersion` item is a failing boundary condition, not completion evidence.
 
 **Acceptance Criteria:**
 
@@ -1622,7 +1634,7 @@ So that the domain service and UI run with their real platform dependencies with
 
 **Given** the corrected Structural Seed and Live-Seam Matrix
 **When** repository conformance and test execution run
-**Then** `global.json`, the workspace package catalog, xUnit v3/Microsoft Testing Platform v2 `test.runner`, Shouldly, and NSubstitute align; `test/Hexalith.Agents.IntegrationTests` exists in the `.slnx`; and the Live Story 5.2/5.3 dispatch, query, and projection seams assert persisted EventStore/state-store/read-model end state
+**Then** `global.json`, the imported Hexalith.Builds package catalog, xUnit v3/Microsoft Testing Platform v2 `test.runner`, Shouldly, and NSubstitute align with no Agents-local package versions; `test/Hexalith.Agents.IntegrationTests` exists in the `.slnx`; and the Live Story 5.2/5.3 dispatch, query, and projection seams assert persisted EventStore/state-store/read-model end state
 **And** every live claim names and passes its registered integration test in the same change.
 
 **Evidence Manifest:**

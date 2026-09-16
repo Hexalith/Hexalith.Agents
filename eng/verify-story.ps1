@@ -12,6 +12,8 @@ if ($Story -ne '5.1') {
 
 $root = Split-Path -Parent $PSScriptRoot
 $solution = Join-Path $root 'Hexalith.Agents.slnx'
+$consumerAuthorityValidator = Join-Path $root 'references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1'
+$authoritativeCatalog = Join-Path $root 'references/Hexalith.Builds/Props/Directory.Packages.props'
 $packageDirectory = Join-Path $root 'artifacts/story-5.1/packages'
 $testProjects = @(
     'test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj',
@@ -96,6 +98,12 @@ function New-UnrelatedPackageArchive {
 
 Push-Location $root
 try {
+    Write-Host 'Gate: shared package authority'
+    pwsh -NoProfile -File $consumerAuthorityValidator -RepositoryRoot $root -CatalogPath $authoritativeCatalog
+
+    Write-Host 'Gate: effective EventStore package floor'
+    pwsh -NoProfile -File (Join-Path $root 'eng/verify-story-5.2.ps1') -PackageFloorOnly
+
     Write-Host 'Gate: source-build'
     dotnet restore $solution -p:Configuration=Debug -p:UseHexalithProjectReferences=true -p:NuGetAudit=false /m:1 /nr:false
     dotnet build $solution -c Debug --no-restore -warnaserror -p:UseHexalithProjectReferences=true /m:1 /nr:false

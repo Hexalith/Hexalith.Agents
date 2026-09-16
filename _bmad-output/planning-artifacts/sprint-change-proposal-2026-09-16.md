@@ -12,7 +12,7 @@ approval_required: false
 approval_status: approved
 approved_by: Administrator
 approved_on: 2026-09-16
-execution_status: approved-awaiting-implementation
+execution_status: implementation-verified-locally-awaiting-builds-publication
 routed_to:
   - Product Owner
   - Developer
@@ -387,4 +387,13 @@ Administrator explicitly approved this proposal on 2026-09-16. The changes liste
 
 ### Handoff Completion
 
-The approved handoff package is §4's exact story, architecture, UX, implementation-file, and guard changes, sequenced by §3 and bounded by §5's success criteria. The Hexalith.Builds Maintainer owns the first implementation step. The Developer must then consume the approved Builds gitlink and reconcile the existing Agents worktree without discarding unrelated changes. Story 5.1 and DW-20 remain open until the full verification evidence passes.
+The approved handoff package is §4's exact story, architecture, UX, implementation-file, and guard changes, sequenced by §3 and bounded by §5's success criteria. The implementation evidence below closes DW-20 and leaves Story 5.1 in review/integration: the locally landed Builds commits must become upstream-fetchable and the parent must record their exact gitlink without discarding unrelated changes.
+
+## Implementation Evidence — 2026-09-16
+
+- Hexalith.Builds catalog commit `dae84d5f96911517eb1e6f97e75eb88e759e6d8a` selects published EventStore `3.106.0`; generated-audit commit `000abf867abc3a99cfa74d39b6e73af05c78a602` records the corresponding catalog evidence.
+- Agents `Directory.Packages.props` is import-only and carries no package-specific version property, `PackageVersion`, or fallback list. The shared consumer-authority validator covers root, sibling, parent-references, missing-catalog, local-property override, local-item override, and `VersionOverride` cases.
+- `pwsh -NoProfile -File ./eng/verify-story.ps1 -Story 5.1` passes the shared-authority and EventStore-floor gates, warning-free Debug/source and Release/package builds, all project-level test suites, source-policy negatives, the exact six-package inventory, and isolated package consumption.
+- DW-20 is closed because the effective Release package graph now uses EventStore `3.106.0` from Hexalith.Builds; no Agents-local override is accepted as evidence.
+- The two Builds commits are locally landed but not yet upstream-fetchable. Until they are published and the parent records exact gitlink `000abf867abc3a99cfa74d39b6e73af05c78a602`, a fresh clone cannot reproduce the successful local lane; ARCH-A-15 remains open for that integration condition.
+- Story 5.1 remains `in-progress` for review/integration. Story 5.2 remains `review` for independent blockers including DW-21; resolving its EventStore package floor does not establish historical completion.

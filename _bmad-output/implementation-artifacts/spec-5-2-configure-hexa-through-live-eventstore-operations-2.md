@@ -2,7 +2,7 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'done'
+status: 'review'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
 review_loop_iteration: 8
@@ -275,9 +275,10 @@ All ten round-2 patch findings were applied. No decision-needed items were raise
 
 Two changes live in the `references/Hexalith.EventStore` submodule (the no-op `resultPayload` forwarding in `AggregateActor` and `GetCommandStatusAsync` on `IEventStoreGatewayClient`). Both are now committed and pushed in that repository, and the submodule pointer here is bumped to `555c9047`.
 
-Package-mode delivery is intentionally still blocked: the imported package graph remains on EventStore `3.104.0`,
-which predates both changes. `eng/verify-story-5.2.ps1` requires `3.105.0` or later and `DW-20` tracks publication
-and consumption of that release. Source-mode evidence is green; this story must not be promoted while that floor is red.
+Package-mode delivery is no longer blocked by the EventStore floor. Story 5.1 advanced the sole authoritative
+Hexalith.Builds catalog to published EventStore `3.106.0`, removed Agents-local version ownership, and passed the
+Release/package and isolated-consumer lanes; `DW-20` is closed. The locally landed Builds commits must still become
+upstream-fetchable and be recorded by the parent gitlink, and Story 5.2 retains its independent review blockers.
 
 **Round 6 re-derivation note, 2026-09-15**
 
@@ -299,8 +300,9 @@ submodule history is preserved. Reapply the round-5 KEEP behavior selectively. D
   activation version as an init-only property. This avoids an unnecessary binary constructor break while retaining
   the additive HTTP/JSON surface and exact retry behavior.
 - Source-mode build, root suites, focused EventStore trust/no-op suites, EventStore client suite, tooling tests, and
-  whitespace checks pass. The package-floor gate intentionally fails closed on EventStore 3.104.0; DW-20 and DW-21
-  remain the explicit promotion blockers, so this story does not move to done.
+  whitespace checks pass. As of the 2026-09-16 Story 5.1 authority change, the shared catalog supplies EventStore
+  `3.106.0` and the package-floor plus Release/package lanes pass, closing DW-20. DW-21 and the other independent
+  Story 5.2 review blockers remain; the package authority repair does not by itself promote this story.
 
 **Round 3 fixes applied 2026-09-14**
 
@@ -369,6 +371,9 @@ submodule history is preserved. Reapply the round-5 KEEP behavior selectively. D
   verdicts are execution evidence rather than canonical intent; newer same-Agent retries use fail-closed verdicts and
   existing EventStore admission, while absent/not-created/foreign/older projections remain undispatched. This avoids
   a new lookup API or retry store and preserves the aggregate N fence and every prior KEEP instruction.
+- 2026-09-16: Story 5.1 moved sole package-version authority to Hexalith.Builds and selected published EventStore
+  `3.106.0`. The effective package-floor and Release/package lanes pass, so DW-20 is closed. Story 5.2 remains in
+  `review` for its independent blockers, including external gateway registration (DW-21).
 
 ## Review Triage Log
 
@@ -600,9 +605,8 @@ the aggregate and is rejected when current state differs from N.
 ## Verification
 
 **Commands:**
-- `pwsh ./eng/verify-story-5.2.ps1` -- expected in source mode: every named Story 5.2 gate passes, including
-  split-provider gateway admission and reserved-extension trust; promotion remains blocked until a published
-  EventStore package containing the no-op, status, and trust-policy changes is consumed.
+- `pwsh ./eng/verify-story-5.2.ps1` -- expected: every named Story 5.2 gate passes, including the EventStore
+  package floor supplied by the imported Builds catalog, split-provider gateway admission, and reserved-extension trust.
 - `dotnet build Hexalith.Agents.slnx --configuration Debug -warnaserror -p:UseHexalithProjectReferences=true -p:NuGetAudit=false` -- expected: warning-free source-mode development build with additive contracts.
 - `dotnet build Hexalith.Agents.slnx --configuration Release -warnaserror -p:UseHexalithProjectReferences=false -p:NuGetAudit=false` -- expected: warning-free package-mode release build.
 - `dotnet pack src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj --configuration Release -p:UseHexalithProjectReferences=false -p:NuGetAudit=false` -- expected: the package contains its public registration/marker surface and only declared package dependencies.

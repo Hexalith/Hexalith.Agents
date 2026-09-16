@@ -2,32 +2,13 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
-    <!-- Hexalith.EventStore — set before the import so it wins over the shared catalog default. The catalog
-         still pins 3.104.0, which is below the Story 5.2 package floor (3.105.0, eng/verify-story-5.2.ps1)
-         and behind references/Hexalith.EventStore (v3.106.0); this keeps the package lane on the same version
-         the source lane compiles. Remove the override once Hexalith.Builds carries the bump. -->
-    <HexalithEventStoreVersion Condition="'$(HexalithEventStoreVersion)' == ''">3.106.0</HexalithEventStoreVersion>
     <Hexalith1BuildPackageProps Condition="'$(Hexalith1BuildPackageProps)' == ''">$(MSBuildThisFileDirectory)references/Hexalith.Builds/Props/Directory.Packages.props</Hexalith1BuildPackageProps>
+    <Hexalith2BuildPackageProps Condition="'$(Hexalith2BuildPackageProps)' == ''">$(MSBuildThisFileDirectory)../Hexalith.Builds/Props/Directory.Packages.props</Hexalith2BuildPackageProps>
+    <Hexalith3BuildPackageProps Condition="'$(Hexalith3BuildPackageProps)' == ''">$(MSBuildThisFileDirectory)../references/Hexalith.Builds/Props/Directory.Packages.props</Hexalith3BuildPackageProps>
+    <Hexalith4BuildPackageProps Condition="'$(Hexalith4BuildPackageProps)' == ''">$(MSBuildThisFileDirectory)../../references/Hexalith.Builds/Props/Directory.Packages.props</Hexalith4BuildPackageProps>
   </PropertyGroup>
   <Import Project="$(Hexalith1BuildPackageProps)" Condition="Exists('$(Hexalith1BuildPackageProps)') And '$(HexalithVersionsLoaded)' != 'true'" />
-  <!-- Only the package versions the buildable shell + boundary-guard tests consume today. Future
-       Agent/provider/Aspire packages are added by the stories that need them (AC4: no premature
-       pre-listing). Versions follow the architecture Stack table. -->
-  <ItemGroup Label="UI">
-    <!-- FluentUI Blazor v5 — the FrontComposer-governed baseline (matches Hexalith.Tenants). The Agents
-         admin-setup UI (Story 1.8) inherits Fluent semantic roles/components; do not pin a different version. -->
-    <PackageVersion Update="Microsoft.FluentUI.AspNetCore.Components" Version="5.0.0-rc.5-26219.1" />
-  </ItemGroup>
-  <ItemGroup Label="Testing">
-    <PackageVersion Update="Microsoft.NET.Test.Sdk" Version="18.10.1" />
-    <PackageVersion Update="xunit.v3" Version="4.0.1" />
-    <PackageVersion Update="xunit.v3.assert" Version="4.0.1" />
-    <PackageVersion Update="xunit.v3.extensibility.core" Version="4.0.1" />
-    <PackageVersion Update="xunit.runner.visualstudio" Version="4.0.0" />
-    <PackageVersion Update="Shouldly" Version="4.3.0" />
-    <PackageVersion Update="NSubstitute" Version="6.2.0" />
-    <PackageVersion Update="coverlet.collector" Version="10.0.1" />
-    <!-- Keep the Agents.UI tests aligned with Hexalith.FrontComposer.Testing and its shared test stack. -->
-    <PackageVersion Update="bunit" Version="2.11.3" />
-  </ItemGroup>
+  <Import Project="$(Hexalith2BuildPackageProps)" Condition="Exists('$(Hexalith2BuildPackageProps)') And '$(HexalithVersionsLoaded)' != 'true'" />
+  <Import Project="$(Hexalith3BuildPackageProps)" Condition="Exists('$(Hexalith3BuildPackageProps)') And '$(HexalithVersionsLoaded)' != 'true'" />
+  <Import Project="$(Hexalith4BuildPackageProps)" Condition="Exists('$(Hexalith4BuildPackageProps)') And '$(HexalithVersionsLoaded)' != 'true'" />
 </Project>

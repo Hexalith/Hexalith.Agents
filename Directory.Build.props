@@ -75,8 +75,8 @@
     <RequiredRootSubmodule Include="Hexalith.Builds" />
   </ItemGroup>
 
-  <Target Name="CheckBuildCatalog" BeforeTargets="Restore;Build">
-    <Error Condition="!Exists('$(MSBuildThisFileDirectory)references/Hexalith.Builds/.git')" Text="Build catalog submodule 'references/Hexalith.Builds' is missing. Run: git submodule update --init -- references/Hexalith.Builds from the repository root." />
+  <Target Name="CheckBuildCatalog" BeforeTargets="Restore;Build;GenerateNuspec;Pack;Publish">
+    <Error Condition="'$(HexalithVersionsLoaded)' != 'true'" Text="Hexalith.Builds package catalog was not loaded. Initialize only the root-declared submodule from the repository root: git submodule update --init -- references/Hexalith.Builds" />
   </Target>
 
   <Target Name="FailReleaseWithHexalithProjectReferences" BeforeTargets="Restore;Build" DependsOnTargets="ValidateDependencyMode" Condition="'$(Configuration)' != 'Debug' and '$(UseHexalithProjectReferences)' == 'true'">

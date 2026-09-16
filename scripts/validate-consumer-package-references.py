@@ -111,6 +111,7 @@ def main() -> int:
             using Hexalith.Agents;
             using Hexalith.Agents.Client;
             using Hexalith.Agents.Contracts.Agent;
+            using Hexalith.Agents.EventStore;
             using Hexalith.Agents.Testing;
             using Hexalith.Agents.UI;
 
@@ -121,6 +122,7 @@ def main() -> int:
                     typeof(AgentsAssemblyMarker),
                     typeof(AgentsClientAssemblyMarker),
                     typeof(AgentLifecycleStatus),
+                    typeof(AgentsEventStoreAssemblyMarker),
                     typeof(AgentsTestingAssemblyMarker),
                     typeof(AgentsUIAssemblyMarker),
                 ];

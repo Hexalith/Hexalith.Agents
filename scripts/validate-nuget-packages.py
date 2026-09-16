@@ -23,6 +23,49 @@ EXPECTED_DEPENDENCIES = {
     "Hexalith.Agents.Client": frozenset(
         {"ByteAether.Ulid", "Hexalith.Agents.Contracts", "Hexalith.Commons.UniqueIds", "Hexalith.EventStore.Contracts"}
     ),
+    "Hexalith.Agents.EventStore": frozenset(
+        {
+            "ByteAether.Ulid",
+            "Dapr.Actors",
+            "Dapr.Actors.AspNetCore",
+            "Dapr.AspNetCore",
+            "Dapr.Client",
+            "FluentValidation",
+            "FluentValidation.DependencyInjectionExtensions",
+            "Hexalith.Agents.Contracts",
+            "Hexalith.Commons.UniqueIds",
+            "Hexalith.EventStore.Admin.Abstractions",
+            "Hexalith.EventStore.Client",
+            "Hexalith.EventStore.Contracts",
+            "Hexalith.EventStore.DomainService",
+            "Hexalith.EventStore.Gateway",
+            "Hexalith.EventStore.Server",
+            "Hexalith.EventStore.ServiceDefaults",
+            "MediatR",
+            "MessagePack",
+            "Microsoft.AspNetCore.Authentication.JwtBearer",
+            "Microsoft.AspNetCore.OpenApi",
+            "Microsoft.AspNetCore.SignalR.StackExchangeRedis",
+            "Microsoft.Extensions.Http.Resilience",
+            "Microsoft.Extensions.ServiceDiscovery",
+            "Microsoft.IdentityModel.Abstractions",
+            "Microsoft.IdentityModel.JsonWebTokens",
+            "Microsoft.IdentityModel.Logging",
+            "Microsoft.IdentityModel.Protocols",
+            "Microsoft.IdentityModel.Protocols.OpenIdConnect",
+            "Microsoft.IdentityModel.Tokens",
+            "Microsoft.OpenApi",
+            "OpenTelemetry",
+            "OpenTelemetry.Exporter.OpenTelemetryProtocol",
+            "OpenTelemetry.Extensions.Hosting",
+            "OpenTelemetry.Instrumentation.AspNetCore",
+            "OpenTelemetry.Instrumentation.Http",
+            "OpenTelemetry.Instrumentation.Runtime",
+            "StackExchange.Redis",
+            "Swashbuckle.AspNetCore.SwaggerUI",
+            "System.IdentityModel.Tokens.Jwt",
+        }
+    ),
     "Hexalith.Agents": frozenset(
         {
             "ByteAether.Ulid",
@@ -101,6 +144,12 @@ FORBIDDEN_DEPENDENCY_FRAGMENTS = (
     "OpenAI",
     "Anthropic",
 )
+
+ALLOWED_INFRASTRUCTURE_DEPENDENCIES = {
+    "Hexalith.Agents.EventStore": frozenset(
+        {"Hexalith.EventStore.Server", "Hexalith.EventStore.ServiceDefaults"}
+    ),
+}
 
 
 @dataclass(frozen=True)
@@ -192,6 +241,7 @@ def validate_package(metadata: PackageMetadata, path: Path, produced_version: st
         dependency.package_id
         for dependency in metadata.dependencies
         if any(fragment.casefold() in dependency.package_id.casefold() for fragment in FORBIDDEN_DEPENDENCY_FRAGMENTS)
+        and dependency.package_id not in ALLOWED_INFRASTRUCTURE_DEPENDENCIES.get(metadata.package_id, frozenset())
     )
     if forbidden:
         raise ValueError(f"{path.name}: infrastructure/reverse dependency leak: {forbidden}")

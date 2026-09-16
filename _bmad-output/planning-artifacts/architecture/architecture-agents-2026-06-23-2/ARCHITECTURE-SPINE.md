@@ -7,8 +7,8 @@ paradigm: event-sourced Dapr-Workflow-orchestrated hexagonal Hexalith domain mod
 scope: Hexalith Agents module in the agents workspace
 status: final
 created: 2026-06-23
-updated: 2026-09-13
-architecture_assumption_index_version: 10
+updated: 2026-09-16
+architecture_assumption_index_version: 11
 binds:
   - PRD FR-1..FR-34
   - PRD NFR-1..NFR-14
@@ -24,6 +24,7 @@ sources:
   - ../../sprint-change-proposal-2026-08-02.md
   - ../../sprint-change-proposal-2026-08-04-live-integration-tier.md
   - ../../sprint-change-proposal-2026-09-09-2.md
+  - ../../sprint-change-proposal-2026-09-16.md
   - ../../research/technical-dapr-ai-agents-research-2026-06-23.md
   - ../../ux-designs/ux-agents-2026-06-23/DESIGN.md
   - ../../ux-designs/ux-agents-2026-06-23/EXPERIENCE.md
@@ -899,29 +900,30 @@ sequenceDiagram
 | Target framework | `net10.0` |
 | C# language | `14` from root `Directory.Build.props` |
 | Solution format | `.slnx` |
-| Package management | Central Package Management via `Directory.Packages.props` importing the `Hexalith.Builds` catalog |
-| Hexalith.EventStore | root parent gitlink `ce9e779a` at the spine `updated` date; the separate submodule working-tree HEAD is not architecture authority |
-| Hexalith.Conversations | parent gitlink `73bcee6f` at the spine `updated` date |
-| Hexalith.Parties | parent gitlink `fa423985` at the spine `updated` date |
-| Hexalith.Tenants | root parent gitlink `2fac1839` at the spine `updated` date |
-| Hexalith.FrontComposer | parent gitlink `053b2008` at the spine `updated` date |
+| Package management | Central Package Management via an import-only Agents `Directory.Packages.props` that resolves `Hexalith.Builds/Props/Directory.Packages.props` in supported standalone and parent/sibling layouts. Hexalith.Builds is the sole package-version authority: Agents declares no `PackageVersion`, dependency-version property, or `VersionOverride`; compatibility floors are checked against the effective imported selection. |
+| Hexalith.Builds | Story 5.1 root gitlink target `000abf867abc3a99cfa74d39b6e73af05c78a602`; catalog commit `dae84d5f96911517eb1e6f97e75eb88e759e6d8a` selects EventStore `3.106.0`, and the following audit commit binds the generated catalog evidence. The commits are locally landed; ARCH-A-15 retains the remaining upstream/fetchable-gitlink condition. |
+| Hexalith.EventStore | root parent gitlink `76051c70cbf868c40edc00ca0344fa5bd8879b69` (`v3.106.0`) at the spine `updated` date |
+| Hexalith.Conversations | parent gitlink `fd3dd58c3c10b512c79cc425f94d57c4d3400b20` at the spine `updated` date |
+| Hexalith.Parties | parent gitlink `14d249fde316b0002aec84351d7a7cdf953d1d30` at the spine `updated` date |
+| Hexalith.Tenants | root parent gitlink `c150d5b1af4f911ff3b2a7ab7901d94838be09d7` at the spine `updated` date |
+| Hexalith.FrontComposer | parent gitlink `0122c53afb5ac2993ca2e4d6a6e828600c960687` at the spine `updated` date |
 | Hosting (Aspire, Dapr hosting integrations) | `Unselected` until `EXT-HOST-1` is `Committed`; historical `Hexalith.Platform@a66cdf34` is not a current or usable target |
-| Dapr .NET packages | The parent-authoritative `Hexalith.Builds@a32cb422` catalog pins `1.18.5`; Agents already consumes `Dapr.Client` and `Dapr.AspNetCore` transitively through EventStore Client/DomainService in source and package modes. The parent-modified but internally clean Builds checkout at `cf52f74` pins `1.18.7` but is not root authority. Official `1.18.7` supersedes `1.18.5`, so ARCH-A-15 blocks release pending an atomic parent gitlink/package-family upgrade with compatibility evidence or a Security-approved bounded exception. |
-| Dapr Workflow | Not yet consumed by an Agents project; future Story 6.1 adoption must use the same ARCH-A-15-approved package-family version, currently `1.18.5` at the parent-authoritative catalog and `1.18.7` only in the parent-modified but internally clean Builds checkout at `cf52f74`. |
-| MediatR | `14.2.0` from imported workspace catalog, but absent from the current Agents runtime dependency graph; the service that first loads it owns license compliance before deployment |
-| FluentValidation | `12.1.1` from imported workspace catalog |
-| OpenTelemetry | `1.18.0` from imported workspace catalog |
-| Fluent UI Blazor | `5.0.0-rc.5-26219.1` root pin matching the catalog |
-| xUnit v3 | `3.2.2` root override; catalog `4.0.0` (Microsoft Testing Platform v2, which needs the `test.runner` entry in `global.json` that most inspected siblings carry and Agents lacks; Conversations is the inspected exception); accepted deviation until Story 5.6 aligns [ASSUMPTION ARCH-A-4] |
-| Shouldly | `4.3.0` from root-selected catalog |
-| NSubstitute | `5.3.0` root override; catalog `6.2.0`; same deviation as xUnit |
-| Microsoft.NET.Test.Sdk | root override diverging from the workspace catalog; same Microsoft Testing Platform v2 deviation as xUnit, accepted until Story 5.6 [ASSUMPTION ARCH-A-4] |
-| xunit.runner.visualstudio | root override diverging from the workspace catalog; same deviation as xUnit, accepted until Story 5.6 [ASSUMPTION ARCH-A-4] |
-| bunit | `2.10.3` root pin matching the current workspace catalog |
+| Dapr .NET packages | The Story 5.1 Builds target selects the complete Client/ASP.NET/Workflow family at official `1.18.7`; Agents consumes Client/ASP.NET transitively through EventStore in source and package modes. The full Story 5.1 source/package and isolated-consumer lane passes. ARCH-A-15 remains open only until the parent records an upstream-fetchable Builds gitlink. |
+| Dapr Workflow | Not yet consumed by an Agents project; future Story 6.1 adoption must use the shared `1.18.7` family and remains subject to ARCH-A-15's final gitlink-availability condition. |
+| MediatR | `14.2.0` from the imported Builds catalog, but absent from the current Agents runtime dependency graph; the service that first loads it owns license compliance before deployment |
+| FluentValidation | `12.1.1` from the imported Builds catalog |
+| OpenTelemetry | `1.18.0` from the imported Builds catalog |
+| Fluent UI Blazor | `5.0.0-rc.5-26219.1` selected by the imported Builds catalog; Agents owns no local pin |
+| xUnit v3 | `4.0.1` from the imported Builds catalog; root `global.json` selects Microsoft Testing Platform through `test.runner` |
+| Shouldly | `4.3.0` from the imported Builds catalog |
+| NSubstitute | `6.2.0` from the imported Builds catalog |
+| Microsoft.NET.Test.Sdk | `18.10.0` from the imported Builds catalog |
+| xunit.runner.visualstudio | `4.0.0` from the imported Builds catalog |
+| bunit | `2.11.3` from the imported Builds catalog |
 | Provider SDK | `Unselected` until `EXT-PROVIDER-1` is committed |
 | Agent Framework SDK | `Unselected` until `EXT-PROVIDER-1` is committed |
 
-**Verified-current security scope:** `CVE-2026-69522` is a Windows vulnerability in `Microsoft.DiaSymReader.Native`; the advisory fixes that component at `18.9.0-beta1.26405.2`, not at an SDK-number floor. The present dependency graph has no direct reference to that component. Any future direct reference must meet the component floor independently; installing a newer SDK elsewhere never compensates for a vulnerable pinned or directly referenced component. The root pins the current September .NET 10 SDK `10.0.401`; this document-only update makes no build-success claim.
+**Verified-current security scope:** `CVE-2026-69522` is a Windows vulnerability in `Microsoft.DiaSymReader.Native`; the advisory fixes that component at `18.9.0-beta1.26405.2`, not at an SDK-number floor. The present dependency graph has no direct reference to that component. Any future direct reference must meet the component floor independently; installing a newer SDK elsewhere never compensates for a vulnerable pinned or directly referenced component. The root pins the current September .NET 10 SDK `10.0.401`; Story 5.1's full Debug/source and Release/package lanes pass against the imported Builds catalog.
 
 ## Structural Seed
 
@@ -1316,7 +1318,7 @@ classDiagram
 | `OD-OPERATOR-DELETION-NONTERMINAL-DISPOSITION-1`: operator-deletion treatment of an awaiting or Approved proposal/nonterminal interaction, including public status/reason, proposal/open-lease transition, audit, SM-3, and SM-C4 attribution | The admission fence and owner Closing stay restrictive, but that owner cannot become Effective and the candidate cannot be built. No Workflow invents a human rejection/abandonment, `SourceConversationUnavailable`, or a new deletion status. Terminal interactions remain evaluable; Conversation-approved source deletion uses its existing Conversation-deleted transitions. | Product + Governance; before Story 8.3 can advance an operator deletion containing nonterminal work; not an `RQ-1` input |
 | `OD-EXPORT-LIFECYCLE-1`: exact export lifetime, whether a later hold extends or supersedes expiry, how restored backups treat expired/held artifacts, and the platform storage provider | `ExportRequest`, `ExportDownload`, `EXT-EXPORT-STORE-1` activation, and `RQ-1` fail closed; hold/deletion operations fail closed only when their exact frozen sets contain committed artifacts or lifecycle-covered copies. An export-free deletion proves that condition at recorded inventory revisions and never reads or fabricates this decision. A hold overlapping committed artifacts remains restrictive pending and cannot report `Active` or unpin until the decision/version and exact store target authorize and acknowledge those artifact operations. AD-22's immutable key, AEAD, index, signed manifest, and purge-receipt invariants remain binding regardless of the choice. | Product + Governance + Security + Platform Maintainer; before Story 8.2, and before Stories 8.1/8.3 only where committed artifacts overlap |
 | `OD-RATE-CONCURRENCY-CONSUMPTION-1`: whether an original-call concurrency rejection consumes either rolling-rate window, and the corresponding joint owner order/status/metric contract | `AgentCallAcceptance` and Story 6.4 fail closed before either rate or open-interaction ledger is contacted; regeneration and already-recorded decisions retain their immutable outcomes. | Product + Architecture; before Story 6.4 can become ready-for-dev |
-| `OD-DAPR-SECURITY-1`: advance the parent-authoritative Builds gitlink/package family to `1.18.7+`, or accept a bounded `1.18.5` exception | Existing transitive Client/ASP.NET exposure is reported, not treated as future-only; no release or Workflow adoption may cite ARCH-A-15 as retired. | Security + Builds Maintainer; ARCH-A-15 target 2026-09-30 |
+| `OD-DAPR-SECURITY-1`: make the Story 5.1 Builds commits that select the complete `1.18.7` family upstream-fetchable and record their exact gitlink in the parent | Local source/package and isolated-consumer compatibility evidence passes, but no release or Workflow adoption may cite ARCH-A-15 as retired until a fresh clone can fetch the selected Builds commit. | Security + Builds Maintainer; ARCH-A-15 target 2026-09-30 |
 | `OD-SPRINT-5.1-5.2-1`: roll the tracker back to current dependency/evidence authority, or prove historical completion and record a changed-dependency exception plus replacement verifier | Architecture and dependency status do not change; `EXT-HOST-1` consumers remain blocked. The spine does not rewrite delivery history. | Delivery owner + Platform Maintainer; before dependent story authorization |
 | `OD-PRD-OQ18-HISTORICAL-SAFETY-1`: choose any future per-category treatment of unsafe historical Conversation content, or retain the current whole-Conversation fail-closed behavior | `RQ-1` fails closed; runtime retains the PRD's current fail-closed whole-history rule and no per-message redaction/exclusion is inferred. | Product + Security; before production enablement |
 | `OD-PRD-OQ23-AUTOMATIC-RETRACTION-1`: choose the retraction metric/dependency branch for the first Automatic-mode tenant | `AutomaticModeEnablementEligibility` fails closed only for Automatic Response Mode; global `RQ-1` and Confirmation-mode enablement are unaffected. | Product + Conversations Maintainer; before the first Automatic-mode tenant is enabled |
@@ -1349,9 +1351,9 @@ The amended rules above are the convergence contract; they do not claim current 
 | Current approval orchestration appends to Conversations before EventStore dispatch and the current approval policy emits `Approved`, `PostingPending`, and the posting result together. It does not implement AD-5's durable `Approved` then `PostingPending` authorization-before-effect protocol. | Story 7.4 refactor plus durable-before-post concurrency, lost-ack, and recovery evidence |
 | Current interaction code maps an output-safety block to `SafetyFailed`, but Product + Security have not approved `OD-INITIAL-OUTPUT-SAFETY-STATUS-1`; it also lacks the generic committed Provider lease followed by an immutable `ProviderInvocationAuthorized`/`ProviderInvocationNotAuthorized` branch and phase-pinned selected status/reason/metric/open-lease mapping. Shipped behavior is implementation reality/debt and is not architecture authority. | Stories 6.1 and 6.3; implement the safe not-authorized settlement branch now, and after the Product decision is approved add phase-pinned authorization/result/recovery evidence and reconcile the public contract to the selected outcome |
 | Public readiness, interaction, mirror, resolution, capacity, and blocker vocabulary is incomplete. | Stories 5.6, 6.2, 6.6, 7.1, 7.4 through 7.6, and 8.5 |
-| The root-authoritative Builds gitlink still pins transitive Dapr Client/ASP.NET `1.18.5`; the parent-modified but internally clean Builds checkout at `cf52f74` has a `1.18.7` catalog but is not a committed root upgrade. Dapr Workflow remains unreferenced. | Builds/Security decision, root gitlink update or exception, compatibility evidence, then Story 6.1 |
-| Sprint status says Story 5.1 is done and 5.2 is in progress while `EXT-HOST-1` is `Uncommitted`, story evidence says backlog/not run, and `eng/verify-story-5.1.ps1` is absent. | `OD-SPRINT-5.1-5.2-1`; tracking/evidence correction, not an AD change |
-| Legacy conformance tests still assert superseded structure/runtime semantics. | Story 5.6/build maintenance; no build success is claimed by this document update |
+| Story 5.1's local Builds commits select the complete Dapr `1.18.7` family and pass source/package compatibility evidence, but those commits are not yet upstream-fetchable and the parent has not recorded the exact gitlink. Dapr Workflow remains unreferenced. | Publish the Builds commits, record the exact parent gitlink, then retire ARCH-A-15 and proceed to Story 6.1 |
+| Story 5.1 is correctly reopened as `in-progress` and its complete local verifier is green. Story 5.2 remains `review`: the EventStore floor is resolved, while independent review blockers and `EXT-HOST-1` remain. | Finish Story 5.1 review/integration and Story 5.2's independent review work; do not conflate dependency repair with historical completion |
+| Package/build conformance now verifies the imported Builds catalog, supported checkout layouts, source-policy negatives, exact package inventory, and isolated consumption. Other legacy structural/runtime assertions remain Story 5.6 debt. | Story 5.6/build maintenance |
 
 ## External V1 Prerequisites
 
@@ -1376,16 +1378,16 @@ Consuming stories, targets, and commitment status are read from the register; st
 
 ## Architecture Assumptions
 
-**Architecture Assumption Index:** `ARCH-A-INDEX-10`
+**Architecture Assumption Index:** `ARCH-A-INDEX-11`
 
-Spine-originated assumptions are keyed so each affected evaluation can name them as `UnretiredAssumption` blockers alongside the scoped PRD section 8.1 rows the ADs cite inline. Every current `ARCH-A` row affects `RQ-1` unless its row explicitly names a narrower evaluation; an `RQ-1` decision records the exact index version it evaluated and each blocker names the row, affected evaluation, and `ARCH-A-INDEX-10`. Adding or retiring a row, or changing an assumption, owner, affected scope, or retirement condition, increments `architecture_assumption_index_version` and the rendered index identifier in the same change. An unscheduled Architecture-owned `RQ-1` row remains a blocker until its co-owners approve a date. PRD A-28 is not a Spine row and remains scoped only to `AutomaticModeEnablementEligibility`. ARCH-A-4's SDK observation is scoped to Windows and the present dependency graph as stated in Stack; any future direct `Microsoft.DiaSymReader.Native` reference must independently meet the advisory's patched component floor.
+Spine-originated assumptions are keyed so each affected evaluation can name them as `UnretiredAssumption` blockers alongside the scoped PRD section 8.1 rows the ADs cite inline. Every current `ARCH-A` row affects `RQ-1` unless its row explicitly names a narrower evaluation; an `RQ-1` decision records the exact index version it evaluated and each blocker names the row, affected evaluation, and `ARCH-A-INDEX-11`. Adding or retiring a row, or changing an assumption, owner, affected scope, or retirement condition, increments `architecture_assumption_index_version` and the rendered index identifier in the same change. An unscheduled Architecture-owned `RQ-1` row remains a blocker until its co-owners approve a date. PRD A-28 is not a Spine row and remains scoped only to `AutomaticModeEnablementEligibility`. ARCH-A-4's SDK observation remains scoped to Windows and the present dependency graph as stated in Stack; any future direct `Microsoft.DiaSymReader.Native` reference must independently meet the advisory's patched component floor.
 
 | Key | Assumption | Where | Owner | Retired when | TargetRetirementDate |
 | --- | --- | --- | --- | --- | --- |
 | ARCH-A-1 | Terminal workflow instances are purged within a 7-day operational window | AD-27 | Architecture + Platform Maintainer | `EXT-HOST-1` confirms the purge job and window | Unscheduled — revisit at `EXT-HOST-1` commitment |
 | ARCH-A-2 | Caller `PartyId` is resolved at ingress through the Parties adapter and Tenants membership | AD-30 | Architecture + Platform Maintainer | Platform identity contract confirms the subject-to-Party mapping | Unscheduled — revisit at `EXT-HOST-1` identity commitment |
 | ARCH-A-3 | `LR-UI-CONFORMANCE`, `LR-RUNTIME-PERFORMANCE`, and `LR-UI-PERFORMANCE` are Platform-scoped gates | AD-17, register | Architecture + Release PM | Product and the Release PM confirm before enablement | Unscheduled — revisit before `RQ-1` evaluation |
-| ARCH-A-4 | SDK observation is retired: root `global.json` pins the September .NET 10 SDK `10.0.401`/`rollForward: latestPatch`, and the inspected Windows graph has no direct `Microsoft.DiaSymReader.Native` reference; any future direct reference must meet advisory floor `18.9.0-beta1.26405.2`. Still open: Story 5.6 aligns root xunit.v3, NSubstitute, Microsoft.NET.Test.Sdk, and xunit.runner.visualstudio overrides plus the Microsoft Testing Platform v2 `test.runner` entry with the workspace catalog. | Stack | Architecture | SDK sub-item retired 2026-09-10; test-stack catalog alignment still targets Story 5.6 | SDK: retired 2026-09-10; test-stack catalog alignment unscheduled — revisit at Story 5.6 |
+| ARCH-A-4 | **RETIRED 2026-09-16.** Root `global.json` pins the September .NET 10 SDK `10.0.401`/`rollForward: latestPatch`, the inspected Windows graph has no direct `Microsoft.DiaSymReader.Native` reference, and any future direct reference must meet advisory floor `18.9.0-beta1.26405.2`. Story 5.1 removed the test-stack overrides, imports xunit.v3, NSubstitute, Microsoft.NET.Test.Sdk, and xunit.runner.visualstudio from Builds, retains the Microsoft Testing Platform v2 `test.runner` entry, and passes both full lanes. | Stack | Architecture | Retired by the Story 5.1 shared-catalog alignment and complete Debug/Release verifier evidence | 2026-09-16 |
 | ARCH-A-5 | **RETIRED 2026-09-09.** Approved sprint planning assigns platform-catalog plus tenant-enablement migration to reopened Story 5.3 and retains `/api/v1/agents` plus readiness consumption in Story 5.5 | AD-2, AD-10, conventions | Architecture + Epics | Retired by approved `sprint-change-proposal-2026-09-09.md` and the corresponding `epics.md` assignment | 2026-09-09 |
 | ARCH-A-6 | `Unreconciled` reservations settle `ChargedAtMaximum` at period close | AD-21 | Architecture + Product | Product confirms or replaces the settlement default | Unscheduled — revisit before `RQ-1` evaluation |
 | ARCH-A-7 | Timer skew tolerance of 2 seconds for elapsed-deadline evaluation | AD-28 | Architecture + Platform Maintainer | `EXT-TOPOLOGY-1` recovery and expiry evidence confirms or retunes it | Unscheduled — revisit before `RQ-1` evaluation |
@@ -1396,7 +1398,7 @@ Spine-originated assumptions are keyed so each affected evaluation can name them
 | ARCH-A-12 | The per-tenant `DigestKey` is versioned rather than singular, every issued version is custodied indefinitely by `EXT-SECRETS-1` while any digest under it survives, and Platform Operator-initiated rotation is unrestricted and content-free | AD-13, AD-22, AD-29 | Architecture + Security | Security confirms the versioned-key rotation policy or a different key-lifecycle procedure supersedes it | Unscheduled — revisit before `RQ-1` evaluation |
 | ARCH-A-13 | **RETIRED 2026-09-12.** The Eligible Approver predicate excludes the Approver who requested regeneration of the version under decision, in addition to the caller and last editor | AD-8 | Architecture + Product | Retired by the user's Product decision and synchronized PRD FR-7 wording | 2026-09-12 |
 | ARCH-A-14 | The `PostingPending` stored attempt-timeout deadline (FR-18: "no shorter than the AD-6 `EXT-CONV-AI-1` seam-2 posting timeout") has no concrete duration fixed by the PRD or this spine | AD-5, AD-28 | Architecture | Architecture proposes a concrete duration, or defers explicitly to the seam's own configured timeout, and Product confirms | Unscheduled — revisit before the `PostingPending` timeout/recovery story |
-| ARCH-A-15 | At the parent-authoritative Builds gitlink, Agents already consumes Dapr Client/ASP.NET transitively at `1.18.5`; only Workflow adoption is future. The parent-modified but internally clean Builds checkout at `cf52f74` pins `1.18.7` but is not committed root authority. | Stack, AD-16, AD-18 | Architecture + Security + Builds Maintainer | The parent gitlink and complete Dapr .NET package family advance atomically to official `1.18.7` or later and compatibility evidence passes, or Security records a time-bounded exception naming the retained exposure, compensating controls, and expiry. | 2026-09-30 |
+| ARCH-A-15 | Story 5.1 locally advances the complete Dapr Client/ASP.NET/Workflow family to official `1.18.7` in Builds and passes full source/package plus isolated-consumer compatibility evidence. Only Client/ASP.NET are currently consumed; Workflow adoption remains future. The Builds commits are not yet upstream-fetchable and the parent has not recorded their exact gitlink. | Stack, AD-16, AD-18 | Architecture + Security + Builds Maintainer | The Story 5.1 Builds commits are upstream-fetchable and the parent records exact gitlink `000abf867abc3a99cfa74d39b6e73af05c78a602`, or Security records a time-bounded exception naming the retained exposure, compensating controls, and expiry. | 2026-09-30 |
 
 ## Deferred Beyond V1
 

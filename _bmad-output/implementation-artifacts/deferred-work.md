@@ -228,7 +228,8 @@ location: references/Hexalith.Builds/Props/Directory.Packages.props:8
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 severity: blocker
 reason: The fix exists after EventStore 3.104.0, but package-mode Release and CI consume 3.104.0. The Story 5.2 verifier now requires 3.105.0 or later and intentionally remains red until that package is published and imported.
-status: open
+resolution: Hexalith.Builds catalog commit `dae84d5f96911517eb1e6f97e75eb88e759e6d8a` selects published EventStore `3.106.0`; audit commit `000abf867abc3a99cfa74d39b6e73af05c78a602` records the generated evidence. Agents owns no local package version, and the Story 5.1 EventStore floor, Release/package, package-validation, and isolated-consumer lanes pass. Upstream publication of the Builds commits and the exact parent gitlink remain integration work tracked by ARCH-A-15, not a reason to keep this package-release dependency open.
+status: done 2026-09-16
 
 ### DW-21: Register the Agents integration in the platform-owned EventStore gateway host.
 
@@ -238,3 +239,7 @@ source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-thro
 severity: blocker
 reason: This repository publishes `Hexalith.Agents.EventStore` and proves its explicit registration in an isolated gateway provider, but it does not own the deployed Platform gateway host. Promotion requires that host to consume the package and call `AddAgentsEventStore` with the exact allow-listed Agents Dapr app id; without that call, reserved metadata and keyed setup commands fail closed before domain execution.
 status: open
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md`
+  summary: Publish the two local Hexalith.Builds commits before publishing the parent gitlink.
+  evidence: The selected gitlink `000abf867abc3a99cfa74d39b6e73af05c78a602` is not contained by an origin ref, so a parent-first publication would make fresh-clone submodule initialization fail; remote publication is explicitly outside this story run's authorized scope.
