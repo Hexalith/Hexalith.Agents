@@ -123,20 +123,20 @@ try {
     foreach ($suite in $focusedSuites) {
         Invoke-Gate -Name "story-5.3 focused — $($suite.Gate)" -Arguments @(
             'test', $suite.Project, '-c', 'Debug', '--no-build',
-            '--filter', $suite.Filter, '/m:1', '/nr:false'
+            '--filter', $suite.Filter
         )
     }
 
     foreach ($testProject in $testProjects) {
         Invoke-Gate -Name "regression — $testProject" -Arguments @(
-            'test', $testProject, '-c', 'Debug', '--no-build', '/m:1', '/nr:false'
+            'test', $testProject, '-c', 'Debug', '--no-build'
         )
     }
 
     foreach ($suite in $compositionSuites) {
         Invoke-Gate -Name "story-5.3 composition — $($suite.Gate)" -Arguments @(
             'test', $suite.Project, '-c', 'Debug', '--no-build',
-            '--filter', $suite.Filter, '/m:1', '/nr:false'
+            '--filter', $suite.Filter
         )
     }
 

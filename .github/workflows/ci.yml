@@ -60,7 +60,7 @@ jobs:
       - *package-dotnet
       - *package-restore
       - *package-compile
-      - run: dotnet test test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false /m:1 /nr:false
+      - run: dotnet test test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false
 
   client-tests:
     name: Client tests
@@ -71,7 +71,7 @@ jobs:
       - *package-dotnet
       - *package-restore
       - *package-compile
-      - run: dotnet test test/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false /m:1 /nr:false
+      - run: dotnet test test/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false
 
   domain-tests:
     name: Domain tests
@@ -82,7 +82,7 @@ jobs:
       - *package-dotnet
       - *package-restore
       - *package-compile
-      - run: dotnet test test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false /m:1 /nr:false
+      - run: dotnet test test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false
 
   server-tests:
     name: Server tests
@@ -93,7 +93,7 @@ jobs:
       - *package-dotnet
       - *package-restore
       - *package-compile
-      - run: dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false /m:1 /nr:false
+      - run: dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false
 
   ui-tests:
     name: UI tests
@@ -104,7 +104,7 @@ jobs:
       - *package-dotnet
       - *package-restore
       - *package-compile
-      - run: dotnet test test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false /m:1 /nr:false
+      - run: dotnet test test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false
 
   boundary-checks:
     name: Boundary checks
@@ -116,7 +116,7 @@ jobs:
       - *package-restore
       - *package-compile
       - name: Run boundary suite
-        run: dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false /m:1 /nr:false
+        run: dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false
 
   package-consumer:
     name: Package consumer

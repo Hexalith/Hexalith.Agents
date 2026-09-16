@@ -102,7 +102,7 @@ try {
 
     foreach ($testProject in $testProjects) {
         Write-Host "Gate: test $testProject"
-        dotnet test $testProject -c Debug --no-build -p:UseHexalithProjectReferences=true /m:1 /nr:false
+        dotnet test $testProject -c Debug --no-build -p:UseHexalithProjectReferences=true
     }
 
     Write-Host 'Gate: package-build'
@@ -111,7 +111,7 @@ try {
 
     foreach ($testProject in $testProjects) {
         Write-Host "Gate: package test $testProject"
-        dotnet test $testProject -c Release --no-build -p:UseHexalithProjectReferences=false /m:1 /nr:false
+        dotnet test $testProject -c Release --no-build -p:UseHexalithProjectReferences=false
     }
 
     Write-Host 'Gate: executable dependency-mode failures'

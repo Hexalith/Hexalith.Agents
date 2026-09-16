@@ -259,7 +259,7 @@ try {
 
     foreach ($testProject in $testProjects) {
         Invoke-Gate -Name "regression — $testProject" -Arguments @(
-            'test', $testProject, '-c', 'Debug', '--no-build', '/m:1', '/nr:false'
+            'test', $testProject, '-c', 'Debug', '--no-build'
         )
     }
 
