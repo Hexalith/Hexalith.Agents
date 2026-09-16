@@ -155,7 +155,13 @@ public sealed class EventStoreAgentAdministrationOperations(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(command);
-        return WriteAsync(agentId, options, ActivateCoreAsync, cancellationToken);
+        int? expectedConfigurationVersion = options?.ExpectedConfigurationVersion;
+        return WriteAsync(
+            agentId,
+            options,
+            (request, ct) => ActivateCoreAsync(request, expectedConfigurationVersion!.Value, ct),
+            cancellationToken,
+            requiresExpectedConfigurationVersion: true);
     }
 
     /// <inheritdoc />
@@ -207,7 +213,7 @@ public sealed class EventStoreAgentAdministrationOperations(
     {
         ArgumentNullException.ThrowIfNull(command);
         return new ValueTask<AgentOperationResult>(
-            AgentOperationResult.Unavailable(options?.CorrelationId));
+            AgentOperationResult.Unavailable(IsCanonicalUlid(options?.CorrelationId) ? options!.CorrelationId : null));
     }
 
     private async ValueTask<AgentOperationResult<AgentSetupResult>> ReadSetupAsync(
@@ -223,7 +229,15 @@ public sealed class EventStoreAgentAdministrationOperations(
         if (!context.IsAuthorized)
         {
             // Fail closed before addressing the read model: a denied caller learns nothing about existence (AC4).
-            return AgentOperationResult<AgentSetupResult>.Succeeded(AgentSetupResult.NotAuthorized(), correlationId: correlationId);
+            return AgentOperationResult<AgentSetupResult>.Succeeded(
+                AgentSetupResult.NotAuthorized(),
+                correlationId: IsCanonicalUlid(correlationId) ? correlationId : null);
+        }
+
+        if ((correlationId is not null && !IsCanonicalUlid(correlationId))
+            || expectedConfigurationVersion is <= 0)
+        {
+            return AgentOperationResult<AgentSetupResult>.Failed(AgentOperationErrorCode.ValidationFailed);
         }
 
         ReadModelEntry<AgentSetupReadModel> entry;
@@ -243,6 +257,16 @@ public sealed class EventStoreAgentAdministrationOperations(
                 correlationId);
         }
 
+
+        if (entry.Value is not null
+            && (!string.Equals(entry.Value.TenantId, context.TenantId, StringComparison.Ordinal)
+                || !string.Equals(entry.Value.AgentId, agentId, StringComparison.Ordinal)))
+        {
+            return AgentOperationResult<AgentSetupResult>.Failed(
+                AgentOperationErrorCode.UnableToVerify,
+                correlationId);
+        }
+
         return AgentOperationResult<AgentSetupResult>.Succeeded(
             AgentSetupViewFactory.Create(
                 entry.Value,
@@ -257,7 +281,8 @@ public sealed class EventStoreAgentAdministrationOperations(
         string agentId,
         AgentOperationOptions? options,
         Func<AgentAdministrationRequest, CancellationToken, Task<AgentAdministrationOutcome>> dispatch,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool requiresExpectedConfigurationVersion = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
 
@@ -277,6 +302,13 @@ public sealed class EventStoreAgentAdministrationOperations(
         if (!IsCanonicalUlid(correlationId))
         {
             return AgentOperationResult<AgentCommandAcceptance>.Failed(AgentOperationErrorCode.ValidationFailed);
+        }
+
+        if (requiresExpectedConfigurationVersion && options?.ExpectedConfigurationVersion is not > 0)
+        {
+            return AgentOperationResult<AgentCommandAcceptance>.Failed(
+                AgentOperationErrorCode.ValidationFailed,
+                correlationId);
         }
 
         // The idempotency key doubles as the command message id, so re-submitting the same caller key is an exact
@@ -335,8 +367,26 @@ public sealed class EventStoreAgentAdministrationOperations(
             // evidence that separates a terminal rejection from an outcome that genuinely cannot be correlated;
             // without it a blocked activation would be offered a retry that can never succeed. Only the coarse
             // answer is used: every rejection maps to one safe code, so no caller learns which rule fired.
-            if (identityVerified
-                && await _statusReader.WasRejectedAsync(receipt!.MessageId!, cancellationToken).ConfigureAwait(false) is true)
+            bool? wasRejected = null;
+            if (identityVerified)
+            {
+                try
+                {
+                    wasRejected = await _statusReader
+                        .WasRejectedAsync(receipt!.MessageId!, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+                {
+                    wasRejected = null;
+                }
+                catch (Exception exception) when (exception is not OperationCanceledException)
+                {
+                    wasRejected = null;
+                }
+            }
+
+            if (wasRejected is true)
             {
                 return AgentOperationResult<AgentCommandAcceptance>.Failed(
                     AgentOperationErrorCode.Rejected,
@@ -361,12 +411,12 @@ public sealed class EventStoreAgentAdministrationOperations(
             correlationId: receipt.CorrelationId);
     }
 
-    // Activation re-validates the recorded provider selection and (in Confirmation mode) the recorded approver
-    // policy before the aggregate's gates can clear. Feeding it the projected setup keeps a single source of truth
-    // for what "currently recorded" means; when the projection has no record yet, the inputs stay empty and the
-    // aggregate fails closed on its own gates rather than this surface guessing.
+    // Exact-version activation re-validates dependencies from the matching projected setup. A newer projection can
+    // only be the retry of an already-admitted intent or a stale first execution: submit it with fail-closed verdicts
+    // so EventStore can replay the former before routing while the aggregate's version fence rejects the latter.
     private async Task<AgentAdministrationOutcome> ActivateCoreAsync(
         AgentAdministrationRequest request,
+        int expectedConfigurationVersion,
         CancellationToken cancellationToken)
     {
         ReadModelEntry<AgentSetupReadModel> entry = await _readModelStore
@@ -377,23 +427,33 @@ public sealed class EventStoreAgentAdministrationOperations(
             .ConfigureAwait(false);
 
         AgentSetupReadModel? model = entry.Value;
-        AgentActivationRevalidationOutcome outcome = await _activation
-            .ExecuteAsync(
-                new AgentActivationRevalidationRequest(
-                    request.MessageId,
-                    request.CorrelationId,
-                    request.TenantId,
-                    request.AgentId,
-                    request.ActorUserId,
-                    request.IsAgentsAdmin,
-                    model?.ProviderId,
-                    model?.ModelId,
-                    model?.ResponseMode ?? AgentResponseMode.Unknown,
-                    model is { ApproverPolicySources.Count: > 0 }
-                        ? new AgentApproverPolicy(model.ApproverPolicySources, model.ApproverPolicyDisclosure)
-                        : null),
-                cancellationToken)
-            .ConfigureAwait(false);
+        if (model is null
+            || !model.IsCreated
+            || !string.Equals(model.TenantId, request.TenantId, StringComparison.Ordinal)
+            || !string.Equals(model.AgentId, request.AgentId, StringComparison.Ordinal)
+            || model.ConfigurationVersion < expectedConfigurationVersion)
+        {
+            return new AgentAdministrationOutcome(Authorized: true, Dispatched: false);
+        }
+
+        var activationRequest = new AgentActivationRevalidationRequest(
+            request.MessageId,
+            request.CorrelationId,
+            request.TenantId,
+            request.AgentId,
+            request.ActorUserId,
+            request.IsAgentsAdmin,
+            expectedConfigurationVersion,
+            model.ProviderId,
+            model.ModelId,
+            model.ResponseMode,
+            model.ApproverPolicySources.Count > 0
+                ? new AgentApproverPolicy(model.ApproverPolicySources, model.ApproverPolicyDisclosure)
+                : null);
+
+        AgentActivationRevalidationOutcome outcome = model.ConfigurationVersion == expectedConfigurationVersion
+            ? await _activation.ExecuteAsync(activationRequest, cancellationToken).ConfigureAwait(false)
+            : await _activation.AttemptReplayAsync(activationRequest, cancellationToken).ConfigureAwait(false);
 
         return new AgentAdministrationOutcome(outcome.Authorized, outcome.Dispatched, outcome.Receipt);
     }
@@ -411,9 +471,9 @@ public sealed class EventStoreAgentAdministrationOperations(
         effect = AgentSetupWriteEffect.Unknown;
         configurationVersion = 0;
         if (payload is not { ValueKind: JsonValueKind.Object } value
-            || !value.TryGetProperty(AgentSetupResultPayload.EffectProperty, out JsonElement effectElement)
+            || !TryGetUniqueProperty(value, AgentSetupResultPayload.EffectProperty, out JsonElement effectElement)
             || effectElement.ValueKind != JsonValueKind.String
-            || !value.TryGetProperty(AgentSetupResultPayload.ConfigurationVersionProperty, out JsonElement versionElement)
+            || !TryGetUniqueProperty(value, AgentSetupResultPayload.ConfigurationVersionProperty, out JsonElement versionElement)
 
             // TryGetInt32 throws rather than returning false when the element is not a number, and this runs
             // outside the dispatch try/catch, so a quoted version would escape instead of failing closed.
@@ -433,5 +493,21 @@ public sealed class EventStoreAgentAdministrationOperations(
         }
 
         return effect is AgentSetupWriteEffect.Applied or AgentSetupWriteEffect.AlreadyApplied;
+    }
+
+    private static bool TryGetUniqueProperty(JsonElement value, string propertyName, out JsonElement property)
+    {
+        property = default;
+        int count = 0;
+        foreach (JsonProperty candidate in value.EnumerateObject())
+        {
+            if (string.Equals(candidate.Name, propertyName, StringComparison.Ordinal))
+            {
+                property = candidate.Value;
+                count++;
+            }
+        }
+
+        return count == 1;
     }
 }

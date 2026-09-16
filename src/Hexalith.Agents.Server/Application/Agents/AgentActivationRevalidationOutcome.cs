@@ -7,8 +7,9 @@ namespace Hexalith.Agents.Server.Application.Agents;
 /// <summary>
 /// Server-internal outcome of the activation re-validation step (Story 1.5 AC2; Story 1.6 AC3). <see cref="Authorized"/>
 /// is <see langword="false"/> when the actor was not an Agents admin (fail closed before any read or dispatch). When
-/// authorized, the <c>ActivateAgent</c> command is dispatched carrying the re-validated provider + approver verdicts
-/// so the aggregate's gates can clear (or fail closed). Carries only the safe verdicts.
+/// authorized, the <c>ActivateAgent</c> command is dispatched carrying either re-validated provider + approver
+/// verdicts or canonical fail-closed replay evidence, so the aggregate's gates can clear only from exact-version
+/// validation. Carries only the safe verdicts.
 /// </summary>
 /// <param name="Authorized">Whether the actor passed the Agents-admin gate.</param>
 /// <param name="Dispatched">Whether the activate command was dispatched.</param>

@@ -90,7 +90,10 @@ public sealed class AgentProviderSelectionTests
         state.ProviderCapabilityVersion.ShouldBeNull();
 
         // AC2: with no recorded selection, activation still fails closed with MissingProviderSelection.
-        DomainResult activation = AgentAggregate.Handle(new ActivateAgent(), state, Envelope(new ActivateAgent()));
+        DomainResult activation = AgentAggregate.Handle(
+            new ActivateAgent(),
+            state,
+            Envelope(new ActivateAgent(), activationExpectedConfigurationVersion: state.ConfigurationVersion));
         AgentActivationBlockedRejection blocked = activation.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>();
         blocked.Blockers.ShouldContain(AgentActivationBlocker.MissingProviderSelection);
     }
@@ -257,7 +260,10 @@ public sealed class AgentProviderSelectionTests
         AgentState state = StateWithLinkedParty(ValidCreate());
         state.Apply(new AgentResponseModeConfigured(AgentId, AgentResponseMode.Automatic, state.ConfigurationVersion + 1));
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, SelectEnvelope(new ActivateAgent()));
+        DomainResult result = AgentAggregate.Handle(
+            new ActivateAgent(),
+            state,
+            SelectEnvelope(new ActivateAgent(), activationExpectedConfigurationVersion: state.ConfigurationVersion));
 
         AgentActivationBlockedRejection blocked = result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>();
         blocked.Blockers.ShouldBe([

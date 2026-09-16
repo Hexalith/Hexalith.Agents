@@ -16,6 +16,7 @@ public sealed class PackageInventoryTests
         ["Hexalith.Agents"] = "src/Hexalith.Agents/Hexalith.Agents.csproj",
         ["Hexalith.Agents.Client"] = "src/Hexalith.Agents.Client/Hexalith.Agents.Client.csproj",
         ["Hexalith.Agents.Contracts"] = "src/Hexalith.Agents.Contracts/Hexalith.Agents.Contracts.csproj",
+        ["Hexalith.Agents.EventStore"] = "src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj",
         ["Hexalith.Agents.Testing"] = "src/Hexalith.Agents.Testing/Hexalith.Agents.Testing.csproj",
         ["Hexalith.Agents.UI"] = "src/Hexalith.Agents.UI/Hexalith.Agents.UI.csproj",
     };

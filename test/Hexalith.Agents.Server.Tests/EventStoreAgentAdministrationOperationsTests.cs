@@ -164,7 +164,10 @@ public sealed class EventStoreAgentAdministrationOperationsTests
             .GetEntryAsync(TenantId, "openai", "gpt-4o", Arg.Any<CancellationToken>())
             .Returns(new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success, SelectableEntry()));
 
-        AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(AgentId, new ActivateAgent());
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(
+            AgentId,
+            new ActivateAgent(),
+            new AgentOperationOptions { ExpectedConfigurationVersion = 2 });
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.ShouldNotBeNull().TruthState.ShouldBe(AgentSetupTruthState.AuthoritativePending);
@@ -185,14 +188,19 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         // Automatic mode needs no approver policy, so no approver verdict is asserted from thin air.
         extensions[AgentActivationProviderRevalidation.ApproverPolicyValidationExtensionKey]
             .ShouldBe(nameof(ApproverPolicyValidationStatus.Unknown));
+        extensions[AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion].ShouldBe("2");
     }
 
     [Fact]
     public async Task Activation_without_a_projected_selection_still_dispatches_and_leaves_the_verdict_unknown()
     {
         CaptureSubmit();
+        SeedProjectedSetup(configurationVersion: 2);
 
-        AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(AgentId, new ActivateAgent());
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(
+            AgentId,
+            new ActivateAgent(),
+            new AgentOperationOptions { ExpectedConfigurationVersion = 2 });
 
         // The surface never invents a provider verdict for an Agent whose selection it cannot see; the aggregate's
         // own gates are what refuse the activation.
@@ -203,6 +211,86 @@ public sealed class EventStoreAgentAdministrationOperationsTests
             .ShouldBe(nameof(ProviderSelectionValidationStatus.Unknown));
     }
 
+    [Theory]
+    [InlineData("absent")]
+    [InlineData("not-created")]
+    [InlineData("foreign-tenant")]
+    [InlineData("foreign-agent")]
+    [InlineData("older-version")]
+    public async Task Activation_without_an_exact_or_newer_same_agent_projection_fails_closed_before_dependency_reads_or_dispatch(
+        string scenario)
+    {
+        CaptureSubmit();
+        if (!string.Equals(scenario, "absent", StringComparison.Ordinal))
+        {
+            SeedProjectedSetup(
+                configurationVersion: scenario == "older-version" ? 1 : 2,
+                providerId: "openai",
+                modelId: "gpt-4o",
+                responseMode: AgentResponseMode.Confirmation,
+                embeddedTenantId: scenario == "foreign-tenant" ? "other-tenant" : TenantId,
+                embeddedAgentId: scenario == "foreign-agent" ? "other-agent" : AgentId,
+                includeApproverPolicy: true,
+                isCreated: scenario != "not-created");
+        }
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(
+            AgentId,
+            new ActivateAgent(),
+            new AgentOperationOptions(CorrelationId, MessageId)
+            {
+                ExpectedConfigurationVersion = 2,
+            });
+
+        result.IsSuccess.ShouldBeFalse();
+        result.Status.ShouldBe(AgentOperationStatus.Unavailable);
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.Unavailable);
+        result.CorrelationId.ShouldBe(CorrelationId);
+        result.Value.ShouldBeNull();
+        _lastSubmit.ShouldBeNull();
+        await _catalogReader.DidNotReceiveWithAnyArgs().GetEntryAsync(default!, default!, default!, default);
+        await _approverPolicyResolver.DidNotReceiveWithAnyArgs().ResolveAsync(default!, default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task Activation_against_a_newer_same_agent_projection_attempts_replay_without_dependency_reads()
+    {
+        CaptureSubmit(configurationVersion: 3);
+        SeedProjectedSetup(
+            configurationVersion: 3,
+            providerId: "openai",
+            modelId: "gpt-4o",
+            responseMode: AgentResponseMode.Confirmation,
+            includeApproverPolicy: true);
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(
+            AgentId,
+            new ActivateAgent(),
+            new AgentOperationOptions(CorrelationId, MessageId)
+            {
+                ExpectedConfigurationVersion = 2,
+            });
+
+        result.IsSuccess.ShouldBeTrue();
+        AgentCommandAcceptance acceptance = result.Value.ShouldNotBeNull();
+        acceptance.MessageId.ShouldBe(MessageId);
+        acceptance.CorrelationId.ShouldBe(CorrelationId);
+        acceptance.TargetConfigurationVersion.ShouldBe(3);
+        await _catalogReader.DidNotReceiveWithAnyArgs().GetEntryAsync(default!, default!, default!, default);
+        await _approverPolicyResolver.DidNotReceiveWithAnyArgs().ResolveAsync(default!, default!, default);
+
+        SubmitCommandRequest submit = _lastSubmit.ShouldNotBeNull();
+        submit.MessageId.ShouldBe(MessageId);
+        submit.CorrelationId.ShouldBe(CorrelationId);
+        Dictionary<string, string> extensions = submit.Extensions.ShouldNotBeNull();
+        extensions[AgentProviderSelectionOrchestrator.ProviderSelectionValidationExtensionKey]
+            .ShouldBe(nameof(ProviderSelectionValidationStatus.Unavailable));
+        extensions[AgentActivationProviderRevalidation.ApproverPolicyValidationExtensionKey]
+            .ShouldBe(nameof(ApproverPolicyValidationStatus.Unavailable));
+        extensions[AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion].ShouldBe("2");
+    }
+
     [Fact]
     public async Task An_unauthorized_activation_is_denied_before_any_dependency_is_read_or_dispatched()
     {
@@ -210,7 +298,10 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         SeedProjectedSetup(configurationVersion: 2, providerId: "openai", modelId: "gpt-4o", responseMode: AgentResponseMode.Automatic);
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "intruder", IsAgentsAdmin: false));
 
-        AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(AgentId, new ActivateAgent());
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(
+            AgentId,
+            new ActivateAgent(),
+            new AgentOperationOptions { ExpectedConfigurationVersion = 2 });
 
         result.IsSuccess.ShouldBeFalse();
         result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.NotAuthorized);
@@ -384,7 +475,10 @@ public sealed class EventStoreAgentAdministrationOperationsTests
             .WasRejectedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<bool?>(true));
 
-        AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(AgentId, new ActivateAgent());
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(
+            AgentId,
+            new ActivateAgent(),
+            new AgentOperationOptions { ExpectedConfigurationVersion = 2 });
 
         result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.Rejected);
         result.Value.ShouldBeNull();
@@ -555,10 +649,10 @@ public sealed class EventStoreAgentAdministrationOperationsTests
 
     private SubmitCommandRequest? _lastSubmit;
 
-    private void CaptureSubmit()
+    private void CaptureSubmit(int configurationVersion = 4)
         => _gateway
             .SubmitCommandAsync(Arg.Do<SubmitCommandRequest>(request => _lastSubmit = request), Arg.Any<CancellationToken>())
-            .Returns(call => AppliedReceipt(call.ArgAt<SubmitCommandRequest>(0), configurationVersion: 4));
+            .Returns(call => AppliedReceipt(call.ArgAt<SubmitCommandRequest>(0), configurationVersion));
 
     private static SubmitCommandResponse AppliedReceipt(SubmitCommandRequest request, int configurationVersion)
         => new(
@@ -641,15 +735,19 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         int configurationVersion,
         string? providerId = null,
         string? modelId = null,
-        AgentResponseMode responseMode = AgentResponseMode.Automatic)
+        AgentResponseMode responseMode = AgentResponseMode.Automatic,
+        string? embeddedTenantId = null,
+        string? embeddedAgentId = null,
+        bool includeApproverPolicy = false,
+        bool isCreated = true)
         => _store.Seed(
             StoreName,
             AgentSetupReadModelAddresses.Detail(TenantId, AgentId),
             new AgentSetupReadModel
             {
-                IsCreated = true,
-                AgentId = AgentId,
-                TenantId = TenantId,
+                IsCreated = isCreated,
+                AgentId = embeddedAgentId ?? AgentId,
+                TenantId = embeddedTenantId ?? TenantId,
                 DisplayName = "hexa",
                 HasInstructions = true,
                 InstructionsValid = true,
@@ -659,6 +757,12 @@ public sealed class EventStoreAgentAdministrationOperationsTests
                 ProviderId = providerId,
                 ModelId = modelId,
                 ResponseMode = responseMode,
+                ApproverPolicySources = includeApproverPolicy
+                    ? [new ApproverPolicySource(ApproverPolicySourceKind.Caller, PartyId: null, TenantRole: null)]
+                    : [],
+                ApproverPolicyDisclosure = includeApproverPolicy
+                    ? ApproverPolicyBasisDisclosure.OperatorOnly
+                    : ApproverPolicyBasisDisclosure.Unknown,
                 LastSequenceNumber = configurationVersion,
                 ProjectedAt = new DateTimeOffset(2026, 6, 24, 12, 0, 0, TimeSpan.Zero),
                 ProjectionVersion = configurationVersion.ToString(System.Globalization.CultureInfo.InvariantCulture),

@@ -94,8 +94,6 @@ public sealed class AgentOperationContractsTests
     // An enum added to either graph later is covered without editing this file, which is the point — a hand-listed
     // subset is exactly how the setup-view enums were missed. They share one sentinel, one by-name encoding, and
     // one tolerant reader, so every property below iterates this set.
-    private static readonly Type[] _publicOperationEnumTypes = DiscoverPublicUnknownSentinelEnums();
-
     // AgentInspectionStatus is excluded by the Unknown = 0 rule itself: its zero is Success, so degrading an
     // unrecognized value there would fail open. The AgentInteraction and ProviderCatalog enums are a separate,
     // deferred migration and are excluded by namespace.
@@ -104,6 +102,8 @@ public sealed class AgentOperationContractsTests
         "Hexalith.Agents.Contracts.AgentInteraction",
         "Hexalith.Agents.Contracts.ProviderCatalog",
     ];
+
+    private static readonly Type[] _publicOperationEnumTypes = DiscoverPublicUnknownSentinelEnums();
 
     private static Type[] DiscoverPublicUnknownSentinelEnums()
     {
@@ -115,6 +115,7 @@ public sealed class AgentOperationContractsTests
         // The story's own read payload is walked transitively; the public operation status terms are taken as
         // declared, so an unrelated story's view type does not silently widen this story's guard.
         pending.Enqueue(typeof(AgentSetupResult));
+        pending.Enqueue(typeof(AgentCommandAcceptance));
         foreach (Type root in contracts.GetTypes()
             .Where(type => type.IsPublic
                 && type.IsEnum
@@ -193,6 +194,30 @@ public sealed class AgentOperationContractsTests
         }
     }
 
+    [Fact]
+    public void Every_unknown_fallback_converter_is_self_typed_and_has_unknown_at_zero()
+    {
+        Type[] guardedEnums = typeof(AgentOperationResult).Assembly.GetTypes()
+            .Where(type => type.IsEnum)
+            .Where(type => type.GetCustomAttribute<JsonConverterAttribute>()?.ConverterType is { } converter
+                && converter.IsGenericType
+                && converter.GetGenericTypeDefinition() == typeof(UnknownFallbackEnumConverter<>))
+            .ToArray();
+
+        guardedEnums.ShouldNotBeEmpty();
+        foreach (Type enumType in guardedEnums)
+        {
+            Type converterType = enumType.GetCustomAttribute<JsonConverterAttribute>()?.ConverterType
+                ?? throw new InvalidOperationException($"{enumType.FullName} has no fallback converter type.");
+            converterType.GetGenericArguments().Single().ShouldBe(
+                enumType,
+                $"{enumType.FullName} must use its own fallback converter.");
+            Enum.GetName(enumType, 0).ShouldBe(
+                "Unknown",
+                $"{enumType.FullName} must fail closed to an Unknown zero sentinel.");
+        }
+    }
+
     public static TheoryData<Type> PublicOperationEnumTypes()
     {
         TheoryData<Type> data = [];
@@ -258,6 +283,12 @@ public sealed class AgentOperationContractsTests
                 .Where(value => Convert.ToInt32(value) != 0)
                 .Select(value => value.ToString()!)
                 .ToArray();
+            if (nonZeroNames.Length < 2)
+            {
+                throw new InvalidOperationException(
+                    $"Compatibility enum '{enumType.FullName}' must declare at least two non-zero members for the comma-list guard.");
+            }
+
             data.Add(enumType, $"\"{nonZeroNames[0]}, {nonZeroNames[1]}\"");
         }
 
@@ -412,6 +443,24 @@ public sealed class AgentOperationContractsTests
         truthState.ShouldBe(AgentSetupTruthState.Submitted);
         acceptance.Effect.ShouldBe(AgentSetupWriteEffect.Unknown);
         acceptance.TargetConfigurationVersion.ShouldBeNull();
+    }
+
+    [Fact]
+    public void LegacyAgentOperationOptionsConstructorShapeRemainsAvailable()
+    {
+        IReadOnlyDictionary<string, string> options = new Dictionary<string, string> { ["trace"] = "value" };
+        var operationOptions = new AgentOperationOptions("correlation", "idempotency", options)
+        {
+            ExpectedConfigurationVersion = 7,
+        };
+
+        operationOptions.CorrelationId.ShouldBe("correlation");
+        operationOptions.IdempotencyKey.ShouldBe("idempotency");
+        operationOptions.Options.ShouldBeSameAs(options);
+        operationOptions.ExpectedConfigurationVersion.ShouldBe(7);
+        typeof(AgentOperationOptions).GetConstructor(
+            [typeof(string), typeof(string), typeof(IReadOnlyDictionary<string, string>)])
+            .ShouldNotBeNull();
     }
 
     [Fact]

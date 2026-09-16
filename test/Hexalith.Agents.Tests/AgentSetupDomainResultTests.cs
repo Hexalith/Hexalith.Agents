@@ -138,7 +138,7 @@ public sealed class AgentSetupDomainResultTests
         var activate = new ActivateAgent();
         yield return (
             nameof(ActivateAgent),
-            AgentAggregate.Handle(activate, activationState, ActivateEnvelope()),
+            AgentAggregate.Handle(activate, activationState, ActivateEnvelope(expectedConfigurationVersion: activationState.ConfigurationVersion)),
             activationState.ConfigurationVersion + 1);
 
         AgentState disableState = StateWith(create);

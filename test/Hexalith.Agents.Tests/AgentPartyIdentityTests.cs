@@ -299,7 +299,10 @@ public sealed class AgentPartyIdentityTests
 
         // Only the party gate remains — display name, instructions, provider readiness, response mode, and content
         // safety are valid.
-        DomainResult blocked = AgentAggregate.Handle(new ActivateAgent(), state, SelectEnvelope(new ActivateAgent()));
+        DomainResult blocked = AgentAggregate.Handle(
+            new ActivateAgent(),
+            state,
+            SelectEnvelope(new ActivateAgent(), activationExpectedConfigurationVersion: state.ConfigurationVersion));
         AgentActivationBlockedRejection rejection = blocked.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>();
         rejection.Blockers.ShouldBe([AgentActivationBlocker.MissingPartyIdentity]);
 
@@ -307,7 +310,10 @@ public sealed class AgentPartyIdentityTests
         var link = new LinkAgentPartyIdentity(LinkedPartyId);
         ApplyAll(state, AgentAggregate.Handle(link, state, LinkEnvelope(link)));
 
-        DomainResult activated = AgentAggregate.Handle(new ActivateAgent(), state, SelectEnvelope(new ActivateAgent()));
+        DomainResult activated = AgentAggregate.Handle(
+            new ActivateAgent(),
+            state,
+            SelectEnvelope(new ActivateAgent(), activationExpectedConfigurationVersion: state.ConfigurationVersion));
         activated.IsSuccess.ShouldBeTrue();
         _ = activated.Events[0].ShouldBeOfType<AgentActivated>();
     }

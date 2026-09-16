@@ -97,11 +97,15 @@ class FakeRunner:
         report: dict[str, object] | str | None = None,
         diff_payload: bytes = b"",
         baseline_returncode: int = 0,
+        ancestry_returncode: int = 0,
+        baseline_is_head_returncode: int = 1,
     ) -> None:
         self.root = root
         self.git_payload = git_payload
         self.diff_payload = diff_payload
         self.baseline_returncode = baseline_returncode
+        self.ancestry_returncode = ancestry_returncode
+        self.baseline_is_head_returncode = baseline_is_head_returncode
         self.build_returncode = build_returncode
         self.test_returncode = test_returncode
         self.report = ctrf_payload() if report is None else report
@@ -134,6 +138,10 @@ class FakeRunner:
             if self.baseline_returncode:
                 return V.CommandResult(self.baseline_returncode)
             return V.CommandResult(0, stdout=b"599208dd40efadef728363c227a0f75ebd888337\n")
+        if values[:3] == ("git", "merge-base", "--is-ancestor"):
+            return V.CommandResult(
+                self.baseline_is_head_returncode if values[3] == "HEAD" else self.ancestry_returncode
+            )
         if values[:2] == ("git", "diff"):
             return V.CommandResult(0, stdout=self.diff_payload)
         raise AssertionError(f"Unexpected command: {values}")
@@ -232,9 +240,34 @@ class StoryParsingTests(unittest.TestCase):
         )
         self.assertEqual(V.unmanaged_count_claims(text, V.parse_story_layout(text)), [])
 
+    def test_single_requirement_ordinals_and_ratios_are_not_test_count_evidence(self):
+        text = story_text(record_text="Domain 5 uses a 16/9 layout.")
+
+        self.assertEqual(V.unmanaged_count_claims(text, V.parse_story_layout(text)), [])
+
+    def test_ratio_after_test_related_prose_is_not_test_count_evidence(self):
+        text = story_text(record_text="A ratio without test-result context, such as 16/9, is ordinary prose.")
+
+        self.assertEqual(V.unmanaged_count_claims(text, V.parse_story_layout(text)), [])
+
+    def test_slash_form_test_count_is_still_unmanaged(self):
+        text = story_text(record_text="Tests: 327/327/0")
+
+        failures = V.unmanaged_count_claims(text, V.parse_story_layout(text))
+
+        self.assertEqual(len(failures), 1)
+
     def test_fenced_numeric_count_is_still_unmanaged(self):
         text = story_text(record_text="```text\n327 tests pass\n```")
         self.assertEqual(len(V.unmanaged_count_claims(text, V.parse_story_layout(text))), 1)
+
+    def test_count_in_review_findings_is_still_unmanaged(self):
+        text = story_text().replace("## Dev Agent Record", "## Review Findings\n\nUI: 1067 passed.\n\n## Dev Agent Record")
+
+        failures = V.unmanaged_count_claims(text, V.parse_story_layout(text))
+
+        self.assertEqual(len(failures), 1)
+        self.assertIn("UI: 1067 passed", failures[0][1])
 
     def test_markers_must_be_standalone_and_cannot_overlap_file_list(self):
         mid_line = story_text(record_text=f"prefix {V.BEGIN_MARKER}\n{V.END_MARKER}")
@@ -705,6 +738,28 @@ class BaselineGateTests(unittest.TestCase):
         runner = FakeRunner(root, git_payload=b"", baseline_returncode=1)
 
         with self.assertRaisesRegex(V.ValidationError, "does not resolve to a commit"):
+            V.execute_gate(root, story_path, runner, lambda: FIXED_NOW)
+
+        self.assertEqual(story_path.read_bytes(), original)
+        self.assertTrue(all(command[:2] != ("dotnet", "build") for command in runner.commands))
+
+    def test_non_ancestor_baseline_stops_before_the_release_build(self):
+        root, story_path = self.fixture(("_bmad-output/implementation-artifacts/story.md",))
+        original = story_path.read_bytes()
+        runner = FakeRunner(root, git_payload=b"", ancestry_returncode=1)
+
+        with self.assertRaisesRegex(V.ValidationError, "not an ancestor of HEAD"):
+            V.execute_gate(root, story_path, runner, lambda: FIXED_NOW)
+
+        self.assertEqual(story_path.read_bytes(), original)
+        self.assertTrue(all(command[:2] != ("dotnet", "build") for command in runner.commands))
+
+    def test_baseline_equal_to_head_stops_before_the_release_build(self):
+        root, story_path = self.fixture(("_bmad-output/implementation-artifacts/story.md",))
+        original = story_path.read_bytes()
+        runner = FakeRunner(root, git_payload=b"", baseline_is_head_returncode=0)
+
+        with self.assertRaisesRegex(V.ValidationError, "must precede HEAD"):
             V.execute_gate(root, story_path, runner, lambda: FIXED_NOW)
 
         self.assertEqual(story_path.read_bytes(), original)

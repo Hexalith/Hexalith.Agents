@@ -1,6 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Hexalith.Agents.Server.Ports;
 
 /// <summary>
@@ -10,11 +7,8 @@ namespace Hexalith.Agents.Server.Ports;
 /// deferred answer is "unknown", which leaves the outcome unverifiable instead of inventing a rejection.
 /// </summary>
 /// <remarks>
-/// The live binding reads <c>GET api/v1/commands/status/{messageId}</c> through the EventStore gateway client. It is
-/// not wired yet because <c>IEventStoreGatewayClient.GetCommandStatusAsync</c> is added but unreleased: Release
-/// builds resolve Hexalith libraries by package reference, so Agents cannot bind to it until that package ships.
-/// Everything downstream of this seam -- the rejection mapping and its tests -- is already in place, so going live
-/// is a single registration change.
+/// A future host may replace this placeholder after the production-like EventStore topology proves the status seam
+/// is reachable. Until then every composition retains this implementation and therefore cannot invent a rejection.
 /// </remarks>
 public sealed class DeferredAgentCommandStatusReader : IAgentCommandStatusReader
 {

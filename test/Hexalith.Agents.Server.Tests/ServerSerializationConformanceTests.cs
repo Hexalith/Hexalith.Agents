@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Serialization;
 using Hexalith.Agents.Server.Projections;
 
@@ -60,7 +61,12 @@ public sealed class ServerSerializationConformanceTests
                 if (fallback < 0 || fallback > stringConverter)
                 {
                     offenders.Add($"{type.Name}.{field.Name}");
+                    continue;
                 }
+
+                JsonSerializer.Deserialize<AgentSetupTruthState>(
+                    "\"SomeMemberAddedLater\"",
+                    options).ShouldBe(AgentSetupTruthState.Unknown, $"{type.Name}.{field.Name}");
             }
         }
 

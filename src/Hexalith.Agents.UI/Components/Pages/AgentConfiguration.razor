@@ -24,43 +24,44 @@
                       Description="@Localizer["Agents.Config.Description"]"
                       TestId="agents-config-header" />
 
-        @if (_pendingWrite is { } pending)
-        {
-            <FluentStack Orientation="Orientation.Vertical"
-                         VerticalGap="8px"
-                         role="status"
-                         aria-live="polite"
-                         data-testid="agents-config-write-recovery">
+        <FluentStack Orientation="Orientation.Vertical"
+                     VerticalGap="8px"
+                     role="status"
+                     aria-live="polite"
+                     aria-atomic="true"
+                     data-testid="agents-config-write-live-region">
+            @if (_pendingWrite is { } pendingStatus)
+            {
                 <FluentText data-testid="agents-config-write-state">
-                    @Localizer[$"Agents.Config.Write.{pending.Status}"]
+                    @Localizer[$"Agents.Config.Write.{pendingStatus.Status}"]
                 </FluentText>
-                @if (_activeAttempt is not null)
+            }
+        </FluentStack>
+        @if (_pendingWrite is { } pending && _activeAttempt is not null)
+        {
+            <FluentStack Orientation="Orientation.Vertical" VerticalGap="8px" data-testid="agents-config-write-recovery">
+                @if (pending.Status == AgentSetupWriteStatus.AwaitingProjection
+                    && pending.TargetConfigurationVersion is not null)
                 {
-                    <FluentStack Orientation="Orientation.Vertical" VerticalGap="8px">
-                        @if (pending.Status == AgentSetupWriteStatus.AwaitingProjection
-                            && pending.TargetConfigurationVersion is not null)
-                        {
-                            <FluentButton Appearance="ButtonAppearance.Outline"
-                                          Disabled="@_busy"
-                                          OnClick="RefreshPendingAsync"
-                                          data-testid="agents-config-write-refresh">
-                                @Localizer["Agents.Config.Write.Refresh"]
-                            </FluentButton>
-                        }
-                        <FluentButton Appearance="ButtonAppearance.Outline"
-                                      Disabled="@_busy"
-                                      OnClick="RetryAttemptAsync"
-                                      data-testid="agents-config-write-retry">
-                            @Localizer["Agents.Config.Write.Retry"]
-                        </FluentButton>
-                        <FluentButton Appearance="ButtonAppearance.Subtle"
-                                      Disabled="@_busy"
-                                      OnClick="AbandonAttempt"
-                                      data-testid="agents-config-write-abandon">
-                            @Localizer["Agents.Config.Write.Abandon"]
-                        </FluentButton>
-                    </FluentStack>
+                    <FluentButton Appearance="ButtonAppearance.Outline"
+                                  Disabled="@_busy"
+                                  OnClick="RefreshPendingAsync"
+                                  data-testid="agents-config-write-refresh">
+                        @Localizer["Agents.Config.Write.Refresh"]
+                    </FluentButton>
                 }
+                <FluentButton Appearance="ButtonAppearance.Outline"
+                              Disabled="@_busy"
+                              OnClick="RetryAttemptAsync"
+                              data-testid="agents-config-write-retry">
+                    @Localizer["Agents.Config.Write.Retry"]
+                </FluentButton>
+                <FluentButton Appearance="ButtonAppearance.Subtle"
+                              Disabled="@_busy"
+                              OnClick="AbandonAttempt"
+                              data-testid="agents-config-write-abandon">
+                    @Localizer["Agents.Config.Write.Abandon"]
+                </FluentButton>
             </FluentStack>
         }
 
@@ -113,14 +114,17 @@
                    so a save reports presence/validity/version and nothing else (AD-14). *@
                 <h2>@Localizer["Agents.Config.Section.Edit"]</h2>
                 <FluentTextInput @bind-Value="_displayNameDraft"
+                                 Disabled="@(_busy || HasUnresolvedAttempt)"
                                  Label="@Localizer["Agents.Config.DisplayName.Label"]"
                                  AriaLabel="@Localizer["Agents.Config.DisplayName.Label"]"
                                  data-testid="agents-config-display-name-input" />
                 <FluentTextInput @bind-Value="_descriptionDraft"
+                                 Disabled="@(_busy || HasUnresolvedAttempt)"
                                  Label="@Localizer["Agents.Config.Description.Label"]"
                                  AriaLabel="@Localizer["Agents.Config.Description.Label"]"
                                  data-testid="agents-config-description-input" />
                 <FluentTextArea @bind-Value="_instructionsDraft"
+                                Disabled="@(_busy || HasUnresolvedAttempt)"
                                 Label="@Localizer["Agents.Config.Instructions.Label"]"
                                 AriaLabel="@Localizer["Agents.Config.Instructions.Label"]"
                                 Required="true"
@@ -166,7 +170,7 @@
 
             <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.ResponseMode"]">
                 <h2>@Localizer["Agents.Config.Section.ResponseMode"]</h2>
-                <ResponseModeToggle Value="@_responseMode" ValueChanged="OnResponseModeChanged" Name="agents-config-response-mode" />
+                <ResponseModeToggle Value="@_responseMode" ValueChanged="OnResponseModeChanged" Name="agents-config-response-mode" Disabled="@(_busy || HasUnresolvedAttempt)" />
                 <p class="agents-config__note">@Localizer["Agents.Config.ResponseMode.FutureOnlyNote"]</p>
                 <FluentButton Appearance="ButtonAppearance.Primary"
                               Disabled="@(_busy || HasUnresolvedAttempt || _responseMode == agent.ResponseMode)"
@@ -315,9 +319,9 @@
             _displayNameDraft,
             string.IsNullOrWhiteSpace(_descriptionDraft) ? null : _descriptionDraft,
             _instructionsDraft);
-        _instructionsDraft = string.Empty;
-
-        await SubmitAsync((options, ct) => Gateway.UpdateConfigurationAsync(command, options, ct)).ConfigureAwait(false);
+        await SubmitAsync(
+            (options, ct) => Gateway.UpdateConfigurationAsync(command, options, ct),
+            instructionsDraft: _instructionsDraft).ConfigureAwait(false);
     }
 
     private Task SubmitResponseModeAsync()
@@ -327,7 +331,9 @@
     }
 
     private Task ActivateAsync()
-        => SubmitAsync(Gateway.ActivateAsync);
+        => _result?.Setup?.ConfigurationVersion is > 0 and int version
+            ? SubmitAsync(Gateway.ActivateAsync, expectedConfigurationVersion: version)
+            : Task.CompletedTask;
 
     private Task DisableAsync()
         => SubmitAsync(Gateway.DisableAsync);
@@ -335,7 +341,10 @@
     // Every write follows the same truth flow: submit, record the accepted identity as Submitted, then re-read at
     // the version that write is expected to produce. The re-read is what decides whether the page shows
     // authoritative-pending or projection-confirmed — the write itself never claims durable truth.
-    private Task SubmitAsync(Func<AgentOperationOptions, CancellationToken, Task<AgentSetupWriteResult>> write)
+    private Task SubmitAsync(
+        Func<AgentOperationOptions, CancellationToken, Task<AgentSetupWriteResult>> write,
+        string? instructionsDraft = null,
+        int? expectedConfigurationVersion = null)
     {
         if (_busy || _activeAttempt is not null)
         {
@@ -344,10 +353,18 @@
 
         var options = new AgentOperationOptions(
             CorrelationId: UlidFactory.NewUlid(),
-            IdempotencyKey: UlidFactory.NewUlid());
-        var attempt = new AgentSetupAttempt(options, write);
+            IdempotencyKey: UlidFactory.NewUlid())
+        {
+            ExpectedConfigurationVersion = expectedConfigurationVersion,
+        };
+        var attempt = new AgentSetupAttempt(options, write, instructionsDraft);
         _pendingWrite = null;
         _activeAttempt = attempt;
+        if (instructionsDraft is not null)
+        {
+            _instructionsDraft = string.Empty;
+        }
+
         return ExecuteAttemptAsync(attempt);
     }
 
@@ -365,7 +382,7 @@
             _pendingWrite = writeResult;
             if (writeResult.Status == AgentSetupWriteStatus.AlreadyApplied)
             {
-                _activeAttempt = null;
+                ReleaseAttempt(restoreInstructionsDraft: false);
             }
             else if (writeResult.Status == AgentSetupWriteStatus.Submitted
                 && writeResult.Acceptance is { } acceptance
@@ -382,9 +399,9 @@
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     _pendingWrite = null;
-                    _activeAttempt = null;
+                    ReleaseAttempt(restoreInstructionsDraft: false);
                 }
-                else if (refreshState == AgentSetupTruthState.AuthoritativePending)
+                else
                 {
                     _pendingWrite = AgentSetupWriteResult.AwaitingProjection(acceptance);
                 }
@@ -395,7 +412,7 @@
             }
             else if (IsTerminalWriteFailure(writeResult.Status))
             {
-                _activeAttempt = null;
+                ReleaseAttempt(restoreInstructionsDraft: true);
             }
         }
         catch (OperationCanceledException) when (_disposed)
@@ -448,7 +465,7 @@
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 _pendingWrite = null;
-                _activeAttempt = null;
+                ReleaseAttempt(restoreInstructionsDraft: false);
             }
             else if (refreshState == AgentSetupTruthState.AuthoritativePending)
             {
@@ -492,8 +509,20 @@
             return;
         }
 
-        _activeAttempt = null;
+        ReleaseAttempt(restoreInstructionsDraft: true);
         _pendingWrite = null;
+    }
+
+    private void ReleaseAttempt(bool restoreInstructionsDraft)
+    {
+        AgentSetupAttempt? attempt = _activeAttempt;
+        _activeAttempt = null;
+        if (restoreInstructionsDraft
+            && attempt?.InstructionsDraft is { } draft
+            && string.IsNullOrEmpty(_instructionsDraft))
+        {
+            _instructionsDraft = draft;
+        }
     }
 
     private static bool IsTerminalWriteFailure(AgentSetupWriteStatus status)
@@ -505,7 +534,7 @@
     private async Task<AgentSetupTruthState> RefreshAfterWriteAsync(
         int? expectedConfigurationVersion,
         CancellationToken cancellationToken,
-        bool applyAuthoritativeDrafts = true)
+        bool applyAuthoritativeDrafts)
     {
         using CancellationTokenSource timeoutCancellation = new(ProjectionPollingTimeout, TimeProvider);
         using CancellationTokenSource pollingCancellation = CancellationTokenSource.CreateLinkedTokenSource(

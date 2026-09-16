@@ -33,12 +33,23 @@ jobs:
         uses: actions/setup-dotnet@v6.0.0
         with:
           global-json-file: global.json
+      - name: Enforce Story 5.2 EventStore package floor
+        shell: pwsh
+        run: ./eng/verify-story-5.2.ps1 -PackageFloorOnly
       - &package-restore
         name: Restore package graph
         run: dotnet restore Hexalith.Agents.slnx -p:Configuration=Release -p:UseHexalithProjectReferences=false /m:1 /nr:false
       - &package-compile
         name: Build package graph
         run: dotnet build Hexalith.Agents.slnx -c Release --no-restore -warnaserror -p:UseHexalithProjectReferences=false /m:1 /nr:false
+
+  tooling-tests:
+    name: Story readiness tooling tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Run readiness gate regressions
+        run: python3 -m unittest discover -s tests/tooling/story_review_readiness -p '*_test.py'
 
   contracts-tests:
     name: Contracts tests

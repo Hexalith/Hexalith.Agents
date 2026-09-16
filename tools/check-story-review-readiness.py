@@ -42,14 +42,14 @@ COUNT_PATTERNS = (
         re.IGNORECASE,
     ),
     re.compile(
-        r"\btests?\b[^\n]*\b\d[\d,]*(?:\s*/\s*\d[\d,]*)+",
+        r"\btests?\b\s*(?::|=|->|→)?\s*\d[\d,]*(?:\s*/\s*\d[\d,]*)+",
         re.IGNORECASE,
     ),
-    re.compile(
-        r"\b(?:[A-Za-z0-9.]+\.Tests|domain|server|contracts|client|ui)"
-        r"\s*(?::|=|->|→)?\s*\d[\d,]*\b",
-        re.IGNORECASE,
-    ),
+)
+SUITE_COUNT_PATTERN = re.compile(
+    r"\b(?:[A-Za-z0-9.]+\.Tests|domain|server|contracts|client|ui)"
+    r"\s*(?::|=|->|→)?\s*\d[\d,]*\b",
+    re.IGNORECASE,
 )
 FRONTMATTER_DELIMITER = "---"
 BASELINE_KEY_PATTERN = re.compile(r"^baseline_commit:[ \t]*(.*)$")
@@ -124,6 +124,7 @@ def default_runner(
     environment: Mapping[str, str] | None = None,
 ) -> CommandResult:
     env = os.environ.copy()
+    env.setdefault("MSBUILDDISABLENODEREUSE", "1")
     if environment:
         env.update(environment)
     try:
@@ -401,16 +402,19 @@ def unmanaged_count_claims(text: str, layout: StoryLayout) -> list[tuple[int, st
     offset = 0
     for number, line in enumerate(text.splitlines(keepends=True), start=1):
         content = line.rstrip("\r\n")
-        in_record = layout.record_start <= offset < layout.record_end
         in_generated = (
             layout.generated_start is not None
             and layout.generated_end is not None
             and layout.generated_start <= offset < layout.generated_end
         )
         in_file_list = layout.file_list_start <= offset < layout.file_list_end
-        if in_record and not in_generated and not in_file_list:
+        if not in_generated and not in_file_list:
             candidate = re.sub(r"[*_]", "", content)
-            if any(pattern.search(candidate) for pattern in COUNT_PATTERNS):
+            # A single phrase such as "domain 5" is ordinary requirements prose. Bare suite-label/count
+            # evidence is recognizable only as a multi-suite summary; explicit "tests"/result terms above
+            # remain sufficient on their own.
+            suite_counts = SUITE_COUNT_PATTERN.findall(candidate)
+            if any(pattern.search(candidate) for pattern in COUNT_PATTERNS) or len(suite_counts) >= 2:
                 failures.append((number, content.strip()))
         offset += len(line)
     return failures
@@ -757,6 +761,12 @@ def resolve_baseline_commit(root: Path, baseline: str, runner: Runner) -> str:
         raise ValidationError("Git returned an invalid baseline commit id") from exc
     if not COMMIT_ID_PATTERN.match(resolved):
         raise ValidationError(f"Git returned an invalid baseline commit id: {resolved!r}")
+    ancestry = runner(("git", "merge-base", "--is-ancestor", resolved, "HEAD"), root, None)
+    if ancestry.returncode != 0:
+        raise ValidationError(f"Story baseline_commit is not an ancestor of HEAD: {baseline}")
+    equality = runner(("git", "merge-base", "--is-ancestor", "HEAD", resolved), root, None)
+    if equality.returncode == 0:
+        raise ValidationError(f"Story baseline_commit must precede HEAD, not equal it: {baseline}")
     return resolved
 
 

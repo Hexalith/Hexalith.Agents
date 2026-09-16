@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AngleSharp.Dom;
+
 using Bunit;
 
 using Hexalith.Agents.Contracts.Agent;
@@ -46,6 +48,21 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         cut.WaitForAssertion(() =>
             cut.Find("#fc-main-content").GetAttribute("data-fc-page-layout").ShouldBe("constrained"));
         cut.Find("[data-testid='agents-config']");
+    }
+
+    [Fact]
+    public void Write_status_live_region_is_persistent_atomic_and_excludes_recovery_controls()
+    {
+        GivenConfiguration(AgentUiTestData.Status(AgentLifecycleStatus.Draft));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-write-live-region']"));
+        IElement liveRegion = cut.Find("[data-testid='agents-config-write-live-region']");
+        liveRegion.GetAttribute("role").ShouldBe("status");
+        liveRegion.GetAttribute("aria-live").ShouldBe("polite");
+        liveRegion.GetAttribute("aria-atomic").ShouldBe("true");
+        liveRegion.QuerySelector("[data-testid='agents-config-write-recovery']").ShouldBeNull();
     }
 
     [Fact]
@@ -289,6 +306,51 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     }
 
     [Fact]
+    public void A_terminal_configuration_failure_restores_the_exact_draft_and_reenables_editing()
+    {
+        GivenSetup(AgentUiTestData.Setup(AgentUiTestData.Status(AgentLifecycleStatus.Draft), configurationVersion: 3));
+        SetupGateway.UpdateConfigurationAsync(
+                Arg.Any<UpdateAgentConfiguration>(),
+                Arg.Any<AgentOperationOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed)));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-submit']"));
+        cut.Find("[data-testid='agents-config-instructions-input']").Change("exact draft to correct and resubmit");
+        cut.Find("[data-testid='agents-config-submit']").Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            IElement instructions = cut.Find("[data-testid='agents-config-instructions-input']");
+            instructions.GetAttribute("value").ShouldBe("exact draft to correct and resubmit");
+            instructions.HasAttribute("disabled").ShouldBeFalse();
+            cut.Find("[data-testid='agents-config-submit']").HasAttribute("disabled").ShouldBeFalse();
+            cut.FindAll("[data-testid='agents-config-write-retry']").ShouldBeEmpty();
+        });
+    }
+
+    [Fact]
+    public void An_unresolved_attempt_disables_every_mutable_configuration_control()
+    {
+        GivenSetup(AgentUiTestData.Setup(AgentUiTestData.Status(AgentLifecycleStatus.Draft), configurationVersion: 3));
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify)));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-activate']"));
+        cut.Find("[data-testid='agents-config-activate']").Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.Find("[data-testid='agents-config-display-name-input']").HasAttribute("disabled").ShouldBeTrue();
+            cut.Find("[data-testid='agents-config-description-input']").HasAttribute("disabled").ShouldBeTrue();
+            cut.Find("[data-testid='agents-config-instructions-input']").HasAttribute("disabled").ShouldBeTrue();
+            cut.FindComponent<ResponseModeToggle>().Instance.Disabled.ShouldBeTrue();
+        });
+    }
+
+    [Fact]
     public void An_already_applied_receipt_reports_the_no_op_without_polling()
     {
         GivenSetup(AgentUiTestData.Setup(
@@ -383,6 +445,34 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             cut.Find("[data-testid='agents-config-lifecycle']").TextContent
                 .ShouldContain("Agents.Lifecycle.Active");
         });
+    }
+
+    [Fact]
+    public async Task Activation_retry_reuses_the_displayed_configuration_version_and_exact_options()
+    {
+        GivenSetup(AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft),
+            configurationVersion: 7));
+        var submittedOptions = new List<AgentOperationOptions>();
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                submittedOptions.Add(call.ArgAt<AgentOperationOptions>(0));
+                return Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify));
+            });
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-activate']"));
+        cut.Find("[data-testid='agents-config-activate']").Click();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-write-retry']"));
+
+        await cut.Find("[data-testid='agents-config-write-retry']").ClickAsync(new MouseEventArgs());
+
+        submittedOptions.Count.ShouldBe(2);
+        submittedOptions[1].ShouldBeSameAs(submittedOptions[0]);
+        submittedOptions[0].ExpectedConfigurationVersion.ShouldBe(7);
+        submittedOptions[0].CorrelationId.ShouldNotBeNull().ShouldMatch("^[0-9A-HJKMNP-TV-Z]{26}$");
+        submittedOptions[0].IdempotencyKey.ShouldNotBeNull().ShouldMatch("^[0-9A-HJKMNP-TV-Z]{26}$");
     }
 
     [Fact]
@@ -785,7 +875,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         ExpectedVersionReadCount(4).ShouldBe(readsAtTerminalOutcome);
         cut.Markup.ShouldContain(expectedSurface);
         cut.Find("[data-testid='agents-config-write-state']").TextContent
-            .ShouldContain("Agents.Config.Write.Submitted");
+            .ShouldContain("Agents.Config.Write.AwaitingProjection");
         cut.Find("[data-testid='agents-config-write-retry']");
         cut.Find("[data-testid='agents-config-write-abandon']");
     }

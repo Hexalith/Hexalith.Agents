@@ -51,6 +51,7 @@ internal static class AgentSetupServiceCollectionExtensions
         services.TryAddSingleton<IAgentCommandStatusReader, DeferredAgentCommandStatusReader>();
 
         string? baseUrl = configuration[$"{EventStoreSectionName}:BaseUrl"];
+        string? appId = configuration[$"{EventStoreSectionName}:AppId"];
         if (string.IsNullOrWhiteSpace(baseUrl) || !Uri.TryCreate(baseUrl, UriKind.Absolute, out Uri? baseAddress))
         {
             // No gateway: keep DeferredAgentCommandDispatcher and the Unavailable client. A host that cannot reach
@@ -58,7 +59,17 @@ internal static class AgentSetupServiceCollectionExtensions
             return services;
         }
 
-        _ = services.AddEventStoreGatewayClient(options => options.BaseAddress = baseAddress);
+        if (string.IsNullOrWhiteSpace(appId))
+        {
+            // A direct HTTP binding cannot authenticate the reserved Agents extensions. Without an exact Dapr
+            // destination app id the live setup path therefore remains unavailable.
+            return services;
+        }
+
+        string? daprApiToken = configuration[$"{EventStoreSectionName}:DaprApiToken"];
+        _ = services
+            .AddEventStoreGatewayClient(options => options.BaseAddress = baseAddress)
+            .AddEventStoreDaprServiceInvocation(appId, daprApiToken);
         services.AddHttpContextAccessor();
         services.AddSingleton<IAgentAdministrationContextProvider, HttpAgentAdministrationContextProvider>();
 

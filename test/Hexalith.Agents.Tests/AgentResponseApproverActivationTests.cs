@@ -40,7 +40,7 @@ public sealed class AgentResponseApproverActivationTests
         // Party + provider ready, but no Response Mode chosen — the only remaining gate is MissingResponseMode.
         AgentState state = StateProviderReadyNoMode();
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope());
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(expectedConfigurationVersion: state.ConfigurationVersion));
 
         AgentActivationBlockedRejection blocked = result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>();
         // 1.7: this state has no content-safety policy, so the content-safety gate is appended last.
@@ -59,7 +59,7 @@ public sealed class AgentResponseApproverActivationTests
         state.ResponseMode.ShouldBe(AgentResponseMode.Automatic);
         state.ApproverPolicySources.ShouldBeNull();
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope());
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.IsSuccess.ShouldBeTrue();
         _ = result.Events[0].ShouldBeOfType<AgentActivated>();
@@ -71,7 +71,7 @@ public sealed class AgentResponseApproverActivationTests
         AgentState state = StateProviderReadyNoMode();
         state.Apply(new AgentResponseModeConfigured(AgentId, AgentResponseMode.Confirmation, state.ConfigurationVersion + 1));
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope());
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(expectedConfigurationVersion: state.ConfigurationVersion));
 
         AgentActivationBlockedRejection blocked = result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>();
         // 1.7: this state has no content-safety policy, so the content-safety gate is appended after the approver gate.
@@ -88,7 +88,7 @@ public sealed class AgentResponseApproverActivationTests
         // MissingApproverPolicy, not ApproverPolicyUnresolvable (hasApproverPolicy is false).
         AgentState state = StateConfirmationReady(ValidCreate(), new AgentApproverPolicy([], ApproverPolicyBasisDisclosure.OperatorOnly));
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope());
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>()
             .Blockers.ShouldBe([AgentActivationBlocker.MissingApproverPolicy]);
@@ -106,7 +106,7 @@ public sealed class AgentResponseApproverActivationTests
     {
         AgentState state = StateConfirmationReady(ValidCreate());
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(approverValidation: verdict));
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(approverValidation: verdict, expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>()
             .Blockers.ShouldBe([AgentActivationBlocker.ApproverPolicyUnresolvable]);
@@ -119,7 +119,7 @@ public sealed class AgentResponseApproverActivationTests
         // A direct-gateway activation that never re-resolved carries no trusted approver verdict — fails closed.
         AgentState state = StateConfirmationReady(ValidCreate());
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(includeApproverValidation: false));
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(includeApproverValidation: false, expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>()
             .Blockers.ShouldBe([AgentActivationBlocker.ApproverPolicyUnresolvable]);
@@ -133,7 +133,7 @@ public sealed class AgentResponseApproverActivationTests
         DomainResult result = AgentAggregate.Handle(
             new ActivateAgent(),
             state,
-            ActivateEnvelope(providerValidation: ProviderSelectionValidationStatus.Valid, approverValidation: ApproverPolicyValidationStatus.Valid));
+            ActivateEnvelope(providerValidation: ProviderSelectionValidationStatus.Valid, approverValidation: ApproverPolicyValidationStatus.Valid, expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.IsSuccess.ShouldBeTrue();
         _ = result.Events[0].ShouldBeOfType<AgentActivated>();
@@ -149,7 +149,7 @@ public sealed class AgentResponseApproverActivationTests
         // Mirrors the 1.4/1.5 verdict-parse hardening: a numeric/aliased/cased approver verdict must never be trusted.
         AgentState state = StateConfirmationReady(ValidCreate());
 
-        CommandEnvelope envelope = ActivateEnvelopeWithRawApproverVerdict(rawVerdict);
+        CommandEnvelope envelope = ActivateEnvelopeWithRawApproverVerdict(rawVerdict, state.ConfigurationVersion);
         DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, envelope);
 
         result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>()
@@ -166,7 +166,7 @@ public sealed class AgentResponseApproverActivationTests
         // is appended last, never reordered).
         AgentState state = StateWith(ValidCreate());
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope());
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>()
             .Blockers.ShouldBe([
@@ -188,7 +188,7 @@ public sealed class AgentResponseApproverActivationTests
         DomainResult result = AgentAggregate.Handle(
             new ActivateAgent(),
             state,
-            ActivateEnvelope(includeProviderValidation: false, includeApproverValidation: false));
+            ActivateEnvelope(includeProviderValidation: false, includeApproverValidation: false, expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>()
             .Blockers.ShouldBe([
@@ -199,7 +199,9 @@ public sealed class AgentResponseApproverActivationTests
 
     // Builds an ActivateAgent envelope with provider:selectionValidation = Valid and an arbitrary raw
     // approver:policyValidation string (to test fail-closed parsing of an unrecognized verdict value).
-    private static CommandEnvelope ActivateEnvelopeWithRawApproverVerdict(string rawApproverVerdict)
+    private static CommandEnvelope ActivateEnvelopeWithRawApproverVerdict(
+        string rawApproverVerdict,
+        int expectedConfigurationVersion)
         => new(
             "msg-raw-activate",
             TenantId,
@@ -215,5 +217,6 @@ public sealed class AgentResponseApproverActivationTests
                 [AgentAdminExtensionKey] = "true",
                 [ProviderSelectionValidationExtensionKey] = ProviderSelectionValidationStatus.Valid.ToString(),
                 [ApproverPolicyValidationExtensionKey] = rawApproverVerdict,
+                [ActivationExpectedConfigurationVersionExtensionKey] = expectedConfigurationVersion.ToString(System.Globalization.CultureInfo.InvariantCulture),
             });
 }

@@ -75,6 +75,7 @@ public sealed class AgentActivationApproverRevalidationTests
             AgentId,
             ActorUserId: "admin-user",
             IsAgentsAdmin: true,
+            ExpectedConfigurationVersion: 1,
             SelectedProviderId: ProviderId,
             SelectedModelId: ModelId,
             ResponseMode: AgentResponseMode.Confirmation,
@@ -175,6 +176,47 @@ public sealed class AgentActivationApproverRevalidationTests
     }
 
     [Fact]
+    public async Task Replay_attempt_dispatches_canonical_fail_closed_verdicts_without_dependency_reads()
+    {
+        CaptureDispatch();
+        var clientExtensions = new Dictionary<string, string>
+        {
+            [AgentProviderSelectionOrchestrator.ProviderSelectionValidationExtensionKey] = "Valid",
+            [AgentActivationProviderRevalidation.ApproverPolicyValidationExtensionKey] = "Valid",
+            [AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion] = "99",
+            ["trace"] = "abc-123",
+        };
+        AgentActivationRevalidationRequest request = Request(
+            AgentResponseMode.Confirmation,
+            _policy,
+            clientExtensions) with
+        {
+            ExpectedConfigurationVersion = 7,
+            SelectedProviderId = ProviderId,
+            SelectedModelId = ModelId,
+        };
+
+        AgentActivationRevalidationOutcome outcome = await Revalidation.AttemptReplayAsync(
+            request,
+            CancellationToken.None);
+
+        outcome.Authorized.ShouldBeTrue();
+        outcome.Dispatched.ShouldBeTrue();
+        outcome.ProviderVerdict.ShouldBe(ProviderSelectionValidationStatus.Unavailable);
+        outcome.ApproverVerdict.ShouldBe(ApproverPolicyValidationStatus.Unavailable);
+        await _reader.DidNotReceiveWithAnyArgs().GetEntryAsync(default!, default!, default!, default);
+        await _resolver.DidNotReceiveWithAnyArgs().ResolveAsync(default!, default!, default);
+        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        Dictionary<string, string> extensions = dispatched.Extensions.ShouldNotBeNull();
+        extensions[AgentProviderSelectionOrchestrator.ProviderSelectionValidationExtensionKey]
+            .ShouldBe(nameof(ProviderSelectionValidationStatus.Unavailable));
+        extensions[AgentActivationProviderRevalidation.ApproverPolicyValidationExtensionKey]
+            .ShouldBe(nameof(ApproverPolicyValidationStatus.Unavailable));
+        extensions[AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion].ShouldBe("7");
+        extensions["trace"].ShouldBe("abc-123");
+    }
+
+    [Fact]
     public async Task Deferred_approver_policy_resolver_throws_until_the_live_binding_is_wired()
     {
         IApproverPolicyResolver deferred = new DeferredApproverPolicyResolver();
@@ -224,6 +266,7 @@ public sealed class AgentActivationApproverRevalidationTests
             AgentId,
             ActorUserId: "admin-user",
             isAgentsAdmin,
+            ExpectedConfigurationVersion: 1,
             SelectedProviderId: null, // focus on the approver leg — no provider selection to re-read here
             SelectedModelId: null,
             ResponseMode: mode,

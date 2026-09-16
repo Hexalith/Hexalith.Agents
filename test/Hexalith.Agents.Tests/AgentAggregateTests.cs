@@ -220,7 +220,10 @@ public sealed class AgentAggregateTests
     {
         AgentState state = StateWith(ValidCreate(displayName: ""));
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, Envelope(new ActivateAgent()));
+        DomainResult result = AgentAggregate.Handle(
+            new ActivateAgent(),
+            state,
+            Envelope(new ActivateAgent(), activationExpectedConfigurationVersion: state.ConfigurationVersion));
 
         result.IsRejection.ShouldBeTrue();
         AgentActivationBlockedRejection blocked = result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>();
@@ -259,7 +262,10 @@ public sealed class AgentAggregateTests
     {
         AgentState state = ActiveStateWith(ValidCreate());
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, Envelope(new ActivateAgent()));
+        DomainResult result = AgentAggregate.Handle(
+            new ActivateAgent(),
+            state,
+            Envelope(new ActivateAgent(), activationExpectedConfigurationVersion: state.ConfigurationVersion));
 
         result.IsRejection.ShouldBeTrue();
         AgentLifecycleStateAlreadySetRejection rejection = result.Events[0].ShouldBeOfType<AgentLifecycleStateAlreadySetRejection>();
@@ -296,7 +302,10 @@ public sealed class AgentAggregateTests
         AgentState state = StateWithSelectedProvider(ValidCreate());
         state.Apply(new AgentDisabled(AgentId) { ConfigurationVersion = state.ConfigurationVersion + 1 });
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, SelectEnvelope(new ActivateAgent()));
+        DomainResult result = AgentAggregate.Handle(
+            new ActivateAgent(),
+            state,
+            SelectEnvelope(new ActivateAgent(), activationExpectedConfigurationVersion: state.ConfigurationVersion));
 
         result.IsSuccess.ShouldBeTrue();
         _ = result.Events[0].ShouldBeOfType<AgentActivated>();
@@ -307,7 +316,10 @@ public sealed class AgentAggregateTests
     {
         AgentState state = DisabledStateWith(ValidCreate(displayName: ""));
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, Envelope(new ActivateAgent()));
+        DomainResult result = AgentAggregate.Handle(
+            new ActivateAgent(),
+            state,
+            Envelope(new ActivateAgent(), activationExpectedConfigurationVersion: state.ConfigurationVersion));
 
         result.IsRejection.ShouldBeTrue();
         AgentActivationBlockedRejection blocked = result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>();

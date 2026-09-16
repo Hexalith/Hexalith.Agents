@@ -27,7 +27,9 @@ public sealed class ProviderCatalogCompositionTests
     [Fact]
     public void A_configured_gateway_resolves_the_live_catalog_seams()
     {
-        using ServiceProvider provider = Build(("Agents:EventStore:BaseUrl", "https://eventstore.example"));
+        using ServiceProvider provider = Build(
+            ("Agents:EventStore:BaseUrl", "https://eventstore.example"),
+            ("Agents:EventStore:AppId", "eventstore"));
         using IServiceScope scope = provider.CreateScope();
 
         scope.ServiceProvider.GetRequiredService<IProviderCatalogOperations>()

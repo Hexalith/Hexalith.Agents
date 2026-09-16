@@ -18,7 +18,7 @@ public record AgentSetupWriteResult(
     AgentSetupWriteStatus Status,
     AgentCommandAcceptance? Acceptance)
 {
-    /// <summary>Gets the truth stage this write has reached (never a projection claim).</summary>
+    /// <summary>Gets the truth stage reported by the verified acceptance, including the approved no-op terminal mapping.</summary>
     public AgentSetupTruthState TruthState
         => Acceptance?.TruthState ?? AgentSetupTruthState.Unknown;
 

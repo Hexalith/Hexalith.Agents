@@ -19,7 +19,8 @@
 #>
 
 param(
-    [switch] $SkipBuild
+    [switch] $SkipBuild,
+    [switch] $PackageFloorOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -34,6 +35,41 @@ $testProjects = @(
     'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj',
     'test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj'
 )
+
+function Assert-EventStorePackageFloor {
+    $minimumVersion = [Version]'3.105.0'
+    $arguments = @(
+        'msbuild', 'src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj', '-nologo',
+        '-getProperty:HexalithEventStoreVersion', '-p:Configuration=Release',
+        '-p:UseHexalithProjectReferences=false', '-p:NuGetAudit=false', '/nr:false'
+    )
+    $nativeErrorPreference = $PSNativeCommandUseErrorActionPreference
+    try {
+        $PSNativeCommandUseErrorActionPreference = $false
+        $output = & dotnet @arguments 2>&1
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        $PSNativeCommandUseErrorActionPreference = $nativeErrorPreference
+    }
+
+    if ($exitCode -ne 0) {
+        $output | ForEach-Object { Write-Host $_ }
+        throw "Unable to resolve the effective package-mode HexalithEventStoreVersion."
+    }
+
+    $versionText = ([string]::Join("`n", $output)).Trim()
+    $effectiveVersion = $null
+    if (-not [Version]::TryParse($versionText, [ref]$effectiveVersion)) {
+        throw "The effective package-mode HexalithEventStoreVersion '$versionText' is not a valid version."
+    }
+
+    if ($effectiveVersion -lt $minimumVersion) {
+        throw "Story 5.2 requires Hexalith.EventStore $minimumVersion or later in package mode; effective version is $effectiveVersion. This release must include no-op result-payload forwarding, command-status reads, and trusted-extension admission."
+    }
+
+    Write-Host "Gate: EventStore package floor $effectiveVersion >= $minimumVersion"
+}
 
 # The focused Story 5.2 evidence: each class list names the suites that prove one acceptance criterion.
 $focusedSuites = @(
@@ -55,6 +91,9 @@ $focusedSuites = @(
         Assembly = 'test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll'
         Classes  = @(
             'Hexalith.Agents.Server.Tests.AgentAdministrationOrchestratorTests',
+            'Hexalith.Agents.Server.Tests.AgentActivationApproverRevalidationTests',
+            'Hexalith.Agents.Server.Tests.AgentProviderSelectionOrchestratorTests',
+            'Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests',
             'Hexalith.Agents.Server.Tests.EventStoreAgentCommandDispatcherTests',
             'Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests',
             'Hexalith.Agents.Server.Tests.AgentInteractionRequestOrchestratorTests',
@@ -100,6 +139,11 @@ $compositionSuites = @(
 
 # Gate 4b anchors: a tripwire for a live seam being deleted outright. Secondary to the composition suites above.
 $liveBindings = @(
+    @{
+        Path   = 'src/Hexalith.Agents.EventStore/AgentsEventStoreServiceCollectionExtensions.cs'
+        Needle = 'AddIdempotencyIntentAdapter'
+        Gate   = 'the platform gateway can explicitly register all Agents admission adapters'
+    },
     @{
         Path   = 'src/Hexalith.Agents.Server/Ports/EventStoreAgentCommandDispatcher.cs'
         Needle = 'SubmitCommandAsync'
@@ -147,44 +191,54 @@ function Invoke-TestClasses {
         [Parameter(Mandatory = $true)] [string[]] $Classes
     )
 
-    $arguments = @($Assembly)
-    foreach ($class in $Classes) {
-        $arguments += @('-class', $class)
-    }
-
     Write-Host "Gate: $Name"
-    $output = & dotnet @arguments
-    if ($null -ne $output) {
-        $output | ForEach-Object { Write-Host $_ }
-    }
-
-    if ($LASTEXITCODE -ne 0) {
-        throw "Gate '$Name' failed with exit code $LASTEXITCODE."
-    }
-
-    # A -class selector that matches nothing runs zero tests and still exits 0, which would silently turn a
-    # renamed or deleted suite into a passing no-op gate. The runner has no -minimumExpectedTests, so the
-    # executed count is read back from its own summary and required to be non-zero.
-    $executed = 0
-    $sawSummary = $false
-    foreach ($line in $output) {
-        foreach ($match in [regex]::Matches([string] $line, 'Total:\s*(\d+)')) {
-            $sawSummary = $true
-            $executed += [int] $match.Groups[1].Value
+    foreach ($class in $Classes) {
+        $arguments = @($Assembly, '-class', $class)
+        $nativeErrorPreference = $PSNativeCommandUseErrorActionPreference
+        try {
+            # Capture both successful and failing output so a failed focused class always remains diagnosable.
+            $PSNativeCommandUseErrorActionPreference = $false
+            $output = & dotnet @arguments 2>&1
+            $exitCode = $LASTEXITCODE
         }
-    }
+        finally {
+            $PSNativeCommandUseErrorActionPreference = $nativeErrorPreference
+        }
 
-    if (-not $sawSummary) {
-        throw "Gate '$Name' produced no test summary, so the focused selection cannot be trusted."
-    }
+        if ($null -ne $output) {
+            $output | ForEach-Object { Write-Host $_ }
+        }
 
-    if ($executed -le 0) {
-        throw "Gate '$Name' executed 0 tests; the -class selection matched nothing: $($Classes -join ', ')."
+        if ($exitCode -ne 0) {
+            throw "Gate '$Name' failed for class '$class' with exit code $exitCode."
+        }
+
+        $executed = 0
+        $sawSummary = $false
+        foreach ($line in $output) {
+            foreach ($match in [regex]::Matches([string] $line, 'Total:\s*(\d+)')) {
+                $sawSummary = $true
+                $executed += [int] $match.Groups[1].Value
+            }
+        }
+
+        if (-not $sawSummary) {
+            throw "Gate '$Name' produced no test summary for class '$class', so the focused selection cannot be trusted."
+        }
+
+        if ($executed -le 0) {
+            throw "Gate '$Name' executed 0 tests; the -class selection matched nothing: $class."
+        }
     }
 }
 
 Push-Location $root
 try {
+    Assert-EventStorePackageFloor
+    if ($PackageFloorOnly) {
+        return
+    }
+
     if (-not $SkipBuild) {
         Invoke-Gate -Name 'restore' -Arguments @(
             'restore', $solution, '-p:Configuration=Debug', '-p:UseHexalithProjectReferences=true',

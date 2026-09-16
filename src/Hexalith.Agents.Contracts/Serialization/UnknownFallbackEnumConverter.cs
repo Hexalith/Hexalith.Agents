@@ -11,11 +11,15 @@ namespace Hexalith.Agents.Contracts.Serialization;
 /// <c>Unknown = 0</c> compatibility guarantee promises.
 /// </summary>
 /// <remarks>
+/// This guarantee is prospective: a consumer compiled against an earlier package that still uses the throwing
+/// converter cannot be made tolerant by a newer producer.
+/// <para>
 /// Reading is deliberately tolerant and total: a name (in any casing, matching the case-insensitive behaviour of
 /// the <see cref="JsonStringEnumConverter"/> this type replaces), an ordinal written as a number or as a quoted
 /// number, and every structurally wrong token all resolve without throwing. It is never permissive in the other
 /// direction: a comma-delimited name list, an undefined ordinal, and an unknown name all resolve to the sentinel,
 /// so nothing that is not a declared member of <typeparamref name="TEnum"/> can ever be produced.
+/// </para>
 /// </remarks>
 /// <typeparam name="TEnum">The enum being converted. Its zero value must be the <c>Unknown</c> sentinel.</typeparam>
 public sealed class UnknownFallbackEnumConverter<TEnum> : JsonConverter<TEnum>
@@ -73,7 +77,7 @@ public sealed class UnknownFallbackEnumConverter<TEnum> : JsonConverter<TEnum>
 
         // Enum.TryParse also accepts a comma-delimited name list on a non-flags enum, which combines the ordinals
         // into a value that is not a declared member. Requiring the parsed value's own name to match the input
-        // rejects that, exactly as the result-payload reader at the operations boundary does.
+        // rejects that while preserving the case-insensitive compatibility of the converter this replaces.
         return Enum.TryParse(name, ignoreCase: true, out TEnum parsed)
             && string.Equals(Enum.GetName(parsed), name, StringComparison.OrdinalIgnoreCase)
                 ? parsed

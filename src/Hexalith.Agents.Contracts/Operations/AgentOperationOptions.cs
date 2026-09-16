@@ -21,4 +21,10 @@ namespace Hexalith.Agents.Contracts.Operations;
 public sealed record AgentOperationOptions(
     string? CorrelationId = null,
     string? IdempotencyKey = null,
-    IReadOnlyDictionary<string, string>? Options = null);
+    IReadOnlyDictionary<string, string>? Options = null)
+{
+    /// <summary>
+    /// Gets the optional positive projected configuration version required by activation. Other operations ignore it.
+    /// </summary>
+    public int? ExpectedConfigurationVersion { get; init; }
+}

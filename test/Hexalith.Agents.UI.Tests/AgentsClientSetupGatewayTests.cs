@@ -125,6 +125,8 @@ public sealed class AgentsClientSetupGatewayTests
     [Theory]
     [InlineData(AgentSetupWriteEffect.Unknown, 7)]
     [InlineData(AgentSetupWriteEffect.Applied, null)]
+    [InlineData(AgentSetupWriteEffect.Applied, 0)]
+    [InlineData(AgentSetupWriteEffect.Applied, -1)]
     [InlineData(AgentSetupWriteEffect.Unknown, null)]
     public async Task An_acceptance_without_verified_effect_and_target_is_unverifiable_not_submitted(
         AgentSetupWriteEffect effect,

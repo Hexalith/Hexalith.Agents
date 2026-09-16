@@ -321,7 +321,7 @@ public sealed class AgentLaunchReadinessTests
         AgentState state = StateWithSelectedProvider(ValidCreate());
         state.ProductionLikeGenerationEnabled.ShouldBeFalse();
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope());
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.IsSuccess.ShouldBeTrue();
         _ = result.Events[0].ShouldBeOfType<AgentActivated>();

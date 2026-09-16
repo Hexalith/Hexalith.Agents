@@ -283,6 +283,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
             AgentId,
             ActorUserId: "admin-user",
             IsAgentsAdmin: true,
+            ExpectedConfigurationVersion: 1,
             SelectedProviderId: ProviderId,
             SelectedModelId: ModelId,
             ClientSuppliedExtensions: clientExtensions);
@@ -354,8 +355,9 @@ public sealed class AgentProviderSelectionOrchestratorTests
             AgentId,
             ActorUserId: "admin-user",
             isAgentsAdmin,
-            selectedProviderId,
-            selectedModelId);
+            ExpectedConfigurationVersion: 1,
+            SelectedProviderId: selectedProviderId,
+            SelectedModelId: selectedModelId);
 
     private CommandEnvelope? _lastDispatched;
 

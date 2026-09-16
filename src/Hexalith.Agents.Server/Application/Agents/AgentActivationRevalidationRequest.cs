@@ -19,6 +19,7 @@ namespace Hexalith.Agents.Server.Application.Agents;
 /// <param name="AgentId">The Agent aggregate id.</param>
 /// <param name="ActorUserId">The authenticated actor.</param>
 /// <param name="IsAgentsAdmin">The trusted Agents-admin decision from claims (the orchestration fails closed when false).</param>
+/// <param name="ExpectedConfigurationVersion">The positive projected configuration version captured by the activation intent.</param>
 /// <param name="SelectedProviderId">The recorded selected provider id, or <see langword="null"/> when none is selected.</param>
 /// <param name="SelectedModelId">The recorded selected model id, or <see langword="null"/> when none is selected.</param>
 /// <param name="ResponseMode">The recorded Response Mode (decides whether the approver policy is re-resolved; 1.6 AC3).</param>
@@ -31,6 +32,7 @@ public sealed record AgentActivationRevalidationRequest(
     string AgentId,
     string ActorUserId,
     bool IsAgentsAdmin,
+    int ExpectedConfigurationVersion,
     string? SelectedProviderId,
     string? SelectedModelId,
     AgentResponseMode ResponseMode = AgentResponseMode.Unknown,

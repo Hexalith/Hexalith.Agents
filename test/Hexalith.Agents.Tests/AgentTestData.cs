@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -28,6 +29,7 @@ internal static class AgentTestData
     internal const string PartyLinkValidationExtensionKey = "party:linkValidation";
     internal const string ProviderSelectionValidationExtensionKey = "provider:selectionValidation";
     internal const string ApproverPolicyValidationExtensionKey = "approver:policyValidation";
+    internal const string ActivationExpectedConfigurationVersionExtensionKey = "agent:activationExpectedConfigurationVersion";
     internal const string AuditGovernanceResolvedExtensionKey = "audit:governanceResolved";
     internal const string LinkedPartyId = "party-001";
     internal const string SelectedProviderId = "openai";
@@ -79,9 +81,23 @@ internal static class AgentTestData
         bool isAgentsAdmin = true,
         string agentId = AgentId,
         string tenantId = TenantId,
-        string actorUserId = "admin-user")
+        string actorUserId = "admin-user",
+        int activationExpectedConfigurationVersion = 1)
         where T : notnull
-        => new(
+    {
+        var extensions = new Dictionary<string, string>();
+        if (isAgentsAdmin)
+        {
+            extensions[AgentAdminExtensionKey] = "true";
+        }
+
+        if (command is ActivateAgent)
+        {
+            extensions[ActivationExpectedConfigurationVersionExtensionKey] =
+                activationExpectedConfigurationVersion.ToString(CultureInfo.InvariantCulture);
+        }
+
+        return new(
             "msg-" + typeof(T).Name,
             tenantId,
             "agent",
@@ -91,9 +107,8 @@ internal static class AgentTestData
             "corr-1",
             null,
             actorUserId,
-            isAgentsAdmin
-                ? new Dictionary<string, string> { [AgentAdminExtensionKey] = "true" }
-                : null);
+            extensions.Count > 0 ? extensions : null);
+    }
 
     /// <summary>
     /// Builds a command envelope carrying the trusted Agents-admin extension and (optionally) the server-populated
@@ -168,7 +183,8 @@ internal static class AgentTestData
         bool includeValidation = true,
         string agentId = AgentId,
         string tenantId = TenantId,
-        string actorUserId = "admin-user")
+        string actorUserId = "admin-user",
+        int activationExpectedConfigurationVersion = 5)
         where T : notnull
     {
         var extensions = new Dictionary<string, string>();
@@ -180,6 +196,12 @@ internal static class AgentTestData
         if (includeValidation)
         {
             extensions[ProviderSelectionValidationExtensionKey] = validation.ToString();
+        }
+
+        if (command is ActivateAgent)
+        {
+            extensions[ActivationExpectedConfigurationVersionExtensionKey] =
+                activationExpectedConfigurationVersion.ToString(CultureInfo.InvariantCulture);
         }
 
         return new(
@@ -220,7 +242,8 @@ internal static class AgentTestData
         bool includeApproverValidation = true,
         string agentId = AgentId,
         string tenantId = TenantId,
-        string actorUserId = "admin-user")
+        string actorUserId = "admin-user",
+        int expectedConfigurationVersion = 1)
     {
         var command = new ActivateAgent();
         var extensions = new Dictionary<string, string>();
@@ -238,6 +261,10 @@ internal static class AgentTestData
         {
             extensions[ApproverPolicyValidationExtensionKey] = approverValidation.ToString();
         }
+
+
+        extensions[ActivationExpectedConfigurationVersionExtensionKey] =
+            expectedConfigurationVersion.ToString(CultureInfo.InvariantCulture);
 
         return new(
             "msg-ActivateAgent",
@@ -518,7 +545,9 @@ internal static class AgentTestData
         bool isAgentsAdmin = true)
         where TCommand : notnull
     {
-        DomainResult result = await aggregate.ProcessAsync(Envelope(command, isAgentsAdmin), state);
+        CommandEnvelope envelope = Envelope(command, isAgentsAdmin);
+        envelope = WithCurrentActivationVersion(command, state, envelope);
+        DomainResult result = await aggregate.ProcessAsync(envelope, state);
         ApplyAll(state, result);
         return result;
     }
@@ -541,8 +570,28 @@ internal static class AgentTestData
         CommandEnvelope envelope)
         where TCommand : notnull
     {
+        envelope = WithCurrentActivationVersion(command, state, envelope);
         DomainResult result = await aggregate.ProcessAsync(envelope, state);
         ApplyAll(state, result);
         return result;
+    }
+
+    private static CommandEnvelope WithCurrentActivationVersion<TCommand>(
+        TCommand command,
+        AgentState state,
+        CommandEnvelope envelope)
+        where TCommand : notnull
+    {
+        if (command is not ActivateAgent)
+        {
+            return envelope;
+        }
+
+        var extensions = envelope.Extensions is null
+            ? new Dictionary<string, string>()
+            : new Dictionary<string, string>(envelope.Extensions, StringComparer.Ordinal);
+        extensions[ActivationExpectedConfigurationVersionExtensionKey] =
+            state.ConfigurationVersion.ToString(CultureInfo.InvariantCulture);
+        return envelope with { Extensions = extensions };
     }
 }

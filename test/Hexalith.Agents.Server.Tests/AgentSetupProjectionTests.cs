@@ -199,8 +199,8 @@ public sealed class AgentSetupProjectionTests
 
         var rebuilt = new FakeReadModelStore();
         _ = await rebuilt.ExecuteAsync(
-            new EventStore.Client.Projections.ReadModelBatch(
-                new EventStore.Client.Projections.ReadModelBatchScope(
+            new global::Hexalith.EventStore.Client.Projections.ReadModelBatch(
+                new global::Hexalith.EventStore.Client.Projections.ReadModelBatchScope(
                     StoreName, TenantId, AgentSetupReadModelAddresses.Domain, AgentId, AgentSetupReadModelAddresses.ProjectionName, "rebuild-1"),
                 plan.Operations),
             CancellationToken.None);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +20,9 @@ namespace Hexalith.Agents.Server.Application.Agents;
 /// verdict, and — when the recorded Response Mode is Confirmation and a policy is present — resolves the recorded
 /// Approver Policy sources through <see cref="IApproverPolicyResolver"/> and populates the trusted
 /// <c>approver:policyValidation</c> verdict. Activation is one command / one envelope carrying all trusted dependency
-/// verdicts, so the aggregate's gates can clear for a genuinely-ready agent and fail closed otherwise.
+/// verdicts, so the aggregate's gates can clear for a genuinely-ready agent and fail closed otherwise. A retained
+/// attempt whose projection has already advanced can instead be dispatched without dependency reads, carrying
+/// canonical unavailable verdicts so EventStore can replay it while a first execution still fails closed.
 /// </summary>
 /// <remarks>
 /// Same trust model as the selection orchestration: <c>actor:agentsAdmin</c>, <c>provider:selectionValidation</c>,
@@ -34,13 +37,14 @@ public sealed class AgentActivationProviderRevalidation
     private const string AgentDomain = "agent";
 
     /// <summary>The server-populated approver-policy verdict extension key (client-stripped).</summary>
-    internal const string ApproverPolicyValidationExtensionKey = "approver:policyValidation";
+    internal const string ApproverPolicyValidationExtensionKey = AgentSetupTrustedExtensions.ApproverPolicyValidation;
 
     private static readonly string[] _reservedExtensionKeys =
     [
         AgentProviderSelectionOrchestrator.AgentAdminExtensionKey,
         AgentProviderSelectionOrchestrator.ProviderSelectionValidationExtensionKey,
         ApproverPolicyValidationExtensionKey,
+        AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion,
     ];
 
     private readonly IProviderCatalogReader _catalogReader;
@@ -78,6 +82,13 @@ public sealed class AgentActivationProviderRevalidation
             return AgentActivationRevalidationOutcome.Denied();
         }
 
+        if (request.ExpectedConfigurationVersion <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(request),
+                "The activation expected configuration version must be positive.");
+        }
+
         // Re-read the catalog for the recorded selection (if any) and compute the fail-closed provider verdict. With
         // no recorded selection there is nothing to re-validate — the aggregate fails closed with MissingProviderSelection.
         ProviderSelectionValidationStatus providerVerdict = ProviderSelectionValidationStatus.Unknown;
@@ -102,6 +113,46 @@ public sealed class AgentActivationProviderRevalidation
             approverVerdict = ApproverPolicyVerdict.Evaluate(policy, resolution);
         }
 
+        return await DispatchAsync(request, providerVerdict, approverVerdict, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Attempts a retained activation through EventStore admission without reading dependency state.
+    /// </summary>
+    /// <param name="request">The retained activation request.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The replay-attempt outcome, carrying fail-closed verdicts if admission routes it for execution.</returns>
+    internal Task<AgentActivationRevalidationOutcome> AttemptReplayAsync(
+        AgentActivationRevalidationRequest request,
+        CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        if (!request.IsAgentsAdmin)
+        {
+            return Task.FromResult(AgentActivationRevalidationOutcome.Denied());
+        }
+
+        if (request.ExpectedConfigurationVersion <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(request),
+                "The activation expected configuration version must be positive.");
+        }
+
+        return DispatchAsync(
+            request,
+            ProviderSelectionValidationStatus.Unavailable,
+            ApproverPolicyValidationStatus.Unavailable,
+            ct);
+    }
+
+    private async Task<AgentActivationRevalidationOutcome> DispatchAsync(
+        AgentActivationRevalidationRequest request,
+        ProviderSelectionValidationStatus providerVerdict,
+        ApproverPolicyValidationStatus approverVerdict,
+        CancellationToken ct)
+    {
         var command = new ActivateAgent();
         var envelope = new CommandEnvelope(
             request.MessageId,
@@ -113,7 +164,11 @@ public sealed class AgentActivationProviderRevalidation
             request.CorrelationId,
             CausationId: null,
             request.ActorUserId,
-            BuildTrustedExtensions(request.ClientSuppliedExtensions, providerVerdict, approverVerdict));
+            BuildTrustedExtensions(
+                request.ClientSuppliedExtensions,
+                providerVerdict,
+                approverVerdict,
+                request.ExpectedConfigurationVersion));
 
         SubmitCommandResponse receipt = await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
 
@@ -123,7 +178,8 @@ public sealed class AgentActivationProviderRevalidation
     private static Dictionary<string, string> BuildTrustedExtensions(
         IReadOnlyDictionary<string, string>? clientSupplied,
         ProviderSelectionValidationStatus providerVerdict,
-        ApproverPolicyValidationStatus approverVerdict)
+        ApproverPolicyValidationStatus approverVerdict,
+        int expectedConfigurationVersion)
     {
         var extensions = new Dictionary<string, string>(StringComparer.Ordinal);
 
@@ -141,6 +197,8 @@ public sealed class AgentActivationProviderRevalidation
         extensions[AgentProviderSelectionOrchestrator.AgentAdminExtensionKey] = "true";
         extensions[AgentProviderSelectionOrchestrator.ProviderSelectionValidationExtensionKey] = providerVerdict.ToString();
         extensions[ApproverPolicyValidationExtensionKey] = approverVerdict.ToString();
+        extensions[AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion] =
+            expectedConfigurationVersion.ToString(CultureInfo.InvariantCulture);
         return extensions;
     }
 }

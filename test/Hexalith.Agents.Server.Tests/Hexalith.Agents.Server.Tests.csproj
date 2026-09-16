@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Hexalith.Agents.EventStore\Hexalith.Agents.EventStore.csproj" />
     <ProjectReference Include="..\..\src\Hexalith.Agents.Server\Hexalith.Agents.Server.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" />
   </ItemGroup>

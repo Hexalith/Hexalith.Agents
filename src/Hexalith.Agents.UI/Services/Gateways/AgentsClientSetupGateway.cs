@@ -165,7 +165,7 @@ public sealed class AgentsClientSetupGateway(
         // A legacy server returns an acceptance with no effect and no target version. That is unverifiable, not
         // progress: without a command-derived target the caller has nothing to poll for and must not be told the
         // write is under way. Enforcing it here keeps the invariant in the gateway rather than in one consumer.
-        return acceptance.Effect is AgentSetupWriteEffect.Unknown || acceptance.TargetConfigurationVersion is null
+        return acceptance.Effect is AgentSetupWriteEffect.Unknown || acceptance.TargetConfigurationVersion is not > 0
             ? AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify)
             : AgentSetupWriteResult.Submitted(acceptance);
     }

@@ -1,9 +1,12 @@
+using System.Globalization;
+
 using Hexalith.Agents.Client;
 using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Contracts.AgentInteraction.Commands;
 using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hexalith.Agents.Server.Api;
@@ -73,7 +76,9 @@ public static class AgentsOperationEndpoints
                     agentId,
                     command,
                     GetCommandOptions(correlationId, idempotencyKey),
-                    cancellationToken));
+                    cancellationToken))
+            .AddEndpointFilter<AgentSetupCommandHeadersFilter>()
+            .ProducesProblem(StatusCodes.Status400BadRequest, "application/problem+json");
         agents.MapPut("/{agentId}", (
             string agentId,
             UpdateAgentConfiguration command,
@@ -85,7 +90,9 @@ public static class AgentsOperationEndpoints
                     agentId,
                     command,
                     GetCommandOptions(correlationId, idempotencyKey),
-                    cancellationToken));
+                    cancellationToken))
+            .AddEndpointFilter<AgentSetupCommandHeadersFilter>()
+            .ProducesProblem(StatusCodes.Status400BadRequest, "application/problem+json");
         agents.MapPost("/{agentId}/response-mode", (
             string agentId,
             ConfigureAgentResponseMode command,
@@ -97,19 +104,27 @@ public static class AgentsOperationEndpoints
                     agentId,
                     command,
                     GetCommandOptions(correlationId, idempotencyKey),
-                    cancellationToken));
+                    cancellationToken))
+            .AddEndpointFilter<AgentSetupCommandHeadersFilter>()
+            .ProducesProblem(StatusCodes.Status400BadRequest, "application/problem+json");
         agents.MapPost("/{agentId}/activate", (
             string agentId,
             ActivateAgent command,
             [FromHeader(Name = "X-Correlation-ID")] string? correlationId,
             [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey,
+            [FromHeader(Name = "X-Expected-Configuration-Version")] string? expectedConfigurationVersion,
             IAgentsClient client,
             CancellationToken cancellationToken) =>
                 client.AgentAdministration.ActivateAsync(
                     agentId,
                     command,
-                    GetCommandOptions(correlationId, idempotencyKey),
-                    cancellationToken));
+                    GetCommandOptions(
+                        correlationId,
+                        idempotencyKey,
+                        int.Parse(expectedConfigurationVersion!, CultureInfo.InvariantCulture)),
+                    cancellationToken))
+            .AddEndpointFilter(AgentSetupCommandHeadersFilter.ForActivation())
+            .ProducesProblem(StatusCodes.Status400BadRequest, "application/problem+json");
         agents.MapPost("/{agentId}/disable", (
             string agentId,
             DisableAgent command,
@@ -121,7 +136,9 @@ public static class AgentsOperationEndpoints
                     agentId,
                     command,
                     GetCommandOptions(correlationId, idempotencyKey),
-                    cancellationToken));
+                    cancellationToken))
+            .AddEndpointFilter<AgentSetupCommandHeadersFilter>()
+            .ProducesProblem(StatusCodes.Status400BadRequest, "application/problem+json");
         agents.MapPost("/party-link", (LinkAgentPartyIdentity command, IAgentsClient client, CancellationToken cancellationToken) =>
             client.AgentAdministration.LinkPartyIdentityAsync(command, cancellationToken: cancellationToken));
         agents.MapPost("/party-link/replace", (ReplaceAgentPartyIdentity command, IAgentsClient client, CancellationToken cancellationToken) =>
@@ -138,10 +155,16 @@ public static class AgentsOperationEndpoints
             client.AgentAdministration.EnableProductionLikeGenerationAsync(command, cancellationToken: cancellationToken));
     }
 
-    private static AgentOperationOptions GetCommandOptions(string? correlationId, string? idempotencyKey)
-        => new(
+    private static AgentOperationOptions GetCommandOptions(
+        string? correlationId,
+        string? idempotencyKey,
+        int? expectedConfigurationVersion = null)
+        => new AgentOperationOptions(
             string.IsNullOrWhiteSpace(correlationId) ? null : correlationId,
-            string.IsNullOrWhiteSpace(idempotencyKey) ? null : idempotencyKey);
+            string.IsNullOrWhiteSpace(idempotencyKey) ? null : idempotencyKey)
+        {
+            ExpectedConfigurationVersion = expectedConfigurationVersion,
+        };
 
     private static void MapInteractions(RouteGroupBuilder group)
     {

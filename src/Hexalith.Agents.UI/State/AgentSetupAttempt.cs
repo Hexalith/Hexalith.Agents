@@ -9,6 +9,8 @@ namespace Hexalith.Agents.UI.State;
 /// </summary>
 /// <param name="Options">The immutable ULID correlation and idempotency identities.</param>
 /// <param name="Submit">The exact captured payload submission.</param>
+/// <param name="InstructionsDraft">The exact write-only instructions draft retained for restoration on terminal failure or abandon.</param>
 internal sealed record AgentSetupAttempt(
     AgentOperationOptions Options,
-    Func<AgentOperationOptions, CancellationToken, Task<AgentSetupWriteResult>> Submit);
+    Func<AgentOperationOptions, CancellationToken, Task<AgentSetupWriteResult>> Submit,
+    string? InstructionsDraft = null);

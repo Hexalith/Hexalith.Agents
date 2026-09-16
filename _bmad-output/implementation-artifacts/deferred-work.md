@@ -105,87 +105,136 @@ status: open
   summary: Prove exact setup result payload replay and projection through the production-like EventStore topology.
   evidence: Unit and component evidence covers the platform contract, but the Story 5.6 production-like host fixture is required to establish whether the payload survives the real EventStore completion, idempotency replay, and persisted projection path end to end.
 
-## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2 (2026-09-14)
+### DW-6: Eventful result payload forwarding depends on advisory command status reaching Completed.
 
-- Eventful `ResultPayload` is dropped whenever the durable advisory status read is not `Completed`.
-  `references/Hexalith.EventStore/src/Hexalith.EventStore.Server/Pipeline/SubmitCommandHandler.cs:538` gates
-  payload forwarding on `finalStatus?.Status == CommandStatus.Completed` and otherwise logs `ResultPayloadDropped`.
-  The gating is deliberate and separately tested in EventStore, and it lives in a different repository boundary,
-  so it is not actionable from this story. Story 5.2's new fail-closed correlation is what makes it visible:
-  a write that genuinely appended its event is reported to the administrator as `UnableToVerify` whenever the
-  advisory status write has not landed by the time it is read. Revisit alongside the no-op payload fix.
+origin: code review, 2026-09-14
+location: references/Hexalith.EventStore/src/Hexalith.EventStore.Server/Pipeline/SubmitCommandHandler.cs:538
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: EventStore deliberately drops the payload when the advisory status read has not reached Completed; a genuinely appended write therefore remains UnableToVerify until the platform policy is revisited.
+status: open
 
-- Domain-rejection correlation is seamed but not bound. `IAgentCommandStatusReader` and the mapping of a rejected
-  command to `AgentOperationErrorCode.Rejected` are implemented and tested, but the live reader is absent because it
-  needs `IEventStoreGatewayClient.GetCommandStatusAsync`, which is added in the submodule and not yet released.
-  Release builds resolve Hexalith libraries by package reference, so Agents cannot bind to it until that package
-  ships. Until then a domain rejection still renders as retryable `UnableToVerify`. Going live is a single
-  registration change in `AgentSetupServiceCollectionExtensions`.
+### DW-7: Bind a live Agent command-status reader after the EventStore status API ships.
 
-- `tools/check-story-review-readiness.py` can hang for its full 900 s timeout on a test project. `default_runner`
-  uses `subprocess.run(capture_output=True)`, which waits for the stdout pipe to reach EOF rather than for the child
-  to exit, so a persistent MSBuild node that inherited that pipe keeps it open and the gate times out. Observed twice
-  on `Hexalith.Agents.Client.Tests`, whose 6 tests finish in 0.14 s when the identical command is run directly.
-  Workaround: `dotnet build-server shutdown` and run the gate with `MSBUILDDISABLENODEREUSE=1`. A durable fix is to
-  set that variable inside `default_runner` for `dotnet` commands.
+origin: code review, 2026-09-14
+location: src/Hexalith.Agents.Server/Composition/AgentSetupServiceCollectionExtensions.cs
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: The seam and rejection mapping are implemented, but package-mode builds cannot bind the live EventStore reader until the package containing GetCommandStatusAsync ships. The host-overridable deferred registration preserves fail-closed behavior meanwhile.
+status: open
 
-## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2 (2026-09-14, round 2)
+### DW-8: Prevent persistent MSBuild nodes from holding the readiness runner's captured output pipe.
 
-- The idempotency key is not bound to the payload it was first used with. `AgentOperationOptions` documents that
-  "An exact retry must reuse the same correlation ID, idempotency key, and payload", but nothing in the Contracts
-  or domain layer enforces the payload half. A retry that reuses the key with a changed payload could be shown the
-  first command's effect and target version. Unverified — settled by inspecting EventStore's idempotency-record
-  handling in `references/Hexalith.EventStore` for whether a replayed key with a different payload is rejected.
-  Would be medium if confirmed.
+origin: code review, 2026-09-14
+location: tools/check-story-review-readiness.py
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: A persistent MSBuild child can keep the captured output pipe open until the runner's timeout; setting MSBUILDDISABLENODEREUSE inside the runner would make the workaround automatic.
+status: open
 
-- Caller-supplied `CorrelationId` may be echoed on read paths without canonical-ULID validation.
-  `EventStoreAgentAdministrationOperations.cs:210,222` were cited; the write paths do validate via
-  `IsCanonicalUlid`, and the read paths fall outside the Contracts/domain chunk reviewed here. Unverified —
-  settled by the Group 3 (Server) chunk review. Would be medium if confirmed.
+### DW-9: Verify that an idempotency key is bound to its first submitted payload.
 
-- `AgentSetupWriteStatus` reserves zero for `Submitted` rather than `Unknown`, so a default or absent value reads
-  as "accepted for processing" — fail-open, against the `Unknown = 0` convention every neighbouring operations
-  enum follows. Pre-existing: `Submitted = 0` was already declared inside `AgentSetupWriteResult.cs` at
-  `baseline_commit`; the current round only split the enum into its own file and appended three members. It is
-  UI-internal today (the client gateway maps into it; it never crosses HTTP), so the fail-open default is not
-  currently reachable from a wire payload. Revisit if the status is ever serialized.
+origin: code review round 2, 2026-09-14
+location: references/Hexalith.EventStore
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+severity: medium
+reason: Exact retry requires the same identity and payload; inspect EventStore's idempotency record handling to prove a changed payload cannot replay the first result.
+status: open
 
-- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
-  summary: Map `AgentOperationStatus.Rejected` to a terminal Agent setup write status before the live `IAgentCommandStatusReader` is registered.
-  evidence: `AgentsClientSetupGateway.ToWriteStatus` has no `Rejected` arm, so a rejection falls through to `Unavailable`, which `IsTerminalWriteFailure` excludes; the page would keep the attempt and offer a Retry that replays the same idempotency key against the same rejection forever. Unreachable today because only `DeferredAgentCommandStatusReader` is registered and it always answers `null`, so this must land with — and no later than — the single registration change that binds the live reader, together with the localized wording a rejection should show.
+### DW-10: Canonicalize correlation identifiers echoed by setup read paths.
 
-- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
-  summary: Extend the `Unknown = 0` fallback converter to the remaining public contract enums on Epic 2/3/4 payloads.
-  evidence: About 45 `Unknown = 0` enums in `Hexalith.Agents.Contracts` (the `AgentInteraction` and `ProviderCatalog` families, plus `OperationalStatusInspectionStatus`) still declare the throwing `JsonStringEnumConverter`, so an additive member still fails a whole response for an older client on those routes. Story 5.2 closes this for its own setup payload only; the rest is the same latent defect on payloads outside this story's reach and should be swept once, with `AgentInspectionStatus` deliberately excluded because its zero is `Success = 0` and the fallback would fail open.
+origin: code review round 2, 2026-09-14
+location: src/Hexalith.Agents.Server/Application/Agents/EventStoreAgentAdministrationOperations.cs
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: Read results previously echoed invalid or non-canonical caller metadata, including on denied and out-of-scope paths.
+status: done 2026-09-15
+resolution: All setup read and out-of-scope results now echo only a canonical uppercase ULID; regression tests cover denied and cross-tenant reads.
 
-## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2 (2026-09-15, round 4)
+### DW-11: Reserve Unknown at zero if AgentSetupWriteStatus ever becomes a wire contract.
 
-- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
-  summary: Complete the provider-catalog write path to the Story 5.2 acceptance contract.
-  evidence: `ProviderCatalogAdministrationOrchestrator` now returns `AgentAdministrationOutcome.FromDispatch(receipt)`, but `EventStoreProviderCatalogOperations.WriteAsync` discards `outcome.Receipt`, reports `AgentSetupTruthState.Submitted` with no effect and no target version, never verifies receipt identity, and accepts any caller string as `IdempotencyKey`/`CorrelationId` while the sibling Agent path requires a canonical ULID. One public surface answers two contradictory acceptance contracts. Completing it belongs to Story 5.3.
-  status: open
+origin: code review round 2, 2026-09-14
+location: src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteStatus.cs
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: The UI-internal enum predates this story with Submitted at zero; migration is required before it can safely be serialized.
+status: open
 
-- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
-  summary: Propagate the zero-test guard to `eng/verify-story-5.3.ps1`.
-  evidence: That script still selects its focused and composition gates with `--filter`, which prints "No test matches the given testcase filter" and exits 0, so a renamed or deleted suite silently turns a gate into a no-op — the defect `Invoke-TestClasses` was written to close in the 5.2 verifier. Pre-existing and outside this story's diff.
-  status: open
+### DW-12: Map Rejected to a terminal UI outcome when the live command-status reader is bound.
 
-- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
-  summary: Map every write outcome code to an HTTP status instead of returning 200 with a failure body.
-  evidence: The write handlers return `AgentOperationResult<AgentCommandAcceptance>` directly, so `ValidationFailed`, `NotAuthorized`, `Rejected` and `UnableToVerify` all arrive as 200; `SendWriteAsync` only calls `EnsureSuccessStatusCode()`, so no test would notice. Pre-existing module-wide pattern, not introduced by this story.
-  status: open
+origin: code review round 2, 2026-09-14
+location: src/Hexalith.Agents.UI/Services/Gateways/AgentsClientSetupGateway.cs
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: Until the live reader is bound Rejected is unreachable; binding must add a terminal mapping and localized wording so retry does not replay a known rejection forever.
+status: open
 
-- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
-  summary: Decide whether the page must signal that a local draft diverges from confirmed authoritative setup.
-  evidence: Both post-write read call sites now pass `applyAuthoritativeDrafts: false`, so a concurrent administrator's `DisplayName`/`Description` change never surfaces while `agents-config-truth-stage` renders `ProjectionConfirmed`. Unverified at `medium`: whether this is a defect or the intended precedence is a UX decision. What would settle it: a product call on draft-versus-authority precedence.
-  status: open
+### DW-13: Extend Unknown-zero fallback to the remaining AgentInteraction and ProviderCatalog wire enums.
 
-- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
-  summary: Group the ten sibling titled sections of `AgentConfiguration.razor` into a single `FluentAccordion`.
-  evidence: `hexalith-ux-instructions.md` requires two or more sibling titled content sections to be grouped in one `FluentAccordion`; the page renders ten with raw `<dl>`, `<ul>`, `<p>` and no accordion. Pre-existing — this story adds no titled section.
-  status: open
+origin: code review round 2, 2026-09-14
+location: src/Hexalith.Agents.Contracts
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: Story 5.2 covers its setup payload and operation terms; the remaining AgentInteraction and ProviderCatalog payload families still require a coordinated prospective-compatibility migration. AgentInspectionStatus remains deliberately excluded because zero means Success.
+status: open
 
-- source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
-  summary: Establish whether the command-status seam is reachable through the live EventStore gateway at all.
-  evidence: `SubmitCommandHandler` calls `ThrowDeterministicFailure` for every `!Accepted` processing result, so a domain rejection throws `DomainCommandRejectedException` (409/422) and is already mapped by the existing dispatch `try/catch` to `Conflict`/`ValidationFailed`; an accepted-but-payload-less receipt may therefore never correspond to a rejection, and the test that proves the `Rejected` branch fabricates that shape rather than producing it. The same shape is produced for a genuine success whenever the advisory status read is not `Completed`, which is what makes the question open rather than settled. If the shape is unreachable, `IAgentCommandStatusReader`, `IEventStoreGatewayClient.GetCommandStatusAsync` and the `Rejected` branch are public surface added to a shared technical module for a path the pipeline never produces, against the frozen Never clause. Unverified at medium by product-owner decision (2026-09-15). What would settle it: a production-like EventStore topology run, i.e. Story 5.6's host fixture.
-  status: open
+### DW-14: Complete the provider-catalog write path to the Story 5.2 acceptance contract.
+
+origin: code review round 4, 2026-09-15
+location: src/Hexalith.Agents.Server/Application/Agents/EventStoreProviderCatalogOperations.cs
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: The provider path still discards the receipt, lacks effect/version evidence and canonical identity validation, and belongs to Story 5.3.
+status: open
+
+### DW-15: Propagate the per-class zero-test guard to the Story 5.3 verifier.
+
+origin: code review round 4, 2026-09-15
+location: eng/verify-story-5.3.ps1
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: That script's pre-existing filter can match nothing and still exit successfully.
+status: open
+
+### DW-16: Map operation failure bodies to appropriate HTTP statuses.
+
+origin: code review round 4, 2026-09-15
+location: src/Hexalith.Agents.Server/Api/AgentsOperationEndpoints.cs
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: The pre-existing module-wide pattern returns HTTP 200 with typed failure bodies; changing that contract is outside this bounded story.
+status: open
+
+### DW-17: Decide how confirmed authoritative setup should interact with a divergent local draft.
+
+origin: code review round 4, 2026-09-15
+location: src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+severity: medium
+reason: Post-write reads deliberately preserve local display-name and description drafts; Product/UX must decide whether divergence needs a signal.
+status: open
+
+### DW-18: Group the configuration page's sibling titled sections into a FluentAccordion.
+
+origin: code review round 4, 2026-09-15
+location: src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: The pre-existing ten-section page does not meet the loaded UX accordion convention; this story adds no titled section.
+status: open
+
+### DW-19: Establish whether the command-status seam is reachable through a production EventStore gateway.
+
+origin: product-owner decision from code review round 4, 2026-09-15
+location: references/Hexalith.EventStore/src/Hexalith.EventStore.Server/Pipeline/SubmitCommandHandler.cs
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+severity: medium
+reason: Deterministic rejection may throw before returning an accepted payload-less receipt, while advisory status lag produces the same shape for success. Story 5.6's production-like topology must settle reachability before the live reader is bound.
+status: open
+
+### DW-20: Publish and consume the EventStore release that forwards no-op result payloads.
+
+origin: product-owner decision from code review round 4, 2026-09-15
+location: references/Hexalith.Builds/Props/Directory.Packages.props:8
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+severity: blocker
+reason: The fix exists after EventStore 3.104.0, but package-mode Release and CI consume 3.104.0. The Story 5.2 verifier now requires 3.105.0 or later and intentionally remains red until that package is published and imported.
+status: open
+
+### DW-21: Register the Agents integration in the platform-owned EventStore gateway host.
+
+origin: approved Story 5.2 replan, 2026-09-15
+location: external Platform EventStore gateway composition
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+severity: blocker
+reason: This repository publishes `Hexalith.Agents.EventStore` and proves its explicit registration in an isolated gateway provider, but it does not own the deployed Platform gateway host. Promotion requires that host to consume the package and call `AddAgentsEventStore` with the exact allow-listed Agents Dapr app id; without that call, reserved metadata and keyed setup commands fail closed before domain execution.
+status: open

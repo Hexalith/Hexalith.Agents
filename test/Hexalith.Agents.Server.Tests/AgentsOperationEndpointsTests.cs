@@ -227,13 +227,82 @@ public sealed class AgentsOperationEndpointsTests
         await administration.Received(1).ActivateAsync(
             "agent-1",
             Arg.Any<ActivateAgent>(),
-            Arg.Is<AgentOperationOptions?>(options => HasExpectedCommandOptions(options)),
+            Arg.Is<AgentOperationOptions?>(options => HasExpectedCommandOptions(options, 3)),
             Arg.Any<CancellationToken>());
         await administration.Received(1).DisableAsync(
             "agent-1",
             Arg.Any<DisableAgent>(),
             Arg.Is<AgentOperationOptions?>(options => HasExpectedCommandOptions(options)),
             Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData("Idempotency-Key", " ")]
+    [InlineData("Idempotency-Key", "77ca7f293a3347b287f963befc1bf125")]
+    [InlineData("X-Correlation-ID", "01arz3ndektsv4rrffq69g5fav")]
+    public async Task Explicit_noncanonical_setup_identity_headers_return_stable_problem_details(
+        string headerName,
+        string headerValue)
+    {
+        IAgentAdministrationOperations administration = Substitute.For<IAgentAdministrationOperations>();
+        await using WebApplication app = BuildHttpApp(AgentsClientWith(administration));
+        await app.StartAsync().ConfigureAwait(true);
+        using HttpClient client = app.GetTestClient();
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/agents/operations/agents/agent-1/disable")
+        {
+            Content = JsonContent.Create(new DisableAgent()),
+        };
+        request.Headers.TryAddWithoutValidation(headerName, headerValue).ShouldBeTrue();
+
+        using HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(true);
+
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
+        response.Content.Headers.ContentType?.MediaType.ShouldBe("application/problem+json");
+        string problem = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+        problem.ShouldContain(AgentSetupCommandHeadersFilter.InvalidIdentityProblemType);
+        problem.ShouldContain("canonical_value_required");
+        problem.ShouldContain(headerName);
+        await administration.DidNotReceiveWithAnyArgs().DisableAsync(
+            default!,
+            default!,
+            default,
+            default);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("0")]
+    [InlineData("+3")]
+    [InlineData("03")]
+    public async Task Activation_requires_one_positive_canonical_configuration_version_header(string? version)
+    {
+        IAgentAdministrationOperations administration = Substitute.For<IAgentAdministrationOperations>();
+        await using WebApplication app = BuildHttpApp(AgentsClientWith(administration));
+        await app.StartAsync().ConfigureAwait(true);
+        using HttpClient client = app.GetTestClient();
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/agents/operations/agents/agent-1/activate")
+        {
+            Content = JsonContent.Create(new ActivateAgent()),
+        };
+        request.Headers.Add("X-Correlation-ID", CorrelationId);
+        request.Headers.Add("Idempotency-Key", MessageId);
+        if (version is not null)
+        {
+            request.Headers.TryAddWithoutValidation("X-Expected-Configuration-Version", version).ShouldBeTrue();
+        }
+
+        using HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(true);
+
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
+        string problem = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+        problem.ShouldContain(AgentSetupCommandHeadersFilter.InvalidActivationVersionProblemType);
+        problem.ShouldContain("canonical_value_required");
+        await administration.DidNotReceiveWithAnyArgs().ActivateAsync(
+            default!,
+            default!,
+            default,
+            default);
     }
 
     [Fact]
@@ -270,6 +339,10 @@ public sealed class AgentsOperationEndpointsTests
 
             headerNames.ShouldContain("X-Correlation-ID", endpoint.RoutePattern.RawText);
             headerNames.ShouldContain("Idempotency-Key", endpoint.RoutePattern.RawText);
+            if (endpoint.RoutePattern.RawText?.EndsWith("/activate", StringComparison.Ordinal) == true)
+            {
+                headerNames.ShouldContain("X-Expected-Configuration-Version", endpoint.RoutePattern.RawText);
+            }
         }
     }
 
@@ -363,12 +436,15 @@ public sealed class AgentsOperationEndpointsTests
         return catalog;
     }
 
-    private static bool HasExpectedCommandOptions(AgentOperationOptions? options)
+    private static bool HasExpectedCommandOptions(
+        AgentOperationOptions? options,
+        int? expectedConfigurationVersion = null)
         => options is
         {
             IdempotencyKey: MessageId,
             CorrelationId: CorrelationId,
-        };
+        }
+        && options.ExpectedConfigurationVersion == expectedConfigurationVersion;
 
     private static async Task SendWriteAsync(HttpClient client, HttpMethod method, string path, object command)
     {
@@ -378,6 +454,10 @@ public sealed class AgentsOperationEndpointsTests
         };
         request.Headers.Add("Idempotency-Key", MessageId);
         request.Headers.Add("X-Correlation-ID", CorrelationId);
+        if (path.EndsWith("/activate", StringComparison.Ordinal))
+        {
+            request.Headers.Add("X-Expected-Configuration-Version", "3");
+        }
 
         using HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(true);
         response.EnsureSuccessStatusCode();
@@ -526,6 +606,17 @@ public sealed class AgentsOperationEndpointsTests
         WebApplication app = builder.Build();
         app.MapAgentsOperationEndpoints();
 
+        return app;
+    }
+
+    private static WebApplication BuildHttpApp(IAgentsClient client)
+    {
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+        builder.Services.AddSingleton(client);
+
+        WebApplication app = builder.Build();
+        app.MapAgentsOperationEndpoints();
         return app;
     }
 

@@ -46,7 +46,7 @@ public sealed class AgentContentSafetyActivationTests
     {
         AgentState state = AutomaticReadyNoContentSafety();
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope());
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>()
             .Blockers.ShouldBe([AgentActivationBlocker.MissingContentSafetyPolicy]);
@@ -58,7 +58,7 @@ public sealed class AgentContentSafetyActivationTests
     {
         AgentState state = ConfirmationReadyNoContentSafety();
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope());
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>()
             .Blockers.ShouldBe([AgentActivationBlocker.MissingContentSafetyPolicy]);
@@ -72,7 +72,7 @@ public sealed class AgentContentSafetyActivationTests
         AgentState state = StateWithSelectedProvider(ValidCreate());
         state.ContentSafety.ShouldNotBeNull();
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope());
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.IsSuccess.ShouldBeTrue();
         _ = result.Events[0].ShouldBeOfType<AgentActivated>();
@@ -87,7 +87,7 @@ public sealed class AgentContentSafetyActivationTests
         DomainResult result = AgentAggregate.Handle(
             new ActivateAgent(),
             state,
-            ActivateEnvelope(providerValidation: ProviderSelectionValidationStatus.Valid, approverValidation: ApproverPolicyValidationStatus.Valid));
+            ActivateEnvelope(providerValidation: ProviderSelectionValidationStatus.Valid, approverValidation: ApproverPolicyValidationStatus.Valid, expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.IsSuccess.ShouldBeTrue();
         _ = result.Events[0].ShouldBeOfType<AgentActivated>();
@@ -104,7 +104,7 @@ public sealed class AgentContentSafetyActivationTests
         DomainResult result = AgentAggregate.Handle(
             new ActivateAgent(),
             state,
-            ActivateEnvelope(providerValidation: ProviderSelectionValidationStatus.Valid, approverValidation: ApproverPolicyValidationStatus.Valid));
+            ActivateEnvelope(providerValidation: ProviderSelectionValidationStatus.Valid, approverValidation: ApproverPolicyValidationStatus.Valid, expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>()
             .Blockers.ShouldBe([AgentActivationBlocker.MissingContentSafetyPolicy]);
@@ -116,7 +116,7 @@ public sealed class AgentContentSafetyActivationTests
         // A fresh draft yields the full gate order with the 1.7 content-safety gate appended last, never reordered.
         AgentState state = StateWith(ValidCreate());
 
-        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope());
+        DomainResult result = AgentAggregate.Handle(new ActivateAgent(), state, ActivateEnvelope(expectedConfigurationVersion: state.ConfigurationVersion));
 
         result.Events[0].ShouldBeOfType<AgentActivationBlockedRejection>()
             .Blockers.ShouldBe([

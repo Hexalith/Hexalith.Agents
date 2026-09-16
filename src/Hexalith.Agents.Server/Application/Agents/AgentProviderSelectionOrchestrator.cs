@@ -36,10 +36,10 @@ public sealed class AgentProviderSelectionOrchestrator
     private const string AgentDomain = "agent";
 
     /// <summary>The server-populated Agents-admin authorization extension key (client-stripped).</summary>
-    internal const string AgentAdminExtensionKey = "actor:agentsAdmin";
+    internal const string AgentAdminExtensionKey = AgentSetupTrustedExtensions.AgentAdministrator;
 
     /// <summary>The server-populated provider-readiness verdict extension key (client-stripped).</summary>
-    internal const string ProviderSelectionValidationExtensionKey = "provider:selectionValidation";
+    internal const string ProviderSelectionValidationExtensionKey = AgentSetupTrustedExtensions.ProviderSelectionValidation;
 
     private static readonly string[] _reservedExtensionKeys =
     [

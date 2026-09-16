@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Hexalith.Agents.EventStore</PackageId>
+    <Description>Explicit EventStore gateway integration for Hexalith Agents command trust and idempotency.</Description>
+    <PackageTags>hexalith;agents;eventstore;gateway</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(HexalithEventStoreFromSource)' == 'true'">
+    <ProjectReference Include="$(HexalithEventStoreRoot)\src\Hexalith.EventStore.DomainService\Hexalith.EventStore.DomainService.csproj" />
+    <ProjectReference Include="$(HexalithEventStoreRoot)\src\Hexalith.EventStore.Gateway\Hexalith.EventStore.Gateway.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(HexalithEventStoreFromSource)' != 'true'">
+    <PackageReference Include="Hexalith.EventStore.DomainService" />
+    <PackageReference Include="Hexalith.EventStore.Gateway" />
+  </ItemGroup>
+
+</Project>

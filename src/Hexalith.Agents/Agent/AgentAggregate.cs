@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 using Hexalith.Agents.Contracts.Agent;
@@ -49,7 +50,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
     // SECURITY: server-populated only (patterned after Tenants' "actor:globalAdmin" and Story 1.2's
     // "actor:agentsProviderAdmin"). The command entry point strips client-provided reserved extensions and
     // repopulates this key from trusted claims only.
-    private const string AgentAdminExtensionKey = "actor:agentsAdmin";
+    private const string AgentAdminExtensionKey = AgentSetupTrustedExtensions.AgentAdministrator;
 
     // SECURITY: server-populated only, identical trust model to AgentAdminExtensionKey. The Parties
     // validation/provisioning runs in the Server orchestration (AD-3) and its verdict is fed back here through
@@ -64,7 +65,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
     // orchestration's catalog read. A direct client command (e.g. a spoofed capability version) carries no trusted
     // verdict, so it parses to Unknown and is rejected — the aggregate makes no provider/catalog call at all, so no
     // bad selection is recorded and no provider SDK/credential path is reachable from the aggregate (AC2; AD-9).
-    private const string ProviderSelectionValidationExtensionKey = "provider:selectionValidation";
+    private const string ProviderSelectionValidationExtensionKey = AgentSetupTrustedExtensions.ProviderSelectionValidation;
 
     // SECURITY: server-populated only, identical trust model to the keys above (Story 1.6). The approver-policy
     // resolution (Parties / Tenants projection / Conversations facilitator) runs in the Server orchestration (AD-3)
@@ -72,7 +73,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
     // client-supplied value and repopulates it from the resolver's result. A direct ActivateAgent that did not
     // re-resolve carries no trusted verdict, so it parses to Unknown and a Confirmation-mode policy fails closed —
     // the aggregate makes no Parties/Tenants/Conversations call at all (AD-3; AC3).
-    private const string ApproverPolicyValidationExtensionKey = "approver:policyValidation";
+    private const string ApproverPolicyValidationExtensionKey = AgentSetupTrustedExtensions.ApproverPolicyValidation;
 
     // SECURITY: server-populated only, identical trust model to the verdict keys above (Story 4.4). Whether the Agents
     // audit-evidence governance is resolved is computed in the Server orchestration from the
@@ -225,6 +226,21 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         if (state is null || !state.IsCreated)
         {
             return DomainResult.Rejection([new AgentNotFoundRejection(agentId)]);
+        }
+
+        if (!TryReadActivationExpectedConfigurationVersion(envelope, out int expectedConfigurationVersion))
+        {
+            return Invalid(agentId, "Activation expected configuration version is required and must be a canonical positive integer.");
+        }
+
+        if (expectedConfigurationVersion != state.ConfigurationVersion)
+        {
+            return DomainResult.Rejection([
+                new AgentActivationConfigurationVersionMismatchRejection(
+                    agentId,
+                    expectedConfigurationVersion,
+                    state.ConfigurationVersion),
+            ]);
         }
 
         if (state.Lifecycle == AgentLifecycleStatus.Active)
@@ -716,6 +732,22 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             && string.Equals(Enum.GetName(status), value, StringComparison.Ordinal)
                 ? status
                 : ApproverPolicyValidationStatus.Unknown;
+
+    private static bool TryReadActivationExpectedConfigurationVersion(
+        CommandEnvelope envelope,
+        out int expectedConfigurationVersion)
+    {
+        expectedConfigurationVersion = 0;
+        return envelope.Extensions?.TryGetValue(
+                AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion,
+                out string? value) == true
+            && int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out expectedConfigurationVersion)
+            && expectedConfigurationVersion > 0
+            && string.Equals(
+                expectedConfigurationVersion.ToString(CultureInfo.InvariantCulture),
+                value,
+                StringComparison.Ordinal);
+    }
 
     // Reads the trusted, server-populated audit-governance-resolved flag from the envelope extension (Story 4.4). Fails
     // closed to false when the key is absent or its value is not the exact, case-sensitive "true" — identical hardening

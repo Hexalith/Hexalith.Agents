@@ -30,7 +30,9 @@ public sealed class AgentSetupCompositionTests
     [Fact]
     public void A_configured_gateway_resolves_the_live_dispatcher_and_administration_operations()
     {
-        using ServiceProvider provider = Build(("Agents:EventStore:BaseUrl", "https://eventstore.example"));
+        using ServiceProvider provider = Build(
+            ("Agents:EventStore:BaseUrl", "https://eventstore.example"),
+            ("Agents:EventStore:AppId", "eventstore"));
         using IServiceScope scope = provider.CreateScope();
 
         scope.ServiceProvider.GetRequiredService<IAgentCommandDispatcher>()
@@ -78,10 +80,22 @@ public sealed class AgentSetupCompositionTests
     }
 
     [Fact]
+    public void A_gateway_without_a_Dapr_app_id_leaves_the_administration_path_fail_closed()
+    {
+        using ServiceProvider provider = Build(("Agents:EventStore:BaseUrl", "https://eventstore.example"));
+        using IServiceScope scope = provider.CreateScope();
+
+        scope.ServiceProvider.GetRequiredService<IAgentCommandDispatcher>()
+            .ShouldBeOfType<DeferredAgentCommandDispatcher>();
+        scope.ServiceProvider.GetService<IAgentAdministrationOperations>().ShouldBeNull();
+    }
+
+    [Fact]
     public void The_configured_read_model_store_name_binds_from_configuration()
     {
         using ServiceProvider provider = Build(
             ("Agents:EventStore:BaseUrl", "https://eventstore.example"),
+            ("Agents:EventStore:AppId", "eventstore"),
             ($"{AgentSetupReadModelOptions.SectionName}:StateStoreName", "agents-statestore"));
 
         provider.GetRequiredService<IOptions<AgentSetupReadModelOptions>>().Value.StateStoreName

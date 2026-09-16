@@ -17,7 +17,7 @@ internal sealed record AgentSetupDomainResult : DomainResult
         IReadOnlyList<IEventPayload> events,
         AgentSetupWriteEffect effect,
         int configurationVersion)
-        : base(events)
+        : base(Validate(events, effect, configurationVersion))
     {
         ResultPayload = JsonSerializer.Serialize(new Dictionary<string, object>
         {
@@ -43,4 +43,30 @@ internal sealed record AgentSetupDomainResult : DomainResult
     /// <returns>The enriched no-op domain result.</returns>
     public static AgentSetupDomainResult AlreadyApplied(int configurationVersion)
         => new([], AgentSetupWriteEffect.AlreadyApplied, configurationVersion);
+
+    private static IReadOnlyList<IEventPayload> Validate(
+        IReadOnlyList<IEventPayload> events,
+        AgentSetupWriteEffect effect,
+        int configurationVersion)
+    {
+        ArgumentNullException.ThrowIfNull(events);
+        if (configurationVersion <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(configurationVersion),
+                "The resulting configuration version must be positive.");
+        }
+
+        if (effect == AgentSetupWriteEffect.Applied && events.Count == 0)
+        {
+            throw new ArgumentException("An applied setup result requires at least one event.", nameof(events));
+        }
+
+        if (effect == AgentSetupWriteEffect.AlreadyApplied && events.Count != 0)
+        {
+            throw new ArgumentException("An already-applied setup result cannot contain events.", nameof(events));
+        }
+
+        return events;
+    }
 }

@@ -88,6 +88,7 @@ public sealed class AgentsClientProviderCatalogGateway(IAgentsClient client) : I
             AgentOperationStatus.NotFound => AgentSetupWriteStatus.NotFound,
             AgentOperationStatus.ValidationFailed => AgentSetupWriteStatus.ValidationFailed,
             AgentOperationStatus.Conflict or AgentOperationStatus.Stale => AgentSetupWriteStatus.Conflict,
+            AgentOperationStatus.UnableToVerify => AgentSetupWriteStatus.UnableToVerify,
             _ => AgentSetupWriteStatus.Unavailable,
         };
 

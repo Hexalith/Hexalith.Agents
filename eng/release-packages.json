@@ -6,6 +6,10 @@
       "project": "src/Hexalith.Agents.Contracts/Hexalith.Agents.Contracts.csproj"
     },
     {
+      "id": "Hexalith.Agents.EventStore",
+      "project": "src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj"
+    },
+    {
       "id": "Hexalith.Agents.Client",
       "project": "src/Hexalith.Agents.Client/Hexalith.Agents.Client.csproj"
     },
