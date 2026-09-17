@@ -188,6 +188,33 @@ context:
 | R3-ECH-06 | low | carried: ECH-06/BH-15 and R2-ECH-05 established the same uncommon validator-child timeout risk and rejected the nontrivial kill/output-drain machinery. | reject |
 | R3-ECH-07 | maybe-false | carried: R2-BH-07 already deferred the unproven dependency asset-exclusion leak and recorded the exact mutated-package `project.assets.json` comparison needed to settle it as DW-22. | defer |
 | R3-VG-01 | false | carried: BH-11/R2-BH-06 already rejected the stale external-version claim because the verified lane rebuilds packages after catalog validation. The mutation proves validators accept externally rewritten artifacts but still does not establish a reachable production path that rewrites those nuspecs. | reject |
+| R4-BH-01 | false | carried: BH-06/R2-ECH-02/R3-BH-06 already established that supported layout fixtures isolate one atomic catalog import while real-root authority validation compares the complete effective catalog. | reject |
+| R4-BH-02 | false | carried: R3-BH-06 already established that the synthetic fixtures test path selection and the real repository validator supplies the complete effective-version comparison. | reject |
+| R4-BH-03 | false | The root wrapper asserts transitive pinning and no current project or later import disables it. Disabling a policy in a hypothetical future project would not itself create a second package-version declaration in the current tree. | reject |
+| R4-BH-04 | false | No tracked Agents build file contains `PackageDownload`; the shared validator proves authority for the package-reference forms the repository actually consumes. The finding demonstrates only a hypothetical future item type. | reject |
+| R4-BH-05 | medium | Pre-verified searches show the changed EventStore floor gate has only current-catalog happy-path coverage; below-floor, malformed, and absent rows are executable branches with no regression test. A broken comparison could therefore allow an incompatible EventStore package into Release mode. | patch |
+| R4-BH-06 | medium | The packed EventStore integration graph demonstrably contains `Dapr.Actors` and `Dapr.Actors.AspNetCore`, so describing compatibility evidence as Client/ASP.NET-only understates the dependency/security scope. | patch |
+| R4-BH-07 | medium | The Spine removed `OD-DAPR-SECURITY-1` from its blocking-open-decision table while retaining that decision as the retirement condition for `ARCH-A-15`, leaving a dangling architecture reference. | patch |
+| R4-BH-08 | medium | The launch-readiness decision contract still frames the already-landed `1.18.7` upgrade as an unmade choice and cites the obsolete dirty checkout, which misstates the remaining Security/Builds approval obligation. | patch |
+| R4-BH-09 | low | `EXPERIENCE.md` explicitly claims a checkable `ARCH-A-INDEX-7` currency baseline after this change advances the authoritative Spine to index 13. The stale banner can misroute later UX reconciliation. | patch |
+| R4-BH-10 | low | Sprint status is `review` and the proposal says review is pending, but the sprint comment says workflow review is complete. That contradiction is a direct wording error. | patch |
+| R4-BH-11 | low | The proposal attributes layout and missing-catalog coverage to the shared validator even though `BuildContractConformanceTests` owns those cases; the inaccurate attribution can cause maintainers to preserve the wrong guard. | patch |
+| R4-BH-12 | false | The persisted table is explicitly Release evidence; the adjacent results record the Debug/source count, and the full verifier rerun independently produced all 2,962 passing Debug/source tests. No second table is required by the acceptance contract. | reject |
+| R4-BH-13 | maybe-false | carried: R2-BH-07/R3-ECH-07 already recorded the unproven dependency asset-exclusion concern as DW-22 with the exact experiment needed to settle it. A checked deferred finding means triage completed, not that the deferred concern was resolved. | defer |
+| R4-BH-14 | low | The changed epic wording says every NuGet version comes from Builds even though Agents' own package identity/version is intentionally supplied by the pack lane. The statement must be narrowed to dependency/package-reference versions. | patch |
+| R4-ECH-01 | low | carried: ECH-02/BH-03/R3-ECH-01 already established that an explicit global marker can spoof the guard, but robust anti-spoof provenance is disproportionate for a deliberate command-line override. | reject |
+| R4-ECH-02 | false | carried: BH-06/R2-ECH-02/R3-BH-06 already rejected the same partial-catalog merge claim for the approved atomic supported-layout resolution and complete real-root validation. | reject |
+| R4-ECH-03 | low | carried: R2-ECH-03/R3-ECH-03 already established that exercised successful MSBuild evaluation emits JSON on stdout without stderr; restructuring capture for a hypothetical successful diagnostic is disproportionate. | reject |
+| R4-ECH-04 | low | carried: R2-BH-02 already established that the frozen floor uses stable published `3.106.0`; introducing NuGet semantic-version parsing for hypothetical prerelease catalog values is disproportionate. | reject |
+| R4-ECH-05 | low | carried: BH-15/R2-ECH-04 already established that an SDK child may wait for the enclosing job timeout, but safe timeout, kill, and stream-drain control is disproportionate for this uncommon gate-helper failure. | reject |
+| R4-ECH-06 | low | carried: R2-ECH-03/R3-ECH-05 already established the same combined-output risk in `RunDotNet`; exercised calls pass and robust stream separation is nontrivial. | reject |
+| R4-ECH-07 | low | carried: BH-15/R2-ECH-04/R3-ECH-04 already established the uncommon unbounded `dotnet` child wait and rejected the nontrivial process-control machinery. | reject |
+| R4-ECH-08 | low | carried: ECH-06/R2-ECH-05/R3-ECH-06 already established the uncommon validator-child timeout risk and rejected the nontrivial kill/output-drain machinery. | reject |
+| R4-ECH-09 | maybe-false | carried: R2-BH-07/R3-ECH-07 already deferred the unproven dependency asset-exclusion leak as DW-22; no duplicate deferral is created. | defer |
+| R4-VG-01 | medium | Pre-verified: searches and mutation reasoning show the floor gate's below-floor, malformed, and missing-row failure branches have no executable negative regression test; current `3.106.0` happy-path runs cannot expose a removed comparison. | patch |
+| R4-VG-02 | false | carried: BH-11/R2-BH-06/R3-VG-01 already rejected the stale external-nuspec-version claim because the verified lane rebuilds packages from the validated catalog and no reachable production rewrite path was shown. | reject |
+| R4-VG-03 | false | carried: BH-06/R2-ECH-02/R3-BH-06 already rejected the same partial-catalog merge claim for supported layouts and complete real-root validation. | reject |
+| R4-VG-04 | medium | Verified: the produced `Hexalith.Agents.EventStore` nuspec includes `Dapr.Actors` and `Dapr.Actors.AspNetCore` `1.18.7`, so the changed Client/ASP.NET-only compatibility narrative is incomplete. | patch |
 
 ## Verification
 
@@ -204,7 +231,7 @@ context:
 - Both Builds catalog validators passed for 286 entries; the generated audit passed with 286 packages, 141 families, and one source.
 - Shared consumer-authority validation passed across 12 Agents projects; the effective package-floor check resolved EventStore `3.106.0`.
 - Focused `BuildContractConformanceTests` and `PackageVersionCentralizationTests` passed; see the generated release-test evidence in the Dev Agent Record.
-- The complete Story 5.1 verifier passed warning-free Debug/source and Release/package builds, with 2,959 Debug/source tests and the 2,935 Release/package tests recorded below.
+- The complete Story 5.1 verifier passed warning-free Debug/source and Release/package builds, with 2,962 Debug/source tests and the 2,938 Release/package tests recorded below.
 - Release source-policy negative probes, exact six-package validation, and isolated six-package consumer validation all passed.
 
 ## Dev Agent Record
@@ -212,16 +239,16 @@ context:
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-17T12:03:43Z
+Run (UTC): 2026-09-17T14:04:22Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Contracts.Tests | 529 | 529 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 540 | 540 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 543 | 543 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 787 | 787 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1073 | 1073 | 0 | 0 | 0 | 0 |
-| **Total** | 2935 | 2935 | 0 | 0 | 0 | 0 |
+| **Total** | 2938 | 2938 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->

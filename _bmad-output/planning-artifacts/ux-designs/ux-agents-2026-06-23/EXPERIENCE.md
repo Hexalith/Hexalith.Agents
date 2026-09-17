@@ -3,13 +3,14 @@ name: Hexalith Agents
 description: Behavioral spine for the Hexalith Agents FrontComposer UI. Owns surfaces, routes, policies, states, interactions, accessibility, and journeys for governed AI participation in Conversations. DESIGN.md owns visuals.
 status: final
 created: 2026-06-23
-updated: 2026-09-12
+updated: 2026-09-17
 sources:
   - ../../briefs/brief-agents-2026-06-23/brief.md
   - ../../prds/prd-agents-2026-06-23/prd.md
   - ../../prds/prd-agents-2026-06-23/addendum.md
   - ../../prds/prd-agents-2026-06-23/reconcile-brief.md
   - ../../sprint-change-proposal-2026-08-02.md
+  - ../../sprint-change-proposal-2026-09-16.md
   - ../../architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md
   - ../../launch-readiness-register.md
   - ../../external-dependency-register.md
@@ -31,7 +32,7 @@ sources:
 
 # Hexalith Agents - Experience Spine
 
-> Spine reconciled to `prd.md` **as of its 2026-09-12 revision in full** — not to a hand-listed row set, which goes stale the moment the PRD moves and is how the FR-33-only reading happened — together with `ARCHITECTURE-SPINE.md` at `architecture_assumption_index_version` 7 (2026-09-12, retiring `ARCH-A-13` and adding `ARCH-A-15`), `epics.md` at its 33-story active backlog (Epics 5–8; Epics 1–4 are superseded history), the 2026-09-12 round-5 four-lens UX validation, and the shipped `src/Hexalith.Agents.UI` tree. **This banner is a claim about currency and is itself checkable**: each cited denominator is the `updated:` field or version field of the named file, and a reconciliation that does not re-verify all four leaves the claim false rather than merely old. `DESIGN.md` owns visuals; this file owns behavior, surfaces, states, accessibility, and flows. The spines win on conflict with mockups, wireframes, imports, sketches, and shipped code. Decisions are logged in `.memlog.md`; the current reconciliation, dispositions, and deferred items are in `reconcile-validation-2026-09-12.md`, its predecessors in `reconcile-validation-2026-09-10.md`, `reconcile-validation-2026-09-09-2.md` and `reconcile-validation-2026-09-09.md`, and the 2026-08-02 closure set remains in force except where a later reconciliation records a revision.
+> Spine reconciled to `prd.md` **as of its 2026-09-12 revision in full** — not to a hand-listed row set, which goes stale the moment the PRD moves and is how the FR-33-only reading happened — together with `ARCHITECTURE-SPINE.md` at `architecture_assumption_index_version` 13 (2026-09-17, keeping `ARCH-A-15` open pending `OD-DAPR-SECURITY-1`), `epics.md` at its 33-story active backlog (Epics 5–8; Epics 1–4 are superseded history), the 2026-09-12 round-5 four-lens UX validation, and the shipped `src/Hexalith.Agents.UI` tree. **This banner is a claim about currency and is itself checkable**: each cited denominator is the `updated:` field or version field of the named file, and a reconciliation that does not re-verify all four leaves the claim false rather than merely old. The 2026-09-17 package-authority reconciliation changes dependency ownership evidence only and introduces no UX behavior change. `DESIGN.md` owns visuals; this file owns behavior, surfaces, states, accessibility, and flows. The spines win on conflict with mockups, wireframes, imports, sketches, and shipped code. Decisions are logged in `.memlog.md`; the current reconciliation, dispositions, and deferred items are in `reconcile-validation-2026-09-12.md`, its predecessors in `reconcile-validation-2026-09-10.md`, `reconcile-validation-2026-09-09-2.md` and `reconcile-validation-2026-09-09.md`, and the 2026-08-02 closure set remains in force except where a later reconciliation records a revision.
 
 ## Foundation
 

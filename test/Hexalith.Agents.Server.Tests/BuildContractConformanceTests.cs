@@ -87,6 +87,50 @@ public sealed class BuildContractConformanceTests
         properties.GetProperty("HexalithEventStoreVersion").GetString().ShouldBe("3.106.0");
     }
 
+    [Theory]
+    [InlineData("3.104.0", "requires Hexalith.EventStore 3.105.0 or later")]
+    [InlineData("not-a-version", "is not a valid version")]
+    [InlineData(null, "No effective package-mode Hexalith.EventStore PackageVersion rows were found")]
+    public void EventStorePackageFloorShouldFailClosedForInvalidPackageVersionRows(
+        string? packageVersion,
+        string expectedDiagnostic)
+    {
+        DirectoryInfo fixture = Directory.CreateTempSubdirectory("hexalith-agents-eventstore-floor-");
+        try
+        {
+            string packageVersionDeclaration = packageVersion is null
+                ? """<PackageVersion Include="Example.Package" Version="1.0.0" />"""
+                : $"""<PackageVersion Include="Hexalith.EventStore.Contracts" Version="{packageVersion}" />""";
+            string projectPath = Path.Combine(fixture.FullName, "PackageFloorFixture.proj");
+            File.WriteAllText(
+                projectPath,
+                $"""
+                <Project>
+                  <ItemGroup>
+                    {packageVersionDeclaration}
+                  </ItemGroup>
+                </Project>
+                """);
+
+            string output = RunProcess(
+                "pwsh",
+                out int exitCode,
+                "-NoProfile",
+                "-File",
+                ModuleLayout.RootFile("eng/verify-story-5.2.ps1"),
+                "-PackageFloorOnly",
+                "-PackageFloorProjectPath",
+                projectPath);
+
+            exitCode.ShouldNotBe(0);
+            output.ShouldContain(expectedDiagnostic);
+        }
+        finally
+        {
+            fixture.Delete(true);
+        }
+    }
+
     [Fact]
     public void WrapperShouldLoadTheSharedCatalogFromASiblingCheckout()
         => AssertWrapperLayoutLoadsCatalog("../Hexalith.Builds/Props/Directory.Packages.props");
@@ -245,10 +289,13 @@ public sealed class BuildContractConformanceTests
     }
 
     private static string RunDotNet(out int exitCode, params string[] arguments)
+        => RunProcess("dotnet", out exitCode, arguments);
+
+    private static string RunProcess(string fileName, out int exitCode, params string[] arguments)
     {
         ProcessStartInfo startInfo = new()
         {
-            FileName = "dotnet",
+            FileName = fileName,
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,

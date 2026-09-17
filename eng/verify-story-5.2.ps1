@@ -20,7 +20,8 @@
 
 param(
     [switch] $SkipBuild,
-    [switch] $PackageFloorOnly
+    [switch] $PackageFloorOnly,
+    [string] $PackageFloorProjectPath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -38,8 +39,14 @@ $testProjects = @(
 
 function Assert-EventStorePackageFloor {
     $minimumVersion = [Version]'3.105.0'
+    $projectPath = if ([string]::IsNullOrWhiteSpace($PackageFloorProjectPath)) {
+        'src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj'
+    }
+    else {
+        $PackageFloorProjectPath
+    }
     $arguments = @(
-        'msbuild', 'src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj', '-nologo',
+        'msbuild', $projectPath, '-nologo',
         '-getItem:PackageVersion', '-p:Configuration=Release',
         '-p:UseHexalithProjectReferences=false', '-p:NuGetAudit=false', '/nr:false'
     )
@@ -260,7 +267,13 @@ function Invoke-TestClasses {
 
 Push-Location $root
 try {
-    Assert-EventStorePackageFloor
+    try {
+        Assert-EventStorePackageFloor
+    }
+    catch {
+        Write-Host $_.Exception.Message
+        throw
+    }
     if ($PackageFloorOnly) {
         return
     }

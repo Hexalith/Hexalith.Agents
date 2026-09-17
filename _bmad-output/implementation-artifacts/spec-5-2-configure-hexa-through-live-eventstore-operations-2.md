@@ -632,7 +632,7 @@ Run (UTC): 2026-09-15T07:48:31Z
 
 Result: PASS
 
-Post-catalog cross-reference (not a new Story 5.2-specific run): [Story 5.1's 2026-09-17 full-project Release/package evidence](spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md#latest-release-test-evidence) records 2,935 passing tests with the imported EventStore `3.106.0` selection.
+Post-catalog cross-reference (not a new Story 5.2-specific run): [Story 5.1's 2026-09-17 full-project Release/package evidence](spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md#latest-release-test-evidence) records 2,938 passing tests with the imported EventStore `3.106.0` selection.
 <!-- dev-agent-test-evidence:end -->
 ### File List
 
