@@ -240,6 +240,11 @@ severity: blocker
 reason: This repository publishes `Hexalith.Agents.EventStore` and proves its explicit registration in an isolated gateway provider, but it does not own the deployed Platform gateway host. Promotion requires that host to consume the package and call `AddAgentsEventStore` with the exact allow-listed Agents Dapr app id; without that call, reserved metadata and keyed setup commands fail closed before domain execution.
 status: open
 
-- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md`
-  summary: Verify that packed dependency asset-exclusion metadata prevents transitive build or analyzer leakage.
-  evidence: The package validator currently discards nuspec dependency asset metadata. The review did not establish that current EventStore dependencies expose affected assets; a mutated-package restore and `project.assets.json` comparison would settle whether omitting generated exclusions creates the claimed medium consumer leak.
+### DW-22: Verify that packed dependency asset-exclusion metadata prevents transitive build or analyzer leakage.
+
+origin: code review of spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md, 2026-09-17
+location: scripts/validate-nuget-packages.py:197
+source_spec: `_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md`
+severity: medium
+reason: This may be a false positive because the review did not establish that current EventStore dependencies expose affected assets. The package validator currently discards nuspec dependency asset metadata; a mutated-package restore and `project.assets.json` comparison would settle whether omitting generated exclusions creates a consumer leak.
+status: open

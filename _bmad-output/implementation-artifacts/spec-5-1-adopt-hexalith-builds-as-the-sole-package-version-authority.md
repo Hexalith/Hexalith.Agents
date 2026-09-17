@@ -70,6 +70,13 @@ context:
 - [x] [Review][Patch] Epics Story 5.1 evidence still says verification was not run / backlog [_bmad-output/planning-artifacts/epics.md:1287]
 - [x] [Review][Patch] RequiredRootSubmodule item is unused after the catalog guard moved to HexalithVersionsLoaded [Directory.Build.props:74]
 - [x] [Review][Patch] Architecture delivery-debt still records Story 5.1 as in-progress [_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md:1355]
+- [x] [Review][Patch] Key-less remaining-work trailer is still dumped onto DW-21 [_bmad-output/implementation-artifacts/deferred-work.md:243]
+- [x] [Review][Patch] Sprint status claims Story 5.1 workflow review is already green [_bmad-output/implementation-artifacts/sprint-status.yaml:87]
+- [x] [Review][Patch] Epics evidence table still names superseded Story 5.1 test classes [_bmad-output/planning-artifacts/epics.md:1284]
+- [x] [Review][Patch] ARCH-A-15 is retired while its authoritative `OD-DAPR-SECURITY-1` approval remains open [_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md:1400]
+- [x] [Review][Patch] Story 5.1 compatibility evidence overclaims Dapr Workflow coverage even though only Client/ASP.NET are consumed [_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md:911]
+- [x] [Review][Patch] Triage presents mutable Agents `origin/main` as immutable commit `01ead38` [_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md:89]
+- [x] [Review][Defer] Packed EventStore dependency asset-exclusion metadata is not retained [scripts/validate-nuget-packages.py:197] — deferred: maybe-false; a mutated-package restore and `project.assets.json` comparison would settle whether omitting generated exclusions creates a consumer leak
 
 #### Rejected
 
@@ -82,10 +89,22 @@ context:
 - false: Shared-validator tests never pass a non-empty `buildDeclaration` / never assert the real repo — the production validator is invoked on the real tree by `eng/verify-story.ps1` and CI; the unused fixture parameter does not leave Directory.Build.props unscanned in those lanes.
 - false: Test/consumer CI jobs restore without the new authority YAML anchors, so the gate is skippable — `package-build` runs the validator and EventStore floor; a failure there fails the workflow.
 - false: `EvaluateMsBuild` throws JsonException when stderr is non-empty — the cited `-getProperty` invocation writes JSON only to stdout (stderr 0 bytes) and the tests pass.
-- false: CI cannot fetch gitlink `000abf867abc3a99cfa74d39b6e73af05c78a602` from origin — `origin/main` in Hexalith.Builds contains that commit, and Agents `origin/main` is `01ead38` recording it.
+- false: CI cannot fetch gitlink `000abf867abc3a99cfa74d39b6e73af05c78a602` from origin — `origin/main` in Hexalith.Builds contains that commit, and Agents commit `01ead38`, published on `origin/main`, records it.
 - false (spec edit): Spec YAML `status: done` versus changelog `in-progress` — fixing that edits the spec under review; sprint-status already records `review`.
 - low: `RunDotNet` / pwsh `WaitForExit()` with no timeout — a hung SDK child is uncommon, and a safe timeout needs kill plus stream-drain branches beyond a direct correction.
 - low: `PackageInventoryTests` does not require the CI file to contain `validate-consumer-package-authority.ps1` — the step exists on `package-build`, and pinning every new CI line in that string test is not a defect developers hit in everyday use.
+- false: Directory.Build.props source roots omit the Hexalith4 nested-parent path — wrapper ACs and layout tests cover catalog import only; Debug/source still requires the Agents root-declared or sibling EventStore checkout and fails closed when it is missing.
+- false: CheckBuildCatalog treats `HexalithVersionsLoaded=true` as catalog proof — that is the spec's loaded-catalog contract; a marker-only stub still fails CPM restore without `PackageVersion` rows.
+- false: EventStore floor prefix-matches extra family packages, has a dead unsuffixed id, and tests hardcode `3.106.0` — evaluated `PackageVersion` rows are the restore source, the family shares `3.106.0`, and that pin is the frozen matrix's current selection.
+- false: Hexalith.Agents.EventStore nuspec flattening plus no catalog-version compare — pack emits the restore graph; this story's authority AC is consumer-declaration absence, not Gateway graph reshaping.
+- false: Missing-catalog Pack/Publish tests never assert empty output directories — `CheckBuildCatalog` errors before those targets, and the tests already require a non-zero exit plus the catalog diagnostic.
+- false: Epics still require Story 5.1 to remain backlog while `EXT-HOST-1` is Uncommitted — that clause is a ready-for-dev entry gate; this reopen is package-authority only, and `EXT-HOST-1` continues to gate later host/launch stories.
+- false: Story 5.1 CI AC says "inline project version" — that is the approved proposal wording, next to separate `PackageVersion` and override clauses.
+- false: Shared-validator negatives never pass `buildDeclaration` / never cover `Update` / `GlobalPackageReference` / child `Version`; new CI steps are not anchors and are absent from `package-consumer` — the production validator scans the real tree; `ci.yml` already uses YAML anchors; a `package-build` failure fails the workflow.
+- false: Floor reads `PackageVersion` items rather than `PackageReference` Version — under CPM those items are the restore versions; project `Version` / `VersionOverride` is already rejected by centralization tests and the shared validator.
+- false (spec edit): Spec YAML `status: done` / `review_loop_iteration: 0` versus changelog `in-progress` — fixing that edits the spec under review; sprint-status already records `review`.
+- false: DW-20 `done 2026-09-16` versus 2026-09-17 verification — the status date is the close date; the resolution already cites the later verifier evidence.
+- low: `RunDotNet` / pwsh `WaitForExit()` with no timeout — a hung SDK child is uncommon, and a safe timeout needs kill plus stream-drain branches beyond a direct correction.
 
 ## Implementation Notes
 
@@ -93,13 +112,13 @@ context:
 - The Agents wrapper now contains only CPM policy, supported-layout path selection, and guarded imports. The early build target checks `HexalithVersionsLoaded` and reports the exact root-only submodule initialization command when no catalog loads.
 - Conformance tests use the shared consumer-authority validator for all declaration negatives. Separate fixture tests prove root, sibling, parent-references, missing-catalog, and effective EventStore-version behavior.
 - Story verification and CI run shared authority validation before the EventStore floor and existing source/package lanes. The package validators were reconciled with the existing six-package release manifest, including the EventStore integration package and its isolated-consumer marker.
-- Epics, Architecture Spine assumption index 12, UX package ownership, Story 5.2 evidence, DW-20, the approved proposal, and sprint status now distinguish the resolved package floor from Story 5.2's independent blockers.
-- Builds `origin/main` contains catalog/audit target `000abf867abc3a99cfa74d39b6e73af05c78a602`, and Agents `origin/main` records that exact gitlink. The former fresh-clone integration risk is resolved; ARCH-A-15 is retired.
+- Epics, Architecture Spine assumption index 13, UX package ownership, Story 5.2 evidence, DW-20, the approved proposal, and sprint status now distinguish the resolved package floor from Story 5.2's independent blockers.
+- Builds `origin/main` contains catalog/audit target `000abf867abc3a99cfa74d39b6e73af05c78a602`, and Agents commit `01ead38` published on `origin/main` records that exact gitlink. The former fresh-clone integration risk is resolved, while `ARCH-A-15` remains open pending approval of `OD-DAPR-SECURITY-1`; current compatibility evidence covers only consumed Client/ASP.NET, and Workflow remains Story 6.1 work.
 
 ## Spec Change Log
 
 - 2026-09-16 — Implemented the approved shared package-authority correction, recorded exact Builds commits and local verification, closed DW-20, and retained Story 5.1 as `in-progress` pending review/integration.
-- 2026-09-17 — Patched all six review findings, added behavioral Pack/Publish missing-catalog coverage, reconciled publication evidence, and retired ARCH-A-15 after the Builds and parent gitlinks became upstream-fetchable.
+- 2026-09-17 — Patched all six review findings, added behavioral Pack/Publish missing-catalog coverage, reconciled publication evidence, and kept `ARCH-A-15` open for the authoritative Security + Builds approval after the Builds and parent gitlinks became upstream-fetchable.
 
 ## Review Triage Log
 
@@ -146,6 +165,29 @@ context:
 | R2-BH-10 | low | Sprint status still describes the six prior review patches as open action items even though the spec and current diff mark all six resolved. | patch |
 | R2-BH-11 | low | The verification results heading says 2026-09-16 while the recorded complete run immediately below is timestamped 2026-09-17. | patch |
 | R2-BH-12 | low | Story 5.2's release table remains the 2026-09-15 story-specific run and does not point readers to the later 2026-09-17 post-catalog full-project package evidence recorded by Story 5.1. | patch |
+| R3-BH-01 | low | A deliberate command-line `HexalithEventStoreVersion` global property can override the catalog default. This is the same uncommon explicit-spoof class as BH-03/ECH-02, and making shared defaults immutable would add disproportionate provenance machinery. | reject |
+| R3-BH-02 | false | carried: ECH-01/BH-04 already established that the path properties support approved layout resolution and test injection; arbitrary or ambiguous catalog redirection is not a supported authoritative invocation. | reject |
+| R3-BH-03 | low | A project could deliberately redefine the uniquely named `CheckBuildCatalog` target, but no current project does so and preventing hostile target shadowing requires a new shared-scanner rule. This is not an everyday developer failure. | reject |
+| R3-BH-04 | low | The shared scanner's XML-name comparisons are case-sensitive even though contrived casing variants can be evaluated by MSBuild. Repository declarations use canonical casing, and hardening the owning Builds validator plus its published gitlink is disproportionate for this deliberate-evasion case. | reject |
+| R3-BH-05 | false | No tracked Agents `.proj` or imported `.xml` build file exists; all current project/build XML is covered by the validator's `.csproj`, `.props`, and `.targets` scan. The finding demonstrates only a hypothetical future import. | reject |
+| R3-BH-06 | false | carried: BH-06/R2-ECH-02 already established that the synthetic layout fixtures isolate path selection while the real-repository shared validator compares every effective `PackageVersion` row. | reject |
+| R3-BH-07 | false | The frozen floor criterion checks the effective shared EventStore selection. Removing or redirecting the actual EventStore references would independently fail the build, package inventory, and integration suites; the floor-only gate is not their replacement. | reject |
+| R3-BH-08 | false | The authoritative EventStore family rows use one shared property and the Builds catalog validators enforce that catalog. The floor gate owns only the durable minimum and correctly accepts every effective row at or above it. | reject |
+| R3-BH-09 | false | carried: BH-11/R2-BH-06 already established that the verified lane deletes and rebuilds packages from the validated catalog and no reachable source path to a stale external nuspec version was shown. | reject |
+| R3-BH-10 | false | The generated audit explicitly records the EventStore family as retained pending consumer acceptance; the story claims catalog provenance binding, not that the audit itself contains downstream Agents compatibility evidence. | reject |
+| R3-BH-11 | medium | The Architecture Spine retires ARCH-A-15 while the active launch-readiness register still records `OD-DAPR-SECURITY-1` as Open and names its approved outcome as a prerequisite to retirement. That contradiction can incorrectly authorize Story 6.1 Dapr Workflow adoption. | patch |
+| R3-BH-12 | medium | The Spine's retirement wording implies compatibility evidence for the complete Dapr family even though the verified Agents graph consumes only Client/ASP.NET and explicitly leaves Workflow to Story 6.1. The evidence scope must remain precise while `OD-DAPR-SECURITY-1` is Open. | patch |
+| R3-BH-13 | false | Story 5.2 remains in review, its command list states an expected result rather than a newly recorded run, and the post-catalog link explicitly says it is not Story 5.2-specific evidence. | reject |
+| R3-BH-14 | false | `review_loop_iteration` counts this workflow's loopbacks, not every historical review label, and the change-log statement accurately refers to the original six findings patched in that recorded round. | reject |
+| R3-BH-15 | low | The triage sentence presents mutable `origin/main` as if it still equals `01ead38`; that branch has advanced even though commit `01ead38` remains the commit that recorded the gitlink. | patch |
+| R3-ECH-01 | low | carried: ECH-02/BH-03 already established that an explicit global `HexalithVersionsLoaded=true` can spoof the internal marker, but robust anti-spoof provenance is disproportionate for deliberate command-line override. | reject |
+| R3-ECH-02 | false | carried: ECH-01/BH-04 already established that first-existing path selection is the approved supported-layout behavior; ambiguous unrelated checkouts are not supported authoritative invocations. | reject |
+| R3-ECH-03 | low | carried: R2-ECH-03 established that exercised successful MSBuild evaluation emits JSON on stdout without stderr; restructuring stream capture for a hypothetical successful diagnostic is disproportionate. | reject |
+| R3-ECH-04 | low | carried: ECH-05/BH-15 and R2-ECH-04 established that an SDK child can wait until the enclosing job timeout, but safe timeout, kill, and stream-drain handling is disproportionate for this uncommon verification-helper failure. | reject |
+| R3-ECH-05 | low | carried: R2-ECH-03/R2-ECH-04 established the same combined-output and unbounded-wait risks in `RunDotNet`; the exercised calls pass and the robust process-control fix is nontrivial. | reject |
+| R3-ECH-06 | low | carried: ECH-06/BH-15 and R2-ECH-05 established the same uncommon validator-child timeout risk and rejected the nontrivial kill/output-drain machinery. | reject |
+| R3-ECH-07 | maybe-false | carried: R2-BH-07 already deferred the unproven dependency asset-exclusion leak and recorded the exact mutated-package `project.assets.json` comparison needed to settle it as DW-22. | defer |
+| R3-VG-01 | false | carried: BH-11/R2-BH-06 already rejected the stale external-version claim because the verified lane rebuilds packages after catalog validation. The mutation proves validators accept externally rewritten artifacts but still does not establish a reachable production path that rewrites those nuspecs. | reject |
 
 ## Verification
 
@@ -170,7 +212,7 @@ context:
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-17T11:09:23Z
+Run (UTC): 2026-09-17T12:03:43Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
@@ -196,6 +238,7 @@ Result: PASS
 - `_bmad-output/planning-artifacts/epics.md`
 - `_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-16.md`
 - `_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23/DESIGN.md`
+- `eng/verify-story-5.2.ps1`
 - `eng/verify-story.ps1`
 - `references/Hexalith.Builds`
 - `scripts/validate-consumer-package-references.py`
