@@ -55,13 +55,7 @@ public sealed class BuildContractConformanceTests
     {
         XDocument props = XDocument.Load(ModuleLayout.RootFile("Directory.Build.props"));
 
-        props
-            .Descendants()
-            .Any(element =>
-                string.Equals(element.Name.LocalName, "RequiredRootSubmodule", StringComparison.Ordinal)
-                && string.Equals(element.Attribute("Include")?.Value, "Hexalith.Builds", StringComparison.Ordinal))
-            .ShouldBeTrue("The shared package catalog must be guarded as a build-required root submodule.");
-
+        props.Root!.Attribute("InitialTargets")?.Value.ShouldContain("CheckBuildCatalog");
         XElement checkTarget = props
             .Descendants()
             .Single(element =>
@@ -105,7 +99,7 @@ public sealed class BuildContractConformanceTests
     public void WrapperShouldLoadTheSharedCatalogFromANestedParentReferencesLayout()
         => AssertWrapperLayoutLoadsCatalog(
             "../../references/Hexalith.Builds/Props/Directory.Packages.props",
-            "host/references/Hexalith.Agents");
+            "host/agents/Hexalith.Agents");
 
     [Fact]
     public void MissingSharedCatalogShouldFailWithRootOnlyInitializationGuidance()
@@ -129,6 +123,55 @@ public sealed class BuildContractConformanceTests
         exitCode.ShouldNotBe(0);
         output.ShouldContain("Hexalith.Builds package catalog was not loaded.");
         output.ShouldContain("git submodule update --init -- references/Hexalith.Builds");
+    }
+
+    [Theory]
+    [InlineData("Pack")]
+    [InlineData("Publish")]
+    public void PackageTargetsShouldFailWhenSharedCatalogIsMissing(string target)
+    {
+        DirectoryInfo fixture = Directory.CreateTempSubdirectory("hexalith-agents-missing-catalog-");
+        try
+        {
+            string projectPath = Path.Combine(fixture.FullName, "CatalogGuardFixture.csproj");
+            File.Copy(ModuleLayout.RootFile("Directory.Build.props"), Path.Combine(fixture.FullName, "Directory.Build.props"));
+            File.Copy(ModuleLayout.RootFile("Directory.Packages.props"), Path.Combine(fixture.FullName, "Directory.Packages.props"));
+            File.WriteAllText(
+                projectPath,
+                """
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <PropertyGroup>
+                    <IsPackable>true</IsPackable>
+                  </PropertyGroup>
+                </Project>
+                """);
+            string missingPath = Path.Combine(fixture.FullName, "missing", "Directory.Packages.props");
+            string output = RunDotNet(
+                out int exitCode,
+                "msbuild",
+                projectPath,
+                "-nologo",
+                $"-t:{target}",
+                "-p:NoBuild=true",
+                "-p:Configuration=Release",
+                "-p:UseHexalithProjectReferences=false",
+                "-p:NuGetAudit=false",
+                $"-p:Hexalith1BuildPackageProps={missingPath}",
+                $"-p:Hexalith2BuildPackageProps={missingPath}",
+                $"-p:Hexalith3BuildPackageProps={missingPath}",
+                $"-p:Hexalith4BuildPackageProps={missingPath}",
+                $"-p:PackageOutputPath={Path.Combine(fixture.FullName, "packages")}",
+                $"-p:PublishDir={Path.Combine(fixture.FullName, "publish")}",
+                "/nr:false");
+
+            exitCode.ShouldNotBe(0);
+            output.ShouldContain("Hexalith.Builds package catalog was not loaded.");
+            output.ShouldContain("git submodule update --init -- references/Hexalith.Builds");
+        }
+        finally
+        {
+            fixture.Delete(true);
+        }
     }
 
     [Fact]

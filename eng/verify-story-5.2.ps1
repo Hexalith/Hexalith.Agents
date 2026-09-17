@@ -40,7 +40,7 @@ function Assert-EventStorePackageFloor {
     $minimumVersion = [Version]'3.105.0'
     $arguments = @(
         'msbuild', 'src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj', '-nologo',
-        '-getProperty:HexalithEventStoreVersion', '-p:Configuration=Release',
+        '-getItem:PackageVersion', '-p:Configuration=Release',
         '-p:UseHexalithProjectReferences=false', '-p:NuGetAudit=false', '/nr:false'
     )
     $nativeErrorPreference = $PSNativeCommandUseErrorActionPreference
@@ -55,20 +55,46 @@ function Assert-EventStorePackageFloor {
 
     if ($exitCode -ne 0) {
         $output | ForEach-Object { Write-Host $_ }
-        throw "Unable to resolve the effective package-mode HexalithEventStoreVersion."
+        throw "Unable to resolve the effective package-mode Hexalith.EventStore PackageVersion rows."
     }
 
-    $versionText = ([string]::Join("`n", $output)).Trim()
-    $effectiveVersion = $null
-    if (-not [Version]::TryParse($versionText, [ref]$effectiveVersion)) {
-        throw "The effective package-mode HexalithEventStoreVersion '$versionText' is not a valid version."
+    try {
+        $evaluation = [string]::Join("`n", $output) | ConvertFrom-Json -ErrorAction Stop
+    }
+    catch {
+        throw "Unable to parse the effective package-mode PackageVersion evaluation. $($_.Exception.Message)"
     }
 
-    if ($effectiveVersion -lt $minimumVersion) {
-        throw "Story 5.2 requires Hexalith.EventStore $minimumVersion or later in package mode; effective version is $effectiveVersion. This release must include no-op result-payload forwarding, command-status reads, and trusted-extension admission."
+    $eventStorePackageVersions = @(
+        $evaluation.Items.PackageVersion |
+            Where-Object {
+                $identity = [string] $_.Identity
+                $identity.Equals('Hexalith.EventStore', [StringComparison]::OrdinalIgnoreCase) -or
+                $identity.StartsWith('Hexalith.EventStore.', [StringComparison]::OrdinalIgnoreCase)
+            }
+    )
+    if ($eventStorePackageVersions.Count -eq 0) {
+        throw "No effective package-mode Hexalith.EventStore PackageVersion rows were found."
     }
 
-    Write-Host "Gate: EventStore package floor $effectiveVersion >= $minimumVersion"
+    $effectiveVersions = [System.Collections.Generic.List[Version]]::new()
+    foreach ($packageVersion in $eventStorePackageVersions) {
+        $identity = [string] $packageVersion.Identity
+        $versionText = ([string] $packageVersion.Version).Trim()
+        $effectiveVersion = $null
+        if (-not [Version]::TryParse($versionText, [ref]$effectiveVersion)) {
+            throw "The effective package-mode PackageVersion for '$identity' ('$versionText') is not a valid version."
+        }
+
+        if ($effectiveVersion -lt $minimumVersion) {
+            throw "Story 5.2 requires Hexalith.EventStore $minimumVersion or later in package mode; effective version for '$identity' is $effectiveVersion. This release must include no-op result-payload forwarding, command-status reads, and trusted-extension admission."
+        }
+
+        $effectiveVersions.Add($effectiveVersion)
+    }
+
+    $selectedVersions = [string]::Join(', ', @($effectiveVersions | Sort-Object -Unique))
+    Write-Host "Gate: EventStore package floor $($eventStorePackageVersions.Count) selected rows at $selectedVersions >= $minimumVersion"
 }
 
 # The focused Story 5.2 evidence: each class list names the suites that prove one acceptance criterion.

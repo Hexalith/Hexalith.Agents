@@ -1,4 +1,4 @@
-<Project>
+<Project InitialTargets="CheckBuildCatalog">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>14</LangVersion>
@@ -70,10 +70,6 @@
     <Error Condition="'$(HexalithFrontComposerFromSource)' != 'true'" Text="Source dependency 'references/Hexalith.FrontComposer' is missing. Run: git submodule update --init -- references/Hexalith.FrontComposer from the repository root." />
     <Error Condition="'$(HexalithCommonsFromSource)' != 'true'" Text="Source dependency 'references/Hexalith.Commons' is missing. Run: git submodule update --init -- references/Hexalith.Commons from the repository root." />
   </Target>
-
-  <ItemGroup>
-    <RequiredRootSubmodule Include="Hexalith.Builds" />
-  </ItemGroup>
 
   <Target Name="CheckBuildCatalog" BeforeTargets="Restore;Build;GenerateNuspec;Pack;Publish">
     <Error Condition="'$(HexalithVersionsLoaded)' != 'true'" Text="Hexalith.Builds package catalog was not loaded. Initialize only the root-declared submodule from the repository root: git submodule update --init -- references/Hexalith.Builds" />

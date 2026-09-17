@@ -2,7 +2,7 @@
 title: 'Story 5.1: Adopt Hexalith.Builds as the Sole Package Version Authority'
 type: 'refactor'
 created: '2026-09-16'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'a9ebd97c2a0e6d4a6a77725ea988c690db1efa67'
@@ -64,12 +64,12 @@ context:
 
 ### Review Findings
 
-- [ ] [Review][Patch] Nested parent-layout test never selects the Hexalith4 catalog import [test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs:105]
-- [ ] [Review][Patch] Pack/Publish unloaded-catalog guard is only asserted as MSBuild XML text [Directory.Build.props:78]
-- [ ] [Review][Patch] Remaining-work still claims unpublished Builds commits and dumps that claim as a key-less DW-21 trailer [_bmad-output/implementation-artifacts/deferred-work.md:243]
-- [ ] [Review][Patch] Epics Story 5.1 evidence still says verification was not run / backlog [_bmad-output/planning-artifacts/epics.md:1287]
-- [ ] [Review][Patch] RequiredRootSubmodule item is unused after the catalog guard moved to HexalithVersionsLoaded [Directory.Build.props:74]
-- [ ] [Review][Patch] Architecture delivery-debt still records Story 5.1 as in-progress [_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md:1355]
+- [x] [Review][Patch] Nested parent-layout test never selects the Hexalith4 catalog import [test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs:105]
+- [x] [Review][Patch] Pack/Publish unloaded-catalog guard is only asserted as MSBuild XML text [Directory.Build.props:78]
+- [x] [Review][Patch] Remaining-work still claims unpublished Builds commits and dumps that claim as a key-less DW-21 trailer [_bmad-output/implementation-artifacts/deferred-work.md:243]
+- [x] [Review][Patch] Epics Story 5.1 evidence still says verification was not run / backlog [_bmad-output/planning-artifacts/epics.md:1287]
+- [x] [Review][Patch] RequiredRootSubmodule item is unused after the catalog guard moved to HexalithVersionsLoaded [Directory.Build.props:74]
+- [x] [Review][Patch] Architecture delivery-debt still records Story 5.1 as in-progress [_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md:1355]
 
 #### Rejected
 
@@ -93,18 +93,19 @@ context:
 - The Agents wrapper now contains only CPM policy, supported-layout path selection, and guarded imports. The early build target checks `HexalithVersionsLoaded` and reports the exact root-only submodule initialization command when no catalog loads.
 - Conformance tests use the shared consumer-authority validator for all declaration negatives. Separate fixture tests prove root, sibling, parent-references, missing-catalog, and effective EventStore-version behavior.
 - Story verification and CI run shared authority validation before the EventStore floor and existing source/package lanes. The package validators were reconciled with the existing six-package release manifest, including the EventStore integration package and its isolated-consumer marker.
-- Epics, Architecture Spine assumption index 11, UX package ownership, Story 5.2 evidence, DW-20, the approved proposal, and sprint status now distinguish the resolved package floor from Story 5.2's independent blockers.
-- Integration risk: both Builds commits are local and `references/Hexalith.Builds` is two commits ahead of `origin/main`. Remote push was explicitly out of scope, so a fresh clone cannot resolve the proposed parent gitlink until the Builds maintainer publishes those commits.
+- Epics, Architecture Spine assumption index 12, UX package ownership, Story 5.2 evidence, DW-20, the approved proposal, and sprint status now distinguish the resolved package floor from Story 5.2's independent blockers.
+- Builds `origin/main` contains catalog/audit target `000abf867abc3a99cfa74d39b6e73af05c78a602`, and Agents `origin/main` records that exact gitlink. The former fresh-clone integration risk is resolved; ARCH-A-15 is retired.
 
 ## Spec Change Log
 
 - 2026-09-16 — Implemented the approved shared package-authority correction, recorded exact Builds commits and local verification, closed DW-20, and retained Story 5.1 as `in-progress` pending review/integration.
+- 2026-09-17 — Patched all six review findings, added behavioral Pack/Publish missing-catalog coverage, reconciled publication evidence, and retired ARCH-A-15 after the Builds and parent gitlinks became upstream-fetchable.
 
 ## Review Triage Log
 
 | ID | Verdict | Evidence | Route |
 | --- | --- | --- | --- |
-| BH-01 | high | The selected Builds gitlink `000abf867abc3a99cfa74d39b6e73af05c78a602` is not contained by an `origin` ref, so publishing the parent first would break fresh-clone submodule initialization. Remote publication is explicitly excluded by the frozen intent. | defer |
+| BH-01 | resolved | Builds `origin/main` now contains selected target `000abf867abc3a99cfa74d39b6e73af05c78a602`, and Agents `origin/main` records that exact gitlink. | close |
 | BH-02 | medium | Reproduced: `Pack` with `NoBuild=true` and all four catalog paths missing exited 0 and created a package because `CheckBuildCatalog` runs only before `Restore;Build`. | patch |
 | BH-03 | low | A caller can deliberately pass global `HexalithVersionsLoaded=true` to suppress imports and the guard. This is an uncommon explicit override, and preventing all command-line spoofing would add catalog provenance/state complexity disproportionate to the normal build risk. | reject |
 | BH-04 | false | Supported builds use the standard first-existing shared-catalog resolution pattern, while the shared validator compares every effective `PackageVersion` against the authoritative catalog passed to it. The claim depends on deliberate path redirection or ambiguous unrelated checkouts, neither of which is a supported authoritative invocation. | reject |
@@ -123,10 +124,28 @@ context:
 | ECH-01 | false | Build-package path properties intentionally support established layouts and test injection. Normal validation resolves the default wrapper import to the passed authoritative catalog and compares the complete effective version set; arbitrary caller redirection is not a supported catalog. | reject |
 | ECH-02 | low | Confirmed as the same explicit global-marker spoof described by BH-03. It is possible only when the caller intentionally supplies the internal marker, and a robust anti-spoof design would add disproportionate provenance complexity. | reject |
 | ECH-03 | false | A property becomes package-specific authority only when it feeds a package version; authoritative catalog properties are rejected directly, while local `PackageVersion` and `PackageReference` metadata are independently rejected. An unused arbitrary `*Version` property does not alter the package graph. | reject |
-| ECH-04 | high | Confirmed as BH-01: the local gitlink is not yet fetchable from origin. Publishing it is external integration work that the frozen intent forbids this run from performing. | defer |
+| ECH-04 | resolved | Confirmed as BH-01: both the Builds target and the exact parent gitlink are now present on their locally known `origin/main` refs. | close |
 | ECH-05 | low | Confirmed as BH-15 for the `dotnet` helper: an indefinite child wait is possible but rare, and a safe timeout requires additional kill/output-drain control flow. | reject |
 | ECH-06 | low | Confirmed as BH-15 for the `pwsh` helper: an indefinite child wait is possible but rare, and a safe timeout requires additional kill/output-drain control flow. | reject |
 | VG-01 | medium | Pre-verified searches show the new fourth `../../references/...` fallback has no positive evaluation test; deleting or mistyping only that import leaves all current tests green while breaking the nested parent checkout. | patch |
+| R2-ECH-01 | false | carried: ECH-01 already established that catalog-path properties intentionally support the approved layouts and test injection; arbitrary caller redirection is not a supported authoritative invocation. | reject |
+| R2-ECH-02 | false | carried: BH-06 already rejected the same partial-import claim because the supported synthetic and real catalogs import atomically and the real-root validator compares the complete effective catalog. | reject |
+| R2-ECH-03 | low | The helper combines stdout and stderr, but the exercised successful `-getProperty` calls emit JSON only on stdout and the full suite passes. Handling a hypothetical successful SDK diagnostic stream requires restructuring the helper for an uncommon condition. | reject |
+| R2-ECH-04 | low | carried: ECH-05/BH-15 already established that an SDK child can wait until the enclosing job timeout, but safe kill and stream-drain handling is disproportionate for this uncommon test-helper failure. | reject |
+| R2-ECH-05 | low | carried: ECH-06/BH-15 already established the same uncommon validator-child timeout risk and rejected the nontrivial kill/output-drain machinery. | reject |
+| R2-ECH-06 | low | carried: ECH-02/BH-03 already established that an explicit global `HexalithVersionsLoaded=true` can spoof the internal marker; preventing deliberate command-line spoofing adds disproportionate provenance state. | reject |
+| R2-BH-01 | medium | The floor gate reads the family property rather than the evaluated `PackageVersion` rows restore consumes. A stale or literal EventStore row could therefore pass the floor while selecting an older shipped package, contrary to the effective-selection acceptance criterion. | patch |
+| R2-BH-02 | low | `[Version]` rejects valid SemVer labels, but the frozen floor is a stable published `3.106.0` selection. Supporting hypothetical prerelease catalog values requires defining NuGet precedence and adding parser dependencies beyond this direct stable-version gate. | reject |
+| R2-BH-03 | false | Story 5.1 explicitly owns preservation of Story 5.2's EventStore release floor; invoking the later verifier's isolated `-PackageFloorOnly` mode implements that requirement without depending on Story 5.2's wider behavior. | reject |
+| R2-BH-04 | low | `InitialTargets` also blocks `Clean` when the catalog is deliberately absent, but the approved boundary requires unloaded catalogs to fail clearly and normal initialized checkouts are unaffected. Narrowing target selection risks weakening the proven Pack/Publish guard for an uncommon recovery state. | reject |
+| R2-BH-05 | false | The shared validator scans all tracked project/build XML for forbidden version declarations and compares each project's complete evaluated `PackageVersion` set with the catalog even in Debug; the full Release/package restore and build separately exercise conditional package references. | reject |
+| R2-BH-06 | false | The verified lane deletes and rebuilds the packages after shared-authority validation, so MSBuild generates external dependency versions from the sole effective catalog. No reachable source path that can produce a divergent external nuspec version under that lane was demonstrated. | reject |
+| R2-BH-07 | maybe-false | The validator does not retain nuspec dependency asset metadata, but the review did not establish that the current EventStore dependencies expose build/analyzer assets or that removing generated exclusions changes a consumer asset graph. A mutated-package restore/assets comparison would settle the claimed medium leak. | defer |
+| R2-BH-08 | false | The isolated consumer proves every package identity and assembly loads from the package graph, while exact dependency IDs are validated separately and `AddAgentsEventStore` behavior is exercised by the integration suite. The frozen package-version-authority goal does not require duplicating that API behavior in the consumer probe. | reject |
+| R2-BH-09 | medium | The architecture and epics claim MediatR is absent from the current runtime dependency graph while the produced EventStore integration package declares it transitively. That wording can misroute the recorded license-compliance obligation. | patch |
+| R2-BH-10 | low | Sprint status still describes the six prior review patches as open action items even though the spec and current diff mark all six resolved. | patch |
+| R2-BH-11 | low | The verification results heading says 2026-09-16 while the recorded complete run immediately below is timestamped 2026-09-17. | patch |
+| R2-BH-12 | low | Story 5.2's release table remains the 2026-09-15 story-specific run and does not point readers to the later 2026-09-17 post-catalog full-project package evidence recorded by Story 5.1. | patch |
 
 ## Verification
 
@@ -138,12 +157,12 @@ context:
 - `pwsh -NoProfile -File ./eng/verify-story.ps1 -Story 5.1` -- complete Story 5.1 lane passes.
 - `dotnet restore Hexalith.Agents.slnx -p:UseHexalithProjectReferences=false && dotnet build Hexalith.Agents.slnx -c Release --no-restore -p:UseHexalithProjectReferences=false` -- package-mode solution is green.
 
-**Results (2026-09-16):**
+**Results (2026-09-17):**
 
 - Both Builds catalog validators passed for 286 entries; the generated audit passed with 286 packages, 141 families, and one source.
 - Shared consumer-authority validation passed across 12 Agents projects; the effective package-floor check resolved EventStore `3.106.0`.
 - Focused `BuildContractConformanceTests` and `PackageVersionCentralizationTests` passed; see the generated release-test evidence in the Dev Agent Record.
-- The complete Story 5.1 verifier passed warning-free Debug/source and Release/package builds; see the generated release-test evidence in the Dev Agent Record for suite totals and outcomes.
+- The complete Story 5.1 verifier passed warning-free Debug/source and Release/package builds, with 2,959 Debug/source tests and the 2,935 Release/package tests recorded below.
 - Release source-policy negative probes, exact six-package validation, and isolated six-package consumer validation all passed.
 
 ## Dev Agent Record
@@ -151,16 +170,16 @@ context:
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-17T09:30:36Z
+Run (UTC): 2026-09-17T11:09:23Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Contracts.Tests | 529 | 529 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 538 | 538 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 540 | 540 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 787 | 787 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1073 | 1073 | 0 | 0 | 0 | 0 |
-| **Total** | 2933 | 2933 | 0 | 0 | 0 | 0 |
+| **Total** | 2935 | 2935 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->

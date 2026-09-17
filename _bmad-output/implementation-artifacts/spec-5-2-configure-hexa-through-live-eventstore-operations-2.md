@@ -277,8 +277,9 @@ Two changes live in the `references/Hexalith.EventStore` submodule (the no-op `r
 
 Package-mode delivery is no longer blocked by the EventStore floor. Story 5.1 advanced the sole authoritative
 Hexalith.Builds catalog to published EventStore `3.106.0`, removed Agents-local version ownership, and passed the
-Release/package and isolated-consumer lanes; `DW-20` is closed. The locally landed Builds commits must still become
-upstream-fetchable and be recorded by the parent gitlink, and Story 5.2 retains its independent review blockers.
+Release/package and isolated-consumer lanes; `DW-20` is closed. The catalog and audit commits are now reachable from
+Builds `origin/main`, Agents `origin/main` records exact gitlink `000abf867abc3a99cfa74d39b6e73af05c78a602`,
+and Story 5.2 retains its independent review blockers.
 
 **Round 6 re-derivation note, 2026-09-15**
 
@@ -630,6 +631,8 @@ Run (UTC): 2026-09-15T07:48:31Z
 | **Total** | 2899 | 2899 | 0 | 0 | 0 | 0 |
 
 Result: PASS
+
+Post-catalog cross-reference (not a new Story 5.2-specific run): [Story 5.1's 2026-09-17 full-project Release/package evidence](spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md#latest-release-test-evidence) records 2,935 passing tests with the imported EventStore `3.106.0` selection.
 <!-- dev-agent-test-evidence:end -->
 ### File List
 
