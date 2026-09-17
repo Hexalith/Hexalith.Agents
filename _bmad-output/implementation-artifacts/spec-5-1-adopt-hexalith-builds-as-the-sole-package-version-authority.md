@@ -2,7 +2,7 @@
 title: 'Story 5.1: Adopt Hexalith.Builds as the Sole Package Version Authority'
 type: 'refactor'
 created: '2026-09-16'
-status: 'done'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'a9ebd97c2a0e6d4a6a77725ea988c690db1efa67'
@@ -34,7 +34,7 @@ context:
 | Root checkout | `references/Hexalith.Builds` exists | Wrapper imports the shared catalog and sets `HexalithVersionsLoaded=true` | Build proceeds |
 | Parent layout | Builds is a supported sibling/ancestor dependency | Wrapper resolves the same catalog | Build proceeds with identical effective versions |
 | Missing catalog | No supported catalog path resolves | Restore/build fails before dependency use | Diagnostic names Hexalith.Builds and root-only initialization command |
-| Local override | Agents adds a version property/item or project metadata | Authority validation and Story 5.1 tests fail | Diagnostic identifies the offending declaration |
+| Local override | Agents adds a version property/item or project metadata | Authority validation and Story 5.1 verification fail | Diagnostic identifies the offending declaration |
 | EventStore floor | Imported catalog selects `3.106.0` | Story 5.2 floor reads the effective shared version | Any lower value fails closed |
 
 </frozen-after-approval>
@@ -53,7 +53,7 @@ context:
 **Execution:**
 - [x] `references/Hexalith.Builds/Props/Directory.Packages.props` -- set `HexalithEventStoreVersion` to published `3.106.0`, validate and commit the catalog, regenerate/validate the audit, then commit the generated audit so Agents can record a clean authoritative gitlink.
 - [x] `Directory.Packages.props` and `Directory.Build.props` -- adopt the reference-repository import resolution pattern, remove every local version declaration, and gate on `HexalithVersionsLoaded` rather than a fixed `.git` path.
-- [x] Story 5.1 tests/verifier and CI -- invoke the shared consumer-authority validator and test root, parent-layout, missing-catalog, local-override, and effective-version behavior without duplicating its scanner.
+- [x] Story 5.1 verification and CI -- invoke the shared consumer-authority validator and test root, parent-layout, missing-catalog, local-override, and effective-version behavior without duplicating its scanner.
 - [x] Planning and implementation artifacts -- reconcile Stories 5.1/5.2/5.6, architecture assumptions/index, UX ownership wording, DW-20, proposal execution evidence, and sprint status with the landed commits and verification results.
 
 **Acceptance Criteria:**
@@ -61,6 +61,31 @@ context:
 - Given supported checkout layouts, when restore/build evaluates the wrapper, then it loads the shared catalog; an unsupported or missing catalog fails with an actionable diagnostic.
 - Given Release package mode, when Story 5.2 checks EventStore, then the effective catalog value is at least `3.105.0` and currently resolves to `3.106.0`.
 - Given the completed change, when Builds validators, Story 5.1 verification, focused tests, Release restore/build, and the package-consumer lane run, then all pass and documentation cites actual commit/version evidence.
+
+### Review Findings
+
+- [ ] [Review][Patch] Nested parent-layout test never selects the Hexalith4 catalog import [test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs:105]
+- [ ] [Review][Patch] Pack/Publish unloaded-catalog guard is only asserted as MSBuild XML text [Directory.Build.props:78]
+- [ ] [Review][Patch] Remaining-work still claims unpublished Builds commits and dumps that claim as a key-less DW-21 trailer [_bmad-output/implementation-artifacts/deferred-work.md:243]
+- [ ] [Review][Patch] Epics Story 5.1 evidence still says verification was not run / backlog [_bmad-output/planning-artifacts/epics.md:1287]
+- [ ] [Review][Patch] RequiredRootSubmodule item is unused after the catalog guard moved to HexalithVersionsLoaded [Directory.Build.props:74]
+- [ ] [Review][Patch] Architecture delivery-debt still records Story 5.1 as in-progress [_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md:1355]
+
+#### Rejected
+
+- false: Uninitialized root submodule loading a sibling/parent catalog, and the missing-catalog diagnostic always naming the root-only init command — supported layouts and the frozen I/O matrix require first-existing catalog resolution and that exact diagnostic.
+- false: Hexalith.Agents.EventStore nuspec flattening (EventStore.Server/ServiceDefaults) plus no catalog-version compare — the EventStore integration package's restore graph is what pack emits; inspected nuspec versions already match the catalog, and this story's authority AC is consumer-declaration absence, not Gateway graph reshaping.
+- false: RuntimeOwnershipConformanceTests no longer scanning wrapper PackageVersion items for Dapr.Workflow — import-only wrappers have no PackageVersion items; project PackageReference scanning remains, and Builds catalog entries are not Agents pins.
+- false: This diff moves Story 5.2 from done to review without product change — the approved proposal keeps 5.2 in review for independent blockers after DW-20 closed.
+- false: Story 5.1 advances Dapr to 1.18.7 — gitlink `aee0132` already selected Dapr 1.18.7; this range only changes EventStore `3.104.0` → `3.106.0`.
+- false: Removing local `Microsoft.NET.Test.Sdk` `18.10.1` silently downgrades to catalog `18.10.0` — the story forbids Agents-local version authority; `18.10.0` is the imported catalog selection already recorded in the spine.
+- false: Shared-validator tests never pass a non-empty `buildDeclaration` / never assert the real repo — the production validator is invoked on the real tree by `eng/verify-story.ps1` and CI; the unused fixture parameter does not leave Directory.Build.props unscanned in those lanes.
+- false: Test/consumer CI jobs restore without the new authority YAML anchors, so the gate is skippable — `package-build` runs the validator and EventStore floor; a failure there fails the workflow.
+- false: `EvaluateMsBuild` throws JsonException when stderr is non-empty — the cited `-getProperty` invocation writes JSON only to stdout (stderr 0 bytes) and the tests pass.
+- false: CI cannot fetch gitlink `000abf867abc3a99cfa74d39b6e73af05c78a602` from origin — `origin/main` in Hexalith.Builds contains that commit, and Agents `origin/main` is `01ead38` recording it.
+- false (spec edit): Spec YAML `status: done` versus changelog `in-progress` — fixing that edits the spec under review; sprint-status already records `review`.
+- low: `RunDotNet` / pwsh `WaitForExit()` with no timeout — a hung SDK child is uncommon, and a safe timeout needs kill plus stream-drain branches beyond a direct correction.
+- low: `PackageInventoryTests` does not require the CI file to contain `validate-consumer-package-authority.ps1` — the step exists on `package-build`, and pinning every new CI line in that string test is not a defect developers hit in everyday use.
 
 ## Implementation Notes
 
@@ -117,6 +142,44 @@ context:
 
 - Both Builds catalog validators passed for 286 entries; the generated audit passed with 286 packages, 141 families, and one source.
 - Shared consumer-authority validation passed across 12 Agents projects; the effective package-floor check resolved EventStore `3.106.0`.
-- Focused `BuildContractConformanceTests` passed 8/8 and `PackageVersionCentralizationTests` passed 4/4.
-- The complete Story 5.1 verifier passed warning-free Debug/source and Release/package builds. Debug suites passed 2,956 tests and Release suites passed 2,932 tests, all with zero failures and zero skips.
+- Focused `BuildContractConformanceTests` and `PackageVersionCentralizationTests` passed; see the generated release-test evidence in the Dev Agent Record.
+- The complete Story 5.1 verifier passed warning-free Debug/source and Release/package builds; see the generated release-test evidence in the Dev Agent Record for suite totals and outcomes.
 - Release source-policy negative probes, exact six-package validation, and isolated six-package consumer validation all passed.
+
+## Dev Agent Record
+
+<!-- dev-agent-test-evidence:start -->
+### Latest Release Test Evidence
+
+Run (UTC): 2026-09-17T09:30:36Z
+
+| Test project | Total | Passed | Failed | Skipped | Pending | Other |
+|---|---:|---:|---:|---:|---:|---:|
+| Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Contracts.Tests | 529 | 529 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 538 | 538 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Tests | 787 | 787 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.UI.Tests | 1073 | 1073 | 0 | 0 | 0 | 0 |
+| **Total** | 2933 | 2933 | 0 | 0 | 0 | 0 |
+
+Result: PASS
+<!-- dev-agent-test-evidence:end -->
+### File List
+
+- `.github/workflows/ci.yml`
+- `Directory.Build.props`
+- `Directory.Packages.props`
+- `_bmad-output/implementation-artifacts/deferred-work.md`
+- `_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md`
+- `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+- `_bmad-output/implementation-artifacts/sprint-status.yaml`
+- `_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md`
+- `_bmad-output/planning-artifacts/epics.md`
+- `_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-16.md`
+- `_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23/DESIGN.md`
+- `eng/verify-story.ps1`
+- `references/Hexalith.Builds`
+- `scripts/validate-consumer-package-references.py`
+- `scripts/validate-nuget-packages.py`
+- `test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs`
+- `test/Hexalith.Agents.Server.Tests/PackageVersionCentralizationTests.cs`
