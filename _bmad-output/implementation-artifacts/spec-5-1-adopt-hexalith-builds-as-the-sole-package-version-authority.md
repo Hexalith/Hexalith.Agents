@@ -217,7 +217,7 @@ context:
 | R4-BH-09 | low | `EXPERIENCE.md` explicitly claims a checkable `ARCH-A-INDEX-7` currency baseline after this change advances the authoritative Spine to index 13. The stale banner can misroute later UX reconciliation. | patch |
 | R4-BH-10 | low | Sprint status is `review` and the proposal says review is pending, but the sprint comment says workflow review is complete. That contradiction is a direct wording error. | patch |
 | R4-BH-11 | low | The proposal attributes layout and missing-catalog coverage to the shared validator even though `BuildContractConformanceTests` owns those cases; the inaccurate attribution can cause maintainers to preserve the wrong guard. | patch |
-| R4-BH-12 | false | The persisted table is explicitly Release evidence; the adjacent results record the Debug/source count, and the full verifier rerun independently produced all 2,962 passing Debug/source tests. No second table is required by the acceptance contract. | reject |
+| R4-BH-12 | false | The persisted table is explicitly Release evidence; the adjacent results record the Debug/source outcome, and the full verifier rerun independently passed the Debug/source test lane. No second table is required by the acceptance contract. | reject |
 | R4-BH-13 | maybe-false | carried: R2-BH-07/R3-ECH-07 already recorded the unproven dependency asset-exclusion concern as DW-22 with the exact experiment needed to settle it. A checked deferred finding means triage completed, not that the deferred concern was resolved. | defer |
 | R4-BH-14 | low | The changed epic wording says every NuGet version comes from Builds even though Agents' own package identity/version is intentionally supplied by the pack lane. The statement must be narrowed to dependency/package-reference versions. | patch |
 | R4-ECH-01 | low | carried: ECH-02/BH-03/R3-ECH-01 already established that an explicit global marker can spoof the guard, but robust anti-spoof provenance is disproportionate for a deliberate command-line override. | reject |
@@ -271,21 +271,21 @@ context:
 - Both Builds catalog validators passed for 286 entries; the generated audit passed with 286 packages, 141 families, and one source.
 - Shared consumer-authority validation passed across 12 Agents projects; the effective package-floor check resolved EventStore `3.106.0`.
 - Focused `BuildContractConformanceTests` and `PackageVersionCentralizationTests` passed; see the generated release-test evidence in the Dev Agent Record.
-- The complete Story 5.1 verifier passed warning-free Debug/source and Release/package builds, with 2,962 Debug/source tests and the 2,938 Release/package tests recorded below.
+- The complete Story 5.1 verifier passed warning-free Debug/source and Release/package builds; see the generated Dev Agent Record evidence block below for the managed Release/package test totals.
 - Release source-policy negative probes, exact six-package validation, and isolated six-package consumer validation all passed.
 
 **Follow-up results (2026-09-18):**
 
-- The focused Release/package build passed with zero warnings and errors; `PackageInventoryTests` (3), `PackageVersionCentralizationTests` (4), and `BuildContractConformanceTests` (14) all passed.
+- The focused Release/package build passed with zero warnings and errors; `PackageInventoryTests`, `PackageVersionCentralizationTests`, and `BuildContractConformanceTests` all passed, with managed totals in the generated Dev Agent Record evidence block below.
 - Builds central-version, authoritative-catalog, and audit validators passed; Agents consumer-authority validation passed for 12 projects; the EventStore floor resolved 13 rows at `3.106.0` against the `3.105.0` minimum.
-- The complete Story 5.1 verifier again passed both builds, all 5,900 tests, source-policy negatives, exact six-package validation, and isolated package consumption.
+- The complete Story 5.1 verifier again passed both builds, the test suites recorded in the generated Dev Agent Record evidence block below, source-policy negatives, exact six-package validation, and isolated package consumption.
 
 ## Dev Agent Record
 
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-17T21:01:40Z
+Run (UTC): 2026-09-18T05:42:29Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
@@ -303,6 +303,7 @@ Result: PASS
 - `.github/workflows/ci.yml`
 - `Directory.Build.props`
 - `Directory.Packages.props`
+- `_bmad-output/implementation-artifacts/deferred-work-archive.md`
 - `_bmad-output/implementation-artifacts/deferred-work.md`
 - `_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md`
 - `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
