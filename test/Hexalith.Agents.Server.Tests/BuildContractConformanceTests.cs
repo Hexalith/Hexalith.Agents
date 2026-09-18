@@ -78,6 +78,17 @@ public sealed class BuildContractConformanceTests
     }
 
     [Fact]
+    public void AgentsUiShouldScopeItsPrereleaseDependencyWarningSuppressionToThePackableProject()
+    {
+        XDocument project = XDocument.Load(ModuleLayout.SourceProjectFile("Hexalith.Agents.UI"));
+        string noWarn = PropertyValue(project, "NoWarn")
+            ?? throw new InvalidOperationException("Hexalith.Agents.UI must declare a scoped NoWarn value.");
+
+        noWarn.ShouldContain("NU5104");
+        project.ToString(SaveOptions.DisableFormatting).ShouldContain("Fluent UI v5 RC");
+    }
+
+    [Fact]
     public void RootCheckoutShouldLoadTheSharedEventStoreVersion()
     {
         using JsonDocument evaluation = EvaluateMsBuild(
