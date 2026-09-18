@@ -95,6 +95,28 @@ public sealed class BuildContractConformanceTests
     }
 
     [Theory]
+    [InlineData("true", "false", "true")]
+    [InlineData("false", "true", "false")]
+    public void DebugRestoreShouldUsePackageModeInGitHubActionsAndSourceModeLocally(
+        string githubActions,
+        string expectedProjectReferences,
+        string expectedNuGetDependencies)
+    {
+        using JsonDocument evaluation = EvaluateMsBuild(
+            ModuleLayout.SourceProjectFile("Hexalith.Agents.Contracts"),
+            "-getProperty:UseHexalithProjectReferences",
+            "-getProperty:UseNuGetDeps",
+            "-p:Configuration=Debug",
+            $"-p:GITHUB_ACTIONS={githubActions}",
+            "-p:NuGetAudit=false",
+            "/nr:false");
+
+        JsonElement properties = evaluation.RootElement.GetProperty("Properties");
+        properties.GetProperty("UseHexalithProjectReferences").GetString().ShouldBe(expectedProjectReferences);
+        properties.GetProperty("UseNuGetDeps").GetString().ShouldBe(expectedNuGetDependencies);
+    }
+
+    [Theory]
     [InlineData("3.104.0", "requires Hexalith.EventStore 3.105.0 or later")]
     [InlineData("not-a-version", "is not a valid version")]
     [InlineData(null, "No effective package-mode Hexalith.EventStore PackageVersion rows were found")]

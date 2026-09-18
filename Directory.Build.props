@@ -23,8 +23,11 @@
 
   <PropertyGroup>
     <!-- UseHexalithProjectReferences is the authoritative dependency mode. Ordinary Debug
-         work uses sibling source; Release and all other configurations use packages. -->
-    <UseHexalithProjectReferences Condition="'$(UseHexalithProjectReferences)' == '' and '$(UseNuGetDeps)' == '' and ('$(Configuration)' == '' or '$(Configuration)' == 'Debug')">true</UseHexalithProjectReferences>
+         work uses sibling source; Release and all other configurations use packages.
+         GitHub Actions restores before the shared workflow selects Release, so keep that
+         restore in package mode to match the subsequent no-restore Release build. -->
+    <UseHexalithProjectReferences Condition="'$(UseHexalithProjectReferences)' == '' and '$(UseNuGetDeps)' == '' and '$(GITHUB_ACTIONS)' == 'true'">false</UseHexalithProjectReferences>
+    <UseHexalithProjectReferences Condition="'$(UseHexalithProjectReferences)' == '' and '$(UseNuGetDeps)' == '' and '$(GITHUB_ACTIONS)' != 'true' and ('$(Configuration)' == '' or '$(Configuration)' == 'Debug')">true</UseHexalithProjectReferences>
     <UseHexalithProjectReferences Condition="'$(UseHexalithProjectReferences)' == '' and '$(UseNuGetDeps)' == ''">false</UseHexalithProjectReferences>
     <UseHexalithProjectReferences Condition="'$(UseHexalithProjectReferences)' == '' and '$(UseNuGetDeps)' == 'false'">true</UseHexalithProjectReferences>
     <UseHexalithProjectReferences Condition="'$(UseHexalithProjectReferences)' == '' and '$(UseNuGetDeps)' == 'true'">false</UseHexalithProjectReferences>
