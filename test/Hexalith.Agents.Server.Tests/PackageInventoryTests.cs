@@ -88,6 +88,10 @@ public sealed class PackageInventoryTests
         workflow.ShouldContain("ui-tests:");
         workflow.ShouldContain("boundary-checks:");
         workflow.ShouldContain("package-consumer:");
+        workflow.ShouldContain("name: Enforce shared package authority");
+        workflow.ShouldContain("./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1 -RepositoryRoot . -CatalogPath ./references/Hexalith.Builds/Props/Directory.Packages.props");
+        workflow.ShouldContain("name: Enforce Story 5.2 EventStore package floor");
+        workflow.ShouldContain("./eng/verify-story-5.2.ps1 -PackageFloorOnly");
         workflow.ShouldNotContain("--filter-class");
         workflow.ShouldNotContain("UseHexalithProjectReferences=true");
         workflow.ShouldNotContain("-c Debug");

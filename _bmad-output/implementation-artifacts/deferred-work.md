@@ -18,13 +18,12 @@ status: open
 
 ### DW-3: Optional post-write projection polling so AuthoritativePending can advance to ProjectionConfirmed without a manual reload.
 
-origin: migrated from legacy ledger (""), 2026-09-08
-location: Post-write setup-status projection refresh
-source_spec: `_bmad-output/implementation-artifacts/spec-5-2-enforce-complete-launch-readiness-before-callability.md`
-reason: The spec accepts a single post-write re-read; a lagging projection keeps the submission pending until the administrator reloads or acts again.
 status: done 2026-09-08
 resolution: resolved by sweep bundle dw-setup-projection-polling
 resolution-undo: 1304c76d4ea1a612802deacd61c7dc7b6f8996c6c45f352f2ebd118674e18e36 2026-09-08 7374617475733a206f70656e
+origin: migrated from legacy ledger (""), 2026-09-08
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-enforce-complete-launch-readiness-before-callability.md`
+archived: 2026-09-18
 
 ### DW-4: Expected configuration versions cannot correlate lifecycle writes or distinguish a specific accepted configuration write.
 origin: spec-deferred 5378b7fc0051
@@ -140,12 +139,10 @@ status: open
 
 ### DW-10: Canonicalize correlation identifiers echoed by setup read paths.
 
-origin: code review round 2, 2026-09-14
-location: src/Hexalith.Agents.Server/Application/Agents/EventStoreAgentAdministrationOperations.cs
-source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
-reason: Read results previously echoed invalid or non-canonical caller metadata, including on denied and out-of-scope paths.
 status: done 2026-09-15
-resolution: All setup read and out-of-scope results now echo only a canonical uppercase ULID; regression tests cover denied and cross-tenant reads.
+origin: code review round 2, 2026-09-14
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+archived: 2026-09-18
 
 ### DW-11: Reserve Unknown at zero if AgentSetupWriteStatus ever becomes a wire contract.
 
@@ -223,13 +220,10 @@ status: open
 
 ### DW-20: Publish and consume the EventStore release that forwards no-op result payloads.
 
-origin: product-owner decision from code review round 4, 2026-09-15
-location: references/Hexalith.Builds/Props/Directory.Packages.props:8
-source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
-severity: blocker
-reason: The fix exists after EventStore 3.104.0, but package-mode Release and CI consume 3.104.0. The Story 5.2 verifier now requires 3.105.0 or later and intentionally remains red until that package is published and imported.
-resolution: Hexalith.Builds catalog commit `dae84d5f96911517eb1e6f97e75eb88e759e6d8a` selects published EventStore `3.106.0`; audit commit `000abf867abc3a99cfa74d39b6e73af05c78a602` records the generated evidence and is reachable from Builds `origin/main`. Agents `origin/main` records that exact gitlink, Agents owns no local package version, and the Story 5.1 EventStore floor, Release/package, package-validation, and isolated-consumer lanes pass.
 status: done 2026-09-16
+origin: product-owner decision from code review round 4, 2026-09-15
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+archived: 2026-09-18
 
 ### DW-21: Register the Agents integration in the platform-owned EventStore gateway host.
 
@@ -248,3 +242,7 @@ source_spec: `_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-buil
 severity: medium
 reason: This may be a false positive because the review did not establish that current EventStore dependencies expose affected assets. The package validator currently discards nuspec dependency asset metadata; a mutated-package restore and `project.assets.json` comparison would settle whether omitting generated exclusions creates a consumer leak.
 status: open
+
+## Deferred from: code review of spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md (2026-09-18)
+
+- GlobalJsonShouldPinTheSdk does not assert `test.runner` — pre-existing; `global.json` is unchanged in this diff and already contains `Microsoft.Testing.Platform`.

@@ -72,11 +72,15 @@ context:
 - [x] [Review][Patch] Architecture delivery-debt still records Story 5.1 as in-progress [_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md:1355]
 - [x] [Review][Patch] Key-less remaining-work trailer is still dumped onto DW-21 [_bmad-output/implementation-artifacts/deferred-work.md:243]
 - [x] [Review][Patch] Sprint status claims Story 5.1 workflow review is already green [_bmad-output/implementation-artifacts/sprint-status.yaml:87]
-- [x] [Review][Patch] Epics evidence table still names superseded Story 5.1 test classes [_bmad-output/planning-artifacts/epics.md:1284]
+- [x] [Review][Patch] Epics evidence table still names superseded Story 5.1's test classes [_bmad-output/planning-artifacts/epics.md:1284]
 - [x] [Review][Patch] ARCH-A-15 is retired while its authoritative `OD-DAPR-SECURITY-1` approval remains open [_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md:1400]
 - [x] [Review][Patch] Story 5.1 compatibility evidence overclaims Dapr Workflow coverage even though only Client/ASP.NET are consumed [_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md:911]
 - [x] [Review][Patch] Triage presents mutable Agents `origin/main` as immutable commit `01ead38` [_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md:89]
 - [x] [Review][Defer] Packed EventStore dependency asset-exclusion metadata is not retained [scripts/validate-nuget-packages.py:197] — deferred: maybe-false; a mutated-package restore and `project.assets.json` comparison would settle whether omitting generated exclusions creates a consumer leak
+- [x] [Review][Patch] Sprint status still claims Story 5.1 workflow review is complete [_bmad-output/implementation-artifacts/sprint-status.yaml:87]
+- [x] [Review][Patch] PackageInventoryTests does not lock the new CI authority and EventStore-floor steps [test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs:82]
+- [x] [Review][Patch] Architecture assumption index jumped 10 to 13 with no memlog entries [_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/.memlog.md:433]
+- [x] [Review][Defer] GlobalJsonShouldPinTheSdk does not assert test.runner [test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs:222] — deferred: pre-existing; global.json is unchanged in this diff and already contains Microsoft.Testing.Platform
 
 #### Rejected
 
@@ -105,6 +109,18 @@ context:
 - false (spec edit): Spec YAML `status: done` / `review_loop_iteration: 0` versus changelog `in-progress` — fixing that edits the spec under review; sprint-status already records `review`.
 - false: DW-20 `done 2026-09-16` versus 2026-09-17 verification — the status date is the close date; the resolution already cites the later verifier evidence.
 - low: `RunDotNet` / pwsh `WaitForExit()` with no timeout — a hung SDK child is uncommon, and a safe timeout needs kill plus stream-drain branches beyond a direct correction.
+- false: Architecture Assumptions preamble still treats ARCH-A-4 as a live scoping rule — the table marks it **RETIRED 2026-09-16**; the leftover sentence restates the Stack Windows/graph security observation, it does not emit `UnretiredAssumption`.
+- false: ARCH-A-8 still says Fluent UI is "pinned" — that row is the RC-versus-GA production risk; Stack already records catalog ownership and "Agents owns no local pin."
+- false: `OD-SPRINT-5.1-5.2-1` remaining Open blocks dependent-story authorization — that is the recorded safe state until Delivery owner + Platform Maintainer choose; this change does not authorize closing it.
+- false: EXPERIENCE.md still cites `reconcile-validation-2026-09-12.md` after a 2026-09-17 pass — the banner states the 2026-09-17 work is dependency-ownership only; 2026-09-12 remains the last UX-behavior reconciliation, and DESIGN.md is not a currency denominator in that banner.
+- false: Floor tests assert `HexalithEventStoreVersion` while the gate reads `PackageVersion` rows, with no mixed-row case — CI and `PackageFloorOnly` already fail closed on evaluated EventStore family items; the catalog binds that family to one property at `3.106.0`.
+- false: Hexalith4 nested-parent catalog resolution has no matching Debug source roots — wrapper ACs and layout tests cover catalog import; missing EventStore source still fails closed.
+- false: `validate-nuget-packages.py` requires a flattened EventStore host graph and skips catalog-version compare — pack emits the restore graph; this story's authority AC is consumer-declaration absence, not Gateway graph reshaping.
+- low: `eng/verify-story.ps1` and CI always pass `references/Hexalith.Builds/Props/Directory.Packages.props` — everyday GitHub and root-submodule checkouts use that path; a sibling/parent resolver would add layout branches this repo's CI never runs.
+- false: The approved proposal still tells implementers to retain an MSBuild-property floor check — §4.9 is the pre-implementation handoff; the implementation-evidence section records the landed `PackageVersion`/gitlink facts.
+- false: Story 5.2's verification section still records the 2026-09-15 suite after the floor rewrite — Story 5.1 cites 2026-09-17 evidence and dedicated floor tests; the 5.2 spec already cross-links that later floor result.
+- false: `AssertSharedValidatorRejects` always passes an empty `buildDeclaration`, and the Agents wrapper never sets `CentralPackageVersionOverrideEnabled=false` — `eng/verify-story.ps1` and CI invoke the shared validator on the real tree, and the imported catalog already evaluates the override to `false`.
+- false (spec edit): Spec implementation notes still say Client/ASP.NET-only compatibility evidence — spine, epics, and launch-readiness already say Client/ASP.NET/Actors; fixing the leftover notes would edit the spec under review.
 
 ## Implementation Notes
 
@@ -114,11 +130,13 @@ context:
 - Story verification and CI run shared authority validation before the EventStore floor and existing source/package lanes. The package validators were reconciled with the existing six-package release manifest, including the EventStore integration package and its isolated-consumer marker.
 - Epics, Architecture Spine assumption index 13, UX package ownership, Story 5.2 evidence, DW-20, the approved proposal, and sprint status now distinguish the resolved package floor from Story 5.2's independent blockers.
 - Builds `origin/main` contains catalog/audit target `000abf867abc3a99cfa74d39b6e73af05c78a602`, and Agents commit `01ead38` published on `origin/main` records that exact gitlink. The former fresh-clone integration risk is resolved, while `ARCH-A-15` remains open pending approval of `OD-DAPR-SECURITY-1`; current compatibility evidence covers only consumed Client/ASP.NET, and Workflow remains Story 6.1 work.
+- Follow-up review now locks both package-authority CI commands in `PackageInventoryTests`, records each ARCH-A index transition from 10 through 13 in the architecture memlog, and keeps the sprint comment aligned with the in-progress workflow state.
 
 ## Spec Change Log
 
 - 2026-09-16 — Implemented the approved shared package-authority correction, recorded exact Builds commits and local verification, closed DW-20, and retained Story 5.1 as `in-progress` pending review/integration.
 - 2026-09-17 — Patched all six review findings, added behavioral Pack/Publish missing-catalog coverage, reconciled publication evidence, and kept `ARCH-A-15` open for the authoritative Security + Builds approval after the Builds and parent gitlinks became upstream-fetchable.
+- 2026-09-18 — Patched the remaining review findings for sprint-status accuracy, CI gate regression coverage, and architecture assumption-index history; reran focused and complete Story 5.1 verification.
 
 ## Review Triage Log
 
@@ -215,6 +233,28 @@ context:
 | R4-VG-02 | false | carried: BH-11/R2-BH-06/R3-VG-01 already rejected the stale external-nuspec-version claim because the verified lane rebuilds packages from the validated catalog and no reachable production rewrite path was shown. | reject |
 | R4-VG-03 | false | carried: BH-06/R2-ECH-02/R3-BH-06 already rejected the same partial-catalog merge claim for supported layouts and complete real-root validation. | reject |
 | R4-VG-04 | medium | Verified: the produced `Hexalith.Agents.EventStore` nuspec includes `Dapr.Actors` and `Dapr.Actors.AspNetCore` `1.18.7`, so the changed Client/ASP.NET-only compatibility narrative is incomplete. | patch |
+| R5-BH-01 | low | carried: BH-03/R2-ECH-06/R3-ECH-01 already established that a caller can deliberately spoof `HexalithVersionsLoaded=true`; robust catalog provenance is disproportionate for this uncommon explicit override. | reject |
+| R5-BH-02 | false | carried: BH-06/R2-ECH-02/R4-ECH-02 already established that supported catalog resolution is atomic and the real-root validator compares the complete effective catalog; the claim depends on an unsupported marker-less catalog. | reject |
+| R5-BH-03 | low | carried: R2-BH-04 already established that `InitialTargets` also blocks `Clean` without a catalog, but the approved fail-closed boundary applies to unloaded catalogs and narrowing it risks the proven Pack/Publish guard. | reject |
+| R5-BH-04 | false | carried: R3-BH-06/R4-BH-01 already established that layout fixtures isolate path selection while the real repository validator proves the complete effective `PackageVersion` set. | reject |
+| R5-BH-05 | low | `PackageFloorProjectPath` can alter the floor target only when a caller deliberately supplies the non-default test seam; the recorded evidence command, Story 5.1 verifier, and CI never pass it, and preventing misuse would add a special-case verifier branch for an uncommon explicit override. | reject |
+| R5-BH-06 | false | carried: R3-BH-07 already established that the floor gate checks the effective shared selection and is not a replacement for build, package inventory, or integration gates, all of which fail if real EventStore references disappear. | reject |
+| R5-BH-07 | low | carried: R2-BH-02/R4-ECH-04 already established that the frozen floor uses stable published `3.106.0`; adding NuGet prerelease precedence and parsing is disproportionate to this stable-version gate. | reject |
+| R5-BH-08 | false | The production validator scans the real repository, including `Directory.Build.props`, and the imported catalog evaluates `CentralPackageVersionOverrideEnabled=false`; the unused fixture parameter does not leave consumer authority unverified. | reject |
+| R5-BH-09 | low | Raw-text assertions could be satisfied by commented YAML, but the current commands are executable in `package-build` and both ran in the complete verifier; structurally parsing Actions YAML would add disproportionate test machinery for a future deliberate/comment-only bypass. | reject |
+| R5-BH-10 | false | carried: BH-11/R2-BH-06/R3-VG-01 already established that the verified lane rebuilds packages after catalog validation and inspected nuspec versions match the catalog; no reachable production path to rewritten external versions was shown. | reject |
+| R5-BH-11 | maybe-false | carried: R2-BH-07/R3-ECH-07/R4-BH-13 already recorded the unproven dependency asset-metadata concern as DW-22 with the mutated-package `project.assets.json` experiment needed to settle it. | defer |
+| R5-BH-12 | low | carried: BH-15/R3-ECH-04/R4-ECH-07 already established that SDK or validator children can wait for the enclosing job timeout, but safe timeout, kill, and stream-drain handling is disproportionate for this uncommon helper failure. | reject |
+| R5-BH-13 | medium | The implementation note at line 132 understates the exercised dependency graph by omitting Dapr Actors, but the architecture, epic, and readiness artifacts carry the corrected Client/ASP.NET/Actors claim; the only remaining fix would edit this build's spec, which review findings must reject. | reject |
+| R5-BH-14 | false | `deferred-work-archive.md` was a pre-existing unrelated worktree change preserved by the implementation handoff, not a Story 5.1 implementation file; the Dev Agent Record correctly lists the story-owned files. | reject |
+| R5-BH-15 | false | Repeated findings are intentionally retained as separate carried rows because the review workflow requires one verdict for every finding in every loop and forbids silently deduplicating them. | reject |
+| R5-BH-16 | false | The unkeyed deferred bullet exactly follows the review workflow's required append-only format for a pre-existing issue; it is not a malformed `DW-*` record. | reject |
+| R5-BH-17 | false | The `555c9047` sentence sits inside the dated Round 2 implementation history and records the pointer produced by that round; later paragraphs separately record the current package/catalog promotion, so it does not claim to be the current EventStore gitlink. | reject |
+| R5-ECH-01 | low | carried: R3-BH-01 already established that an explicit global `HexalithEventStoreVersion` override can spoof the catalog default, but immutable shared defaults would add disproportionate provenance machinery for deliberate command-line tampering. | reject |
+| R5-ECH-02 | low | carried: R2-BH-02/R4-ECH-04 already established that NuGet prerelease parsing is unnecessary for the frozen stable `3.106.0` selection and would add disproportionate precedence machinery. | reject |
+| R5-ECH-03 | low | carried: BH-03/R2-ECH-06/R3-ECH-01 already established the deliberate global-marker spoof and rejected the disproportionate anti-spoof provenance machinery. | reject |
+| R5-ECH-04 | low | carried: BH-15/R2-ECH-04/R4-ECH-07 already established the uncommon unbounded `dotnet` child wait and rejected the nontrivial timeout, kill, and stream-drain branches. | reject |
+| R5-ECH-05 | low | carried: BH-15/R2-ECH-05/R3-ECH-06 already established the uncommon unbounded validator-child wait and rejected the nontrivial timeout, kill, and stream-drain branches. | reject |
 
 ## Verification
 
@@ -234,12 +274,18 @@ context:
 - The complete Story 5.1 verifier passed warning-free Debug/source and Release/package builds, with 2,962 Debug/source tests and the 2,938 Release/package tests recorded below.
 - Release source-policy negative probes, exact six-package validation, and isolated six-package consumer validation all passed.
 
+**Follow-up results (2026-09-18):**
+
+- The focused Release/package build passed with zero warnings and errors; `PackageInventoryTests` (3), `PackageVersionCentralizationTests` (4), and `BuildContractConformanceTests` (14) all passed.
+- Builds central-version, authoritative-catalog, and audit validators passed; Agents consumer-authority validation passed for 12 projects; the EventStore floor resolved 13 rows at `3.106.0` against the `3.105.0` minimum.
+- The complete Story 5.1 verifier again passed both builds, all 5,900 tests, source-policy negatives, exact six-package validation, and isolated package consumption.
+
 ## Dev Agent Record
 
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-17T14:04:22Z
+Run (UTC): 2026-09-17T21:01:40Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
@@ -261,14 +307,18 @@ Result: PASS
 - `_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md`
 - `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 - `_bmad-output/implementation-artifacts/sprint-status.yaml`
+- `_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/.memlog.md`
 - `_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md`
 - `_bmad-output/planning-artifacts/epics.md`
+- `_bmad-output/planning-artifacts/launch-readiness-register.md`
 - `_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-16.md`
 - `_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23/DESIGN.md`
+- `_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23/EXPERIENCE.md`
 - `eng/verify-story-5.2.ps1`
 - `eng/verify-story.ps1`
 - `references/Hexalith.Builds`
 - `scripts/validate-consumer-package-references.py`
 - `scripts/validate-nuget-packages.py`
 - `test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs`
+- `test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs`
 - `test/Hexalith.Agents.Server.Tests/PackageVersionCentralizationTests.cs`
