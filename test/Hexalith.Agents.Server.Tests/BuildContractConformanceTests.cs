@@ -25,6 +25,13 @@ public sealed class BuildContractConformanceTests
         PropertyValue(props, "Nullable").ShouldBe("enable");
         PropertyValue(props, "ImplicitUsings").ShouldBe("enable");
         PropertyValue(props, "TreatWarningsAsErrors").ShouldBe("true");
+        PropertyValue(props, "NuGetAudit").ShouldBe("true");
+        PropertyValue(props, "NuGetAuditMode").ShouldBe("all");
+        string warningsNotAsErrors = PropertyValue(props, "WarningsNotAsErrors")!;
+        warningsNotAsErrors.ShouldContain("NU1901");
+        warningsNotAsErrors.ShouldContain("NU1902");
+        warningsNotAsErrors.ShouldContain("NU1903");
+        warningsNotAsErrors.ShouldContain("NU1904");
     }
 
     [Fact]

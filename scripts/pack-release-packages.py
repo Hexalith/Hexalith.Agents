@@ -49,7 +49,6 @@ def evaluated_package_id(project: Path) -> str:
             "-getProperty:PackageId",
             "-p:Configuration=Release",
             "-p:UseHexalithProjectReferences=false",
-            "-p:NuGetAudit=false",
         ],
         cwd=ROOT,
         check=True,
@@ -154,7 +153,6 @@ def main() -> int:
             f"-p:Version={args.version}",
             f"-p:PackageVersion={args.version}",
             "-p:UseHexalithProjectReferences=false",
-            "-p:NuGetAudit=false",
             "/m:1",
             "/nr:false",
         ]

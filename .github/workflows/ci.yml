@@ -6,133 +6,54 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
-env:
-  DOTNET_NOLOGO: 'true'
-
 jobs:
-  package-build:
-    name: Release package-mode build
+  ci:
+    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@main
+    with:
+      solution: Hexalith.Agents.slnx
+      test-platform: microsoft-testing-platform
+      run-consumer-validation: true
+      unit-test-projects: |
+        test/Hexalith.Agents.Contracts.Tests
+        test/Hexalith.Agents.Client.Tests
+        test/Hexalith.Agents.Tests
+        test/Hexalith.Agents.Server.Tests
+        test/Hexalith.Agents.UI.Tests
+
+  agents-policy:
+    name: Agents package and tooling policy
     runs-on: ubuntu-latest
     steps:
-      - &package-checkout
-        uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
           submodules: false
-      - &root-submodules
-        name: Initialize root-declared submodules
+      - name: Initialize root-declared submodules
         shell: bash
         run: |
           set -euo pipefail
           mapfile -t paths < <(git config -f .gitmodules --get-regexp path | awk '{print $2}')
-          git submodule update --init -- "${paths[@]}"
-      - &package-dotnet
-        uses: actions/setup-dotnet@v6.0.0
+          git -c submodule.recurse=false submodule update --init -- "${paths[@]}"
+      - uses: actions/setup-dotnet@v6.0.0
         with:
           global-json-file: global.json
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: '24'
+      - name: Install locked JavaScript tooling
+        run: npm ci --ignore-scripts
       - name: Enforce shared package authority
         shell: pwsh
         run: ./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1 -RepositoryRoot . -CatalogPath ./references/Hexalith.Builds/Props/Directory.Packages.props
-      - name: Enforce Story 5.2 EventStore package floor
+      - name: Enforce EventStore package floor
         shell: pwsh
         run: ./eng/verify-story-5.2.ps1 -PackageFloorOnly
-      - &package-restore
-        name: Restore package graph
-        run: dotnet restore Hexalith.Agents.slnx -p:Configuration=Release -p:UseHexalithProjectReferences=false /m:1 /nr:false
-      - &package-compile
-        name: Build package graph
-        run: dotnet build Hexalith.Agents.slnx -c Release --no-restore -warnaserror -p:UseHexalithProjectReferences=false /m:1 /nr:false
-
-  tooling-tests:
-    name: Story readiness tooling tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - name: Run readiness gate regressions
-        run: python3 -m unittest discover -s tests/tooling/story_review_readiness -p '*_test.py'
-
-  contracts-tests:
-    name: Contracts tests
-    runs-on: ubuntu-latest
-    steps:
-      - *package-checkout
-      - *root-submodules
-      - *package-dotnet
-      - *package-restore
-      - *package-compile
-      - run: dotnet test test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false
-
-  client-tests:
-    name: Client tests
-    runs-on: ubuntu-latest
-    steps:
-      - *package-checkout
-      - *root-submodules
-      - *package-dotnet
-      - *package-restore
-      - *package-compile
-      - run: dotnet test test/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false
-
-  domain-tests:
-    name: Domain tests
-    runs-on: ubuntu-latest
-    steps:
-      - *package-checkout
-      - *root-submodules
-      - *package-dotnet
-      - *package-restore
-      - *package-compile
-      - run: dotnet test test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false
-
-  server-tests:
-    name: Server tests
-    runs-on: ubuntu-latest
-    steps:
-      - *package-checkout
-      - *root-submodules
-      - *package-dotnet
-      - *package-restore
-      - *package-compile
-      - run: dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false
-
-  ui-tests:
-    name: UI tests
-    runs-on: ubuntu-latest
-    steps:
-      - *package-checkout
-      - *root-submodules
-      - *package-dotnet
-      - *package-restore
-      - *package-compile
-      - run: dotnet test test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false
-
-  boundary-checks:
-    name: Boundary checks
-    runs-on: ubuntu-latest
-    steps:
-      - *package-checkout
-      - *root-submodules
-      - *package-dotnet
-      - *package-restore
-      - *package-compile
-      - name: Run boundary suite
-        run: dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Release --no-build -p:UseHexalithProjectReferences=false
-
-  package-consumer:
-    name: Package consumer
-    runs-on: ubuntu-latest
-    steps:
-      - *package-checkout
-      - *root-submodules
-      - *package-dotnet
-      - *package-restore
-      - *package-compile
-      - name: Pack exact inventory
-        run: python3 scripts/pack-release-packages.py nupkgs 0.0.0-ci
-      - name: Inspect package metadata and assets
-        run: python3 scripts/validate-nuget-packages.py nupkgs
-      - name: Build isolated package consumer
-        run: python3 scripts/validate-consumer-package-references.py nupkgs
+      - name: Run tooling contract tests
+        run: python3 -m unittest discover -s tests/tooling -p '*_test.py'

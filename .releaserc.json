@@ -1,0 +1,25 @@
+{
+  "branches": ["main"],
+  "tagFormat": "v${version}",
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/exec",
+      {
+        "verifyReleaseCmd": "test -n \"$NUGET_API_KEY\" || { echo 'NUGET_API_KEY is required for publication.' >&2; exit 1; }; python3 scripts/verify-nuget-publication.py eng/release-packages.json ${nextRelease.version} --expect absent",
+        "prepareCmd": "python3 scripts/pack-release-packages.py ./nupkgs ${nextRelease.version} && python3 scripts/validate-nuget-packages.py ./nupkgs && python3 scripts/validate-consumer-package-references.py ./nupkgs",
+        "publishCmd": "bash scripts/publish-release-packages.sh ${nextRelease.version}"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": ["nupkgs/*.nupkg"],
+        "labels": [],
+        "successCommentCondition": false,
+        "releasedLabels": false
+      }
+    ]
+  ]
+}

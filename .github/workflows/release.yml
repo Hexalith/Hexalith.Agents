@@ -1,0 +1,174 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: release-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify-source:
+    name: Verify exact green main source
+    runs-on: ubuntu-latest
+    outputs:
+      publish-enabled: ${{ steps.publication-gate.outputs.publish-enabled }}
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Apply publication freeze
+        id: publication-gate
+        shell: bash
+        env:
+          HEXALITH_RELEASE_PUBLISH_ENABLED: ${{ vars.HEXALITH_RELEASE_PUBLISH_ENABLED }}
+        run: |
+          set -euo pipefail
+          if [ "${HEXALITH_RELEASE_PUBLISH_ENABLED-}" = "true" ]; then
+            echo "publish-enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish-enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Release publication frozen::HEXALITH_RELEASE_PUBLISH_ENABLED is not exactly the string 'true'; publication and post-publication assertions will be skipped."
+          fi
+      - uses: actions/checkout@v7.0.1
+        if: steps.publication-gate.outputs.publish-enabled == 'true'
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+          submodules: false
+      - name: Require the current green main tip
+        if: steps.publication-gate.outputs.publish-enabled == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          DISPATCH_REF: ${{ github.ref }}
+          DISPATCH_SHA: ${{ github.sha }}
+        run: >-
+          python3 scripts/verify-release-source.py
+          --repository "$REPOSITORY"
+          --workflow ci.yml
+          --dispatch-ref "$DISPATCH_REF"
+          --dispatch-sha "$DISPATCH_SHA"
+
+  plan-release:
+    name: Plan exact-source release
+    needs: verify-source
+    if: needs.verify-source.outputs.publish-enabled == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      release-required: ${{ steps.plan.outputs.release-required }}
+      version: ${{ steps.plan.outputs.version }}
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: '24'
+      - name: Install and verify release tooling
+        run: |
+          npm ci --ignore-scripts
+          npm audit signatures
+      - name: Compute release decision without side effects
+        id: plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          node eng/semantic-release-plan.mjs > release-plan.json
+          required="$(jq -er '.release_required | if . then "true" else "false" end' release-plan.json)"
+          version="$(jq -r '.version // ""' release-plan.json)"
+          if [ "$required" = "true" ] && [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Semantic Release returned a malformed version." >&2
+            exit 1
+          fi
+          echo "release-required=$required" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  release:
+    name: Protected NuGet release
+    needs: [verify-source, plan-release]
+    if: >-
+      always() &&
+      needs.verify-source.result == 'success' &&
+      needs.verify-source.outputs.publish-enabled == 'true' &&
+      needs.plan-release.result == 'success' &&
+      needs.plan-release.outputs.release-required == 'true'
+    permissions:
+      actions: read
+      attestations: write
+      contents: write
+      id-token: write
+      issues: write
+      pull-requests: write
+    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-release.yml@cb91511794c8898b738d85dc6c751f82b832cbc9
+    with:
+      solution: Hexalith.Agents.slnx
+      test-platform: microsoft-testing-platform
+      test-projects: ''
+      timeout-minutes: 60
+      environment-name: production
+      governed-release: false
+      publish-containers: false
+      container-projects: ''
+      builds-execution-sha: cb91511794c8898b738d85dc6c751f82b832cbc9
+      source-branch: main
+      source-ci-workflow: ci.yml
+      package-manifest: eng/release-packages.json
+      expected-package-count: 6
+      require-publication-authority: false
+    secrets:
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
+  verify-publication:
+    name: Verify exact release publication
+    needs: [verify-source, plan-release, release]
+    if: >-
+      always() &&
+      needs.verify-source.result == 'success' &&
+      needs.verify-source.outputs.publish-enabled == 'true' &&
+      needs.plan-release.result == 'success' &&
+      needs.plan-release.outputs.release-required == 'true' &&
+      needs.release.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+      - name: Require the GitHub Release and exact six assets at the dispatched SHA
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          DISPATCH_SHA: ${{ github.sha }}
+          VERSION: ${{ needs.plan-release.outputs.version }}
+        run: |
+          set -euo pipefail
+          tag="v${VERSION}"
+          gh api "repos/${REPOSITORY}/releases/tags/${tag}" > github-release.json
+          git fetch --force origin "refs/tags/${tag}:refs/tags/${tag}"
+          release_sha="$(git rev-list -n 1 "$tag")"
+          python3 scripts/verify-github-release.py \
+            eng/release-packages.json \
+            github-release.json \
+            "$VERSION" \
+            "$DISPATCH_SHA" \
+            "$release_sha"
+      - name: Verify all six versions reached NuGet
+        env:
+          VERSION: ${{ needs.plan-release.outputs.version }}
+        run: python3 scripts/verify-nuget-publication.py eng/release-packages.json "$VERSION" --expect present

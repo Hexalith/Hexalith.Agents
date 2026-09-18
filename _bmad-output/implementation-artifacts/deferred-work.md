@@ -246,3 +246,7 @@ status: open
 ## Deferred from: code review of spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md (2026-09-18)
 
 - GlobalJsonShouldPinTheSdk does not assert `test.runner` — pre-existing; `global.json` is unchanged in this diff and already contains `Microsoft.Testing.Platform`.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-implement-agents-ci-cd.md`
+  summary: Determine whether another credential holder can race the NuGet absence proof for the six Agents package IDs and whether an atomic reservation mechanism exists.
+  evidence: The absence probe and first push are necessarily separate operations; the risk becomes concrete only if another principal can publish the same IDs/version in that interval, which requires an authority inventory or NuGet reservation evidence to settle.

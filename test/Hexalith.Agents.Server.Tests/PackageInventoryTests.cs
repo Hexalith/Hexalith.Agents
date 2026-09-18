@@ -69,8 +69,22 @@ public sealed class PackageInventoryTests
             "scripts/pack-release-packages.py",
             "scripts/validate-nuget-packages.py",
             "scripts/validate-consumer-package-references.py",
+            "scripts/verify-nuget-publication.py",
+            "scripts/verify-release-source.py",
+            "scripts/verify-github-release.py",
+            "scripts/publish-release-packages.sh",
             "eng/verify-story.ps1",
             ".github/workflows/ci.yml",
+            ".github/workflows/release.yml",
+            ".github/workflows/commitlint.yml",
+            ".github/workflows/codeql.yml",
+            ".github/workflows/dependency-review.yml",
+            ".github/dependabot.yml",
+            ".releaserc.json",
+            "package.json",
+            "package-lock.json",
+            "commitlint.config.mjs",
+            "eng/semantic-release-plan.mjs",
         ];
 
         foreach (string requiredFile in requiredFiles)
@@ -80,27 +94,94 @@ public sealed class PackageInventoryTests
         }
 
         string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/ci.yml"));
-        workflow.ShouldContain("package-build:");
-        workflow.ShouldContain("contracts-tests:");
-        workflow.ShouldContain("client-tests:");
-        workflow.ShouldContain("domain-tests:");
-        workflow.ShouldContain("server-tests:");
-        workflow.ShouldContain("ui-tests:");
-        workflow.ShouldContain("boundary-checks:");
-        workflow.ShouldContain("package-consumer:");
+        workflow.ShouldContain("Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@main");
+        workflow.ShouldContain("test-platform: microsoft-testing-platform");
+        workflow.ShouldContain("run-consumer-validation: true");
+        workflow.ShouldContain("test/Hexalith.Agents.Contracts.Tests");
+        workflow.ShouldContain("test/Hexalith.Agents.Client.Tests");
+        workflow.ShouldContain("test/Hexalith.Agents.Tests");
+        workflow.ShouldContain("test/Hexalith.Agents.Server.Tests");
+        workflow.ShouldContain("test/Hexalith.Agents.UI.Tests");
         workflow.ShouldContain("name: Enforce shared package authority");
         workflow.ShouldContain("./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1 -RepositoryRoot . -CatalogPath ./references/Hexalith.Builds/Props/Directory.Packages.props");
-        workflow.ShouldContain("name: Enforce Story 5.2 EventStore package floor");
+        workflow.ShouldContain("name: Enforce EventStore package floor");
         workflow.ShouldContain("./eng/verify-story-5.2.ps1 -PackageFloorOnly");
-        workflow.ShouldNotContain("--filter-class");
-        workflow.ShouldNotContain("UseHexalithProjectReferences=true");
-        workflow.ShouldNotContain("-c Debug");
+        workflow.ShouldContain("python3 -m unittest discover -s tests/tooling -p '*_test.py'");
+        workflow.ShouldContain("git -c submodule.recurse=false submodule update --init");
+        workflow.ShouldNotContain("dotnet test");
+        workflow.ShouldNotContain("--recursive");
+    }
 
-        foreach (string command in workflow.Split('\n').Where(line => line.Contains("dotnet ", StringComparison.Ordinal)))
-        {
-            command.ShouldContain("UseHexalithProjectReferences=false");
-            command.ShouldContain("Release");
-        }
+    [Fact]
+    public void ReleaseShouldBeManualProtectedPinnedAndCollisionFailing()
+    {
+        const string approvedBuildsSha = "cb91511794c8898b738d85dc6c751f82b832cbc9";
+        string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/release.yml"));
+        string releaseConfiguration = File.ReadAllText(ModuleLayout.ResolveModulePath(".releaserc.json"));
+        string publisher = File.ReadAllText(ModuleLayout.ResolveModulePath("scripts/publish-release-packages.sh"));
+        using JsonDocument toolchain = JsonDocument.Parse(
+            File.ReadAllText(ModuleLayout.ResolveModulePath("package.json")));
+        JsonElement developmentDependencies = toolchain.RootElement.GetProperty("devDependencies");
+
+        workflow.ShouldContain("workflow_dispatch:");
+        workflow.ShouldNotContain("push:");
+        workflow.ShouldContain("environment-name: production");
+        workflow.ShouldContain("DISPATCH_REF");
+        workflow.ShouldContain("scripts/verify-release-source.py");
+        workflow.ShouldContain("scripts/verify-github-release.py");
+        workflow.ShouldContain("timeout-minutes: 45");
+        workflow.ShouldContain($"domain-release.yml@{approvedBuildsSha}");
+        workflow.ShouldContain($"builds-execution-sha: {approvedBuildsSha}");
+        workflow.Split(approvedBuildsSha).Length.ShouldBe(3);
+        workflow.ShouldContain("expected-package-count: 6");
+        workflow.ShouldContain("publish-containers: false");
+        workflow.ShouldContain("HEXALITH_RELEASE_PUBLISH_ENABLED");
+        workflow.ShouldContain("NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}");
+        workflow.ShouldNotContain("secrets: inherit");
+        workflow.ShouldNotContain("--skip-duplicate");
+
+        releaseConfiguration.ShouldContain("verify-nuget-publication.py eng/release-packages.json ${nextRelease.version} --expect absent");
+        releaseConfiguration.ShouldContain("test -n \\\"$NUGET_API_KEY\\\"");
+        releaseConfiguration.ShouldContain("bash scripts/publish-release-packages.sh ${nextRelease.version}");
+        releaseConfiguration.ShouldNotContain("--skip-duplicate");
+        releaseConfiguration.ShouldNotContain("@semantic-release/changelog");
+        releaseConfiguration.ShouldNotContain("\"@semantic-release/git\"");
+        developmentDependencies.TryGetProperty("@semantic-release/changelog", out _).ShouldBeFalse();
+        developmentDependencies.TryGetProperty("@semantic-release/git", out _).ShouldBeFalse();
+        publisher.ShouldContain("dotnet nuget push");
+        publisher.ShouldContain("--expect present");
+        publisher.ShouldNotContain("--skip-duplicate");
+        publisher.IndexOf("--expect absent", StringComparison.Ordinal)
+            .ShouldBeLessThan(publisher.IndexOf("scripts/verify-release-source.py", StringComparison.Ordinal));
+        publisher.IndexOf("scripts/verify-release-source.py", StringComparison.Ordinal)
+            .ShouldBeLessThan(publisher.IndexOf("dotnet nuget push", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void FrozenReleaseShouldRemainGreenAndSkipPublicationAssertions()
+    {
+        string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/release.yml"));
+
+        workflow.ShouldContain("if [ \"${HEXALITH_RELEASE_PUBLISH_ENABLED-}\" = \"true\" ]");
+        workflow.ShouldContain("publish-enabled=false");
+        workflow.ShouldContain("Release publication frozen");
+        workflow.ShouldContain("needs.verify-source.outputs.publish-enabled == 'true'");
+        workflow.ShouldContain("if: needs.verify-source.outputs.publish-enabled == 'true'");
+        workflow.ShouldContain("needs.plan-release.outputs.release-required == 'true'");
+        workflow.ShouldContain("publication and post-publication assertions will be skipped");
+    }
+
+    [Fact]
+    public void DependencyAutomationAndCodeQlShouldCoverTheReleaseToolchain()
+    {
+        string commitlint = File.ReadAllText(ModuleLayout.ResolveModulePath("commitlint.config.mjs"));
+        string dependabot = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/dependabot.yml"));
+        string codeQl = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/codeql.yml"));
+
+        commitlint.ShouldContain("'chore'");
+        dependabot.Split("prefix: \"chore(deps)\"").Length.ShouldBe(3);
+        dependabot.ShouldContain("prefix: \"ci(deps)\"");
+        codeQl.ShouldContain("languages: csharp,javascript-typescript");
     }
 
     [Fact]
@@ -114,6 +195,15 @@ public sealed class PackageInventoryTests
         packScript.ShouldContain("clean_manifest_archives");
         packScript.ShouldContain("\"dotnet\", \"build\"");
         packScript.ShouldContain("\"--no-build\"");
+        packScript.ShouldNotContain("NuGetAudit=false");
+
+        string publicationVerifier = File.ReadAllText(
+            ModuleLayout.ResolveModulePath("scripts/verify-nuget-publication.py"));
+        publicationVerifier.ShouldContain("HTTPError");
+        publicationVerifier.ShouldContain("status == 404");
+        publicationVerifier.ShouldContain("TransientProbeError");
+        publicationVerifier.ShouldContain("publication collision");
+        publicationVerifier.ShouldContain("retry exhaustion");
 
         string verifier = File.ReadAllText(ModuleLayout.ResolveModulePath("eng/verify-story.ps1"));
         verifier.ShouldContain("Unrelated.Package.1.0.0.nupkg");
