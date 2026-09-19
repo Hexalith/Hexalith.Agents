@@ -619,7 +619,7 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-19T15:49:14Z
+Run (UTC): 2026-09-19T15:59:29Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
@@ -633,6 +633,8 @@ Run (UTC): 2026-09-19T15:49:14Z
 Result: PASS
 <!-- dev-agent-test-evidence:end -->
 ### File List
+
+#### Story 5.2 files
 
 - `.github/workflows/ci.yml`
 - `Directory.Packages.props`
@@ -757,3 +759,57 @@ Result: PASS
 - `test/Hexalith.Agents.UI.Tests/LocalizationResourceTests.cs`
 - `tests/tooling/story_review_readiness/story_review_readiness_test.py`
 - `tools/check-story-review-readiness.py`
+
+#### Inherited from Story 5.1 on main, not part of this story's change
+
+These paths entered the baseline diff through the linearly developed Story 5.1 build, package-authority, release,
+tooling, documentation, and submodule-pointer commits after Story 5.2's implementation commits. They are listed only
+to keep the readiness gate's baseline-diff reconciliation complete; Story 5.2 does not claim them as its work.
+
+- `.github/dependabot.yml`
+- `.github/workflows/codeql.yml`
+- `.github/workflows/commitlint.yml`
+- `.github/workflows/dependency-review.yml`
+- `.github/workflows/release.yml`
+- `.releaserc.json`
+- `Directory.Build.props`
+- `_bmad-output/implementation-artifacts/deferred-work-archive.md`
+- `_bmad-output/implementation-artifacts/epic-5-context.md`
+- `_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md`
+- `_bmad-output/implementation-artifacts/spec-5-1-correct-platform-hosting-boundary-and-quality-gates.md`
+- `_bmad-output/implementation-artifacts/spec-5-1-establish-build-package-boundary-and-basic-ci-gates.md`
+- `_bmad-output/implementation-artifacts/spec-implement-agents-ci-cd.md`
+- `_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/.memlog.md`
+- `_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md`
+- `_bmad-output/planning-artifacts/epics.md`
+- `_bmad-output/planning-artifacts/external-dependency-register.md`
+- `_bmad-output/planning-artifacts/launch-readiness-register.md`
+- `_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-16.md`
+- `_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23/DESIGN.md`
+- `_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23/EXPERIENCE.md`
+- `commitlint.config.mjs`
+- `eng/semantic-release-plan.mjs`
+- `eng/verify-story-5.3.ps1`
+- `eng/verify-story.ps1`
+- `global.json`
+- `package-lock.json`
+- `package.json`
+- `references/Hexalith.Builds`
+- `references/Hexalith.Commons`
+- `references/Hexalith.PolymorphicSerializations`
+- `scripts/pack-release-packages.py`
+- `scripts/publish-release-packages.sh`
+- `scripts/validate-consumer-package-references.py`
+- `scripts/validate-nuget-packages.py`
+- `scripts/verify-github-release.py`
+- `scripts/verify-nuget-publication.py`
+- `scripts/verify-release-source.py`
+- `src/Hexalith.Agents.UI/Hexalith.Agents.UI.csproj`
+- `test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs`
+- `test/Hexalith.Agents.Server.Tests/PackageVersionCentralizationTests.cs`
+- `tests/tooling/dependency_commit_contract_test.py`
+- `tests/tooling/github_release_verification_test.py`
+- `tests/tooling/release_source_proof_test.py`
+- `tests/tooling/semantic_release_plan_test.py`
+- `tests/tooling/story_review_readiness/__init__.py`
+- `tests/tooling/verify_nuget_publication_test.py`
