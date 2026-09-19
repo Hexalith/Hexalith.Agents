@@ -7,7 +7,7 @@
     [
       "@semantic-release/exec",
       {
-        "verifyReleaseCmd": "test -n \"$NUGET_API_KEY\" || { echo 'NUGET_API_KEY is required for publication.' >&2; exit 1; }; python3 scripts/verify-nuget-publication.py eng/release-packages.json ${nextRelease.version} --expect absent",
+        "verifyReleaseCmd": "test -n \"$NUGET_API_KEY\" || { echo 'NUGET_API_KEY is required for publication.' >&2; exit 1; }; test \"${nextRelease.version}\" = \"$HEXALITH_RELEASE_RESERVED_VERSION\" || { echo 'Semantic Release version does not match the reviewed release plan.' >&2; exit 1; }; python3 scripts/verify-nuget-publication.py eng/release-packages.json ${nextRelease.version} --expect absent",
         "prepareCmd": "python3 scripts/pack-release-packages.py ./nupkgs ${nextRelease.version} && python3 scripts/validate-nuget-packages.py ./nupkgs && python3 scripts/validate-consumer-package-references.py ./nupkgs",
         "publishCmd": "bash scripts/publish-release-packages.sh ${nextRelease.version}"
       }

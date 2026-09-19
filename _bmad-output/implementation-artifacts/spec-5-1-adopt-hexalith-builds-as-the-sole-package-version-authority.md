@@ -285,7 +285,7 @@ context:
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-18T05:42:29Z
+Run (UTC): 2026-09-18T07:34:09Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
@@ -318,6 +318,10 @@ Result: PASS
 - `eng/verify-story-5.2.ps1`
 - `eng/verify-story.ps1`
 - `references/Hexalith.Builds`
+- `references/Hexalith.Commons`
+- `references/Hexalith.Conversations`
+- `references/Hexalith.EventStore`
+- `references/Hexalith.FrontComposer`
 - `scripts/validate-consumer-package-references.py`
 - `scripts/validate-nuget-packages.py`
 - `test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs`

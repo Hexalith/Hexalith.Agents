@@ -108,6 +108,7 @@ public sealed class PackageInventoryTests
         workflow.ShouldContain("./eng/verify-story-5.2.ps1 -PackageFloorOnly");
         workflow.ShouldContain("python3 -m unittest discover -s tests/tooling -p '*_test.py'");
         workflow.ShouldContain("git -c submodule.recurse=false submodule update --init");
+        workflow.ShouldContain("timeout-minutes: 30");
         workflow.ShouldNotContain("dotnet test");
         workflow.ShouldNotContain("--recursive");
     }
@@ -134,6 +135,8 @@ public sealed class PackageInventoryTests
         workflow.ShouldContain($"builds-execution-sha: {approvedBuildsSha}");
         workflow.Split(approvedBuildsSha).Length.ShouldBe(3);
         workflow.ShouldContain("expected-package-count: 6");
+        workflow.ShouldContain("reserved-version: ${{ needs.plan-release.outputs.version }}");
+        workflow.Split("timeout-minutes: 10").Length.ShouldBe(3);
         workflow.ShouldContain("publish-containers: false");
         workflow.ShouldContain("HEXALITH_RELEASE_PUBLISH_ENABLED");
         workflow.ShouldContain("NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}");
@@ -142,6 +145,7 @@ public sealed class PackageInventoryTests
 
         releaseConfiguration.ShouldContain("verify-nuget-publication.py eng/release-packages.json ${nextRelease.version} --expect absent");
         releaseConfiguration.ShouldContain("test -n \\\"$NUGET_API_KEY\\\"");
+        releaseConfiguration.ShouldContain("test \\\"${nextRelease.version}\\\" = \\\"$HEXALITH_RELEASE_RESERVED_VERSION\\\"");
         releaseConfiguration.ShouldContain("bash scripts/publish-release-packages.sh ${nextRelease.version}");
         releaseConfiguration.ShouldNotContain("--skip-duplicate");
         releaseConfiguration.ShouldNotContain("@semantic-release/changelog");
