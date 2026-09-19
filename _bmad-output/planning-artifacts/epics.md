@@ -163,7 +163,7 @@ NFR10: Cost Control - Hard numeric per-tenant monthly and per-call caps warn at 
 - NFR-13 evidence covers every interactive V1 route and high-impact state for WCAG 2.2 AA, keyboard/focus/semantic/live-region behavior, whole-string English/French parity, FrontComposer/Fluent V5 inheritance, and restrictive-viewport blocking.
 - NFR-14 uses authenticated browser-monotonic, kind-discriminated samples correlated to safe server evidence; each sample kind requires at least 30 production-like executions and missing/invalid ticks, correlation, localized live-region mutation, or samples yields `InsufficientEvidence`.
 - Public contracts are versioned and additive-first. Evidence Levels retain PRD meanings: Level 1 structure, Level 2 pure behavior, Level 3 fail-closed deferred seam, Level 4 live component, and Level 5 production-like cross-system evidence.
-- The active stack baseline is the Architecture Spine's current Stack table. The root SDK `10.0.401` with `latestPatch`, `net10.0`, C# 14, and `.slnx` selections remain explicit; every dependency/package-reference version comes exclusively from the root-recorded Hexalith.Builds catalog. At Builds commit `000abf867abc3a99cfa74d39b6e73af05c78a602`, the effective selections include EventStore `3.106.0`, the Dapr .NET/Actors/Workflow family `1.18.7`, FluentValidation `12.1.1`, OpenTelemetry `1.18.0`, Fluent UI Blazor `5.0.0-rc.5-26219.1`, xUnit v3 `4.0.1`, Microsoft.NET.Test.Sdk `18.10.0`, Shouldly `4.3.0`, NSubstitute `6.2.0`, and bunit `2.11.3`. Story 5.1 compatibility evidence covers only Dapr Client/ASP.NET/Actors as currently consumed through EventStore; Workflow remains Story 6.1 work, and `ARCH-A-15` stays open pending exact Security + Builds Maintainer approval of `OD-DAPR-SECURITY-1`. Story compatibility floors may constrain the shared selection but may not create an Agents-local pin. Hosting plus Provider/Agent Framework SDKs remain unselected until their dependency records commit them. MediatR `14.2.0` is declared transitively by the `Hexalith.Agents.EventStore` integration package; the platform service that first loads it owns license compliance before deployment.
+- The active stack baseline is the Architecture Spine's current Stack table. The root SDK `10.0.401` with `latestPatch`, `net10.0`, C# 14, and `.slnx` selections remain explicit; every dependency/package-reference version comes exclusively from the root-recorded Hexalith.Builds catalog. At the current Builds gitlink `a74e783bd253d8f9f6b8bed22e65855ac0f96306`, the effective selections include EventStore `3.106.0`, the Dapr .NET/Actors/Workflow family `1.18.7`, FluentValidation `12.1.1`, OpenTelemetry `1.18.0`, Fluent UI Blazor `5.0.0-rc.5-26219.1`, xUnit v3 `4.0.1`, Microsoft.NET.Test.Sdk `18.10.1`, Shouldly `4.3.0`, NSubstitute `6.2.0`, and bunit `2.11.3`. Story 5.1 compatibility evidence covers only Dapr Client/ASP.NET/Actors as currently consumed through EventStore; Workflow remains Story 6.1 work, and `ARCH-A-15` stays open pending exact Security + Builds Maintainer approval of `OD-DAPR-SECURITY-1`. Story compatibility floors may constrain the shared selection but may not create an Agents-local pin. Hosting plus Provider/Agent Framework SDKs remain unselected until their dependency records commit them. MediatR `14.2.0` is declared transitively by the `Hexalith.Agents.EventStore` integration package; the platform service that first loads it owns license compliance before deployment.
 - The external-dependency register is the only commitment authority for all twelve records: `EXT-CONV-AI-1`, `EXT-CONV-UI-1`, optional `EXT-CONV-RETRACTION-1`, `EXT-HOST-1`, `EXT-PROVIDER-1`, `EXT-SAFETY-1`, `EXT-TOKEN-1`, `EXT-SECRETS-1`, `EXT-EXPORT-STORE-1`, `EXT-PROTECTION-1`, `EXT-TOPOLOGY-1`, and `EXT-PARTIES-1`; any `Uncommitted` record blocks launch evidence for its consuming stories. Optional retraction has no consumer unless Product selects OQ-23's branch. The register's `EXT-PARTIES-1` development allowance permits its fourteen direct human/identity consumers — Stories 5.2, 5.4, 5.5, 6.6, 7.1–7.5, 8.1–8.4, and 8.8 — to build against Branch-B-compatible identity-by-id behavior where applicable, but cannot establish human actor-binding, separation-of-duty, launch evidence, or `RQ-1` until the record is `Available` and its compatibility command passes.
 - The launch-readiness register is the machine-testable callability and qualification authority. `RQ-1` is a non-estimated release gate outside the development backlog and currently returns NOT READY.
 
@@ -1238,7 +1238,7 @@ So that every later Agents change is built and consumed through the corrected pl
 **Dependencies:**
 
 - **Prior stories:** None.
-- **External:** EXT-HOST-1 must be at least Committed before this story can enter ready-for-dev; its target contract is needed to remove the old ownership without inventing a replacement.
+- **External:** The original `EXT-HOST-1` entry gate was satisfied by the Platform Maintainer's accepted 2026-08-09 commitment for the platform-owned host boundary. The later expanded, currently `Uncommitted` host contract does not reopen this completed boundary story; Story 5.6 owns production-like composition and live-host compatibility.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
@@ -1268,10 +1268,10 @@ So that every later Agents change is built and consumed through the corrected pl
 **Then** a named source/package/boundary/basic test gate fails with a support-safe diagnostic that identifies Hexalith.Builds as the package-version owner
 **And** the gate never weakens warnings-as-errors or initializes nested submodules.
 
-**Given** EXT-HOST-1 is Uncommitted, missing an immutable target, date, or executable compatibility command
-**When** readiness for this story is evaluated
-**Then** the story remains backlog and cannot move to ready-for-dev
-**And** no local path, package already present, or historical AppHost is inferred as the platform commitment.
+**Given** the expanded current `EXT-HOST-1` contract is Uncommitted, missing an immutable target, date, or executable compatibility command
+**When** Story 5.1 completion and live-host readiness are evaluated
+**Then** the completed build/package boundary remains valid while Story 5.6 and production-like host qualification stay fail-closed
+**And** no local path, package already present, historical AppHost, or Story 5.1 evidence is inferred as current live-host availability.
 
 **Evidence Manifest:**
 
@@ -1279,12 +1279,12 @@ So that every later Agents change is built and consumed through the corrected pl
 | --- | --- |
 | Requirements | FR21, FR23; NFR3, NFR4; UX: not applicable to this non-UI boundary outcome; AD-1, AD-15, AD-16, AD-17 |
 | OwnedClauses | FR21.external-dependency-entry-gate; FR23.no-internal-contract-leak; FR23.package-consumer-compatibility; NFR3.clean-build-integrity; NFR4.actionable-ci-diagnostics; AD-1.domain-module-boundary; AD-15.public-surface-boundary; AD-16.platform-owned-host; AD-17.source-package-boundary-gates |
-| Dependencies | EXT-HOST-1 at Committed or Available; no prior story |
+| Dependencies | Original EXT-HOST-1 boundary commitment accepted 2026-08-09; expanded current host-composition contract belongs to Story 5.6; no prior story |
 | EvidenceLevel | Levels 1-3: structure, package-consumer behavior, and fail-closed deferred host seam |
 | TestOrArtifact | StructuralSeedConformanceTests; BuildContractConformanceTests; PackageVersionCentralizationTests; PackageDependencyModeTests; PublicContractPackageBoundaryTests; PackageInventoryTests; clean-checkout CI transcript; produced package inventory; isolated package-consumer probe |
 | VerificationCommand | pwsh -NoProfile -File ./eng/verify-story.ps1 -Story 5.1 |
 | NegativeEvidence | ForbiddenHostingOwnershipTests; BuildContractConformanceTests missing-catalog and Pack/Publish probes; PackageVersionCentralizationTests shared-validator override probes; `eng/verify-story.ps1` source/package dependency-mode failures |
-| Result | Passed 2026-09-17 — the complete Story 5.1 verifier is green with 2,962 Debug/source and 2,938 Release/package tests, shared-authority negatives, exact package inventory, and isolated package consumption; workflow review remains separate from the evidence result |
+| Result | Done 2026-09-19 — at Agents HEAD `1b0a65b62df5ee9dca2326d448c4bf56144f9967`, the complete Story 5.1 verifier passed 2,968 Debug/source and 2,944 Release/package tests with zero failures or skips, shared-authority and dependency-mode negatives, exact six-package inspection, and isolated six-package consumption |
 
 ### Story 5.2: Configure hexa Through Live EventStore Operations
 

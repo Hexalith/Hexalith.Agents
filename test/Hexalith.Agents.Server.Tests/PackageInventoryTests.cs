@@ -2,6 +2,7 @@ namespace Hexalith.Agents.Server.Tests;
 
 using System.IO;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 using Shouldly;
@@ -212,5 +213,29 @@ public sealed class PackageInventoryTests
         string verifier = File.ReadAllText(ModuleLayout.ResolveModulePath("eng/verify-story.ps1"));
         verifier.ShouldContain("Unrelated.Package.1.0.0.nupkg");
         verifier.ShouldContain("Package automation deleted an unrelated caller-owned archive.");
+        (string Path, int Debug, int Release)[] expectedTestFloors =
+        [
+            ("test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj", 529, 529),
+            ("test/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj", 6, 6),
+            ("test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj", 787, 787),
+            ("test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj", 573, 549),
+            ("test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj", 1073, 1073),
+        ];
+        foreach ((string testProject, int debugMinimum, int releaseMinimum) in expectedTestFloors)
+        {
+            string policyPattern =
+                $"Path\\s*=\\s*'{Regex.Escape(testProject)}'\\s+" +
+                $"DebugMinimumExpectedTests\\s*=\\s*{debugMinimum}\\s+" +
+                $"ReleaseMinimumExpectedTests\\s*=\\s*{releaseMinimum}";
+            Regex.IsMatch(verifier, policyPattern, RegexOptions.CultureInvariant)
+                .ShouldBeTrue($"Story 5.1 must retain the Debug and Release minimum test floors for '{testProject}'.");
+        }
+
+        verifier.ShouldContain(
+            "dotnet test --project $testProject.Path -c Debug --no-build -p:UseHexalithProjectReferences=true --minimum-expected-tests $testProject.DebugMinimumExpectedTests --fail-skips on");
+        verifier.ShouldContain(
+            "dotnet test --project $testProject.Path -c Release --no-build -p:UseHexalithProjectReferences=false --minimum-expected-tests $testProject.ReleaseMinimumExpectedTests --fail-skips on");
+        verifier.Split("--fail-skips").Length.ShouldBe(3);
+        verifier.Split("--minimum-expected-tests").Length.ShouldBe(3);
     }
 }

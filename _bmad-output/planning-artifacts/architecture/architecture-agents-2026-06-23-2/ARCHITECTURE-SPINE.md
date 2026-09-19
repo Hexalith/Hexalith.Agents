@@ -7,8 +7,8 @@ paradigm: event-sourced Dapr-Workflow-orchestrated hexagonal Hexalith domain mod
 scope: Hexalith Agents module in the agents workspace
 status: final
 created: 2026-06-23
-updated: 2026-09-17
-architecture_assumption_index_version: 13
+updated: 2026-09-19
+architecture_assumption_index_version: 14
 binds:
   - PRD FR-1..FR-34
   - PRD NFR-1..NFR-14
@@ -440,7 +440,7 @@ Provider output is not itself authority to persist a proposal. A Provider error 
 
 - **Binds:** deployment and environments.
 - **Prevents:** domain modules duplicating or contradicting platform hosting, Dapr, telemetry, health, identity, secrets, or EventStore plumbing.
-- **Rule:** Hexalith Agents ships no module-owned AppHost, Aspire, or ServiceDefaults project; guard tests enforce the boundary. It exposes the reusable Agents domain service through the shared EventStore DomainService SDK host and owns domain-specific UI assets. The platform-owned host committed as `EXT-HOST-1` must compose that service and UI with EventStore, Conversations, Parties, Tenants, Provider adapters, the Content Safety adapter, the readiness registry, capacity admission, browser evidence ingestion, and Dapr Workflow for local, test, and deployed environments, and owns Dapr sidecars, telemetry, health, secrets through `EXT-SECRETS-1`, identity, backup/restore procedure, and EventStore security wiring. Hosting package versions are the platform's, not the spine's.
+- **Rule:** Hexalith Agents ships no module-owned AppHost, Aspire, or ServiceDefaults project; guard tests enforce the boundary. It exposes the reusable Agents domain service through the shared EventStore DomainService SDK host and owns domain-specific UI assets. Story 5.1 completed that module/package boundary after the original `EXT-HOST-1` entry commitment was accepted; later expansions of the host contract do not reopen it. Story 5.6 owns the current production-like host composition and compatibility evidence. That platform-owned host must compose the service and UI with EventStore, Conversations, Parties, Tenants, Provider adapters, the Content Safety adapter, the readiness registry, capacity admission, browser evidence ingestion, and Dapr Workflow for local, test, and deployed environments, and owns Dapr sidecars, telemetry, health, secrets through `EXT-SECRETS-1`, identity, backup/restore procedure, and EventStore security wiring. Hosting package versions are the platform's, not the spine's.
 
 ### AD-17 - Readiness Registry, Freshness, Projections, And Test Gates
 
@@ -901,7 +901,7 @@ sequenceDiagram
 | C# language | `14` from root `Directory.Build.props` |
 | Solution format | `.slnx` |
 | Package management | Central Package Management via an import-only Agents `Directory.Packages.props` that resolves `Hexalith.Builds/Props/Directory.Packages.props` in supported standalone and parent/sibling layouts. Hexalith.Builds is the sole package-version authority: Agents declares no `PackageVersion`, dependency-version property, or `VersionOverride`; compatibility floors are checked against the effective imported selection. |
-| Hexalith.Builds | Story 5.1 root gitlink target `000abf867abc3a99cfa74d39b6e73af05c78a602`; catalog commit `dae84d5f96911517eb1e6f97e75eb88e759e6d8a` selects EventStore `3.106.0`, and the following audit commit binds the generated catalog evidence. Builds `origin/main` contains the target and Agents `origin/main` records that exact gitlink. |
+| Hexalith.Builds | Current root gitlink `a74e783bd253d8f9f6b8bed22e65855ac0f96306`, recorded by Agents commit `d0f08bf3945d1869e08beed82881eadf8a654527`; Builds and Agents `origin/main` contain those exact commits. The imported catalog preserves EventStore `3.106.0` and Dapr `1.18.7` while selecting Microsoft.NET.Test.Sdk `18.10.1`. |
 | Hexalith.EventStore | root parent gitlink `76051c70cbf868c40edc00ca0344fa5bd8879b69` (`v3.106.0`) at the spine `updated` date |
 | Hexalith.Conversations | parent gitlink `fd3dd58c3c10b512c79cc425f94d57c4d3400b20` at the spine `updated` date |
 | Hexalith.Parties | parent gitlink `14d249fde316b0002aec84351d7a7cdf953d1d30` at the spine `updated` date |
@@ -917,7 +917,7 @@ sequenceDiagram
 | xUnit v3 | `4.0.1` from the imported Builds catalog; root `global.json` selects Microsoft Testing Platform through `test.runner` |
 | Shouldly | `4.3.0` from the imported Builds catalog |
 | NSubstitute | `6.2.0` from the imported Builds catalog |
-| Microsoft.NET.Test.Sdk | `18.10.0` from the imported Builds catalog |
+| Microsoft.NET.Test.Sdk | `18.10.1` from the imported Builds catalog |
 | xunit.runner.visualstudio | `4.0.0` from the imported Builds catalog |
 | bunit | `2.11.3` from the imported Builds catalog |
 | Provider SDK | `Unselected` until `EXT-PROVIDER-1` is committed |
@@ -1351,9 +1351,9 @@ The amended rules above are the convergence contract; they do not claim current 
 | Current approval orchestration appends to Conversations before EventStore dispatch and the current approval policy emits `Approved`, `PostingPending`, and the posting result together. It does not implement AD-5's durable `Approved` then `PostingPending` authorization-before-effect protocol. | Story 7.4 refactor plus durable-before-post concurrency, lost-ack, and recovery evidence |
 | Current interaction code maps an output-safety block to `SafetyFailed`, but Product + Security have not approved `OD-INITIAL-OUTPUT-SAFETY-STATUS-1`; it also lacks the generic committed Provider lease followed by an immutable `ProviderInvocationAuthorized`/`ProviderInvocationNotAuthorized` branch and phase-pinned selected status/reason/metric/open-lease mapping. Shipped behavior is implementation reality/debt and is not architecture authority. | Stories 6.1 and 6.3; implement the safe not-authorized settlement branch now, and after the Product decision is approved add phase-pinned authorization/result/recovery evidence and reconcile the public contract to the selected outcome |
 | Public readiness, interaction, mirror, resolution, capacity, and blocker vocabulary is incomplete. | Stories 5.6, 6.2, 6.6, 7.1, 7.4 through 7.6, and 8.5 |
-| Story 5.1's package-authority implementation and patch verifier are green, Builds `origin/main` contains the selected catalog/audit commit, and Agents commit `01ead38` published on `origin/main` records the exact gitlink. Compatibility evidence covers the currently consumed Dapr Client/ASP.NET/Actors graph only; Dapr Workflow remains unreferenced. | `ARCH-A-15` remains open pending exact Security + Builds Maintainer approval of `OD-DAPR-SECURITY-1`; Story 6.1 owns Workflow adoption and its compatibility evidence, while no Story 5.1 package-publication debt remains |
-| Story 5.1's complete verifier is green; its workflow state remains governed by `sprint-status.yaml` rather than duplicated here. Story 5.2 remains `review`: the EventStore floor is resolved, while independent review blockers and `EXT-HOST-1` remain. | Complete Story 5.1 workflow review and Story 5.2's independent review work; do not conflate dependency repair with historical completion |
-| Package/build conformance now verifies the imported Builds catalog, supported checkout layouts, source-policy negatives, exact package inventory, and isolated consumption. Other legacy structural/runtime assertions remain Story 5.6 debt. | Story 5.6/build maintenance |
+| Story 5.1's package-authority implementation and current verifier are green. Builds `origin/main` contains `a74e783bd253d8f9f6b8bed22e65855ac0f96306`, and Agents commit `d0f08bf3945d1869e08beed82881eadf8a654527` on `origin/main` records that exact gitlink. Compatibility evidence covers the currently consumed Dapr Client/ASP.NET/Actors graph only; Dapr Workflow remains unreferenced. | `ARCH-A-15` remains open pending exact Security + Builds Maintainer approval of `OD-DAPR-SECURITY-1`; Story 6.1 owns Workflow adoption and its compatibility evidence, while no Story 5.1 package-publication debt remains |
+| Story 5.1 is done after its 2026-09-19 complete verifier passed at Agents HEAD `1b0a65b62df5ee9dca2326d448c4bf56144f9967`. Story 5.2 remains `review` for independent blockers. The expanded `EXT-HOST-1` contract is Story 5.6/live-host work and does not reopen Story 5.1. | Continue Story 5.2's independent review work and Story 5.6's production-like host composition without conflating either with Story 5.1 completion |
+| Package/build conformance verifies the imported Builds catalog, supported checkout layouts, source-policy negatives, exact six-package inventory, and isolated six-package consumption. Other legacy structural/runtime assertions remain Story 5.6 debt. | Story 5.6/build maintenance |
 
 ## External V1 Prerequisites
 
@@ -1378,9 +1378,9 @@ Consuming stories, targets, and commitment status are read from the register; st
 
 ## Architecture Assumptions
 
-**Architecture Assumption Index:** `ARCH-A-INDEX-13`
+**Architecture Assumption Index:** `ARCH-A-INDEX-14`
 
-Spine-originated assumptions are keyed so each affected evaluation can name them as `UnretiredAssumption` blockers alongside the scoped PRD section 8.1 rows the ADs cite inline. Every current `ARCH-A` row affects `RQ-1` unless its row explicitly names a narrower evaluation; an `RQ-1` decision records the exact index version it evaluated and each blocker names the row, affected evaluation, and `ARCH-A-INDEX-13`. Adding or retiring a row, or changing an assumption, owner, affected scope, or retirement condition, increments `architecture_assumption_index_version` and the rendered index identifier in the same change. An unscheduled Architecture-owned `RQ-1` row remains a blocker until its co-owners approve a date. PRD A-28 is not a Spine row and remains scoped only to `AutomaticModeEnablementEligibility`. ARCH-A-4's SDK observation remains scoped to Windows and the present dependency graph as stated in Stack; any future direct `Microsoft.DiaSymReader.Native` reference must independently meet the advisory's patched component floor.
+Spine-originated assumptions are keyed so each affected evaluation can name them as `UnretiredAssumption` blockers alongside the scoped PRD section 8.1 rows the ADs cite inline. Every current `ARCH-A` row affects `RQ-1` unless its row explicitly names a narrower evaluation; an `RQ-1` decision records the exact index version it evaluated and each blocker names the row, affected evaluation, and `ARCH-A-INDEX-14`. Adding or retiring a row, or changing an assumption, owner, affected scope, or retirement condition, increments `architecture_assumption_index_version` and the rendered index identifier in the same change. An unscheduled Architecture-owned `RQ-1` row remains a blocker until its co-owners approve a date. PRD A-28 is not a Spine row and remains scoped only to `AutomaticModeEnablementEligibility`. ARCH-A-4's SDK observation remains scoped to Windows and the present dependency graph as stated in Stack; any future direct `Microsoft.DiaSymReader.Native` reference must independently meet the advisory's patched component floor.
 
 | Key | Assumption | Where | Owner | Retired when | TargetRetirementDate |
 | --- | --- | --- | --- | --- | --- |
@@ -1398,7 +1398,7 @@ Spine-originated assumptions are keyed so each affected evaluation can name them
 | ARCH-A-12 | The per-tenant `DigestKey` is versioned rather than singular, every issued version is custodied indefinitely by `EXT-SECRETS-1` while any digest under it survives, and Platform Operator-initiated rotation is unrestricted and content-free | AD-13, AD-22, AD-29 | Architecture + Security | Security confirms the versioned-key rotation policy or a different key-lifecycle procedure supersedes it | Unscheduled — revisit before `RQ-1` evaluation |
 | ARCH-A-13 | **RETIRED 2026-09-12.** The Eligible Approver predicate excludes the Approver who requested regeneration of the version under decision, in addition to the caller and last editor | AD-8 | Architecture + Product | Retired by the user's Product decision and synchronized PRD FR-7 wording | 2026-09-12 |
 | ARCH-A-14 | The `PostingPending` stored attempt-timeout deadline (FR-18: "no shorter than the AD-6 `EXT-CONV-AI-1` seam-2 posting timeout") has no concrete duration fixed by the PRD or this spine | AD-5, AD-28 | Architecture | Architecture proposes a concrete duration, or defers explicitly to the seam's own configured timeout, and Product confirms | Unscheduled — revisit before the `PostingPending` timeout/recovery story |
-| ARCH-A-15 | The parent-authoritative Builds catalog selects the complete Dapr Client/ASP.NET/Actors/Workflow family at official `1.18.7`, and Agents commit `01ead38` published on `origin/main` records that gitlink. Story 5.1 compatibility evidence covers only Client/ASP.NET/Actors as currently consumed through EventStore; Workflow remains unconsumed and its adoption and compatibility evidence belong to Story 6.1. | Stack, AD-16, AD-18 | Architecture + Security + Builds Maintainer | Security + Builds Maintainer approve `OD-DAPR-SECURITY-1` at its exact decision version; Workflow adoption additionally requires Story 6.1 compatibility evidence | Unscheduled — revisit before Story 6.1 or `RQ-1` evaluation |
+| ARCH-A-15 | The parent-authoritative Builds catalog at gitlink `a74e783bd253d8f9f6b8bed22e65855ac0f96306` selects the complete Dapr Client/ASP.NET/Actors/Workflow family at official `1.18.7`, and Agents commit `d0f08bf3945d1869e08beed82881eadf8a654527` on `origin/main` records that gitlink. Story 5.1 compatibility evidence covers only Client/ASP.NET/Actors as currently consumed through EventStore; Workflow remains unconsumed and its adoption and compatibility evidence belong to Story 6.1. | Stack, AD-16, AD-18 | Architecture + Security + Builds Maintainer | Security + Builds Maintainer approve `OD-DAPR-SECURITY-1` at its exact decision version; Workflow adoption additionally requires Story 6.1 compatibility evidence | Unscheduled — revisit before Story 6.1 or `RQ-1` evaluation |
 
 ## Deferred Beyond V1
 

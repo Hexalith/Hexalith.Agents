@@ -186,3 +186,11 @@ Result: PASS
 ### File List
 
 - `_bmad-output/implementation-artifacts/spec-5-1-correct-platform-hosting-boundary-and-quality-gates.md`
+
+## Current Closure Evidence (2026-09-19)
+
+- At Agents HEAD `1b0a65b62df5ee9dca2326d448c4bf56144f9967`, `pwsh -NoProfile -File ./eng/verify-story.ps1 -Story 5.1` passed the shared-package-authority and EventStore-floor gates, warning-free Debug/source and Release/package builds, all configured tests, the three dependency-mode negative probes, exact package validation, and isolated package consumption.
+- The current root-recorded Hexalith.Builds gitlink is `a74e783bd253d8f9f6b8bed22e65855ac0f96306`. Its imported catalog selects EventStore `3.106.0` and Microsoft.NET.Test.Sdk `18.10.1`.
+- The current release manifest contains exactly six packages: `Hexalith.Agents.Contracts`, `Hexalith.Agents.EventStore`, `Hexalith.Agents.Client`, `Hexalith.Agents`, `Hexalith.Agents.UI`, and `Hexalith.Agents.Testing`.
+- The five-package statements in the 2026-08-04 Executed Evidence and Auto Run Result above are historical evidence from before `Hexalith.Agents.EventStore` joined the manifest; they do not describe the current inventory.
+- The current run passed 2,968 Debug/source tests and 2,944 Release/package tests with zero failures or skips. Release totals were Client 6, Contracts 529, Server 549, Agents 787, and UI 1,073.

@@ -327,3 +327,11 @@ Result: PASS
 - `test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs`
 - `test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs`
 - `test/Hexalith.Agents.Server.Tests/PackageVersionCentralizationTests.cs`
+
+## Current Closure Evidence (2026-09-19)
+
+- At Agents HEAD `1b0a65b62df5ee9dca2326d448c4bf56144f9967`, the complete Story 5.1 verifier passed shared catalog authority, the 13-row EventStore `3.106.0 >= 3.105.0` floor, warning-free source/package builds, every configured test with zero skips, fail-closed dependency-mode probes, exact six-package inspection, and isolated six-package consumption.
+- The current root-recorded Hexalith.Builds gitlink is `a74e783bd253d8f9f6b8bed22e65855ac0f96306`, recorded by Agents commit `d0f08bf3945d1869e08beed82881eadf8a654527`. The imported catalog currently selects Microsoft.NET.Test.Sdk `18.10.1` while preserving EventStore `3.106.0` and Dapr `1.18.7`.
+- References above to Builds gitlink `000abf867abc3a99cfa74d39b6e73af05c78a602` and Microsoft.NET.Test.Sdk `18.10.0` are dated 2026-09-16 through 2026-09-18 historical evidence. They remain immutable review history and are not current catalog claims.
+- The current release manifest contains exactly six packages: `Hexalith.Agents.Contracts`, `Hexalith.Agents.EventStore`, `Hexalith.Agents.Client`, `Hexalith.Agents`, `Hexalith.Agents.UI`, and `Hexalith.Agents.Testing`. The current run passed 2,968 Debug/source tests and 2,944 Release/package tests with zero failures or skips.
+- `DW-22` remains open because this run did not perform its mutated-package asset-exclusion experiment. `OD-DAPR-SECURITY-1` also remains Open: Story 5.1 proves only the consumed Client/ASP.NET/Actors graph, while Workflow adoption and compatibility evidence remain Story 6.1 work.

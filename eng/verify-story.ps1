@@ -16,11 +16,31 @@ $consumerAuthorityValidator = Join-Path $root 'references/Hexalith.Builds/Tools/
 $authoritativeCatalog = Join-Path $root 'references/Hexalith.Builds/Props/Directory.Packages.props'
 $packageDirectory = Join-Path $root 'artifacts/story-5.1/packages'
 $testProjects = @(
-    'test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj',
-    'test/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj',
-    'test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj',
-    'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj',
-    'test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj'
+    [PSCustomObject]@{
+        Path = 'test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj'
+        DebugMinimumExpectedTests = 529
+        ReleaseMinimumExpectedTests = 529
+    }
+    [PSCustomObject]@{
+        Path = 'test/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj'
+        DebugMinimumExpectedTests = 6
+        ReleaseMinimumExpectedTests = 6
+    }
+    [PSCustomObject]@{
+        Path = 'test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj'
+        DebugMinimumExpectedTests = 787
+        ReleaseMinimumExpectedTests = 787
+    }
+    [PSCustomObject]@{
+        Path = 'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj'
+        DebugMinimumExpectedTests = 573
+        ReleaseMinimumExpectedTests = 549
+    }
+    [PSCustomObject]@{
+        Path = 'test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj'
+        DebugMinimumExpectedTests = 1073
+        ReleaseMinimumExpectedTests = 1073
+    }
 )
 $unrelatedPackage = Join-Path $packageDirectory 'Unrelated.Package.1.0.0.nupkg'
 
@@ -109,8 +129,8 @@ try {
     dotnet build $solution -c Debug --no-restore -warnaserror -p:UseHexalithProjectReferences=true /m:1 /nr:false
 
     foreach ($testProject in $testProjects) {
-        Write-Host "Gate: test $testProject"
-        dotnet test $testProject -c Debug --no-build -p:UseHexalithProjectReferences=true
+        Write-Host "Gate: test $($testProject.Path) (minimum $($testProject.DebugMinimumExpectedTests))"
+        dotnet test --project $testProject.Path -c Debug --no-build -p:UseHexalithProjectReferences=true --minimum-expected-tests $testProject.DebugMinimumExpectedTests --fail-skips on
     }
 
     Write-Host 'Gate: package-build'
@@ -118,8 +138,8 @@ try {
     dotnet build $solution -c Release --no-restore -warnaserror -p:UseHexalithProjectReferences=false /m:1 /nr:false
 
     foreach ($testProject in $testProjects) {
-        Write-Host "Gate: package test $testProject"
-        dotnet test $testProject -c Release --no-build -p:UseHexalithProjectReferences=false
+        Write-Host "Gate: package test $($testProject.Path) (minimum $($testProject.ReleaseMinimumExpectedTests))"
+        dotnet test --project $testProject.Path -c Release --no-build -p:UseHexalithProjectReferences=false --minimum-expected-tests $testProject.ReleaseMinimumExpectedTests --fail-skips on
     }
 
     Write-Host 'Gate: executable dependency-mode failures'
