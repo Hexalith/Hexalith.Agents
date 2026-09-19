@@ -131,10 +131,10 @@ The invocation uses the earlier combined title, while the current Epic 5 plan se
 
 **Executed evidence (2026-08-04):**
 
-- `pwsh ./eng/verify-story.ps1 -Story 5.1` -- passed end to end: Debug/source restore and warning-free build; Contracts 327/327, Client 6/6, Domain 724/724, Server 385/385, and UI 968/968 tests (2,410 total); Release/package restore and warning-free build; Contracts 327/327, Client 6/6, Domain 724/724, Server 361/361, and UI 968/968 tests (2,386 total).
+- `pwsh ./eng/verify-story.ps1 -Story 5.1` -- passed end to end across the Debug/source and Release/package builds and every configured test project; fresh numeric results belong only in the generated Dev Agent Record evidence.
 - The verifier's executable negative gates rejected Release+source mode, pack+source mode, and a missing EventStore source root with exit code 1 and their intended diagnostics.
 - Release packaging rebuilt every manifest project at version `0.0.0-story-5-1`, preserved the unrelated output sentinel, produced and inspected the exact five-package inventory, and built the isolated consumer with every local Agents package proven to originate from the isolated feed and no project/source-path resolution.
-- `dotnet build` and the complete package-mode Server boundary suite -- passed warning-free with 361/361 tests; Python syntax and package/consumer validation checks also passed.
+- `dotnet build` and the complete package-mode Server boundary suite passed warning-free; Python syntax and package/consumer validation checks also passed.
 - Aspire pre-change baseline did not produce live evidence: `aspire start --apphost src/Hexalith.Agents.AppHost/Hexalith.Agents.AppHost.csproj --format Json --non-interactive` timed out after 120 seconds during restore with a local OpenSSL certificate-trust warning.
 
 ## Auto Run Result
@@ -155,6 +155,34 @@ The invocation uses the earlier combined title, while the current Epic 5 plan se
 
 **Follow-up review recommendation:** `true`; patched findings were high severity (high 9, medium 5, low 0; weighted medium/low score 15, with the high-severity rule independently requiring follow-up).
 
-**Verification:** `pwsh ./eng/verify-story.ps1 -Story 5.1` passed independently after review fixes: warning-free Debug/source and Release/package builds; 2,410 source-mode tests; 2,386 package-mode tests; three intended negative dependency-mode failures; exact five-package validation at `0.0.0-story-5-1`; unrelated-output preservation; and an isolated local-feed consumer build with no project or source-path resolution. `git diff --check` also passed.
+**Verification:** `pwsh ./eng/verify-story.ps1 -Story 5.1` passed independently after review fixes: warning-free Debug/source and Release/package builds; all configured suites passed; the intended negative dependency-mode checks failed closed; exact package validation, unrelated-output preservation, and an isolated local-feed consumer build completed without project or source-path resolution. `git diff --check` also passed.
 
 **Residual risks:** The new GitHub Actions workflow has not run on the remote service in this local execution. The pre-change Aspire host could not provide live baseline evidence before its removal because restore timed out. Platform-host composition remains an external operator commitment under `EXT-HOST-1`; the frontmatter records the required operator handoff without marking the story blocked.
+
+## Dev Agent Record
+
+### Completion Notes
+
+- Repaired the historical story record without changing product implementation or lifecycle status. The generated block below is the sole current numeric test evidence.
+- The File List reflects the exact repository change set validated by the review-readiness gate; the original Story 5.1 implementation scope remains documented in the Code Map and Auto Run Result.
+
+<!-- dev-agent-test-evidence:start -->
+### Latest Release Test Evidence
+
+Run (UTC): 2026-09-19T09:33:14Z
+
+| Test project | Total | Passed | Failed | Skipped | Pending | Other |
+|---|---:|---:|---:|---:|---:|---:|
+| Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Contracts.Tests | 529 | 529 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 549 | 549 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Tests | 787 | 787 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.UI.Tests | 1073 | 1073 | 0 | 0 | 0 | 0 |
+| **Total** | 2944 | 2944 | 0 | 0 | 0 | 0 |
+
+Result: PASS
+<!-- dev-agent-test-evidence:end -->
+
+### File List
+
+- `_bmad-output/implementation-artifacts/spec-5-1-correct-platform-hosting-boundary-and-quality-gates.md`
