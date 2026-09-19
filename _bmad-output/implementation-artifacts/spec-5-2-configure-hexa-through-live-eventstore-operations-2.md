@@ -619,20 +619,18 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-15T07:48:31Z
+Run (UTC): 2026-09-19T15:49:14Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Contracts.Tests | 528 | 528 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 512 | 512 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Tests | 780 | 780 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Contracts.Tests | 529 | 529 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 549 | 549 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Tests | 787 | 787 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1073 | 1073 | 0 | 0 | 0 | 0 |
-| **Total** | 2899 | 2899 | 0 | 0 | 0 | 0 |
+| **Total** | 2944 | 2944 | 0 | 0 | 0 | 0 |
 
 Result: PASS
-
-Post-catalog cross-reference (not a new Story 5.2-specific run): [Story 5.1's 2026-09-17 full-project Release/package evidence](spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md#latest-release-test-evidence) records 2,938 passing tests with the imported EventStore `3.106.0` selection.
 <!-- dev-agent-test-evidence:end -->
 ### File List
 
