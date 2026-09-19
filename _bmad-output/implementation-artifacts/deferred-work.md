@@ -250,3 +250,53 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-implement-agents-ci-cd.md`
   summary: Determine whether another credential holder can race the NuGet absence proof for the six Agents package IDs and whether an atomic reservation mechanism exists.
   evidence: The absence probe and first push are necessarily separate operations; the risk becomes concrete only if another principal can publish the same IDs/version in that interval, which requires an authority inventory or NuGet reservation evidence to settle.
+
+## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2.md (2026-09-19)
+
+### DW-23: Finish the `Unknown = 0` tolerance migration and make its guard traverse the Operations graph.
+
+origin: code review, 2026-09-19
+location: test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: Eight sibling `Hexalith.Agents.Contracts.Agent` enums (`ContentSafetyFailureHandling`, `ContentSafetyAuditTreatment`, `ApproverPolicySourceKind`, `ApproverPolicyValidationStatus`, `CostControlPosture`, `LaunchMetricClassification`, `PartyLinkValidationStatus`, `ProviderSelectionValidationStatus`) still declare the throwing `JsonStringEnumConverter` and escape `DiscoverPublicUnknownSentinelEnums` only because nothing on `AgentSetupView`/`AgentStatusView` references them. The Operations side is enumerated by namespace rather than traversed, so an `Unknown = 0` enum reaching the wire through an Operations record — `ContentSafetyAuditTreatment` on `AgentAuditGovernanceReadiness` today — is invisible to the guard despite its comment claiming either graph is "covered without editing this file". DW-13 is worded by namespace and does not name these. Widen the ledger wording, and replace `_deferredEnumNamespaces` with an explicit deferred-type list so a new Agent-namespace enum cannot fall through both nets.
+status: open
+
+### DW-24: Settle the tenant-scoped authorization contract for the gateway command-status read.
+
+origin: code review, 2026-09-19
+location: references/Hexalith.EventStore/src/Hexalith.EventStore/Controllers/CommandStatusController.cs
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: `GetStatus` returns 403 for any principal without an `eventstore:tenant` claim and has no global-admin bypass, while `DaprInternalAuthenticationHandler` issues only `sub`, `NameIdentifier`, `global_admin` and `dapr_caller_app_id`. The submit path works for that identity only because `ClaimsTenantValidator` short-circuits for global admins. Binding the live `IAgentCommandStatusReader` through `AddEventStoreDaprServiceInvocation` would therefore yield 403 → `EventStoreGatewayException` → `UnableToVerify`, never the `Rejected` the round-1 resolution specifies. This is the concrete mechanism behind the round-4 item deferred as only possibly unreachable, and it blocks DW-12 and DW-19.
+status: open
+
+### DW-25 (carried): `Rejected`/`Blocked` map to retryable `Unavailable` in the UI.
+
+origin: code review, 2026-09-19 (carried — owned by DW-12)
+location: src/Hexalith.Agents.UI/Services/Gateways/AgentsClientSetupGateway.cs
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: Re-confirmed this round that the `_ => AgentSetupWriteStatus.Unavailable` fall-through is unchanged and `IsTerminalWriteFailure` excludes `Unavailable`, so a rejected write renders as a transient outage with a Retry that replays the same rejected key. Unreachable in every composition that exists because only `DeferredAgentCommandStatusReader` is registered. Recorded as a pointer only — DW-12 owns both the live binding and this terminal mapping, and the two must land together.
+status: open
+
+### DW-26 (carried): `Unavailable` conflates "write path not bound" with "unreachable mid-flight".
+
+origin: code review, 2026-09-19 (carried — round 2 rejected the same root cause)
+location: src/Hexalith.Agents.UI/Services/Gateways/DeferredAgentSetupGateway.cs
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: `DeferredAgentSetupGateway` returns `Unavailable` unconditionally because the write path is not bound, but `ExecuteAttemptAsync` treats `Unavailable` as non-terminal, so a single click retains the attempt and disables every mutable control until Abandon is pressed. A distinct `NotBound` status adds public surface for no user-visible gain while the deferred gateway resolves only when no Agent target is named; revisit when the live gateway binding lands with DW-12.
+status: open
+
+### DW-27: Revisit the repo-wide `-p:NuGetAudit=false` pin now its advisory is remediated.
+
+origin: code review, 2026-09-19
+location: eng/verify-story.ps1
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: The pin sits in `eng/verify-story.ps1` (4 sites), `eng/verify-story-5.2.ps1` (2) and `eng/verify-story-5.3.ps1` (1), so it is a repo-wide convention that predates and outlives Story 5.2; round 4 already adjudicated the 5.2 half as "keep and record the advisory". The advisory it was scoped to, `GHSA-pgww-w46g-26qg`, is now remediated in the shared Builds catalog (`AngleSharp 1.8.2` with that fix pinned by comment), so the suppression no longer hides a known blocker — it only hides future ones, against `hexalith-llm-instructions.md`'s rule that the pin is a triage-ladder fallback. Decide repo-wide whether to drop it from all three verifiers.
+status: open
+
+### DW-28: Settle the durable replay authorization contract for reserved command extensions.
+
+origin: code review, 2026-09-19 (durable design behind the DW-flagged stopgap)
+location: references/Hexalith.EventStore/src/Hexalith.EventStore/Controllers/ReplayController.cs
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: The accepted fix strips colon-namespaced keys in `ArchivedCommandExtensions.ToSubmitCommand`, which is fail-closed but blunt — it applies to every integration's reserved keys and leaves Agents commands technically replayable yet always domain-rejected for want of `actor:agentsAdmin`. `ReplayController` authorizes on an `eventstore:tenant` claim alone while the replayed command runs as `UserId: "system"`, so replay authority and command authority are decoupled by design. The durable options are to require global-admin (or an explicit replay claim) when an archived command carries reserved keys, or to re-evaluate the trust policy against a principal the replay path can actually present. This is a platform authorization decision, not a domain-module one.
+status: open
