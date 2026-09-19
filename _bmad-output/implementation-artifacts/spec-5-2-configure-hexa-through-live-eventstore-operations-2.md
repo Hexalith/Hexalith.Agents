@@ -619,7 +619,7 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-19T15:59:29Z
+Run (UTC): 2026-09-19T17:06:38Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
