@@ -1,5 +1,3 @@
-namespace Hexalith.Agents.Contracts.Tests;
-
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
@@ -10,6 +8,8 @@ using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.Serialization;
 
 using Shouldly;
+
+namespace Hexalith.Agents.Contracts.Tests;
 
 /// <summary>
 /// Public operation-envelope contract tests for Story 4.1.
@@ -311,6 +311,20 @@ public sealed class AgentOperationContractsTests
         }
     }
 
+    [Fact]
+    public void A_byte_backed_enum_reads_declared_ordinals_without_throwing()
+    {
+        var options = new JsonSerializerOptions
+        {
+            Converters = { new UnknownFallbackEnumConverter<ByteBackedToleranceStatus>() },
+        };
+
+        JsonSerializer.Deserialize<ByteBackedToleranceStatus>("1", options)
+            .ShouldBe(ByteBackedToleranceStatus.Ready);
+        JsonSerializer.Deserialize<ByteBackedToleranceStatus>("255", options)
+            .ShouldBe(ByteBackedToleranceStatus.Unknown);
+    }
+
     [Theory]
     [MemberData(nameof(PublicOperationEnumTypes))]
     public void RecognizedOperationEnumNamesStillParseCaseInsensitively(Type enumType)
@@ -510,5 +524,11 @@ public sealed class AgentOperationContractsTests
         ProposalOperationStatus.PostingPending.ShouldNotBe(ProposalOperationStatus.Posted);
         AuditAvailabilityStatus.AuditPending.ShouldNotBe(AuditAvailabilityStatus.AuditAvailable);
         AgentReadinessStatus.Checking.ShouldNotBe(AgentReadinessStatus.Callable);
+    }
+
+    private enum ByteBackedToleranceStatus : byte
+    {
+        Unknown = 0,
+        Ready = 1,
     }
 }

@@ -1,13 +1,20 @@
 namespace Hexalith.Agents.Server.Tests;
 
 using System.Net.Http.Json;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
+using Dapr.Actors;
+using Dapr.Actors.Client;
+
+using Hexalith.Agents.Client;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.EventStore;
+using Hexalith.Agents.Server.Composition;
+using Hexalith.Agents.Server.Ports;
 
 using Hexalith.EventStore.Authentication;
 using Hexalith.EventStore.Authorization;
@@ -26,6 +33,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -63,10 +71,18 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         ]);
         gateway.GetServices<ITrustedCommandExtensionPolicy>().Count().ShouldBe(1);
 
-        // This deliberately represents the independently composed Agents process. Importing its Server assembly
-        // must not make gateway admission adapters appear there.
+        // This deliberately represents the independently composed Agents process. Exercise its real setup
+        // composition so an accidental Server-side registration of either gateway-owned seam is observable here.
         ServiceCollection agentsServices = new();
-        using ServiceProvider agents = agentsServices.BuildServiceProvider();
+        agentsServices.AddSingleton<IAgentCommandDispatcher, DeferredAgentCommandDispatcher>();
+        agentsServices.AddSingleton(AgentsClient.Unavailable());
+        IConfiguration agentsConfiguration = new ConfigurationBuilder().Build();
+        _ = agentsServices.AddAgentSetupServices(agentsConfiguration);
+        using ServiceProvider agents = agentsServices.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateOnBuild = true,
+            ValidateScopes = true,
+        });
         agents.GetServices<IIdempotencyIntentAdapter>().ShouldBeEmpty();
         agents.GetServices<ITrustedCommandExtensionPolicy>().ShouldBeEmpty();
     }
@@ -102,6 +118,21 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         {
             registry.Resolve(conflict).CanonicalIntent.ShouldNotBe(descriptor.CanonicalIntent);
         }
+    }
+
+    [Fact]
+    public void Setup_intent_scopes_the_canonical_target_by_tenant_and_agent()
+    {
+        IdempotencyIntentAdapterRegistry registry = Registry();
+        SubmitCommand original = ActivationCommand(
+            payload: "{\"value\":1}",
+            version: "7",
+            providerVerdict: nameof(ProviderSelectionValidationStatus.Valid),
+            approverVerdict: nameof(ApproverPolicyValidationStatus.Valid));
+        byte[] originalIntent = registry.Resolve(original).CanonicalIntent;
+
+        registry.Resolve(original with { Tenant = "tenant-b" }).CanonicalIntent.ShouldNotBe(originalIntent);
+        registry.Resolve(original with { AggregateId = "agent-b" }).CanonicalIntent.ShouldNotBe(originalIntent);
     }
 
     [Fact]
@@ -236,6 +267,31 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             Request(domain, commandType),
             key,
             value).ShouldBe(expected);
+    }
+
+    [Theory]
+    [InlineData("agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, true)]
+    [InlineData("agent", nameof(UpdateAgentConfiguration), AgentSetupTrustedExtensions.AgentAdministrator, true)]
+    [InlineData("agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ProviderSelectionValidation, true)]
+    [InlineData("agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ApproverPolicyValidation, true)]
+    [InlineData("agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, true)]
+    [InlineData("agent", nameof(UpdateAgentConfiguration), AgentSetupTrustedExtensions.ProviderSelectionValidation, false)]
+    [InlineData("other-domain", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, false)]
+    [InlineData("agent", "OtherCommand", AgentSetupTrustedExtensions.AgentAdministrator, false)]
+    [InlineData("agent", nameof(ActivateAgent), "agent:unknown", false)]
+    public void Reserved_extension_policy_claims_only_its_exact_keys(
+        string domain,
+        string commandType,
+        string key,
+        bool expected)
+    {
+        ITrustedCommandExtensionPolicy policy = Policy();
+        MethodInfo claims = policy.GetType().GetMethod(
+            "Claims",
+            BindingFlags.Instance | BindingFlags.Public,
+            [typeof(string), typeof(string), typeof(string)]).ShouldNotBeNull();
+
+        claims.Invoke(policy, [domain, commandType, key]).ShouldBe(expected);
     }
 
     [Fact]
@@ -398,39 +454,29 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             _ = builder.Services.AddAgentsEventStore(AgentsAppId);
         }
 
+        builder.Services.AddSingleton<IIdempotencyDigestKeyProvider>(_ =>
+            new StaticIdempotencyDigestKeyProvider(
+                "v1",
+                new Dictionary<string, byte[]>(StringComparer.Ordinal)
+                {
+                    ["v1"] = Encoding.UTF8.GetBytes("0123456789abcdef0123456789abcdef"),
+                },
+                []));
+        builder.Services.AddSingleton(CreateProductionAdmissionActorFactory());
         builder.Services.AddSingleton<IMediator>(services =>
         {
             var mediator = Substitute.For<IMediator>();
             var registry = new IdempotencyIntentAdapterRegistry(
                 services.GetServices<IIdempotencyIntentAdapter>(),
                 new CanonicalIdempotencyIntentEncoder());
-            IIdempotencyAdmissionCoordinator coordinator = Substitute.For<IIdempotencyAdmissionCoordinator>();
-            coordinator.AdmitAsync(Arg.Any<SubmitCommand>(), Arg.Any<CancellationToken>())
-                .Returns(call => ledger.AdmitAsync(
-                    registry,
-                    call.ArgAt<SubmitCommand>(0),
-                    call.ArgAt<CancellationToken>(1)));
-            coordinator.ValidateExecutionCapabilityAsync(
-                    Arg.Any<IdempotencyAdmissionSession>(),
-                    Arg.Any<SubmitCommand>(),
-                    Arg.Any<CancellationToken>())
-                .Returns(Task.CompletedTask);
-            coordinator.ValidateExecutionAsync(
-                    Arg.Any<IdempotencyAdmissionSession>(),
-                    Arg.Any<SubmitCommand>(),
-                    Arg.Any<CancellationToken>())
-                .Returns(Task.CompletedTask);
-            coordinator.BeginAsync(Arg.Any<IdempotencyAdmissionSession>(), Arg.Any<CancellationToken>())
-                .Returns(Task.CompletedTask);
-            coordinator.CompleteAsync(
-                    Arg.Any<IdempotencyAdmissionSession>(),
-                    Arg.Any<CommandProcessingResult>(),
-                    Arg.Any<CancellationToken>())
-                .Returns(call =>
-                {
-                    ledger.Complete(call.ArgAt<CommandProcessingResult>(1));
-                    return Task.CompletedTask;
-                });
+            IActorProxyFactory actorProxyFactory = services.GetRequiredService<IActorProxyFactory>();
+            IIdempotencyDigestKeyProvider keyProvider = services
+                .GetRequiredService<IIdempotencyDigestKeyProvider>();
+            var coordinator = new IdempotencyAdmissionCoordinator(
+                actorProxyFactory,
+                new IdempotencyKeyProtector(keyProvider),
+                registry,
+                new IdempotencyExecutionContextProtector(keyProvider, actorProxyFactory));
 
             ICommandRouter router = Substitute.For<ICommandRouter>();
             router.RouteFencedCommandAsync(
@@ -486,45 +532,142 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         return app;
     }
 
-    private sealed class InMemoryAdmissionLedger(HttpClient domainClient)
+    private static IActorProxyFactory CreateProductionAdmissionActorFactory()
     {
-        private byte[]? _intent;
+        var state = new ProductionAdmissionState();
+        IIdempotencyAdmissionActor admission = Substitute.For<IIdempotencyAdmissionActor>();
+        IIdempotencyAdmissionDirectoryActor directory = Substitute.For<IIdempotencyAdmissionDirectoryActor>();
+        IIdempotencyTenantLifecycleActor lifecycle = Substitute.For<IIdempotencyTenantLifecycleActor>();
+        IIdempotencyLegacyInventoryActor legacyInventory = Substitute.For<IIdempotencyLegacyInventoryActor>();
+        IActorProxyFactory factory = Substitute.For<IActorProxyFactory>();
+
+        _ = factory.CreateActorProxy<IIdempotencyAdmissionActor>(
+                Arg.Any<ActorId>(),
+                IdempotencyAdmissionActor.ActorTypeName)
+            .Returns(admission);
+        _ = factory.CreateActorProxy<IIdempotencyAdmissionDirectoryActor>(
+                Arg.Any<ActorId>(),
+                IdempotencyAdmissionDirectoryActor.ActorTypeName)
+            .Returns(directory);
+        _ = factory.CreateActorProxy<IIdempotencyTenantLifecycleActor>(
+                Arg.Any<ActorId>(),
+                IdempotencyTenantLifecycleActor.ActorTypeName)
+            .Returns(lifecycle);
+        _ = factory.CreateActorProxy<IIdempotencyLegacyInventoryActor>(
+                Arg.Any<ActorId>(),
+                IdempotencyLegacyInventoryActor.ActorTypeName)
+            .Returns(legacyInventory);
+
+        _ = legacyInventory.InspectAsync(Arg.Any<IdempotencyAdmissionDirectoryAlias[]>())
+            .Returns(new IdempotencyLegacyInventoryInspection(IdempotencyLegacyInventoryDecision.NoLegacy));
+        _ = admission.InspectAsync().Returns(_ => state.Inspect());
+        _ = directory.ResolveAsync(Arg.Any<IdempotencyAdmissionDirectoryRequest>())
+            .Returns(call =>
+            {
+                IdempotencyAdmissionDirectoryRequest request = call
+                    .ArgAt<IdempotencyAdmissionDirectoryRequest>(0);
+                return new IdempotencyAdmissionDirectoryResult(
+                    request.ExistingActorId ?? request.ActiveActorId,
+                    IdempotencyAdmissionPromotionPhase.Stable);
+            });
+        _ = lifecycle.RegisterAsync(Arg.Any<IdempotencyTenantLifecycleReference[]>())
+            .Returns(Task.CompletedTask);
+        _ = lifecycle.AdmitAsync(Arg.Any<IdempotencyTenantLifecycleAdmissionRequest>())
+            .Returns(call => state.Admit(call.ArgAt<IdempotencyTenantLifecycleAdmissionRequest>(0).Admission));
+        _ = admission.BeginAsync(Arg.Any<IdempotencyAdmissionTransitionRequest>())
+            .Returns(call =>
+            {
+                state.ValidateFence(call.ArgAt<IdempotencyAdmissionTransitionRequest>(0).FencingToken);
+                return Task.CompletedTask;
+            });
+        _ = admission.ValidateAuthorityAsync(Arg.Any<IdempotencyAdmissionAuthorityRequest>())
+            .Returns(call =>
+            {
+                state.ValidateAuthority(call.ArgAt<IdempotencyAdmissionAuthorityRequest>(0));
+                return Task.CompletedTask;
+            });
+        _ = admission.CompleteAsync(Arg.Any<IdempotencyAdmissionCompletionRequest>())
+            .Returns(call =>
+            {
+                state.Complete(call.ArgAt<IdempotencyAdmissionCompletionRequest>(0));
+                return Task.CompletedTask;
+            });
+
+        return factory;
+    }
+
+    private sealed class ProductionAdmissionState
+    {
+        private const long FencingToken = 1;
+
+        private string? _intentDigest;
+        private string? _executionMessageId;
+        private string? _executionCorrelationId;
         private CommandProcessingResult? _result;
 
-        public int ExecutionCount { get; private set; }
+        public IdempotencyAdmissionInspection Inspect()
+            => new(_intentDigest is not null);
 
-        public Task<IdempotencyAdmissionSession?> AdmitAsync(
-            IdempotencyIntentAdapterRegistry registry,
-            SubmitCommand command,
-            CancellationToken cancellationToken)
+        public IdempotencyAdmissionResult Admit(IdempotencyAdmissionRequest request)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            byte[] intent = registry.Resolve(command).CanonicalIntent;
-            if (_intent is not null)
+            if (_intentDigest is null)
             {
-                if (!_intent.AsSpan().SequenceEqual(intent))
-                {
-                    return Task.FromResult<IdempotencyAdmissionSession?>(Session(
-                        command,
-                        IdempotencyAdmissionDecision.Conflict));
-                }
-
-                return Task.FromResult<IdempotencyAdmissionSession?>(Session(
-                    command,
-                    IdempotencyAdmissionDecision.Replay,
-                    _result ?? throw new InvalidOperationException("Replay was requested before completion.")));
+                _intentDigest = request.IntentDigest;
+                _executionMessageId = request.ExecutionMessageId;
+                _executionCorrelationId = request.ExecutionCorrelationId;
+                return Result(IdempotencyAdmissionDecision.Execute);
             }
 
-            _intent = intent.ToArray();
-            return Task.FromResult<IdempotencyAdmissionSession?>(Session(
-                command,
-                IdempotencyAdmissionDecision.Execute));
+            if (!string.Equals(_intentDigest, request.IntentDigest, StringComparison.Ordinal))
+            {
+                return Result(IdempotencyAdmissionDecision.Conflict);
+            }
+
+            return _result is null
+                ? Result(IdempotencyAdmissionDecision.Pending)
+                : Result(IdempotencyAdmissionDecision.Replay, _result);
         }
 
-        public void Complete(CommandProcessingResult result)
+        public void ValidateFence(long fencingToken)
         {
-            _result = result;
+            if (fencingToken != FencingToken || _intentDigest is null)
+            {
+                throw new InvalidOperationException("The production-coordinator test fence is invalid.");
+            }
         }
+
+        public void ValidateAuthority(IdempotencyAdmissionAuthorityRequest request)
+        {
+            ValidateFence(request.FencingToken);
+            if (!string.Equals(request.DigestKeyVersion, "v1", StringComparison.Ordinal)
+                || !string.Equals(request.ExecutionMessageId, _executionMessageId, StringComparison.Ordinal)
+                || !string.Equals(request.ExecutionCorrelationId, _executionCorrelationId, StringComparison.Ordinal)
+                || request.Purpose != IdempotencyExecutionPurpose.Execute)
+            {
+                throw new InvalidOperationException("The production-coordinator test authority is invalid.");
+            }
+        }
+
+        public void Complete(IdempotencyAdmissionCompletionRequest request)
+        {
+            ValidateFence(request.FencingToken);
+            _result = request.Result;
+        }
+
+        private IdempotencyAdmissionResult Result(
+            IdempotencyAdmissionDecision decision,
+            CommandProcessingResult? replay = null)
+            => new(
+                decision,
+                FencingToken,
+                replay,
+                ExecutionMessageId: _executionMessageId,
+                ExecutionCorrelationId: _executionCorrelationId);
+    }
+
+    private sealed class InMemoryAdmissionLedger(HttpClient domainClient)
+    {
+        public int ExecutionCount { get; private set; }
 
         public async Task<CommandProcessingResult> RouteAsync(
             SubmitCommand command,
@@ -545,31 +688,5 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
                 EventCount: 1,
                 ResultPayload: receipt.ResultPayload);
         }
-
-        private static IdempotencyAdmissionSession Session(
-            SubmitCommand command,
-            IdempotencyAdmissionDecision decision,
-            CommandProcessingResult? replay = null)
-            => new(
-                ActorId: "test-admission",
-                FencingToken: 1,
-                decision,
-                replay,
-                ExecutionContext: decision == IdempotencyAdmissionDecision.Execute
-                    ? new IdempotencyExecutionContext(
-                        IdempotencyExecutionContext.CurrentSchemaVersion,
-                        "test-admission",
-                        1,
-                        "v1",
-                        command.MessageId,
-                        command.CorrelationId,
-                        command.Tenant,
-                        command.Domain,
-                        command.AggregateId,
-                        command.CommandType,
-                        "test-proof")
-                    : null,
-                ExecutionMessageId: command.MessageId,
-                ExecutionCorrelationId: command.CorrelationId);
     }
 }

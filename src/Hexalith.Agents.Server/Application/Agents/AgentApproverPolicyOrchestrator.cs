@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Server.Ports;
 
@@ -33,6 +34,7 @@ public sealed class AgentApproverPolicyOrchestrator
         AgentProviderSelectionOrchestrator.AgentAdminExtensionKey,
         AgentProviderSelectionOrchestrator.ProviderSelectionValidationExtensionKey,
         AgentActivationProviderRevalidation.ApproverPolicyValidationExtensionKey,
+        AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion,
     ];
 
     private readonly IAgentCommandDispatcher _dispatcher;

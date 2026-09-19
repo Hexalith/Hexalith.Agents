@@ -242,6 +242,10 @@
   <data name="Agents.Config.Write.AlreadyApplied" xml:space="preserve"><value>Aucune modification n'était nécessaire. Cette configuration exacte était déjà appliquée.</value></data>
   <data name="Agents.Config.Write.AwaitingProjection" xml:space="preserve"><value>La commande est terminée, mais son résultat exact est toujours en attente de projection.</value></data>
   <data name="Agents.Config.Write.UnableToVerify" xml:space="preserve"><value>Le résultat de la commande n'a pas pu être vérifié. Relancez exactement la même tentative ou abandonnez-la avant de soumettre une autre modification.</value></data>
+  <data name="Agents.Config.Write.Confirmed" xml:space="preserve"><value>La configuration projetée confirme maintenant le résultat exact de la commande.</value></data>
+  <data name="Agents.Config.Write.Refreshing" xml:space="preserve"><value>Actualisation unique de la configuration projetée.</value></data>
+  <data name="Agents.Config.Write.RefreshIncomplete" xml:space="preserve"><value>La configuration projetée n'a pas encore pu être confirmée. Actualisez-la de nouveau, relancez exactement la commande ou abandonnez la tentative.</value></data>
+  <data name="Agents.Config.Write.RetryUnresolved" xml:space="preserve"><value>Le résultat initialement accepté attend toujours sa projection. Actualisez la projection, relancez exactement la commande ou abandonnez la tentative.</value></data>
   <data name="Agents.Config.Write.Refresh" xml:space="preserve"><value>Actualiser la configuration projetée</value></data>
   <data name="Agents.Config.Write.Retry" xml:space="preserve"><value>Relancer exactement cette tentative</value></data>
   <data name="Agents.Config.Write.Abandon" xml:space="preserve"><value>Abandonner cette tentative</value></data>

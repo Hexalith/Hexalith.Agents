@@ -57,7 +57,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
     // this trusted extension. The command entry point strips any client-supplied value and repopulates it from
     // the orchestration's port result. A direct client command carries no trusted verdict, so it parses to
     // Unknown and is rejected — the aggregate's independent non-Valid rejection is the security guarantee (AC2).
-    private const string PartyLinkValidationExtensionKey = "party:linkValidation";
+    private const string PartyLinkValidationExtensionKey = AgentSetupTrustedExtensions.PartyLinkValidation;
 
     // SECURITY: server-populated only, identical trust model to the two keys above (Story 1.5). The ProviderCatalog
     // read + verdict computation runs in the Server orchestration (AD-3) and its verdict is fed back here through
@@ -82,7 +82,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
     // EnableProductionLikeGeneration that did not resolve audit governance carries no trusted flag, so it parses to
     // false and the launch-readiness gate fails closed with UnresolvedAuditGovernance (AD-12). The aggregate makes no
     // port/dependency call at all.
-    private const string AuditGovernanceResolvedExtensionKey = "audit:governanceResolved";
+    private const string AuditGovernanceResolvedExtensionKey = AgentSetupTrustedExtensions.AuditGovernanceResolved;
 
     // The fail-safe placeholder returned in the `out` parameter when a Content Safety configuration is rejected, so the
     // value is never null. It is never emitted — a rejection carries no configuration — and its Unknown sentinels make

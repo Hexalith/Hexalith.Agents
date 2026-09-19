@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Hexalith.Agents.AgentInteraction;
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.AgentInteraction.Commands;
 using Hexalith.Agents.Contracts.ProviderCatalog;
@@ -40,10 +41,10 @@ public sealed class AgentInteractionContextOrchestrator
     // client-supplied extensions so a client cannot smuggle a forged admin/verdict onto the interaction stream.
     private static readonly string[] _reservedExtensionKeys =
     [
-        "actor:agentsAdmin",
-        "provider:selectionValidation",
-        "approver:policyValidation",
-        "party:linkValidation",
+        AgentSetupTrustedExtensions.AgentAdministrator,
+        AgentSetupTrustedExtensions.ProviderSelectionValidation,
+        AgentSetupTrustedExtensions.ApproverPolicyValidation,
+        AgentSetupTrustedExtensions.PartyLinkValidation,
     ];
 
     private readonly IConversationContextReader _contextReader;

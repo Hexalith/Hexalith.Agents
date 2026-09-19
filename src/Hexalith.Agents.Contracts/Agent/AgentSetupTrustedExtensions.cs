@@ -20,4 +20,10 @@ public static class AgentSetupTrustedExtensions
 
     /// <summary>Gets the activation expected-configuration-version extension key.</summary>
     public const string ActivationExpectedConfigurationVersion = "agent:activationExpectedConfigurationVersion";
+
+    /// <summary>Gets the Party-link validation extension key.</summary>
+    public const string PartyLinkValidation = "party:linkValidation";
+
+    /// <summary>Gets the audit-governance resolution extension key.</summary>
+    public const string AuditGovernanceResolved = "audit:governanceResolved";
 }

@@ -68,6 +68,7 @@ public sealed class AgentPartyIdentityOrchestratorTests
         {
             ["actor:agentsAdmin"] = "true",          // forged
             ["party:linkValidation"] = "Valid",      // forged bypass attempt
+            [AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion] = "7",
             ["trace"] = "abc-123",                   // benign, must be preserved
         };
 
@@ -77,6 +78,7 @@ public sealed class AgentPartyIdentityOrchestratorTests
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions["party:linkValidation"].ShouldBe("Missing"); // the trusted verdict wins, not the forged "Valid"
         dispatched.Extensions["actor:agentsAdmin"].ShouldBe("true");        // repopulated from the trusted decision
+        dispatched.Extensions.ContainsKey(AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion).ShouldBeFalse();
         dispatched.Extensions["trace"].ShouldBe("abc-123");                 // non-reserved client extension preserved
     }
 

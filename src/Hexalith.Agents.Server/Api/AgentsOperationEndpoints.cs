@@ -121,7 +121,7 @@ public static class AgentsOperationEndpoints
                     GetCommandOptions(
                         correlationId,
                         idempotencyKey,
-                        int.Parse(expectedConfigurationVersion!, CultureInfo.InvariantCulture)),
+                        ParseExpectedConfigurationVersion(expectedConfigurationVersion)),
                     cancellationToken))
             .AddEndpointFilter(AgentSetupCommandHeadersFilter.ForActivation())
             .ProducesProblem(StatusCodes.Status400BadRequest, "application/problem+json");
@@ -165,6 +165,17 @@ public static class AgentsOperationEndpoints
         {
             ExpectedConfigurationVersion = expectedConfigurationVersion,
         };
+
+    private static int? ParseExpectedConfigurationVersion(string? value)
+        => int.TryParse(
+                value,
+                NumberStyles.None,
+                CultureInfo.InvariantCulture,
+                out int parsed)
+            && parsed > 0
+            && string.Equals(parsed.ToString(CultureInfo.InvariantCulture), value, StringComparison.Ordinal)
+                ? parsed
+                : null;
 
     private static void MapInteractions(RouteGroupBuilder group)
     {

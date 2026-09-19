@@ -75,6 +75,7 @@ public sealed class PackageInventoryTests
             "scripts/verify-github-release.py",
             "scripts/publish-release-packages.sh",
             "eng/verify-story.ps1",
+            "eng/verify-story-5.2.ps1",
             ".github/workflows/ci.yml",
             ".github/workflows/release.yml",
             ".github/workflows/commitlint.yml",
@@ -95,7 +96,10 @@ public sealed class PackageInventoryTests
         }
 
         string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/ci.yml"));
-        workflow.ShouldContain("Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@main");
+        workflow.ShouldContain(
+            "Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@cb91511794c8898b738d85dc6c751f82b832cbc9");
+        workflow.ShouldContain("cancel-in-progress: ${{ github.event_name == 'pull_request' }}");
+        workflow.ShouldNotContain("domain-ci.yml@main");
         workflow.ShouldContain("test-platform: microsoft-testing-platform");
         workflow.ShouldContain("run-consumer-validation: true");
         workflow.ShouldContain("test/Hexalith.Agents.Contracts.Tests");

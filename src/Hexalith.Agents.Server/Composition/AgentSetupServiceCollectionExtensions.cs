@@ -39,6 +39,7 @@ internal static class AgentSetupServiceCollectionExtensions
         services.Configure<AgentSetupReadModelOptions>(configuration.GetSection(AgentSetupReadModelOptions.SectionName));
         services.Configure<ProviderCatalogReadModelOptions>(configuration.GetSection(ProviderCatalogReadModelOptions.SectionName));
         services.TryAddSingleton<IAgentCommandIdentityFactory, AgentCommandIdentityFactory>();
+        services.TryAddSingleton(AgentsClient.Unavailable().ProviderCatalog);
 
         // The projection handler is discovered by the domain-service assembly scan; the orchestrations are always
         // registered so the DI graph resolves whether or not the gateway is bound.
@@ -79,7 +80,6 @@ internal static class AgentSetupServiceCollectionExtensions
         services.AddSingleton<IAgentCommandDispatcher, EventStoreAgentCommandDispatcher>();
 
         services.AddScoped<IAgentAdministrationOperations, EventStoreAgentAdministrationOperations>();
-        services.AddScoped<IProviderCatalogOperations, EventStoreProviderCatalogOperations>();
         services.RemoveAll<IProviderCatalogReader>();
         services.AddScoped<IProviderCatalogReader, ProjectedProviderCatalogReader>();
         services.RemoveAll<IAgentsClient>();

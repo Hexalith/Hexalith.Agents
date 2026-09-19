@@ -36,10 +36,10 @@ public sealed class AgentInteractionProposalAbandonmentOrchestrator
 
     private static readonly string[] _reservedExtensionKeys =
     [
-        "actor:agentsAdmin",
-        "provider:selectionValidation",
-        "approver:policyValidation",
-        "party:linkValidation",
+        AgentSetupTrustedExtensions.AgentAdministrator,
+        AgentSetupTrustedExtensions.ProviderSelectionValidation,
+        AgentSetupTrustedExtensions.ApproverPolicyValidation,
+        AgentSetupTrustedExtensions.PartyLinkValidation,
     ];
 
     private readonly IApproverPolicyResolver _approverPolicyResolver;

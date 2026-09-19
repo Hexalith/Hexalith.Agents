@@ -9,8 +9,8 @@ namespace Hexalith.Agents.UI.Services.Gateways;
 
 /// <summary>
 /// Fail-closed placeholder for <see cref="IAgentSetupGateway"/> used by a host that has not bound the live Agents
-/// client. Reads return not-authorized and writes return <see cref="AgentSetupWriteStatus.Unavailable"/>, so an
-/// unbound host renders the permission-denied surface rather than fabricating a "ready/healthy" Agent or letting a
+/// client. Reads and writes return unavailable, so an unbound host renders the service-unavailable surface rather
+/// than fabricating a "ready/healthy" Agent or letting a
 /// write appear to succeed (AD-12).
 /// </summary>
 /// <remarks>
@@ -23,15 +23,15 @@ public sealed class DeferredAgentSetupGateway : IAgentSetupGateway
 {
     /// <inheritdoc />
     public Task<AgentInspectionResult> GetStatusAsync(CancellationToken cancellationToken)
-        => Task.FromResult(AgentInspectionResult.NotAuthorized());
+        => Task.FromResult(new AgentInspectionResult(AgentInspectionStatus.Unavailable, null));
 
     /// <inheritdoc />
     public Task<AgentInspectionResult> GetConfigurationAsync(CancellationToken cancellationToken)
-        => Task.FromResult(AgentInspectionResult.NotAuthorized());
+        => Task.FromResult(new AgentInspectionResult(AgentInspectionStatus.Unavailable, null));
 
     /// <inheritdoc />
     public Task<AgentSetupResult> GetSetupAsync(int? expectedConfigurationVersion, CancellationToken cancellationToken)
-        => Task.FromResult(AgentSetupResult.NotAuthorized());
+        => Task.FromResult(AgentSetupResult.Unavailable());
 
     /// <inheritdoc />
     public Task<AgentSetupWriteResult> UpdateConfigurationAsync(UpdateAgentConfiguration command, CancellationToken cancellationToken)

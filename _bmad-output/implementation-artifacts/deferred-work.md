@@ -99,10 +99,12 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Decide whether unresolved setup-write identity and payload must survive route navigation or browser reload.
   evidence: The component retains an exact attempt only for its lifetime; whether leaving and returning may create a new attempt while the first outcome is unresolved requires an explicit Product/UX state-lifetime decision.
+  status: open
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Prove exact setup result payload replay and projection through the production-like EventStore topology.
   evidence: Unit and component evidence covers the platform contract, but the Story 5.6 production-like host fixture is required to establish whether the payload survives the real EventStore completion, idempotency replay, and persisted projection path end to end.
+  status: open
 
 ### DW-6: Eventful result payload forwarding depends on advisory command status reaching Completed.
 
@@ -126,7 +128,8 @@ origin: code review, 2026-09-14
 location: tools/check-story-review-readiness.py
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: A persistent MSBuild child can keep the captured output pipe open until the runner's timeout; setting MSBUILDDISABLENODEREUSE inside the runner would make the workaround automatic.
-status: open
+status: done 2026-09-20
+resolution: The readiness runner now forces MSBUILDDISABLENODEREUSE=1 after applying caller overrides, with a regression test proving an inherited or supplied zero cannot defeat the safeguard.
 
 ### DW-9: Verify that an idempotency key is bound to its first submitted payload.
 
@@ -245,11 +248,15 @@ status: open
 
 ## Deferred from: code review of spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md (2026-09-18)
 
-- GlobalJsonShouldPinTheSdk does not assert `test.runner` — pre-existing; `global.json` is unchanged in this diff and already contains `Microsoft.Testing.Platform`.
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md`
+  summary: Make GlobalJsonShouldPinTheSdk assert the `test.runner` selection.
+  evidence: The omission is pre-existing; `global.json` was unchanged by that story and already selects `Microsoft.Testing.Platform`, but the contract test does not pin it.
+  status: open
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-implement-agents-ci-cd.md`
   summary: Determine whether another credential holder can race the NuGet absence proof for the six Agents package IDs and whether an atomic reservation mechanism exists.
   evidence: The absence probe and first push are necessarily separate operations; the risk becomes concrete only if another principal can publish the same IDs/version in that interval, which requires an authority inventory or NuGet reservation evidence to settle.
+  status: open
 
 ## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2.md (2026-09-19)
 
@@ -300,3 +307,31 @@ location: references/Hexalith.EventStore/src/Hexalith.EventStore/Controllers/Rep
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: The accepted fix strips colon-namespaced keys in `ArchivedCommandExtensions.ToSubmitCommand`, which is fail-closed but blunt — it applies to every integration's reserved keys and leaves Agents commands technically replayable yet always domain-rejected for want of `actor:agentsAdmin`. `ReplayController` authorizes on an `eventstore:tenant` claim alone while the replayed command runs as `UserId: "system"`, so replay authority and command authority are decoupled by design. The durable options are to require global-admin (or an explicit replay claim) when an archived command carries reserved keys, or to re-evaluate the trust policy against a principal the replay path can actually present. This is a platform authorization decision, not a domain-module one.
 status: open
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Fail closed when a setup query reads a projection whose embedded tenant or Agent identity does not match its address.
+  evidence: `AgentSetupQueryHandlerBase` passes the stored model directly to `AgentSetupViewFactory`, whose state reconstruction uses the embedded identifiers and metadata; unlike the operations path, no identity guard prevents a mis-keyed projection from disclosing another scope.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Render an unavailable setup state when the initial configuration-page read throws.
+  evidence: `AgentConfiguration.OnInitializedAsync` catches disposal cancellation only, so a transport or deserialization exception from `LoadAsync` breaks initialization instead of using the page's existing unavailable state.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Define a fail-closed projection policy for malformed payloads of known Agent event types.
+  evidence: `AgentSetupProjectionFold.Deserialize` returns null for corrupt JSON while `Fold` still advances the persisted sequence checkpoint, permanently presenting incomplete state as current; this behavior predates the current exact-correlation patch.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Pin inherited reusable security workflows to reviewed immutable revisions.
+  evidence: CodeQL, commitlint, and dependency-review workflows consume mutable `@main` refs, so upstream branch movement can change repository gates without a local review.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Make multi-package NuGet publication recoverable after a partial push.
+  evidence: The inherited release tooling requires the entire immutable version set to be absent before a non-transactional push; a partial service-side success leaves a package version set that the next run refuses to reconcile.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Restrict CodeQL concurrency cancellation so merged and scheduled revisions retain completed scans.
+  evidence: The inherited CodeQL workflow cancels any run sharing the branch ref, including main pushes and scheduled scans, so a later run can erase the only completed evidence for an earlier merged SHA.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Reject GitHub releases marked prerelease when verifying a stable semantic-version tag.
+  evidence: The inherited release verifier checks tag, draft status, source SHA, and assets but never checks the GitHub `prerelease` flag, so a release marked prerelease can satisfy the stable-publication gate.

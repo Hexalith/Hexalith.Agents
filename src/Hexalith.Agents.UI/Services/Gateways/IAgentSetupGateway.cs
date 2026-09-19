@@ -16,8 +16,9 @@ namespace Hexalith.Agents.UI.Services.Gateways;
 /// <para>
 /// Reads answer with the same authoritative <see cref="AgentSetupResult"/> the API and the public client serve, so
 /// FrontComposer cannot drift from them. Writes answer with an <see cref="AgentSetupWriteResult"/> whose accepted
-/// identity means <em>submitted</em> and nothing more — the page must re-read the setup at the accepted
-/// configuration version to learn whether the projection has confirmed the change.
+/// identity means <em>submitted</em> and nothing more. Applied writes are re-read at the accepted configuration
+/// version to learn whether the projection has confirmed the change; an already-applied no-op terminates without
+/// polling because it appended no new version to reach.
 /// </para>
 /// <para>
 /// Nothing on this seam reports callability. Lifecycle <see cref="AgentLifecycleStatus.Active"/> is a lifecycle

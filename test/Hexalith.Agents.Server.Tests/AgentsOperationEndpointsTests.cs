@@ -248,25 +248,30 @@ public sealed class AgentsOperationEndpointsTests
         await using WebApplication app = BuildHttpApp(AgentsClientWith(administration));
         await app.StartAsync().ConfigureAwait(true);
         using HttpClient client = app.GetTestClient();
-        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/agents/operations/agents/agent-1/disable")
+
+        foreach ((HttpMethod method, string path, object command) in SetupWriteRequests())
         {
-            Content = JsonContent.Create(new DisableAgent()),
-        };
-        request.Headers.TryAddWithoutValidation(headerName, headerValue).ShouldBeTrue();
+            using var request = new HttpRequestMessage(method, path)
+            {
+                Content = JsonContent.Create(command),
+            };
+            request.Headers.TryAddWithoutValidation(headerName, headerValue).ShouldBeTrue();
+            if (path.EndsWith("/activate", StringComparison.Ordinal))
+            {
+                request.Headers.Add("X-Expected-Configuration-Version", "3");
+            }
 
-        using HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(true);
+            using HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(true);
 
-        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
-        response.Content.Headers.ContentType?.MediaType.ShouldBe("application/problem+json");
-        string problem = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
-        problem.ShouldContain(AgentSetupCommandHeadersFilter.InvalidIdentityProblemType);
-        problem.ShouldContain("canonical_value_required");
-        problem.ShouldContain(headerName);
-        await administration.DidNotReceiveWithAnyArgs().DisableAsync(
-            default!,
-            default!,
-            default,
-            default);
+            response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest, path);
+            response.Content.Headers.ContentType?.MediaType.ShouldBe("application/problem+json", path);
+            string problem = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            problem.ShouldContain(AgentSetupCommandHeadersFilter.InvalidIdentityProblemType);
+            problem.ShouldContain("canonical_value_required");
+            problem.ShouldContain(headerName);
+        }
+
+        await AssertNoSetupWriteWasInvokedAsync(administration);
     }
 
     [Theory]
@@ -306,13 +311,49 @@ public sealed class AgentsOperationEndpointsTests
     }
 
     [Theory]
-    [InlineData("X-Correlation-ID", CorrelationId, AgentSetupCommandHeadersFilter.InvalidIdentityProblemType)]
-    [InlineData("Idempotency-Key", MessageId, AgentSetupCommandHeadersFilter.InvalidIdentityProblemType)]
-    [InlineData("X-Expected-Configuration-Version", "3", AgentSetupCommandHeadersFilter.InvalidActivationVersionProblemType)]
-    public async Task Duplicate_canonical_setup_headers_return_stable_problem_details_without_invoking_the_operation(
+    [InlineData("X-Correlation-ID", CorrelationId)]
+    [InlineData("Idempotency-Key", MessageId)]
+    public async Task Duplicate_canonical_setup_identity_headers_return_stable_problem_details_on_every_write_route(
         string duplicateHeader,
-        string canonicalValue,
-        string expectedProblemType)
+        string canonicalValue)
+    {
+        IAgentAdministrationOperations administration = Substitute.For<IAgentAdministrationOperations>();
+        await using WebApplication app = BuildHttpApp(AgentsClientWith(administration));
+        await app.StartAsync().ConfigureAwait(true);
+        using HttpClient client = app.GetTestClient();
+
+        foreach ((HttpMethod method, string path, object command) in SetupWriteRequests())
+        {
+            using var request = new HttpRequestMessage(method, path)
+            {
+                Content = JsonContent.Create(command),
+            };
+            request.Headers.TryAddWithoutValidation(
+                "X-Correlation-ID",
+                duplicateHeader == "X-Correlation-ID" ? [canonicalValue, canonicalValue] : [CorrelationId]).ShouldBeTrue();
+            request.Headers.TryAddWithoutValidation(
+                "Idempotency-Key",
+                duplicateHeader == "Idempotency-Key" ? [canonicalValue, canonicalValue] : [MessageId]).ShouldBeTrue();
+            if (path.EndsWith("/activate", StringComparison.Ordinal))
+            {
+                request.Headers.Add("X-Expected-Configuration-Version", "3");
+            }
+
+            using HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(true);
+
+            response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest, path);
+            response.Content.Headers.ContentType?.MediaType.ShouldBe("application/problem+json", path);
+            string problem = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            problem.ShouldContain(AgentSetupCommandHeadersFilter.InvalidIdentityProblemType);
+            problem.ShouldContain("canonical_value_required");
+            problem.ShouldContain(duplicateHeader);
+        }
+
+        await AssertNoSetupWriteWasInvokedAsync(administration);
+    }
+
+    [Fact]
+    public async Task Duplicate_activation_version_header_returns_stable_problem_details_without_invoking_the_operation()
     {
         IAgentAdministrationOperations administration = Substitute.For<IAgentAdministrationOperations>();
         await using WebApplication app = BuildHttpApp(AgentsClientWith(administration));
@@ -322,24 +363,18 @@ public sealed class AgentsOperationEndpointsTests
         {
             Content = JsonContent.Create(new ActivateAgent()),
         };
-        request.Headers.TryAddWithoutValidation(
-            "X-Correlation-ID",
-            duplicateHeader == "X-Correlation-ID" ? [CorrelationId, CorrelationId] : [CorrelationId]).ShouldBeTrue();
-        request.Headers.TryAddWithoutValidation(
-            "Idempotency-Key",
-            duplicateHeader == "Idempotency-Key" ? [MessageId, MessageId] : [MessageId]).ShouldBeTrue();
-        request.Headers.TryAddWithoutValidation(
-            "X-Expected-Configuration-Version",
-            duplicateHeader == "X-Expected-Configuration-Version" ? [canonicalValue, canonicalValue] : ["3"]).ShouldBeTrue();
+        request.Headers.Add("X-Correlation-ID", CorrelationId);
+        request.Headers.Add("Idempotency-Key", MessageId);
+        request.Headers.TryAddWithoutValidation("X-Expected-Configuration-Version", ["3", "3"]).ShouldBeTrue();
 
         using HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(true);
 
         response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
         response.Content.Headers.ContentType?.MediaType.ShouldBe("application/problem+json");
         string problem = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
-        problem.ShouldContain(expectedProblemType);
+        problem.ShouldContain(AgentSetupCommandHeadersFilter.InvalidActivationVersionProblemType);
         problem.ShouldContain("canonical_value_required");
-        problem.ShouldContain(duplicateHeader);
+        problem.ShouldContain("X-Expected-Configuration-Version");
         await administration.DidNotReceiveWithAnyArgs().ActivateAsync(
             default!,
             default!,
@@ -503,6 +538,25 @@ public sealed class AgentsOperationEndpointsTests
 
         using HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(true);
         response.EnsureSuccessStatusCode();
+    }
+
+    private static (HttpMethod Method, string Path, object Command)[] SetupWriteRequests()
+        =>
+        [
+            (HttpMethod.Post, "/api/agents/operations/agents/agent-1", new CreateAgent("tenant-from-body", "hexa", null, "instructions long enough to be valid")),
+            (HttpMethod.Put, "/api/agents/operations/agents/agent-1", new UpdateAgentConfiguration("hexa", null, "instructions long enough to be valid")),
+            (HttpMethod.Post, "/api/agents/operations/agents/agent-1/response-mode", new ConfigureAgentResponseMode(AgentResponseMode.Confirmation)),
+            (HttpMethod.Post, "/api/agents/operations/agents/agent-1/activate", new ActivateAgent()),
+            (HttpMethod.Post, "/api/agents/operations/agents/agent-1/disable", new DisableAgent()),
+        ];
+
+    private static async Task AssertNoSetupWriteWasInvokedAsync(IAgentAdministrationOperations administration)
+    {
+        await administration.DidNotReceiveWithAnyArgs().CreateAsync(default!, default!, default, default);
+        await administration.DidNotReceiveWithAnyArgs().UpdateConfigurationAsync(default!, default!, default, default);
+        await administration.DidNotReceiveWithAnyArgs().ConfigureResponseModeAsync(default!, default!, default, default);
+        await administration.DidNotReceiveWithAnyArgs().ActivateAsync(default!, default!, default, default);
+        await administration.DidNotReceiveWithAnyArgs().DisableAsync(default!, default!, default, default);
     }
 
     [Fact]

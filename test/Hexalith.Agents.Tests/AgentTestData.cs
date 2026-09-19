@@ -262,7 +262,6 @@ internal static class AgentTestData
             extensions[ApproverPolicyValidationExtensionKey] = approverValidation.ToString();
         }
 
-
         extensions[ActivationExpectedConfigurationVersionExtensionKey] =
             expectedConfigurationVersion.ToString(CultureInfo.InvariantCulture);
 
@@ -518,6 +517,7 @@ internal static class AgentTestData
                 case AgentNotFoundRejection e: state.Apply(e); break;
                 case AgentAlreadyExistsRejection e: state.Apply(e); break;
                 case AgentActivationBlockedRejection e: state.Apply(e); break;
+                case AgentActivationConfigurationVersionMismatchRejection e: state.Apply(e); break;
                 case AgentLifecycleStateAlreadySetRejection e: state.Apply(e); break;
                 case InvalidAgentConfigurationRejection e: state.Apply(e); break;
                 case AgentPartyIdentityLinkRejected e: state.Apply(e); break;

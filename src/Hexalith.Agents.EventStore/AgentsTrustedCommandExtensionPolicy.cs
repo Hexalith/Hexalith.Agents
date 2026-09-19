@@ -26,6 +26,15 @@ internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId) : 
 
     private readonly string _agentsAppId = agentsAppId;
 
+    public bool Claims(string domain, string commandType, string key)
+        => string.Equals(domain, AgentDomain, StringComparison.Ordinal)
+            && _setupCommandTypes.Contains(commandType)
+            && (string.Equals(key, AgentSetupTrustedExtensions.AgentAdministrator, StringComparison.Ordinal)
+                || (string.Equals(commandType, nameof(ActivateAgent), StringComparison.Ordinal)
+                    && (string.Equals(key, AgentSetupTrustedExtensions.ProviderSelectionValidation, StringComparison.Ordinal)
+                        || string.Equals(key, AgentSetupTrustedExtensions.ApproverPolicyValidation, StringComparison.Ordinal)
+                        || string.Equals(key, AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, StringComparison.Ordinal))));
+
     public bool Accepts(ClaimsPrincipal principal, SubmitCommandRequest command, string key, string value)
     {
         ArgumentNullException.ThrowIfNull(principal);
@@ -42,8 +51,7 @@ internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId) : 
             || authenticatedIdentities[0].FindAll(DaprCallerAppIdClaim).Select(claim => claim.Value).Count(value =>
                 string.Equals(value, _agentsAppId, StringComparison.Ordinal)) != 1
             || principal.FindAll(DaprCallerAppIdClaim).Count() != 1
-            || !string.Equals(command.Domain, AgentDomain, StringComparison.Ordinal)
-            || !_setupCommandTypes.Contains(command.CommandType))
+            || !Claims(command.Domain, command.CommandType, key))
         {
             return false;
         }

@@ -122,7 +122,7 @@ def main() -> int:
                     typeof(AgentsAssemblyMarker),
                     typeof(AgentsClientAssemblyMarker),
                     typeof(AgentLifecycleStatus),
-                    typeof(AgentsEventStoreAssemblyMarker),
+                    typeof(AgentsEventStoreServiceCollectionExtensions),
                     typeof(AgentsTestingAssemblyMarker),
                     typeof(AgentsUIAssemblyMarker),
                 ];

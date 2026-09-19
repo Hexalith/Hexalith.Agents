@@ -43,7 +43,7 @@ public sealed class AgentSetupDomainResultTests
 
     [Theory]
     [MemberData(nameof(EventfulCommandNames))]
-    public void EveryEventfulSetupHandlerCarriesAppliedEffectAndItsEmittedVersion(string commandName)
+    public void Every_eventful_setup_handler_carries_applied_effect_and_its_emitted_version(string commandName)
     {
         (DomainResult result, int expectedVersion) = EventfulCase(commandName);
 
@@ -56,7 +56,7 @@ public sealed class AgentSetupDomainResultTests
 
     [Theory]
     [MemberData(nameof(NoOpCommandNames))]
-    public void EveryNoOpCapableSetupHandlerCarriesAlreadyAppliedEffectAndItsUnchangedVersion(string commandName)
+    public void Every_noop_capable_setup_handler_carries_already_applied_effect_and_its_unchanged_version(string commandName)
     {
         (DomainResult result, int unchangedVersion) = NoOpCase(commandName);
 
@@ -66,7 +66,7 @@ public sealed class AgentSetupDomainResultTests
 
     [Theory]
     [MemberData(nameof(NoOpCommandNames))]
-    public void NoOpResultPayloadSurvivesTheDomainServiceWireContract(string commandName)
+    public void Noop_result_payload_survives_the_domain_service_wire_contract(string commandName)
     {
         // The wire result is the first hop out of the aggregate. It preserves the payload for IsNoOp as well as
         // IsSuccess, which is what makes an AlreadyApplied receipt correlatable at the operations boundary.
@@ -109,7 +109,7 @@ public sealed class AgentSetupDomainResultTests
     }
 
     [Fact]
-    public void DomainRejectionCarriesNoResultPayload()
+    public void Domain_rejection_carries_no_result_payload()
     {
         var command = new UpdateAgentConfiguration("hexa", null, ValidInstructions);
 

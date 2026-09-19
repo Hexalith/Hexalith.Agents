@@ -50,9 +50,9 @@ public sealed class AgentSetupCompositionTests
         scope.ServiceProvider.GetRequiredService<IAgentsClient>().AgentAdministration
             .ShouldBeOfType<EventStoreAgentAdministrationOperations>();
         scope.ServiceProvider.GetRequiredService<IAgentsClient>().ProviderCatalog
-            .ShouldBeOfType<EventStoreProviderCatalogOperations>();
+            .ShouldNotBeOfType<EventStoreProviderCatalogOperations>();
         scope.ServiceProvider.GetRequiredService<IProviderCatalogOperations>()
-            .ShouldBeOfType<EventStoreProviderCatalogOperations>();
+            .ShouldNotBeOfType<EventStoreProviderCatalogOperations>();
         scope.ServiceProvider.GetRequiredService<IProviderCatalogReader>()
             .ShouldBeOfType<ProjectedProviderCatalogReader>();
     }
@@ -83,7 +83,39 @@ public sealed class AgentSetupCompositionTests
             CancellationToken.None);
 
         handler.DaprAppId.ShouldBe("eventstore-runtime");
+        handler.DaprAppIdHeaderValueCount.ShouldBe(1);
         handler.DaprApiToken.ShouldBe("secret-token");
+        handler.DaprApiTokenHeaderValueCount.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Configured_Dapr_identity_without_an_optional_token_sends_only_the_app_id_header()
+    {
+        var handler = new CapturingHandler();
+        using ServiceProvider provider = BuildWithHandler(
+            handler,
+            ("Agents:EventStore:BaseUrl", "https://eventstore.example"),
+            ("Agents:EventStore:AppId", "eventstore-runtime"));
+
+        IAgentCommandDispatcher dispatcher = provider.GetRequiredService<IAgentCommandDispatcher>();
+        _ = await dispatcher.DispatchAsync(
+            new CommandEnvelope(
+                "message-1",
+                "tenant-a",
+                "agent",
+                "agent-a",
+                "DisableAgent",
+                [],
+                "correlation-1",
+                null,
+                "system:agents",
+                null),
+            CancellationToken.None);
+
+        handler.DaprAppId.ShouldBe("eventstore-runtime");
+        handler.DaprAppIdHeaderValueCount.ShouldBe(1);
+        handler.DaprApiToken.ShouldBeNull();
+        handler.DaprApiTokenHeaderValueCount.ShouldBe(0);
     }
 
     [Fact]
@@ -180,14 +212,26 @@ public sealed class AgentSetupCompositionTests
     {
         internal string? DaprAppId { get; private set; }
 
+        internal int DaprAppIdHeaderValueCount { get; private set; }
+
         internal string? DaprApiToken { get; private set; }
+
+        internal int DaprApiTokenHeaderValueCount { get; private set; }
 
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
-            DaprAppId = request.Headers.GetValues("dapr-app-id").Single();
-            DaprApiToken = request.Headers.GetValues("dapr-api-token").Single();
+            string[] appIds = request.Headers.TryGetValues("dapr-app-id", out IEnumerable<string>? appIdValues)
+                ? appIdValues.ToArray()
+                : [];
+            string[] apiTokens = request.Headers.TryGetValues("dapr-api-token", out IEnumerable<string>? apiTokenValues)
+                ? apiTokenValues.ToArray()
+                : [];
+            DaprAppIdHeaderValueCount = appIds.Length;
+            DaprAppId = appIds.SingleOrDefault();
+            DaprApiTokenHeaderValueCount = apiTokens.Length;
+            DaprApiToken = apiTokens.SingleOrDefault();
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.Accepted)
             {
                 Content = new StringContent(

@@ -176,7 +176,7 @@ public sealed class AgentsClientSetupGatewayTests
     }
 
     [Fact]
-    public async Task A_write_forwards_the_exact_correlation_and_idempotency_options()
+    public async Task Every_write_forwards_the_exact_correlation_and_idempotency_options()
     {
         var acceptance = new AgentCommandAcceptance(
             AgentId,
@@ -189,14 +189,51 @@ public sealed class AgentsClientSetupGatewayTests
             CorrelationId: acceptance.CorrelationId,
             IdempotencyKey: acceptance.MessageId);
         _administration
+            .UpdateConfigurationAsync(AgentId, Arg.Any<UpdateAgentConfiguration>(), Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(
+                AgentOperationResult<AgentCommandAcceptance>.Succeeded(acceptance)));
+        _administration
+            .ConfigureResponseModeAsync(AgentId, Arg.Any<ConfigureAgentResponseMode>(), Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(
+                AgentOperationResult<AgentCommandAcceptance>.Succeeded(acceptance)));
+        _administration
+            .ActivateAsync(AgentId, Arg.Any<ActivateAgent>(), Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(
+                AgentOperationResult<AgentCommandAcceptance>.Succeeded(acceptance)));
+        _administration
             .DisableAsync(AgentId, Arg.Any<DisableAgent>(), Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
             .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(
                 AgentOperationResult<AgentCommandAcceptance>.Succeeded(acceptance)));
 
-        AgentSetupWriteResult result = await Gateway().DisableAsync(options, CancellationToken.None);
+        AgentsClientSetupGateway gateway = Gateway();
+        AgentSetupWriteResult[] results =
+        [
+            await gateway.UpdateConfigurationAsync(
+                new UpdateAgentConfiguration("hexa", null, "instructions long enough to be valid"),
+                options,
+                CancellationToken.None),
+            await gateway.ConfigureResponseModeAsync(AgentResponseMode.Confirmation, options, CancellationToken.None),
+            await gateway.ActivateAsync(options, CancellationToken.None),
+            await gateway.DisableAsync(options, CancellationToken.None),
+        ];
 
-        result.Status.ShouldBe(AgentSetupWriteStatus.AlreadyApplied);
-        result.Acceptance.ShouldBeSameAs(acceptance);
+        results.ShouldAllBe(result => result.Status == AgentSetupWriteStatus.AlreadyApplied);
+        results.ShouldAllBe(result => ReferenceEquals(result.Acceptance, acceptance));
+        await _administration.Received(1).UpdateConfigurationAsync(
+            AgentId,
+            Arg.Any<UpdateAgentConfiguration>(),
+            Arg.Is<AgentOperationOptions?>(actual => ReferenceEquals(actual, options)),
+            Arg.Any<CancellationToken>());
+        await _administration.Received(1).ConfigureResponseModeAsync(
+            AgentId,
+            Arg.Any<ConfigureAgentResponseMode>(),
+            Arg.Is<AgentOperationOptions?>(actual => ReferenceEquals(actual, options)),
+            Arg.Any<CancellationToken>());
+        await _administration.Received(1).ActivateAsync(
+            AgentId,
+            Arg.Any<ActivateAgent>(),
+            Arg.Is<AgentOperationOptions?>(actual => ReferenceEquals(actual, options)),
+            Arg.Any<CancellationToken>());
         await _administration.Received(1).DisableAsync(
             AgentId,
             Arg.Any<DisableAgent>(),

@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 using Hexalith.Agents.ProviderCatalog;
 using Hexalith.Agents.Server.Ports;
@@ -29,6 +30,7 @@ public sealed class ProviderCatalogAdministrationOrchestrator
         AgentProviderSelectionOrchestrator.AgentAdminExtensionKey,
         AgentProviderSelectionOrchestrator.ProviderSelectionValidationExtensionKey,
         AgentActivationProviderRevalidation.ApproverPolicyValidationExtensionKey,
+        AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion,
     ];
 
     private readonly IAgentCommandDispatcher _dispatcher;

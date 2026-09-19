@@ -3,10 +3,13 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Hexalith.Agents.Contracts.Agent;
+using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Server.Application.Agents;
 using Hexalith.Agents.Server.Ports;
 using Hexalith.Agents.Server.Projections;
+
+using Hexalith.EventStore.Contracts.Commands;
 
 using Microsoft.Extensions.Options;
 
@@ -84,6 +87,40 @@ public sealed class ProviderCatalogAuthorizationTests
         result.Entry.ShouldBeNull();
         _store.GetCount.ShouldBe(getsBefore);
         JsonSerializer.Serialize(result).ShouldNotContain("openai");
+    }
+
+    [Fact]
+    public async Task Catalog_orchestration_strips_the_internal_activation_version_extension()
+    {
+        CommandEnvelope? dispatched = null;
+        IAgentCommandDispatcher dispatcher = Substitute.For<IAgentCommandDispatcher>();
+        dispatcher.DispatchAsync(
+                Arg.Do<CommandEnvelope>(value => dispatched = value),
+                Arg.Any<CancellationToken>())
+            .Returns(new Hexalith.EventStore.Contracts.Commands.SubmitCommandResponse("corr-1", null, "msg-1"));
+        var orchestrator = new ProviderCatalogAdministrationOrchestrator(dispatcher);
+        var request = new ProviderCatalogAdministrationRequest(
+            "msg-1",
+            "corr-1",
+            TenantId,
+            "admin-user",
+            IsProviderAdmin: true,
+            new Dictionary<string, string>
+            {
+                [AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion] = "7",
+                ["trace"] = "safe",
+            });
+
+        _ = await orchestrator.DisableAsync(
+            request,
+            new DisableProviderModelEntry("openai", "gpt-4o"),
+            CancellationToken.None);
+
+        CommandEnvelope sent = dispatched.ShouldNotBeNull();
+        sent.Extensions.ShouldNotBeNull()
+            .ContainsKey(AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion)
+            .ShouldBeFalse();
+        sent.Extensions["trace"].ShouldBe("safe");
     }
 
     private ProjectedProviderCatalogReader Reader()

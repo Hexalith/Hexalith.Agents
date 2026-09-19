@@ -45,6 +45,11 @@ COUNT_PATTERNS = (
         r"\btests?\b\s*(?::|=|->|→)?\s*\d[\d,]*(?:\s*/\s*\d[\d,]*)+",
         re.IGNORECASE,
     ),
+    re.compile(
+        r"\btests?\b\s+(?:(?:are\s+)?(?:all\s+)?)?(?:green|pass(?:ed|ing)?)"
+        r"\s*(?::|=|->|→)?\s*\d[\d,]*(?:\s*/\s*\d[\d,]*)+",
+        re.IGNORECASE,
+    ),
 )
 SUITE_COUNT_PATTERN = re.compile(
     r"\b(?:[A-Za-z0-9.]+\.Tests|domain|server|contracts|client|ui)"
@@ -404,7 +409,6 @@ def parse_file_list(text: str, layout: StoryLayout) -> set[str]:
 
 def unmanaged_count_claims(text: str, layout: StoryLayout) -> list[tuple[int, str]]:
     failures: list[tuple[int, str]] = []
-    pending_suite_count: tuple[int, str] | None = None
     offset = 0
     for number, line in enumerate(text.splitlines(keepends=True), start=1):
         content = line.rstrip("\r\n")
@@ -416,24 +420,14 @@ def unmanaged_count_claims(text: str, layout: StoryLayout) -> list[tuple[int, st
         in_file_list = layout.file_list_start <= offset < layout.file_list_end
         if not in_generated and not in_file_list:
             candidate = re.sub(r"[*_]", "", content)
-            # A single phrase such as "domain 5" is ordinary requirements prose. Bare suite-label/count
-            # evidence is recognizable only as a multi-suite summary; explicit "tests"/result terms above
-            # remain sufficient on their own.
+            # A phrase such as "domain 5" in ordinary requirements prose is not a count claim. A bare
+            # suite-label/count line is evidence on its own; explicit "tests"/result terms remain sufficient
+            # even when embedded in a longer line.
             suite_counts = SUITE_COUNT_PATTERN.findall(candidate)
             if any(pattern.search(candidate) for pattern in COUNT_PATTERNS) or len(suite_counts) >= 2:
                 failures.append((number, content.strip()))
-                pending_suite_count = None
             elif SUITE_COUNT_LINE_PATTERN.fullmatch(candidate):
-                current = (number, content.strip())
-                if pending_suite_count is not None and pending_suite_count[0] == number - 1:
-                    if not failures or failures[-1][0] != pending_suite_count[0]:
-                        failures.append(pending_suite_count)
-                    failures.append(current)
-                pending_suite_count = current
-            else:
-                pending_suite_count = None
-        else:
-            pending_suite_count = None
+                failures.append((number, content.strip()))
         offset += len(line)
     return failures
 

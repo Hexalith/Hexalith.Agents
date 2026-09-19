@@ -30,7 +30,13 @@
                      aria-live="polite"
                      aria-atomic="true"
                      data-testid="agents-config-write-live-region">
-            @if (_pendingWrite is { } pendingStatus)
+            @if (_writeAnnouncementKey is { } announcementKey)
+            {
+                <FluentText data-testid="agents-config-write-state">
+                    @Localizer[announcementKey]
+                </FluentText>
+            }
+            else if (_pendingWrite is { } pendingStatus)
             {
                 <FluentText data-testid="agents-config-write-state">
                     @Localizer[$"Agents.Config.Write.{pendingStatus.Status}"]
@@ -110,8 +116,9 @@
 
             <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Edit"]">
                 @* The only write surface for identity and instructions. The instructions field always starts empty
-                   and is cleared after every submit: the current instruction text is never read back into the page,
-                   so a save reports presence/validity/version and nothing else (AD-14). *@
+                   and is cleared while a submit is owned by the retained attempt; terminal failure or abandonment
+                   restores that exact draft. The current instruction text is never read back into the page, so a
+                   save reports presence/validity/version and nothing else (AD-14). *@
                 <h2>@Localizer["Agents.Config.Section.Edit"]</h2>
                 <FluentTextInput @bind-Value="_displayNameDraft"
                                  Disabled="@(_busy || HasUnresolvedAttempt)"
@@ -239,7 +246,7 @@
                 @* Activation is a distinct action shown after validity is visible. Activating sets a lifecycle
                    flag; it never means the Agent can be called, and the note says so on every render. *@
                 <FluentButton Appearance="ButtonAppearance.Primary"
-                              Disabled="@(_busy || HasUnresolvedAttempt || agent.Lifecycle == AgentLifecycleStatus.Active)"
+                              Disabled="@(_busy || HasUnresolvedAttempt || setup.ConfigurationVersion <= 0 || agent.Lifecycle == AgentLifecycleStatus.Active)"
                               OnClick="ActivateAsync"
                               data-testid="agents-config-activate">
                     @Localizer["Agents.Config.Activation.Label"]
@@ -267,6 +274,7 @@
     private FcPageHeader? _header;
     private AgentSetupResult? _result;
     private AgentSetupWriteResult? _pendingWrite;
+    private string? _writeAnnouncementKey;
     private AgentSetupAttempt? _activeAttempt;
     private AgentResponseMode _responseMode = AgentResponseMode.Unknown;
     private string _displayNameDraft = string.Empty;
@@ -359,6 +367,7 @@
         };
         var attempt = new AgentSetupAttempt(options, write, instructionsDraft);
         _pendingWrite = null;
+        _writeAnnouncementKey = null;
         _activeAttempt = attempt;
         if (instructionsDraft is not null)
         {
@@ -375,11 +384,25 @@
         {
             CancellationToken cancellationToken = _lifetimeCancellation.Token;
 
+            AgentCommandAcceptance? retainedAcceptance = _pendingWrite?.Acceptance;
             AgentSetupWriteResult writeResult = await attempt.Submit(attempt.Options, cancellationToken)
                 .WaitAsync(cancellationToken)
                 .ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
+
+            if (retainedAcceptance is not null
+                && writeResult.Status != AgentSetupWriteStatus.Submitted)
+            {
+                // Once EventStore has accepted an attempt, a later retry response cannot erase that evidence.
+                // In particular, an AlreadyApplied replay is not a new no-op: the original eventful receipt still
+                // needs its target projection confirmed before this attempt can be released.
+                _pendingWrite = AgentSetupWriteResult.AwaitingProjection(retainedAcceptance);
+                _writeAnnouncementKey = "Agents.Config.Write.RetryUnresolved";
+                return;
+            }
+
             _pendingWrite = writeResult;
+            _writeAnnouncementKey = null;
             if (writeResult.Status == AgentSetupWriteStatus.AlreadyApplied)
             {
                 ReleaseAttempt(restoreInstructionsDraft: false);
@@ -391,14 +414,14 @@
                 await RequestRenderAsync(cancellationToken).ConfigureAwait(false);
                 AgentSetupTruthState refreshState = await RefreshAfterWriteAsync(
                         targetVersion,
-                        cancellationToken,
-                        applyAuthoritativeDrafts: false)
+                        cancellationToken)
                     .ConfigureAwait(false);
 
                 if (refreshState == AgentSetupTruthState.ProjectionConfirmed)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     _pendingWrite = null;
+                    _writeAnnouncementKey = "Agents.Config.Write.Confirmed";
                     ReleaseAttempt(restoreInstructionsDraft: false);
                 }
                 else
@@ -456,20 +479,21 @@
         try
         {
             CancellationToken cancellationToken = _lifetimeCancellation.Token;
-            AgentSetupTruthState refreshState = await RefreshAfterWriteAsync(
-                    targetVersion,
-                    cancellationToken,
-                    applyAuthoritativeDrafts: false)
-                .ConfigureAwait(false);
+            _writeAnnouncementKey = "Agents.Config.Write.Refreshing";
+            await RequestRenderAsync(cancellationToken).ConfigureAwait(false);
+            await LoadAsync(targetVersion, cancellationToken, applyAuthoritativeDrafts: false).ConfigureAwait(false);
+            AgentSetupTruthState refreshState = _result?.Setup?.TruthState ?? AgentSetupTruthState.Unknown;
             if (refreshState == AgentSetupTruthState.ProjectionConfirmed)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 _pendingWrite = null;
+                _writeAnnouncementKey = "Agents.Config.Write.Confirmed";
                 ReleaseAttempt(restoreInstructionsDraft: false);
             }
-            else if (refreshState == AgentSetupTruthState.AuthoritativePending)
+            else
             {
                 _pendingWrite = AgentSetupWriteResult.AwaitingProjection(acceptance);
+                _writeAnnouncementKey = "Agents.Config.Write.RefreshIncomplete";
             }
         }
         catch (OperationCanceledException) when (_disposed)
@@ -482,6 +506,9 @@
             {
                 _pendingWrite = RetainedAwaitingProjection()
                     ?? AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
+                _writeAnnouncementKey = _pendingWrite?.Acceptance is not null
+                    ? "Agents.Config.Write.RefreshIncomplete"
+                    : null;
             }
         }
         finally
@@ -511,6 +538,7 @@
 
         ReleaseAttempt(restoreInstructionsDraft: true);
         _pendingWrite = null;
+        _writeAnnouncementKey = null;
     }
 
     private void ReleaseAttempt(bool restoreInstructionsDraft)
@@ -533,8 +561,7 @@
 
     private async Task<AgentSetupTruthState> RefreshAfterWriteAsync(
         int? expectedConfigurationVersion,
-        CancellationToken cancellationToken,
-        bool applyAuthoritativeDrafts)
+        CancellationToken cancellationToken)
     {
         using CancellationTokenSource timeoutCancellation = new(ProjectionPollingTimeout, TimeProvider);
         using CancellationTokenSource pollingCancellation = CancellationTokenSource.CreateLinkedTokenSource(
@@ -546,7 +573,7 @@
             await LoadAsync(
                 expectedConfigurationVersion,
                 pollingCancellation.Token,
-                applyAuthoritativeDrafts).ConfigureAwait(false);
+                applyAuthoritativeDrafts: false).ConfigureAwait(false);
             if (_result?.Setup is not { TruthState: AgentSetupTruthState.AuthoritativePending })
             {
                 return _result?.Setup?.TruthState ?? AgentSetupTruthState.Unknown;
@@ -567,7 +594,8 @@
         catch (OperationCanceledException) when (
             timeoutCancellation.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
         {
-            // Exhaustion preserves the last authoritative-pending view and its Submitted notice.
+            // Exhaustion preserves the last authoritative-pending view; callers relabel the retained acceptance
+            // as AwaitingProjection and keep its recovery actions available.
             return AgentSetupTruthState.AuthoritativePending;
         }
     }

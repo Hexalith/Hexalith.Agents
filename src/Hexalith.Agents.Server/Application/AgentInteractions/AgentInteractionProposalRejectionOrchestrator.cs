@@ -41,10 +41,10 @@ public sealed class AgentInteractionProposalRejectionOrchestrator
     // admin/verdict onto the interaction stream. This terminal-action path repopulates none of them.
     private static readonly string[] _reservedExtensionKeys =
     [
-        "actor:agentsAdmin",
-        "provider:selectionValidation",
-        "approver:policyValidation",
-        "party:linkValidation",
+        AgentSetupTrustedExtensions.AgentAdministrator,
+        AgentSetupTrustedExtensions.ProviderSelectionValidation,
+        AgentSetupTrustedExtensions.ApproverPolicyValidation,
+        AgentSetupTrustedExtensions.PartyLinkValidation,
     ];
 
     private readonly IApproverPolicyResolver _approverPolicyResolver;

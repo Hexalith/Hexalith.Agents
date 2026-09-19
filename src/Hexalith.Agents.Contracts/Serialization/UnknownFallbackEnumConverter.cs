@@ -58,9 +58,19 @@ public sealed class UnknownFallbackEnumConverter<TEnum> : JsonConverter<TEnum>
     }
 
     private static TEnum FromOrdinal(int ordinal)
-        => Enum.IsDefined(typeof(TEnum), ordinal)
-            ? (TEnum)Enum.ToObject(typeof(TEnum), ordinal)
-            : default;
+    {
+        object value;
+        try
+        {
+            value = Enum.ToObject(typeof(TEnum), ordinal);
+        }
+        catch (ArgumentException)
+        {
+            return default;
+        }
+
+        return Enum.IsDefined(typeof(TEnum), value) ? (TEnum)value : default;
+    }
 
     private static TEnum FromName(string? name)
     {

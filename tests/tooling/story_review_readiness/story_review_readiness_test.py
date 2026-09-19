@@ -262,12 +262,22 @@ class StoryParsingTests(unittest.TestCase):
 
         self.assertEqual(V.unmanaged_count_claims(text, V.parse_story_layout(text)), [])
 
-    def test_adjacent_single_suite_count_lines_are_reported_as_unmanaged_evidence(self):
-        text = story_text(record_text="Server: 545\nDomain: 787")
+    def test_bare_suite_count_lines_are_reported_even_when_separated_or_alone(self):
+        text = story_text(record_text="Server: 545\n\nDomain: 787\nNotes stay prose.\nUI: 1073")
 
         failures = V.unmanaged_count_claims(text, V.parse_story_layout(text))
 
-        self.assertEqual([content for _, content in failures], ["Server: 545", "Domain: 787"])
+        self.assertEqual(
+            [content for _, content in failures],
+            ["Server: 545", "Domain: 787", "UI: 1073"],
+        )
+
+    def test_qualified_test_ratio_is_reported_as_unmanaged_evidence(self):
+        text = story_text(record_text="All tests green: 2944/2944")
+
+        failures = V.unmanaged_count_claims(text, V.parse_story_layout(text))
+
+        self.assertEqual([content for _, content in failures], ["All tests green: 2944/2944"])
 
     def test_ratio_after_test_related_prose_is_not_test_count_evidence(self):
         text = story_text(record_text="A ratio without test-result context, such as 16/9, is ordinary prose.")

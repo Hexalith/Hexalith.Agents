@@ -53,10 +53,10 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
     // client-supplied extensions so a client cannot smuggle a forged admin/verdict onto the interaction stream.
     private static readonly string[] _reservedExtensionKeys =
     [
-        "actor:agentsAdmin",
-        "provider:selectionValidation",
-        "approver:policyValidation",
-        "party:linkValidation",
+        AgentSetupTrustedExtensions.AgentAdministrator,
+        AgentSetupTrustedExtensions.ProviderSelectionValidation,
+        AgentSetupTrustedExtensions.ApproverPolicyValidation,
+        AgentSetupTrustedExtensions.PartyLinkValidation,
     ];
 
     private readonly IConversationContextReader _contextReader;

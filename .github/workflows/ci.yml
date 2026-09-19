@@ -8,14 +8,14 @@ on:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
 
 jobs:
   ci:
-    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@main
+    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@cb91511794c8898b738d85dc6c751f82b832cbc9
     with:
       solution: Hexalith.Agents.slnx
       test-platform: microsoft-testing-platform

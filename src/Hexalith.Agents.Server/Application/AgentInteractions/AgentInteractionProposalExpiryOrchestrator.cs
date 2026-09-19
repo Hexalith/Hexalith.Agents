@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Hexalith.Agents.AgentInteraction;
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.AgentInteraction.Commands;
 using Hexalith.Agents.Server.Ports;
@@ -36,10 +37,10 @@ public sealed class AgentInteractionProposalExpiryOrchestrator
 
     private static readonly string[] _reservedExtensionKeys =
     [
-        "actor:agentsAdmin",
-        "provider:selectionValidation",
-        "approver:policyValidation",
-        "party:linkValidation",
+        AgentSetupTrustedExtensions.AgentAdministrator,
+        AgentSetupTrustedExtensions.ProviderSelectionValidation,
+        AgentSetupTrustedExtensions.ApproverPolicyValidation,
+        AgentSetupTrustedExtensions.PartyLinkValidation,
     ];
 
     private readonly IProposalExpiryPolicyReader _expiryReader;

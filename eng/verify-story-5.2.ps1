@@ -16,6 +16,15 @@
     administration operations, context provider, and UI setup gateway actually come out of DI (and that an
     unconfigured host stays fail-closed). The file anchors that follow are only a cheap tripwire for a live seam
     being deleted outright — the DI suites are the real evidence.
+
+.PARAMETER SkipBuild
+    Skips restore and build while retaining the package floor, focused tests, regressions, composition, and anchors.
+
+.PARAMETER PackageFloorOnly
+    Runs only the effective package-mode Hexalith.EventStore version-floor check.
+
+.PARAMETER PackageFloorProjectPath
+    Overrides the project evaluated by the package-floor check. Relative paths resolve from the repository root.
 #>
 
 param(
@@ -38,7 +47,7 @@ $testProjects = @(
 )
 
 function Assert-EventStorePackageFloor {
-    $minimumVersion = [Version]'3.105.0'
+    $minimumVersion = [Version]'3.106.0'
     $projectPath = if ([string]::IsNullOrWhiteSpace($PackageFloorProjectPath)) {
         'src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj'
     }
@@ -51,19 +60,25 @@ function Assert-EventStorePackageFloor {
         '-p:UseHexalithProjectReferences=false', '-p:NuGetAudit=false', '/nr:false'
     )
     $nativeErrorPreference = $PSNativeCommandUseErrorActionPreference
+    $standardErrorPath = [IO.Path]::GetTempFileName()
     try {
         $PSNativeCommandUseErrorActionPreference = $false
-        $output = & dotnet @arguments 2>&1
+        $output = & dotnet @arguments 2> $standardErrorPath
         $exitCode = $LASTEXITCODE
+        $standardError = @(Get-Content -LiteralPath $standardErrorPath)
     }
     finally {
         $PSNativeCommandUseErrorActionPreference = $nativeErrorPreference
+        Remove-Item -LiteralPath $standardErrorPath -Force -ErrorAction SilentlyContinue
     }
 
     if ($exitCode -ne 0) {
         $output | ForEach-Object { Write-Host $_ }
+        $standardError | ForEach-Object { Write-Host $_ }
         throw "Unable to resolve the effective package-mode Hexalith.EventStore PackageVersion rows."
     }
+
+    $standardError | ForEach-Object { Write-Host $_ }
 
     try {
         $evaluation = [string]::Join("`n", $output) | ConvertFrom-Json -ErrorAction Stop
@@ -84,20 +99,38 @@ function Assert-EventStorePackageFloor {
         throw "No effective package-mode Hexalith.EventStore PackageVersion rows were found."
     }
 
-    $effectiveVersions = [System.Collections.Generic.List[Version]]::new()
+    $effectiveVersions = [System.Collections.Generic.List[string]]::new()
     foreach ($packageVersion in $eventStorePackageVersions) {
         $identity = [string] $packageVersion.Identity
         $versionText = ([string] $packageVersion.Version).Trim()
-        $effectiveVersion = $null
-        if (-not [Version]::TryParse($versionText, [ref]$effectiveVersion)) {
-            throw "The effective package-mode PackageVersion for '$identity' ('$versionText') is not a valid version."
+        $versionMatch = [regex]::Match(
+            $versionText,
+            '^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)' +
+                '(?:-(?<prerelease>(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*))?' +
+                '(?:\+(?<metadata>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$'
+        )
+        if (-not $versionMatch.Success) {
+            throw "The effective package-mode PackageVersion for '$identity' ('$versionText') is not a valid SemVer 2 version."
         }
 
-        if ($effectiveVersion -lt $minimumVersion) {
-            throw "Story 5.2 requires Hexalith.EventStore $minimumVersion or later in package mode; effective version for '$identity' is $effectiveVersion. This release must include no-op result-payload forwarding, command-status reads, and trusted-extension admission."
+        try {
+            $effectiveVersion = [Version]::new(
+                [int] $versionMatch.Groups['major'].Value,
+                [int] $versionMatch.Groups['minor'].Value,
+                [int] $versionMatch.Groups['patch'].Value
+            )
+        }
+        catch {
+            throw "The effective package-mode PackageVersion for '$identity' ('$versionText') is outside the supported version range."
         }
 
-        $effectiveVersions.Add($effectiveVersion)
+        $isPrereleaseAtFloor =
+            $effectiveVersion -eq $minimumVersion -and $versionMatch.Groups['prerelease'].Success
+        if ($effectiveVersion -lt $minimumVersion -or $isPrereleaseAtFloor) {
+            throw "Story 5.2 requires Hexalith.EventStore $minimumVersion or later in package mode; effective version for '$identity' is $versionText. This release must include no-op result-payload forwarding, command-status reads, and trusted-extension admission."
+        }
+
+        $effectiveVersions.Add($versionText)
     }
 
     $selectedVersions = [string]::Join(', ', @($effectiveVersions | Sort-Object -Unique))
@@ -225,8 +258,18 @@ function Invoke-TestClasses {
     )
 
     Write-Host "Gate: $Name"
+    $assemblyPath = if ([IO.Path]::IsPathRooted($Assembly)) {
+        $Assembly
+    }
+    else {
+        Join-Path $root $Assembly
+    }
+    if (-not (Test-Path -LiteralPath $assemblyPath -PathType Leaf)) {
+        throw "Gate '$Name' requires the built test assembly '$Assembly'. Run without -SkipBuild or build it first."
+    }
+
     foreach ($class in $Classes) {
-        $arguments = @($Assembly, '-class', $class)
+        $arguments = @($assemblyPath, '-class', $class)
         $nativeErrorPreference = $PSNativeCommandUseErrorActionPreference
         try {
             # Capture both successful and failing output so a failed focused class always remains diagnosable.

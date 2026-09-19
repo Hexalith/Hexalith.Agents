@@ -259,7 +259,6 @@ public sealed class EventStoreAgentAdministrationOperations(
                 correlationId);
         }
 
-
         if (entry.Value is not null
             && (!string.Equals(entry.Value.TenantId, context.TenantId, StringComparison.Ordinal)
                 || !string.Equals(entry.Value.AgentId, agentId, StringComparison.Ordinal)))
@@ -476,7 +475,6 @@ public sealed class EventStoreAgentAdministrationOperations(
             || !TryGetUniqueProperty(value, AgentSetupResultPayload.EffectProperty, out JsonElement effectElement)
             || effectElement.ValueKind != JsonValueKind.String
             || !TryGetUniqueProperty(value, AgentSetupResultPayload.ConfigurationVersionProperty, out JsonElement versionElement)
-
             // TryGetInt32 throws rather than returning false when the element is not a number, and this runs
             // outside the dispatch try/catch, so a quoted version would escape instead of failing closed.
             || versionElement.ValueKind != JsonValueKind.Number

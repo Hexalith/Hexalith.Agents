@@ -33,15 +33,16 @@ public sealed class AgentPartyIdentityOrchestrator
     private const string AgentDomain = "agent";
 
     /// <summary>The server-populated Agents-admin authorization extension key (client-stripped).</summary>
-    internal const string AgentAdminExtensionKey = "actor:agentsAdmin";
+    internal const string AgentAdminExtensionKey = AgentSetupTrustedExtensions.AgentAdministrator;
 
     /// <summary>The server-populated Parties-validation verdict extension key (client-stripped).</summary>
-    internal const string PartyLinkValidationExtensionKey = "party:linkValidation";
+    internal const string PartyLinkValidationExtensionKey = AgentSetupTrustedExtensions.PartyLinkValidation;
 
     private static readonly string[] _reservedExtensionKeys =
     [
         AgentAdminExtensionKey,
         PartyLinkValidationExtensionKey,
+        AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion,
     ];
 
     private readonly IAgentPartyDirectory _directory;

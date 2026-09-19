@@ -156,6 +156,22 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         result.CorrelationId.ShouldBe(CorrelationId);
     }
 
+    [Theory]
+    [InlineData("not-a-ulid")]
+    [InlineData("01arz3ndektsv4rrffq69g5faw")]
+    public async Task A_read_rejects_noncanonical_correlation_metadata(string correlationId)
+    {
+        SeedProjectedSetup(configurationVersion: 2);
+
+        AgentOperationResult<AgentSetupResult> result = await Operations().GetStatusAsync(
+            AgentId,
+            options: new AgentOperationOptions(CorrelationId: correlationId));
+
+        result.Status.ShouldBe(AgentOperationStatus.ValidationFailed);
+        result.CorrelationId.ShouldBeNull();
+        result.Value.ShouldBeNull();
+    }
+
     [Fact]
     public async Task The_status_and_configuration_reads_serve_identical_truth()
     {
@@ -377,9 +393,28 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     }
 
     [Theory]
+    [InlineData("foreign-tenant", AgentId)]
+    [InlineData(TenantId, "foreign-agent")]
+    public async Task A_read_fails_closed_when_the_addressed_projection_embeds_another_identity(
+        string embeddedTenantId,
+        string embeddedAgentId)
+    {
+        SeedProjectedSetup(
+            configurationVersion: 2,
+            embeddedTenantId: embeddedTenantId,
+            embeddedAgentId: embeddedAgentId);
+
+        AgentOperationResult<AgentSetupResult> result = await Operations().GetStatusAsync(AgentId);
+
+        result.Status.ShouldBe(AgentOperationStatus.UnableToVerify);
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.UnableToVerify);
+        result.Value.ShouldBeNull();
+    }
+
+    [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task TheRealDomainResultPayloadIsUnderstoodAtTheOperationsBoundary(bool alreadyApplied)
+    public async Task The_real_domain_result_payload_is_understood_at_the_operations_boundary(bool alreadyApplied)
     {
         // The payload is written by the aggregate in Hexalith.Agents and read back in Hexalith.Agents.Server, so
         // fixtures hand-built on either side would keep agreeing with themselves after a one-sided rename. This
@@ -521,6 +556,45 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.UnableToVerify);
     }
 
+    [Fact]
+    public async Task A_status_reader_exception_keeps_a_payload_less_receipt_unverifiable()
+    {
+        _gateway
+            .SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                SubmitCommandRequest request = call.ArgAt<SubmitCommandRequest>(0);
+                return new SubmitCommandResponse(request.CorrelationId!, null, request.MessageId);
+            });
+        _statusReader
+            .WasRejectedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns<Task<bool?>>(_ => throw new InvalidOperationException("status unavailable"));
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(AgentId, new DisableAgent());
+
+        result.Status.ShouldBe(AgentOperationStatus.UnableToVerify);
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.UnableToVerify);
+    }
+
+    [Fact]
+    public async Task A_receipt_identity_mismatch_never_queries_command_status()
+    {
+        _gateway
+            .SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call => new SubmitCommandResponse(
+                call.ArgAt<SubmitCommandRequest>(0).CorrelationId!,
+                null,
+                CorrelationId));
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(
+            AgentId,
+            new DisableAgent(),
+            new AgentOperationOptions(IdempotencyKey: MessageId));
+
+        result.Status.ShouldBe(AgentOperationStatus.UnableToVerify);
+        await _statusReader.DidNotReceiveWithAnyArgs().WasRejectedAsync(default!, default);
+    }
+
     [Theory]
     [InlineData("missing-payload")]
     [InlineData("malformed-payload")]
@@ -533,6 +607,8 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     [InlineData("null-version")]
     [InlineData("bool-version")]
     [InlineData("object-version")]
+    [InlineData("duplicate-effect")]
+    [InlineData("duplicate-version")]
     public async Task An_unverifiable_gateway_receipt_fails_closed(string scenario)
     {
         _gateway
@@ -582,6 +658,14 @@ public sealed class EventStoreAgentAdministrationOperationsTests
                         request.CorrelationId!,
                         NonNumericVersionPayload("{\"value\":4}"),
                         request.MessageId),
+                    "duplicate-effect" => new SubmitCommandResponse(
+                        request.CorrelationId!,
+                        DuplicatePropertyPayload(AgentSetupResultPayload.EffectProperty),
+                        request.MessageId),
+                    "duplicate-version" => new SubmitCommandResponse(
+                        request.CorrelationId!,
+                        DuplicatePropertyPayload(AgentSetupResultPayload.ConfigurationVersionProperty),
+                        request.MessageId),
                     _ => new SubmitCommandResponse(
                         request.CorrelationId!,
                         SetupPayload("applied", 4),
@@ -599,7 +683,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     }
 
     [Fact]
-    public async Task NonUlidCallerCommandMetadataIsRejectedBeforeDispatch()
+    public async Task Non_ulid_caller_command_metadata_is_rejected_before_dispatch()
     {
         CaptureSubmit();
 
@@ -613,7 +697,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     }
 
     [Fact]
-    public async Task NonUlidIdempotencyKeyIsRejectedAfterAValidCorrelationWithoutDispatch()
+    public async Task Non_ulid_idempotency_key_is_rejected_after_a_valid_correlation_without_dispatch()
     {
         CaptureSubmit();
 
@@ -631,7 +715,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     [Theory]
     [InlineData("correlation")]
     [InlineData("idempotency")]
-    public async Task ParseableButNonCanonicalCallerUlidsAreRejectedBeforeDispatch(string field)
+    public async Task Parseable_but_noncanonical_caller_ulids_are_rejected_before_dispatch(string field)
     {
         CaptureSubmit();
         var options = new AgentOperationOptions(
@@ -716,6 +800,14 @@ public sealed class EventStoreAgentAdministrationOperationsTests
                 $$"""{"{{AgentSetupResultPayload.EffectProperty}}":"Applied","{{AgentSetupResultPayload.ConfigurationVersionProperty}}":{{versionJson}} }""")
             .RootElement
             .Clone();
+
+    private static JsonElement DuplicatePropertyPayload(string duplicatedProperty)
+    {
+        string json = duplicatedProperty == AgentSetupResultPayload.EffectProperty
+            ? $$"""{"{{AgentSetupResultPayload.EffectProperty}}":"Applied","{{AgentSetupResultPayload.EffectProperty}}":"Applied","{{AgentSetupResultPayload.ConfigurationVersionProperty}}":4}"""
+            : $$"""{"{{AgentSetupResultPayload.EffectProperty}}":"Applied","{{AgentSetupResultPayload.ConfigurationVersionProperty}}":4,"{{AgentSetupResultPayload.ConfigurationVersionProperty}}":4}""";
+        return JsonDocument.Parse(json).RootElement.Clone();
+    }
 
     // Keyed by the shared constants, so a renamed property fails here instead of degrading every write to
     // UnableToVerify at run time.

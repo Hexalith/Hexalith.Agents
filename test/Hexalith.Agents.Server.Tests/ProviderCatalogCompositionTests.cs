@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Hexalith.Agents.Client;
+using Hexalith.Agents.Contracts.Operations;
+using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Server.Application.Agents;
 using Hexalith.Agents.Server.Composition;
 using Hexalith.Agents.Server.Ports;
@@ -19,13 +21,14 @@ using NSubstitute;
 using Shouldly;
 
 /// <summary>
-/// Composition tests for the Story 5.3 live catalog path. A configured EventStore gateway must resolve the live
-/// catalog operations and projected reader; an unconfigured host must keep the deferred seams.
+/// Composition tests for the deferred Story 5.3 catalog write path. A configured EventStore gateway resolves the
+/// projected reader but keeps catalog mutations on the unavailable default until Story 5.3 supplies its own trusted
+/// gateway policy and idempotency adapters.
 /// </summary>
 public sealed class ProviderCatalogCompositionTests
 {
     [Fact]
-    public void A_configured_gateway_resolves_the_live_catalog_seams()
+    public async Task A_configured_gateway_keeps_catalog_writes_unavailable_while_resolving_projected_reads()
     {
         using ServiceProvider provider = Build(
             ("Agents:EventStore:BaseUrl", "https://eventstore.example"),
@@ -33,13 +36,29 @@ public sealed class ProviderCatalogCompositionTests
         using IServiceScope scope = provider.CreateScope();
 
         scope.ServiceProvider.GetRequiredService<IProviderCatalogOperations>()
-            .ShouldBeOfType<EventStoreProviderCatalogOperations>();
+            .ShouldNotBeOfType<EventStoreProviderCatalogOperations>();
         scope.ServiceProvider.GetRequiredService<IProviderCatalogReader>()
             .ShouldBeOfType<ProjectedProviderCatalogReader>();
         scope.ServiceProvider.GetRequiredService<IAgentsClient>().ProviderCatalog
-            .ShouldBeOfType<EventStoreProviderCatalogOperations>();
+            .ShouldNotBeOfType<EventStoreProviderCatalogOperations>();
         scope.ServiceProvider.GetRequiredService<IAgentsClient>().AgentAdministration
             .ShouldBeOfType<EventStoreAgentAdministrationOperations>();
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> result = await scope.ServiceProvider
+            .GetRequiredService<IProviderCatalogOperations>()
+            .CreateEntryAsync(new Hexalith.Agents.Contracts.ProviderCatalog.Commands.CreateProviderModelEntry(
+                "openai",
+                "gpt-4o",
+                "OpenAI GPT-4o",
+                Enabled: true,
+                SupportsTextGeneration: true,
+                128_000,
+                16_000,
+                new ProviderModelTimeoutPolicy(30_000, 3),
+                ProviderModelCapabilityFlags.Streaming,
+                "cfg-openai-gpt4o",
+                new ProviderModelPricing("USD", 0.002m, 0.008m, 0)));
+        result.Status.ShouldBe(AgentOperationStatus.Unavailable);
     }
 
     [Fact]
@@ -48,7 +67,8 @@ public sealed class ProviderCatalogCompositionTests
         using ServiceProvider provider = Build();
         using IServiceScope scope = provider.CreateScope();
 
-        scope.ServiceProvider.GetService<IProviderCatalogOperations>().ShouldBeNull();
+        scope.ServiceProvider.GetRequiredService<IProviderCatalogOperations>()
+            .ShouldNotBeOfType<EventStoreProviderCatalogOperations>();
         scope.ServiceProvider.GetRequiredService<IAgentsClient>().ProviderCatalog
             .ShouldNotBeOfType<EventStoreProviderCatalogOperations>();
     }

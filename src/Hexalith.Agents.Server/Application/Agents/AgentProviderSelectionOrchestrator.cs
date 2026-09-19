@@ -45,6 +45,7 @@ public sealed class AgentProviderSelectionOrchestrator
     [
         AgentAdminExtensionKey,
         ProviderSelectionValidationExtensionKey,
+        AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion,
     ];
 
     private readonly IProviderCatalogReader _catalogReader;

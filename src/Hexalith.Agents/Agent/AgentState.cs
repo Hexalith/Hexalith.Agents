@@ -401,6 +401,14 @@ public sealed class AgentState
 
     /// <summary>No-op replay handler — rejection events carry no state change.</summary>
     /// <param name="e">The rejection event.</param>
+    public void Apply(AgentActivationConfigurationVersionMismatchRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>No-op replay handler — rejection events carry no state change.</summary>
+    /// <param name="e">The rejection event.</param>
     public void Apply(AgentLifecycleStateAlreadySetRejection e)
     {
         ArgumentNullException.ThrowIfNull(e);

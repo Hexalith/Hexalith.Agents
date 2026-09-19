@@ -70,6 +70,7 @@ public sealed class AgentApproverPolicyOrchestratorTests
         {
             ["actor:agentsAdmin"] = "true",          // forged
             ["approver:policyValidation"] = "Valid", // smuggled activation verdict — must be stripped
+            [AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion] = "7",
             ["trace"] = "xyz-789",                    // benign, must be preserved
         };
 
@@ -79,6 +80,7 @@ public sealed class AgentApproverPolicyOrchestratorTests
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions["actor:agentsAdmin"].ShouldBe("true");
         dispatched.Extensions.ContainsKey("approver:policyValidation").ShouldBeFalse();
+        dispatched.Extensions.ContainsKey(AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion).ShouldBeFalse();
         dispatched.Extensions["trace"].ShouldBe("xyz-789");
     }
 

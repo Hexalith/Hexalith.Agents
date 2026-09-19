@@ -162,6 +162,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
         {
             ["actor:agentsAdmin"] = "true",                  // forged
             ["provider:selectionValidation"] = "Valid",      // forged bypass attempt
+            [AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion] = "7",
             ["trace"] = "abc-123",                           // benign, must be preserved
         };
 
@@ -171,6 +172,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions["provider:selectionValidation"].ShouldBe("Disabled"); // the trusted verdict wins, not the forged "Valid"
         dispatched.Extensions["actor:agentsAdmin"].ShouldBe("true");                 // repopulated from the trusted decision
+        dispatched.Extensions.ContainsKey(AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion).ShouldBeFalse();
         dispatched.Extensions["trace"].ShouldBe("abc-123");                          // non-reserved client extension preserved
     }
 

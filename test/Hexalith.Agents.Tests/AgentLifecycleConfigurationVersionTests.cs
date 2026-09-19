@@ -127,7 +127,10 @@ public sealed class AgentLifecycleConfigurationVersionTests
             .ShouldBeOfType<AgentActivationConfigurationVersionMismatchRejection>();
         rejection.ExpectedConfigurationVersion.ShouldBe(expected);
         rejection.ActualConfigurationVersion.ShouldBe(state.ConfigurationVersion);
+        int versionBeforeReplay = state.ConfigurationVersion;
+        ApplyAll(state, result);
         state.Lifecycle.ShouldBe(AgentLifecycleStatus.Draft);
+        state.ConfigurationVersion.ShouldBe(versionBeforeReplay);
     }
 
     [Fact]
