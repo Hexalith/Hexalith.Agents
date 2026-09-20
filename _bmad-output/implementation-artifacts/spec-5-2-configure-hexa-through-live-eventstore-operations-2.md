@@ -407,6 +407,35 @@ Code review of Story 5.2 **group A** (Contracts source and `test/Hexalith.Agents
 - `AgentActivationConfigurationVersionMismatchRejection` lacks a Web round-trip, a `Stale` mapping, and equal/non-positive version guards — `false`. Reproduced: `JsonSerializerDefaults.Web` round-trips the retained versions. The aggregate emits the event only after a canonical positive expected version that differs from state; event constructors must not throw on replay. Public `Stale` mapping is the dispatch/HTTP layer, not this type. Same claim from Blind Hunter and Edge Case Hunter.
 - The four-value V1 `Deconstruct` is unaccompanied by a six-value deconstruct test — `false`. The six-value shape is the compiler-generated primary-constructor deconstruct; dropping `Effect` or `TargetConfigurationVersion` would fail the existing JSON compatibility properties.
 
+### Review Findings
+
+Code review of Story 5.2 **group A** (Contracts source and `test/Hexalith.Agents.Contracts.Tests/**`, `599208d` → working tree), 2026-09-20, fourth pass. Four layers launched; Verification Gap Reviewer returned empty results and is recorded as a failed layer. Remaining groups: B Domain+EventStore+Server, C UI+related gitlinks, D Tests, E Tooling/docs.
+
+**Patch**
+
+- [ ] [Review][Patch] Quoted signed or padded ordinals resolve to a defined member instead of `Unknown` [src/Hexalith.Agents.Contracts/Serialization/UnknownFallbackEnumConverter.cs:89]
+- [ ] [Review][Patch] Independent setup-payload enum coverage still omits `AgentSetupWriteEffect` unless the discovery walk seeds `AgentCommandAcceptance` [test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs:176]
+
+**Deferred**
+
+- [x] [Review][Defer] The `Unknown = 0` tolerance migration still omits sibling public Agent enums [src/Hexalith.Agents.Contracts/Agent/ProviderSelectionValidationStatus.cs:19] — deferred: pre-existing migration scope, already tracked as DW-23. This Contracts slice did not change those files.
+
+**Rejected**
+
+- JSON `null` throws because `HandleNull` is not overridden — `false`. `UnrecognizedEnumPayloads` already includes `"null"`, and the Contracts suite passed 531 tests including that theory.
+- `AgentSetupWriteResult.Submitted` treats unverifiable effect/version as progress — `false`. Current remarks put verification on the gateway. `AgentsClientSetupGateway.WriteAsync` maps missing effect or non-positive target to `UnableToVerify` before `Submitted`. Same claim from Blind Hunter and Acceptance Auditor; rejected on these grounds in the prior Group A passes.
+- `AwaitingProjection` does not require `Applied` and a positive target version — `false`. UI callers pass a previously accepted identity that already had a positive target (`RefreshPendingAsync` and `RetainedAwaitingProjection` both require `TargetConfigurationVersion`).
+- `Failed` accepts `Submitted`, `AlreadyApplied`, or `AwaitingProjection` — `false`. Production `Failed` callers pass mapped denials; `ToWriteStatus` never emits those success-like statuses.
+- `AgentCommandAcceptance` accepts mixed `TruthState`/`Effect`/`TargetConfigurationVersion` pairings — `false`. No producer in this slice emits a mismatched pair; the record is a DTO. Server construction and the gateway mapping are what the matrix binds.
+- Contracts tests never construct `AgentSetupWriteResult` after the factory split — `false`. `AgentsClientSetupGatewayTests` already pins `Submitted`/`AlreadyApplied`/`UnableToVerify` for verified, no-op, and legacy acceptances.
+- Compatibility coverage is only isolated enum tokens, so a nested unknown/null fails the whole payload — `false`. The converter is type-level, so nested properties use the same `Read` path the theories already exercise.
+- `ExpectedConfigurationVersion` is an unvalidated init-only extra and is not JSON-round-tripped — `false`. HTTP parse requires a canonical positive integer; activation `WriteAsync` returns `ValidationFailed` when the value is not `> 0`. Options are built from headers, not JSON-deserialized.
+- `AgentOperationOptions` documents canonical ULIDs but stores any string — `false`. `IsCanonicalUlid` on the write path and the header filter reject non-canonical identities before dispatch.
+- `UnableToVerify` is a new wire name that old throwing converters will reject — `false`. The converter remarks already call the guarantee prospective; additive members are the reason the fallback exists for new consumers.
+- `AgentSetupTrustedExtensions` documents `PartyLinkValidation` and `AuditGovernanceResolved` that this policy does not claim — `false`. Unclaimed colon keys are rejected by the gateway unless a registered policy accepts them; those keys are not part of the Story 5.2 setup-adapter claim set.
+- `AgentActivationConfigurationVersionMismatchRejection` lacks remarks, positivity/inequality guards, and a Web round-trip — `false`. The aggregate emits it only after a canonical positive expected version that differs from state; event constructors must not throw on replay. Prior Group A pass reproduced the Web round-trip.
+- `AgentSetupWriteStatus` still uses `Submitted = 0` with no fallback converter — `low`. Duplicate of DW-11. The type is UI-internal and is not HTTP-deserialized; inserting `Unknown = 0` would shift ordinals.
+
 ## Implementation Notes
 
 - Added the canonical `## Dev Agent Record` and nested `### File List` this story was missing, so the
@@ -886,7 +915,7 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-20T13:39:45Z
+Run (UTC): 2026-09-20T15:09:28Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
