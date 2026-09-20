@@ -85,7 +85,7 @@ development_status:
   epic-4-retrospective: done
   epic-5: in-progress
   5-1-establish-build-package-boundary-and-basic-ci-gates: done  # Current full verifier and artifact reconciliation passed 2026-09-19; expanded live-host work remains Story 5.6.
-  5-2-configure-hexa-through-live-eventstore-operations: review  # Round-10 review patches and all Story 5.2 verification gates passed 2026-09-20; external promotion prerequisites remain tracked in deferred work.
+  5-2-configure-hexa-through-live-eventstore-operations: in-progress  # Chunk-1 code review 2026-09-20 left 3 patch findings as story action items; 4 deferrals carried on existing DW rows; chunks 2–4 not reviewed.
   # Story 5.1's shared catalog now supplies published EventStore 3.106.0 and the floor/Release/package lanes pass, closing DW-20 without a local override. Story 5.2 remains in review for its independent blockers: the external Platform gateway must consume Hexalith.Agents.EventStore and explicitly register it (DW-21), the deferred status reader remains host-overridable until Story 5.6 proves reachability, and immutable ProvisionHexa/link retirement remains deferred.
   5-3-govern-provider-models-and-pricing-through-live-operations: backlog  # Noted 2026-09-09 (round-5 spine validation, brownfield M1): a completed, fully-tested prior implementation (2569/2569 tests passing) exists underneath this backlog status; not promoted to done/in-progress here because AD-2's platform/tenant ProviderCatalog split (NC-5.3-PLATFORM-CATALOG-SCOPE) is still unreconciled in code.
   5-4-prove-trusted-principal-tenant-party-and-approver-readiness: backlog

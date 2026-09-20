@@ -335,3 +335,12 @@ status: open
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reject GitHub releases marked prerelease when verifying a stable semantic-version tag.
   evidence: The inherited release verifier checks tag, draft status, source SHA, and assets but never checks the GitHub `prerelease` flag, so a release marked prerelease can satisfy the stable-publication gate.
+
+## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2.md (2026-09-20)
+
+Chunk 1 (production source) review. These items are carried onto existing ledger rows; no new DW keys.
+
+- Domain rejection stays unverifiable: no live status reader, and `Rejected`/`Blocked` map to retryable `Unavailable`. Carried; owned by DW-7, DW-12, DW-19, DW-24, and DW-25.
+- A failed catch-up read aborts polling and replaces the configuration form with Unavailable/Empty while the attempt is retained. Carried; owned by DW-5.
+- `Unknown = 0` tolerance remains incomplete and `AgentSetupWriteStatus.Submitted = 0` is fail-open if it becomes a wire contract. Carried; owned by DW-11 and DW-23.
+- Provider-catalog writes lack the configuration page's retained-attempt and exact-retry path. Carried; owned by DW-14 / Story 5.3.

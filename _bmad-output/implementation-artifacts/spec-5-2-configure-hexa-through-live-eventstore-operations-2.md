@@ -2,7 +2,7 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'done'
+status: 'in-progress'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
 review_loop_iteration: 9
@@ -296,6 +296,38 @@ Code review of the whole story (`599208d..HEAD` working tree, plus EventStore su
 - The EventStore submodule pointer is 19 commits past `v3.106.0`, carrying unrelated Story 8.3/4.15 work — `low`. Confirmed (`v3.106.0-19-gba7ac196`), but the ride-along commits are in a separate repository's own reviewed history and the accounting fix edits the spec under review.
 - `AggregateActor`'s no-op `resultPayload` forwarding is untested and unbounded — `false`/`low`. `ProcessCommand_NoOp_WithResultPayload_PreservesTerminalPayload` exists in `StateMachineIntegrationTests` outside the narrowed diff, and the payload is the aggregate's own two-field JSON.
 - `AgentSetupDomainResult.Validate` throws from inside `Handle` when `ConfigurationVersion` is 0 — `maybe-false` at `low`. No handler reaches a no-op on a zero-version aggregate in any demonstrated path, and the no-op factories are only called after a create has advanced the version.
+
+### Review Findings
+
+Code review of Story 5.2 **chunk 1** (production source only: `src/Hexalith.Agents*`, UI, and submodule gitlinks) against `baseline_commit` `599208d`, 2026-09-20. Four layers, none failed. Tests, tooling, and nested EventStore content were out of this pass.
+
+**Patch**
+
+- [ ] [Review][Patch] Localization guard misses the new write-announcement keys [test/Hexalith.Agents.UI.Tests/LocalizationResourceTests.cs:113]
+- [ ] [Review][Patch] Activate and Disable already-set still emit a domain rejection instead of AlreadyApplied [src/Hexalith.Agents/Agent/AgentAggregate.cs:249]
+- [ ] [Review][Patch] Program.cs pins the deferred status reader so TryAdd cannot be overridden [src/Hexalith.Agents.Server/Program.cs:51]
+
+**Deferred**
+
+- [x] [Review][Defer] Domain rejection stays unverifiable: no live status reader, and Rejected/Blocked map to retryable Unavailable [src/Hexalith.Agents.Server/Ports/DeferredAgentCommandStatusReader.cs:16] — deferred: pre-existing, carried. The identity-verified payload-less receipt consults `WasRejectedAsync`, which the registered reader always answers `null`, so AC3's typed rejection is `UnableToVerify`. `ToWriteStatus` still falls through `Rejected`/`Blocked` to `Unavailable`, which `IsTerminalWriteFailure` excludes. Unreachable until the live reader binds; owned by DW-7, DW-12, DW-19, DW-24, and DW-25.
+- [x] [Review][Defer] A failed catch-up read aborts polling and replaces the configuration form [src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor:577] — deferred: pre-existing product choice, owned by DW-5. `RefreshAfterWriteAsync` returns on the first non-`AuthoritativePending` truth, including `Unavailable`/`NotFound` with a null `Setup`, and `LoadAsync` always overwrites `_result`, so the markup switches to `AgentSurfaceKind.Unavailable` or Empty while the attempt is still retained.
+- [x] [Review][Defer] `Unknown = 0` tolerance is incomplete and `AgentSetupWriteStatus` still uses `Submitted = 0` [src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteStatus.cs:9] — deferred: pre-existing migration scope, owned by DW-11 and DW-23. Sibling contract enums still use throwing `JsonStringEnumConverter`; the UI-internal write-status zero is fail-open if it ever becomes a wire contract.
+- [x] [Review][Defer] Provider-catalog writes lack the configuration page's retained-attempt and exact-retry path [src/Hexalith.Agents.UI/Services/Gateways/AgentsClientProviderCatalogGateway.cs:84] — deferred: pre-existing, owned by DW-14 / Story 5.3. Catalog resources gained copy for the new statuses, but writes were not given the header, retry, or catch-up options path.
+
+**Rejected**
+
+- Trusted policy claims reserved colon keys only for the five setup commands, so Party/provider/approver commands would fail closed — `false`. Live `EventStoreAgentAdministrationOperations` maps those seven writes to `OutOfScope` and returns `Unavailable` without dispatch; Program.cs documents that they stay unavailable until their own stories supply dependency verdicts.
+- `PartyLinkValidation` and `AuditGovernanceResolved` are never claimed by the Agents policy — `false`. Same live path: those keys are not submitted on in-scope setup commands, and out-of-scope commands never reach EventStore admission from this host.
+- Interaction orchestrators omit `ActivationExpectedConfigurationVersion` from reserved-key stripping — `false`. Interaction operations stay on the Unavailable client in this composition, so the key cannot reach EventStore; an unclaimed colon key would fail closed rather than forge trust.
+- `UnknownFallbackEnumConverterFactory` is missing from HTTP JSON options — `false`. `MapAgentsOperationEndpoints` does not register a competing `JsonStringEnumConverter`; type-level converters apply. The factory is required only on the five query/projection bags that do mix converters, which already register it.
+- Retry of an accepted write never runs catch-up and rewrites the result to `AwaitingProjection` — `false`. Spec recovery is Refresh plus exact Retry; the page keeps the original acceptance and exposes Refresh. Auto-polling on retry would change the approved exhaustion UX.
+- `IAgentSetupGateway` default options overloads return `Unavailable` — `false`. Both production implementers (`AgentsClientSetupGateway` and `DeferredAgentSetupGateway`) override every overload; no shipped caller uses the defaults.
+- `AbandonAttempt` does not re-read projected setup — `low`. Abandon is an explicit give-up; a browser reload shows current truth. Making the handler async and choosing draft-vs-server precedence after abandon adds complexity already tracked as a product choice under DW-5/DW-17.
+- Disable/activate already-set cannot terminate through the new no-op path from this page's primary click — grouped into the patch above for the API and two-tab race; the configuration buttons already disable when lifecycle matches.
+- No client HTTP mapping of `AgentOperationOptions` onto retry headers — `false`. `Hexalith.Agents.Client` is an in-process facade; the UI passes options as method arguments, and the Minimal API binds the headers for remote callers.
+- This chunk's diff contains no test hunks — `false`. Tests were excluded by the agreed chunk 1 file-list split; they remain in chunk 2.
+- `AlreadyApplied` releases the attempt without `RefreshAfterWriteAsync` — `false`. The frozen matrix no-op row forbids polling for a version that was not appended.
+- `AlreadyApplied` releases without restoring the instructions draft — `false`. The instructions field is write-only and starts empty by design; a no-op means the submitted values were already present.
 
 ## Implementation Notes
 
@@ -725,7 +757,7 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-19T23:59:28Z
+Run (UTC): 2026-09-20T06:50:07Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
@@ -783,7 +815,6 @@ Result: PASS
 - `src/Hexalith.Agents.Contracts/Serialization/UnknownFallbackEnumConverterFactory.cs`
 - `src/Hexalith.Agents.EventStore/ActivateAgentIdempotencyIntentAdapter.cs`
 - `src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs`
-- `src/Hexalith.Agents.EventStore/AgentsEventStoreAssemblyMarker.cs`
 - `src/Hexalith.Agents.EventStore/AgentsEventStoreServiceCollectionExtensions.cs`
 - `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs`
 - `src/Hexalith.Agents.EventStore/ConfigureAgentResponseModeIdempotencyIntentAdapter.cs`
