@@ -783,16 +783,16 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-20T07:57:00Z
+Run (UTC): 2026-09-20T09:18:25Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Contracts.Tests | 530 | 530 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 570 | 570 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 576 | 576 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 791 | 791 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1082 | 1082 | 0 | 0 | 0 | 0 |
-| **Total** | 2979 | 2979 | 0 | 0 | 0 | 0 |
+| **Total** | 2985 | 2985 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->
@@ -889,7 +889,6 @@ Result: PASS
 - `src/Hexalith.Agents.Server/Ports/IAgentCommandDispatcher.cs`
 - `src/Hexalith.Agents.Server/Ports/IAgentCommandIdentityFactory.cs`
 - `src/Hexalith.Agents.Server/Ports/IAgentCommandStatusReader.cs`
-- `src/Hexalith.Agents.Server/Program.cs`
 - `src/Hexalith.Agents.Server/Projections/AgentSetupProjectionFold.cs`
 - `src/Hexalith.Agents.Server/Projections/ProviderCatalogProjectionFold.cs`
 - `src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor`
