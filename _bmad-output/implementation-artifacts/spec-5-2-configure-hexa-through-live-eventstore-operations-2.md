@@ -356,6 +356,29 @@ Code review of Story 5.2 **group A** (`src/Hexalith.Agents.Contracts/**` only, `
 - `AwaitingProjection` does not require `Applied` plus a positive target — `false`. The only production caller is the configuration page, which passes a previously accepted identity that already had a target version.
 - `AgentActivationConfigurationVersionMismatchRejection` can be constructed with equal or non-positive versions — `false`. The aggregate emits it only after a canonical positive expected version that differs from current state. Event constructors must not throw, or replay of a stored payload would fail.
 
+### Review Findings
+
+Code review of Story 5.2 **group A** (`src/Hexalith.Agents.Contracts/**` only, `599208d` → working tree), 2026-09-20, second pass. Four layers, none failed. Remaining groups: B Domain+Application+Server+EventStore, C UI+Client, D Tests, E Tooling/docs/gitlinks.
+
+**Deferred**
+
+- [x] [Review][Defer] The `Unknown = 0` tolerance migration still omits sibling public Agent enums [src/Hexalith.Agents.Contracts/Agent/ContentSafetyAuditTreatment.cs:16] — deferred: pre-existing migration scope, already tracked as DW-23. `ProviderSelectionValidationStatus`, `ApproverPolicyValidationStatus`, `PartyLinkValidationStatus`, `CostControlPosture`, `ContentSafetyAuditTreatment`, and `ContentSafetyFailureHandling` still use throwing `JsonStringEnumConverter`; this Contracts slice did not change those files. `ContentSafetyAuditTreatment` still reaches the wire on `AgentAuditGovernanceReadiness`.
+
+**Rejected**
+
+- `UnknownFallbackEnumConverter.FromOrdinal` throws `OverflowException` for a `: byte` enum given `256` or `-1` — `false`. Reproduced on the Release Contracts assembly under .NET 10: those payloads degrade to `Unknown` without throwing. Production guarded enums are default `int`; `int` ordinals that do not fit `Int32` already take the `TryGetInt32`/`TryParse` failure path to `Unknown`.
+- JSON `null` still throws because `HandleNull` is not overridden — `false`. Reproduced: `Deserialize<AgentSetupTruthState>("null")`, `Deserialize("null", typeof(AgentSetupTruthState))`, and `"TruthState":null` on `AgentCommandAcceptance` all become `Unknown`. `UnrecognizedEnumPayloads` already includes `"null"`.
+- Contracts does not ship a canonical options bag that registers the factory ahead of `JsonStringEnumConverter` — `false`. Type-level converters apply on the public Minimal API (no competing string converter there). The five query/projection bags that mix converters already register the factory, pinned by `ServerSerializationConformanceTests`. A new public options type would add packable surface for a pairing the factory remarks already document.
+- `AgentCommandAcceptance` V1 four-value `Deconstruct` drops `Effect` and `TargetConfigurationVersion` — `false`. Additive V1 compatibility is tested; the only in-repo 4-tuple use is that test. An older CLR shape yields `Unknown` effect / null version, which `AgentsClientSetupGateway.WriteAsync` fail-closes.
+- `AgentSetupWriteResult.Submitted` records `Unknown` effect or a missing target as progress — `false`. `WriteAsync` maps that shape to `UnableToVerify` before calling the factory; the factory remarks put verification on the gateway. Same claim from Blind Hunter and Edge Case Hunter.
+- `AwaitingProjection` accepts a missing target or a non-`Applied` effect — `false`. The factory has no production callers. Catch-up polling lives in the UI, which is out of this Contracts slice.
+- `Failed` accepts `Submitted` / `AlreadyApplied` / `AwaitingProjection` — `false`. Production callers pass only mapped failures (`Unavailable`, `UnableToVerify`, and the `ToWriteStatus` denials). Same claim from both hunters; prior group A triage rejected it.
+- `ExpectedConfigurationVersion` has no positivity invariant and is silently ignored on non-activation operations — `false`. HTTP parse requires a canonical positive integer; `WriteAsync` returns `ValidationFailed` when activation requires a version and it is not `> 0`. Other operations ignore it as the property summary states. Same claim from Edge Case Hunter.
+- `AgentSetupWriteStatus` still uses `Submitted = 0` with no `Unknown` sentinel or fallback converter — `low`. Duplicate of DW-11. The type is UI-internal and is not HTTP-deserialized; inserting `Unknown = 0` would shift ordinals.
+- `AgentActivationConfigurationVersionMismatchRejection` omits `CommandName` and does not name a public error mapping — `false`. The event is activation-only, so the type name is the command. Sibling `AgentActivationBlockedRejection` also omits `CommandName`; shared-across-commands rejections are the ones that carry it. Public mapping uses the rejection type, not a command string.
+- `AgentSetupTruthState` / `AgentSetupFreshness` changed wire encoding from numbers to names — `false`. This is the adopted `Unknown = 0` name encoding: tests pin name writes and still read the numeric legacy form. The converter remarks already document that an older throwing consumer cannot be repaired by a newer producer.
+- `AgentSetupTrustedExtensions` publishes reserved EventStore keys as public constants — `false`. Contracts is the shared packable source for the gateway policy and the aggregate. Public callers asserting those keys are rejected by `AgentsTrustedCommandExtensionPolicy`; hiding the strings would duplicate them.
+
 ## Implementation Notes
 
 - Added the canonical `## Dev Agent Record` and nested `### File List` this story was missing, so the
@@ -835,16 +858,16 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-20T10:58:52Z
+Run (UTC): 2026-09-20T11:52:23Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Contracts.Tests | 531 | 531 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 600 | 600 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 576 | 576 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 791 | 791 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1082 | 1082 | 0 | 0 | 0 | 0 |
-| **Total** | 3010 | 3010 | 0 | 0 | 0 | 0 |
+| **Total** | 2986 | 2986 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->

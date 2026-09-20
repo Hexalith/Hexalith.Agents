@@ -340,6 +340,8 @@ status: open
 
 Chunk 1 (production source) review. These items are carried onto existing ledger rows; no new DW keys.
 
+Group A contracts re-review (second pass). Incomplete `Unknown = 0` tolerance migration remains DW-23; no new DW key.
+
 - Domain rejection stays unverifiable: no live status reader, and `Rejected`/`Blocked` map to retryable `Unavailable`. Carried; owned by DW-7, DW-12, DW-19, DW-24, and DW-25.
 - A failed catch-up read aborts polling and replaces the configuration form with Unavailable/Empty while the attempt is retained. Carried; owned by DW-5.
 - `Unknown = 0` tolerance remains incomplete and `AgentSetupWriteStatus.Submitted = 0` is fail-open if it becomes a wire contract. Carried; owned by DW-11 and DW-23.
