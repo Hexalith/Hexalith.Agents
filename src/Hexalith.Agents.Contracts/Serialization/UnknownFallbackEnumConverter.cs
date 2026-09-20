@@ -83,20 +83,24 @@ public sealed class UnknownFallbackEnumConverter<TEnum> : JsonConverter<TEnum>
             return default;
         }
 
-        name = name.Trim();
+        string trimmedName = name.Trim();
 
-        // A peer that quoted the ordinal is read exactly like a bare number, so "1" and 1 cannot disagree.
-        if (int.TryParse(name, NumberStyles.Integer, CultureInfo.InvariantCulture, out int ordinal))
+        // A peer that quoted a canonical ordinal is read exactly like a bare number, so "1" and 1 cannot
+        // disagree. JSON numbers cannot carry a leading plus, surrounding whitespace, or leading zeroes, so the
+        // quoted form must not accept those non-canonical spellings either.
+        if (int.TryParse(trimmedName, NumberStyles.Integer, CultureInfo.InvariantCulture, out int ordinal))
         {
-            return FromOrdinal(ordinal);
+            return string.Equals(name, ordinal.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                ? FromOrdinal(ordinal)
+                : default;
         }
 
         // Enum.TryParse also accepts a comma-delimited name list on a non-flags enum, which combines the ordinals
         // into a value that is not a declared member. Requiring the parsed value's own name to match the input
         // rejects that while preserving the case-insensitive, whitespace-tolerant compatibility of the converter
         // this replaces.
-        return Enum.TryParse(name, ignoreCase: true, out TEnum parsed)
-            && string.Equals(Enum.GetName(parsed), name, StringComparison.OrdinalIgnoreCase)
+        return Enum.TryParse(trimmedName, ignoreCase: true, out TEnum parsed)
+            && string.Equals(Enum.GetName(parsed), trimmedName, StringComparison.OrdinalIgnoreCase)
                 ? parsed
                 : default;
     }

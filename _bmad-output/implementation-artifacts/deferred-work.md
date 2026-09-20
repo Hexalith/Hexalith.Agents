@@ -358,3 +358,11 @@ Group A contracts re-review (fourth pass). Incomplete `Unknown = 0` tolerance mi
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reject non-HTTP EventStore base-address schemes during Agents host composition.
   evidence: `AgentSetupServiceCollectionExtensions` accepts any absolute URI even though the configured HTTP client cannot send non-HTTP schemes, so an invalid pre-existing configuration can resolve the live setup services and then fail every request at runtime.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Verify the integrity and package identity of GitHub Release assets instead of accepting filenames alone.
+  evidence: The inherited release verifier accepts empty, truncated, or substituted assets carrying the six expected names; NuGet publication checks protect the feed but do not validate the separate GitHub download artifacts.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Reject non-positive and non-finite NuGet publication verifier timeouts with a bounded diagnostic.
+  evidence: The inherited CLI passes an explicit invalid timeout to URL opening without validation, so negative, NaN, or infinite values can crash or wait unpredictably instead of failing through `VerificationError`.

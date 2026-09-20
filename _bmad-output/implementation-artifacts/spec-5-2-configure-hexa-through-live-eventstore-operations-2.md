@@ -2,7 +2,7 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
 review_loop_iteration: 9
@@ -413,8 +413,8 @@ Code review of Story 5.2 **group A** (Contracts source and `test/Hexalith.Agents
 
 **Patch**
 
-- [ ] [Review][Patch] Quoted signed or padded ordinals resolve to a defined member instead of `Unknown` [src/Hexalith.Agents.Contracts/Serialization/UnknownFallbackEnumConverter.cs:89]
-- [ ] [Review][Patch] Independent setup-payload enum coverage still omits `AgentSetupWriteEffect` unless the discovery walk seeds `AgentCommandAcceptance` [test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs:176]
+- [x] [Review][Patch] Quoted signed or padded ordinals resolve to a defined member instead of `Unknown` [src/Hexalith.Agents.Contracts/Serialization/UnknownFallbackEnumConverter.cs:89]
+- [x] [Review][Patch] Independent setup-payload enum coverage still omits `AgentSetupWriteEffect` unless the discovery walk seeds `AgentCommandAcceptance` [test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs:176]
 
 **Deferred**
 
@@ -880,6 +880,27 @@ submodule history is preserved. Reapply the round-5 KEEP behavior selectively. D
 | edge-case-hunter-r12 | A configured non-HTTP EventStore URI is treated as a live gateway. | medium | defer | Absolute-URI validation predates this story and accepts schemes `HttpClient` cannot send; a later composition-hardening change should restrict the scheme to HTTP/HTTPS and prove the host stays fail-closed. |
 | edge-case-hunter-r12 | Rejected setup outcomes remain retryable. | medium | defer | carried: DW-12 owns this mapping together with the deferred live status-reader binding. |
 | edge-case-hunter-r12 | `ContentSafetyAuditTreatment` still uses the throwing enum converter. | medium | defer | carried: it is part of the sibling public-enum migration already tracked as DW-23, not this setup-correlation patch. |
+| blind-hunter-r13 | Configured Agents composition still has no live command-status reader. | false | reject | carried: the absence is explicitly disclosed and intentionally keeps payload-less outcomes unverifiable pending the tenant-scoped Story 5.6 binding; it does not invent a rejection. |
+| blind-hunter-r13 | `Rejected` and `Blocked` setup outcomes map to retryable `Unavailable`. | medium | defer | carried: the terminal UI mapping remains coupled to the deliberately deferred live status reader and is owned by DW-12. |
+| blind-hunter-r13 | The command-status reader lacks tenant, Agent, and correlation scope. | medium | defer | carried: the future live read's tenant-scoped authorization and identity contract are already owned by DW-24 and Story 5.6. |
+| blind-hunter-r13 | The split-provider test substitutes durable gateway infrastructure. | maybe-false | defer | carried: the contract and admission behavior are covered here, while Story 5.6 owns the production-like persistence/replay topology needed to establish or refute the transport gap. |
+| blind-hunter-r13 | A retry can replace retained acceptance with a different submitted acceptance. | false | reject | carried: EventStore binds an exact retry to the retained key and canonical intent, so the different receipt assumed by the finding requires a violation of the admission contract already under test. |
+| blind-hunter-r13 | The client gateway does not validate every acceptance identity and effect/truth combination. | false | reject | carried: the production operations boundary verifies receipt message/correlation identity, constructs the Agent id from the requested target, and maps terminal behavior from the verified effect; contradictory custom-gateway DTOs are outside the trusted path. |
+| blind-hunter-r13 | Three inherited security workflows consume mutable reusable-workflow refs. | medium | defer | carried: the inherited Story 5.1 workflows use `@main`, so upstream movement can alter gates without local review; this remains outside setup correlation. |
+| blind-hunter-r13 | CodeQL cancellation applies to main pushes and scheduled scans. | medium | defer | carried: branch-ref concurrency can cancel evidence for a merged or scheduled revision in inherited Story 5.1 workflow code. |
+| blind-hunter-r13 | Multi-package NuGet publication cannot recover cleanly from a partial push. | high | defer | carried: the inherited all-absent preflight plus non-transactional push can strand an immutable partial version set. |
+| blind-hunter-r13 | GitHub Release asset verification checks filenames but not artifact integrity. | medium | defer | The inherited verifier accepts empty, truncated, or substituted assets carrying the expected names; NuGet verification protects the package feed but not the separate GitHub download surface. |
+| blind-hunter-r13 | The focused verifier accepts a class whose tests are all skipped. | low | reject | carried: no required Story 5.2 class is skipped or trait-gated, so reaching this requires a separate deliberate test change; adding structured-result machinery is disproportionate to the current gate. |
+| blind-hunter-r13 | The generic tolerant enum converter cannot read valid ordinals outside `Int32`. | low | reject | Every shipped enum using the converter is guarded and `Int32`-backed; supporting hypothetical direct external use with `long` or `ulong` backing adds parsing complexity for an undemonstrated production path. |
+| edge-case-hunter-r13 | A configured non-HTTP EventStore URI is treated as a live gateway. | medium | defer | carried: absolute-URI validation predates this story and accepts schemes the HTTP client cannot send; the existing deferred composition-hardening item owns an HTTP/HTTPS restriction. |
+| edge-case-hunter-r13 | An `AlreadyApplied` result should poll a newer projected version before completing. | false | reject | carried: the frozen matrix deliberately makes no-op terminal without polling because it appends no new version; reversing it would contradict approved intent. |
+| edge-case-hunter-r13 | A payload-less domain rejection cannot be classified by the configured reader. | false | reject | carried: the configured deferred reader deliberately returns unknown and keeps the outcome unverifiable pending the Story 5.6 status contract; it does not make a false terminal claim. |
+| edge-case-hunter-r13 | `Rejected` or `Blocked` setup outcomes remain retryable. | medium | defer | carried: this branch remains coupled to the deferred live status reader and is owned by DW-12. |
+| edge-case-hunter-r13 | The NuGet publication verifier accepts a non-positive or non-finite timeout. | low | defer | The inherited CLI passes the value to URL opening without validation; defaults are safe, but an explicit invalid override can crash or wait unpredictably instead of returning the verifier's bounded diagnostic. |
+| edge-case-hunter-r13-claim | Canonical rejected outcomes are not available through the deferred status reader. | false | reject | carried: the absence is intentionally fail-closed and disclosed pending the tenant-scoped live reader; the fallback returns unknown rather than misclassifying a rejection. |
+| edge-case-hunter-r13-claim | Split-provider tests use an in-memory admission ledger. | maybe-false | defer | carried: Story 5.6 owns the deployed persistence topology required to establish or refute any durable replay gap beyond the policy/admission contract proven here. |
+| verification-gap-r13 | The real live operations wrapper is not exercised for Agent creation. | medium | patch | Filed pre-verified: endpoint tests substitute the interface and orchestrator tests bypass the wrapper; calling `Operations().CreateAsync` with the existing captured-receipt fixture must prove dispatch and verified acceptance through the public create path. |
+| verification-gap-r13 | GitHub Release verification accepts a stable tag marked prerelease. | medium | defer | carried: inherited release tooling validates tag, draft state, SHA, and asset names but not the `prerelease` flag; its existing deferred item remains authoritative. |
 
 ## Design Notes
 

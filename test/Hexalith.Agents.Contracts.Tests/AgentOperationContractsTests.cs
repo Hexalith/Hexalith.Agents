@@ -195,6 +195,26 @@ public sealed class AgentOperationContractsTests
     }
 
     [Fact]
+    public void TheDiscoveredEnumSetCoversTheWholeSetupWriteAcceptancePayload()
+    {
+        // Independent of the discovery roots above: the write receipt is also part of Story 5.2's setup payload.
+        // If AgentCommandAcceptance stops being traversed, the compatibility theories must fail rather than
+        // silently omitting AgentSetupWriteEffect.
+        Type[] declared = typeof(AgentCommandAcceptance)
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Select(property => Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType)
+            .Where(type => type.IsEnum && Enum.GetName(type, 0) == "Unknown")
+            .Distinct()
+            .ToArray();
+
+        declared.ShouldContain(typeof(AgentSetupWriteEffect));
+        foreach (Type enumType in declared)
+        {
+            _publicOperationEnumTypes.ShouldContain(enumType, $"{enumType.Name} is on the setup write acceptance payload.");
+        }
+    }
+
+    [Fact]
     public void Every_unknown_fallback_converter_is_self_typed_and_has_unknown_at_zero()
     {
         Type[] guardedEnums = typeof(AgentOperationResult).Assembly.GetTypes()
@@ -308,6 +328,32 @@ public sealed class AgentOperationContractsTests
             int ordinal = Convert.ToInt32(declared);
             JsonSerializer.Deserialize($"{ordinal}", enumType).ShouldBe(declared, enumType.Name);
             JsonSerializer.Deserialize($"\"{ordinal}\"", enumType).ShouldBe(declared, enumType.Name);
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(PublicOperationEnumTypes))]
+    public void NoncanonicalQuotedOrdinalsDegradeToUnknown(Type enumType)
+    {
+        ArgumentNullException.ThrowIfNull(enumType);
+
+        int ordinal = Enum.GetValues(enumType)
+            .Cast<object>()
+            .Select(Convert.ToInt32)
+            .First(value => value > 0);
+
+        string[] payloads =
+        [
+            $"\"+{ordinal}\"",
+            $"\" {ordinal}\"",
+            $"\"{ordinal} \"",
+            $"\"0{ordinal}\"",
+        ];
+
+        foreach (string payload in payloads)
+        {
+            object value = JsonSerializer.Deserialize(payload, enumType).ShouldNotBeNull();
+            Convert.ToInt32(value).ShouldBe(0, $"{enumType.Name} must reject noncanonical ordinal {payload}.");
         }
     }
 

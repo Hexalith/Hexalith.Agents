@@ -77,6 +77,41 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     }
 
     [Fact]
+    public async Task CreateDispatchesTheSanitizedPayloadAndReturnsTheVerifiedAcceptance()
+    {
+        CaptureSubmit(configurationVersion: 1);
+        var command = new CreateAgent(
+            "caller-supplied-tenant",
+            "Hexa Assistant",
+            "Tenant governed assistant",
+            RealInstructions);
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().CreateAsync(
+            AgentId,
+            command,
+            new AgentOperationOptions(CorrelationId, MessageId));
+
+        SubmitCommandRequest submit = _lastSubmit.ShouldNotBeNull();
+        submit.CommandType.ShouldBe(nameof(CreateAgent));
+        submit.AggregateId.ShouldBe(AgentId);
+        submit.Tenant.ShouldBe(TenantId);
+        submit.CorrelationId.ShouldBe(CorrelationId);
+        submit.IdempotencyKey.ShouldBe(MessageId);
+
+        CreateAgent dispatched = submit.Payload.Deserialize<CreateAgent>().ShouldNotBeNull();
+        dispatched.ShouldBe(command with { TenantId = TenantId });
+
+        result.IsSuccess.ShouldBeTrue();
+        AgentCommandAcceptance acceptance = result.Value.ShouldNotBeNull();
+        acceptance.AgentId.ShouldBe(AgentId);
+        acceptance.MessageId.ShouldBe(MessageId);
+        acceptance.CorrelationId.ShouldBe(CorrelationId);
+        acceptance.TruthState.ShouldBe(AgentSetupTruthState.AuthoritativePending);
+        acceptance.Effect.ShouldBe(AgentSetupWriteEffect.Applied);
+        acceptance.TargetConfigurationVersion.ShouldBe(1);
+    }
+
+    [Fact]
     public async Task An_acceptance_carries_no_eventstore_internals()
     {
         AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(AgentId, new DisableAgent());
