@@ -2,7 +2,7 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'done'
+status: 'in-progress'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
 review_loop_iteration: 9
@@ -378,6 +378,34 @@ Code review of Story 5.2 **group A** (`src/Hexalith.Agents.Contracts/**` only, `
 - `AgentActivationConfigurationVersionMismatchRejection` omits `CommandName` and does not name a public error mapping — `false`. The event is activation-only, so the type name is the command. Sibling `AgentActivationBlockedRejection` also omits `CommandName`; shared-across-commands rejections are the ones that carry it. Public mapping uses the rejection type, not a command string.
 - `AgentSetupTruthState` / `AgentSetupFreshness` changed wire encoding from numbers to names — `false`. This is the adopted `Unknown = 0` name encoding: tests pin name writes and still read the numeric legacy form. The converter remarks already document that an older throwing consumer cannot be repaired by a newer producer.
 - `AgentSetupTrustedExtensions` publishes reserved EventStore keys as public constants — `false`. Contracts is the shared packable source for the gateway policy and the aggregate. Public callers asserting those keys are rejected by `AgentsTrustedCommandExtensionPolicy`; hiding the strings would duplicate them.
+
+### Review Findings
+
+Code review of Story 5.2 **group A** (Contracts source and `test/Hexalith.Agents.Contracts.Tests/**`, `599208d` → working tree), 2026-09-20, third pass, story-file diffs only. Four layers, none failed. Remaining groups: B Domain+EventStore+Server, C UI+related gitlinks, D Tests, E Tooling/docs.
+
+**Patch**
+
+- [x] [Review][Patch] `UnknownFallbackEnumConverter.FromOrdinal` treats a wrapped backing-type ordinal as a defined member [src/Hexalith.Agents.Contracts/Serialization/UnknownFallbackEnumConverter.cs:72]
+- [x] [Review][Patch] `FromName` rejects whitespace-padded names that `JsonStringEnumConverter` still accepts [src/Hexalith.Agents.Contracts/Serialization/UnknownFallbackEnumConverter.cs:91]
+
+**Deferred**
+
+- [x] [Review][Defer] The `Unknown = 0` tolerance migration still omits sibling public Agent enums [src/Hexalith.Agents.Contracts/Agent/ContentSafetyAuditTreatment.cs:16] — deferred: pre-existing migration scope, already tracked as DW-23. This Contracts slice did not change those files. `ContentSafetyAuditTreatment` still reaches the wire on `AgentAuditGovernanceReadiness`.
+
+**Rejected**
+
+- JSON `null` throws because `HandleNull` is not overridden — `false`. Reproduced on the Release Contracts assembly: `Deserialize<AgentSetupTruthState>("null")` and `Deserialize("null", typeof(AgentSetupTruthState))` both become `Unknown`. `UnrecognizedEnumPayloads` already includes `"null"`.
+- `AgentSetupWriteResult` factories do not enforce effect/version invariants — `false`. Current remarks put verification on the gateway. `AgentsClientSetupGateway.WriteAsync` maps missing effect or non-positive target to `UnableToVerify` before `Submitted`. Same claim from Blind Hunter and Edge Case Hunter.
+- `AwaitingProjection` accepts a no-op effect or missing target — `false`. UI callers pass a previously accepted identity that already had a positive target (`RefreshPendingAsync` and `RetainedAwaitingProjection` both require `TargetConfigurationVersion`).
+- `Failed` accepts `AlreadyApplied` or `AwaitingProjection` — `false`. Production `Failed` callers pass mapped denials; `ToWriteStatus` never emits those success-like statuses.
+- `AgentSetupWriteStatus` still uses `Submitted = 0` with no fallback converter — `low`. Duplicate of DW-11. The type is UI-internal and is not HTTP-deserialized; inserting `Unknown = 0` would shift ordinals.
+- `ProviderCatalogWriteResult` still assumes only `Submitted` carries acceptance — `false`. That type is not in this group-A diff; catalog no-op correlation remains Story 5.3 / DW-14.
+- Dropping `StatusFor(UnableToVerify)` silently maps the outcome to `Unknown` — `false`. `AgentOperationResult<T>.Failed` uses `StatusFor`, and `EventStoreAgentAdministrationOperationsTests` already asserts `result.Status.ShouldBe(AgentOperationStatus.UnableToVerify)` on that path.
+- Registering the factory after `JsonStringEnumConverter` restores throwing with no test — `false`. Type-level converters apply on the public Minimal API. The five query/projection bags that mix converters already register the factory first, pinned by `ServerSerializationConformanceTests`.
+- `ExpectedConfigurationVersion` has no positivity invariant or contracts JSON pin, and the legacy constructor accepts `"correlation"` / `"idempotency"` — `false`. HTTP parse requires a canonical positive integer; activation `WriteAsync` returns `ValidationFailed` when the value is not `> 0`. Options are built from headers, not JSON-deserialized. Canonical ULID checks live on the server. Same claim from Blind Hunter and Edge Case Hunter.
+- `AgentSetupResultPayload` and `AgentSetupTrustedExtensions` literals are unpinned in Contracts tests — `false`. Server tests bind both payload property names and the reserved extension keys; public callers asserting those keys are rejected by `AgentsTrustedCommandExtensionPolicy`.
+- `AgentActivationConfigurationVersionMismatchRejection` lacks a Web round-trip, a `Stale` mapping, and equal/non-positive version guards — `false`. Reproduced: `JsonSerializerDefaults.Web` round-trips the retained versions. The aggregate emits the event only after a canonical positive expected version that differs from state; event constructors must not throw on replay. Public `Stale` mapping is the dispatch/HTTP layer, not this type. Same claim from Blind Hunter and Edge Case Hunter.
+- The four-value V1 `Deconstruct` is unaccompanied by a six-value deconstruct test — `false`. The six-value shape is the compiler-generated primary-constructor deconstruct; dropping `Effect` or `TargetConfigurationVersion` would fail the existing JSON compatibility properties.
 
 ## Implementation Notes
 
@@ -858,7 +886,7 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-20T11:52:23Z
+Run (UTC): 2026-09-20T13:39:45Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|

@@ -323,6 +323,12 @@ public sealed class AgentOperationContractsTests
             .ShouldBe(ByteBackedToleranceStatus.Ready);
         JsonSerializer.Deserialize<ByteBackedToleranceStatus>("255", options)
             .ShouldBe(ByteBackedToleranceStatus.Unknown);
+        JsonSerializer.Deserialize<ByteBackedToleranceStatus>("257", options)
+            .ShouldBe(ByteBackedToleranceStatus.Unknown);
+        JsonSerializer.Deserialize<ByteBackedToleranceStatus>("513", options)
+            .ShouldBe(ByteBackedToleranceStatus.Unknown);
+        JsonSerializer.Deserialize<ByteBackedToleranceStatus>("\"257\"", options)
+            .ShouldBe(ByteBackedToleranceStatus.Unknown);
     }
 
     [Theory]
@@ -339,6 +345,7 @@ public sealed class AgentOperationContractsTests
         JsonSerializer.Deserialize($"\"{name.ToUpperInvariant()}\"", enumType).ShouldBe(canonical, enumType.Name);
         JsonSerializer.Deserialize($"\"{name.ToLowerInvariant()}\"", enumType).ShouldBe(canonical, enumType.Name);
         JsonSerializer.Deserialize($"\"{name}\"", enumType).ShouldBe(canonical, enumType.Name);
+        JsonSerializer.Deserialize($"\" {name} \"", enumType).ShouldBe(canonical, enumType.Name);
     }
 
     [Theory]
