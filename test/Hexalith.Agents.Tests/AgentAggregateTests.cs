@@ -258,7 +258,7 @@ public sealed class AgentAggregateTests
     }
 
     [Fact]
-    public void Activate_already_active_produces_lifecycle_already_set()
+    public void Activate_already_active_is_already_applied()
     {
         AgentState state = ActiveStateWith(ValidCreate());
 
@@ -267,11 +267,8 @@ public sealed class AgentAggregateTests
             state,
             Envelope(new ActivateAgent(), activationExpectedConfigurationVersion: state.ConfigurationVersion));
 
-        result.IsRejection.ShouldBeTrue();
-        AgentLifecycleStateAlreadySetRejection rejection = result.Events[0].ShouldBeOfType<AgentLifecycleStateAlreadySetRejection>();
-        rejection.CurrentStatus.ShouldBe(AgentLifecycleStatus.Active);
-        rejection.RequestedStatus.ShouldBe(AgentLifecycleStatus.Active);
-        rejection.CommandName.ShouldBe(nameof(ActivateAgent));
+        result.IsNoOp.ShouldBeTrue();
+        result.Events.ShouldBeEmpty();
     }
 
     [Fact]
@@ -352,17 +349,14 @@ public sealed class AgentAggregateTests
     }
 
     [Fact]
-    public void Disable_already_disabled_produces_lifecycle_already_set()
+    public void Disable_already_disabled_is_already_applied()
     {
         AgentState state = DisabledStateWith(ValidCreate());
 
         DomainResult result = AgentAggregate.Handle(new DisableAgent(), state, Envelope(new DisableAgent()));
 
-        result.IsRejection.ShouldBeTrue();
-        AgentLifecycleStateAlreadySetRejection rejection = result.Events[0].ShouldBeOfType<AgentLifecycleStateAlreadySetRejection>();
-        rejection.CurrentStatus.ShouldBe(AgentLifecycleStatus.Disabled);
-        rejection.RequestedStatus.ShouldBe(AgentLifecycleStatus.Disabled);
-        rejection.CommandName.ShouldBe(nameof(DisableAgent));
+        result.IsNoOp.ShouldBeTrue();
+        result.Events.ShouldBeEmpty();
     }
 
     [Fact]

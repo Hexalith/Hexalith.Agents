@@ -2,7 +2,7 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
 review_loop_iteration: 9
@@ -303,9 +303,9 @@ Code review of Story 5.2 **chunk 1** (production source only: `src/Hexalith.Agen
 
 **Patch**
 
-- [ ] [Review][Patch] Localization guard misses the new write-announcement keys [test/Hexalith.Agents.UI.Tests/LocalizationResourceTests.cs:113]
-- [ ] [Review][Patch] Activate and Disable already-set still emit a domain rejection instead of AlreadyApplied [src/Hexalith.Agents/Agent/AgentAggregate.cs:249]
-- [ ] [Review][Patch] Program.cs pins the deferred status reader so TryAdd cannot be overridden [src/Hexalith.Agents.Server/Program.cs:51]
+- [x] [Review][Patch] Localization guard misses the new write-announcement keys [test/Hexalith.Agents.UI.Tests/LocalizationResourceTests.cs:113]
+- [x] [Review][Patch] Activate and Disable already-set still emit a domain rejection instead of AlreadyApplied [src/Hexalith.Agents/Agent/AgentAggregate.cs:249]
+- [x] [Review][Patch] Program.cs pins the deferred status reader so TryAdd cannot be overridden [src/Hexalith.Agents.Server/Program.cs:51]
 
 **Deferred**
 
@@ -722,6 +722,32 @@ submodule history is preserved. Reapply the round-5 KEEP behavior selectively. D
 | edge-case-hunter-r10 | Replay throws when ordinary archived extension keys differ only by case. | medium | patch | Verified: round 9 rebuilds the filtered dictionary with `StringComparer.OrdinalIgnoreCase`, so two otherwise preserved ordinary keys such as `trace` and `Trace` throw during `ToDictionary`. Preserve the archive's case-sensitive key set while stripping colon-namespaced authority. |
 | verification-gap-r10 | Sibling setup routes do not prove their negative header filter remains attached. | medium | patch | Pre-verified: canonical headers cover all routes, but malformed coverage exercises only disable and duplicate coverage only activate; removing filters from create, update, or response-mode leaves the checked suite green. |
 | verification-gap-r10 | Optional-token Dapr composition is not exercised through the Agents outbound client. | medium | patch | Pre-verified: the token-bearing request test covers both headers, while the no-token test resolves services only; conditional handler registration could drop `dapr-app-id` when the optional token is absent without failing tests. |
+| blind-hunter-r11 | No production Platform gateway consumes `Hexalith.Agents.EventStore`. | high | defer | carried: the external Platform host still owns package consumption and `AddAgentsEventStore`; DW-21 remains the explicit promotion blocker. |
+| blind-hunter-r11 | Configured Agents composition still falls back to `DeferredAgentCommandStatusReader`. | false | reject | carried: the absence of a live reader is explicitly disclosed and intentionally fails closed as unverifiable pending the tenant-scoped Story 5.6 binding. |
+| blind-hunter-r11 | The future Dapr command-status read lacks the tenant claim required by the status route. | medium | defer | carried: Dapr internal authentication supplies app/global identity but no `eventstore:tenant`; DW-24 owns the future tenant-scoped status contract. |
+| blind-hunter-r11 | Eventful result payload is withheld while advisory status is not `Completed`. | medium | defer | carried: this pre-existing EventStore behavior deliberately maps to `UnableToVerify`; changing the advisory-status/result contract remains separate platform work. |
+| blind-hunter-r11 | `Rejected` and `Blocked` setup outcomes map to retryable `Unavailable`. | medium | defer | carried: the terminal UI mapping remains coupled to the deliberately deferred live status reader and is owned by DW-12. |
+| blind-hunter-r11 | An unbound setup gateway locks mutable controls until Abandon. | low | reject | carried: distinguishing not-bound from a mid-flight outage requires new public state for a host-composition failure and was already rejected as disproportionate. |
+| blind-hunter-r11 | Navigation or reload loses the in-memory retained attempt. | maybe-false | defer | carried: the approved intent does not settle persistence beyond component lifetime; a product/UX state-lifetime decision is required. |
+| blind-hunter-r11 | The split-provider proof does not establish deployed Dapr/persistence behavior. | maybe-false | defer | carried: Story 5.6 owns the production-like topology needed to establish or refute that transport/persistence gap. |
+| blind-hunter-r11 | The setup query handler trusts identifiers embedded in the stored model. | high | defer | carried: a mis-keyed projection can disclose another scope; this predates the current patch and remains platform projection-hardening work. |
+| blind-hunter-r11 | HTTP setup operations and EventStore setup queries use different authorization authorities. | high | defer | carried: the role-plus-tenant-claim HTTP path and `ITenantAccessReader` query path can disagree, and the current deferred tenant reader makes that divergence concrete. Story 5.4/DW-2 already owns the pre-existing JWT-only authority hazard. |
+| blind-hunter-r11 | Initial configuration loading lets gateway exceptions escape. | medium | defer | carried: `OnInitializedAsync` catches disposal cancellation only; the pre-existing page behavior remains outside this exact-correlation patch. |
+| blind-hunter-r11 | A malformed known-event payload advances the setup projection checkpoint. | high | defer | carried: deserialization can return null while the fold advances sequence; the pre-existing behavior requires a projection-corruption policy. |
+| blind-hunter-r11 | The tolerant-enum migration omits sibling public `Unknown = 0` enums. | medium | defer | carried: the incomplete pre-existing migration remains tracked as DW-23; the current setup payload and operation enums are guarded. |
+| blind-hunter-r11 | The configuration page uses sibling titled sections instead of one `FluentAccordion`. | medium | defer | carried: DW-18 already records this pre-existing repository UX violation; the recovery patch added no titled section. |
+| blind-hunter-r11 | Typed Agents operation failures retain HTTP 200. | medium | defer | carried: this is the pre-existing module-wide endpoint contract already recorded as DW-16. |
+| blind-hunter-r11 | Archived replay strips colon-namespaced authority and therefore domain-rejects Agents commands. | false | reject | Colon authority is intentionally removed so a tenant-admin replay cannot inherit a prior Dapr caller's trusted evidence. Exact keyed admission replay occurs before routing and does not rely on archived extension reconstruction. |
+| edge-case-hunter-r11 | A no-op is marked `ProjectionConfirmed` without polling a lagging projection. | false | reject | carried: the frozen matrix explicitly makes no-op terminal because it appends no new version to await. |
+| edge-case-hunter-r11 | Rejected setup outcomes are surfaced as retryable outages. | medium | defer | carried: DW-12 owns this mapping together with the deferred live status-reader binding. |
+| edge-case-hunter-r11 | `ContentSafetyAuditTreatment` still uses the throwing enum converter. | medium | defer | carried: it is part of the sibling public-enum migration already tracked as DW-23, not the setup-correlation patch. |
+| edge-case-hunter-r11 | A byte-backed enum receiving ordinal 257 could truncate to a concrete member. | low | reject | carried: every shipped enum using this converter has the default `Int32` backing type; supporting hypothetical external use with another backing type adds complexity for an undemonstrated path. |
+| edge-case-hunter-r11 | Configuration-version mutation can overflow at `Int32.MaxValue`. | low | reject | carried: the pre-existing theoretical overflow requires more than two billion setup mutations and a new exhaustion policy is disproportionate here. |
+| edge-case-hunter-r11 | The legacy parameterless-options activation overload omits the required projected version. | low | reject | The behavior is real but fail-closed: that compatibility overload cannot provide the pinned projection required by the frozen activation fence, while the page and exact-retry path use the retained-options overload. Making the legacy path implicitly read and mint retry state would add behavior beyond a direct correction. |
+| edge-case-hunter-r11 | Re-registering `AddAgentsEventStore` with another app id retains the first policy. | low | reject | carried: the extension supports one configured Agents application and idempotent identical registration; mutable or multi-app registration is an undemonstrated configuration misuse. |
+| verification-gap-r11 | The four explicit write-announcement localization keys lack real-resource coverage. | false | reject | Today's patch adds `Confirmed`, `Refreshing`, `RefreshIncomplete`, and `RetryUnresolved` to `LocalizationResourceTests`; the claim describes the pre-patch tree, not the reviewed working tree. |
+| verification-gap-r11 | Four non-activation setup adapter identifiers are unpinned. | medium | patch | Pre-verified: only activation asserts adapter id, operation id, and descriptor version, so another adapter identifier can drift and turn cross-deployment retries into conflicts without failing tests. |
+| verification-gap-r11 | The prerelease-at-floor package rejection branch lacks a regression case. | medium | patch | Pre-verified: existing invalid rows omit `3.106.0-alpha`; removing the prerelease-at-floor guard leaves all current tests green while accepting a version below the required stable floor. |
 
 ## Design Notes
 
@@ -757,16 +783,16 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-20T06:50:07Z
+Run (UTC): 2026-09-20T07:57:00Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Contracts.Tests | 530 | 530 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 569 | 569 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Tests | 787 | 787 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.UI.Tests | 1078 | 1078 | 0 | 0 | 0 | 0 |
-| **Total** | 2970 | 2970 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 570 | 570 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Tests | 791 | 791 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.UI.Tests | 1082 | 1082 | 0 | 0 | 0 | 0 |
+| **Total** | 2979 | 2979 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->
@@ -882,6 +908,7 @@ Result: PASS
 - `test/Hexalith.Agents.Server.Tests/AgentActivationApproverRevalidationTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentAdministrationOrchestratorTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentApproverPolicyOrchestratorTests.cs`
+- `test/Hexalith.Agents.Server.Tests/AppHostSecurityTopologyTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentContentSafetyPolicyOrchestratorTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentPartyIdentityOrchestratorTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentProviderSelectionOrchestratorTests.cs`

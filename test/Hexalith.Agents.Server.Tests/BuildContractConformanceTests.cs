@@ -129,6 +129,7 @@ public sealed class BuildContractConformanceTests
 
     [Theory]
     [InlineData("3.104.0", "requires Hexalith.EventStore 3.106.0 or later")]
+    [InlineData("3.106.0-alpha", "requires Hexalith.EventStore 3.106.0 or later")]
     [InlineData("not-a-version", "is not a valid SemVer 2 version")]
     [InlineData(null, "No effective package-mode Hexalith.EventStore PackageVersion rows were found")]
     public void EventStorePackageFloorShouldFailClosedForInvalidPackageVersionRows(

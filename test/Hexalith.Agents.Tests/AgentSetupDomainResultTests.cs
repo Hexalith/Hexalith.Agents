@@ -218,6 +218,23 @@ public sealed class AgentSetupDomainResultTests
             AgentAggregate.Handle(update, updateState, Envelope(update)),
             updateState.ConfigurationVersion);
 
+        AgentState activationState = ActiveStateWith(create);
+        var activate = new ActivateAgent();
+        yield return (
+            nameof(ActivateAgent),
+            AgentAggregate.Handle(
+                activate,
+                activationState,
+                ActivateEnvelope(expectedConfigurationVersion: activationState.ConfigurationVersion)),
+            activationState.ConfigurationVersion);
+
+        AgentState disableState = DisabledStateWith(create);
+        var disable = new DisableAgent();
+        yield return (
+            nameof(DisableAgent),
+            AgentAggregate.Handle(disable, disableState, Envelope(disable)),
+            disableState.ConfigurationVersion);
+
         AgentState linkState = StateWithLinkedParty(create);
         var link = new LinkAgentPartyIdentity(LinkedPartyId);
         yield return (

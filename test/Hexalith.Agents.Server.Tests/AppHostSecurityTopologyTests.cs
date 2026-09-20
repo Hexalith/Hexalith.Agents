@@ -27,6 +27,15 @@ public sealed class AppHostSecurityTopologyTests
     }
 
     [Fact]
+    public void ServerHostShouldDelegateTheStatusReaderFallbackToSetupComposition()
+    {
+        string program = File.ReadAllText(ModuleLayout.ResolveModulePath("src/Hexalith.Agents.Server/Program.cs"));
+
+        program.ShouldContain("AddAgentSetupServices(builder.Configuration)");
+        program.ShouldNotContain("AddSingleton<IAgentCommandStatusReader, DeferredAgentCommandStatusReader>");
+    }
+
+    [Fact]
     public void DomainServiceShouldRemainTheOnlyOwnedExecutableWebHost()
     {
         string[] webHosts = Directory.GetFiles(ModuleLayout.SourceRoot, "*.csproj", SearchOption.AllDirectories)

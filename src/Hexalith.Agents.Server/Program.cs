@@ -48,7 +48,6 @@ if (builder.Configuration.GetSection("Parties").Exists())
 
 builder.Services.AddScoped<IAgentPartyDirectory, PartiesAgentPartyDirectory>();
 builder.Services.AddSingleton<IAgentCommandDispatcher, DeferredAgentCommandDispatcher>();
-builder.Services.AddSingleton<IAgentCommandStatusReader, DeferredAgentCommandStatusReader>();
 builder.Services.AddScoped<AgentPartyIdentityOrchestrator>();
 
 // Story 1.5: Provider/model selection wiring. The decision logic — the provider-catalog reader port and the

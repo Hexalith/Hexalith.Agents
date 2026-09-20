@@ -245,13 +245,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
 
         if (state.Lifecycle == AgentLifecycleStatus.Active)
         {
-            return DomainResult.Rejection([
-                new AgentLifecycleStateAlreadySetRejection(
-                    agentId,
-                    AgentLifecycleStatus.Active,
-                    AgentLifecycleStatus.Active,
-                    nameof(ActivateAgent)),
-            ]);
+            return AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion);
         }
 
         // Reactivating a Disabled agent re-runs the same gates (AC2): activation is never a blind flip to active.
@@ -307,12 +301,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         }
 
         return state.Lifecycle == AgentLifecycleStatus.Disabled
-            ? DomainResult.Rejection([
-                new AgentLifecycleStateAlreadySetRejection(
-                    agentId,
-                    AgentLifecycleStatus.Disabled,
-                    AgentLifecycleStatus.Disabled,
-                    nameof(DisableAgent))])
+            ? AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion)
             : AgentSetupDomainResult.Applied([
                 new AgentDisabled(agentId) { ConfigurationVersion = state.ConfigurationVersion + 1 },
             ], state.ConfigurationVersion + 1);

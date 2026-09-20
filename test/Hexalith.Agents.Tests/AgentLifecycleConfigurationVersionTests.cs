@@ -45,7 +45,7 @@ public sealed class AgentLifecycleConfigurationVersionTests
     }
 
     [Fact]
-    public void RejectedRepeatedLifecycleCommandsDoNotIncrementConfigurationVersion()
+    public void RepeatedLifecycleCommandsAreNoOpsAndDoNotIncrementConfigurationVersion()
     {
         AgentState state = StateWithSelectedProvider(ValidCreate());
         DomainResult activation = AgentAggregate.Handle(
@@ -60,7 +60,8 @@ public sealed class AgentLifecycleConfigurationVersionTests
             state,
             SelectEnvelope(new ActivateAgent(), activationExpectedConfigurationVersion: state.ConfigurationVersion));
 
-        _ = repeatedActivation.Events.Single().ShouldBeOfType<AgentLifecycleStateAlreadySetRejection>();
+        repeatedActivation.IsNoOp.ShouldBeTrue();
+        repeatedActivation.Events.ShouldBeEmpty();
         ApplyAll(state, repeatedActivation);
         state.ConfigurationVersion.ShouldBe(activeVersion);
 
@@ -70,7 +71,8 @@ public sealed class AgentLifecycleConfigurationVersionTests
 
         DomainResult repeatedDisable = AgentAggregate.Handle(new DisableAgent(), state, Envelope(new DisableAgent()));
 
-        _ = repeatedDisable.Events.Single().ShouldBeOfType<AgentLifecycleStateAlreadySetRejection>();
+        repeatedDisable.IsNoOp.ShouldBeTrue();
+        repeatedDisable.Events.ShouldBeEmpty();
         ApplyAll(state, repeatedDisable);
         state.ConfigurationVersion.ShouldBe(disabledVersion);
     }

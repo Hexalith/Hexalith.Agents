@@ -87,6 +87,34 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         agents.GetServices<ITrustedCommandExtensionPolicy>().ShouldBeEmpty();
     }
 
+    [Theory]
+    [InlineData(nameof(ActivateAgent), "Hexalith.Agents.EventStore.ActivateAgent.v1", "agents.setup.activate", 1)]
+    [InlineData(nameof(ConfigureAgentResponseMode), "Hexalith.Agents.EventStore.ConfigureAgentResponseMode.v1", "agents.setup.response-mode", 1)]
+    [InlineData(nameof(CreateAgent), "Hexalith.Agents.EventStore.CreateAgent.v1", "agents.setup.create", 1)]
+    [InlineData(nameof(DisableAgent), "Hexalith.Agents.EventStore.DisableAgent.v1", "agents.setup.disable", 1)]
+    [InlineData(nameof(UpdateAgentConfiguration), "Hexalith.Agents.EventStore.UpdateAgentConfiguration.v1", "agents.setup.update", 1)]
+    public void Every_setup_adapter_publishes_its_stable_descriptor_contract(
+        string commandType,
+        string expectedAdapterId,
+        string expectedOperationId,
+        int expectedDescriptorVersion)
+    {
+        SubmitCommand command = ActivationCommand(
+            payload: "{\"value\":1}",
+            version: "7",
+            providerVerdict: nameof(ProviderSelectionValidationStatus.Valid),
+            approverVerdict: nameof(ApproverPolicyValidationStatus.Valid)) with
+        {
+            CommandType = commandType,
+        };
+
+        TrustedIdempotencyDescriptor descriptor = Registry().Resolve(command);
+
+        descriptor.AdapterId.ShouldBe(expectedAdapterId);
+        descriptor.OperationId.ShouldBe(expectedOperationId);
+        descriptor.DescriptorVersion.ShouldBe(expectedDescriptorVersion);
+    }
+
     [Fact]
     public void Activation_intent_excludes_dependency_evidence_but_keeps_payload_authorization_and_version()
     {
