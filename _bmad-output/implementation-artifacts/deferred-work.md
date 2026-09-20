@@ -344,3 +344,11 @@ Chunk 1 (production source) review. These items are carried onto existing ledger
 - A failed catch-up read aborts polling and replaces the configuration form with Unavailable/Empty while the attempt is retained. Carried; owned by DW-5.
 - `Unknown = 0` tolerance remains incomplete and `AgentSetupWriteStatus.Submitted = 0` is fail-open if it becomes a wire contract. Carried; owned by DW-11 and DW-23.
 - Provider-catalog writes lack the configuration page's retained-attempt and exact-retry path. Carried; owned by DW-14 / Story 5.3.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Convert setup-query read-model-store failures into the typed unavailable result.
+  evidence: `AgentSetupQueryHandlerBase.ExecuteAsync` lets a non-cancellation `IReadModelStore.GetAsync` failure escape, while the sibling provider query handler already catches the same infrastructure failure and returns its structured unavailable result; this behavior predates the current story patch.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Reject non-HTTP EventStore base-address schemes during Agents host composition.
+  evidence: `AgentSetupServiceCollectionExtensions` accepts any absolute URI even though the configured HTTP client cannot send non-HTTP schemes, so an invalid pre-existing configuration can resolve the live setup services and then fail every request at runtime.

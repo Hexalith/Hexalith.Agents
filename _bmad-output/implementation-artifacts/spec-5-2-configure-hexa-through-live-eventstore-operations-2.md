@@ -329,6 +329,33 @@ Code review of Story 5.2 **chunk 1** (production source only: `src/Hexalith.Agen
 - `AlreadyApplied` releases the attempt without `RefreshAfterWriteAsync` — `false`. The frozen matrix no-op row forbids polling for a version that was not appended.
 - `AlreadyApplied` releases without restoring the instructions draft — `false`. The instructions field is write-only and starts empty by design; a no-op means the submitted values were already present.
 
+### Review Findings
+
+Code review of Story 5.2 **group A** (`src/Hexalith.Agents.Contracts/**` only, `599208d` → working tree), 2026-09-20. Four layers, none failed. Remaining groups: B Domain+EventStore package+Server, C UI, D Tests, E Tooling/docs/gitlinks.
+
+**Patch**
+
+- [x] [Review][Patch] `AgentActivationConfigurationVersionMismatchRejection` has no JSON round-trip, unlike every sibling Agent rejection — `AgentContractsRoundTripTests` remarks claim this suite round-trips all rejection events, but this type is constructed only in-process in `AgentLifecycleConfigurationVersionTests` and applied as a no-op. `[JsonIgnore]` or a renamed constructor parameter would keep those tests green while EventStore persisted a payload that dropped the retained versions. [test/Hexalith.Agents.Contracts.Tests/AgentContractsRoundTripTests.cs:88]
+
+**Rejected**
+
+- `AgentSetupWriteStatus` still uses `Submitted = 0` with no `Unknown` sentinel or fallback converter — `low`. Duplicate of the already-deferred UI-internal zero (DW-11 / DW-23). This type is not on the HTTP envelope; inserting `Unknown = 0` would shift ordinals.
+- `AgentSetupWriteResult.Submitted` treats `Unknown` effect or a missing target as progress — `false`. `AgentsClientSetupGateway.WriteAsync` already maps that shape to `UnableToVerify` before calling the factory; the factory remarks put verification on the gateway. Same claim from Blind Hunter and Edge Case Hunter.
+- `AgentSetupWriteResult.Failed` accepts success-like statuses — `false`. No production caller passes `Submitted` / `AlreadyApplied` / `AwaitingProjection` into `Failed`. The page also remaps `Submitted` with no acceptance to `UnableToVerify`. Same claim from both hunters; prior triage rejected it.
+- `Submitted` / `AwaitingProjection` do not require `Effect` / `TruthState` / `TargetConfigurationVersion` to agree — `false`. Live writers set matching fields; the frozen matrix and type remarks define `ProjectionConfirmed` for both a caught-up read and a no-op.
+- `AgentSetupResultPayload` is only property-name strings — `false`. The constants exist so the domain writer and operations reader can bind without a shared DTO; both sides already use these names.
+- `AgentSetupTrustedExtensions` publishes keys without allowed values or per-command scope — `false`. Values, activation-only scope, and the canonical version grammar are enforced by `AgentsTrustedCommandExtensionPolicy`. `PartyLinkValidation` / `AuditGovernanceResolved` are not submitted on in-scope setup commands.
+- `AgentCommandAcceptance` keeps the unmarked V1 constructor and four-value `Deconstruct` — `false`. Additive V1 compatibility is tested; an older CLR shape yields `Unknown` effect / null version, which the gateway fail-closes.
+- `UnknownFallbackEnumConverter.FromName` parses `"07"`, `"+7"`, and `" 7 "` as defined members — `false`. Quoted ordinals are documented to read like numbers; undefined ordinals still degrade to `Unknown`. The stricter canonical grammar belongs to the activation-version identifier, not this compatibility converter.
+- No `Stale` member on `AgentSetupWriteStatus`, and `ActivateAgent` XML still describes only field blockers — `false` / `low`. Public `AgentOperationStatus.Stale` exists; the UI maps it to `Conflict` by design. XML on the empty command record does not change the aggregate fence.
+- `ProviderCatalogWriteResult` still assumes only `Submitted` carries acceptance — `false`. That type is not in this group-A diff and still only mints `Submitted` or a denial; catalog no-op correlation is Story 5.3.
+- `AgentOperationOptions.ExpectedConfigurationVersion` has no `> 0` invariant, and retry remarks omit the pinned version — `false`. HTTP parse and `WriteAsync` already reject a non-positive value when activation requires it; omitting it on retry is `ValidationFailed`.
+- `ProjectionConfirmed` means either a caught-up read or a no-op with no read — `false`. Frozen matrix and the enum remarks require that dual path so polling is not used for a version that was never appended.
+- JSON `null` for a non-nullable fallback enum throws — `false`. Reproduced: root and `AgentCommandAcceptance.TruthState: null` both deserialize to `Unknown` without throwing.
+- Enums used as JSON property names throw because `ReadAsPropertyName` is not overridden — `false`. No reviewed contract uses these enums as property names.
+- `AwaitingProjection` does not require `Applied` plus a positive target — `false`. The only production caller is the configuration page, which passes a previously accepted identity that already had a target version.
+- `AgentActivationConfigurationVersionMismatchRejection` can be constructed with equal or non-positive versions — `false`. The aggregate emits it only after a canonical positive expected version that differs from current state. Event constructors must not throw, or replay of a stored payload would fail.
+
 ## Implementation Notes
 
 - Added the canonical `## Dev Agent Record` and nested `### File List` this story was missing, so the
@@ -748,6 +775,31 @@ submodule history is preserved. Reapply the round-5 KEEP behavior selectively. D
 | verification-gap-r11 | The four explicit write-announcement localization keys lack real-resource coverage. | false | reject | Today's patch adds `Confirmed`, `Refreshing`, `RefreshIncomplete`, and `RetryUnresolved` to `LocalizationResourceTests`; the claim describes the pre-patch tree, not the reviewed working tree. |
 | verification-gap-r11 | Four non-activation setup adapter identifiers are unpinned. | medium | patch | Pre-verified: only activation asserts adapter id, operation id, and descriptor version, so another adapter identifier can drift and turn cross-deployment retries into conflicts without failing tests. |
 | verification-gap-r11 | The prerelease-at-floor package rejection branch lacks a regression case. | medium | patch | Pre-verified: existing invalid rows omit `3.106.0-alpha`; removing the prerelease-at-floor guard leaves all current tests green while accepting a version below the required stable floor. |
+| blind-hunter-r12 | The setup query handler trusts identifiers embedded in the stored model. | high | defer | carried: a mis-keyed projection can disclose another scope; this predates the exact-correlation patch and remains platform projection-hardening work. |
+| blind-hunter-r12 | Non-positive expected configuration versions are accepted by setup reads. | medium | patch | carried: zero or negative expectations make a legitimate projection appear confirmed; the existing patch route remains recorded. |
+| blind-hunter-r12 | Setup query read-model-store failures escape instead of returning `Unavailable`. | medium | defer | The uncaught store call predates this story's converter-only change to the handler; the sibling provider handler demonstrates the typed fail-closed behavior that later query hardening should adopt. |
+| blind-hunter-r12 | Tolerant enum deserialization can advance a projection with an `Unknown` value. | false | reject | `Unknown` is the deliberate fail-closed compatibility state required by the story, and the read model is rebuildable after an upgraded projector understands a future member; no permanent corruption is produced. |
+| blind-hunter-r12 | The fallback enum converter makes malformed command values unverifiable. | false | reject | An unknown response mode reaches the aggregate's validation and is rejected without mutation; EventStore maps deterministic rejection rather than treating the malformed command as an accepted, unverifiable write. |
+| blind-hunter-r12 | The client gateway does not validate `TruthState` against effect and target version. | false | reject | carried: production constructs the acceptance from one verified receipt and maps terminal behavior from the effect; contradictory custom-gateway states are outside the trusted boundary and were already rejected as undemonstrated misuse. |
+| blind-hunter-r12 | `Rejected` and `Blocked` setup outcomes map to retryable `Unavailable`. | medium | defer | carried: the terminal UI mapping remains coupled to the deliberately deferred live status reader and is owned by DW-12. |
+| blind-hunter-r12 | Configured Agents composition still falls back to `DeferredAgentCommandStatusReader`. | false | reject | carried: the absence of a live reader is explicitly disclosed and intentionally keeps ambiguous outcomes unverifiable pending the tenant-scoped Story 5.6 binding. |
+| blind-hunter-r12 | The command-status reader lacks tenant, Agent, and correlation scope. | medium | defer | carried: the future live read's tenant-scoped authorization and identity contract are already owned by DW-24 and Story 5.6. |
+| blind-hunter-r12 | Callers that omit retry identities cannot replay after a lost acknowledgement. | false | reject | Exact replay is promised only when the caller supplies and retains the operation options; the FrontComposer path always does so, while omission intentionally opts into server-minted one-shot identities. |
+| blind-hunter-r12 | A no-op is marked `ProjectionConfirmed` without polling a lagging projection. | false | reject | carried: the frozen matrix explicitly makes a no-op terminal because it appends no new version to await. |
+| blind-hunter-r12 | A transient setup read result stops polling and replaces the displayed form. | medium | defer | carried: this pre-existing page behavior is owned by DW-5 and remains outside the exact-correlation patch. |
+| blind-hunter-r12 | Navigation or reload loses the in-memory retained attempt. | maybe-false | defer | carried: the approved intent does not settle persistence beyond component lifetime; a product/UX state-lifetime decision is required. |
+| blind-hunter-r12 | Setup composition replaces independently registered live `IAgentsClient` groups. | false | reject | The internal host composition has no independently registered live interaction, proposal, status, or audit facade to preserve; it deliberately composes only the groups this host currently binds. |
+| blind-hunter-r12 | The readiness gate writes `Result: PASS` before validating the File List. | medium | patch | Verified: `execute_gate` performs the atomic story write before computing and rejecting a File List mismatch, so a failing run can leave misleading passing evidence. Validate the paths before writing. |
+| blind-hunter-r12 | The readiness gate does not run its Python contract tests. | false | reject | The generated PASS block explicitly records xUnit project evidence; tooling regressions are a separate verification command and CI lane, and the story ran all 61 Python tests independently. |
+| blind-hunter-r12 | Package catalog lookup can select a sibling checkout. | false | reject | The root-declared `references/Hexalith.Builds` catalog is first and always wins in a correctly initialized checkout; sibling fallbacks are unreachable under the repository's required submodule state. |
+| blind-hunter-r12 | Header syntax validation precedes authorization. | false | reject | carried: the filter exposes only static public header-shape rules and performs no protected read or dispatch; authorization still precedes every protected operation. |
+| edge-case-hunter-r12 | A retry can replace retained acceptance with a different submitted acceptance. | false | reject | EventStore binds an exact retry to the retained key and canonical intent, so a submitted replay cannot produce a different receipt target; the alleged consequence requires violation of the admission contract under test. |
+| edge-case-hunter-r12 | `CreateAgent` can persist a body tenant different from the envelope tenant. | false | reject | `AgentAdministrationOrchestrator.CreateAsync` overwrites the body tenant with the authenticated request tenant before constructing the only trusted live envelope, and tests pin that cross-tenant input is replaced. |
+| edge-case-hunter-r12 | Configuration-version mutation can overflow at `Int32.MaxValue`. | low | reject | carried: the pre-existing theoretical overflow requires more than two billion setup mutations and a new exhaustion policy is disproportionate here. |
+| edge-case-hunter-r12 | Initial setup loading lets gateway exceptions escape. | medium | defer | carried: `OnInitializedAsync` catches disposal cancellation only; the pre-existing page behavior remains outside this exact-correlation patch. |
+| edge-case-hunter-r12 | A configured non-HTTP EventStore URI is treated as a live gateway. | medium | defer | Absolute-URI validation predates this story and accepts schemes `HttpClient` cannot send; a later composition-hardening change should restrict the scheme to HTTP/HTTPS and prove the host stays fail-closed. |
+| edge-case-hunter-r12 | Rejected setup outcomes remain retryable. | medium | defer | carried: DW-12 owns this mapping together with the deferred live status-reader binding. |
+| edge-case-hunter-r12 | `ContentSafetyAuditTreatment` still uses the throwing enum converter. | medium | defer | carried: it is part of the sibling public-enum migration already tracked as DW-23, not this setup-correlation patch. |
 
 ## Design Notes
 
@@ -783,16 +835,16 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-20T09:18:25Z
+Run (UTC): 2026-09-20T10:58:52Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Contracts.Tests | 530 | 530 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 576 | 576 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Contracts.Tests | 531 | 531 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 600 | 600 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 791 | 791 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1082 | 1082 | 0 | 0 | 0 | 0 |
-| **Total** | 2985 | 2985 | 0 | 0 | 0 | 0 |
+| **Total** | 3010 | 3010 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->
@@ -903,6 +955,7 @@ Result: PASS
 - `src/Hexalith.Agents/Agent/AgentAggregate.cs`
 - `src/Hexalith.Agents/Agent/AgentSetupDomainResult.cs`
 - `src/Hexalith.Agents/Agent/AgentState.cs`
+- `test/Hexalith.Agents.Contracts.Tests/AgentContractsRoundTripTests.cs`
 - `test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentActivationApproverRevalidationTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentAdministrationOrchestratorTests.cs`

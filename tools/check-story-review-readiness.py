@@ -837,10 +837,6 @@ def execute_gate(
         )
 
     summaries = collect_fresh_test_summaries(root, runner)
-    block = render_test_evidence(summaries, now_utc())
-    updated = update_generated_block(text, layout, block)
-    atomic_write_story(story_path, updated, encoding, expected_bytes=original_raw)
-
     changed = git_status_paths(root, runner)
     scope = "Git status"
     if baseline is not None:
@@ -849,6 +845,10 @@ def execute_gate(
     mismatch = mismatch_message(file_list, changed, scope)
     if mismatch:
         raise ValidationError(mismatch)
+
+    block = render_test_evidence(summaries, now_utc())
+    updated = update_generated_block(text, layout, block)
+    atomic_write_story(story_path, updated, encoding, expected_bytes=original_raw)
     return summaries, len(changed)
 
 

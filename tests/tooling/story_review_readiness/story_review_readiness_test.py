@@ -602,17 +602,16 @@ class GateOrchestrationTests(unittest.TestCase):
         self.assertEqual(story_path.read_bytes(), original)
         self.assertEqual(runner.commands, [])
 
-    def test_file_list_mismatch_leaves_fresh_block_but_never_edits_file_list(self):
+    def test_file_list_mismatch_preserves_story_without_generated_evidence(self):
         root, story_path, _ = self.fixture()
         runner = FakeRunner(root, git_payload=b" M src/missing.cs\0")
-        original_file_list = "- `_bmad-output/implementation-artifacts/story.md`"
+        original = story_path.read_bytes()
 
         with self.assertRaisesRegex(V.ValidationError, "Missing from File List") as raised:
             V.execute_gate(root, story_path, runner, lambda: FIXED_NOW)
 
-        updated = story_path.read_text(encoding="utf-8")
-        self.assertIn(V.BEGIN_MARKER, updated)
-        self.assertIn(original_file_list, updated)
+        self.assertEqual(story_path.read_bytes(), original)
+        self.assertNotIn(V.BEGIN_MARKER, story_path.read_text(encoding="utf-8"))
         self.assertIn("Not present in Git status", str(raised.exception))
 
 

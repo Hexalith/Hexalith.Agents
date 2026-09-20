@@ -157,6 +157,19 @@ public sealed class AgentContractsRoundTripTests
         roundTripped.Blockers.ShouldBe(rejection.Blockers);
     }
 
+    [Fact]
+    public void Activation_configuration_version_mismatch_rejection_round_trips_the_retained_versions()
+    {
+        var rejection = new AgentActivationConfigurationVersionMismatchRejection(
+            "hexa",
+            ExpectedConfigurationVersion: 17,
+            ActualConfigurationVersion: 19);
+
+        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(rejection);
+
+        JsonSerializer.Deserialize<AgentActivationConfigurationVersionMismatchRejection>(bytes).ShouldBe(rejection);
+    }
+
     // ===== Safe status view =====
 
     [Fact]
