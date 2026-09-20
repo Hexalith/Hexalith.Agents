@@ -725,16 +725,16 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-19T22:52:34Z
+Run (UTC): 2026-09-19T23:59:28Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Contracts.Tests | 530 | 530 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 568 | 568 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 569 | 569 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 787 | 787 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.UI.Tests | 1077 | 1077 | 0 | 0 | 0 | 0 |
-| **Total** | 2968 | 2968 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.UI.Tests | 1078 | 1078 | 0 | 0 | 0 | 0 |
+| **Total** | 2970 | 2970 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->
