@@ -371,3 +371,11 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 
 - Typed `Rejected` is proven only against a substitute; the composed host still registers `DeferredAgentCommandStatusReader`. Carried; owned by DW-7, DW-19, DW-24, and DW-25.
 - Never-admitted stale/newer activation is unproven on the HTTP split-provider fabric because `BuildDomainApp` always returns `Applied`. Aggregate fence remains Group D3 (`AgentLifecycleConfigurationVersionTests`); a live HTTP proof needs the platform-owned domain processor, owned by Story 5.6 / DW-21.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Bind Agent administration scope, actor, and role claims to one unambiguous authenticated identity.
+  evidence: `HttpAgentAdministrationContextProvider` resolves claims and roles across the whole principal, so a primary authenticated identity can borrow authority or a conflicting tenant from another identity; this provider and behavior predate the current Story 5.2 patch.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Define how confirmed setup writes reconcile editable drafts with a newer concurrent projection.
+  evidence: Post-write polling deliberately preserves local drafts even when the projection advances beyond the accepted target; deciding whether to replace, merge, or flag those drafts requires a product/UX draft-versus-authority rule.

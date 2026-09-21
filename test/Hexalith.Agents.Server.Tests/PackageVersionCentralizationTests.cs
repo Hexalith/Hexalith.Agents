@@ -14,6 +14,8 @@ using Shouldly;
 /// </summary>
 public sealed class PackageVersionCentralizationTests
 {
+    private const int ProcessTimeoutMilliseconds = 120_000;
+
     [Fact]
     public void NoProjectShouldDeclareInlinePackageReferenceVersions()
     {
@@ -132,7 +134,13 @@ public sealed class PackageVersionCentralizationTests
             process.Start().ShouldBeTrue("The shared Hexalith.Builds consumer-authority validator must be executable.");
             Task<string> standardOutput = process.StandardOutput.ReadToEndAsync();
             Task<string> standardError = process.StandardError.ReadToEndAsync();
-            process.WaitForExit();
+            if (!process.WaitForExit(ProcessTimeoutMilliseconds))
+            {
+                process.Kill(entireProcessTree: true);
+                throw new TimeoutException(
+                    $"The shared package-authority validator did not exit within {ProcessTimeoutMilliseconds / 1000} seconds.");
+            }
+
             string output = standardOutput.GetAwaiter().GetResult() + standardError.GetAwaiter().GetResult();
 
             process.ExitCode.ShouldNotBe(0, "A consumer-owned package version must fail the shared authority validator.");

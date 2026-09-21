@@ -420,6 +420,10 @@ public sealed class AgentsOperationEndpointsTests
             {
                 headerNames.ShouldContain("X-Expected-Configuration-Version", endpoint.RoutePattern.RawText);
             }
+            else
+            {
+                headerNames.ShouldNotContain("X-Expected-Configuration-Version", endpoint.RoutePattern.RawText);
+            }
         }
     }
 

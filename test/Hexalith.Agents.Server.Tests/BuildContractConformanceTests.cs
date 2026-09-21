@@ -15,6 +15,8 @@ using Shouldly;
 /// </summary>
 public sealed class BuildContractConformanceTests
 {
+    private const int ProcessTimeoutMilliseconds = 120_000;
+
     [Fact]
     public void RootBuildPropsShouldEnforceLanguageAndBuildContract()
     {
@@ -321,18 +323,30 @@ public sealed class BuildContractConformanceTests
 
     private static JsonDocument EvaluateMsBuild(string projectPath, params string[] arguments)
     {
-        string output = RunDotNet(
+        string standardOutput = RunProcess(
+            "dotnet",
             out int exitCode,
+            out string standardError,
             new[] { "msbuild", projectPath, "-nologo" }.Concat(arguments).ToArray());
 
-        exitCode.ShouldBe(0, output);
-        return JsonDocument.Parse(output);
+        exitCode.ShouldBe(0, standardOutput + standardError);
+        return JsonDocument.Parse(standardOutput);
     }
 
     private static string RunDotNet(out int exitCode, params string[] arguments)
         => RunProcess("dotnet", out exitCode, arguments);
 
     private static string RunProcess(string fileName, out int exitCode, params string[] arguments)
+    {
+        string standardOutput = RunProcess(fileName, out exitCode, out string standardError, arguments);
+        return standardOutput + standardError;
+    }
+
+    private static string RunProcess(
+        string fileName,
+        out int exitCode,
+        out string standardError,
+        params string[] arguments)
     {
         ProcessStartInfo startInfo = new()
         {
@@ -349,9 +363,16 @@ public sealed class BuildContractConformanceTests
         using Process process = new() { StartInfo = startInfo };
         process.Start().ShouldBeTrue("The .NET SDK must be available to evaluate the package wrapper.");
         Task<string> standardOutput = process.StandardOutput.ReadToEndAsync();
-        Task<string> standardError = process.StandardError.ReadToEndAsync();
-        process.WaitForExit();
+        Task<string> standardErrorTask = process.StandardError.ReadToEndAsync();
+        if (!process.WaitForExit(ProcessTimeoutMilliseconds))
+        {
+            process.Kill(entireProcessTree: true);
+            throw new TimeoutException(
+                $"'{fileName}' did not exit within {ProcessTimeoutMilliseconds / 1000} seconds.");
+        }
+
         exitCode = process.ExitCode;
-        return standardOutput.GetAwaiter().GetResult() + standardError.GetAwaiter().GetResult();
+        standardError = standardErrorTask.GetAwaiter().GetResult();
+        return standardOutput.GetAwaiter().GetResult();
     }
 }

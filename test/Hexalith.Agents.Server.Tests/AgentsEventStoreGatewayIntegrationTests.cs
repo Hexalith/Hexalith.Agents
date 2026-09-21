@@ -76,13 +76,21 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         ServiceCollection agentsServices = new();
         agentsServices.AddSingleton<IAgentCommandDispatcher, DeferredAgentCommandDispatcher>();
         agentsServices.AddSingleton(AgentsClient.Unavailable());
-        IConfiguration agentsConfiguration = new ConfigurationBuilder().Build();
+        IConfiguration agentsConfiguration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Agents:EventStore:BaseUrl"] = "https://eventstore.example",
+                ["Agents:EventStore:AppId"] = "eventstore",
+            })
+            .Build();
         _ = agentsServices.AddAgentSetupServices(agentsConfiguration);
         using ServiceProvider agents = agentsServices.BuildServiceProvider(new ServiceProviderOptions
         {
-            ValidateOnBuild = true,
+            ValidateOnBuild = false,
             ValidateScopes = true,
         });
+        agents.GetRequiredService<IAgentCommandDispatcher>()
+            .ShouldBeOfType<EventStoreAgentCommandDispatcher>();
         agents.GetServices<IIdempotencyIntentAdapter>().ShouldBeEmpty();
         agents.GetServices<ITrustedCommandExtensionPolicy>().ShouldBeEmpty();
     }
@@ -146,6 +154,21 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         {
             registry.Resolve(conflict).CanonicalIntent.ShouldNotBe(descriptor.CanonicalIntent);
         }
+    }
+
+    [Theory]
+    [InlineData(nameof(ConfigureAgentResponseMode))]
+    [InlineData(nameof(CreateAgent))]
+    [InlineData(nameof(DisableAgent))]
+    [InlineData(nameof(UpdateAgentConfiguration))]
+    public void Standard_setup_intent_keeps_administrator_authorization(string commandType)
+    {
+        IdempotencyIntentAdapterRegistry registry = Registry();
+        SubmitCommand authorized = StandardCommand(commandType, administratorAuthorization: "true");
+        SubmitCommand unauthorized = StandardCommand(commandType, administratorAuthorization: "false");
+
+        registry.Resolve(unauthorized).CanonicalIntent
+            .ShouldNotBe(registry.Resolve(authorized).CanonicalIntent);
     }
 
     [Fact]
@@ -218,6 +241,12 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         [
             ActivationRequest(JsonSerializer.SerializeToElement(new { value = 2 }), "7", nameof(ProviderSelectionValidationStatus.Valid), nameof(ApproverPolicyValidationStatus.Valid)),
             ActivationRequest(JsonSerializer.SerializeToElement(new { value = 1 }), "8", nameof(ProviderSelectionValidationStatus.Valid), nameof(ApproverPolicyValidationStatus.Valid)),
+            ActivationRequest(
+                JsonSerializer.SerializeToElement(new { value = 1 }),
+                "7",
+                nameof(ProviderSelectionValidationStatus.Valid),
+                nameof(ApproverPolicyValidationStatus.Valid),
+                administratorAuthorization: null),
         ];
         foreach (SubmitCommandRequest conflict in conflicts)
         {
@@ -276,6 +305,9 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", "OtherCommand", AgentSetupTrustedExtensions.AgentAdministrator, "true", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "True", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(UpdateAgentConfiguration), AgentSetupTrustedExtensions.ProviderSelectionValidation, "Valid", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ProviderSelectionValidation, "Valid", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ApproverPolicyValidation, "Valid", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, "7", true)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ProviderSelectionValidation, "valid", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, "07", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), "agent:unknown", "true", false)]
@@ -412,6 +444,21 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             IsGlobalAdmin: true,
             IdempotencyKey: "01ARZ3NDEKTSV4RRFFQ69G5FAV");
 
+    private static SubmitCommand StandardCommand(string commandType, string administratorAuthorization)
+        => ActivationCommand(
+            payload: "{\"value\":1}",
+            version: "7",
+            providerVerdict: nameof(ProviderSelectionValidationStatus.Valid),
+            approverVerdict: nameof(ApproverPolicyValidationStatus.Valid),
+            administratorAuthorization: administratorAuthorization) with
+        {
+            CommandType = commandType,
+            Extensions = new Dictionary<string, string>
+            {
+                [AgentSetupTrustedExtensions.AgentAdministrator] = administratorAuthorization,
+            },
+        };
+
     private static ClaimsPrincipal Principal(string authenticationType, string appId)
         => new(new ClaimsIdentity(
         [
@@ -436,23 +483,39 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         JsonElement payload,
         string version,
         string providerVerdict,
-        string approverVerdict)
-        => Request("agent", nameof(ActivateAgent)) with
+        string approverVerdict,
+        string? administratorAuthorization = "true")
+    {
+        var extensions = new Dictionary<string, string>
+        {
+            [AgentSetupTrustedExtensions.ProviderSelectionValidation] = providerVerdict,
+            [AgentSetupTrustedExtensions.ApproverPolicyValidation] = approverVerdict,
+            [AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion] = version,
+        };
+        if (administratorAuthorization is not null)
+        {
+            extensions[AgentSetupTrustedExtensions.AgentAdministrator] = administratorAuthorization;
+        }
+
+        return Request("agent", nameof(ActivateAgent)) with
         {
             Payload = payload,
-            Extensions = new Dictionary<string, string>
-            {
-                [AgentSetupTrustedExtensions.AgentAdministrator] = "true",
-                [AgentSetupTrustedExtensions.ProviderSelectionValidation] = providerVerdict,
-                [AgentSetupTrustedExtensions.ApproverPolicyValidation] = approverVerdict,
-                [AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion] = version,
-            },
+            Extensions = extensions,
         };
+    }
 
     private static WebApplication BuildDomainApp(Action<SubmitCommand> onExecute)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.WebHost.UseTestServer();
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Agents:EventStore:BaseUrl"] = "https://eventstore.example",
+            ["Agents:EventStore:AppId"] = "eventstore",
+        });
+        builder.Services.AddSingleton<IAgentCommandDispatcher, DeferredAgentCommandDispatcher>();
+        builder.Services.AddSingleton(AgentsClient.Unavailable());
+        _ = builder.Services.AddAgentSetupServices(builder.Configuration);
         WebApplication app = builder.Build();
         app.MapPost("/process", (SubmitCommand command) =>
         {

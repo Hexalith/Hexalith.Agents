@@ -152,20 +152,23 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     [Fact]
     public async Task A_write_then_projection_then_read_reaches_projection_confirmed()
     {
-        _ = await Operations().UpdateConfigurationAsync(
+        AgentOperationResult<AgentCommandAcceptance> write = await Operations().UpdateConfigurationAsync(
             AgentId,
             new UpdateAgentConfiguration("hexa renamed", null, "instructions long enough to be valid"));
+        int targetConfigurationVersion = write.Value.ShouldNotBeNull()
+            .TargetConfigurationVersion.ShouldNotBeNull();
 
         // Nothing is durable until the projection says so: the read before projection finds no Agent at all.
         AgentSetupResult beforeProjection = (await Operations().GetConfigurationAsync(AgentId)).Value.ShouldNotBeNull();
         beforeProjection.Status.ShouldBe(AgentInspectionStatus.AgentNotFound);
 
-        SeedProjectedSetup(configurationVersion: 2);
+        SeedProjectedSetup(configurationVersion: targetConfigurationVersion);
 
-        AgentSetupResult afterProjection = (await Operations().GetConfigurationAsync(AgentId, expectedConfigurationVersion: 2)).Value.ShouldNotBeNull();
+        AgentSetupResult afterProjection = (await Operations()
+            .GetConfigurationAsync(AgentId, expectedConfigurationVersion: targetConfigurationVersion)).Value.ShouldNotBeNull();
         AgentSetupView setup = afterProjection.Setup.ShouldNotBeNull();
         setup.TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
-        setup.ConfigurationVersion.ShouldBe(2);
+        setup.ConfigurationVersion.ShouldBe(targetConfigurationVersion);
     }
 
     [Fact]

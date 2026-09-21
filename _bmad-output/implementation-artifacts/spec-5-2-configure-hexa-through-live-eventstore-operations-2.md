@@ -2,7 +2,7 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
 review_loop_iteration: 10
@@ -495,17 +495,17 @@ Acceptance Auditor: one finding (above, resolved and patched); no other AC viola
 
 Code review of Story 5.2 **group D1** (`test/Hexalith.Agents.Server.Tests/**` only, `599208d` → working tree), 2026-09-21. Four layers, none failed. Remaining groups: D2 UI.Tests, D3 Agents.Tests + Contracts.Tests + readiness tests, E Tooling/docs/gitlinks.
 
-Readiness gate: `python3 tools/check-story-review-readiness.py _bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md` — PASS (5 projects, 3015/3015 passed, File List 192/192). Floor, not proof of acceptance.
+Readiness gate: `python3 tools/check-story-review-readiness.py _bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md` — PASS; see the generated evidence block below. Floor, not proof of acceptance.
 
 **Patch**
 
-- [ ] [Review][Patch] Standard setup adapters never compare `CanonicalIntent` for administrator authorization, and the HTTP admission test never conflicts a changed admin flag [test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs:96] — `Every_setup_adapter_publishes_its_stable_descriptor_contract` overlays `CommandType` onto an `ActivationCommand` and asserts only `AdapterId`/`OperationId`/`DescriptorVersion`. `Activation_intent_excludes_dependency_evidence_but_keeps_payload_authorization_and_version` pins admin `true` vs `false` only for `ActivateAgent`. Emptying `StandardSemanticExtensionKeys()` would still pass. `Real_gateway_HTTP_path_replays_the_same_intent_and_conflicts_changed_semantics_without_a_second_execution` posts only `ActivateAgent` and its `conflicts` array is payload `{value:2}` and version `"8"` — no HTTP 409 for `actor:agentsAdmin=false`. Same claim from Verification Gap, Blind Hunter, and Acceptance Auditor.
-- [ ] [Review][Patch] Reserved-extension `Accepts` has no successful case for activation verdict or canonical version values [test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs:267] — the theory pins `actor:agentsAdmin=true` and several negatives (`valid`, `"07"`, Update+`ProviderSelectionValidation`). There is no `expected: true` row for `ProviderSelectionValidation=Valid`, `ApproverPolicyValidation=Valid`, or `ActivationExpectedConfigurationVersion=7`. A regression that rejects the live activation extensions still leaves this suite green.
-- [ ] [Review][Patch] Split-provider isolation is still tautological on the HTTP domain host and unproven on the live-configured Agents host [test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs:452] — `BuildDomainApp` maps a stub `/process` and never calls `AddAgentSetupServices`, so `GetServices<IIdempotencyIntentAdapter>()`/`ITrustedCommandExtensionPolicy` empty holds for any Server registration. `Gateway_registration_is_explicit_idempotent_and_owns_all_five_setup_adapters` composes Agents with an empty configuration. `A_configured_gateway_resolves_the_live_dispatcher_and_administration_operations` never asserts those gateway seams are absent. Round 9 already patched this class of vacuity once. Same claim from Blind Hunter and Acceptance Auditor.
-- [ ] [Review][Patch] Non-activate write handlers are not asserted to omit `X-Expected-Configuration-Version` [test/Hexalith.Agents.Server.Tests/AgentsOperationEndpointsTests.cs:419] — the metadata test requires the header on `/activate` and is silent on create/update/response-mode/disable. Production omits `[FromHeader]` there (`AgentsOperationEndpoints.cs:71-132`); adding it would bind the activation fence on those routes unnoticed. Edge Case Hunter.
-- [ ] [Review][Patch] `A_write_then_projection_then_read_reaches_projection_confirmed` confirms a seeded version, not the write receipt [test/Hexalith.Agents.Server.Tests/EventStoreAgentAdministrationOperationsTests.cs:153] — the constructor stub returns `Applied` at version 4; the test discards the write result, seeds version 2, and reads `expectedConfigurationVersion: 2`. AC3's eventful-write row is poll-until-**that** receipt version. Acceptance Auditor.
-- [ ] [Review][Patch] MSBuild and package-authority child processes wait forever and parse stderr as JSON [test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs:322] — `EvaluateMsBuild` concatenates stdout+stderr then `JsonDocument.Parse`; `RunProcess` and `PackageVersionCentralizationTests` (`:131`) call `WaitForExit()` with no timeout. A warning on stderr throws `JsonException` on a passing evaluation; a stuck `dotnet`/`pwsh` hangs the suite. Blind Hunter and Edge Case Hunter.
-- [ ] [Review][Patch] `AppHostSecurityTopologyTests` never forbids `AddAgentsEventStore` on the domain host [test/Hexalith.Agents.Server.Tests/AppHostSecurityTopologyTests.cs:23] — `Program.cs` is already scanned to keep the deferred status reader off the host, but nothing forbids registering gateway admission adapters there. AC1 / **Never** register admission adapters only in `Hexalith.Agents.Server`. Blind Hunter.
+- [x] [Review][Patch] Standard setup adapters never compare `CanonicalIntent` for administrator authorization, and the HTTP admission test never conflicts a changed admin flag [test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs:96] — `Every_setup_adapter_publishes_its_stable_descriptor_contract` overlays `CommandType` onto an `ActivationCommand` and asserts only `AdapterId`/`OperationId`/`DescriptorVersion`. `Activation_intent_excludes_dependency_evidence_but_keeps_payload_authorization_and_version` pins admin `true` vs `false` only for `ActivateAgent`. Emptying `StandardSemanticExtensionKeys()` would still pass. `Real_gateway_HTTP_path_replays_the_same_intent_and_conflicts_changed_semantics_without_a_second_execution` posts only `ActivateAgent` and its `conflicts` array is payload `{value:2}` and version `"8"` — no HTTP 409 for `actor:agentsAdmin=false`. Same claim from Verification Gap, Blind Hunter, and Acceptance Auditor.
+- [x] [Review][Patch] Reserved-extension `Accepts` has no successful case for activation verdict or canonical version values [test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs:267] — the theory pins `actor:agentsAdmin=true` and several negatives (`valid`, `"07"`, Update+`ProviderSelectionValidation`). There is no `expected: true` row for `ProviderSelectionValidation=Valid`, `ApproverPolicyValidation=Valid`, or `ActivationExpectedConfigurationVersion=7`. A regression that rejects the live activation extensions still leaves this suite green.
+- [x] [Review][Patch] Split-provider isolation is still tautological on the HTTP domain host and unproven on the live-configured Agents host [test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs:452] — `BuildDomainApp` maps a stub `/process` and never calls `AddAgentSetupServices`, so `GetServices<IIdempotencyIntentAdapter>()`/`ITrustedCommandExtensionPolicy` empty holds for any Server registration. `Gateway_registration_is_explicit_idempotent_and_owns_all_five_setup_adapters` composes Agents with an empty configuration. `A_configured_gateway_resolves_the_live_dispatcher_and_administration_operations` never asserts those gateway seams are absent. Round 9 already patched this class of vacuity once. Same claim from Blind Hunter and Acceptance Auditor.
+- [x] [Review][Patch] Non-activate write handlers are not asserted to omit `X-Expected-Configuration-Version` [test/Hexalith.Agents.Server.Tests/AgentsOperationEndpointsTests.cs:419] — the metadata test requires the header on `/activate` and is silent on create/update/response-mode/disable. Production omits `[FromHeader]` there (`AgentsOperationEndpoints.cs:71-132`); adding it would bind the activation fence on those routes unnoticed. Edge Case Hunter.
+- [x] [Review][Patch] `A_write_then_projection_then_read_reaches_projection_confirmed` confirms a seeded version, not the write receipt [test/Hexalith.Agents.Server.Tests/EventStoreAgentAdministrationOperationsTests.cs:153] — the constructor stub returns `Applied` at version 4; the test discards the write result, seeds version 2, and reads `expectedConfigurationVersion: 2`. AC3's eventful-write row is poll-until-**that** receipt version. Acceptance Auditor.
+- [x] [Review][Patch] MSBuild and package-authority child processes wait forever and parse stderr as JSON [test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs:322] — `EvaluateMsBuild` concatenates stdout+stderr then `JsonDocument.Parse`; `RunProcess` and `PackageVersionCentralizationTests` (`:131`) call `WaitForExit()` with no timeout. A warning on stderr throws `JsonException` on a passing evaluation; a stuck `dotnet`/`pwsh` hangs the suite. Blind Hunter and Edge Case Hunter.
+- [x] [Review][Patch] `AppHostSecurityTopologyTests` never forbids `AddAgentsEventStore` on the domain host [test/Hexalith.Agents.Server.Tests/AppHostSecurityTopologyTests.cs:23] — `Program.cs` is already scanned to keep the deferred status reader off the host, but nothing forbids registering gateway admission adapters there. AC1 / **Never** register admission adapters only in `Hexalith.Agents.Server`. Blind Hunter.
 
 **Deferred**
 
@@ -664,6 +664,15 @@ submodule history is preserved. Reapply the round-5 KEEP behavior selectively. D
 - CI, package-floor SemVer handling, verifier assembly guards, readiness unmanaged-count detection, sprint metadata,
   and deferred-work ledger statuses were reconciled. The canonical Story 5.2 verifier passes end to end.
 
+**Round 10 D1 fixes applied 2026-09-21**
+
+- Pinned administrator authorization in every setup adapter's canonical intent, every activation-only trusted
+  extension happy path, and the changed-authorization conflict through the real gateway admission path.
+- Composed the independently hosted Agents test service with its live Dapr dispatcher while proving gateway-owned
+  adapters and trusted-extension policies remain absent from that service provider.
+- Pinned activation-only header metadata, receipt-derived projection confirmation, bounded child-process execution,
+  stdout-only MSBuild JSON parsing, and the domain-host prohibition on `AddAgentsEventStore`.
+
 ## Spec Change Log
 
 - 2026-09-14: Added the mandatory Dev Agent Record and File List, and taught the readiness gate to include
@@ -701,6 +710,8 @@ submodule history is preserved. Reapply the round-5 KEEP behavior selectively. D
   `review` for its independent blockers, including external gateway registration (DW-21).
 - 2026-09-20: Applied all 25 round-9 review patches across Agents, the EventStore source dependency, UI recovery,
   composition, CI, verification tooling, and evidence bookkeeping. Intent and acceptance criteria are unchanged.
+- 2026-09-21: Applied all seven Group D1 review patches in the Server.Tests slice. Intent and acceptance criteria
+  are unchanged.
 
 ## Review Triage Log
 
@@ -1004,6 +1015,32 @@ submodule history is preserved. Reapply the round-5 KEEP behavior selectively. D
 | edge-case-hunter-r13-claim | Split-provider tests use an in-memory admission ledger. | maybe-false | defer | carried: Story 5.6 owns the deployed persistence topology required to establish or refute any durable replay gap beyond the policy/admission contract proven here. |
 | verification-gap-r13 | The real live operations wrapper is not exercised for Agent creation. | medium | patch | Filed pre-verified: endpoint tests substitute the interface and orchestrator tests bypass the wrapper; calling `Operations().CreateAsync` with the existing captured-receipt fixture must prove dispatch and verified acceptance through the public create path. |
 | verification-gap-r13 | GitHub Release verification accepts a stable tag marked prerelease. | medium | defer | carried: inherited release tooling validates tag, draft state, SHA, and asset names but not the `prerelease` flag; its existing deferred item remains authoritative. |
+| blind-hunter-r14 | A malformed known-event payload advances the setup projection checkpoint without applying the event. | high | defer | carried: deserialization can return null while the fold advances sequence; the pre-existing behavior requires a projection-corruption policy. |
+| blind-hunter-r14 | Configured Agents composition still falls back to `DeferredAgentCommandStatusReader`. | false | reject | carried: the absence of a live reader is explicitly disclosed and intentionally keeps ambiguous outcomes unverifiable pending the tenant-scoped Story 5.6 binding. |
+| blind-hunter-r14 | `Rejected` and `Blocked` setup outcomes map to retryable `Unavailable`. | medium | defer | carried: the terminal UI mapping remains coupled to the deliberately deferred live status reader and is owned by DW-12. |
+| blind-hunter-r14 | A transient setup read result stops polling and replaces the displayed form. | medium | defer | carried: this pre-existing page behavior is owned by DW-5 and remains outside the exact-correlation patch. |
+| blind-hunter-r14 | Administration context can combine scope, actor, and role claims from different identities. | medium | defer | Verified: `FindFirstValue` and `IsInRole` traverse the whole principal, so a primary authenticated identity can borrow the admin role or a conflicting tenant claim from another identity. The provider predates this story and needs an authentication-authority decision before selecting one identity. |
+| blind-hunter-r14 | Setup query dependency failures escape instead of returning `Unavailable`. | medium | defer | carried: the uncaught tenant/read-model calls predate this story's converter-only handler change; the sibling provider handler demonstrates the later typed fail-closed behavior. |
+| blind-hunter-r14 | The configuration page uses sibling titled sections instead of one `FluentAccordion`. | medium | defer | carried: DW-18 already records this pre-existing repository UX violation; the recovery patch added no titled section. |
+| blind-hunter-r14 | The split-provider test does not establish deployed Dapr authentication, aggregate execution, or durable persistence. | maybe-false | defer | carried: the policy/admission contract and Dapr handler are covered separately, while Story 5.6 owns the production-like persistence/replay topology needed to establish or refute a transport gap. |
+| blind-hunter-r14 | Multi-package NuGet publication cannot recover cleanly from a partial push. | high | defer | carried: the inherited all-absent preflight plus non-transactional push can strand an immutable partial version set. |
+| blind-hunter-r14 | The release workflow fails to enforce its fixed six-package inventory when containers are disabled. | false | reject | The pinned reusable workflow enforces `expected-package-count` on the governed candidate independently of container publication, and `PackageInventoryTests` pins the caller's value to six. |
+| blind-hunter-r14 | Three inherited security workflows consume mutable reusable-workflow refs. | medium | defer | carried: the inherited Story 5.1 workflows use `@main`, so upstream movement can alter gates without local review; this remains outside setup correlation. |
+| blind-hunter-r14 | GitHub Release asset verification checks filenames but not artifact integrity. | medium | defer | carried: the inherited verifier accepts empty, truncated, or substituted assets carrying the expected names; NuGet verification protects the package feed but not the separate GitHub download surface. |
+| blind-hunter-r14 | The focused verifier accepts a class whose tests are all skipped. | low | reject | carried: no required Story 5.2 class is skipped or trait-gated, so reaching this requires a separate deliberate test change; adding structured-result machinery is disproportionate to the current gate. |
+| blind-hunter-r14 | The tolerant-enum migration omits sibling public `Unknown = 0` enums. | medium | defer | carried: the incomplete pre-existing migration remains tracked as DW-23; the current setup payload and operation enums are guarded. |
+| edge-case-hunter-r14-claim | Canonical rejected outcomes are not available through the deferred status reader. | false | reject | carried: the absence is intentionally fail-closed and disclosed pending the tenant-scoped live reader; the fallback returns unknown rather than misclassifying a rejection. |
+| edge-case-hunter-r14 | `Rejected` or `Blocked` setup outcomes remain retryable. | medium | defer | carried: this branch remains coupled to the deferred live status reader and is owned by DW-12. |
+| edge-case-hunter-r14 | A later concurrent projection can leave editable drafts stale after confirmation. | maybe-false | defer | Verified that post-write polling deliberately preserves drafts even when the observed projection advances beyond the accepted target. Whether to replace, merge, or flag those drafts is a product/UX decision; a draft-versus-authority rule would settle it. |
+| edge-case-hunter-r14 | A retry can replace retained acceptance with a different submitted acceptance. | false | reject | carried: EventStore binds an exact retry to the retained key and canonical intent, so the different receipt assumed by the finding requires a violation of the admission contract already under test. |
+| edge-case-hunter-r14 | Configuration-version mutation can overflow at `Int32.MaxValue`. | low | reject | carried: the pre-existing theoretical overflow requires more than two billion setup mutations and a new exhaustion policy is disproportionate here. |
+| edge-case-hunter-r14 | Instructions or policy sub-version mutation can overflow at `Int32.MaxValue`. | low | reject | The increments predate this story and require more than two billion mutations of one sub-version; defining a new exhaustion result and applying it across every versioned policy is disproportionate to this unreachable-in-practice path. |
+| edge-case-hunter-r14 | Multi-package publication cannot resume safely after a partial push. | high | defer | carried: the inherited all-absent preflight plus non-transactional push can strand an immutable partial version set. |
+| edge-case-hunter-r14 | Inherited security workflows execute mutable `@main` references. | medium | defer | carried: upstream movement can change the security and commit-policy gates without a local revision; the existing release-hardening ledger item remains authoritative. |
+| verification-gap-r14 | Rejected setup outcomes are not adopted as terminal by the UI gateway. | medium | defer | carried: the filed evidence confirms `Rejected` falls through to retryable `Unavailable`, but the branch is unreachable until the deliberately deferred live status-reader binding; DW-12 owns both changes together. |
+| verification-gap-r14 | GitHub Release verification accepts a stable tag marked prerelease. | medium | defer | carried: inherited release tooling validates tag, draft state, SHA, and asset names but not the `prerelease` flag; its existing deferred item remains authoritative. |
+| verification-gap-r14 | GitHub Release verification proves filenames rather than uploaded artifact integrity. | medium | defer | carried: the inherited verifier accepts empty, truncated, or substituted assets carrying expected names; the existing release-hardening ledger item remains authoritative. |
+| verification-gap-r14 | Security verification can change without a repository revision. | medium | defer | carried: CodeQL, commitlint, and dependency-review use mutable inherited refs; the existing immutable-revision ledger item remains authoritative. |
 
 ## Design Notes
 
@@ -1039,16 +1076,16 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-21T05:51:51Z
+Run (UTC): 2026-09-21T06:52:40Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Contracts.Tests | 548 | 548 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 578 | 578 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 585 | 585 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 791 | 791 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1092 | 1092 | 0 | 0 | 0 | 0 |
-| **Total** | 3015 | 3015 | 0 | 0 | 0 | 0 |
+| **Total** | 3022 | 3022 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->

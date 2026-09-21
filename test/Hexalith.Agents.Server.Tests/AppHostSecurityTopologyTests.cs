@@ -33,6 +33,8 @@ public sealed class AppHostSecurityTopologyTests
 
         program.ShouldContain("AddAgentSetupServices(builder.Configuration)");
         program.ShouldNotContain("AddSingleton<IAgentCommandStatusReader, DeferredAgentCommandStatusReader>");
+        // Gateway admission adapters and trusted-extension policies belong to the independently composed gateway.
+        program.ShouldNotContain("AddAgentsEventStore(");
     }
 
     [Fact]
