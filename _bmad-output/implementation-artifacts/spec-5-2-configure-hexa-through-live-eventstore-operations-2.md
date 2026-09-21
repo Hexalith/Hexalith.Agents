@@ -2,7 +2,7 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'done'
+status: 'in-progress'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
 review_loop_iteration: 10
@@ -538,6 +538,43 @@ Readiness gate: `python3 tools/check-story-review-readiness.py _bmad-output/impl
 - Foreign / not-created projections are never exercised as newer than N — `false`. `ActivateCoreAsync` rejects null, `!IsCreated`, and identity mismatch *before* the newer-version replay lane; a foreign row at version 3 cannot call `AttemptReplayAsync`.
 - AC4 aggregate fence, AC6 retained retry attempt, and AC3 8 s UI exhaustion are unproven in D1 — `false` as D1 defects. Aggregate fence is `AgentLifecycleConfigurationVersionTests` (D3). Retry retention and catch-up UX are UI tests (D2).
 - Several `CaptureDispatch` helpers still return hardcoded `"corr-1"`/`"msg-1"` — `low`. Pre-existing orchestrator fixtures; provider-selection tests already bind envelope identities. Not introduced as a D1 behavior bug.
+
+### Review Findings
+
+Code review of Story 5.2 **group D2** (`test/Hexalith.Agents.UI.Tests/**` only, `599208d` → working tree), 2026-09-21. Four layers, none failed. Remaining groups: D3 Agents.Tests + Contracts.Tests + readiness tests, E Tooling/docs/gitlinks.
+
+Readiness gate: `python3 tools/check-story-review-readiness.py _bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md` — PASS; 5 projects, 3022/3022 passed, File List 192/192. Floor, not proof of acceptance.
+
+**Patch**
+
+- [ ] [Review][Patch] Projection confirmation never asserts that the retained attempt is released [test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs:517] — after `Agents.Config.Write.Confirmed`, no test asserts a `HasUnresolvedAttempt`-gated control is enabled again. Deleting `ReleaseAttempt` from the two confirmation branches leaves the administrator locked out with recovery hidden. Verification Gap.
+- [ ] [Review][Patch] Abandon of a configuration write never asserts restoration of the write-only instructions draft [test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs:1341] — `Unable_to_verify_retains_and_blocks_the_exact_attempt_until_retry_or_abandon` clicks Abandon and checks re-enabled actions, never the instructions `value`. `ReleaseAttempt(restoreInstructionsDraft: false)` would drop the only copy of the text. Verification Gap.
+- [ ] [Review][Patch] In-flight refresh announcement is never observed by a running test [test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs:1461] — `Agents.Config.Write.Refreshing` is only in the `.resx` key list. Stall `GetSetupAsync` on the Refresh click and assert the live region before the read completes. Verification Gap and Blind Hunter.
+- [ ] [Review][Patch] Catch-up that returns a terminal inspection result does not pin Refresh [test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs:1074] — `A_terminal_retry_result_stops_polling_and_renders_the_typed_failure` asserts Retry/Abandon and AwaitingProjection, not `[data-testid='agents-config-write-refresh']`. Gating Refresh on a non-null setup would drop the only non-resubmitting recovery. Verification Gap.
+- [ ] [Review][Patch] Retry mask omits `Unavailable` and `UnableToVerify` [test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs:759] — `Retrying_an_accepted_pending_attempt_never_erases_its_acceptance` covers Conflict/ValidationFailed/AlreadyApplied only, while production comments and the mask include those two replay-consistency outcomes. Blind Hunter and Edge Case Hunter.
+- [ ] [Review][Patch] Activate/Disable catch-up tests still treat displayed N+1 as the poll target [test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs:451] — `Submitting_a_response_mode_change_rereads_at_the_accepted_version` uses receipt `7` vs displayed `3`. `Accepted()` still hardcodes target `4` with displayed `3`, so Activate/Disable/immediate-confirmation still pass if the UI polls local `3+1`. Violates AC3 / local N+1 forbidden. Acceptance Auditor.
+- [ ] [Review][Patch] `Stale` → `Conflict` is omitted from both client-gateway write-mapping theories [test/Hexalith.Agents.UI.Tests/AgentsClientSetupGatewayTests.cs:244] — `ToWriteStatus` maps `AgentOperationStatus.Stale` to `Conflict` in setup and provider-catalog gateways; the theories list `Conflict` from `ErrorCode.Conflict` only. Removing the `Stale` arm leaves the suites green. Blind Hunter and Edge Case Hunter.
+- [ ] [Review][Patch] `DeferredGatewayTests` never calls the deferred setup write members [test/Hexalith.Agents.UI.Tests/DeferredGatewayTests.cs:46] — reads now assert `Unavailable`, but `UpdateConfigurationAsync` / `ConfigureResponseModeAsync` / `ActivateAsync` / `DisableAsync` (plain and options overloads) are unenforced. Catalog writes in the same file already pin fail-closed. Blind Hunter.
+- [ ] [Review][Patch] Activation and configuration retry tests never assert `CorrelationId != IdempotencyKey` [test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs:493] — each identity is regex-checked independently, so minting the same ULID twice still passes. Blind Hunter.
+- [ ] [Review][Patch] No first-write `Conflict` case shows terminal release with no Retry [test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs:328] — `A_terminal_configuration_failure_restores_the_exact_draft_and_reenables_editing` covers `ValidationFailed` only. `Conflict` shares `IsTerminalWriteFailure` but a Conflict-only removal would keep Retry on a first-write denial. Blind Hunter.
+- [ ] [Review][Patch] `LegacyGatewayImplementationsFailClosedForRetainedMetadataOverloads` is PascalCase [test/Hexalith.Agents.UI.Tests/AgentsClientSetupGatewayTests.cs:278] — the rest of the UI tests are snake_case. Blind Hunter.
+- [ ] [Review][Patch] `An_accepted_write_carries_the_servers_acceptance_and_the_submitted_stage` still says submitted [test/Hexalith.Agents.UI.Tests/AgentsClientSetupGatewayTests.cs:102] — the body now asserts `AuthoritativePending`. Blind Hunter.
+
+#### Rejected
+
+- `DidNotReceive().GetSetupAsync(Arg.Any<int>(), …)` does not match `int?`, so no-op and unverifiable tests still pass if catch-up runs — `false`. Empirically `Arg.Any<int>()` matches `GetSetupAsync(3)`/`GetSetupAsync(4)` and fails `DidNotReceive`; only a null-version read slips through, and production catch-up always passes the receipt `int`. Same claim from Blind Hunter, Edge Case Hunter, and Acceptance Auditor.
+- `An_unresolved_attempt_disables_every_mutable_configuration_control` never asserts Activate/Disable/Save/Retry — `false`. Sibling tests (`Unable_to_verify_…`, `A_gateway_that_throws_…`) already pin those controls; this test owns the four draft fields.
+- `Write_status_live_region_…` never asserts Retry/Abandon present and Refresh absent for `UnableToVerify` — `false`. This test pins the live-region split; `Unable_to_verify_…` and `An_already_applied_receipt_…` pin recovery membership.
+- Exact-options reuse is only asserted for Activate; configuration/response-mode retries never check `ExpectedConfigurationVersion`; Disable has no retry test — `false`. The activation fence is Activate-only by design; configuration and response-mode retries already reuse the same options object through `SubmitAsync`, which Disable also uses.
+- `An_acceptance_without_verified_effect_and_target` omits `AlreadyApplied` with a missing/non-positive target — `false`. That input hits the same `TargetConfigurationVersion is not > 0` arm as `Applied` + null/0/-1, already in the theory.
+- `AgentsClientProviderCatalogGatewayTests` still asserts `Submitted` and never covers Create/Update — `false`. `ProviderCatalogCommandAcceptance` is documented as always `Submitted` (Story 5.3 / DW-14); Create/Update share `WriteAsync` with the Enable/Disable cases that already run.
+- Stalled 8s catch-up still claims `ProjectionConfirmed` — `false`. The last completed setup read is still the pre-write confirmed snapshot (default fixture at version 3); the write banner is `AwaitingProjection`, not `Write.Confirmed`. Same claim from Blind Hunter and Acceptance Auditor.
+- There is no abandon of an accepted `AwaitingProjection` configuration write — `false` as a distinct defect. `AbandonAttempt` is the same path already clicked in `Unable_to_verify_…`; the real hole is the missing instructions-value assertion, filed as a patch.
+- `A_throwing_refresh_…` never checks that Retry is enabled — `false`. Retry is present and shares `_busy` with Refresh/Abandon, which the same test asserts are enabled.
+- Nothing asserts the page never calls the throwing no-options overloads — `false`. Tests that capture `ActivateAsync(AgentOperationOptions, …)` (and siblings) already fail if the no-options members are used.
+- `Accepted()` still uses `"agent-1"` / `"message-1"` / `"correlation-1"` rather than ULIDs — `false`. That helper is stubbed server evidence, not the page-minted ULID pair.
+- `Activation_is_disabled_when_the_displayed_configuration_version_is_not_positive` only uses version `0`, not negative — `false`. Production uses `configurationVersion <= 0`; zero is already in that branch. Edge Case Hunter.
+- That same test never asserts a click does not call `ActivateAsync` — `false`. The user-facing contract is the disabled attribute; a click on a disabled Fluent button is not the everyday path.
 
 ## Implementation Notes
 
@@ -1076,7 +1113,7 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-21T06:52:40Z
+Run (UTC): 2026-09-21T08:59:22Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
