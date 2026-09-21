@@ -2,7 +2,7 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'done'
+status: 'in-progress'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
 review_loop_iteration: 10
@@ -576,6 +576,40 @@ Readiness gate: `python3 tools/check-story-review-readiness.py _bmad-output/impl
 - `Activation_is_disabled_when_the_displayed_configuration_version_is_not_positive` only uses version `0`, not negative — `false`. Production uses `configurationVersion <= 0`; zero is already in that branch. Edge Case Hunter.
 - That same test never asserts a click does not call `ActivateAsync` — `false`. The user-facing contract is the disabled attribute; a click on a disabled Fluent button is not the everyday path.
 
+### Review Findings
+
+Code review of Story 5.2 **group D3** (`test/Hexalith.Agents.Tests/**`, `tests/tooling/story_review_readiness/**`, and `tools/check-story-review-readiness.py`; `599208d` → working tree), 2026-09-21. Four layers, none failed. Remaining group: E Tooling/docs/gitlinks. Contracts.Tests was already reviewed with group A.
+
+Readiness gate: `python3 tools/check-story-review-readiness.py _bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md` — PASS; see the generated evidence block below. Floor, not proof of acceptance.
+
+**Patch**
+
+- [ ] [Review][Patch] Already-active `ActivateAgent` with a stale or future expected version is not pinned against the fence [test/Hexalith.Agents.Tests/AgentLifecycleConfigurationVersionTests.cs:114] — production compares expected N before the already-active no-op (`AgentAggregate.cs:231-249`), but `Activate_already_active_is_already_applied` and `RepeatedLifecycleCommandsAreNoOpsAndDoNotIncrementConfigurationVersion` send a matching N, and the mismatch theories use `StateWithSelectedProvider` (Draft). Swapping the no-op above the fence still leaves those tests green; a stale retry against an Active agent would ship as `AlreadyApplied` instead of `AgentActivationConfigurationVersionMismatchRejection`. Blind Hunter, Verification Gap, and Acceptance Auditor.
+- [ ] [Review][Patch] Failed `git diff` after a declared `baseline_commit` is not exercised [tools/check-story-review-readiness.py:790] — `git_diff_paths` raises on a non-zero status, but `FakeRunner` always returns 0 and `parse_diff_name_status_z(b"")` is empty, so dropping the raise shrinks the File List union to `git status` and none of the BaselineGateTests fail. Verification Gap and Blind Hunter.
+- [ ] [Review][Patch] A single green/pass total with no slash is not treated as unmanaged evidence [tools/check-story-review-readiness.py:48] — the green/pass pattern requires `(?:\s*/\s*\d[\d,]*)+`, so `All tests green: 2944/2944` is flagged while `All tests green: 2944` is not. Blind Hunter and Edge Case Hunter.
+- [ ] [Review][Patch] Applied `ResultPayload` is not taken through the domain-service wire hop the new test claims to cover [test/Hexalith.Agents.Tests/AgentSetupDomainResultTests.cs:67] — `Noop_result_payload_survives_the_domain_service_wire_contract` comments that `FromDomainResult` preserves payload for `IsSuccess` as well as `IsNoOp`, but `[MemberData(nameof(NoOpCommandNames))]` never drives an eventful Applied result. Eventful cases assert `DomainResult.ResultPayload` only. Blind Hunter and Acceptance Auditor.
+- [ ] [Review][Patch] Unmanaged-count failures still say they were found in Dev Agent Record [tools/check-story-review-readiness.py:834] — `unmanaged_count_claims` now scans every line except the generated block and File List, but `execute_gate` still raises `Unmanaged numeric test-count claims found in Dev Agent Record`. `test_unmanaged_claim_fails_before_build_and_preserves_story` only matches `Unmanaged numeric`. Blind Hunter, Verification Gap, and Acceptance Auditor.
+- [ ] [Review][Patch] A git error on the forward ancestry probe is reported as a non-ancestor baseline [tools/check-story-review-readiness.py:776] — `if ancestry.returncode != 0` maps 128 to "not an ancestor of HEAD", while the reverse probe maps any code other than 0/1 to "Unable to verify". Blind Hunter and Edge Case Hunter.
+
+#### Rejected
+
+- Envelope / `SelectEnvelope` / `ActivateEnvelope` stamp magic defaults (`1` / `5` / `1`) and several `ActivateAgent` call sites omit N — `low`. Current fixtures match those defaults (`StateWith` is version 1; `StateWithSelectedProvider` is version 5), so a composition drift fails loudly. Dedicated fence tests already pass `state.ConfigurationVersion`. Updating every omitted call site is churn without a demonstrated fence hole. Same claim from Blind Hunter and Acceptance Auditor (the AC4 production framing is false: those envelopes still send an exact match).
+- `WithCurrentActivationVersion` overwrites retained N on every `ProcessAndApplyAsync` path, so E2E cannot represent a stale fence — `false` as an AC4 production defect. The helper is test-only; `Handle` mismatch tests retain N. `ProcessAsync` is reflection dispatch already exercised by happy-path `ProcessAndApplyAsync`; the aggregate decision under review is `Handle`. Acceptance Auditor and Blind Hunter.
+- Canonical-version theory omits `"5 "`, `"5.0"`, `"1e2"`, overflow, and a version-1 `delta = -1` (0) — `false`. `NumberStyles.None` plus the canonical round-trip already reject those forms the same way as covered `" 5"` / `"0"` / `"05"`. Zero is `InvalidAgentConfigurationRejection`, not a mismatch, and that path is already in `Activation_requires_a_canonical_positive_expected_configuration_version`. Blind Hunter.
+- Canonical-version theory never asserts the rejection reason string — `low`. It already requires `InvalidAgentConfigurationRejection`. Blind Hunter.
+- `AssertPayload` never feeds `AgentSetupDomainResult.ResultPayload` into `TryParseSetupResult` — `false`. Round 2 already closed that seam in Server tests (`TheRealDomainResultPayloadIsUnderstoodAtTheOperationsBoundary`). D3 domain tests own the aggregate JSON shape; the operations parser is D1. Blind Hunter.
+- `Domain_rejection_carries_no_result_payload` only uses `UpdateAgentConfiguration` against null state — `low`. Mismatch and canonical-version failures use `DomainResult.Rejection` / `Invalid`, which carry no payload by construction; one rejection fact already pins `ResultPayload` null. Blind Hunter.
+- `Never_admitted_replay_lane_attempt_is_rejected_by_the_version_fence_before_dependency_gates` does not implement AC7 admission/replay — `false`. This D3 fact is the aggregate half of AC7 (never-admitted command reaches `Handle` and is rejected by the N fence before dependency gates). EventStore admission/replay belongs to D1 / Story 5.6 / DW-21. Acceptance Auditor.
+- That same test does not `ApplyAll` the mismatch rejection — `false`. `Activation_rejects_stale_and_future_configuration_versions_before_lifecycle_gates` already `ApplyAll`s `AgentActivationConfigurationVersionMismatchRejection`. Blind Hunter.
+- Mismatch tests never assert `result.IsRejection` or `rejection.AgentId` — `low`. `Events.Single().ShouldBeOfType<AgentActivationConfigurationVersionMismatchRejection>()` already requires the typed rejection; `AgentId` is the fixture constant. Blind Hunter.
+- `SelectEnvelope` / `ActivateEnvelope` XML comments were not updated for the fence parameters — `low`. The C# signatures expose the defaults; this is test-helper documentation. Blind Hunter.
+- `execute_gate` still runs the full suite before File List comparison — `low`. Unresolvable baselines already fail before the Release build; a matching File List is the everyday path. Blind Hunter.
+- No test that a missing `baseline_commit` never invokes `git diff` — `low`. Without a baseline the committed union is not part of the contract; an extra empty diff does not change `git status` matching. Blind Hunter.
+- `test_path_committed_since_baseline_but_absent_from_file_list_still_fails` does not assert the story bytes were left untouched — `low`. Mismatch raises before `atomic_write_story`; sibling baseline failures already pin preservation. Blind Hunter.
+- `parse_baseline_commit` ignores YAML `baseline_commit :` (space before the colon) — `false`. The gate's key is `^baseline_commit:`; that is the form every story in this repo declares. An unrecognized key correctly means no baseline. Blind Hunter and Edge Case Hunter.
+- Quoted `baseline_commit` followed by another token silently drops the rest — `low`. Malformed frontmatter is not everyday; the fix adds a trailing-token guard. Edge Case Hunter.
+- `FakeRunner` answers every `git rev-parse` with the same SHA — `low`. `test_committed_baseline_changes_join_the_working_tree_change_set` already requires the resolved full SHA on the two-dot `git diff` range, so skipping resolve still fails. Blind Hunter.
+
 ## Implementation Notes
 
 - Added the canonical `## Dev Agent Record` and nested `### File List` this story was missing, so the
@@ -1143,7 +1177,7 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-21T10:11:48Z
+Run (UTC): 2026-09-21T10:35:31Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
