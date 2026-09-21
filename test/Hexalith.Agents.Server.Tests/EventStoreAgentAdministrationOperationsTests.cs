@@ -317,6 +317,25 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     }
 
     [Fact]
+    public async Task Activation_without_an_expected_configuration_version_is_rejected_before_dispatch()
+    {
+        CaptureSubmit();
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(
+            AgentId,
+            new ActivateAgent(),
+            new AgentOperationOptions());
+
+        // Guards the ordering the null-forgiving expectedConfigurationVersion!.Value dispatch closure depends on:
+        // WriteAsync's ExpectedConfigurationVersion guard must run and return before that closure is ever invoked.
+        result.IsSuccess.ShouldBeFalse();
+        result.Status.ShouldBe(AgentOperationStatus.ValidationFailed);
+        _lastSubmit.ShouldBeNull();
+        await _catalogReader.DidNotReceiveWithAnyArgs().GetEntryAsync(default!, default!, default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
+    }
+
+    [Fact]
     public async Task Activation_against_a_newer_same_agent_projection_attempts_replay_without_dependency_reads()
     {
         CaptureSubmit(configurationVersion: 3);

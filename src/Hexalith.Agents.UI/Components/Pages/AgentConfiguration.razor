@@ -391,11 +391,17 @@
             cancellationToken.ThrowIfCancellationRequested();
 
             if (retainedAcceptance is not null
-                && writeResult.Status != AgentSetupWriteStatus.Submitted)
+                && writeResult.Status != AgentSetupWriteStatus.Submitted
+                && writeResult.Status != AgentSetupWriteStatus.NotAuthorized
+                && writeResult.Status != AgentSetupWriteStatus.NotFound)
             {
                 // Once EventStore has accepted an attempt, a later retry response cannot erase that evidence.
                 // In particular, an AlreadyApplied replay is not a new no-op: the original eventful receipt still
-                // needs its target projection confirmed before this attempt can be released.
+                // needs its target projection confirmed before this attempt can be released. This only holds for
+                // replay-consistency outcomes (Conflict/ValidationFailed/AlreadyApplied/Unavailable/UnableToVerify):
+                // NotAuthorized and NotFound are decided by the authorization/dispatch check before the idempotency
+                // key is even considered, so a fresh denial there is new, trustworthy evidence — not a replay
+                // artifact — and must surface immediately instead of masking it as still-pending.
                 _pendingWrite = AgentSetupWriteResult.AwaitingProjection(retainedAcceptance);
                 _writeAnnouncementKey = "Agents.Config.Write.RetryUnresolved";
                 return;
@@ -450,6 +456,11 @@
             {
                 _pendingWrite = RetainedAwaitingProjection()
                     ?? AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
+
+                // A stale announcement from an earlier retry cycle (e.g. RetryUnresolved) must not outlive this
+                // attempt's own outcome: without this reset the live region would keep announcing the prior
+                // cycle's message instead of the fail-closed status just recomputed above.
+                _writeAnnouncementKey = null;
             }
         }
         finally
@@ -469,6 +480,7 @@
     private async Task RefreshPendingAsync()
     {
         if (_busy
+            || _activeAttempt is null
             || _pendingWrite?.Acceptance is not { } acceptance
             || _pendingWrite.TargetConfigurationVersion is not int targetVersion)
         {

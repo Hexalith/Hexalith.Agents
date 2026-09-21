@@ -422,7 +422,7 @@ Code review of Story 5.2 **group A** (Contracts source and `test/Hexalith.Agents
 
 **Rejected**
 
-- JSON `null` throws because `HandleNull` is not overridden — `false`. `UnrecognizedEnumPayloads` already includes `"null"`, and the Contracts suite passed 531 tests including that theory.
+- JSON `null` throws because `HandleNull` is not overridden — `false`. `UnrecognizedEnumPayloads` already includes `"null"`.
 - `AgentSetupWriteResult.Submitted` treats unverifiable effect/version as progress — `false`. Current remarks put verification on the gateway. `AgentsClientSetupGateway.WriteAsync` maps missing effect or non-positive target to `UnableToVerify` before `Submitted`. Same claim from Blind Hunter and Acceptance Auditor; rejected on these grounds in the prior Group A passes.
 - `AwaitingProjection` does not require `Applied` and a positive target version — `false`. UI callers pass a previously accepted identity that already had a positive target (`RefreshPendingAsync` and `RetainedAwaitingProjection` both require `TargetConfigurationVersion`).
 - `Failed` accepts `Submitted`, `AlreadyApplied`, or `AwaitingProjection` — `false`. Production `Failed` callers pass mapped denials; `ToWriteStatus` never emits those success-like statuses.
@@ -435,6 +435,61 @@ Code review of Story 5.2 **group A** (Contracts source and `test/Hexalith.Agents
 - `AgentSetupTrustedExtensions` documents `PartyLinkValidation` and `AuditGovernanceResolved` that this policy does not claim — `false`. Unclaimed colon keys are rejected by the gateway unless a registered policy accepts them; those keys are not part of the Story 5.2 setup-adapter claim set.
 - `AgentActivationConfigurationVersionMismatchRejection` lacks remarks, positivity/inequality guards, and a Web round-trip — `false`. The aggregate emits it only after a canonical positive expected version that differs from state; event constructors must not throw on replay. Prior Group A pass reproduced the Web round-trip.
 - `AgentSetupWriteStatus` still uses `Submitted = 0` with no fallback converter — `low`. Duplicate of DW-11. The type is UI-internal and is not HTTP-deserialized; inserting `Unknown = 0` would shift ordinals.
+
+### Review Findings
+
+Code review of Story 5.2 **group B** (Domain + Application/Server + `Hexalith.Agents.EventStore`, `599208d..HEAD`), 2026-09-20. Four layers, none failed. Remaining groups: C UI+Client+related gitlinks, D Tests, E Tooling/docs.
+
+**Patch**
+
+- [x] [Review][Patch] `AgentActivationProviderRevalidation`'s class remarks are stale about which extension keys it server-populates [src/Hexalith.Agents.Server/Application/Agents/AgentActivationProviderRevalidation.cs:28] — patched: remarks now name `activation:expectedConfigurationVersion` alongside the other three server-populated keys.
+- [x] [Review][Patch] `EventStoreAgentAdministrationOperations.ActivateAsync`'s null-forgiving `expectedConfigurationVersion!.Value` dispatch closure has no regression test proving the guard-before-dispatch order holds [src/Hexalith.Agents.Server/Application/Agents/EventStoreAgentAdministrationOperations.cs:158] — patched: added `Activation_without_an_expected_configuration_version_is_rejected_before_dispatch` [test/Hexalith.Agents.Server.Tests/EventStoreAgentAdministrationOperationsTests.cs:320]; verified it fails without the guard (an unhandled `InvalidOperationException` from `Nullable<int>.Value`) and passes with it.
+
+**Deferred**
+
+- [x] [Review][Defer] No live `IAgentCommandStatusReader` is registered; only `DeferredAgentCommandStatusReader` [src/Hexalith.Agents.Server/Composition/AgentSetupServiceCollectionExtensions.cs] — deferred: pre-existing, already tracked as DW-7 (live binding blocked until Story 5.6 proves reachability; see also DW-24/DW-25).
+
+**Rejected**
+
+- `AgentSetupServiceCollectionExtensions` drops `EventStoreProviderCatalogOperations` registration, leaving `IProviderCatalogOperations` on the `Unavailable` fallback — `false`. Confirmed intentional: `ProviderCatalogCompositionTests.A_configured_gateway_keeps_catalog_writes_unavailable_while_resolving_projected_reads` pins exactly this behavior per the round-9 decision (catalog writes stay deferred, reads stay live). Same claim from Blind Hunter and Edge Case Hunter; independently verified against the test.
+- This diff contains no test-file changes despite the size of the new activation/rejection/dispatch behavior — `false`. Tests for this exact behavior exist and are tracked in the story's own File List under the separate Group D (Tests) chunk of this same story; a real-class test run during this pass shows 601/601 `Hexalith.Agents.Server.Tests` and 791/791 `Hexalith.Agents.Tests` passing, exercising the changed code.
+- `AgentSetupIdempotencyIntentAdapter.CreateIntent` can collapse two `ActivateAgent` intents with different expected configuration versions into one duplicate when `command.Extensions` is `null` — `false`. Verified unreachable: the sole production call site that builds an `ActivateAgent` envelope, `AgentActivationProviderRevalidation.BuildTrustedExtensions`, always returns a non-null dictionary that unconditionally sets `ActivationExpectedConfigurationVersion`; no other code path constructs this command.
+- `AgentSetupIdempotencyIntentAdapter.ActivationSemanticExtensionKeys()` excludes `ProviderSelectionValidation`/`ApproverPolicyValidation` from the canonical intent with no code-level explanation — `false`. This exclusion is the frozen 2026-09-16 spec decision that dependency verdicts are trusted execution evidence, not semantic idempotency identity; not a code defect.
+- This chunk's diff references types it does not itself define (`AgentSetupTrustedExtensions`, `AgentSetupWriteEffect`, `AgentSetupResultPayload`, `AgentActivationConfigurationVersionMismatchRejection`, `AgentSetupTruthState`, `AgentCommandAcceptance`, `AgentOperationOptions.ExpectedConfigurationVersion`) — `false`. Those types are defined by the already-reviewed Group A (Contracts) chunk of this same story; `dotnet build Hexalith.Agents.slnx -warnaserror` succeeds with 0 errors, proving the pairing.
+- The two `catch` clauses around `_statusReader.WasRejectedAsync` in `WriteAsync` swallow every non-cancellation exception to `null` with no logging — `low`. Real but unlikely to be hit in everyday use (fails closed correctly to `UnableToVerify` either way), and fixing it means introducing a new `ILogger` dependency across the constructor, DI registration, and test mocks — more than a direct correction.
+- Canonical-format validation (ULID/positive-int grammar) is duplicated near-verbatim across `AgentSetupCommandHeadersFilter`, `AgentsOperationEndpoints`, `EventStoreAgentAdministrationOperations`, `AgentsTrustedCommandExtensionPolicy`, and `AgentAggregate` — `low`. No current behavioral bug — all sites agree — and extracting a shared helper is a non-trivial cross-file/cross-project refactor, more than a direct correction.
+- The `UnknownFallbackEnumConverterFactory` + `JsonStringEnumConverter` converter pair and its three-line ordering comment are duplicated verbatim across five files (`AgentInteractionAuditQueryHandlerBase`, `AgentSetupQueryHandlerBase`, `ProviderCatalogQueryHandlerBase`, `AgentSetupProjectionFold`, `ProviderCatalogProjectionFold`) — `low`. No current bug — `ServerSerializationConformanceTests` already guards ordering in every bag — and factoring one shared options instance is more than a direct correction.
+
+Acceptance Auditor: no AC violations, spec-intent deviations, missing behavior, or spec/code contradictions found in Group B (full line-by-line trace against every AC/constraint plus `dotnet build -warnaserror` and the two real test suites).
+
+### Review Findings
+
+Code review of Story 5.2 **group C** (UI + related gitlinks: `src/Hexalith.Agents.UI`, `references/Hexalith.EventStore`, `references/Hexalith.Conversations`, `references/Hexalith.FrontComposer`; `599208d..HEAD`), 2026-09-20. Four layers, none failed. Remaining groups: D Tests, E Tooling/docs.
+
+**Patch**
+
+- [x] [Review][Patch] `ExecuteAttemptAsync`'s exception catch never resets `_writeAnnouncementKey`, unlike the equivalent catch in `RefreshPendingAsync` which explicitly recomputes it — a stale announcement (e.g. `Agents.Config.Write.RetryUnresolved` from a prior retry cycle) persists across a later retry that throws, misdescribing the outcome that actually just occurred [src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor:451] — patched: the catch now resets `_writeAnnouncementKey = null` alongside the recomputed `_pendingWrite`. Added `A_retry_that_throws_after_a_masked_retry_does_not_keep_the_earlier_announcement` [test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs:876]; verified it fails without the fix (stale `RetryUnresolved` text survives the throwing retry) and passes with it.
+- [x] [Review][Patch] `RefreshPendingAsync` omits the `_activeAttempt is not null` guard its sole call site relies on purely via markup gating, unlike `RetryAttemptAsync`'s own explicit check — [src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor:480]. Same claim from Blind Hunter and Edge Case Hunter — patched: added the explicit `_activeAttempt is null` guard, matching `RetryAttemptAsync`. Not independently reachable through the rendered UI today (the Refresh button only exists in markup when `_activeAttempt is not null`), so no new bUnit regression test was added for this one; the guard closes the gap defensively at the method boundary itself.
+- [x] [Review][Patch] The new `AgentOperationStatus.UnableToVerify` → `AgentSetupWriteStatus.UnableToVerify` mapping in `AgentsClientProviderCatalogGateway.ToWriteStatus` has no executing test — no test in the repo constructs this gateway with a substituted `IAgentsClient` and drives its write path; only `AgentsUiCompositionTests` checks DI resolution of the concrete type [src/Hexalith.Agents.UI/Services/Gateways/AgentsClientProviderCatalogGateway.cs:91]. Verification Gap Reviewer finding, confirmed independently by Blind Hunter — patched: added `test/Hexalith.Agents.UI.Tests/AgentsClientProviderCatalogGatewayTests.cs`, covering every `ToWriteStatus` arm (including `UnableToVerify`) and the `Submitted`/acceptance-carrying path; verified the `UnableToVerify` case fails without the mapping (falls through to `Unavailable`) and passes with it.
+- [x] [Review][Patch] Once a write has ever been accepted, `ExecuteAttemptAsync`'s retry-response guard (`retainedAcceptance is not null && writeResult.Status != Submitted`) masked every later non-`Submitted` response — including `NotAuthorized` and `NotFound` — into `AwaitingProjection`/`RetryUnresolved` [src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor:393]. Retaining evidence across `Conflict`/`ValidationFailed`/`AlreadyApplied` is the deliberate, tested resolution to an earlier round's concern (a retry response was overwriting/erasing a retained acceptance — see the round-2 finding "A retry returning ValidationFailed/Conflict overwrites a retained acceptance") and matches idempotent-replay reasoning: an exact-key retry should deterministically reproduce its original result, so a different-looking replay is inherently suspect. `Retrying_an_accepted_pending_attempt_never_erases_its_acceptance` [test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs:763] pins exactly this for `Conflict`/`ValidationFailed`/`AlreadyApplied`. `NotAuthorized`/`NotFound`, however, are resolved by `WriteAsync`'s authorization/dispatch checks before the idempotency key is even considered [src/Hexalith.Agents.Server/Application/Agents/EventStoreAgentAdministrationOperations.cs:291], so a fresh denial there is not a replay-consistency concern — it is new, trustworthy information the mask was discarding, leaving an administrator whose access was revoked (or whose Agent was removed) mid-attempt believing their command was still awaiting projection. Acceptance Auditor finding, narrowed after tracing prior-round history and confirming `AgentCommandDispatchFailure.Map`'s HTTP 409/412/428 mapping makes `Conflict`/`Stale` live-reachable today [src/Hexalith.Agents.Server/Ports/AgentCommandDispatchFailure.cs:29]. **Decision (product owner, 2026-09-20): carve out `NotAuthorized`/`NotFound` so they always surface immediately as their real terminal denial, even with a retained acceptance.** Patched: the guard now excludes `AgentSetupWriteStatus.NotAuthorized` and `AgentSetupWriteStatus.NotFound`, so both fall through to the existing `IsTerminalWriteFailure` handling (release the attempt, restore the draft, render the typed denial) instead of being masked. Added `Retrying_an_accepted_pending_attempt_surfaces_a_fresh_authorization_or_existence_denial` [test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs:828] (theory over both statuses); verified both cases fail without the carve-out (render `RetryUnresolved` instead of the real denial) and pass with it. The masking is otherwise unchanged and still covered by the existing `Retrying_an_accepted_pending_attempt_never_erases_its_acceptance` test for `Conflict`/`ValidationFailed`/`AlreadyApplied`.
+
+**Rejected**
+
+- Retry mid-flight collapsing `Conflict`/`ValidationFailed`/`AlreadyApplied` into `AwaitingProjection`/`RetryUnresolved` — `false` for these three statuses specifically. Deliberate, tested design settled in an earlier round; `Retrying_an_accepted_pending_attempt_never_erases_its_acceptance` [test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs:763] pins exactly this behavior for all three. Narrowed to `NotAuthorized`/`NotFound` above (Decision Needed).
+- A retry-replayed `AlreadyApplied` acceptance carrying `TruthState.ProjectionConfirmed` is still shown as `AwaitingProjection` pending a manual Refresh instead of being trusted immediately — `false`. Consistent with the page's own stated design that a write's own acceptance never claims durable truth, only an explicit re-read does; the exact scenario (a fresh `AlreadyApplied` acceptance with `ProjectionConfirmed`) is pinned by the same test expecting `RetryUnresolved`, not immediate confirmation. Same claim from Blind Hunter.
+- A terminal post-write catch-up read outcome (`NotAuthorized`/`AgentNotFound`/`Unavailable`) is mislabeled by the write-status banner as "awaiting projection" — `false`. The main content surface (`agents-config-state`) correctly renders the typed `PermissionDenied`/`Empty`/`Unavailable` state; only the smaller write-status banner keeps its generic wording, which is deliberately tested: `A_terminal_retry_result_stops_polling_and_renders_the_typed_failure` [test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs:920] asserts both the correct typed surface and the banner text together. Same claim from Edge Case Hunter.
+- `AbandonAttempt` discards evidence of an already-accepted write without confirming its projection — `false`. Matches the frozen single-result UI contract; whether prior pending truth must survive abandonment is already tracked as DW-5, not a new defect. Same claim from Edge Case Hunter.
+- `RetryAttemptAsync` gives no interim "retry in progress" announcement — `false`. Matches the initial-submission path's own behavior (also silent while in flight, relying on `_busy`-disabled controls); not a retry-specific regression.
+- The `Submitted`-without-target-version branch [src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor:432] is dead code — `false`. `AgentSetupWriteResult.Submitted` only guarantees a non-null `Acceptance`, not a positive `TargetConfigurationVersion`; the branch defends the `IAgentSetupGateway` interface contract against any implementer that does not enforce the live gateway's own additional guard, and remains real defensive code, not literally unreachable.
+- New `Agents.ProviderCatalog.Write.Status.AlreadyApplied`/`.AwaitingProjection` resx strings are unreachable — `false`, duplicate of DW-14. `ProviderCatalogWriteResult.Submitted` hardcodes `Status: Submitted` and `ProviderCatalogCommandAcceptance` carries no `Effect`/`TargetConfigurationVersion`; completing that mapping is explicitly Story 5.3 scope per DW-14. Same claim from Blind Hunter.
+- `AgentsClientProviderCatalogGateway.WriteAsync` lacks the unverifiable-acceptance guard `AgentsClientSetupGateway.WriteAsync` has — `false`, duplicate of DW-14 for the same reason.
+- `ProviderCatalog.razor` has no retry/refresh/abandon recovery affordance despite its gateway now able to surface `UnableToVerify` — `false`, duplicate of DW-14 (provider-catalog write UX belongs to Story 5.3). Same claim from Blind Hunter.
+- New default interface members on `IAgentSetupGateway` fail closed to `Unavailable` for any non-overriding implementer — `false`. Deliberate, documented fail-closed default; `DeferredAgentSetupGateway` (the only other implementer) already returns `Unavailable` for every write by design, so the default and the explicit override agree.
+- `DeferredAgentSetupGateway` redundantly re-implements the new overloads instead of relying on the interface's default bodies — `false`. Zero behavioral difference; both paths return the identical `Unavailable` result.
+- `ProjectionPollingTimeout` raised from 5s to 8s with no inline rationale — `false`. A tuning constant with no functional defect; no demonstrated user or developer harm.
+- The asymmetry between `ActivateAsync` (passes `ExpectedConfigurationVersion`) and `DisableAsync` (does not) is unexplained — `false`, duplicate of DW-4 (lifecycle writes not correlating via configuration version is already an open, tracked limitation predating this patch).
+
+Acceptance Auditor: one finding (above, resolved and patched); no other AC violations, spec-intent deviations, missing behavior, or spec/code contradictions found.
 
 ## Implementation Notes
 
@@ -936,16 +991,16 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-20T15:09:28Z
+Run (UTC): 2026-09-20T21:10:00Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Contracts.Tests | 531 | 531 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 576 | 576 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Contracts.Tests | 548 | 548 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 602 | 602 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 791 | 791 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.UI.Tests | 1082 | 1082 | 0 | 0 | 0 | 0 |
-| **Total** | 2986 | 2986 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.UI.Tests | 1092 | 1092 | 0 | 0 | 0 | 0 |
+| **Total** | 3039 | 3039 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->
@@ -1090,6 +1145,7 @@ Result: PASS
 - `test/Hexalith.Agents.Tests/AgentSetupDomainResultTests.cs`
 - `test/Hexalith.Agents.Tests/AgentTestData.cs`
 - `test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs`
+- `test/Hexalith.Agents.UI.Tests/AgentsClientProviderCatalogGatewayTests.cs`
 - `test/Hexalith.Agents.UI.Tests/AgentsClientSetupGatewayTests.cs`
 - `test/Hexalith.Agents.UI.Tests/AgentsTestContext.cs`
 - `test/Hexalith.Agents.UI.Tests/DeferredGatewayTests.cs`

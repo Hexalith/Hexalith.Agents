@@ -822,6 +822,114 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         cut.Find("[data-testid='agents-config-write-abandon']");
     }
 
+    [Theory]
+    [InlineData(AgentSetupWriteStatus.NotAuthorized)]
+    [InlineData(AgentSetupWriteStatus.NotFound)]
+    public async Task Retrying_an_accepted_pending_attempt_surfaces_a_fresh_authorization_or_existence_denial(
+        AgentSetupWriteStatus retryOutcome)
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3);
+        AgentSetupView pending = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3,
+            freshness: AgentSetupFreshness.Stale,
+            truthState: AgentSetupTruthState.AuthoritativePending);
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(call =>
+            Task.FromResult(AgentSetupResult.Success(call.ArgAt<int?>(0) is null ? initial : pending)));
+        int submissions = 0;
+        SetupGateway.ConfigureResponseModeAsync(
+                AgentResponseMode.Confirmation,
+                Arg.Any<AgentOperationOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns(_ =>
+            {
+                submissions++;
+                return Task.FromResult(submissions == 1
+                    ? Accepted()
+                    : AgentSetupWriteResult.Failed(retryOutcome));
+            });
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
+        Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
+
+        for (int tick = 0; tick < 33; tick++)
+        {
+            Clock.Advance(TimeSpan.FromMilliseconds(250));
+            await cut.InvokeAsync(() => Task.CompletedTask);
+        }
+
+        await submission;
+        await cut.Find("[data-testid='agents-config-write-retry']").ClickAsync(new MouseEventArgs());
+
+        submissions.ShouldBe(2);
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldContain($"Agents.Config.Write.{retryOutcome}");
+        cut.FindAll("[data-testid='agents-config-write-recovery']").ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task A_retry_that_throws_after_a_masked_retry_does_not_keep_the_earlier_announcement()
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3);
+        AgentSetupView pending = AgentUiTestData.Setup(
+            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
+            configurationVersion: 3,
+            freshness: AgentSetupFreshness.Stale,
+            truthState: AgentSetupTruthState.AuthoritativePending);
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(call =>
+            Task.FromResult(AgentSetupResult.Success(call.ArgAt<int?>(0) is null ? initial : pending)));
+        int submissions = 0;
+        SetupGateway.ConfigureResponseModeAsync(
+                AgentResponseMode.Confirmation,
+                Arg.Any<AgentOperationOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns(_ =>
+            {
+                submissions++;
+                return submissions switch
+                {
+                    1 => Task.FromResult(Accepted()),
+                    2 => Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Conflict)),
+                    _ => throw new InvalidOperationException("transport failure"),
+                };
+            });
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
+            AgentResponseMode.Confirmation));
+        Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
+
+        for (int tick = 0; tick < 33; tick++)
+        {
+            Clock.Advance(TimeSpan.FromMilliseconds(250));
+            await cut.InvokeAsync(() => Task.CompletedTask);
+        }
+
+        await submission;
+
+        // First retry resolves to Conflict while an acceptance is retained: masked as RetryUnresolved.
+        await cut.Find("[data-testid='agents-config-write-retry']").ClickAsync(new MouseEventArgs());
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldContain("Agents.Config.Write.RetryUnresolved");
+
+        // Second retry throws a transport exception: the stale RetryUnresolved announcement must not survive it.
+        await cut.Find("[data-testid='agents-config-write-retry']").ClickAsync(new MouseEventArgs());
+
+        submissions.ShouldBe(3);
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldNotContain("Agents.Config.Write.RetryUnresolved");
+        cut.Find("[data-testid='agents-config-write-state']").TextContent
+            .ShouldContain("Agents.Config.Write.AwaitingProjection");
+    }
+
     [Fact]
     public async Task Disposing_during_polling_cancels_the_lifetime_token_and_prevents_later_reads()
     {
