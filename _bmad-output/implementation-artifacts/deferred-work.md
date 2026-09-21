@@ -366,3 +366,10 @@ Group A contracts re-review (fourth pass). Incomplete `Unknown = 0` tolerance mi
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reject non-positive and non-finite NuGet publication verifier timeouts with a bounded diagnostic.
   evidence: The inherited CLI passes an explicit invalid timeout to URL opening without validation, so negative, NaN, or infinite values can crash or wait unpredictably instead of failing through `VerificationError`.
+
+## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2.md (2026-09-21)
+
+Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carried onto existing ledger rows; no new DW keys.
+
+- Typed `Rejected` is proven only against a substitute; the composed host still registers `DeferredAgentCommandStatusReader`. Carried; owned by DW-7, DW-19, DW-24, and DW-25.
+- Never-admitted stale/newer activation is unproven on the HTTP split-provider fabric because `BuildDomainApp` always returns `Applied`. Aggregate fence remains Group D3 (`AgentLifecycleConfigurationVersionTests`); a live HTTP proof needs the platform-owned domain processor, owned by Story 5.6 / DW-21.

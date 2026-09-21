@@ -2,10 +2,10 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'done'
+status: 'in-progress'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
-review_loop_iteration: 9
+review_loop_iteration: 10
 context:
   - '_bmad-output/implementation-artifacts/epic-5-context.md'
   - 'references/Hexalith.AI.Tools/hexalith-llm-instructions.md'
@@ -490,6 +490,54 @@ Code review of Story 5.2 **group C** (UI + related gitlinks: `src/Hexalith.Agent
 - The asymmetry between `ActivateAsync` (passes `ExpectedConfigurationVersion`) and `DisableAsync` (does not) is unexplained — `false`, duplicate of DW-4 (lifecycle writes not correlating via configuration version is already an open, tracked limitation predating this patch).
 
 Acceptance Auditor: one finding (above, resolved and patched); no other AC violations, spec-intent deviations, missing behavior, or spec/code contradictions found.
+
+### Review Findings
+
+Code review of Story 5.2 **group D1** (`test/Hexalith.Agents.Server.Tests/**` only, `599208d` → working tree), 2026-09-21. Four layers, none failed. Remaining groups: D2 UI.Tests, D3 Agents.Tests + Contracts.Tests + readiness tests, E Tooling/docs/gitlinks.
+
+Readiness gate: `python3 tools/check-story-review-readiness.py _bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md` — PASS (5 projects, 3015/3015 passed, File List 192/192). Floor, not proof of acceptance.
+
+**Patch**
+
+- [ ] [Review][Patch] Standard setup adapters never compare `CanonicalIntent` for administrator authorization, and the HTTP admission test never conflicts a changed admin flag [test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs:96] — `Every_setup_adapter_publishes_its_stable_descriptor_contract` overlays `CommandType` onto an `ActivationCommand` and asserts only `AdapterId`/`OperationId`/`DescriptorVersion`. `Activation_intent_excludes_dependency_evidence_but_keeps_payload_authorization_and_version` pins admin `true` vs `false` only for `ActivateAgent`. Emptying `StandardSemanticExtensionKeys()` would still pass. `Real_gateway_HTTP_path_replays_the_same_intent_and_conflicts_changed_semantics_without_a_second_execution` posts only `ActivateAgent` and its `conflicts` array is payload `{value:2}` and version `"8"` — no HTTP 409 for `actor:agentsAdmin=false`. Same claim from Verification Gap, Blind Hunter, and Acceptance Auditor.
+- [ ] [Review][Patch] Reserved-extension `Accepts` has no successful case for activation verdict or canonical version values [test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs:267] — the theory pins `actor:agentsAdmin=true` and several negatives (`valid`, `"07"`, Update+`ProviderSelectionValidation`). There is no `expected: true` row for `ProviderSelectionValidation=Valid`, `ApproverPolicyValidation=Valid`, or `ActivationExpectedConfigurationVersion=7`. A regression that rejects the live activation extensions still leaves this suite green.
+- [ ] [Review][Patch] Split-provider isolation is still tautological on the HTTP domain host and unproven on the live-configured Agents host [test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs:452] — `BuildDomainApp` maps a stub `/process` and never calls `AddAgentSetupServices`, so `GetServices<IIdempotencyIntentAdapter>()`/`ITrustedCommandExtensionPolicy` empty holds for any Server registration. `Gateway_registration_is_explicit_idempotent_and_owns_all_five_setup_adapters` composes Agents with an empty configuration. `A_configured_gateway_resolves_the_live_dispatcher_and_administration_operations` never asserts those gateway seams are absent. Round 9 already patched this class of vacuity once. Same claim from Blind Hunter and Acceptance Auditor.
+- [ ] [Review][Patch] Non-activate write handlers are not asserted to omit `X-Expected-Configuration-Version` [test/Hexalith.Agents.Server.Tests/AgentsOperationEndpointsTests.cs:419] — the metadata test requires the header on `/activate` and is silent on create/update/response-mode/disable. Production omits `[FromHeader]` there (`AgentsOperationEndpoints.cs:71-132`); adding it would bind the activation fence on those routes unnoticed. Edge Case Hunter.
+- [ ] [Review][Patch] `A_write_then_projection_then_read_reaches_projection_confirmed` confirms a seeded version, not the write receipt [test/Hexalith.Agents.Server.Tests/EventStoreAgentAdministrationOperationsTests.cs:153] — the constructor stub returns `Applied` at version 4; the test discards the write result, seeds version 2, and reads `expectedConfigurationVersion: 2`. AC3's eventful-write row is poll-until-**that** receipt version. Acceptance Auditor.
+- [ ] [Review][Patch] MSBuild and package-authority child processes wait forever and parse stderr as JSON [test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs:322] — `EvaluateMsBuild` concatenates stdout+stderr then `JsonDocument.Parse`; `RunProcess` and `PackageVersionCentralizationTests` (`:131`) call `WaitForExit()` with no timeout. A warning on stderr throws `JsonException` on a passing evaluation; a stuck `dotnet`/`pwsh` hangs the suite. Blind Hunter and Edge Case Hunter.
+- [ ] [Review][Patch] `AppHostSecurityTopologyTests` never forbids `AddAgentsEventStore` on the domain host [test/Hexalith.Agents.Server.Tests/AppHostSecurityTopologyTests.cs:23] — `Program.cs` is already scanned to keep the deferred status reader off the host, but nothing forbids registering gateway admission adapters there. AC1 / **Never** register admission adapters only in `Hexalith.Agents.Server`. Blind Hunter.
+
+**Deferred**
+
+- [x] [Review][Defer] Typed `Rejected` is proven only against a substitute; the composed host still registers `DeferredAgentCommandStatusReader` [test/Hexalith.Agents.Server.Tests/EventStoreAgentAdministrationOperationsTests.cs:565] — deferred: pre-existing, carried. `A_domain_rejection_is_reported_as_rejected_rather_than_retryable_unverifiable` injects `_statusReader.WasRejectedAsync → true`. No composition test resolves `IAgentCommandStatusReader`; `AddAgentSetupServices` `TryAddSingleton`s `DeferredAgentCommandStatusReader`, which cannot produce `Rejected`. Owned by DW-7, DW-19, DW-24, and DW-25.
+- [x] [Review][Defer] Never-admitted stale/newer activation is unproven on the HTTP split-provider fabric [test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs:452] — deferred: the stub `BuildDomainApp` always returns `Accepted` + `Applied` at version 8, so a first execution against newer state stays green. Aggregate fence proof already lives in `AgentLifecycleConfigurationVersionTests` (Group D3). A real never-admitted HTTP proof needs the platform-owned domain processor, owned by Story 5.6 / DW-21.
+
+#### Rejected
+
+- HTTP test swallows `IdempotencyConflictException` into a bare 409 instead of EventStore `ProblemDetails` — `low`. The test already fails if admission does not conflict; wiring `IdempotencyConflictExceptionHandler` is EventStore host complexity, not an Agents D1 pin.
+- `AddAgentsEventStore` silently keeps the first AppId on a second call with a different id — `false`. `TryAddEnumerable` idempotence for identical composition is what the test claims; Group B already rejected multi-app registration as undemonstrated misuse.
+- Catalog composition uses `ShouldNotBeOfType<EventStoreProviderCatalogOperations>` rather than locking `UnavailableProviderCatalogOperations` — `low`. Round 9's pin is exactly "not the EventStore writer"; a third live type is speculative. Disable/enable/update catalog writes are the same unavailable object (DW-14 / Story 5.3).
+- Unconfigured host no longer asserts `IProviderCatalogOperations` is missing — `false`. `TryAddSingleton(AgentsClient.Unavailable().ProviderCatalog)` always registers a fail-closed instance; "missing" is the wrong shape.
+- `Claims` is invoked through reflection — `false`. `ITrustedCommandExtensionPolicy.Claims` exists; a missing method fails `ShouldNotBeNull`. The missing *Accepts* happy paths are the real gap, filed as a patch.
+- `AttemptReplayAsync` non-admin deny and `ExpectedConfigurationVersion <= 0` throw are untested — `low`. `ActivateCoreAsync` / `WriteAsync` already deny unauthorized callers and reject non-positive versions before replay; the branches are defensive.
+- `A_later_projected_version_confirms_the_original_command_derived_target` only runs `GetAgentStatusQuery` — `false`. Both handlers share `ReadExpectedConfigurationVersion` on `AgentSetupQueryHandlerBase`; `Both_setup_queries_answer_with_the_same_authoritative_truth` already pairs them.
+- Omitted `X-Correlation-ID` / `Idempotency-Key` success path, and activation's missing `application/problem+json` content-type check — `low`. Invalid/duplicate headers are already pinned; minting identities on omit is the first-submit path, not AC2 retry identity.
+- `RootCheckoutShouldLoadTheSharedEventStoreVersion` hard-codes `3.106.0` / floor tests are fail-only — `false`. The checkout test is the pass case for the published floor; a catalog bump is supposed to update it.
+- `PackageInventoryTests` Story 5.1 floors 573/549 were not raised for new D1 tests — `false`. `eng/verify-story-5.2.ps1` `$focusedSuites` already names the new Server.Tests classes; the 5.1 floors are the 5.1 baseline by design.
+- `ServerSerializationConformanceTests` skips static properties / EventStore / locally built options — `false`. Every Server production bag is a static field (`_jsonOptions` / `s_jsonOptions`). No property-hosted bag exists. Query-test `_json` is a test deserializer, not a production options bag.
+- Fail-closed composition omits AppId `" "` / Dapr tests do not assert URI/method/body — `low`. Whitespace hits the same `IsNullOrWhiteSpace(appId)` branch as a missing id; the client owns the invoke path, the composition test owns identity headers.
+- `duplicate-effect` / `duplicate-version` fixtures never reach `TryGetUniqueProperty` — `false`. Those cases pass as `UnableToVerify`; `EnumerateObject` still sees the duplicates on this runtime.
+- `The_real_domain_result_payload_is_understood_at_the_operations_boundary` submits `DisableAgent` with a `CreateAgent` payload — `false`. Both write `AgentSetupDomainResult.ResultPayload` with the shared property-name constants; a Disable-only rename cannot drift those keys.
+- `WasRejectedAsync(Arg.Any<string>())` never pins the receipt message id — `low`. The production call uses `receipt.MessageId`; unlikely in everyday use.
+- `CapturingHandler` `SingleOrDefault` throws on multiple `dapr-app-id` values — `low`. Duplicate headers still fail the test, just with a less specific exception.
+- Unknown `InlineData` scenario names reuse the wrong-case payload — `low`. The default arm still fail-closes as `UnableToVerify`; no current scenario is unnamed.
+- `AgentSetupViewFactory` later-version `ProjectionConfirmed` overclaims that version 5 proves version 4 applied — `false`. `behind` is `ConfigurationVersion < expected`; confirming N once the projection is at N+1 is the frozen catch-up contract. Aggregate versions increment by one; skipped intermediates are not shown.
+- Newer-projection retry asserts receipt version 3 rather than retained N — `false`. Operations reports the gateway receipt; the mock returns 3 because the test asked `CaptureSubmit(configurationVersion: 3)`. Replay vs first-execution is EventStore + the aggregate fence (D3).
+- Exact-N activation with no projected selection reports `Applied` — `false`. Dispatching `Unknown` verdicts for the aggregate to refuse is the documented operations contract; the mock Applied is isolation, not a false confirmation in production.
+- Same-key Disable does not prove EventStore "no second event" — `false`. This is an operations-layer unit test; persisted end-state is the live host (Story 5.6). The test does pin identical forwarded message ids.
+- Foreign / not-created projections are never exercised as newer than N — `false`. `ActivateCoreAsync` rejects null, `!IsCreated`, and identity mismatch *before* the newer-version replay lane; a foreign row at version 3 cannot call `AttemptReplayAsync`.
+- AC4 aggregate fence, AC6 retained retry attempt, and AC3 8 s UI exhaustion are unproven in D1 — `false` as D1 defects. Aggregate fence is `AgentLifecycleConfigurationVersionTests` (D3). Retry retention and catch-up UX are UI tests (D2).
+- Several `CaptureDispatch` helpers still return hardcoded `"corr-1"`/`"msg-1"` — `low`. Pre-existing orchestrator fixtures; provider-selection tests already bind envelope identities. Not introduced as a D1 behavior bug.
 
 ## Implementation Notes
 
@@ -991,16 +1039,16 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-20T21:10:00Z
+Run (UTC): 2026-09-21T05:51:51Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Contracts.Tests | 548 | 548 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 602 | 602 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 578 | 578 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 791 | 791 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1092 | 1092 | 0 | 0 | 0 | 0 |
-| **Total** | 3039 | 3039 | 0 | 0 | 0 | 0 |
+| **Total** | 3015 | 3015 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->
