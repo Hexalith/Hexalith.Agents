@@ -124,12 +124,10 @@ status: open
 
 ### DW-8: Prevent persistent MSBuild nodes from holding the readiness runner's captured output pipe.
 
-origin: code review, 2026-09-14
-location: tools/check-story-review-readiness.py
-source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
-reason: A persistent MSBuild child can keep the captured output pipe open until the runner's timeout; setting MSBUILDDISABLENODEREUSE inside the runner would make the workaround automatic.
 status: done 2026-09-20
-resolution: The readiness runner now forces MSBUILDDISABLENODEREUSE=1 after applying caller overrides, with a regression test proving an inherited or supplied zero cannot defeat the safeguard.
+origin: code review, 2026-09-14
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+archived: 2026-09-21
 
 ### DW-9: Verify that an idempotency key is bound to its first submitted payload.
 

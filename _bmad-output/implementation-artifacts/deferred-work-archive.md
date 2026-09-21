@@ -29,3 +29,14 @@ reason: The fix exists after EventStore 3.104.0, but package-mode Release and CI
 resolution: Hexalith.Builds catalog commit `dae84d5f96911517eb1e6f97e75eb88e759e6d8a` selects published EventStore `3.106.0`; audit commit `000abf867abc3a99cfa74d39b6e73af05c78a602` records the generated evidence and is reachable from Builds `origin/main`. Agents `origin/main` records that exact gitlink, Agents owns no local package version, and the Story 5.1 EventStore floor, Release/package, package-validation, and isolated-consumer lanes pass.
 status: done 2026-09-16
 archived: 2026-09-18
+
+### DW-8: Prevent persistent MSBuild nodes from holding the readiness runner's captured output pipe.
+
+origin: code review, 2026-09-14
+location: tools/check-story-review-readiness.py
+source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+reason: A persistent MSBuild child can keep the captured output pipe open until the runner's timeout; setting MSBUILDDISABLENODEREUSE inside the runner would make the workaround automatic.
+status: done 2026-09-20
+archived: 2026-09-21
+resolution: The readiness runner now forces MSBUILDDISABLENODEREUSE=1 after applying caller overrides, with a regression test proving an inherited or supplied zero cannot defeat the safeguard.
+
