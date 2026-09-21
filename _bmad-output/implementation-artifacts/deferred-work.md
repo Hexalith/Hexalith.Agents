@@ -379,3 +379,15 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Define how confirmed setup writes reconcile editable drafts with a newer concurrent projection.
   evidence: Post-write polling deliberately preserves local drafts even when the projection advances beyond the accepted target; deciding whether to replace, merge, or flag those drafts requires a product/UX draft-versus-authority rule.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Add a negative regression test proving release source verification rejects non-main dispatch refs.
+  evidence: The inherited source-proof suite passes `refs/heads/main` in every case, so deleting the explicit main-ref guard leaves all current tests green and can admit a branch ref that points at the current main commit.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Exercise the release source-proof CLI entry point through fixture-backed subprocess tests.
+  evidence: Current tests invoke `verify_source_proof` directly; deleting the production CLI call leaves the suite green while the command exits successfully without checking main identity or CI evidence.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Align the completed Agents CI/CD specification with the immutable shared-workflow revision now used by ordinary CI.
+  evidence: The completed CI/CD artifact still says ordinary CI tracks `domain-ci.yml@main`, while `.github/workflows/ci.yml` now pins the reusable workflow to a reviewed full commit SHA.

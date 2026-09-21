@@ -99,7 +99,7 @@ public sealed class AgentsClientSetupGatewayTests
     }
 
     [Fact]
-    public async Task An_accepted_write_carries_the_servers_acceptance_and_the_submitted_stage()
+    public async Task An_accepted_write_carries_the_servers_acceptance_and_the_authoritative_pending_stage()
     {
         var acceptance = new AgentCommandAcceptance(
             AgentId,
@@ -246,6 +246,7 @@ public sealed class AgentsClientSetupGatewayTests
     [InlineData(AgentOperationErrorCode.NotFound, AgentSetupWriteStatus.NotFound)]
     [InlineData(AgentOperationErrorCode.ValidationFailed, AgentSetupWriteStatus.ValidationFailed)]
     [InlineData(AgentOperationErrorCode.Conflict, AgentSetupWriteStatus.Conflict)]
+    [InlineData(AgentOperationErrorCode.Stale, AgentSetupWriteStatus.Conflict)]
     [InlineData(AgentOperationErrorCode.Unavailable, AgentSetupWriteStatus.Unavailable)]
     [InlineData(AgentOperationErrorCode.UnableToVerify, AgentSetupWriteStatus.UnableToVerify)]
     public async Task A_failed_write_keeps_its_typed_status_and_carries_no_acceptance(
@@ -275,7 +276,7 @@ public sealed class AgentsClientSetupGatewayTests
     }
 
     [Fact]
-    public async Task LegacyGatewayImplementationsFailClosedForRetainedMetadataOverloads()
+    public async Task Legacy_gateway_implementations_fail_closed_for_retained_metadata_overloads()
     {
         IAgentSetupGateway gateway = new LegacyAgentSetupGateway();
         var options = new AgentOperationOptions(

@@ -30,6 +30,7 @@ public sealed class AgentsClientProviderCatalogGatewayTests
     [InlineData(AgentOperationErrorCode.NotFound, AgentSetupWriteStatus.NotFound)]
     [InlineData(AgentOperationErrorCode.ValidationFailed, AgentSetupWriteStatus.ValidationFailed)]
     [InlineData(AgentOperationErrorCode.Conflict, AgentSetupWriteStatus.Conflict)]
+    [InlineData(AgentOperationErrorCode.Stale, AgentSetupWriteStatus.Conflict)]
     [InlineData(AgentOperationErrorCode.Unavailable, AgentSetupWriteStatus.Unavailable)]
     [InlineData(AgentOperationErrorCode.UnableToVerify, AgentSetupWriteStatus.UnableToVerify)]
     public async Task A_failed_write_keeps_its_typed_status_and_carries_no_acceptance(

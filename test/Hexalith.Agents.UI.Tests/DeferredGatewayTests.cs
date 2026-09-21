@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Hexalith.Agents.Contracts.Agent;
+using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.ProviderCatalog;
@@ -51,6 +52,37 @@ public sealed class DeferredGatewayTests
 
         result.Status.ShouldBe(AgentInspectionStatus.Unavailable);
         result.Setup.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task DeferredAgentSetupGateway_writes_fail_closed_with_unavailable_and_no_acceptance()
+    {
+        DeferredAgentSetupGateway gateway = new();
+        var command = new UpdateAgentConfiguration(
+            "hexa",
+            null,
+            "instructions long enough to be valid");
+        var options = new AgentOperationOptions(
+            CorrelationId: "01ARZ3NDEKTSV4RRFFQ69G5FAW",
+            IdempotencyKey: "01ARZ3NDEKTSV4RRFFQ69G5FAV")
+        {
+            ExpectedConfigurationVersion = 3,
+        };
+
+        AgentSetupWriteResult[] results =
+        [
+            await gateway.UpdateConfigurationAsync(command, CancellationToken.None),
+            await gateway.UpdateConfigurationAsync(command, options, CancellationToken.None),
+            await gateway.ConfigureResponseModeAsync(AgentResponseMode.Automatic, CancellationToken.None),
+            await gateway.ConfigureResponseModeAsync(AgentResponseMode.Automatic, options, CancellationToken.None),
+            await gateway.ActivateAsync(CancellationToken.None),
+            await gateway.ActivateAsync(options, CancellationToken.None),
+            await gateway.DisableAsync(CancellationToken.None),
+            await gateway.DisableAsync(options, CancellationToken.None),
+        ];
+
+        results.ShouldAllBe(result => result.Status == AgentSetupWriteStatus.Unavailable
+            && result.Acceptance == null);
     }
 
     [Theory]
