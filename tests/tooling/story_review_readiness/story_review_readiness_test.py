@@ -96,6 +96,7 @@ class FakeRunner:
         test_returncode: int = 0,
         report: dict[str, object] | str | None = None,
         diff_payload: bytes = b"",
+        diff_returncode: int = 0,
         baseline_returncode: int = 0,
         ancestry_returncode: int = 0,
         baseline_is_head_returncode: int = 1,
@@ -103,6 +104,7 @@ class FakeRunner:
         self.root = root
         self.git_payload = git_payload
         self.diff_payload = diff_payload
+        self.diff_returncode = diff_returncode
         self.baseline_returncode = baseline_returncode
         self.ancestry_returncode = ancestry_returncode
         self.baseline_is_head_returncode = baseline_is_head_returncode
@@ -143,7 +145,11 @@ class FakeRunner:
                 self.baseline_is_head_returncode if values[3] == "HEAD" else self.ancestry_returncode
             )
         if values[:2] == ("git", "diff"):
-            return V.CommandResult(0, stdout=self.diff_payload)
+            return V.CommandResult(
+                self.diff_returncode,
+                stdout=self.diff_payload,
+                stderr=b"diff failed" if self.diff_returncode else b"",
+            )
         raise AssertionError(f"Unexpected command: {values}")
 
 
@@ -278,6 +284,15 @@ class StoryParsingTests(unittest.TestCase):
         failures = V.unmanaged_count_claims(text, V.parse_story_layout(text))
 
         self.assertEqual([content for _, content in failures], ["All tests green: 2944/2944"])
+
+    def test_qualified_single_test_total_is_reported_as_unmanaged_evidence(self):
+        shapes = ("All tests green: 2944", "Tests passed: 2944")
+
+        for shape in shapes:
+            with self.subTest(shape=shape):
+                text = story_text(record_text=shape)
+                failures = V.unmanaged_count_claims(text, V.parse_story_layout(text))
+                self.assertEqual([content for _, content in failures], [shape])
 
     def test_ratio_after_test_related_prose_is_not_test_count_evidence(self):
         text = story_text(record_text="A ratio without test-result context, such as 16/9, is ordinary prose.")
@@ -596,9 +611,11 @@ class GateOrchestrationTests(unittest.TestCase):
         original = story_path.read_bytes()
         runner = FakeRunner(root, git_payload=status)
 
-        with self.assertRaisesRegex(V.ValidationError, "Unmanaged numeric"):
+        with self.assertRaisesRegex(V.ValidationError, "Unmanaged numeric") as raised:
             V.execute_gate(root, story_path, runner, lambda: FIXED_NOW)
 
+        self.assertIn("outside the generated evidence block", str(raised.exception))
+        self.assertNotIn("found in Dev Agent Record", str(raised.exception))
         self.assertEqual(story_path.read_bytes(), original)
         self.assertEqual(runner.commands, [])
 
@@ -787,6 +804,17 @@ class BaselineGateTests(unittest.TestCase):
         self.assertEqual(story_path.read_bytes(), original)
         self.assertTrue(all(command[:2] != ("dotnet", "build") for command in runner.commands))
 
+    def test_forward_ancestry_probe_error_stops_before_the_release_build(self):
+        root, story_path = self.fixture(("_bmad-output/implementation-artifacts/story.md",))
+        original = story_path.read_bytes()
+        runner = FakeRunner(root, git_payload=b"", ancestry_returncode=2)
+
+        with self.assertRaisesRegex(V.ValidationError, "Unable to verify"):
+            V.execute_gate(root, story_path, runner, lambda: FIXED_NOW)
+
+        self.assertEqual(story_path.read_bytes(), original)
+        self.assertTrue(all(command[:2] != ("dotnet", "build") for command in runner.commands))
+
     def test_baseline_equal_to_head_stops_before_the_release_build(self):
         root, story_path = self.fixture(("_bmad-output/implementation-artifacts/story.md",))
         original = story_path.read_bytes()
@@ -808,6 +836,18 @@ class BaselineGateTests(unittest.TestCase):
 
         self.assertEqual(story_path.read_bytes(), original)
         self.assertTrue(all(command[:2] != ("dotnet", "build") for command in runner.commands))
+
+    def test_failed_git_diff_is_reported_and_preserves_story(self):
+        root, story_path = self.fixture(("_bmad-output/implementation-artifacts/story.md",))
+        original = story_path.read_bytes()
+        runner = FakeRunner(root, git_payload=b"", diff_returncode=2)
+
+        with self.assertRaisesRegex(V.ValidationError, "Unable to read Git diff") as raised:
+            V.execute_gate(root, story_path, runner, lambda: FIXED_NOW)
+
+        self.assertIn("diff failed", str(raised.exception))
+        self.assertEqual(story_path.read_bytes(), original)
+        self.assertTrue(any(command[:2] == ("git", "diff") for command in runner.commands))
 
 
 if __name__ == "__main__":

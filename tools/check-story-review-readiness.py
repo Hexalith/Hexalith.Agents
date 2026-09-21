@@ -47,7 +47,7 @@ COUNT_PATTERNS = (
     ),
     re.compile(
         r"\btests?\b\s+(?:(?:are\s+)?(?:all\s+)?)?(?:green|pass(?:ed|ing)?)"
-        r"\s*(?::|=|->|→)?\s*\d[\d,]*(?:\s*/\s*\d[\d,]*)+",
+        r"\s*(?::|=|->|→)?\s*\d[\d,]*(?:\s*/\s*\d[\d,]*)*",
         re.IGNORECASE,
     ),
 )
@@ -774,8 +774,13 @@ def resolve_baseline_commit(root: Path, baseline: str, runner: Runner) -> str:
     if not COMMIT_ID_PATTERN.match(resolved):
         raise ValidationError(f"Git returned an invalid baseline commit id: {resolved!r}")
     ancestry = runner(("git", "merge-base", "--is-ancestor", resolved, "HEAD"), root, None)
-    if ancestry.returncode != 0:
+    if ancestry.returncode == 1:
         raise ValidationError(f"Story baseline_commit is not an ancestor of HEAD: {baseline}")
+    if ancestry.returncode != 0:
+        raise ValidationError(
+            "Unable to verify that story baseline_commit is an ancestor of HEAD: "
+            f"{command_detail(ancestry)}"
+        )
     equality = runner(("git", "merge-base", "--is-ancestor", "HEAD", resolved), root, None)
     if equality.returncode == 0:
         raise ValidationError(f"Story baseline_commit must precede HEAD, not equal it: {baseline}")
@@ -832,7 +837,7 @@ def execute_gate(
     if claims:
         details = "\n".join(f"  line {line}: {content}" for line, content in claims)
         raise ValidationError(
-            "Unmanaged numeric test-count claims found in Dev Agent Record; "
+            "Unmanaged numeric test-count claims found outside the generated evidence block; "
             f"refer to the generated block instead:\n{details}"
         )
 

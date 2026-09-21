@@ -69,7 +69,7 @@ public sealed class EventStoreAgentCommandDispatcherTests
     [Theory]
     [InlineData(400, AgentOperationErrorCode.ValidationFailed)]
     [InlineData(403, AgentOperationErrorCode.NotAuthorized)]
-    [InlineData(404, AgentOperationErrorCode.NotFound)]
+    [InlineData(404, AgentOperationErrorCode.Unavailable)]
     [InlineData(409, AgentOperationErrorCode.Conflict)]
     [InlineData(412, AgentOperationErrorCode.Stale)]
     [InlineData(503, AgentOperationErrorCode.Unavailable)]

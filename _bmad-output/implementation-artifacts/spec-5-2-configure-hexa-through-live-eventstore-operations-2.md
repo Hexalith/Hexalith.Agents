@@ -2,7 +2,7 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
 review_loop_iteration: 10
@@ -584,12 +584,12 @@ Readiness gate: `python3 tools/check-story-review-readiness.py _bmad-output/impl
 
 **Patch**
 
-- [ ] [Review][Patch] Already-active `ActivateAgent` with a stale or future expected version is not pinned against the fence [test/Hexalith.Agents.Tests/AgentLifecycleConfigurationVersionTests.cs:114] — production compares expected N before the already-active no-op (`AgentAggregate.cs:231-249`), but `Activate_already_active_is_already_applied` and `RepeatedLifecycleCommandsAreNoOpsAndDoNotIncrementConfigurationVersion` send a matching N, and the mismatch theories use `StateWithSelectedProvider` (Draft). Swapping the no-op above the fence still leaves those tests green; a stale retry against an Active agent would ship as `AlreadyApplied` instead of `AgentActivationConfigurationVersionMismatchRejection`. Blind Hunter, Verification Gap, and Acceptance Auditor.
-- [ ] [Review][Patch] Failed `git diff` after a declared `baseline_commit` is not exercised [tools/check-story-review-readiness.py:790] — `git_diff_paths` raises on a non-zero status, but `FakeRunner` always returns 0 and `parse_diff_name_status_z(b"")` is empty, so dropping the raise shrinks the File List union to `git status` and none of the BaselineGateTests fail. Verification Gap and Blind Hunter.
-- [ ] [Review][Patch] A single green/pass total with no slash is not treated as unmanaged evidence [tools/check-story-review-readiness.py:48] — the green/pass pattern requires `(?:\s*/\s*\d[\d,]*)+`, so `All tests green: 2944/2944` is flagged while `All tests green: 2944` is not. Blind Hunter and Edge Case Hunter.
-- [ ] [Review][Patch] Applied `ResultPayload` is not taken through the domain-service wire hop the new test claims to cover [test/Hexalith.Agents.Tests/AgentSetupDomainResultTests.cs:67] — `Noop_result_payload_survives_the_domain_service_wire_contract` comments that `FromDomainResult` preserves payload for `IsSuccess` as well as `IsNoOp`, but `[MemberData(nameof(NoOpCommandNames))]` never drives an eventful Applied result. Eventful cases assert `DomainResult.ResultPayload` only. Blind Hunter and Acceptance Auditor.
-- [ ] [Review][Patch] Unmanaged-count failures still say they were found in Dev Agent Record [tools/check-story-review-readiness.py:834] — `unmanaged_count_claims` now scans every line except the generated block and File List, but `execute_gate` still raises `Unmanaged numeric test-count claims found in Dev Agent Record`. `test_unmanaged_claim_fails_before_build_and_preserves_story` only matches `Unmanaged numeric`. Blind Hunter, Verification Gap, and Acceptance Auditor.
-- [ ] [Review][Patch] A git error on the forward ancestry probe is reported as a non-ancestor baseline [tools/check-story-review-readiness.py:776] — `if ancestry.returncode != 0` maps 128 to "not an ancestor of HEAD", while the reverse probe maps any code other than 0/1 to "Unable to verify". Blind Hunter and Edge Case Hunter.
+- [x] [Review][Patch] Already-active `ActivateAgent` with a stale or future expected version is not pinned against the fence [test/Hexalith.Agents.Tests/AgentLifecycleConfigurationVersionTests.cs:114] — production compares expected N before the already-active no-op (`AgentAggregate.cs:231-249`), but `Activate_already_active_is_already_applied` and `RepeatedLifecycleCommandsAreNoOpsAndDoNotIncrementConfigurationVersion` send a matching N, and the mismatch theories use `StateWithSelectedProvider` (Draft). Swapping the no-op above the fence still leaves those tests green; a stale retry against an Active agent would ship as `AlreadyApplied` instead of `AgentActivationConfigurationVersionMismatchRejection`. Blind Hunter, Verification Gap, and Acceptance Auditor.
+- [x] [Review][Patch] Failed `git diff` after a declared `baseline_commit` is not exercised [tools/check-story-review-readiness.py:790] — `git_diff_paths` raises on a non-zero status, but `FakeRunner` always returns 0 and `parse_diff_name_status_z(b"")` is empty, so dropping the raise shrinks the File List union to `git status` and none of the BaselineGateTests fail. Verification Gap and Blind Hunter.
+- [x] [Review][Patch] A single green/pass total with no slash is not treated as unmanaged evidence [tools/check-story-review-readiness.py:48] — the green/pass pattern requires a slash-separated ratio, so it flags a pass/total form while missing the equivalent green/pass phrase followed by one bare total. Blind Hunter and Edge Case Hunter.
+- [x] [Review][Patch] Applied `ResultPayload` is not taken through the domain-service wire hop the new test claims to cover [test/Hexalith.Agents.Tests/AgentSetupDomainResultTests.cs:67] — `Noop_result_payload_survives_the_domain_service_wire_contract` comments that `FromDomainResult` preserves payload for `IsSuccess` as well as `IsNoOp`, but `[MemberData(nameof(NoOpCommandNames))]` never drives an eventful Applied result. Eventful cases assert `DomainResult.ResultPayload` only. Blind Hunter and Acceptance Auditor.
+- [x] [Review][Patch] Unmanaged-count failures still say they were found in Dev Agent Record [tools/check-story-review-readiness.py:834] — `unmanaged_count_claims` now scans every line except the generated block and File List, but `execute_gate` still raises `Unmanaged numeric test-count claims found in Dev Agent Record`. `test_unmanaged_claim_fails_before_build_and_preserves_story` only matches `Unmanaged numeric`. Blind Hunter, Verification Gap, and Acceptance Auditor.
+- [x] [Review][Patch] A git error on the forward ancestry probe is reported as a non-ancestor baseline [tools/check-story-review-readiness.py:776] — `if ancestry.returncode != 0` maps 128 to "not an ancestor of HEAD", while the reverse probe maps any code other than 0/1 to "Unable to verify". Blind Hunter and Edge Case Hunter.
 
 #### Rejected
 
@@ -744,6 +744,13 @@ submodule history is preserved. Reapply the round-5 KEEP behavior selectively. D
 - Pinned activation-only header metadata, receipt-derived projection confirmation, bounded child-process execution,
   stdout-only MSBuild JSON parsing, and the domain-host prohibition on `AddAgentsEventStore`.
 
+**Round 10 D3 fixes applied 2026-09-21**
+
+- Pinned stale and future activation-version fences after an Agent is already active, and carried every eventful
+  setup result payload through the domain-service wire contract.
+- Hardened the readiness gate's baseline diagnostics and regression coverage for failed Git diffs, forward-ancestry
+  probe errors, single-total green/pass claims, and whole-story unmanaged-count error wording.
+
 ## Spec Change Log
 
 - 2026-09-14: Added the mandatory Dev Agent Record and File List, and taught the readiness gate to include
@@ -783,6 +790,8 @@ submodule history is preserved. Reapply the round-5 KEEP behavior selectively. D
   composition, CI, verification tooling, and evidence bookkeeping. Intent and acceptance criteria are unchanged.
 - 2026-09-21: Applied all seven Group D1 review patches in the Server.Tests slice. Intent and acceptance criteria
   are unchanged.
+- 2026-09-21: Applied all six Group D3 review patches in the domain and readiness-tooling slices. Intent and
+  acceptance criteria are unchanged.
 
 ## Review Triage Log
 
@@ -1142,6 +1151,38 @@ submodule history is preserved. Reapply the round-5 KEEP behavior selectively. D
 | blind-hunter-r15 | GitHub Release verification omits prerelease and asset-integrity checks. | medium | defer | carried: both omissions belong to inherited release tooling and already have authoritative release-hardening ledger entries. |
 | blind-hunter-r15 | CI invokes the Story 5.2 verifier only in package-floor mode. | false | reject | The pinned shared CI performs the package-mode build and runs all five listed test projects, including the focused Story 5.2 and composition classes; `-PackageFloorOnly` is the supplemental policy check, while a source-reference build is intentionally a local development lane. |
 | blind-hunter-r15 | The completed CI/CD spec still describes ordinary CI as tracking `domain-ci.yml@main`. | low | defer | Verified: the inherited completed artifact's frozen constraint and implementation note say `@main`, while the current caller is SHA-pinned. Rewriting an unrelated completed spec is outside setup correlation; the CI/CD documentation needs its own correction. |
+| verification-gap-r16 | Terminal rejections are not adopted by the setup UI. | medium | defer | carried: `Rejected` and `Blocked` still fall through to retryable `Unavailable`, but the branch remains coupled to the deliberately deferred live status reader and is owned by DW-12. |
+| verification-gap-r16 | Production release-verifier entry points are not executed by their tests. | medium | defer | Filed pre-verified: the source-proof half is carried from round 15, and the same helper-only pattern leaves the GitHub Release and NuGet CLI argument/exit wiring unpinned. This is inherited release tooling outside setup correlation. |
+| verification-gap-r16 | The non-main release guard has no negative regression case. | medium | defer | carried: removing the `refs/heads/main` guard leaves the direct verifier suite green; inherited release tooling needs the already-recorded executable non-main fixture case. |
+| blind-hunter-r16 | A no-op is marked `ProjectionConfirmed` without polling a lagging projection. | false | reject | carried: the frozen matrix explicitly makes a no-op terminal because it appends no new version to await. |
+| blind-hunter-r16 | Configured Agents composition still falls back to `DeferredAgentCommandStatusReader`. | false | reject | carried: the absence is explicitly disclosed and intentionally keeps ambiguous payload-less outcomes unverifiable pending the tenant-scoped Story 5.6 binding. |
+| blind-hunter-r16 | `Rejected` and `Blocked` setup outcomes map to retryable `Unavailable`. | medium | defer | carried: the terminal UI mapping remains coupled to the deliberately deferred live status reader and is owned by DW-12. |
+| blind-hunter-r16 | No production Platform gateway consumes `Hexalith.Agents.EventStore`. | high | defer | carried: the external Platform host owns package consumption and `AddAgentsEventStore`; DW-21 remains the explicit promotion blocker. |
+| blind-hunter-r16 | A configured non-HTTP EventStore URI is treated as a live gateway. | medium | defer | carried: absolute-URI validation predates this story and accepts schemes the HTTP client cannot send; the existing composition-hardening item owns an HTTP/HTTPS restriction. |
+| blind-hunter-r16 | Agent-id validation occurs before the authorization context is read. | false | reject | The frozen rule requires authorization before lookup-dependent disclosure; rejecting a blank method argument performs no lookup and reveals no Agent or tenant existence. Normal routed identifiers are nonblank, so no claimed cross-tenant disclosure occurs here. |
+| blind-hunter-r16 | An unqualified gateway HTTP 404 is exposed as terminal Agent `NotFound`. | medium | patch | Verified: `EventStoreGatewayClient` throws the same status-only exception for any failed submit response, while `AgentCommandDispatchFailure.Map` maps every 404 to `NotFound`; a missing route can therefore make the UI release recovery state as though the Agent were absent. Default unqualified transport 404 to `Unavailable`. |
+| blind-hunter-r16 | Three inherited security workflows consume mutable reusable-workflow refs. | medium | defer | carried: the Story 5.1 CodeQL, commitlint, and dependency-review callers use `@main`, so upstream movement can alter gates without local review; the existing immutable-revision ledger item remains authoritative. |
+| blind-hunter-r16 | High and critical NuGet audit diagnostics are exempted from warnings-as-errors. | medium | defer | Verified: `Directory.Build.props` appends `NU1901` through `NU1904` to `WarningsNotAsErrors`, so ordinary warning-as-error CI does not fail when an existing dependency later receives a high/critical advisory. This is inherited Story 5.1 build policy. |
+| blind-hunter-r16 | Package archive traversal is checked after `lstrip("./")` erases leading `../`. | high | defer | Verified: `posixpath.normpath("../../lib/net10.0/X.dll").lstrip("./")` becomes `lib/net10.0/X.dll`, so the intended traversal rejection and exact DLL inventory can both be bypassed. The validator is inherited Story 5.1 release tooling. |
+| blind-hunter-r16 | Multi-package NuGet publication cannot recover cleanly from a partial push. | high | defer | carried: the inherited all-absent preflight plus non-transactional push can strand an immutable partial version set. |
+| blind-hunter-r16 | Duplicate manifest package IDs collapse during GitHub Release asset verification. | false | reject | The standalone helper collapses IDs, but the production release first runs `pack-release-packages.py`, which rejects case-insensitive duplicate IDs, and post-publication NuGet verification independently rejects them; the claimed fewer-package successful release is unreachable. |
+| blind-hunter-r16 | GitHub Release verification checks asset names rather than uploaded artifact integrity. | medium | defer | carried: the inherited verifier accepts empty, truncated, or substituted assets carrying expected names; the existing release-hardening ledger item remains authoritative. |
+| blind-hunter-r16 | The semantic-release planner duplicates release configuration instead of loading `.releaserc.json`. | medium | defer | Verified: the planner hardcodes branches, tag format, and two plugins; a later analyzer or branch-policy change can disagree with publication configuration and block the release at the reserved-version check. This is inherited release tooling. |
+| blind-hunter-r16 | Package validation does not enforce the centrally declared legal and provenance metadata. | medium | defer | Verified: validation requires only a nonempty license and does not compare MIT, repository/project URLs, or the readme, so a project override can publish inconsistent metadata while the package gate passes. This is inherited release tooling. |
+| edge-case-hunter-r16 | A payload-less rejection reaches only the deferred command-status reader. | false | reject | carried: the absence is intentionally fail-closed and disclosed pending the tenant-scoped Story 5.6 reader; it returns unknown rather than inventing a terminal rejection. |
+| edge-case-hunter-r16 | A returned `Rejected` setup status remains retryable in the UI. | medium | defer | carried: the branch remains coupled to the deferred live status reader and is owned by DW-12. |
+| edge-case-hunter-r16 | `AlreadyApplied` can release an attempt without verified acceptance evidence. | false | reject | `AgentsClientSetupGateway.WriteAsync` rejects unknown effects and nonpositive/missing target versions before constructing `AlreadyApplied`; production acceptances also come from the identity-verified operations boundary. A fabricated custom client result is outside the trusted path. |
+| edge-case-hunter-r16 | The release workflow does not enforce the fixed package-manifest count. | false | reject | carried: the pinned reusable workflow enforces `expected-package-count: 6` independently of container publication, and `PackageInventoryTests` pins the caller value. |
+| edge-case-hunter-r16 | Multi-package publication cannot resume after a partial push. | high | defer | carried: the inherited all-absent preflight plus non-transactional push can strand an immutable partial version set. |
+| edge-case-hunter-r16 | Main can advance after source proof but before the first irreversible package push. | high | defer | Verified: the completed CI/CD specification requires stale source to stop before the first push, but the caller performs source proof before planning/packing and no local publish-boundary recheck exists. This is inherited release work, not setup correlation. |
+| edge-case-hunter-r16 | GitHub Release verification accepts a stable tag marked prerelease. | medium | defer | carried: inherited release tooling validates tag, draft state, SHA, and asset names but not the `prerelease` flag; its existing deferred item remains authoritative. |
+| edge-case-hunter-r16 | GitHub Release verification accepts corrupted or substituted asset bytes. | medium | defer | carried: the inherited verifier checks filenames rather than artifact integrity; the existing release-hardening ledger item remains authoritative. |
+| edge-case-hunter-r16 | CodeQL cancellation applies to main pushes and scheduled scans. | medium | defer | carried: branch-ref concurrency can cancel evidence for a merged or scheduled revision in inherited Story 5.1 workflow code. |
+| edge-case-hunter-r16 | The CodeQL reusable workflow uses a mutable `@main` ref. | medium | defer | carried: upstream movement can alter the security gate without local review; the existing immutable-revision ledger item remains authoritative. |
+| edge-case-hunter-r16 | The commitlint reusable workflow uses a mutable `@main` ref. | medium | defer | carried: upstream movement can alter the commit-policy gate without local review; the existing immutable-revision ledger item remains authoritative. |
+| edge-case-hunter-r16 | The dependency-review reusable workflow uses a mutable `@main` ref. | medium | defer | carried: upstream movement can alter the dependency gate without local review; the existing immutable-revision ledger item remains authoritative. |
+| edge-case-hunter-r16 | A quoted `baseline_commit` can carry trailing non-comment tokens. | low | reject | carried: malformed frontmatter is not an everyday path, and adding a dedicated trailing-token guard is disproportionate to this setup slice. |
+| edge-case-hunter-r16-claim | Canonical rejected outcomes are unavailable through the deferred status reader. | false | reject | carried: the fallback is intentionally fail-closed and disclosed pending the tenant-scoped live reader; it returns unknown rather than misclassifying a rejection. |
 
 ## Design Notes
 
@@ -1177,16 +1218,16 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-21T10:35:31Z
+Run (UTC): 2026-09-21T11:23:23Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Contracts.Tests | 548 | 548 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Server.Tests | 585 | 585 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Tests | 791 | 791 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Tests | 805 | 805 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1099 | 1099 | 0 | 0 | 0 | 0 |
-| **Total** | 3029 | 3029 | 0 | 0 | 0 | 0 |
+| **Total** | 3043 | 3043 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->

@@ -68,8 +68,8 @@ public sealed class AgentSetupDomainResultTests
     [MemberData(nameof(NoOpCommandNames))]
     public void Noop_result_payload_survives_the_domain_service_wire_contract(string commandName)
     {
-        // The wire result is the first hop out of the aggregate. It preserves the payload for IsNoOp as well as
-        // IsSuccess, which is what makes an AlreadyApplied receipt correlatable at the operations boundary.
+        // The wire result is the first hop out of the aggregate. Preserving the no-op payload is what makes an
+        // AlreadyApplied receipt correlatable at the operations boundary.
         (DomainResult result, int unchangedVersion) = NoOpCase(commandName);
 
         DomainServiceWireResult wire = DomainServiceWireResult.FromDomainResult(result);
@@ -80,6 +80,24 @@ public sealed class AgentSetupDomainResultTests
         using JsonDocument payload = JsonDocument.Parse(wire.ResultPayload.ShouldNotBeNull(commandName));
         payload.RootElement.GetProperty("effect").GetString().ShouldBe("AlreadyApplied", commandName);
         payload.RootElement.GetProperty("configurationVersion").GetInt32().ShouldBe(unchangedVersion, commandName);
+    }
+
+    [Theory]
+    [MemberData(nameof(EventfulCommandNames))]
+    public void Applied_result_payload_survives_the_domain_service_wire_contract(string commandName)
+    {
+        // The wire result is the first hop out of the aggregate. Preserving the success payload is what makes an
+        // Applied receipt correlatable at the operations boundary.
+        (DomainResult result, int appliedVersion) = EventfulCase(commandName);
+
+        DomainServiceWireResult wire = DomainServiceWireResult.FromDomainResult(result);
+
+        wire.Events.ShouldNotBeEmpty(commandName);
+        wire.IsRejection.ShouldBeFalse(commandName);
+        wire.ResultPayload.ShouldBe(result.ResultPayload, commandName);
+        using JsonDocument payload = JsonDocument.Parse(wire.ResultPayload.ShouldNotBeNull(commandName));
+        payload.RootElement.GetProperty("effect").GetString().ShouldBe("Applied", commandName);
+        payload.RootElement.GetProperty("configurationVersion").GetInt32().ShouldBe(appliedVersion, commandName);
     }
 
     private static (DomainResult Result, int Version) EventfulCase(string commandName)

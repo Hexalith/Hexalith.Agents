@@ -25,7 +25,7 @@ public static class AgentCommandDispatchFailure
             {
                 400 or 422 => AgentOperationErrorCode.ValidationFailed,
                 401 or 403 => AgentOperationErrorCode.NotAuthorized,
-                404 => AgentOperationErrorCode.NotFound,
+                404 => AgentOperationErrorCode.Unavailable,
                 409 => AgentOperationErrorCode.Conflict,
                 412 or 428 => AgentOperationErrorCode.Stale,
                 _ => AgentOperationErrorCode.Unavailable,

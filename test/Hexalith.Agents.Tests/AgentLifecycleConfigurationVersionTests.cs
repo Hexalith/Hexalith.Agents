@@ -135,6 +135,31 @@ public sealed class AgentLifecycleConfigurationVersionTests
         state.ConfigurationVersion.ShouldBe(versionBeforeReplay);
     }
 
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(1)]
+    public void Already_active_activation_rejects_stale_and_future_configuration_versions_before_noop(int delta)
+    {
+        AgentState state = ActiveStateWith(ValidCreate());
+        int activeVersion = state.ConfigurationVersion;
+        int expected = activeVersion + delta;
+
+        DomainResult result = AgentAggregate.Handle(
+            new ActivateAgent(),
+            state,
+            SelectEnvelope(new ActivateAgent(), activationExpectedConfigurationVersion: expected));
+
+        AgentActivationConfigurationVersionMismatchRejection rejection = result.Events
+            .Single()
+            .ShouldBeOfType<AgentActivationConfigurationVersionMismatchRejection>();
+        rejection.ExpectedConfigurationVersion.ShouldBe(expected);
+        rejection.ActualConfigurationVersion.ShouldBe(activeVersion);
+        result.IsNoOp.ShouldBeFalse();
+        ApplyAll(state, result);
+        state.Lifecycle.ShouldBe(AgentLifecycleStatus.Active);
+        state.ConfigurationVersion.ShouldBe(activeVersion);
+    }
+
     [Fact]
     public void Never_admitted_replay_lane_attempt_is_rejected_by_the_version_fence_before_dependency_gates()
     {

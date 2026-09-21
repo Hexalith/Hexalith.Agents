@@ -391,3 +391,27 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Align the completed Agents CI/CD specification with the immutable shared-workflow revision now used by ordinary CI.
   evidence: The completed CI/CD artifact still says ordinary CI tracks `domain-ci.yml@main`, while `.github/workflows/ci.yml` now pins the reusable workflow to a reviewed full commit SHA.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Exercise the GitHub Release and NuGet publication verifier CLI entry points through fixture-backed subprocess tests.
+  evidence: The inherited tooling tests call helper functions directly, so deleting either production `main` verifier call leaves its suite green while the CLI can exit successfully without performing the release check.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Make high and critical NuGet vulnerability findings fail an ordinary CI build.
+  evidence: The inherited build policy exempts `NU1901` through `NU1904` from warnings-as-errors, so a newly disclosed high or critical vulnerability in an existing dependency does not fail the warning-as-error lane.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Reject traversing NuGet archive paths before stripping an optional current-directory prefix.
+  evidence: The inherited package validator applies `lstrip("./")` before its traversal check, allowing a normalized `../../lib/...` path to become `lib/...` and potentially satisfy the exact DLL inventory.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Derive semantic-release planning and publication from one release configuration.
+  evidence: The inherited planner hardcodes branches, tag format, and plugins separately from `.releaserc.json`, so a later release-rule change can produce a different reserved version and block publication.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Enforce the centrally declared package license, provenance URLs, and readme in package validation.
+  evidence: The inherited package validator requires only a nonempty license and does not compare the expected MIT expression, repository/project URLs, or readme, so a project override can pass the release gate with inconsistent metadata.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Re-prove that the dispatched source is still current immediately before the first irreversible NuGet push.
+  evidence: The release workflow proves current green main before planning and packing, but has no local publication-boundary recheck, so main can advance before the first package write despite the completed CI/CD requirement to stop stale source before publication.
