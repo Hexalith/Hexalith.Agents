@@ -162,20 +162,24 @@ Semantic identity is the command after declared-contract normalization, then the
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-22T20:06:15Z
+Run (UTC): 2026-09-22T21:15:01Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Contracts.Tests | 681 | 681 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 608 | 608 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Contracts.Tests | 687 | 687 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 611 | 611 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 805 | 805 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1099 | 1099 | 0 | 0 | 0 | 0 |
-| **Total** | 3199 | 3199 | 0 | 0 | 0 | 0 |
+| **Total** | 3208 | 3208 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->
 ### File List
+
+#### Follow-up -3 paths
+
+These paths contain follow-up -3 work. `deferred-work.md` and the EventStore gitlink also have changes from other work in the baseline range; the gate compares whole paths.
 
 - `_bmad-output/implementation-artifacts/deferred-work.md`
 - `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
@@ -199,6 +203,25 @@ Result: PASS
 - `src/Hexalith.Agents.Server/Composition/AgentDomainHostComposition.cs`
 - `src/Hexalith.Agents.Server/Program.cs`
 - `test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs`
+- `test/Hexalith.Agents.Contracts.Tests/WideSignedToleranceStatus.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AppHostSecurityTopologyTests.cs`
 - `references/Hexalith.EventStore`
+
+#### Other paths required by the baseline, outside follow-up -3
+
+These paths were changed by CI/release, submodule-pointer, follow-up -2, or later registration-policy work. They are included only for the gate's path reconciliation and are not claimed as follow-up -3 work. The registration-policy changes add whitespace rejection and duplicate-registration checks, which the frozen intent excludes.
+
+- `.github/dependabot.yml`
+- `.github/workflows/ci.yml`
+- `.github/workflows/release.yml`
+- `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+- `eng/verify-story-5.2.ps1`
+- `references/Hexalith.Builds`
+- `references/Hexalith.Conversations`
+- `references/Hexalith.FrontComposer`
+- `references/Hexalith.Memories`
+- `references/Hexalith.Tenants`
+- `src/Hexalith.Agents.EventStore/AgentsEventStoreServiceCollectionExtensions.cs`
+- `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs`
+- `test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs`

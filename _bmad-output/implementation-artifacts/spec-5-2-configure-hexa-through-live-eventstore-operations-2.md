@@ -1355,7 +1355,7 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-22T20:24:20Z
+Run (UTC): 2026-09-22T21:16:19Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
@@ -1370,11 +1370,11 @@ Result: PASS
 <!-- dev-agent-test-evidence:end -->
 ### File List
 
-#### Story 5.2 files
+#### Follow-up -2 paths
 
-- `.github/dependabot.yml`
+These paths contain follow-up -2 work. Some also contain later Story 5.1, CI/release, or follow-up -3 changes; the baseline gate compares whole paths, not individual changes within a path.
+
 - `.github/workflows/ci.yml`
-- `.github/workflows/release.yml`
 - `Directory.Packages.props`
 - `Hexalith.Agents.slnx`
 - `_bmad-output/implementation-artifacts/deferred-work.md`
@@ -1383,9 +1383,7 @@ Result: PASS
 - `docs/migrations/story-5.2-command-identities.md`
 - `eng/release-packages.json`
 - `eng/verify-story-5.2.ps1`
-- `references/Hexalith.Conversations`
 - `references/Hexalith.EventStore`
-- `references/Hexalith.FrontComposer`
 - `src/Hexalith.Agents.Contracts/Agent/AgentActivationBlocker.cs`
 - `src/Hexalith.Agents.Contracts/Agent/AgentLaunchReadinessBlocker.cs`
 - `src/Hexalith.Agents.Contracts/Agent/AgentLifecycleStatus.cs`
@@ -1480,7 +1478,6 @@ Result: PASS
 - `src/Hexalith.Agents/Agent/AgentState.cs`
 - `test/Hexalith.Agents.Contracts.Tests/AgentContractsRoundTripTests.cs`
 - `test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs`
-- `test/Hexalith.Agents.Contracts.Tests/WideSignedToleranceStatus.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentActivationApproverRevalidationTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentAdministrationOrchestratorTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentApproverPolicyOrchestratorTests.cs`
@@ -1522,15 +1519,15 @@ Result: PASS
 - `tests/tooling/story_review_readiness/story_review_readiness_test.py`
 - `tools/check-story-review-readiness.py`
 
-#### Inherited from Story 5.1 on main, not part of this story's change
+#### Other paths required by the baseline, outside follow-up -2
 
-These paths entered the baseline diff through the linearly developed Story 5.1 build, package-authority, release,
-tooling, documentation, and submodule-pointer commits after Story 5.2's implementation commits. They are listed only
-to keep the readiness gate's baseline-diff reconciliation complete; Story 5.2 does not claim them as its work.
+These paths entered the baseline diff through other Story 5.1, CI/release, follow-up -3, tooling, documentation, or submodule-pointer changes. They are included only for the gate's path reconciliation and are not claimed as follow-up -2 work.
 
+- `.github/dependabot.yml`
 - `.github/workflows/codeql.yml`
 - `.github/workflows/commitlint.yml`
 - `.github/workflows/dependency-review.yml`
+- `.github/workflows/release.yml`
 - `.releaserc.json`
 - `Directory.Build.props`
 - `_bmad-output/implementation-artifacts/deferred-work-archive.md`
@@ -1557,6 +1554,8 @@ to keep the readiness gate's baseline-diff reconciliation complete; Story 5.2 do
 - `package.json`
 - `references/Hexalith.Builds`
 - `references/Hexalith.Commons`
+- `references/Hexalith.Conversations`
+- `references/Hexalith.FrontComposer`
 - `references/Hexalith.Memories`
 - `references/Hexalith.PolymorphicSerializations`
 - `references/Hexalith.Tenants`
@@ -1573,6 +1572,7 @@ to keep the readiness gate's baseline-diff reconciliation complete; Story 5.2 do
 - `src/Hexalith.Agents.Server/Program.cs`
 - `test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs`
 - `test/Hexalith.Agents.Server.Tests/PackageVersionCentralizationTests.cs`
+- `test/Hexalith.Agents.Contracts.Tests/WideSignedToleranceStatus.cs`
 - `tests/tooling/dependency_commit_contract_test.py`
 - `tests/tooling/github_release_verification_test.py`
 - `tests/tooling/release_source_proof_test.py`
