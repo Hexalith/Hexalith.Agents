@@ -144,7 +144,7 @@ Semantic identity is the command after declared-contract normalization, then the
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-22T15:45:37Z
+Run (UTC): 2026-09-22T16:36:09Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
