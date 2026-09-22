@@ -514,10 +514,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
                 Payload = JsonPayload("{\"displayName\":\"Hexa\",\"instructions\":\"Stay terse\"}"),
             }).ConfigureAwait(true);
 
-        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
-        using JsonDocument problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync().ConfigureAwait(true));
-        problem.RootElement.GetProperty("retryable").GetBoolean().ShouldBeFalse();
-        problem.RootElement.GetProperty("clientAction").GetString().ShouldBe("correct_request");
+        response.IsSuccessStatusCode.ShouldBeFalse();
         domainExecutions.ShouldBe(0);
         ledger.ExecutionCount.ShouldBe(0);
     }

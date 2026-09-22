@@ -162,16 +162,16 @@ Semantic identity is the command after declared-contract normalization, then the
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-22T17:16:18Z
+Run (UTC): 2026-09-22T20:06:15Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Contracts.Tests | 647 | 647 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Contracts.Tests | 681 | 681 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Server.Tests | 608 | 608 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 805 | 805 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1099 | 1099 | 0 | 0 | 0 | 0 |
-| **Total** | 3165 | 3165 | 0 | 0 | 0 | 0 |
+| **Total** | 3199 | 3199 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->
