@@ -453,3 +453,19 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 ## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-3.md (2026-09-22)
 
 - A create payload tenant can disagree with the envelope tenant. `AgentAggregate.Handle(CreateAgent)` stores `command.TenantId`, while setup idempotency scopes the canonical target by the envelope tenant. Pre-existing; this spec forbids changing Party identity. Same split as the bullet above.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Require Agents administrator authority before disclosing live setup queries.
+  evidence: `AgentSetupQueryHandlerBase.IsAgentsAdminAsync` treats fresh tenant access as administrator authority, so an ordinary tenant member can receive administrator setup details through a direct EventStore query; this authorization path predates the current review pass.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Fail provider catalog projection deliveries closed when a known event payload is corrupt.
+  evidence: `ProviderCatalogProjectionFold.Fold` stops on a malformed payload but `ProviderCatalogProjectionHandler` can write the partial model and acknowledge the delivery, leaving later events unapplied; this projection policy predates the current setup-correlation patch.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Publish only archives declared in the release package manifest.
+  evidence: The inherited pack script preserves unrelated archives in `nupkgs`, while `publish-release-packages.sh` pushes the whole `nupkgs/*.nupkg` glob; a stray archive can bypass the manifest preflight.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Reject a direct trusted CreateAgent command whose payload tenant differs from the EventStore envelope tenant.
+  evidence: `AgentAggregate.Handle(CreateAgent)` stores `command.TenantId` without comparing it to `envelope.TenantId`; the supplied orchestrator rewrites the tenant but a direct or misconfigured trusted caller can bypass that caller-side guard. This repeats the previously recorded domain-invariant risk for this review finding.

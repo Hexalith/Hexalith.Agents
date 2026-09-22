@@ -551,6 +551,39 @@ public sealed class AgentOperationContractsTests
     }
 
     [Theory]
+    [InlineData("18446744073709551615")]
+    [InlineData("\"18446744073709551615\"")]
+    public void An_unsigned_backed_enum_reads_a_declared_wide_ordinal(string json)
+    {
+        var options = new JsonSerializerOptions
+        {
+            Converters = { new UnknownFallbackEnumConverter<UnsignedBackedToleranceStatus>() },
+        };
+
+        JsonSerializer.Deserialize<UnsignedBackedToleranceStatus>(json, options)
+            .ShouldBe(UnsignedBackedToleranceStatus.Maximum);
+    }
+
+    [Theory]
+    [InlineData("9223372036854775807")]
+    [InlineData("\"9223372036854775807\"")]
+    [InlineData("-9223372036854775808")]
+    [InlineData("\"-9223372036854775808\"")]
+    public void A_signed_backed_enum_reads_declared_wide_ordinals(string json)
+    {
+        ArgumentNullException.ThrowIfNull(json);
+        var options = new JsonSerializerOptions
+        {
+            Converters = { new UnknownFallbackEnumConverter<WideSignedToleranceStatus>() },
+        };
+
+        WideSignedToleranceStatus expected = json.Contains('-')
+            ? WideSignedToleranceStatus.Minimum
+            : WideSignedToleranceStatus.Maximum;
+        JsonSerializer.Deserialize<WideSignedToleranceStatus>(json, options).ShouldBe(expected);
+    }
+
+    [Theory]
     [MemberData(nameof(PublicOperationEnumTypes))]
     public void RecognizedOperationEnumNamesStillParseCaseInsensitively(Type enumType)
     {

@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   ci:
-    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@cb91511794c8898b738d85dc6c751f82b832cbc9
+    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@2fba3497043fe5ffcfe4dc44c51a09eae9b950ab
     with:
       solution: Hexalith.Agents.slnx
       test-platform: microsoft-testing-platform
@@ -30,11 +30,12 @@ jobs:
   agents-policy:
     name: Agents package and tooling policy
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
           submodules: false
       - name: Initialize root-declared submodules
         shell: bash
@@ -42,6 +43,11 @@ jobs:
           set -euo pipefail
           mapfile -t paths < <(git config -f .gitmodules --get-regexp path | awk '{print $2}')
           git -c submodule.recurse=false submodule update --init -- "${paths[@]}"
+      - name: Require the pinned Builds workflow source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C references/Hexalith.Builds rev-parse HEAD)" = "2fba3497043fe5ffcfe4dc44c51a09eae9b950ab"
       - uses: actions/setup-dotnet@v6.0.0
         with:
           global-json-file: global.json
@@ -49,12 +55,17 @@ jobs:
         with:
           node-version: '24'
       - name: Install locked JavaScript tooling
-        run: npm ci --ignore-scripts
+        run: |
+          npm ci --ignore-scripts
+          npm audit signatures
       - name: Enforce shared package authority
         shell: pwsh
         run: ./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1 -RepositoryRoot . -CatalogPath ./references/Hexalith.Builds/Props/Directory.Packages.props
       - name: Enforce EventStore package floor
         shell: pwsh
         run: ./eng/verify-story-5.2.ps1 -PackageFloorOnly
+      - name: Enforce source and package test floors without skips
+        shell: pwsh
+        run: ./eng/verify-story.ps1 -Story 5.1
       - name: Run tooling contract tests
         run: python3 -m unittest discover -s tests/tooling -p '*_test.py'

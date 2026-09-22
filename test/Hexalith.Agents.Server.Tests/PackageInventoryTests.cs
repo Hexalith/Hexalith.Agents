@@ -97,7 +97,7 @@ public sealed class PackageInventoryTests
 
         string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/ci.yml"));
         workflow.ShouldContain(
-            "Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@cb91511794c8898b738d85dc6c751f82b832cbc9");
+            "Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@2fba3497043fe5ffcfe4dc44c51a09eae9b950ab");
         workflow.ShouldContain("cancel-in-progress: ${{ github.event_name == 'pull_request' }}");
         workflow.ShouldNotContain("domain-ci.yml@main");
         workflow.ShouldContain("test-platform: microsoft-testing-platform");
@@ -113,15 +113,35 @@ public sealed class PackageInventoryTests
         workflow.ShouldContain("./eng/verify-story-5.2.ps1 -PackageFloorOnly");
         workflow.ShouldContain("python3 -m unittest discover -s tests/tooling -p '*_test.py'");
         workflow.ShouldContain("git -c submodule.recurse=false submodule update --init");
-        workflow.ShouldContain("timeout-minutes: 30");
-        workflow.ShouldNotContain("dotnet test");
+        workflow.ShouldContain("timeout-minutes: 90");
+        workflow.ShouldContain("./eng/verify-story.ps1 -Story 5.1");
+        workflow.ShouldContain("npm audit signatures");
+        workflow.ShouldContain("persist-credentials: false");
+        workflow.ShouldContain("git -C references/Hexalith.Builds rev-parse HEAD");
+        workflow.ShouldContain("2fba3497043fe5ffcfe4dc44c51a09eae9b950ab");
         workflow.ShouldNotContain("--recursive");
+
+        Match projectList = Regex.Match(
+            workflow,
+            @"(?m)^      unit-test-projects: \|\r?\n(?<projects>(?:        test/[^\r\n]+\r?\n)+)");
+        projectList.Success.ShouldBeTrue("CI must declare its unit-test-projects list.");
+        string[] ciProjects = projectList.Groups["projects"].Value
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+        string[] onDiskProjects = ModuleLayout.ProjectFiles
+            .Select(project => Path.GetRelativePath(ModuleLayout.ModuleRoot, project).Replace('\\', '/'))
+            .Where(project => project.StartsWith("test/", StringComparison.Ordinal))
+            .Select(project => Path.GetDirectoryName(project)!.Replace('\\', '/'))
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+        ciProjects.ShouldBe(onDiskProjects, ignoreOrder: false);
     }
 
     [Fact]
     public void ReleaseShouldBeManualProtectedPinnedAndCollisionFailing()
     {
-        const string approvedBuildsSha = "cb91511794c8898b738d85dc6c751f82b832cbc9";
+        const string approvedBuildsSha = "2fba3497043fe5ffcfe4dc44c51a09eae9b950ab";
         string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/release.yml"));
         string releaseConfiguration = File.ReadAllText(ModuleLayout.ResolveModulePath(".releaserc.json"));
         string publisher = File.ReadAllText(ModuleLayout.ResolveModulePath("scripts/publish-release-packages.sh"));
@@ -139,7 +159,13 @@ public sealed class PackageInventoryTests
         workflow.ShouldContain($"domain-release.yml@{approvedBuildsSha}");
         workflow.ShouldContain($"builds-execution-sha: {approvedBuildsSha}");
         workflow.Split(approvedBuildsSha).Length.ShouldBe(3);
-        workflow.ShouldContain("expected-package-count: 6");
+        using JsonDocument packageManifest = JsonDocument.Parse(
+            File.ReadAllText(ModuleLayout.ResolveModulePath("eng/release-packages.json")));
+        int packageCount = packageManifest.RootElement.GetProperty("packages").GetArrayLength();
+        Match declaredPackageCount = Regex.Match(workflow, @"(?m)^      expected-package-count: (\d+)$");
+        declaredPackageCount.Success.ShouldBeTrue();
+        int.Parse(declaredPackageCount.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture)
+            .ShouldBe(packageCount);
         workflow.ShouldContain("reserved-version: ${{ needs.plan-release.outputs.version }}");
         workflow.Split("timeout-minutes: 10").Length.ShouldBe(3);
         workflow.ShouldContain("publish-containers: false");
@@ -178,6 +204,7 @@ public sealed class PackageInventoryTests
         workflow.ShouldContain("if: needs.verify-source.outputs.publish-enabled == 'true'");
         workflow.ShouldContain("needs.plan-release.outputs.release-required == 'true'");
         workflow.ShouldContain("publication and post-publication assertions will be skipped");
+        workflow.ShouldContain("$GITHUB_STEP_SUMMARY");
     }
 
     [Fact]
@@ -188,6 +215,8 @@ public sealed class PackageInventoryTests
         string codeQl = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/codeql.yml"));
 
         commitlint.ShouldContain("'chore'");
+        dependabot.ShouldContain("package-ecosystem: \"gitsubmodule\"");
+        dependabot.ShouldNotContain("package-ecosystem: \"nuget\"");
         dependabot.Split("prefix: \"chore(deps)\"").Length.ShouldBe(3);
         dependabot.ShouldContain("prefix: \"ci(deps)\"");
         codeQl.ShouldContain("languages: csharp,javascript-typescript");

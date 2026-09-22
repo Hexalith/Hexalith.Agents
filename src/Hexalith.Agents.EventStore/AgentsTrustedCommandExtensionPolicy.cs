@@ -26,6 +26,8 @@ internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId) : 
 
     private readonly string _agentsAppId = agentsAppId;
 
+    internal string AgentsAppId => _agentsAppId;
+
     public bool Claims(string domain, string commandType, string key)
         => string.Equals(domain, AgentDomain, StringComparison.Ordinal)
             && _setupCommandTypes.Contains(commandType)

@@ -157,15 +157,25 @@ $focusedSuites = @(
         Assembly = 'test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll'
         Classes  = @(
             'Hexalith.Agents.Server.Tests.AgentAdministrationOrchestratorTests',
-            'Hexalith.Agents.Server.Tests.AgentActivationApproverRevalidationTests',
             'Hexalith.Agents.Server.Tests.AgentProviderSelectionOrchestratorTests',
-            'Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests',
             'Hexalith.Agents.Server.Tests.EventStoreAgentCommandDispatcherTests',
-            'Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests',
             'Hexalith.Agents.Server.Tests.AgentInteractionRequestOrchestratorTests',
             'Hexalith.Agents.Server.Tests.ServerSerializationConformanceTests'
         )
-        Gate = 'AC1/AC4 live command dispatch, enum-compatibility wiring, and later interaction snapshot propagation'
+        Gate = 'AC1/AC3 live dispatch and safe command-result mapping'
+    },
+    @{
+        Assembly = 'test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll'
+        Classes  = @('Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests')
+        Gate = 'AC1/AC2/AC5 gateway admission, exact replay, and reserved-extension trust'
+    },
+    @{
+        Assembly = 'test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll'
+        Classes  = @(
+            'Hexalith.Agents.Server.Tests.AgentActivationApproverRevalidationTests',
+            'Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests'
+        )
+        Gate = 'AC4/AC6/AC7 activation version fence and fail-closed retry lanes'
     },
     @{
         Assembly = 'test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll'
@@ -181,7 +191,7 @@ $focusedSuites = @(
             'Hexalith.Agents.UI.Tests.AgentConfigurationTests',
             'Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests'
         )
-        Gate = 'AC2 FrontComposer truth flow without callability inference'
+        Gate = 'AC3/AC4 FrontComposer truth flow and retained activation attempt'
     }
 )
 
@@ -194,12 +204,12 @@ $compositionSuites = @(
             'Hexalith.Agents.Server.Tests.HttpAgentAdministrationContextProviderTests',
             'Hexalith.Agents.Server.Tests.AgentsOperationEndpointsTests'
         )
-        Gate = 'the server container resolves the live dispatcher, operations, and trusted context provider'
+        Gate = 'AC1/AC5 the server container resolves live dispatch and trusted gateway composition'
     },
     @{
         Assembly = 'test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll'
         Classes  = @('Hexalith.Agents.UI.Tests.AgentsUiCompositionTests')
-        Gate     = 'the FrontComposer container resolves the live setup gateway only when an Agent target is named'
+        Gate     = 'AC3/AC4 the FrontComposer container resolves the live setup gateway only when an Agent target is named'
     }
 )
 
@@ -269,7 +279,7 @@ function Invoke-TestClasses {
     }
 
     foreach ($class in $Classes) {
-        $arguments = @($assemblyPath, '-class', $class)
+        $arguments = @($assemblyPath, '-class', $class, '-failSkips')
         $nativeErrorPreference = $PSNativeCommandUseErrorActionPreference
         try {
             # Capture both successful and failing output so a failed focused class always remains diagnosable.
@@ -292,8 +302,14 @@ function Invoke-TestClasses {
         $executed = 0
         $sawSummary = $false
         foreach ($line in $output) {
-            foreach ($match in [regex]::Matches([string] $line, 'Total:\s*(\d+)')) {
+            foreach ($match in [regex]::Matches([string] $line, 'Total:\s*(\d+),\s*Errors:\s*\d+,\s*Failed:\s*\d+,\s*Skipped:\s*(\d+),\s*Not Run:\s*(\d+)')) {
                 $sawSummary = $true
+                $skipped = [int] $match.Groups[2].Value
+                $notRun = [int] $match.Groups[3].Value
+                if ($skipped -gt 0 -or $notRun -gt 0) {
+                    throw "Gate '$Name' skipped or did not run tests in class '$class'."
+                }
+
                 $executed += [int] $match.Groups[1].Value
             }
         }
@@ -341,7 +357,7 @@ try {
 
     foreach ($testProject in $testProjects) {
         Invoke-Gate -Name "regression — $testProject" -Arguments @(
-            'test', $testProject, '-c', 'Debug', '--no-build'
+            'test', $testProject, '-c', 'Debug', '--no-build', '-p:UseHexalithProjectReferences=true'
         )
     }
 

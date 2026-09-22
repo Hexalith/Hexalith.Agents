@@ -2,7 +2,7 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
 review_loop_iteration: 10
@@ -621,11 +621,11 @@ Readiness gate: `python3 tools/check-story-review-readiness.py _bmad-output/impl
 
 **Patch**
 
-- [ ] [Review][Patch] Canonical idempotency intent preserves JSON spelling instead of normalizing the declared command semantics, so equivalent payload casing can conflict under the same key [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:50]
-- [ ] [Review][Patch] Numeric legacy compatibility depends on implicit enum ordinals, so a future insertion can silently reinterpret an already-shipped payload [src/Hexalith.Agents.Contracts/Agent/AgentSetupTruthState.cs:29]
-- [ ] [Review][Patch] The tolerant enum converter is not total for valid wide or unsigned enum backing types and can degrade declared numeric values or throw on unsigned extremes [src/Hexalith.Agents.Contracts/Serialization/UnknownFallbackEnumConverter.cs:35]
-- [ ] [Review][Patch] `AddAgentsEventStore` accepts a whitespace-padded app id that can never match the canonical Dapr caller claim [src/Hexalith.Agents.EventStore/AgentsEventStoreServiceCollectionExtensions.cs:20]
-- [ ] [Review][Patch] Re-registering `AddAgentsEventStore` with a different app id silently keeps the first trusted policy instead of rejecting conflicting gateway configuration [src/Hexalith.Agents.EventStore/AgentsEventStoreServiceCollectionExtensions.cs:30]
+- [x] [Review][Patch] Canonical idempotency intent preserves JSON spelling instead of normalizing the declared command semantics, so equivalent payload casing can conflict under the same key [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:50]
+- [x] [Review][Patch] Numeric legacy compatibility depends on implicit enum ordinals, so a future insertion can silently reinterpret an already-shipped payload [src/Hexalith.Agents.Contracts/Agent/AgentSetupTruthState.cs:29]
+- [x] [Review][Patch] The tolerant enum converter is not total for valid wide or unsigned enum backing types and can degrade declared numeric values or throw on unsigned extremes [src/Hexalith.Agents.Contracts/Serialization/UnknownFallbackEnumConverter.cs:35]
+- [x] [Review][Patch] `AddAgentsEventStore` accepts a whitespace-padded app id that can never match the canonical Dapr caller claim [src/Hexalith.Agents.EventStore/AgentsEventStoreServiceCollectionExtensions.cs:20]
+- [x] [Review][Patch] Re-registering `AddAgentsEventStore` with a different app id silently keeps the first trusted policy instead of rejecting conflicting gateway configuration [src/Hexalith.Agents.EventStore/AgentsEventStoreServiceCollectionExtensions.cs:30]
 
 #### Rejected
 
@@ -656,16 +656,16 @@ Readiness gate: `python3 tools/check-story-review-readiness.py _bmad-output/impl
 
 **Patch**
 
-- [ ] [Review][Patch] Focused-test floors and skip rejection are enforced by no automated lane, and the source-mode-only Server suites are compiled out of every CI build [eng/verify-story.ps1:18] -- `eng/verify-story.ps1` is the only place that passes `--minimum-expected-tests` and `--fail-skips on`, and no workflow invokes it: `.github/workflows/ci.yml` delegates to the pinned `domain-ci.yml`, whose Microsoft.Testing.Platform step passes neither and exposes no input for them, and the only `eng/` call in CI is `./eng/verify-story-5.2.ps1 -PackageFloorOnly`. `PackageInventoryTests` pins the floor numbers by reading the script text, never by executing it. Compounding it, `Directory.Build.props:29` forces package mode whenever `GITHUB_ACTIONS` is true, so `HexalithConversationsFromSource` is never true in CI and `test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj:13` always removes `ConversationClientContextReaderTests.cs` and `ConversationClientResponsePosterTests.cs` from compilation -- exactly the Debug/Release Server delta the new floors encode. Tests that stop being discovered, get skipped, or get compiled out stay green on `main`. Decided: run the floors and `--fail-skips on` in the repo-owned `agents-policy` job, accepting a second test execution in CI so enforcement stays under this repository's control. Verification Gap Reviewer, Edge Case Hunter, and Acceptance Auditor.
-- [ ] [Review][Patch] The reusable-workflow pin and the checked-in `Hexalith.Builds` gitlink are fourteen commits apart with nothing asserting they agree [.github/workflows/ci.yml:18] -- `ci.yml` and `release.yml` pin `domain-ci.yml`/`domain-release.yml` at `cb91511`, while this change moves `references/Hexalith.Builds` to `410bd59`. The `agents-policy` job then runs `./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1` against `./references/Hexalith.Builds/Props/Directory.Packages.props` -- tooling and catalog from the gitlink, workflow logic from the older pin. Decided: move the pin to the current gitlink and add a CI step failing when `git -C references/Hexalith.Builds rev-parse HEAD` differs from the pinned revision, so the coupling is explicit. Blind Hunter and Edge Case Hunter.
-- [ ] [Review][Patch] `Invoke-TestClasses` accepts a focused class whose every test was skipped or not run [eng/verify-story-5.2.ps1:293] -- the guard sums `Total:` from the xUnit summary line, which counts skipped and not-run alongside executed, and passes no `-failSkips`. A focused class whose facts all carry `Skip=` yields a positive total, exit zero, and a green gate. The sibling `eng/verify-story.ps1` passes `--fail-skips on`, so the two verifiers disagree about whether a skipped test counts as Story 5.2 evidence -- and the checked-off row above that noted `Total:` includes skipped and not-run did not close it. Acceptance Auditor and Edge Case Hunter.
-- [ ] [Review][Patch] A frozen release run reports fully green, so an operator cannot tell a dispatch published nothing [.github/workflows/release.yml:24] -- when `vars.HEXALITH_RELEASE_PUBLISH_ENABLED` is not exactly `true`, the gate step writes a `::notice`, every later step in `verify-source` is skipped by its own `if:`, and all downstream jobs are skipped. The dispatch finishes with an all-green run and no step summary. Blind Hunter.
-- [ ] [Review][Patch] The `agents-policy` job persists checkout credentials and skips the signature audit its release sibling performs [.github/workflows/ci.yml:34] -- every `actions/checkout` in `release.yml` sets `persist-credentials: false` and pairs `npm ci --ignore-scripts` with `npm audit signatures`; this job does neither while running third-party tooling from the same lockfile. Blind Hunter.
-- [ ] [Review][Patch] `expected-package-count` can drift from the release manifest with every test still green [.github/workflows/release.yml:128] -- the workflow input restates a count that `eng/release-packages.json` already expresses. `PackageInventoryTests` asserts the manifest length against its own expected list and separately asserts the literal `expected-package-count: 6` string, so adding a package and updating the test list leaves the workflow input stale and every test passing; the mismatch surfaces mid-release, after packing and tagging. Derive the input from the manifest, or assert the two agree. Blind Hunter and Edge Case Hunter.
-- [ ] [Review][Patch] The CI test-project list is never cross-checked against the test projects on disk [.github/workflows/ci.yml:23] -- `unit-test-projects` is tied to reality only by string containment checks in `PackageInventoryTests`. `ModuleLayout.ProjectFiles` already enumerates `test/` from disk, but nothing compares the two, so a test project added later would simply never run in CI and no test would say so. Verification Gap Reviewer.
-- [ ] [Review][Patch] The verifier's regression run omits the dependency-mode flag its own build step passes [eng/verify-story-5.2.ps1:344] -- the restore and build gates pass `-p:UseHexalithProjectReferences=true`, but the regression `dotnet test ... -c Debug --no-build` does not, so under `GITHUB_ACTIONS` the property defaults to `false` and test evaluation resolves package mode against source-mode build output. Edge Case Hunter.
-- [ ] [Review][Patch] Verifier gate labels stop at AC4, so the fail-closed, replay, and approver lanes report under the wrong criterion [eng/verify-story-5.2.ps1:154] -- the file's own comment states each class list names the suites that prove one acceptance criterion, but the labels cover AC1 through AC4 only; the classes proving the later criteria are folded into the AC1/AC4 label and the two composition gates carry no criterion at all. Acceptance Auditor.
-- [ ] [Review][Patch] Dependabot has no `gitsubmodule` ecosystem while its `nuget` entry now has nothing local to update [.github/dependabot.yml:3] -- this change removes every local `PackageVersion` row in favour of the shared catalog, leaving the nuget updater without a manifest row to bump, while the six `references/*` gitlinks this change moves are the repository's real dependency surface and are not covered. Blind Hunter and Edge Case Hunter.
+- [x] [Review][Patch] Focused-test floors and skip rejection are enforced by no automated lane, and the source-mode-only Server suites are compiled out of every CI build [eng/verify-story.ps1:18] -- `eng/verify-story.ps1` is the only place that passes `--minimum-expected-tests` and `--fail-skips on`, and no workflow invokes it: `.github/workflows/ci.yml` delegates to the pinned `domain-ci.yml`, whose Microsoft.Testing.Platform step passes neither and exposes no input for them, and the only `eng/` call in CI is `./eng/verify-story-5.2.ps1 -PackageFloorOnly`. `PackageInventoryTests` pins the floor numbers by reading the script text, never by executing it. Compounding it, `Directory.Build.props:29` forces package mode whenever `GITHUB_ACTIONS` is true, so `HexalithConversationsFromSource` is never true in CI and `test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj:13` always removes `ConversationClientContextReaderTests.cs` and `ConversationClientResponsePosterTests.cs` from compilation -- exactly the Debug/Release Server delta the new floors encode. Tests that stop being discovered, get skipped, or get compiled out stay green on `main`. Decided: run the floors and `--fail-skips on` in the repo-owned `agents-policy` job, accepting a second test execution in CI so enforcement stays under this repository's control. Verification Gap Reviewer, Edge Case Hunter, and Acceptance Auditor.
+- [x] [Review][Patch] The reusable-workflow pin and the checked-in `Hexalith.Builds` gitlink are fourteen commits apart with nothing asserting they agree [.github/workflows/ci.yml:18] -- `ci.yml` and `release.yml` pin `domain-ci.yml`/`domain-release.yml` at `cb91511`, while this change moves `references/Hexalith.Builds` to `410bd59`. The `agents-policy` job then runs `./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1` against `./references/Hexalith.Builds/Props/Directory.Packages.props` -- tooling and catalog from the gitlink, workflow logic from the older pin. Decided: move the pin to the current gitlink and add a CI step failing when `git -C references/Hexalith.Builds rev-parse HEAD` differs from the pinned revision, so the coupling is explicit. Blind Hunter and Edge Case Hunter.
+- [x] [Review][Patch] `Invoke-TestClasses` accepts a focused class whose every test was skipped or not run [eng/verify-story-5.2.ps1:293] -- the guard sums `Total:` from the xUnit summary line, which counts skipped and not-run alongside executed, and passes no `-failSkips`. A focused class whose facts all carry `Skip=` yields a positive total, exit zero, and a green gate. The sibling `eng/verify-story.ps1` passes `--fail-skips on`, so the two verifiers disagree about whether a skipped test counts as Story 5.2 evidence -- and the checked-off row above that noted `Total:` includes skipped and not-run did not close it. Acceptance Auditor and Edge Case Hunter.
+- [x] [Review][Patch] A frozen release run reports fully green, so an operator cannot tell a dispatch published nothing [.github/workflows/release.yml:24] -- when `vars.HEXALITH_RELEASE_PUBLISH_ENABLED` is not exactly `true`, the gate step writes a `::notice`, every later step in `verify-source` is skipped by its own `if:`, and all downstream jobs are skipped. The dispatch finishes with an all-green run and no step summary. Blind Hunter.
+- [x] [Review][Patch] The `agents-policy` job persists checkout credentials and skips the signature audit its release sibling performs [.github/workflows/ci.yml:34] -- every `actions/checkout` in `release.yml` sets `persist-credentials: false` and pairs `npm ci --ignore-scripts` with `npm audit signatures`; this job does neither while running third-party tooling from the same lockfile. Blind Hunter.
+- [x] [Review][Patch] `expected-package-count` can drift from the release manifest with every test still green [.github/workflows/release.yml:128] -- the workflow input restates a count that `eng/release-packages.json` already expresses. `PackageInventoryTests` asserts the manifest length against its own expected list and separately asserts the literal `expected-package-count: 6` string, so adding a package and updating the test list leaves the workflow input stale and every test passing; the mismatch surfaces mid-release, after packing and tagging. Derive the input from the manifest, or assert the two agree. Blind Hunter and Edge Case Hunter.
+- [x] [Review][Patch] The CI test-project list is never cross-checked against the test projects on disk [.github/workflows/ci.yml:23] -- `unit-test-projects` is tied to reality only by string containment checks in `PackageInventoryTests`. `ModuleLayout.ProjectFiles` already enumerates `test/` from disk, but nothing compares the two, so a test project added later would simply never run in CI and no test would say so. Verification Gap Reviewer.
+- [x] [Review][Patch] The verifier's regression run omits the dependency-mode flag its own build step passes [eng/verify-story-5.2.ps1:344] -- the restore and build gates pass `-p:UseHexalithProjectReferences=true`, but the regression `dotnet test ... -c Debug --no-build` does not, so under `GITHUB_ACTIONS` the property defaults to `false` and test evaluation resolves package mode against source-mode build output. Edge Case Hunter.
+- [x] [Review][Patch] Verifier gate labels stop at AC4, so the fail-closed, replay, and approver lanes report under the wrong criterion [eng/verify-story-5.2.ps1:154] -- the file's own comment states each class list names the suites that prove one acceptance criterion, but the labels cover AC1 through AC4 only; the classes proving the later criteria are folded into the AC1/AC4 label and the two composition gates carry no criterion at all. Acceptance Auditor.
+- [x] [Review][Patch] Dependabot has no `gitsubmodule` ecosystem while its `nuget` entry now has nothing local to update [.github/dependabot.yml:3] -- this change removes every local `PackageVersion` row in favour of the shared catalog, leaving the nuget updater without a manifest row to bump, while the six `references/*` gitlinks this change moves are the repository's real dependency surface and are not covered. Blind Hunter and Edge Case Hunter.
 
 **Deferred**
 
@@ -715,14 +715,14 @@ Code review of Story 5.2 **product chunk 1** (EventStore integration, Agents con
 
 Code review of Story 5.2 **EventStore integration chunk** (`src/Hexalith.Agents.EventStore/` and `references/` gitlinks; 15 files, +251 / −6, baseline `599208dd` → working tree), 2026-09-22. Four layers, none failed. Readiness gate passed earlier (5 projects, 3043/3043, File List 193/193) and is only a floor. Remaining chunks: server orchestration, aggregate and contracts, UI, tests, packaging/tooling/docs.
 
-- [ ] [Review][Patch] Setup idempotency hashes the raw JSON payload instead of the semantic command [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:52]
-- [ ] [Review][Patch] Replay retention tier and canonical intent bytes are not pinned outside one process [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:27]
-- [ ] [Review][Patch] Activation-only trusted keys are not tested on create, disable, or response-mode commands [src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs:33]
-- [ ] [Review][Patch] Administrator extension value "false" is not in the accept theory [src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs:61]
-- [ ] [Review][Patch] Expected configuration version "0" is not in the accept theory [src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs:81]
-- [ ] [Review][Patch] A Dapr identity carrying the allow-listed app id plus another app id is not tested [src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs:53]
-- [ ] [Review][Patch] A non-agent domain is not tested on the setup intent adapter [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:32]
-- [ ] [Review][Patch] The domain host's ban on gateway registration is only a source-text scan [src/Hexalith.Agents.EventStore/AgentsEventStoreServiceCollectionExtensions.cs:20]
+- [x] [Review][Patch] Setup idempotency hashes the raw JSON payload instead of the semantic command [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:52]
+- [x] [Review][Patch] Replay retention tier and canonical intent bytes are not pinned outside one process [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:27]
+- [x] [Review][Patch] Activation-only trusted keys are not tested on create, disable, or response-mode commands [src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs:33]
+- [x] [Review][Patch] Administrator extension value "false" is not in the accept theory [src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs:61]
+- [x] [Review][Patch] Expected configuration version "0" is not in the accept theory [src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs:81]
+- [x] [Review][Patch] A Dapr identity carrying the allow-listed app id plus another app id is not tested [src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs:53]
+- [x] [Review][Patch] A non-agent domain is not tested on the setup intent adapter [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:32]
+- [x] [Review][Patch] The domain host's ban on gateway registration is only a source-text scan [src/Hexalith.Agents.EventStore/AgentsEventStoreServiceCollectionExtensions.cs:20]
 - [x] [Review][Defer] Five submodule pins besides EventStore are not shown to be required by this integration [references/Hexalith.Builds] — deferred: maybe-false, medium if true. Settle by rebuilding `Hexalith.Agents.EventStore` against the previous Builds, Commons, Conversations, FrontComposer, and PolymorphicSerializations pins.
 
 #### Rejected
@@ -1307,6 +1307,19 @@ submodule history is preserved. Reapply the round-5 KEEP behavior selectively. D
 | edge-case-hunter-r16 | The dependency-review reusable workflow uses a mutable `@main` ref. | medium | defer | carried: upstream movement can alter the dependency gate without local review; the existing immutable-revision ledger item remains authoritative. |
 | edge-case-hunter-r16 | A quoted `baseline_commit` can carry trailing non-comment tokens. | low | reject | carried: malformed frontmatter is not an everyday path, and adding a dedicated trailing-token guard is disproportionate to this setup slice. |
 | edge-case-hunter-r16-claim | Canonical rejected outcomes are unavailable through the deferred status reader. | false | reject | carried: the fallback is intentionally fail-closed and disclosed pending the tenant-scoped live reader; it returns unknown rather than misclassifying a rejection. |
+| blind-hunter-r17 | Setup queries accept fresh tenant membership as Agents administrator authority. | high | defer | `AgentSetupQueryHandlerBase.IsAgentsAdminAsync` returns true for a fresh `ITenantAccessReader` result without checking the Agents administrator role, while the public operations path requires that role. This pre-existing query authorization path can disclose administrator setup data to an ordinary tenant member. |
+| blind-hunter-r17 | A malformed known Agent event advances the setup projection checkpoint. | high | defer | carried: deserialization can return null while `Fold` advances sequence; the pre-existing corruption policy is recorded in the deferred-work ledger. |
+| blind-hunter-r17 | A future resolved Agent event omitted from `Apply` would advance the checkpoint. | low | reject | The current switch applies the state-changing Agent events and intentionally ignores rejection events; the claimed bad outcome requires a future contract addition that also omits projection handling, and an extra defensive dispatch branch adds complexity without fixing a current delivery. |
+| blind-hunter-r17 | A malformed Provider Catalog event can leave a partial projection write. | high | defer | `ProviderCatalogProjectionFold.Fold` stops when deserialization returns null, but the handler writes the returned partial model and can acknowledge the delivery; this pre-existing corruption behavior needs a projection failure policy. |
+| blind-hunter-r17 | No live setup command-status reader is registered. | false | reject | carried: the deferred reader intentionally returns unknown pending the tenant-scoped Story 5.6 binding, so a payload-less result remains unverifiable rather than being misclassified as a rejection. |
+| blind-hunter-r17 | Rejected and Blocked setup outcomes map to retryable Unavailable in the UI. | medium | defer | carried: the terminal UI mapping remains coupled to the deliberately deferred live status reader and is owned by DW-12. |
+| blind-hunter-r17 | A direct trusted CreateAgent command can store a body tenant different from its envelope tenant. | high | defer | The supplied orchestrator rewrites the body tenant, but `AgentAggregate.Handle(CreateAgent)` persists `command.TenantId` without comparing it to `envelope.TenantId`. A direct or misconfigured trusted command can cross scopes; this pre-existing domain invariant is already recorded in the deferred ledger and the completed 5.2 follow-up spec. |
+| blind-hunter-r17 | Three inherited security workflows use mutable `@main` refs. | medium | defer | carried: CodeQL, commitlint, and dependency-review can change with an upstream branch movement; the existing immutable-revision ledger item owns this inherited work. |
+| blind-hunter-r17 | A stray NuGet archive in `nupkgs` can be published. | medium | defer | `pack-release-packages.py` preserves archives outside the manifest while `publish-release-packages.sh` pushes the entire `nupkgs/*.nupkg` glob; a stray archive can bypass the manifest preflight in this inherited release tooling. |
+| blind-hunter-r17 | Multi-package publication cannot resume after a partial push. | high | defer | carried: the inherited all-absent preflight plus non-transactional push can strand an immutable partial version set. |
+| blind-hunter-r17 | GitHub Release verification checks asset names but not bytes. | medium | defer | carried: the inherited verifier accepts corrupted or substituted assets with expected names; the release-hardening ledger item remains authoritative. |
+| blind-hunter-r17 | The configuration page uses sibling titled sections instead of `FluentAccordion`. | medium | defer | carried: DW-18 records this pre-existing UX violation; the current pass adds no titled section. |
+| edge-case-hunter-r17 | Provider Catalog writes return Unavailable under configured live setup composition. | false | reject | The round-9 decision deliberately keeps catalog writes deferred pending Story 5.3; `ProviderCatalogCompositionTests.A_configured_gateway_keeps_catalog_writes_unavailable_while_resolving_projected_reads` pins the fail-closed behavior while reads remain live. |
 
 ## Design Notes
 
@@ -1342,16 +1355,16 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-22T08:26:05Z
+Run (UTC): 2026-09-22T20:24:20Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Contracts.Tests | 548 | 548 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 585 | 585 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Contracts.Tests | 687 | 687 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 611 | 611 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 805 | 805 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1099 | 1099 | 0 | 0 | 0 | 0 |
-| **Total** | 3043 | 3043 | 0 | 0 | 0 | 0 |
+| **Total** | 3208 | 3208 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->
@@ -1359,7 +1372,9 @@ Result: PASS
 
 #### Story 5.2 files
 
+- `.github/dependabot.yml`
 - `.github/workflows/ci.yml`
+- `.github/workflows/release.yml`
 - `Directory.Packages.props`
 - `Hexalith.Agents.slnx`
 - `_bmad-output/implementation-artifacts/deferred-work.md`
@@ -1465,6 +1480,7 @@ Result: PASS
 - `src/Hexalith.Agents/Agent/AgentState.cs`
 - `test/Hexalith.Agents.Contracts.Tests/AgentContractsRoundTripTests.cs`
 - `test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs`
+- `test/Hexalith.Agents.Contracts.Tests/WideSignedToleranceStatus.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentActivationApproverRevalidationTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentAdministrationOrchestratorTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentApproverPolicyOrchestratorTests.cs`
@@ -1512,11 +1528,9 @@ These paths entered the baseline diff through the linearly developed Story 5.1 b
 tooling, documentation, and submodule-pointer commits after Story 5.2's implementation commits. They are listed only
 to keep the readiness gate's baseline-diff reconciliation complete; Story 5.2 does not claim them as its work.
 
-- `.github/dependabot.yml`
 - `.github/workflows/codeql.yml`
 - `.github/workflows/commitlint.yml`
 - `.github/workflows/dependency-review.yml`
-- `.github/workflows/release.yml`
 - `.releaserc.json`
 - `Directory.Build.props`
 - `_bmad-output/implementation-artifacts/deferred-work-archive.md`
@@ -1524,6 +1538,7 @@ to keep the readiness gate's baseline-diff reconciliation complete; Story 5.2 do
 - `_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md`
 - `_bmad-output/implementation-artifacts/spec-5-1-correct-platform-hosting-boundary-and-quality-gates.md`
 - `_bmad-output/implementation-artifacts/spec-5-1-establish-build-package-boundary-and-basic-ci-gates.md`
+- `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
 - `_bmad-output/implementation-artifacts/spec-implement-agents-ci-cd.md`
 - `_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/.memlog.md`
 - `_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md`
@@ -1542,7 +1557,9 @@ to keep the readiness gate's baseline-diff reconciliation complete; Story 5.2 do
 - `package.json`
 - `references/Hexalith.Builds`
 - `references/Hexalith.Commons`
+- `references/Hexalith.Memories`
 - `references/Hexalith.PolymorphicSerializations`
+- `references/Hexalith.Tenants`
 - `scripts/pack-release-packages.py`
 - `scripts/publish-release-packages.sh`
 - `scripts/validate-consumer-package-references.py`
@@ -1551,6 +1568,9 @@ to keep the readiness gate's baseline-diff reconciliation complete; Story 5.2 do
 - `scripts/verify-nuget-publication.py`
 - `scripts/verify-release-source.py`
 - `src/Hexalith.Agents.UI/Hexalith.Agents.UI.csproj`
+- `src/Hexalith.Agents.Contracts/Agent/AgentInspectionStatus.cs`
+- `src/Hexalith.Agents.Server/Composition/AgentDomainHostComposition.cs`
+- `src/Hexalith.Agents.Server/Program.cs`
 - `test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs`
 - `test/Hexalith.Agents.Server.Tests/PackageVersionCentralizationTests.cs`
 - `tests/tooling/dependency_commit_contract_test.py`

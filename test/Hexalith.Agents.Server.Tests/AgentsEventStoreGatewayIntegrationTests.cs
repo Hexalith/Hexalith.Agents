@@ -96,6 +96,28 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     }
 
     [Theory]
+    [InlineData(" agents")]
+    [InlineData("agents ")]
+    public void Gateway_registration_rejects_a_padded_Dapr_app_id(string appId)
+    {
+        ServiceCollection services = new();
+
+        Should.Throw<ArgumentException>(() => services.AddAgentsEventStore(appId));
+        services.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void Gateway_registration_rejects_a_conflicting_Dapr_app_id()
+    {
+        ServiceCollection services = new();
+        _ = services.AddAgentsEventStore(AgentsAppId);
+
+        Should.Throw<InvalidOperationException>(() => services.AddAgentsEventStore("other-agents"));
+        using ServiceProvider provider = services.BuildServiceProvider();
+        provider.GetServices<ITrustedCommandExtensionPolicy>().Count().ShouldBe(1);
+    }
+
+    [Theory]
     [InlineData(nameof(ActivateAgent), "Hexalith.Agents.EventStore.ActivateAgent.v1", "agents.setup.activate", 1)]
     [InlineData(nameof(ConfigureAgentResponseMode), "Hexalith.Agents.EventStore.ConfigureAgentResponseMode.v1", "agents.setup.response-mode", 1)]
     [InlineData(nameof(CreateAgent), "Hexalith.Agents.EventStore.CreateAgent.v1", "agents.setup.create", 1)]
@@ -401,6 +423,8 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             .ConfigureAwait(true)).ShouldNotBeNull();
         admission.ObservedRetentionTier.ShouldBe(IdempotencyReplayRetentionTier.Mutation);
         admission.ObservedIntentDigest.ShouldBe(await IntentDigestAsync(descriptor).ConfigureAwait(true));
+        // A fixed cross-run digest catches accidental canonical-byte or retention-policy drift.
+        admission.ObservedIntentDigest.ShouldBe("xwzhj031wJ2Up6cE0vPZaOY6M2ZH7WsxcdBkiLf-0No");
 
         using HttpResponseMessage replayResponse = await client
             .PostAsJsonAsync("/api/v1/commands", spelled)

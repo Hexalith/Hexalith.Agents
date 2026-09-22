@@ -33,6 +33,8 @@ jobs:
           else
             echo "publish-enabled=false" >> "$GITHUB_OUTPUT"
             echo "::notice title=Release publication frozen::HEXALITH_RELEASE_PUBLISH_ENABLED is not exactly the string 'true'; publication and post-publication assertions will be skipped."
+            echo "## Release publication frozen" >> "$GITHUB_STEP_SUMMARY"
+            echo "No packages were published. Set HEXALITH_RELEASE_PUBLISH_ENABLED to exactly true and dispatch again when publication is intended." >> "$GITHUB_STEP_SUMMARY"
           fi
       - uses: actions/checkout@v7.0.1
         if: steps.publication-gate.outputs.publish-enabled == 'true'
@@ -111,7 +113,7 @@ jobs:
       id-token: write
       issues: write
       pull-requests: write
-    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-release.yml@cb91511794c8898b738d85dc6c751f82b832cbc9
+    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-release.yml@2fba3497043fe5ffcfe4dc44c51a09eae9b950ab
     with:
       solution: Hexalith.Agents.slnx
       test-platform: microsoft-testing-platform
@@ -121,7 +123,7 @@ jobs:
       governed-release: false
       publish-containers: false
       container-projects: ''
-      builds-execution-sha: cb91511794c8898b738d85dc6c751f82b832cbc9
+      builds-execution-sha: 2fba3497043fe5ffcfe4dc44c51a09eae9b950ab
       source-branch: main
       source-ci-workflow: ci.yml
       package-manifest: eng/release-packages.json
