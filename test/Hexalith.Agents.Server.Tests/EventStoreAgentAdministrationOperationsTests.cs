@@ -437,6 +437,20 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     }
 
     [Fact]
+    public async Task An_unauthorized_read_never_echoes_noncanonical_correlation_metadata()
+    {
+        SeedProjectedSetup(configurationVersion: 2);
+        _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "intruder", IsAgentsAdmin: false));
+
+        AgentOperationResult<AgentSetupResult> result = await Operations().GetStatusAsync(
+            AgentId,
+            options: new AgentOperationOptions(CorrelationId: "not-a-ulid"));
+
+        result.Value.ShouldNotBeNull().Status.ShouldBe(AgentInspectionStatus.NotAuthorized);
+        result.CorrelationId.ShouldBeNull();
+    }
+
+    [Fact]
     public async Task A_caller_from_another_tenant_cannot_read_the_agent()
     {
         SeedProjectedSetup(configurationVersion: 2);
@@ -634,6 +648,28 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     }
 
     [Fact]
+    public async Task A_status_reader_timeout_keeps_a_payload_less_receipt_unverifiable()
+    {
+        _gateway
+            .SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                SubmitCommandRequest request = call.ArgAt<SubmitCommandRequest>(0);
+                return new SubmitCommandResponse(request.CorrelationId!, null, request.MessageId);
+            });
+
+        // A transport timeout surfaces as a cancellation the caller never requested.
+        _statusReader
+            .WasRejectedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns<Task<bool?>>(_ => throw new TaskCanceledException("status read timed out"));
+
+        AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(AgentId, new DisableAgent());
+
+        result.Status.ShouldBe(AgentOperationStatus.UnableToVerify);
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.UnableToVerify);
+    }
+
+    [Fact]
     public async Task A_receipt_identity_mismatch_never_queries_command_status()
     {
         _gateway
@@ -798,6 +834,17 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         result.IsSuccess.ShouldBeFalse();
         result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.Unavailable);
         await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task Out_of_scope_administration_commands_never_echo_noncanonical_correlation_metadata()
+    {
+        AgentOperationResult result = await Operations().SelectProviderModelAsync(
+            new SelectAgentProviderModel("openai", "gpt-x", 1),
+            new AgentOperationOptions(CorrelationId: "not-a-ulid"));
+
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.Unavailable);
+        result.CorrelationId.ShouldBeNull();
     }
 
     private SubmitCommandRequest? _lastSubmit;

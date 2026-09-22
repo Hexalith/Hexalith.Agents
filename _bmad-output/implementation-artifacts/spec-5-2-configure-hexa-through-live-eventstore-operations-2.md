@@ -734,6 +734,34 @@ Code review of Story 5.2 **EventStore integration chunk** (`src/Hexalith.Agents.
 - `AddAgentsEventStore` accepts a padded app id that matches no Dapr caller — `low`. A padded id fails closed. Trimming it is an extra guard, and everyday composition passes a single unpadded app id. An earlier round left the same item open; this pass does not promote it.
 - A second `AddAgentsEventStore` call with a different app id keeps the first policy — `low`. No owned host registers two app ids. Rejecting the second call would add a branch for undemonstrated misuse. The earlier product-chunk review already rejected this.
 
+### Review Findings
+
+Code review of Story 5.2 **server orchestration chunk** (`src/Hexalith.Agents.Server/**` only; 46 files, +992 / −404, baseline `599208dd` → working tree), 2026-09-23. Four layers, none failed. The readiness gate passed (5 projects, 3208/3208, File List 200/200); that is only a floor. Remaining chunks: aggregate and contracts, UI and UI tests, Server/Agents/Contracts tests, packaging/tooling/docs, and planning artifacts.
+
+- [x] [Review][Patch] Activation remarks name the reserved key `activation:expectedConfigurationVersion`, but the constant and the gateway policy use `agent:activationExpectedConfigurationVersion` [src/Hexalith.Agents.Server/Application/Agents/AgentActivationProviderRevalidation.cs:29]
+- [x] [Review][Patch] No test shows that a status-reader `OperationCanceledException` the caller did not request keeps a payload-less receipt `UnableToVerify` (filed pre-verified by the verification-gap layer). Removing the `when (!cancellationToken.IsCancellationRequested)` catch leaves the suite green. Add a `TaskCanceledException` sibling to `A_status_reader_exception_keeps_a_payload_less_receipt_unverifiable` [test/Hexalith.Agents.Server.Tests/EventStoreAgentAdministrationOperationsTests.cs:617]
+- [x] [Review][Patch] No test shows that a non-canonical correlation id is dropped on a denied setup read or on an out-of-scope command (filed pre-verified by the verification-gap layer). Reverting either site to the raw `options?.CorrelationId` leaves the suite green. Pass `CorrelationId: "not-a-ulid"` and assert `CorrelationId` is null in `An_unauthorized_read_reveals_nothing_about_the_agent` and `Out_of_scope_administration_commands_stay_fail_closed` [test/Hexalith.Agents.Server.Tests/EventStoreAgentAdministrationOperationsTests.cs:428]
+- [x] [Review][Defer] The `Rejected` branch in `WriteAsync` cannot be reached, because every composition registers only `DeferredAgentCommandStatusReader`. A domain-rejected setup command, such as a stale or blocked activation, therefore returns a retryable `UnableToVerify` [src/Hexalith.Agents.Server/Composition/AgentSetupServiceCollectionExtensions.cs:52] — deferred: pre-existing and already tracked by DW-7, DW-12, DW-19, DW-24, and DW-25. Blind Hunter, Edge Case Hunter, and Verification Gap.
+
+#### Rejected
+
+- `AlreadyApplied` is reported as `ProjectionConfirmed` with no projection read — rejected: the fix edits the spec. The frozen matrix no-op row requires stopping without polling. The Group 1 review rejected the same claim.
+- A stale activation with no `Idempotency-Key` is dispatched with a freshly minted key that can never replay — `low`. The aggregate's N fence still prevents activation. The endless `UnableToVerify` retry is the DW-7 outcome and becomes `Rejected` once the live reader is bound. A no-dispatch short-circuit would add a branch, and only for API callers that omit the key; the UI always retains one.
+- An absent, foreign, or older projection and a gateway 404 all return `Unavailable` — rejected: the fix edits the spec. AC6 requires `Unavailable` for those projection lanes, and the round-16 patch deliberately mapped an unqualified 404 to `Unavailable`.
+- Live provider-catalog writes were removed and `EventStoreProviderCatalogOperations` is orphaned — `false`. This is the round-9 decision, pinned by `ProviderCatalogCompositionTests.A_configured_gateway_keeps_catalog_writes_unavailable_while_resolving_projected_reads`; completion is DW-14 / Story 5.3.
+- A `BaseUrl` with no `AppId` falls back to Unavailable with no warning — `low`. The Code Map requires this fail-closed fallback. A warning would need a logger in static composition, for a misconfiguration that shows up on the first write.
+- Interaction orchestrators do not strip the activation-version key, and Agent-side orchestrators do not strip `audit:governanceResolved` — `false`. `AgentsTrustedCommandExtensionPolicy.Claims` accepts only domain `agent` setup commands, and the activation key only on `ActivateAgent`, so the gateway rejects any other colon key. `AgentsClient.WithProviderCatalog` also keeps interaction operations unavailable.
+- Canonical ULID and positive-integer validation is duplicated, and `ParseExpectedConfigurationVersion` silently drops a malformed value — `false`. A dropped value reaches `WriteAsync`, which returns `ValidationFailed` when `requiresExpectedConfigurationVersion` is set. The duplication has no named divergence.
+- The HTTP route returns `problem+json` while the SDK returns `ValidationFailed` — `low`. The route validates headers before the client call, as designed. Aligning the two would change the documented 400 contract.
+- Only five routes bind the retry headers, and `ReadSetupAsync` validates a correlation id no endpoint passes — `false`. The other routes are `OutOfScope` and never dispatch (rejected in rounds 2 and 4). SDK callers do pass read options.
+- Status-reader failures and `UnableToVerify` paths are not logged — `low`. The outcome fails closed correctly. The same item was rejected earlier because a logger dependency is more than a direct correction.
+- `ExecuteAsync` and `AttemptReplayAsync` throw on a non-positive version — `false`. `WriteAsync` rejects `ExpectedConfigurationVersion is not > 0` before either one can be reached.
+- Comments moved into `AgentDomainHostComposition` still say the dispatcher stays deferred — `false` as a regression. The block was moved verbatim, and the baseline already replaced the dispatcher. The interaction orchestrators have no live entry point.
+- Canonical ULIDs embed timing, and a lowercase ULID gets a 400 — `low`. The frozen Boundaries require canonical uppercase ULIDs, and round 4 already documented the timing trade.
+- A stale receipt `targetVersion` is not compared with the expected activation version — `false`. The receipt is identity-bound to this message id, and the aggregate executes activation only at exactly N, so an older applied version cannot be produced.
+- Cancellation during the status read throws instead of returning `UnableToVerify` — `false`. The caller requested that cancellation, and the dispatch path propagates caller cancellation the same way.
+- `ExecuteAsync` enforces the exact-version projection rule only through its single caller — `low`. The only caller enforces it today. The method does not receive the projection, so adding a guard means restructuring it for a hypothetical caller.
+
 ## Implementation Notes
 
 - Added the canonical `## Dev Agent Record` and nested `### File List` this story was missing, so the
@@ -1355,7 +1383,7 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-22T21:16:19Z
+Run (UTC): 2026-09-22T21:21:28Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|

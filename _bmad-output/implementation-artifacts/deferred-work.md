@@ -469,3 +469,9 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reject a direct trusted CreateAgent command whose payload tenant differs from the EventStore envelope tenant.
   evidence: `AgentAggregate.Handle(CreateAgent)` stores `command.TenantId` without comparing it to `envelope.TenantId`; the supplied orchestrator rewrites the tenant but a direct or misconfigured trusted caller can bypass that caller-side guard. This repeats the previously recorded domain-invariant risk for this review finding.
+
+## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2.md (2026-09-23)
+
+Server orchestration chunk review. Carried onto existing ledger rows; no new DW keys.
+
+- The `WriteAsync` `Rejected` branch is unreachable because only `DeferredAgentCommandStatusReader` is registered. A domain-rejected setup command, such as a stale or blocked activation, returns a retryable `UnableToVerify`. Carried; owned by DW-7, DW-12, DW-19, DW-24, and DW-25.

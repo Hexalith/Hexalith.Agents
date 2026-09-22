@@ -26,7 +26,7 @@ namespace Hexalith.Agents.Server.Application.Agents;
 /// </summary>
 /// <remarks>
 /// Same trust model as the selection orchestration: <c>actor:agentsAdmin</c>, <c>provider:selectionValidation</c>,
-/// <c>approver:policyValidation</c>, and <c>activation:expectedConfigurationVersion</c> are server-populated only;
+/// <c>approver:policyValidation</c>, and <c>agent:activationExpectedConfigurationVersion</c> are server-populated only;
 /// client-supplied reserved keys are stripped and repopulated from trusted sources. When no selection is recorded the provider verdict stays <c>Unknown</c>; in
 /// Automatic mode or with no configured approver source the approver verdict stays <c>Unknown</c> (the aggregate's
 /// gate ignores it for Automatic). The live reader / resolver / dispatcher bindings are deferred (mirroring Story
