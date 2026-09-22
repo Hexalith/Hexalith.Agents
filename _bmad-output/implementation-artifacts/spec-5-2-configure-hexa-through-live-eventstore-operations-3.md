@@ -64,12 +64,30 @@ context:
 - Given current enum ordinals and a numeric token outside `Int32`, when the tolerant converter reads it, then every shipped ordinal is unchanged and the value is `Unknown`.
 - Given a create, disable, or response-mode command, when it carries an activation-only extension or a mixed Dapr app-id claim, then the trusted policy rejects it before admission.
 
+### Review Findings
+
+- [x] [Review][Patch] Unpinned setup-surface enums can still be renumbered [src/Hexalith.Agents.Contracts/Agent/ApproverPolicyBasisDisclosure.cs:24]
+- [x] [Review][Patch] Create canonical intent is not asserted [test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs:205]
+- [x] [Review][Patch] A payload that is not the declared command is untested [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:69]
+
+**Rejected**
+
+- Composition proof never builds `Program.cs` — `false`. `ServerHostShouldDelegateTheStatusReaderFallbackToSetupComposition` builds `AgentDomainHostComposition` and asserts both adapter collections are empty. Removing `Configure` from `Program.cs` leaves those collections empty too, and `GetServices` still sees a registration when `ValidateOnBuild` is false.
+- Empty configuration hides a live adapter registration — `false`. The `Agents:EventStore:BaseUrl` branch registers a gateway client and dispatcher, not `IIdempotencyIntentAdapter` or `ITrustedCommandExtensionPolicy`.
+- Verification commands pass `--filter-class` — rejected. The only correction is editing this spec.
+- The Code Map and open triage rows disagree with `status: done` — rejected. The only correction is editing this spec.
+- Duplicate `Mode` and `mode` keys collapse to the last value — `low`. `JsonSerializerDefaults.Web` keeps the last value (`AllowDuplicateProperties=True`), which is the declared bind. Rejecting both spellings needs a new guard, and everyday clients do not send both.
+- A whitespace-padded enum name shares an intent — `false`. `FromName` trims by design, so the padded token is that declared member. The padded display-name assertion covers a free-text field.
+- In-flight create and update payloads that omitted nulls are unseeded — `low`. Re-serialization writes those nulls (`DefaultIgnoreCondition=Never`), and the spec wants that byte mismatch to conflict. The shared HTTP conflict test already requires a mismatch to return 409.
+- New deferred-work bullets hide the payload-tenant hash and have no status — `false` for the hash claim. The bullet names `CreateAgent.TenantId` and says this slice hashes the declared payload. Neighboring bullets in that section also omit `status`, and `source_spec` names this story.
+
 ## Implementation Notes
 
 - Setup adapters now pass the declared command type into `AgentSetupIdempotencyIntentAdapter`, which deserializes the payload with `EventStorePayloadSerialization.Options` and re-serializes that contract before the existing canonical encoder. Equivalent spelling and key order share one intent. An in-flight digest built from the previous raw payload conflicts on the gateway HTTP path and does not execute.
 - `AgentSetupWriteEffect`, `AgentOperationStatus`, and `AgentOperationErrorCode` pin their existing ordinals. `UnknownFallbackEnumConverter` reads `long` and `ulong` tokens that do not fit `Int32` and returns `Unknown` without casting them down.
+- The complete setup-view enum graph now has pinned ordinal assertions, including explicit `ApproverPolicyBasisDisclosure` values. Create-command normalization and incompatible payload rejection are covered directly at the adapter registry boundary.
 - Domain-host registration moved unchanged into `AgentDomainHostComposition`. `ServerHostShouldDelegateTheStatusReaderFallbackToSetupComposition` builds that graph and asserts no idempotency adapters or trusted-extension policies are registered.
-- Verification on 2026-09-22, after rebuilding: `Hexalith.Agents.Contracts.Tests` class `AgentOperationContractsTests` passed 322/322; `AgentsEventStoreGatewayIntegrationTests` passed 62/62; `AppHostSecurityTopologyTests` passed 5/5. None skipped.
+- Verification results are recorded in the generated test-evidence block under the Dev Agent Record.
 
 ## Spec Change Log
 
@@ -92,6 +110,24 @@ context:
 | ECH-01 | false | Same duplicate-property claim as BH-03. A probe of `JsonSerializerDefaults.Web` on this SDK kept the last value (`AllowDuplicateProperties=True`), which is the declared bind. | reject |
 | ECH-02 | medium | Same unpinned `AgentResponseMode` and `AgentLifecycleStatus` ordinals as BH-05 and BH-06. Numeric `1` is now part of setup idempotency identity. | patch |
 | VG-01 | medium | Pre-verified. Nothing asserts that `{"value":1}` and `{"value":2}` share one activation or disable intent, or that the second activation HTTP submit replays with one execution. Restoring a raw payload hash would leave the remaining activation checks green. | patch |
+| VG2-01 | low | Pre-verified: the composition test calls `AgentDomainHostComposition.Configure` directly, so deleting the production call would not fail this focused test. The approved proof target is the composed domain graph rather than executable-entrypoint bootstrapping, and adding a second host harness is disproportionate to this hypothetical regression. | reject |
+| ECH2-01 | defer | carried: `CreateAgent.TenantId` can differ from the envelope tenant, as already recorded by BH-11 and the existing deferred-work entry; this slice deliberately does not choose event tenant identity. | defer |
+| ECH2-02 | medium | `FromOrdinal(-1)` can create a declared `ulong.MaxValue` member and then throw from `Convert.ToInt64`, violating the converter's total fallback contract. | patch |
+| ECH2-03 | low | The test builds the extracted composition directly and therefore would not detect deletion of the call in `Program.cs`. That is a hypothetical entrypoint-wiring regression outside the approved composed-graph isolation proof, and an executable host harness is not a proportionate patch here. | reject |
+| BH2-01 | false | `DescriptorVersion` versions the descriptor field schema, which is unchanged; declared-command normalization changes the semantic payload value while intentionally preserving the same operation identity so prior admitted keys conflict. | reject |
+| BH2-02 | false | The frozen intent explicitly hashes declared command semantics, not the aggregate's later storage normalization. Prior BH-02 also records that default-bound command values remain part of that declared object identity. | reject |
+| BH2-03 | defer | carried: the payload/envelope tenant mismatch is the same claim already recorded by BH-11 and the existing deferred-work entry. | defer |
+| BH2-04 | false | The cited `null` and array payloads are rejected as HTTP 400 before mediation because `SubmitCommandRequestValidator` requires an object payload; the direct adapter tests intentionally verify its typed fail-closed boundary. | reject |
+| BH2-05 | false | The gateway assertion proves the coordinator received the digest derived from the resolved descriptor. Exact encoder bytes are not this operation's contract and intentionally changed in this story. | reject |
+| BH2-06 | low | Rebuilding old raw-payload bytes with the shared syntax encoder does not freeze a historical byte fixture, but the required behavior is the raw-versus-declared digest mismatch and conflict; a literal encoder snapshot would add brittle duplication without changing that proof. | reject |
+| BH2-07 | false | EventStore's `AdmitAsync_LiveDifferentIntent_ReturnsConflictWithoutMutation` already covers a terminal admission with a different digest, while this integration test proves the prior Agents encoder produces that different digest. The actor compares intent before replay state. | reject |
+| BH2-08 | low | The focused composition test would stay green if `Program.cs` stopped calling the helper, but executable-entrypoint bootstrapping is not the approved isolation proof and no current wiring is missing. | reject |
+| BH2-09 | low | The diff moves the full registration block unchanged and the focused test verifies the story-relevant absence/presence seams. No omitted registration was identified; full graph parity would be a broad hypothetical regression harness. | reject |
+| BH2-10 | medium | `AgentInspectionStatus` is shipped directly by `AgentSetupResult` yet leaves its nonzero ordinals implicit, contrary to the approved requirement to pin every shipped setup enum. | patch |
+| BH2-11 | medium | The hand-maintained ordinal assertions do not prove that every enum discovered through the setup-contract graph is included, so another setup enum can be added without entering the pin guard. | patch |
+| BH2-12 | false | `Claims` has one command-independent non-activation branch: all activation-only keys are rejected for every non-`ActivateAgent` command before key-specific parsing. Existing rows exercise every command and the distinct branch, so the omitted Cartesian pairs add no behavior. | reject |
+| BH2-13 | medium | The same unsigned-backing defect as ECH2-02 lets a negative ordinal reach a declared `ulong.MaxValue` and overflow instead of returning `Unknown`. | patch |
+| BH2-14 | false | carried: as BH-08 records, the Code Map is historical pre-change planning context; the completed tasks and Implementation Notes are the artifact's implementation account. | reject |
 
 ## Design Notes
 
@@ -102,3 +138,48 @@ Semantic identity is the command after declared-contract normalization, then the
 **Commands:**
 - `dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj --filter-class Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests --filter-class Hexalith.Agents.Server.Tests.AppHostSecurityTopologyTests` -- expected: replay, conflict, extension-policy, and host-composition tests pass.
 - `dotnet test test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj --filter-class Hexalith.Agents.Contracts.Tests.AgentOperationContractsTests` -- expected: explicit ordinals and wide-token degradation pass.
+
+## Dev Agent Record
+
+<!-- dev-agent-test-evidence:start -->
+### Latest Release Test Evidence
+
+Run (UTC): 2026-09-22T11:49:48Z
+
+| Test project | Total | Passed | Failed | Skipped | Pending | Other |
+|---|---:|---:|---:|---:|---:|---:|
+| Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Contracts.Tests | 645 | 645 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 605 | 605 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Tests | 805 | 805 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.UI.Tests | 1099 | 1099 | 0 | 0 | 0 | 0 |
+| **Total** | 3160 | 3160 | 0 | 0 | 0 | 0 |
+
+Result: PASS
+<!-- dev-agent-test-evidence:end -->
+### File List
+
+- `_bmad-output/implementation-artifacts/deferred-work.md`
+- `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
+- `src/Hexalith.Agents.Contracts/Agent/ApproverPolicyBasisDisclosure.cs`
+- `src/Hexalith.Agents.Contracts/Agent/AgentInspectionStatus.cs`
+- `src/Hexalith.Agents.Contracts/Agent/AgentActivationBlocker.cs`
+- `src/Hexalith.Agents.Contracts/Agent/AgentLaunchReadinessBlocker.cs`
+- `src/Hexalith.Agents.Contracts/Agent/AgentLifecycleStatus.cs`
+- `src/Hexalith.Agents.Contracts/Agent/AgentResponseMode.cs`
+- `src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteEffect.cs`
+- `src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteStatus.cs`
+- `src/Hexalith.Agents.Contracts/Operations/AgentOperationErrorCode.cs`
+- `src/Hexalith.Agents.Contracts/Operations/AgentOperationStatus.cs`
+- `src/Hexalith.Agents.Contracts/Serialization/UnknownFallbackEnumConverter.cs`
+- `src/Hexalith.Agents.EventStore/ActivateAgentIdempotencyIntentAdapter.cs`
+- `src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs`
+- `src/Hexalith.Agents.EventStore/ConfigureAgentResponseModeIdempotencyIntentAdapter.cs`
+- `src/Hexalith.Agents.EventStore/CreateAgentIdempotencyIntentAdapter.cs`
+- `src/Hexalith.Agents.EventStore/DisableAgentIdempotencyIntentAdapter.cs`
+- `src/Hexalith.Agents.EventStore/UpdateAgentConfigurationIdempotencyIntentAdapter.cs`
+- `src/Hexalith.Agents.Server/Composition/AgentDomainHostComposition.cs`
+- `src/Hexalith.Agents.Server/Program.cs`
+- `test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs`
+- `test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs`
+- `test/Hexalith.Agents.Server.Tests/AppHostSecurityTopologyTests.cs`

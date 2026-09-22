@@ -11,10 +11,10 @@ public enum AgentInspectionStatus
     Success = 0,
 
     /// <summary>The caller is not authorized to administer Agents for the tenant; no Agent data is returned (AC4).</summary>
-    NotAuthorized,
+    NotAuthorized = 1,
 
     /// <summary>No Agent exists for the requested aggregate; no Agent data is returned.</summary>
-    AgentNotFound,
+    AgentNotFound = 2,
 
     /// <summary>
     /// The read could not be served — the backing surface was unreachable or failed. No Agent data is returned, and
@@ -22,5 +22,5 @@ public enum AgentInspectionStatus
     /// transport failure must not be shown to an administrator as "denied" or "no such Agent", because both of
     /// those are claims about state this read never established.
     /// </summary>
-    Unavailable,
+    Unavailable = 3,
 }

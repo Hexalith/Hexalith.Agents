@@ -27,6 +27,10 @@ namespace Hexalith.Agents.Contracts.Serialization;
 public sealed class UnknownFallbackEnumConverter<TEnum> : JsonConverter<TEnum>
     where TEnum : struct, Enum
 {
+    private static readonly bool _hasUnsignedBackingType
+        = Type.GetTypeCode(Enum.GetUnderlyingType(typeof(TEnum)))
+            is TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64;
+
     /// <inheritdoc />
     public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -70,6 +74,11 @@ public sealed class UnknownFallbackEnumConverter<TEnum> : JsonConverter<TEnum>
 
     private static TEnum FromOrdinal(int ordinal)
     {
+        if (ordinal < 0 && _hasUnsignedBackingType)
+        {
+            return default;
+        }
+
         object value;
         try
         {

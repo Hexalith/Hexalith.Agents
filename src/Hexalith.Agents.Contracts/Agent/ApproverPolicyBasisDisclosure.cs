@@ -21,14 +21,14 @@ public enum ApproverPolicyBasisDisclosure
     Unknown = 0,
 
     /// <summary>The policy basis may be shown to end users on user-visible surfaces.</summary>
-    UserVisible,
+    UserVisible = 1,
 
     /// <summary>The policy basis is shown only to operators/administrators, not end users.</summary>
-    OperatorOnly,
+    OperatorOnly = 2,
 
     /// <summary>The policy basis is shown in a redacted form.</summary>
-    Redacted,
+    Redacted = 3,
 
     /// <summary>The policy basis is omitted from reporting surfaces entirely.</summary>
-    Omitted,
+    Omitted = 4,
 }

@@ -225,6 +225,35 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     }
 
     [Fact]
+    public void Create_declared_command_spelling_shares_one_canonical_intent_and_semantic_changes_do_not()
+    {
+        IdempotencyIntentAdapterRegistry registry = Registry();
+        SubmitCommand pascalCase = CreateCommand(
+            "{\"TenantId\":\"tenant-a\",\"DisplayName\":\"Hexa\",\"Description\":null,\"Instructions\":\"Stay terse\"}");
+        SubmitCommand camelCase = CreateCommand(
+            "{\"instructions\":\"Stay terse\",\"description\":null,\"displayName\":\"Hexa\",\"tenantId\":\"tenant-a\"}");
+        SubmitCommand changedTenant = CreateCommand(
+            "{\"tenantId\":\"tenant-b\",\"displayName\":\"Hexa\",\"description\":null,\"instructions\":\"Stay terse\"}");
+        SubmitCommand changedInstructions = CreateCommand(
+            "{\"tenantId\":\"tenant-a\",\"displayName\":\"Hexa\",\"description\":null,\"instructions\":\"Say more\"}");
+
+        byte[] canonical = registry.Resolve(pascalCase).CanonicalIntent;
+        registry.Resolve(camelCase).CanonicalIntent.SequenceEqual(canonical).ShouldBeTrue();
+        registry.Resolve(changedTenant).CanonicalIntent.SequenceEqual(canonical).ShouldBeFalse();
+        registry.Resolve(changedInstructions).CanonicalIntent.SequenceEqual(canonical).ShouldBeFalse();
+    }
+
+    [Theory]
+    [InlineData("null")]
+    [InlineData("[]")]
+    public void A_payload_that_is_not_the_declared_command_is_rejected(string payload)
+    {
+        IdempotencyIntentAdapterRegistry registry = Registry();
+
+        Should.Throw<ArgumentException>(() => registry.Resolve(UpdateCommand(payload)));
+    }
+
+    [Fact]
     public void A_non_agent_domain_is_rejected_by_the_setup_adapter()
     {
         SubmitCommand foreign = UpdateCommand("{\"displayName\":\"Hexa\",\"instructions\":\"Stay terse\"}") with
@@ -681,6 +710,12 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         => ResponseModeCommand(payload) with
         {
             CommandType = nameof(UpdateAgentConfiguration),
+        };
+
+    private static SubmitCommand CreateCommand(string payload)
+        => StandardCommand(nameof(CreateAgent), "true") with
+        {
+            Payload = Encoding.UTF8.GetBytes(payload),
         };
 
     private static SubmitCommand ResponseModeCommand(string payload)

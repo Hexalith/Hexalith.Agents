@@ -89,8 +89,8 @@ public sealed class AgentOperationContractsTests
         }
     }
 
-    // Derived, never hand-maintained: every Unknown = 0 enum reachable from this story's own public read payload
-    // (AgentSetupResult, which reaches AgentSetupView and AgentStatusView) and from the public operation envelope.
+    // Derived, never hand-maintained: every Unknown = 0 enum reachable from this story's own public read/write
+    // payloads and from the public operation envelope.
     // An enum added to either graph later is covered without editing this file, which is the point — a hand-listed
     // subset is exactly how the setup-view enums were missed. They share one sentinel, one by-name encoding, and
     // one tolerant reader, so every property below iterates this set.
@@ -103,26 +103,18 @@ public sealed class AgentOperationContractsTests
         "Hexalith.Agents.Contracts.ProviderCatalog",
     ];
 
+    private static readonly Type[] _setupContractEnumTypes = DiscoverEnumTypes(
+        typeof(AgentSetupResult),
+        typeof(AgentSetupWriteResult));
+
     private static readonly Type[] _publicOperationEnumTypes = DiscoverPublicUnknownSentinelEnums();
 
-    private static Type[] DiscoverPublicUnknownSentinelEnums()
+    private static Type[] DiscoverEnumTypes(params Type[] roots)
     {
         Assembly contracts = typeof(AgentOperationResult).Assembly;
         HashSet<Type> visited = [];
         SortedDictionary<string, Type> found = [];
-        Queue<Type> pending = new();
-
-        // The story's own read payload is walked transitively; the public operation status terms are taken as
-        // declared, so an unrelated story's view type does not silently widen this story's guard.
-        pending.Enqueue(typeof(AgentSetupResult));
-        pending.Enqueue(typeof(AgentCommandAcceptance));
-        foreach (Type root in contracts.GetTypes()
-            .Where(type => type.IsPublic
-                && type.IsEnum
-                && type.Namespace == typeof(AgentOperationResult).Namespace))
-        {
-            pending.Enqueue(root);
-        }
+        Queue<Type> pending = new(roots);
 
         while (pending.Count > 0)
         {
@@ -149,12 +141,7 @@ public sealed class AgentOperationContractsTests
 
             if (candidate.IsEnum)
             {
-                if (Enum.GetName(candidate, 0) == "Unknown"
-                    && !_deferredEnumNamespaces.Contains(candidate.Namespace))
-                {
-                    found[candidate.FullName!] = candidate;
-                }
-
+                found[candidate.FullName!] = candidate;
                 continue;
             }
 
@@ -166,6 +153,34 @@ public sealed class AgentOperationContractsTests
             foreach (PropertyInfo property in candidate.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 pending.Enqueue(property.PropertyType);
+            }
+        }
+
+        return [.. found.Values];
+    }
+
+    private static Type[] DiscoverPublicUnknownSentinelEnums()
+    {
+        Assembly contracts = typeof(AgentOperationResult).Assembly;
+        SortedDictionary<string, Type> found = [];
+
+        // The story's own read payload is walked transitively; the public operation status terms are taken as
+        // declared, so an unrelated story's view type does not silently widen this story's guard.
+        foreach (Type enumType in _setupContractEnumTypes
+            .Where(type => Enum.GetName(type, 0) == "Unknown"
+                && !_deferredEnumNamespaces.Contains(type.Namespace)))
+        {
+            found[enumType.FullName!] = enumType;
+        }
+
+        foreach (Type root in contracts.GetTypes()
+            .Where(type => type.IsPublic
+                && type.IsEnum
+                && type.Namespace == typeof(AgentOperationResult).Namespace))
+        {
+            if (Enum.GetName(root, 0) == "Unknown")
+            {
+                found[root.FullName!] = root;
             }
         }
 
@@ -366,11 +381,20 @@ public sealed class AgentOperationContractsTests
     [Fact]
     public void ShippedSetupEnumsKeepTheirPinnedOrdinals()
     {
-        AssertPinnedOrdinals(
+        HashSet<Type> pinnedEnumTypes = [];
+
+        void Pin<TEnum>(params (TEnum Member, int Ordinal)[] expected)
+            where TEnum : struct, Enum
+        {
+            pinnedEnumTypes.Add(typeof(TEnum)).ShouldBeTrue($"{typeof(TEnum).Name} is pinned more than once.");
+            AssertPinnedOrdinals(expected);
+        }
+
+        Pin(
             (AgentSetupWriteEffect.Unknown, 0),
             (AgentSetupWriteEffect.Applied, 1),
             (AgentSetupWriteEffect.AlreadyApplied, 2));
-        AssertPinnedOrdinals(
+        Pin(
             (AgentOperationStatus.Unknown, 0),
             (AgentOperationStatus.Succeeded, 1),
             (AgentOperationStatus.Pending, 2),
@@ -385,7 +409,7 @@ public sealed class AgentOperationContractsTests
             (AgentOperationStatus.Rejected, 11),
             (AgentOperationStatus.Blocked, 12),
             (AgentOperationStatus.UnableToVerify, 13));
-        AssertPinnedOrdinals(
+        Pin(
             (AgentOperationErrorCode.Unknown, 0),
             (AgentOperationErrorCode.NotAuthorized, 1),
             (AgentOperationErrorCode.ValidationFailed, 2),
@@ -396,16 +420,36 @@ public sealed class AgentOperationContractsTests
             (AgentOperationErrorCode.Rejected, 7),
             (AgentOperationErrorCode.Blocked, 8),
             (AgentOperationErrorCode.UnableToVerify, 9));
-        AssertPinnedOrdinals(
+        Pin(
             (AgentResponseMode.Unknown, 0),
             (AgentResponseMode.Automatic, 1),
             (AgentResponseMode.Confirmation, 2));
-        AssertPinnedOrdinals(
+        Pin(
             (AgentLifecycleStatus.Unknown, 0),
             (AgentLifecycleStatus.Draft, 1),
             (AgentLifecycleStatus.Active, 2),
             (AgentLifecycleStatus.Disabled, 3));
-        AssertPinnedOrdinals(
+        Pin(
+            (AgentInspectionStatus.Success, 0),
+            (AgentInspectionStatus.NotAuthorized, 1),
+            (AgentInspectionStatus.AgentNotFound, 2),
+            (AgentInspectionStatus.Unavailable, 3));
+        Pin(
+            (ApproverPolicyBasisDisclosure.Unknown, 0),
+            (ApproverPolicyBasisDisclosure.UserVisible, 1),
+            (ApproverPolicyBasisDisclosure.OperatorOnly, 2),
+            (ApproverPolicyBasisDisclosure.Redacted, 3),
+            (ApproverPolicyBasisDisclosure.Omitted, 4));
+        Pin(
+            (AgentSetupFreshness.Unknown, 0),
+            (AgentSetupFreshness.Current, 1),
+            (AgentSetupFreshness.Stale, 2));
+        Pin(
+            (AgentSetupTruthState.Unknown, 0),
+            (AgentSetupTruthState.Submitted, 1),
+            (AgentSetupTruthState.AuthoritativePending, 2),
+            (AgentSetupTruthState.ProjectionConfirmed, 3));
+        Pin(
             (AgentSetupWriteStatus.Submitted, 0),
             (AgentSetupWriteStatus.NotAuthorized, 1),
             (AgentSetupWriteStatus.NotFound, 2),
@@ -415,7 +459,7 @@ public sealed class AgentOperationContractsTests
             (AgentSetupWriteStatus.AlreadyApplied, 6),
             (AgentSetupWriteStatus.AwaitingProjection, 7),
             (AgentSetupWriteStatus.UnableToVerify, 8));
-        AssertPinnedOrdinals(
+        Pin(
             (AgentActivationBlocker.Unknown, 0),
             (AgentActivationBlocker.MissingDisplayName, 1),
             (AgentActivationBlocker.MissingInstructions, 2),
@@ -427,7 +471,7 @@ public sealed class AgentOperationContractsTests
             (AgentActivationBlocker.MissingApproverPolicy, 8),
             (AgentActivationBlocker.ApproverPolicyUnresolvable, 9),
             (AgentActivationBlocker.MissingContentSafetyPolicy, 10));
-        AssertPinnedOrdinals(
+        Pin(
             (AgentLaunchReadinessBlocker.Unknown, 0),
             (AgentLaunchReadinessBlocker.MissingContentSafetyPolicy, 1),
             (AgentLaunchReadinessBlocker.MissingContextPolicy, 2),
@@ -437,6 +481,11 @@ public sealed class AgentOperationContractsTests
             (AgentLaunchReadinessBlocker.MissingConfirmationLatencyTarget, 6),
             (AgentLaunchReadinessBlocker.MissingCostControlPosture, 7),
             (AgentLaunchReadinessBlocker.UnresolvedAuditGovernance, 8));
+
+        foreach (Type enumType in _setupContractEnumTypes)
+        {
+            pinnedEnumTypes.ShouldContain(enumType, $"{enumType.Name} is part of the setup contract graph.");
+        }
     }
 
     private static void AssertPinnedOrdinals<TEnum>(params (TEnum Member, int Ordinal)[] expected)
@@ -469,6 +518,20 @@ public sealed class AgentOperationContractsTests
             .ShouldBe(ByteBackedToleranceStatus.Unknown);
         JsonSerializer.Deserialize<ByteBackedToleranceStatus>("\"257\"", options)
             .ShouldBe(ByteBackedToleranceStatus.Unknown);
+    }
+
+    [Theory]
+    [InlineData("-1")]
+    [InlineData("\"-1\"")]
+    public void An_unsigned_backed_enum_rejects_negative_ordinals_without_throwing(string json)
+    {
+        var options = new JsonSerializerOptions
+        {
+            Converters = { new UnknownFallbackEnumConverter<UnsignedBackedToleranceStatus>() },
+        };
+
+        JsonSerializer.Deserialize<UnsignedBackedToleranceStatus>(json, options)
+            .ShouldBe(UnsignedBackedToleranceStatus.Unknown);
     }
 
     [Theory]
@@ -677,5 +740,11 @@ public sealed class AgentOperationContractsTests
     {
         Unknown = 0,
         Ready = 1,
+    }
+
+    private enum UnsignedBackedToleranceStatus : ulong
+    {
+        Unknown = 0,
+        Maximum = ulong.MaxValue,
     }
 }
