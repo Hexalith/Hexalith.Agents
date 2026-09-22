@@ -2,7 +2,7 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'done'
+status: 'in-progress'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
 review_loop_iteration: 10
@@ -609,6 +609,130 @@ Readiness gate: `python3 tools/check-story-review-readiness.py _bmad-output/impl
 - `parse_baseline_commit` ignores YAML `baseline_commit :` (space before the colon) — `false`. The gate's key is `^baseline_commit:`; that is the form every story in this repo declares. An unrecognized key correctly means no baseline. Blind Hunter and Edge Case Hunter.
 - Quoted `baseline_commit` followed by another token silently drops the rest — `low`. Malformed frontmatter is not everyday; the fix adds a trailing-token guard. Edge Case Hunter.
 - `FakeRunner` answers every `git rev-parse` with the same SHA — `low`. `test_committed_baseline_changes_join_the_working_tree_change_set` already requires the resolved full SHA on the two-dot `git diff` range, so skipping resolve still fails. Blind Hunter.
+
+### Review Findings
+
+Code review of Story 5.2 **core domain/contracts/EventStore chunk** (`src/Hexalith.Agents/**`,
+`src/Hexalith.Agents.Contracts/**`, `src/Hexalith.Agents.EventStore/**`, and direct domain/contract tests;
+`599208d` → `7433af0`), 2026-09-21. Four layers, none failed. The Server/API, UI, verification tooling,
+build/release, lockfile, planning-artifact, and submodule-pointer chunks remain for follow-up runs.
+
+Readiness gate: `python3 tools/check-story-review-readiness.py _bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md` — PASS; see the generated evidence block below. Floor, not proof of acceptance.
+
+**Patch**
+
+- [ ] [Review][Patch] Canonical idempotency intent preserves JSON spelling instead of normalizing the declared command semantics, so equivalent payload casing can conflict under the same key [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:50]
+- [ ] [Review][Patch] Numeric legacy compatibility depends on implicit enum ordinals, so a future insertion can silently reinterpret an already-shipped payload [src/Hexalith.Agents.Contracts/Agent/AgentSetupTruthState.cs:29]
+- [ ] [Review][Patch] The tolerant enum converter is not total for valid wide or unsigned enum backing types and can degrade declared numeric values or throw on unsigned extremes [src/Hexalith.Agents.Contracts/Serialization/UnknownFallbackEnumConverter.cs:35]
+- [ ] [Review][Patch] `AddAgentsEventStore` accepts a whitespace-padded app id that can never match the canonical Dapr caller claim [src/Hexalith.Agents.EventStore/AgentsEventStoreServiceCollectionExtensions.cs:20]
+- [ ] [Review][Patch] Re-registering `AddAgentsEventStore` with a different app id silently keeps the first trusted policy instead of rejecting conflicting gateway configuration [src/Hexalith.Agents.EventStore/AgentsEventStoreServiceCollectionExtensions.cs:30]
+
+#### Rejected
+
+- `AgentSetupWriteStatus.Submitted = 0` makes a default status look successful — `false`. This is a pre-existing in-process UI result enum, not part of the Story 5.2 serialized transport graph; production keeps pending state nullable and creates every result explicitly.
+- `AgentSetupWriteResult` permits inconsistent status/acceptance combinations — `false`. The record explicitly assigns verification to the gateway, and every production gateway path either supplies verified effect/version evidence or returns `UnableToVerify`; no current caller constructs the claimed inconsistent state.
+- A legacy `AgentCommandAcceptance` becomes a success-like submitted result — `false`. `AgentsClientSetupGateway.WriteAsync` rejects `Unknown` effect or a missing/non-positive target version before calling `Submitted`.
+- Declared enum aliases can degrade to `Unknown` because `Enum.GetName` returns only one alias — `low`. No guarded contract enum declares aliases, and broadening the accepted wire-name set for hypothetical aliases is not worth adding policy complexity in this slice.
+- The fallback converter factory ignores a configured enum naming policy — `low`. No production serializer configures such a policy, while guarded enums intentionally emit their canonical declared names; changing that contract would require new public configuration semantics.
+- Internal EventStore integration types lack XML summaries — `low`. The build succeeds and the omission has no runtime or consumer-facing consequence; adding documentation-only churn is not warranted here.
+- `UnrecognizedEnumPayloads` requires every discovered enum to have two nonzero members — `low`. Every current guarded enum satisfies the precondition, and a future one-member enum would fail loudly during test discovery rather than weakening production behavior.
+- `AnOptionsBagWithOnlyTheStringConverterStillThrows` pins an undesirable framework behavior — `false`. The test intentionally proves why the fallback factory must precede the framework converter on the repository's pinned .NET version; a future framework behavior change would legitimately require revisiting that assertion.
+- The setup-result theories use hand-maintained handler case lists — `low`. The lists currently cover all twelve aggregate setup handlers; a reflection completeness mechanism would add disproportionate test complexity for a hypothetical future handler.
+- `AgentSetupDomainResult.Validate` failure branches lack focused tests — `low`. Current factories make event-bearing no-ops unconstructable and all production callers provide positive versions and eventful applied results; extra defensive-guard tests would not close a demonstrated behavior gap.
+- Structured malformed enum tokens are tested only at the root, not before a later property — `low`. The converter directly calls `Utf8JsonReader.Skip`, and the existing object/array cases prove tolerant consumption; a containing-record fixture would add coverage without exposing a defect.
+- The edge-case report independently claims inconsistent `AgentSetupWriteResult` combinations can reach the UI — `false`. Production reaches this record only through the validating gateway or retained verified acceptance, so the reported bad outcome is not reachable.
+- Configuration version overflows after `Int32.MaxValue` mutations — `low`. The arithmetic can eventually fail, but reaching more than two billion changes to one Agent is not an everyday path, and defining a new version-exhaustion domain policy is disproportionate to this story.
+
+### Review Findings
+
+Code review of Story 5.2 **group E1** (build/CI/release configuration and submodule gitlinks:
+`.github/**`, `.releaserc.json`, `Directory.Build.props`, `Directory.Packages.props`,
+`Hexalith.Agents.slnx`, `commitlint.config.mjs`, `global.json`, `package.json`, `eng/**`, and the
+`references/*` gitlinks; `599208d` -> working tree), 2026-09-22. Four layers, none failed.
+Remaining group E sub-chunks: E2 release scripts and tooling contract tests, E3 docs and planning
+artifacts, E4 `package-lock.json`.
+
+Readiness gate: `python3 tools/check-story-review-readiness.py _bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md` -- PASS; see the generated evidence block below. Floor, not proof of acceptance.
+
+**Patch**
+
+- [ ] [Review][Patch] Focused-test floors and skip rejection are enforced by no automated lane, and the source-mode-only Server suites are compiled out of every CI build [eng/verify-story.ps1:18] -- `eng/verify-story.ps1` is the only place that passes `--minimum-expected-tests` and `--fail-skips on`, and no workflow invokes it: `.github/workflows/ci.yml` delegates to the pinned `domain-ci.yml`, whose Microsoft.Testing.Platform step passes neither and exposes no input for them, and the only `eng/` call in CI is `./eng/verify-story-5.2.ps1 -PackageFloorOnly`. `PackageInventoryTests` pins the floor numbers by reading the script text, never by executing it. Compounding it, `Directory.Build.props:29` forces package mode whenever `GITHUB_ACTIONS` is true, so `HexalithConversationsFromSource` is never true in CI and `test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj:13` always removes `ConversationClientContextReaderTests.cs` and `ConversationClientResponsePosterTests.cs` from compilation -- exactly the Debug/Release Server delta the new floors encode. Tests that stop being discovered, get skipped, or get compiled out stay green on `main`. Decided: run the floors and `--fail-skips on` in the repo-owned `agents-policy` job, accepting a second test execution in CI so enforcement stays under this repository's control. Verification Gap Reviewer, Edge Case Hunter, and Acceptance Auditor.
+- [ ] [Review][Patch] The reusable-workflow pin and the checked-in `Hexalith.Builds` gitlink are fourteen commits apart with nothing asserting they agree [.github/workflows/ci.yml:18] -- `ci.yml` and `release.yml` pin `domain-ci.yml`/`domain-release.yml` at `cb91511`, while this change moves `references/Hexalith.Builds` to `410bd59`. The `agents-policy` job then runs `./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1` against `./references/Hexalith.Builds/Props/Directory.Packages.props` -- tooling and catalog from the gitlink, workflow logic from the older pin. Decided: move the pin to the current gitlink and add a CI step failing when `git -C references/Hexalith.Builds rev-parse HEAD` differs from the pinned revision, so the coupling is explicit. Blind Hunter and Edge Case Hunter.
+- [ ] [Review][Patch] `Invoke-TestClasses` accepts a focused class whose every test was skipped or not run [eng/verify-story-5.2.ps1:293] -- the guard sums `Total:` from the xUnit summary line, which counts skipped and not-run alongside executed, and passes no `-failSkips`. A focused class whose facts all carry `Skip=` yields a positive total, exit zero, and a green gate. The sibling `eng/verify-story.ps1` passes `--fail-skips on`, so the two verifiers disagree about whether a skipped test counts as Story 5.2 evidence -- and the checked-off row above that noted `Total:` includes skipped and not-run did not close it. Acceptance Auditor and Edge Case Hunter.
+- [ ] [Review][Patch] A frozen release run reports fully green, so an operator cannot tell a dispatch published nothing [.github/workflows/release.yml:24] -- when `vars.HEXALITH_RELEASE_PUBLISH_ENABLED` is not exactly `true`, the gate step writes a `::notice`, every later step in `verify-source` is skipped by its own `if:`, and all downstream jobs are skipped. The dispatch finishes with an all-green run and no step summary. Blind Hunter.
+- [ ] [Review][Patch] The `agents-policy` job persists checkout credentials and skips the signature audit its release sibling performs [.github/workflows/ci.yml:34] -- every `actions/checkout` in `release.yml` sets `persist-credentials: false` and pairs `npm ci --ignore-scripts` with `npm audit signatures`; this job does neither while running third-party tooling from the same lockfile. Blind Hunter.
+- [ ] [Review][Patch] `expected-package-count` can drift from the release manifest with every test still green [.github/workflows/release.yml:128] -- the workflow input restates a count that `eng/release-packages.json` already expresses. `PackageInventoryTests` asserts the manifest length against its own expected list and separately asserts the literal `expected-package-count: 6` string, so adding a package and updating the test list leaves the workflow input stale and every test passing; the mismatch surfaces mid-release, after packing and tagging. Derive the input from the manifest, or assert the two agree. Blind Hunter and Edge Case Hunter.
+- [ ] [Review][Patch] The CI test-project list is never cross-checked against the test projects on disk [.github/workflows/ci.yml:23] -- `unit-test-projects` is tied to reality only by string containment checks in `PackageInventoryTests`. `ModuleLayout.ProjectFiles` already enumerates `test/` from disk, but nothing compares the two, so a test project added later would simply never run in CI and no test would say so. Verification Gap Reviewer.
+- [ ] [Review][Patch] The verifier's regression run omits the dependency-mode flag its own build step passes [eng/verify-story-5.2.ps1:344] -- the restore and build gates pass `-p:UseHexalithProjectReferences=true`, but the regression `dotnet test ... -c Debug --no-build` does not, so under `GITHUB_ACTIONS` the property defaults to `false` and test evaluation resolves package mode against source-mode build output. Edge Case Hunter.
+- [ ] [Review][Patch] Verifier gate labels stop at AC4, so the fail-closed, replay, and approver lanes report under the wrong criterion [eng/verify-story-5.2.ps1:154] -- the file's own comment states each class list names the suites that prove one acceptance criterion, but the labels cover AC1 through AC4 only; the classes proving the later criteria are folded into the AC1/AC4 label and the two composition gates carry no criterion at all. Acceptance Auditor.
+- [ ] [Review][Patch] Dependabot has no `gitsubmodule` ecosystem while its `nuget` entry now has nothing local to update [.github/dependabot.yml:3] -- this change removes every local `PackageVersion` row in favour of the shared catalog, leaving the nuget updater without a manifest row to bump, while the six `references/*` gitlinks this change moves are the repository's real dependency surface and are not covered. Blind Hunter and Edge Case Hunter.
+
+**Deferred**
+
+- [x] [Review][Defer] Three security workflows consume reusable workflows from mutable `@main` refs [.github/workflows/codeql.yml:20] -- deferred: carried from rounds 10 and 13 through 16. `codeql.yml`, `commitlint.yml`, and `dependency-review.yml` float on `@main` while this change pins `ci.yml` and `release.yml` to an exact revision, and `codeql.yml` grants `security-events: write` to an unpinned caller. Upstream movement can alter the security, commit-policy, and dependency gates with no local review. The immutable-revision ledger item remains authoritative. All four layers.
+- [x] [Review][Defer] High and critical NuGet audit diagnostics are exempted from warnings-as-errors [Directory.Build.props:17] -- deferred: carried from round 16. `NuGetAudit` and `NuGetAuditMode=all` are enabled in the same property group that appends `NU1901` through `NU1904` to `WarningsNotAsErrors`, so every `-warnaserror` lane reports advisories and passes, and `BuildContractConformanceTests` pins that combination as intended. The story text scopes the audit exception to one inherited advisory, so closing this would also require renegotiating that text. Inherited Story 5.1 build policy. Blind Hunter, Acceptance Auditor, Edge Case Hunter, and Verification Gap Reviewer.
+- [x] [Review][Defer] The release planner restates release configuration instead of loading `.releaserc.json` [eng/semantic-release-plan.mjs:41] -- deferred: carried from round 16. The planner hardcodes its own branches and tag format; a probe run in a scratch repository carrying a different `tagFormat` showed the rc file fully overridden. Editing either file alone makes the planner reserve a version the real run never produces, aborting at the reserved-version check after packing. The actionable residue is a tooling test asserting the two sources agree. Inherited release tooling. Blind Hunter, Verification Gap Reviewer, and Edge Case Hunter.
+- [x] [Review][Defer] The new commit, release, and test toolchain has no contributor documentation [README.md:1] -- deferred: this change enforces Conventional Commits on pull-request titles and on pushes to `main`, adds a Node toolchain and semantic-release, gates publication behind a repository variable, and switches the test runner, while `README.md` and `AGENTS.md` mention none of it and no `CONTRIBUTING.md` exists. Part of the fix edits agent-context files. Blind Hunter.
+- [x] [Review][Defer] The `references/Hexalith.EventStore` gitlink is twenty commits past the `v3.106.0` tag the package floor and the story record as matching [references/Hexalith.EventStore] -- deferred: `git describe --tags` on the gitlink returns `v3.106.0-20-g4bc61d9a`. Debug source mode therefore compiles unreleased EventStore code while Release consumes the published `3.106.0`, so a green source-mode lane does not prove the package-mode lane. Moving the gitlink changes the File List and invalidates the chunk evidence already recorded for this story, so it needs its own run. Edge Case Hunter.
+
+#### Rejected
+
+- `eng/verify-story-5.3.ps1` was edited here but left on the VSTest `--filter` pattern this story replaced -- `low`. The filter is now routed through Microsoft.Testing.Platform, but that is not fail-open: a non-matching filter exits with the zero-tests-ran code, as Acceptance Auditor verified. Converting Story 5.3's loops to the direct-assembly pattern rewrites another story's verifier, and no workflow runs that script.
+- Deleting the local `PackageVersion` block silently majors the test stack -- `low`. The shared catalog does carry newer xUnit, test-SDK, NSubstitute, and bunit rows than the removed local ones, but that is the intended consequence of delegating to the single package authority, the whole suite is green on those versions, and the fix is documentation churn in the spec under review.
+- The rationale comments deleted with that block are preserved nowhere -- `low`. The FluentUI baseline the comment protected is currently the same version in the shared catalog, so there is no present harm; re-adding prose, or adding a pin test against an upstream-owned row, is churn without a demonstrated defect.
+- `GITHUB_ACTIONS` sniffing changes dependency mode and no test covers the branch -- `false`. `BuildContractConformanceTests` evaluates the dependency-mode rules through real `dotnet msbuild -getProperty` runs, including this condition. The genuine harm in that property is the compiled-out Server classes, recorded as a decision item above.
+- Promoting `CheckBuildCatalog` to `InitialTargets` makes it fire on every evaluation including the floor gate's item query -- `false`. Probed directly: with all four catalog import paths pointed at a nonexistent file, `dotnet msbuild -getItem:PackageVersion` returned an empty item list and exit zero, so the target never ran.
+- The floor gate hides a missing build catalog behind a no-rows message -- `low`. It is fail-closed: zero matching rows throws rather than passing. Only the message is imprecise, and the proposed fix adds a second MSBuild round-trip to improve wording.
+- The out-of-repository catalog fallbacks conflict with the root-submodule-only rule -- `false` here. The sibling and parent import paths are deliberate Story 5.1 supported-layout design, raised and rejected in that story's triage, and the floor gate evaluates the effective catalog, which is the stricter check.
+- `Hexalith.Agents.EventStore` ships as a package with no test project -- `false`. `test/Hexalith.Agents.Server.Tests` project-references it directly and exercises its registration surface through the gateway integration suite, so the grep tripwire is not its only coverage.
+- The release version guard rejects a version carrying both prerelease and build metadata -- `low`. The plus sign is already in the character class; only the combined form is rejected, and with a single `main` branch and no prerelease plugin the release tool never emits build metadata.
+- The tag fetch runs on a credential-free checkout and would fail without auth -- `low`. The repository is public, so the unauthenticated fetch of the release tag succeeds.
+- A Dependabot nuget pull request would be rejected by the consumer package-authority validator -- `maybe-false`. The validator does reject any consumer `PackageVersion` declaration, but Dependabot updates existing rows rather than adding them, and this change leaves none, so no such pull request is raised. A Dependabot run against this configuration would settle it. The useful half -- that the nuget entry is now inert while submodules are uncovered -- is filed as a patch above.
+- The new floor constants carry no explanatory comment, and the shared test props still reference the VSTest SDK and adapter after the runner switch -- `low`. Both are comment or dependency-hygiene churn; removing the adapter packages is not a demonstrated defect and would change how the projects run outside the new runner.
+
+### Review Findings
+
+Code review of Story 5.2 **product chunk 1** (EventStore integration, Agents contracts, and the domain aggregate; 39 files, +842 / −104, baseline `599208dd` → working tree), 2026-09-22. Four layers, none failed. Remaining chunks: server API and orchestration, UI, tests, EventStore pin and story verifier, planning artifacts, and build/CI/release (group E1 findings above are still open).
+
+✅ Clean review — all layers passed for this chunk. No decision-needed, patch, or defer items.
+
+#### Rejected
+
+- `AgentSetupWriteStatus` uses `Submitted = 0` and has no `Unknown` sentinel — `low`. The public HTTP status is `AgentOperationStatus`, which already degrades to `Unknown = 0`. This enum is set by factories and the UI gateway, not default-initialized on a user path, and inserting `Unknown = 0` would renumber a status callers already treat as accepted.
+- `AgentSetupWriteResult.Submitted` treats an unknown effect or missing version as accepted progress — `false`. The only caller, `AgentsClientSetupGateway.WriteAsync`, maps `Effect == Unknown` or a non-positive target version to `UnableToVerify` before `Submitted`. The server success path builds `AgentCommandAcceptance` only after `TryParseSetupResult` requires `Applied` or `AlreadyApplied` and a positive version.
+- `Failed` and `AwaitingProjection` accept success-like statuses or a no-op effect — `false`. `AwaitingProjection` has no callers. `Failed` is only called with `Unavailable` or `ToWriteStatus`, which never returns `Submitted`, `AlreadyApplied`, or `AwaitingProjection`.
+- The V1 `AgentCommandAcceptance` constructor and four-value `Deconstruct` drop effect and target version — `false`. That constructor is the documented additive shape for older callers. No Agents caller deconstructs the four-value form, and the UI reads the properties after the gateway has rejected unknown effect or a missing version.
+- `ExpectedConfigurationVersion` sits outside the positional constructor and accepts non-positive values — `false`. `GetCommandOptions` sets it with an initializer, activation dispatch rejects `is not > 0`, and no Agents caller deconstructs `AgentOperationOptions`.
+- The extension policy does not claim `party:linkValidation` or `audit:governanceResolved`, and claims provider and approver verdicts only on `ActivateAgent` — `false`. Live party, provider-selection, approver, content-safety, launch-readiness, and production-like endpoints return `Unavailable` without dispatch. Those keys are not submitted on the five setup commands this policy claims. Group B already rejected the same claim.
+- Activation canonical intent omits provider and approver verdicts, so a verdict-only retry replays — `false`. The frozen 2026-09-16 decision requires that replay. Changing the intent would edit the spec.
+- `Handle(ActivateAgent)` returns `AlreadyApplied` for an already-active agent before `ComputeActivationBlockers` — `false`. At the matching version that is the specified no-op. Gate checks run on the transition into `Active`; a `Disabled` agent still re-runs them.
+- The expected-version fence exists only on `ActivateAgent` — `false`. `AgentOperationOptions` documents that other operations ignore it, and a concurrent bump is what makes a stale activation conflict.
+- `CreateIntent` copies a null extension value and the canonical encoder then rejects it — `false`. `Accepts` refuses a null admin, verdict, or version value before admission. The encoder throw is fail-closed for a value the policy never accepts.
+- `AddAgentsEventStore` keeps the first app id when called again with a different one — `low`. `TryAddEnumerable` is idempotent for one documented Agents app. A second app id is undemonstrated host misuse, and a multi-app registry would add state this story does not have. Group B already rejected it.
+- `AgentSetupDomainResult.Applied` could carry only rejection events — `false`. Rejections go through `DomainResult.Rejection`. `Applied` is only constructed with setup events, and `Validate` already requires a positive version and at least one event.
+
+### Review Findings
+
+Code review of Story 5.2 **EventStore integration chunk** (`src/Hexalith.Agents.EventStore/` and `references/` gitlinks; 15 files, +251 / −6, baseline `599208dd` → working tree), 2026-09-22. Four layers, none failed. Readiness gate passed earlier (5 projects, 3043/3043, File List 193/193) and is only a floor. Remaining chunks: server orchestration, aggregate and contracts, UI, tests, packaging/tooling/docs.
+
+- [ ] [Review][Patch] Setup idempotency hashes the raw JSON payload instead of the semantic command [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:52]
+- [ ] [Review][Patch] Replay retention tier and canonical intent bytes are not pinned outside one process [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:27]
+- [ ] [Review][Patch] Activation-only trusted keys are not tested on create, disable, or response-mode commands [src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs:33]
+- [ ] [Review][Patch] Administrator extension value "false" is not in the accept theory [src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs:61]
+- [ ] [Review][Patch] Expected configuration version "0" is not in the accept theory [src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs:81]
+- [ ] [Review][Patch] A Dapr identity carrying the allow-listed app id plus another app id is not tested [src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs:53]
+- [ ] [Review][Patch] A non-agent domain is not tested on the setup intent adapter [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:32]
+- [ ] [Review][Patch] The domain host's ban on gateway registration is only a source-text scan [src/Hexalith.Agents.EventStore/AgentsEventStoreServiceCollectionExtensions.cs:20]
+- [x] [Review][Defer] Five submodule pins besides EventStore are not shown to be required by this integration [references/Hexalith.Builds] — deferred: maybe-false, medium if true. Settle by rebuilding `Hexalith.Agents.EventStore` against the previous Builds, Commons, Conversations, FrontComposer, and PolymorphicSerializations pins.
+
+#### Rejected
+
+- Accepted activation verdicts are omitted, so a valid activation and a blocked one share a replay — `false`. `ActivationSemanticExtensionKeys` returns only the administrator flag and the expected version. The frozen 2026-09-16 decision and the acceptance criterion require a verdict-only retry to replay.
+- `CreateAgent.TenantId` can disagree with the envelope tenant and still be stored — `false` at the adapter. `CreateIntent` only builds the idempotency digest. The event tenant is written by `AgentAggregate.Handle` from the executed payload, which this method does not select.
+- `Hexalith.Agents.EventStore` references the whole EventStore gateway host — `false`. `ITrustedCommandExtensionPolicy` and `DaprInternalAuthenticationOptions` are compiled only into `Hexalith.EventStore.Gateway`, and the story requires that package reference.
+- The policy leaves `party:linkValidation` and non-setup `actor:agentsAdmin` unclaimed, so those commands fail at the gateway — `false`. `EventStoreAgentAdministrationOperations` returns `Unavailable` from `OutOfScope` for party, provider, approver, content-safety, launch-readiness, and production-like commands and does not dispatch them. The same claim was rejected in the earlier product-chunk review.
+- `AddAgentsEventStore` accepts a padded app id that matches no Dapr caller — `low`. A padded id fails closed. Trimming it is an extra guard, and everyday composition passes a single unpadded app id. An earlier round left the same item open; this pass does not promote it.
+- A second `AddAgentsEventStore` call with a different app id keeps the first policy — `low`. No owned host registers two app ids. Rejecting the second call would add a branch for undemonstrated misuse. The earlier product-chunk review already rejected this.
 
 ## Implementation Notes
 
@@ -1218,7 +1342,7 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-21T11:23:23Z
+Run (UTC): 2026-09-22T08:26:05Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
@@ -1317,6 +1441,7 @@ Result: PASS
 - `src/Hexalith.Agents.Server/Application/Queries/ProviderCatalogQueryHandlerBase.cs`
 - `src/Hexalith.Agents.Server/Composition/AgentSetupServiceCollectionExtensions.cs`
 - `src/Hexalith.Agents.Server/Hexalith.Agents.Server.csproj`
+- `src/Hexalith.Agents.Server/Ports/AgentCommandDispatchFailure.cs`
 - `src/Hexalith.Agents.Server/Ports/AgentCommandIdentityFactory.cs`
 - `src/Hexalith.Agents.Server/Ports/DeferredAgentCommandDispatcher.cs`
 - `src/Hexalith.Agents.Server/Ports/DeferredAgentCommandStatusReader.cs`

@@ -415,3 +415,29 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Re-prove that the dispatched source is still current immediately before the first irreversible NuGet push.
   evidence: The release workflow proves current green main before planning and packing, but has no local publication-boundary recheck, so main can advance before the first package write despite the completed CI/CD requirement to stop stale source before publication.
+
+## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2.md (2026-09-22)
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Pin the CodeQL, commitlint, and dependency-review callers to an exact reviewed revision.
+  evidence: The three security workflows consume `Hexalith.Builds` reusable workflows from mutable `@main` refs while the same change pins the CI and release callers to an exact revision, and the CodeQL caller grants security-events write to an unpinned workflow, so upstream movement can alter this repository's gates with no local review. Carried from earlier review rounds.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Decide whether high and critical NuGet audit diagnostics should fail the build.
+  evidence: `Directory.Build.props` enables NuGet auditing across all dependencies and in the same property group appends NU1901 through NU1904 to `WarningsNotAsErrors`, so warnings-as-errors lanes report advisories and pass; a build-contract test pins that combination, and the story text scopes the audit exception to one inherited advisory, so closing it also requires renegotiating that text. Carried from an earlier review round.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Make the release planner read `.releaserc.json` instead of restating branches and tag format.
+  evidence: The planner hardcodes its own branch list and tag format; a probe run in a scratch repository carrying a different tag format confirmed the rc file is fully overridden, so editing either file alone makes the planner reserve a version the real run never produces and the release aborts at the reserved-version check after packing. The actionable residue is a tooling test asserting the two sources agree. Carried from an earlier review round.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Document the Conventional Commits, semantic-release, Node tooling, and test-runner changes for contributors.
+  evidence: The change enforces Conventional Commits on pull-request titles and pushes to main, adds a Node toolchain and semantic-release, gates publication behind a repository variable, and switches the test runner, while the readme and agent instructions mention none of it and no contributing guide exists. Part of the fix edits agent-context files.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Reconcile the `references/Hexalith.EventStore` gitlink with the released package version the floor gate requires.
+  evidence: `git describe --tags` on the gitlink returns a revision twenty commits past the `v3.106.0` tag, so Debug source mode compiles unreleased EventStore code while Release consumes the published package and a green source-mode lane does not prove the package-mode lane. Deferred because moving the gitlink changes the File List and invalidates the chunk evidence already recorded for this story, so it needs its own run.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Show that the Builds, Commons, Conversations, FrontComposer, and PolymorphicSerializations gitlinks are required by the Agents EventStore integration.
+  evidence: The EventStore integration diff moves those five pins with the EventStore pin. Nothing in that diff shows the new adapters need them. Unverified medium: an unnecessary pin can pull unrelated submodule behavior into this story. Settle by rebuilding `Hexalith.Agents.EventStore` against the previous five pins.
