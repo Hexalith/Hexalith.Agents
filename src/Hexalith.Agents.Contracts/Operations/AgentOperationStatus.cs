@@ -14,41 +14,41 @@ public enum AgentOperationStatus
     Unknown = 0,
 
     /// <summary>The operation completed successfully.</summary>
-    Succeeded,
+    Succeeded = 1,
 
     /// <summary>The operation was accepted but is still pending asynchronous completion.</summary>
-    Pending,
+    Pending = 2,
 
     /// <summary>The operation is checking dependencies/readiness and must not be treated as success yet.</summary>
-    Checking,
+    Checking = 3,
 
     /// <summary>The operation completed with degraded or stale information that must not be rendered as fresh success.</summary>
-    Degraded,
+    Degraded = 4,
 
     /// <summary>The authenticated caller is not authorized for the operation.</summary>
-    NotAuthorized,
+    NotAuthorized = 5,
 
     /// <summary>The request shape or trusted server-side validation failed.</summary>
-    ValidationFailed,
+    ValidationFailed = 6,
 
     /// <summary>The requested resource was not found in the caller's authorized scope.</summary>
-    NotFound,
+    NotFound = 7,
 
     /// <summary>The operation conflicts with the current resource state.</summary>
-    Conflict,
+    Conflict = 8,
 
     /// <summary>The operation could not proceed because the observed state is stale.</summary>
-    Stale,
+    Stale = 9,
 
     /// <summary>A required dependency, projection, or deferred binding is unavailable.</summary>
-    Unavailable,
+    Unavailable = 10,
 
     /// <summary>The governed workflow rejected the operation.</summary>
-    Rejected,
+    Rejected = 11,
 
     /// <summary>The operation was blocked by policy or dependency readiness gates.</summary>
-    Blocked,
+    Blocked = 12,
 
     /// <summary>The operation completed without enough trusted evidence to verify its exact outcome.</summary>
-    UnableToVerify,
+    UnableToVerify = 13,
 }

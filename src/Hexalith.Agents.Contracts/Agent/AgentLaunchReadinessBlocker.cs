@@ -24,26 +24,26 @@ public enum AgentLaunchReadinessBlocker
     Unknown = 0,
 
     /// <summary>No active Content Safety Policy is configured (AC1; references the Story 1.7 policy).</summary>
-    MissingContentSafetyPolicy,
+    MissingContentSafetyPolicy = 1,
 
     /// <summary>No Conversation Context Policy is in force (AC1; references the Story 2.3 context policy).</summary>
-    MissingContextPolicy,
+    MissingContextPolicy = 2,
 
     /// <summary>No launch metrics have been recorded (AC2).</summary>
-    MissingLaunchMetrics,
+    MissingLaunchMetrics = 3,
 
     /// <summary>A recorded launch metric is missing a required field (numerator/denominator/target/window/cohort/classification; AC2).</summary>
-    IncompleteLaunchMetricDefinition,
+    IncompleteLaunchMetricDefinition = 4,
 
     /// <summary>No explicit Automatic Response Mode latency target is recorded (AC3).</summary>
-    MissingAutomaticLatencyTarget,
+    MissingAutomaticLatencyTarget = 5,
 
     /// <summary>No explicit Confirmation Response Mode latency target is recorded (AC3).</summary>
-    MissingConfirmationLatencyTarget,
+    MissingConfirmationLatencyTarget = 6,
 
     /// <summary>No cost-control posture is recorded (AC3).</summary>
-    MissingCostControlPosture,
+    MissingCostControlPosture = 7,
 
     /// <summary>The Agents audit-evidence governance is unresolved (AC1; consumes the Story 4.2 audit-governance launch-readiness blocker).</summary>
-    UnresolvedAuditGovernance,
+    UnresolvedAuditGovernance = 8,
 }

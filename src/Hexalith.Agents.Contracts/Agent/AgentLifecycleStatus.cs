@@ -24,11 +24,11 @@ public enum AgentLifecycleStatus
     Unknown = 0,
 
     /// <summary>The Agent record exists but has not passed activation gates; not callable.</summary>
-    Draft,
+    Draft = 1,
 
     /// <summary>The Agent passed this story's activation gates and is active (full callability accretes across the epic).</summary>
-    Active,
+    Active = 2,
 
     /// <summary>The Agent is disabled — not callable; prior history is preserved (AC3).</summary>
-    Disabled,
+    Disabled = 3,
 }

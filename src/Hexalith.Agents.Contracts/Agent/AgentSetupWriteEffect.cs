@@ -14,8 +14,8 @@ public enum AgentSetupWriteEffect
     Unknown = 0,
 
     /// <summary>The command appended an Agent setup event.</summary>
-    Applied,
+    Applied = 1,
 
     /// <summary>The requested setup was already present and no event was appended.</summary>
-    AlreadyApplied,
+    AlreadyApplied = 2,
 }

@@ -282,6 +282,12 @@ public sealed class AgentOperationContractsTests
             "\"SomeMemberAddedLater\"",
             "9999",
             "\"9999\"",
+            "2147483648",
+            "\"2147483648\"",
+            "9223372036854775808",
+            "\"9223372036854775808\"",
+            "18446744073709551615",
+            "\"18446744073709551615\"",
             "null",
             "true",
             "{}",
@@ -354,6 +360,94 @@ public sealed class AgentOperationContractsTests
         {
             object value = JsonSerializer.Deserialize(payload, enumType).ShouldNotBeNull();
             Convert.ToInt32(value).ShouldBe(0, $"{enumType.Name} must reject noncanonical ordinal {payload}.");
+        }
+    }
+
+    [Fact]
+    public void ShippedSetupEnumsKeepTheirPinnedOrdinals()
+    {
+        AssertPinnedOrdinals(
+            (AgentSetupWriteEffect.Unknown, 0),
+            (AgentSetupWriteEffect.Applied, 1),
+            (AgentSetupWriteEffect.AlreadyApplied, 2));
+        AssertPinnedOrdinals(
+            (AgentOperationStatus.Unknown, 0),
+            (AgentOperationStatus.Succeeded, 1),
+            (AgentOperationStatus.Pending, 2),
+            (AgentOperationStatus.Checking, 3),
+            (AgentOperationStatus.Degraded, 4),
+            (AgentOperationStatus.NotAuthorized, 5),
+            (AgentOperationStatus.ValidationFailed, 6),
+            (AgentOperationStatus.NotFound, 7),
+            (AgentOperationStatus.Conflict, 8),
+            (AgentOperationStatus.Stale, 9),
+            (AgentOperationStatus.Unavailable, 10),
+            (AgentOperationStatus.Rejected, 11),
+            (AgentOperationStatus.Blocked, 12),
+            (AgentOperationStatus.UnableToVerify, 13));
+        AssertPinnedOrdinals(
+            (AgentOperationErrorCode.Unknown, 0),
+            (AgentOperationErrorCode.NotAuthorized, 1),
+            (AgentOperationErrorCode.ValidationFailed, 2),
+            (AgentOperationErrorCode.NotFound, 3),
+            (AgentOperationErrorCode.Conflict, 4),
+            (AgentOperationErrorCode.Stale, 5),
+            (AgentOperationErrorCode.Unavailable, 6),
+            (AgentOperationErrorCode.Rejected, 7),
+            (AgentOperationErrorCode.Blocked, 8),
+            (AgentOperationErrorCode.UnableToVerify, 9));
+        AssertPinnedOrdinals(
+            (AgentResponseMode.Unknown, 0),
+            (AgentResponseMode.Automatic, 1),
+            (AgentResponseMode.Confirmation, 2));
+        AssertPinnedOrdinals(
+            (AgentLifecycleStatus.Unknown, 0),
+            (AgentLifecycleStatus.Draft, 1),
+            (AgentLifecycleStatus.Active, 2),
+            (AgentLifecycleStatus.Disabled, 3));
+        AssertPinnedOrdinals(
+            (AgentSetupWriteStatus.Submitted, 0),
+            (AgentSetupWriteStatus.NotAuthorized, 1),
+            (AgentSetupWriteStatus.NotFound, 2),
+            (AgentSetupWriteStatus.ValidationFailed, 3),
+            (AgentSetupWriteStatus.Conflict, 4),
+            (AgentSetupWriteStatus.Unavailable, 5),
+            (AgentSetupWriteStatus.AlreadyApplied, 6),
+            (AgentSetupWriteStatus.AwaitingProjection, 7),
+            (AgentSetupWriteStatus.UnableToVerify, 8));
+        AssertPinnedOrdinals(
+            (AgentActivationBlocker.Unknown, 0),
+            (AgentActivationBlocker.MissingDisplayName, 1),
+            (AgentActivationBlocker.MissingInstructions, 2),
+            (AgentActivationBlocker.InvalidInstructions, 3),
+            (AgentActivationBlocker.MissingPartyIdentity, 4),
+            (AgentActivationBlocker.MissingProviderSelection, 5),
+            (AgentActivationBlocker.ProviderUnavailable, 6),
+            (AgentActivationBlocker.MissingResponseMode, 7),
+            (AgentActivationBlocker.MissingApproverPolicy, 8),
+            (AgentActivationBlocker.ApproverPolicyUnresolvable, 9),
+            (AgentActivationBlocker.MissingContentSafetyPolicy, 10));
+        AssertPinnedOrdinals(
+            (AgentLaunchReadinessBlocker.Unknown, 0),
+            (AgentLaunchReadinessBlocker.MissingContentSafetyPolicy, 1),
+            (AgentLaunchReadinessBlocker.MissingContextPolicy, 2),
+            (AgentLaunchReadinessBlocker.MissingLaunchMetrics, 3),
+            (AgentLaunchReadinessBlocker.IncompleteLaunchMetricDefinition, 4),
+            (AgentLaunchReadinessBlocker.MissingAutomaticLatencyTarget, 5),
+            (AgentLaunchReadinessBlocker.MissingConfirmationLatencyTarget, 6),
+            (AgentLaunchReadinessBlocker.MissingCostControlPosture, 7),
+            (AgentLaunchReadinessBlocker.UnresolvedAuditGovernance, 8));
+    }
+
+    private static void AssertPinnedOrdinals<TEnum>(params (TEnum Member, int Ordinal)[] expected)
+        where TEnum : struct, Enum
+    {
+        Enum.GetValues<TEnum>().Length.ShouldBe(expected.Length, typeof(TEnum).Name);
+        string[] declared = Enum.GetValues<TEnum>().Select(value => value.ToString()!).ToArray();
+        declared.ShouldBe(expected.Select(pair => pair.Member.ToString()!).ToArray());
+        foreach ((TEnum member, int ordinal) in expected)
+        {
+            Convert.ToInt32(member).ShouldBe(ordinal, member.ToString());
         }
     }
 

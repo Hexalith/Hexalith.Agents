@@ -17,8 +17,10 @@ namespace Hexalith.Agents.Contracts.Serialization;
 /// Reading is deliberately tolerant and total: a name (in any casing, matching the case-insensitive behaviour of
 /// the <see cref="JsonStringEnumConverter"/> this type replaces), an ordinal written as a number or as a quoted
 /// number, and every structurally wrong token all resolve without throwing. It is never permissive in the other
-/// direction: a comma-delimited name list, an undefined ordinal, and an unknown name all resolve to the sentinel,
-/// so nothing that is not a declared member of <typeparamref name="TEnum"/> can ever be produced.
+/// direction: a comma-delimited name list, an undefined ordinal, an integer outside <see cref="int"/> (including a
+/// valid <see cref="long"/> or <see cref="ulong"/> token), and an unknown name all resolve to the sentinel,
+/// so nothing that is not a declared member of <typeparamref name="TEnum"/> can ever be produced. A wide integer
+/// is read and discarded; it is never cast down into the enum's range.
 /// </para>
 /// </remarks>
 /// <typeparam name="TEnum">The enum being converted. Its zero value must be the <c>Unknown</c> sentinel.</typeparam>
@@ -33,7 +35,16 @@ public sealed class UnknownFallbackEnumConverter<TEnum> : JsonConverter<TEnum>
             // A numeric value is accepted so a payload written by an older peer that serialized this enum
             // numerically still round-trips; an undefined ordinal degrades to the sentinel.
             case JsonTokenType.Number:
-                return reader.TryGetInt32(out int ordinal) ? FromOrdinal(ordinal) : default;
+                if (reader.TryGetInt32(out int ordinal))
+                {
+                    return FromOrdinal(ordinal);
+                }
+
+                // A JSON number that fits in long or ulong but not Int32 is a valid numeric token this
+                // contract cannot represent. Read it so the value is consumed, then degrade. Do not cast
+                // it to Int32: that would truncate a wide ordinal into a declared member.
+                _ = reader.TryGetInt64(out _) || reader.TryGetUInt64(out _);
+                return default;
 
             case JsonTokenType.String:
                 return FromName(reader.GetString());
@@ -93,6 +104,14 @@ public sealed class UnknownFallbackEnumConverter<TEnum> : JsonConverter<TEnum>
             return string.Equals(name, ordinal.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
                 ? FromOrdinal(ordinal)
                 : default;
+        }
+
+        // A canonical or non-canonical integer outside Int32 must not fall through to Enum.TryParse, which
+        // can accept a numeric string that does not fit the backing type. The token degrades to Unknown.
+        if (long.TryParse(trimmedName, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out _)
+            || ulong.TryParse(trimmedName, NumberStyles.None, CultureInfo.InvariantCulture, out _))
+        {
+            return default;
         }
 
         // Enum.TryParse also accepts a comma-delimited name list on a non-flags enum, which combines the ordinals

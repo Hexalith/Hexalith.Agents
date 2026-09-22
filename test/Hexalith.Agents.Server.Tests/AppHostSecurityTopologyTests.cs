@@ -3,6 +3,17 @@ namespace Hexalith.Agents.Server.Tests;
 using System.IO;
 using System.Xml.Linq;
 
+using Hexalith.Agents;
+using Hexalith.Agents.Server;
+using Hexalith.Agents.Server.Composition;
+using Hexalith.Agents.Server.Ports;
+
+using Hexalith.EventStore.Authorization;
+using Hexalith.EventStore.DomainService;
+
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+
 using Shouldly;
 
 /// <summary>
@@ -29,12 +40,21 @@ public sealed class AppHostSecurityTopologyTests
     [Fact]
     public void ServerHostShouldDelegateTheStatusReaderFallbackToSetupComposition()
     {
-        string program = File.ReadAllText(ModuleLayout.ResolveModulePath("src/Hexalith.Agents.Server/Program.cs"));
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.AddEventStoreDomainService(
+            typeof(AgentsAssemblyMarker).Assembly,
+            typeof(ServerAssemblyMarker).Assembly);
+        AgentDomainHostComposition.Configure(builder);
+        using ServiceProvider provider = builder.Services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateOnBuild = false,
+            ValidateScopes = true,
+        });
 
-        program.ShouldContain("AddAgentSetupServices(builder.Configuration)");
-        program.ShouldNotContain("AddSingleton<IAgentCommandStatusReader, DeferredAgentCommandStatusReader>");
-        // Gateway admission adapters and trusted-extension policies belong to the independently composed gateway.
-        program.ShouldNotContain("AddAgentsEventStore(");
+        provider.GetServices<IIdempotencyIntentAdapter>().ShouldBeEmpty();
+        provider.GetServices<ITrustedCommandExtensionPolicy>().ShouldBeEmpty();
+        provider.GetRequiredService<IAgentCommandStatusReader>()
+            .ShouldBeOfType<DeferredAgentCommandStatusReader>();
     }
 
     [Fact]

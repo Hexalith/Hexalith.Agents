@@ -23,31 +23,31 @@ public enum AgentActivationBlocker
     Unknown = 0,
 
     /// <summary>The required display name is missing.</summary>
-    MissingDisplayName,
+    MissingDisplayName = 1,
 
     /// <summary>The required Agent Instructions are missing.</summary>
-    MissingInstructions,
+    MissingInstructions = 2,
 
     /// <summary>The Agent Instructions are present but do not meet validity requirements.</summary>
-    InvalidInstructions,
+    InvalidInstructions = 3,
 
     /// <summary>No valid Party identity is linked, so the Agent has no attributable AI participant (AC2, AC4; 1.4).</summary>
-    MissingPartyIdentity,
+    MissingPartyIdentity = 4,
 
     /// <summary>No Provider/model has been selected yet, so the Agent has no model to call (AC2; 1.5).</summary>
-    MissingProviderSelection,
+    MissingProviderSelection = 5,
 
     /// <summary>A Provider/model is selected but it is currently not selectable/ready — maps to the canonical UX <c>provider unavailable</c> readiness state (AC2; 1.5).</summary>
-    ProviderUnavailable,
+    ProviderUnavailable = 6,
 
     /// <summary>No Response Mode has been chosen yet, so the Agent has no governed delivery policy (AC1; 1.6). Automatic mode requires no approver policy.</summary>
-    MissingResponseMode,
+    MissingResponseMode = 7,
 
     /// <summary>The Agent is in Confirmation mode but no approver source is configured, so confirmation has nothing to confirm with (AC3; 1.6).</summary>
-    MissingApproverPolicy,
+    MissingApproverPolicy = 8,
 
     /// <summary>The Agent is in Confirmation mode and a configured approver source is missing/disabled/ambiguous/unavailable/unauthorized — fails closed (AC3; 1.6).</summary>
-    ApproverPolicyUnresolvable,
+    ApproverPolicyUnresolvable = 9,
 
     /// <summary>No active Content Safety Policy is configured, so production/production-like enablement is not permitted — the final Epic 1 activation gate (AC2, AC4; 1.7).</summary>
     MissingContentSafetyPolicy = 10,

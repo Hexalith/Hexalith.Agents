@@ -143,10 +143,25 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         descriptor.OperationId.ShouldBe("agents.setup.activate");
         descriptor.DescriptorVersion.ShouldBe(1);
         registry.Resolve(reorderedRetry).CanonicalIntent.ShouldBe(descriptor.CanonicalIntent);
+        registry.Resolve(ActivationCommand(
+            "{\"value\":1}",
+            "7",
+            nameof(ProviderSelectionValidationStatus.Valid),
+            nameof(ApproverPolicyValidationStatus.Valid))).CanonicalIntent
+            .ShouldBe(descriptor.CanonicalIntent);
+        registry.Resolve(ActivationCommand(
+            "{\"value\":2}",
+            "7",
+            nameof(ProviderSelectionValidationStatus.Valid),
+            nameof(ApproverPolicyValidationStatus.Valid))).CanonicalIntent
+            .ShouldBe(descriptor.CanonicalIntent);
+
+        SubmitCommand disabled = StandardCommand(nameof(DisableAgent), "true");
+        registry.Resolve(disabled with { Payload = Encoding.UTF8.GetBytes("{\"value\":2}") }).CanonicalIntent
+            .ShouldBe(registry.Resolve(disabled).CanonicalIntent);
 
         SubmitCommand[] conflicts =
         [
-            ActivationCommand("{\"value\":2}", "7", nameof(ProviderSelectionValidationStatus.Valid), nameof(ApproverPolicyValidationStatus.Valid)),
             ActivationCommand("{\"value\":1}", "8", nameof(ProviderSelectionValidationStatus.Valid), nameof(ApproverPolicyValidationStatus.Valid)),
             ActivationCommand("{\"value\":1}", "7", nameof(ProviderSelectionValidationStatus.Valid), nameof(ApproverPolicyValidationStatus.Valid), administratorAuthorization: "false"),
         ];
@@ -184,6 +199,40 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
 
         registry.Resolve(original with { Tenant = "tenant-b" }).CanonicalIntent.ShouldNotBe(originalIntent);
         registry.Resolve(original with { AggregateId = "agent-b" }).CanonicalIntent.ShouldNotBe(originalIntent);
+    }
+
+    [Fact]
+    public void Declared_command_spelling_shares_one_canonical_intent_and_a_semantic_change_does_not()
+    {
+        IdempotencyIntentAdapterRegistry registry = Registry();
+        SubmitCommand pascalCase = UpdateCommand("{\"DisplayName\":\"Hexa\",\"Instructions\":\"Stay terse\"}");
+        SubmitCommand camelCase = UpdateCommand("{\"instructions\":\"Stay terse\",\"displayName\":\"Hexa\"}");
+        SubmitCommand changedInstructions = UpdateCommand("{\"displayName\":\"Hexa\",\"instructions\":\"Say more\"}");
+        SubmitCommand paddedName = UpdateCommand("{\"displayName\":\"Hexa \",\"instructions\":\"Stay terse\"}");
+
+        byte[] canonical = registry.Resolve(pascalCase).CanonicalIntent;
+        registry.Resolve(pascalCase).RetentionTier.ShouldBe(IdempotencyReplayRetentionTier.Mutation);
+        registry.Resolve(camelCase).CanonicalIntent.SequenceEqual(canonical).ShouldBeTrue();
+        registry.Resolve(changedInstructions).CanonicalIntent.SequenceEqual(canonical).ShouldBeFalse();
+        registry.Resolve(paddedName).CanonicalIntent.SequenceEqual(canonical).ShouldBeFalse();
+
+        SubmitCommand namedMode = ResponseModeCommand("{\"Mode\":\"Automatic\"}");
+        SubmitCommand numericMode = ResponseModeCommand("{\"mode\":1}");
+        SubmitCommand otherMode = ResponseModeCommand("{\"mode\":\"Confirmation\"}");
+        byte[] modeCanonical = registry.Resolve(namedMode).CanonicalIntent;
+        registry.Resolve(numericMode).CanonicalIntent.SequenceEqual(modeCanonical).ShouldBeTrue();
+        registry.Resolve(otherMode).CanonicalIntent.SequenceEqual(modeCanonical).ShouldBeFalse();
+    }
+
+    [Fact]
+    public void A_non_agent_domain_is_rejected_by_the_setup_adapter()
+    {
+        SubmitCommand foreign = UpdateCommand("{\"displayName\":\"Hexa\",\"instructions\":\"Stay terse\"}") with
+        {
+            Domain = "other-domain",
+        };
+
+        Should.Throw<ArgumentException>(() => Registry().Resolve(foreign));
     }
 
     [Fact]
@@ -234,12 +283,27 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         replayReceipt.ResultPayload.ShouldNotBeNull().GetRawText()
             .ShouldBe(originalReceipt.ResultPayload.ShouldNotBeNull().GetRawText());
         executedCommands.Count.ShouldBe(1);
+
+        using HttpResponseMessage undeclaredValueReplay = await client
+            .PostAsJsonAsync(
+                "/api/v1/commands",
+                ActivationRequest(
+                    JsonSerializer.SerializeToElement(new { value = 2 }),
+                    "7",
+                    nameof(ProviderSelectionValidationStatus.Valid),
+                    nameof(ApproverPolicyValidationStatus.Valid)))
+            .ConfigureAwait(true);
+        undeclaredValueReplay.StatusCode.ShouldBe(System.Net.HttpStatusCode.Accepted);
+        SubmitCommandResponse undeclaredValueReceipt = (await undeclaredValueReplay.Content
+            .ReadFromJsonAsync<SubmitCommandResponse>()
+            .ConfigureAwait(true)).ShouldNotBeNull();
+        undeclaredValueReceipt.MessageId.ShouldBe(originalReceipt.MessageId);
+        executedCommands.Count.ShouldBe(1);
         executedCommands[0].Extensions?[AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion]
             .ShouldBe("7");
 
         SubmitCommandRequest[] conflicts =
         [
-            ActivationRequest(JsonSerializer.SerializeToElement(new { value = 2 }), "7", nameof(ProviderSelectionValidationStatus.Valid), nameof(ApproverPolicyValidationStatus.Valid)),
             ActivationRequest(JsonSerializer.SerializeToElement(new { value = 1 }), "8", nameof(ProviderSelectionValidationStatus.Valid), nameof(ApproverPolicyValidationStatus.Valid)),
             ActivationRequest(
                 JsonSerializer.SerializeToElement(new { value = 1 }),
@@ -258,6 +322,152 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
 
         executedCommands.Count.ShouldBe(1);
         ledger.ExecutionCount.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Equivalent_setup_spelling_replays_on_the_gateway_and_a_semantic_change_does_not_append_again()
+    {
+        var executedCommands = new List<SubmitCommand>();
+        await using WebApplication domain = BuildDomainApp(executedCommands.Add);
+        await domain.StartAsync().ConfigureAwait(true);
+        using HttpClient domainClient = domain.GetTestClient();
+        var ledger = new InMemoryAdmissionLedger(domainClient);
+        var admission = new ProductionAdmissionState();
+        await using WebApplication gateway = BuildGatewayApp(
+            Principal(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId),
+            ledger,
+            registerAgentsIntegration: true,
+            admission);
+        await gateway.StartAsync().ConfigureAwait(true);
+        using HttpClient client = gateway.GetTestClient();
+
+        SubmitCommandRequest original = ResponseModeRequest("{\"Mode\":\"Automatic\"}");
+        SubmitCommandRequest spelled = ResponseModeRequest("{\"mode\":\"automatic\"}");
+        SubmitCommandRequest numeric = ResponseModeRequest("{\"mode\":1}");
+        TrustedIdempotencyDescriptor descriptor = Registry().Resolve(Submitted(original));
+        descriptor.RetentionTier.ShouldBe(IdempotencyReplayRetentionTier.Mutation);
+        Registry().Resolve(Submitted(spelled)).CanonicalIntent.SequenceEqual(descriptor.CanonicalIntent).ShouldBeTrue();
+        Registry().Resolve(Submitted(numeric)).CanonicalIntent.SequenceEqual(descriptor.CanonicalIntent).ShouldBeTrue();
+
+        using HttpResponseMessage originalResponse = await client
+            .PostAsJsonAsync("/api/v1/commands", original)
+            .ConfigureAwait(true);
+        originalResponse.StatusCode.ShouldBe(System.Net.HttpStatusCode.Accepted);
+        SubmitCommandResponse originalReceipt = (await originalResponse.Content
+            .ReadFromJsonAsync<SubmitCommandResponse>()
+            .ConfigureAwait(true)).ShouldNotBeNull();
+        admission.ObservedRetentionTier.ShouldBe(IdempotencyReplayRetentionTier.Mutation);
+        admission.ObservedIntentDigest.ShouldBe(await IntentDigestAsync(descriptor).ConfigureAwait(true));
+
+        using HttpResponseMessage replayResponse = await client
+            .PostAsJsonAsync("/api/v1/commands", spelled)
+            .ConfigureAwait(true);
+        replayResponse.StatusCode.ShouldBe(System.Net.HttpStatusCode.Accepted);
+        SubmitCommandResponse replayReceipt = (await replayResponse.Content
+            .ReadFromJsonAsync<SubmitCommandResponse>()
+            .ConfigureAwait(true)).ShouldNotBeNull();
+        replayReceipt.MessageId.ShouldBe(originalReceipt.MessageId);
+        replayReceipt.ResultPayload.ShouldNotBeNull().GetRawText()
+            .ShouldBe(originalReceipt.ResultPayload.ShouldNotBeNull().GetRawText());
+
+        using HttpResponseMessage numericResponse = await client
+            .PostAsJsonAsync("/api/v1/commands", numeric)
+            .ConfigureAwait(true);
+        numericResponse.StatusCode.ShouldBe(System.Net.HttpStatusCode.Accepted);
+
+        using HttpResponseMessage conflictResponse = await client
+            .PostAsJsonAsync("/api/v1/commands", ResponseModeRequest("{\"mode\":\"Confirmation\"}"))
+            .ConfigureAwait(true);
+        conflictResponse.StatusCode.ShouldBe(System.Net.HttpStatusCode.Conflict);
+        executedCommands.Count.ShouldBe(1);
+        ledger.ExecutionCount.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task An_in_flight_key_from_the_previous_encoder_conflicts_without_a_second_execution()
+    {
+        const string RawPayload = "{\"Mode\":\"Automatic\"}";
+        var semanticOptions = new Dictionary<string, string>
+        {
+            [AgentSetupTrustedExtensions.AgentAdministrator] = "true",
+        };
+        byte[] previousCanonical = new CanonicalIdempotencyIntentEncoder().Encode(
+            "Hexalith.Agents.EventStore.ConfigureAgentResponseMode.v1",
+            "agents.setup.response-mode",
+            1,
+            IdempotencyReplayRetentionTier.Mutation,
+            new IdempotencyCanonicalIntent(
+                JsonSerializer.Serialize(new[] { "tenant-a", "agent", "agent-a" }),
+                Encoding.UTF8.GetBytes(RawPayload),
+                semanticOptions,
+                PolicyVersion: "1",
+                DelegatedTaskScope: null,
+                CredentialScope: null));
+        SubmitCommandRequest retry = ResponseModeRequest(RawPayload);
+        byte[] currentCanonical = Registry().Resolve(Submitted(retry)).CanonicalIntent;
+        currentCanonical.SequenceEqual(previousCanonical).ShouldBeFalse();
+
+        var admission = new ProductionAdmissionState();
+        admission.SeedInFlight(await IntentDigestAsync(new TrustedIdempotencyDescriptor(
+            "Hexalith.Agents.EventStore.ConfigureAgentResponseMode.v1",
+            "agents.setup.response-mode",
+            1,
+            previousCanonical,
+            IdempotencyReplayRetentionTier.Mutation)).ConfigureAwait(true));
+
+        int domainExecutions = 0;
+        await using WebApplication domain = BuildDomainApp(_ => domainExecutions++);
+        await domain.StartAsync().ConfigureAwait(true);
+        using HttpClient domainClient = domain.GetTestClient();
+        var ledger = new InMemoryAdmissionLedger(domainClient);
+        await using WebApplication gateway = BuildGatewayApp(
+            Principal(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId),
+            ledger,
+            registerAgentsIntegration: true,
+            admission);
+        await gateway.StartAsync().ConfigureAwait(true);
+        using HttpClient client = gateway.GetTestClient();
+
+        using HttpResponseMessage response = await client
+            .PostAsJsonAsync("/api/v1/commands", retry)
+            .ConfigureAwait(true);
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.Conflict);
+        domainExecutions.ShouldBe(0);
+        ledger.ExecutionCount.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task A_non_agent_domain_fails_on_the_gateway_before_execution()
+    {
+        SubmitCommand foreign = UpdateCommand("{\"displayName\":\"Hexa\",\"instructions\":\"Stay terse\"}") with
+        {
+            Domain = "other-domain",
+            Extensions = null,
+        };
+        Should.Throw<ArgumentException>(() => Registry().Resolve(foreign));
+
+        int domainExecutions = 0;
+        await using WebApplication domain = BuildDomainApp(_ => domainExecutions++);
+        await domain.StartAsync().ConfigureAwait(true);
+        using HttpClient domainClient = domain.GetTestClient();
+        var ledger = new InMemoryAdmissionLedger(domainClient);
+        await using WebApplication gateway = BuildGatewayApp(
+            Principal(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId),
+            ledger,
+            registerAgentsIntegration: true);
+        await gateway.StartAsync().ConfigureAwait(true);
+        using HttpClient client = gateway.GetTestClient();
+
+        using HttpResponseMessage response = await client.PostAsJsonAsync(
+            "/api/v1/commands",
+            Request("other-domain", nameof(UpdateAgentConfiguration)) with
+            {
+                Payload = JsonPayload("{\"displayName\":\"Hexa\",\"instructions\":\"Stay terse\"}"),
+            }).ConfigureAwait(true);
+
+        response.IsSuccessStatusCode.ShouldBeFalse();
+        domainExecutions.ShouldBe(0);
+        ledger.ExecutionCount.ShouldBe(0);
     }
 
     [Theory]
@@ -304,6 +514,15 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "other-domain", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "true", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", "OtherCommand", AgentSetupTrustedExtensions.AgentAdministrator, "true", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "True", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "false", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "0", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, "0", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(CreateAgent), AgentSetupTrustedExtensions.ProviderSelectionValidation, "Valid", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(CreateAgent), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, "7", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(DisableAgent), AgentSetupTrustedExtensions.ApproverPolicyValidation, "Valid", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(DisableAgent), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, "7", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ConfigureAgentResponseMode), AgentSetupTrustedExtensions.ProviderSelectionValidation, "Valid", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ConfigureAgentResponseMode), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, "7", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(UpdateAgentConfiguration), AgentSetupTrustedExtensions.ProviderSelectionValidation, "Valid", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ProviderSelectionValidation, "Valid", true)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ApproverPolicyValidation, "Valid", true)]
@@ -336,6 +555,12 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     [InlineData("agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ApproverPolicyValidation, true)]
     [InlineData("agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, true)]
     [InlineData("agent", nameof(UpdateAgentConfiguration), AgentSetupTrustedExtensions.ProviderSelectionValidation, false)]
+    [InlineData("agent", nameof(CreateAgent), AgentSetupTrustedExtensions.ProviderSelectionValidation, false)]
+    [InlineData("agent", nameof(CreateAgent), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, false)]
+    [InlineData("agent", nameof(DisableAgent), AgentSetupTrustedExtensions.ApproverPolicyValidation, false)]
+    [InlineData("agent", nameof(DisableAgent), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, false)]
+    [InlineData("agent", nameof(ConfigureAgentResponseMode), AgentSetupTrustedExtensions.ProviderSelectionValidation, false)]
+    [InlineData("agent", nameof(ConfigureAgentResponseMode), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, false)]
     [InlineData("other-domain", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, false)]
     [InlineData("agent", "OtherCommand", AgentSetupTrustedExtensions.AgentAdministrator, false)]
     [InlineData("agent", nameof(ActivateAgent), "agent:unknown", false)]
@@ -384,6 +609,13 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             DaprInternalAuthenticationOptions.SchemeName),
             new ClaimsIdentity([new Claim("sub", "public-user")], "Bearer"),
         ]);
+        var mixedAppId = new ClaimsPrincipal(new ClaimsIdentity(
+        [
+            new Claim("sub", "system:agents"),
+            new Claim("dapr_caller_app_id", AgentsAppId),
+            new Claim("dapr_caller_app_id", "other-app"),
+        ],
+        DaprInternalAuthenticationOptions.SchemeName));
 
         foreach (ClaimsPrincipal principal in new[]
         {
@@ -391,6 +623,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             duplicateClaim,
             claimOnAnotherIdentity,
             additionalAuthenticatedIdentity,
+            mixedAppId,
         })
         {
             policy.Accepts(
@@ -443,6 +676,18 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             },
             IsGlobalAdmin: true,
             IdempotencyKey: "01ARZ3NDEKTSV4RRFFQ69G5FAV");
+
+    private static SubmitCommand UpdateCommand(string payload)
+        => ResponseModeCommand(payload) with
+        {
+            CommandType = nameof(UpdateAgentConfiguration),
+        };
+
+    private static SubmitCommand ResponseModeCommand(string payload)
+        => StandardCommand(nameof(ConfigureAgentResponseMode), "true") with
+        {
+            Payload = Encoding.UTF8.GetBytes(payload),
+        };
 
     private static SubmitCommand StandardCommand(string commandType, string administratorAuthorization)
         => ActivationCommand(
@@ -504,6 +749,52 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         };
     }
 
+    private static SubmitCommandRequest ResponseModeRequest(string json)
+        => Request("agent", nameof(ConfigureAgentResponseMode)) with
+        {
+            Payload = JsonPayload(json),
+            Extensions = new Dictionary<string, string>
+            {
+                [AgentSetupTrustedExtensions.AgentAdministrator] = "true",
+            },
+        };
+
+    private static JsonElement JsonPayload(string json)
+        => JsonSerializer.Deserialize<JsonElement>(json);
+
+    private static SubmitCommand Submitted(SubmitCommandRequest request)
+        => new(
+            MessageId: request.MessageId,
+            Tenant: request.Tenant,
+            Domain: request.Domain,
+            AggregateId: request.AggregateId,
+            CommandType: request.CommandType,
+            Payload: JsonSerializer.SerializeToUtf8Bytes(request.Payload),
+            CorrelationId: string.IsNullOrWhiteSpace(request.CorrelationId) ? request.MessageId : request.CorrelationId,
+            UserId: "system:agents",
+            Extensions: request.Extensions is null
+                ? null
+                : new Dictionary<string, string>(request.Extensions, StringComparer.Ordinal),
+            IsGlobalAdmin: true,
+            IdempotencyKey: request.IdempotencyKey);
+
+    private static StaticIdempotencyDigestKeyProvider CreateDigestKeyProvider()
+        => new(
+            "v1",
+            new Dictionary<string, byte[]>(StringComparer.Ordinal)
+            {
+                ["v1"] = Encoding.UTF8.GetBytes("0123456789abcdef0123456789abcdef"),
+            },
+            []);
+
+    private static async Task<string> IntentDigestAsync(TrustedIdempotencyDescriptor descriptor)
+    {
+        IdempotencyProtectedIdentitySet identities = await new IdempotencyKeyProtector(CreateDigestKeyProvider())
+            .ProtectAsync("tenant-a", "01ARZ3NDEKTSV4RRFFQ69G5FAV", descriptor)
+            .ConfigureAwait(false);
+        return identities.Active.IntentDigest;
+    }
+
     private static WebApplication BuildDomainApp(Action<SubmitCommand> onExecute)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
@@ -531,8 +822,10 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     private static WebApplication BuildGatewayApp(
         ClaimsPrincipal principal,
         InMemoryAdmissionLedger ledger,
-        bool registerAgentsIntegration)
+        bool registerAgentsIntegration,
+        ProductionAdmissionState? admissionState = null)
     {
+        ProductionAdmissionState state = admissionState ?? new ProductionAdmissionState();
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.WebHost.UseTestServer();
         _ = builder.Services.AddAuthorization();
@@ -545,15 +838,8 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             _ = builder.Services.AddAgentsEventStore(AgentsAppId);
         }
 
-        builder.Services.AddSingleton<IIdempotencyDigestKeyProvider>(_ =>
-            new StaticIdempotencyDigestKeyProvider(
-                "v1",
-                new Dictionary<string, byte[]>(StringComparer.Ordinal)
-                {
-                    ["v1"] = Encoding.UTF8.GetBytes("0123456789abcdef0123456789abcdef"),
-                },
-                []));
-        builder.Services.AddSingleton(CreateProductionAdmissionActorFactory());
+        builder.Services.AddSingleton<IIdempotencyDigestKeyProvider>(_ => CreateDigestKeyProvider());
+        builder.Services.AddSingleton(CreateProductionAdmissionActorFactory(state));
         builder.Services.AddSingleton<IMediator>(services =>
         {
             var mediator = Substitute.For<IMediator>();
@@ -617,15 +903,18 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             {
                 context.Response.StatusCode = StatusCodes.Status409Conflict;
             }
+            catch (IdempotencyAdmissionFailureException)
+            {
+                context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+            }
         });
         app.UseAuthorization();
         app.MapControllers();
         return app;
     }
 
-    private static IActorProxyFactory CreateProductionAdmissionActorFactory()
+    private static IActorProxyFactory CreateProductionAdmissionActorFactory(ProductionAdmissionState state)
     {
-        var state = new ProductionAdmissionState();
         IIdempotencyAdmissionActor admission = Substitute.For<IIdempotencyAdmissionActor>();
         IIdempotencyAdmissionDirectoryActor directory = Substitute.For<IIdempotencyAdmissionDirectoryActor>();
         IIdempotencyTenantLifecycleActor lifecycle = Substitute.For<IIdempotencyTenantLifecycleActor>();
@@ -696,11 +985,24 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         private string? _executionCorrelationId;
         private CommandProcessingResult? _result;
 
+        public IdempotencyReplayRetentionTier? ObservedRetentionTier { get; private set; }
+
+        public string? ObservedIntentDigest { get; private set; }
+
         public IdempotencyAdmissionInspection Inspect()
             => new(_intentDigest is not null);
 
+        public void SeedInFlight(string intentDigest)
+        {
+            _intentDigest = intentDigest;
+            _executionMessageId = "01ARZ3NDEKTSV4RRFFQ69G5FAV";
+            _executionCorrelationId = "01ARZ3NDEKTSV4RRFFQ69G5FAW";
+        }
+
         public IdempotencyAdmissionResult Admit(IdempotencyAdmissionRequest request)
         {
+            ObservedRetentionTier = request.RetentionTier;
+            ObservedIntentDigest = request.IntentDigest;
             if (_intentDigest is null)
             {
                 _intentDigest = request.IntentDigest;

@@ -24,8 +24,8 @@ public enum AgentResponseMode
     Unknown = 0,
 
     /// <summary>Generated content is posted directly to the Conversation without prior approval.</summary>
-    Automatic,
+    Automatic = 1,
 
     /// <summary>Generated content requires a configured Approver Policy to confirm before it reaches the Conversation.</summary>
-    Confirmation,
+    Confirmation = 2,
 }

@@ -441,3 +441,11 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Show that the Builds, Commons, Conversations, FrontComposer, and PolymorphicSerializations gitlinks are required by the Agents EventStore integration.
   evidence: The EventStore integration diff moves those five pins with the EventStore pin. Nothing in that diff shows the new adapters need them. Unverified medium: an unnecessary pin can pull unrelated submodule behavior into this story. Settle by rebuilding `Hexalith.Agents.EventStore` against the previous five pins.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
+  summary: Make CI and release evidence honest for Story 5.2 floors, pins, skips, package layout, Dependabot, and unpublished dispatches.
+  evidence: Split from the live-setup correctness spec because token count was 2491. The deferred slice is test floors and skip rejection in agents-policy, aligning the domain-ci and domain-release pin with the Builds gitlink, verifier skip and source-mode gaps, checkout credentials, npm signature audit, package-count and test-project drift, Dependabot gitlinks, and the unpublished-release signal. That last signal is still undecided: fail the workflow when publication is disabled, or stay green and write a job summary that publication did not run.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
+  summary: Stop a create command from storing a payload tenant that disagrees with the envelope tenant.
+  evidence: `CreateAgent.TenantId` is stored by `AgentAggregate` from the payload, while idempotency scopes the canonical target by the envelope tenant. This slice hashes the declared payload and does not choose the event tenant; the approved spec forbids changing Party identity. The split predates this change.

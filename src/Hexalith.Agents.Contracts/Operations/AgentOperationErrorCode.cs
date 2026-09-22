@@ -18,29 +18,29 @@ public enum AgentOperationErrorCode
     Unknown = 0,
 
     /// <summary>The authenticated caller is not authorized for the operation.</summary>
-    NotAuthorized,
+    NotAuthorized = 1,
 
     /// <summary>The request shape or trusted server-side validation failed.</summary>
-    ValidationFailed,
+    ValidationFailed = 2,
 
     /// <summary>The requested resource was not found in the caller's authorized scope.</summary>
-    NotFound,
+    NotFound = 3,
 
     /// <summary>The operation conflicts with the current resource state.</summary>
-    Conflict,
+    Conflict = 4,
 
     /// <summary>The operation could not proceed because the observed state is stale.</summary>
-    Stale,
+    Stale = 5,
 
     /// <summary>A required dependency, projection, or deferred binding is unavailable.</summary>
-    Unavailable,
+    Unavailable = 6,
 
     /// <summary>The governed workflow rejected the operation.</summary>
-    Rejected,
+    Rejected = 7,
 
     /// <summary>The operation was blocked by policy or dependency readiness gates.</summary>
-    Blocked,
+    Blocked = 8,
 
     /// <summary>The operation completed without enough trusted evidence to verify its exact outcome.</summary>
-    UnableToVerify,
+    UnableToVerify = 9,
 }
