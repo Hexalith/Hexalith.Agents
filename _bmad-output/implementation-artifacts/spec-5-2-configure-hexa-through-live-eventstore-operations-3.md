@@ -81,6 +81,24 @@ context:
 - In-flight create and update payloads that omitted nulls are unseeded — `low`. Re-serialization writes those nulls (`DefaultIgnoreCondition=Never`), and the spec wants that byte mismatch to conflict. The shared HTTP conflict test already requires a mismatch to return 409.
 - New deferred-work bullets hide the payload-tenant hash and have no status — `false` for the hash claim. The bullet names `CreateAgent.TenantId` and says this slice hashes the declared payload. Neighboring bullets in that section also omit `status`, and `source_spec` names this story.
 
+### Review Findings
+
+- [x] [Review][Patch] A permanent payload or domain defect is reported as a retryable outage [references/Hexalith.EventStore/src/Hexalith.EventStore.Server/Pipeline/SubmitCommandHandler.cs:87]
+- [x] [Review][Patch] Wide tokens that truncate to a declared ordinal are untested [src/Hexalith.Agents.Contracts/Serialization/UnknownFallbackEnumConverter.cs:50]
+- [x] [Review][Patch] The unsigned-enum test never reads a positive in-range ordinal [test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs:526]
+- [x] [Review][Patch] The numeric gateway replay does not require the original receipt [test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs:402]
+- [x] [Review][Patch] Declared-command collapse for unknown mode tokens and omitted nulls is unasserted [test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs:228]
+- [x] [Review][Defer] A create payload tenant can disagree with the envelope tenant [src/Hexalith.Agents/Agent/AgentAggregate.cs:118] — deferred: pre-existing. The aggregate stores `CreateAgent.TenantId` while idempotency scopes the target by the envelope tenant, and this spec forbids changing Party identity.
+
+**Rejected**
+
+- Plus-prefixed and over-long integer strings fall through to `Enum.TryParse` — `false`. Those strings do reach `TryParse`, and it returns false, so `"+9223372036854775808"`, a 30-digit string, and `"+18446744073709551615"` still deserialize to `Unknown`.
+- `1.0` and `1e1` collapse to the zero sentinel — `false`. They are not integer ordinal tokens. `TryGetInt32`, `TryGetInt64`, and `TryGetUInt64` all fail, and the converter returns `Unknown`. Bare `1` still reads as `Automatic`.
+- Composition proof never boots `Program.cs` and ignores the `BaseUrl` branch — `low`. `AddAgentSetupServices` registers a gateway client and dispatcher on that branch, not admission adapters, and the spec's proof is the composed graph the test already builds. An executable host harness is more than a direct correction.
+- Spec verification commands, the empty change log, and `review_loop_iteration: 0` disagree with `status: done` — rejected. The only correction is editing this spec.
+- The Code Map still describes the pre-change converter and theories — rejected. The only correction is editing this spec.
+- The CI deferred bullet leaves the unpublished-release signal undecided — `low`. This slice is forbidden to change CI, and the choice is already recorded in `deferred-work.md`. Closing it is a workflow policy change, not a direct correction of this diff.
+
 ## Implementation Notes
 
 - Setup adapters now pass the declared command type into `AgentSetupIdempotencyIntentAdapter`, which deserializes the payload with `EventStorePayloadSerialization.Options` and re-serializes that contract before the existing canonical encoder. Equivalent spelling and key order share one intent. An in-flight digest built from the previous raw payload conflicts on the gateway HTTP path and does not execute.
@@ -144,7 +162,7 @@ Semantic identity is the command after declared-contract normalization, then the
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-22T16:36:09Z
+Run (UTC): 2026-09-22T17:16:18Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
@@ -183,3 +201,4 @@ Result: PASS
 - `test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AppHostSecurityTopologyTests.cs`
+- `references/Hexalith.EventStore`

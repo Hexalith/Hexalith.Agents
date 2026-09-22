@@ -299,6 +299,8 @@ public sealed class AgentOperationContractsTests
             "\"9999\"",
             "2147483648",
             "\"2147483648\"",
+            "4294967297",
+            "\"4294967297\"",
             "9223372036854775808",
             "\"9223372036854775808\"",
             "18446744073709551615",
@@ -535,6 +537,20 @@ public sealed class AgentOperationContractsTests
     }
 
     [Theory]
+    [InlineData("1")]
+    [InlineData("\"1\"")]
+    public void An_unsigned_backed_enum_reads_a_positive_in_range_ordinal(string json)
+    {
+        var options = new JsonSerializerOptions
+        {
+            Converters = { new UnknownFallbackEnumConverter<UnsignedBackedToleranceStatus>() },
+        };
+
+        JsonSerializer.Deserialize<UnsignedBackedToleranceStatus>(json, options)
+            .ShouldBe(UnsignedBackedToleranceStatus.Ready);
+    }
+
+    [Theory]
     [MemberData(nameof(PublicOperationEnumTypes))]
     public void RecognizedOperationEnumNamesStillParseCaseInsensitively(Type enumType)
     {
@@ -745,6 +761,7 @@ public sealed class AgentOperationContractsTests
     private enum UnsignedBackedToleranceStatus : ulong
     {
         Unknown = 0,
+        Ready = 1,
         Maximum = ulong.MaxValue,
     }
 }

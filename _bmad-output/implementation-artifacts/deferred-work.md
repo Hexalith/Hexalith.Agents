@@ -449,3 +449,7 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
   summary: Stop a create command from storing a payload tenant that disagrees with the envelope tenant.
   evidence: `CreateAgent.TenantId` is stored by `AgentAggregate` from the payload, while idempotency scopes the canonical target by the envelope tenant. This slice hashes the declared payload and does not choose the event tenant; the approved spec forbids changing Party identity. The split predates this change.
+
+## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-3.md (2026-09-22)
+
+- A create payload tenant can disagree with the envelope tenant. `AgentAggregate.Handle(CreateAgent)` stores `command.TenantId`, while setup idempotency scopes the canonical target by the envelope tenant. Pre-existing; this spec forbids changing Party identity. Same split as the bullet above.

@@ -222,6 +222,16 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         byte[] modeCanonical = registry.Resolve(namedMode).CanonicalIntent;
         registry.Resolve(numericMode).CanonicalIntent.SequenceEqual(modeCanonical).ShouldBeTrue();
         registry.Resolve(otherMode).CanonicalIntent.SequenceEqual(modeCanonical).ShouldBeFalse();
+
+        SubmitCommand unknownMode = ResponseModeCommand("{\"mode\":\"Unknown\"}");
+        byte[] unknownCanonical = registry.Resolve(unknownMode).CanonicalIntent;
+        unknownCanonical.SequenceEqual(modeCanonical).ShouldBeFalse();
+        registry.Resolve(ResponseModeCommand("{\"mode\":\"nope\"}")).CanonicalIntent
+            .SequenceEqual(unknownCanonical).ShouldBeTrue();
+        registry.Resolve(ResponseModeCommand("{\"mode\":9999}")).CanonicalIntent
+            .SequenceEqual(unknownCanonical).ShouldBeTrue();
+        registry.Resolve(ResponseModeCommand("{}")).CanonicalIntent
+            .SequenceEqual(unknownCanonical).ShouldBeTrue();
     }
 
     [Fact]
@@ -241,6 +251,10 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         registry.Resolve(camelCase).CanonicalIntent.SequenceEqual(canonical).ShouldBeTrue();
         registry.Resolve(changedTenant).CanonicalIntent.SequenceEqual(canonical).ShouldBeFalse();
         registry.Resolve(changedInstructions).CanonicalIntent.SequenceEqual(canonical).ShouldBeFalse();
+
+        SubmitCommand omittedDescription = CreateCommand(
+            "{\"tenantId\":\"tenant-a\",\"displayName\":\"Hexa\",\"instructions\":\"Stay terse\"}");
+        registry.Resolve(omittedDescription).CanonicalIntent.SequenceEqual(canonical).ShouldBeTrue();
     }
 
     [Theory]
@@ -403,6 +417,12 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             .PostAsJsonAsync("/api/v1/commands", numeric)
             .ConfigureAwait(true);
         numericResponse.StatusCode.ShouldBe(System.Net.HttpStatusCode.Accepted);
+        SubmitCommandResponse numericReceipt = (await numericResponse.Content
+            .ReadFromJsonAsync<SubmitCommandResponse>()
+            .ConfigureAwait(true)).ShouldNotBeNull();
+        numericReceipt.MessageId.ShouldBe(originalReceipt.MessageId);
+        numericReceipt.ResultPayload.ShouldNotBeNull().GetRawText()
+            .ShouldBe(originalReceipt.ResultPayload.ShouldNotBeNull().GetRawText());
 
         using HttpResponseMessage conflictResponse = await client
             .PostAsJsonAsync("/api/v1/commands", ResponseModeRequest("{\"mode\":\"Confirmation\"}"))
@@ -494,7 +514,10 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
                 Payload = JsonPayload("{\"displayName\":\"Hexa\",\"instructions\":\"Stay terse\"}"),
             }).ConfigureAwait(true);
 
-        response.IsSuccessStatusCode.ShouldBeFalse();
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
+        using JsonDocument problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync().ConfigureAwait(true));
+        problem.RootElement.GetProperty("retryable").GetBoolean().ShouldBeFalse();
+        problem.RootElement.GetProperty("clientAction").GetString().ShouldBe("correct_request");
         domainExecutions.ShouldBe(0);
         ledger.ExecutionCount.ShouldBe(0);
     }
@@ -938,9 +961,15 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             {
                 context.Response.StatusCode = StatusCodes.Status409Conflict;
             }
-            catch (IdempotencyAdmissionFailureException)
+            catch (IdempotencyAdmissionFailureException exception)
             {
-                context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+                context.Response.StatusCode = exception.StatusCode;
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    status = exception.StatusCode,
+                    retryable = exception.Retryable,
+                    clientAction = exception.ClientAction,
+                }).ConfigureAwait(false);
             }
         });
         app.UseAuthorization();
