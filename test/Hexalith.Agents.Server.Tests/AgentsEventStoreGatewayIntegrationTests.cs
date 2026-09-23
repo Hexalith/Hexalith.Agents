@@ -509,16 +509,14 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         ledger.ExecutionCount.ShouldBe(0);
     }
 
-    [Fact]
-    public async Task A_non_agent_domain_fails_on_the_gateway_before_execution()
+    [Theory]
+    [InlineData("other-domain", "{\"displayName\":\"Hexa\",\"instructions\":\"Stay terse\"}")]
+    [InlineData("agent", "null")]
+    [InlineData("agent", "[]")]
+    public async Task A_command_the_setup_adapter_rejects_fails_on_the_gateway_before_execution(
+        string commandDomain,
+        string payload)
     {
-        SubmitCommand foreign = UpdateCommand("{\"displayName\":\"Hexa\",\"instructions\":\"Stay terse\"}") with
-        {
-            Domain = "other-domain",
-            Extensions = null,
-        };
-        Should.Throw<ArgumentException>(() => Registry().Resolve(foreign));
-
         int domainExecutions = 0;
         await using WebApplication domain = BuildDomainApp(_ => domainExecutions++);
         await domain.StartAsync().ConfigureAwait(true);
@@ -533,12 +531,24 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
 
         using HttpResponseMessage response = await client.PostAsJsonAsync(
             "/api/v1/commands",
-            Request("other-domain", nameof(UpdateAgentConfiguration)) with
+            Request(commandDomain, nameof(UpdateAgentConfiguration)) with
             {
-                Payload = JsonPayload("{\"displayName\":\"Hexa\",\"instructions\":\"Stay terse\"}"),
+                Payload = JsonPayload(payload),
             }).ConfigureAwait(true);
 
-        response.IsSuccessStatusCode.ShouldBeFalse();
+        using JsonDocument failure = JsonDocument.Parse(
+            await response.Content.ReadAsStringAsync().ConfigureAwait(true));
+#if HEXALITH_EVENTSTORE_FROM_SOURCE
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
+        failure.RootElement.GetProperty("retryable").GetBoolean().ShouldBeFalse();
+        failure.RootElement.GetProperty("clientAction").GetString().ShouldBe("correct_request");
+#else
+        // Published EventStore packages still report an adapter rejection as a retryable outage. When the
+        // package floor moves past EventStore commit 42a7ff05 this branch fails; delete it and keep the one above.
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.ServiceUnavailable);
+        failure.RootElement.GetProperty("retryable").GetBoolean().ShouldBeTrue();
+        failure.RootElement.GetProperty("clientAction").GetString().ShouldBe("retry_later");
+#endif
         domainExecutions.ShouldBe(0);
         ledger.ExecutionCount.ShouldBe(0);
     }
@@ -652,11 +662,20 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         claims.Invoke(policy, [domain, commandType, key]).ShouldBe(expected);
     }
 
-    [Fact]
-    public void Reserved_extension_policy_rejects_missing_duplicate_or_foreign_identity_claims()
+    [Theory]
+    [InlineData(nameof(CreateAgent))]
+    [InlineData(nameof(DisableAgent))]
+    [InlineData(nameof(ConfigureAgentResponseMode))]
+    [InlineData(nameof(ActivateAgent))]
+    public void Reserved_extension_policy_rejects_missing_duplicate_or_foreign_identity_claims(string commandType)
     {
         ITrustedCommandExtensionPolicy policy = Policy();
-        SubmitCommandRequest request = Request("agent", nameof(ActivateAgent));
+        SubmitCommandRequest request = Request("agent", commandType);
+        policy.Accepts(
+            Principal(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId),
+            request,
+            AgentSetupTrustedExtensions.AgentAdministrator,
+            "true").ShouldBeTrue();
         var missingClaim = new ClaimsPrincipal(new ClaimsIdentity(
             [new Claim("sub", "system:agents")],
             DaprInternalAuthenticationOptions.SchemeName));

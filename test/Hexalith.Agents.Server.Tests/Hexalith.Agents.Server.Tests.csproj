@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <IsPackable>false</IsPackable>
+    <DefineConstants Condition="'$(HexalithEventStoreFromSource)' == 'true'">$(DefineConstants);HEXALITH_EVENTSTORE_FROM_SOURCE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

@@ -510,3 +510,7 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
   summary: Add executable fixture coverage for the focused Story 5.2 verifier's success, skip, unrun, and zero-discovery outcomes.
   evidence: The verification-gap reviewer found only PackageFloorOnly execution and source-text checks; reverting Invoke-TestClasses to its earlier total-only behavior would leave those checks green. This inherited CI/tooling change predates the normalization follow-up.
+
+## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-3.md (2026-09-23, re-review)
+
+- `AgentDomainHostComposition.Configure` carries about 180 lines of story-by-story comments moved verbatim from `Program.cs`, and several of them say live command dispatch "stays deferred behind DeferredAgentCommandDispatcher" (for example line 72). That contradicts the Story 5.2 `Agents:EventStore:BaseUrl` block in the same method. Pre-existing; trim or correct them when that composition is next edited.

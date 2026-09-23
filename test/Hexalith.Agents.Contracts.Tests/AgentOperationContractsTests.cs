@@ -584,6 +584,21 @@ public sealed class AgentOperationContractsTests
     }
 
     [Theory]
+    [InlineData("9223372036854775808")]
+    [InlineData("\"9223372036854775808\"")]
+    public void A_signed_backed_enum_never_wraps_an_unsigned_ordinal_onto_a_declared_member(string json)
+    {
+        var options = new JsonSerializerOptions
+        {
+            Converters = { new UnknownFallbackEnumConverter<WideSignedToleranceStatus>() },
+        };
+
+        // Cast to long, this token wraps to long.MinValue, which is the declared Minimum member.
+        JsonSerializer.Deserialize<WideSignedToleranceStatus>(json, options)
+            .ShouldBe(WideSignedToleranceStatus.Unknown);
+    }
+
+    [Theory]
     [MemberData(nameof(PublicOperationEnumTypes))]
     public void RecognizedOperationEnumNamesStillParseCaseInsensitively(Type enumType)
     {
