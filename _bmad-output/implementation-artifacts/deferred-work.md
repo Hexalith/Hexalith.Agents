@@ -485,3 +485,7 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - `AgentInspectionStatus.Success = 0` is deliberately excluded from the fallback. Carried; owned by DW-13.
 - A stale activation's `AgentActivationConfigurationVersionMismatchRejection` surfaces as retryable `UnableToVerify`, not `Stale` or `Conflict`. Carried; owned by DW-7, DW-12, and DW-25.
 - The Agent setup-event enums still use the throwing `JsonStringEnumConverter`. Carried; owned by DW-23.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
+  summary: Compare published NuGet package bytes with the release archives during publication verification.
+  evidence: The inherited `verify-nuget-publication.py` accepts a matching registration-leaf ID and version without downloading or hashing the package, so the publication gate cannot establish that NuGet serves the same archive as the release artifacts.

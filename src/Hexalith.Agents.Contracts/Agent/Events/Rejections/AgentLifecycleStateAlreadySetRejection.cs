@@ -1,9 +1,9 @@
 namespace Hexalith.Agents.Contracts.Agent.Events.Rejections;
 
 /// <summary>
-/// An activate/disable command requested the lifecycle state the Agent is already in (AC2, AC3). A deterministic,
-/// structured rejection rather than a silent re-emission. Carries only safe lifecycle classification — no
-/// instructions or unrelated tenant data.
+/// Historical rejection retained so existing Agent event streams can be replayed. Current activate and disable
+/// commands return an already-applied result when the requested lifecycle state is already set.
+/// Carries only safe lifecycle classification, with no instructions or unrelated tenant data.
 /// </summary>
 /// <param name="AgentId">The Agent aggregate identifier the command targeted.</param>
 /// <param name="CurrentStatus">The Agent's current lifecycle state.</param>
