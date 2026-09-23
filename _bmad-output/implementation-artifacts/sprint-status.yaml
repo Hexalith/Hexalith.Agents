@@ -1,5 +1,5 @@
 # generated: 2026-06-23T21:28:59+02:00
-# last_updated: 2026-09-21
+# last_updated: 2026-09-23
 # project: agents
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-06-23T21:28:59+02:00
-last_updated: 2026-09-21
+last_updated: 2026-09-23
 project: agents
 # retrospectives: epic-1 retro completed 2026-06-26 (epic-1-retro-2026-06-26.md); epic-2 retro completed 2026-06-24 (epic-2-retro-2026-06-24.md); epic-3 retro completed 2026-06-26 (epic-3-retro-2026-06-26.md); epic-4 retro completed 2026-06-25 (epic-4-retro-2026-06-25.md)
 project_key: NOKEY
@@ -85,7 +85,7 @@ development_status:
   epic-4-retrospective: done
   epic-5: in-progress
   5-1-establish-build-package-boundary-and-basic-ci-gates: done  # Current full verifier and artifact reconciliation passed 2026-09-19; expanded live-host work remains Story 5.6.
-  5-2-configure-hexa-through-live-eventstore-operations: review  # Full baseline review and verification passed 2026-09-21; inherited release hardening and live-host/status-reader work remain in the deferred-work ledger and Story 5.6.
+  5-2-configure-hexa-through-live-eventstore-operations: review  # Story 5.2 build review and verification passed 2026-09-23; external Platform composition, status-reader binding, and immutable provisioning remain promotion prerequisites.
   # Story 5.1's shared catalog now supplies published EventStore 3.106.0 and the floor/Release/package lanes pass, closing DW-20 without a local override. Story 5.2 remains in review for its independent blockers: the external Platform gateway must consume Hexalith.Agents.EventStore and explicitly register it (DW-21), the deferred status reader remains host-overridable until Story 5.6 proves reachability, and immutable ProvisionHexa/link retirement remains deferred.
   5-3-govern-provider-models-and-pricing-through-live-operations: backlog  # Noted 2026-09-09 (round-5 spine validation, brownfield M1): a completed, fully-tested prior implementation (2569/2569 tests passing) exists underneath this backlog status; not promoted to done/in-progress here because AD-2's platform/tenant ProviderCatalog split (NC-5.3-PLATFORM-CATALOG-SCOPE) is still unreconciled in code.
   5-4-prove-trusted-principal-tenant-party-and-approver-readiness: backlog
