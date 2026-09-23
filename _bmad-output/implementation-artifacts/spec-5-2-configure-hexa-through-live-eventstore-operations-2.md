@@ -2,7 +2,7 @@
 title: '5.2 Correlate Setup Writes With Their Exact Projected Outcome'
 type: 'feature'
 created: '2026-09-14'
-status: 'done'
+status: 'in-progress'
 route: 'dispatch'
 baseline_commit: '599208dd40efadef728363c227a0f75ebd888337'
 review_loop_iteration: 10
@@ -762,6 +762,34 @@ Code review of Story 5.2 **server orchestration chunk** (`src/Hexalith.Agents.Se
 - Cancellation during the status read throws instead of returning `UnableToVerify` — `false`. The caller requested that cancellation, and the dispatch path propagates caller cancellation the same way.
 - `ExecuteAsync` enforces the exact-version projection rule only through its single caller — `low`. The only caller enforces it today. The method does not receive the projection, so adding a guard means restructuring it for a hypothetical caller.
 
+### Review Findings
+
+Code review of Story 5.2 **aggregate and contracts chunk** (`src/Hexalith.Agents/**` and `src/Hexalith.Agents.Contracts/**` only; 31 files, +679 / −153, baseline `599208dd` → HEAD `db88b0f`), 2026-09-23. Four layers, none failed; the Verification Gap layer found no gaps and the Acceptance Auditor found no spec violations. The readiness gate passed (5 projects, 3211/3211, File List 200/200); that is only a floor. Remaining chunks: UI and UI tests, Server/Agents/Contracts tests, packaging/tooling/docs, and planning artifacts.
+
+- [ ] [Review][Patch] `AgentLifecycleStateAlreadySetRejection` still documents itself as the deterministic answer to an activate or disable that requests the current lifecycle state. `Handle(ActivateAgent)` at the matching version and `Handle(DisableAgent)` now return `AgentSetupDomainResult.AlreadyApplied` instead, and only `AgentState.Apply` still references the type. Reword the summary to say the event is kept to replay historical streams, so no one maps or reintroduces it as current behaviour [src/Hexalith.Agents.Contracts/Agent/Events/Rejections/AgentLifecycleStateAlreadySetRejection.cs:3]
+- [x] [Review][Defer] Six operation enums (`AgentReadinessStatus`, `AgentCallOperationStatus`, `AuditAvailabilityStatus`, `ProposalOperationStatus`, `ProviderModelReadinessStatus`, `OperationalStatusInspectionStatus`) now use `UnknownFallbackEnumConverter`, which reads numeric tokens, but their members after `Unknown = 0` still have implicit ordinals and are not in `ShippedSetupEnumsKeepTheirPinnedOrdinals`. Inserting a member later would silently change what a numeric peer's value means [src/Hexalith.Agents.Contracts/Operations/ProposalOperationStatus.cs:15] — deferred: pre-existing. The replaced `JsonStringEnumConverter` also accepted integers, and spec -3 limits pinning to setup enums
+- [x] [Review][Defer] `AgentSetupWriteStatus` keeps `Submitted = 0` with no fallback converter [src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteStatus.cs:8] — deferred: pre-existing and carried on DW-11. The enum never crosses HTTP, and every factory call site passes a non-success status or a gateway-verified acceptance
+- [x] [Review][Defer] `AgentInspectionStatus` keeps `Success = 0` with no fallback converter [src/Hexalith.Agents.Contracts/Agent/AgentInspectionStatus.cs:11] — deferred: pre-existing, deliberately excluded and carried on DW-13, because a fallback to zero would fail open
+- [x] [Review][Defer] `AgentActivationConfigurationVersionMismatchRejection` is not mapped to `Stale` or `Conflict`, so a stale activation reaches the administrator as retryable `UnableToVerify` [src/Hexalith.Agents/Agent/AgentAggregate.cs:1227] — deferred: pre-existing and carried on DW-7, DW-12, and DW-25. It becomes reachable only when the live command-status reader is bound
+- [x] [Review][Defer] Agent setup-event enums (`ContentSafetyFailureHandling`, `CostControlPosture`, `ApproverPolicySourceKind`, and siblings) still declare the throwing `JsonStringEnumConverter` [src/Hexalith.Agents.Contracts/Serialization/UnknownFallbackEnumConverterFactory.cs:1099] — deferred: pre-existing and carried on DW-23
+
+#### Rejected
+
+- `AgentSetupWriteResult.Failed` accepts `Submitted`, `AlreadyApplied`, or `AwaitingProjection` — `false`. Every caller passes `Unavailable`, `UnableToVerify`, or `ToWriteStatus`, and `ToWriteStatus` never returns a success-like status (`AgentsClientSetupGateway.cs:139-147`).
+- `Submitted` and `AwaitingProjection` do not check that the acceptance carries a known effect and a positive target — `false`. `AgentsClientSetupGateway.WriteAsync` maps an unknown effect or a non-positive target to `UnableToVerify` before it calls `Submitted`, and `AwaitingProjection` has no production caller. Earlier rounds rejected the same claim.
+- `AgentCommandAcceptance` allows `TruthState` and `Effect` to disagree — `false`. The only production constructor (`EventStoreAgentAdministrationOperations.cs:403`) derives `TruthState` from `effect`.
+- A no-op reports `ProjectionConfirmed` while the projection may still lag behind the unchanged version — rejected: the fix edits the spec. The frozen matrix no-op row requires stopping without polling, and the `AgentSetupTruthState` remarks already state that this stage does not prove a read was performed.
+- An activation retried with a new idempotency key after a lost acknowledgement gets a mismatch instead of `AlreadyApplied` — `false`. The frozen matrix requires a retry to reuse the same key and N, and EventStore replays that pair. A never-admitted stale command is specified to conflict and require a reload.
+- The fallback converter does not override `ReadAsPropertyName` / `WriteAsPropertyName` — `false`. No `Dictionary` in `src/` or `test/` is keyed by any contract enum that uses the converter.
+- The converter does not enforce `Unknown` at zero, and `Write` hides undefined values — `false`. `Every_unknown_fallback_converter_is_self_typed_and_has_unknown_at_zero` enforces the precondition for every enum that declares the converter. Degrading an undefined value to the sentinel is the documented design.
+- `ProviderCatalogWriteResult` was not updated for the new statuses — `false`. It exposes only `Submitted` and `Failed`, and the UI gateway passes `UnableToVerify` only to `Failed`, whose acceptance is null, which matches the type's documentation. The file is not in this diff.
+- The canonical-ULID and positive-version rules in `AgentOperationOptions` are not validated — `false`. The HTTP routes validate the retry headers, and `WriteAsync` rejects `ExpectedConfigurationVersion is not > 0`. The remarks already state that other operations ignore that property.
+- The result-payload shape is not locked between the domain writer and the server reader — `false`. Both sides bind to the `AgentSetupResultPayload` constants. `AgentSetupDomainResultTests` pins the payload, and the gateway integration tests compare the replayed and original receipt payloads.
+- `AgentSetupTruthState.Submitted` is never produced — `false`. `EventStoreProviderCatalogOperations.cs:231` produces it for catalog acceptances.
+- `AgentSetupDomainResult.Applied` could carry only rejection events — `false`. Every `Applied` call site in `AgentAggregate` passes setup events, and rejections go through `DomainResult.Rejection`.
+- `ConfigurationVersion + 1` overflows at `int.MaxValue` — `low`. Two billion setup writes on one Agent cannot happen in practice. `Validate` fails loudly on a non-positive version, and a guard would add a branch.
+- Already-active activation and already-disabled disable changed from a rejection to `AlreadyApplied` — `false` as a defect. This is what the matrix no-op row specifies, and earlier triage accepted it.
+
 ## Implementation Notes
 
 - Added the canonical `## Dev Agent Record` and nested `### File List` this story was missing, so the
@@ -1383,16 +1411,16 @@ the aggregate and is rejected when current state differs from N.
 <!-- dev-agent-test-evidence:start -->
 ### Latest Release Test Evidence
 
-Run (UTC): 2026-09-22T21:21:28Z
+Run (UTC): 2026-09-22T22:39:00Z
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Contracts.Tests | 687 | 687 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 611 | 611 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 614 | 614 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 805 | 805 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1099 | 1099 | 0 | 0 | 0 | 0 |
-| **Total** | 3208 | 3208 | 0 | 0 | 0 | 0 |
+| **Total** | 3211 | 3211 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->
