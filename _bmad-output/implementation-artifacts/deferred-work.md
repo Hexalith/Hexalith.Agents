@@ -489,3 +489,24 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Compare published NuGet package bytes with the release archives during publication verification.
   evidence: The inherited `verify-nuget-publication.py` accepts a matching registration-leaf ID and version without downloading or hashing the package, so the publication gate cannot establish that NuGet serves the same archive as the release artifacts.
+
+## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-3.md (2026-09-23)
+
+- CI runs only `verify-story-5.2.ps1 -PackageFloorOnly` and the Story 5.1 floor, so a missing Story 5.2 focused class can leave CI green while broad test counts remain above their minima. Pre-existing; carried under the existing CI and release evidence row.
+- The Story 5.2 verifier's project-level regression calls have neither `--fail-skips on` nor minimum test counts, unlike its focused class calls. Skipped or undiscovered regression tests can leave the local verifier green. Pre-existing; carried under the existing CI and release evidence row.
+- `AgentAggregate.Handle(CreateAgent)` stores `CreateAgent.TenantId` while the setup adapter scopes canonical intent by the envelope tenant. A trusted direct caller can submit a mismatched pair. Pre-existing; the approved slice does not change Party identity, and this is already recorded above.
+- The domain host still falls back to `DeferredAgentCommandStatusReader`, so a domain-rejected setup write lacks a live terminal status and remains unverifiable. Pre-existing; carried under DW-7, DW-12, DW-19, DW-24, and DW-25.
+- `AgentInspectionStatus.Success = 0` makes a missing status field deserialize as success status with a null setup payload. Pre-existing; this type is deliberately excluded from the Unknown-zero migration and is tracked under the existing enum-compatibility work.
+- Six public operation enums still have implicit nonzero ordinals despite numeric legacy reads. A future insertion can reinterpret a shipped numeric value. Pre-existing; the setup-only pin test does not cover them, and the same finding is recorded in the aggregate-and-contracts chunk above.
+
+- source_spec: `spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
+  summary: Exercise the Story 5.2 focused class-presence gates in CI and reject skipped or undiscovered tests in its regression lane.
+  evidence: The resumed review confirms CI invokes only PackageFloorOnly plus Story 5.1 broad floors, while verify-story-5.2.ps1 regression calls still omit skip rejection and minimum counts; these inherited gaps precede the normalization follow-up.
+
+- source_spec: `spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
+  summary: Define the coupled update path for Dependabot proposals that advance the Builds gitlink.
+  evidence: A gitlink-only proposal fails the literal Builds SHA assertions in CI and PackageInventoryTests until workflow and test pins move together; preserve the consistency gate and supply automation or explicit maintainer instructions in the separate dependency-maintenance work.
+
+- source_spec: `spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
+  summary: Add executable fixture coverage for the focused Story 5.2 verifier's success, skip, unrun, and zero-discovery outcomes.
+  evidence: The verification-gap reviewer found only PackageFloorOnly execution and source-text checks; reverting Invoke-TestClasses to its earlier total-only behavior would leave those checks green. This inherited CI/tooling change predates the normalization follow-up.

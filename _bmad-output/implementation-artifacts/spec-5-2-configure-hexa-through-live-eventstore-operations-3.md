@@ -99,6 +99,24 @@ context:
 - The Code Map still describes the pre-change converter and theories — rejected. The only correction is editing this spec.
 - The CI deferred bullet leaves the unpublished-release signal undecided — `low`. This slice is forbidden to change CI, and the choice is already recorded in `deferred-work.md`. Closing it is a workflow policy change, not a direct correction of this diff.
 
+### Review Findings (2026-09-23)
+
+- [x] [Review][Patch] The production `Program.cs` call to `AgentDomainHostComposition.Configure` is unguarded after the test refactor [test/Hexalith.Agents.Server.Tests/AppHostSecurityTopologyTests.cs:42] — patched: the host topology test now checks the entrypoint call alongside the composed service graph.
+- [x] [Review][Defer] CI does not run the Story 5.2 focused verifier [.github/workflows/ci.yml:64] — deferred: pre-existing. The policy job invokes only `-PackageFloorOnly` and the Story 5.1 floor; a missing 5.2 class can remain above those broad counts. The existing CI evidence row tracks this gap.
+- [x] [Review][Defer] The Story 5.2 regression lane accepts skipped or undiscovered tests [eng/verify-story-5.2.ps1:357] — deferred: pre-existing. Unlike the focused lane, its project-level `dotnet test` calls have neither `--fail-skips on` nor a minimum count; the existing CI evidence row tracks the verifier gap.
+- [x] [Review][Defer] A trusted create payload can store a tenant different from its envelope tenant [src/Hexalith.Agents.EventStore/AgentSetupIdempotencyIntentAdapter.cs:52] — deferred: pre-existing. `AgentAggregate.Handle(CreateAgent)` stores the payload tenant while admission scopes the target by the envelope tenant; this is already recorded in deferred work.
+- [x] [Review][Defer] Domain rejection remains unverifiable while the command-status reader is deferred [src/Hexalith.Agents.Server/Composition/AgentDomainHostComposition.cs:204] — deferred: pre-existing. The moved registration still installs `DeferredAgentCommandStatusReader`; DW-7, DW-12, DW-19, DW-24, and DW-25 cover the live binding and terminal mapping.
+- [x] [Review][Defer] A missing inspection status can deserialize as `Success` [src/Hexalith.Agents.Contracts/Agent/AgentInspectionStatus.cs:11] — deferred: pre-existing. `Success = 0` remains the positional-record default, so a malformed response can report success status with no setup payload; the existing enum-compatibility ledger records the deliberate exclusion.
+- [x] [Review][Defer] Six public operation enums retain implicit numeric ordinals [test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs:384] — deferred: pre-existing. Their numeric readers can reinterpret a shipped value after a future member insertion; the 5.2 pin test covers setup enums only, and this gap is already recorded in deferred work.
+
+**Rejected**
+
+- `AgentSetupWriteStatus.Submitted = 0` can arise from a missing wire field — `false`. Current setup and provider-catalog gateways construct this UI result in process; no current reader deserializes a missing `Status` into it. DW-11 already tracks migration if it becomes a wire contract.
+- A future optional command property makes today's normalization wrong — `false`. No such property is added in this diff; the approved contract intentionally conflicts with prior canonical bytes, and any later schema change needs its own identity decision.
+- The gateway replay test must persist and reload admission state — `low`, rejected. This focused test exercises HTTP admission semantics with an in-memory ledger; live persistence and restart evidence belong to the separately deferred integration tier, so adding that harness is disproportionate to this normalization change.
+- Gateway registration violates this follow-up's scope — `false`. The spec's File List explicitly attributes the padded-ID and different-app-ID guards to separate work in the baseline range; repeated registration with the same ID is still accepted.
+- CI, release, Dependabot, and Builds changes violate this follow-up's scope — `false`. The spec's File List explicitly identifies those paths as separate work included by the shared baseline range.
+
 ## Implementation Notes
 
 - Setup adapters now pass the declared command type into `AgentSetupIdempotencyIntentAdapter`, which deserializes the payload with `EventStorePayloadSerialization.Options` and re-serializes that contract before the existing canonical encoder. Equivalent spelling and key order share one intent. An in-flight digest built from the previous raw payload conflicts on the gateway HTTP path and does not execute.
@@ -108,6 +126,8 @@ context:
 - Verification results are recorded in the generated test-evidence block under the Dev Agent Record.
 
 ## Spec Change Log
+
+- 2026-09-23 resumed review: retained all semantic-normalization and enum behavior. Corrected the package-count assertion for CRLF checkouts and moved the unsigned test enum into its own documented file. The existing host-entrypoint assertion was preserved. Full Debug/source verification passed; frozen intent is unchanged.
 
 ## Review Triage Log
 
@@ -147,31 +167,61 @@ context:
 | BH2-13 | medium | The same unsigned-backing defect as ECH2-02 lets a negative ordinal reach a declared `ulong.MaxValue` and overflow instead of returning `Unknown`. | patch |
 | BH2-14 | false | carried: as BH-08 records, the Code Map is historical pre-change planning context; the completed tasks and Implementation Notes are the artifact's implementation account. | reject |
 
+| BH3-01 | medium | The new package-count regex anchors digits directly to `$`, so a valid CRLF workflow fails on Windows. Accepting an optional carriage return is a direct test correction. | patch |
+| BH3-02 | medium | CI invokes the package-floor-only mode and broad Story 5.1 counts, not the Story 5.2 focused class checks. This predates this resumed normalization follow-up and belongs to the separately split CI work. | defer |
+| BH3-03 | medium | The verifier regression loop omits skip rejection and minimum counts; only focused classes enforce them. This inherited verification gap predates the normalization follow-up. | defer |
+| BH3-04 | false | Commit `2e3fd00ccc07f88e00824e5dfbca059e452af6a0` deliberately removes the readiness gate and its override as separate work. No active gate invocation remains in the loaded workflow; historical evidence text does not restore the removed requirement. | reject |
+| BH3-05 | medium | A Builds gitlink-only Dependabot proposal fails the literal workflow/test SHA checks until the coupled pins are updated. The gate correctly refuses inconsistent pins, but dependency maintenance needs a documented/manual or automated coupled-update path; this is inherited CI work. | defer |
+| BH3-06 | low | The HTTP fixture proves one gateway dispatch and receipt replay, but uses a simulated ledger rather than persisted events. A durable runtime harness is the separately deferred live-integration tier; introducing that harness is more than a direct correction to this normalization follow-up. | reject |
+| BH3-07 | false | `SubmitCommandHandlerIdempotencyAdmissionTests.Handle_PermanentAdmissionRejectionIsNotRetryable` at lines 512–531 explicitly makes descriptor resolution throw `ArgumentException` and asserts HTTP 400, `Retryable=false`, and `correct_request`. The Agents adapter tests pin that exception boundary; the claimed absence of mapping regression coverage is disproved by the platform test. | reject |
+| BH3-08 | false | carried: the configured `AddAgentSetupServices` branch registers the live dispatcher and operations, not admission adapters, and `AgentSetupCompositionTests.A_configured_gateway_resolves_the_live_dispatcher_and_administration_operations` resolves both. The moved host composition adds no configured admission branch. | reject |
+| BH3-09 | low | The newly added unsigned test enum is nested in a second type's file despite the explicit single-type-per-file rule. Moving it to a named file is a direct correction with no behavior change. | patch |
+| BH3-10 | false | The deferred ledger is append-only in this workflow, and its older undecided-publication wording records the state when that work was split. Later CI changes are explicitly recorded as separate baseline work; rewriting or consolidating those historical entries would violate this workflow. | reject |
+| ECH3-01 | medium | Same demonstrated CRLF package-count failure as BH3-01; group with that direct correction. | patch |
+| VG3-01 | medium | Pre-verified: no executable regression test exercises the focused runner's skip/non-discovery failure behavior. This runner hardening is separately split CI/tooling work that predates the normalization follow-up; add fixture-based verification in that workstream. | defer |
+
 ## Design Notes
 
 Semantic identity is the command after declared-contract normalization, then the existing syntax canonicalizer. Key order is already canonical. Property spelling is not. Observe retention tier and canonical bytes on the existing gateway HTTP path; do not add a store.
 
 ## Verification
 
-**Commands:**
-- `dotnet test test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj --filter-class Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests --filter-class Hexalith.Agents.Server.Tests.AppHostSecurityTopologyTests` -- expected: replay, conflict, extension-policy, and host-composition tests pass.
-- `dotnet test test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj --filter-class Hexalith.Agents.Contracts.Tests.AgentOperationContractsTests` -- expected: explicit ordinals and wide-token degradation pass.
+**Executed verification (2026-09-23):**
+- `dotnet build Hexalith.Agents.slnx -c Debug -m:1 -p:UseHexalithProjectReferences=true --nologo` — passed with zero warnings/errors.
+- Each root test project was run individually through `dotnet test/<project>/bin/Debug/net10.0/<project>.dll -noLogo -noColor -failSkips -ctrf <report>` after that build. CTRF summaries and individual test statuses were checked: no failures, skips, pending, or unrun tests.
+- Focused xUnit classes were also run directly with `-class` for `AgentsEventStoreGatewayIntegrationTests`, `AppHostSecurityTopologyTests`, and `AgentOperationContractsTests`. The CRLF correction passed both LF/CRLF theory cases; unsigned-enum tests passed after relocation.
+- Initial source build with `--no-restore` encountered stale Conversations contract references. A normal restore/build resolved it; final solution verification has no build blocker.
+- Local validation uses Debug and source references. The earlier Release/package evidence is historical; no new Release/package run or live-platform test is claimed.
+
+**Matrix audit:** every covering test below appears as passed in the current CTRF output.
+
+| Matrix row | Covering test(s) |
+| --- | --- |
+| Equivalent setup JSON | `Equivalent_setup_spelling_replays_on_the_gateway_and_a_semantic_change_does_not_append_again`; `Declared_command_spelling_shares_one_canonical_intent_and_a_semantic_change_does_not` |
+| In-flight key | `An_in_flight_key_from_the_previous_encoder_conflicts_without_a_second_execution` |
+| Non-agent domain | `A_non_agent_domain_is_rejected_by_the_setup_adapter`; `A_non_agent_domain_fails_on_the_gateway_before_execution` |
+| Activation-only key | `Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value` create/disable/response-mode rows |
+| Mixed Dapr identity | `Reserved_extension_policy_rejects_missing_duplicate_or_foreign_identity_claims` |
+| Wide enum token | `UnrecognizedOperationEnumValuesDegradeToUnknownInsteadOfThrowing`; `ShippedSetupEnumsKeepTheirPinnedOrdinals`; signed/unsigned wide-ordinal theories |
+| Domain host | `ServerHostShouldDelegateTheStatusReaderFallbackToSetupComposition` |
+
+Review: three independent layers completed. BH3-01/ECH3-01 and BH3-09 are patched; CI/verifier and coupled dependency-update follow-ups are recorded in deferred work. External Platform registration, tenant-scoped command-status binding, and immutable provisioning remain broader Story 5.2 promotion prerequisites.
 
 ## Dev Agent Record
 
 <!-- dev-agent-test-evidence:start -->
-### Latest Release Test Evidence
+### Latest Debug Source Test Evidence
 
-Run (UTC): 2026-09-22T21:15:01Z
+Run (UTC): 2026-09-23T12:39:56.614394+00:00
 
 | Test project | Total | Passed | Failed | Skipped | Pending | Other |
 |---|---:|---:|---:|---:|---:|---:|
 | Hexalith.Agents.Client.Tests | 6 | 6 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Contracts.Tests | 687 | 687 | 0 | 0 | 0 | 0 |
-| Hexalith.Agents.Server.Tests | 611 | 611 | 0 | 0 | 0 | 0 |
+| Hexalith.Agents.Server.Tests | 639 | 639 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.Tests | 805 | 805 | 0 | 0 | 0 | 0 |
 | Hexalith.Agents.UI.Tests | 1099 | 1099 | 0 | 0 | 0 | 0 |
-| **Total** | 3208 | 3208 | 0 | 0 | 0 | 0 |
+| **Total** | 3236 | 3236 | 0 | 0 | 0 | 0 |
 
 Result: PASS
 <!-- dev-agent-test-evidence:end -->
@@ -204,6 +254,7 @@ These paths contain follow-up -3 work. `deferred-work.md` and the EventStore git
 - `src/Hexalith.Agents.Server/Program.cs`
 - `test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs`
 - `test/Hexalith.Agents.Contracts.Tests/WideSignedToleranceStatus.cs`
+- `test/Hexalith.Agents.Contracts.Tests/UnsignedBackedToleranceStatus.cs`
 - `test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs`
 - `test/Hexalith.Agents.Server.Tests/AppHostSecurityTopologyTests.cs`
 - `references/Hexalith.EventStore`
@@ -225,3 +276,16 @@ These paths were changed by CI/release, submodule-pointer, follow-up -2, or late
 - `src/Hexalith.Agents.EventStore/AgentsEventStoreServiceCollectionExtensions.cs`
 - `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs`
 - `test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs`
+
+#### Additional baseline paths from separate completed work
+
+These existing baseline changes are preserved and are not introduced by this resumed normalization follow-up. Deleted readiness tooling belongs to the separately committed removal of that gate.
+
+- `_bmad-output/implementation-artifacts/sprint-status.yaml`
+- `_bmad/custom/bmad-code-review.toml` (deleted)
+- `src/Hexalith.Agents.Contracts/Agent/Events/Rejections/AgentLifecycleStateAlreadySetRejection.cs`
+- `src/Hexalith.Agents.Server/Application/Agents/AgentActivationProviderRevalidation.cs`
+- `test/Hexalith.Agents.Server.Tests/EventStoreAgentAdministrationOperationsTests.cs`
+- `tests/tooling/story_review_readiness/__init__.py` (deleted)
+- `tests/tooling/story_review_readiness/story_review_readiness_test.py` (deleted)
+- `tools/check-story-review-readiness.py` (deleted)

@@ -34,6 +34,7 @@ public sealed class AppHostSecurityTopologyTests
         string program = File.ReadAllText(ModuleLayout.ResolveModulePath("src/Hexalith.Agents.Server/Program.cs"));
 
         program.ShouldContain("AddEventStoreDomainService(");
+        program.ShouldContain("AgentDomainHostComposition.Configure(builder);");
         program.ShouldContain("UseEventStoreDomainService()");
     }
 

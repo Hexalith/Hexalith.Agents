@@ -138,11 +138,14 @@ public sealed class PackageInventoryTests
         ciProjects.ShouldBe(onDiskProjects, ignoreOrder: false);
     }
 
-    [Fact]
-    public void ReleaseShouldBeManualProtectedPinnedAndCollisionFailing()
+    [Theory]
+    [InlineData("\n")]
+    [InlineData("\r\n")]
+    public void ReleaseShouldBeManualProtectedPinnedAndCollisionFailing(string lineEnding)
     {
         const string approvedBuildsSha = "2fba3497043fe5ffcfe4dc44c51a09eae9b950ab";
-        string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/release.yml"));
+        string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/release.yml"))
+            .ReplaceLineEndings(lineEnding);
         string releaseConfiguration = File.ReadAllText(ModuleLayout.ResolveModulePath(".releaserc.json"));
         string publisher = File.ReadAllText(ModuleLayout.ResolveModulePath("scripts/publish-release-packages.sh"));
         using JsonDocument toolchain = JsonDocument.Parse(
@@ -162,7 +165,7 @@ public sealed class PackageInventoryTests
         using JsonDocument packageManifest = JsonDocument.Parse(
             File.ReadAllText(ModuleLayout.ResolveModulePath("eng/release-packages.json")));
         int packageCount = packageManifest.RootElement.GetProperty("packages").GetArrayLength();
-        Match declaredPackageCount = Regex.Match(workflow, @"(?m)^      expected-package-count: (\d+)$");
+        Match declaredPackageCount = Regex.Match(workflow, @"(?m)^      expected-package-count: (\d+)\r?$");
         declaredPackageCount.Success.ShouldBeTrue();
         int.Parse(declaredPackageCount.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture)
             .ShouldBe(packageCount);

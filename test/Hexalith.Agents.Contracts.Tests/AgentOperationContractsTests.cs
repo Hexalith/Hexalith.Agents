@@ -790,11 +790,4 @@ public sealed class AgentOperationContractsTests
         Unknown = 0,
         Ready = 1,
     }
-
-    private enum UnsignedBackedToleranceStatus : ulong
-    {
-        Unknown = 0,
-        Ready = 1,
-        Maximum = ulong.MaxValue,
-    }
 }
