@@ -514,3 +514,8 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 ## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-3.md (2026-09-23, re-review)
 
 - `AgentDomainHostComposition.Configure` carries about 180 lines of story-by-story comments moved verbatim from `Program.cs`, and several of them say live command dispatch "stays deferred behind DeferredAgentCommandDispatcher" (for example line 72). That contradicts the Story 5.2 `Agents:EventStore:BaseUrl` block in the same method. Pre-existing; trim or correct them when that composition is next edited.
+
+## Deferred from: code review of spec-5-3-govern-provider-models-and-pricing-through-live-operations-2.md (2026-09-24, contracts and domain chunk)
+
+- Pricing-version and initial-capability-version validation in `ProviderCatalogAggregate.ValidatePricing`/`Handle(CreateProviderModelEntry)` has no rejection test (mismatched positive version on update/create, non-migrated `InitialCapabilityVersion != 1`). The UI always sends `PricingVersion: 0`, so no current caller reaches it; add theory rows when this area is next touched.
+- `ProviderCatalogAggregate` and `TenantProviderEnablementAggregate` trust payload `EffectiveAt`/`DecidedAt`; only `EventStoreProviderCatalogOperations` stamps server time. Unverified (medium if true): settle by confirming whether the external EventStore gateway host (DW-21) exposes generic command submission for `provider-catalog`/`tenant-provider-enablement`, which would let an operator backdate or future-date grace or a tenant administrator falsify decision time.
