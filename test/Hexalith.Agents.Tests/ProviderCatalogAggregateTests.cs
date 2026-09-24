@@ -24,6 +24,32 @@ public sealed class ProviderCatalogAggregateTests
 {
     // ===== Create =====
 
+    [Theory]
+    [InlineData("create")]
+    [InlineData("update")]
+    [InlineData("enable")]
+    [InlineData("disable")]
+    public void Legacy_tenant_catalog_commands_are_frozen_at_the_aggregate_write_boundary(string operation)
+    {
+        ProviderCatalogState legacy = StateWith(ValidCreate());
+        DomainResult result = operation switch
+        {
+            "create" => ProviderCatalogAggregate.Handle(ValidCreate(), legacy,
+                Envelope(ValidCreate()) with { TenantId = "tenant-a", AggregateId = "tenant-a" }),
+            "update" => ProviderCatalogAggregate.Handle(ValidUpdate(), legacy,
+                Envelope(ValidUpdate()) with { TenantId = "tenant-a", AggregateId = "tenant-a" }),
+            "enable" => ProviderCatalogAggregate.Handle(new EnableProviderModelEntry("openai", "gpt-4o"), legacy,
+                Envelope(new EnableProviderModelEntry("openai", "gpt-4o")) with { TenantId = "tenant-a", AggregateId = "tenant-a" }),
+            "disable" => ProviderCatalogAggregate.Handle(new DisableProviderModelEntry("openai", "gpt-4o"), legacy,
+                Envelope(new DisableProviderModelEntry("openai", "gpt-4o")) with { TenantId = "tenant-a", AggregateId = "tenant-a" }),
+            _ => throw new ArgumentOutOfRangeException(nameof(operation)),
+        };
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.ShouldHaveSingleItem().ShouldBeOfType<ProviderCatalogAdministrationDeniedRejection>();
+        legacy.Entries.ShouldHaveSingleItem().Value.CapabilityVersion.ShouldBe(1);
+    }
+
     [Fact]
     public void Create_with_no_state_and_admin_produces_created()
     {
@@ -42,6 +68,41 @@ public sealed class ProviderCatalogAggregateTests
         created.MaxOutputTokenLimit.ShouldBe(16_000);
         created.ConfigurationState.ShouldBe(ProviderConfigurationState.Configured);
         created.ConfigurationReferenceId.ShouldBe("cfg-openai-gpt4o");
+    }
+
+    [Fact]
+    public void Migration_preserves_historical_capability_pricing_and_terms_versions()
+    {
+        CreateProviderModelEntry command = ValidCreate() with
+        {
+            MigratedFrom = "legacy:tenant-a",
+            InitialCapabilityVersion = 4,
+            Pricing = new ProviderModelPricing("USD", 0.002m, 0.008m, 3),
+            DataHandling = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v2", 2),
+        };
+
+        DomainResult result = ProviderCatalogAggregate.Handle(command, null, Envelope(command));
+
+        result.IsSuccess.ShouldBeTrue();
+        ProviderModelEntryCreated created = result.Events.ShouldHaveSingleItem().ShouldBeOfType<ProviderModelEntryCreated>();
+        created.CapabilityVersion.ShouldBe(4);
+        created.Pricing.PricingVersion.ShouldBe(3);
+        created.DataHandling!.DataHandlingVersion.ShouldBe(2);
+        created.MigratedFrom.ShouldBe("legacy:tenant-a");
+    }
+
+    [Fact]
+    public void Unknown_three_letter_currency_rejects_as_non_iso()
+    {
+        CreateProviderModelEntry command = ValidCreate() with
+        {
+            Pricing = new ProviderModelPricing("ZZZ", 0m, 0m, 1),
+        };
+
+        DomainResult result = ProviderCatalogAggregate.Handle(command, null, Envelope(command));
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.ShouldHaveSingleItem().ShouldBeOfType<InvalidProviderModelPricingRejection>();
     }
 
     [Fact]
@@ -206,6 +267,42 @@ public sealed class ProviderCatalogAggregateTests
 
     // ===== Update =====
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Terms_update_records_tightening_only_when_platform_operator_declares_it(bool declare)
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        ProviderDataHandlingRecord proposed = ValidTerms() with
+        {
+            RetentionDays = 14,
+            DataHandlingVersion = 0,
+            EffectiveAt = new DateTimeOffset(2026, 9, 24, 0, 0, 0, TimeSpan.Zero),
+        };
+        UpdateProviderModelEntry command = ValidUpdate() with
+        {
+            DataHandling = proposed,
+            DeclareDataHandlingTightening = declare,
+        };
+
+        DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
+
+        result.IsSuccess.ShouldBeTrue();
+        ProviderDataHandlingRecord updated = result.Events.ShouldHaveSingleItem()
+            .ShouldBeOfType<ProviderModelEntryMetadataUpdated>().DataHandling.ShouldNotBeNull();
+        updated.DataHandlingVersion.ShouldBe(2);
+        if (declare)
+        {
+            updated.TighteningDeclaration.ShouldNotBeNull().ActorUserId.ShouldBe("admin-user");
+            updated.TighteningDeclaration.FieldDiff.PreviousRetentionDays.ShouldBe(30);
+            updated.TighteningDeclaration.FieldDiff.NewRetentionDays.ShouldBe(14);
+        }
+        else
+        {
+            updated.TighteningDeclaration.ShouldBeNull();
+        }
+    }
+
     [Fact]
     public void Update_existing_entry_changes_metadata_produces_updated()
     {
@@ -249,6 +346,29 @@ public sealed class ProviderCatalogAggregateTests
     }
 
     [Fact]
+    public void Changed_pricing_rejects_when_imported_version_is_exhausted()
+    {
+        CreateProviderModelEntry imported = ValidCreate() with
+        {
+            MigratedFrom = "legacy:provider-model",
+            Pricing = ValidPricing(int.MaxValue),
+        };
+        ProviderCatalogState state = StateWith(imported);
+        UpdateProviderModelEntry unchanged = ValidUpdate(imported);
+        UpdateProviderModelEntry changed = ValidUpdate(imported,
+            pricing: imported.Pricing with { InputTokenUnitPrice = imported.Pricing.InputTokenUnitPrice + 0.001m,
+                PricingVersion = 0 });
+
+        ProviderCatalogAggregate.Handle(unchanged, state, Envelope(unchanged)).IsNoOp.ShouldBeTrue();
+        DomainResult result = ProviderCatalogAggregate.Handle(changed, state, Envelope(changed));
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.ShouldHaveSingleItem().ShouldBeOfType<InvalidProviderModelPricingRejection>()
+            .Reason.ShouldBe("Pricing version is exhausted.");
+        state.Entries.ShouldHaveSingleItem().Value.Pricing.ShouldNotBeNull().PricingVersion.ShouldBe(int.MaxValue);
+    }
+
+    [Fact]
     public void Update_missing_entry_produces_not_found()
     {
         var command = new UpdateProviderModelEntry(
@@ -289,6 +409,30 @@ public sealed class ProviderCatalogAggregateTests
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 
         result.IsNoOp.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Changed_update_rejects_when_imported_capability_version_is_exhausted()
+    {
+        CreateProviderModelEntry imported = ValidCreate() with
+        {
+            MigratedFrom = "legacy:provider-model",
+            InitialCapabilityVersion = int.MaxValue,
+        };
+        var state = new ProviderCatalogState();
+        state.Apply(CreatedEvent(imported) with { CapabilityVersion = int.MaxValue });
+        UpdateProviderModelEntry changed = ValidUpdate() with
+        {
+            DisplayLabel = "Changed label",
+            ExpectedCapabilityVersion = int.MaxValue,
+        };
+
+        DomainResult result = ProviderCatalogAggregate.Handle(changed, state, Envelope(changed));
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.ShouldHaveSingleItem().ShouldBeOfType<InvalidProviderModelMetadataRejection>()
+            .Reason.ShouldBe("Capability version is exhausted.");
+        state.Entries.ShouldHaveSingleItem().Value.CapabilityVersion.ShouldBe(int.MaxValue);
     }
 
     [Fact]

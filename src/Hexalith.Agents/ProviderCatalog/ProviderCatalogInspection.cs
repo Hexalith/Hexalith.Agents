@@ -91,7 +91,8 @@ public static class ProviderCatalogInspection
             && HasValidLimits(entry)
             && ProviderCatalogAggregate.HasValidPricing(entry.Pricing)
             && entry.CapabilityVersion >= 1
-            && entry.Pricing is { PricingVersion: >= 1 };
+            && entry.Pricing is { PricingVersion: >= 1 }
+            && entry.DataHandling is { DataHandlingVersion: >= 1 };
     }
 
     /// <summary>Maps a replayed entry to the safe public view.</summary>
@@ -114,7 +115,10 @@ public static class ProviderCatalogInspection
             entry.ConfigurationReferenceId,
             IsSelectableForNewActiveUse(entry),
             entry.CapabilityVersion,
-            entry.Pricing);
+            entry.Pricing,
+            entry.DataHandling,
+            entry.MigratedFrom,
+            entry.DataHandlingHistory);
     }
 
     private static bool HasValidLimits(ProviderModelEntryState entry)

@@ -51,4 +51,13 @@ public sealed class ProviderModelEntryState
 
     /// <summary>Gets or sets the administrator-supplied versioned pricing, or <see langword="null"/> when unpriced.</summary>
     public ProviderModelPricing? Pricing { get; set; }
+
+    /// <summary>Gets or sets the current governed data handling terms.</summary>
+    public ProviderDataHandlingRecord? DataHandling { get; set; }
+
+    /// <summary>Gets or sets all governed terms versions needed for cumulative grace evaluation.</summary>
+    public List<ProviderDataHandlingRecord> DataHandlingHistory { get; set; } = [];
+
+    /// <summary>Gets or sets the legacy stream that supplied this entry, when migrated.</summary>
+    public string? MigratedFrom { get; set; }
 }

@@ -8,6 +8,7 @@ using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Server.Application.Agents;
 using Hexalith.Agents.Server.Ports;
 using Hexalith.Agents.Server.Projections;
+using Hexalith.Agents.ProviderCatalog;
 
 using Hexalith.EventStore.Contracts.Commands;
 
@@ -109,7 +110,8 @@ public sealed class ProviderCatalogAuthorizationTests
             {
                 [AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion] = "7",
                 ["trace"] = "safe",
-            });
+            },
+            IsPlatformOperator: true);
 
         _ = await orchestrator.DisableAsync(
             request,
@@ -140,11 +142,11 @@ public sealed class ProviderCatalogAuthorizationTests
     private void SeedCatalog()
         => _store.Seed(
             StoreName,
-            ProviderCatalogReadModelAddresses.Detail(TenantId),
+            ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId),
             new ProviderCatalogReadModel
             {
-                CatalogId = TenantId,
-                TenantId = TenantId,
+                CatalogId = ProviderCatalogIdentity.PlatformTenantId,
+                TenantId = ProviderCatalogIdentity.PlatformTenantId,
                 Entries =
                 [
                     new ProviderCatalogEntryView(

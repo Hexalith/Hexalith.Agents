@@ -50,9 +50,9 @@ public sealed class AgentSetupCompositionTests
         scope.ServiceProvider.GetRequiredService<IAgentsClient>().AgentAdministration
             .ShouldBeOfType<EventStoreAgentAdministrationOperations>();
         scope.ServiceProvider.GetRequiredService<IAgentsClient>().ProviderCatalog
-            .ShouldNotBeOfType<EventStoreProviderCatalogOperations>();
+            .ShouldBeOfType<EventStoreProviderCatalogOperations>();
         scope.ServiceProvider.GetRequiredService<IProviderCatalogOperations>()
-            .ShouldNotBeOfType<EventStoreProviderCatalogOperations>();
+            .ShouldBeOfType<EventStoreProviderCatalogOperations>();
         scope.ServiceProvider.GetRequiredService<IProviderCatalogReader>()
             .ShouldBeOfType<ProjectedProviderCatalogReader>();
     }

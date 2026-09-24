@@ -39,12 +39,15 @@ internal static class AgentSetupServiceCollectionExtensions
         services.Configure<AgentSetupReadModelOptions>(configuration.GetSection(AgentSetupReadModelOptions.SectionName));
         services.Configure<ProviderCatalogReadModelOptions>(configuration.GetSection(ProviderCatalogReadModelOptions.SectionName));
         services.TryAddSingleton<IAgentCommandIdentityFactory, AgentCommandIdentityFactory>();
+        services.AddHttpContextAccessor();
+        services.TryAddSingleton<IAgentAdministrationContextProvider, HttpAgentAdministrationContextProvider>();
         services.TryAddSingleton(AgentsClient.Unavailable().ProviderCatalog);
 
         // The projection handler is discovered by the domain-service assembly scan; the orchestrations are always
         // registered so the DI graph resolves whether or not the gateway is bound.
         services.AddScoped<AgentAdministrationOrchestrator>();
         services.AddScoped<ProviderCatalogAdministrationOrchestrator>();
+        services.AddScoped<ProviderCatalogMigrationService>();
 
         // The status-read seam must always resolve, with or without a gateway. TryAdd leaves a host that already
         // registered a live reader untouched; the deferred reader answers "unknown", which keeps an uncorrelatable
@@ -71,8 +74,6 @@ internal static class AgentSetupServiceCollectionExtensions
         _ = services
             .AddEventStoreGatewayClient(options => options.BaseAddress = baseAddress)
             .AddEventStoreDaprServiceInvocation(appId, daprApiToken);
-        services.AddHttpContextAccessor();
-        services.AddSingleton<IAgentAdministrationContextProvider, HttpAgentAdministrationContextProvider>();
 
         // Replace the deferred dispatcher rather than TryAdd-ing beside it: for the in-scope administration
         // commands the deferred throw must no longer be reachable.
@@ -80,6 +81,8 @@ internal static class AgentSetupServiceCollectionExtensions
         services.AddSingleton<IAgentCommandDispatcher, EventStoreAgentCommandDispatcher>();
 
         services.AddScoped<IAgentAdministrationOperations, EventStoreAgentAdministrationOperations>();
+        services.RemoveAll<IProviderCatalogOperations>();
+        services.AddScoped<IProviderCatalogOperations, EventStoreProviderCatalogOperations>();
         services.RemoveAll<IProviderCatalogReader>();
         services.AddScoped<IProviderCatalogReader, ProjectedProviderCatalogReader>();
         services.RemoveAll<IAgentsClient>();

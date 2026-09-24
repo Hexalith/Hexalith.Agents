@@ -19,6 +19,50 @@ public sealed class AgentsClientProviderCatalogGateway(IAgentsClient client) : I
     private readonly IAgentsClient _client = client ?? throw new ArgumentNullException(nameof(client));
 
     /// <inheritdoc />
+    public async Task<TenantProviderEnablementInspectionResult> GetTenantEnablementAsync(
+        string tenantId, string providerId, string modelId, CancellationToken cancellationToken)
+    {
+        AgentOperationResult<TenantProviderEnablementInspectionResult> result = await _client.ProviderCatalog
+            .GetTenantEnablementAsync(tenantId, providerId, modelId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        return result is { IsSuccess: true, Value: { } inspection }
+            ? inspection : new(ToReadResult(result.Status).Status, null, null);
+    }
+
+    /// <inheritdoc />
+    public async Task<TenantProviderCatalogInspectionResult> ListTenantEntriesAsync(bool includeDisabled, CancellationToken cancellationToken)
+    {
+        AgentOperationResult<TenantProviderCatalogInspectionResult> result = await _client.ProviderCatalog
+            .ListTenantEntriesAsync(includeDisabled, cancellationToken: cancellationToken).ConfigureAwait(false);
+        return result is { IsSuccess: true, Value: { } inspection }
+            ? inspection : new(ToReadResult(result.Status).Status, []);
+    }
+
+    /// <inheritdoc />
+    public async Task<TenantProviderCatalogInspectionResult> GetTenantEntryAsync(string providerId, string modelId, CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(providerId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(modelId);
+        AgentOperationResult<TenantProviderCatalogInspectionResult> result = await _client.ProviderCatalog
+            .GetTenantEntryAsync(providerId, modelId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        return result is { IsSuccess: true, Value: { } inspection }
+            ? inspection : new(ToReadResult(result.Status).Status, []);
+    }
+
+    /// <inheritdoc />
+    public Task<ProviderCatalogWriteResult> SetTenantEnablementAsync(SetTenantProviderModelEnablement command, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        return WriteAsync(ct => _client.ProviderCatalog.SetTenantEnablementAsync(command, cancellationToken: ct), cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ProviderCatalogWriteResult> DecideDataHandlingAsync(DecideProviderDataHandling command, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        return WriteAsync(ct => _client.ProviderCatalog.DecideDataHandlingAsync(command, cancellationToken: ct), cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<ProviderCatalogInspectionResult> ListEntriesAsync(
         bool includeDisabled,
         string? expectedProjectionVersion,

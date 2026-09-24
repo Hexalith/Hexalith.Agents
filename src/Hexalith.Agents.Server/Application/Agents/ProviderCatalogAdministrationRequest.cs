@@ -18,4 +18,5 @@ public sealed record ProviderCatalogAdministrationRequest(
     string TenantId,
     string ActorUserId,
     bool IsProviderAdmin,
-    IReadOnlyDictionary<string, string>? ClientSuppliedExtensions = null);
+    IReadOnlyDictionary<string, string>? ClientSuppliedExtensions = null,
+    bool IsPlatformOperator = false);

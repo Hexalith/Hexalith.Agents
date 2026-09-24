@@ -16,6 +16,16 @@ using Shouldly;
 /// </summary>
 public sealed class HttpAgentAdministrationContextProviderTests
 {
+    [Theory]
+    [InlineData("Agents.PlatformOperator", true)]
+    [InlineData("Platform.Operator", false)]
+    public void Platform_authority_comes_only_from_the_agents_platform_operator_role(string role, bool expected)
+    {
+        AgentAdministrationContext context = Resolve(("sub", "operator"), (ClaimTypes.Role, role));
+
+        context.IsPlatformOperator.ShouldBe(expected);
+    }
+
     [Fact]
     public void An_authenticated_administrator_yields_an_authorized_context()
     {

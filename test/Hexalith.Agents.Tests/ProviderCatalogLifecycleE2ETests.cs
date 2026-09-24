@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Text.Json;
 
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
@@ -204,7 +205,7 @@ public sealed class ProviderCatalogLifecycleE2ETests
         ProviderCatalogInspectionResult replayedViews = ProviderCatalogInspection.ListEntries(replayed, isProviderAdmin: true, includeDisabled: true);
 
         replayedViews.Entries.Count.ShouldBe(2);
-        replayedViews.Entries.ShouldBe(liveViews.Entries); // element-wise record equality
+        JsonSerializer.Serialize(replayedViews.Entries).ShouldBe(JsonSerializer.Serialize(liveViews.Entries));
         replayed.CatalogId.ShouldBe(live.CatalogId);
     }
 }

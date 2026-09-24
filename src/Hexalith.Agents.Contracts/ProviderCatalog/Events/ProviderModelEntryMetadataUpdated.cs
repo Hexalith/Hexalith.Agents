@@ -18,4 +18,5 @@ public record ProviderModelEntryMetadataUpdated(
     ProviderConfigurationState ConfigurationState,
     string? ConfigurationReferenceId,
     ProviderModelPricing Pricing,
-    int CapabilityVersion) : IEventPayload;
+    int CapabilityVersion,
+    ProviderDataHandlingRecord? DataHandling = null) : IEventPayload;

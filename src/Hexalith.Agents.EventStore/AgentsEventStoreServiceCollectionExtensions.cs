@@ -1,5 +1,6 @@
 using Hexalith.EventStore.Authorization;
 using Hexalith.EventStore.DomainService;
+using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -42,8 +43,16 @@ public static class AgentsEventStoreServiceCollectionExtensions
         services.AddIdempotencyIntentAdapter<ConfigureAgentResponseModeIdempotencyIntentAdapter>();
         services.AddIdempotencyIntentAdapter<ActivateAgentIdempotencyIntentAdapter>();
         services.AddIdempotencyIntentAdapter<DisableAgentIdempotencyIntentAdapter>();
+        services.AddIdempotencyIntentAdapter<ProviderGovernanceIdempotencyIntentAdapter<CreateProviderModelEntry>>();
+        services.AddIdempotencyIntentAdapter<ProviderGovernanceIdempotencyIntentAdapter<UpdateProviderModelEntry>>();
+        services.AddIdempotencyIntentAdapter<ProviderGovernanceIdempotencyIntentAdapter<EnableProviderModelEntry>>();
+        services.AddIdempotencyIntentAdapter<ProviderGovernanceIdempotencyIntentAdapter<DisableProviderModelEntry>>();
+        services.AddIdempotencyIntentAdapter<ProviderGovernanceIdempotencyIntentAdapter<SetTenantProviderModelEnablement>>();
+        services.AddIdempotencyIntentAdapter<ProviderGovernanceIdempotencyIntentAdapter<DecideProviderDataHandling>>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ITrustedCommandExtensionPolicy>(
             new AgentsTrustedCommandExtensionPolicy(agentsAppId)));
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<Hexalith.EventStore.Server.Commands.ICoordinatedCommandPolicy,
+            AgentsProviderCatalogCoordinationPolicy>());
         return services;
     }
 }

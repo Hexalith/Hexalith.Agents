@@ -9,6 +9,7 @@ using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.Serialization;
 using Hexalith.Agents.Server.Ports;
 using Hexalith.Agents.Server.Projections;
+using Hexalith.Agents.ProviderCatalog;
 
 using Hexalith.EventStore.Client.Projections;
 using Hexalith.EventStore.Contracts.Queries;
@@ -26,7 +27,8 @@ namespace Hexalith.Agents.Server.Application.Queries;
 public abstract class ProviderCatalogQueryHandlerBase(
     IReadModelStore readModelStore,
     IOptions<ProviderCatalogReadModelOptions> options,
-    ITenantAccessReader tenantAccessReader) : IDomainQueryHandler
+    ITenantAccessReader tenantAccessReader,
+    IAgentAdministrationContextProvider contextProvider) : IDomainQueryHandler
 {
     private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web)
     {
@@ -39,6 +41,7 @@ public abstract class ProviderCatalogQueryHandlerBase(
     private readonly IReadModelStore _readModelStore = readModelStore ?? throw new ArgumentNullException(nameof(readModelStore));
     private readonly IOptions<ProviderCatalogReadModelOptions> _options = options ?? throw new ArgumentNullException(nameof(options));
     private readonly ITenantAccessReader _tenantAccessReader = tenantAccessReader ?? throw new ArgumentNullException(nameof(tenantAccessReader));
+    private readonly IAgentAdministrationContextProvider _contextProvider = contextProvider ?? throw new ArgumentNullException(nameof(contextProvider));
 
     /// <inheritdoc />
     public string Domain => ProviderCatalogReadModelAddresses.Domain;
@@ -59,27 +62,39 @@ public abstract class ProviderCatalogQueryHandlerBase(
             return QueryResult.FromPayload(ToElement(ProviderCatalogInspectionResult.NotAuthorized()));
         }
 
-        if (!await IsProviderAdminAsync(query, cancellationToken).ConfigureAwait(false))
+        bool platformQuery = string.Equals(query.TenantId, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal);
+        if (!await IsProviderAdminAsync(query, platformQuery, cancellationToken).ConfigureAwait(false))
         {
             return QueryResult.FromPayload(ToElement(ProviderCatalogInspectionResult.NotAuthorized()));
         }
 
         ReadModelEntry<ProviderCatalogReadModel> entry;
+        TenantProviderEnablementReadModel? tenant = null;
         try
         {
             entry = await _readModelStore
                 .GetAsync<ProviderCatalogReadModel>(
                     _options.Value.StateStoreName,
-                    ProviderCatalogReadModelAddresses.Detail(query.TenantId),
+                    ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId),
                     cancellationToken)
                 .ConfigureAwait(false);
+            if (!platformQuery)
+            {
+                tenant = (await _readModelStore.GetAsync<TenantProviderEnablementReadModel>(
+                    _options.Value.StateStoreName,
+                    TenantProviderEnablementReadModelAddresses.Detail(query.TenantId),
+                    cancellationToken).ConfigureAwait(false)).Value;
+            }
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             return QueryResult.FromPayload(ToElement(ProviderCatalogInspectionResult.Unavailable()));
         }
 
-        return QueryResult.FromPayload(ToElement(CreateResult(entry.Value, query)));
+        object result = platformQuery
+            ? CreateResult(entry.Value, query)
+            : CreateTenantResult(entry.Value, tenant, query);
+        return QueryResult.FromPayload(JsonSerializer.SerializeToElement(result, result.GetType(), _jsonOptions));
     }
 
     /// <summary>Builds the authorized inspection result from the persisted read model.</summary>
@@ -87,6 +102,12 @@ public abstract class ProviderCatalogQueryHandlerBase(
     /// <param name="query">The query envelope.</param>
     /// <returns>The structured inspection result.</returns>
     protected abstract ProviderCatalogInspectionResult CreateResult(ProviderCatalogReadModel? model, QueryEnvelope query);
+
+    /// <summary>Builds the configuration-free tenant result.</summary>
+    protected abstract TenantProviderCatalogInspectionResult CreateTenantResult(
+        ProviderCatalogReadModel? platform,
+        TenantProviderEnablementReadModel? tenant,
+        QueryEnvelope query);
 
     /// <summary>Serializes the payload with contract enum names.</summary>
     /// <typeparam name="T">The payload type.</typeparam>
@@ -117,11 +138,16 @@ public abstract class ProviderCatalogQueryHandlerBase(
         }
     }
 
-    private async Task<bool> IsProviderAdminAsync(QueryEnvelope query, CancellationToken cancellationToken)
+    private async Task<bool> IsProviderAdminAsync(QueryEnvelope query, bool platformQuery, CancellationToken cancellationToken)
     {
-        if (query.IsGlobalAdmin)
+        if (platformQuery)
         {
-            return true;
+            // EventStore's GlobalAdministrator flag is infrastructure authority, not Agents.PlatformOperator.
+            // The latter must be independently proven by the authenticated host principal.
+            AgentAdministrationContext actor = _contextProvider.GetContext();
+            return query.IsGlobalAdmin && actor.IsPlatformOperator
+                && !string.IsNullOrWhiteSpace(actor.ActorUserId)
+                && string.Equals(actor.ActorUserId, query.UserId, StringComparison.Ordinal);
         }
 
         TenantAccessReadResult access = await _tenantAccessReader

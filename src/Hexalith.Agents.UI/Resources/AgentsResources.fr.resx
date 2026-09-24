@@ -695,4 +695,39 @@
   <data name="Agents.LaunchReadiness.Enable.Label" xml:space="preserve"><value>Activer la génération en conditions de production</value></data>
   <data name="Agents.LaunchReadiness.Enable.Button" xml:space="preserve"><value>Activer la génération en conditions de production</value></data>
   <data name="Agents.LaunchReadiness.Enable.Submitted" xml:space="preserve"><value>Demande d'activation soumise.</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.RetentionDays" xml:space="preserve"><value>Durée de conservation en jours</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.TrainingUse" xml:space="preserve"><value>Utilisation pour l'entraînement autorisée (true ou false)</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.ProcessingRegions" xml:space="preserve"><value>Régions de traitement (séparées par des virgules)</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.TermsReference" xml:space="preserve"><value>Référence des conditions</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.Version" xml:space="preserve"><value>Version des conditions</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.Missing" xml:space="preserve"><value>Conditions manquantes</value></data>
+  <data name="Agents.TenantProviders.Title" xml:space="preserve"><value>Modèles fournisseurs du locataire</value></data>
+  <data name="Agents.TenantProviders.Description" xml:space="preserve"><value>Examinez les modèles fournisseurs activés pour votre locataire et décidez des conditions actuelles de traitement des données.</value></data>
+  <data name="Agents.TenantProviders.TermsStatus" xml:space="preserve"><value>État des conditions</value></data>
+  <data name="Agents.TenantProviders.Review" xml:space="preserve"><value>Examiner les conditions</value></data>
+  <data name="Agents.TenantProviders.ConfirmTitle" xml:space="preserve"><value>Confirmer les conditions actuelles</value></data>
+  <data name="Agents.TenantProviders.ExactVersion" xml:space="preserve"><value>Version de traitement des données {0}</value></data>
+  <data name="Agents.TenantProviders.Retention" xml:space="preserve"><value>Conservation : {0} jours</value></data>
+  <data name="Agents.TenantProviders.Training" xml:space="preserve"><value>Utilisation pour l'entraînement : {0}</value></data>
+  <data name="Agents.TenantProviders.Regions" xml:space="preserve"><value>Régions de traitement : {0}</value></data>
+  <data name="Agents.TenantProviders.TermsReference" xml:space="preserve"><value>Référence des conditions : {0}</value></data>
+  <data name="Agents.TenantProviders.GraceDeadline" xml:space="preserve"><value>La période de grâce se termine le {0}</value></data>
+  <data name="Agents.TenantProviders.Justification" xml:space="preserve"><value>Justification de la décision</value></data>
+  <data name="Agents.TenantProviders.Accept" xml:space="preserve"><value>Accepter les conditions actuelles</value></data>
+  <data name="Agents.TenantProviders.Decline" xml:space="preserve"><value>Refuser les conditions actuelles</value></data>
+  <data name="Agents.TenantProviders.Status.Current" xml:space="preserve"><value>Conditions actuelles acceptées</value></data>
+  <data name="Agents.TenantProviders.Status.Grace" xml:space="preserve"><value>Période de grâce pour des conditions plus strictes</value></data>
+  <data name="Agents.TenantProviders.Status.GraceExpired" xml:space="preserve"><value>Période de grâce expirée</value></data>
+  <data name="Agents.TenantProviders.Status.TermsChanged" xml:space="preserve"><value>Acceptation requise pour les nouvelles conditions</value></data>
+  <data name="Agents.TenantProviders.Status.UnknownEvidence" xml:space="preserve"><value>Preuve des conditions indisponible</value></data>
+  <data name="Agents.TenantProviders.Status.Declined" xml:space="preserve"><value>Conditions refusées</value></data>
+  <data name="Agents.TenantProviders.Status.AcceptanceRequired" xml:space="preserve"><value>Acceptation requise</value></data>
+  <data name="Agents.TenantProviders.Status.MissingEnablementOrTerms" xml:space="preserve"><value>Conditions du fournisseur indisponibles</value></data>
+  <data name="Agents.TenantProviders.Status.PlatformNotReady" xml:space="preserve"><value>Plateforme non prête</value></data>
+  <data name="Agents.ProviderCatalog.Enablement.Title" xml:space="preserve"><value>Définir l’activation pour le locataire</value></data>
+  <data name="Agents.ProviderCatalog.Enablement.Tenant" xml:space="preserve"><value>Identifiant du locataire</value></data>
+  <data name="Agents.ProviderCatalog.Enablement.ExpectedRevision" xml:space="preserve"><value>Révision actuelle du locataire</value></data>
+  <data name="Agents.ProviderCatalog.Enablement.Enabled" xml:space="preserve"><value>Activé pour le locataire</value></data>
+  <data name="Agents.ProviderCatalog.Enablement.Load" xml:space="preserve"><value>Charger l’état du locataire</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.DeclareTightening" xml:space="preserve"><value>Déclarer ce changement comme des conditions de traitement des données plus strictes</value></data>
 </root>

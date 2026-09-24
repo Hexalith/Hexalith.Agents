@@ -1,5 +1,5 @@
 @page "/agents/providers"
-@attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsAdministratorPolicy)]
+@attribute [Authorize(Policy = AgentsFrontComposerRegistration.PlatformOperatorPolicy)]
 @implements IDisposable
 @inject IStringLocalizer<AgentsResources> Localizer
 @inject IProviderCatalogGateway Gateway
@@ -107,6 +107,28 @@
                                          AriaLabel="@Localizer["Agents.ProviderCatalog.Editor.ConfigurationReference"]"
                                          autocomplete="off"
                                          data-testid="agents-provider-catalog-configuration-reference-input" />
+                        <FluentTextInput @bind-Value="_retentionDays"
+                                         Label="@Localizer["Agents.ProviderCatalog.DataHandling.RetentionDays"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.DataHandling.RetentionDays"]"
+                                         data-testid="agents-provider-catalog-retention-input" />
+                        <FluentTextInput @bind-Value="_trainingUse"
+                                         Label="@Localizer["Agents.ProviderCatalog.DataHandling.TrainingUse"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.DataHandling.TrainingUse"]"
+                                         data-testid="agents-provider-catalog-training-input" />
+                        <FluentTextInput @bind-Value="_processingRegions"
+                                         Label="@Localizer["Agents.ProviderCatalog.DataHandling.ProcessingRegions"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.DataHandling.ProcessingRegions"]"
+                                         data-testid="agents-provider-catalog-regions-input" />
+                        <FluentTextInput @bind-Value="_termsReference"
+                                         Label="@Localizer["Agents.ProviderCatalog.DataHandling.TermsReference"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.DataHandling.TermsReference"]"
+                                         data-testid="agents-provider-catalog-terms-input" />
+                        @if (_editing)
+                        {
+                            <FluentSwitch @bind-Value="_declareTightening"
+                                          Label="@Localizer["Agents.ProviderCatalog.DataHandling.DeclareTightening"]"
+                                          data-testid="agents-provider-catalog-declare-tightening" />
+                        }
                         <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="8px">
                             <FluentButton Appearance="ButtonAppearance.Primary"
                                           Disabled="_busy"
@@ -118,6 +140,43 @@
                                 @Localizer["Agents.ProviderCatalog.Action.Cancel"]
                             </FluentButton>
                         </FluentStack>
+                    </FluentStack>
+                </FluentAccordionItem>
+            </FluentAccordion>
+        }
+        @if (_enablementEntry is { } selected)
+        {
+            <FluentAccordion>
+                <FluentAccordionItem Heading="@Localizer["Agents.ProviderCatalog.Enablement.Title"]" Expanded="true">
+                    <FluentStack Orientation="Orientation.Vertical" VerticalGap="12px" data-testid="agents-provider-catalog-enablement-editor">
+                        <FluentText>@selected.ProviderId / @selected.ModelId</FluentText>
+                        <FluentTextInput @bind-Value="_enablementTenantId"
+                                         Label="@Localizer["Agents.ProviderCatalog.Enablement.Tenant"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.Enablement.Tenant"]"
+                                         data-testid="agents-provider-catalog-enablement-tenant" />
+                        <FluentButton Disabled="_busy" OnClick="LoadEnablementRevisionAsync"
+                                      data-testid="agents-provider-catalog-enablement-load">
+                            @Localizer["Agents.ProviderCatalog.Enablement.Load"]
+                        </FluentButton>
+                        <FluentTextInput @bind-Value="_enablementExpectedRevision"
+                                         Label="@Localizer["Agents.ProviderCatalog.Enablement.ExpectedRevision"]"
+                                         AriaLabel="@Localizer["Agents.ProviderCatalog.Enablement.ExpectedRevision"]"
+                                         data-testid="agents-provider-catalog-enablement-revision" />
+                        <FluentSwitch @bind-Value="_enablementEnabled"
+                                      Label="@Localizer["Agents.ProviderCatalog.Enablement.Enabled"]"
+                                      data-testid="agents-provider-catalog-enablement-enabled" />
+                        <FluentButton Appearance="ButtonAppearance.Primary" Disabled="_busy"
+                                      OnClick="SubmitEnablementAsync" data-testid="agents-provider-catalog-enablement-save">
+                            @Localizer["Agents.ProviderCatalog.Action.Save"]
+                        </FluentButton>
+                        @if (_enablementWrite is { } outcome)
+                        {
+                            <FluentText aria-live="polite" data-testid="agents-provider-catalog-enablement-truth">
+                                @(outcome.Status is AgentSetupWriteStatus.Submitted
+                                    ? Localizer[$"Agents.ProviderCatalog.Truth.Stage.{_enablementTruth ?? "Submitted"}"]
+                                    : Localizer[$"Agents.ProviderCatalog.Write.Status.{outcome.Status}"])
+                            </FluentText>
+                        }
                     </FluentStack>
                 </FluentAccordionItem>
             </FluentAccordion>
@@ -193,6 +252,9 @@
                 <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.CapabilityVersion"]" ColumnId="capability-version">
                     <span data-testid="agents-provider-catalog-capability-version">@context.CapabilityVersion</span>
                 </TemplateColumn>
+                <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.DataHandling.Version"]" ColumnId="data-handling-version">
+                    @(context.DataHandling?.DataHandlingVersion.ToString(CultureInfo.InvariantCulture) ?? Localizer["Agents.ProviderCatalog.DataHandling.Missing"])
+                </TemplateColumn>
                 <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Freshness"]" ColumnId="freshness">
                     @Localizer[$"Agents.ProviderCatalog.Freshness.{_result!.Freshness}"]
                 </TemplateColumn>
@@ -208,6 +270,10 @@
                     <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="8px">
                         <FluentButton Disabled="_busy" OnClick="@(() => BeginEdit(context))" data-testid="agents-provider-catalog-edit">
                             @Localizer["Agents.ProviderCatalog.Action.Edit"]
+                        </FluentButton>
+                        <FluentButton Disabled="_busy || context.DataHandling is null" OnClick="@(() => BeginEnablement(context))"
+                                      data-testid="agents-provider-catalog-set-tenant-enablement">
+                            @Localizer["Agents.ProviderCatalog.Enablement.Title"]
                         </FluentButton>
                         @if (context.Status is ProviderModelStatus.Enabled)
                         {
@@ -258,7 +324,18 @@
     private string _timeoutMs = "30000";
     private string _maxRetries = "3";
     private string _configurationReference = string.Empty;
+    private string _retentionDays = string.Empty;
+    private string _trainingUse = string.Empty;
+    private string _processingRegions = string.Empty;
+    private string _termsReference = string.Empty;
+    private bool _declareTightening;
     private ProviderCatalogEntryView? _editingEntry;
+    private ProviderCatalogEntryView? _enablementEntry;
+    private ProviderCatalogWriteResult? _enablementWrite;
+    private string? _enablementTruth;
+    private string _enablementTenantId = string.Empty;
+    private string _enablementExpectedRevision = "0";
+    private bool _enablementEnabled = true;
 
     private IReadOnlyList<ProviderCatalogEntryView> VisibleRows
         => _result is { Status: ProviderCatalogInspectionStatus.Success }
@@ -298,6 +375,109 @@
 
     private void ResetFilters() => _selectableOnly = false;
 
+    private void BeginEnablement(ProviderCatalogEntryView entry)
+    {
+        _enablementEntry = entry;
+        _enablementWrite = null;
+        _enablementTruth = null;
+        _enablementTenantId = string.Empty;
+        _enablementExpectedRevision = "0";
+        _enablementEnabled = true;
+    }
+
+    private async Task SubmitEnablementAsync()
+    {
+        if (_busy || _enablementEntry?.DataHandling is not { } terms)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_enablementTenantId)
+            || string.Equals(_enablementTenantId.Trim(), "system", StringComparison.Ordinal)
+            || !int.TryParse(_enablementExpectedRevision, NumberStyles.Integer, CultureInfo.InvariantCulture, out int revision)
+            || revision < 0)
+        {
+            _enablementWrite = ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed);
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            _enablementWrite = await Gateway.SetTenantEnablementAsync(
+                new SetTenantProviderModelEnablement(_enablementTenantId.Trim(), _enablementEntry.ProviderId,
+                    _enablementEntry.ModelId, _enablementEnabled, revision, terms),
+                _lifetimeCancellation.Token).ConfigureAwait(false);
+            if (_enablementWrite.Status is AgentSetupWriteStatus.Submitted)
+            {
+                _enablementTruth = "Submitted";
+                await RequestRenderAsync(_lifetimeCancellation.Token);
+                using CancellationTokenSource timeout = new(ProjectionPollingTimeout, TimeProvider);
+                using CancellationTokenSource polling = CancellationTokenSource.CreateLinkedTokenSource(
+                    _lifetimeCancellation.Token, timeout.Token);
+                try
+                {
+                    while (true)
+                    {
+                        TenantProviderEnablementInspectionResult current = await Gateway.GetTenantEnablementAsync(
+                            _enablementTenantId.Trim(), _enablementEntry.ProviderId, _enablementEntry.ModelId,
+                            polling.Token).ConfigureAwait(false);
+                        bool confirmed = _enablementWrite.Acceptance is { MessageId: { Length: > 0 } messageId }
+                            && string.Equals(current.LastEnablementMessageId, messageId, StringComparison.Ordinal)
+                            && current.Status == ProviderCatalogInspectionStatus.Success
+                            && current.Enabled == _enablementEnabled && current.Revision > revision;
+                        _enablementTruth = confirmed ? "ProjectionConfirmed" : "AuthoritativePending";
+                        if (confirmed)
+                        {
+                            break;
+                        }
+
+                        await RequestRenderAsync(polling.Token);
+                        await Task.Delay(ProjectionPollingInterval, TimeProvider, polling.Token).ConfigureAwait(false);
+                    }
+                }
+                catch (OperationCanceledException) when (timeout.IsCancellationRequested && !_lifetimeCancellation.IsCancellationRequested)
+                {
+                    _enablementTruth = "AuthoritativePending";
+                }
+            }
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task LoadEnablementRevisionAsync()
+    {
+        if (_busy || _enablementEntry is null || string.IsNullOrWhiteSpace(_enablementTenantId)
+            || string.Equals(_enablementTenantId.Trim(), "system", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            TenantProviderEnablementInspectionResult current = await Gateway.GetTenantEnablementAsync(
+                _enablementTenantId.Trim(), _enablementEntry.ProviderId, _enablementEntry.ModelId,
+                _lifetimeCancellation.Token).ConfigureAwait(false);
+            if ((current.Status is ProviderCatalogInspectionStatus.Success or ProviderCatalogInspectionStatus.EntryNotFound)
+                && current.Revision is { } revision)
+            {
+                _enablementExpectedRevision = revision.ToString(CultureInfo.InvariantCulture);
+                if (current.Enabled is { } enabled)
+                {
+                    _enablementEnabled = enabled;
+                }
+            }
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
     private void BeginCreate()
     {
         _editing = false;
@@ -314,6 +494,11 @@
         _timeoutMs = "30000";
         _maxRetries = "3";
         _configurationReference = string.Empty;
+        _retentionDays = string.Empty;
+        _trainingUse = string.Empty;
+        _processingRegions = string.Empty;
+        _termsReference = string.Empty;
+        _declareTightening = false;
         _expectedCapabilityVersion = null;
     }
 
@@ -334,6 +519,11 @@
         _maxRetries = entry.TimeoutPolicy.MaxRetries.ToString(CultureInfo.InvariantCulture);
         // Never prefill the stored configuration reference — the grid and editor must not render it.
         _configurationReference = string.Empty;
+        _retentionDays = entry.DataHandling?.RetentionDays.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+        _trainingUse = entry.DataHandling?.AllowsTrainingUse.ToString() ?? string.Empty;
+        _processingRegions = entry.DataHandling is { } terms ? string.Join(",", terms.ProcessingRegions) : string.Empty;
+        _termsReference = entry.DataHandling?.TermsReferenceId ?? string.Empty;
+        _declareTightening = false;
         _expectedCapabilityVersion = entry.CapabilityVersion;
     }
 
@@ -353,6 +543,7 @@
             async ct =>
             {
                 if (!TryBuildPricing(out ProviderModelPricing? pricing) || pricing is null
+                    || !TryBuildDataHandling(out ProviderDataHandlingRecord? dataHandling) || dataHandling is null
                     || !TryBuildLimits(out int contextWindow, out int maxOutput, out ProviderModelTimeoutPolicy? timeout)
                     || timeout is null)
                 {
@@ -379,7 +570,9 @@
                             flags,
                             configurationReference,
                             pricing,
-                            _expectedCapabilityVersion),
+                            _expectedCapabilityVersion,
+                            dataHandling,
+                            _declareTightening),
                         ct).ConfigureAwait(false);
                 }
 
@@ -395,7 +588,8 @@
                         timeout,
                         flags,
                         configurationReference,
-                        pricing),
+                        pricing,
+                        dataHandling),
                     ct).ConfigureAwait(false);
             },
             providerId,
@@ -595,6 +789,26 @@
         }
 
         pricing = new ProviderModelPricing(currency, input, output, PricingVersion: 0);
+        return true;
+    }
+
+    private bool TryBuildDataHandling(out ProviderDataHandlingRecord? record)
+    {
+        record = null;
+        if (!int.TryParse(_retentionDays, NumberStyles.Integer, CultureInfo.InvariantCulture, out int days)
+            || days < 0 || !bool.TryParse(_trainingUse, out bool trainingUse)
+            || string.IsNullOrWhiteSpace(_termsReference))
+        {
+            return false;
+        }
+
+        string[] regions = _processingRegions.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (regions.Length == 0 || regions.Any(string.IsNullOrWhiteSpace))
+        {
+            return false;
+        }
+
+        record = new ProviderDataHandlingRecord(days, trainingUse, regions, _termsReference.Trim(), 0);
         return true;
     }
 

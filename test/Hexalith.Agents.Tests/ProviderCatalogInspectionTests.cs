@@ -1,4 +1,5 @@
 using Hexalith.Agents.Contracts.ProviderCatalog;
+using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 using Hexalith.Agents.Contracts.ProviderCatalog.Events;
 using Hexalith.Agents.ProviderCatalog;
 
@@ -30,6 +31,22 @@ public sealed class ProviderCatalogInspectionTests
         view.IsSelectableForNewActiveUse.ShouldBeTrue();
         view.ConfigurationState.ShouldBe(ProviderConfigurationState.Configured);
         view.ConfigurationReferenceId.ShouldBe("cfg-openai-gpt4o"); // safe reference only — no secret value
+    }
+
+    [Fact]
+    public void Imported_positive_pricing_version_remains_ready_for_selection()
+    {
+        CreateProviderModelEntry imported = ValidCreate() with
+        {
+            MigratedFrom = "legacy:provider-model",
+            Pricing = ValidPricing(2),
+            DataHandling = ValidTerms() with { DataHandlingVersion = 2 },
+        };
+        ProviderCatalogEntryView view = ProviderCatalogInspection.GetEntry(StateWith(imported),
+            isProviderAdmin: true, "openai", "gpt-4o").Entries.ShouldHaveSingleItem();
+
+        view.Pricing.ShouldNotBeNull().PricingVersion.ShouldBe(2);
+        view.IsSelectableForNewActiveUse.ShouldBeTrue();
     }
 
     [Fact]

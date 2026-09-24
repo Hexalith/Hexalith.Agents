@@ -28,7 +28,7 @@ using Shouldly;
 public sealed class ProviderCatalogCompositionTests
 {
     [Fact]
-    public async Task A_configured_gateway_keeps_catalog_writes_unavailable_while_resolving_projected_reads()
+    public async Task A_configured_gateway_binds_live_catalog_operations_and_requires_platform_authority()
     {
         using ServiceProvider provider = Build(
             ("Agents:EventStore:BaseUrl", "https://eventstore.example"),
@@ -36,11 +36,11 @@ public sealed class ProviderCatalogCompositionTests
         using IServiceScope scope = provider.CreateScope();
 
         scope.ServiceProvider.GetRequiredService<IProviderCatalogOperations>()
-            .ShouldNotBeOfType<EventStoreProviderCatalogOperations>();
+            .ShouldBeOfType<EventStoreProviderCatalogOperations>();
         scope.ServiceProvider.GetRequiredService<IProviderCatalogReader>()
             .ShouldBeOfType<ProjectedProviderCatalogReader>();
         scope.ServiceProvider.GetRequiredService<IAgentsClient>().ProviderCatalog
-            .ShouldNotBeOfType<EventStoreProviderCatalogOperations>();
+            .ShouldBeOfType<EventStoreProviderCatalogOperations>();
         scope.ServiceProvider.GetRequiredService<IAgentsClient>().AgentAdministration
             .ShouldBeOfType<EventStoreAgentAdministrationOperations>();
 
@@ -58,7 +58,7 @@ public sealed class ProviderCatalogCompositionTests
                 ProviderModelCapabilityFlags.Streaming,
                 "cfg-openai-gpt4o",
                 new ProviderModelPricing("USD", 0.002m, 0.008m, 0)));
-        result.Status.ShouldBe(AgentOperationStatus.Unavailable);
+        result.Status.ShouldBe(AgentOperationStatus.NotAuthorized);
     }
 
     [Fact]

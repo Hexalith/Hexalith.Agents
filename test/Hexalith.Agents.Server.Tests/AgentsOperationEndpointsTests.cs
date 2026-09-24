@@ -9,6 +9,7 @@ using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.ProviderCatalog;
+using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 using Hexalith.Agents.Server.Api;
 
 using Microsoft.AspNetCore.Builder;
@@ -455,6 +456,36 @@ public sealed class AgentsOperationEndpointsTests
             ("modelId", "gpt-4o")).ConfigureAwait(true);
 
         await catalog.Received(1).GetEntryAsync("openai", "gpt-4o", 2, Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Tenant_decision_http_route_forwards_retry_and_correlation_headers()
+    {
+        IProviderCatalogOperations catalog = Substitute.For<IProviderCatalogOperations>();
+        catalog.DecideDataHandlingAsync(Arg.Any<DecideProviderDataHandling>(),
+                Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>>(
+                AgentOperationResult<ProviderCatalogCommandAcceptance>.Succeeded(
+                    new("openai", "gpt-4o", MessageId, CorrelationId, AgentSetupTruthState.Submitted))));
+        await using WebApplication app = BuildHttpApp(AgentsClientWith(catalog));
+        await app.StartAsync();
+        var terms = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1);
+        var decision = new DecideProviderDataHandling("openai", "gpt-4o", 1, true, "approved", 1, terms, default);
+        using var request = new HttpRequestMessage(HttpMethod.Post,
+            "/api/agents/operations/providers/tenant/data-handling")
+        {
+            Content = JsonContent.Create(decision),
+        };
+        request.Headers.Add("X-Correlation-ID", CorrelationId);
+        request.Headers.Add("Idempotency-Key", MessageId);
+
+        using HttpResponseMessage response = await app.GetTestClient().SendAsync(request);
+
+        response.EnsureSuccessStatusCode();
+        await catalog.Received(1).DecideDataHandlingAsync(Arg.Any<DecideProviderDataHandling>(),
+            Arg.Is<AgentOperationOptions?>(options => options != null
+                && options.CorrelationId == CorrelationId && options.IdempotencyKey == MessageId),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]

@@ -12,6 +12,8 @@ using Dapr.Actors.Client;
 using Hexalith.Agents.Client;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
+using Hexalith.Agents.Contracts.ProviderCatalog;
+using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 using Hexalith.Agents.EventStore;
 using Hexalith.Agents.Server.Composition;
 using Hexalith.Agents.Server.Ports;
@@ -50,7 +52,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     private const string AgentsAppId = "agents";
 
     [Fact]
-    public void Gateway_registration_is_explicit_idempotent_and_owns_all_five_setup_adapters()
+    public void Gateway_registration_is_explicit_idempotent_and_owns_setup_and_governance_adapters()
     {
         ServiceCollection gatewayServices = new();
         _ = gatewayServices.AddAgentsEventStore(AgentsAppId);
@@ -66,10 +68,17 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             nameof(ActivateAgent),
             nameof(ConfigureAgentResponseMode),
             nameof(CreateAgent),
+            nameof(CreateProviderModelEntry),
+            nameof(DecideProviderDataHandling),
             nameof(DisableAgent),
+            nameof(DisableProviderModelEntry),
+            nameof(EnableProviderModelEntry),
+            nameof(SetTenantProviderModelEnablement),
             nameof(UpdateAgentConfiguration),
+            nameof(UpdateProviderModelEntry),
         ]);
         gateway.GetServices<ITrustedCommandExtensionPolicy>().Count().ShouldBe(1);
+        gateway.GetServices<ICoordinatedCommandPolicy>().Count().ShouldBe(1);
 
         // This deliberately represents the independently composed Agents process. Exercise its real setup
         // composition so an accidental Server-side registration of either gateway-owned seam is observable here.
@@ -93,6 +102,34 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             .ShouldBeOfType<EventStoreAgentCommandDispatcher>();
         agents.GetServices<IIdempotencyIntentAdapter>().ShouldBeEmpty();
         agents.GetServices<ITrustedCommandExtensionPolicy>().ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void Governance_admission_intent_ignores_restamped_decision_time_but_rejects_semantic_change()
+    {
+        ServiceCollection services = new();
+        _ = services.AddAgentsEventStore(AgentsAppId);
+        using ServiceProvider provider = services.BuildServiceProvider();
+        IIdempotencyIntentAdapter adapter = provider.GetServices<IIdempotencyIntentAdapter>()
+            .Single(item => item.CommandType == nameof(DecideProviderDataHandling));
+        DateTimeOffset now = new(2026, 9, 23, 0, 0, 0, TimeSpan.Zero);
+        var terms = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1, now);
+        var decision = new DecideProviderDataHandling("provider", "model", 1, true, "approved", 1, terms, now);
+        var original = new IdempotencyIntentCommand(nameof(DecideProviderDataHandling), "tenant-a",
+            "tenant-provider-enablement", "tenant-a", JsonSerializer.SerializeToUtf8Bytes(decision),
+            new Dictionary<string, string> { ["actor:tenantAgentAdministrator"] = "true" });
+        IdempotencyCanonicalIntent first = adapter.CreateIntent(original);
+        IdempotencyCanonicalIntent retry = adapter.CreateIntent(original with
+        {
+            Payload = JsonSerializer.SerializeToUtf8Bytes(decision with { DecidedAt = now.AddMinutes(1) }),
+        });
+        IdempotencyCanonicalIntent divergent = adapter.CreateIntent(original with
+        {
+            Payload = JsonSerializer.SerializeToUtf8Bytes(decision with { Justification = "different" }),
+        });
+
+        retry.SemanticPayload.SequenceEqual(first.SemanticPayload).ShouldBeTrue();
+        divergent.SemanticPayload.SequenceEqual(first.SemanticPayload).ShouldBeFalse();
     }
 
     [Theory]
@@ -592,6 +629,15 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(CreateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "true", true)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(DisableAgent), AgentSetupTrustedExtensions.AgentAdministrator, "true", true)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(UpdateAgentConfiguration), AgentSetupTrustedExtensions.AgentAdministrator, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "provider-catalog", nameof(CreateProviderModelEntry), "actor:agentsProviderAdmin", "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "provider-catalog", nameof(UpdateProviderModelEntry), "actor:agentsProviderAdmin", "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "provider-catalog", nameof(EnableProviderModelEntry), "actor:agentsProviderAdmin", "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "provider-catalog", nameof(DisableProviderModelEntry), "actor:agentsProviderAdmin", "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "tenant-provider-enablement", nameof(SetTenantProviderModelEnablement), "actor:platformOperator", "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "tenant-provider-enablement", nameof(DecideProviderDataHandling), "actor:tenantAgentAdministrator", "true", true)]
+    [InlineData("Bearer", AgentsAppId, "tenant-provider-enablement", nameof(DecideProviderDataHandling), "actor:tenantAgentAdministrator", "true", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, "other-app", "provider-catalog", nameof(CreateProviderModelEntry), "actor:agentsProviderAdmin", "true", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "provider-catalog", nameof(CreateProviderModelEntry), "actor:agentsProviderAdmin", "false", false)]
     [InlineData("Bearer", AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "true", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, "other-app", "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "true", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "other-domain", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, "true", false)]
@@ -637,6 +683,12 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     [InlineData("agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ProviderSelectionValidation, true)]
     [InlineData("agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ApproverPolicyValidation, true)]
     [InlineData("agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, true)]
+    [InlineData("provider-catalog", nameof(CreateProviderModelEntry), "actor:agentsProviderAdmin", true)]
+    [InlineData("provider-catalog", nameof(UpdateProviderModelEntry), "actor:agentsProviderAdmin", true)]
+    [InlineData("tenant-provider-enablement", nameof(SetTenantProviderModelEnablement), "actor:platformOperator", true)]
+    [InlineData("tenant-provider-enablement", nameof(DecideProviderDataHandling), "actor:tenantAgentAdministrator", true)]
+    [InlineData("tenant-provider-enablement", nameof(DecideProviderDataHandling), "actor:platformOperator", false)]
+    [InlineData("provider-catalog", nameof(CreateProviderModelEntry), "actor:platformOperator", false)]
     [InlineData("agent", nameof(UpdateAgentConfiguration), AgentSetupTrustedExtensions.ProviderSelectionValidation, false)]
     [InlineData("agent", nameof(CreateAgent), AgentSetupTrustedExtensions.ProviderSelectionValidation, false)]
     [InlineData("agent", nameof(CreateAgent), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, false)]

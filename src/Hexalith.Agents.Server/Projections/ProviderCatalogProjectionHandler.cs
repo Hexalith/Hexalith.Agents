@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.EventStore.Client.Projections;
 using Hexalith.EventStore.Contracts.Projections;
 using Hexalith.EventStore.DomainService;
+using Hexalith.Agents.ProviderCatalog;
 
 using Microsoft.Extensions.Options;
 
@@ -29,7 +32,7 @@ public sealed class ProviderCatalogProjectionHandler(
             ProviderCatalogReadModelAddresses.Domain,
             ProviderCatalogReadModelAddresses.ProjectionName,
             ProviderCatalogReadModelAddresses.DetailSlot,
-            ProjectionReadModelSlotKind.AggregateOwned,
+            ProjectionReadModelSlotKind.Shared,
             declaresCanonicalWriter: true),
     ];
 
@@ -49,6 +52,10 @@ public sealed class ProviderCatalogProjectionHandler(
         CancellationToken cancellationToken)
     {
         Validate(request, dispatchId);
+        if (!string.Equals(request.TenantId, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal))
+        {
+            return DomainProjectionHandlerResult.AlreadyCompleted();
+        }
         cancellationToken.ThrowIfCancellationRequested();
         if (request.Events.Length == 0)
         {
@@ -56,20 +63,21 @@ public sealed class ProviderCatalogProjectionHandler(
         }
 
         string storeName = StoreName;
-        string key = ProviderCatalogReadModelAddresses.Detail(request.TenantId);
+        string key = ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId);
         ReadModelEntry<ProviderCatalogReadModel> current = await readModelStore
             .GetAsync<ProviderCatalogReadModel>(storeName, key, cancellationToken)
             .ConfigureAwait(false);
 
         if (ProviderCatalogProjectionFold.GetDeliveryFailureReason(
                 request.Events,
-                current.Value?.LastSequenceNumber ?? 0) is { } deliveryFailure)
+                current.Value?.StreamSequences.GetValueOrDefault(request.AggregateId) ?? 0) is { } deliveryFailure)
         {
             return DomainProjectionHandlerResult.Retryable(deliveryFailure);
         }
 
         ProviderCatalogReadModel next = ProviderCatalogProjectionFold.Fold(request, current.Value);
-        if (current.Value is not null && next.LastSequenceNumber == current.Value.LastSequenceNumber)
+        if (current.Value is not null
+            && next.StreamSequences.GetValueOrDefault(request.AggregateId) == current.Value.StreamSequences.GetValueOrDefault(request.AggregateId))
         {
             return DomainProjectionHandlerResult.AlreadyCompleted();
         }
@@ -90,26 +98,49 @@ public sealed class ProviderCatalogProjectionHandler(
     }
 
     /// <inheritdoc />
-    public Task<DomainProjectionRebuildPlan> PrepareRebuildAsync(
+    public async Task<DomainProjectionRebuildPlan> PrepareRebuildAsync(
         ProjectionRequest request,
         string operationId,
         CancellationToken cancellationToken)
     {
         Validate(request, operationId);
+        if (!string.Equals(request.TenantId, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Legacy catalog projection is frozen.");
+        }
         cancellationToken.ThrowIfCancellationRequested();
         if (ProviderCatalogProjectionFold.GetDeliveryFailureReason(request.Events, 0) is { } deliveryFailure)
         {
             throw new InvalidOperationException(deliveryFailure);
         }
 
-        return Task.FromResult(new DomainProjectionRebuildPlan(
+        string key = ProviderCatalogReadModelAddresses.Detail(request.TenantId);
+        ReadModelEntry<ProviderCatalogReadModel> stored = await readModelStore
+            .GetAsync<ProviderCatalogReadModel>(StoreName, key, cancellationToken)
+            .ConfigureAwait(false);
+        ProviderCatalogReadModel? current = stored.Value;
+        ProviderCatalogReadModel? unaffected = current is null ? null : new ProviderCatalogReadModel
+        {
+            CatalogId = current.CatalogId,
+            TenantId = current.TenantId,
+            Entries = [.. current.Entries.Where(entry =>
+                !string.Equals(ProviderCatalogIdentity.EntryId(entry.ProviderId, entry.ModelId), request.AggregateId, StringComparison.Ordinal))],
+            StreamSequences = current.StreamSequences
+                .Where(pair => !string.Equals(pair.Key, request.AggregateId, StringComparison.Ordinal))
+                .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal),
+            ProjectedAt = current.ProjectedAt,
+        };
+
+        return new DomainProjectionRebuildPlan(
             StoreName,
             [
                 ReadModelBatchOperation.Write(
-                    ProviderCatalogReadModelAddresses.Detail(request.TenantId),
-                    ProviderCatalogProjectionFold.Fold(request, current: null),
-                    ReadModelBatchConcurrency.LastWrite),
-            ]));
+                    key,
+                    ProviderCatalogProjectionFold.Fold(request, unaffected),
+                    stored.ETag is { Length: > 0 } etag
+                        ? ReadModelBatchConcurrency.Match(etag)
+                        : ReadModelBatchConcurrency.CreateOnly),
+            ]);
     }
 
     private string StoreName

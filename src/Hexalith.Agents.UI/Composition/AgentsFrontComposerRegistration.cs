@@ -22,6 +22,9 @@ public static class AgentsFrontComposerRegistration
     /// </summary>
     public const string AgentsAdministratorPolicy = "Agents.Administrator";
 
+    /// <summary>The platform operator policy for system catalog governance.</summary>
+    public const string PlatformOperatorPolicy = "Agents.PlatformOperator";
+
     /// <summary>
     /// Authorization policy gating the approver-facing proposal-queue navigation entry and page (AD-12, AD-15). This
     /// is the first <b>Approver</b> (not Administrator) surface — the proposal queue's audience is Approvers, not only
@@ -119,7 +122,7 @@ public static class AgentsFrontComposerRegistration
             "/agents/providers",
             Icon: "Regular.Size20.DevMode",
             Order: 2,
-            RequiredPolicy: AgentsAdministratorPolicy,
+            RequiredPolicy: PlatformOperatorPolicy,
             TitleKey: "Agents.Navigation.ProviderCatalog",
             Resource: typeof(AgentsResources)));
         registry.AddNavEntry(new FrontComposerNavEntry(
@@ -199,6 +202,15 @@ public static class AgentsFrontComposerRegistration
             Order: 8,
             RequiredPolicy: AgentsAdministratorPolicy,
             TitleKey: "Agents.Navigation.LaunchReadiness",
+            Resource: typeof(AgentsResources)));
+        registry.AddNavEntry(new FrontComposerNavEntry(
+            "agents",
+            "Tenant provider models",
+            "/agents/tenant-providers",
+            Icon: "Regular.Size20.DevMode",
+            Order: 9,
+            RequiredPolicy: AgentsAdministratorPolicy,
+            TitleKey: "Agents.TenantProviders.Title",
             Resource: typeof(AgentsResources)));
     }
 }

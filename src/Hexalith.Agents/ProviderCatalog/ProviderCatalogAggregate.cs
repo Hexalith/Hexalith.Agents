@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 using Hexalith.Agents.Contracts.ProviderCatalog;
@@ -45,7 +48,7 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
     internal const int MaxDisplayLabelLength = 256;
 
     /// <summary>The kebab-case EventStore domain this aggregate owns.</summary>
-    public const string Domain = "provider-catalog";
+    public const string Domain = ProviderCatalogIdentity.Domain;
 
     // SECURITY: server-populated only (patterned after Tenants' "actor:globalAdmin"). The command entry point
     // strips client-provided reserved extensions and repopulates this key from trusted claims only.
@@ -55,8 +58,11 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
     private static readonly Regex _configurationReferenceRegex =
         new("^[A-Za-z0-9._:-]+$", RegexOptions.Compiled);
 
-    private static readonly Regex _currencyRegex =
-        new("^[A-Za-z]{3}$", RegexOptions.Compiled);
+    private static readonly HashSet<string> _isoCurrencyCodes =
+        CultureInfo.GetCultures(CultureTypes.SpecificCultures)
+            .Select(culture => new RegionInfo(culture.Name).ISOCurrencySymbol)
+            .Concat(["XAU", "XAG", "XPT", "XPD", "XDR", "XTS", "XXX"])
+            .ToHashSet(StringComparer.Ordinal);
 
     /// <summary>Handles creation (or idempotent re-creation) of a provider/model catalog entry.</summary>
     /// <param name="command">The create command.</param>
@@ -69,7 +75,7 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
         ArgumentNullException.ThrowIfNull(envelope);
         string catalogId = envelope.AggregateId;
 
-        if (!IsProviderAdmin(envelope))
+        if (!IsProviderAdmin(envelope) || !ProviderCatalogIdentity.IsPlatformEntry(envelope.TenantId, catalogId, command.ProviderId, command.ModelId))
         {
             return Denied(catalogId, envelope, nameof(CreateProviderModelEntry));
         }
@@ -97,9 +103,32 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
             return metaRejection;
         }
 
-        if (TryGetPricingRejection(catalogId, command.ProviderId, command.ModelId, command.Pricing, current: null, out DomainResult? pricingRejection))
+        if (TryGetPricingRejection(catalogId, command.ProviderId, command.ModelId, command.Pricing, current: null, out DomainResult? pricingRejection,
+            allowHistoricalVersion: command.MigratedFrom is not null))
         {
             return pricingRejection;
+        }
+
+        if (command.InitialCapabilityVersion < 1
+            || command.MigratedFrom is null && (command.InitialCapabilityVersion != 1 || command.Pricing.PricingVersion is not 0 and not 1))
+        {
+            return DomainResult.Rejection([new InvalidProviderModelMetadataRejection(catalogId, command.ProviderId, command.ModelId, "Invalid initial catalog version.")]);
+        }
+
+        if (command.DataHandling?.TighteningDeclaration is not null)
+        {
+            return DomainResult.Rejection([new InvalidProviderDataHandlingRejection(catalogId, command.ProviderId, command.ModelId, "A tightening declaration requires a prior version.")]);
+        }
+
+        if (TryGetDataHandlingRejection(catalogId, command.ProviderId, command.ModelId, command.DataHandling, current: null, out DomainResult? termsRejection,
+            allowHistoricalVersion: command.MigratedFrom is not null))
+        {
+            return termsRejection;
+        }
+
+        if (command.Enabled && command.DataHandling is null)
+        {
+            return DomainResult.Rejection([new InvalidProviderDataHandlingRejection(catalogId, command.ProviderId, command.ModelId, "Current terms are required to enable an entry.")]);
         }
 
         ProviderConfigurationState configurationState = ResolveConfigurationState(command.ConfigurationReferenceId);
@@ -110,6 +139,8 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
             // AC4: exact-duplicate create is a deterministic no-op; a conflicting payload is rejected and never
             // mutates state silently.
             return CreateMatchesExisting(existing, command, configurationState, pricing)
+                && SameTerms(existing.DataHandling, ProviderDataHandlingPolicy.Assign(command.DataHandling, current: null))
+                && string.Equals(existing.MigratedFrom, command.MigratedFrom, StringComparison.Ordinal)
                 ? DomainResult.NoOp()
                 : DomainResult.Rejection([new ProviderModelEntryAlreadyExistsRejection(catalogId, command.ProviderId, command.ModelId)]);
         }
@@ -129,7 +160,9 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
                 configurationState,
                 command.ConfigurationReferenceId,
                 pricing,
-                CapabilityVersion: 1),
+                CapabilityVersion: command.InitialCapabilityVersion,
+                ProviderDataHandlingPolicy.Assign(command.DataHandling, current: null),
+                command.MigratedFrom),
         ]);
     }
 
@@ -144,7 +177,7 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
         ArgumentNullException.ThrowIfNull(envelope);
         string catalogId = envelope.AggregateId;
 
-        if (!IsProviderAdmin(envelope))
+        if (!IsProviderAdmin(envelope) || !ProviderCatalogIdentity.IsPlatformEntry(envelope.TenantId, catalogId, command.ProviderId, command.ModelId))
         {
             return Denied(catalogId, envelope, nameof(UpdateProviderModelEntry));
         }
@@ -183,13 +216,44 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
             return pricingRejection;
         }
 
+        if (TryGetDataHandlingRejection(catalogId, command.ProviderId, command.ModelId, command.DataHandling, existing.DataHandling, out DomainResult? termsRejection))
+        {
+            return termsRejection;
+        }
+
+        if (command.DataHandling?.TighteningDeclaration is not null)
+        {
+            return DomainResult.Rejection([new InvalidProviderDataHandlingRejection(catalogId, command.ProviderId, command.ModelId, "Tightening declarations are assigned by the platform aggregate.")]);
+        }
+
         ProviderConfigurationState configurationState = ResolveConfigurationState(command.ConfigurationReferenceId);
         ProviderModelPricing pricing = AssignPricing(command.Pricing, existing.Pricing);
 
         // AC4: an update that changes nothing is a deterministic no-op.
-        if (UpdateMatchesExisting(existing, command, configurationState, pricing))
+        ProviderDataHandlingRecord? dataHandling = ProviderDataHandlingPolicy.Assign(command.DataHandling, existing.DataHandling);
+        if (command.DeclareDataHandlingTightening)
+        {
+            ProviderDataHandlingTighteningDeclaration? declaration = existing.DataHandling is { } previous
+                && dataHandling is { } current
+                ? ProviderDataHandlingPolicy.DeclareTightening(previous, current, envelope.UserId)
+                : null;
+            if (declaration is null)
+            {
+                return DomainResult.Rejection([new InvalidProviderDataHandlingRejection(catalogId, command.ProviderId, command.ModelId, "Declared terms must be a complete tightening with a trusted effective time.")]);
+            }
+
+            dataHandling = dataHandling! with { TighteningDeclaration = declaration };
+        }
+        if (UpdateMatchesExisting(existing, command, configurationState, pricing)
+            && Equals(existing.DataHandling, dataHandling))
         {
             return DomainResult.NoOp();
+        }
+
+        if (existing.CapabilityVersion == int.MaxValue)
+        {
+            return DomainResult.Rejection([new InvalidProviderModelMetadataRejection(
+                catalogId, command.ProviderId, command.ModelId, "Capability version is exhausted.")]);
         }
 
         int nextCapabilityVersion = existing.CapabilityVersion + 1;
@@ -207,7 +271,8 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
                 configurationState,
                 command.ConfigurationReferenceId,
                 pricing,
-                nextCapabilityVersion),
+                nextCapabilityVersion,
+                dataHandling),
         ]);
     }
 
@@ -222,7 +287,7 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
         ArgumentNullException.ThrowIfNull(envelope);
         string catalogId = envelope.AggregateId;
 
-        if (!IsProviderAdmin(envelope))
+        if (!IsProviderAdmin(envelope) || !ProviderCatalogIdentity.IsPlatformEntry(envelope.TenantId, catalogId, command.ProviderId, command.ModelId))
         {
             return Denied(catalogId, envelope, nameof(EnableProviderModelEntry));
         }
@@ -240,6 +305,7 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
                     ProviderModelStatus.Enabled,
                     nameof(EnableProviderModelEntry)),
             ]),
+            { DataHandling: null } => DomainResult.Rejection([new InvalidProviderDataHandlingRejection(catalogId, command.ProviderId, command.ModelId, "Current terms are required to enable an entry.")]),
             _ => DomainResult.Success([new ProviderModelEntryEnabled(catalogId, command.ProviderId, command.ModelId)]),
         };
     }
@@ -255,7 +321,7 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
         ArgumentNullException.ThrowIfNull(envelope);
         string catalogId = envelope.AggregateId;
 
-        if (!IsProviderAdmin(envelope))
+        if (!IsProviderAdmin(envelope) || !ProviderCatalogIdentity.IsPlatformEntry(envelope.TenantId, catalogId, command.ProviderId, command.ModelId))
         {
             return Denied(catalogId, envelope, nameof(DisableProviderModelEntry));
         }
@@ -292,7 +358,8 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
     /// <param name="pricing">The pricing to inspect.</param>
     /// <returns><see langword="true"/> when currency and unit prices are valid.</returns>
     internal static bool HasValidPricing(ProviderModelPricing? pricing)
-        => ValidatePricing(pricing, current: null) is null;
+        => pricing is { PricingVersion: >= 1 }
+            && ValidatePricing(pricing, current: null, allowHistoricalVersion: true) is null;
 
     private static bool IsProviderAdmin(CommandEnvelope envelope)
         => envelope.Extensions?.TryGetValue(ProviderAdminExtensionKey, out string? value) == true
@@ -373,12 +440,29 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
         string modelId,
         ProviderModelPricing? pricing,
         ProviderModelPricing? current,
-        [NotNullWhen(true)] out DomainResult? rejection)
+        [NotNullWhen(true)] out DomainResult? rejection,
+        bool allowHistoricalVersion = false)
     {
-        string? reason = ValidatePricing(pricing, current);
+        string? reason = ValidatePricing(pricing, current, allowHistoricalVersion);
         rejection = reason is null
             ? null
             : DomainResult.Rejection([new InvalidProviderModelPricingRejection(catalogId, providerId, modelId, reason)]);
+        return rejection is not null;
+    }
+
+    private static bool TryGetDataHandlingRejection(
+        string catalogId,
+        string providerId,
+        string modelId,
+        ProviderDataHandlingRecord? proposed,
+        ProviderDataHandlingRecord? current,
+        [NotNullWhen(true)] out DomainResult? rejection,
+        bool allowHistoricalVersion = false)
+    {
+        string? reason = ProviderDataHandlingPolicy.Validate(proposed, current, allowHistoricalVersion);
+        rejection = reason is null
+            ? null
+            : DomainResult.Rejection([new InvalidProviderDataHandlingRejection(catalogId, providerId, modelId, reason)]);
         return rejection is not null;
     }
 
@@ -467,14 +551,14 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
             : null;
     }
 
-    private static string? ValidatePricing(ProviderModelPricing? pricing, ProviderModelPricing? current)
+    private static string? ValidatePricing(ProviderModelPricing? pricing, ProviderModelPricing? current, bool allowHistoricalVersion = false)
     {
         if (pricing is null || string.IsNullOrWhiteSpace(pricing.Currency))
         {
             return "Pricing units and currency are required.";
         }
 
-        if (!_currencyRegex.IsMatch(pricing.Currency))
+        if (pricing.Currency.Length != 3 || !_isoCurrencyCodes.Contains(pricing.Currency.ToUpperInvariant()))
         {
             return "Pricing.Currency must be a three-letter ISO 4217 code.";
         }
@@ -489,14 +573,20 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
             return "Pricing.PricingVersion must not be negative.";
         }
 
-        if (current is null && pricing.PricingVersion is not 0 and not 1)
+        bool changed = current is null
+            || !string.Equals(pricing.Currency, current.Currency, StringComparison.OrdinalIgnoreCase)
+            || pricing.InputTokenUnitPrice != current.InputTokenUnitPrice
+            || pricing.OutputTokenUnitPrice != current.OutputTokenUnitPrice;
+        if (changed && current?.PricingVersion == int.MaxValue)
         {
-            return "Pricing.PricingVersion must be 1 on create.";
+            return "Pricing version is exhausted.";
         }
 
-        if (current is not null && pricing.PricingVersion > 0 && pricing.PricingVersion < current.PricingVersion)
+        int requiredVersion = current is null ? 1 : changed ? current.PricingVersion + 1 : current.PricingVersion;
+        if (pricing.PricingVersion > 0 && pricing.PricingVersion != requiredVersion
+            && !(allowHistoricalVersion && current is null))
         {
-            return "Pricing.PricingVersion must not decrease or be reused.";
+            return "Pricing.PricingVersion must advance only when price or currency changes.";
         }
 
         return null;
@@ -509,9 +599,13 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
             || !string.Equals(current.Currency, currency, StringComparison.Ordinal)
             || current.InputTokenUnitPrice != pricing.InputTokenUnitPrice
             || current.OutputTokenUnitPrice != pricing.OutputTokenUnitPrice;
+        if (unitsChanged && current?.PricingVersion == int.MaxValue)
+        {
+            throw new InvalidOperationException("Pricing version is exhausted.");
+        }
 
         int version = current is null
-            ? 1
+            ? pricing.PricingVersion > 0 ? pricing.PricingVersion : 1
             : unitsChanged ? current.PricingVersion + 1 : current.PricingVersion;
 
         return new ProviderModelPricing(currency, pricing.InputTokenUnitPrice, pricing.OutputTokenUnitPrice, version);
@@ -523,7 +617,7 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
         ProviderConfigurationState configurationState,
         ProviderModelPricing pricing)
         => existing.IsEnabled == command.Enabled
-            && existing.CapabilityVersion == 1
+            && existing.CapabilityVersion == command.InitialCapabilityVersion
             && SafeMetadataMatches(
                 existing,
                 command.DisplayLabel,
@@ -579,4 +673,11 @@ public class ProviderCatalogAggregate : EventStoreAggregate<ProviderCatalogState
             && string.Equals(existing.Currency, proposed.Currency, StringComparison.Ordinal)
             && existing.InputTokenUnitPrice == proposed.InputTokenUnitPrice
             && existing.OutputTokenUnitPrice == proposed.OutputTokenUnitPrice;
+
+    private static bool SameTerms(ProviderDataHandlingRecord? existing, ProviderDataHandlingRecord? proposed)
+        => existing is null && proposed is null
+            || existing is not null && proposed is not null
+                && existing.DataHandlingVersion == proposed.DataHandlingVersion
+                && existing.EffectiveAt == proposed.EffectiveAt
+                && ProviderDataHandlingPolicy.SameFields(existing, proposed);
 }

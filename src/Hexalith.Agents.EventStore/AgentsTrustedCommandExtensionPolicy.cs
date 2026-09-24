@@ -3,6 +3,7 @@ using System.Security.Claims;
 
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
+using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 
 using Hexalith.EventStore.Authentication;
 using Hexalith.EventStore.Authorization;
@@ -13,6 +14,8 @@ namespace Hexalith.Agents.EventStore;
 internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId) : ITrustedCommandExtensionPolicy
 {
     private const string AgentDomain = "agent";
+    private const string ProviderCatalogDomain = "provider-catalog";
+    private const string TenantProviderEnablementDomain = "tenant-provider-enablement";
     private const string DaprCallerAppIdClaim = "dapr_caller_app_id";
 
     private static readonly HashSet<string> _setupCommandTypes =
@@ -29,7 +32,16 @@ internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId) : 
     internal string AgentsAppId => _agentsAppId;
 
     public bool Claims(string domain, string commandType, string key)
-        => string.Equals(domain, AgentDomain, StringComparison.Ordinal)
+        => (string.Equals(domain, ProviderCatalogDomain, StringComparison.Ordinal)
+            && commandType is (nameof(CreateProviderModelEntry) or nameof(UpdateProviderModelEntry)
+                or nameof(EnableProviderModelEntry) or nameof(DisableProviderModelEntry))
+            && string.Equals(key, "actor:agentsProviderAdmin", StringComparison.Ordinal))
+            || string.Equals(domain, TenantProviderEnablementDomain, StringComparison.Ordinal)
+            && ((string.Equals(commandType, nameof(SetTenantProviderModelEnablement), StringComparison.Ordinal)
+                    && string.Equals(key, "actor:platformOperator", StringComparison.Ordinal))
+                || (string.Equals(commandType, nameof(DecideProviderDataHandling), StringComparison.Ordinal)
+                    && string.Equals(key, "actor:tenantAgentAdministrator", StringComparison.Ordinal)))
+            || string.Equals(domain, AgentDomain, StringComparison.Ordinal)
             && _setupCommandTypes.Contains(commandType)
             && (string.Equals(key, AgentSetupTrustedExtensions.AgentAdministrator, StringComparison.Ordinal)
                 || (string.Equals(commandType, nameof(ActivateAgent), StringComparison.Ordinal)
@@ -58,7 +70,10 @@ internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId) : 
             return false;
         }
 
-        if (string.Equals(key, AgentSetupTrustedExtensions.AgentAdministrator, StringComparison.Ordinal))
+        if (string.Equals(key, AgentSetupTrustedExtensions.AgentAdministrator, StringComparison.Ordinal)
+            || string.Equals(key, "actor:agentsProviderAdmin", StringComparison.Ordinal)
+            || string.Equals(key, "actor:platformOperator", StringComparison.Ordinal)
+            || string.Equals(key, "actor:tenantAgentAdministrator", StringComparison.Ordinal))
         {
             return string.Equals(value, "true", StringComparison.Ordinal);
         }

@@ -23,7 +23,7 @@ namespace Hexalith.Agents.UI.Tests;
 public sealed class AgentsNavigationTests : AgentsTestContext
 {
     [Fact]
-    public void RegisterDomain_registers_agents_manifest_and_nine_ordered_entries()
+    public void RegisterDomain_registers_agents_manifest_and_ten_ordered_entries()
     {
         // Story 4.3/4.4 AC3 — the Agents domain is coherent in operational-setup → workflow → status → audit → launch
         // order, now nine ordered entries (the Story 4.4 launch-readiness surface is appended at Order 8).
@@ -36,12 +36,12 @@ public sealed class AgentsNavigationTests : AgentsTestContext
         manifest.NameKey.ShouldBe("Agents.Navigation.Agents");
 
         registry.NavEntries.Select(entry => entry.Href)
-            .ShouldBe(["/agents", "/agents/configuration", "/agents/providers", "/agents/approver-policy", "/agents/conversation-call", "/agents/proposals", "/agents/status", "/agents/audit", "/agents/launch-readiness"]);
+            .ShouldBe(["/agents", "/agents/configuration", "/agents/providers", "/agents/approver-policy", "/agents/conversation-call", "/agents/proposals", "/agents/status", "/agents/audit", "/agents/launch-readiness", "/agents/tenant-providers"]);
         registry.NavEntries.Select(entry => entry.Order)
-            .ShouldBe([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+            .ShouldBe([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
         registry.NavEntries.ShouldAllBe(entry => entry.BoundedContext == "agents");
         registry.NavEntries.First().Title.ShouldBe("Agents overview");
-        registry.NavEntries.Last().Title.ShouldBe("Launch readiness");
+        registry.NavEntries.Last().Title.ShouldBe("Tenant provider models");
     }
 
     [Fact]
@@ -77,9 +77,12 @@ public sealed class AgentsNavigationTests : AgentsTestContext
 
         AgentsFrontComposerRegistration.RegisterDomain(registry);
 
-        string[] adminHrefs = ["/agents", "/agents/configuration", "/agents/providers", "/agents/approver-policy", "/agents/conversation-call"];
+        string[] adminHrefs = ["/agents", "/agents/configuration", "/agents/tenant-providers", "/agents/approver-policy", "/agents/conversation-call"];
         registry.NavEntries.Where(entry => adminHrefs.Contains(entry.Href))
             .ShouldAllBe(entry => entry.RequiredPolicy == AgentsFrontComposerRegistration.AgentsAdministratorPolicy);
+
+        registry.NavEntries.Single(entry => entry.Href == "/agents/providers").RequiredPolicy
+            .ShouldBe(AgentsFrontComposerRegistration.PlatformOperatorPolicy);
 
         FrontComposerNavEntry proposals = registry.NavEntries.Single(entry => entry.Href == "/agents/proposals");
         proposals.RequiredPolicy.ShouldBe(AgentsFrontComposerRegistration.AgentsApproverPolicy);
@@ -179,11 +182,27 @@ public sealed class AgentsNavigationTests : AgentsTestContext
         {
             cut.Markup.ShouldContain("href=\"/agents\"");
             cut.Markup.ShouldContain("href=\"/agents/configuration\"");
-            cut.Markup.ShouldContain("href=\"/agents/providers\"");
+            cut.Markup.ShouldContain("href=\"/agents/tenant-providers\"");
+            cut.Markup.ShouldNotContain("href=\"/agents/providers\"");
             cut.Markup.ShouldContain("href=\"/agents/approver-policy\"");
             cut.Markup.ShouldContain("href=\"/agents/conversation-call\"");
             // The administrator policy does NOT grant the approver-only proposal queue (Approver ≠ Administrator).
             cut.Markup.ShouldNotContain("href=\"/agents/proposals\"");
+        });
+    }
+
+    [Fact]
+    public void Platform_operator_sees_system_catalog_without_tenant_decision_controls()
+    {
+        Authorization.SetAuthorized("operator");
+        Authorization.SetPolicies(AgentsFrontComposerRegistration.PlatformOperatorPolicy);
+
+        IRenderedComponent<NavEntryGatingHarness> cut = RenderRegisteredEntries();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.Markup.ShouldContain("href=\"/agents/providers\"");
+            cut.Markup.ShouldNotContain("href=\"/agents/tenant-providers\"");
         });
     }
 
@@ -199,6 +218,7 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             cut.Markup.ShouldNotContain("href=\"/agents\"");
             cut.Markup.ShouldNotContain("href=\"/agents/configuration\"");
             cut.Markup.ShouldNotContain("href=\"/agents/providers\"");
+            cut.Markup.ShouldNotContain("href=\"/agents/tenant-providers\"");
             cut.Markup.ShouldNotContain("href=\"/agents/approver-policy\"");
             cut.Markup.ShouldNotContain("href=\"/agents/conversation-call\"");
             cut.Markup.ShouldNotContain("href=\"/agents/proposals\"");
@@ -221,6 +241,7 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             cut.Markup.ShouldNotContain("href=\"/agents\"");
             cut.Markup.ShouldNotContain("href=\"/agents/configuration\"");
             cut.Markup.ShouldNotContain("href=\"/agents/providers\"");
+            cut.Markup.ShouldNotContain("href=\"/agents/tenant-providers\"");
             cut.Markup.ShouldNotContain("href=\"/agents/approver-policy\"");
             cut.Markup.ShouldNotContain("href=\"/agents/conversation-call\"");
             cut.Markup.ShouldNotContain("href=\"/agents/proposals\"");
@@ -250,6 +271,7 @@ public sealed class AgentsNavigationTests : AgentsTestContext
             "Agents.Navigation.OperationalStatus",
             "Agents.Navigation.AuditEvidence",
             "Agents.Navigation.LaunchReadiness",
+            "Agents.TenantProviders.Title",
         ]);
     }
 

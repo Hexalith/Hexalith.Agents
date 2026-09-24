@@ -695,4 +695,39 @@
   <data name="Agents.LaunchReadiness.Enable.Label" xml:space="preserve"><value>Enable production-like generation</value></data>
   <data name="Agents.LaunchReadiness.Enable.Button" xml:space="preserve"><value>Enable production-like generation</value></data>
   <data name="Agents.LaunchReadiness.Enable.Submitted" xml:space="preserve"><value>Enablement request submitted.</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.RetentionDays" xml:space="preserve"><value>Retention days</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.TrainingUse" xml:space="preserve"><value>Training use permitted (true or false)</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.ProcessingRegions" xml:space="preserve"><value>Processing regions (comma separated)</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.TermsReference" xml:space="preserve"><value>Terms reference</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.Version" xml:space="preserve"><value>Terms version</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.Missing" xml:space="preserve"><value>Terms missing</value></data>
+  <data name="Agents.TenantProviders.Title" xml:space="preserve"><value>Tenant provider models</value></data>
+  <data name="Agents.TenantProviders.Description" xml:space="preserve"><value>Review the provider models enabled for your tenant and decide on their current data handling terms.</value></data>
+  <data name="Agents.TenantProviders.TermsStatus" xml:space="preserve"><value>Terms status</value></data>
+  <data name="Agents.TenantProviders.Review" xml:space="preserve"><value>Review terms</value></data>
+  <data name="Agents.TenantProviders.ConfirmTitle" xml:space="preserve"><value>Confirm current terms</value></data>
+  <data name="Agents.TenantProviders.ExactVersion" xml:space="preserve"><value>Data handling version {0}</value></data>
+  <data name="Agents.TenantProviders.Retention" xml:space="preserve"><value>Retention: {0} days</value></data>
+  <data name="Agents.TenantProviders.Training" xml:space="preserve"><value>Training use: {0}</value></data>
+  <data name="Agents.TenantProviders.Regions" xml:space="preserve"><value>Processing regions: {0}</value></data>
+  <data name="Agents.TenantProviders.TermsReference" xml:space="preserve"><value>Terms reference: {0}</value></data>
+  <data name="Agents.TenantProviders.GraceDeadline" xml:space="preserve"><value>Grace ends at {0}</value></data>
+  <data name="Agents.TenantProviders.Justification" xml:space="preserve"><value>Decision justification</value></data>
+  <data name="Agents.TenantProviders.Accept" xml:space="preserve"><value>Accept current terms</value></data>
+  <data name="Agents.TenantProviders.Decline" xml:space="preserve"><value>Decline current terms</value></data>
+  <data name="Agents.TenantProviders.Status.Current" xml:space="preserve"><value>Accepted current terms</value></data>
+  <data name="Agents.TenantProviders.Status.Grace" xml:space="preserve"><value>Tightening grace</value></data>
+  <data name="Agents.TenantProviders.Status.GraceExpired" xml:space="preserve"><value>Grace expired</value></data>
+  <data name="Agents.TenantProviders.Status.TermsChanged" xml:space="preserve"><value>Acceptance required for changed terms</value></data>
+  <data name="Agents.TenantProviders.Status.UnknownEvidence" xml:space="preserve"><value>Terms evidence unavailable</value></data>
+  <data name="Agents.TenantProviders.Status.Declined" xml:space="preserve"><value>Terms declined</value></data>
+  <data name="Agents.TenantProviders.Status.AcceptanceRequired" xml:space="preserve"><value>Acceptance required</value></data>
+  <data name="Agents.TenantProviders.Status.MissingEnablementOrTerms" xml:space="preserve"><value>Provider terms unavailable</value></data>
+  <data name="Agents.TenantProviders.Status.PlatformNotReady" xml:space="preserve"><value>Platform not ready</value></data>
+  <data name="Agents.ProviderCatalog.Enablement.Title" xml:space="preserve"><value>Set tenant enablement</value></data>
+  <data name="Agents.ProviderCatalog.Enablement.Tenant" xml:space="preserve"><value>Tenant ID</value></data>
+  <data name="Agents.ProviderCatalog.Enablement.ExpectedRevision" xml:space="preserve"><value>Current tenant revision</value></data>
+  <data name="Agents.ProviderCatalog.Enablement.Enabled" xml:space="preserve"><value>Enabled for tenant</value></data>
+  <data name="Agents.ProviderCatalog.Enablement.Load" xml:space="preserve"><value>Load tenant state</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.DeclareTightening" xml:space="preserve"><value>Declare this change as stricter data handling terms</value></data>
 </root>

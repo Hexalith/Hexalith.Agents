@@ -21,14 +21,17 @@ public sealed class ProviderCatalogState
     public Dictionary<string, ProviderModelEntryState> Entries { get; set; } = [];
 
     /// <summary>
-    /// Builds the composite dictionary key for a provider/model entry. Joins the identifiers with the ASCII
-    /// unit-separator (<c>\u001f</c>) — not a character that appears in provider/model identifiers — so distinct
-    /// (provider, model) pairs never collide (for example ("ab","c") and ("a","bc") map to different keys).
+    /// Builds a collision-free length-prefixed dictionary key for a provider/model pair.
     /// </summary>
     /// <param name="providerId">Stable provider identifier.</param>
     /// <param name="modelId">Stable model identifier.</param>
     /// <returns>The composite entry key.</returns>
-    public static string EntryKey(string providerId, string modelId) => $"{providerId}\u001f{modelId}";
+    public static string EntryKey(string providerId, string modelId)
+    {
+        ArgumentNullException.ThrowIfNull(providerId);
+        ArgumentNullException.ThrowIfNull(modelId);
+        return $"{providerId.Length}:{providerId}{modelId.Length}:{modelId}";
+    }
 
     /// <summary>Applies a provider/model entry creation.</summary>
     /// <param name="e">The event.</param>
@@ -51,6 +54,9 @@ public sealed class ProviderCatalogState
             ConfigurationReferenceId = e.ConfigurationReferenceId,
             CapabilityVersion = e.CapabilityVersion > 0 ? e.CapabilityVersion : 1,
             Pricing = e.Pricing,
+            DataHandling = e.DataHandling,
+            DataHandlingHistory = e.DataHandling is null ? [] : [e.DataHandling],
+            MigratedFrom = e.MigratedFrom,
         };
     }
 
@@ -80,6 +86,12 @@ public sealed class ProviderCatalogState
         entry.ConfigurationState = e.ConfigurationState;
         entry.ConfigurationReferenceId = e.ConfigurationReferenceId;
         entry.Pricing = e.Pricing;
+        if (e.DataHandling is { } terms && terms.DataHandlingVersion > (entry.DataHandling?.DataHandlingVersion ?? 0))
+        {
+            entry.DataHandlingHistory.Add(terms);
+        }
+
+        entry.DataHandling = e.DataHandling;
         entry.CapabilityVersion = nextVersion;
     }
 
@@ -156,6 +168,13 @@ public sealed class ProviderCatalogState
     /// <summary>No-op replay handler — rejection events carry no state change.</summary>
     /// <param name="e">The rejection event.</param>
     public void Apply(InvalidProviderModelPricingRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>No-op replay handler for invalid data handling terms.</summary>
+    public void Apply(InvalidProviderDataHandlingRejection e)
     {
         ArgumentNullException.ThrowIfNull(e);
         MarkReplayOnlyEventHandled();

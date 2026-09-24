@@ -1,0 +1,197 @@
+@page "/agents/tenant-providers"
+@attribute [Authorize(Policy = AgentsFrontComposerRegistration.AgentsAdministratorPolicy)]
+@implements IDisposable
+@inject IStringLocalizer<AgentsResources> Localizer
+@inject IProviderCatalogGateway Gateway
+@inject TimeProvider TimeProvider
+
+@using Hexalith.Agents.Contracts.ProviderCatalog.Commands
+
+<FcContentLabel LabelledBy="tenant-provider-heading" />
+<FcAggregateListPage TItem="TenantProviderCatalogEntryView"
+                     LayoutMode="FcPageLayoutMode.FullWidth"
+                     RootTestId="agents-tenant-provider-catalog"
+                     PageTitle="@Localizer["Agents.TenantProviders.Title"]"
+                     Heading="@Localizer["Agents.TenantProviders.Title"]"
+                     HeadingId="tenant-provider-heading"
+                     HeadingTabIndex="-1"
+                     Description="@Localizer["Agents.TenantProviders.Description"]">
+    <Filters>
+        @if (_truth is not null)
+        {
+            <FluentText aria-live="polite" data-testid="agents-tenant-provider-truth">@Localizer[$"Agents.ProviderCatalog.Truth.Stage.{_truth}"]</FluentText>
+        }
+        else if (_writeFailure is { } failure)
+        {
+            <FluentText aria-live="polite" data-testid="agents-tenant-provider-truth">@Localizer[$"Agents.ProviderCatalog.Write.Status.{failure}"]</FluentText>
+        }
+        else if (_result is { TruthState: AgentSetupTruthState.AuthoritativePending })
+        {
+            <FluentText aria-live="polite" data-testid="agents-tenant-provider-truth">@Localizer["Agents.ProviderCatalog.Truth.Stage.AuthoritativePending"]</FluentText>
+        }
+    </Filters>
+    <States>
+        @if (_result is null)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Loading" TestId="agents-tenant-provider-state" />
+        }
+        else if (_result.Status is ProviderCatalogInspectionStatus.NotAuthorized)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-tenant-provider-state" />
+        }
+        else if (_result.Status is ProviderCatalogInspectionStatus.Unavailable)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Error" TestId="agents-tenant-provider-state" />
+        }
+        else if (_result is { TruthState: AgentSetupTruthState.AuthoritativePending, Entries.Count: 0 })
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Stale" TestId="agents-tenant-provider-state" />
+        }
+        else if (_result.Entries.Count == 0)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Empty" TestId="agents-tenant-provider-state" />
+        }
+    </States>
+    <Body>
+        @if (_result is { Status: ProviderCatalogInspectionStatus.Success, Entries.Count: > 0 })
+        {
+            <FluentAccordion>
+                <FluentAccordionItem Heading="@Localizer["Agents.TenantProviders.Title"]" Expanded="true">
+                    <FluentDataGrid Items="@_result.Entries.AsQueryable()" ItemKey="@(entry => entry.ProviderId + "/" + entry.ModelId)"
+                                    data-testid="agents-tenant-provider-grid">
+                        <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Provider"]">@context.ProviderId</TemplateColumn>
+                        <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Model"]">@context.ModelId</TemplateColumn>
+                        <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Label"]">@context.DisplayLabel</TemplateColumn>
+                        <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Pricing"]">
+                            @(context.Pricing is { } price
+                                ? Localizer["Agents.ProviderCatalog.Pricing.Value", price.Currency, price.InputTokenUnitPrice, price.OutputTokenUnitPrice, price.PricingVersion]
+                                : Localizer["Agents.ProviderCatalog.Pricing.Missing"])
+                        </TemplateColumn>
+                        <TemplateColumn Title="@Localizer["Agents.TenantProviders.TermsStatus"]">
+                            @Localizer[$"Agents.TenantProviders.Status.{context.DataHandlingStatus}"]
+                        </TemplateColumn>
+                        <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Actions"]">
+                            <FluentButton Disabled="_busy || context.DataHandling is null" OnClick="@(() => Select(context))"
+                                          data-testid="agents-tenant-provider-review">
+                                @Localizer["Agents.TenantProviders.Review"]
+                            </FluentButton>
+                        </TemplateColumn>
+                    </FluentDataGrid>
+                </FluentAccordionItem>
+                @if (_selected is { DataHandling: { } terms })
+                {
+                    <FluentAccordionItem Heading="@Localizer["Agents.TenantProviders.ConfirmTitle"]" Expanded="true">
+                        <FluentStack Orientation="Orientation.Vertical" VerticalGap="12px" data-testid="agents-tenant-provider-confirmation">
+                            <FluentText>@Localizer["Agents.TenantProviders.ExactVersion", terms.DataHandlingVersion]</FluentText>
+                            <FluentText>@Localizer["Agents.TenantProviders.Retention", terms.RetentionDays]</FluentText>
+                            <FluentText>@Localizer["Agents.TenantProviders.Training", Localizer[terms.AllowsTrainingUse ? "Agents.ProviderCatalog.Selectable.Yes" : "Agents.ProviderCatalog.Selectable.No"]]</FluentText>
+                            <FluentText>@Localizer["Agents.TenantProviders.Regions", string.Join(", ", terms.ProcessingRegions)]</FluentText>
+                            <FluentText>@Localizer["Agents.TenantProviders.TermsReference", terms.TermsReferenceId]</FluentText>
+                            @if (_selected.GraceExpiresAt is { } deadline)
+                            {
+                                <FluentText>@Localizer["Agents.TenantProviders.GraceDeadline", deadline]</FluentText>
+                            }
+                            <FluentTextInput @bind-Value="_justification"
+                                             Label="@Localizer["Agents.TenantProviders.Justification"]"
+                                             AriaLabel="@Localizer["Agents.TenantProviders.Justification"]"
+                                             data-testid="agents-tenant-provider-justification" />
+                            <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="8px">
+                                <FluentButton Appearance="ButtonAppearance.Primary" Disabled="_busy || string.IsNullOrWhiteSpace(_justification)"
+                                              OnClick="@(() => DecideAsync(true))" data-testid="agents-tenant-provider-accept">
+                                    @Localizer["Agents.TenantProviders.Accept"]
+                                </FluentButton>
+                                <FluentButton Disabled="_busy || string.IsNullOrWhiteSpace(_justification)"
+                                              OnClick="@(() => DecideAsync(false))" data-testid="agents-tenant-provider-decline">
+                                    @Localizer["Agents.TenantProviders.Decline"]
+                                </FluentButton>
+                            </FluentStack>
+                        </FluentStack>
+                    </FluentAccordionItem>
+                }
+            </FluentAccordion>
+        }
+    </Body>
+</FcAggregateListPage>
+
+@code {
+    private readonly CancellationTokenSource _lifetime = new();
+    private TenantProviderCatalogInspectionResult? _result;
+    private TenantProviderCatalogEntryView? _selected;
+    private string _justification = string.Empty;
+    private string? _truth;
+    private AgentSetupWriteStatus? _writeFailure;
+    private bool _busy;
+
+    protected override async Task OnInitializedAsync()
+        => _result = await Gateway.ListTenantEntriesAsync(includeDisabled: true, _lifetime.Token);
+
+    private void Select(TenantProviderCatalogEntryView entry)
+    {
+        _selected = entry;
+        _justification = string.Empty;
+    }
+
+    private async Task DecideAsync(bool accepted)
+    {
+        if (_busy || _selected?.DataHandling is not { } terms || string.IsNullOrWhiteSpace(_justification))
+        {
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            var command = new DecideProviderDataHandling(_selected.ProviderId, _selected.ModelId,
+                terms.DataHandlingVersion, accepted, _justification.Trim(), _selected.TenantRevision, terms, default);
+            ProviderCatalogWriteResult write = await Gateway.DecideDataHandlingAsync(command, _lifetime.Token);
+            _truth = write.Status is AgentSetupWriteStatus.Submitted ? "Submitted" : null;
+            _writeFailure = write.Status is AgentSetupWriteStatus.Submitted ? null : write.Status;
+            if (write.Status is AgentSetupWriteStatus.Submitted)
+            {
+                await InvokeAsync(StateHasChanged);
+                using CancellationTokenSource timeout = new(TimeSpan.FromSeconds(8), TimeProvider);
+                using CancellationTokenSource polling = CancellationTokenSource.CreateLinkedTokenSource(
+                    _lifetime.Token, timeout.Token);
+                try
+                {
+                    while (true)
+                    {
+                        _result = await Gateway.ListTenantEntriesAsync(includeDisabled: true, polling.Token);
+                        TenantProviderCatalogEntryView? current = _result.Entries.FirstOrDefault(item =>
+                            item.ProviderId == command.ProviderId && item.ModelId == command.ModelId);
+                        bool confirmed = current is not null && write.Acceptance is { MessageId: { Length: > 0 } messageId }
+                            && string.Equals(current.LastDecisionMessageId, messageId, StringComparison.Ordinal)
+                            && current.TenantRevision > command.ExpectedRevision
+                            && current.DataHandling?.DataHandlingVersion == command.DataHandlingVersion
+                            && (accepted ? current.InForceDataHandlingVersion == command.DataHandlingVersion
+                                    && current.DataHandlingStatus == "Current"
+                                : current.DataHandlingStatus == "Declined");
+                        _truth = confirmed ? "ProjectionConfirmed" : "AuthoritativePending";
+                        _selected = current;
+                        if (confirmed)
+                        {
+                            break;
+                        }
+
+                        await InvokeAsync(StateHasChanged);
+                        await Task.Delay(TimeSpan.FromMilliseconds(200), TimeProvider, polling.Token);
+                    }
+                }
+                catch (OperationCanceledException) when (timeout.IsCancellationRequested && !_lifetime.IsCancellationRequested)
+                {
+                    _truth = "AuthoritativePending";
+                }
+            }
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    public void Dispose()
+    {
+        _lifetime.Cancel();
+        _lifetime.Dispose();
+    }
+}

@@ -12,6 +12,22 @@ namespace Hexalith.Agents.UI.Services.Gateways;
 /// </summary>
 public interface IProviderCatalogGateway
 {
+    /// <summary>Reads platform-authorized tenant enablement for write confirmation.</summary>
+    Task<TenantProviderEnablementInspectionResult> GetTenantEnablementAsync(
+        string tenantId, string providerId, string modelId, CancellationToken cancellationToken);
+
+    /// <summary>Lists the tenant-safe enabled catalog join.</summary>
+    Task<TenantProviderCatalogInspectionResult> ListTenantEntriesAsync(bool includeDisabled, CancellationToken cancellationToken);
+
+    /// <summary>Gets a tenant-safe enabled entry.</summary>
+    Task<TenantProviderCatalogInspectionResult> GetTenantEntryAsync(string providerId, string modelId, CancellationToken cancellationToken);
+
+    /// <summary>Changes tenant enablement under platform authority.</summary>
+    Task<ProviderCatalogWriteResult> SetTenantEnablementAsync(SetTenantProviderModelEnablement command, CancellationToken cancellationToken);
+
+    /// <summary>Records a tenant administrator's terms decision.</summary>
+    Task<ProviderCatalogWriteResult> DecideDataHandlingAsync(DecideProviderDataHandling command, CancellationToken cancellationToken);
+
     /// <summary>Lists the safe provider/model catalog entry views backing the Provider catalog grid.</summary>
     /// <param name="includeDisabled">When <see langword="true"/>, disabled entries are included for inspection.</param>
     /// <param name="expectedProjectionVersion">The projection version the caller is waiting to see, if any.</param>

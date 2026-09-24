@@ -7,6 +7,39 @@ namespace Hexalith.Agents.Client;
 /// <summary>Public provider-catalog administration operations.</summary>
 public interface IProviderCatalogOperations
 {
+    /// <summary>Reads one tenant enablement under Platform Operator authority.</summary>
+    ValueTask<AgentOperationResult<TenantProviderEnablementInspectionResult>> GetTenantEnablementAsync(
+        string tenantId,
+        string providerId,
+        string modelId,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Lists the current tenant's enabled entries without platform configuration fields.</summary>
+    ValueTask<AgentOperationResult<TenantProviderCatalogInspectionResult>> ListTenantEntriesAsync(
+        bool includeDisabled = false,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Gets one tenant-enabled entry, using the same response for absent and disabled entries.</summary>
+    ValueTask<AgentOperationResult<TenantProviderCatalogInspectionResult>> GetTenantEntryAsync(
+        string providerId,
+        string modelId,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Sets one tenant's enablement under platform authority.</summary>
+    ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>> SetTenantEnablementAsync(
+        SetTenantProviderModelEnablement command,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Accepts or declines current data handling terms under tenant authority.</summary>
+    ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>> DecideDataHandlingAsync(
+        DecideProviderDataHandling command,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Lists authorized provider/model catalog entries.</summary>
     /// <param name="includeDisabled">Whether disabled and otherwise ineligible entries are included.</param>
     /// <param name="expectedProjectionVersion">The projection version the caller is waiting to see, if any.</param>

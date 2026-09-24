@@ -20,4 +20,6 @@ public record ProviderModelEntryCreated(
     ProviderConfigurationState ConfigurationState,
     string? ConfigurationReferenceId,
     ProviderModelPricing Pricing,
-    int CapabilityVersion) : IEventPayload;
+    int CapabilityVersion,
+    ProviderDataHandlingRecord? DataHandling = null,
+    string? MigratedFrom = null) : IEventPayload;

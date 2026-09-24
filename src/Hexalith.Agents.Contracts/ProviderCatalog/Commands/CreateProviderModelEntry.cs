@@ -27,4 +27,7 @@ public record CreateProviderModelEntry(
     ProviderModelTimeoutPolicy TimeoutPolicy,
     ProviderModelCapabilityFlags SafeCapabilityFlags,
     string? ConfigurationReferenceId,
-    ProviderModelPricing Pricing);
+    ProviderModelPricing Pricing,
+    ProviderDataHandlingRecord? DataHandling = null,
+    string? MigratedFrom = null,
+    int InitialCapabilityVersion = 1);

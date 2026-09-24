@@ -23,6 +23,9 @@ public sealed class HttpAgentAdministrationContextProvider(
     /// <summary>The role granting Agent administration authority within the caller's tenant.</summary>
     public const string AgentsAdministratorRole = "Agents.Administrator";
 
+    /// <summary>The platform operator role used for reserved-system governance.</summary>
+    public const string PlatformOperatorRole = "Agents.PlatformOperator";
+
     /// <summary>The claim types carrying the caller's tenant scope, in resolution order.</summary>
     private static readonly string[] _tenantClaimTypes = ["tenantId", "tenant_id", "tid", "tenant"];
 
@@ -48,6 +51,7 @@ public sealed class HttpAgentAdministrationContextProvider(
         return new AgentAdministrationContext(
             tenantId,
             actorUserId,
-            user.IsInRole(AgentsAdministratorRole));
+            user.IsInRole(AgentsAdministratorRole),
+            user.IsInRole(PlatformOperatorRole));
     }
 }

@@ -30,4 +30,6 @@ public record UpdateProviderModelEntry(
     ProviderModelCapabilityFlags SafeCapabilityFlags,
     string? ConfigurationReferenceId,
     ProviderModelPricing Pricing,
-    int? ExpectedCapabilityVersion = null);
+    int? ExpectedCapabilityVersion = null,
+    ProviderDataHandlingRecord? DataHandling = null,
+    bool DeclareDataHandlingTightening = false);

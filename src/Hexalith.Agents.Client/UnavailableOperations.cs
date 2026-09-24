@@ -11,6 +11,36 @@ namespace Hexalith.Agents.Client;
 
 internal sealed class UnavailableProviderCatalogOperations : IProviderCatalogOperations
 {
+    public ValueTask<AgentOperationResult<TenantProviderEnablementInspectionResult>> GetTenantEnablementAsync(
+        string tenantId, string providerId, string modelId,
+        AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        Validate(tenantId);
+        Validate(providerId);
+        Validate(modelId);
+        return Unavailable.Typed<TenantProviderEnablementInspectionResult>();
+    }
+
+    public ValueTask<AgentOperationResult<TenantProviderCatalogInspectionResult>> ListTenantEntriesAsync(
+        bool includeDisabled = false, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+        => Unavailable.Typed<TenantProviderCatalogInspectionResult>();
+
+    public ValueTask<AgentOperationResult<TenantProviderCatalogInspectionResult>> GetTenantEntryAsync(
+        string providerId, string modelId, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        Validate(providerId);
+        Validate(modelId);
+        return Unavailable.Typed<TenantProviderCatalogInspectionResult>();
+    }
+
+    public ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>> SetTenantEnablementAsync(
+        SetTenantProviderModelEnablement command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+        => Unavailable.TypedCommand<ProviderCatalogCommandAcceptance>(command);
+
+    public ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>> DecideDataHandlingAsync(
+        DecideProviderDataHandling command, AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+        => Unavailable.TypedCommand<ProviderCatalogCommandAcceptance>(command);
+
     public ValueTask<AgentOperationResult<ProviderCatalogInspectionResult>> ListEntriesAsync(
         bool includeDisabled,
         string? expectedProjectionVersion = null,

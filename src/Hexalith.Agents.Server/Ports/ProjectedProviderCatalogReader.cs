@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Server.Projections;
+using Hexalith.Agents.ProviderCatalog;
 
 using Hexalith.EventStore.Client.Projections;
 
@@ -53,14 +54,18 @@ public sealed class ProjectedProviderCatalogReader(
         }
 
         ReadModelEntry<ProviderCatalogReadModel> entry;
+        ReadModelEntry<TenantProviderEnablementReadModel> tenant;
         try
         {
             entry = await _readModelStore
                 .GetAsync<ProviderCatalogReadModel>(
                     _options.Value.StateStoreName,
-                    ProviderCatalogReadModelAddresses.Detail(tenantId),
+                    ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId),
                     ct)
                 .ConfigureAwait(false);
+            tenant = await _readModelStore.GetAsync<TenantProviderEnablementReadModel>(
+                _options.Value.StateStoreName,
+                TenantProviderEnablementReadModelAddresses.Detail(tenantId), ct).ConfigureAwait(false);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
@@ -68,13 +73,21 @@ public sealed class ProjectedProviderCatalogReader(
             return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null);
         }
 
-        ProviderCatalogInspectionResult result = ProviderCatalogViewFactory.CreateEntry(
-            entry.Value,
-            tenantId,
-            providerId,
-            modelId,
-            expectedCapabilityVersion: null,
-            isProviderAdmin: true);
+        TenantProviderCatalogInspectionResult visible = TenantProviderCatalogViewFactory.CreateEntry(
+            entry.Value, tenant.Value, authorized: true, providerId, modelId, DateTimeOffset.UtcNow);
+        if (visible.Status != ProviderCatalogInspectionStatus.Success || visible.Entries.Count != 1)
+        {
+            return new ProviderCatalogEntryReadResult(visible.Status, null);
+        }
+
+        ProviderCatalogEntryView? platformEntry = entry.Value?.Entries.FirstOrDefault(item =>
+            item.ProviderId == providerId && item.ModelId == modelId);
+        ProviderCatalogInspectionResult result = platformEntry is null
+            ? ProviderCatalogInspectionResult.NotFound()
+            : ProviderCatalogInspectionResult.Success([platformEntry with
+            {
+                IsSelectableForNewActiveUse = visible.Entries[0].IsSelectableForNewActiveUse,
+            }]);
 
         return result.Status switch
         {

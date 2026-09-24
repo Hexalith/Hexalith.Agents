@@ -22,20 +22,20 @@ namespace Hexalith.Agents.Tests;
 /// </summary>
 internal static class ProviderCatalogTestData
 {
-    internal const string CatalogId = "acme";
+    internal static string CatalogId => ProviderCatalogIdentity.EntryId("openai", "gpt-4o");
     internal const string ProviderAdminExtensionKey = "actor:agentsProviderAdmin";
 
     internal static CommandEnvelope Envelope<T>(
         T command,
         bool isProviderAdmin = true,
-        string catalogId = CatalogId,
+        string? catalogId = null,
         string actorUserId = "admin-user")
         where T : notnull
         => new(
             "msg-" + typeof(T).Name,
-            "acme",
+            ProviderCatalogIdentity.PlatformTenantId,
             "provider-catalog",
-            catalogId,
+            catalogId ?? Identity(command),
             typeof(T).Name,
             JsonSerializer.SerializeToUtf8Bytes(command),
             "corr-1",
@@ -47,6 +47,9 @@ internal static class ProviderCatalogTestData
 
     internal static ProviderModelPricing ValidPricing(int pricingVersion = 1)
         => new("USD", 0.002m, 0.008m, pricingVersion);
+
+    internal static ProviderDataHandlingRecord ValidTerms(int version = 1)
+        => new(30, false, ["EU"], "terms-v1", version, DateTimeOffset.Parse("2026-09-23T00:00:00Z"));
 
     internal static CreateProviderModelEntry ValidCreate(
         bool enabled = true,
@@ -66,7 +69,8 @@ internal static class ProviderCatalogTestData
             new ProviderModelTimeoutPolicy(30_000, 3),
             ProviderModelCapabilityFlags.Streaming | ProviderModelCapabilityFlags.ToolCalling,
             configurationReferenceId,
-            pricing ?? ValidPricing(0));
+            pricing ?? ValidPricing(0),
+            ValidTerms());
 
     internal static UpdateProviderModelEntry ValidUpdate(
         CreateProviderModelEntry? create = null,
@@ -86,12 +90,13 @@ internal static class ProviderCatalogTestData
             source.SafeCapabilityFlags,
             source.ConfigurationReferenceId,
             pricing ?? AssignPricing(source.Pricing),
-            expectedCapabilityVersion);
+            expectedCapabilityVersion,
+            source.DataHandling);
     }
 
-    internal static ProviderModelEntryCreated CreatedEvent(CreateProviderModelEntry create, string catalogId = CatalogId)
+    internal static ProviderModelEntryCreated CreatedEvent(CreateProviderModelEntry create, string? catalogId = null)
         => new(
-            catalogId,
+            catalogId ?? ProviderCatalogIdentity.EntryId(create.ProviderId, create.ModelId),
             create.ProviderId,
             create.ModelId,
             create.DisplayLabel,
@@ -106,7 +111,8 @@ internal static class ProviderCatalogTestData
                 : ProviderConfigurationState.Configured,
             create.ConfigurationReferenceId,
             AssignPricing(create.Pricing),
-            CapabilityVersion: 1);
+            CapabilityVersion: 1,
+            create.DataHandling);
 
     private static ProviderModelPricing AssignPricing(ProviderModelPricing pricing)
         => pricing.PricingVersion > 0
@@ -149,6 +155,7 @@ internal static class ProviderCatalogTestData
                 case InvalidProviderModelMetadataRejection e: state.Apply(e); break;
                 case UnsafeProviderConfigurationInputRejection e: state.Apply(e); break;
                 case InvalidProviderModelPricingRejection e: state.Apply(e); break;
+                case InvalidProviderDataHandlingRejection e: state.Apply(e); break;
                 case ProviderModelCapabilityVersionRegressedRejection e: state.Apply(e); break;
                 case ProviderModelEntryStaleRevisionRejection e: state.Apply(e); break;
                 default: throw new InvalidOperationException($"Unhandled event type '{payload.GetType().Name}' in test apply dispatch.");
@@ -178,4 +185,18 @@ internal static class ProviderCatalogTestData
         ApplyAll(state, result);
         return result;
     }
+
+    private static string Identity<T>(T command)
+        => command switch
+        {
+            CreateProviderModelEntry value when !string.IsNullOrWhiteSpace(value.ProviderId) && !string.IsNullOrWhiteSpace(value.ModelId)
+                => ProviderCatalogIdentity.EntryId(value.ProviderId, value.ModelId),
+            UpdateProviderModelEntry value when !string.IsNullOrWhiteSpace(value.ProviderId) && !string.IsNullOrWhiteSpace(value.ModelId)
+                => ProviderCatalogIdentity.EntryId(value.ProviderId, value.ModelId),
+            EnableProviderModelEntry value when !string.IsNullOrWhiteSpace(value.ProviderId) && !string.IsNullOrWhiteSpace(value.ModelId)
+                => ProviderCatalogIdentity.EntryId(value.ProviderId, value.ModelId),
+            DisableProviderModelEntry value when !string.IsNullOrWhiteSpace(value.ProviderId) && !string.IsNullOrWhiteSpace(value.ModelId)
+                => ProviderCatalogIdentity.EntryId(value.ProviderId, value.ModelId),
+            _ => CatalogId,
+        };
 }

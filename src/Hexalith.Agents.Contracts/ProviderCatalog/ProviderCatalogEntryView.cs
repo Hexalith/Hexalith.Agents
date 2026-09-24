@@ -40,4 +40,7 @@ public record ProviderCatalogEntryView(
     string? ConfigurationReferenceId,
     bool IsSelectableForNewActiveUse,
     int CapabilityVersion,
-    ProviderModelPricing? Pricing);
+    ProviderModelPricing? Pricing,
+    ProviderDataHandlingRecord? DataHandling = null,
+    string? MigratedFrom = null,
+    IReadOnlyList<ProviderDataHandlingRecord>? DataHandlingHistory = null);

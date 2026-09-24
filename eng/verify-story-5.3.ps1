@@ -22,6 +22,7 @@ $PSNativeCommandUseErrorActionPreference = $true
 
 $root = Split-Path -Parent $PSScriptRoot
 $solution = Join-Path $root 'Hexalith.Agents.slnx'
+$eventStoreCoordinatorProject = 'references/Hexalith.EventStore/tests/Hexalith.EventStore.Server.Tests/Hexalith.EventStore.Server.Tests.csproj'
 $testProjects = @(
     'test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj',
     'test/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj',
@@ -33,12 +34,12 @@ $testProjects = @(
 $focusedSuites = @(
     @{
         Project = 'test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj'
-        Filter  = 'FullyQualifiedName~ProviderCatalogAggregate|FullyQualifiedName~ProviderCatalogStateReplay|FullyQualifiedName~ProviderCatalogVersionRegression|FullyQualifiedName~ProviderSecretLeak'
+        Filter  = 'FullyQualifiedName~ProviderCatalogAggregate|FullyQualifiedName~ProviderCatalogStateReplay|FullyQualifiedName~ProviderCatalogVersionRegression|FullyQualifiedName~ProviderSecretLeak|FullyQualifiedName~TenantProviderEnablementAggregate|FullyQualifiedName~DataHandlingGraceDeadline'
         Gate    = 'AC1 aggregate replay, pricing, version regression, and poison-secret sweep'
     },
     @{
         Project = 'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj'
-        Filter  = 'FullyQualifiedName~EventStoreProviderCatalogOperations|FullyQualifiedName~ProviderCatalogEventStoreIntegration|FullyQualifiedName~ProviderCatalogQuery|FullyQualifiedName~ProviderCatalogAuthorization'
+        Filter  = 'FullyQualifiedName~EventStoreProviderCatalogOperations|FullyQualifiedName~ProviderCatalogEventStoreIntegration|FullyQualifiedName~ProviderCatalogCoordinationIntegration|FullyQualifiedName~ProviderCatalogQuery|FullyQualifiedName~ProviderCatalogAuthorization|FullyQualifiedName~TenantProviderCatalogIntegration|FullyQualifiedName~ProviderCatalogMigration|FullyQualifiedName~HttpAgentAdministrationContextProvider'
         Gate    = 'AC1-AC4 live EventStore command-query-projection and cross-tenant selection denial'
     },
     @{
@@ -107,6 +108,31 @@ function Invoke-Gate {
     }
 }
 
+function Invoke-TestGate {
+    param(
+        [Parameter(Mandatory = $true)] [string] $Name,
+        [Parameter(Mandatory = $true)] [string] $Project,
+        [string] $Filter
+    )
+
+    $assembly = [IO.Path]::GetFileNameWithoutExtension($Project)
+    $path = Join-Path $root ([IO.Path]::Combine([IO.Path]::GetDirectoryName($Project), 'bin', 'Debug', 'net10.0', "$assembly.dll"))
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+        throw "Gate '$Name' requires built test assembly '$path'."
+    }
+
+    Write-Host "Gate: $Name"
+    if ([string]::IsNullOrWhiteSpace($Filter)) {
+        & dotnet $path
+    }
+    else {
+        & dotnet $path '-filterVSTest' $Filter
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw "Gate '$Name' failed with exit code $LASTEXITCODE."
+    }
+}
+
 Push-Location $root
 try {
     if (-not $SkipBuild) {
@@ -118,26 +144,29 @@ try {
             'build', $solution, '-c', 'Debug', '--no-restore', '-warnaserror',
             '-p:UseHexalithProjectReferences=true', '/m:1', '/nr:false'
         )
+        Invoke-Gate -Name 'EventStore coordinator restore' -Arguments @(
+            'restore', $eventStoreCoordinatorProject, '-p:NuGetAudit=false', '/m:1', '/nr:false'
+        )
+        Invoke-Gate -Name 'EventStore coordinator build' -Arguments @(
+            'build', $eventStoreCoordinatorProject, '-c', 'Debug', '--no-restore', '-warnaserror',
+            '-p:NuGetAudit=false', '/m:1', '/nr:false'
+        )
     }
 
+    Invoke-TestGate -Name 'story-5.3 focused — EventStore coordinated stream guard and terminal conflict status' `
+        -Project $eventStoreCoordinatorProject `
+        -Filter 'FullyQualifiedName~CoordinatedCommandActorTests|FullyQualifiedName~Handle_CoordinatedSourceConflict'
+
     foreach ($suite in $focusedSuites) {
-        Invoke-Gate -Name "story-5.3 focused — $($suite.Gate)" -Arguments @(
-            'test', $suite.Project, '-c', 'Debug', '--no-build',
-            '--filter', $suite.Filter
-        )
+        Invoke-TestGate -Name "story-5.3 focused — $($suite.Gate)" -Project $suite.Project -Filter $suite.Filter
     }
 
     foreach ($testProject in $testProjects) {
-        Invoke-Gate -Name "regression — $testProject" -Arguments @(
-            'test', $testProject, '-c', 'Debug', '--no-build'
-        )
+        Invoke-TestGate -Name "regression — $testProject" -Project $testProject
     }
 
     foreach ($suite in $compositionSuites) {
-        Invoke-Gate -Name "story-5.3 composition — $($suite.Gate)" -Arguments @(
-            'test', $suite.Project, '-c', 'Debug', '--no-build',
-            '--filter', $suite.Filter
-        )
+        Invoke-TestGate -Name "story-5.3 composition — $($suite.Gate)" -Project $suite.Project -Filter $suite.Filter
     }
 
     Write-Host 'Gate: in-scope catalog seams are still present in source'

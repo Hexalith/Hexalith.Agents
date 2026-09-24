@@ -14,8 +14,9 @@ namespace Hexalith.Agents.Server.Application.Queries;
 public sealed class GetProviderCatalogEntryQueryHandler(
     IReadModelStore readModelStore,
     IOptions<ProviderCatalogReadModelOptions> options,
-    ITenantAccessReader tenantAccessReader)
-    : ProviderCatalogQueryHandlerBase(readModelStore, options, tenantAccessReader)
+    ITenantAccessReader tenantAccessReader,
+    IAgentAdministrationContextProvider contextProvider)
+    : ProviderCatalogQueryHandlerBase(readModelStore, options, tenantAccessReader, contextProvider)
 {
     /// <inheritdoc />
     public override string QueryType => GetProviderCatalogEntryQuery.QueryType;
@@ -31,5 +32,18 @@ public sealed class GetProviderCatalogEntryQueryHandler(
             payload?.ModelId ?? string.Empty,
             payload?.ExpectedCapabilityVersion,
             isProviderAdmin: true);
+    }
+
+    /// <inheritdoc />
+    protected override TenantProviderCatalogInspectionResult CreateTenantResult(
+        ProviderCatalogReadModel? platform,
+        TenantProviderEnablementReadModel? tenant,
+        QueryEnvelope query)
+    {
+        GetProviderCatalogEntryQuery? payload = ReadPayload<GetProviderCatalogEntryQuery>(query.Payload);
+        return payload is null || string.IsNullOrWhiteSpace(payload.ProviderId) || string.IsNullOrWhiteSpace(payload.ModelId)
+            ? new(ProviderCatalogInspectionStatus.EntryNotFound, [])
+            : TenantProviderCatalogViewFactory.CreateEntry(
+                platform, tenant, authorized: true, payload.ProviderId, payload.ModelId, DateTimeOffset.UtcNow);
     }
 }

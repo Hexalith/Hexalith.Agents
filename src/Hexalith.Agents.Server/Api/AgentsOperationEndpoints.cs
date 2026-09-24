@@ -5,6 +5,7 @@ using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Contracts.AgentInteraction.Commands;
 using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
+using Hexalith.Agents.Server.Application.Agents;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -41,18 +42,43 @@ public static class AgentsOperationEndpoints
     {
         RouteGroupBuilder providers = group.MapGroup("/providers");
 
+        providers.MapGet("/tenant", (bool includeDisabled, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.ProviderCatalog.ListTenantEntriesAsync(includeDisabled, cancellationToken: cancellationToken));
+        providers.MapGet("/tenant/{providerId}/{modelId}", (string providerId, string modelId, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.ProviderCatalog.GetTenantEntryAsync(providerId, modelId, cancellationToken: cancellationToken));
+        providers.MapGet("/tenant/{tenantId}/enablement/{providerId}/{modelId}", (string tenantId, string providerId, string modelId, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.ProviderCatalog.GetTenantEnablementAsync(tenantId, providerId, modelId, cancellationToken: cancellationToken));
+        providers.MapPost("/tenant/enablement", (SetTenantProviderModelEnablement command,
+            [FromHeader(Name = "X-Correlation-ID")] string? correlationId,
+            [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.ProviderCatalog.SetTenantEnablementAsync(command, GetCommandOptions(correlationId, idempotencyKey), cancellationToken));
+        providers.MapPost("/tenant/data-handling", (DecideProviderDataHandling command,
+            [FromHeader(Name = "X-Correlation-ID")] string? correlationId,
+            [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.ProviderCatalog.DecideDataHandlingAsync(command, GetCommandOptions(correlationId, idempotencyKey), cancellationToken));
+        providers.MapPost("/migration", (ProviderCatalogMigrationRequest request, [FromServices] ProviderCatalogMigrationService migration, CancellationToken cancellationToken) =>
+            migration.MigrateAsync(request.LegacyTenantIds ?? [], cancellationToken));
+
         providers.MapGet("/", (bool includeDisabled, string? expectedProjectionVersion, IAgentsClient client, CancellationToken cancellationToken) =>
             client.ProviderCatalog.ListEntriesAsync(includeDisabled, expectedProjectionVersion, cancellationToken: cancellationToken));
         providers.MapGet("/{providerId}/{modelId}", (string providerId, string modelId, int? expectedCapabilityVersion, IAgentsClient client, CancellationToken cancellationToken) =>
             client.ProviderCatalog.GetEntryAsync(providerId, modelId, expectedCapabilityVersion, cancellationToken: cancellationToken));
-        providers.MapPost("/", (CreateProviderModelEntry command, IAgentsClient client, CancellationToken cancellationToken) =>
-            client.ProviderCatalog.CreateEntryAsync(command, cancellationToken: cancellationToken));
-        providers.MapPut("/", (UpdateProviderModelEntry command, IAgentsClient client, CancellationToken cancellationToken) =>
-            client.ProviderCatalog.UpdateEntryAsync(command, cancellationToken: cancellationToken));
-        providers.MapPost("/enable", (EnableProviderModelEntry command, IAgentsClient client, CancellationToken cancellationToken) =>
-            client.ProviderCatalog.EnableEntryAsync(command, cancellationToken: cancellationToken));
-        providers.MapPost("/disable", (DisableProviderModelEntry command, IAgentsClient client, CancellationToken cancellationToken) =>
-            client.ProviderCatalog.DisableEntryAsync(command, cancellationToken: cancellationToken));
+        providers.MapPost("/", (CreateProviderModelEntry command,
+            [FromHeader(Name = "X-Correlation-ID")] string? correlationId,
+            [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.ProviderCatalog.CreateEntryAsync(command, GetCommandOptions(correlationId, idempotencyKey), cancellationToken));
+        providers.MapPut("/", (UpdateProviderModelEntry command,
+            [FromHeader(Name = "X-Correlation-ID")] string? correlationId,
+            [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.ProviderCatalog.UpdateEntryAsync(command, GetCommandOptions(correlationId, idempotencyKey), cancellationToken));
+        providers.MapPost("/enable", (EnableProviderModelEntry command,
+            [FromHeader(Name = "X-Correlation-ID")] string? correlationId,
+            [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.ProviderCatalog.EnableEntryAsync(command, GetCommandOptions(correlationId, idempotencyKey), cancellationToken));
+        providers.MapPost("/disable", (DisableProviderModelEntry command,
+            [FromHeader(Name = "X-Correlation-ID")] string? correlationId,
+            [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey, IAgentsClient client, CancellationToken cancellationToken) =>
+            client.ProviderCatalog.DisableEntryAsync(command, GetCommandOptions(correlationId, idempotencyKey), cancellationToken));
     }
 
     private static void MapAgentAdministration(RouteGroupBuilder group)

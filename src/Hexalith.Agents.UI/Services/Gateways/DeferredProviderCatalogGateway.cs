@@ -16,6 +16,27 @@ namespace Hexalith.Agents.UI.Services.Gateways;
 public sealed class DeferredProviderCatalogGateway : IProviderCatalogGateway
 {
     /// <inheritdoc />
+    public Task<TenantProviderEnablementInspectionResult> GetTenantEnablementAsync(
+        string tenantId, string providerId, string modelId, CancellationToken cancellationToken)
+        => Task.FromResult(new TenantProviderEnablementInspectionResult(ProviderCatalogInspectionStatus.NotAuthorized, null, null));
+
+    /// <inheritdoc />
+    public Task<TenantProviderCatalogInspectionResult> ListTenantEntriesAsync(bool includeDisabled, CancellationToken cancellationToken)
+        => Task.FromResult(new TenantProviderCatalogInspectionResult(ProviderCatalogInspectionStatus.NotAuthorized, []));
+
+    /// <inheritdoc />
+    public Task<TenantProviderCatalogInspectionResult> GetTenantEntryAsync(string providerId, string modelId, CancellationToken cancellationToken)
+        => Task.FromResult(new TenantProviderCatalogInspectionResult(ProviderCatalogInspectionStatus.NotAuthorized, []));
+
+    /// <inheritdoc />
+    public Task<ProviderCatalogWriteResult> SetTenantEnablementAsync(SetTenantProviderModelEnablement command, CancellationToken cancellationToken)
+        => Denied(command);
+
+    /// <inheritdoc />
+    public Task<ProviderCatalogWriteResult> DecideDataHandlingAsync(DecideProviderDataHandling command, CancellationToken cancellationToken)
+        => Denied(command);
+
+    /// <inheritdoc />
     public Task<ProviderCatalogInspectionResult> ListEntriesAsync(
         bool includeDisabled,
         string? expectedProjectionVersion,
