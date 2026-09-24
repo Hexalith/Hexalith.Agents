@@ -46,6 +46,8 @@ public sealed class DataHandlingGraceDeadlineTests
             .Status.ShouldBe("UnknownEvidence");
         tenant.DeclinedVersion = 2;
         TenantProviderEligibility.Evaluate(tenant, [accepted, loosening], now).Status.ShouldBe("Declined");
+        TenantProviderEligibility.Evaluate(tenant, [accepted, loosening, loosening with { DataHandlingVersion = 3 }], now)
+            .Status.ShouldBe("AcceptanceRequired");
     }
 
     [Theory]

@@ -6,6 +6,8 @@ namespace Hexalith.Agents.Contracts.ProviderCatalog;
 /// <param name="ProcessingRegions">The allowed processing regions.</param>
 /// <param name="TermsReferenceId">The safe reference to the terms presented to the tenant.</param>
 /// <param name="DataHandlingVersion">The non-reusable version of these terms.</param>
+/// <param name="EffectiveAt">Trusted time when this version took effect.</param>
+/// <param name="TighteningDeclaration">Recorded operator evidence for a qualifying tightening.</param>
 public sealed record ProviderDataHandlingRecord(
     int RetentionDays,
     bool AllowsTrainingUse,

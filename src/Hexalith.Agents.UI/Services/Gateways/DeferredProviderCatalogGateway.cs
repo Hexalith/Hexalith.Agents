@@ -16,6 +16,11 @@ namespace Hexalith.Agents.UI.Services.Gateways;
 public sealed class DeferredProviderCatalogGateway : IProviderCatalogGateway
 {
     /// <inheritdoc />
+    public Task<AgentSetupWriteStatus> GetCommandOutcomeAsync(
+        string targetTenantId, string messageId, CancellationToken cancellationToken)
+        => Task.FromResult(AgentSetupWriteStatus.UnableToVerify);
+
+    /// <inheritdoc />
     public Task<TenantProviderEnablementInspectionResult> GetTenantEnablementAsync(
         string tenantId, string providerId, string modelId, CancellationToken cancellationToken)
         => Task.FromResult(new TenantProviderEnablementInspectionResult(ProviderCatalogInspectionStatus.NotAuthorized, null, null));

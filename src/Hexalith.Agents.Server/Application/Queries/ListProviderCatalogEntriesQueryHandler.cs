@@ -4,6 +4,7 @@ using Hexalith.Agents.Server.Ports;
 using Hexalith.Agents.Server.Projections;
 
 using Hexalith.EventStore.Client.Projections;
+using Hexalith.EventStore.Client.Gateway;
 using Hexalith.EventStore.Contracts.Queries;
 
 using Microsoft.Extensions.Options;
@@ -15,8 +16,10 @@ public sealed class ListProviderCatalogEntriesQueryHandler(
     IReadModelStore readModelStore,
     IOptions<ProviderCatalogReadModelOptions> options,
     ITenantAccessReader tenantAccessReader,
-    IAgentAdministrationContextProvider contextProvider)
-    : ProviderCatalogQueryHandlerBase(readModelStore, options, tenantAccessReader, contextProvider)
+    IAgentAdministrationContextProvider contextProvider,
+    IEventStoreGatewayClient? gateway = null,
+    TimeProvider? clock = null)
+    : ProviderCatalogQueryHandlerBase(readModelStore, options, tenantAccessReader, contextProvider, gateway, clock)
 {
     /// <inheritdoc />
     public override string QueryType => ListProviderCatalogEntriesQuery.QueryType;
@@ -37,10 +40,11 @@ public sealed class ListProviderCatalogEntriesQueryHandler(
     protected override TenantProviderCatalogInspectionResult CreateTenantResult(
         ProviderCatalogReadModel? platform,
         TenantProviderEnablementReadModel? tenant,
-        QueryEnvelope query)
+        QueryEnvelope query,
+        DateTimeOffset evaluatedAt)
     {
         ListProviderCatalogEntriesQuery? payload = ReadPayload<ListProviderCatalogEntriesQuery>(query.Payload);
         return TenantProviderCatalogViewFactory.CreateList(
-            platform, tenant, authorized: true, DateTimeOffset.UtcNow, payload?.IncludeDisabled ?? false);
+            platform, tenant, authorized: true, evaluatedAt, payload?.IncludeDisabled ?? false);
     }
 }

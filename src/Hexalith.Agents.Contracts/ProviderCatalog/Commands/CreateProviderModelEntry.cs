@@ -16,6 +16,9 @@ namespace Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 /// <param name="SafeCapabilityFlags">Optional allow-listed safe capability flags.</param>
 /// <param name="ConfigurationReferenceId">Optional safe configuration reference identifier (never a secret value).</param>
 /// <param name="Pricing">Administrator-supplied versioned pricing units and currency (required).</param>
+/// <param name="DataHandling">The governed terms required for an initially enabled entry.</param>
+/// <param name="MigratedFrom">Migration-only provenance, rejected by the public write surface.</param>
+/// <param name="InitialCapabilityVersion">Migration-only historical version; public creation starts at one.</param>
 public record CreateProviderModelEntry(
     string ProviderId,
     string ModelId,

@@ -4,6 +4,7 @@
 @inject IStringLocalizer<AgentsResources> Localizer
 @inject IProviderCatalogGateway Gateway
 @inject TimeProvider TimeProvider
+@inject IPendingProviderCommandStore PendingCommands
 
 @using Hexalith.Agents.Contracts.ProviderCatalog.Commands
 
@@ -57,7 +58,7 @@
         {
             <FluentAccordion>
                 <FluentAccordionItem Heading="@Localizer["Agents.TenantProviders.Title"]" Expanded="true">
-                    <FluentDataGrid Items="@_result.Entries.AsQueryable()" ItemKey="@(entry => entry.ProviderId + "/" + entry.ModelId)"
+                    <FluentDataGrid Items="@_result.Entries.AsQueryable()" ItemKey="@(entry => ProviderCatalogIdentity.EntryId(entry.ProviderId, entry.ModelId))"
                                     data-testid="agents-tenant-provider-grid">
                         <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Provider"]">@context.ProviderId</TemplateColumn>
                         <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Model"]">@context.ModelId</TemplateColumn>
@@ -87,6 +88,19 @@
                             <FluentText>@Localizer["Agents.TenantProviders.Training", Localizer[terms.AllowsTrainingUse ? "Agents.ProviderCatalog.Selectable.Yes" : "Agents.ProviderCatalog.Selectable.No"]]</FluentText>
                             <FluentText>@Localizer["Agents.TenantProviders.Regions", string.Join(", ", terms.ProcessingRegions)]</FluentText>
                             <FluentText>@Localizer["Agents.TenantProviders.TermsReference", terms.TermsReferenceId]</FluentText>
+                            @if (terms.EffectiveAt is { } effectiveAt)
+                            {
+                                <FluentText data-testid="agents-tenant-provider-effective-at">@Localizer["Agents.TenantProviders.EffectiveAt", effectiveAt]</FluentText>
+                            }
+                            @if (terms.TighteningDeclaration is { } declaration)
+                            {
+                                <FluentText data-testid="agents-tenant-provider-tightening">@Localizer["Agents.TenantProviders.TighteningDeclaration", declaration.FromVersion, declaration.ToVersion, declaration.ActorUserId, declaration.RoleBasis, declaration.DeclaredAt]</FluentText>
+                                <FluentText>@Localizer["Agents.TenantProviders.Tightening.Retention", declaration.FieldDiff.PreviousRetentionDays, declaration.FieldDiff.NewRetentionDays]</FluentText>
+                                <FluentText>@Localizer["Agents.TenantProviders.Tightening.Training", Localizer[declaration.FieldDiff.PreviousAllowsTrainingUse ? "Agents.ProviderCatalog.Selectable.Yes" : "Agents.ProviderCatalog.Selectable.No"], Localizer[declaration.FieldDiff.NewAllowsTrainingUse ? "Agents.ProviderCatalog.Selectable.Yes" : "Agents.ProviderCatalog.Selectable.No"]]</FluentText>
+                                <FluentText>@Localizer["Agents.TenantProviders.Tightening.RemovedRegions", string.Join(", ", declaration.FieldDiff.RemovedProcessingRegions)]</FluentText>
+                                <FluentText>@Localizer["Agents.TenantProviders.Tightening.AddedRegions", string.Join(", ", declaration.FieldDiff.AddedProcessingRegions)]</FluentText>
+                                <FluentText>@Localizer["Agents.TenantProviders.Tightening.TermsReference", declaration.FieldDiff.PreviousTermsReferenceId, declaration.FieldDiff.NewTermsReferenceId]</FluentText>
+                            }
                             @if (_selected.GraceExpiresAt is { } deadline)
                             {
                                 <FluentText>@Localizer["Agents.TenantProviders.GraceDeadline", deadline]</FluentText>
@@ -96,14 +110,21 @@
                                              AriaLabel="@Localizer["Agents.TenantProviders.Justification"]"
                                              data-testid="agents-tenant-provider-justification" />
                             <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="8px">
-                                <FluentButton Appearance="ButtonAppearance.Primary" Disabled="_busy || string.IsNullOrWhiteSpace(_justification)"
+                                <FluentButton Appearance="ButtonAppearance.Primary" Disabled="_busy || _pendingRestoring || _storeUnavailable || PendingSelectedDecision || string.IsNullOrWhiteSpace(_justification)"
                                               OnClick="@(() => DecideAsync(true))" data-testid="agents-tenant-provider-accept">
                                     @Localizer["Agents.TenantProviders.Accept"]
                                 </FluentButton>
-                                <FluentButton Disabled="_busy || string.IsNullOrWhiteSpace(_justification)"
+                                <FluentButton Disabled="_busy || _pendingRestoring || _storeUnavailable || PendingSelectedDecision || string.IsNullOrWhiteSpace(_justification)"
                                               OnClick="@(() => DecideAsync(false))" data-testid="agents-tenant-provider-decline">
                                     @Localizer["Agents.TenantProviders.Decline"]
                                 </FluentButton>
+                                @if (PendingSelectedDecision)
+                                {
+                                    <FluentButton Disabled="_busy" OnClick="CheckPendingDecisionAsync"
+                                                  data-testid="agents-tenant-provider-check-pending">
+                                        @Localizer["Agents.TenantProviders.CheckPending"]
+                                    </FluentButton>
+                                }
                             </FluentStack>
                         </FluentStack>
                     </FluentAccordionItem>
@@ -115,25 +136,132 @@
 
 @code {
     private readonly CancellationTokenSource _lifetime = new();
+    private CancellationTokenSource? _graceRefresh;
+    private DateTimeOffset? _lastRefreshedGraceDeadline;
     private TenantProviderCatalogInspectionResult? _result;
     private TenantProviderCatalogEntryView? _selected;
     private string _justification = string.Empty;
     private string? _truth;
     private AgentSetupWriteStatus? _writeFailure;
     private bool _busy;
+    private bool _pendingRestoring = true;
+    private bool _storeUnavailable;
+    private const string PendingFamily = "DataHandlingAcceptance";
+    private readonly Dictionary<string, string> _pendingDecisionMessageIds = new(StringComparer.Ordinal);
+
+    private string? SelectedKey => _selected is null
+        ? null : ProviderCatalogIdentity.EntryId(_selected.ProviderId, _selected.ModelId);
+
+    private bool PendingSelectedDecision => SelectedKey is { } key && _pendingDecisionMessageIds.ContainsKey(key);
 
     protected override async Task OnInitializedAsync()
-        => _result = await Gateway.ListTenantEntriesAsync(includeDisabled: true, _lifetime.Token);
+    {
+        _result = await Gateway.ListTenantEntriesAsync(includeDisabled: true, _lifetime.Token);
+        ScheduleGraceRefresh();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            foreach (PendingProviderCommand pending in await PendingCommands.LoadAsync(_lifetime.Token))
+            {
+                if (pending.Family == PendingFamily)
+                {
+                    _pendingDecisionMessageIds[pending.ResourceKey] = pending.Acceptance.MessageId;
+                }
+            }
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            _storeUnavailable = true;
+        }
+        finally
+        {
+            _pendingRestoring = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void ScheduleGraceRefresh()
+    {
+        _graceRefresh?.Cancel();
+        _graceRefresh?.Dispose();
+        DateTimeOffset? next = _result?.Entries
+            .Where(entry => entry.DataHandlingStatus == "Grace" && entry.GraceExpiresAt is not null)
+            .Select(entry => entry.GraceExpiresAt)
+            .Min();
+        if (next is null || next <= _lastRefreshedGraceDeadline || _lifetime.IsCancellationRequested)
+        {
+            _graceRefresh = null;
+            return;
+        }
+
+        _graceRefresh = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token);
+        _ = RefreshAtGraceDeadlineAsync(next.Value, _graceRefresh.Token);
+    }
+
+    private async Task RefreshAtGraceDeadlineAsync(DateTimeOffset deadline, CancellationToken cancellationToken)
+    {
+        try
+        {
+            TimeSpan remaining = deadline - TimeProvider.GetUtcNow();
+            if (remaining > TimeSpan.Zero)
+            {
+                await Task.Delay(remaining, TimeProvider, cancellationToken);
+            }
+
+            TenantProviderCatalogInspectionResult refreshed = await Gateway.ListTenantEntriesAsync(
+                includeDisabled: true, cancellationToken);
+            await InvokeAsync(() =>
+            {
+                _lastRefreshedGraceDeadline = deadline;
+                _result = refreshed;
+                if (_selected is { } selected)
+                {
+                    _selected = refreshed.Entries.FirstOrDefault(entry => entry.ProviderId == selected.ProviderId
+                        && entry.ModelId == selected.ModelId);
+                }
+                StateHasChanged();
+                ScheduleGraceRefresh();
+            });
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            await InvokeAsync(() =>
+            {
+                _result = _result is null ? null : _result with
+                {
+                    Entries = [],
+                    Freshness = AgentSetupFreshness.Stale,
+                    TruthState = AgentSetupTruthState.AuthoritativePending,
+                };
+                _selected = null;
+                StateHasChanged();
+            });
+        }
+    }
 
     private void Select(TenantProviderCatalogEntryView entry)
     {
         _selected = entry;
         _justification = string.Empty;
+        _truth = PendingSelectedDecision ? "AuthoritativePending" : null;
+        _writeFailure = null;
     }
 
     private async Task DecideAsync(bool accepted)
     {
-        if (_busy || _selected?.DataHandling is not { } terms || string.IsNullOrWhiteSpace(_justification))
+        if (_busy || _pendingRestoring || _storeUnavailable || PendingSelectedDecision || _selected?.DataHandling is not { } terms
+            || string.IsNullOrWhiteSpace(_justification))
         {
             return;
         }
@@ -144,10 +272,16 @@
             var command = new DecideProviderDataHandling(_selected.ProviderId, _selected.ModelId,
                 terms.DataHandlingVersion, accepted, _justification.Trim(), _selected.TenantRevision, terms, default);
             ProviderCatalogWriteResult write = await Gateway.DecideDataHandlingAsync(command, _lifetime.Token);
-            _truth = write.Status is AgentSetupWriteStatus.Submitted ? "Submitted" : null;
+            _truth = write.Status is AgentSetupWriteStatus.Submitted
+                ? write.Acceptance?.TruthState == AgentSetupTruthState.ProjectionConfirmed ? "ProjectionConfirmed" : "Submitted"
+                : null;
             _writeFailure = write.Status is AgentSetupWriteStatus.Submitted ? null : write.Status;
-            if (write.Status is AgentSetupWriteStatus.Submitted)
+            if (write is { Status: AgentSetupWriteStatus.Submitted, Acceptance: { TruthState: not AgentSetupTruthState.ProjectionConfirmed } acceptance })
             {
+                string decisionKey = ProviderCatalogIdentity.EntryId(command.ProviderId, command.ModelId);
+                _pendingDecisionMessageIds[decisionKey] = acceptance.MessageId;
+                await PendingCommands.SaveAsync(new PendingProviderCommand(PendingFamily, decisionKey,
+                    "current", acceptance), _lifetime.Token);
                 await InvokeAsync(StateHasChanged);
                 using CancellationTokenSource timeout = new(TimeSpan.FromSeconds(8), TimeProvider);
                 using CancellationTokenSource polling = CancellationTokenSource.CreateLinkedTokenSource(
@@ -156,20 +290,34 @@
                 {
                     while (true)
                     {
+                        AgentSetupWriteStatus outcome = await Gateway.GetCommandOutcomeAsync(
+                            "current", acceptance.MessageId, polling.Token);
+                        if (outcome is AgentSetupWriteStatus.Rejected or AgentSetupWriteStatus.Unavailable)
+                        {
+                            await RemovePendingDecisionAsync(decisionKey, acceptance.MessageId);
+                            _writeFailure = outcome;
+                            _truth = null;
+                            break;
+                        }
+
+                        if (outcome is AgentSetupWriteStatus.AlreadyApplied)
+                        {
+                            await RemovePendingDecisionAsync(decisionKey, acceptance.MessageId);
+                            _truth = "ProjectionConfirmed";
+                            break;
+                        }
+
                         _result = await Gateway.ListTenantEntriesAsync(includeDisabled: true, polling.Token);
+                        ScheduleGraceRefresh();
                         TenantProviderCatalogEntryView? current = _result.Entries.FirstOrDefault(item =>
                             item.ProviderId == command.ProviderId && item.ModelId == command.ModelId);
-                        bool confirmed = current is not null && write.Acceptance is { MessageId: { Length: > 0 } messageId }
-                            && string.Equals(current.LastDecisionMessageId, messageId, StringComparison.Ordinal)
-                            && current.TenantRevision > command.ExpectedRevision
-                            && current.DataHandling?.DataHandlingVersion == command.DataHandlingVersion
-                            && (accepted ? current.InForceDataHandlingVersion == command.DataHandlingVersion
-                                    && current.DataHandlingStatus == "Current"
-                                : current.DataHandlingStatus == "Declined");
+                        bool confirmed = _result.ProjectedCommandMessageIds?.Contains(acceptance.MessageId, StringComparer.Ordinal) == true
+                            && outcome == AgentSetupWriteStatus.AwaitingProjection;
                         _truth = confirmed ? "ProjectionConfirmed" : "AuthoritativePending";
-                        _selected = current;
+                        _selected = current ?? _selected;
                         if (confirmed)
                         {
+                            await RemovePendingDecisionAsync(decisionKey, acceptance.MessageId);
                             break;
                         }
 
@@ -183,15 +331,81 @@
                 }
             }
         }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            _storeUnavailable = true;
+            _truth = "AuthoritativePending";
+        }
         finally
         {
             _busy = false;
         }
     }
 
+    private async Task CheckPendingDecisionAsync()
+    {
+        if (_busy || SelectedKey is not { } key || !_pendingDecisionMessageIds.TryGetValue(key, out string? messageId))
+        {
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            AgentSetupWriteStatus outcome = await Gateway.GetCommandOutcomeAsync(
+                "current", messageId, _lifetime.Token);
+            if (outcome is AgentSetupWriteStatus.Rejected or AgentSetupWriteStatus.Unavailable)
+            {
+                await RemovePendingDecisionAsync(key, messageId);
+                _writeFailure = outcome;
+                _truth = null;
+                return;
+            }
+
+            if (outcome is AgentSetupWriteStatus.AlreadyApplied)
+            {
+                await RemovePendingDecisionAsync(key, messageId);
+                _truth = "ProjectionConfirmed";
+                return;
+            }
+
+            _result = await Gateway.ListTenantEntriesAsync(includeDisabled: true, _lifetime.Token);
+            ScheduleGraceRefresh();
+            if (_result.ProjectedCommandMessageIds?.Contains(messageId, StringComparer.Ordinal) == true
+                && outcome == AgentSetupWriteStatus.AwaitingProjection)
+            {
+                await RemovePendingDecisionAsync(key, messageId);
+                _selected = _result.Entries.FirstOrDefault(item =>
+                    ProviderCatalogIdentity.EntryId(item.ProviderId, item.ModelId) == key);
+                _truth = "ProjectionConfirmed";
+            }
+            else
+            {
+                _truth = "AuthoritativePending";
+            }
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            _storeUnavailable = true;
+            _truth = "AuthoritativePending";
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task RemovePendingDecisionAsync(string key, string messageId)
+    {
+        await PendingCommands.RemoveAsync(PendingFamily, key, messageId, _lifetime.Token);
+        _pendingDecisionMessageIds.Remove(key);
+    }
+
     public void Dispose()
     {
         _lifetime.Cancel();
+        _graceRefresh?.Cancel();
+        _graceRefresh?.Dispose();
         _lifetime.Dispose();
     }
 }

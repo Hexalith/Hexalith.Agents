@@ -13,6 +13,9 @@ public sealed class TenantProviderEnablementReadModel : IReadModelFreshness
     /// <summary>Gets or sets the projected sequence.</summary>
     public long LastSequenceNumber { get; set; }
 
+    /// <summary>Gets recent successful projected command identities for exact write confirmation.</summary>
+    public List<string> ProjectedCommandMessageIds { get; set; } = [];
+
     /// <inheritdoc />
     public DateTimeOffset? ProjectedAt { get; set; }
 

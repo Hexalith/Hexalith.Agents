@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Hexalith.Agents.Contracts.AgentInteraction;
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.Serialization;
 using Hexalith.Agents.Server.Ports;
@@ -12,6 +13,7 @@ using Hexalith.Agents.Server.Projections;
 using Hexalith.Agents.ProviderCatalog;
 
 using Hexalith.EventStore.Client.Projections;
+using Hexalith.EventStore.Client.Gateway;
 using Hexalith.EventStore.Contracts.Queries;
 using Hexalith.EventStore.DomainService;
 
@@ -28,7 +30,9 @@ public abstract class ProviderCatalogQueryHandlerBase(
     IReadModelStore readModelStore,
     IOptions<ProviderCatalogReadModelOptions> options,
     ITenantAccessReader tenantAccessReader,
-    IAgentAdministrationContextProvider contextProvider) : IDomainQueryHandler
+    IAgentAdministrationContextProvider contextProvider,
+    IEventStoreGatewayClient? gateway = null,
+    TimeProvider? clock = null) : IDomainQueryHandler
 {
     private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web)
     {
@@ -42,6 +46,8 @@ public abstract class ProviderCatalogQueryHandlerBase(
     private readonly IOptions<ProviderCatalogReadModelOptions> _options = options ?? throw new ArgumentNullException(nameof(options));
     private readonly ITenantAccessReader _tenantAccessReader = tenantAccessReader ?? throw new ArgumentNullException(nameof(tenantAccessReader));
     private readonly IAgentAdministrationContextProvider _contextProvider = contextProvider ?? throw new ArgumentNullException(nameof(contextProvider));
+    private readonly IEventStoreGatewayClient? _gateway = gateway;
+    private readonly TimeProvider _clock = clock ?? TimeProvider.System;
 
     /// <inheritdoc />
     public string Domain => ProviderCatalogReadModelAddresses.Domain;
@@ -91,9 +97,38 @@ public abstract class ProviderCatalogQueryHandlerBase(
             return QueryResult.FromPayload(ToElement(ProviderCatalogInspectionResult.Unavailable()));
         }
 
+        (string? providerId, string? modelId) = GetRequestedEntry(query);
+        bool current = platformQuery
+            ? await ProviderCatalogReadFreshness.IsPlatformCurrentAsync(_gateway, entry.Value,
+                providerId, modelId, cancellationToken).ConfigureAwait(false)
+            : await ProviderCatalogReadFreshness.IsTenantCurrentAsync(_gateway, query.TenantId,
+                entry.Value, tenant, providerId, modelId, cancellationToken).ConfigureAwait(false);
+        // Freshness reads may cross the exclusive grace deadline. Build eligibility from server time
+        // after those reads, including when the result must be returned as pending.
         object result = platformQuery
             ? CreateResult(entry.Value, query)
-            : CreateTenantResult(entry.Value, tenant, query);
+            : CreateTenantResult(entry.Value, tenant, query, _clock.GetUtcNow());
+        if (!current || platformQuery && providerId is null)
+        {
+            result = platformQuery
+                ? ((ProviderCatalogInspectionResult)result) with
+                {
+                    Status = ProviderCatalogInspectionStatus.Success,
+                    Entries = current && providerId is null
+                        ? ((ProviderCatalogInspectionResult)result).Entries : [],
+                    Freshness = AgentSetupFreshness.Stale,
+                    TruthState = AgentSetupTruthState.AuthoritativePending,
+                    ProjectedCommandMessageIds = null,
+                }
+                : ((TenantProviderCatalogInspectionResult)result) with
+                {
+                    Status = ProviderCatalogInspectionStatus.Success,
+                    Entries = [],
+                    Freshness = AgentSetupFreshness.Stale,
+                    TruthState = AgentSetupTruthState.AuthoritativePending,
+                    ProjectedCommandMessageIds = null,
+                };
+        }
         return QueryResult.FromPayload(JsonSerializer.SerializeToElement(result, result.GetType(), _jsonOptions));
     }
 
@@ -107,7 +142,12 @@ public abstract class ProviderCatalogQueryHandlerBase(
     protected abstract TenantProviderCatalogInspectionResult CreateTenantResult(
         ProviderCatalogReadModel? platform,
         TenantProviderEnablementReadModel? tenant,
-        QueryEnvelope query);
+        QueryEnvelope query,
+        DateTimeOffset evaluatedAt);
+
+    /// <summary>Gets the requested provider/model for a detail query, or nulls for a list.</summary>
+    protected virtual (string? ProviderId, string? ModelId) GetRequestedEntry(QueryEnvelope query)
+        => (null, null);
 
     /// <summary>Serializes the payload with contract enum names.</summary>
     /// <typeparam name="T">The payload type.</typeparam>

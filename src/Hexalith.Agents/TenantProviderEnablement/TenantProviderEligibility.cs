@@ -18,9 +18,14 @@ public static class TenantProviderEligibility
         }
 
         ProviderDataHandlingRecord current = history[^1];
-        if (tenant?.DeclinedVersion is not null)
+        if (tenant?.DeclinedVersion == current.DataHandlingVersion)
         {
             return new("Declined", null);
+        }
+
+        if (tenant?.DeclinedVersion is not null)
+        {
+            return new("AcceptanceRequired", null);
         }
 
         ProviderDataHandlingRecord? accepted = tenant?.AcceptedTerms;

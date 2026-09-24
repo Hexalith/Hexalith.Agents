@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 
@@ -12,6 +13,10 @@ namespace Hexalith.Agents.UI.Services.Gateways;
 /// </summary>
 public interface IProviderCatalogGateway
 {
+    /// <summary>Reads the exact terminal outcome of a submitted governance command.</summary>
+    Task<AgentSetupWriteStatus> GetCommandOutcomeAsync(
+        string targetTenantId, string messageId, CancellationToken cancellationToken);
+
     /// <summary>Reads platform-authorized tenant enablement for write confirmation.</summary>
     Task<TenantProviderEnablementInspectionResult> GetTenantEnablementAsync(
         string tenantId, string providerId, string modelId, CancellationToken cancellationToken);

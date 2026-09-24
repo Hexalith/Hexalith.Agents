@@ -1,6 +1,7 @@
 using System;
 
 using Hexalith.Agents.UI.Services.Gateways;
+using Hexalith.Agents.UI.State;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,7 @@ public static class AgentsUiServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
 
         services.TryAddSingleton<TimeProvider>(TimeProvider.System);
+        services.TryAddScoped<IPendingProviderCommandStore, BrowserSessionPendingProviderCommandStore>();
         services.TryAddScoped<IAgentSetupGateway, DeferredAgentSetupGateway>();
         services.TryAddScoped<IProviderCatalogGateway, DeferredProviderCatalogGateway>();
         services.TryAddScoped<IConversationAgentCallGateway, DeferredConversationAgentCallGateway>();

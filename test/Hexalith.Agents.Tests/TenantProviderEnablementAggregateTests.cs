@@ -70,6 +70,20 @@ public sealed class TenantProviderEnablementAggregateTests
     }
 
     [Fact]
+    public void Enablement_retry_without_provenance_is_a_noop_after_migration()
+    {
+        var state = new TenantProviderEnablementState();
+        state.Apply(new TenantProviderModelEnablementSet("tenant-a", "provider", "model", true, 1,
+            "operator", "legacy:tenant-a"));
+        var command = new SetTenantProviderModelEnablement("tenant-a", "provider", "model", true, 1,
+            ProviderCatalogTestData.ValidTerms());
+
+        TenantProviderEnablementAggregate.Handle(command, state, Envelope(command, "tenant-a", platform: true))
+            .IsNoOp.ShouldBeTrue();
+        state.Revision.ShouldBe(1);
+    }
+
+    [Fact]
     public void First_enablement_accepts_a_structurally_valid_current_platform_terms_version_above_one()
     {
         var terms = ProviderCatalogTestData.ValidTerms() with { DataHandlingVersion = 2 };
@@ -122,6 +136,46 @@ public sealed class TenantProviderEnablementAggregateTests
         TenantProviderEnablementAggregate.Handle(decision, state, Envelope(decision, "tenant-b", tenantAdmin: true))
             .Events[0].ShouldBeOfType<TenantProviderGovernanceRejected>();
         state.Revision.ShouldBe(1);
+    }
+
+    [Fact]
+    public void Decline_can_be_reversed_on_the_same_current_version_by_a_new_decision()
+    {
+        TenantProviderEnablementState state = Enabled();
+        var terms = ProviderCatalogTestData.ValidTerms();
+        var decline = new DecideProviderDataHandling("provider", "model", 1, false, "Decline", 1, terms, _now);
+        ProviderDataHandlingDecided first = TenantProviderEnablementAggregate.Handle(decline, state,
+            Envelope(decline, "tenant-a", tenantAdmin: true)).Events.ShouldHaveSingleItem()
+            .ShouldBeOfType<ProviderDataHandlingDecided>();
+        state.Apply(first);
+        TenantProviderEligibility.Evaluate(state.Entries.ShouldHaveSingleItem().Value, [terms], _now)
+            .Status.ShouldBe("Declined");
+
+        DecideProviderDataHandling acceptance = decline with { Accepted = true, Justification = "Approved", ExpectedRevision = 2 };
+        ProviderDataHandlingDecided second = TenantProviderEnablementAggregate.Handle(acceptance, state,
+            Envelope(acceptance, "tenant-a", tenantAdmin: true)).Events.ShouldHaveSingleItem()
+            .ShouldBeOfType<ProviderDataHandlingDecided>();
+        state.Apply(second);
+        state.Revision.ShouldBe(3);
+        TenantProviderEligibility.Evaluate(state.Entries.ShouldHaveSingleItem().Value, [terms], _now)
+            .Status.ShouldBe("Current");
+    }
+
+    [Fact]
+    public void Another_administrator_can_record_a_new_decision_on_the_current_version()
+    {
+        TenantProviderEnablementState state = Enabled();
+        var terms = ProviderCatalogTestData.ValidTerms();
+        var decision = new DecideProviderDataHandling("provider", "model", 1, true, "Approved", 1, terms, _now);
+        state.Apply(TenantProviderEnablementAggregate.Handle(decision, state, Envelope(decision, "tenant-a", tenantAdmin: true))
+            .Events.ShouldHaveSingleItem().ShouldBeOfType<ProviderDataHandlingDecided>());
+
+        DecideProviderDataHandling next = decision with { ExpectedRevision = 2 };
+        ProviderDataHandlingDecided recorded = TenantProviderEnablementAggregate.Handle(next, state,
+            Envelope(next, "tenant-a", tenantAdmin: true) with { UserId = "another-admin" })
+            .Events.ShouldHaveSingleItem().ShouldBeOfType<ProviderDataHandlingDecided>();
+        recorded.ActorUserId.ShouldBe("another-admin");
+        recorded.Revision.ShouldBe(3);
     }
 
     private static TenantProviderEnablementState Enabled()

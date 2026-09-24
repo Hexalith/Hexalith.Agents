@@ -12,6 +12,7 @@ using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.UI.Resources;
 using Hexalith.Agents.UI.Services.Gateways;
+using Hexalith.Agents.UI.State;
 using Hexalith.FrontComposer.Shell.Components.Layout;
 using Hexalith.FrontComposer.Testing;
 
@@ -93,6 +94,7 @@ public abstract class AgentsTestContext : FrontComposerTestBase
 
         Services.AddSingleton(SetupGateway);
         Services.AddSingleton(CatalogGateway);
+        Services.AddSingleton<IPendingProviderCommandStore>(PendingCommandStore);
         Services.AddSingleton(CallGateway);
         Services.AddSingleton(ProposalGateway);
         Services.AddSingleton(ProposalDetailGateway);
@@ -114,6 +116,9 @@ public abstract class AgentsTestContext : FrontComposerTestBase
 
     /// <summary>The substituted provider-catalog read gateway.</summary>
     protected IProviderCatalogGateway CatalogGateway { get; } = Substitute.For<IProviderCatalogGateway>();
+
+    /// <summary>The session pending-command store shared across page navigation in a test.</summary>
+    protected MemoryPendingProviderCommandStore PendingCommandStore { get; } = new();
 
     /// <summary>The substituted Conversation Agent Call request/status gateway (defaults to the fail-closed result).</summary>
     protected IConversationAgentCallGateway CallGateway { get; } = Substitute.For<IConversationAgentCallGateway>();

@@ -124,11 +124,13 @@
   <data name="Agents.ProviderCatalog.Action.Create" xml:space="preserve"><value>Add catalog entry</value></data>
   <data name="Agents.ProviderCatalog.Action.Edit" xml:space="preserve"><value>Edit</value></data>
   <data name="Agents.ProviderCatalog.Action.Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Agents.ProviderCatalog.Action.CheckPending" xml:space="preserve"><value>Check pending {0} / {1}</value></data>
   <data name="Agents.ProviderCatalog.Action.Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Agents.ProviderCatalog.Action.Enable" xml:space="preserve"><value>Enable</value></data>
   <data name="Agents.ProviderCatalog.Action.Disable" xml:space="preserve"><value>Disable</value></data>
   <data name="Agents.ProviderCatalog.Editor.Title" xml:space="preserve"><value>Add or update a catalog entry</value></data>
   <data name="Agents.ProviderCatalog.Editor.ConfigurationReference" xml:space="preserve"><value>Configuration reference</value></data>
+  <data name="Agents.ProviderCatalog.Editor.ClearConfigurationReference" xml:space="preserve"><value>Clear configuration reference</value></data>
   <data name="Agents.ProviderCatalog.Editor.TimeoutMilliseconds" xml:space="preserve"><value>Request timeout (ms)</value></data>
   <data name="Agents.ProviderCatalog.Editor.MaxRetries" xml:space="preserve"><value>Max retries</value></data>
   <data name="Agents.ProviderCatalog.Write.Status.ValidationFailed" xml:space="preserve"><value>The catalog write was rejected because the submitted fields are invalid.</value></data>
@@ -139,6 +141,7 @@
   <data name="Agents.ProviderCatalog.Write.Status.AlreadyApplied" xml:space="preserve"><value>No catalog change was needed because the exact entry state was already applied.</value></data>
   <data name="Agents.ProviderCatalog.Write.Status.AwaitingProjection" xml:space="preserve"><value>The catalog command completed and is awaiting projection.</value></data>
   <data name="Agents.ProviderCatalog.Write.Status.UnableToVerify" xml:space="preserve"><value>The exact catalog command outcome could not be verified.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.Rejected" xml:space="preserve"><value>The submitted catalog command was rejected. Review the current entry and try again.</value></data>
   <data name="Agents.ProviderCatalog.Truth.Stage.Unknown" xml:space="preserve"><value>Catalog truth is not established.</value></data>
   <data name="Agents.ProviderCatalog.Truth.Stage.Submitted" xml:space="preserve"><value>Submitted — accepted for processing, not yet durable evidence.</value></data>
   <data name="Agents.ProviderCatalog.Truth.Stage.AuthoritativePending" xml:space="preserve"><value>Authoritative pending — accepted, but the projection has not caught up.</value></data>
@@ -242,6 +245,7 @@
   <data name="Agents.Config.Write.AlreadyApplied" xml:space="preserve"><value>No change was needed. This exact setup was already applied.</value></data>
   <data name="Agents.Config.Write.AwaitingProjection" xml:space="preserve"><value>The command completed, but its exact outcome is still awaiting projection.</value></data>
   <data name="Agents.Config.Write.UnableToVerify" xml:space="preserve"><value>The command outcome could not be verified. Retry the same attempt or abandon it before submitting a different change.</value></data>
+  <data name="Agents.Config.Write.Rejected" xml:space="preserve"><value>The submitted command was rejected. Review the current configuration and try again.</value></data>
   <data name="Agents.Config.Write.Confirmed" xml:space="preserve"><value>The projected setup now confirms the exact command outcome.</value></data>
   <data name="Agents.Config.Write.Refreshing" xml:space="preserve"><value>Refreshing the projected setup once.</value></data>
   <data name="Agents.Config.Write.RefreshIncomplete" xml:space="preserve"><value>The projected setup could not be confirmed yet. Refresh again, retry the exact command, or abandon the attempt.</value></data>
@@ -696,7 +700,7 @@
   <data name="Agents.LaunchReadiness.Enable.Button" xml:space="preserve"><value>Enable production-like generation</value></data>
   <data name="Agents.LaunchReadiness.Enable.Submitted" xml:space="preserve"><value>Enablement request submitted.</value></data>
   <data name="Agents.ProviderCatalog.DataHandling.RetentionDays" xml:space="preserve"><value>Retention days</value></data>
-  <data name="Agents.ProviderCatalog.DataHandling.TrainingUse" xml:space="preserve"><value>Training use permitted (true or false)</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.TrainingUse" xml:space="preserve"><value>Allow training use</value></data>
   <data name="Agents.ProviderCatalog.DataHandling.ProcessingRegions" xml:space="preserve"><value>Processing regions (comma separated)</value></data>
   <data name="Agents.ProviderCatalog.DataHandling.TermsReference" xml:space="preserve"><value>Terms reference</value></data>
   <data name="Agents.ProviderCatalog.DataHandling.Version" xml:space="preserve"><value>Terms version</value></data>
@@ -705,12 +709,20 @@
   <data name="Agents.TenantProviders.Description" xml:space="preserve"><value>Review the provider models enabled for your tenant and decide on their current data handling terms.</value></data>
   <data name="Agents.TenantProviders.TermsStatus" xml:space="preserve"><value>Terms status</value></data>
   <data name="Agents.TenantProviders.Review" xml:space="preserve"><value>Review terms</value></data>
+  <data name="Agents.TenantProviders.CheckPending" xml:space="preserve"><value>Check decision status</value></data>
   <data name="Agents.TenantProviders.ConfirmTitle" xml:space="preserve"><value>Confirm current terms</value></data>
   <data name="Agents.TenantProviders.ExactVersion" xml:space="preserve"><value>Data handling version {0}</value></data>
   <data name="Agents.TenantProviders.Retention" xml:space="preserve"><value>Retention: {0} days</value></data>
   <data name="Agents.TenantProviders.Training" xml:space="preserve"><value>Training use: {0}</value></data>
   <data name="Agents.TenantProviders.Regions" xml:space="preserve"><value>Processing regions: {0}</value></data>
   <data name="Agents.TenantProviders.TermsReference" xml:space="preserve"><value>Terms reference: {0}</value></data>
+  <data name="Agents.TenantProviders.EffectiveAt" xml:space="preserve"><value>Effective at {0}</value></data>
+  <data name="Agents.TenantProviders.TighteningDeclaration" xml:space="preserve"><value>Tightening declared from version {0} to {1} by {2} ({3}) at {4}</value></data>
+  <data name="Agents.TenantProviders.Tightening.Retention" xml:space="preserve"><value>Retention changed from {0} to {1} days</value></data>
+  <data name="Agents.TenantProviders.Tightening.Training" xml:space="preserve"><value>Training use changed from {0} to {1}</value></data>
+  <data name="Agents.TenantProviders.Tightening.RemovedRegions" xml:space="preserve"><value>Removed processing regions: {0}</value></data>
+  <data name="Agents.TenantProviders.Tightening.AddedRegions" xml:space="preserve"><value>Added processing regions: {0}</value></data>
+  <data name="Agents.TenantProviders.Tightening.TermsReference" xml:space="preserve"><value>Terms reference changed from {0} to {1}</value></data>
   <data name="Agents.TenantProviders.GraceDeadline" xml:space="preserve"><value>Grace ends at {0}</value></data>
   <data name="Agents.TenantProviders.Justification" xml:space="preserve"><value>Decision justification</value></data>
   <data name="Agents.TenantProviders.Accept" xml:space="preserve"><value>Accept current terms</value></data>

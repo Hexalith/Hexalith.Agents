@@ -38,6 +38,56 @@ public sealed class ProviderCatalogCoordinationIntegrationTests
     private const string StoreName = "statestore";
     private static readonly DateTimeOffset _now = new(2026, 9, 23, 0, 0, 0, TimeSpan.Zero);
 
+    [Fact]
+    public async Task Fenced_tenant_decision_reaches_real_terms_coordinator_and_rejects_stale_source()
+    {
+        var policy = new AgentsProviderCatalogCoordinationPolicy();
+        var termsV1 = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1, _now);
+        var termsV2 = new ProviderDataHandlingRecord(40, false, ["EU"], "terms-v2", 2, _now.AddMinutes(1));
+        string entryId = ProviderCatalogIdentity.EntryId("provider", "model");
+        var decision = new DecideProviderDataHandling("provider", "model", 1, true,
+            "approved", 1, termsV1, _now);
+        SubmitCommand submitted = Submit("fenced-decision", "tenant-a", TenantProviderEnablementAggregate.Domain,
+            "tenant-a", decision, TenantProviderEnablementAggregate.TenantAdministratorExtensionKey);
+        CommandEnvelope command = submitted.ToCommandEnvelope();
+        string actorId = policy.GetScope(command).Source.ActorId;
+        var source = Substitute.For<IAggregateActor>();
+        var current = new ProviderModelEntryCreated(entryId, "provider", "model", "Model", true, true,
+            1000, 500, new ProviderModelTimeoutPolicy(30000, 3), ProviderModelCapabilityFlags.Streaming,
+            ProviderConfigurationState.Configured, "cfg-ref", new ProviderModelPricing("USD", 0.002m, 0.008m, 1),
+            1, termsV2);
+        source.GetEventsAsync(0).Returns([Persisted("created", 1, ProviderCatalogAggregate.Domain,
+            ProviderCatalogIdentity.PlatformTenantId, entryId, current)]);
+        var target = Substitute.For<IAggregateActor>();
+        target.ReconcileFencedCommandAsync(Arg.Any<FencedCommandEnvelope>())
+            .Returns(new IdempotencyCheckResult(IdempotencyCheckOutcome.Miss, null));
+        IActorProxyFactory factory = Substitute.For<IActorProxyFactory>();
+        factory.CreateActorProxy<IAggregateActor>(Arg.Any<ActorId>(), Arg.Any<string>())
+            .Returns(call => call.ArgAt<ActorId>(0).ToString() == actorId ? source : target);
+        var host = ActorHost.CreateForTest<CoordinatedCommandActor>(new ActorTestOptions { ActorId = new ActorId(actorId) });
+        var coordinator = new CoordinatedCommandActor(host, factory, Options.Create(new EventStoreActorOptions()),
+            [policy], new NoOpEventPayloadProtectionService());
+        typeof(Actor).GetProperty("StateManager", BindingFlags.Public | BindingFlags.Instance)!
+            .SetValue(coordinator, Substitute.For<IActorStateManager>());
+        factory.CreateActorProxy<ICoordinatedCommandActor>(Arg.Any<ActorId>(), Arg.Any<string>())
+            .Returns(coordinator);
+        var router = new CommandRouter(factory, Options.Create(new EventStoreActorOptions()),
+            NullLogger<CommandRouter>.Instance, [policy]);
+        var fence = new IdempotencyExecutionContext(1, "admission", 1, "v1", command.MessageId,
+            command.CorrelationId, command.TenantId, command.Domain, command.AggregateId,
+            command.CommandType, "proof");
+
+        CommandProcessingResult result = await router.RouteFencedCommandAsync(submitted, fence);
+
+        result.Accepted.ShouldBeFalse();
+        result.FailureReason.ShouldBe("ConcurrencyConflict");
+        _ = factory.Received(1).CreateActorProxy<ICoordinatedCommandActor>(
+            Arg.Is<ActorId>(id => id.ToString() == actorId), CoordinatedCommandActor.ActorTypeName);
+        await target.Received(1).ReconcileFencedCommandAsync(Arg.Any<FencedCommandEnvelope>());
+        await target.DidNotReceive().ProcessFencedCommandAsync(Arg.Any<FencedCommandEnvelope>());
+        await target.DidNotReceive().ProcessCommandAsync(Arg.Any<CommandEnvelope>());
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]

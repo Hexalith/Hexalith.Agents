@@ -11,6 +11,15 @@ namespace Hexalith.Agents.Client;
 
 internal sealed class UnavailableProviderCatalogOperations : IProviderCatalogOperations
 {
+    public ValueTask<AgentOperationResult<AgentSetupWriteStatus>> GetCommandOutcomeAsync(
+        string targetTenantId, string messageId,
+        AgentOperationOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        Validate(targetTenantId);
+        Validate(messageId);
+        return Unavailable.Typed<AgentSetupWriteStatus>();
+    }
+
     public ValueTask<AgentOperationResult<TenantProviderEnablementInspectionResult>> GetTenantEnablementAsync(
         string tenantId, string providerId, string modelId,
         AgentOperationOptions? options = null, CancellationToken cancellationToken = default)

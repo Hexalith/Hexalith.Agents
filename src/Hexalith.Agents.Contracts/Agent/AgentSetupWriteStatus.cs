@@ -31,4 +31,7 @@ public enum AgentSetupWriteStatus
 
     /// <summary>The command outcome could not be correlated safely with a canonical receipt and target version.</summary>
     UnableToVerify = 8,
+
+    /// <summary>The exact command reached a terminal domain rejection.</summary>
+    Rejected = 9,
 }

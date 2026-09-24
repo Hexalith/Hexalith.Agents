@@ -92,11 +92,11 @@ public static class ProviderCatalogViewFactory
                 || inspection.Entries.Count == 0
                 || inspection.Entries.All(entry => entry.CapabilityVersion < expectedCapabilityVersion));
 
-        bool behind = behindProjection || missingOrBehindCapability;
+        bool behind = model is null || behindProjection || missingOrBehindCapability;
 
         if (inspection.Status is ProviderCatalogInspectionStatus.EntryNotFound)
         {
-            return waitingForCapability || behindProjection
+            return behind
                 ? inspection with
                 {
                     ProjectionVersion = model?.ProjectionVersion,
@@ -113,6 +113,10 @@ public static class ProviderCatalogViewFactory
             ProjectedAt = model?.ProjectedAt,
             Freshness = behind ? AgentSetupFreshness.Stale : AgentSetupFreshness.Current,
             TruthState = behind ? AgentSetupTruthState.AuthoritativePending : AgentSetupTruthState.ProjectionConfirmed,
+            ProjectedCommandMessageIds = inspection.Entries.Count == 1 && model is not null
+                ? model.StreamCommandMessageIds.GetValueOrDefault(ProviderCatalogIdentity.EntryId(
+                    inspection.Entries[0].ProviderId, inspection.Entries[0].ModelId))
+                : null,
         };
     }
 

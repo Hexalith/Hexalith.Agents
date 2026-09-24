@@ -102,6 +102,18 @@ public sealed class AgentProviderSelectionOrchestratorTests
         => (await RunVerdict(SuccessRead(ValidEntry() with { Pricing = null })))
             .ShouldBe(ProviderSelectionValidationStatus.Unpriced);
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Zero_unit_price_maps_to_unpriced(bool zeroInput)
+    {
+        ProviderModelPricing pricing = ValidEntry().Pricing.ShouldNotBeNull();
+        pricing = zeroInput ? pricing with { InputTokenUnitPrice = 0 } : pricing with { OutputTokenUnitPrice = 0 };
+
+        (await RunVerdict(SuccessRead(ValidEntry() with { Pricing = pricing })))
+            .ShouldBe(ProviderSelectionValidationStatus.Unpriced);
+    }
+
     [Fact]
     public async Task Regressed_capability_version_maps_to_regressed()
         => (await RunVerdict(SuccessRead(ValidEntry(capabilityVersion: 0))))

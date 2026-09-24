@@ -23,6 +23,7 @@ $PSNativeCommandUseErrorActionPreference = $true
 $root = Split-Path -Parent $PSScriptRoot
 $solution = Join-Path $root 'Hexalith.Agents.slnx'
 $eventStoreCoordinatorProject = 'references/Hexalith.EventStore/tests/Hexalith.EventStore.Server.Tests/Hexalith.EventStore.Server.Tests.csproj'
+$eventStoreClientProject = 'references/Hexalith.EventStore/tests/Hexalith.EventStore.Client.Tests/Hexalith.EventStore.Client.Tests.csproj'
 $testProjects = @(
     'test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj',
     'test/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj',
@@ -39,12 +40,12 @@ $focusedSuites = @(
     },
     @{
         Project = 'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj'
-        Filter  = 'FullyQualifiedName~EventStoreProviderCatalogOperations|FullyQualifiedName~ProviderCatalogEventStoreIntegration|FullyQualifiedName~ProviderCatalogCoordinationIntegration|FullyQualifiedName~ProviderCatalogQuery|FullyQualifiedName~ProviderCatalogAuthorization|FullyQualifiedName~TenantProviderCatalogIntegration|FullyQualifiedName~ProviderCatalogMigration|FullyQualifiedName~HttpAgentAdministrationContextProvider'
+        Filter  = 'FullyQualifiedName~EventStoreProviderCatalogOperations|FullyQualifiedName~ProviderCatalogEventStoreIntegration|FullyQualifiedName~ProviderCatalogCoordinationIntegration|FullyQualifiedName~ProviderCatalogQuery|FullyQualifiedName~ProviderCatalogAuthorization|FullyQualifiedName~TenantProviderCatalogIntegration|FullyQualifiedName~ProviderCatalogMigration|FullyQualifiedName~ProjectedProviderCatalogReader|FullyQualifiedName~HttpAgentAdministrationContextProvider'
         Gate    = 'AC1-AC4 live EventStore command-query-projection and cross-tenant selection denial'
     },
     @{
         Project = 'test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj'
-        Filter  = 'FullyQualifiedName~ProviderCatalogTests|FullyQualifiedName~ProviderCatalogUiTests'
+        Filter  = 'FullyQualifiedName~ProviderCatalogTests|FullyQualifiedName~ProviderCatalogUiTests|FullyQualifiedName~ProviderCatalogGovernanceUiTests'
         Gate    = 'AC2 FrontComposer catalog truth flow without callability inference'
     }
 )
@@ -151,11 +152,21 @@ try {
             'build', $eventStoreCoordinatorProject, '-c', 'Debug', '--no-restore', '-warnaserror',
             '-p:NuGetAudit=false', '/m:1', '/nr:false'
         )
+        Invoke-Gate -Name 'EventStore client restore' -Arguments @(
+            'restore', $eventStoreClientProject, '-p:NuGetAudit=false', '/m:1', '/nr:false'
+        )
+        Invoke-Gate -Name 'EventStore client build' -Arguments @(
+            'build', $eventStoreClientProject, '-c', 'Debug', '--no-restore', '-warnaserror',
+            '-p:NuGetAudit=false', '/m:1', '/nr:false'
+        )
     }
 
     Invoke-TestGate -Name 'story-5.3 focused — EventStore coordinated stream guard and terminal conflict status' `
         -Project $eventStoreCoordinatorProject `
-        -Filter 'FullyQualifiedName~CoordinatedCommandActorTests|FullyQualifiedName~Handle_CoordinatedSourceConflict'
+        -Filter 'FullyQualifiedName~CoordinatedCommandActorTests|FullyQualifiedName~Fenced_stale_source_after_a_target_reconciliation_miss|FullyQualifiedName~Handle_CoordinatedSourceConflict|FullyQualifiedName~CommandStatusControllerTests'
+    Invoke-TestGate -Name 'story-5.3 focused — EventStore gateway owning tenant status' `
+        -Project $eventStoreClientProject `
+        -Filter 'FullyQualifiedName~GetCommandStatusAsync_UsesConfiguredPathAndDeserializesRejectedStatus|FullyQualifiedName~GetCommandStatusAsync_PreservesCompletedZeroEventCount'
 
     foreach ($suite in $focusedSuites) {
         Invoke-TestGate -Name "story-5.3 focused — $($suite.Gate)" -Project $suite.Project -Filter $suite.Filter

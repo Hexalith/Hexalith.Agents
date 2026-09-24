@@ -44,7 +44,8 @@ public static class TenantProviderCatalogViewFactory
             ProjectedAt: platform.ProjectedAt is { } p && tenant.ProjectedAt is { } t
                 ? p <= t ? p : t : null,
             Freshness: AgentSetupFreshness.Current,
-            TruthState: AgentSetupTruthState.ProjectionConfirmed);
+            TruthState: AgentSetupTruthState.ProjectionConfirmed,
+            ProjectedCommandMessageIds: tenant.ProjectedCommandMessageIds);
     }
 
     /// <summary>Gets an enabled entry; absent and nonenabled identities share the same result.</summary>
@@ -58,8 +59,24 @@ public static class TenantProviderCatalogViewFactory
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(providerId);
         ArgumentException.ThrowIfNullOrWhiteSpace(modelId);
+        if (authorized && platform is not null && tenant is not null
+            && (!tenant.State.Entries.TryGetValue(ProviderCatalogState.EntryKey(providerId, modelId),
+                out TenantProviderEntryState? enablement) || !enablement.Enabled))
+        {
+            return new(ProviderCatalogInspectionStatus.EntryNotFound, [],
+                TenantProjectionVersion: tenant.ProjectionVersion,
+                ProjectedAt: tenant.ProjectedAt,
+                Freshness: AgentSetupFreshness.Current,
+                TruthState: AgentSetupTruthState.ProjectionConfirmed);
+        }
+
         TenantProviderCatalogInspectionResult listed = CreateList(platform, tenant, authorized, evaluatedAt, includeDisabled: true);
         if (listed.Status != ProviderCatalogInspectionStatus.Success)
+        {
+            return listed;
+        }
+
+        if (listed.TruthState == AgentSetupTruthState.AuthoritativePending)
         {
             return listed;
         }

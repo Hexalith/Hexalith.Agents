@@ -49,6 +49,9 @@ public sealed class ProviderModelEntryState
     /// </summary>
     public int CapabilityVersion { get; set; }
 
+    /// <summary>Gets or sets the lifecycle revision, incremented only by enable or disable events.</summary>
+    public int LifecycleRevision { get; set; } = 1;
+
     /// <summary>Gets or sets the administrator-supplied versioned pricing, or <see langword="null"/> when unpriced.</summary>
     public ProviderModelPricing? Pricing { get; set; }
 

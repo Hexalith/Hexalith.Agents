@@ -26,6 +26,10 @@ namespace Hexalith.Agents.Contracts.ProviderCatalog;
 /// enable/disable). A plain int — exposes nothing secret.
 /// </param>
 /// <param name="Pricing">Administrator-supplied versioned pricing units and currency, or <see langword="null"/> when unpriced.</param>
+/// <param name="DataHandling">Current governed terms, if present.</param>
+/// <param name="MigratedFrom">Legacy provenance, if migrated.</param>
+/// <param name="DataHandlingHistory">Historical terms needed for grace evaluation.</param>
+/// <param name="LifecycleRevision">Observed lifecycle revision for enable/disable concurrency.</param>
 public record ProviderCatalogEntryView(
     string ProviderId,
     string ModelId,
@@ -43,4 +47,5 @@ public record ProviderCatalogEntryView(
     ProviderModelPricing? Pricing,
     ProviderDataHandlingRecord? DataHandling = null,
     string? MigratedFrom = null,
-    IReadOnlyList<ProviderDataHandlingRecord>? DataHandlingHistory = null);
+    IReadOnlyList<ProviderDataHandlingRecord>? DataHandlingHistory = null,
+    int LifecycleRevision = 1);

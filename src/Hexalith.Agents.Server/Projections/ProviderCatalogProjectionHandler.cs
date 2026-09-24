@@ -52,10 +52,6 @@ public sealed class ProviderCatalogProjectionHandler(
         CancellationToken cancellationToken)
     {
         Validate(request, dispatchId);
-        if (!string.Equals(request.TenantId, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal))
-        {
-            return DomainProjectionHandlerResult.AlreadyCompleted();
-        }
         cancellationToken.ThrowIfCancellationRequested();
         if (request.Events.Length == 0)
         {
@@ -63,21 +59,22 @@ public sealed class ProviderCatalogProjectionHandler(
         }
 
         string storeName = StoreName;
-        string key = ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId);
+        string key = ProviderCatalogReadModelAddresses.Detail(request.TenantId);
         ReadModelEntry<ProviderCatalogReadModel> current = await readModelStore
             .GetAsync<ProviderCatalogReadModel>(storeName, key, cancellationToken)
             .ConfigureAwait(false);
 
         if (ProviderCatalogProjectionFold.GetDeliveryFailureReason(
                 request.Events,
-                current.Value?.StreamSequences.GetValueOrDefault(request.AggregateId) ?? 0) is { } deliveryFailure)
+                ProviderCatalogProjectionFold.Checkpoint(current.Value, request.TenantId, request.AggregateId)) is { } deliveryFailure)
         {
             return DomainProjectionHandlerResult.Retryable(deliveryFailure);
         }
 
         ProviderCatalogReadModel next = ProviderCatalogProjectionFold.Fold(request, current.Value);
         if (current.Value is not null
-            && next.StreamSequences.GetValueOrDefault(request.AggregateId) == current.Value.StreamSequences.GetValueOrDefault(request.AggregateId))
+            && next.StreamSequences.GetValueOrDefault(request.AggregateId)
+                == ProviderCatalogProjectionFold.Checkpoint(current.Value, request.TenantId, request.AggregateId))
         {
             return DomainProjectionHandlerResult.AlreadyCompleted();
         }
@@ -104,10 +101,6 @@ public sealed class ProviderCatalogProjectionHandler(
         CancellationToken cancellationToken)
     {
         Validate(request, operationId);
-        if (!string.Equals(request.TenantId, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal))
-        {
-            throw new InvalidOperationException("Legacy catalog projection is frozen.");
-        }
         cancellationToken.ThrowIfCancellationRequested();
         if (ProviderCatalogProjectionFold.GetDeliveryFailureReason(request.Events, 0) is { } deliveryFailure)
         {
@@ -119,13 +112,18 @@ public sealed class ProviderCatalogProjectionHandler(
             .GetAsync<ProviderCatalogReadModel>(StoreName, key, cancellationToken)
             .ConfigureAwait(false);
         ProviderCatalogReadModel? current = stored.Value;
-        ProviderCatalogReadModel? unaffected = current is null ? null : new ProviderCatalogReadModel
+        bool legacyTenantStream = !string.Equals(request.TenantId, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal)
+            && string.Equals(request.AggregateId, request.TenantId, StringComparison.Ordinal);
+        ProviderCatalogReadModel? unaffected = current is null || legacyTenantStream ? null : new ProviderCatalogReadModel
         {
             CatalogId = current.CatalogId,
             TenantId = current.TenantId,
             Entries = [.. current.Entries.Where(entry =>
                 !string.Equals(ProviderCatalogIdentity.EntryId(entry.ProviderId, entry.ModelId), request.AggregateId, StringComparison.Ordinal))],
             StreamSequences = current.StreamSequences
+                .Where(pair => !string.Equals(pair.Key, request.AggregateId, StringComparison.Ordinal))
+                .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal),
+            StreamCommandMessageIds = current.StreamCommandMessageIds
                 .Where(pair => !string.Equals(pair.Key, request.AggregateId, StringComparison.Ordinal))
                 .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal),
             ProjectedAt = current.ProjectedAt,

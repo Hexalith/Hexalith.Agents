@@ -6,4 +6,5 @@ namespace Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 /// </summary>
 /// <param name="ProviderId">Stable provider identifier (non-empty).</param>
 /// <param name="ModelId">Stable model identifier (non-empty).</param>
-public record DisableProviderModelEntry(string ProviderId, string ModelId);
+/// <param name="ExpectedLifecycleRevision">Lifecycle revision observed by the caller.</param>
+public record DisableProviderModelEntry(string ProviderId, string ModelId, int? ExpectedLifecycleRevision = null);

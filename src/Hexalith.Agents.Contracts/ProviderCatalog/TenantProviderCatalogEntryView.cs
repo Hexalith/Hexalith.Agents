@@ -15,6 +15,10 @@ namespace Hexalith.Agents.Contracts.ProviderCatalog;
 /// <param name="Pricing">The governed pricing.</param>
 /// <param name="DataHandling">The governed data handling terms.</param>
 /// <param name="IsSelectableForNewActiveUse">Whether selection is currently permitted.</param>
+/// <param name="DataHandlingStatus">The tenant's current terms status.</param>
+/// <param name="GraceExpiresAt">The exclusive end of a qualifying grace period.</param>
+/// <param name="InForceDataHandlingVersion">The accepted or grace-covered version in force.</param>
+/// <param name="TenantRevision">The tenant enablement stream revision.</param>
 /// <param name="LastDecisionMessageId">The last projected terms decision command identity, for exact write confirmation.</param>
 public sealed record TenantProviderCatalogEntryView(
     string ProviderId,

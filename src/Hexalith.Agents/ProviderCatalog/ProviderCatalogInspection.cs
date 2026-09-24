@@ -118,7 +118,8 @@ public static class ProviderCatalogInspection
             entry.Pricing,
             entry.DataHandling,
             entry.MigratedFrom,
-            entry.DataHandlingHistory);
+            entry.DataHandlingHistory,
+            entry.LifecycleRevision);
     }
 
     private static bool HasValidLimits(ProviderModelEntryState entry)

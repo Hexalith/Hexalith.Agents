@@ -13,6 +13,9 @@ using Hexalith.Agents.Server.Projections;
 using Hexalith.Agents.TenantProviderEnablement;
 
 using Hexalith.EventStore.Contracts.Commands;
+using Hexalith.EventStore.Contracts.Streams;
+using Hexalith.EventStore.Client.Gateway;
+using Hexalith.EventStore.Contracts.Projections;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,6 +35,135 @@ public sealed class ProviderCatalogMigrationTests
     private const string StoreName = "statestore";
     private readonly FakeReadModelStore _store = new();
     private readonly List<CommandEnvelope> _sent = [];
+    private readonly Dictionary<string, long> _legacyHeads = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, long> _targetHeads = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _rejectedMessages = new(StringComparer.Ordinal);
+    private bool _rejectNextCommand;
+    private bool _mutatePlatformAfterTenantB;
+    private bool _togglePlatformAfterTenantB;
+    private bool _advanceLegacyAfterTenantB;
+    private string? _missingTargetReason;
+
+    private static string TargetKey(string tenantId, string domain, string aggregateId)
+        => $"{tenantId}/{domain}/{aggregateId}";
+
+    [Theory]
+    [InlineData("missing-stream", "ProjectionConfirmed")]
+    [InlineData("other", "AuthoritativePending")]
+    public async Task First_migration_accepts_only_exact_missing_stream_as_zero_target(
+        string reason, string expected)
+    {
+        SeedLegacy("tenant-a", Entry());
+        _missingTargetReason = reason;
+
+        ProviderCatalogMigrationResult result = await Service().MigrateAsync(["tenant-a"]);
+
+        result.Status.ShouldBe(expected);
+        if (reason == "missing-stream")
+        {
+            _sent.Count.ShouldBe(2);
+        }
+        else
+        {
+            _sent.ShouldBeEmpty();
+        }
+    }
+
+    [Theory]
+    [InlineData("platform")]
+    [InlineData("tenant")]
+    public async Task Repeat_with_a_stale_target_projection_remains_pending_without_dispatch(string target)
+    {
+        SeedLegacy("tenant-a", Entry());
+        ProviderCatalogMigrationService migration = Service();
+        (await migration.MigrateAsync(["tenant-a"])).Status.ShouldBe("ProjectionConfirmed");
+        int sent = _sent.Count;
+        string key = target == "platform"
+            ? TargetKey(ProviderCatalogIdentity.PlatformTenantId, ProviderCatalogAggregate.Domain,
+                ProviderCatalogIdentity.EntryId("openai", "gpt-4o"))
+            : TargetKey("tenant-a", TenantProviderEnablementAggregate.Domain, "tenant-a");
+        _targetHeads[key]++;
+
+        ProviderCatalogMigrationResult repeat = await migration.MigrateAsync(["tenant-a"]);
+
+        repeat.Status.ShouldBe("AuthoritativePending");
+        _sent.Count.ShouldBe(sent);
+    }
+
+    [Fact]
+    public async Task Rejected_migration_command_cannot_be_confirmed_by_a_matching_target_projection()
+    {
+        SeedLegacy("tenant-a", Entry());
+        _rejectNextCommand = true;
+
+        ProviderCatalogMigrationResult result = await Service().MigrateAsync(["tenant-a"]);
+
+        result.Status.ShouldBe("Rejected");
+        _sent.Count.ShouldBe(1);
+        _store.Snapshot<ProviderCatalogReadModel>(StoreName,
+            ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId))
+            .ShouldNotBeNull().Entries.ShouldHaveSingleItem();
+    }
+
+    [Fact]
+    public async Task Delayed_legacy_delivery_blocks_migration_until_projected_then_exact_repeat_is_no_op()
+    {
+        SeedLegacy("tenant-a", Entry());
+        _legacyHeads["tenant-a"] = 2;
+        ProviderCatalogMigrationService migration = Service();
+
+        ProviderCatalogMigrationResult before = await migration.MigrateAsync(["tenant-a"]);
+        before.Status.ShouldBe("AuthoritativePending");
+        _sent.ShouldBeEmpty();
+
+        var handler = new ProviderCatalogProjectionHandler(_store, _store,
+            Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = StoreName }));
+        var delivered = new ProviderModelEntryDisabled("tenant-a", "openai", "gpt-4o");
+        var request = new ProjectionRequest("tenant-a", ProviderCatalogAggregate.Domain, "tenant-a",
+            [new ProjectionEventDto(nameof(ProviderModelEntryDisabled),
+                JsonSerializer.SerializeToUtf8Bytes(delivered), "json", 2,
+                new DateTimeOffset(2026, 9, 24, 12, 0, 0, TimeSpan.Zero), "corr-legacy", "msg-legacy")]);
+        await handler.ProjectAsync(request, "dispatch-legacy", CancellationToken.None);
+
+        ProviderCatalogReadModel caughtUp = _store.Snapshot<ProviderCatalogReadModel>(StoreName,
+            ProviderCatalogReadModelAddresses.Detail("tenant-a")).ShouldNotBeNull();
+        caughtUp.StreamSequences["tenant-a"].ShouldBe(2);
+        caughtUp.Entries.ShouldHaveSingleItem().Status.ShouldBe(ProviderModelStatus.Disabled);
+
+        (await migration.MigrateAsync(["tenant-a"])).Status.ShouldBe("ProjectionConfirmed");
+        (await migration.MigrateAsync(["tenant-a"])).Status.ShouldBe("NoOp");
+        _sent.Count.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task Pre_upgrade_legacy_checkpoint_accepts_sequence_two_then_migration_repeats_as_no_op()
+    {
+        SeedLegacy("tenant-a", Entry());
+        ProviderCatalogReadModel prior = _store.Snapshot<ProviderCatalogReadModel>(StoreName,
+            ProviderCatalogReadModelAddresses.Detail("tenant-a")).ShouldNotBeNull();
+        prior.StreamSequences.Clear();
+        _store.Seed(StoreName, ProviderCatalogReadModelAddresses.Detail("tenant-a"), prior);
+        _legacyHeads["tenant-a"] = 2;
+        ProviderCatalogMigrationService migration = Service();
+        (await migration.MigrateAsync(["tenant-a"])).Status.ShouldBe("AuthoritativePending");
+
+        var handler = new ProviderCatalogProjectionHandler(_store, _store,
+            Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = StoreName }));
+        var disabled = new ProviderModelEntryDisabled("tenant-a", "openai", "gpt-4o");
+        var request = new ProjectionRequest("tenant-a", ProviderCatalogAggregate.Domain, "tenant-a",
+            [new ProjectionEventDto(nameof(ProviderModelEntryDisabled),
+                JsonSerializer.SerializeToUtf8Bytes(disabled), "json", 2,
+                new DateTimeOffset(2026, 9, 24, 12, 0, 0, TimeSpan.Zero), "corr-legacy", "msg-legacy")]);
+
+        (await handler.ProjectAsync(request, "dispatch-upgrade", CancellationToken.None))
+            .Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        ProviderCatalogReadModel caughtUp = _store.Snapshot<ProviderCatalogReadModel>(StoreName,
+            ProviderCatalogReadModelAddresses.Detail("tenant-a")).ShouldNotBeNull();
+        caughtUp.StreamSequences["tenant-a"].ShouldBe(2);
+        caughtUp.Entries.ShouldHaveSingleItem().Status.ShouldBe(ProviderModelStatus.Disabled);
+        (await migration.MigrateAsync(["tenant-a"])).Status.ShouldBe("ProjectionConfirmed");
+        (await migration.MigrateAsync(["tenant-a"])).Status.ShouldBe("NoOp");
+    }
 
     [Fact]
     public async Task Migration_confirms_persisted_targets_and_an_exact_repeat_sends_nothing()
@@ -76,6 +208,51 @@ public sealed class ProviderCatalogMigrationTests
             tenant.State.Revision.ShouldBe(1);
             tenant.State.Entries.ShouldHaveSingleItem().Value.Enabled.ShouldBeTrue();
         }
+    }
+
+    [Fact]
+    public async Task Final_revalidation_detects_a_projected_mutation_to_an_earlier_target()
+    {
+        SeedLegacy("tenant-a", Entry());
+        SeedLegacy("tenant-b", Entry());
+        _mutatePlatformAfterTenantB = true;
+
+        ProviderCatalogMigrationResult result = await Service().MigrateAsync(["tenant-a", "tenant-b"]);
+
+        result.Status.ShouldBe("AuthoritativePending");
+        result.PlatformEntries.ShouldBe(1);
+        result.TenantEntries.ShouldBe(2);
+        _sent.Count.ShouldBe(3);
+    }
+
+    [Fact]
+    public async Task Final_revalidation_rejects_a_legacy_event_admitted_during_multi_tenant_dispatch()
+    {
+        SeedLegacy("tenant-a", Entry());
+        SeedLegacy("tenant-b", Entry());
+        _advanceLegacyAfterTenantB = true;
+
+        ProviderCatalogMigrationResult result = await Service().MigrateAsync(["tenant-a", "tenant-b"]);
+
+        result.Status.ShouldBe("AuthoritativePending");
+        _legacyHeads["tenant-a"].ShouldBe(2);
+        _sent.Count.ShouldBe(3);
+    }
+
+    [Fact]
+    public async Task Final_revalidation_rejects_a_disable_reenable_with_equal_final_metadata()
+    {
+        SeedLegacy("tenant-a", Entry());
+        SeedLegacy("tenant-b", Entry());
+        _togglePlatformAfterTenantB = true;
+
+        ProviderCatalogMigrationResult result = await Service().MigrateAsync(["tenant-a", "tenant-b"]);
+
+        result.Status.ShouldBe("AuthoritativePending");
+        ProviderCatalogReadModel platform = _store.Snapshot<ProviderCatalogReadModel>(StoreName,
+            ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId)).ShouldNotBeNull();
+        platform.Entries.ShouldHaveSingleItem().Status.ShouldBe(ProviderModelStatus.Enabled);
+        _sent.Count.ShouldBe(3);
     }
 
     [Fact]
@@ -127,26 +304,32 @@ public sealed class ProviderCatalogMigrationTests
     [Theory]
     [InlineData("divergent-legacy", "DivergentLegacyMetadata")]
     [InlineData("divergent-target", "TargetConflict")]
+    [InlineData("enablement-target", "TargetConflict")]
     [InlineData("missing-inventory", "InvalidLegacyInventory")]
     public async Task Invalid_migration_matrix_rejects_every_row_before_dispatch(string scenario, string expected)
     {
         if (scenario != "missing-inventory")
         {
-            SeedLegacy("tenant-a", scenario == "missing-terms" ? Entry() with { DataHandling = null } : Entry());
+            SeedLegacy("tenant-a", scenario == "enablement-target"
+                ? Entry() with { Status = ProviderModelStatus.Disabled, IsSelectableForNewActiveUse = false }
+                : Entry());
         }
 
         if (scenario == "divergent-legacy")
         {
             SeedLegacy("tenant-b", Entry() with { DisplayLabel = "Different" });
         }
-        else if (scenario == "divergent-target")
+        else if (scenario is "divergent-target" or "enablement-target")
         {
             _store.Seed(StoreName, ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId),
                 new ProviderCatalogReadModel
                 {
                     CatalogId = ProviderCatalogIdentity.PlatformTenantId,
                     TenantId = ProviderCatalogIdentity.PlatformTenantId,
-                    Entries = [Entry() with { DisplayLabel = "Different", MigratedFrom =
+                    Entries = [Entry() with {
+                        DisplayLabel = scenario == "divergent-target" ? "Different" : Entry().DisplayLabel,
+                        Status = ProviderModelStatus.Enabled,
+                        MigratedFrom =
                         $"legacy:provider-model:{ProviderCatalogIdentity.EntryId("openai", "gpt-4o")}" }],
                 });
         }
@@ -238,21 +421,64 @@ public sealed class ProviderCatalogMigrationTests
 
     private ProviderCatalogMigrationService Service(bool isPlatformOperator = true)
     {
+        IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
+        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                StreamReadRequest request = call.Arg<StreamReadRequest>();
+                if (_missingTargetReason is not null
+                    && !(request.Domain == ProviderCatalogAggregate.Domain && request.AggregateId == request.Tenant)
+                    && !_targetHeads.ContainsKey(TargetKey(request.Tenant, request.Domain,
+                        request.AggregateId ?? string.Empty)))
+                {
+                    throw new EventStoreGatewayException(404, "Not Found", reasonCode: _missingTargetReason);
+                }
+                long head = request.Domain == ProviderCatalogAggregate.Domain && request.AggregateId == request.Tenant
+                    ? _legacyHeads.GetValueOrDefault(request.Tenant)
+                    : _targetHeads.GetValueOrDefault(TargetKey(request.Tenant, request.Domain, request.AggregateId ?? string.Empty));
+                return new StreamReadPage(request.Tenant, request.Domain, request.AggregateId, [],
+                    new StreamReadMetadata(request.FromSequence, null, null, head, 0, false, null));
+            });
+        gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                CommandEnvelope? command = _sent.FirstOrDefault(item => item.MessageId == call.Arg<string>());
+                bool rejected = command is not null && _rejectedMessages.Contains(command.MessageId);
+                return command is null ? null : new CommandStatusQueryResponse(command.CorrelationId,
+                    rejected ? nameof(CommandStatus.Rejected) : nameof(CommandStatus.Completed),
+                    (int)(rejected ? CommandStatus.Rejected : CommandStatus.Completed),
+                    RejectionEventType: rejected ? "InvalidProviderModelMetadataRejection" : null,
+                    MessageId: command.MessageId)
+                {
+                    TenantId = command.TenantId,
+                    EventCount = rejected ? null : 1,
+                };
+            });
         IAgentCommandDispatcher dispatcher = Substitute.For<IAgentCommandDispatcher>();
         dispatcher.DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>())
             .Returns(call =>
             {
                 CommandEnvelope envelope = call.Arg<CommandEnvelope>();
                 _sent.Add(envelope);
-                Persist(envelope);
-                return Task.FromResult(new SubmitCommandResponse("corr-1", null, "msg-1"));
+                if (_rejectNextCommand)
+                {
+                    _rejectNextCommand = false;
+                    _rejectedMessages.Add(envelope.MessageId);
+                    // Another writer projects the same target while this exact command is rejected.
+                    Persist(envelope with { MessageId = "unrelated-writer" });
+                }
+                else
+                {
+                    Persist(envelope);
+                }
+                return Task.FromResult(new SubmitCommandResponse(envelope.CorrelationId, null, envelope.MessageId));
             });
         IAgentAdministrationContextProvider context = Substitute.For<IAgentAdministrationContextProvider>();
         context.GetContext().Returns(new AgentAdministrationContext(
             "tenant-a", "operator", IsAgentsAdmin: false, IsPlatformOperator: isPlatformOperator));
         return new(new ProviderCatalogAdministrationOrchestrator(dispatcher), context,
             new AgentCommandIdentityFactory(), _store,
-            Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = StoreName }));
+            Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = StoreName }), gateway: gateway);
     }
 
     private void Persist(CommandEnvelope envelope)
@@ -275,6 +501,10 @@ public sealed class ProviderCatalogMigrationTests
                     ? ProviderConfigurationState.NotConfigured : ProviderConfigurationState.Configured,
                 command.ConfigurationReferenceId, command.Enabled, command.InitialCapabilityVersion,
                 command.Pricing, command.DataHandling, command.MigratedFrom));
+            string targetKey = TargetKey(envelope.TenantId, envelope.Domain, envelope.AggregateId);
+            long sequence = _targetHeads[targetKey] = _targetHeads.GetValueOrDefault(targetKey) + 1;
+            model.StreamSequences[envelope.AggregateId] = sequence;
+            model.StreamCommandMessageIds[envelope.AggregateId] = [envelope.MessageId];
             _store.Seed(StoreName, key, model);
         }
         else if (envelope.CommandType == nameof(EnableProviderModelEntry))
@@ -285,6 +515,10 @@ public sealed class ProviderCatalogMigrationTests
             ProviderCatalogEntryView current = model.Entries.Single(item => item.ProviderId == command.ProviderId && item.ModelId == command.ModelId);
             model.Entries.Remove(current);
             model.Entries.Add(current with { Status = ProviderModelStatus.Enabled, IsSelectableForNewActiveUse = true });
+            string targetKey = TargetKey(envelope.TenantId, envelope.Domain, envelope.AggregateId);
+            long sequence = _targetHeads[targetKey] = _targetHeads.GetValueOrDefault(targetKey) + 1;
+            model.StreamSequences[envelope.AggregateId] = sequence;
+            model.StreamCommandMessageIds[envelope.AggregateId] = [envelope.MessageId];
             _store.Seed(StoreName, key, model);
         }
         else if (envelope.CommandType == nameof(SetTenantProviderModelEnablement))
@@ -295,7 +529,42 @@ public sealed class ProviderCatalogMigrationTests
                 ?? new TenantProviderEnablementReadModel();
             model.State.Apply(new TenantProviderModelEnablementSet(command.TenantId, command.ProviderId,
                 command.ModelId, command.Enabled, model.State.Revision + 1, "operator", command.MigratedFrom));
+            string targetKey = TargetKey(envelope.TenantId, envelope.Domain, envelope.AggregateId);
+            model.LastSequenceNumber = _targetHeads[targetKey] = _targetHeads.GetValueOrDefault(targetKey) + 1;
+            model.ProjectedCommandMessageIds.Add(envelope.MessageId);
             _store.Seed(StoreName, key, model);
+            if (_mutatePlatformAfterTenantB && command.TenantId == "tenant-b")
+            {
+                _mutatePlatformAfterTenantB = false;
+                string platformKey = ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId);
+                ProviderCatalogReadModel platform = _store.Snapshot<ProviderCatalogReadModel>(StoreName, platformKey)
+                    .ShouldNotBeNull();
+                platform.Entries[0] = platform.Entries[0] with { DisplayLabel = "Concurrent operator edit" };
+                string platformEntryId = ProviderCatalogIdentity.EntryId("openai", "gpt-4o");
+                string platformTargetKey = TargetKey(ProviderCatalogIdentity.PlatformTenantId,
+                    ProviderCatalogAggregate.Domain, platformEntryId);
+                platform.StreamSequences[platformEntryId] = _targetHeads[platformTargetKey]
+                    = _targetHeads.GetValueOrDefault(platformTargetKey) + 1;
+                _store.Seed(StoreName, platformKey, platform);
+            }
+            if (_advanceLegacyAfterTenantB && command.TenantId == "tenant-b")
+            {
+                _advanceLegacyAfterTenantB = false;
+                _legacyHeads["tenant-a"]++;
+            }
+            if (_togglePlatformAfterTenantB && command.TenantId == "tenant-b")
+            {
+                _togglePlatformAfterTenantB = false;
+                string platformKey = ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId);
+                ProviderCatalogReadModel platform = _store.Snapshot<ProviderCatalogReadModel>(StoreName, platformKey)
+                    .ShouldNotBeNull();
+                string platformEntryId = ProviderCatalogIdentity.EntryId("openai", "gpt-4o");
+                string platformTargetKey = TargetKey(ProviderCatalogIdentity.PlatformTenantId,
+                    ProviderCatalogAggregate.Domain, platformEntryId);
+                platform.StreamSequences[platformEntryId] = _targetHeads[platformTargetKey]
+                    = _targetHeads.GetValueOrDefault(platformTargetKey) + 2;
+                _store.Seed(StoreName, platformKey, platform);
+            }
         }
         else
         {
@@ -304,8 +573,16 @@ public sealed class ProviderCatalogMigrationTests
     }
 
     private void SeedLegacy(string tenantId, ProviderCatalogEntryView entry)
-        => _store.Seed(StoreName, ProviderCatalogReadModelAddresses.Detail(tenantId),
-            new ProviderCatalogReadModel { CatalogId = tenantId, TenantId = tenantId, Entries = [entry] });
+    {
+        _legacyHeads[tenantId] = 1;
+        _store.Seed(StoreName, ProviderCatalogReadModelAddresses.Detail(tenantId),
+            new ProviderCatalogReadModel
+            {
+                CatalogId = tenantId, TenantId = tenantId, Entries = [entry],
+                LastSequenceNumber = 1,
+                StreamSequences = new Dictionary<string, long>(StringComparer.Ordinal) { [tenantId] = 1 },
+            });
+    }
 
     private static ProviderCatalogEntryView Entry()
         => new("openai", "gpt-4o", "OpenAI GPT-4o", ProviderModelStatus.Enabled,

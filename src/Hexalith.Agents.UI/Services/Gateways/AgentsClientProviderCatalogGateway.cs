@@ -19,6 +19,17 @@ public sealed class AgentsClientProviderCatalogGateway(IAgentsClient client) : I
     private readonly IAgentsClient _client = client ?? throw new ArgumentNullException(nameof(client));
 
     /// <inheritdoc />
+    public async Task<AgentSetupWriteStatus> GetCommandOutcomeAsync(
+        string targetTenantId, string messageId, CancellationToken cancellationToken)
+    {
+        AgentOperationResult<AgentSetupWriteStatus> result = await _client.ProviderCatalog
+            .GetCommandOutcomeAsync(targetTenantId, messageId, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+        return result.IsSuccess && result.Value is { } status
+            ? status : ToWriteStatus(result.Status);
+    }
+
+    /// <inheritdoc />
     public async Task<TenantProviderEnablementInspectionResult> GetTenantEnablementAsync(
         string tenantId, string providerId, string modelId, CancellationToken cancellationToken)
     {
@@ -133,6 +144,7 @@ public sealed class AgentsClientProviderCatalogGateway(IAgentsClient client) : I
             AgentOperationStatus.ValidationFailed => AgentSetupWriteStatus.ValidationFailed,
             AgentOperationStatus.Conflict or AgentOperationStatus.Stale => AgentSetupWriteStatus.Conflict,
             AgentOperationStatus.UnableToVerify => AgentSetupWriteStatus.UnableToVerify,
+            AgentOperationStatus.Rejected => AgentSetupWriteStatus.Rejected,
             _ => AgentSetupWriteStatus.Unavailable,
         };
 

@@ -124,11 +124,13 @@
   <data name="Agents.ProviderCatalog.Action.Create" xml:space="preserve"><value>Ajouter une entrée</value></data>
   <data name="Agents.ProviderCatalog.Action.Edit" xml:space="preserve"><value>Modifier</value></data>
   <data name="Agents.ProviderCatalog.Action.Save" xml:space="preserve"><value>Enregistrer</value></data>
+  <data name="Agents.ProviderCatalog.Action.CheckPending" xml:space="preserve"><value>Vérifier l'opération en attente {0} / {1}</value></data>
   <data name="Agents.ProviderCatalog.Action.Cancel" xml:space="preserve"><value>Annuler</value></data>
   <data name="Agents.ProviderCatalog.Action.Enable" xml:space="preserve"><value>Activer</value></data>
   <data name="Agents.ProviderCatalog.Action.Disable" xml:space="preserve"><value>Désactiver</value></data>
   <data name="Agents.ProviderCatalog.Editor.Title" xml:space="preserve"><value>Ajouter ou mettre à jour une entrée du catalogue</value></data>
   <data name="Agents.ProviderCatalog.Editor.ConfigurationReference" xml:space="preserve"><value>Référence de configuration</value></data>
+  <data name="Agents.ProviderCatalog.Editor.ClearConfigurationReference" xml:space="preserve"><value>Effacer la référence de configuration</value></data>
   <data name="Agents.ProviderCatalog.Editor.TimeoutMilliseconds" xml:space="preserve"><value>Délai d'attente de la requête (ms)</value></data>
   <data name="Agents.ProviderCatalog.Editor.MaxRetries" xml:space="preserve"><value>Tentatives maximales</value></data>
   <data name="Agents.ProviderCatalog.Write.Status.ValidationFailed" xml:space="preserve"><value>L'écriture du catalogue a été rejetée car les champs soumis sont invalides.</value></data>
@@ -139,6 +141,7 @@
   <data name="Agents.ProviderCatalog.Write.Status.AlreadyApplied" xml:space="preserve"><value>Aucune modification du catalogue n'était nécessaire, car l'état exact de l'entrée était déjà appliqué.</value></data>
   <data name="Agents.ProviderCatalog.Write.Status.AwaitingProjection" xml:space="preserve"><value>La commande du catalogue est terminée et attend sa projection.</value></data>
   <data name="Agents.ProviderCatalog.Write.Status.UnableToVerify" xml:space="preserve"><value>Le résultat exact de la commande du catalogue n'a pas pu être vérifié.</value></data>
+  <data name="Agents.ProviderCatalog.Write.Status.Rejected" xml:space="preserve"><value>La commande de catalogue soumise a été refusée. Vérifiez l'entrée actuelle et réessayez.</value></data>
   <data name="Agents.ProviderCatalog.Truth.Stage.Unknown" xml:space="preserve"><value>La vérité du catalogue n'est pas établie.</value></data>
   <data name="Agents.ProviderCatalog.Truth.Stage.Submitted" xml:space="preserve"><value>Soumise — acceptée pour traitement, sans preuve durable pour l'instant.</value></data>
   <data name="Agents.ProviderCatalog.Truth.Stage.AuthoritativePending" xml:space="preserve"><value>En attente d'autorité — acceptée, mais la projection n'est pas encore à jour.</value></data>
@@ -242,6 +245,7 @@
   <data name="Agents.Config.Write.AlreadyApplied" xml:space="preserve"><value>Aucune modification n'était nécessaire. Cette configuration exacte était déjà appliquée.</value></data>
   <data name="Agents.Config.Write.AwaitingProjection" xml:space="preserve"><value>La commande est terminée, mais son résultat exact est toujours en attente de projection.</value></data>
   <data name="Agents.Config.Write.UnableToVerify" xml:space="preserve"><value>Le résultat de la commande n'a pas pu être vérifié. Relancez exactement la même tentative ou abandonnez-la avant de soumettre une autre modification.</value></data>
+  <data name="Agents.Config.Write.Rejected" xml:space="preserve"><value>La commande soumise a été refusée. Vérifiez la configuration actuelle et réessayez.</value></data>
   <data name="Agents.Config.Write.Confirmed" xml:space="preserve"><value>La configuration projetée confirme maintenant le résultat exact de la commande.</value></data>
   <data name="Agents.Config.Write.Refreshing" xml:space="preserve"><value>Actualisation unique de la configuration projetée.</value></data>
   <data name="Agents.Config.Write.RefreshIncomplete" xml:space="preserve"><value>La configuration projetée n'a pas encore pu être confirmée. Actualisez-la de nouveau, relancez exactement la commande ou abandonnez la tentative.</value></data>
@@ -696,7 +700,7 @@
   <data name="Agents.LaunchReadiness.Enable.Button" xml:space="preserve"><value>Activer la génération en conditions de production</value></data>
   <data name="Agents.LaunchReadiness.Enable.Submitted" xml:space="preserve"><value>Demande d'activation soumise.</value></data>
   <data name="Agents.ProviderCatalog.DataHandling.RetentionDays" xml:space="preserve"><value>Durée de conservation en jours</value></data>
-  <data name="Agents.ProviderCatalog.DataHandling.TrainingUse" xml:space="preserve"><value>Utilisation pour l'entraînement autorisée (true ou false)</value></data>
+  <data name="Agents.ProviderCatalog.DataHandling.TrainingUse" xml:space="preserve"><value>Autoriser l'utilisation pour l'entraînement</value></data>
   <data name="Agents.ProviderCatalog.DataHandling.ProcessingRegions" xml:space="preserve"><value>Régions de traitement (séparées par des virgules)</value></data>
   <data name="Agents.ProviderCatalog.DataHandling.TermsReference" xml:space="preserve"><value>Référence des conditions</value></data>
   <data name="Agents.ProviderCatalog.DataHandling.Version" xml:space="preserve"><value>Version des conditions</value></data>
@@ -705,12 +709,20 @@
   <data name="Agents.TenantProviders.Description" xml:space="preserve"><value>Examinez les modèles fournisseurs activés pour votre locataire et décidez des conditions actuelles de traitement des données.</value></data>
   <data name="Agents.TenantProviders.TermsStatus" xml:space="preserve"><value>État des conditions</value></data>
   <data name="Agents.TenantProviders.Review" xml:space="preserve"><value>Examiner les conditions</value></data>
+  <data name="Agents.TenantProviders.CheckPending" xml:space="preserve"><value>Vérifier l'état de la décision</value></data>
   <data name="Agents.TenantProviders.ConfirmTitle" xml:space="preserve"><value>Confirmer les conditions actuelles</value></data>
   <data name="Agents.TenantProviders.ExactVersion" xml:space="preserve"><value>Version de traitement des données {0}</value></data>
   <data name="Agents.TenantProviders.Retention" xml:space="preserve"><value>Conservation : {0} jours</value></data>
   <data name="Agents.TenantProviders.Training" xml:space="preserve"><value>Utilisation pour l'entraînement : {0}</value></data>
   <data name="Agents.TenantProviders.Regions" xml:space="preserve"><value>Régions de traitement : {0}</value></data>
   <data name="Agents.TenantProviders.TermsReference" xml:space="preserve"><value>Référence des conditions : {0}</value></data>
+  <data name="Agents.TenantProviders.EffectiveAt" xml:space="preserve"><value>En vigueur le {0}</value></data>
+  <data name="Agents.TenantProviders.TighteningDeclaration" xml:space="preserve"><value>Durcissement déclaré de la version {0} à {1} par {2} ({3}) le {4}</value></data>
+  <data name="Agents.TenantProviders.Tightening.Retention" xml:space="preserve"><value>Conservation modifiée de {0} à {1} jours</value></data>
+  <data name="Agents.TenantProviders.Tightening.Training" xml:space="preserve"><value>Utilisation pour l'entraînement modifiée de {0} à {1}</value></data>
+  <data name="Agents.TenantProviders.Tightening.RemovedRegions" xml:space="preserve"><value>Régions de traitement retirées : {0}</value></data>
+  <data name="Agents.TenantProviders.Tightening.AddedRegions" xml:space="preserve"><value>Régions de traitement ajoutées : {0}</value></data>
+  <data name="Agents.TenantProviders.Tightening.TermsReference" xml:space="preserve"><value>Référence des conditions modifiée de {0} à {1}</value></data>
   <data name="Agents.TenantProviders.GraceDeadline" xml:space="preserve"><value>La période de grâce se termine le {0}</value></data>
   <data name="Agents.TenantProviders.Justification" xml:space="preserve"><value>Justification de la décision</value></data>
   <data name="Agents.TenantProviders.Accept" xml:space="preserve"><value>Accepter les conditions actuelles</value></data>

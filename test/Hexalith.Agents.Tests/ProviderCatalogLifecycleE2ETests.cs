@@ -74,7 +74,7 @@ public sealed class ProviderCatalogLifecycleE2ETests
             .Entries.ShouldContain(v => v.ProviderId == create.ProviderId && v.IsSelectableForNewActiveUse);
 
         // Disable it.
-        (await ProcessAndApplyAsync(aggregate, state, new DisableProviderModelEntry(create.ProviderId, create.ModelId)))
+        (await ProcessAndApplyAsync(aggregate, state, new DisableProviderModelEntry(create.ProviderId, create.ModelId, 1)))
             .IsSuccess.ShouldBeTrue();
 
         // AC2: no longer selectable for new active use → excluded from the default (enabled-only) list.
@@ -92,7 +92,7 @@ public sealed class ProviderCatalogLifecycleE2ETests
             .Status.ShouldBe(ProviderCatalogInspectionStatus.Success);
 
         // Re-enabling restores selectability.
-        (await ProcessAndApplyAsync(aggregate, state, new EnableProviderModelEntry(create.ProviderId, create.ModelId)))
+        (await ProcessAndApplyAsync(aggregate, state, new EnableProviderModelEntry(create.ProviderId, create.ModelId, 2)))
             .IsSuccess.ShouldBeTrue();
         ProviderCatalogInspection.GetEntry(state, isProviderAdmin: true, create.ProviderId, create.ModelId)
             .Entries.ShouldHaveSingleItem().IsSelectableForNewActiveUse.ShouldBeTrue();
@@ -192,8 +192,9 @@ public sealed class ProviderCatalogLifecycleE2ETests
             new ProviderModelTimeoutPolicy(45_000, 2),
             ProviderModelCapabilityFlags.Streaming | ProviderModelCapabilityFlags.Vision,
             "cfg-openai-gpt4o",
-            ValidPricing()));
-        await Drive(new DisableProviderModelEntry("anthropic", "claude"));
+            ValidPricing(),
+            ExpectedCapabilityVersion: 1));
+        await Drive(new DisableProviderModelEntry("anthropic", "claude", 1));
 
         // Replay the captured stream into a brand-new state (the production Apply handlers).
         var replayed = new ProviderCatalogState();

@@ -29,6 +29,9 @@ public sealed class ProviderCatalogReadModel : IReadModelFreshness
     /// <summary>Gets or sets each platform entry stream's projected sequence.</summary>
     public Dictionary<string, long> StreamSequences { get; set; } = [];
 
+    /// <summary>Gets recent successful projected command identities by entry stream for exact write confirmation.</summary>
+    public Dictionary<string, List<string>> StreamCommandMessageIds { get; set; } = [];
+
     /// <summary>Gets or sets the highest aggregate sequence number folded into this read model.</summary>
     public long LastSequenceNumber { get; set; }
 

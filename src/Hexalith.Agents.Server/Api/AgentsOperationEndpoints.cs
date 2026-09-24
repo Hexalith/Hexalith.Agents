@@ -42,6 +42,10 @@ public static class AgentsOperationEndpoints
     {
         RouteGroupBuilder providers = group.MapGroup("/providers");
 
+        providers.MapGet("/commands/{targetTenantId}/{messageId}", (string targetTenantId, string messageId,
+            IAgentsClient client, CancellationToken cancellationToken) =>
+            client.ProviderCatalog.GetCommandOutcomeAsync(targetTenantId, messageId, cancellationToken: cancellationToken));
+
         providers.MapGet("/tenant", (bool includeDisabled, IAgentsClient client, CancellationToken cancellationToken) =>
             client.ProviderCatalog.ListTenantEntriesAsync(includeDisabled, cancellationToken: cancellationToken));
         providers.MapGet("/tenant/{providerId}/{modelId}", (string providerId, string modelId, IAgentsClient client, CancellationToken cancellationToken) =>

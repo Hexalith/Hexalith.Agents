@@ -460,7 +460,8 @@ public sealed class AgentOperationContractsTests
             (AgentSetupWriteStatus.Unavailable, 5),
             (AgentSetupWriteStatus.AlreadyApplied, 6),
             (AgentSetupWriteStatus.AwaitingProjection, 7),
-            (AgentSetupWriteStatus.UnableToVerify, 8));
+            (AgentSetupWriteStatus.UnableToVerify, 8),
+            (AgentSetupWriteStatus.Rejected, 9));
         Pin(
             (AgentActivationBlocker.Unknown, 0),
             (AgentActivationBlocker.MissingDisplayName, 1),

@@ -5,8 +5,11 @@ using System.Threading.Tasks;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Server.Projections;
 using Hexalith.Agents.ProviderCatalog;
+using Hexalith.Agents.TenantProviderEnablement;
 
 using Hexalith.EventStore.Client.Projections;
+using Hexalith.EventStore.Client.Gateway;
+using Hexalith.EventStore.Contracts.Streams;
 
 using Microsoft.Extensions.Options;
 
@@ -20,7 +23,9 @@ namespace Hexalith.Agents.Server.Ports;
 public sealed class ProjectedProviderCatalogReader(
     IReadModelStore readModelStore,
     IOptions<ProviderCatalogReadModelOptions> options,
-    IAgentAdministrationContextProvider contextProvider) : IProviderCatalogReader
+    IAgentAdministrationContextProvider contextProvider,
+    IEventStoreGatewayClient? gateway = null,
+    TimeProvider? clock = null) : IProviderCatalogReader
 {
     private readonly IReadModelStore _readModelStore = readModelStore
         ?? throw new ArgumentNullException(nameof(readModelStore));
@@ -30,6 +35,9 @@ public sealed class ProjectedProviderCatalogReader(
 
     private readonly IAgentAdministrationContextProvider _contextProvider = contextProvider
         ?? throw new ArgumentNullException(nameof(contextProvider));
+
+    private readonly IEventStoreGatewayClient? _gateway = gateway;
+    private readonly TimeProvider _clock = clock ?? TimeProvider.System;
 
     /// <inheritdoc />
     public async Task<ProviderCatalogEntryReadResult> GetEntryAsync(
@@ -73,15 +81,45 @@ public sealed class ProjectedProviderCatalogReader(
             return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null);
         }
 
+        ProviderCatalogEntryView? platformEntry = entry.Value?.Entries.FirstOrDefault(item =>
+            item.ProviderId == providerId && item.ModelId == modelId);
+        // Do not probe a named platform stream for a key this tenant cannot see. Hidden and absent
+        // keys must share the same result, including when the platform projection is missing.
+        string key = ProviderCatalogState.EntryKey(providerId, modelId);
+        if (tenant.Value is { } projectedTenant
+            && (!projectedTenant.State.Entries.TryGetValue(key, out TenantProviderEntryState? enabled)
+                || !enabled.Enabled))
+        {
+            return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.EntryNotFound, null);
+        }
+
+        if (tenant.Value is null || !await IsTenantProjectionCurrentAsync(tenantId, tenant.Value, ct).ConfigureAwait(false))
+        {
+            return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null);
+        }
+
+        if (platformEntry is null)
+        {
+            bool? committed = await IsPlatformStreamCommittedAsync(providerId, modelId, ct).ConfigureAwait(false);
+            return new ProviderCatalogEntryReadResult(committed is false
+                ? ProviderCatalogInspectionStatus.EntryNotFound : ProviderCatalogInspectionStatus.Unavailable, null);
+        }
+
+        if (entry.Value is null || !await IsPlatformProjectionCurrentAsync(
+            entry.Value, providerId, modelId, ct).ConfigureAwait(false))
+        {
+            return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null);
+        }
+
+        // The authoritative reads can straddle the exclusive grace deadline. Evaluate eligibility only
+        // after both checkpoints have returned so a just-expired grace period cannot remain selectable.
         TenantProviderCatalogInspectionResult visible = TenantProviderCatalogViewFactory.CreateEntry(
-            entry.Value, tenant.Value, authorized: true, providerId, modelId, DateTimeOffset.UtcNow);
+            entry.Value, tenant.Value, authorized: true, providerId, modelId, _clock.GetUtcNow());
         if (visible.Status != ProviderCatalogInspectionStatus.Success || visible.Entries.Count != 1)
         {
             return new ProviderCatalogEntryReadResult(visible.Status, null);
         }
 
-        ProviderCatalogEntryView? platformEntry = entry.Value?.Entries.FirstOrDefault(item =>
-            item.ProviderId == providerId && item.ModelId == modelId);
         ProviderCatalogInspectionResult result = platformEntry is null
             ? ProviderCatalogInspectionResult.NotFound()
             : ProviderCatalogInspectionResult.Success([platformEntry with
@@ -101,5 +139,89 @@ public sealed class ProjectedProviderCatalogReader(
                 => new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null),
             _ => new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null),
         };
+    }
+
+    private async Task<bool> IsPlatformProjectionCurrentAsync(
+        ProviderCatalogReadModel projected,
+        string providerId,
+        string modelId,
+        CancellationToken ct)
+    {
+        if (_gateway is null)
+        {
+            return false;
+        }
+
+        string aggregateId = ProviderCatalogIdentity.EntryId(providerId, modelId);
+        try
+        {
+            StreamReadPage page = await _gateway.ReadStreamAsync(
+                new StreamReadRequest(ProviderCatalogIdentity.PlatformTenantId,
+                    ProviderCatalogReadModelAddresses.Domain, aggregateId, PageSize: 1), ct).ConfigureAwait(false);
+            return string.Equals(page.Tenant, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal)
+                && string.Equals(page.Domain, ProviderCatalogReadModelAddresses.Domain, StringComparison.Ordinal)
+                && string.Equals(page.AggregateId, aggregateId, StringComparison.Ordinal)
+                && page.Metadata.LatestSequence > 0
+                && projected.StreamSequences.GetValueOrDefault(aggregateId) == page.Metadata.LatestSequence;
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            return false;
+        }
+    }
+
+    private async Task<bool?> IsPlatformStreamCommittedAsync(string providerId, string modelId, CancellationToken ct)
+    {
+        if (_gateway is null)
+        {
+            return null;
+        }
+
+        string aggregateId = ProviderCatalogIdentity.EntryId(providerId, modelId);
+        try
+        {
+            StreamReadPage page = await _gateway.ReadStreamAsync(
+                new StreamReadRequest(ProviderCatalogIdentity.PlatformTenantId,
+                    ProviderCatalogReadModelAddresses.Domain, aggregateId, PageSize: 1), ct).ConfigureAwait(false);
+            if (!string.Equals(page.Tenant, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal)
+                || !string.Equals(page.Domain, ProviderCatalogReadModelAddresses.Domain, StringComparison.Ordinal)
+                || !string.Equals(page.AggregateId, aggregateId, StringComparison.Ordinal))
+            {
+                return null;
+            }
+
+            return page.Metadata.LatestSequence > 0;
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            return null;
+        }
+    }
+
+    private async Task<bool> IsTenantProjectionCurrentAsync(
+        string tenantId,
+        TenantProviderEnablementReadModel projected,
+        CancellationToken ct)
+    {
+        if (_gateway is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            StreamReadPage page = await _gateway.ReadStreamAsync(
+                new StreamReadRequest(tenantId, TenantProviderEnablementAggregate.Domain, tenantId, PageSize: 1),
+                ct).ConfigureAwait(false);
+            return string.Equals(page.Tenant, tenantId, StringComparison.Ordinal)
+                && string.Equals(page.Domain, TenantProviderEnablementAggregate.Domain, StringComparison.Ordinal)
+                && string.Equals(page.AggregateId, tenantId, StringComparison.Ordinal)
+                && page.Metadata.LatestSequence > 0
+                && projected.LastSequenceNumber == page.Metadata.LatestSequence;
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            return false;
+        }
     }
 }

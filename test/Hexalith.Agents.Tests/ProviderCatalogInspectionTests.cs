@@ -173,6 +173,31 @@ public sealed class ProviderCatalogInspectionTests
             .Entries.ShouldHaveSingleItem().IsSelectableForNewActiveUse.ShouldBeFalse();
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Enabled_entry_with_a_zero_unit_price_is_not_selectable(bool zeroInput)
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        ProviderModelEntryState entry = state.Entries.ShouldHaveSingleItem().Value;
+        entry.Pricing = zeroInput
+            ? entry.Pricing! with { InputTokenUnitPrice = 0 }
+            : entry.Pricing! with { OutputTokenUnitPrice = 0 };
+
+        ProviderCatalogInspection.GetEntry(state, isProviderAdmin: true, "openai", "gpt-4o")
+            .Entries.ShouldHaveSingleItem().IsSelectableForNewActiveUse.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Enabled_entry_without_current_terms_is_not_selectable()
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        state.Entries.ShouldHaveSingleItem().Value.DataHandling = null;
+
+        ProviderCatalogInspection.GetEntry(state, isProviderAdmin: true, "openai", "gpt-4o")
+            .Entries.ShouldHaveSingleItem().IsSelectableForNewActiveUse.ShouldBeFalse();
+    }
+
     [Fact]
     public void Enabled_unconfigured_entry_is_not_selectable()
     {

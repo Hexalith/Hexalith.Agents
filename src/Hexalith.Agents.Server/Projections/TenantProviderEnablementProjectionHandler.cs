@@ -91,6 +91,9 @@ public sealed class TenantProviderEnablementProjectionHandler(
         long sequence = current?.LastSequenceNumber ?? 0;
         TenantProviderEnablementState state = current?.State ?? new TenantProviderEnablementState { TenantId = request.TenantId };
         DateTimeOffset? projectedAt = current?.ProjectedAt;
+        List<string> commandIds = current?.ProjectedCommandMessageIds is { } prior
+            ? [.. prior] : [];
+        ProjectedCommandIdentityWindow.Trim(commandIds);
         foreach (ProjectionEventDto item in request.Events.Where(item => item.SequenceNumber > sequence).OrderBy(item => item.SequenceNumber))
         {
             if (item.SequenceNumber != sequence + 1)
@@ -105,6 +108,7 @@ public sealed class TenantProviderEnablementProjectionHandler(
                 case TenantProviderModelEnablementSet e:
                     state.Apply(e);
                     state.Entries[ProviderCatalogState.EntryKey(e.ProviderId, e.ModelId)].LastEnablementMessageId = item.MessageId;
+                    ProjectedCommandIdentityWindow.Add(commandIds, item.MessageId);
                     break;
                 case ProviderDataHandlingDecided e:
                     state.Apply(e);
@@ -112,6 +116,7 @@ public sealed class TenantProviderEnablementProjectionHandler(
                     {
                         decided.LastDecisionMessageId = item.MessageId;
                     }
+                    ProjectedCommandIdentityWindow.Add(commandIds, item.MessageId);
                     break;
                 case TenantProviderGovernanceRejected e: state.Apply(e); break;
                 default:
@@ -128,6 +133,7 @@ public sealed class TenantProviderEnablementProjectionHandler(
         {
             State = state,
             LastSequenceNumber = sequence,
+            ProjectedCommandMessageIds = commandIds,
             ProjectedAt = projectedAt,
             ProjectionVersion = sequence == 0 ? null : sequence.ToString(CultureInfo.InvariantCulture),
         };

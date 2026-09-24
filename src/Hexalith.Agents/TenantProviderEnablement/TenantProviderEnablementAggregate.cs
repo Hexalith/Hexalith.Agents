@@ -24,6 +24,10 @@ public sealed class TenantProviderEnablementAggregate : EventStoreAggregate<Tena
     public const string TenantAdministratorExtensionKey = "actor:tenantAgentAdministrator";
 
     /// <summary>Decides a platform enablement change for one tenant.</summary>
+    /// <param name="command">The platform enablement command.</param>
+    /// <param name="state">The replayed tenant state.</param>
+    /// <param name="envelope">The authorized command envelope.</param>
+    /// <returns>The event, rejection, or deterministic no-op.</returns>
     public static DomainResult Handle(SetTenantProviderModelEnablement command, TenantProviderEnablementState? state, CommandEnvelope envelope)
     {
         ArgumentNullException.ThrowIfNull(command);
@@ -52,12 +56,12 @@ public sealed class TenantProviderEnablementAggregate : EventStoreAggregate<Tena
 
         if (state?.Entries.TryGetValue(key, out TenantProviderEntryState? existing) == true
             && existing.Enabled == command.Enabled
-            && string.Equals(existing.MigratedFrom, command.MigratedFrom, StringComparison.Ordinal))
+            && (command.MigratedFrom is null || string.Equals(existing.MigratedFrom, command.MigratedFrom, StringComparison.Ordinal)))
         {
-            return DomainResult.NoOp();
+            return ProviderGovernanceDomainResult.AlreadyApplied();
         }
 
-        return DomainResult.Success([new TenantProviderModelEnablementSet(
+        return ProviderGovernanceDomainResult.Applied([new TenantProviderModelEnablementSet(
             envelope.TenantId,
             command.ProviderId,
             command.ModelId,
@@ -68,6 +72,10 @@ public sealed class TenantProviderEnablementAggregate : EventStoreAggregate<Tena
     }
 
     /// <summary>Decides an administrator's acceptance or decline of current terms.</summary>
+    /// <param name="command">The terms decision.</param>
+    /// <param name="state">The replayed tenant state.</param>
+    /// <param name="envelope">The authorized command envelope.</param>
+    /// <returns>The event, rejection, or deterministic no-op.</returns>
     public static DomainResult Handle(DecideProviderDataHandling command, TenantProviderEnablementState? state, CommandEnvelope envelope)
     {
         ArgumentNullException.ThrowIfNull(command);
@@ -99,13 +107,12 @@ public sealed class TenantProviderEnablementAggregate : EventStoreAggregate<Tena
         }
 
         ProviderDataHandlingDecided? prior = entry.LastDecision;
-        if (prior is not null && prior.ConfirmedTerms.DataHandlingVersion == command.DataHandlingVersion)
+        if (prior is not null && prior.ConfirmedTerms.DataHandlingVersion == command.DataHandlingVersion
+            && prior.Accepted == command.Accepted && prior.ActorUserId == envelope.UserId)
         {
-            return prior.Accepted == command.Accepted
-                && prior.Justification == command.Justification
-                && prior.ActorUserId == envelope.UserId
-                && ProviderDataHandlingPolicy.SameFields(prior.ConfirmedTerms, command.ConfirmedTerms)
-                ? DomainResult.NoOp()
+            return prior.Justification == command.Justification
+                && ProviderDataHandlingPolicy.SameSnapshot(prior.ConfirmedTerms, command.ConfirmedTerms)
+                ? ProviderGovernanceDomainResult.AlreadyApplied()
                 : Reject(envelope, command.ProviderId, command.ModelId, "DivergentDuplicate");
         }
 
@@ -114,7 +121,7 @@ public sealed class TenantProviderEnablementAggregate : EventStoreAggregate<Tena
             return Reject(envelope, command.ProviderId, command.ModelId, "StaleRevision");
         }
 
-        return DomainResult.Success([new ProviderDataHandlingDecided(
+        return ProviderGovernanceDomainResult.Applied([new ProviderDataHandlingDecided(
             envelope.TenantId,
             command.ProviderId,
             command.ModelId,

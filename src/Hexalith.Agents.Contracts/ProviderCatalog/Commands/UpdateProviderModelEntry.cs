@@ -16,8 +16,8 @@ namespace Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 /// <param name="ConfigurationReferenceId">Optional safe configuration reference identifier (never a secret value).</param>
 /// <param name="Pricing">Administrator-supplied versioned pricing units and currency (required).</param>
 /// <param name="ExpectedCapabilityVersion">
-/// The capability version the caller last observed, or <see langword="null"/> when the caller is not asserting a
-/// revision. A value below the current version is a regression; a value above it is a stale revision.
+/// The required capability version the caller last observed. A value below the current version is a regression;
+/// a value above it is a stale revision.
 /// </param>
 public record UpdateProviderModelEntry(
     string ProviderId,

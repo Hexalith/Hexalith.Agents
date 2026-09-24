@@ -4,6 +4,7 @@
 @inject IStringLocalizer<AgentsResources> Localizer
 @inject IProviderCatalogGateway Gateway
 @inject TimeProvider TimeProvider
+@inject IPendingProviderCommandStore PendingCommands
 
 @using Hexalith.Agents.Contracts.ProviderCatalog.Commands
 
@@ -30,7 +31,7 @@
                               Label="@Localizer["Agents.ProviderCatalog.Filter.SelectableOnly"]"
                               data-testid="agents-provider-catalog-selectable-filter" />
                 <FluentButton Appearance="ButtonAppearance.Primary"
-                              Disabled="_busy"
+                              Disabled="_busy || _pendingRestoring || _storeUnavailable"
                               OnClick="BeginCreate"
                               data-testid="agents-provider-catalog-create">
                     @Localizer["Agents.ProviderCatalog.Action.Create"]
@@ -54,6 +55,13 @@
             <p data-testid="agents-provider-catalog-freshness" aria-live="polite">
                 @Localizer[$"Agents.ProviderCatalog.Freshness.{_result.Freshness}"]
             </p>
+        }
+        @foreach (var pending in _pendingCatalogCommands)
+        {
+            <FluentButton Disabled="_busy" OnClick="@(() => CheckPendingCatalogAsync(pending.Key))"
+                          data-testid="agents-provider-catalog-check-pending">
+                @Localizer["Agents.ProviderCatalog.Action.CheckPending", pending.Value.Acceptance.ProviderId, pending.Value.Acceptance.ModelId]
+            </FluentButton>
         }
         @if (_editorOpen)
         {
@@ -102,19 +110,47 @@
                                          Label="@Localizer["Agents.ProviderCatalog.Editor.MaxRetries"]"
                                          AriaLabel="@Localizer["Agents.ProviderCatalog.Editor.MaxRetries"]"
                                          data-testid="agents-provider-catalog-retries-input" />
+                        <FluentSwitch @bind-Value="_supportsTextGeneration"
+                                      Label="@Localizer["Agents.ProviderCatalog.Capability.TextGeneration"]"
+                                      data-testid="agents-provider-catalog-text-generation-input" />
+                        @if (!_editing)
+                        {
+                            <FluentSwitch @bind-Value="_createEnabled"
+                                          Label="@Localizer["Agents.ProviderCatalog.ModelStatus.Enabled"]"
+                                          data-testid="agents-provider-catalog-create-enabled-input" />
+                        }
+                        <FluentSwitch @bind-Value="_supportsStreaming"
+                                      Label="@Localizer["Agents.ProviderCatalog.Capability.Streaming"]"
+                                      data-testid="agents-provider-catalog-streaming-input" />
+                        <FluentSwitch @bind-Value="_supportsToolCalling"
+                                      Label="@Localizer["Agents.ProviderCatalog.Capability.ToolCalling"]"
+                                      data-testid="agents-provider-catalog-tool-calling-input" />
+                        <FluentSwitch @bind-Value="_supportsVision"
+                                      Label="@Localizer["Agents.ProviderCatalog.Capability.Vision"]"
+                                      data-testid="agents-provider-catalog-vision-input" />
+                        <FluentSwitch @bind-Value="_supportsStructuredOutput"
+                                      Label="@Localizer["Agents.ProviderCatalog.Capability.StructuredOutput"]"
+                                      data-testid="agents-provider-catalog-structured-output-input" />
                         <FluentTextInput @bind-Value="_configurationReference"
                                          Label="@Localizer["Agents.ProviderCatalog.Editor.ConfigurationReference"]"
                                          AriaLabel="@Localizer["Agents.ProviderCatalog.Editor.ConfigurationReference"]"
                                          autocomplete="off"
+                                         Disabled="_clearConfigurationReference"
                                          data-testid="agents-provider-catalog-configuration-reference-input" />
+                        @if (_editing)
+                        {
+                            <FluentSwitch @bind-Value="_clearConfigurationReference"
+                                          Label="@Localizer["Agents.ProviderCatalog.Editor.ClearConfigurationReference"]"
+                                          data-testid="agents-provider-catalog-clear-configuration-reference" />
+                        }
                         <FluentTextInput @bind-Value="_retentionDays"
                                          Label="@Localizer["Agents.ProviderCatalog.DataHandling.RetentionDays"]"
                                          AriaLabel="@Localizer["Agents.ProviderCatalog.DataHandling.RetentionDays"]"
                                          data-testid="agents-provider-catalog-retention-input" />
-                        <FluentTextInput @bind-Value="_trainingUse"
-                                         Label="@Localizer["Agents.ProviderCatalog.DataHandling.TrainingUse"]"
-                                         AriaLabel="@Localizer["Agents.ProviderCatalog.DataHandling.TrainingUse"]"
-                                         data-testid="agents-provider-catalog-training-input" />
+                        <FluentSwitch @bind-Value="_trainingUse"
+                                      Label="@Localizer["Agents.ProviderCatalog.DataHandling.TrainingUse"]"
+                                      role="switch"
+                                      data-testid="agents-provider-catalog-training-input" />
                         <FluentTextInput @bind-Value="_processingRegions"
                                          Label="@Localizer["Agents.ProviderCatalog.DataHandling.ProcessingRegions"]"
                                          AriaLabel="@Localizer["Agents.ProviderCatalog.DataHandling.ProcessingRegions"]"
@@ -131,7 +167,7 @@
                         }
                         <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="8px">
                             <FluentButton Appearance="ButtonAppearance.Primary"
-                                          Disabled="_busy"
+                                          Disabled="_busy || _pendingRestoring || _storeUnavailable || IsPending(_providerId, _modelId)"
                                           OnClick="SubmitEditorAsync"
                                           data-testid="agents-provider-catalog-save">
                                 @Localizer["Agents.ProviderCatalog.Action.Save"]
@@ -150,7 +186,7 @@
                 <FluentAccordionItem Heading="@Localizer["Agents.ProviderCatalog.Enablement.Title"]" Expanded="true">
                     <FluentStack Orientation="Orientation.Vertical" VerticalGap="12px" data-testid="agents-provider-catalog-enablement-editor">
                         <FluentText>@selected.ProviderId / @selected.ModelId</FluentText>
-                        <FluentTextInput @bind-Value="_enablementTenantId"
+                        <FluentTextInput @bind-Value="_enablementTenantId" @bind-Value:after="OnEnablementTenantChanged"
                                          Label="@Localizer["Agents.ProviderCatalog.Enablement.Tenant"]"
                                          AriaLabel="@Localizer["Agents.ProviderCatalog.Enablement.Tenant"]"
                                          data-testid="agents-provider-catalog-enablement-tenant" />
@@ -165,16 +201,29 @@
                         <FluentSwitch @bind-Value="_enablementEnabled"
                                       Label="@Localizer["Agents.ProviderCatalog.Enablement.Enabled"]"
                                       data-testid="agents-provider-catalog-enablement-enabled" />
-                        <FluentButton Appearance="ButtonAppearance.Primary" Disabled="_busy"
+                        <FluentButton Appearance="ButtonAppearance.Primary" Disabled="_busy || _pendingRestoring || _storeUnavailable || PendingSelectedEnablement || _enablementTruth == nameof(AgentSetupTruthState.AuthoritativePending)"
                                       OnClick="SubmitEnablementAsync" data-testid="agents-provider-catalog-enablement-save">
                             @Localizer["Agents.ProviderCatalog.Action.Save"]
                         </FluentButton>
+                        @if (PendingSelectedEnablement)
+                        {
+                            <FluentButton Disabled="_busy" OnClick="CheckPendingEnablementAsync"
+                                          data-testid="agents-provider-catalog-enablement-check-pending">
+                                @Localizer["Agents.TenantProviders.CheckPending"]
+                            </FluentButton>
+                        }
                         @if (_enablementWrite is { } outcome)
                         {
                             <FluentText aria-live="polite" data-testid="agents-provider-catalog-enablement-truth">
                                 @(outcome.Status is AgentSetupWriteStatus.Submitted
                                     ? Localizer[$"Agents.ProviderCatalog.Truth.Stage.{_enablementTruth ?? "Submitted"}"]
                                     : Localizer[$"Agents.ProviderCatalog.Write.Status.{outcome.Status}"])
+                            </FluentText>
+                        }
+                        else if (PendingSelectedEnablement || _enablementTruth is not null)
+                        {
+                            <FluentText aria-live="polite" data-testid="agents-provider-catalog-enablement-truth">
+                                @Localizer[$"Agents.ProviderCatalog.Truth.Stage.{_enablementTruth ?? "AuthoritativePending"}"]
                             </FluentText>
                         }
                     </FluentStack>
@@ -195,6 +244,10 @@
         {
             <AgentSurfaceState Kind="AgentSurfaceKind.Error" TestId="agents-provider-catalog-state" />
         }
+        else if (_result is { TruthState: AgentSetupTruthState.AuthoritativePending, Entries.Count: 0 })
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Stale" TestId="agents-provider-catalog-state" />
+        }
         else if (_result.Status is ProviderCatalogInspectionStatus.EntryNotFound || _result.Entries.Count == 0)
         {
             <AgentSurfaceState Kind="AgentSurfaceKind.Empty" TestId="agents-provider-catalog-state" />
@@ -210,7 +263,7 @@
             <FluentDataGrid Items="@VisibleRows.AsQueryable()"
                             ResizableColumns="true"
                             GenerateHeader="DataGridGeneratedHeaderType.Sticky"
-                            ItemKey="@(entry => entry.ProviderId + "/" + entry.ModelId)"
+                            ItemKey="@(entry => ProviderCatalogIdentity.EntryId(entry.ProviderId, entry.ModelId))"
                             data-testid="agents-provider-catalog-grid">
                 <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Provider"]"
                                 ColumnId="provider"
@@ -268,22 +321,22 @@
                 </TemplateColumn>
                 <TemplateColumn Title="@Localizer["Agents.ProviderCatalog.Column.Actions"]" ColumnId="actions">
                     <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="8px">
-                        <FluentButton Disabled="_busy" OnClick="@(() => BeginEdit(context))" data-testid="agents-provider-catalog-edit">
+                        <FluentButton Disabled="_busy || _pendingRestoring || _storeUnavailable || IsPending(context.ProviderId, context.ModelId)" OnClick="@(() => BeginEdit(context))" data-testid="agents-provider-catalog-edit">
                             @Localizer["Agents.ProviderCatalog.Action.Edit"]
                         </FluentButton>
-                        <FluentButton Disabled="_busy || context.DataHandling is null" OnClick="@(() => BeginEnablement(context))"
+                        <FluentButton Disabled="_busy" OnClick="@(() => BeginEnablement(context))"
                                       data-testid="agents-provider-catalog-set-tenant-enablement">
                             @Localizer["Agents.ProviderCatalog.Enablement.Title"]
                         </FluentButton>
                         @if (context.Status is ProviderModelStatus.Enabled)
                         {
-                            <FluentButton Disabled="_busy" OnClick="@(() => SubmitLifecycleAsync(context, enable: false))" data-testid="agents-provider-catalog-disable">
+                            <FluentButton Disabled="_busy || _pendingRestoring || _storeUnavailable || IsPending(context.ProviderId, context.ModelId)" OnClick="@(() => SubmitLifecycleAsync(context, enable: false))" data-testid="agents-provider-catalog-disable">
                                 @Localizer["Agents.ProviderCatalog.Action.Disable"]
                             </FluentButton>
                         }
                         else
                         {
-                            <FluentButton Disabled="_busy" OnClick="@(() => SubmitLifecycleAsync(context, enable: true))" data-testid="agents-provider-catalog-enable">
+                            <FluentButton Disabled="_busy || _pendingRestoring || _storeUnavailable || IsPending(context.ProviderId, context.ModelId)" OnClick="@(() => SubmitLifecycleAsync(context, enable: true))" data-testid="agents-provider-catalog-enable">
                                 @Localizer["Agents.ProviderCatalog.Action.Enable"]
                             </FluentButton>
                         }
@@ -296,6 +349,8 @@
 
 @code {
     private const string HeadingId = "agents-provider-catalog-heading";
+    private const string CatalogPendingFamily = "ProviderCatalogMutation";
+    private const string EnablementPendingFamily = "TenantProviderEnablement";
     private static readonly TimeSpan ProjectionPollingTimeout = TimeSpan.FromSeconds(8);
     private static readonly TimeSpan ProjectionPollingInterval = TimeSpan.FromMilliseconds(200);
 
@@ -306,9 +361,14 @@
     private FcAggregateListPage<ProviderCatalogEntryView>? _listPage;
     private ProviderCatalogInspectionResult? _result;
     private ProviderCatalogWriteResult? _pendingWrite;
+    private readonly Dictionary<string, (ProviderCatalogCommandAcceptance Acceptance, int? ExpectedCapabilityVersion,
+        ProviderModelStatus? ExpectedStatus)> _pendingCatalogCommands = new(StringComparer.Ordinal);
+    private AgentSetupTruthState _writeTruth = AgentSetupTruthState.Unknown;
     private bool _selectableOnly;
     private bool _focusHeadingPending = true;
     private bool _busy;
+    private bool _pendingRestoring = true;
+    private bool _storeUnavailable;
     private bool _disposed;
     private bool _editorOpen;
     private bool _editing;
@@ -324,8 +384,15 @@
     private string _timeoutMs = "30000";
     private string _maxRetries = "3";
     private string _configurationReference = string.Empty;
+    private bool _clearConfigurationReference;
+    private bool _supportsTextGeneration = true;
+    private bool _createEnabled = true;
+    private bool _supportsStreaming;
+    private bool _supportsToolCalling;
+    private bool _supportsVision;
+    private bool _supportsStructuredOutput;
     private string _retentionDays = string.Empty;
-    private string _trainingUse = string.Empty;
+    private bool _trainingUse;
     private string _processingRegions = string.Empty;
     private string _termsReference = string.Empty;
     private bool _declareTightening;
@@ -336,6 +403,12 @@
     private string _enablementTenantId = string.Empty;
     private string _enablementExpectedRevision = "0";
     private bool _enablementEnabled = true;
+    private readonly Dictionary<string, string> _pendingEnablementCommands = new(StringComparer.Ordinal);
+
+    private string? SelectedEnablementKey => _enablementEntry is null || string.IsNullOrWhiteSpace(_enablementTenantId)
+        ? null : $"{_enablementTenantId.Trim()}:{ProviderCatalogIdentity.EntryId(_enablementEntry.ProviderId, _enablementEntry.ModelId)}";
+
+    private bool PendingSelectedEnablement => SelectedEnablementKey is { } key && _pendingEnablementCommands.ContainsKey(key);
 
     private IReadOnlyList<ProviderCatalogEntryView> VisibleRows
         => _result is { Status: ProviderCatalogInspectionStatus.Success }
@@ -347,9 +420,11 @@
     private bool ShowGrid => VisibleRows.Count > 0;
 
     private AgentSetupTruthState DisplayedWriteTruth
-        => _result is { TruthState: AgentSetupTruthState.AuthoritativePending or AgentSetupTruthState.ProjectionConfirmed }
-            ? _result.TruthState
-            : AgentSetupTruthState.Submitted;
+        => _writeTruth;
+
+    private bool IsPending(string providerId, string modelId)
+        => !string.IsNullOrWhiteSpace(providerId) && !string.IsNullOrWhiteSpace(modelId)
+            && _pendingCatalogCommands.ContainsKey(ProviderCatalogIdentity.EntryId(providerId, modelId));
 
     protected override async Task OnInitializedAsync()
     {
@@ -366,6 +441,43 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            try
+            {
+                foreach (PendingProviderCommand pending in await PendingCommands.LoadAsync(_lifetimeCancellation.Token))
+                {
+                    if (pending.Family == CatalogPendingFamily)
+                    {
+                        _pendingCatalogCommands[pending.ResourceKey] = (pending.Acceptance,
+                            pending.ExpectedCapabilityVersion, pending.ExpectedStatus);
+                        _pendingWrite ??= ProviderCatalogWriteResult.Submitted(pending.Acceptance);
+                        _writeTruth = AgentSetupTruthState.AuthoritativePending;
+                    }
+                    else if (pending.Family == EnablementPendingFamily)
+                    {
+                        _pendingEnablementCommands[pending.ResourceKey] = pending.Acceptance.MessageId;
+                        if (_enablementEntry is null)
+                        {
+                            _enablementEntry = _result?.Entries.FirstOrDefault(entry =>
+                                entry.ProviderId == pending.Acceptance.ProviderId
+                                && entry.ModelId == pending.Acceptance.ModelId);
+                            _enablementTenantId = pending.TenantId;
+                            _enablementTruth = "AuthoritativePending";
+                        }
+                    }
+                }
+            }
+            catch (Exception exception) when (exception is not OperationCanceledException)
+            {
+                _storeUnavailable = true;
+            }
+            finally
+            {
+                _pendingRestoring = false;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
         if (_focusHeadingPending && _listPage is not null)
         {
             _focusHeadingPending = false;
@@ -385,9 +497,16 @@
         _enablementEnabled = true;
     }
 
+    private void OnEnablementTenantChanged()
+    {
+        _enablementWrite = null;
+        _enablementTruth = PendingSelectedEnablement ? "AuthoritativePending" : null;
+    }
+
     private async Task SubmitEnablementAsync()
     {
-        if (_busy || _enablementEntry?.DataHandling is not { } terms)
+        if (_busy || _pendingRestoring || _storeUnavailable || _enablementEntry is null || PendingSelectedEnablement
+            || (_enablementEnabled && _enablementEntry.DataHandling is not { DataHandlingVersion: >= 1 }))
         {
             return;
         }
@@ -404,13 +523,35 @@
         _busy = true;
         try
         {
+            string tenantId = _enablementTenantId.Trim();
+            string providerId = _enablementEntry.ProviderId;
+            string modelId = _enablementEntry.ModelId;
+            string pendingKey = $"{tenantId}:{ProviderCatalogIdentity.EntryId(providerId, modelId)}";
             _enablementWrite = await Gateway.SetTenantEnablementAsync(
-                new SetTenantProviderModelEnablement(_enablementTenantId.Trim(), _enablementEntry.ProviderId,
-                    _enablementEntry.ModelId, _enablementEnabled, revision, terms),
+                new SetTenantProviderModelEnablement(tenantId, providerId,
+                    modelId, _enablementEnabled, revision,
+                    _enablementEnabled ? _enablementEntry.DataHandling : null),
                 _lifetimeCancellation.Token).ConfigureAwait(false);
             if (_enablementWrite.Status is AgentSetupWriteStatus.Submitted)
             {
-                _enablementTruth = "Submitted";
+                _enablementTruth = _enablementWrite.Acceptance?.TruthState == AgentSetupTruthState.ProjectionConfirmed
+                    ? "ProjectionConfirmed" : "Submitted";
+                if (_enablementTruth == "ProjectionConfirmed")
+                {
+                    return;
+                }
+
+                ProviderCatalogCommandAcceptance? acceptance = _enablementWrite.Acceptance;
+                if (acceptance is null)
+                {
+                    _enablementWrite = ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify);
+                    return;
+                }
+
+                _pendingEnablementCommands[pendingKey] = acceptance.MessageId;
+                await PendingCommands.SaveAsync(new PendingProviderCommand(EnablementPendingFamily,
+                    pendingKey, tenantId, acceptance), _lifetimeCancellation.Token);
+
                 await RequestRenderAsync(_lifetimeCancellation.Token);
                 using CancellationTokenSource timeout = new(ProjectionPollingTimeout, TimeProvider);
                 using CancellationTokenSource polling = CancellationTokenSource.CreateLinkedTokenSource(
@@ -419,16 +560,32 @@
                 {
                     while (true)
                     {
+                        AgentSetupWriteStatus outcome = await Gateway.GetCommandOutcomeAsync(
+                            tenantId, acceptance.MessageId, polling.Token).ConfigureAwait(false);
+                        if (outcome is AgentSetupWriteStatus.Rejected or AgentSetupWriteStatus.Unavailable)
+                        {
+                            await RemovePendingEnablementAsync(pendingKey, acceptance.MessageId);
+                            _enablementWrite = ProviderCatalogWriteResult.Failed(outcome);
+                            _enablementTruth = null;
+                            break;
+                        }
+
+                        if (outcome == AgentSetupWriteStatus.AlreadyApplied)
+                        {
+                            await RemovePendingEnablementAsync(pendingKey, acceptance.MessageId);
+                            _enablementTruth = "ProjectionConfirmed";
+                            break;
+                        }
+
                         TenantProviderEnablementInspectionResult current = await Gateway.GetTenantEnablementAsync(
-                            _enablementTenantId.Trim(), _enablementEntry.ProviderId, _enablementEntry.ModelId,
+                            tenantId, providerId, modelId,
                             polling.Token).ConfigureAwait(false);
-                        bool confirmed = _enablementWrite.Acceptance is { MessageId: { Length: > 0 } messageId }
-                            && string.Equals(current.LastEnablementMessageId, messageId, StringComparison.Ordinal)
-                            && current.Status == ProviderCatalogInspectionStatus.Success
-                            && current.Enabled == _enablementEnabled && current.Revision > revision;
+                        bool confirmed = current?.ProjectedCommandMessageIds?.Contains(acceptance.MessageId, StringComparer.Ordinal) == true
+                            && outcome == AgentSetupWriteStatus.AwaitingProjection;
                         _enablementTruth = confirmed ? "ProjectionConfirmed" : "AuthoritativePending";
                         if (confirmed)
                         {
+                            await RemovePendingEnablementAsync(pendingKey, acceptance.MessageId);
                             break;
                         }
 
@@ -441,6 +598,64 @@
                     _enablementTruth = "AuthoritativePending";
                 }
             }
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            _storeUnavailable = true;
+            _enablementTruth = "AuthoritativePending";
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task CheckPendingEnablementAsync()
+    {
+        if (_busy || _enablementEntry is null || SelectedEnablementKey is not { } key
+            || !_pendingEnablementCommands.TryGetValue(key, out string? messageId))
+        {
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            AgentSetupWriteStatus outcome = await Gateway.GetCommandOutcomeAsync(
+                _enablementTenantId.Trim(), messageId, _lifetimeCancellation.Token).ConfigureAwait(false);
+            if (outcome is AgentSetupWriteStatus.Rejected or AgentSetupWriteStatus.Unavailable)
+            {
+                await RemovePendingEnablementAsync(key, messageId);
+                _enablementWrite = ProviderCatalogWriteResult.Failed(outcome);
+                _enablementTruth = null;
+                return;
+            }
+
+            if (outcome == AgentSetupWriteStatus.AlreadyApplied)
+            {
+                await RemovePendingEnablementAsync(key, messageId);
+                _enablementTruth = "ProjectionConfirmed";
+                return;
+            }
+
+            TenantProviderEnablementInspectionResult current = await Gateway.GetTenantEnablementAsync(
+                _enablementTenantId.Trim(), _enablementEntry.ProviderId, _enablementEntry.ModelId,
+                _lifetimeCancellation.Token).ConfigureAwait(false);
+            if (outcome == AgentSetupWriteStatus.AwaitingProjection
+                && current?.ProjectedCommandMessageIds?.Contains(messageId, StringComparer.Ordinal) == true)
+            {
+                await RemovePendingEnablementAsync(key, messageId);
+                _enablementTruth = "ProjectionConfirmed";
+            }
+            else
+            {
+                _enablementTruth = "AuthoritativePending";
+            }
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            _storeUnavailable = true;
+            _enablementTruth = "AuthoritativePending";
         }
         finally
         {
@@ -465,11 +680,16 @@
             if ((current.Status is ProviderCatalogInspectionStatus.Success or ProviderCatalogInspectionStatus.EntryNotFound)
                 && current.Revision is { } revision)
             {
+                _enablementTruth = null;
                 _enablementExpectedRevision = revision.ToString(CultureInfo.InvariantCulture);
                 if (current.Enabled is { } enabled)
                 {
                     _enablementEnabled = enabled;
                 }
+            }
+            else if (current.TruthState == AgentSetupTruthState.AuthoritativePending)
+            {
+                _enablementTruth = "AuthoritativePending";
             }
         }
         finally
@@ -480,6 +700,8 @@
 
     private void BeginCreate()
     {
+        _pendingWrite = null;
+        _writeTruth = AgentSetupTruthState.Unknown;
         _editing = false;
         _editorOpen = true;
         _editingEntry = null;
@@ -494,8 +716,15 @@
         _timeoutMs = "30000";
         _maxRetries = "3";
         _configurationReference = string.Empty;
+        _clearConfigurationReference = false;
+        _supportsTextGeneration = true;
+        _createEnabled = true;
+        _supportsStreaming = false;
+        _supportsToolCalling = false;
+        _supportsVision = false;
+        _supportsStructuredOutput = false;
         _retentionDays = string.Empty;
-        _trainingUse = string.Empty;
+        _trainingUse = false;
         _processingRegions = string.Empty;
         _termsReference = string.Empty;
         _declareTightening = false;
@@ -504,6 +733,8 @@
 
     private void BeginEdit(ProviderCatalogEntryView entry)
     {
+        _pendingWrite = null;
+        _writeTruth = AgentSetupTruthState.Unknown;
         _editing = true;
         _editorOpen = true;
         _editingEntry = entry;
@@ -519,8 +750,14 @@
         _maxRetries = entry.TimeoutPolicy.MaxRetries.ToString(CultureInfo.InvariantCulture);
         // Never prefill the stored configuration reference — the grid and editor must not render it.
         _configurationReference = string.Empty;
+        _clearConfigurationReference = false;
+        _supportsTextGeneration = entry.SupportsTextGeneration;
+        _supportsStreaming = entry.SafeCapabilityFlags.HasFlag(ProviderModelCapabilityFlags.Streaming);
+        _supportsToolCalling = entry.SafeCapabilityFlags.HasFlag(ProviderModelCapabilityFlags.ToolCalling);
+        _supportsVision = entry.SafeCapabilityFlags.HasFlag(ProviderModelCapabilityFlags.Vision);
+        _supportsStructuredOutput = entry.SafeCapabilityFlags.HasFlag(ProviderModelCapabilityFlags.StructuredOutput);
         _retentionDays = entry.DataHandling?.RetentionDays.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
-        _trainingUse = entry.DataHandling?.AllowsTrainingUse.ToString() ?? string.Empty;
+        _trainingUse = entry.DataHandling?.AllowsTrainingUse ?? false;
         _processingRegions = entry.DataHandling is { } terms ? string.Join(",", terms.ProcessingRegions) : string.Empty;
         _termsReference = entry.DataHandling?.TermsReferenceId ?? string.Empty;
         _declareTightening = false;
@@ -542,19 +779,45 @@
         return SubmitAsync(
             async ct =>
             {
+                bool requiresTerms = (_editing
+                        ? _editingEntry is { Status: ProviderModelStatus.Enabled } or { DataHandling: not null }
+                        : _createEnabled)
+                    || !string.IsNullOrWhiteSpace(_retentionDays)
+                    || !string.IsNullOrWhiteSpace(_processingRegions)
+                    || !string.IsNullOrWhiteSpace(_termsReference)
+                    || _trainingUse;
+                ProviderDataHandlingRecord? dataHandling = null;
                 if (!TryBuildPricing(out ProviderModelPricing? pricing) || pricing is null
-                    || !TryBuildDataHandling(out ProviderDataHandlingRecord? dataHandling) || dataHandling is null
+                    || requiresTerms && (!TryBuildDataHandling(out dataHandling) || dataHandling is null)
                     || !TryBuildLimits(out int contextWindow, out int maxOutput, out ProviderModelTimeoutPolicy? timeout)
                     || timeout is null)
                 {
                     return ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed);
                 }
 
-                string? configurationReference = string.IsNullOrWhiteSpace(_configurationReference)
-                    ? _editingEntry?.ConfigurationReferenceId
-                    : _configurationReference.Trim();
-                ProviderModelCapabilityFlags flags = _editingEntry?.SafeCapabilityFlags ?? ProviderModelCapabilityFlags.None;
-                bool supportsTextGeneration = _editingEntry?.SupportsTextGeneration ?? true;
+                string? configurationReference = _clearConfigurationReference
+                    ? null
+                    : string.IsNullOrWhiteSpace(_configurationReference)
+                        ? _editingEntry?.ConfigurationReferenceId
+                        : _configurationReference.Trim();
+                ProviderModelCapabilityFlags flags = ProviderModelCapabilityFlags.None;
+                if (_supportsStreaming)
+                {
+                    flags |= ProviderModelCapabilityFlags.Streaming;
+                }
+                if (_supportsToolCalling)
+                {
+                    flags |= ProviderModelCapabilityFlags.ToolCalling;
+                }
+                if (_supportsVision)
+                {
+                    flags |= ProviderModelCapabilityFlags.Vision;
+                }
+                if (_supportsStructuredOutput)
+                {
+                    flags |= ProviderModelCapabilityFlags.StructuredOutput;
+                }
+                bool supportsTextGeneration = _supportsTextGeneration;
 
                 if (_editing)
                 {
@@ -581,7 +844,7 @@
                         providerId,
                         modelId,
                         _displayLabel,
-                        Enabled: true,
+                        Enabled: _createEnabled,
                         supportsTextGeneration,
                         contextWindow,
                         maxOutput,
@@ -601,8 +864,8 @@
     private Task SubmitLifecycleAsync(ProviderCatalogEntryView entry, bool enable)
         => SubmitAsync(
             ct => enable
-                ? Gateway.EnableAsync(new EnableProviderModelEntry(entry.ProviderId, entry.ModelId), ct)
-                : Gateway.DisableAsync(new DisableProviderModelEntry(entry.ProviderId, entry.ModelId), ct),
+                ? Gateway.EnableAsync(new EnableProviderModelEntry(entry.ProviderId, entry.ModelId, entry.LifecycleRevision), ct)
+                : Gateway.DisableAsync(new DisableProviderModelEntry(entry.ProviderId, entry.ModelId, entry.LifecycleRevision), ct),
             entry.ProviderId,
             entry.ModelId,
             expectedCapabilityVersion: null,
@@ -615,7 +878,14 @@
         int? expectedCapabilityVersion,
         ProviderModelStatus? expectedStatus)
     {
-        if (_busy)
+        if (string.IsNullOrWhiteSpace(providerId) || string.IsNullOrWhiteSpace(modelId))
+        {
+            _pendingWrite = ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed);
+            return;
+        }
+
+        string entryKey = ProviderCatalogIdentity.EntryId(providerId, modelId);
+        if (_busy || _pendingRestoring || _storeUnavailable || _pendingCatalogCommands.ContainsKey(entryKey))
         {
             return;
         }
@@ -630,18 +900,17 @@
             _pendingWrite = writeResult;
             if (_pendingWrite.Status is AgentSetupWriteStatus.Submitted)
             {
+                _writeTruth = _pendingWrite.Acceptance?.TruthState ?? AgentSetupTruthState.Submitted;
                 _editorOpen = false;
                 await RequestRenderAsync(cancellationToken).ConfigureAwait(false);
-                bool confirmed = await RefreshAfterWriteAsync(
-                        providerId,
-                        modelId,
-                        expectedCapabilityVersion,
-                        expectedStatus,
-                        cancellationToken)
-                    .ConfigureAwait(false);
-                if (confirmed && !_disposed)
+                if (_writeTruth != AgentSetupTruthState.ProjectionConfirmed
+                    && _pendingWrite.Acceptance is { } acceptance)
                 {
-                    _pendingWrite = null;
+                    _pendingCatalogCommands[entryKey] = (acceptance, expectedCapabilityVersion, expectedStatus);
+                    await PendingCommands.SaveAsync(new PendingProviderCommand(CatalogPendingFamily,
+                        entryKey, "system", acceptance, expectedCapabilityVersion, expectedStatus), cancellationToken);
+                    await RefreshAfterWriteAsync(providerId, modelId, expectedCapabilityVersion,
+                        expectedStatus, acceptance, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -650,7 +919,12 @@
         }
         catch (Exception)
         {
-            if (!_disposed && writeResult is not { Status: AgentSetupWriteStatus.Submitted })
+            if (!_disposed && writeResult is { Status: AgentSetupWriteStatus.Submitted })
+            {
+                _storeUnavailable = true;
+                _writeTruth = AgentSetupTruthState.AuthoritativePending;
+            }
+            else if (!_disposed)
             {
                 _pendingWrite = ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
             }
@@ -664,11 +938,12 @@
         }
     }
 
-    private async Task<bool> RefreshAfterWriteAsync(
+    private async Task RefreshAfterWriteAsync(
         string providerId,
         string modelId,
         int? expectedCapabilityVersion,
         ProviderModelStatus? expectedStatus,
+        ProviderCatalogCommandAcceptance acceptance,
         CancellationToken cancellationToken)
     {
         using CancellationTokenSource timeoutCancellation = new(ProjectionPollingTimeout, TimeProvider);
@@ -677,35 +952,122 @@
             timeoutCancellation.Token);
         try
         {
-            await LoadAfterWriteAsync(providerId, modelId, expectedCapabilityVersion, expectedStatus, pollingCancellation.Token)
-                .ConfigureAwait(false);
-            if (_result is not { TruthState: AgentSetupTruthState.AuthoritativePending })
+            while (true)
             {
-                return _result is { TruthState: AgentSetupTruthState.ProjectionConfirmed };
-            }
+                AgentSetupWriteStatus outcome = await Gateway.GetCommandOutcomeAsync(
+                    "system", acceptance.MessageId, pollingCancellation.Token).ConfigureAwait(false);
+                if (outcome is AgentSetupWriteStatus.Rejected or AgentSetupWriteStatus.Unavailable)
+                {
+                    await RemovePendingCatalogAsync(providerId, modelId, acceptance.MessageId, cancellationToken);
+                    _pendingWrite = ProviderCatalogWriteResult.Failed(outcome);
+                    _writeTruth = AgentSetupTruthState.Unknown;
+                    return;
+                }
 
-            await RequestRenderAsync(pollingCancellation.Token).ConfigureAwait(false);
-            while (_result is { TruthState: AgentSetupTruthState.AuthoritativePending })
-            {
-                await Task.Delay(ProjectionPollingInterval, TimeProvider, pollingCancellation.Token).ConfigureAwait(false);
-                await LoadAfterWriteAsync(providerId, modelId, expectedCapabilityVersion, expectedStatus, pollingCancellation.Token)
+                if (outcome == AgentSetupWriteStatus.AlreadyApplied)
+                {
+                    await RemovePendingCatalogAsync(providerId, modelId, acceptance.MessageId, cancellationToken);
+                    _writeTruth = AgentSetupTruthState.ProjectionConfirmed;
+                    return;
+                }
+
+                bool projected = await LoadAfterWriteAsync(providerId, modelId,
+                    expectedCapabilityVersion, expectedStatus, acceptance.MessageId, pollingCancellation.Token)
                     .ConfigureAwait(false);
-            }
+                if (projected && outcome == AgentSetupWriteStatus.AwaitingProjection)
+                {
+                    await RemovePendingCatalogAsync(providerId, modelId, acceptance.MessageId, cancellationToken);
+                    _writeTruth = AgentSetupTruthState.ProjectionConfirmed;
+                    return;
+                }
 
-            return _result is { TruthState: AgentSetupTruthState.ProjectionConfirmed };
+                _writeTruth = AgentSetupTruthState.AuthoritativePending;
+                await RequestRenderAsync(pollingCancellation.Token).ConfigureAwait(false);
+                await Task.Delay(ProjectionPollingInterval, TimeProvider, pollingCancellation.Token).ConfigureAwait(false);
+            }
         }
         catch (OperationCanceledException) when (
             timeoutCancellation.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
         {
-            return false;
+            _writeTruth = AgentSetupTruthState.AuthoritativePending;
         }
     }
 
-    private async Task LoadAfterWriteAsync(
+    private async Task CheckPendingCatalogAsync(string entryKey)
+    {
+        if (_busy || !_pendingCatalogCommands.TryGetValue(entryKey, out var pending))
+        {
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            ProviderCatalogCommandAcceptance acceptance = pending.Acceptance;
+            AgentSetupWriteStatus outcome = await Gateway.GetCommandOutcomeAsync(
+                "system", acceptance.MessageId, _lifetimeCancellation.Token).ConfigureAwait(false);
+            if (outcome is AgentSetupWriteStatus.Rejected or AgentSetupWriteStatus.Unavailable)
+            {
+                await RemovePendingCatalogAsync(acceptance.ProviderId, acceptance.ModelId,
+                    acceptance.MessageId, _lifetimeCancellation.Token);
+                _pendingWrite = ProviderCatalogWriteResult.Failed(outcome);
+                _writeTruth = AgentSetupTruthState.Unknown;
+                return;
+            }
+
+            if (outcome == AgentSetupWriteStatus.AlreadyApplied)
+            {
+                await RemovePendingCatalogAsync(acceptance.ProviderId, acceptance.ModelId,
+                    acceptance.MessageId, _lifetimeCancellation.Token);
+                _writeTruth = AgentSetupTruthState.ProjectionConfirmed;
+                return;
+            }
+
+            bool projected = await LoadAfterWriteAsync(acceptance.ProviderId, acceptance.ModelId,
+                pending.ExpectedCapabilityVersion, pending.ExpectedStatus, acceptance.MessageId,
+                _lifetimeCancellation.Token).ConfigureAwait(false);
+            if (projected && outcome == AgentSetupWriteStatus.AwaitingProjection)
+            {
+                await RemovePendingCatalogAsync(acceptance.ProviderId, acceptance.ModelId,
+                    acceptance.MessageId, _lifetimeCancellation.Token);
+                _writeTruth = AgentSetupTruthState.ProjectionConfirmed;
+            }
+            else
+            {
+                _writeTruth = AgentSetupTruthState.AuthoritativePending;
+            }
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            _storeUnavailable = true;
+            _writeTruth = AgentSetupTruthState.AuthoritativePending;
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task RemovePendingEnablementAsync(string key, string messageId)
+    {
+        await PendingCommands.RemoveAsync(EnablementPendingFamily, key, messageId, _lifetimeCancellation.Token);
+        _pendingEnablementCommands.Remove(key);
+    }
+
+    private async Task RemovePendingCatalogAsync(string providerId, string modelId,
+        string messageId, CancellationToken cancellationToken)
+    {
+        string key = ProviderCatalogIdentity.EntryId(providerId, modelId);
+        await PendingCommands.RemoveAsync(CatalogPendingFamily, key, messageId, cancellationToken);
+        _pendingCatalogCommands.Remove(key);
+    }
+
+    private async Task<bool> LoadAfterWriteAsync(
         string providerId,
         string modelId,
         int? expectedCapabilityVersion,
         ProviderModelStatus? expectedStatus,
+        string messageId,
         CancellationToken cancellationToken)
     {
         ProviderCatalogInspectionResult entry = await Gateway
@@ -717,7 +1079,7 @@
         if (entry.Status is ProviderCatalogInspectionStatus.NotAuthorized)
         {
             _result = entry;
-            return;
+            return false;
         }
 
         ProviderCatalogInspectionResult list = await Gateway
@@ -729,40 +1091,12 @@
         if (list.Status is not ProviderCatalogInspectionStatus.Success)
         {
             _result = list;
-            return;
-        }
-
-        bool caughtUp = IsCaughtUp(entry, providerId, modelId, expectedCapabilityVersion, expectedStatus);
-        _result = list with
-        {
-            Freshness = caughtUp ? AgentSetupFreshness.Current : AgentSetupFreshness.Stale,
-            TruthState = caughtUp ? AgentSetupTruthState.ProjectionConfirmed : AgentSetupTruthState.AuthoritativePending,
-            ProjectionVersion = entry.ProjectionVersion ?? list.ProjectionVersion,
-            ProjectedAt = entry.ProjectedAt ?? list.ProjectedAt,
-        };
-    }
-
-    private static bool IsCaughtUp(
-        ProviderCatalogInspectionResult entry,
-        string providerId,
-        string modelId,
-        int? expectedCapabilityVersion,
-        ProviderModelStatus? expectedStatus)
-    {
-        ProviderCatalogEntryView? row = entry.Entries.FirstOrDefault(item =>
-            string.Equals(item.ProviderId, providerId, StringComparison.Ordinal)
-            && string.Equals(item.ModelId, modelId, StringComparison.Ordinal));
-        if (row is null || entry.Status is not ProviderCatalogInspectionStatus.Success)
-        {
             return false;
         }
 
-        if (expectedCapabilityVersion is { } version && row.CapabilityVersion < version)
-        {
-            return false;
-        }
-
-        return expectedStatus is not { } status || row.Status == status;
+        bool caughtUp = entry.ProjectedCommandMessageIds?.Contains(messageId, StringComparer.Ordinal) == true;
+        _result = list;
+        return caughtUp;
     }
 
     private Task RequestRenderAsync(CancellationToken cancellationToken)
@@ -796,7 +1130,7 @@
     {
         record = null;
         if (!int.TryParse(_retentionDays, NumberStyles.Integer, CultureInfo.InvariantCulture, out int days)
-            || days < 0 || !bool.TryParse(_trainingUse, out bool trainingUse)
+            || days < 0
             || string.IsNullOrWhiteSpace(_termsReference))
         {
             return false;
@@ -808,7 +1142,7 @@
             return false;
         }
 
-        record = new ProviderDataHandlingRecord(days, trainingUse, regions, _termsReference.Trim(), 0);
+        record = new ProviderDataHandlingRecord(days, _trainingUse, regions, _termsReference.Trim(), 0);
         return true;
     }
 

@@ -61,6 +61,13 @@ internal static class ProviderSelectionVerdict
             return ProviderSelectionValidationStatus.Unpriced;
         }
 
+        // The tenant join owns terms eligibility. A platform-valid entry still blocks when its
+        // tenant's accepted terms are absent, declined, expired, or awaiting a fresh projection.
+        if (!entry.IsSelectableForNewActiveUse)
+        {
+            return ProviderSelectionValidationStatus.Unavailable;
+        }
+
         return entry.CapabilityVersion >= 1
             ? ProviderSelectionValidationStatus.Valid
             : ProviderSelectionValidationStatus.Regressed;
@@ -74,9 +81,6 @@ internal static class ProviderSelectionVerdict
             && entry.TimeoutPolicy is { RequestTimeoutMilliseconds: > 0, MaxRetries: >= 0 };
 
     private static bool HasValidPricing(ProviderModelPricing? pricing)
-        => pricing is { PricingVersion: >= 1, InputTokenUnitPrice: >= 0, OutputTokenUnitPrice: >= 0 }
-            && IsIso4217Currency(pricing.Currency);
-
-    private static bool IsIso4217Currency(string? currency)
-        => currency is { Length: 3 } && char.IsAsciiLetter(currency[0]) && char.IsAsciiLetter(currency[1]) && char.IsAsciiLetter(currency[2]);
+        => pricing is { PricingVersion: >= 1, InputTokenUnitPrice: > 0, OutputTokenUnitPrice: > 0 }
+            && Iso4217CurrencyCodes.IsValid(pricing.Currency);
 }

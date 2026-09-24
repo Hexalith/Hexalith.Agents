@@ -1,3 +1,4 @@
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
@@ -7,6 +8,13 @@ namespace Hexalith.Agents.Client;
 /// <summary>Public provider-catalog administration operations.</summary>
 public interface IProviderCatalogOperations
 {
+    /// <summary>Reads the exact EventStore outcome of a previously submitted governance command.</summary>
+    ValueTask<AgentOperationResult<AgentSetupWriteStatus>> GetCommandOutcomeAsync(
+        string targetTenantId,
+        string messageId,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Reads one tenant enablement under Platform Operator authority.</summary>
     ValueTask<AgentOperationResult<TenantProviderEnablementInspectionResult>> GetTenantEnablementAsync(
         string tenantId,

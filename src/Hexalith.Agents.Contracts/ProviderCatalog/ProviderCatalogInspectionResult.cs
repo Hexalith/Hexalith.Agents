@@ -19,13 +19,15 @@ namespace Hexalith.Agents.Contracts.ProviderCatalog;
 /// <param name="ProjectedAt">When the catalog projection was last folded, or <see langword="null"/> when unknown.</param>
 /// <param name="Freshness">Whether the projection reflects the version the caller is waiting for.</param>
 /// <param name="TruthState">The truth stage of this observation.</param>
+/// <param name="ProjectedCommandMessageIds">Recent successful command identities folded into the selected entry stream.</param>
 public record ProviderCatalogInspectionResult(
     ProviderCatalogInspectionStatus Status,
     IReadOnlyList<ProviderCatalogEntryView> Entries,
     string? ProjectionVersion = null,
     DateTimeOffset? ProjectedAt = null,
     AgentSetupFreshness Freshness = AgentSetupFreshness.Unknown,
-    AgentSetupTruthState TruthState = AgentSetupTruthState.Unknown)
+    AgentSetupTruthState TruthState = AgentSetupTruthState.Unknown,
+    IReadOnlyList<string>? ProjectedCommandMessageIds = null)
 {
     /// <summary>Creates a successful inspection result carrying the given safe views and freshness.</summary>
     public static ProviderCatalogInspectionResult Success(

@@ -7,14 +7,14 @@ using Hexalith.Agents.Contracts.ProviderCatalog.Events.Rejections;
 namespace Hexalith.Agents.ProviderCatalog;
 
 /// <summary>
-/// Replay state for the tenant-scoped <c>ProviderCatalog</c> aggregate (AD-2 aggregate boundary). Holds the
-/// catalog's provider/model entries keyed by provider+model identity. State changes only through the
+/// Replay state for a platform <c>ProviderCatalog</c> entry (AD-2 aggregate boundary). Holds the
+/// provider/model entry keyed by provider+model identity. State changes only through the
 /// <c>Apply</c> methods (AD-3); no-op <c>Apply</c> methods for the rejection events keep replay total so a
 /// persisted rejection never breaks rehydration.
 /// </summary>
 public sealed class ProviderCatalogState
 {
-    /// <summary>Gets or sets the provider-catalog aggregate identifier (the tenant's catalog id).</summary>
+    /// <summary>Gets or sets the provider-catalog aggregate identifier.</summary>
     public string CatalogId { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the provider/model entries keyed by <see cref="EntryKey"/>.</summary>
@@ -53,6 +53,7 @@ public sealed class ProviderCatalogState
             ConfigurationState = e.ConfigurationState,
             ConfigurationReferenceId = e.ConfigurationReferenceId,
             CapabilityVersion = e.CapabilityVersion > 0 ? e.CapabilityVersion : 1,
+            LifecycleRevision = 1,
             Pricing = e.Pricing,
             DataHandling = e.DataHandling,
             DataHandlingHistory = e.DataHandling is null ? [] : [e.DataHandling],
@@ -103,6 +104,7 @@ public sealed class ProviderCatalogState
         if (Entries.TryGetValue(EntryKey(e.ProviderId, e.ModelId), out ProviderModelEntryState? entry))
         {
             entry.IsEnabled = true;
+            entry.LifecycleRevision++;
         }
     }
 
@@ -114,6 +116,7 @@ public sealed class ProviderCatalogState
         if (Entries.TryGetValue(EntryKey(e.ProviderId, e.ModelId), out ProviderModelEntryState? entry))
         {
             entry.IsEnabled = false;
+            entry.LifecycleRevision++;
         }
     }
 
@@ -191,6 +194,14 @@ public sealed class ProviderCatalogState
     /// <summary>No-op replay handler — rejection events carry no state change.</summary>
     /// <param name="e">The rejection event.</param>
     public void Apply(ProviderModelEntryStaleRevisionRejection e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+        MarkReplayOnlyEventHandled();
+    }
+
+    /// <summary>No-op replay handler for a stale lifecycle revision.</summary>
+    /// <param name="e">The rejection event.</param>
+    public void Apply(ProviderModelLifecycleRevisionRejected e)
     {
         ArgumentNullException.ThrowIfNull(e);
         MarkReplayOnlyEventHandled();

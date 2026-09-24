@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 
 using Hexalith.Agents.Contracts.ProviderCatalog.Events;
 using Hexalith.Agents.Contracts.ProviderCatalog.Events.Rejections;
+using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.Serialization;
 using Hexalith.Agents.ProviderCatalog;
 
@@ -64,9 +65,28 @@ public static class ProviderCatalogProjectionFold
             }
         }
 
-        return Array.Exists(pending, item => ProviderCatalogEventTypeResolver.Resolve(item.EventTypeName) is null)
-            ? UnresolvedEventReason
-            : null;
+        return Array.Exists(pending, item => ProviderCatalogEventTypeResolver.Resolve(item.EventTypeName) is not { } eventType
+            || Deserialize(item.Payload, eventType) is null)
+            ? UnresolvedEventReason : null;
+    }
+
+    /// <summary>Gets the projected checkpoint, including a pre-upgrade legacy tenant catalog.</summary>
+    public static long Checkpoint(ProviderCatalogReadModel? current, string tenantId, string aggregateId)
+    {
+        if (current is null)
+        {
+            return 0;
+        }
+
+        if (current.StreamSequences.TryGetValue(aggregateId, out long sequence))
+        {
+            return sequence;
+        }
+
+        return string.Equals(aggregateId, tenantId, StringComparison.Ordinal)
+            && string.Equals(current.CatalogId, tenantId, StringComparison.Ordinal)
+            && !string.Equals(tenantId, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal)
+            ? current.LastSequenceNumber : 0;
     }
 
     /// <summary>Folds the delivered slice onto the current read model, returning the next value.</summary>
@@ -77,10 +97,22 @@ public static class ProviderCatalogProjectionFold
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        long checkpoint = current?.StreamSequences.GetValueOrDefault(request.AggregateId) ?? 0;
+        long checkpoint = Checkpoint(current, request.TenantId, request.AggregateId);
         ProviderCatalogState state = ToState(current, request.TenantId);
         DateTimeOffset? projectedAt = current?.ProjectedAt;
         long lastSequence = checkpoint;
+        Dictionary<string, List<string>> commandIds = current?.StreamCommandMessageIds is { } priorIds
+            ? priorIds.ToDictionary(pair => pair.Key, pair => new List<string>(pair.Value), StringComparer.Ordinal)
+            : new(StringComparer.Ordinal);
+        foreach (List<string> identities in commandIds.Values)
+        {
+            ProjectedCommandIdentityWindow.Trim(identities);
+        }
+        if (!commandIds.TryGetValue(request.AggregateId, out List<string>? streamCommandIds))
+        {
+            streamCommandIds = [];
+            commandIds[request.AggregateId] = streamCommandIds;
+        }
 
         foreach (ProjectionEventDto @event in request.Events
                      .Where(item => item.SequenceNumber > checkpoint)
@@ -98,6 +130,12 @@ public static class ProviderCatalogProjectionFold
             }
 
             Apply(state, payload);
+            if (payload is (ProviderModelEntryCreated or ProviderModelEntryMetadataUpdated
+                or ProviderModelEntryEnabled or ProviderModelEntryDisabled)
+                && !string.IsNullOrWhiteSpace(@event.MessageId))
+            {
+                ProjectedCommandIdentityWindow.Add(streamCommandIds, @event.MessageId);
+            }
             lastSequence = Math.Max(lastSequence, @event.SequenceNumber);
             DateTimeOffset timestamp = @event.Timestamp.ToUniversalTime();
             projectedAt = projectedAt is { } known && known >= timestamp ? known : timestamp;
@@ -107,7 +145,7 @@ public static class ProviderCatalogProjectionFold
             ? new(prior, StringComparer.Ordinal)
             : new(StringComparer.Ordinal);
         streamSequences[request.AggregateId] = lastSequence;
-        return ToReadModel(state, request.TenantId, streamSequences, projectedAt);
+        return ToReadModel(state, request.TenantId, streamSequences, commandIds, projectedAt);
     }
 
     /// <summary>Rebuilds the folded catalog state from a persisted read model.</summary>
@@ -138,6 +176,7 @@ public static class ProviderCatalogProjectionFold
                 ConfigurationState = view.ConfigurationState,
                 ConfigurationReferenceId = view.ConfigurationReferenceId,
                 CapabilityVersion = view.CapabilityVersion,
+                LifecycleRevision = view.LifecycleRevision,
                 Pricing = view.Pricing,
                 DataHandling = view.DataHandling,
                 DataHandlingHistory = view.DataHandlingHistory is null ? [] : [.. view.DataHandlingHistory],
@@ -152,6 +191,7 @@ public static class ProviderCatalogProjectionFold
         ProviderCatalogState state,
         string tenantId,
         Dictionary<string, long> streamSequences,
+        Dictionary<string, List<string>> commandIds,
         DateTimeOffset? projectedAt)
         => new()
         {
@@ -162,6 +202,7 @@ public static class ProviderCatalogProjectionFold
                 .ThenBy(entry => entry.ModelId, StringComparer.Ordinal)
                 .Select(ProviderCatalogInspection.ToView)],
             StreamSequences = streamSequences,
+            StreamCommandMessageIds = commandIds,
             LastSequenceNumber = streamSequences.Values.Sum(),
             ProjectedAt = projectedAt,
             ProjectionVersion = streamSequences.Count == 0
@@ -201,6 +242,7 @@ public static class ProviderCatalogProjectionFold
             case InvalidProviderDataHandlingRejection e: state.Apply(e); break;
             case ProviderModelCapabilityVersionRegressedRejection e: state.Apply(e); break;
             case ProviderModelEntryStaleRevisionRejection e: state.Apply(e); break;
+            case ProviderModelLifecycleRevisionRejected e: state.Apply(e); break;
             default: break;
         }
     }

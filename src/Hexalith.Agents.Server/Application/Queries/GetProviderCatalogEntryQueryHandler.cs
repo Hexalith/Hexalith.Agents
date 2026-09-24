@@ -4,6 +4,7 @@ using Hexalith.Agents.Server.Ports;
 using Hexalith.Agents.Server.Projections;
 
 using Hexalith.EventStore.Client.Projections;
+using Hexalith.EventStore.Client.Gateway;
 using Hexalith.EventStore.Contracts.Queries;
 
 using Microsoft.Extensions.Options;
@@ -15,11 +16,20 @@ public sealed class GetProviderCatalogEntryQueryHandler(
     IReadModelStore readModelStore,
     IOptions<ProviderCatalogReadModelOptions> options,
     ITenantAccessReader tenantAccessReader,
-    IAgentAdministrationContextProvider contextProvider)
-    : ProviderCatalogQueryHandlerBase(readModelStore, options, tenantAccessReader, contextProvider)
+    IAgentAdministrationContextProvider contextProvider,
+    IEventStoreGatewayClient? gateway = null,
+    TimeProvider? clock = null)
+    : ProviderCatalogQueryHandlerBase(readModelStore, options, tenantAccessReader, contextProvider, gateway, clock)
 {
     /// <inheritdoc />
     public override string QueryType => GetProviderCatalogEntryQuery.QueryType;
+
+    /// <inheritdoc />
+    protected override (string? ProviderId, string? ModelId) GetRequestedEntry(QueryEnvelope query)
+    {
+        GetProviderCatalogEntryQuery? payload = ReadPayload<GetProviderCatalogEntryQuery>(query.Payload);
+        return (payload?.ProviderId, payload?.ModelId);
+    }
 
     /// <inheritdoc />
     protected override ProviderCatalogInspectionResult CreateResult(ProviderCatalogReadModel? model, QueryEnvelope query)
@@ -38,12 +48,13 @@ public sealed class GetProviderCatalogEntryQueryHandler(
     protected override TenantProviderCatalogInspectionResult CreateTenantResult(
         ProviderCatalogReadModel? platform,
         TenantProviderEnablementReadModel? tenant,
-        QueryEnvelope query)
+        QueryEnvelope query,
+        DateTimeOffset evaluatedAt)
     {
         GetProviderCatalogEntryQuery? payload = ReadPayload<GetProviderCatalogEntryQuery>(query.Payload);
         return payload is null || string.IsNullOrWhiteSpace(payload.ProviderId) || string.IsNullOrWhiteSpace(payload.ModelId)
             ? new(ProviderCatalogInspectionStatus.EntryNotFound, [])
             : TenantProviderCatalogViewFactory.CreateEntry(
-                platform, tenant, authorized: true, payload.ProviderId, payload.ModelId, DateTimeOffset.UtcNow);
+                platform, tenant, authorized: true, payload.ProviderId, payload.ModelId, evaluatedAt);
     }
 }

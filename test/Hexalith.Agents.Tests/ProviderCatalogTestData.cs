@@ -90,7 +90,7 @@ internal static class ProviderCatalogTestData
             source.SafeCapabilityFlags,
             source.ConfigurationReferenceId,
             pricing ?? AssignPricing(source.Pricing),
-            expectedCapabilityVersion,
+            expectedCapabilityVersion ?? source.InitialCapabilityVersion,
             source.DataHandling);
     }
 
@@ -158,6 +158,7 @@ internal static class ProviderCatalogTestData
                 case InvalidProviderDataHandlingRejection e: state.Apply(e); break;
                 case ProviderModelCapabilityVersionRegressedRejection e: state.Apply(e); break;
                 case ProviderModelEntryStaleRevisionRejection e: state.Apply(e); break;
+                case ProviderModelLifecycleRevisionRejected e: state.Apply(e); break;
                 default: throw new InvalidOperationException($"Unhandled event type '{payload.GetType().Name}' in test apply dispatch.");
             }
         }

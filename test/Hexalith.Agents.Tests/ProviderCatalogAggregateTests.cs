@@ -5,6 +5,7 @@ using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 using Hexalith.Agents.Contracts.ProviderCatalog.Events;
 using Hexalith.Agents.Contracts.ProviderCatalog.Events.Rejections;
 using Hexalith.Agents.ProviderCatalog;
+using Hexalith.Agents.TenantProviderEnablement;
 
 using Hexalith.EventStore.Contracts.Commands;
 using Hexalith.EventStore.Contracts.Results;
@@ -23,6 +24,27 @@ namespace Hexalith.Agents.Tests;
 public sealed class ProviderCatalogAggregateTests
 {
     // ===== Create =====
+
+    [Theory]
+    [InlineData("create")]
+    [InlineData("update")]
+    public void Undefined_safe_capability_bits_reject_without_mutating_catalog(string operation)
+    {
+        ProviderModelCapabilityFlags undefined = ProviderModelCapabilityFlags.Streaming
+            | (ProviderModelCapabilityFlags)(1 << 12);
+        ProviderCatalogState state = StateWith(ValidCreate());
+        DomainResult result = operation == "create"
+            ? ProviderCatalogAggregate.Handle(ValidCreate() with
+            {
+                ModelId = "new-model", SafeCapabilityFlags = undefined,
+            }, state, Envelope(ValidCreate() with { ModelId = "new-model" }))
+            : ProviderCatalogAggregate.Handle(ValidUpdate() with { SafeCapabilityFlags = undefined },
+                state, Envelope(ValidUpdate()));
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.ShouldHaveSingleItem().ShouldBeOfType<InvalidProviderModelMetadataRejection>();
+        state.Entries.ShouldHaveSingleItem().Value.SafeCapabilityFlags.ShouldBe(ValidCreate().SafeCapabilityFlags);
+    }
 
     [Theory]
     [InlineData("create")]
@@ -106,6 +128,16 @@ public sealed class ProviderCatalogAggregateTests
     }
 
     [Fact]
+    public void ISO_currency_validation_accepts_codes_without_a_host_region()
+    {
+        Iso4217CurrencyCodes.IsValid("XCG").ShouldBeTrue();
+        Iso4217CurrencyCodes.IsValid("xau").ShouldBeTrue();
+        Iso4217CurrencyCodes.IsValid("ZZZ").ShouldBeFalse();
+        CreateProviderModelEntry command = ValidCreate() with { Pricing = new("XCG", 0.002m, 0.008m, 1) };
+        ProviderCatalogAggregate.Handle(command, null, Envelope(command)).IsSuccess.ShouldBeTrue();
+    }
+
+    [Fact]
     public void Create_without_provider_admin_produces_denied_and_no_created()
     {
         CreateProviderModelEntry command = ValidCreate();
@@ -142,6 +174,55 @@ public sealed class ProviderCatalogAggregateTests
 
         result.IsNoOp.ShouldBeTrue();
         result.Events.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void Create_duplicate_ignores_a_new_server_stamped_effective_time()
+    {
+        CreateProviderModelEntry original = ValidCreate();
+        ProviderCatalogState state = StateWith(original);
+        CreateProviderModelEntry retry = original with
+        {
+            DataHandling = original.DataHandling! with { EffectiveAt = original.DataHandling.EffectiveAt!.Value.AddMinutes(1) },
+        };
+
+        ProviderCatalogAggregate.Handle(retry, state, Envelope(retry)).IsNoOp.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Enabled_create_without_terms_rejects()
+    {
+        CreateProviderModelEntry command = ValidCreate() with { DataHandling = null };
+
+        ProviderCatalogAggregate.Handle(command, null, Envelope(command)).Events.ShouldHaveSingleItem()
+            .ShouldBeOfType<InvalidProviderDataHandlingRejection>();
+    }
+
+    [Fact]
+    public void Enable_without_terms_rejects()
+    {
+        CreateProviderModelEntry create = ValidCreate(enabled: false) with { DataHandling = null };
+        ProviderCatalogState state = StateWith(create);
+        var command = new EnableProviderModelEntry(create.ProviderId, create.ModelId, 1);
+
+        ProviderCatalogAggregate.Handle(command, state, Envelope(command)).Events.ShouldHaveSingleItem()
+            .ShouldBeOfType<InvalidProviderDataHandlingRejection>();
+    }
+
+    [Fact]
+    public void Create_with_a_client_tightening_declaration_rejects()
+    {
+        ProviderDataHandlingRecord prior = ValidTerms() with { DataHandlingVersion = 0, RetentionDays = 60 };
+        ProviderDataHandlingRecord current = ValidTerms();
+        ProviderDataHandlingTighteningDeclaration declaration = ProviderDataHandlingPolicy.DeclareTightening(
+            prior, current, "operator")!;
+        CreateProviderModelEntry command = ValidCreate() with
+        {
+            DataHandling = current with { TighteningDeclaration = declaration },
+        };
+
+        ProviderCatalogAggregate.Handle(command, null, Envelope(command)).Events.ShouldHaveSingleItem()
+            .ShouldBeOfType<InvalidProviderDataHandlingRejection>();
     }
 
     [Fact]
@@ -267,6 +348,23 @@ public sealed class ProviderCatalogAggregateTests
 
     // ===== Update =====
 
+    [Fact]
+    public void Update_without_expected_capability_version_rejects_before_changing_metadata()
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        UpdateProviderModelEntry command = ValidUpdate() with
+        {
+            DisplayLabel = "New label",
+            ExpectedCapabilityVersion = null,
+        };
+
+        DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
+
+        result.IsRejection.ShouldBeTrue();
+        _ = result.Events.ShouldHaveSingleItem().ShouldBeOfType<InvalidProviderModelMetadataRejection>();
+        state.Entries.ShouldHaveSingleItem().Value.DisplayLabel.ShouldBe(ValidCreate().DisplayLabel);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -303,6 +401,80 @@ public sealed class ProviderCatalogAggregateTests
         }
     }
 
+    [Theory]
+    [InlineData(30)]
+    [InlineData(60)]
+    public void Declared_unchanged_or_loosened_terms_reject(int retentionDays)
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        UpdateProviderModelEntry command = ValidUpdate() with
+        {
+            DataHandling = ValidTerms() with
+            {
+                RetentionDays = retentionDays,
+                DataHandlingVersion = 0,
+                EffectiveAt = ValidTerms().EffectiveAt!.Value.AddDays(1),
+            },
+            DeclareDataHandlingTightening = true,
+        };
+
+        ProviderCatalogAggregate.Handle(command, state, Envelope(command)).Events.ShouldHaveSingleItem()
+            .ShouldBeOfType<InvalidProviderDataHandlingRejection>();
+    }
+
+    [Fact]
+    public void Update_with_a_client_supplied_tightening_declaration_rejects_without_changing_history()
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        ProviderModelEntryState entry = state.Entries.ShouldHaveSingleItem().Value;
+        ProviderDataHandlingRecord previous = entry.DataHandling.ShouldNotBeNull();
+        ProviderDataHandlingRecord proposed = previous with
+        {
+            RetentionDays = 14,
+            DataHandlingVersion = 2,
+            EffectiveAt = previous.EffectiveAt!.Value.AddDays(1),
+        };
+        ProviderDataHandlingTighteningDeclaration supplied = ProviderDataHandlingPolicy.DeclareTightening(
+            previous, proposed, "client-actor").ShouldNotBeNull();
+        UpdateProviderModelEntry command = ValidUpdate() with
+        {
+            DataHandling = proposed with { TighteningDeclaration = supplied },
+        };
+
+        DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.ShouldHaveSingleItem().ShouldBeOfType<InvalidProviderDataHandlingRejection>();
+        entry.CapabilityVersion.ShouldBe(1);
+        entry.DataHandlingHistory.ShouldHaveSingleItem().ShouldBe(previous);
+    }
+
+    [Fact]
+    public void Terms_history_fold_controls_tenant_eligibility_after_loosening()
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        ProviderDataHandlingRecord accepted = state.Entries.ShouldHaveSingleItem().Value.DataHandling.ShouldNotBeNull();
+        UpdateProviderModelEntry tightening = ValidUpdate() with
+        {
+            DataHandling = accepted with { RetentionDays = 14, DataHandlingVersion = 0, EffectiveAt = accepted.EffectiveAt!.Value.AddDays(1) },
+            DeclareDataHandlingTightening = true,
+        };
+        ApplyAll(state, ProviderCatalogAggregate.Handle(tightening, state, Envelope(tightening)));
+        ProviderDataHandlingRecord first = state.Entries.ShouldHaveSingleItem().Value.DataHandling.ShouldNotBeNull();
+        UpdateProviderModelEntry loosening = ValidUpdate() with
+        {
+            ExpectedCapabilityVersion = 2,
+            DataHandling = first with { RetentionDays = 60, DataHandlingVersion = 0, TighteningDeclaration = null,
+                EffectiveAt = first.EffectiveAt!.Value.AddDays(1) },
+        };
+        ApplyAll(state, ProviderCatalogAggregate.Handle(loosening, state, Envelope(loosening)));
+
+        IReadOnlyList<ProviderDataHandlingRecord> history = state.Entries.ShouldHaveSingleItem().Value.DataHandlingHistory;
+        history.Select(item => item.DataHandlingVersion).ShouldBe([1, 2, 3]);
+        TenantProviderEligibility.Evaluate(new TenantProviderEntryState { Enabled = true, AcceptedTerms = accepted },
+            history, first.EffectiveAt!.Value.AddDays(2)).Status.ShouldBe("TermsChanged");
+    }
+
     [Fact]
     public void Update_existing_entry_changes_metadata_produces_updated()
     {
@@ -317,7 +489,8 @@ public sealed class ProviderCatalogAggregateTests
             new ProviderModelTimeoutPolicy(45_000, 2),
             ProviderModelCapabilityFlags.Streaming,
             "cfg-openai-gpt4o",
-            ValidPricing());
+            ValidPricing(),
+            ExpectedCapabilityVersion: 1);
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 
@@ -404,7 +577,8 @@ public sealed class ProviderCatalogAggregateTests
             create.TimeoutPolicy,
             create.SafeCapabilityFlags,
             create.ConfigurationReferenceId,
-            ValidPricing());
+            ValidPricing(),
+            ExpectedCapabilityVersion: 1);
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 
@@ -460,10 +634,35 @@ public sealed class ProviderCatalogAggregateTests
     // ===== Enable / Disable =====
 
     [Fact]
+    public void Two_operators_cannot_reverse_a_lifecycle_change_with_stale_intent()
+    {
+        ProviderCatalogState state = StateWith(ValidCreate(enabled: true));
+        var disable = new DisableProviderModelEntry("openai", "gpt-4o", 1);
+        DomainResult first = ProviderCatalogAggregate.Handle(disable, state, Envelope(disable));
+        first.IsSuccess.ShouldBeTrue();
+        state.Apply(first.Events[0].ShouldBeOfType<ProviderModelEntryDisabled>());
+        state.Entries.Values.ShouldHaveSingleItem().LifecycleRevision.ShouldBe(2);
+
+        var staleEnable = new EnableProviderModelEntry("openai", "gpt-4o", 1);
+        ProviderCatalogAggregate.Handle(staleEnable, state, Envelope(staleEnable)).Events.ShouldHaveSingleItem()
+            .ShouldBeOfType<ProviderModelLifecycleRevisionRejected>();
+        var missingRevision = new EnableProviderModelEntry("openai", "gpt-4o");
+        ProviderCatalogAggregate.Handle(missingRevision, state, Envelope(missingRevision)).Events.ShouldHaveSingleItem()
+            .ShouldBeOfType<ProviderModelLifecycleRevisionRejected>();
+        state.Entries.Values.ShouldHaveSingleItem().IsEnabled.ShouldBeFalse();
+
+        var currentEnable = new EnableProviderModelEntry("openai", "gpt-4o", 2);
+        DomainResult second = ProviderCatalogAggregate.Handle(currentEnable, state, Envelope(currentEnable));
+        second.IsSuccess.ShouldBeTrue();
+        state.Apply(second.Events[0].ShouldBeOfType<ProviderModelEntryEnabled>());
+        state.Entries.Values.ShouldHaveSingleItem().LifecycleRevision.ShouldBe(3);
+    }
+
+    [Fact]
     public void Disable_enabled_entry_produces_disabled()
     {
         ProviderCatalogState state = StateWith(ValidCreate(enabled: true));
-        var command = new DisableProviderModelEntry("openai", "gpt-4o");
+        var command = new DisableProviderModelEntry("openai", "gpt-4o", 1);
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 
@@ -477,7 +676,7 @@ public sealed class ProviderCatalogAggregateTests
     public void Disable_already_disabled_produces_lifecycle_already_set()
     {
         ProviderCatalogState state = StateWith(ValidCreate(enabled: false));
-        var command = new DisableProviderModelEntry("openai", "gpt-4o");
+        var command = new DisableProviderModelEntry("openai", "gpt-4o", 1);
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 
@@ -504,7 +703,7 @@ public sealed class ProviderCatalogAggregateTests
     public void Disable_without_provider_admin_produces_denied()
     {
         ProviderCatalogState state = StateWith(ValidCreate());
-        var command = new DisableProviderModelEntry("openai", "gpt-4o");
+        var command = new DisableProviderModelEntry("openai", "gpt-4o", 1);
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command, isProviderAdmin: false));
 
@@ -516,7 +715,7 @@ public sealed class ProviderCatalogAggregateTests
     public void Enable_disabled_entry_produces_enabled()
     {
         ProviderCatalogState state = StateWith(ValidCreate(enabled: false));
-        var command = new EnableProviderModelEntry("openai", "gpt-4o");
+        var command = new EnableProviderModelEntry("openai", "gpt-4o", 1);
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 
@@ -528,7 +727,7 @@ public sealed class ProviderCatalogAggregateTests
     public void Enable_already_enabled_produces_lifecycle_already_set()
     {
         ProviderCatalogState state = StateWith(ValidCreate(enabled: true));
-        var command = new EnableProviderModelEntry("openai", "gpt-4o");
+        var command = new EnableProviderModelEntry("openai", "gpt-4o", 1);
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 
@@ -554,7 +753,7 @@ public sealed class ProviderCatalogAggregateTests
     public void Enable_without_provider_admin_produces_denied()
     {
         ProviderCatalogState state = StateWith(ValidCreate(enabled: false));
-        var command = new EnableProviderModelEntry("openai", "gpt-4o");
+        var command = new EnableProviderModelEntry("openai", "gpt-4o", 1);
 
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command, isProviderAdmin: false));
 
