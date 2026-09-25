@@ -2,7 +2,7 @@
 title: '5.3 Migrate Provider Governance to Platform Catalog and Tenant Enablement'
 type: 'feature'
 created: '2026-09-23'
-status: 'done'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 5
 baseline_commit: '1d69f3f349b76716fca20ef126ae35ed4a6c4d40'
@@ -259,6 +259,57 @@ Code review 2026-09-25, group 1 of 3: domain aggregates (`src/Hexalith.Agents`),
 - low — Divergent same-state `MigratedFrom` retry bumps revision: already adjudicated.
 - low — `LifecycleRevision` overflow at `int.MaxValue`: not reachable in normal use.
 - low — Unknown-currency test uses `0m` prices: currency is rejected before price checks, so the test still isolates currency.
+
+### Review Findings — group 3 first pass (2026-09-25)
+
+Code review 2026-09-25, group 3 of 3: client (`src/Hexalith.Agents.Client`), UI (`src/Hexalith.Agents.UI`), `test/Hexalith.Agents.UI.Tests`, and `eng/verify-story-5.3.ps1`, diff `1d69f3f..54a5ad5` (submodule pointers and `_bmad-output` artifacts excluded). Layers: Blind Hunter, Edge Case Hunter, Verification Gap, Acceptance Auditor (none failed). Group 2 (server/EventStore/projections) remains to be reviewed. Items already adjudicated in earlier passes were re-checked, not re-litigated.
+
+- [ ] [Review][Patch] Map `PublishFailed` to `AwaitingProjection` so a stored-but-unpublished command keeps its pending lock until the exact message projects [src/Hexalith.Agents.Server/Application/Agents/EventStoreProviderCatalogOperations.cs:124] — Decision 2026-09-25 (option a): `PublishFailed` means events were stored and EventStore drain recovery republishes them; today it maps to `Unavailable`, which every UI outcome loop treats as terminal, releasing the lock and showing a failure for a persisted governance change. `TimedOut` stays `Unavailable`. Add a server outcome test.
+- [ ] [Review][Patch] Show training use to tenants as allowed/not allowed, not "Selectable"/"Not selectable" [src/Hexalith.Agents.UI/Components/Pages/TenantProviderCatalog.razor:88] — both the terms line and the tightening-diff line reuse `Agents.ProviderCatalog.Selectable.*`, so the tenant confirms "Training use: Selectable". Add English/French allowed/not-allowed keys, use them on both lines, and assert the tenant training line in both cultures.
+- [ ] [Review][Patch] Surface every restored pending tenant enablement, independent of list-load timing [src/Hexalith.Agents.UI/Components/Pages/ProviderCatalog.razor:459] — first-render restore resolves `_enablementEntry` from `_result`, which is usually still null with an async gateway, and restores only the first pending enablement; the lock holds but its check-pending action is unreachable unless the operator knows and retypes the tenant. Render a check-pending action per pending enablement (as for catalog commands) or resolve after the list loads.
+- [ ] [Review][Patch] Give feedback when enabling a tenant for an entry without terms [src/Hexalith.Agents.UI/Components/Pages/ProviderCatalog.razor:510] — `SubmitEnablementAsync` returns silently and Save is not disabled for this case; set `ValidationFailed` before returning.
+- [ ] [Review][Patch] Disable the enablement tenant, revision, and enabled inputs while a write is in flight [src/Hexalith.Agents.UI/Components/Pages/ProviderCatalog.razor:188] — editing the tenant during polling resets the editor, then the loop writes the old tenant's truth or failure under the newly typed tenant.
+- [ ] [Review][Patch] Map a failed command-outcome read to `UnableToVerify` (keep `NotAuthorized`) instead of `Unavailable` [src/Hexalith.Agents.UI/Services/Gateways/AgentsClientProviderCatalogGateway.cs:29] — the UI treats `Unavailable` as terminal and drops the lock, so an unverifiable read (e.g. the unavailable client) releases a command whose fate is unknown.
+- [ ] [Review][Patch] Localize the tightening declaration role basis [src/Hexalith.Agents.UI/Components/Pages/TenantProviderCatalog.razor:97] — the raw `Agents.PlatformOperator` identifier is interpolated into the English and French declaration text.
+- [ ] [Review][Patch] Assert the page `[Authorize]` policies: `ProviderCatalog` = `Agents.PlatformOperator`, `TenantProviderCatalog` = `Agents.Administrator` [test/Hexalith.Agents.UI.Tests/AgentsNavigationTests.cs:122] — render tests bypass page authorization, so reverting the operator page to the administrator policy passes every test.
+- [ ] [Review][Patch] Test the live gateway's new members: `GetCommandOutcomeAsync` success pass-through and failure mapping, the `Rejected` write mapping, and tenant read failure mapping [src/Hexalith.Agents.UI/Services/Gateways/AgentsClientProviderCatalogGateway.cs:22]
+- [ ] [Review][Patch] Assert `IPendingProviderCommandStore` is registered Scoped as `BrowserSessionPendingProviderCommandStore` in the UI composition test [src/Hexalith.Agents.UI/Services/Gateways/AgentsUiServiceCollectionExtensions.cs:32]
+- [ ] [Review][Patch] Extend the deferred-gateway and unavailable-client fail-closed tests to the new enablement/decision writes, tenant reads, and outcome read [src/Hexalith.Agents.UI/Services/Gateways/DeferredProviderCatalogGateway.cs:37]
+- [ ] [Review][Patch] Test that an enabled Decline submits `Accepted == false` with the exact version, revision, and justification [src/Hexalith.Agents.UI/Components/Pages/TenantProviderCatalog.razor:118]
+- [ ] [Review][Patch] Test an edit that changes terms and sets the tightening switch, asserting `DataHandling` values and `DeclareDataHandlingTightening == true` [src/Hexalith.Agents.UI/Components/Pages/ProviderCatalog.razor:840]
+- [ ] [Review][Patch] Test that Rejected and Unavailable outcomes empty the pending store and re-enable the entry for catalog, enablement, and decision families [src/Hexalith.Agents.UI/Components/Pages/ProviderCatalog.razor:961]
+- [ ] [Review][Patch] Test that "Load tenant state" fills the revision and enabled controls without manual edits [src/Hexalith.Agents.UI/Components/Pages/ProviderCatalog.razor:686]
+- [ ] [Review][Patch] Correct the stale "nine ordered entries … Order 8" comment in the ten-entry navigation test [test/Hexalith.Agents.UI.Tests/AgentsNavigationTests.cs:29]
+
+**Rejected (group 3 first pass):**
+
+- low — `_storeUnavailable` latches on any post-submission or check-pending exception, with no explanatory message: already adjudicated (FB8); the page stays fail-closed and session locks recover on reload.
+- low — Pre-submission gateway exception shows `AuthoritativePending`: same FB8 fail-closed path; the server write operations return typed failures rather than throwing.
+- low — Grace refresh does not retry after a read failure: already adjudicated (LD9, FB10, R25B6).
+- false — Grace refresh stops while a lagging projection or skewed clock still reports `Grace`: the UI gateway calls the in-process client with the same host `TimeProvider`, and eligibility is evaluated at read time, so a read at the exclusive deadline returns expired.
+- false — Tenant page requests platform-disabled entries (`includeDisabled: true`): `TenantProviderCatalogViewFactory` always requires tenant enablement; platform-disabled rows show the required `PlatformNotReady` blocker (BH2 adjudication).
+- false — `LoadEnablementRevisionAsync` exception crashes the circuit: the server read catches store failures and returns `Unavailable`; the gateway does not throw.
+- low — Load gives no feedback for `NotAuthorized`/`Unavailable`: uncommon; a stale revision is rejected as `Conflict` on submit.
+- low — Expected revision is a free-text field defaulting to `0`: by design with the Load action; the server rejects stale revisions.
+- low — Pending decisions are visible only after selecting the row, and an entry whose terms became null cannot be reviewed: the lock holds; enabled entries always carry terms.
+- low — Hard-coded `system`, `current`, role, and `Grace` literals: values match `ProviderCatalogIdentity` and `HttpAgentAdministrationContextProvider`; no divergence shown.
+- low — The store repeats the server's tenant-claim order: identical list today; the key only scopes session storage, so drift cannot disclose data.
+- low — Corrupt or old-schema session JSON throws on load: requires tampering; the key is versioned (`.v1.`).
+- false — The lock is per tab, not per user: the spec scopes advisory locks to the browser session; server revision checks protect cross-tab writes.
+- low — Leftover `expectedStatus`/`ExpectedStatus`/`ExpectedCapabilityVersion` values: no behavior depends on them.
+- low — Truth stages held as strings and unknown `DataHandlingStatus` keys: values are fixed server-side; no typo shown.
+- false — The UI focused filter omits `PendingProviderCommandStoreTests` and `AgentsNavigationTests`: the full UI project also runs (`eng/verify-story-5.3.ps1:175`).
+- low — Verifier hard-codes `bin/Debug/net10.0`, relies on the xunit v3 runner, `-SkipBuild` may use stale builds, and gate labels are dated: all work as written today.
+- low — A focused filter matching zero tests passes vacuously: every current filter matches existing tests (verified); a count guard adds tooling complexity.
+- low — `TryBuildDataHandling` has a redundant whitespace check and no region dedupe: cosmetic; duplicates are rare operator input.
+- low — One shared catalog truth line for several pending commands, and Create/Edit hides a restored truth line: each pending entry keeps its own labelled check-pending action and lock.
+- false — The Fluent switch role test is a tautology: it asserts the role on the rendered element that assistive technology reads, and the change payload is asserted too.
+- false — `Submitted` with null acceptance leaves an unlocked pending state: the gateway returns `Submitted` only with a non-null acceptance.
+- false — Catalog lock removal recomputes the key from echoed IDs: the server echoes the submitted provider/model IDs.
+- low — `System` in another case bypasses the client-side reserved-tenant guard: the server is the authority for tenant scope.
+- low — Nonterminal outcomes keep a lock for the session with no abandon action: required by spec until exact terminal truth; an abandon action adds public UI.
+- low — Check-pending calls use only the lifetime token: the in-process reads are bounded; no hang shown.
+- low — `ConfigureAwait(false)` in component code may race rendering: established repository pattern (13 uses in this page before the story); no observed failure.
 
 ## Implementation Notes
 
