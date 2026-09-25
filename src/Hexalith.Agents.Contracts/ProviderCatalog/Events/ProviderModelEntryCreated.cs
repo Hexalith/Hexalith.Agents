@@ -2,9 +2,11 @@ namespace Hexalith.Agents.Contracts.ProviderCatalog.Events;
 
 /// <summary>
 /// Records that a governed provider/model catalog entry was created (AC1). Display/audit safe: carries only
-/// safe capability metadata, versioned pricing, CapabilityVersion, and a safe configuration reference/state —
-/// never raw credentials, provider SDK options, or secret values (AD-9, AD-14). No wall-clock timestamp is
-/// carried; occurrence time is supplied by the EventStore event metadata (aggregates stay pure — AD-3).
+/// safe capability metadata, versioned pricing, CapabilityVersion, a safe configuration reference/state, the
+/// initial governed terms, and migration provenance — never raw credentials, provider SDK options, or secret
+/// values (AD-9, AD-14). The only times carried are the server-stamped terms <c>EffectiveAt</c> (and any
+/// tightening <c>DeclaredAt</c>); occurrence time is supplied by the EventStore event metadata (aggregates stay
+/// pure — AD-3).
 /// </summary>
 /// <param name="CatalogId">The platform entry stream identifier.</param>
 /// <param name="ProviderId">The provider identifier.</param>

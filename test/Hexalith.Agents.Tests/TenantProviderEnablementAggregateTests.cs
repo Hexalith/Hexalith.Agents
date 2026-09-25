@@ -52,6 +52,28 @@ public sealed class TenantProviderEnablementAggregateTests
     }
 
     [Fact]
+    public void Platform_disable_without_terms_revokes_tenant_visibility()
+    {
+        TenantProviderEnablementState state = Enabled();
+        var command = new SetTenantProviderModelEnablement("tenant-a", "provider", "model", false, 1, CurrentTerms: null);
+
+        var result = TenantProviderEnablementAggregate.Handle(command, state, Envelope(command, "tenant-a", platform: true));
+
+        result.IsSuccess.ShouldBeTrue();
+        TenantProviderModelEnablementSet disabled = result.Events.ShouldHaveSingleItem().ShouldBeOfType<TenantProviderModelEnablementSet>();
+        disabled.Enabled.ShouldBeFalse();
+        disabled.Revision.ShouldBe(2);
+        state.Apply(disabled);
+        state.Revision.ShouldBe(2);
+        TenantProviderEntryState entry = state.Entries.ShouldHaveSingleItem().Value;
+        entry.Enabled.ShouldBeFalse();
+        TenantProviderEligibility.Evaluate(entry, [ProviderCatalogTestData.ValidTerms()], _now)
+            .Status.ShouldBe("MissingEnablementOrTerms");
+        TenantProviderEnablementAggregate.Handle(command with { ExpectedRevision = 2 }, state,
+            Envelope(command, "tenant-a", platform: true)).IsNoOp.ShouldBeTrue();
+    }
+
+    [Fact]
     public void Migrated_enablement_with_historical_terms_version_is_repeatable()
     {
         var terms = ProviderCatalogTestData.ValidTerms() with { DataHandlingVersion = 4 };

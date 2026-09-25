@@ -227,6 +227,39 @@ Code review 2026-09-25, group A of 3: domain aggregates (`src/Hexalith.Agents/{P
 - low — Disable/re-enable keeps earlier acceptance: already adjudicated.
 - already deferred — Explicit pricing-version rule on update is untested (chunk (a), `deferred-work.md`).
 
+### Review Findings — group 1 fourth pass (2026-09-25)
+
+Code review 2026-09-25, group 1 of 3: domain aggregates (`src/Hexalith.Agents`), `src/Hexalith.Agents.Contracts`, and `test/Hexalith.Agents{,.Contracts}.Tests`, diff `1d69f3f..1333b34`. Layers: Blind Hunter, Edge Case Hunter, Verification Gap, Acceptance Auditor (none failed).
+
+- [x] [Review][Patch] Remove the accounting unit `XAD` (Arab Accounting Dinar) from the tender currency set and add an `XAD` row to `Non_currency_iso_codes_cannot_price_a_selectable_entry` [src/Hexalith.Agents.Contracts/ProviderCatalog/Iso4217CurrencyCodes.cs:18] — missed by the 2026-09-25 tender-only decision; an XAD-priced entry passes `HasValidPricing` today.
+- [x] [Review][Patch] Test a platform disable (`Enabled: false`, `CurrentTerms: null`, correct revision) through `TenantProviderEnablementAggregate.Handle`, asserting the event, `Revision == prior + 1`, and `MissingEnablementOrTerms` eligibility after `Apply` [src/Hexalith.Agents/TenantProviderEnablement/TenantProviderEnablementAggregate.cs:43] — every aggregate-level platform command in the tests enables; a regression in the `command.Enabled &&` guard or the no-op check would silently block revocation.
+- [x] [Review][Patch] Test that a metadata-only update after a declared tightening keeps history `[1,2]` and `Grace` eligibility [src/Hexalith.Agents/ProviderCatalog/ProviderCatalogState.cs:90] — no fold test runs an unchanged-terms update after a terms change; weakening the version guard would duplicate history and strip grace unnoticed.
+- [x] [Review][Patch] Test the platform stream-address guard on Update, Enable, and Disable, not only Create [src/Hexalith.Agents/ProviderCatalog/ProviderCatalogAggregate.cs:176] — the coordination policy returns early for `provider-catalog`, so the aggregate check is the only guard and three of four handlers are unpinned.
+- [x] [Review][Patch] Correct the `ProviderModelEntryCreated` summary: it now carries governed terms with trusted `EffectiveAt`/`DeclaredAt` times and `MigratedFrom` provenance [src/Hexalith.Agents.Contracts/ProviderCatalog/Events/ProviderModelEntryCreated.cs:6]
+
+**Rejected (group 1 fourth pass):**
+
+- false — `ConfirmedTerms` unvalidated or version-0 in `DecideProviderDataHandling`: already adjudicated; the server validates and the coordinator enforces the exact platform snapshot.
+- false — Decision replay for a missing entry skips `Revision`: the handler rejects `EntryNotEnabled` before any decision event exists, so no producer reaches that branch.
+- false — Future-dated, backdated, or overflow-near-`MaxValue` `EffectiveAt`: server-stamped by `EventStoreProviderCatalogOperations.cs:577,582`; raw-gateway residual already deferred.
+- false — Changed terms without `EffectiveAt` or declaration never earn grace: undeclared changes are specified to block (`TermsChanged`).
+- false — Disable blocked by stale `CurrentTerms`: the server nulls `CurrentTerms` on disable (already adjudicated).
+- false — View aliases the mutable `DataHandlingHistory`: already adjudicated; views come from freshly replayed state and the projection fold copies.
+- false — `IsPlatformEntry` true on blank IDs; `EntryKey` format change breaks snapshots; state dictionary can hold foreign entries: already adjudicated.
+- false — `ProviderCatalogTestData.CreatedEvent` drops `InitialCapabilityVersion`/`MigratedFrom`: no test passes a migration create through it.
+- rejected by decision 2026-09-24 — Zero unit prices are accepted at write but never selectable.
+- low — `Expected*` revisions declared `int?`: already adjudicated; omission yields an explicit rejection and the change breaks the public contract.
+- low — `IsValid` uses `ToUpperInvariant` rather than ASCII-only folding: the stored code is normalized to a valid ISO code, so no bad value persists.
+- low — `CurrentTerms` not recorded on `TenantProviderModelEnablementSet`: already adjudicated.
+- low — Disable/re-enable keeps earlier acceptance: already adjudicated.
+- low — Projection message IDs on aggregate entry state: already adjudicated.
+- low — Views with `IReadOnlyList` members compare by reference; no-op check relies on `Assign` returning the same instance: no consumer depends on view value equality, and the no-op path is correct as written.
+- low — Stringly typed statuses, role bases, and the 30-day constant: already adjudicated.
+- low — Migration-only `MigratedFrom`/`InitialCapabilityVersion` unchecked in the aggregate: trusted Platform Operator path; bounds already adjudicated.
+- low — Divergent same-state `MigratedFrom` retry bumps revision: already adjudicated.
+- low — `LifecycleRevision` overflow at `int.MaxValue`: not reachable in normal use.
+- low — Unknown-currency test uses `0m` prices: currency is rejected before price checks, so the test still isolates currency.
+
 ## Implementation Notes
 
 The staged implementation adds the reserved `system` catalog, tenant enablement and terms decisions, a Platform Operator migration endpoint, safe tenant joins, recorded tightening declarations, and command-message-specific UI confirmation. Migration reads the operator-supplied legacy tenant inventory from persisted projections and rejects divergent or mismatched records before dispatch. The supplied inventory cannot itself prove that every legacy tenant was named.
@@ -420,3 +453,5 @@ Grace requires each pending version to cumulatively tighten the tenant's accepte
 **2026-09-25 re-review patch result:** `pwsh -NoProfile -File eng/verify-story-5.3.ps1` passed with zero build warnings and no failed or skipped tests after all eleven accepted re-review patches. Focused domain tests passed 115 cases; focused EventStore server/client passed 32/2. Root `git diff --check` passed. The external NC evidence gate remains open.
 
 **2026-09-25 final review result:** Three independent review layers completed; six verified direct fixes were applied and all other findings were triaged above. `pwsh -NoProfile -File eng/verify-story-5.3.ps1` passed with three zero-warning builds, focused EventStore server/client/domain/Agents server/UI suites of 32/2/115/131/40 cases, full owning projects of 689/6/879/761/1132 cases, and composition suites of 9/7 cases; no tests failed or skipped. `git diff --check` passed. `NC-5.3-PLATFORM-CATALOG-SCOPE` remains open pending complete legacy inventory, external gateway registration (DW-21), and live Dapr sidecar evidence.
+
+**2026-09-25 group 1 fourth-pass result:** Four review layers completed on domain and contracts; five verified patches were applied (XAD removed from tender currencies, `ProviderModelEntryCreated` summary corrected, and tests for platform disable, metadata-only history/grace, and the stream-address guard on every handler). `pwsh -NoProfile -File eng/verify-story-5.3.ps1` passed with three zero-warning builds and no failed or skipped tests (domain 904, contracts 689, server 762, UI 1134). Groups 2 (server/EventStore/projections) and 3 (client/UI) remain for review.

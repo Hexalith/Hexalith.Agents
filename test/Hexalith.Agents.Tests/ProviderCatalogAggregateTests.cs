@@ -143,6 +143,7 @@ public sealed class ProviderCatalogAggregateTests
     [InlineData("XTS")]
     [InlineData("xau")]
     [InlineData("XDR")]
+    [InlineData("XAD")]
     [InlineData("XBA")]
     [InlineData("CLF")]
     [InlineData("USN")]
@@ -154,13 +155,27 @@ public sealed class ProviderCatalogAggregateTests
             .ShouldBeOfType<InvalidProviderModelPricingRejection>();
     }
 
-    [Fact]
-    public void A_system_command_addressed_to_another_platform_entry_is_denied()
+    [Theory]
+    [InlineData("create")]
+    [InlineData("update")]
+    [InlineData("enable")]
+    [InlineData("disable")]
+    public void A_system_command_addressed_to_another_platform_entry_is_denied(string operation)
     {
-        CreateProviderModelEntry command = ValidCreate();
         string otherEntryId = ProviderCatalogIdentity.EntryId("other", "model");
+        ProviderCatalogState enabled = StateWith(ValidCreate());
+        ProviderCatalogState disabled = StateWith(ValidCreate(enabled: false));
+        UpdateProviderModelEntry update = ValidUpdate(displayLabel: "Renamed");
+        var enable = new EnableProviderModelEntry("openai", "gpt-4o", ExpectedLifecycleRevision: 1);
+        var disable = new DisableProviderModelEntry("openai", "gpt-4o", ExpectedLifecycleRevision: 1);
 
-        DomainResult result = ProviderCatalogAggregate.Handle(command, null, Envelope(command, catalogId: otherEntryId));
+        DomainResult result = operation switch
+        {
+            "create" => ProviderCatalogAggregate.Handle(ValidCreate(), null, Envelope(ValidCreate(), catalogId: otherEntryId)),
+            "update" => ProviderCatalogAggregate.Handle(update, enabled, Envelope(update, catalogId: otherEntryId)),
+            "enable" => ProviderCatalogAggregate.Handle(enable, disabled, Envelope(enable, catalogId: otherEntryId)),
+            _ => ProviderCatalogAggregate.Handle(disable, enabled, Envelope(disable, catalogId: otherEntryId)),
+        };
 
         result.IsRejection.ShouldBeTrue();
         result.Events.ShouldHaveSingleItem().ShouldBeOfType<ProviderCatalogAdministrationDeniedRejection>();
@@ -585,6 +600,34 @@ public sealed class ProviderCatalogAggregateTests
         history.Select(item => item.DataHandlingVersion).ShouldBe([1, 2, 3]);
         TenantProviderEligibility.Evaluate(new TenantProviderEntryState { Enabled = true, AcceptedTerms = accepted },
             history, first.EffectiveAt!.Value.AddDays(2)).Status.ShouldBe("TermsChanged");
+    }
+
+    [Fact]
+    public void Metadata_only_update_does_not_duplicate_terms_history_or_break_grace()
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        ProviderDataHandlingRecord accepted = state.Entries.ShouldHaveSingleItem().Value.DataHandling.ShouldNotBeNull();
+        UpdateProviderModelEntry tightening = ValidUpdate() with
+        {
+            DataHandling = accepted with { RetentionDays = 14, DataHandlingVersion = 0, EffectiveAt = accepted.EffectiveAt!.Value.AddDays(1) },
+            DeclareDataHandlingTightening = true,
+        };
+        ApplyAll(state, ProviderCatalogAggregate.Handle(tightening, state, Envelope(tightening)));
+        ProviderDataHandlingRecord tightened = state.Entries.ShouldHaveSingleItem().Value.DataHandling.ShouldNotBeNull();
+        UpdateProviderModelEntry relabel = ValidUpdate(displayLabel: "Renamed", expectedCapabilityVersion: 2) with
+        {
+            DataHandling = null,
+        };
+
+        DomainResult result = ProviderCatalogAggregate.Handle(relabel, state, Envelope(relabel));
+        result.IsSuccess.ShouldBeTrue();
+        ApplyAll(state, result);
+
+        ProviderModelEntryState entry = state.Entries.ShouldHaveSingleItem().Value;
+        entry.DisplayLabel.ShouldBe("Renamed");
+        entry.DataHandlingHistory.Select(item => item.DataHandlingVersion).ShouldBe([1, 2]);
+        TenantProviderEligibility.Evaluate(new TenantProviderEntryState { Enabled = true, AcceptedTerms = accepted },
+            entry.DataHandlingHistory, tightened.EffectiveAt!.Value.AddDays(1)).Status.ShouldBe("Grace");
     }
 
     [Fact]
