@@ -132,7 +132,7 @@ public sealed class ProviderCatalogAggregateTests
     public void ISO_currency_validation_accepts_codes_without_a_host_region()
     {
         Iso4217CurrencyCodes.IsValid("XCG").ShouldBeTrue();
-        Iso4217CurrencyCodes.IsValid("xau").ShouldBeTrue();
+        Iso4217CurrencyCodes.IsValid("xof").ShouldBeTrue();
         Iso4217CurrencyCodes.IsValid("ZZZ").ShouldBeFalse();
         CreateProviderModelEntry command = ValidCreate() with { Pricing = new("XCG", 0.002m, 0.008m, 1) };
         ProviderCatalogAggregate.Handle(command, null, Envelope(command)).IsSuccess.ShouldBeTrue();
@@ -141,6 +141,11 @@ public sealed class ProviderCatalogAggregateTests
     [Theory]
     [InlineData("XXX")]
     [InlineData("XTS")]
+    [InlineData("xau")]
+    [InlineData("XDR")]
+    [InlineData("XBA")]
+    [InlineData("CLF")]
+    [InlineData("USN")]
     public void Non_currency_iso_codes_cannot_price_a_selectable_entry(string currency)
     {
         Iso4217CurrencyCodes.IsValid(currency).ShouldBeFalse();
@@ -327,6 +332,22 @@ public sealed class ProviderCatalogAggregateTests
         result.IsRejection.ShouldBeTrue();
         _ = result.Events[0].ShouldBeOfType<ProviderModelEntryAlreadyExistsRejection>();
         result.Events.ShouldNotContain(e => e is ProviderModelEntryCreated);
+    }
+
+    [Theory]
+    [InlineData("terms")]
+    [InlineData("provenance")]
+    public void Create_duplicate_with_different_terms_or_provenance_is_rejected(string difference)
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        CreateProviderModelEntry duplicate = difference == "terms"
+            ? ValidCreate() with { DataHandling = ValidTerms() with { RetentionDays = 60 } }
+            : ValidCreate() with { MigratedFrom = "legacy:tenant-a" };
+
+        DomainResult result = ProviderCatalogAggregate.Handle(duplicate, state, Envelope(duplicate));
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.ShouldHaveSingleItem().ShouldBeOfType<ProviderModelEntryAlreadyExistsRejection>();
     }
 
     [Fact]
@@ -674,6 +695,12 @@ public sealed class ProviderCatalogAggregateTests
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 
         result.IsNoOp.ShouldBeTrue();
+        Effect(result).ShouldBe("AlreadyApplied");
+
+        UpdateProviderModelEntry changed = command with { DisplayLabel = "A New Label" };
+        DomainResult applied = ProviderCatalogAggregate.Handle(changed, state, Envelope(changed));
+        applied.IsSuccess.ShouldBeTrue();
+        Effect(applied).ShouldBe("Applied");
     }
 
     [Fact]
@@ -758,6 +785,7 @@ public sealed class ProviderCatalogAggregateTests
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 
         result.IsSuccess.ShouldBeTrue();
+        Effect(result).ShouldBe("Applied");
         ProviderModelEntryDisabled disabled = result.Events[0].ShouldBeOfType<ProviderModelEntryDisabled>();
         disabled.ProviderId.ShouldBe("openai");
         disabled.ModelId.ShouldBe("gpt-4o");
@@ -811,6 +839,7 @@ public sealed class ProviderCatalogAggregateTests
         DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
 
         result.IsSuccess.ShouldBeTrue();
+        Effect(result).ShouldBe("Applied");
         _ = result.Events[0].ShouldBeOfType<ProviderModelEntryEnabled>();
     }
 
@@ -896,5 +925,11 @@ public sealed class ProviderCatalogAggregateTests
 
         result.IsRejection.ShouldBeTrue();
         _ = result.Events[0].ShouldBeOfType<ProviderCatalogAdministrationDeniedRejection>();
+    }
+
+    private static string Effect(DomainResult result)
+    {
+        using JsonDocument document = JsonDocument.Parse(result.ResultPayload.ShouldNotBeNull());
+        return document.RootElement.GetProperty("effect").GetString().ShouldNotBeNull();
     }
 }

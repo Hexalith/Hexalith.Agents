@@ -380,6 +380,7 @@ public sealed class ProviderCatalogMigrationTests
     [Theory]
     [InlineData("XTS")]
     [InlineData("XXX")]
+    [InlineData("XAU")]
     public async Task Invalid_second_legacy_price_rejects_before_dispatching_the_first_target(string currency)
     {
         SeedLegacy("tenant-a", Entry() with { ProviderId = "a-provider", ModelId = "first" });
@@ -535,8 +536,14 @@ public sealed class ProviderCatalogMigrationTests
             string key = ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId);
             ProviderCatalogReadModel model = _store.Snapshot<ProviderCatalogReadModel>(StoreName, key).ShouldNotBeNull();
             ProviderCatalogEntryView current = model.Entries.Single(item => item.ProviderId == command.ProviderId && item.ModelId == command.ModelId);
+            command.ExpectedLifecycleRevision.ShouldBe(current.LifecycleRevision);
             model.Entries.Remove(current);
-            model.Entries.Add(current with { Status = ProviderModelStatus.Enabled, IsSelectableForNewActiveUse = true });
+            model.Entries.Add(current with
+            {
+                Status = ProviderModelStatus.Enabled,
+                IsSelectableForNewActiveUse = true,
+                LifecycleRevision = current.LifecycleRevision + 1,
+            });
             string targetKey = TargetKey(envelope.TenantId, envelope.Domain, envelope.AggregateId);
             long sequence = _targetHeads[targetKey] = _targetHeads.GetValueOrDefault(targetKey) + 1;
             model.StreamSequences[envelope.AggregateId] = sequence;

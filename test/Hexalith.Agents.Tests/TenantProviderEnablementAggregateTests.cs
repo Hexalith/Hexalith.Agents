@@ -133,6 +133,50 @@ public sealed class TenantProviderEnablementAggregateTests
     }
 
     [Fact]
+    public void A_decision_on_a_superseded_terms_version_is_stale()
+    {
+        TenantProviderEnablementState state = Enabled();
+        ProviderDataHandlingRecord first = ProviderCatalogTestData.ValidTerms();
+        ProviderDataHandlingRecord second = first with { RetentionDays = 15, DataHandlingVersion = 2 };
+        var current = new DecideProviderDataHandling("provider", "model", 2, true, "Approved v2", 1, second, _now);
+        state.Apply(TenantProviderEnablementAggregate.Handle(current, state, Envelope(current, "tenant-a", tenantAdmin: true))
+            .Events.ShouldHaveSingleItem().ShouldBeOfType<ProviderDataHandlingDecided>());
+
+        var superseded = new DecideProviderDataHandling("provider", "model", 1, true, "Approved v1", 2, first, _now);
+        TenantProviderEnablementAggregate.Handle(superseded, state, Envelope(superseded, "tenant-a", tenantAdmin: true))
+            .Events.ShouldHaveSingleItem().ShouldBeOfType<TenantProviderGovernanceRejected>()
+            .Reason.ShouldBe("StaleRevision");
+        state.Entries.Single().Value.AcceptedTerms!.DataHandlingVersion.ShouldBe(2);
+    }
+
+    [Theory]
+    [InlineData("enable", "system")]
+    [InlineData("enable", "mismatched-aggregate")]
+    [InlineData("decide", "system")]
+    [InlineData("decide", "mismatched-aggregate")]
+    public void Tenant_commands_outside_their_own_tenant_stream_are_not_authorized(string commandKind, string scope)
+    {
+        string tenantId = scope == "system" ? ProviderCatalogIdentity.PlatformTenantId : "tenant-a";
+        TenantProviderEnablementState? state = commandKind == "decide" && scope != "system" ? Enabled() : null;
+        var terms = ProviderCatalogTestData.ValidTerms();
+        object command = commandKind == "enable"
+            ? new SetTenantProviderModelEnablement(tenantId, "provider", "model", true, 0, terms)
+            : new DecideProviderDataHandling("provider", "model", 1, true, "Approved", state?.Revision ?? 0, terms, _now);
+        CommandEnvelope envelope = Envelope(command, tenantId, platform: commandKind == "enable", tenantAdmin: commandKind == "decide");
+        if (scope == "mismatched-aggregate")
+        {
+            envelope = envelope with { AggregateId = "tenant-b" };
+        }
+
+        var result = command is SetTenantProviderModelEnablement enable
+            ? TenantProviderEnablementAggregate.Handle(enable, state, envelope)
+            : TenantProviderEnablementAggregate.Handle((DecideProviderDataHandling)command, state, envelope);
+
+        result.Events.ShouldHaveSingleItem().ShouldBeOfType<TenantProviderGovernanceRejected>()
+            .Reason.ShouldBe("NotAuthorized");
+    }
+
+    [Fact]
     public void Tenant_governance_handlers_report_exact_applied_and_already_applied_effects()
     {
         var terms = ProviderCatalogTestData.ValidTerms();

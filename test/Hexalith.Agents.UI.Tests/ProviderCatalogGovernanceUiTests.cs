@@ -612,6 +612,41 @@ public sealed class ProviderCatalogGovernanceUiTests : AgentsTestContext
             .ClassList.ShouldNotContain("agent-surface-state--empty");
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Lifecycle_toggle_sends_the_observed_lifecycle_revision(bool enable)
+    {
+        ProviderCatalogEntryView entry = AgentUiTestData.Entry(
+            status: enable ? ProviderModelStatus.Disabled : ProviderModelStatus.Enabled) with { LifecycleRevision = 3 };
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success([entry])));
+        ProviderCatalogWriteResult submitted = ProviderCatalogWriteResult.Submitted(new ProviderCatalogCommandAcceptance(
+            "openai", "gpt-x", "msg-toggle", "corr-toggle", AgentSetupTruthState.ProjectionConfirmed));
+        CatalogGateway.EnableAsync(Arg.Any<EnableProviderModelEntry>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(submitted));
+        CatalogGateway.DisableAsync(Arg.Any<DisableProviderModelEntry>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(submitted));
+        string button = enable ? "agents-provider-catalog-enable" : "agents-provider-catalog-disable";
+
+        IRenderedComponent<ProviderCatalog> cut = RenderPage<ProviderCatalog>();
+        cut.WaitForAssertion(() => cut.Find($"[data-testid='{button}']"));
+        await cut.Find($"[data-testid='{button}']").ClickAsync(new MouseEventArgs());
+
+        if (enable)
+        {
+            await CatalogGateway.Received(1).EnableAsync(
+                Arg.Is<EnableProviderModelEntry>(command => command.ExpectedLifecycleRevision == 3),
+                Arg.Any<CancellationToken>());
+        }
+        else
+        {
+            await CatalogGateway.Received(1).DisableAsync(
+                Arg.Is<DisableProviderModelEntry>(command => command.ExpectedLifecycleRevision == 3),
+                Arg.Any<CancellationToken>());
+        }
+    }
+
     [Fact]
     public async Task Timed_out_catalog_mutation_locks_only_its_entry_until_exact_outcome_is_known()
     {

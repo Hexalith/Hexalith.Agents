@@ -192,6 +192,41 @@ Code review 2026-09-24, group 1 of 4: domain aggregates (`src/Hexalith.Agents/{P
 - low — `ProviderCatalogTestData.StateWith` may diverge from emitted events for imported creates: a test helper, with no false pass shown.
 - low — `ToUpperInvariant` folds non-ASCII look-alikes (`ı`, `ſ`) into valid codes: the stored value is still a valid ISO code, so the harm is negligible.
 
+### Review Findings — group A third pass (2026-09-25)
+
+Code review 2026-09-25, group A of 3: domain aggregates (`src/Hexalith.Agents/{ProviderCatalog,TenantProviderEnablement}`), `src/Hexalith.Agents.Contracts/**`, and `test/Hexalith.Agents{,.Contracts}.Tests`, diff `1d69f3f..d42e9b4`. Groups B (server/EventStore/client) and C (UI) remain to be reviewed. All nine patches were applied and verified: a Release-equivalent build with `UseHexalithProjectReferences=true` had zero warnings; domain, contracts, server, and UI suites passed (898/689/762/1134); mutations removing the migration and UI lifecycle revisions, the tenant aggregate-id scope check, and the duplicate-create terms check each failed a new test. Items already adjudicated in the chunk (a) and chunk 1 re-review lists were re-checked, not re-litigated.
+
+- [x] [Review][Patch] Restrict pricing currencies to ISO 4217 tender currencies [src/Hexalith.Agents.Contracts/ProviderCatalog/Iso4217CurrencyCodes.cs:6] — Decision 2026-09-25: remove the precious metals (`XAU`, `XAG`, `XPD`, `XPT`), bond-market units (`XBA`–`XBD`), `XDR`/`XSU`/`XUA`, and fund codes (`BOV`, `CHE`, `CHW`, `CLF`, `COU`, `MXV`, `USN`, `UYI`, `UYW`), for the same reason `XXX`/`XTS` were removed. Update the class summary, flip the `IsValid("xau")` assertion to a rejection theory, and add `XAU` to the migration non-currency rows.
+- [x] [Review][Patch] Test that a duplicate create with different terms or provenance is rejected, not `AlreadyApplied` [src/Hexalith.Agents/ProviderCatalog/ProviderCatalogAggregate.cs:138]
+- [x] [Review][Patch] Test the two `UnknownEvidence` eligibility branches: same version with different fields, and current version below accepted [src/Hexalith.Agents/TenantProviderEnablement/TenantProviderEligibility.cs:42]
+- [x] [Review][Patch] Test the tenant aggregate's `ValidScope` guard (reserved `system` tenant, `AggregateId != TenantId`) for both commands [src/Hexalith.Agents/TenantProviderEnablement/TenantProviderEnablementAggregate.cs:137]
+- [x] [Review][Patch] Assert `ExpectedLifecycleRevision` on the UI and migration enable/disable call sites [src/Hexalith.Agents.UI/Components/Pages/ProviderCatalog.razor:869]
+- [x] [Review][Patch] Assert the `effect` payload for update, enable, and disable, not only create [src/Hexalith.Agents/ProviderCatalog/ProviderCatalogAggregate.cs:258]
+- [x] [Review][Patch] Test tampered `FieldDiff`, null `FieldDiff`, wrong `RoleBasis`, and `DeclaredAt != EffectiveAt` in `HasRecordedTightening` [src/Hexalith.Agents.Contracts/ProviderCatalog/ProviderDataHandlingPolicy.cs:172]
+- [x] [Review][Patch] Make the adjacent-step pin test discriminate: give v3 a valid declaration from v1 (the accepted version) and assert grace is still withheld [test/Hexalith.Agents.Tests/DataHandlingGraceDeadlineTests.cs:81]
+- [x] [Review][Patch] Test a realistic superseded decision (v2 accepted, later v1 decision rejects `StaleRevision`) instead of only the version-0 case [test/Hexalith.Agents.Tests/TenantProviderEnablementAggregateTests.cs:125]
+
+**Rejected (group A third pass):**
+
+- false — `DecideProviderDataHandling` stores unvalidated or version-0 `ConfirmedTerms`: already adjudicated; the server validates and the coordinator enforces the exact platform snapshot.
+- false — Tenant `CurrentTerms` not checked against the platform: `EventStoreProviderCatalogOperations.cs:291` replaces them with the authoritative entry terms after a freshness check.
+- false — Caller-controlled or backdated `EffectiveAt`/`DecidedAt`, `AddDays` overflow: server-stamped on the public path; the raw-gateway residual is already deferred.
+- false — Exact retry returns `StaleRevision` rather than `AlreadyApplied`: EventStore message-ID idempotency (already adjudicated).
+- rejected by decision 2026-09-24 — Tenant views show `TighteningDeclaration.ActorUserId`.
+- false — Platform operator has two authority keys: both `actor:agentsProviderAdmin` and `actor:platformOperator` are trusted, server-populated from the same `IsPlatformOperator` decision (`ProviderCatalogAdministrationOrchestrator.cs:31-33,103,174`); no divergence shown.
+- false — `Evaluate` assumes sorted history; migration imports only current terms; `EntryKey` format change; view aliases mutable history: all already adjudicated.
+- false — `LastEnablementMessageId`/`LastDecisionMessageId` never written: `TenantProviderEnablementProjectionHandler.cs:110,117` sets them and `TenantProviderCatalogViewFactory.cs:120` maps them.
+- false — Disable fails on malformed `CurrentTerms`: the server nulls `CurrentTerms` on disable (`EventStoreProviderCatalogOperations.cs:255`).
+- false — `IsPlatformEntry` true on blank IDs: already adjudicated.
+- rejected by decision 2026-09-24 — Zero unit prices are accepted at write and existing zero-priced entries become unselectable.
+- low — `Expected*` revisions declared nullable; divergent tenant `MigratedFrom`; blank `MigratedFrom`; phantom disabled tenant entry; `int.MaxValue` revisions; stringly typed statuses: already adjudicated as low.
+- low — `Applied()` accepts rejection payloads or throws on empty input untested: every caller passes success events.
+- low — Previously accepted withdrawn currency codes (e.g. `HRK`) now fail: a legacy entry with one surfaces as a visible migration rejection; no such data was shown.
+- low — Enable/disable of an entry already in the requested state at the current revision rejects instead of `AlreadyApplied`: pre-existing; a current revision means the operator saw the current state, and exact retries dedupe by message ID.
+- low — No test replays `TenantProviderGovernanceRejected` or a decision for an unknown entry; the `_and_replays` test folds incrementally: no named regression.
+- low — Disable/re-enable keeps earlier acceptance: already adjudicated.
+- already deferred — Explicit pricing-version rule on update is untested (chunk (a), `deferred-work.md`).
+
 ## Implementation Notes
 
 The staged implementation adds the reserved `system` catalog, tenant enablement and terms decisions, a Platform Operator migration endpoint, safe tenant joins, recorded tightening declarations, and command-message-specific UI confirmation. Migration reads the operator-supplied legacy tenant inventory from persisted projections and rejects divergent or mismatched records before dispatch. The supplied inventory cannot itself prove that every legacy tenant was named.

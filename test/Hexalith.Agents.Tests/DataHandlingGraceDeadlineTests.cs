@@ -77,6 +77,67 @@ public sealed class DataHandlingGraceDeadlineTests
         }], now).Status.ShouldBe("TermsChanged");
     }
 
+    [Theory]
+    [InlineData("field-diff")]
+    [InlineData("missing-diff")]
+    [InlineData("role")]
+    [InlineData("declared-at")]
+    [InlineData("to-version")]
+    public void Tampered_tightening_declaration_blocks_grace(string tampering)
+    {
+        DateTimeOffset now = new(2026, 9, 1, 0, 0, 0, TimeSpan.Zero);
+        ProviderDataHandlingRecord accepted = new(90, true, ["EU", "US"], "terms", 1, now.AddDays(-1));
+        ProviderDataHandlingRecord declared = Declare(accepted, new(30, false, ["EU"], "terms", 2, now));
+        ProviderDataHandlingTighteningDeclaration declaration = declared.TighteningDeclaration!;
+        ProviderDataHandlingTighteningDeclaration tampered = tampering switch
+        {
+            "field-diff" => declaration with { FieldDiff = declaration.FieldDiff with { NewRetentionDays = 7 } },
+            "missing-diff" => declaration with { FieldDiff = null! },
+            "role" => declaration with { RoleBasis = "TenantAgentAdministrator" },
+            "declared-at" => declaration with { DeclaredAt = now.AddDays(-5) },
+            _ => declaration with { ToVersion = 3 },
+        };
+        var tenant = new TenantProviderEntryState { Enabled = true, AcceptedTerms = accepted };
+
+        TenantProviderEligibility.Evaluate(tenant, [accepted, declared], now).Status.ShouldBe("Grace");
+        TenantProviderEligibility.Evaluate(tenant, [accepted, declared with { TighteningDeclaration = tampered }], now)
+            .Status.ShouldBe("TermsChanged");
+    }
+
+    [Fact]
+    public void A_declaration_against_the_accepted_version_does_not_replace_the_adjacent_step()
+    {
+        DateTimeOffset now = new(2026, 9, 1, 0, 0, 0, TimeSpan.Zero);
+        ProviderDataHandlingRecord accepted = new(90, false, ["EU"], "terms", 1, now.AddDays(-1));
+        ProviderDataHandlingRecord second = Declare(accepted, accepted with
+        {
+            RetentionDays = 30, DataHandlingVersion = 2, EffectiveAt = now,
+        });
+        ProviderDataHandlingRecord third = Declare(accepted, second with
+        {
+            RetentionDays = 60, DataHandlingVersion = 3, EffectiveAt = now.AddDays(1), TighteningDeclaration = null,
+        });
+        var tenant = new TenantProviderEntryState { Enabled = true, AcceptedTerms = accepted };
+
+        third.TighteningDeclaration!.FromVersion.ShouldBe(1);
+        TenantProviderEligibility.Evaluate(tenant, [accepted, second, third], now.AddDays(1))
+            .Status.ShouldBe("TermsChanged");
+    }
+
+    [Fact]
+    public void Same_version_with_different_fields_or_a_regressed_version_is_unknown_evidence()
+    {
+        DateTimeOffset now = new(2026, 9, 1, 0, 0, 0, TimeSpan.Zero);
+        ProviderDataHandlingRecord accepted = new(30, false, ["EU"], "terms", 2, now.AddDays(-1));
+        var tenant = new TenantProviderEntryState { Enabled = true, AcceptedTerms = accepted };
+
+        TenantProviderEligibility.Evaluate(tenant, [accepted], now).Status.ShouldBe("Current");
+        TenantProviderEligibility.Evaluate(tenant, [accepted with { RetentionDays = 90 }], now)
+            .Status.ShouldBe("UnknownEvidence");
+        TenantProviderEligibility.Evaluate(tenant, [accepted with { DataHandlingVersion = 1 }], now)
+            .Status.ShouldBe("UnknownEvidence");
+    }
+
     [Fact]
     public void An_adjacent_loosening_blocks_grace_even_when_current_terms_tighten_the_accepted_version()
     {
