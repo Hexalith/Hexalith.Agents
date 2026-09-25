@@ -377,6 +377,28 @@ public sealed class ProviderCatalogMigrationTests
         _sent.ShouldBeEmpty();
     }
 
+    [Theory]
+    [InlineData("XTS")]
+    [InlineData("XXX")]
+    public async Task Invalid_second_legacy_price_rejects_before_dispatching_the_first_target(string currency)
+    {
+        SeedLegacy("tenant-a", Entry() with { ProviderId = "a-provider", ModelId = "first" });
+        string key = ProviderCatalogReadModelAddresses.Detail("tenant-a");
+        ProviderCatalogReadModel inventory = _store.Snapshot<ProviderCatalogReadModel>(StoreName, key)
+            .ShouldNotBeNull();
+        inventory.Entries.Add(Entry() with
+        {
+            ProviderId = "z-provider", ModelId = "second",
+            Pricing = Entry().Pricing! with { Currency = currency },
+        });
+        _store.Seed(StoreName, key, inventory);
+
+        ProviderCatalogMigrationResult result = await Service().MigrateAsync(["tenant-a"]);
+
+        result.Status.ShouldBe("InvalidLegacyInventory");
+        _sent.ShouldBeEmpty();
+    }
+
     [Fact]
     public async Task Platform_operator_can_invoke_migration_through_the_operations_route()
     {

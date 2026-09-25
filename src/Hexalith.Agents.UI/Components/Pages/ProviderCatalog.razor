@@ -500,6 +500,8 @@
     private void OnEnablementTenantChanged()
     {
         _enablementWrite = null;
+        _enablementExpectedRevision = "0";
+        _enablementEnabled = true;
         _enablementTruth = PendingSelectedEnablement ? "AuthoritativePending" : null;
     }
 

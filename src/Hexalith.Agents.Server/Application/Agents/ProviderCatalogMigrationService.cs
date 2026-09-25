@@ -78,7 +78,10 @@ public sealed class ProviderCatalogMigrationService(
                 new KeyValuePair<string, long>(tenantId, LegacyCheckpoint(tenantId, ordered[index])))
             .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
 
-        if (ordered.SelectMany(model => model.Entries).Any(entry => entry.Pricing is null
+        if (ordered.SelectMany(model => model.Entries).Any(entry => entry.Pricing is not { } pricing
+            || !Iso4217CurrencyCodes.IsValid(pricing.Currency)
+            || pricing.InputTokenUnitPrice < 0 || pricing.OutputTokenUnitPrice < 0
+            || pricing.PricingVersion < 0
             || entry.DataHandling is not null
                 && ProviderDataHandlingPolicy.Validate(entry.DataHandling, current: null, allowHistoricalVersion: true) is not null))
         {

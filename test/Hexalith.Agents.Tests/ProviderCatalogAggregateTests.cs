@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Threading.Tasks;
 
 using Hexalith.Agents.Contracts.ProviderCatalog;
@@ -137,6 +138,37 @@ public sealed class ProviderCatalogAggregateTests
         ProviderCatalogAggregate.Handle(command, null, Envelope(command)).IsSuccess.ShouldBeTrue();
     }
 
+    [Theory]
+    [InlineData("XXX")]
+    [InlineData("XTS")]
+    public void Non_currency_iso_codes_cannot_price_a_selectable_entry(string currency)
+    {
+        Iso4217CurrencyCodes.IsValid(currency).ShouldBeFalse();
+        CreateProviderModelEntry command = ValidCreate() with { Pricing = new(currency, 0.002m, 0.008m, 1) };
+        ProviderCatalogAggregate.Handle(command, null, Envelope(command)).Events.ShouldHaveSingleItem()
+            .ShouldBeOfType<InvalidProviderModelPricingRejection>();
+    }
+
+    [Fact]
+    public void A_system_command_addressed_to_another_platform_entry_is_denied()
+    {
+        CreateProviderModelEntry command = ValidCreate();
+        string otherEntryId = ProviderCatalogIdentity.EntryId("other", "model");
+
+        DomainResult result = ProviderCatalogAggregate.Handle(command, null, Envelope(command, catalogId: otherEntryId));
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.ShouldHaveSingleItem().ShouldBeOfType<ProviderCatalogAdministrationDeniedRejection>();
+    }
+
+    [Fact]
+    public void Platform_entry_id_is_stable_and_separates_ambiguous_pairs()
+    {
+        ProviderCatalogIdentity.EntryId("ab", "c").ShouldBe(
+            "entry-430fb1b4ac43316eca81fab27a1930ab8eff8fef6a1dc7903dce44bbc2790dc5");
+        ProviderCatalogIdentity.EntryId("ab", "c").ShouldNotBe(ProviderCatalogIdentity.EntryId("a", "bc"));
+    }
+
     [Fact]
     public void Create_without_provider_admin_produces_denied_and_no_created()
     {
@@ -177,6 +209,22 @@ public sealed class ProviderCatalogAggregateTests
     }
 
     [Fact]
+    public void Platform_governance_handler_reports_exact_applied_and_already_applied_effects()
+    {
+        CreateProviderModelEntry command = ValidCreate();
+        DomainResult applied = ProviderCatalogAggregate.Handle(command, null, Envelope(command));
+        using (JsonDocument payload = JsonDocument.Parse(applied.ResultPayload.ShouldNotBeNull()))
+        {
+            payload.RootElement.GetProperty("effect").GetString().ShouldBe("Applied");
+        }
+
+        DomainResult repeat = ProviderCatalogAggregate.Handle(command, StateWith(command), Envelope(command));
+        repeat.IsNoOp.ShouldBeTrue();
+        using JsonDocument repeatPayload = JsonDocument.Parse(repeat.ResultPayload.ShouldNotBeNull());
+        repeatPayload.RootElement.GetProperty("effect").GetString().ShouldBe("AlreadyApplied");
+    }
+
+    [Fact]
     public void Create_duplicate_ignores_a_new_server_stamped_effective_time()
     {
         CreateProviderModelEntry original = ValidCreate();
@@ -196,6 +244,49 @@ public sealed class ProviderCatalogAggregateTests
 
         ProviderCatalogAggregate.Handle(command, null, Envelope(command)).Events.ShouldHaveSingleItem()
             .ShouldBeOfType<InvalidProviderDataHandlingRejection>();
+    }
+
+    [Theory]
+    [InlineData("create", "empty-regions")]
+    [InlineData("create", "duplicate-regions")]
+    [InlineData("create", "malformed-region")]
+    [InlineData("create", "invalid-reference")]
+    [InlineData("create", "long-reference")]
+    [InlineData("create", "negative-retention")]
+    [InlineData("create", "skipped-version")]
+    [InlineData("update", "empty-regions")]
+    [InlineData("update", "duplicate-regions")]
+    [InlineData("update", "malformed-region")]
+    [InlineData("update", "invalid-reference")]
+    [InlineData("update", "long-reference")]
+    [InlineData("update", "negative-retention")]
+    [InlineData("update", "skipped-version")]
+    [InlineData("update", "reused-version")]
+    public void Invalid_governed_terms_reject_before_catalog_mutation(string operation, string invalidField)
+    {
+        ProviderDataHandlingRecord terms = ValidTerms();
+        terms = invalidField switch
+        {
+            "empty-regions" => terms with { ProcessingRegions = [] },
+            "duplicate-regions" => terms with { ProcessingRegions = ["EU", "eu"] },
+            "malformed-region" => terms with { ProcessingRegions = ["EU!"] },
+            "invalid-reference" => terms with { TermsReferenceId = "bad reference" },
+            "long-reference" => terms with { TermsReferenceId = new string('x', 129) },
+            "negative-retention" => terms with { RetentionDays = -1 },
+            "skipped-version" => terms with { DataHandlingVersion = operation == "create" ? 3 : 4, RetentionDays = 14 },
+            "reused-version" => terms with { DataHandlingVersion = 1, RetentionDays = 14 },
+            _ => throw new ArgumentOutOfRangeException(nameof(invalidField)),
+        };
+        ProviderCatalogState state = StateWith(ValidCreate());
+        DomainResult result = operation == "create"
+            ? ProviderCatalogAggregate.Handle(ValidCreate(modelId: "new-model") with { DataHandling = terms },
+                state, Envelope(ValidCreate(modelId: "new-model")))
+            : ProviderCatalogAggregate.Handle(ValidUpdate() with { DataHandling = terms },
+                state, Envelope(ValidUpdate()));
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.ShouldHaveSingleItem().ShouldBeOfType<InvalidProviderDataHandlingRejection>();
+        state.Entries.ShouldHaveSingleItem().Value.DataHandling!.DataHandlingVersion.ShouldBe(1);
     }
 
     [Fact]

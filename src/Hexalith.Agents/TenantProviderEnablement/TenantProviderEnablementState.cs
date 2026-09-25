@@ -17,6 +17,7 @@ public sealed class TenantProviderEnablementState
     public Dictionary<string, TenantProviderEntryState> Entries { get; set; } = [];
 
     /// <summary>Applies a platform enablement decision.</summary>
+    /// <param name="e">The enablement event.</param>
     public void Apply(TenantProviderModelEnablementSet e)
     {
         ArgumentNullException.ThrowIfNull(e);
@@ -34,6 +35,7 @@ public sealed class TenantProviderEnablementState
     }
 
     /// <summary>Applies a tenant's accepted or declined terms.</summary>
+    /// <param name="e">The decision event.</param>
     public void Apply(ProviderDataHandlingDecided e)
     {
         ArgumentNullException.ThrowIfNull(e);
@@ -59,6 +61,7 @@ public sealed class TenantProviderEnablementState
     }
 
     /// <summary>No-op replay handler for a rejected command.</summary>
+    /// <param name="e">The rejected event.</param>
     public void Apply(TenantProviderGovernanceRejected e)
     {
         ArgumentNullException.ThrowIfNull(e);

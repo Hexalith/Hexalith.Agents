@@ -199,6 +199,17 @@ public sealed class ProviderCatalogInspectionTests
     }
 
     [Fact]
+    public void Enabled_entry_with_version_zero_terms_is_not_selectable()
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        ProviderModelEntryState entry = state.Entries.ShouldHaveSingleItem().Value;
+        entry.DataHandling = entry.DataHandling! with { DataHandlingVersion = 0 };
+
+        ProviderCatalogInspection.GetEntry(state, isProviderAdmin: true, "openai", "gpt-4o")
+            .Entries.ShouldHaveSingleItem().IsSelectableForNewActiveUse.ShouldBeFalse();
+    }
+
+    [Fact]
     public void Enabled_unconfigured_entry_is_not_selectable()
     {
         ProviderCatalogState state = StateWith(ValidCreate(configurationReferenceId: null));

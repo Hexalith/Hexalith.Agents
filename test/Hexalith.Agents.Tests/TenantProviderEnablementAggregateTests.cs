@@ -1,5 +1,6 @@
 using System.Text.Json;
 
+using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 using Hexalith.Agents.Contracts.ProviderCatalog.Events;
 using Hexalith.Agents.Contracts.ProviderCatalog.Events.Rejections;
@@ -119,9 +120,87 @@ public sealed class TenantProviderEnablementAggregateTests
         TenantProviderEnablementAggregate.Handle(decision with { ExpectedRevision = 2, Justification = "different" }, state,
             Envelope(decision, "tenant-a", tenantAdmin: true)).Events[0].ShouldBeOfType<TenantProviderGovernanceRejected>()
             .Reason.ShouldBe("DivergentDuplicate");
-        TenantProviderEnablementAggregate.Handle(decision with { DataHandlingVersion = 2 }, state,
-            Envelope(decision, "tenant-a", tenantAdmin: true)).Events[0].ShouldBeOfType<TenantProviderGovernanceRejected>();
+        DecideProviderDataHandling superseded = decision with
+        {
+            DataHandlingVersion = 0,
+            ConfirmedTerms = terms with { DataHandlingVersion = 0 },
+            ExpectedRevision = 2,
+        };
+        TenantProviderEnablementAggregate.Handle(superseded, state,
+            Envelope(superseded, "tenant-a", tenantAdmin: true)).Events[0]
+            .ShouldBeOfType<TenantProviderGovernanceRejected>().Reason.ShouldBe("StaleRevision");
         state.Revision.ShouldBe(2);
+    }
+
+    [Fact]
+    public void Tenant_governance_handlers_report_exact_applied_and_already_applied_effects()
+    {
+        var terms = ProviderCatalogTestData.ValidTerms();
+        var enable = new SetTenantProviderModelEnablement("tenant-a", "provider", "model", true, 0, terms);
+        var state = new TenantProviderEnablementState();
+        var applied = TenantProviderEnablementAggregate.Handle(enable, state, Envelope(enable, "tenant-a", platform: true));
+        Effect(applied).ShouldBe("Applied");
+        state.Apply(applied.Events.ShouldHaveSingleItem().ShouldBeOfType<TenantProviderModelEnablementSet>());
+        var repeat = enable with { ExpectedRevision = 1 };
+        Effect(TenantProviderEnablementAggregate.Handle(repeat, state, Envelope(repeat, "tenant-a", platform: true)))
+            .ShouldBe("AlreadyApplied");
+
+        var decision = new DecideProviderDataHandling("provider", "model", 1, true, "Approved", 1, terms, _now);
+        var decided = TenantProviderEnablementAggregate.Handle(decision, state,
+            Envelope(decision, "tenant-a", tenantAdmin: true));
+        Effect(decided).ShouldBe("Applied");
+        state.Apply(decided.Events.ShouldHaveSingleItem().ShouldBeOfType<ProviderDataHandlingDecided>());
+        var decisionRepeat = decision with { ExpectedRevision = 2 };
+        Effect(TenantProviderEnablementAggregate.Handle(decisionRepeat, state,
+            Envelope(decisionRepeat, "tenant-a", tenantAdmin: true))).ShouldBe("AlreadyApplied");
+    }
+
+    [Theory]
+    [InlineData("missing")]
+    [InlineData("disabled")]
+    public void Tenant_decision_requires_an_enabled_entry(string stateKind)
+    {
+        var state = stateKind == "missing" ? new TenantProviderEnablementState { TenantId = "tenant-a" } : Enabled();
+        if (stateKind == "disabled")
+        {
+            state.Apply(new TenantProviderModelEnablementSet("tenant-a", "provider", "model", false, 2, "operator", null));
+        }
+        var terms = ProviderCatalogTestData.ValidTerms();
+        var decision = new DecideProviderDataHandling("provider", "model", 1, true, "Approved",
+            state.Revision, terms, _now);
+
+        TenantProviderEnablementAggregate.Handle(decision, state, Envelope(decision, "tenant-a", tenantAdmin: true))
+            .Events.ShouldHaveSingleItem().ShouldBeOfType<TenantProviderGovernanceRejected>()
+            .Reason.ShouldBe("EntryNotEnabled");
+    }
+
+    [Theory]
+    [InlineData("missing")]
+    [InlineData("version-zero")]
+    [InlineData("invalid-reference")]
+    public void Tenant_enablement_requires_valid_current_terms(string termsKind)
+    {
+        ProviderDataHandlingRecord? terms = termsKind switch
+        {
+            "missing" => null,
+            "version-zero" => ProviderCatalogTestData.ValidTerms() with { DataHandlingVersion = 0 },
+            _ => ProviderCatalogTestData.ValidTerms() with { TermsReferenceId = "bad reference" },
+        };
+        var command = new SetTenantProviderModelEnablement("tenant-a", "provider", "model", true, 0, terms);
+
+        TenantProviderEnablementAggregate.Handle(command, null, Envelope(command, "tenant-a", platform: true))
+            .Events.ShouldHaveSingleItem().ShouldBeOfType<TenantProviderGovernanceRejected>()
+            .Reason.ShouldBe("InvalidCurrentTerms");
+    }
+
+    [Fact]
+    public void Tenant_decision_rejects_blank_justification()
+    {
+        var terms = ProviderCatalogTestData.ValidTerms();
+        var decision = new DecideProviderDataHandling("provider", "model", 1, true, " ", 1, terms, _now);
+        TenantProviderEnablementAggregate.Handle(decision, Enabled(), Envelope(decision, "tenant-a", tenantAdmin: true))
+            .Events.ShouldHaveSingleItem().ShouldBeOfType<TenantProviderGovernanceRejected>()
+            .Reason.ShouldBe("InvalidDecision");
     }
 
     [Fact]
@@ -183,6 +262,12 @@ public sealed class TenantProviderEnablementAggregateTests
         var state = new TenantProviderEnablementState();
         state.Apply(new TenantProviderModelEnablementSet("tenant-a", "provider", "model", true, 1, "operator", null));
         return state;
+    }
+
+    private static string Effect(Hexalith.EventStore.Contracts.Results.DomainResult result)
+    {
+        using JsonDocument document = JsonDocument.Parse(result.ResultPayload.ShouldNotBeNull());
+        return document.RootElement.GetProperty("effect").GetString().ShouldNotBeNull();
     }
 
     private static CommandEnvelope Envelope<T>(T command, string tenantId, bool platform = false, bool tenantAdmin = false)

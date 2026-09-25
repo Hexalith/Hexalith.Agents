@@ -83,19 +83,18 @@ public sealed class ProjectedProviderCatalogReader(
 
         ProviderCatalogEntryView? platformEntry = entry.Value?.Entries.FirstOrDefault(item =>
             item.ProviderId == providerId && item.ModelId == modelId);
-        // Do not probe a named platform stream for a key this tenant cannot see. Hidden and absent
-        // keys must share the same result, including when the platform projection is missing.
-        string key = ProviderCatalogState.EntryKey(providerId, modelId);
-        if (tenant.Value is { } projectedTenant
-            && (!projectedTenant.State.Entries.TryGetValue(key, out TenantProviderEntryState? enabled)
-                || !enabled.Enabled))
-        {
-            return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.EntryNotFound, null);
-        }
-
         if (tenant.Value is null || !await IsTenantProjectionCurrentAsync(tenantId, tenant.Value, ct).ConfigureAwait(false))
         {
             return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null);
+        }
+
+        // Do not probe a named platform stream for a key this tenant cannot see. Hidden and absent
+        // keys share the same result once the tenant projection is known to be current.
+        string key = ProviderCatalogState.EntryKey(providerId, modelId);
+        if (!tenant.Value.State.Entries.TryGetValue(key, out TenantProviderEntryState? enabled)
+            || !enabled.Enabled)
+        {
+            return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.EntryNotFound, null);
         }
 
         if (platformEntry is null)

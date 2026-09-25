@@ -6,7 +6,12 @@ namespace Hexalith.Agents.TenantProviderEnablement;
 /// <summary>Evaluates tenant terms against the complete platform terms history.</summary>
 public static class TenantProviderEligibility
 {
-    /// <summary>Returns the safe eligibility status and exclusive grace deadline.</summary>
+    /// <summary>Returns the safe eligibility status and exclusive grace deadline. Each pending version must
+    /// cumulatively tighten the accepted terms and declare its change from the immediately preceding version.</summary>
+    /// <param name="tenant">The tenant enablement and last decision.</param>
+    /// <param name="history">The complete platform terms history.</param>
+    /// <param name="evaluatedAt">The trusted instant at which eligibility is evaluated.</param>
+    /// <returns>The eligibility status and any exclusive grace deadline.</returns>
     public static TenantProviderEligibilityResult Evaluate(
         TenantProviderEntryState? tenant,
         IReadOnlyList<ProviderDataHandlingRecord>? history,

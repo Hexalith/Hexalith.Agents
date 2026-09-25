@@ -72,6 +72,39 @@ public sealed class ProjectedProviderCatalogReaderTests
     }
 
     [Fact]
+    public async Task Unprojected_tenant_enablement_remains_unavailable_before_hidden_key_check()
+    {
+        const string tenantId = "tenant-a";
+        const string storeName = "statestore";
+        var store = new FakeReadModelStore();
+        var projectedTenant = new TenantProviderEnablementReadModel { LastSequenceNumber = 1 };
+        projectedTenant.State.Apply(new TenantProviderModelEnablementSet(tenantId, "other", "model", true,
+            1, "operator", null));
+        store.Seed(storeName, TenantProviderEnablementReadModelAddresses.Detail(tenantId), projectedTenant);
+        IAgentAdministrationContextProvider context = Substitute.For<IAgentAdministrationContextProvider>();
+        context.GetContext().Returns(new AgentAdministrationContext(tenantId, "admin", IsAgentsAdmin: true));
+        IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
+        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                StreamReadRequest request = call.Arg<StreamReadRequest>();
+                return new StreamReadPage(request.Tenant, request.Domain, request.AggregateId, [],
+                    new StreamReadMetadata(0, null, null, 2, 0, false, null));
+            });
+        var reader = new ProjectedProviderCatalogReader(store,
+            Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = storeName }), context, gateway);
+
+        ProviderCatalogEntryReadResult result = await reader.GetEntryAsync(tenantId, "openai", "gpt-x",
+            CancellationToken.None);
+
+        result.Status.ShouldBe(ProviderCatalogInspectionStatus.Unavailable);
+        await gateway.Received(1).ReadStreamAsync(Arg.Is<StreamReadRequest>(request =>
+            request.Domain == TenantProviderEnablementAggregate.Domain), Arg.Any<CancellationToken>());
+        await gateway.DidNotReceive().ReadStreamAsync(Arg.Is<StreamReadRequest>(request =>
+            request.Domain == ProviderCatalogAggregate.Domain), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task Grace_expiring_during_authoritative_reads_is_blocked_at_selection_time()
     {
         const string tenantId = "tenant-a";

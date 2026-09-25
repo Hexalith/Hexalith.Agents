@@ -10,6 +10,10 @@ public static class ProviderDataHandlingPolicy
     private static readonly Regex _region = new("^[A-Za-z0-9-]{2,32}$", RegexOptions.Compiled);
 
     /// <summary>Returns a safe validation reason, or null for valid terms.</summary>
+    /// <param name="proposed">The proposed terms.</param>
+    /// <param name="current">The current terms, if any.</param>
+    /// <param name="allowHistoricalVersion">Whether a first imported version may exceed one.</param>
+    /// <returns>A safe validation reason, or null for valid terms.</returns>
     public static string? Validate(ProviderDataHandlingRecord? proposed, ProviderDataHandlingRecord? current, bool allowHistoricalVersion = false)
     {
         if (proposed is null)
@@ -50,6 +54,9 @@ public static class ProviderDataHandlingPolicy
     }
 
     /// <summary>Assigns the next non-reusable version and canonicalizes region names.</summary>
+    /// <param name="proposed">The proposed terms.</param>
+    /// <param name="current">The current terms, if any.</param>
+    /// <returns>The versioned terms, or the current terms when nothing changed.</returns>
     public static ProviderDataHandlingRecord? Assign(ProviderDataHandlingRecord? proposed, ProviderDataHandlingRecord? current)
     {
         if (proposed is null)
@@ -79,6 +86,9 @@ public static class ProviderDataHandlingPolicy
     }
 
     /// <summary>Returns whether the governed fields match, independent of region ordering and version.</summary>
+    /// <param name="left">The first terms record.</param>
+    /// <param name="right">The second terms record.</param>
+    /// <returns>True when the governed fields match.</returns>
     public static bool SameFields(ProviderDataHandlingRecord left, ProviderDataHandlingRecord right)
     {
         ArgumentNullException.ThrowIfNull(left);
@@ -92,6 +102,9 @@ public static class ProviderDataHandlingPolicy
     }
 
     /// <summary>Compares every submitted term field, including effective time and tightening declaration.</summary>
+    /// <param name="left">The first terms record.</param>
+    /// <param name="right">The second terms record.</param>
+    /// <returns>True when the complete snapshots match.</returns>
     public static bool SameSnapshot(ProviderDataHandlingRecord left, ProviderDataHandlingRecord right)
     {
         ArgumentNullException.ThrowIfNull(left);
@@ -101,6 +114,9 @@ public static class ProviderDataHandlingPolicy
     }
 
     /// <summary>Returns whether current terms cumulatively tighten the last accepted terms.</summary>
+    /// <param name="accepted">The tenant's last accepted terms.</param>
+    /// <param name="current">The proposed current terms.</param>
+    /// <returns>True when every governed change tightens or preserves the accepted terms.</returns>
     public static bool IsCumulativeTightening(ProviderDataHandlingRecord accepted, ProviderDataHandlingRecord current)
     {
         ArgumentNullException.ThrowIfNull(accepted);
@@ -122,6 +138,10 @@ public static class ProviderDataHandlingPolicy
     }
 
     /// <summary>Records the Platform Operator's field-level declaration for a qualifying change.</summary>
+    /// <param name="previous">The immediately preceding terms.</param>
+    /// <param name="current">The qualifying proposed terms.</param>
+    /// <param name="actorUserId">The Platform Operator identifier.</param>
+    /// <returns>The declaration, or null when the change does not qualify.</returns>
     public static ProviderDataHandlingTighteningDeclaration? DeclareTightening(
         ProviderDataHandlingRecord previous,
         ProviderDataHandlingRecord current,
@@ -141,6 +161,9 @@ public static class ProviderDataHandlingPolicy
     }
 
     /// <summary>Checks that the declaration describes this exact adjacent change.</summary>
+    /// <param name="previous">The immediately preceding terms.</param>
+    /// <param name="current">The declared current terms.</param>
+    /// <returns>True when the recorded declaration matches the adjacent change.</returns>
     public static bool HasRecordedTightening(ProviderDataHandlingRecord previous, ProviderDataHandlingRecord current)
     {
         ArgumentNullException.ThrowIfNull(previous);

@@ -77,6 +77,48 @@ public sealed class DataHandlingGraceDeadlineTests
         }], now).Status.ShouldBe("TermsChanged");
     }
 
+    [Fact]
+    public void An_adjacent_loosening_blocks_grace_even_when_current_terms_tighten_the_accepted_version()
+    {
+        DateTimeOffset now = new(2026, 9, 1, 0, 0, 0, TimeSpan.Zero);
+        ProviderDataHandlingRecord accepted = new(90, false, ["EU"], "terms", 1, now.AddDays(-1));
+        ProviderDataHandlingRecord second = Declare(accepted, accepted with
+        {
+            RetentionDays = 30, DataHandlingVersion = 2, EffectiveAt = now,
+        });
+        ProviderDataHandlingRecord third = second with
+        {
+            RetentionDays = 60, DataHandlingVersion = 3, EffectiveAt = now.AddDays(1),
+            TighteningDeclaration = null,
+        };
+        var tenant = new TenantProviderEntryState { Enabled = true, AcceptedTerms = accepted };
+
+        ProviderDataHandlingPolicy.IsCumulativeTightening(accepted, third).ShouldBeTrue();
+        TenantProviderEligibility.Evaluate(tenant, [accepted, second, third], now.AddDays(1))
+            .Status.ShouldBe("TermsChanged");
+    }
+
+    [Theory]
+    [InlineData("reference")]
+    [InlineData("training")]
+    [InlineData("region")]
+    public void Every_incomparable_terms_dimension_blocks_grace(string dimension)
+    {
+        DateTimeOffset now = new(2026, 9, 1, 0, 0, 0, TimeSpan.Zero);
+        ProviderDataHandlingRecord accepted = new(90, false, ["EU"], "terms", 1, now.AddDays(-1));
+        ProviderDataHandlingRecord changed = dimension switch
+        {
+            "reference" => accepted with { RetentionDays = 30, TermsReferenceId = "new-terms" },
+            "training" => accepted with { RetentionDays = 30, AllowsTrainingUse = true },
+            _ => accepted with { RetentionDays = 30, ProcessingRegions = ["EU", "US"] },
+        };
+        changed = changed with { DataHandlingVersion = 2, EffectiveAt = now };
+        var tenant = new TenantProviderEntryState { Enabled = true, AcceptedTerms = accepted };
+
+        ProviderDataHandlingPolicy.IsCumulativeTightening(accepted, changed).ShouldBeFalse();
+        TenantProviderEligibility.Evaluate(tenant, [accepted, changed], now).Status.ShouldBe("TermsChanged");
+    }
+
     private static ProviderDataHandlingRecord Declare(ProviderDataHandlingRecord prior, ProviderDataHandlingRecord current)
         => current with
         {

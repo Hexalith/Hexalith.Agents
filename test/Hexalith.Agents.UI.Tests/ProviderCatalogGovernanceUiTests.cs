@@ -427,8 +427,12 @@ public sealed class ProviderCatalogGovernanceUiTests : AgentsTestContext
     [Fact]
     public async Task Pending_enablement_for_one_tenant_does_not_lock_same_model_for_another()
     {
+        var entry = AgentUiTestData.Entry() with
+        {
+            DataHandling = new ProviderDataHandlingRecord(14, false, ["EU"], "terms-v1", 1),
+        };
         CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success([AgentUiTestData.Entry()])));
+            .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success([entry])));
         CatalogGateway.SetTenantEnablementAsync(Arg.Any<SetTenantProviderModelEnablement>(), Arg.Any<CancellationToken>())
             .Returns(call =>
             {
@@ -443,6 +447,7 @@ public sealed class ProviderCatalogGovernanceUiTests : AgentsTestContext
         cut.WaitForAssertion(() => cut.Find("[data-testid='agents-provider-catalog-set-tenant-enablement']"));
         cut.Find("[data-testid='agents-provider-catalog-set-tenant-enablement']").Click();
         cut.Find("[data-testid='agents-provider-catalog-enablement-tenant']").Change("tenant-a");
+        cut.Find("[data-testid='agents-provider-catalog-enablement-revision']").Change("5");
         cut.Find("[data-testid='agents-provider-catalog-enablement-enabled']").Change(false);
         Task pending = cut.Find("[data-testid='agents-provider-catalog-enablement-save']")
             .ClickAsync(new MouseEventArgs());
@@ -451,12 +456,14 @@ public sealed class ProviderCatalogGovernanceUiTests : AgentsTestContext
         await pending.WaitAsync(TimeSpan.FromSeconds(2));
 
         cut.Find("[data-testid='agents-provider-catalog-enablement-tenant']").Change("tenant-b");
+        cut.Find("[data-testid='agents-provider-catalog-enablement-revision']").GetAttribute("value").ShouldBe("0");
         cut.Find("[data-testid='agents-provider-catalog-enablement-save']")
             .HasAttribute("disabled").ShouldBeFalse();
         await cut.Find("[data-testid='agents-provider-catalog-enablement-save']")
             .ClickAsync(new MouseEventArgs());
         await CatalogGateway.Received(1).SetTenantEnablementAsync(
-            Arg.Is<SetTenantProviderModelEnablement>(command => command.TenantId == "tenant-b"),
+            Arg.Is<SetTenantProviderModelEnablement>(command => command.TenantId == "tenant-b"
+                && command.ExpectedRevision == 0 && command.Enabled),
             Arg.Any<CancellationToken>());
     }
 

@@ -736,6 +736,11 @@ public sealed class EventStoreProviderCatalogOperations(
             return null;
         }
 
+        if (effect.ValueKind != JsonValueKind.String)
+        {
+            return AgentSetupWriteStatus.UnableToVerify;
+        }
+
         return effect.GetString() switch
         {
             "Applied" => AgentSetupWriteStatus.AwaitingProjection,

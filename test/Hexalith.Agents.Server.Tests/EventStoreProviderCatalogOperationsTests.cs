@@ -199,6 +199,60 @@ public sealed class EventStoreProviderCatalogOperationsTests
         result.Value.MessageId.ShouldBe(_submitted.ShouldHaveSingleItem().MessageId);
     }
 
+    [Theory]
+    [InlineData("Applied", AgentSetupTruthState.AuthoritativePending)]
+    [InlineData("AlreadyApplied", AgentSetupTruthState.ProjectionConfirmed)]
+    public async Task Governance_receipt_effect_controls_the_exact_submitted_write_truth(
+        string effect, AgentSetupTruthState expectedTruth)
+    {
+        _gateway.SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                SubmitCommandRequest request = call.Arg<SubmitCommandRequest>();
+                _submitted.Add(request);
+                using JsonDocument payload = JsonDocument.Parse($$"""{"effect":"{{effect}}"}""");
+                return new SubmitCommandResponse(request.CorrelationId!, payload.RootElement.Clone(), request.MessageId);
+            });
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> result = await Operations().CreateEntryAsync(CreateCommand());
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.ShouldNotBeNull().TruthState.ShouldBe(expectedTruth);
+        result.Value.MessageId.ShouldBe(_submitted.ShouldHaveSingleItem().MessageId);
+        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task Non_string_governance_receipt_effect_is_unverifiable_without_throwing()
+    {
+        _gateway.SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                SubmitCommandRequest request = call.Arg<SubmitCommandRequest>();
+                using JsonDocument payload = JsonDocument.Parse("""{"effect":42}""");
+                return new SubmitCommandResponse(request.CorrelationId!, payload.RootElement.Clone(), request.MessageId);
+            });
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> result = await Operations().CreateEntryAsync(CreateCommand());
+
+        result.IsSuccess.ShouldBeFalse();
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.UnableToVerify);
+        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task Operator_list_without_expected_version_remains_pending_when_known_heads_match()
+    {
+        SeedProjectedEntry(1);
+
+        ProviderCatalogInspectionResult result = (await Operations().ListEntriesAsync(includeDisabled: true))
+            .Value.ShouldNotBeNull();
+
+        result.Status.ShouldBe(ProviderCatalogInspectionStatus.Success);
+        result.TruthState.ShouldBe(AgentSetupTruthState.AuthoritativePending);
+        result.Freshness.ShouldBe(AgentSetupFreshness.Stale);
+    }
+
     [Fact]
     public async Task Rejected_platform_command_is_terminal_even_if_another_writer_advances_the_projection()
     {

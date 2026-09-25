@@ -97,6 +97,29 @@ public sealed class ProviderCatalogEventStoreIntegrationTests
     }
 
     [Fact]
+    public async Task Lifecycle_revision_survives_safe_view_and_projection_round_trip()
+    {
+        ProjectionEventDto created = Created();
+        string entryId = ProviderCatalogIdentity.EntryId("openai", "gpt-4o");
+        ProjectionEventDto disabled = Event(nameof(ProviderModelEntryDisabled), 2,
+            new ProviderModelEntryDisabled(entryId, "openai", "gpt-4o"));
+        ProjectionEventDto enabled = Event(nameof(ProviderModelEntryEnabled), 3,
+            new ProviderModelEntryEnabled(entryId, "openai", "gpt-4o"));
+
+        await ProjectAsync(created);
+        Persisted().Entries.ShouldHaveSingleItem().LifecycleRevision.ShouldBe(1);
+        await ProjectAsync(disabled);
+        Persisted().Entries.ShouldHaveSingleItem().LifecycleRevision.ShouldBe(2);
+        await ProjectAsync(enabled);
+        ProviderCatalogReadModel persisted = Persisted();
+        persisted.Entries.ShouldHaveSingleItem().LifecycleRevision.ShouldBe(3);
+        ProviderCatalogProjectionFold.ToState(persisted, TenantId).Entries.ShouldHaveSingleItem()
+            .Value.LifecycleRevision.ShouldBe(3);
+        ProviderCatalogProjectionFold.Fold(Request(created, disabled, enabled), null)
+            .Entries.ShouldHaveSingleItem().LifecycleRevision.ShouldBe(3);
+    }
+
+    [Fact]
     public async Task Replayed_platform_terms_preserve_the_operator_declaration_and_field_diff()
     {
         ProviderDataHandlingRecord prior = new(30, false, ["EU"], "terms-v1", 1,

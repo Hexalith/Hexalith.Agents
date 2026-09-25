@@ -177,6 +177,7 @@ public sealed class ProviderCatalogState
     }
 
     /// <summary>No-op replay handler for invalid data handling terms.</summary>
+    /// <param name="e">The rejected event.</param>
     public void Apply(InvalidProviderDataHandlingRejection e)
     {
         ArgumentNullException.ThrowIfNull(e);

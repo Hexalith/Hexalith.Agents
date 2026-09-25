@@ -82,18 +82,17 @@ public sealed class ProviderCatalogVersionRegressionTests
         int capability = state.Entries[key].CapabilityVersion;
         int pricing = state.Entries[key].Pricing!.PricingVersion;
 
-        DomainResult disable = ProviderCatalogAggregate.Handle(
-            new Contracts.ProviderCatalog.Commands.DisableProviderModelEntry("openai", "gpt-4o"),
-            state,
-            Envelope(new Contracts.ProviderCatalog.Commands.DisableProviderModelEntry("openai", "gpt-4o")));
+        var disableCommand = new Contracts.ProviderCatalog.Commands.DisableProviderModelEntry("openai", "gpt-4o", 1);
+        DomainResult disable = ProviderCatalogAggregate.Handle(disableCommand, state, Envelope(disableCommand));
+        disable.IsSuccess.ShouldBeTrue();
         ApplyAll(state, disable);
-        DomainResult enable = ProviderCatalogAggregate.Handle(
-            new Contracts.ProviderCatalog.Commands.EnableProviderModelEntry("openai", "gpt-4o"),
-            state,
-            Envelope(new Contracts.ProviderCatalog.Commands.EnableProviderModelEntry("openai", "gpt-4o")));
+        var enableCommand = new Contracts.ProviderCatalog.Commands.EnableProviderModelEntry("openai", "gpt-4o", 2);
+        DomainResult enable = ProviderCatalogAggregate.Handle(enableCommand, state, Envelope(enableCommand));
+        enable.IsSuccess.ShouldBeTrue();
         ApplyAll(state, enable);
 
         state.Entries[key].CapabilityVersion.ShouldBe(capability);
         state.Entries[key].Pricing!.PricingVersion.ShouldBe(pricing);
+        state.Entries[key].LifecycleRevision.ShouldBe(3);
     }
 }
