@@ -27,8 +27,10 @@ public sealed class ProjectedProviderCatalogReaderTests
     [Theory]
     [InlineData("enabled-committed", ProviderCatalogInspectionStatus.Unavailable, 1)]
     [InlineData("enabled-absent", ProviderCatalogInspectionStatus.EntryNotFound, 1)]
+    [InlineData("enabled-rejected-create", ProviderCatalogInspectionStatus.EntryNotFound, 1)]
     [InlineData("hidden", ProviderCatalogInspectionStatus.EntryNotFound, 0)]
     [InlineData("absent", ProviderCatalogInspectionStatus.EntryNotFound, 0)]
+    [InlineData("never-enabled", ProviderCatalogInspectionStatus.EntryNotFound, 0)]
     public async Task Missing_platform_row_checks_authority_only_for_a_tenant_visible_key(
         string scenario, ProviderCatalogInspectionStatus expected, int expectedHeadReads)
     {
@@ -36,18 +38,32 @@ public sealed class ProjectedProviderCatalogReaderTests
         const string providerId = "openai";
         const string modelId = "gpt-x";
         const string storeName = "statestore";
+        string entryId = ProviderCatalogIdentity.EntryId(providerId, modelId);
         var store = new FakeReadModelStore();
-        store.Seed(storeName, ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId),
-            new ProviderCatalogReadModel { CatalogId = ProviderCatalogIdentity.PlatformTenantId,
-                TenantId = ProviderCatalogIdentity.PlatformTenantId });
-        var tenant = new TenantProviderEnablementReadModel();
-        if (scenario != "absent")
+        var platform = new ProviderCatalogReadModel
         {
-            tenant.State.Apply(new TenantProviderModelEnablementSet(tenantId, providerId, modelId,
-                scenario != "hidden", 1, "operator", null));
+            CatalogId = ProviderCatalogIdentity.PlatformTenantId,
+            TenantId = ProviderCatalogIdentity.PlatformTenantId,
+        };
+        if (scenario == "enabled-rejected-create")
+        {
+            // A rejected create advances the stream and its projected checkpoint without adding a row.
+            platform.StreamSequences[entryId] = 1;
         }
-        tenant.LastSequenceNumber = 1;
-        store.Seed(storeName, TenantProviderEnablementReadModelAddresses.Detail(tenantId), tenant);
+
+        store.Seed(storeName, ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId), platform);
+        if (scenario != "never-enabled")
+        {
+            var tenant = new TenantProviderEnablementReadModel();
+            if (scenario != "absent")
+            {
+                tenant.State.Apply(new TenantProviderModelEnablementSet(tenantId, providerId, modelId,
+                    scenario != "hidden", 1, "operator", null));
+            }
+            tenant.LastSequenceNumber = 1;
+            store.Seed(storeName, TenantProviderEnablementReadModelAddresses.Detail(tenantId), tenant);
+        }
+
         IAgentAdministrationContextProvider context = Substitute.For<IAgentAdministrationContextProvider>();
         context.GetContext().Returns(new AgentAdministrationContext(tenantId, "admin", IsAgentsAdmin: true));
         IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
@@ -55,10 +71,16 @@ public sealed class ProjectedProviderCatalogReaderTests
             .Returns(call =>
             {
                 StreamReadRequest request = call.Arg<StreamReadRequest>();
-                long head = request.Domain == TenantProviderEnablementAggregate.Domain ? 1
-                    : scenario == "enabled-committed" ? 1 : 0;
+                bool tenantStream = request.Domain == TenantProviderEnablementAggregate.Domain;
+                if (tenantStream ? scenario == "never-enabled" : scenario == "enabled-absent")
+                {
+                    // EventStore reports a stream that was never written as 404 missing-stream, not head 0.
+                    throw new EventStoreGatewayException(404, "Not Found",
+                        reasonCode: StreamReplayReasonCodes.MissingStream);
+                }
+
                 return new StreamReadPage(request.Tenant, request.Domain, request.AggregateId, [],
-                    new StreamReadMetadata(0, null, null, head, 0, false, null));
+                    new StreamReadMetadata(0, null, null, 1, 0, false, null));
             });
         var reader = new ProjectedProviderCatalogReader(store,
             Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = storeName }), context, gateway);

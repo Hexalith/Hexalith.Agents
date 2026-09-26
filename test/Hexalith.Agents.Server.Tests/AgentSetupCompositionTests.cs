@@ -3,18 +3,24 @@ namespace Hexalith.Agents.Server.Tests;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 
 using Hexalith.Agents.Client;
+using Hexalith.Agents.Contracts.ProviderCatalog;
+using Hexalith.Agents.ProviderCatalog;
 using Hexalith.Agents.Server.Application.Agents;
+using Hexalith.Agents.Server.Application.Queries;
 using Hexalith.Agents.Server.Composition;
 using Hexalith.Agents.Server.Ports;
 using Hexalith.Agents.Server.Projections;
+using Hexalith.Agents.TenantProviderEnablement;
 
 using Hexalith.EventStore.Client.Projections;
 using Hexalith.EventStore.Client.Gateway;
 using Hexalith.EventStore.Contracts.Commands;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -167,16 +173,69 @@ public sealed class AgentSetupCompositionTests
             .ShouldBe("agents-statestore");
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Provider_catalog_query_and_migration_services_resolve_with_and_without_a_gateway(bool gateway)
+    {
+        using ServiceProvider provider = gateway
+            ? Build(("Agents:EventStore:BaseUrl", "https://eventstore.example"), ("Agents:EventStore:AppId", "eventstore"))
+            : Build();
+        using IServiceScope scope = provider.CreateScope();
+
+        // Query handlers are materialized by the EventStore domain-service scan; they need the context provider
+        // whether or not the gateway is bound.
+        scope.ServiceProvider.GetRequiredService<IAgentAdministrationContextProvider>()
+            .ShouldBeOfType<HttpAgentAdministrationContextProvider>();
+        scope.ServiceProvider.GetRequiredService<ProviderCatalogMigrationService>().ShouldNotBeNull();
+        ActivatorUtilities.CreateInstance<ListProviderCatalogEntriesQueryHandler>(scope.ServiceProvider).ShouldNotBeNull();
+        ActivatorUtilities.CreateInstance<GetProviderCatalogEntryQueryHandler>(scope.ServiceProvider).ShouldNotBeNull();
+    }
+
+    [Fact]
+    public async Task Configured_gateway_reaches_the_projected_reader_authority_check()
+    {
+        const string storeName = "statestore";
+        var handler = new CapturingHandler();
+        var store = new FakeReadModelStore();
+        var tenant = new TenantProviderEnablementReadModel { LastSequenceNumber = 1 };
+        tenant.State.Apply(new Hexalith.Agents.Contracts.ProviderCatalog.Events.TenantProviderModelEnablementSet(
+            "tenant-a", "openai", "gpt-4o", true, 1, "operator", null));
+        store.Seed(storeName, TenantProviderEnablementReadModelAddresses.Detail("tenant-a"), tenant);
+        using ServiceProvider provider = BuildCore(
+            handler,
+            store,
+            ("Agents:EventStore:BaseUrl", "https://eventstore.example"),
+            ("Agents:EventStore:AppId", "eventstore"),
+            ($"{ProviderCatalogReadModelOptions.SectionName}:StateStoreName", storeName));
+        using IServiceScope scope = provider.CreateScope();
+        scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext = new DefaultHttpContext
+        {
+            User = new ClaimsPrincipal(new ClaimsIdentity(
+                [new Claim("tenantId", "tenant-a"), new Claim("sub", "admin"),
+                    new Claim(ClaimTypes.Role, HttpAgentAdministrationContextProvider.AgentsAdministratorRole)],
+                "test")),
+        };
+
+        ProviderCatalogEntryReadResult result = await scope.ServiceProvider.GetRequiredService<IProviderCatalogReader>()
+            .GetEntryAsync("tenant-a", "openai", "gpt-4o", CancellationToken.None);
+
+        // The stub answers with a non-stream payload, so the head check fails closed after reaching the gateway.
+        result.Status.ShouldBe(ProviderCatalogInspectionStatus.Unavailable);
+        handler.RequestCount.ShouldBeGreaterThan(0);
+    }
+
     private static ServiceProvider Build(params (string Key, string Value)[] settings)
-        => BuildCore(null, settings);
+        => BuildCore(null, null, settings);
 
     private static ServiceProvider BuildWithHandler(
         HttpMessageHandler handler,
         params (string Key, string Value)[] settings)
-        => BuildCore(handler, settings);
+        => BuildCore(handler, null, settings);
 
     private static ServiceProvider BuildCore(
         HttpMessageHandler? handler,
+        IReadModelStore? store,
         params (string Key, string Value)[] settings)
     {
         ServiceCollection services = new();
@@ -189,7 +248,8 @@ public sealed class AgentSetupCompositionTests
         services.AddSingleton(AgentsClient.Unavailable());
         services.AddSingleton(Substitute.For<IProviderCatalogReader>());
         services.AddSingleton(Substitute.For<IApproverPolicyResolver>());
-        services.AddSingleton(Substitute.For<IReadModelStore>());
+        services.AddSingleton(store ?? Substitute.For<IReadModelStore>());
+        services.AddSingleton(Substitute.For<ITenantAccessReader>());
         services.AddScoped<AgentResponseModeOrchestrator>();
         services.AddScoped<AgentActivationProviderRevalidation>();
 
@@ -218,10 +278,13 @@ public sealed class AgentSetupCompositionTests
 
         internal int DaprApiTokenHeaderValueCount { get; private set; }
 
+        internal int RequestCount { get; private set; }
+
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
+            RequestCount++;
             string[] appIds = request.Headers.TryGetValues("dapr-app-id", out IEnumerable<string>? appIdValues)
                 ? appIdValues.ToArray()
                 : [];

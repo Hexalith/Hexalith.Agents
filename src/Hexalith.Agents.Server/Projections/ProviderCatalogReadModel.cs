@@ -32,7 +32,9 @@ public sealed class ProviderCatalogReadModel : IReadModelFreshness
     /// <summary>Gets recent successful projected command identities by entry stream for exact write confirmation.</summary>
     public Dictionary<string, List<string>> StreamCommandMessageIds { get; set; } = [];
 
-    /// <summary>Gets or sets the highest aggregate sequence number folded into this read model.</summary>
+    /// <summary>
+    /// Gets or sets the sum of the projected entry stream sequences (a legacy tenant catalog holds one stream).
+    /// </summary>
     public long LastSequenceNumber { get; set; }
 
     /// <inheritdoc />

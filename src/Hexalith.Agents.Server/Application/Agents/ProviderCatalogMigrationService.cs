@@ -26,6 +26,13 @@ public sealed class ProviderCatalogMigrationService(
     TimeProvider? clock = null,
     IEventStoreGatewayClient? gateway = null)
 {
+    // Mirrors the platform aggregate's allow-list. The legacy aggregate accepted undefined bits, and a
+    // rejected create after earlier groups commit would leave a partial migration.
+    private const ProviderModelCapabilityFlags SafeCapabilityFlags = ProviderModelCapabilityFlags.Streaming
+        | ProviderModelCapabilityFlags.ToolCalling
+        | ProviderModelCapabilityFlags.Vision
+        | ProviderModelCapabilityFlags.StructuredOutput;
+
     private readonly TimeProvider _clock = clock ?? TimeProvider.System;
     private readonly IEventStoreGatewayClient? _gateway = gateway;
 
@@ -82,6 +89,7 @@ public sealed class ProviderCatalogMigrationService(
             || !Iso4217CurrencyCodes.IsValid(pricing.Currency)
             || pricing.InputTokenUnitPrice < 0 || pricing.OutputTokenUnitPrice < 0
             || pricing.PricingVersion < 0
+            || (entry.SafeCapabilityFlags & ~SafeCapabilityFlags) != 0
             || entry.DataHandling is not null
                 && ProviderDataHandlingPolicy.Validate(entry.DataHandling, current: null, allowHistoricalVersion: true) is not null))
         {
@@ -145,9 +153,8 @@ public sealed class ProviderCatalogMigrationService(
             ProviderCatalogEntryView? target = Find(platform, source);
             bool expectedEnabled = group.Any(item => CanEnable(item.entry));
             if (target is not null
-                && !PlatformMatches(target, source, provenance, expectedEnabled)
-                && !(expectedEnabled && target.Status == ProviderModelStatus.Disabled
-                    && PlatformMetadataMatches(target, source, provenance)))
+                && !(PlatformMetadataMatches(target, source, provenance)
+                    && PlatformStatusAccepts(target, expectedEnabled, allowUpgrade: true)))
             {
                 return new("TargetConflict", 0, 0);
             }
@@ -279,7 +286,7 @@ public sealed class ProviderCatalogMigrationService(
         foreach (string tenantId in tenantIds)
         {
             finalTenants[tenantId] = await ReadTenantAsync(tenantId, cancellationToken).ConfigureAwait(false);
-            if (finalTenants[tenantId]?.LastSequenceNumber != tenantCheckpoints[tenantId]
+            if ((finalTenants[tenantId]?.LastSequenceNumber ?? 0) != tenantCheckpoints[tenantId]
                 || !await IsTargetCurrentAsync(tenantId, TenantProviderEnablementAggregate.Domain, tenantId,
                     tenantCheckpoints[tenantId], cancellationToken).ConfigureAwait(false))
             {
@@ -301,8 +308,8 @@ public sealed class ProviderCatalogMigrationService(
             }
 
             ProviderCatalogEntryView? target = Find(finalPlatform, source);
-            if (target is null || !PlatformMatches(target, source, PlatformProvenance(source),
-                group.Any(item => CanEnable(item.entry))))
+            if (target is null || !PlatformMetadataMatches(target, source, PlatformProvenance(source))
+                || !PlatformStatusAccepts(target, group.Any(item => CanEnable(item.entry)), allowUpgrade: false))
             {
                 return new("TargetConflict", platformCount, tenantCount);
             }
@@ -530,6 +537,14 @@ public sealed class ProviderCatalogMigrationService(
         string provenance, bool enabled)
         => PlatformMetadataMatches(target, source, provenance)
             && target.Status == (enabled ? ProviderModelStatus.Enabled : ProviderModelStatus.Disabled);
+
+    // A run expecting Disabled accepts an Enabled entry: an earlier run may have enabled it for another tenant,
+    // and tenant enablement still governs access. Migration upgrades Disabled to Enabled only while the entry is
+    // at its migrated-create lifecycle revision, so a rerun never re-enables a Platform Operator's disable.
+    private static bool PlatformStatusAccepts(ProviderCatalogEntryView target, bool expectedEnabled, bool allowUpgrade)
+        => target.Status == ProviderModelStatus.Enabled
+            || target.Status == ProviderModelStatus.Disabled
+                && (!expectedEnabled || allowUpgrade && target.LifecycleRevision == 1);
 
     private static bool PlatformMetadataMatches(ProviderCatalogEntryView target, ProviderCatalogEntryView source,
         string provenance)

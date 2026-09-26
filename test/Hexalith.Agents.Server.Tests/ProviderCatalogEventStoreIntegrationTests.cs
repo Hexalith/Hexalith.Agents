@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.ProviderCatalog.Events;
+using Hexalith.Agents.Contracts.ProviderCatalog.Events.Rejections;
 using Hexalith.Agents.ProviderCatalog;
 using Hexalith.Agents.Server.Projections;
 
@@ -79,6 +80,20 @@ public sealed class ProviderCatalogEventStoreIntegrationTests
         retained.ShouldNotContain("cmd-3");
         retained.ShouldContain($"cmd-{ProjectedCommandIdentityWindow.Capacity + 3}");
         projected.StreamSequences[aggregateId].ShouldBe(ProjectedCommandIdentityWindow.Capacity + 3);
+    }
+
+    [Fact]
+    public void Fold_advances_past_a_rejection_without_adding_its_message_id_to_the_confirmation_window()
+    {
+        string aggregateId = ProviderCatalogIdentity.EntryId("openai", "gpt-4o");
+        ProjectionEventDto rejected = Event(nameof(ProviderModelEntryAlreadyExistsRejection), 2,
+            new ProviderModelEntryAlreadyExistsRejection(aggregateId, "openai", "gpt-4o")) with { MessageId = "rejected" };
+
+        ProviderCatalogReadModel projected = ProviderCatalogProjectionFold.Fold(
+            Request(Created() with { MessageId = "cmd-1" }, rejected), current: null);
+
+        projected.StreamSequences[aggregateId].ShouldBe(2);
+        projected.StreamCommandMessageIds[aggregateId].ShouldBe(["cmd-1"]);
     }
 
     [Fact]
@@ -194,6 +209,36 @@ public sealed class ProviderCatalogEventStoreIntegrationTests
         rebuilt.Entries.Single(entry => entry.ProviderId == "openai").CapabilityVersion.ShouldBe(2);
         rebuilt.Entries.Single(entry => entry.ProviderId == "other").CapabilityVersion.ShouldBe(1);
         rebuilt.StreamSequences[second.CatalogId].ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Rebuilding_one_platform_entry_fails_when_another_entry_projects_into_the_shared_index_first()
+    {
+        await ProjectAsync(Created());
+        string otherId = ProviderCatalogIdentity.EntryId("other", "model");
+        ProviderModelEntryCreated other = new(
+            otherId, "other", "model", "Other model",
+            true, true, 32_000, 8_000, new ProviderModelTimeoutPolicy(30_000, 3),
+            ProviderModelCapabilityFlags.Streaming, ProviderConfigurationState.Configured, "cfg-other",
+            new ProviderModelPricing("USD", 0.001m, 0.002m, 1), 1,
+            new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1,
+                new DateTimeOffset(2026, 6, 24, 0, 0, 0, TimeSpan.Zero)));
+
+        DomainProjectionRebuildPlan plan = await Handler().PrepareRebuildAsync(
+            Request(Created(), Updated(sequence: 2)), "rebuild-1", CancellationToken.None);
+        (await Handler().ProjectAsync(new ProjectionRequest(TenantId, ProviderCatalogReadModelAddresses.Domain,
+            otherId, [Event(nameof(ProviderModelEntryCreated), 1, other)]), "dispatch-other", CancellationToken.None))
+            .Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        ReadModelBatchResult applied = await _store.ExecuteAsync(new ReadModelBatch(
+            new ReadModelBatchScope(StoreName, TenantId, ProviderCatalogReadModelAddresses.Domain,
+                ProviderCatalogIdentity.EntryId("openai", "gpt-4o"),
+                ProviderCatalogReadModelAddresses.ProjectionName, "rebuild-1"),
+            plan.Operations), CancellationToken.None);
+
+        applied.IsSuccess.ShouldBeFalse();
+        ProviderCatalogReadModel persisted = Persisted();
+        persisted.Entries.Count.ShouldBe(2);
+        persisted.StreamSequences[otherId].ShouldBe(1);
     }
 
     [Fact]

@@ -11,7 +11,8 @@ namespace Hexalith.Agents.Server.Application.Agents;
 /// </summary>
 /// <remarks>
 /// Precedence is top-to-bottom: existence → authorization → availability → enabled → text-gen → configured →
-/// capability metadata → pricing → capability-version floor → <see cref="ProviderSelectionValidationStatus.Valid"/>.
+/// capability metadata → pricing → tenant terms eligibility → capability-version floor →
+/// <see cref="ProviderSelectionValidationStatus.Valid"/>.
 /// It reads only the safe projection and fails closed on any uncertainty (an unauthorized/unavailable/degraded
 /// read never resolves to <c>Valid</c>).
 /// </remarks>

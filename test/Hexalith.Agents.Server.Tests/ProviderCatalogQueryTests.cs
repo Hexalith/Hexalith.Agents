@@ -456,6 +456,76 @@ public sealed class ProviderCatalogQueryTests
         JsonSerializer.Serialize(denied).ShouldNotContain("cfg-openai-gpt4o");
     }
 
+    [Theory]
+    [InlineData("not-global")]
+    [InlineData("other-user")]
+    public async Task Platform_query_requires_the_global_envelope_and_the_same_platform_operator(string scenario)
+    {
+        Seed();
+        if (scenario == "other-user")
+        {
+            _contextProvider.GetContext().Returns(new AgentAdministrationContext(
+                TenantId, "another-operator", IsAgentsAdmin: false, IsPlatformOperator: true));
+        }
+
+        QueryResult wire = await GetHandler().ExecuteAsync(Query(GetProviderCatalogEntryQuery.QueryType,
+            new GetProviderCatalogEntryQuery("openai", "gpt-4o"), global: scenario != "not-global"),
+            CancellationToken.None);
+
+        ProviderCatalogInspectionResult denied = JsonSerializer.Deserialize<ProviderCatalogInspectionResult>(
+            wire.PayloadBytes.ShouldNotBeNull(), _json).ShouldNotBeNull();
+        denied.Status.ShouldBe(ProviderCatalogInspectionStatus.NotAuthorized);
+        denied.Entries.ShouldBeEmpty();
+        System.Text.Encoding.UTF8.GetString(wire.PayloadBytes!).ShouldNotContain("cfg-openai-gpt4o");
+    }
+
+    [Fact]
+    public async Task Platform_detail_carries_the_entry_stream_projected_command_ids()
+    {
+        Seed();
+        string platformKey = ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId);
+        ProviderCatalogReadModel platform = _store.Snapshot<ProviderCatalogReadModel>(StoreName, platformKey).ShouldNotBeNull();
+        platform.StreamCommandMessageIds[ProviderCatalogIdentity.EntryId("openai", "gpt-4o")] = ["msg-x"];
+        _store.Seed(StoreName, platformKey, platform);
+
+        ProviderCatalogInspectionResult detail = await ExecuteAsync(GetHandler(),
+            Query(GetProviderCatalogEntryQuery.QueryType, new GetProviderCatalogEntryQuery("openai", "gpt-4o")));
+
+        detail.TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
+        detail.ProjectedCommandMessageIds.ShouldNotBeNull().ShouldBe(["msg-x"]);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Never_enabled_tenant_gets_a_confirmed_empty_catalog(bool platformProjected)
+    {
+        if (platformProjected)
+        {
+            Seed();
+        }
+
+        _gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>())
+            .Returns<Task<StreamReadPage>>(call => call.Arg<StreamReadRequest>().Domain == TenantProviderEnablementAggregate.Domain
+                ? throw new EventStoreGatewayException(404, "Not Found", reasonCode: StreamReplayReasonCodes.MissingStream)
+                : throw new InvalidOperationException("A never-enabled tenant must not probe platform streams."));
+
+        QueryResult listWire = await ListHandler().ExecuteAsync(Query(ListProviderCatalogEntriesQuery.QueryType,
+            new ListProviderCatalogEntriesQuery(false), tenantId: TenantId, global: false), CancellationToken.None);
+        QueryResult getWire = await GetHandler().ExecuteAsync(Query(GetProviderCatalogEntryQuery.QueryType,
+            new GetProviderCatalogEntryQuery("openai", "gpt-4o"), tenantId: TenantId, global: false), CancellationToken.None);
+
+        TenantProviderCatalogInspectionResult list = JsonSerializer.Deserialize<TenantProviderCatalogInspectionResult>(
+            listWire.PayloadBytes.ShouldNotBeNull(), _json).ShouldNotBeNull();
+        TenantProviderCatalogInspectionResult get = JsonSerializer.Deserialize<TenantProviderCatalogInspectionResult>(
+            getWire.PayloadBytes.ShouldNotBeNull(), _json).ShouldNotBeNull();
+        list.Status.ShouldBe(ProviderCatalogInspectionStatus.Success);
+        list.Entries.ShouldBeEmpty();
+        list.TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
+        get.Status.ShouldBe(ProviderCatalogInspectionStatus.EntryNotFound);
+        get.TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
+    }
+
     private ListProviderCatalogEntriesQueryHandler ListHandler()
         => new(_store, Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = StoreName }), _tenantAccess, _contextProvider, _gateway);
 

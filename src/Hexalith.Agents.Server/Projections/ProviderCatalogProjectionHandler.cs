@@ -33,7 +33,9 @@ public sealed class ProviderCatalogProjectionHandler(
             ProviderCatalogReadModelAddresses.ProjectionName,
             ProviderCatalogReadModelAddresses.DetailSlot,
             ProjectionReadModelSlotKind.Shared,
-            declaresCanonicalWriter: true),
+
+            // EventStore accepts canonical-writer declarations only for aggregate-owned slots.
+            declaresCanonicalWriter: false),
     ];
 
     /// <inheritdoc />

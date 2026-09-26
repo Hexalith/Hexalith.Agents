@@ -42,6 +42,7 @@ public sealed class ProviderCatalogMigrationTests
     private bool _mutatePlatformAfterTenantB;
     private bool _togglePlatformAfterTenantB;
     private bool _advanceLegacyAfterTenantB;
+    private bool _toggleTenantAAfterTenantB;
     private CommandStatus? _forcedStatus;
     private string? _missingTargetReason;
 
@@ -276,6 +277,92 @@ public sealed class ProviderCatalogMigrationTests
     }
 
     [Fact]
+    public async Task Final_revalidation_rejects_a_tenant_disable_reenable_with_equal_final_state()
+    {
+        SeedLegacy("tenant-a", Entry());
+        SeedLegacy("tenant-b", Entry());
+        _toggleTenantAAfterTenantB = true;
+
+        ProviderCatalogMigrationResult result = await Service().MigrateAsync(["tenant-a", "tenant-b"]);
+
+        result.Status.ShouldBe("AuthoritativePending");
+        _store.Snapshot<TenantProviderEnablementReadModel>(StoreName,
+            TenantProviderEnablementReadModelAddresses.Detail("tenant-a")).ShouldNotBeNull()
+            .State.Entries.ShouldHaveSingleItem().Value.Enabled.ShouldBeTrue();
+        _sent.Count.ShouldBe(3);
+    }
+
+    [Fact]
+    public async Task Later_disabled_tenant_accepts_a_platform_entry_an_earlier_run_enabled()
+    {
+        SeedLegacy("tenant-a", Entry());
+        ProviderCatalogMigrationService migration = Service();
+        (await migration.MigrateAsync(["tenant-a"])).Status.ShouldBe("ProjectionConfirmed");
+
+        SeedLegacy("tenant-b", Entry() with { Status = ProviderModelStatus.Disabled, IsSelectableForNewActiveUse = false });
+        ProviderCatalogMigrationResult late = await migration.MigrateAsync(["tenant-b"]);
+
+        late.Status.ShouldBe("ProjectionConfirmed");
+        late.PlatformEntries.ShouldBe(0);
+        late.TenantEntries.ShouldBe(1);
+        _sent.Count.ShouldBe(3);
+        _store.Snapshot<ProviderCatalogReadModel>(StoreName,
+            ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId)).ShouldNotBeNull()
+            .Entries.ShouldHaveSingleItem().Status.ShouldBe(ProviderModelStatus.Enabled);
+        _store.Snapshot<TenantProviderEnablementReadModel>(StoreName,
+            TenantProviderEnablementReadModelAddresses.Detail("tenant-b")).ShouldNotBeNull()
+            .State.Entries.ShouldHaveSingleItem().Value.Enabled.ShouldBeFalse();
+        (await migration.MigrateAsync(["tenant-a", "tenant-b"])).Status.ShouldBe("NoOp");
+    }
+
+    [Fact]
+    public async Task Rerun_never_reenables_a_platform_entry_an_operator_disabled()
+    {
+        SeedLegacy("tenant-a", Entry());
+        ProviderCatalogMigrationService migration = Service();
+        (await migration.MigrateAsync(["tenant-a"])).Status.ShouldBe("ProjectionConfirmed");
+        string platformKey = ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId);
+        ProviderCatalogReadModel platform = _store.Snapshot<ProviderCatalogReadModel>(StoreName, platformKey)
+            .ShouldNotBeNull();
+        platform.Entries[0] = platform.Entries[0] with
+        {
+            Status = ProviderModelStatus.Disabled,
+            IsSelectableForNewActiveUse = false,
+            LifecycleRevision = platform.Entries[0].LifecycleRevision + 1,
+        };
+        string entryId = ProviderCatalogIdentity.EntryId("openai", "gpt-4o");
+        platform.StreamSequences[entryId] = ++_targetHeads[TargetKey(ProviderCatalogIdentity.PlatformTenantId,
+            ProviderCatalogAggregate.Domain, entryId)];
+        _store.Seed(StoreName, platformKey, platform);
+
+        ProviderCatalogMigrationResult rerun = await migration.MigrateAsync(["tenant-a"]);
+
+        rerun.Status.ShouldBe("TargetConflict");
+        _sent.Count.ShouldBe(2);
+        _store.Snapshot<ProviderCatalogReadModel>(StoreName, platformKey).ShouldNotBeNull()
+            .Entries.ShouldHaveSingleItem().Status.ShouldBe(ProviderModelStatus.Disabled);
+    }
+
+    [Fact]
+    public async Task Empty_legacy_catalog_in_the_inventory_confirms_and_repeats_as_no_op()
+    {
+        SeedLegacy("tenant-a", Entry());
+        SeedLegacy("tenant-e", Entry());
+        ProviderCatalogReadModel empty = _store.Snapshot<ProviderCatalogReadModel>(StoreName,
+            ProviderCatalogReadModelAddresses.Detail("tenant-e")).ShouldNotBeNull();
+        empty.Entries.Clear();
+        _store.Seed(StoreName, ProviderCatalogReadModelAddresses.Detail("tenant-e"), empty);
+        ProviderCatalogMigrationService migration = Service();
+
+        ProviderCatalogMigrationResult first = await migration.MigrateAsync(["tenant-a", "tenant-e"]);
+
+        first.Status.ShouldBe("ProjectionConfirmed");
+        first.TenantEntries.ShouldBe(1);
+        (await migration.MigrateAsync(["tenant-a", "tenant-e"])).Status.ShouldBe("NoOp");
+        _sent.Count.ShouldBe(2);
+    }
+
+    [Fact]
     public async Task Mixed_legacy_status_uses_valid_enabled_source_for_platform_and_preserves_tenant_statuses()
     {
         SeedLegacy("tenant-a", Entry() with { Status = ProviderModelStatus.Disabled, IsSelectableForNewActiveUse = false });
@@ -324,22 +411,20 @@ public sealed class ProviderCatalogMigrationTests
     [Theory]
     [InlineData("divergent-legacy", "DivergentLegacyMetadata")]
     [InlineData("divergent-target", "TargetConflict")]
-    [InlineData("enablement-target", "TargetConflict")]
+    [InlineData("operator-disabled-target", "TargetConflict")]
     [InlineData("missing-inventory", "InvalidLegacyInventory")]
     public async Task Invalid_migration_matrix_rejects_every_row_before_dispatch(string scenario, string expected)
     {
         if (scenario != "missing-inventory")
         {
-            SeedLegacy("tenant-a", scenario == "enablement-target"
-                ? Entry() with { Status = ProviderModelStatus.Disabled, IsSelectableForNewActiveUse = false }
-                : Entry());
+            SeedLegacy("tenant-a", Entry());
         }
 
         if (scenario == "divergent-legacy")
         {
             SeedLegacy("tenant-b", Entry() with { DisplayLabel = "Different" });
         }
-        else if (scenario is "divergent-target" or "enablement-target")
+        else if (scenario is "divergent-target" or "operator-disabled-target")
         {
             _store.Seed(StoreName, ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId),
                 new ProviderCatalogReadModel
@@ -348,7 +433,9 @@ public sealed class ProviderCatalogMigrationTests
                     TenantId = ProviderCatalogIdentity.PlatformTenantId,
                     Entries = [Entry() with {
                         DisplayLabel = scenario == "divergent-target" ? "Different" : Entry().DisplayLabel,
-                        Status = ProviderModelStatus.Enabled,
+                        Status = scenario == "operator-disabled-target"
+                            ? ProviderModelStatus.Disabled : ProviderModelStatus.Enabled,
+                        LifecycleRevision = scenario == "operator-disabled-target" ? 2 : 1,
                         MigratedFrom =
                         $"legacy:provider-model:{ProviderCatalogIdentity.EntryId("openai", "gpt-4o")}" }],
                 });
@@ -411,6 +498,26 @@ public sealed class ProviderCatalogMigrationTests
         {
             ProviderId = "z-provider", ModelId = "second",
             Pricing = Entry().Pricing! with { Currency = currency },
+        });
+        _store.Seed(StoreName, key, inventory);
+
+        ProviderCatalogMigrationResult result = await Service().MigrateAsync(["tenant-a"]);
+
+        result.Status.ShouldBe("InvalidLegacyInventory");
+        _sent.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Undefined_capability_bits_on_a_second_legacy_entry_reject_before_dispatching_the_first_target()
+    {
+        SeedLegacy("tenant-a", Entry() with { ProviderId = "a-provider", ModelId = "first" });
+        string key = ProviderCatalogReadModelAddresses.Detail("tenant-a");
+        ProviderCatalogReadModel inventory = _store.Snapshot<ProviderCatalogReadModel>(StoreName, key)
+            .ShouldNotBeNull();
+        inventory.Entries.Add(Entry() with
+        {
+            ProviderId = "z-provider", ModelId = "second",
+            SafeCapabilityFlags = ProviderModelCapabilityFlags.Streaming | (ProviderModelCapabilityFlags)(1 << 8),
         });
         _store.Seed(StoreName, key, inventory);
 
@@ -600,6 +707,18 @@ public sealed class ProviderCatalogMigrationTests
             {
                 _advanceLegacyAfterTenantB = false;
                 _legacyHeads["tenant-a"]++;
+            }
+            if (_toggleTenantAAfterTenantB && command.TenantId == "tenant-b")
+            {
+                // A disable then re-enable of tenant A commits and projects; its final state still matches.
+                _toggleTenantAAfterTenantB = false;
+                string tenantAKey = TenantProviderEnablementReadModelAddresses.Detail("tenant-a");
+                TenantProviderEnablementReadModel tenantA = _store.Snapshot<TenantProviderEnablementReadModel>(
+                    StoreName, tenantAKey).ShouldNotBeNull();
+                string tenantATargetKey = TargetKey("tenant-a", TenantProviderEnablementAggregate.Domain, "tenant-a");
+                tenantA.LastSequenceNumber = _targetHeads[tenantATargetKey]
+                    = _targetHeads.GetValueOrDefault(tenantATargetKey) + 2;
+                _store.Seed(StoreName, tenantAKey, tenantA);
             }
             if (_togglePlatformAfterTenantB && command.TenantId == "tenant-b")
             {

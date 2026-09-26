@@ -4,6 +4,7 @@ using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.ProviderCatalog.Queries;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.ProviderCatalog.Events;
+using Hexalith.Agents.Contracts.ProviderCatalog.Events.Rejections;
 using Hexalith.Agents.ProviderCatalog;
 using Hexalith.Agents.Server.Application.Queries;
 using Hexalith.Agents.Server.Ports;
@@ -114,6 +115,31 @@ public sealed class TenantProviderCatalogIntegrationTests
         projected.ProjectedCommandMessageIds.ShouldNotContain("msg-2");
         projected.ProjectedCommandMessageIds.ShouldContain($"msg-{ProjectedCommandIdentityWindow.Capacity + 2}");
         projected.LastSequenceNumber.ShouldBe(ProjectedCommandIdentityWindow.Capacity + 2);
+    }
+
+    [Fact]
+    public async Task Tenant_projection_advances_past_a_rejection_without_confirming_its_command()
+    {
+        var handler = new TenantProviderEnablementProjectionHandler(_store, _store, Options());
+
+        DomainProjectionHandlerResult result = await handler.ProjectAsync(
+            new ProjectionRequest("tenant-a", "tenant-provider-enablement", "tenant-a",
+            [
+                Event(nameof(TenantProviderModelEnablementSet), 1,
+                    new TenantProviderModelEnablementSet("tenant-a", "openai", "gpt-4o", true, 1, "operator", null)),
+                Event(nameof(TenantProviderGovernanceRejected), 2,
+                    new TenantProviderGovernanceRejected("tenant-a", "openai", "gpt-4o", "StaleRevision")),
+                Event(nameof(TenantProviderModelEnablementSet), 3,
+                    new TenantProviderModelEnablementSet("tenant-a", "openai", "gpt-4o", false, 2, "operator", null)),
+            ]),
+            "tenant-rejection", CancellationToken.None);
+
+        result.Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        TenantProviderEnablementReadModel projected = _store.Snapshot<TenantProviderEnablementReadModel>(
+            StoreName, TenantProviderEnablementReadModelAddresses.Detail("tenant-a")).ShouldNotBeNull();
+        projected.LastSequenceNumber.ShouldBe(3);
+        projected.ProjectedCommandMessageIds.ShouldBe(["msg-1", "msg-3"]);
+        projected.State.Entries.ShouldHaveSingleItem().Value.Enabled.ShouldBeFalse();
     }
 
     [Fact]
