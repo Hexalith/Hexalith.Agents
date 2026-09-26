@@ -42,10 +42,30 @@ public sealed class ProviderCatalogMigrationTests
     private bool _mutatePlatformAfterTenantB;
     private bool _togglePlatformAfterTenantB;
     private bool _advanceLegacyAfterTenantB;
+    private CommandStatus? _forcedStatus;
     private string? _missingTargetReason;
 
     private static string TargetKey(string tenantId, string domain, string aggregateId)
         => $"{tenantId}/{domain}/{aggregateId}";
+
+    [Theory]
+    [InlineData(CommandStatus.PublishFailed, "AuthoritativePending")]
+    [InlineData(CommandStatus.TimedOut, "DispatchFailed")]
+    public async Task Stored_publish_failure_keeps_migration_pending_for_drain_recovery(
+        CommandStatus status, string expected)
+    {
+        SeedLegacy("tenant-a", Entry());
+        _forcedStatus = status;
+
+        ProviderCatalogMigrationResult result = await Service().MigrateAsync(["tenant-a"]);
+
+        result.Status.ShouldBe(expected);
+        result.PlatformEntries.ShouldBe(1);
+        _sent.ShouldHaveSingleItem().CommandType.ShouldBe(nameof(CreateProviderModelEntry));
+        _store.Snapshot<ProviderCatalogReadModel>(StoreName,
+            ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId))
+            .ShouldNotBeNull().Entries.ShouldHaveSingleItem();
+    }
 
     [Theory]
     [InlineData("missing-stream", "ProjectionConfirmed")]
@@ -467,9 +487,9 @@ public sealed class ProviderCatalogMigrationTests
             {
                 CommandEnvelope? command = _sent.FirstOrDefault(item => item.MessageId == call.Arg<string>());
                 bool rejected = command is not null && _rejectedMessages.Contains(command.MessageId);
+                CommandStatus commandStatus = _forcedStatus ?? (rejected ? CommandStatus.Rejected : CommandStatus.Completed);
                 return command is null ? null : new CommandStatusQueryResponse(command.CorrelationId,
-                    rejected ? nameof(CommandStatus.Rejected) : nameof(CommandStatus.Completed),
-                    (int)(rejected ? CommandStatus.Rejected : CommandStatus.Completed),
+                    commandStatus.ToString(), (int)commandStatus,
                     RejectionEventType: rejected ? "InvalidProviderModelMetadataRejection" : null,
                     MessageId: command.MessageId)
                 {

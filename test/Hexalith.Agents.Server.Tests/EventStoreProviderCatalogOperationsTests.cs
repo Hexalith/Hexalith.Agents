@@ -87,6 +87,26 @@ public sealed class EventStoreProviderCatalogOperationsTests
         result.Value.ShouldBe(AgentSetupWriteStatus.UnableToVerify);
     }
 
+    [Theory]
+    [InlineData(CommandStatus.PublishFailed, AgentSetupWriteStatus.AwaitingProjection)]
+    [InlineData(CommandStatus.TimedOut, AgentSetupWriteStatus.Unavailable)]
+    public async Task Stored_publish_failure_keeps_pending_truth_but_timeout_is_terminal(
+        CommandStatus status, AgentSetupWriteStatus expected)
+    {
+        _gateway.GetCommandStatusAsync("msg-outcome", Arg.Any<CancellationToken>())
+            .Returns(new CommandStatusQueryResponse("corr", status.ToString(), (int)status,
+                MessageId: "msg-outcome")
+            {
+                TenantId = ProviderCatalogIdentity.PlatformTenantId,
+            });
+
+        AgentOperationResult<AgentSetupWriteStatus> result = await Operations()
+            .GetCommandOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId, "msg-outcome");
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.ShouldBe(expected);
+    }
+
     [Fact]
     public async Task A_valid_submission_receipt_can_report_submitted_before_its_status_record_exists()
     {
@@ -99,6 +119,22 @@ public sealed class EventStoreProviderCatalogOperationsTests
         write.Value.ShouldNotBeNull().TruthState.ShouldBe(AgentSetupTruthState.Submitted);
         (await Operations().GetCommandOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId,
             write.Value.MessageId)).Value.ShouldBe(AgentSetupWriteStatus.UnableToVerify);
+    }
+
+    [Fact]
+    public async Task Failed_immediate_status_lookup_preserves_the_valid_receipt_identity()
+    {
+        _gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<CommandStatusQueryResponse?>(new InvalidOperationException("status unavailable")));
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> write = await Operations().CreateEntryAsync(CreateCommand());
+
+        write.IsSuccess.ShouldBeTrue();
+        ProviderCatalogCommandAcceptance acceptance = write.Value.ShouldNotBeNull();
+        SubmitCommandRequest submitted = _submitted.ShouldHaveSingleItem();
+        acceptance.MessageId.ShouldBe(submitted.MessageId);
+        acceptance.CorrelationId.ShouldBe(submitted.CorrelationId);
+        acceptance.TruthState.ShouldBe(AgentSetupTruthState.Submitted);
     }
 
     [Theory]

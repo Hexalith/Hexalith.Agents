@@ -96,6 +96,16 @@ public sealed class DeferredGatewayTests
 
         result.Status.ShouldBe(ProviderCatalogInspectionStatus.NotAuthorized);
         result.Entries.ShouldBeEmpty();
+        (await gateway.ListTenantEntriesAsync(includeDisabled, CancellationToken.None)).Status
+            .ShouldBe(ProviderCatalogInspectionStatus.NotAuthorized);
+        (await gateway.GetTenantEntryAsync("openai", "gpt-x", CancellationToken.None)).Status
+            .ShouldBe(ProviderCatalogInspectionStatus.NotAuthorized);
+        TenantProviderEnablementInspectionResult enablement = await gateway.GetTenantEnablementAsync(
+            "tenant-a", "openai", "gpt-x", CancellationToken.None);
+        enablement.Status.ShouldBe(ProviderCatalogInspectionStatus.NotAuthorized);
+        enablement.Enabled.ShouldBeNull();
+        (await gateway.GetCommandOutcomeAsync("tenant-a", "message-1", CancellationToken.None))
+            .ShouldBe(AgentSetupWriteStatus.UnableToVerify);
     }
 
     [Fact]
@@ -130,8 +140,13 @@ public sealed class DeferredGatewayTests
         ProviderCatalogWriteResult updated = await gateway.UpdateAsync(update, CancellationToken.None);
         ProviderCatalogWriteResult enabled = await gateway.EnableAsync(new EnableProviderModelEntry("openai", "gpt-x"), CancellationToken.None);
         ProviderCatalogWriteResult disabled = await gateway.DisableAsync(new DisableProviderModelEntry("openai", "gpt-x"), CancellationToken.None);
+        ProviderCatalogWriteResult tenantEnabled = await gateway.SetTenantEnablementAsync(
+            new SetTenantProviderModelEnablement("tenant-a", "openai", "gpt-x", true, 0, null), CancellationToken.None);
+        ProviderCatalogWriteResult decided = await gateway.DecideDataHandlingAsync(
+            new DecideProviderDataHandling("openai", "gpt-x", 1, false, "Declined", 0,
+                new ProviderDataHandlingRecord(30, false, ["FR"], "terms-1", 1), DateTimeOffset.UtcNow), CancellationToken.None);
 
-        foreach (ProviderCatalogWriteResult result in new[] { created, updated, enabled, disabled })
+        foreach (ProviderCatalogWriteResult result in new[] { created, updated, enabled, disabled, tenantEnabled, decided })
         {
             result.Status.ShouldBe(AgentSetupWriteStatus.NotAuthorized);
             result.Acceptance.ShouldBeNull();

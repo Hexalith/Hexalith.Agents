@@ -93,6 +93,10 @@ public sealed class BuildContractConformanceTests
     [Fact]
     public void RootCheckoutShouldLoadTheSharedEventStoreVersion()
     {
+        XDocument catalog = XDocument.Load(ModuleLayout.RootFile(
+            "references/Hexalith.Builds/Props/Directory.Packages.props"));
+        string sharedVersion = PropertyValue(catalog, "HexalithEventStoreVersion")
+            ?? throw new InvalidOperationException("The shared catalog must select Hexalith.EventStore.");
         using JsonDocument evaluation = EvaluateMsBuild(
             ModuleLayout.SourceProjectFile("Hexalith.Agents.EventStore"),
             "-getProperty:HexalithVersionsLoaded",
@@ -104,7 +108,7 @@ public sealed class BuildContractConformanceTests
 
         JsonElement properties = evaluation.RootElement.GetProperty("Properties");
         properties.GetProperty("HexalithVersionsLoaded").GetString().ShouldBe("true");
-        properties.GetProperty("HexalithEventStoreVersion").GetString().ShouldBe("3.106.0");
+        properties.GetProperty("HexalithEventStoreVersion").GetString().ShouldBe(sharedVersion);
     }
 
     [Theory]

@@ -714,6 +714,10 @@
   <data name="Agents.TenantProviders.ExactVersion" xml:space="preserve"><value>Data handling version {0}</value></data>
   <data name="Agents.TenantProviders.Retention" xml:space="preserve"><value>Retention: {0} days</value></data>
   <data name="Agents.TenantProviders.Training" xml:space="preserve"><value>Training use: {0}</value></data>
+  <data name="Agents.TenantProviders.Training.Allowed" xml:space="preserve"><value>Allowed</value></data>
+  <data name="Agents.ProviderCatalog.Enablement.CheckPending" xml:space="preserve"><value>Check pending enablement for tenant {0}: {1} / {2}</value></data>
+  <data name="Agents.TenantProviders.Training.NotAllowed" xml:space="preserve"><value>Not allowed</value></data>
+  <data name="Agents.TenantProviders.Role.PlatformOperator" xml:space="preserve"><value>Platform Operator</value></data>
   <data name="Agents.TenantProviders.Regions" xml:space="preserve"><value>Processing regions: {0}</value></data>
   <data name="Agents.TenantProviders.TermsReference" xml:space="preserve"><value>Terms reference: {0}</value></data>
   <data name="Agents.TenantProviders.EffectiveAt" xml:space="preserve"><value>Effective at {0}</value></data>

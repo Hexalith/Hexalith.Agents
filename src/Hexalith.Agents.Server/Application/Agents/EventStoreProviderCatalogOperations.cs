@@ -122,7 +122,8 @@ public sealed class EventStoreProviderCatalogOperations(
                     ((int)CommandStatus.Rejected, nameof(CommandStatus.Rejected)) when !string.IsNullOrWhiteSpace(status.FailureReason)
                         => AgentSetupWriteStatus.Unavailable,
                     ((int)CommandStatus.PublishFailed, nameof(CommandStatus.PublishFailed))
-                        or ((int)CommandStatus.TimedOut, nameof(CommandStatus.TimedOut))
+                        => AgentSetupWriteStatus.AwaitingProjection,
+                    ((int)CommandStatus.TimedOut, nameof(CommandStatus.TimedOut))
                         => AgentSetupWriteStatus.Unavailable,
                     ((int)CommandStatus.Received, nameof(CommandStatus.Received))
                         or ((int)CommandStatus.Processing, nameof(CommandStatus.Processing))
@@ -709,7 +710,8 @@ public sealed class EventStoreProviderCatalogOperations(
             AgentOperationResult<AgentSetupWriteStatus> observed = await GetCommandOutcomeCoreAsync(
                 targetTenantId, messageId, hasSubmissionReceipt: true, ct).ConfigureAwait(false);
             status = observed.IsSuccess && observed.Value is { } value
-                ? value : AgentSetupWriteStatus.UnableToVerify;
+                ? value == AgentSetupWriteStatus.UnableToVerify ? AgentSetupWriteStatus.Submitted : value
+                : AgentSetupWriteStatus.UnableToVerify;
         }
         return status switch
         {

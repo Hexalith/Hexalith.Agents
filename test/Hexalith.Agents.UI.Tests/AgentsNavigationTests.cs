@@ -26,7 +26,7 @@ public sealed class AgentsNavigationTests : AgentsTestContext
     public void RegisterDomain_registers_agents_manifest_and_ten_ordered_entries()
     {
         // Story 4.3/4.4 AC3 — the Agents domain is coherent in operational-setup → workflow → status → audit → launch
-        // order, now nine ordered entries (the Story 4.4 launch-readiness surface is appended at Order 8).
+        // order, now ten ordered entries (the tenant provider surface is appended at Order 9).
         CapturingFrontComposerRegistry registry = new();
 
         AgentsFrontComposerRegistration.RegisterDomain(registry);
@@ -66,6 +66,15 @@ public sealed class AgentsNavigationTests : AgentsTestContext
         // Story 4.4 AC3 — nav hiding is not authorization: the page itself carries [Authorize(Policy = …)].
         AuthorizeAttribute authorize = typeof(LaunchReadiness).GetCustomAttributes<AuthorizeAttribute>(inherit: true).ShouldHaveSingleItem();
         authorize.Policy.ShouldBe(AgentsFrontComposerRegistration.AgentsAdministratorPolicy);
+    }
+
+    [Theory]
+    [InlineData(typeof(ProviderCatalog), AgentsFrontComposerRegistration.PlatformOperatorPolicy)]
+    [InlineData(typeof(TenantProviderCatalog), AgentsFrontComposerRegistration.AgentsAdministratorPolicy)]
+    public void Provider_catalog_pages_enforce_their_own_policies(System.Type pageType, string expectedPolicy)
+    {
+        AuthorizeAttribute authorize = pageType.GetCustomAttributes<AuthorizeAttribute>(inherit: true).ShouldHaveSingleItem();
+        authorize.Policy.ShouldBe(expectedPolicy);
     }
 
     [Fact]

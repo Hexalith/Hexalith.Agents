@@ -133,6 +133,56 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     }
 
     [Theory]
+    [InlineData(nameof(CreateProviderModelEntry))]
+    [InlineData(nameof(UpdateProviderModelEntry))]
+    public void Registered_catalog_admission_intent_ignores_restamped_terms_time_but_rejects_field_change(
+        string commandType)
+    {
+        ServiceCollection services = new();
+        _ = services.AddAgentsEventStore(AgentsAppId);
+        using ServiceProvider provider = services.BuildServiceProvider();
+        IIdempotencyIntentAdapter adapter = provider.GetServices<IIdempotencyIntentAdapter>()
+            .Single(item => item.CommandType == commandType);
+        DateTimeOffset now = new(2026, 9, 25, 0, 0, 0, TimeSpan.Zero);
+        var declaration = new ProviderDataHandlingTighteningDeclaration(1, 2,
+            new ProviderDataHandlingFieldDiff(30, 14, true, false, ["US"], [], "terms-v1", "terms-v1"),
+            "operator", "Agents.PlatformOperator", now);
+        var terms = new ProviderDataHandlingRecord(14, false, ["EU"], "terms-v1",
+            commandType == nameof(CreateProviderModelEntry) ? 1 : 2, now,
+            commandType == nameof(CreateProviderModelEntry) ? null : declaration);
+        var pricing = new ProviderModelPricing("USD", 1m, 2m, 1);
+        var timeout = new ProviderModelTimeoutPolicy(30_000, 3);
+        byte[] Payload(ProviderDataHandlingRecord record) => commandType == nameof(CreateProviderModelEntry)
+            ? JsonSerializer.SerializeToUtf8Bytes(new CreateProviderModelEntry("provider", "model", "Model", true,
+                true, 128_000, 16_000, timeout, ProviderModelCapabilityFlags.None, null, pricing, record))
+            : JsonSerializer.SerializeToUtf8Bytes(new UpdateProviderModelEntry("provider", "model", "Model",
+                true, 128_000, 16_000, timeout, ProviderModelCapabilityFlags.None, null, pricing,
+                ExpectedCapabilityVersion: 1, DataHandling: record, DeclareDataHandlingTightening: true));
+        var original = new IdempotencyIntentCommand(commandType, ProviderCatalogIdentity.PlatformTenantId,
+            "provider-catalog", ProviderCatalogIdentity.EntryId("provider", "model"), Payload(terms),
+            new Dictionary<string, string> { ["actor:agentsProviderAdmin"] = "true" });
+        ProviderDataHandlingRecord restamped = terms with
+        {
+            EffectiveAt = now.AddMinutes(1),
+            TighteningDeclaration = terms.TighteningDeclaration is { } prior
+                ? prior with { DeclaredAt = now.AddMinutes(1) } : null,
+        };
+
+        IdempotencyCanonicalIntent first = adapter.CreateIntent(original);
+        IdempotencyCanonicalIntent retry = adapter.CreateIntent(original with { Payload = Payload(restamped) });
+        IdempotencyCanonicalIntent divergent = adapter.CreateIntent(original with
+        {
+            Payload = Payload(terms with { RetentionDays = 7 }),
+        });
+
+        var encoder = new CanonicalIdempotencyIntentEncoder();
+        byte[] Canonical(IdempotencyCanonicalIntent intent) => encoder.Encode(adapter.AdapterId,
+            adapter.OperationId, adapter.DescriptorVersion, adapter.RetentionTier, intent);
+        Canonical(retry).SequenceEqual(Canonical(first)).ShouldBeTrue();
+        Canonical(divergent).SequenceEqual(Canonical(first)).ShouldBeFalse();
+    }
+
+    [Theory]
     [InlineData(" agents")]
     [InlineData("agents ")]
     public void Gateway_registration_rejects_a_padded_Dapr_app_id(string appId)

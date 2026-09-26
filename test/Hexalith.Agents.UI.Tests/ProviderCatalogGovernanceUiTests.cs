@@ -271,17 +271,60 @@ public sealed class ProviderCatalogGovernanceUiTests : AgentsTestContext
         reads.ShouldBeGreaterThan(1);
     }
 
+    [Fact]
+    public async Task Grace_refresh_clears_prior_decision_input_and_truth_when_terms_change()
+    {
+        var terms = new ProviderDataHandlingRecord(14, false, ["EU"], "terms-v2", 2);
+        DateTimeOffset deadline = Clock.GetUtcNow().AddSeconds(1);
+        TenantProviderCatalogEntryView grace = TenantEntry("openai", "gpt-x", terms) with
+        {
+            DataHandlingStatus = "Grace",
+            GraceExpiresAt = deadline,
+        };
+        TenantProviderCatalogEntryView changed = grace with
+        {
+            DisplayLabel = "Changed terms model",
+            DataHandling = terms with { RetentionDays = 7, DataHandlingVersion = 3 },
+            DataHandlingStatus = "AcceptanceRequired",
+            GraceExpiresAt = null,
+        };
+        CatalogGateway.ListTenantEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Task.FromResult(new TenantProviderCatalogInspectionResult(
+                ProviderCatalogInspectionStatus.Success, [Clock.GetUtcNow() < deadline ? grace : changed])));
+        CatalogGateway.DecideDataHandlingAsync(Arg.Any<DecideProviderDataHandling>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProviderCatalogWriteResult.Submitted(new ProviderCatalogCommandAcceptance(
+                "openai", "gpt-x", "msg-decided", "corr", AgentSetupTruthState.ProjectionConfirmed))));
+
+        IRenderedComponent<TenantProviderCatalog> cut = RenderPage<TenantProviderCatalog>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-tenant-provider-review']"));
+        cut.Find("[data-testid='agents-tenant-provider-review']").Click();
+        cut.Find("[data-testid='agents-tenant-provider-justification']").Change("Reviewed old terms");
+        await cut.Find("[data-testid='agents-tenant-provider-accept']").ClickAsync(new MouseEventArgs());
+        cut.Find("[data-testid='agents-tenant-provider-truth']").TextContent.ShouldContain("ProjectionConfirmed");
+
+        Clock.Advance(TimeSpan.FromSeconds(1));
+
+        cut.WaitForAssertion(() => cut.VisibleText().ShouldContain("Changed terms model"));
+        cut.Find("[data-testid='agents-tenant-provider-justification']").GetAttribute("value").ShouldBe(string.Empty);
+        cut.Find("[data-testid='agents-tenant-provider-accept']").HasAttribute("disabled").ShouldBeTrue();
+        cut.Find("[data-testid='agents-tenant-provider-decline']").HasAttribute("disabled").ShouldBeTrue();
+        cut.FindAll("[data-testid='agents-tenant-provider-truth']").ShouldBeEmpty();
+        await CatalogGateway.Received(1).DecideDataHandlingAsync(Arg.Any<DecideProviderDataHandling>(),
+            Arg.Any<CancellationToken>());
+    }
+
     [Theory]
-    [InlineData("en", "Effective at", "Tightening declared", "Retention changed", "Allow training use")]
-    [InlineData("fr", "En vigueur", "Durcissement déclaré", "Conservation modifiée", "Autoriser l'utilisation")]
+    [InlineData("en", "Effective at", "Tightening declared", "Retention changed", "Allow training use", "Training use: Not allowed", "Allowed to Not allowed", "Platform Operator")]
+    [InlineData("fr", "En vigueur", "Durcissement déclaré", "Conservation modifiée", "Autoriser l'utilisation", "Utilisation pour l'entraînement : Non autorisée", "Autorisée à Non autorisée", "Opérateur de plateforme")]
     public void Terms_review_renders_effective_time_and_complete_declared_diff_in_both_cultures(
-        string cultureName, string effectiveLabel, string declarationLabel, string retentionLabel, string trainingLabel)
+        string cultureName, string effectiveLabel, string declarationLabel, string retentionLabel, string trainingLabel,
+        string tenantTraining, string tighteningTraining, string roleBasis)
     {
         Services.AddSingleton<IStringLocalizer<AgentsResources>>(
             new EmbeddedResourceLocalizer(CultureInfo.GetCultureInfo(cultureName)));
         var diff = new ProviderDataHandlingFieldDiff(30, 14, true, false, ["US"], [], "terms-v1", "terms-v1");
         var declaration = new ProviderDataHandlingTighteningDeclaration(
-            1, 2, diff, "operator-a", "PlatformOperator", new DateTimeOffset(2026, 6, 20, 10, 0, 0, TimeSpan.Zero));
+            1, 2, diff, "operator-a", "Agents.PlatformOperator", new DateTimeOffset(2026, 6, 20, 10, 0, 0, TimeSpan.Zero));
         var terms = new ProviderDataHandlingRecord(14, false, ["EU"], "terms-v1", 2,
             new DateTimeOffset(2026, 6, 21, 10, 0, 0, TimeSpan.Zero), declaration);
         var entry = TenantEntry("openai", "gpt-x", terms);
@@ -297,6 +340,9 @@ public sealed class ProviderCatalogGovernanceUiTests : AgentsTestContext
         cut.Find("[data-testid='agents-tenant-provider-effective-at']").TextContent
             .ShouldContain(terms.EffectiveAt.ShouldNotBeNull().ToString(CultureInfo.GetCultureInfo(cultureName)));
         cut.Find("[data-testid='agents-tenant-provider-tightening']").TextContent.ShouldContain(declarationLabel);
+        cut.Find("[data-testid='agents-tenant-provider-tightening']").TextContent.ShouldContain(roleBasis);
+        cut.VisibleText().ShouldContain(tenantTraining);
+        cut.VisibleText().ShouldContain(tighteningTraining);
         cut.Find("[data-testid='agents-tenant-provider-tightening']").TextContent
             .ShouldContain(declaration.DeclaredAt.ToString(CultureInfo.GetCultureInfo(cultureName)));
         cut.VisibleText().ShouldContain(retentionLabel);
@@ -452,6 +498,9 @@ public sealed class ProviderCatalogGovernanceUiTests : AgentsTestContext
         Task pending = cut.Find("[data-testid='agents-provider-catalog-enablement-save']")
             .ClickAsync(new MouseEventArgs());
         cut.WaitForAssertion(() => cut.Find("[data-testid='agents-provider-catalog-enablement-check-pending']"));
+        cut.Find("[data-testid='agents-provider-catalog-enablement-tenant']").HasAttribute("disabled").ShouldBeTrue();
+        cut.Find("[data-testid='agents-provider-catalog-enablement-revision']").HasAttribute("disabled").ShouldBeTrue();
+        cut.Find("[data-testid='agents-provider-catalog-enablement-enabled']").HasAttribute("disabled").ShouldBeTrue();
         Clock.Advance(TimeSpan.FromSeconds(8));
         await pending.WaitAsync(TimeSpan.FromSeconds(2));
 
@@ -465,6 +514,204 @@ public sealed class ProviderCatalogGovernanceUiTests : AgentsTestContext
             Arg.Is<SetTenantProviderModelEnablement>(command => command.TenantId == "tenant-b"
                 && command.ExpectedRevision == 0 && command.Enabled),
             Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Restored_enablements_are_checkable_before_the_catalog_list_finishes_loading()
+    {
+        TaskCompletionSource<ProviderCatalogInspectionResult> list = new();
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(list.Task);
+        foreach (string tenant in new[] { "tenant-a", "tenant-b" })
+        {
+            await PendingCommandStore.SaveAsync(new PendingProviderCommand("TenantProviderEnablement",
+                $"{tenant}:{ProviderCatalogIdentity.EntryId("openai", "gpt-x")}", tenant,
+                new ProviderCatalogCommandAcceptance("openai", "gpt-x", $"msg-{tenant}", "corr",
+                    AgentSetupTruthState.Submitted)));
+            CatalogGateway.GetCommandOutcomeAsync(tenant, $"msg-{tenant}", Arg.Any<CancellationToken>())
+                .Returns(Task.FromResult(AgentSetupWriteStatus.Submitted));
+        }
+
+        IRenderedComponent<ProviderCatalog> cut = RenderPage<ProviderCatalog>();
+        cut.WaitForAssertion(() => cut.FindAll("[data-testid='agents-provider-catalog-enablement-check-pending']")
+            .Count.ShouldBe(2));
+        await cut.FindAll("[data-testid='agents-provider-catalog-enablement-check-pending']")[1]
+            .ClickAsync(new MouseEventArgs());
+        await CatalogGateway.Received(1).GetCommandOutcomeAsync("tenant-b", "msg-tenant-b",
+            Arg.Any<CancellationToken>());
+        (await PendingCommandStore.LoadAsync()).Count.ShouldBe(2);
+        list.SetResult(ProviderCatalogInspectionResult.Success([]));
+    }
+
+    [Fact]
+    public async Task Enabling_a_tenant_without_platform_terms_shows_validation_failure()
+    {
+        ProviderCatalogEntryView entry = AgentUiTestData.Entry("openai", "staged",
+            status: ProviderModelStatus.Disabled) with { DataHandling = null };
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success([entry])));
+        IRenderedComponent<ProviderCatalog> cut = RenderPage<ProviderCatalog>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-provider-catalog-set-tenant-enablement']"));
+        cut.Find("[data-testid='agents-provider-catalog-set-tenant-enablement']").Click();
+        cut.Find("[data-testid='agents-provider-catalog-enablement-tenant']").Change("tenant-a");
+
+        await cut.Find("[data-testid='agents-provider-catalog-enablement-save']").ClickAsync(new MouseEventArgs());
+
+        cut.Find("[data-testid='agents-provider-catalog-enablement-truth']").TextContent
+            .ShouldContain("ValidationFailed");
+        await CatalogGateway.DidNotReceive().SetTenantEnablementAsync(
+            Arg.Any<SetTenantProviderModelEnablement>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Loading_tenant_state_fills_revision_and_enabled_intent()
+    {
+        ProviderCatalogEntryView entry = AgentUiTestData.Entry();
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success([entry])));
+        CatalogGateway.GetTenantEnablementAsync("tenant-a", entry.ProviderId, entry.ModelId,
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new TenantProviderEnablementInspectionResult(
+                ProviderCatalogInspectionStatus.Success, false, 7)));
+        CatalogGateway.SetTenantEnablementAsync(Arg.Any<SetTenantProviderModelEnablement>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProviderCatalogWriteResult.Submitted(new ProviderCatalogCommandAcceptance(
+                entry.ProviderId, entry.ModelId, "msg-loaded", "corr", AgentSetupTruthState.ProjectionConfirmed))));
+
+        IRenderedComponent<ProviderCatalog> cut = RenderPage<ProviderCatalog>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-provider-catalog-set-tenant-enablement']"));
+        cut.Find("[data-testid='agents-provider-catalog-set-tenant-enablement']").Click();
+        cut.Find("[data-testid='agents-provider-catalog-enablement-tenant']").Change("tenant-a");
+        await cut.Find("[data-testid='agents-provider-catalog-enablement-load']").ClickAsync(new MouseEventArgs());
+        cut.Find("[data-testid='agents-provider-catalog-enablement-revision']").GetAttribute("value").ShouldBe("7");
+        await cut.Find("[data-testid='agents-provider-catalog-enablement-save']").ClickAsync(new MouseEventArgs());
+
+        await CatalogGateway.Received(1).SetTenantEnablementAsync(
+            Arg.Is<SetTenantProviderModelEnablement>(command => command.TenantId == "tenant-a"
+                && command.ExpectedRevision == 7 && !command.Enabled), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Enabled_decline_submits_the_exact_displayed_terms_and_revision()
+    {
+        var terms = new ProviderDataHandlingRecord(14, false, ["EU"], "terms-v2", 2);
+        TenantProviderCatalogEntryView entry = TenantEntry("openai", "gpt-x", terms) with { TenantRevision = 4 };
+        CatalogGateway.ListTenantEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new TenantProviderCatalogInspectionResult(
+                ProviderCatalogInspectionStatus.Success, [entry])));
+        CatalogGateway.DecideDataHandlingAsync(Arg.Any<DecideProviderDataHandling>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProviderCatalogWriteResult.Submitted(new ProviderCatalogCommandAcceptance(
+                "openai", "gpt-x", "msg-decline", "corr", AgentSetupTruthState.ProjectionConfirmed))));
+
+        IRenderedComponent<TenantProviderCatalog> cut = RenderPage<TenantProviderCatalog>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-tenant-provider-review']"));
+        cut.Find("[data-testid='agents-tenant-provider-review']").Click();
+        cut.Find("[data-testid='agents-tenant-provider-justification']").Change("Reviewed and declined");
+        await cut.Find("[data-testid='agents-tenant-provider-decline']").ClickAsync(new MouseEventArgs());
+
+        await CatalogGateway.Received(1).DecideDataHandlingAsync(
+            Arg.Is<DecideProviderDataHandling>(decision => !decision.Accepted
+                && decision.ProviderId == "openai" && decision.ModelId == "gpt-x"
+                && decision.DataHandlingVersion == 2 && decision.ExpectedRevision == 4
+                && decision.Justification == "Reviewed and declined" && decision.ConfirmedTerms == terms),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Terms_edit_submits_changed_fields_and_tightening_declaration()
+    {
+        ProviderCatalogEntryView entry = AgentUiTestData.Entry() with
+        {
+            DataHandling = new ProviderDataHandlingRecord(30, true, ["EU", "US"], "terms-v1", 1),
+        };
+        CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success([entry])));
+        CatalogGateway.UpdateAsync(Arg.Any<UpdateProviderModelEntry>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(ProviderCatalogWriteResult.Submitted(new ProviderCatalogCommandAcceptance(
+                entry.ProviderId, entry.ModelId, "msg-terms", "corr", AgentSetupTruthState.ProjectionConfirmed))));
+
+        IRenderedComponent<ProviderCatalog> cut = RenderPage<ProviderCatalog>();
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-provider-catalog-edit']"));
+        cut.Find("[data-testid='agents-provider-catalog-edit']").Click();
+        cut.Find("[data-testid='agents-provider-catalog-retention-input']").Change("14");
+        cut.Find("[data-testid='agents-provider-catalog-training-input']").Change(false);
+        cut.Find("[data-testid='agents-provider-catalog-regions-input']").Change("EU");
+        cut.Find("[data-testid='agents-provider-catalog-declare-tightening']").Change(true);
+        await cut.Find("[data-testid='agents-provider-catalog-save']").ClickAsync(new MouseEventArgs());
+
+        await CatalogGateway.Received(1).UpdateAsync(
+            Arg.Is<UpdateProviderModelEntry>(command => command.DeclareDataHandlingTightening
+                && command.DataHandling != null && command.DataHandling.RetentionDays == 14
+                && !command.DataHandling.AllowsTrainingUse
+                && command.DataHandling.ProcessingRegions.Count == 1
+                && command.DataHandling.ProcessingRegions[0] == "EU"
+                && command.DataHandling.TermsReferenceId == "terms-v1"),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData("catalog", AgentSetupWriteStatus.Rejected)]
+    [InlineData("catalog", AgentSetupWriteStatus.Unavailable)]
+    [InlineData("enablement", AgentSetupWriteStatus.Rejected)]
+    [InlineData("enablement", AgentSetupWriteStatus.Unavailable)]
+    [InlineData("decision", AgentSetupWriteStatus.Rejected)]
+    [InlineData("decision", AgentSetupWriteStatus.Unavailable)]
+    public async Task Terminal_outcome_releases_the_exact_pending_command_and_entry(
+        string family, AgentSetupWriteStatus terminal)
+    {
+        var terms = new ProviderDataHandlingRecord(14, false, ["EU"], "terms-v1", 1);
+        ProviderCatalogEntryView operatorEntry = AgentUiTestData.Entry("openai", "gpt-x") with { DataHandling = terms };
+        string resourceKey = family == "enablement"
+            ? $"tenant-a:{ProviderCatalogIdentity.EntryId("openai", "gpt-x")}" : ProviderCatalogIdentity.EntryId("openai", "gpt-x");
+        string tenantId = family == "catalog" ? "system" : family == "decision" ? "current" : "tenant-a";
+        string pendingFamily = family switch
+        {
+            "catalog" => "ProviderCatalogMutation",
+            "enablement" => "TenantProviderEnablement",
+            _ => "DataHandlingAcceptance",
+        };
+        await PendingCommandStore.SaveAsync(new PendingProviderCommand(pendingFamily, resourceKey, tenantId,
+            new ProviderCatalogCommandAcceptance("openai", "gpt-x", "msg-terminal", "corr",
+                AgentSetupTruthState.Submitted)));
+        CatalogGateway.GetCommandOutcomeAsync(tenantId, "msg-terminal", Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(terminal));
+
+        if (family == "decision")
+        {
+            CatalogGateway.ListTenantEntriesAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+                .Returns(Task.FromResult(new TenantProviderCatalogInspectionResult(
+                    ProviderCatalogInspectionStatus.Success, [TenantEntry("openai", "gpt-x", terms)])));
+            IRenderedComponent<TenantProviderCatalog> page = RenderPage<TenantProviderCatalog>();
+            page.WaitForAssertion(() => page.Find("[data-testid='agents-tenant-provider-review']"));
+            page.Find("[data-testid='agents-tenant-provider-review']").Click();
+            page.Find("[data-testid='agents-tenant-provider-justification']").Change("Reviewed");
+            page.Find("[data-testid='agents-tenant-provider-accept']").HasAttribute("disabled").ShouldBeTrue();
+            await page.Find("[data-testid='agents-tenant-provider-check-pending']").ClickAsync(new MouseEventArgs());
+            page.Find("[data-testid='agents-tenant-provider-accept']").HasAttribute("disabled").ShouldBeFalse();
+        }
+        else
+        {
+            CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+                .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success([operatorEntry])));
+            IRenderedComponent<ProviderCatalog> page = RenderPage<ProviderCatalog>();
+            if (family == "catalog")
+            {
+                page.WaitForAssertion(() => page.Find("[data-testid='agents-provider-catalog-check-pending']"));
+                page.Find("[data-testid='agents-provider-catalog-disable']").HasAttribute("disabled").ShouldBeTrue();
+                await page.Find("[data-testid='agents-provider-catalog-check-pending']").ClickAsync(new MouseEventArgs());
+                page.Find("[data-testid='agents-provider-catalog-disable']").HasAttribute("disabled").ShouldBeFalse();
+            }
+            else
+            {
+                page.WaitForAssertion(() => page.Find("[data-testid='agents-provider-catalog-enablement-check-pending']"));
+                page.Find("[data-testid='agents-provider-catalog-set-tenant-enablement']").Click();
+                page.Find("[data-testid='agents-provider-catalog-enablement-tenant']").Change("tenant-a");
+                page.Find("[data-testid='agents-provider-catalog-enablement-save']").HasAttribute("disabled").ShouldBeTrue();
+                await page.Find("[data-testid='agents-provider-catalog-enablement-check-pending']").ClickAsync(new MouseEventArgs());
+                page.Find("[data-testid='agents-provider-catalog-enablement-save']").HasAttribute("disabled").ShouldBeFalse();
+            }
+        }
+
+        (await PendingCommandStore.LoadAsync()).ShouldBeEmpty();
     }
 
     [Fact]

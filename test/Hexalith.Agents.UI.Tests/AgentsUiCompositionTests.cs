@@ -4,6 +4,7 @@ using System.Linq;
 using Hexalith.Agents.Client;
 using Hexalith.Agents.UI;
 using Hexalith.Agents.UI.Services.Gateways;
+using Hexalith.Agents.UI.State;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,9 @@ public sealed class AgentsUiCompositionTests
 
         services.Single(d => d.ServiceType == typeof(IAgentSetupGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
         services.Single(d => d.ServiceType == typeof(IProviderCatalogGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
+        ServiceDescriptor pendingStore = services.Single(d => d.ServiceType == typeof(IPendingProviderCommandStore));
+        pendingStore.Lifetime.ShouldBe(ServiceLifetime.Scoped);
+        pendingStore.ImplementationType.ShouldBe(typeof(BrowserSessionPendingProviderCommandStore));
         services.Single(d => d.ServiceType == typeof(IConversationAgentCallGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
         services.Single(d => d.ServiceType == typeof(IProposalQueueGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
         services.Single(d => d.ServiceType == typeof(IProposalDetailGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);

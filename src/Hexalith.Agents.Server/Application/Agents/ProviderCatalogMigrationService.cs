@@ -415,7 +415,12 @@ public sealed class ProviderCatalogMigrationService(
                     };
                 }
 
-                if (status.StatusCode is (int)CommandStatus.PublishFailed or (int)CommandStatus.TimedOut
+                if (status.StatusCode == (int)CommandStatus.PublishFailed)
+                {
+                    return "AuthoritativePending";
+                }
+
+                if (status.StatusCode == (int)CommandStatus.TimedOut
                     || status.StatusCode == (int)CommandStatus.Rejected && status.Retryable is not true)
                 {
                     return "DispatchFailed";

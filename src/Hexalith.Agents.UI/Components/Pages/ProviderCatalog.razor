@@ -63,6 +63,14 @@
                 @Localizer["Agents.ProviderCatalog.Action.CheckPending", pending.Value.Acceptance.ProviderId, pending.Value.Acceptance.ModelId]
             </FluentButton>
         }
+        @foreach (PendingProviderCommand pending in _pendingEnablementCommands.Values)
+        {
+            <FluentButton Disabled="_busy" OnClick="@(() => CheckPendingEnablementAsync(pending.ResourceKey))"
+                          data-testid="agents-provider-catalog-enablement-check-pending">
+                @Localizer["Agents.ProviderCatalog.Enablement.CheckPending", pending.TenantId,
+                    pending.Acceptance.ProviderId, pending.Acceptance.ModelId]
+            </FluentButton>
+        }
         @if (_editorOpen)
         {
             <FluentAccordion>
@@ -189,6 +197,7 @@
                         <FluentTextInput @bind-Value="_enablementTenantId" @bind-Value:after="OnEnablementTenantChanged"
                                          Label="@Localizer["Agents.ProviderCatalog.Enablement.Tenant"]"
                                          AriaLabel="@Localizer["Agents.ProviderCatalog.Enablement.Tenant"]"
+                                         Disabled="_busy"
                                          data-testid="agents-provider-catalog-enablement-tenant" />
                         <FluentButton Disabled="_busy" OnClick="LoadEnablementRevisionAsync"
                                       data-testid="agents-provider-catalog-enablement-load">
@@ -197,21 +206,16 @@
                         <FluentTextInput @bind-Value="_enablementExpectedRevision"
                                          Label="@Localizer["Agents.ProviderCatalog.Enablement.ExpectedRevision"]"
                                          AriaLabel="@Localizer["Agents.ProviderCatalog.Enablement.ExpectedRevision"]"
+                                         Disabled="_busy"
                                          data-testid="agents-provider-catalog-enablement-revision" />
                         <FluentSwitch @bind-Value="_enablementEnabled"
                                       Label="@Localizer["Agents.ProviderCatalog.Enablement.Enabled"]"
+                                      Disabled="_busy"
                                       data-testid="agents-provider-catalog-enablement-enabled" />
                         <FluentButton Appearance="ButtonAppearance.Primary" Disabled="_busy || _pendingRestoring || _storeUnavailable || PendingSelectedEnablement || _enablementTruth == nameof(AgentSetupTruthState.AuthoritativePending)"
                                       OnClick="SubmitEnablementAsync" data-testid="agents-provider-catalog-enablement-save">
                             @Localizer["Agents.ProviderCatalog.Action.Save"]
                         </FluentButton>
-                        @if (PendingSelectedEnablement)
-                        {
-                            <FluentButton Disabled="_busy" OnClick="CheckPendingEnablementAsync"
-                                          data-testid="agents-provider-catalog-enablement-check-pending">
-                                @Localizer["Agents.TenantProviders.CheckPending"]
-                            </FluentButton>
-                        }
                         @if (_enablementWrite is { } outcome)
                         {
                             <FluentText aria-live="polite" data-testid="agents-provider-catalog-enablement-truth">
@@ -403,7 +407,7 @@
     private string _enablementTenantId = string.Empty;
     private string _enablementExpectedRevision = "0";
     private bool _enablementEnabled = true;
-    private readonly Dictionary<string, string> _pendingEnablementCommands = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, PendingProviderCommand> _pendingEnablementCommands = new(StringComparer.Ordinal);
 
     private string? SelectedEnablementKey => _enablementEntry is null || string.IsNullOrWhiteSpace(_enablementTenantId)
         ? null : $"{_enablementTenantId.Trim()}:{ProviderCatalogIdentity.EntryId(_enablementEntry.ProviderId, _enablementEntry.ModelId)}";
@@ -456,7 +460,7 @@
                     }
                     else if (pending.Family == EnablementPendingFamily)
                     {
-                        _pendingEnablementCommands[pending.ResourceKey] = pending.Acceptance.MessageId;
+                        _pendingEnablementCommands[pending.ResourceKey] = pending;
                         if (_enablementEntry is null)
                         {
                             _enablementEntry = _result?.Entries.FirstOrDefault(entry =>
@@ -507,9 +511,14 @@
 
     private async Task SubmitEnablementAsync()
     {
-        if (_busy || _pendingRestoring || _storeUnavailable || _enablementEntry is null || PendingSelectedEnablement
-            || (_enablementEnabled && _enablementEntry.DataHandling is not { DataHandlingVersion: >= 1 }))
+        if (_busy || _pendingRestoring || _storeUnavailable || _enablementEntry is null || PendingSelectedEnablement)
         {
+            return;
+        }
+
+        if (_enablementEnabled && _enablementEntry.DataHandling is not { DataHandlingVersion: >= 1 })
+        {
+            _enablementWrite = ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed);
             return;
         }
 
@@ -550,9 +559,9 @@
                     return;
                 }
 
-                _pendingEnablementCommands[pendingKey] = acceptance.MessageId;
-                await PendingCommands.SaveAsync(new PendingProviderCommand(EnablementPendingFamily,
-                    pendingKey, tenantId, acceptance), _lifetimeCancellation.Token);
+                PendingProviderCommand pending = new(EnablementPendingFamily, pendingKey, tenantId, acceptance);
+                _pendingEnablementCommands[pendingKey] = pending;
+                await PendingCommands.SaveAsync(pending, _lifetimeCancellation.Token);
 
                 await RequestRenderAsync(_lifetimeCancellation.Token);
                 using CancellationTokenSource timeout = new(ProjectionPollingTimeout, TimeProvider);
@@ -612,44 +621,54 @@
         }
     }
 
-    private async Task CheckPendingEnablementAsync()
+    private async Task CheckPendingEnablementAsync(string key)
     {
-        if (_busy || _enablementEntry is null || SelectedEnablementKey is not { } key
-            || !_pendingEnablementCommands.TryGetValue(key, out string? messageId))
+        if (_busy || !_pendingEnablementCommands.TryGetValue(key, out PendingProviderCommand? pending))
         {
             return;
         }
 
+        string messageId = pending.Acceptance.MessageId;
+        bool selected = SelectedEnablementKey == key;
         _busy = true;
         try
         {
             AgentSetupWriteStatus outcome = await Gateway.GetCommandOutcomeAsync(
-                _enablementTenantId.Trim(), messageId, _lifetimeCancellation.Token).ConfigureAwait(false);
+                pending.TenantId, messageId, _lifetimeCancellation.Token).ConfigureAwait(false);
             if (outcome is AgentSetupWriteStatus.Rejected or AgentSetupWriteStatus.Unavailable)
             {
                 await RemovePendingEnablementAsync(key, messageId);
-                _enablementWrite = ProviderCatalogWriteResult.Failed(outcome);
-                _enablementTruth = null;
+                if (selected)
+                {
+                    _enablementWrite = ProviderCatalogWriteResult.Failed(outcome);
+                    _enablementTruth = null;
+                }
                 return;
             }
 
             if (outcome == AgentSetupWriteStatus.AlreadyApplied)
             {
                 await RemovePendingEnablementAsync(key, messageId);
-                _enablementTruth = "ProjectionConfirmed";
+                if (selected)
+                {
+                    _enablementTruth = "ProjectionConfirmed";
+                }
                 return;
             }
 
             TenantProviderEnablementInspectionResult current = await Gateway.GetTenantEnablementAsync(
-                _enablementTenantId.Trim(), _enablementEntry.ProviderId, _enablementEntry.ModelId,
+                pending.TenantId, pending.Acceptance.ProviderId, pending.Acceptance.ModelId,
                 _lifetimeCancellation.Token).ConfigureAwait(false);
             if (outcome == AgentSetupWriteStatus.AwaitingProjection
                 && current?.ProjectedCommandMessageIds?.Contains(messageId, StringComparer.Ordinal) == true)
             {
                 await RemovePendingEnablementAsync(key, messageId);
-                _enablementTruth = "ProjectionConfirmed";
+                if (selected)
+                {
+                    _enablementTruth = "ProjectionConfirmed";
+                }
             }
-            else
+            else if (selected)
             {
                 _enablementTruth = "AuthoritativePending";
             }

@@ -85,7 +85,7 @@
                         <FluentStack Orientation="Orientation.Vertical" VerticalGap="12px" data-testid="agents-tenant-provider-confirmation">
                             <FluentText>@Localizer["Agents.TenantProviders.ExactVersion", terms.DataHandlingVersion]</FluentText>
                             <FluentText>@Localizer["Agents.TenantProviders.Retention", terms.RetentionDays]</FluentText>
-                            <FluentText>@Localizer["Agents.TenantProviders.Training", Localizer[terms.AllowsTrainingUse ? "Agents.ProviderCatalog.Selectable.Yes" : "Agents.ProviderCatalog.Selectable.No"]]</FluentText>
+                            <FluentText>@Localizer["Agents.TenantProviders.Training", Localizer[terms.AllowsTrainingUse ? "Agents.TenantProviders.Training.Allowed" : "Agents.TenantProviders.Training.NotAllowed"]]</FluentText>
                             <FluentText>@Localizer["Agents.TenantProviders.Regions", string.Join(", ", terms.ProcessingRegions)]</FluentText>
                             <FluentText>@Localizer["Agents.TenantProviders.TermsReference", terms.TermsReferenceId]</FluentText>
                             @if (terms.EffectiveAt is { } effectiveAt)
@@ -94,9 +94,9 @@
                             }
                             @if (terms.TighteningDeclaration is { } declaration)
                             {
-                                <FluentText data-testid="agents-tenant-provider-tightening">@Localizer["Agents.TenantProviders.TighteningDeclaration", declaration.FromVersion, declaration.ToVersion, declaration.ActorUserId, declaration.RoleBasis, declaration.DeclaredAt]</FluentText>
+                                <FluentText data-testid="agents-tenant-provider-tightening">@Localizer["Agents.TenantProviders.TighteningDeclaration", declaration.FromVersion, declaration.ToVersion, declaration.ActorUserId, Localizer["Agents.TenantProviders.Role.PlatformOperator"], declaration.DeclaredAt]</FluentText>
                                 <FluentText>@Localizer["Agents.TenantProviders.Tightening.Retention", declaration.FieldDiff.PreviousRetentionDays, declaration.FieldDiff.NewRetentionDays]</FluentText>
-                                <FluentText>@Localizer["Agents.TenantProviders.Tightening.Training", Localizer[declaration.FieldDiff.PreviousAllowsTrainingUse ? "Agents.ProviderCatalog.Selectable.Yes" : "Agents.ProviderCatalog.Selectable.No"], Localizer[declaration.FieldDiff.NewAllowsTrainingUse ? "Agents.ProviderCatalog.Selectable.Yes" : "Agents.ProviderCatalog.Selectable.No"]]</FluentText>
+                                <FluentText>@Localizer["Agents.TenantProviders.Tightening.Training", Localizer[declaration.FieldDiff.PreviousAllowsTrainingUse ? "Agents.TenantProviders.Training.Allowed" : "Agents.TenantProviders.Training.NotAllowed"], Localizer[declaration.FieldDiff.NewAllowsTrainingUse ? "Agents.TenantProviders.Training.Allowed" : "Agents.TenantProviders.Training.NotAllowed"]]</FluentText>
                                 <FluentText>@Localizer["Agents.TenantProviders.Tightening.RemovedRegions", string.Join(", ", declaration.FieldDiff.RemovedProcessingRegions)]</FluentText>
                                 <FluentText>@Localizer["Agents.TenantProviders.Tightening.AddedRegions", string.Join(", ", declaration.FieldDiff.AddedProcessingRegions)]</FluentText>
                                 <FluentText>@Localizer["Agents.TenantProviders.Tightening.TermsReference", declaration.FieldDiff.PreviousTermsReferenceId, declaration.FieldDiff.NewTermsReferenceId]</FluentText>
@@ -224,8 +224,17 @@
                 _result = refreshed;
                 if (_selected is { } selected)
                 {
-                    _selected = refreshed.Entries.FirstOrDefault(entry => entry.ProviderId == selected.ProviderId
+                    TenantProviderCatalogEntryView? replacement = refreshed.Entries.FirstOrDefault(entry => entry.ProviderId == selected.ProviderId
                         && entry.ModelId == selected.ModelId);
+                    if (selected.DataHandling is { } previousTerms
+                        && (replacement?.DataHandling is not { } currentTerms
+                            || !ProviderDataHandlingPolicy.SameSnapshot(previousTerms, currentTerms)))
+                    {
+                        _justification = string.Empty;
+                        _truth = PendingSelectedDecision ? "AuthoritativePending" : null;
+                        _writeFailure = null;
+                    }
+                    _selected = replacement;
                 }
                 StateHasChanged();
                 ScheduleGraceRefresh();

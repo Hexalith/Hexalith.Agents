@@ -98,6 +98,10 @@ public sealed class LocalizationResourceTests
         yield return "Agents.ProviderCatalog.Action.Cancel";
         yield return "Agents.ProviderCatalog.Action.Enable";
         yield return "Agents.ProviderCatalog.Action.Disable";
+        yield return "Agents.ProviderCatalog.Enablement.CheckPending";
+        yield return "Agents.TenantProviders.Training.Allowed";
+        yield return "Agents.TenantProviders.Training.NotAllowed";
+        yield return "Agents.TenantProviders.Role.PlatformOperator";
         yield return "Agents.ProviderCatalog.Editor.Title";
         yield return "Agents.ProviderCatalog.Editor.ConfigurationReference";
         yield return "Agents.ProviderCatalog.Editor.TimeoutMilliseconds";

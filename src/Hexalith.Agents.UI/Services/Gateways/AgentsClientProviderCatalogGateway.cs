@@ -26,7 +26,8 @@ public sealed class AgentsClientProviderCatalogGateway(IAgentsClient client) : I
             .GetCommandOutcomeAsync(targetTenantId, messageId, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
         return result.IsSuccess && result.Value is { } status
-            ? status : ToWriteStatus(result.Status);
+            ? status : result.Status is AgentOperationStatus.NotAuthorized
+                ? AgentSetupWriteStatus.NotAuthorized : AgentSetupWriteStatus.UnableToVerify;
     }
 
     /// <inheritdoc />
