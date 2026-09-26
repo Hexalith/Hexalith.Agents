@@ -8,6 +8,7 @@ using Dapr.Actors.Runtime;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 using Hexalith.Agents.Contracts.ProviderCatalog.Events;
+using Hexalith.Agents.Contracts.ProviderCatalog.Events.Rejections;
 using Hexalith.Agents.EventStore;
 using Hexalith.Agents.ProviderCatalog;
 using Hexalith.Agents.Server.Projections;
@@ -229,6 +230,69 @@ public sealed class ProviderCatalogCoordinationIntegrationTests
         policy.GetCommandDigest(retry).ShouldBe(policy.GetCommandDigest(first));
         policy.GetCommandDigest(divergent).ShouldNotBe(policy.GetCommandDigest(first));
     }
+
+    [Fact]
+    public void Enabling_a_tenant_requires_source_validation_against_current_platform_terms()
+    {
+        var policy = new AgentsProviderCatalogCoordinationPolicy();
+        var termsV1 = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1, _now);
+        var termsV2 = new ProviderDataHandlingRecord(40, false, ["EU"], "terms-v2", 2, _now.AddMinutes(1));
+        ProjectionEventDto[] source = [Projected("created", 1, Created(termsV1)), Projected("updated", 2, Updated(termsV2))];
+        CommandEnvelope Enable(bool enabled, ProviderDataHandlingRecord? terms)
+            => Submit("enable-msg", "tenant-a", TenantProviderEnablementAggregate.Domain, "tenant-a",
+                new SetTenantProviderModelEnablement("tenant-a", "provider", "model", enabled, 0, terms),
+                TenantProviderEnablementAggregate.PlatformOperatorExtensionKey).ToCommandEnvelope();
+
+        policy.GetScope(Enable(true, termsV2)).RequiresSourceValidation.ShouldBeTrue();
+        policy.GetScope(Enable(false, null)).RequiresSourceValidation.ShouldBeFalse();
+        policy.Validate(Enable(true, termsV2), source).ShouldBeTrue();
+        policy.Validate(Enable(true, termsV1), source).ShouldBeFalse();
+        policy.Validate(Enable(false, null), source).ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Decision_against_a_platform_disabled_source_is_rejected()
+    {
+        var policy = new AgentsProviderCatalogCoordinationPolicy();
+        var terms = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1, _now);
+        string entryId = ProviderCatalogIdentity.EntryId("provider", "model");
+        CommandEnvelope decision = Submit("decision-msg", "tenant-a", TenantProviderEnablementAggregate.Domain,
+            "tenant-a", new DecideProviderDataHandling("provider", "model", 1, true, "approved", 1, terms, _now),
+            TenantProviderEnablementAggregate.TenantAdministratorExtensionKey).ToCommandEnvelope();
+
+        policy.Validate(decision, [Projected("created", 1, Created(terms))]).ShouldBeTrue();
+        policy.Validate(decision, [Projected("created", 1, Created(terms)),
+            Projected("disabled", 2, new ProviderModelEntryDisabled(entryId, "provider", "model"))]).ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Persisted_platform_rejections_do_not_block_tenant_validation()
+    {
+        var policy = new AgentsProviderCatalogCoordinationPolicy();
+        var terms = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1, _now);
+        string entryId = ProviderCatalogIdentity.EntryId("provider", "model");
+        CommandEnvelope decision = Submit("decision-msg", "tenant-a", TenantProviderEnablementAggregate.Domain,
+            "tenant-a", new DecideProviderDataHandling("provider", "model", 1, true, "approved", 1, terms, _now),
+            TenantProviderEnablementAggregate.TenantAdministratorExtensionKey).ToCommandEnvelope();
+
+        policy.Validate(decision, [
+            Projected("created", 1, Created(terms)),
+            Projected("stale-toggle", 2, new ProviderModelLifecycleRevisionRejected(entryId, "provider", "model", 0, 1)),
+            Projected("missing", 3, new ProviderModelEntryNotFoundRejection(entryId, "provider", "model")),
+        ]).ShouldBeTrue();
+    }
+
+    private static ProviderModelEntryCreated Created(ProviderDataHandlingRecord terms)
+        => new(ProviderCatalogIdentity.EntryId("provider", "model"), "provider", "model", "Model", true, true,
+            1000, 500, new ProviderModelTimeoutPolicy(30000, 3), ProviderModelCapabilityFlags.Streaming,
+            ProviderConfigurationState.Configured, "cfg-ref", new ProviderModelPricing("USD", 0.002m, 0.008m, 1),
+            1, terms);
+
+    private static ProviderModelEntryMetadataUpdated Updated(ProviderDataHandlingRecord terms)
+        => new(ProviderCatalogIdentity.EntryId("provider", "model"), "provider", "model", "Model", true,
+            1000, 500, new ProviderModelTimeoutPolicy(30000, 3), ProviderModelCapabilityFlags.Streaming,
+            ProviderConfigurationState.Configured, "cfg-ref", new ProviderModelPricing("USD", 0.002m, 0.008m, 2),
+            2, terms);
 
     private static SubmitCommand Submit<T>(string messageId, string tenant, string domain, string aggregateId,
         T payload, string authorityKey)

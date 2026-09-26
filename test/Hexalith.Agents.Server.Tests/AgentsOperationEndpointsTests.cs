@@ -488,6 +488,55 @@ public sealed class AgentsOperationEndpointsTests
             Arg.Any<CancellationToken>());
     }
 
+    [Theory]
+    [InlineData("create")]
+    [InlineData("update")]
+    [InlineData("enable")]
+    [InlineData("disable")]
+    [InlineData("tenant-enablement")]
+    public async Task Governance_write_http_routes_forward_retry_and_correlation_headers(string write)
+    {
+        IProviderCatalogOperations catalog = Substitute.For<IProviderCatalogOperations>();
+        var accepted = new ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>>(
+            AgentOperationResult<ProviderCatalogCommandAcceptance>.Succeeded(
+                new("openai", "gpt-4o", MessageId, CorrelationId, AgentSetupTruthState.Submitted)));
+        catalog.CreateEntryAsync(default!, default, default).ReturnsForAnyArgs(accepted);
+        catalog.UpdateEntryAsync(default!, default, default).ReturnsForAnyArgs(accepted);
+        catalog.EnableEntryAsync(default!, default, default).ReturnsForAnyArgs(accepted);
+        catalog.DisableEntryAsync(default!, default, default).ReturnsForAnyArgs(accepted);
+        catalog.SetTenantEnablementAsync(default!, default, default).ReturnsForAnyArgs(accepted);
+        await using WebApplication app = BuildHttpApp(AgentsClientWith(catalog));
+        await app.StartAsync();
+        var terms = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1);
+        var timeout = new ProviderModelTimeoutPolicy(30_000, 3);
+        var pricing = new ProviderModelPricing("USD", 0.002m, 0.008m, 1);
+        (HttpMethod method, string path, object body) = write switch
+        {
+            "create" => (HttpMethod.Post, "", (object)new CreateProviderModelEntry("openai", "gpt-4o", "GPT-4o", true,
+                true, 128_000, 16_000, timeout, ProviderModelCapabilityFlags.Streaming, "cfg", pricing, terms)),
+            "update" => (HttpMethod.Put, "", new UpdateProviderModelEntry("openai", "gpt-4o", "GPT-4o", true,
+                128_000, 16_000, timeout, ProviderModelCapabilityFlags.Streaming, "cfg", pricing, 1, terms)),
+            "enable" => (HttpMethod.Post, "/enable", new EnableProviderModelEntry("openai", "gpt-4o", 0)),
+            "disable" => (HttpMethod.Post, "/disable", new DisableProviderModelEntry("openai", "gpt-4o", 0)),
+            _ => (HttpMethod.Post, "/tenant/enablement", new SetTenantProviderModelEnablement("acme", "openai",
+                "gpt-4o", true, 0, null)),
+        };
+        using var request = new HttpRequestMessage(method, "/api/agents/operations/providers" + path)
+        {
+            Content = JsonContent.Create(body, body.GetType()),
+        };
+        request.Headers.Add("X-Correlation-ID", CorrelationId);
+        request.Headers.Add("Idempotency-Key", MessageId);
+
+        using HttpResponseMessage response = await app.GetTestClient().SendAsync(request);
+
+        response.EnsureSuccessStatusCode();
+        AgentOperationOptions? forwarded = catalog.ReceivedCalls().ShouldHaveSingleItem().GetArguments()[1]
+            .ShouldBeOfType<AgentOperationOptions>();
+        forwarded.CorrelationId.ShouldBe(CorrelationId);
+        forwarded.IdempotencyKey.ShouldBe(MessageId);
+    }
+
     [Fact]
     public async Task A_setup_read_without_a_version_asks_for_the_currently_projected_truth()
     {

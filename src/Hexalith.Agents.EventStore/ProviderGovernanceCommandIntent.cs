@@ -7,7 +7,7 @@ using Hexalith.EventStore.Contracts.Serialization;
 
 namespace Hexalith.Agents.EventStore;
 
-/// <summary>Normalizes server-stamped governance clocks out of exact retry identity.</summary>
+/// <summary>Normalizes server-stamped governance clocks and server-derived terms out of exact retry identity.</summary>
 internal static class ProviderGovernanceCommandIntent
 {
     public static byte[] Normalize(string commandType, byte[] payload)
@@ -18,7 +18,8 @@ internal static class ProviderGovernanceCommandIntent
             nameof(UpdateProviderModelEntry) => NormalizeUpdate(Read<UpdateProviderModelEntry>(payload)),
             nameof(EnableProviderModelEntry) => Read<EnableProviderModelEntry>(payload),
             nameof(DisableProviderModelEntry) => Read<DisableProviderModelEntry>(payload),
-            nameof(SetTenantProviderModelEnablement) => Read<SetTenantProviderModelEnablement>(payload),
+            // The server re-reads the current platform terms on every attempt; they are not caller intent.
+            nameof(SetTenantProviderModelEnablement) => Read<SetTenantProviderModelEnablement>(payload) with { CurrentTerms = null },
             nameof(DecideProviderDataHandling) => Read<DecideProviderDataHandling>(payload) with { DecidedAt = default },
             _ => throw new InvalidOperationException("The governance command is unsupported."),
         };

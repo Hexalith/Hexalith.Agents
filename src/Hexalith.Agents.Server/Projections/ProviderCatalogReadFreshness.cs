@@ -58,7 +58,10 @@ public static class ProviderCatalogReadFreshness
         string? modelId,
         CancellationToken cancellationToken)
     {
-        if (gateway is null || tenant is null
+        // A tenant never enabled for any model has no enablement stream or read model; a missing stream at
+        // sequence zero is confirmed empty truth, while an existing unprojected stream stays pending.
+        tenant ??= new TenantProviderEnablementReadModel();
+        if (gateway is null
             || !await HasHeadAsync(gateway, tenantId, TenantProviderEnablementAggregate.Domain,
                 tenantId, tenant.LastSequenceNumber, cancellationToken).ConfigureAwait(false))
         {

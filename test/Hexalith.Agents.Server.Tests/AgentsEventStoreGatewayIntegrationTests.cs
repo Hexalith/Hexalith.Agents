@@ -26,6 +26,7 @@ using Hexalith.EventStore.Contracts.Commands;
 using Hexalith.EventStore.DomainService;
 using Hexalith.EventStore.Server.Actors;
 using Hexalith.EventStore.Server.Commands;
+using Hexalith.EventStore.Server.Configuration;
 using Hexalith.EventStore.Server.Pipeline;
 using Hexalith.EventStore.Server.Pipeline.Commands;
 using Hexalith.EventStore.Validation;
@@ -102,6 +103,41 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             .ShouldBeOfType<EventStoreAgentCommandDispatcher>();
         agents.GetServices<IIdempotencyIntentAdapter>().ShouldBeEmpty();
         agents.GetServices<ITrustedCommandExtensionPolicy>().ShouldBeEmpty();
+        agents.GetServices<ICoordinatedCommandPolicy>().ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Di_resolved_router_sends_a_claimed_governance_command_to_the_coordinator()
+    {
+        var accepted = new CommandProcessingResult(true, CorrelationId: "correlation");
+        ICoordinatedCommandActor coordinator = Substitute.For<ICoordinatedCommandActor>();
+        coordinator.ProcessCommandAsync(Arg.Any<CommandEnvelope>()).Returns(accepted);
+        IActorProxyFactory factory = Substitute.For<IActorProxyFactory>();
+        factory.CreateActorProxy<ICoordinatedCommandActor>(Arg.Any<ActorId>(), CoordinatedCommandActor.ActorTypeName)
+            .Returns(coordinator);
+        ServiceCollection services = new();
+        _ = services.AddAgentsEventStore(AgentsAppId);
+        services.AddLogging();
+        services.AddSingleton(factory);
+        services.AddSingleton(Options.Create(new EventStoreActorOptions()));
+        services.AddSingleton<ICommandRouter, CommandRouter>();
+        using ServiceProvider provider = services.BuildServiceProvider();
+        DateTimeOffset now = new(2026, 9, 23, 0, 0, 0, TimeSpan.Zero);
+        var terms = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1, now);
+        var decision = new DecideProviderDataHandling("provider", "model", 1, true, "approved", 1, terms, now);
+        var command = new SubmitCommand("msg", "tenant-a", "tenant-provider-enablement", "tenant-a",
+            nameof(DecideProviderDataHandling), JsonSerializer.SerializeToUtf8Bytes(decision), "correlation", "user",
+            new Dictionary<string, string> { ["actor:tenantAgentAdministrator"] = "true" });
+
+        CommandProcessingResult result = await provider.GetRequiredService<ICommandRouter>().RouteCommandAsync(command);
+
+        result.ShouldBe(accepted);
+        string sourceActorId = new Hexalith.EventStore.Contracts.Identity.AggregateIdentity(
+            ProviderCatalogIdentity.PlatformTenantId, ProviderCatalogIdentity.Domain,
+            ProviderCatalogIdentity.EntryId("provider", "model")).ActorId;
+        _ = factory.Received(1).CreateActorProxy<ICoordinatedCommandActor>(
+            Arg.Is<ActorId>(id => id.ToString() == sourceActorId), CoordinatedCommandActor.ActorTypeName);
+        _ = factory.DidNotReceive().CreateActorProxy<IAggregateActor>(Arg.Any<ActorId>(), Arg.Any<string>());
     }
 
     [Fact]
@@ -126,6 +162,35 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         IdempotencyCanonicalIntent divergent = adapter.CreateIntent(original with
         {
             Payload = JsonSerializer.SerializeToUtf8Bytes(decision with { Justification = "different" }),
+        });
+
+        retry.SemanticPayload.SequenceEqual(first.SemanticPayload).ShouldBeTrue();
+        divergent.SemanticPayload.SequenceEqual(first.SemanticPayload).ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Enablement_admission_intent_ignores_server_derived_terms_but_rejects_semantic_change()
+    {
+        ServiceCollection services = new();
+        _ = services.AddAgentsEventStore(AgentsAppId);
+        using ServiceProvider provider = services.BuildServiceProvider();
+        IIdempotencyIntentAdapter adapter = provider.GetServices<IIdempotencyIntentAdapter>()
+            .Single(item => item.CommandType == nameof(SetTenantProviderModelEnablement));
+        DateTimeOffset now = new(2026, 9, 26, 0, 0, 0, TimeSpan.Zero);
+        var termsV1 = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1, now);
+        var termsV2 = new ProviderDataHandlingRecord(40, false, ["EU"], "terms-v2", 2, now.AddMinutes(1));
+        var enable = new SetTenantProviderModelEnablement("tenant-a", "provider", "model", true, 0, termsV1);
+        var original = new IdempotencyIntentCommand(nameof(SetTenantProviderModelEnablement), "tenant-a",
+            "tenant-provider-enablement", "tenant-a", JsonSerializer.SerializeToUtf8Bytes(enable),
+            new Dictionary<string, string> { ["actor:platformOperator"] = "true" });
+        IdempotencyCanonicalIntent first = adapter.CreateIntent(original);
+        IdempotencyCanonicalIntent retry = adapter.CreateIntent(original with
+        {
+            Payload = JsonSerializer.SerializeToUtf8Bytes(enable with { CurrentTerms = termsV2 }),
+        });
+        IdempotencyCanonicalIntent divergent = adapter.CreateIntent(original with
+        {
+            Payload = JsonSerializer.SerializeToUtf8Bytes(enable with { ExpectedRevision = 1 }),
         });
 
         retry.SemanticPayload.SequenceEqual(first.SemanticPayload).ShouldBeTrue();

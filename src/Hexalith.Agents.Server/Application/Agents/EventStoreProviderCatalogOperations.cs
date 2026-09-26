@@ -270,9 +270,11 @@ public sealed class EventStoreProviderCatalogOperations(
             item.ProviderId == command.ProviderId && item.ModelId == command.ModelId);
         if (entry is null)
         {
+            // A rejected create advances the stream without a row, so compare with the projected sequence (FE1).
+            string entryId = ProviderCatalogIdentity.EntryId(command.ProviderId, command.ModelId);
             bool absent = await ProviderCatalogReadFreshness.HasHeadAsync(_gateway,
-                ProviderCatalogIdentity.PlatformTenantId, ProviderCatalogAggregate.Domain,
-                ProviderCatalogIdentity.EntryId(command.ProviderId, command.ModelId), 0,
+                ProviderCatalogIdentity.PlatformTenantId, ProviderCatalogAggregate.Domain, entryId,
+                platform?.StreamSequences.GetValueOrDefault(entryId) ?? 0,
                 cancellationToken).ConfigureAwait(false);
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(
                 absent ? AgentOperationErrorCode.NotFound : AgentOperationErrorCode.Unavailable);
@@ -284,7 +286,7 @@ public sealed class EventStoreProviderCatalogOperations(
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.Unavailable);
         }
 
-        if (command.Enabled && entry.DataHandling is not { DataHandlingVersion: >= 1 })
+        if (entry.Status != ProviderModelStatus.Enabled || entry.DataHandling is not { DataHandlingVersion: >= 1 })
         {
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.Blocked);
         }
@@ -619,8 +621,10 @@ public sealed class EventStoreProviderCatalogOperations(
                 return AgentOperationResult<TenantProviderCatalogInspectionResult>.Succeeded(
                     pending, correlationId: options?.CorrelationId);
             }
+            // Freshness confirmed that a missing tenant read model has no enablement stream.
             return AgentOperationResult<TenantProviderCatalogInspectionResult>.Succeeded(
-                create(platform.Value, tenant.Value), correlationId: options?.CorrelationId);
+                create(platform.Value, tenant.Value ?? new TenantProviderEnablementReadModel()),
+                correlationId: options?.CorrelationId);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {

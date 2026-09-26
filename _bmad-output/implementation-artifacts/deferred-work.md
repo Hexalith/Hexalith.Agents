@@ -519,3 +519,7 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 
 - Pricing-version and initial-capability-version validation in `ProviderCatalogAggregate.ValidatePricing`/`Handle(CreateProviderModelEntry)` has no rejection test (mismatched positive version on update/create, non-migrated `InitialCapabilityVersion != 1`). The UI always sends `PricingVersion: 0`, so no current caller reaches it; add theory rows when this area is next touched.
 - `ProviderCatalogAggregate` and `TenantProviderEnablementAggregate` trust payload `EffectiveAt`/`DecidedAt`; only `EventStoreProviderCatalogOperations` stamps server time. Unverified (medium if true): settle by confirming whether the external EventStore gateway host (DW-21) exposes generic command submission for `provider-catalog`/`tenant-provider-enablement`, which would let an operator backdate or future-date grace or a tenant administrator falsify decision time.
+
+## Deferred from: code review of spec-5-3-govern-provider-models-and-pricing-through-live-operations-2.md (2026-09-26, group 2 slice 1)
+
+- `AgentsProviderCatalogCoordinationPolicy.ReadIdentity` reads `ProviderId`/`ModelId` from raw JSON properties (exact then camelCase), while `Validate` and the tenant aggregate deserialize case-insensitively. A payload repeating an identity under two casings could validate one platform entry and record a decision for another. Unverified (medium if true): the server builds typed payloads, so this needs a raw EventStore submission; settle together with the raw-gateway residual under DW-21.

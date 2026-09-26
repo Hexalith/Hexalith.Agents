@@ -154,7 +154,9 @@ public sealed class AgentsProviderCatalogCoordinationPolicy : ICoordinatedComman
 
                     enabled = false;
                     break;
-                case string rejected when rejected.EndsWith("Rejection", StringComparison.Ordinal):
+                // Domain rejections persist as normal stream events; both naming forms leave the entry unchanged.
+                case string rejected when rejected.EndsWith("Rejection", StringComparison.Ordinal)
+                    || rejected.EndsWith("Rejected", StringComparison.Ordinal):
                     break;
                 default:
                     throw new InvalidOperationException("The authoritative platform stream has an unknown event.");

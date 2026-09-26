@@ -768,7 +768,221 @@ public sealed class EventStoreProviderCatalogOperationsTests
         result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.Unavailable);
     }
 
-    private IProviderCatalogOperations Operations(IReadModelStore? store = null)
+    [Theory]
+    [InlineData("list")]
+    [InlineData("get")]
+    public async Task Tenant_administrator_cannot_read_the_platform_catalog(string read)
+    {
+        SeedProjectedEntry(1);
+        _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "tenant-admin", IsAgentsAdmin: true));
+        int priorGets = _store.GetCount;
+
+        ProviderCatalogInspectionResult result = (read == "list"
+            ? await Operations().ListEntriesAsync(includeDisabled: true)
+            : await Operations().GetEntryAsync("openai", "gpt-4o")).Value.ShouldNotBeNull();
+
+        result.Status.ShouldBe(ProviderCatalogInspectionStatus.NotAuthorized);
+        result.Entries.ShouldBeEmpty();
+        _store.GetCount.ShouldBe(priorGets);
+    }
+
+    [Theory]
+    [InlineData("create")]
+    [InlineData("update")]
+    [InlineData("enable")]
+    [InlineData("disable")]
+    [InlineData("tenant-enable")]
+    public async Task Tenant_administrator_cannot_mutate_platform_catalog_or_tenant_enablement(string write)
+    {
+        SeedProjectedEntry(1);
+        _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "tenant-admin", IsAgentsAdmin: true));
+        IProviderCatalogOperations operations = Operations();
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> result = write switch
+        {
+            "create" => await operations.CreateEntryAsync(CreateCommand()),
+            "update" => await operations.UpdateEntryAsync(UpdateCommand()),
+            "enable" => await operations.EnableEntryAsync(new EnableProviderModelEntry("openai", "gpt-4o", 0)),
+            "disable" => await operations.DisableEntryAsync(new DisableProviderModelEntry("openai", "gpt-4o", 0)),
+            _ => await operations.SetTenantEnablementAsync(new SetTenantProviderModelEnablement(TenantId,
+                "openai", "gpt-4o", true, 0, null)),
+        };
+
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.NotAuthorized);
+        _submitted.ShouldBeEmpty();
+    }
+
+    [Theory]
+    [InlineData(ProviderCatalogIdentity.PlatformTenantId)]
+    [InlineData("another-tenant")]
+    public async Task Tenant_administrator_cannot_read_platform_or_other_tenant_command_outcomes(string targetTenantId)
+    {
+        _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "tenant-admin", IsAgentsAdmin: true));
+
+        AgentOperationResult<AgentSetupWriteStatus> result = await Operations()
+            .GetCommandOutcomeAsync(targetTenantId, "msg-outcome");
+
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.NotAuthorized);
+        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task Platform_operator_without_tenant_administration_cannot_decide_terms()
+    {
+        SeedTenantDecisionView();
+        _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "operator", IsAgentsAdmin: false,
+            IsPlatformOperator: true));
+        ProviderDataHandlingRecord terms = SelectableEntry(1).DataHandling.ShouldNotBeNull();
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> result = await Operations().DecideDataHandlingAsync(
+            new DecideProviderDataHandling("openai", "gpt-4o", 1, true, "approved", 1, terms, default));
+
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.NotAuthorized);
+        _submitted.ShouldBeEmpty();
+    }
+
+    [Theory]
+    [InlineData("create")]
+    [InlineData("update")]
+    public async Task Create_and_update_stamp_terms_effective_time_from_the_trusted_clock(string write)
+    {
+        DateTimeOffset trusted = new(2026, 9, 26, 8, 30, 0, TimeSpan.Zero);
+        DateTimeOffset forged = trusted.AddDays(-10);
+        IProviderCatalogOperations operations = Operations(clock: new FixedClock(trusted));
+
+        _ = write == "create"
+            ? await operations.CreateEntryAsync(CreateCommand() with
+            {
+                DataHandling = CreateCommand().DataHandling! with { EffectiveAt = forged },
+            })
+            : await operations.UpdateEntryAsync(UpdateCommand() with
+            {
+                DataHandling = UpdateCommand().DataHandling! with { EffectiveAt = forged },
+            });
+
+        string raw = _submitted.ShouldHaveSingleItem().Payload.GetRawText();
+        ProviderDataHandlingRecord? sent = write == "create"
+            ? JsonSerializer.Deserialize<CreateProviderModelEntry>(raw).ShouldNotBeNull().DataHandling
+            : JsonSerializer.Deserialize<UpdateProviderModelEntry>(raw).ShouldNotBeNull().DataHandling;
+        sent.ShouldNotBeNull().EffectiveAt.ShouldBe(trusted);
+    }
+
+    [Theory]
+    [InlineData(1, AgentSetupWriteStatus.AwaitingProjection)]
+    [InlineData(null, AgentSetupWriteStatus.UnableToVerify)]
+    public async Task Completed_command_outcome_depends_on_its_event_count(int? eventCount, AgentSetupWriteStatus expected)
+    {
+        _gateway.GetCommandStatusAsync("msg-outcome", Arg.Any<CancellationToken>())
+            .Returns(new CommandStatusQueryResponse("corr", nameof(CommandStatus.Completed), (int)CommandStatus.Completed,
+                MessageId: "msg-outcome")
+            {
+                TenantId = ProviderCatalogIdentity.PlatformTenantId,
+                EventCount = eventCount,
+            });
+
+        AgentOperationResult<AgentSetupWriteStatus> result = await Operations()
+            .GetCommandOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId, "msg-outcome");
+
+        result.Value.ShouldBe(expected);
+    }
+
+    [Fact]
+    public async Task Committed_platform_write_with_events_is_authoritatively_pending()
+    {
+        _gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(call => new CommandStatusQueryResponse("corr", nameof(CommandStatus.Completed),
+                (int)CommandStatus.Completed, MessageId: call.Arg<string>())
+            {
+                TenantId = ProviderCatalogIdentity.PlatformTenantId,
+                EventCount = 1,
+            });
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> result = await Operations().CreateEntryAsync(CreateCommand());
+
+        result.Value.ShouldNotBeNull().TruthState.ShouldBe(AgentSetupTruthState.AuthoritativePending);
+    }
+
+    [Fact]
+    public async Task Tenant_enablement_reports_a_rejected_platform_create_as_not_found()
+    {
+        string entryId = ProviderCatalogIdentity.EntryId("openai", "gpt-4o");
+        _store.Seed(StoreName, ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId),
+            new ProviderCatalogReadModel
+            {
+                CatalogId = ProviderCatalogIdentity.PlatformTenantId,
+                TenantId = ProviderCatalogIdentity.PlatformTenantId,
+                StreamSequences = new Dictionary<string, long>(StringComparer.Ordinal) { [entryId] = 1 },
+            });
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> result = await Operations().SetTenantEnablementAsync(
+            new SetTenantProviderModelEnablement(TenantId, "openai", "gpt-4o", true, 0, null));
+
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.NotFound);
+        _submitted.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Tenant_enablement_for_a_platform_disabled_entry_is_blocked_before_dispatch()
+    {
+        SeedProjectedEntry(1);
+        ProviderCatalogReadModel platform = _store.Snapshot<ProviderCatalogReadModel>(StoreName,
+            ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId)).ShouldNotBeNull();
+        platform.Entries[0] = platform.Entries[0] with { Status = ProviderModelStatus.Disabled };
+        _store.Seed(StoreName, ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId), platform);
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> result = await Operations().SetTenantEnablementAsync(
+            new SetTenantProviderModelEnablement(TenantId, "openai", "gpt-4o", true, 0, null));
+
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.Blocked);
+        _submitted.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Tenant_without_an_enablement_stream_has_a_confirmed_empty_catalog()
+    {
+        SeedProjectedEntry(1);
+        _gateway.ReadStreamAsync(Arg.Is<StreamReadRequest>(request => request.Domain == TenantProviderEnablementAggregate.Domain),
+                Arg.Any<CancellationToken>())
+            .Returns<Task<StreamReadPage>>(_ => throw new EventStoreGatewayException(404, "Not Found",
+                reasonCode: StreamReplayReasonCodes.MissingStream));
+
+        TenantProviderCatalogInspectionResult list = (await Operations().ListTenantEntriesAsync(includeDisabled: true))
+            .Value.ShouldNotBeNull();
+        TenantProviderCatalogInspectionResult detail = (await Operations().GetTenantEntryAsync("openai", "gpt-4o"))
+            .Value.ShouldNotBeNull();
+
+        list.Status.ShouldBe(ProviderCatalogInspectionStatus.Success);
+        list.Entries.ShouldBeEmpty();
+        list.TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
+        detail.Status.ShouldBe(ProviderCatalogInspectionStatus.EntryNotFound);
+        detail.TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
+    }
+
+    [Fact]
+    public async Task Tenant_with_an_unprojected_enablement_stream_stays_pending()
+    {
+        SeedProjectedEntry(1);
+
+        TenantProviderCatalogInspectionResult list = (await Operations().ListTenantEntriesAsync(includeDisabled: true))
+            .Value.ShouldNotBeNull();
+        list.TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
+
+        _gateway.ReadStreamAsync(Arg.Is<StreamReadRequest>(request => request.Domain == TenantProviderEnablementAggregate.Domain),
+                Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                StreamReadRequest request = call.Arg<StreamReadRequest>();
+                return new StreamReadPage(request.Tenant, request.Domain, request.AggregateId, [],
+                    new StreamReadMetadata(request.FromSequence, null, null, 1, 0, false, null));
+            });
+
+        TenantProviderCatalogInspectionResult pending = (await Operations().ListTenantEntriesAsync(includeDisabled: true))
+            .Value.ShouldNotBeNull();
+        pending.TruthState.ShouldBe(AgentSetupTruthState.AuthoritativePending);
+        pending.Entries.ShouldBeEmpty();
+    }
+
+    private IProviderCatalogOperations Operations(IReadModelStore? store = null, TimeProvider? clock = null)
     {
         var dispatcher = new EventStoreAgentCommandDispatcher(_gateway);
         return new EventStoreProviderCatalogOperations(
@@ -776,7 +990,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
             new ProviderCatalogAdministrationOrchestrator(dispatcher),
             store ?? _store,
             Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = StoreName }),
-            new AgentCommandIdentityFactory(), gateway: _gateway);
+            new AgentCommandIdentityFactory(), clock, _gateway);
     }
 
     private void SeedProjectedEntry(int capabilityVersion)
@@ -822,6 +1036,12 @@ public sealed class EventStoreProviderCatalogOperationsTests
             new ProviderModelPricing("USD", 0.002m, 0.008m, 0),
             new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1));
 
+    private static UpdateProviderModelEntry UpdateCommand()
+        => new("openai", "gpt-4o", "OpenAI GPT-4o", true, 128_000, 16_000,
+            new ProviderModelTimeoutPolicy(30_000, 3), ProviderModelCapabilityFlags.Streaming, "cfg-openai-gpt4o",
+            new ProviderModelPricing("USD", 0.003m, 0.009m, 2), 1,
+            new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1));
+
     private static ProviderCatalogEntryView SelectableEntry(int capabilityVersion)
         => new(
             "openai",
@@ -839,4 +1059,9 @@ public sealed class EventStoreProviderCatalogOperationsTests
             capabilityVersion,
             new ProviderModelPricing("USD", 0.002m, 0.008m, 1),
             new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1));
+
+    private sealed class FixedClock(DateTimeOffset utcNow) : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow() => utcNow;
+    }
 }

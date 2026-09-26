@@ -10,6 +10,7 @@ namespace Hexalith.Agents.Server.Ports;
 /// <param name="TenantId">The caller's tenant scope, or empty when no tenant could be established.</param>
 /// <param name="ActorUserId">The authenticated user, or empty when the caller is anonymous.</param>
 /// <param name="IsAgentsAdmin">Whether the caller holds Agent administration authority for <paramref name="TenantId"/>.</param>
+/// <param name="IsPlatformOperator">Whether the caller holds Platform Operator authority over the platform provider catalog and tenant enablement.</param>
 public sealed record AgentAdministrationContext(string TenantId, string ActorUserId, bool IsAgentsAdmin, bool IsPlatformOperator = false)
 {
     /// <summary>The fail-closed context used when no authenticated administrator can be established.</summary>

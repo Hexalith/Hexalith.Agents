@@ -103,6 +103,12 @@ public abstract class ProviderCatalogQueryHandlerBase(
                 providerId, modelId, cancellationToken).ConfigureAwait(false)
             : await ProviderCatalogReadFreshness.IsTenantCurrentAsync(_gateway, query.TenantId,
                 entry.Value, tenant, providerId, modelId, cancellationToken).ConfigureAwait(false);
+        if (current && !platformQuery)
+        {
+            // Freshness confirmed that a missing tenant read model has no enablement stream.
+            tenant ??= new TenantProviderEnablementReadModel();
+        }
+
         // Freshness reads may cross the exclusive grace deadline. Build eligibility from server time
         // after those reads, including when the result must be returned as pending.
         object result = platformQuery
