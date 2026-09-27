@@ -120,6 +120,8 @@ A runtime, test, or qualification path that would execute a seam whose record is
 
 *Added 2026-09-12 to land the dependency requested by PRD A-27. Its branch, immutable target, date, and verification command remain incomplete, so `RQ-1` stays blocked; adding the record does not retire A-27 or turn transitional development behavior into launch evidence.*
 
+*Implementation direction 2026-09-27: the user selected **Branch B** after reviewing the Parties-first implementation proposal. Owner work should preserve the existing Organization-typed `hexa` Party and prove identity everywhere by its immutable tenant-scoped ID. This direction does not establish formal Product or Parties Maintainer acceptance of the complete Branch B launch contract. The immutable target, integration date and executable command remain `TBD`; `AcceptedStatus` remains `Uncommitted`, and no consumer may execute the seam or cite this direction as launch evidence.*
+
 ### EXT-HOST-1 — Platform-Owned Agents Host Composition
 
 | Commitment field | Value |

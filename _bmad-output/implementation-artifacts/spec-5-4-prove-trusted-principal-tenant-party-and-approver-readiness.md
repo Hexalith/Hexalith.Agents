@@ -9,6 +9,7 @@ context:
   - '_bmad-output/implementation-artifacts/epic-5-context.md'
   - '_bmad-output/planning-artifacts/external-dependency-register.md'
   - '_bmad-output/implementation-artifacts/story-5-4-dependency-recheck.md'
+  - '_bmad-output/specs/spec-story-5-4-dependency-unblock/SPEC.md'
 ---
 
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
@@ -37,12 +38,14 @@ context:
 
 ## Open Questions
 
-- **Scope after dependency recheck:** Keep full 5.4 in `draft` pending owner commitments (preserves live readiness); or narrow this run to local Caller-policy retirement and regression tests (delivers a prerequisite; live readiness remains deferred). Neither option selects a Party branch or advances dependency status.
+- **Owner acceptance:** The user selected Branch B as the implementation path. Product and Parties Maintainer must formally accept its complete launch contract; final identity/binding, Conversations, custody and host contracts, complete immutable targets, integration dates and executable compatibility commands remain unaccepted. See the [owner work and acceptance packet](../specs/spec-story-5-4-dependency-unblock/SPEC.md).
+
+The user confirmed full scope on 2026-09-27. The former narrowing question is resolved: retain all 5.4 work in `draft`; local Caller-policy retirement is a prerequisite within that scope, not an alternative completion.
 
 ## Code Map
 
 - `src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs` — JWT role authority; tenant/approver readers remain deferred.
-- `src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs` — ambient tenant, unchecked returned ID, nullable freshness; Organization provisioning does not select Branch B.
+- `src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs` — ambient tenant, unchecked returned ID, nullable freshness; existing Organization provisioning supports the user-selected Branch B path but does not satisfy its contract.
 - `src/Hexalith.Agents.Server/Application/Queries/AgentSetupQueryHandlerBase.cs` — global-admin bypass needs current authority.
 - `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs` — Dapr identity plus literal flags, without signed ingress. Reuse EventStore idempotency separately from AD-29/30 signing.
 
@@ -66,11 +69,14 @@ context:
 
 ## Spec Change Log
 
+- 2026-09-27: User directed preservation of full scope. Added the Parties-first implementation proposal and complete dependency-ordered owner work. No frozen intent, acceptance criterion, dependency status or readiness gate changed.
+- 2026-09-27: User selected Branch B as the implementation path. Product and Parties Maintainer acceptance and every complete dependency gate remain pending.
+
 ## Review Triage Log
 
 ## Design Notes
 
-Rechecked 2026-09-27: all four dependency records remain `Uncommitted`; owner issues remain open without replies. Updated code still lacks accepted actor-binding, trusted-envelope, and spool contracts. See the dependency recheck for exact revisions. Full 5.4 cannot enter `ready-for-dev`; a narrower scope requires a user decision. No migration, deployment, or external write is proposed. Preserve 5.3's platform catalog, tenant enablement, and exact command-outcome behavior.
+Rechecked 2026-09-27: all four dependency records remain `Uncommitted`; owner issues remain open without replies. The [implementation proposal](../specs/spec-story-5-4-dependency-unblock/SPEC.md) now directs Branch B work, supplies the concrete Parties identity/current-and-historical binding spec and preserves complete Conversations/custody/host owner work, including v21/v23. Its source revisions are observations, not accepted targets. Full 5.4 stays `draft` until all entry requirements are met; consuming seam execution still requires `Available`. No migration, deployment, or external write is proposed. Preserve 5.3's platform catalog, tenant enablement, and exact command-outcome behavior.
 
 ## Verification
 

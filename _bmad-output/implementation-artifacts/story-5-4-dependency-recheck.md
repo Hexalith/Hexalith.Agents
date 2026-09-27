@@ -44,3 +44,11 @@ The authoritative [dependency register](../planning-artifacts/external-dependenc
 The full draft retains its frozen intent and remains `draft`; sprint status remains `backlog`. The unresolved choice is to retain this complete scope until owner acceptance, or explicitly narrow to local Caller-policy retirement and its regression tests. Narrowing would not select Branch B, close the four dependencies, or complete live readiness.
 
 `eng/verify-story-5.4.ps1` does not exist yet. No source code changed, builds/tests were not run, and no external seam was executed. Implementation still needs persisted-state replay/denial recovery, restricted-capability ACL, cross-tenant non-disclosure and live dependency evidence after the applicable gates are satisfied. Prior Story 5.3 test results are continuity context only.
+
+## Full-scope owner implementation follow-through — 2026-09-27
+
+The user has resolved the scope choice above: preserve **all** of Story 5.4. The [owner implementation proposal](../specs/spec-story-5-4-dependency-unblock/SPEC.md) replaces the proposed narrowing option with concrete work: Parties identity-by-id, tenant isolation, divergent-retry conflicts and durable current/historical human binding first; then the complete six Conversations seams, full custody profile and complete Platform composition including v21/v23.
+
+Branch B was recommended from the current Organization provisioning code and selected by the user as the implementation path on 2026-09-27; formal Product/Parties acceptance remains pending. The proposal's [evidence and acceptance handoff](../specs/spec-story-5-4-dependency-unblock/evidence-and-acceptance.md) records the newer inspected reference/owner revisions, existing in-memory identity-binding work and EventStore crypto core without treating them as delivered contracts or live evidence. Read-only owner issue checks still found four open issues with no comments.
+
+The original inspection above remains historical evidence. The story is still draft/backlog; all four complete records remain Uncommitted with no accepted target/date/command. The register now records the Branch B implementation direction; its commitment fields and all original entry/execution gates are unchanged. No owner messages were posted and no external seam was executed.
