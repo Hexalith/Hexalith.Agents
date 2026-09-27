@@ -2,7 +2,7 @@
 title: Hexalith Agents External Dependency Register
 status: active
 created: 2026-08-02
-updated: 2026-09-19
+updated: 2026-09-27
 project: agents
 authority: sprint-change-proposal-2026-09-09-2.md
 ---
@@ -277,6 +277,17 @@ This historical ruling does not commit `EXT-PROVIDER-1`, advance its status, or 
 | `DependencyEffect` | This record does not make `EXT-PROVIDER-1` a Story 5.3 consumer, does not alter any dependency status, and cannot be cited as current architecture or release conformance. |
 
 The record closes only when its named evidence is accepted and this table is amended in the same change. A completed historical Story 5.3 specification or the existing tenant-scoped implementation does not close it.
+
+## 2026-09-27 Owner Coordination For Story 5.4
+
+The following requests are open with the owning repositories. They are requests for decisions and delivery evidence, **not** accepted commitments. The inspected local revisions are observations only; none supplies an accepted `TargetVersionOrCommit`, integration date, or exact live compatibility command. All four records remain `Uncommitted`, and no Story 5.4-only subset may advance a broader record to `Available`.
+
+| Record and owner request | Inspected evidence | Exact owner response still needed |
+| --- | --- | --- |
+| `EXT-CONV-AI-1` — [Conversations #4](https://github.com/Hexalith/Hexalith.Conversations/issues/4) | At `0bb017e641eb7bd03864466526c4918f9c55ef70`, the detail projection has Participants and `Facilitator`; the general hidden result does not distinguish Conversation deletion from principal removal. No accepted Agents Service Principal read contract or six-seam live command was found. | Conversations Maintainer accepts all six core seams, final public members and typed failures, one immutable full target, integration date, and one command proving the complete target with live Level 4 and cross-tenant evidence. |
+| `EXT-PARTIES-1` — [Parties #54](https://github.com/Hexalith/Hexalith.Parties/issues/54) | At `14d249fde316b0002aec84351d7a7cdf953d1d30`, `PartyDetail` exposes type and active state; no `AuthenticatedHumanActorId`, binding version, or historical binding read was found. | Product and Parties Maintainer explicitly select Branch A or B; Parties Maintainer accepts the complete create-only identity-by-id and current/historical human binding contract, final typed outcomes, immutable full target, integration date, and live command. |
+| `EXT-SECRETS-1` — [Platform #1](https://github.com/Hexalith/Hexalith.Platform/issues/1) | The owning repository is still `TBD`. The Platform scaffold contains no accepted HMAC/replay profile or full custody command. | Platform Maintainer selects the owning repository and accepts the **full** secrets contract, including numeric trusted-envelope bounds, replay retention, security digest, rotation/revocation, and the later signing/custody extensions; supplies an immutable full target, integration date, and live command. |
+| `EXT-HOST-1` — [Platform #2](https://github.com/Hexalith/Hexalith.Platform/issues/2) | At historical `a66cdf346e521ad147f442b686f301f0f59c525c`, `./eng/verify-agents-host.sh` builds the scaffold and explicitly defers live Agents composition. The Platform working tree has pre-existing changes that are not an immutable target. | Platform Maintainer accepts the complete expanded host contract, including replicated security-audit spool, restricted replay/security credentials, recovery worker, full composition and v21/v23 protection/migration extensions; supplies an immutable full target, integration date, and exact live command. |
 
 ## Current Blocking Summary
 
