@@ -8,6 +8,7 @@ review_loop_iteration: 0
 context:
   - '_bmad-output/implementation-artifacts/epic-5-context.md'
   - '_bmad-output/planning-artifacts/external-dependency-register.md'
+  - '_bmad-output/implementation-artifacts/story-5-4-dependency-recheck.md'
 ---
 
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
@@ -36,16 +37,14 @@ context:
 
 ## Open Questions
 
-- **Execution scope while four dependencies remain `Uncommitted`:** Keep full 5.4 in `draft` until owners accept targets and commands (preserves the full outcome); or narrow this run to Branch-B-compatible contracts/tests and defer live integration to another story (delivers only a prerequisite).
+- **Scope after dependency recheck:** Keep full 5.4 in `draft` pending owner commitments (preserves live readiness); or narrow this run to local Caller-policy retirement and regression tests (delivers a prerequisite; live readiness remains deferred). Neither option selects a Party branch or advances dependency status.
 
 ## Code Map
 
-- `src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs`, `ITenantAccessReader.cs` — claim-only authority and deferred tenant read; Tenants' handler accepts gaps.
-- `src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs`, `IApproverPolicyResolver.cs` — current Party read ignores tenant and assumes Organization; approver reader is deferred.
-- `src/Hexalith.Agents/Agent/AgentAggregate.cs`, `src/Hexalith.Agents.UI/Components/Pages/ApproverPolicy.razor` — Caller is still accepted/offered; preserve its wire enum.
-- `src/Hexalith.Agents.Server/Api/AgentsOperationEndpoints.cs`, `src/Hexalith.Agents.Server/Application/Queries/AgentSetupQueryHandlerBase.cs` — public paths and global-admin bypass need pre-lookup authority.
-- `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs`, `src/Hexalith.Agents.Server/Ports/EventStoreAgentCommandDispatcher.cs` — literal flags and shared dispatch lack signed principal, scope, and delivery nonce.
-- `src/Hexalith.Agents/TrustedEnvelopeReplay/`, `src/Hexalith.Agents/SecurityEventLog/` — missing pure aggregates and private registrar/recorder bindings.
+- `src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs` — JWT role authority; tenant/approver readers remain deferred.
+- `src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs` — ambient tenant, unchecked returned ID, nullable freshness; Organization provisioning does not select Branch B.
+- `src/Hexalith.Agents.Server/Application/Queries/AgentSetupQueryHandlerBase.cs` — global-admin bypass needs current authority.
+- `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs` — Dapr identity plus literal flags, without signed ingress. Reuse EventStore idempotency separately from AD-29/30 signing.
 
 ## Tasks & Acceptance
 
@@ -55,7 +54,7 @@ context:
 - [ ] `src/Hexalith.Agents.Server/Api/AgentsOperationEndpoints.cs`, `src/Hexalith.Agents.Server/Application/Queries/AgentSetupQueryHandlerBase.cs`, and `src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs` — authorize before protected reads or effects.
 - [ ] `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs` and `src/Hexalith.Agents.Server/Ports/EventStoreAgentCommandDispatcher.cs` — verify signed operation/principal/scope and separate logical/delivery ids.
 - [ ] `src/Hexalith.Agents/TrustedEnvelopeReplay/TrustedEnvelopeReplayAggregate.cs` and `src/Hexalith.Agents/SecurityEventLog/SecurityEventLogAggregate.cs` — implement pure folds; bind private exact-target replay/spool/worker ports in `src/Hexalith.Agents.Server/Composition/AgentDomainHostComposition.cs`.
-- [ ] `eng/verify-story-5.4.ps1` — run focused persisted-state, replay, ACL, cross-tenant, UI, and live compatibility tests only when external targets are `Available`.
+- [ ] `test/Hexalith.Agents.Tests/AgentApproverPolicyTests.cs`, `test/Hexalith.Agents.UI.Tests/ApproverPolicyTests.cs`, and `eng/verify-story-5.4.ps1` — cover matrix edge cases, persisted replay, ACL, isolation, and UI; execute external seams only at `Available`.
 
 **Acceptance Criteria:**
 - Given active tenant/Party/approver evidence, when setup is queried, then API/UI expose the same safe basis; revocation or uncertainty blocks before downstream effects.
@@ -71,7 +70,7 @@ context:
 
 ## Design Notes
 
-The register marks `EXT-CONV-AI-1`, `EXT-HOST-1`, `EXT-PARTIES-1`, and `EXT-SECRETS-1` Uncommitted: full story cannot enter `ready-for-dev`. Branch-B-compatible code alone is not launch evidence. The host lives outside this repository; the spool is host infrastructure, while both security aggregates are EventStore state.
+Rechecked 2026-09-27: all four dependency records remain `Uncommitted`; owner issues remain open without replies. Updated code still lacks accepted actor-binding, trusted-envelope, and spool contracts. See the dependency recheck for exact revisions. Full 5.4 cannot enter `ready-for-dev`; a narrower scope requires a user decision. No migration, deployment, or external write is proposed. Preserve 5.3's platform catalog, tenant enablement, and exact command-outcome behavior.
 
 ## Verification
 
