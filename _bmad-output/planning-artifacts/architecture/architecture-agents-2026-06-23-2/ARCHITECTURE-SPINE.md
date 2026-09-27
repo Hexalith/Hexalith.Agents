@@ -158,6 +158,9 @@ companions:
 
 # Architecture Spine - Hexalith Agents
 
+**Approved McpCli course correction (2026-09-27):** `Hexalith.McpCli` is the target Hexalith-owned CLI/MCP surface for Agents operations that pass contract enrollment and authorization. Any proprietary module CLI, MCP host, plug-in, or planned adapter described below is an obsolete migration source or historical design, not a new target. The module retains its domain, UI, and security semantics; replacement or approved withdrawal and parity evidence precede retirement. External development CLIs are unaffected.
+
+
 ## Design Paradigm
 
 Hexalith Agents is an event-sourced, Dapr-Workflow-orchestrated, hexagonal Hexalith domain module: EventStore aggregates in the `Hexalith.Agents` domain assembly are business truth, replay-safe Server orchestrators and workflow activities coordinate every side effect through ports, adapters implement Conversations, Parties, Tenants, Provider, safety, secret, and FrontComposer integration, and a platform-owned host composes it all.
