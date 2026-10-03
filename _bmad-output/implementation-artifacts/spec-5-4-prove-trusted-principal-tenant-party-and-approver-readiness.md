@@ -38,16 +38,13 @@ context:
 
 ## Open Questions
 
-- **Owner acceptance:** The user selected Branch B as the implementation path. Product and Parties Maintainer must formally accept its complete launch contract; final identity/binding, Conversations, custody and host contracts, complete immutable targets, integration dates and executable compatibility commands remain unaccepted. See the [owner work and acceptance packet](../specs/spec-story-5-4-dependency-unblock/SPEC.md).
-
-The user confirmed full scope on 2026-09-27. The former narrowing question is resolved: retain all 5.4 work in `draft`; local Caller-policy retirement is a prerequisite within that scope, not an alternative completion.
+- **Owner commitments:** Where are the four complete commitments? Supply their location (reconcile readiness), or retain draft pending delivery. Contract/target/date/command and custody profile are unaccepted. Full scope and Branch B are settled.
 
 ## Code Map
 
-- `src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs` — JWT role authority; tenant/approver readers remain deferred.
-- `src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs` — ambient tenant, unchecked returned ID, nullable freshness; existing Organization provisioning supports the user-selected Branch B path but does not satisfy its contract.
-- `src/Hexalith.Agents.Server/Application/Queries/AgentSetupQueryHandlerBase.cs` — global-admin bypass needs current authority.
-- `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs` — Dapr identity plus literal flags, without signed ingress. Reuse EventStore idempotency separately from AD-29/30 signing.
+- `src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs` — JWT/query flags bypass current authority; Tenants continuity is unproven.
+- `src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs` — unchecked tenant/ID/freshness; preserve Organization ID. Human binding is absent.
+- `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs` — unsigned flags. Reuse EventStore digest/admission hooks separately from envelope signing/replay; preserve 5.3 exact outcomes.
 
 ## Tasks & Acceptance
 
@@ -71,14 +68,15 @@ The user confirmed full scope on 2026-09-27. The former narrowing question is re
 
 - 2026-09-27: User directed preservation of full scope. Added the Parties-first implementation proposal and complete dependency-ordered owner work. No frozen intent, acceptance criterion, dependency status or readiness gate changed.
 - 2026-09-27: User selected Branch B as the implementation path. Product and Parties Maintainer acceptance and every complete dependency gate remain pending.
+- 2026-10-03: Updated source/owner recheck and Code Map after reference updates. All four records remain Uncommitted; no complete new contract or owner acceptance was found. KEEP full scope, Branch B direction, frozen intent, original acceptance and draft/backlog gates.
 
 ## Review Triage Log
 
 ## Design Notes
 
-Rechecked 2026-09-27: all four dependency records remain `Uncommitted`; owner issues remain open without replies. The [implementation proposal](../specs/spec-story-5-4-dependency-unblock/SPEC.md) now directs Branch B work, supplies the concrete Parties identity/current-and-historical binding spec and preserves complete Conversations/custody/host owner work, including v21/v23. Its source revisions are observations, not accepted targets. Full 5.4 stays `draft` until all entry requirements are met; consuming seam execution still requires `Available`. No migration, deployment, or external write is proposed. Preserve 5.3's platform catalog, tenant enablement, and exact command-outcome behavior.
+Consumer seams require Available. The [recheck](story-5-4-dependency-recheck.md#current-reference-and-owner-recheck--2026-10-03) maps gaps. No irreversible planning action; implementation adds authority/replay/security ports across domain, Server, EventStore, UI and tests.
 
 ## Verification
 
 **Commands:**
-- `pwsh ./eng/verify-story-5.4.ps1` — warning-free builds, individual suites, persisted end state and negative evidence; live lanes only against `Available` targets.
+- Proposed `pwsh ./eng/verify-story-5.4.ps1` — builds/suites, persisted-state and isolation evidence. Not implemented/executed; live lanes require Available targets.

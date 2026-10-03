@@ -52,3 +52,50 @@ The user has resolved the scope choice above: preserve **all** of Story 5.4. The
 Branch B was recommended from the current Organization provisioning code and selected by the user as the implementation path on 2026-09-27; formal Product/Parties acceptance remains pending. The proposal's [evidence and acceptance handoff](../specs/spec-story-5-4-dependency-unblock/evidence-and-acceptance.md) records the newer inspected reference/owner revisions, existing in-memory identity-binding work and EventStore crypto core without treating them as delivered contracts or live evidence. Read-only owner issue checks still found four open issues with no comments.
 
 The original inspection above remains historical evidence. The story is still draft/backlog; all four complete records remain Uncommitted with no accepted target/date/command. The register now records the Branch B implementation direction; its commitment fields and all original entry/execution gates are unchanged. No owner messages were posted and no external seam was executed.
+
+## Current reference and owner recheck — 2026-10-03
+
+Rechecked during `bmad-build 5.4` after the root reference update. Agents started clean on `main`. The full-scope and Branch B choices remain settled; this recheck does not request narrowing or another identity-branch decision.
+
+### Inspected immutable source positions
+
+| Checkout | Full HEAD |
+| --- | --- |
+| Agents | `88105d4178d3827c7a5488e9008f358cb7b8db15` |
+| Tenants reference | `bfc10cb62dff6784c4b4bcabadfd537ef74fd77a` |
+| Parties reference | `937cb2a343aaa74963db9bb867a2c3a01ff48677` |
+| Conversations reference | `35121cab6bfc963fb2a8d411a51800f6ef5a2a70` |
+| EventStore reference | `2c58ffda41759e895ace4b9625c9bd931a217672` |
+| Builds reference | `c16249a6a0c88b903e14c7f6612632e2c70d4e94` |
+| Sibling Platform | `c3c473a4aa8da421896e4795fcdb0f4d2771a0be` |
+
+Each identifier was obtained directly with `git rev-parse HEAD`. They identify inspected source, not accepted dependency targets. Sibling Platform and references were read-only; no fetch, submodule update or nested initialization occurred.
+
+### Owner acceptance and entry gates
+
+Fresh `gh issue view --json number,title,state,url,body,comments` reads found [Parties #54](https://github.com/Hexalith/Hexalith.Parties/issues/54), [Conversations #4](https://github.com/Hexalith/Hexalith.Conversations/issues/4), [Platform #1](https://github.com/Hexalith/Hexalith.Platform/issues/1) and [Platform #2](https://github.com/Hexalith/Hexalith.Platform/issues/2) all OPEN with empty comments. None supplies owner acceptance, an immutable complete target, integration date or executable command.
+
+| Record | Current disposition | Missing input beyond target/date/command |
+| --- | --- | --- |
+| EXT-PARTIES-1 | Uncommitted | Product/Parties acceptance of Branch B, final tenant-scoped provisioning and authoritative current/historical human-binding contract |
+| EXT-CONV-AI-1 | Uncommitted | Final complete six-seam contract and live component verification |
+| EXT-SECRETS-1 | Uncommitted | Custody repository, independent trust authorities, numeric signing/recovery/retention profile and full custody contract |
+| EXT-HOST-1 | Uncommitted | Complete host/protection/migration composition, replicated spool durability, restricted replay/recorder credentials and full v21/v23 contract |
+
+The [register](../planning-artifacts/external-dependency-register.md#authority-and-entry-gate) requires complete Committed/Available records before ready-for-dev. Available and passing evidence for the exact installed target are required before consumer seam execution; only an accepted owner's exact compatibility command can qualify a Committed seam. New source primitives and local tests cannot establish either gate.
+
+### Updated code findings
+
+- **Tenants:** `TenantProjectionEventHandler.ApplyAsync` still ignores only lower sequences and accepts jumps/equal conflicts. `TenantLocalState.LastEvent` is not a contiguous checkpoint/high-water proof. `AddHexalithTenants` defaults to an in-memory consumer store and does not register a global-administrator consumer. Public global-administrator set/remove events and the `system/global-administrators` identity are reusable; do not depend on Tenants Server's internal singleton projection as authority.
+- **Parties:** Identity/provisioning/binding domain and public contracts remain unchanged from the prior inspected reference. `PartyDetail` still mixes PII with nullable freshness and lacks stable actor/version/interval/history. Create on any existing state returns no-op before divergent intent validation. UI identity binding still defaults to in-memory storage. Branch B preserves the existing Organization identity, but this is not the complete authoritative contract.
+- **Conversations:** Domain, Server, Client and Contracts have no six-seam completion changes from the prior inspected reference. `IConversationClient` supplies general get/append and `ParticipantRole.Facilitator` remains reusable. Public restricted membership/removal, accepted trace/provenance, typed MessageId/existence/deletion/removal results, authoritative denominator and atomic durable approved-deletion delivery remain absent. Hidden detail still collapses access outcomes.
+- **Agents authority:** `HttpAgentAdministrationContextProvider` trusts JWT roles; setup and audit query bases trust global-admin flags. Composition still binds deferred authority/Party/approver readers. `AgentInteractionGateOrchestrator` performs downstream reads after tenant denial. `IApproverPolicyResolver` has no acting actor/binding/Conversation/exclusion context; `ApproverPolicyVerdict` does not prove returned source correspondence and unknown outcomes can pass. These require fresh authority admission before protected reads/effects and exact stable-human approver evidence.
+- **Caller:** Aggregate configuration and UI still accept/offer Caller, with existing tests affirming it. Retirement remains a prerequisite inside full 5.4: preserve enum deserialization and historical event folds, reject new writes and legacy runtime eligibility, remove configuration choices, update shared fixtures and focused domain/UI tests. This alone cannot complete the story.
+- **EventStore:** `ITrustedCommandExtensionPolicy`, `IIdempotencyIntentAdapter`, `IIdempotencyAdmissionCoordinator` and `IAggregateActor` provide extension/admission/fenced-read primitives. New `DaprSecretIdempotencyDigestKeyProvider`, `IIdempotencyDigestKeyProvider` and `IdempotencyDigestKeyRing` support active/retained business-idempotency keys and production secret-source validation. `CanonicalIdempotencyIntentEncoder` has its own framing; these do not supply AD-29/30 trusted-envelope custody, issuer-wide nonce replay or security-denial durability. Payload-protection core/interface remain reusable, while default DI still registers `NoOpEventPayloadProtectionService`.
+- **Platform/Builds:** No trusted-envelope profile, replay registrar, replicated security spool/worker or exact-stream/event capability implementation was found. `../platform/apphost.cs` still defers Agents DomainService/UI to 5.6, and its host verifier only builds the historical scaffold. New Platform planning assigns Agents enrollment to post-MVP Epic 12; that is not a delivery commitment. Builds' per-run development signing helpers do not establish production custody.
+
+### Planning result and validation limits
+
+Refreshed the Story 5.4 draft Code Map and epic context. Preserve the frozen intent, original acceptance criteria, Branch B implementation direction, Story 5.3 behavior, dependency commitment fields and sprint backlog status. No source implementation, owner message, migration, deployment, build/test, compatibility command or consumer seam execution occurred. `eng/verify-story-5.4.ps1` remains unimplemented.
+
+Required next evidence is the complete owner acceptance packet, not another approval of full scope or Branch B. The existing [owner implementation plan](../specs/spec-story-5-4-dependency-unblock/owner-implementation-plan.md) remains the handoff for delivering missing contracts. Full 5.4 cannot become ready-for-dev from these static findings.
