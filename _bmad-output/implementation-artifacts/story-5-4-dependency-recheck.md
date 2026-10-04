@@ -99,3 +99,37 @@ The [register](../planning-artifacts/external-dependency-register.md#authority-a
 Refreshed the Story 5.4 draft Code Map and epic context. Preserve the frozen intent, original acceptance criteria, Branch B implementation direction, Story 5.3 behavior, dependency commitment fields and sprint backlog status. No source implementation, owner message, migration, deployment, build/test, compatibility command or consumer seam execution occurred. `eng/verify-story-5.4.ps1` remains unimplemented.
 
 Required next evidence is the complete owner acceptance packet, not another approval of full scope or Branch B. The existing [owner implementation plan](../specs/spec-story-5-4-dependency-unblock/owner-implementation-plan.md) remains the handoff for delivering missing contracts. Full 5.4 cannot become ready-for-dev from these static findings.
+
+## Post-reference-update gate recheck — 2026-10-03
+
+Rechecked after the two latest Agents reference-update commits during `bmad-build 5.4`. Agents began clean on `main`. Independent read-only investigations covered authority/identity, all six Conversations seams, and custody/host composition. Full scope and Branch B remain settled. No owner messages, Git mutations, builds/tests, compatibility commands or consumer seams were executed.
+
+### Inspected source positions
+
+| Checkout | Full HEAD |
+| --- | --- |
+| Agents | `1b101eb0adca6387b66ec4b456e204f26e38a9c8` |
+| Parties reference and sibling owner | `5388884eec84b16545fdc008b2fc04547b0ed5b6` |
+| Tenants reference and sibling owner | `a46c127c8be1d8d6ecccdf0d710e25befa644cc6` |
+| Conversations reference | `f415298801097caa5f745e6976d67a79e4e2aab4` |
+| Sibling Conversations owner | `932548e2f222dce546f8f777b8827af5b43be417` |
+| EventStore reference | `b51978dd1d2a3721ad239db2623e1560377c7583` |
+| Builds reference | `688eec9a4333245cc0ff7772115c769094471863` |
+| Platform reference | `c3c473a4aa8da421896e4795fcdb0f4d2771a0be` |
+| Sibling Platform owner | `909321c40e36074d345b707b942c74a7c8f5c075` |
+
+These identifiers came directly from Git and locate inspected source only. Sibling Parties and Platform contain existing uncommitted implementation, preserved read-only; their working-tree contents are not covered by their HEAD identifiers or installed in Agents' clean references.
+
+### New implementation evidence and remaining gaps
+
+- **Parties:** The reference adds a [draft Branch B identity specification](../../references/Hexalith.Parties/_bmad-output/implementation-artifacts/spec-ext-parties-1-branch-b-authoritative-identity.md), without committed source contracts. The [sibling owner spec](../../../parties/_bmad-output/implementation-artifacts/spec-ext-parties-1-branch-b-authoritative-identity.md) is in-progress and records design approval for Platform actor authority, trusted identity-service binding writes and finite Parties attribution history. Its uncommitted `IPartiesIdentityClient`, `PartyIdentityEvidence`, `HumanActorBindingEvidence`, `PartyIdentityAuthority` and authoritative source/query folds address explicit tenant scope, immutable provisioning, source correspondence and historical intervals. This is owner implementation progress, not formal acceptance of the complete dependency target. The [owner implementation notes](../../../parties/_bmad-output/implementation-artifacts/ext-parties-1-implementation-notes.md) still identify pending production retention settings, no production `IIdentityHistoryCustody`, missing irreversible cleanup/restore guarantees and no purpose-scoped retained-history source/checkpoint after profile erasure. The [proposed verifier](../../../parties/eng/verify-ext-parties-1.ps1) explicitly exits 1 in Live mode even with every input supplied because production custody/history and authenticated persisted P-01–P-10/restart/restore/failure-injection lanes are missing. Final typed outcomes also need reconciliation with the register. No verifier was run here.
+- **Tenants:** New correction UI/state/tests do not change the authority seam. `TenantProjectionEventHandler` still accepts equal and jumping sequences, has no global-administrator event consumer and retains nullable last-event metadata rather than contiguous/high-water proof. Reuse exact `TenantIdentity` source addresses; current membership and global-administrator revocation still need authoritative admission.
+- **Conversations:** Neither reference nor newer sibling has any `src/` change since the previous recheck. Existing `MessageId`, idempotency and Facilitator primitives remain reusable. Restricted membership/read/removal, accepted trace/provenance, typed message/existence/deletion/removal results, authoritative denominator and durable approved-deletion delivery remain incomplete. A generic `Hidden` detail result still collapses access outcomes.
+- **EventStore/Platform:** New operation-bound RSA-PSS identity admission and stable actor registry are reusable through `IdentityAdmissionProof`, `IdentityAdmissionSigner` and `IdentityActorRegistryActor`; sibling Platform adds purpose-separated identity configuration. These do not implement AD-29/30 envelope HMAC custody, the numeric signing/recovery/retention profile, issuer-wide nonce replay or independent decision-approval authority. No replicated denial spool, restricted exact-stream replay/recorder credentials or complete v21/v23 host/protection protocol was found. Both Platform host verifiers still defer live Agents composition to Story 5.6. Builds changes add no relevant custody/host contract.
+- **Agents:** Source/test/verifier files are unchanged from the previous inspected root revision. JWT/global-admin flags, deferred authority/approver bindings, unchecked Party scope/freshness, Caller acceptance, post-denial downstream reads and unsigned trusted extensions remain implementation work. Preserve Story 5.3 catalog/enablement and exact command outcomes.
+
+### Owner evidence and disposition
+
+Fresh authenticated `gh issue view --json number,title,state,url,body,comments` reads found [Parties #54](https://github.com/Hexalith/Hexalith.Parties/issues/54), [Conversations #4](https://github.com/Hexalith/Hexalith.Conversations/issues/4), [Platform #1](https://github.com/Hexalith/Hexalith.Platform/issues/1) and [Platform #2](https://github.com/Hexalith/Hexalith.Platform/issues/2) OPEN with empty comments. No complete accepted target/date/command packet was found in those requests or inspected owner artifacts. Parties design approval is recorded as progress without filling the register's commitment fields.
+
+All four complete records remain `Uncommitted`. The register requires accepted complete commitments before `ready-for-dev`; Available and passing exact-target compatibility evidence remain prerequisites to consumer execution. Preserve frozen intent, original acceptance criteria, full scope, Branch B, draft/backlog and every dependency commitment field. Updated only this report and the draft's questions, Code Map and planning notes. `eng/verify-story-5.4.ps1` remains absent; no live readiness or story completion is claimed.

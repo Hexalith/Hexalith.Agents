@@ -38,13 +38,13 @@ context:
 
 ## Open Questions
 
-- **Owner commitments:** Where are the four complete commitments? Supply their location (reconcile readiness), or retain draft pending delivery. Contract/target/date/command and custody profile are unaccepted. Full scope and Branch B are settled.
+- **Owner packets:** Where are the four complete accepted commitments? Supply links (reconcile entry) or retain draft pending delivery. Full scope and Branch B are settled.
 
 ## Code Map
 
-- `src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs` — JWT/query flags bypass current authority; Tenants continuity is unproven.
-- `src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs` — unchecked tenant/ID/freshness; preserve Organization ID. Human binding is absent.
-- `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs` — unsigned flags. Reuse EventStore digest/admission hooks separately from envelope signing/replay; preserve 5.3 exact outcomes.
+- `src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs` — replace claim authority; prove Tenants continuity.
+- `src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs` — verify tenant/ID/freshness; preserve Organization ID. Sibling identity work is uncommitted.
+- `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs` — replace unsigned flags; digest/identity proofs do not supply AD-30 replay.
 
 ## Tasks & Acceptance
 
@@ -69,14 +69,15 @@ context:
 - 2026-09-27: User directed preservation of full scope. Added the Parties-first implementation proposal and complete dependency-ordered owner work. No frozen intent, acceptance criterion, dependency status or readiness gate changed.
 - 2026-09-27: User selected Branch B as the implementation path. Product and Parties Maintainer acceptance and every complete dependency gate remain pending.
 - 2026-10-03: Updated source/owner recheck and Code Map after reference updates. All four records remain Uncommitted; no complete new contract or owner acceptance was found. KEEP full scope, Branch B direction, frozen intent, original acceptance and draft/backlog gates.
+- 2026-10-03: Rechecked latest references and sibling identity progress; history custody/live verification remain incomplete. KEEP all prior scope, intent, acceptance and dependency gates.
 
 ## Review Triage Log
 
 ## Design Notes
 
-Consumer seams require Available. The [recheck](story-5-4-dependency-recheck.md#current-reference-and-owner-recheck--2026-10-03) maps gaps. No irreversible planning action; implementation adds authority/replay/security ports across domain, Server, EventStore, UI and tests.
+[Recheck](story-5-4-dependency-recheck.md#post-reference-update-gate-recheck--2026-10-03). No irreversible planning action. Footprint: domain, Server, EventStore, UI, tests.
 
 ## Verification
 
 **Commands:**
-- Proposed `pwsh ./eng/verify-story-5.4.ps1` — builds/suites, persisted-state and isolation evidence. Not implemented/executed; live lanes require Available targets.
+- `pwsh ./eng/verify-story-5.4.ps1` — planned verifier; absent and unexecuted. Live lanes require Available targets.
