@@ -1,0 +1,9 @@
+{
+  "Parties": {
+    "Identity": {
+      "PolicyId": "party-actor-retention-v1",
+      "Retention": "365.00:00:00",
+      "ExpiryTrigger": "binding-effective-at"
+    }
+  }
+}

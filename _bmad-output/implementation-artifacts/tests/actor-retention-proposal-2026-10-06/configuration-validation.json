@@ -1,0 +1,10 @@
+{
+  "retentionDays": 365.0,
+  "productionEnabled": false,
+  "status": "ConfigurationValidated",
+  "expiresAt": "2027-10-06T00:00:00.0000000+00:00",
+  "custodyQualified": false,
+  "effectiveAt": "2026-10-06T00:00:00.0000000+00:00",
+  "expiryTrigger": "binding-effective-at",
+  "policyId": "party-actor-retention-v1"
+}

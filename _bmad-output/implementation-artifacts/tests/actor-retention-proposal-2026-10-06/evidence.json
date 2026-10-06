@@ -1,0 +1,38 @@
+{
+  "scope": "concrete proposal and SDK configuration check",
+  "command": "pwsh -NoProfile -File /tmp/agents54-retention-proposal-check-20261006.ps1",
+  "result": {
+    "retentionDays": 365.0,
+    "productionEnabled": false,
+    "status": "ConfigurationValidated",
+    "expiresAt": "2027-10-06T00:00:00.0000000+00:00",
+    "custodyQualified": false,
+    "effectiveAt": "2026-10-06T00:00:00.0000000+00:00",
+    "expiryTrigger": "binding-effective-at",
+    "policyId": "party-actor-retention-v1"
+  },
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/specs/spec-story-5-4-dependency-unblock/proposals/parties-identity-365-days.proposed.json",
+      "sha256": "d821fd4c7827d13c7b2ef2a287773a77f96aba5c2462d5f44184ed9b9607ca96"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-retention-custody-proposal-2026-10-06.md",
+      "sha256": "d3f6ce3faad15f7eb2841396dfb1be804e62f7f5dd24a55a926132100c157bb6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/actor-retention-proposal-2026-10-06/configuration-check.ps1",
+      "sha256": "512429645657f5b041f758154ec41e28b5643c146fabfc86cb253d47847d3db2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/actor-retention-proposal-2026-10-06/configuration-validation.json",
+      "sha256": "dd9bda09faab5ba398ab9a6497dc25e1318ef25217a38267eac4758d604cf694"
+    },
+    {
+      "path": "/tmp/hexalith-agents54-retention-artifacts/bin/Hexalith.Parties.Tests/debug/Hexalith.EventStore.Contracts.dll",
+      "sha256": "f9efc779627fa45fd83a15d85ca20b1a80dfc31174f8b37800c8f61d0ffef904"
+    }
+  ],
+  "resource_discovery": "Azure vault enumeration failed: missing MSAL cached token; no target discovered or qualified",
+  "live_calls": 0
+}
