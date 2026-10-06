@@ -1,0 +1,22 @@
+{
+  "status": "awaiting-independent-review",
+  "reason": "agent thread limit reached",
+  "full_diff_sha256": "535d5be4e75b719839554176297867a482761c67e5b6b4276a3194171a3766c3",
+  "prompts": {
+    "blind-hunter": {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/retention-review-2026-10-06/blind-hunter.md",
+      "bytes": 351916,
+      "sha256": "b8540387c6c2dfc6f8658a53cdf53472eaeeefb38c93bf501940235397ea6861"
+    },
+    "edge-case-hunter": {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/retention-review-2026-10-06/edge-case-hunter.md",
+      "bytes": 368312,
+      "sha256": "05662df06930882380c3acae74710fc4d4dcf051f5935773000506724cc54ccd"
+    },
+    "verification-gap": {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/retention-review-2026-10-06/verification-gap.md",
+      "bytes": 361383,
+      "sha256": "3129c78b62bd8118b798bfc08ca83b25b40ab803214911859c8485ecdfb65bff"
+    }
+  }
+}
