@@ -1,0 +1,152 @@
+{
+  "observed_at_utc": "2026-10-07T12:53:49.597434+00:00",
+  "repositories": {
+    ".": {
+      "head": "35911237f9405f4a71ccf74c9f1779bd33fe6f11",
+      "status": "M _bmad-output/implementation-artifacts/epic-5-context.md"
+    },
+    "references/Hexalith.Parties": {
+      "head": "d519cec885fe32e77452bfe66048e04db22ffd0e",
+      "status": ""
+    },
+    "references/Hexalith.Tenants": {
+      "head": "811447342e8f44b644a2074565e83f45519528fd",
+      "status": ""
+    },
+    "references/Hexalith.Conversations": {
+      "head": "d54cba773290b555e1939e9d943ae84548e5eba3",
+      "status": ""
+    },
+    "references/Hexalith.Platform": {
+      "head": "fd5db04d48423bc30f5a5e141a9019fede5d736f",
+      "status": ""
+    }
+  },
+  "baseline_sha256": {
+    "_bmad-output/planning-artifacts/external-dependency-register.md": "7b5c24fc10db943be744ba579f96a44d9488f8f2ebc8cd8929ead73a2b6424e1",
+    "_bmad-output/implementation-artifacts/sprint-status.yaml": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+    "_bmad-output/implementation-artifacts/story-5-4-owner-commitments-2026-10-07.md": "65fc8d29934d5db2bf8cfac8f000ac2ed639f2e10fb1908e3b5b150390682398",
+    "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md": "882d583dd571918c2e4e28c2f2207e584e6f2a0bdb5abdf3132281f80df0f6e7"
+  },
+  "frozen_intent_sha256": "4274a26ce87edaad0fc45b03637b08ac281f90ba6e4534174943688911f98b39",
+  "completed_at_utc": "2026-10-07T12:57:07.971603+00:00",
+  "evidence_kind": "ReadOnlySourceAndEntryGateInspection",
+  "fresh_tests_run": false,
+  "live_seams_executed": false,
+  "dependency_records": {
+    "EXT-PARTIES-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Parties Maintainer",
+      "Repository": "`Hexalith.Parties`",
+      "TargetVersionOrCommit": "`TBD`",
+      "TargetIntegrationDate": "`TBD`",
+      "AcceptedStatus": "`Uncommitted`",
+      "complete_verification_command": "TBD"
+    },
+    "EXT-CONV-AI-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Conversations Maintainer",
+      "Repository": "`Hexalith.Conversations`",
+      "TargetVersionOrCommit": "`TBD`",
+      "TargetIntegrationDate": "`TBD`",
+      "AcceptedStatus": "`Uncommitted`",
+      "complete_verification_command": "TBD"
+    },
+    "EXT-SECRETS-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Platform Maintainer",
+      "Repository": "`Hexalith.Platform`",
+      "TargetVersionOrCommit": "`TBD`",
+      "TargetIntegrationDate": "`TBD`",
+      "AcceptedStatus": "`Uncommitted`",
+      "complete_verification_command": "TBD"
+    },
+    "EXT-HOST-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Platform Maintainer",
+      "Repository": "`Hexalith.Platform`",
+      "TargetVersionOrCommit": "`TBD`",
+      "TargetIntegrationDate": "`TBD`",
+      "AcceptedStatus": "`Uncommitted`",
+      "complete_verification_command": "TBD"
+    }
+  },
+  "selected_source_sha256": {
+    "src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs": "de60dde13e947de701529bc753a58fda983bff4d65a601725b27c22ce9dc30cf",
+    "src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs": "288f1d82a12febd22bf491621b9fc15413c1f0d074de8df21271492398124a9b",
+    "src/Hexalith.Agents.Server/Ports/DeferredTenantAccessReader.cs": "90449cf30e1b83073c8faf057f9e9dd68590687d6291a7d22e9663af63e76edc",
+    "src/Hexalith.Agents.Server/Ports/DeferredApproverPolicyResolver.cs": "df85401c03e22825838424eb3bb025539bb4cb895c464fee03e43056e252561e",
+    "src/Hexalith.Agents.Server/Application/Agents/ApproverPolicyVerdict.cs": "7d302890259f3ddb86b1be1f351b07b1e859e7020022b7f86afb13c46b18b993",
+    "src/Hexalith.Agents.Server/Application/Queries/AgentSetupQueryHandlerBase.cs": "159030316c3cf7e5db615c7323093d642b8dc799c66d9054144cb74a4b75fd82",
+    "src/Hexalith.Agents.Server/Application/Queries/AgentInteractionAuditQueryHandlerBase.cs": "2d98a441fdb9b178fead38a208fdbc169aa97619353fa3ad4ffc4b9d03572a79",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs": "f23c746367205d9dc65335e343570911da3d9e1290a5e7443777b9088d4b763e",
+    "src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs": "db1e6db6d408762bc139af820faf73f0d8e37e6380ff2f334e55a9779cf5827f",
+    "references/Hexalith.Tenants/src/Hexalith.Tenants/Authorization/TenantsGlobalAdministratorVerifier.cs": "03c3a6d90ee14b92bf9d5ef4e7ca6e773f9a74a65313b361c11851803824f81c",
+    "references/Hexalith.Tenants/src/Hexalith.Tenants.Client/Handlers/TenantProjectionEventHandler.cs": "d8b6261fd71962f16e44d4ccbbb46ace98f0d041149226ecbc8a6a4d3b156e3b",
+    "references/Hexalith.Tenants/src/Hexalith.Tenants.Client/Registration/TenantServiceCollectionExtensions.cs": "16100f8857e93d74ecd2c48c60b34b6ba6fcdf95d433837f36907be04e570def",
+    "references/Hexalith.Parties/src/Hexalith.Parties.Client/Abstractions/IPartiesIdentityClient.cs": "e2e976e151896b7a3daf56f52f7f0bd18586a1b7a1c777ed99fef1c02d7e0f02",
+    "references/Hexalith.Parties/eng/verify-ext-parties-1.ps1": "d9f939321545cffac9125384b9eeaade5c5af6dd3f1dcca0b848c82a03ff2270",
+    "references/Hexalith.Conversations/eng/verify-ext-conv-ai-1.ps1": "3934603317c7a57817c038046eb97afe51c2772fa0be8ac22ec3550dc057bd19",
+    "references/Hexalith.Conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentServiceCollectionExtensions.cs": "cf26a74a54fafee591a02fc37504a232be4ecb6f9b39f63709e9bccbe5ac1f68",
+    "references/Hexalith.Platform/eng/verify-ext-secrets-1.ps1": "5c205ce0c82539786a14774454bd11ff0952d1168bf918626d71a6a722377726",
+    "references/Hexalith.Platform/eng/verify-agents-host.sh": "dd65e6a86a28315b8d22298e9e654e1c27426de1640ebcb698d539b4f43b3fb2",
+    "references/Hexalith.Platform/src/Hexalith.Platform.Custody/PlatformCustodyServiceCollectionExtensions.cs": "61321c8bbb32db758859aa5be182e9d2124781b7b8203ffec54373dd6b434ad6",
+    "references/Hexalith.Platform/apphost.cs": "7c140eb97bbc45e6ab0589ba3f186ea8eccc623bac9f8850bf2b42aadf136f9a"
+  },
+  "independent_investigations": [
+    "identity_gate",
+    "conversations_gate",
+    "platform_gate"
+  ],
+  "additional_platform_owner_observation": {
+    "path": "/home/administrator/projects/hexalith/platform",
+    "head": "bed37580a4213edb3e4698525e530b85aa4a80ea",
+    "worktree": "13 pre-existing staged paths; unchanged during investigator inspection; not an accepted target"
+  },
+  "validation_commands": [
+    "python3 document/frozen-intent/source-hash/record/link inspection",
+    "git diff --check",
+    "git diff --stat",
+    "git status --short --branch"
+  ],
+  "production_qualification": false,
+  "document_checks": {
+    "frozen_intent_unchanged": true,
+    "original_tasks_and_acceptance_unchanged": true,
+    "spec_draft_approval_entry_preserved": true,
+    "register_sprint_owner_packet_unchanged": true,
+    "exact_story_backlog_preserved": true,
+    "all_four_records_uncommitted_and_incomplete": true,
+    "selected_source_hashes_match": true,
+    "conversations_79_selected_hashes_match": true,
+    "full_story_verifier_still_absent": true,
+    "owner_prerequisite_parent_in_progress": true,
+    "context_valid_and_current": true,
+    "local_markdown_links_resolve": true,
+    "installed_owner_revisions_and_clean_status_preserved": true,
+    "root_revision_preserved": true,
+    "git_diff_check": true,
+    "new_report_whitespace": true
+  },
+  "story_key": "5-4-prove-trusted-principal-tenant-party-and-approver-readiness",
+  "final_repositories": {
+    ".": {
+      "head": "35911237f9405f4a71ccf74c9f1779bd33fe6f11",
+      "status": "M _bmad-output/implementation-artifacts/epic-5-context.md\n M _bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md\n?? _bmad-output/implementation-artifacts/story-5-4-entry-recheck-2026-10-07.json\n?? _bmad-output/implementation-artifacts/story-5-4-entry-recheck-2026-10-07.md"
+    },
+    "references/Hexalith.Parties": {
+      "head": "d519cec885fe32e77452bfe66048e04db22ffd0e",
+      "status": ""
+    },
+    "references/Hexalith.Tenants": {
+      "head": "811447342e8f44b644a2074565e83f45519528fd",
+      "status": ""
+    },
+    "references/Hexalith.Conversations": {
+      "head": "d54cba773290b555e1939e9d943ae84548e5eba3",
+      "status": ""
+    },
+    "references/Hexalith.Platform": {
+      "head": "fd5db04d48423bc30f5a5e141a9019fede5d736f",
+      "status": ""
+    }
+  },
+  "conversations_manifest_selected_source_count": 79,
+  "validation_completed_at_utc": "2026-10-07T12:58:33.357501+00:00"
+}

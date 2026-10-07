@@ -4,7 +4,7 @@
 
 ## Goal
 
-Deliver tenant-scoped `hexa` setup with shared authoritative configuration, lifecycle, readiness, and callability. Preserve history; uncertainty blocks effects.
+Deliver live tenant-scoped `hexa` setup with shared authoritative configuration, lifecycle, readiness, and callability. Preserve history; uncertainty blocks effects.
 
 ## Stories
 
@@ -21,31 +21,34 @@ Deliver tenant-scoped `hexa` setup with shared authoritative configuration, life
 
 ## Requirements & Constraints
 
-- Platform provisions one `hexa` per tenant, create-only under the Agents Service Principal. Exact retries preserve identity; divergence conflicts. Tenant administrators configure/activate/disable/inspect but cannot create another Agent, delete it, or replace its Party.
-- Branch B is the selected implementation direction: preserve the Organization Party and verify its immutable tenant-scoped ID. Formal Product/Parties acceptance remains pending. Type alone proves no Agent identity; Uncommitted development supplies no launch evidence.
+- Platform provisions one `hexa` per tenant, create-only under Agents Service Principal. Exact retries preserve identity; divergence conflicts. Tenant administrators configure/activate/disable/inspect; second-Agent creation, deletion, and Party replacement are forbidden.
+- Selected Branch B preserves the Organization Party verified by immutable tenant-scoped ID. Complete Product/Parties launch-contract acceptance remains required. Type proves no identity; Uncommitted development supplies no launch evidence.
 - Require authoritative Party classification/liveness and evidence position/time; humans need stable non-PII actor identity, versioned current binding, and action-time history. Missing/stale/ambiguous/overlapping/mismatched evidence blocks; non-human Parties cannot approve.
-- Durable changes require expected revisions, deterministic duplicates, and persisted projection outcomes. Active never proves callable; revocation blocks effects. Authorize before lookup/disclosure/mutation; cross-tenant responses reveal no existence, counts, membership, instructions, or configuration.
+- Durable changes require expected revisions, deterministic duplicates, and persisted projections. Active never proves callable; revocation blocks. Authorize before lookup/disclosure/mutation; cross-tenant responses reveal no target existence or data.
 - Provider catalog belongs to `system`; tenant enablement, selection, and versioned data-handling acceptance remain separate. Configuration applies prospectively; migration preserves history. Expose secret references/configured state only.
 - Retired Caller/safety-override/prohibited-cost values remain deserializable but cannot mutate/authorize. Unknown values block.
+- Human-binding history retains the accepted 365 fixed days from binding-effective-at, exclusive expiry. Custody/destruction/restore/successor continuity still need qualification. Interaction-content retention instead starts at terminal state.
 
 ## Technical Decisions
 
-- Pure EventStore aggregates own state; Server/Dapr Workflow coordinate effects through ports. Hexalith.Builds owns versions; Debug uses project references, Release public packages. Agents owns no AppHost/Aspire/ServiceDefaults.
+- Pure EventStore aggregates own state; Server/Dapr Workflow coordinate effects. Hexalith.Builds owns versions; Debug uses project references, Release public packages. Platform owns hosting.
 - Select one current operation-specific User/Administrator/Platform/Workflow principal; Platform humans require Tenants `global-administrators`. Actor identity survives role changes; history grants no authority. Strip reserved client extensions; verify scope-bound canonical HMAC before dispatch.
 - Separate logical command identity/delivery nonce. Private replay registration uses reserved `system` issuer/nonce identity before target construction. Exact replay reuses stored times and reaches domain idempotency; changed fields/cross-tenant nonce reuse deny and audit.
-- 5.4 owns restricted replay registration and content-free security recording. Route from authenticated authority, durably spool denials before reporting processed, and drain exactly once with durable acknowledgement. Replay/spool failure blocks target construction. Platform owns replicated spool, custody, worker, and restricted credentials.
-- Matrix-v7 readiness uses one registry checkpoint, current producer/scope-valid observations, typed blockers, and newest-record-wins without fallback. Preserve callable Degraded Providers. Independent runtime decision authority governs open outcomes; recorders/custodians cannot mint approvals.
+- Restricted replay/security recording precedes commands. Route from authenticated authority; spool denials before reporting processed; drain exactly once with durable acknowledgement. Replay/spool failure blocks target construction. Platform owns replicated spool, custody, worker, and restricted credentials.
+- Matrix-v7 readiness uses one registry checkpoint, current producer/scope-valid observations, typed blockers, and newest-record-wins without fallback. Preserve callable Degraded Providers. Independent decision authority governs open outcomes; recorders/custodians cannot mint approvals.
 - Platform protection seals sensitive fields before infrastructure; workflows carry references. Exact-target canaries prove persisted ciphertext, unseal, destruction, and Erased replay. No-op protection, uncertain legacy plaintext, or unresolved Instruction classification blocks applicable work.
 - `/api/v1/agents/...` exposes safe domain contracts.
 
 ## UX & Interaction Patterns
 
-Use FrontComposer/Fluent V5. Separate lifecycle, suspension, readiness, and callability. Writes show Submitted, AuthoritativePending, then ProjectionConfirmed; uncertainty never shows success. Identity is inspect-only. Approver sources: Facilitator, predefined human Party, tenant role. Hide unauthorized controls; name recovery owners. Preserve English/French parity, WCAG 2.2 AA, and 320-pixel operability.
+Use FrontComposer/Fluent V5. Separate lifecycle, suspension, readiness, and callability. Writes show Submitted, AuthoritativePending, then ProjectionConfirmed. Identity is inspect-only. Approver sources: Facilitator, predefined human Party, tenant role. Hide unauthorized controls; preserve English/French parity, WCAG 2.2 AA, and 320-pixel operability.
 
 ## Cross-Story Dependencies
 
 5.1 provides the boundary; 5.2/5.3 independently provide Agent/catalog operations; 5.4 authority/security; 5.5 shared readiness; 5.6 composition; 5.7 prior-setup activation. 5.8 protects later content; 5.9/5.10 tighten foundations. No later-epic dependency.
 
-All twelve external records remain Uncommitted. Ready-for-dev requires complete accepted fields, immutable target/date/command for every declared record. Committed permits contract/package work; only its owner's accepted exact-target compatibility command may execute to establish Available. Consumers require Available and passing exact-target evidence, otherwise DependencyNotAvailable(record). Levels 4/5 and persisted-state gates remain; fixtures prove decisions only. Historical host evidence preserves 5.1 completion without availability.
+All twelve external records remain Uncommitted. Ready-for-dev requires complete accepted Committed/Available records without TBD target/date/executable command. Committed permits contract/package work; only its owner's accepted exact-target compatibility command may execute to establish Available. Consumers require Available and passing exact-target evidence, otherwise DependencyNotAvailable(record). Available needs live Level 4; required Level 5 completes in consuming qualification/RQ-1. Changed commitments invalidate acceptance; failed compatibility blocks use. Fixtures supply no live attainment. Historical host evidence preserves 5.1 completion only.
 
-Full 5.4 remains draft/backlog with complete Parties/Conversations/host/secrets dependencies, including host/secrets migration/governance/destruction extensions. 5.3 invokes no Provider seam. Host/protection/topology gates and conditional recorder, Instruction-protection, and legacy-plaintext decisions remain; no local default or subset resolves them.
+Full 5.4 is specification-approved but draft/backlog; full scope, Branch B, and separate owner-prerequisite authorization remain settled. The project owner acts as Parties/Conversations/Platform Maintainer; Hexalith.Platform owns secrets. This supplies no target/date/command, independent policy approval, or availability. Preserve complete Conversations and host/secrets migration/governance/destruction scopes; no subset advances a broader record.
+
+5.3 invokes no Provider seam; its accepted historical Branch B non-consumption ruling and open platform-catalog migration non-conformance remain distinct. Host/protection/topology gates and conditional recorder, Instruction-protection, and legacy-plaintext decisions remain; no local default resolves them.

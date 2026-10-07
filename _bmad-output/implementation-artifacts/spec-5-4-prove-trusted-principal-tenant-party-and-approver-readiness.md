@@ -45,11 +45,13 @@ context:
 
 ## Code Map
 
-- `src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs` — replace JWT role authority with fresh operation-specific evidence; Tenants `TenantProjectionEventHandler` still accepts sequence gaps/equal conflicts and has no global-administrator consumer.
-- `src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs` — verify explicit tenant/ID/freshness and preserve Organization ID. The installed Parties reference now includes `IPartiesIdentityClient`, current/action-time evidence and binding transitions. Newer retained-history/policy/cancellation/completion work is selected local owner implementation; production custody/restore and complete exact-target Live qualification remain incomplete. Map provisioned Organization type and safe Agent classification only through the final accepted contract.
-- `src/Hexalith.Agents.Server/Ports/IApproverPolicyResolver.cs` and `src/Hexalith.Agents.Server/Application/Agents/ApproverPolicyVerdict.cs` — add actor/binding/source correspondence; reject unknown outcomes and Caller. Preserve historical deserialization/folds.
-- `src/Hexalith.Agents.Server/Application/Queries/{AgentSetupQueryHandlerBase,AgentInteractionAuditQueryHandlerBase}.cs` — replace global-admin flag bypasses before protected reads; `AgentInteractionGateOrchestrator` must stop downstream reads on authority denial.
-- `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs` — replace unsigned flags; existing digest/identity primitives do not supply AD-30 custody/replay. Preserve Story 5.3 outcomes.
+- `src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs` — replace JWT-derived administration roles with current operation-specific authority. Installed Tenants `Authorization/TenantsGlobalAdministratorVerifier.cs` already checks the global-administrators read model; it does not establish source-head freshness. `Tenants.Client/Handlers/TenantProjectionEventHandler.cs` accepts gaps and equal-sequence conflicts; a global-administrator client consumer and contiguous authority proof remain missing.
+- `src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs` — replace the ambient-tenant `PartyDetail`/legacy provisioning path with accepted explicit tenant/immutable-ID evidence. Installed Parties has `IPartiesIdentityClient`, Branch-B Organization classification and completion checks. Production custody, actor-free expired-predecessor continuation, irreversible receipts, restore and complete P-01–P-10 Live qualification remain missing; historical HTTP/replay blockers are superseded.
+- `src/Hexalith.Agents.Server/Ports/{DeferredTenantAccessReader,DeferredApproverPolicyResolver}.cs` and `Composition/AgentDomainHostComposition.cs` — current fail-closed placeholders; `ProjectedTenantAccessReader.cs` and `ProjectedApproverPolicyResolver.cs` in the tasks are planned new files. Add current actor/binding/source correspondence through `IApproverPolicyResolver` and `Application/Agents/ApproverPolicyVerdict.cs`; reject unknown outcomes and Caller without changing historical folds.
+- `src/Hexalith.Agents.Server/Application/Queries/{AgentSetupQueryHandlerBase,AgentInteractionAuditQueryHandlerBase}.cs` — replace global-admin flag bypasses before protected reads; `AgentInteractionGateOrchestrator` must stop downstream reads after tenant denial.
+- `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs` — existing Dapr caller checks and canonical enum/flag validation do not deliver signed AD-30 envelopes or private replay admission. Preserve Story 5.3 outcomes.
+- Installed Conversations `Server/Agents`, `Contracts/Agents`, `Client/ConversationClient.cs` and pure `ConversationAggregate.Agents.cs` — reuse restricted local seams and cancellation/replay checks. Production authority/source compare-append/catalogue/approval bindings and automatic C4 discovery/backfill/pump/authenticated receiver remain missing; the count window is not owner-accepted.
+- Installed Platform `src/Hexalith.Platform.Custody`, `apphost.cs` and `eng/{verify-ext-secrets-1.ps1,verify-agents-host.sh}` — reuse S1/S2 primitives and preserve closed production defaults. Full S3/S4/v23, qualified custody/profile/independent trust, replicated spool/worker/private credentials and H1–H4 remain undelivered. Current Live/Full branches refuse before calls.
 
 ## Tasks & Acceptance
 
@@ -73,6 +75,8 @@ context:
 - 2026-10-06: Rechecked owner issues, installed references and sibling source. Parties identity/history and Platform identity hosting are now committed in sibling repositories; full live contracts and owner packets remain missing. Preserve prior approval, frozen intent, acceptance criteria, full scope and Branch B; retain draft/backlog. No implementation or consumer seam execution occurred.
 - 2026-10-07: Recorded the user's project-owner declaration and instruction to make the four complete commitments. Updated owner accountability and selected Hexalith.Platform for secret custody. [Commitment packet](story-5-4-owner-commitments-2026-10-07.md) retains missing target/date/complete-command fields explicitly; no current partial commit, delivery date or live success was invented. Direct owner instruction supersedes the need for another owner to respond on GitHub, while complete record and execution gates remain unchanged.
 
+- 2026-10-07 entry recheck: Three independent read-only investigations found no complete accepted target/date/command packet. Refreshed the Code Map against the installed clean owner references, distinguishing Tenants' existing projection verifier from missing authoritative freshness and client consumption. [Current evidence](story-5-4-entry-recheck-2026-10-07.md) records exact source observations and unchanged gate hashes. Full scope, prior approval, Branch B, accepted 365-day policy, original acceptance and draft/backlog remain unchanged; no source implementation or live seam ran.
+
 ## Spec Change Log
 
 - 2026-09-27: User directed preservation of full scope. Added the Parties-first implementation proposal and complete dependency-ordered owner work. No frozen intent, acceptance criterion, dependency status or readiness gate changed.
@@ -87,7 +91,7 @@ context:
 
 ## Design Notes
 
-[Recheck](story-5-4-dependency-recheck.md#owner-and-contract-gate-recheck--2026-10-06). No new intent decision or irreversible planning action. Footprint: domain, Server, EventStore, UI, tests. Contract entry remains blocked; source inspection cannot supply owner acceptance.
+Full-story intent and scope are settled. Unresolved delivery fields are owner commitments the code cannot supply. No irreversible operation is planned before those inputs and the applicable execution gates are satisfied. Implementation footprint remains domain, Server, EventStore, UI and tests; shared infrastructure belongs to its technical owner. [Current recheck](story-5-4-entry-recheck-2026-10-07.md) distinguishes implementation gaps from historical local evidence. No repeat scope, Branch-B or retention approval is required.
 
 ## Verification
 
