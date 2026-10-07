@@ -1,0 +1,186 @@
+{
+  "observed_at_utc": "2026-10-07T14:38:20.554320+00:00",
+  "workflow": "bmad-build",
+  "workflow_step": "step-02-plan",
+  "story_key": "5-4-prove-trusted-principal-tenant-party-and-approver-readiness",
+  "evidence_kind": "ReadOnlySourceAndEntryGateInspection",
+  "fresh_tests_run": false,
+  "live_seams_executed": false,
+  "production_qualification": false,
+  "independent_investigations": [
+    "identity_entry_check",
+    "conversations_entry_check",
+    "platform_entry_check"
+  ],
+  "repositories": {
+    "/home/administrator/projects/hexalith/agents": {
+      "head": "cdbf4c9e800fd41d40db40c898c3b49d19d3238c",
+      "status": "## main...origin/main [ahead 1]\n M _bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md\n?? _bmad-output/implementation-artifacts/story-5-4-build-entry-recheck-2026-10-07.md"
+    },
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties": {
+      "head": "2fb9e545adbb2f974abf3791b726a2f29750bcf9",
+      "status": "## main...origin/main"
+    },
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Tenants": {
+      "head": "811447342e8f44b644a2074565e83f45519528fd",
+      "status": "## main...origin/main"
+    },
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations": {
+      "head": "d54cba773290b555e1939e9d943ae84548e5eba3",
+      "status": "## main...origin/main"
+    },
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform": {
+      "head": "fd5db04d48423bc30f5a5e141a9019fede5d736f",
+      "status": "## main...origin/main"
+    },
+    "/home/administrator/projects/hexalith/parties": {
+      "head": "2fb9e545adbb2f974abf3791b726a2f29750bcf9",
+      "status": "## main...origin/main\n M .github/workflows/release.yml\n M _bmad-output/implementation-artifacts/spec-align-parties-ci-cd-with-eventstore-tenants.md\n M docs/architecture.md\n M docs/ci-secrets-checklist.md\n M docs/ci.md\n M scripts/validate-publication-preflight.sh\n M src/Hexalith.Parties/Queries/PartyIdentitySourceFold.cs\n M tests/Hexalith.Parties.Ci.Tests/PartiesContainerPublishWorkflowTests.cs\n M tests/Hexalith.Parties.Ci.Tests/ReleaseSourcePreflightTests.cs\n M tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs"
+    },
+    "/home/administrator/projects/hexalith/tenants": {
+      "head": "f92bf34159c40b6f7fe12eb746565868422dc035",
+      "status": "## main...origin/main [ahead 2]\n M references/Hexalith.EventStore"
+    },
+    "/home/administrator/projects/hexalith/conversations": {
+      "head": "c44f6b7b116b17453aa213d39cd244a3e0cbe1dd",
+      "status": "## main...origin/main [ahead 4]"
+    },
+    "/home/administrator/projects/hexalith/platform": {
+      "head": "2fe0f793a2aa3ec6a0df5e1d5c933a387ec99be4",
+      "status": "## main...origin/main\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T143111Z-resumed-verification/SHA256SUMS\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T143111Z-resumed-verification/authorization.json\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T143111Z-resumed-verification/browser-access-observations.json\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T143111Z-resumed-verification/connector-observations.json\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T143111Z-resumed-verification/discovery.json\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T143111Z-resumed-verification/local-validation.json\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T143111Z-resumed-verification/preflight.json\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T143111Z-resumed-verification/proposed-changes.json\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T143111Z-resumed-verification/summary.md\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T143111Z-resumed-verification/unittest-output.txt\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T143111Z-resumed-verification/verification.json\nM  _bmad-output/implementation-artifacts/spec-4-4-apply-publication-and-operations-repository-controls.md\nM  eng/repository-controls/README.md\nM  eng/repository-controls/controls.py\nM  eng/repository-controls/test_controls.py"
+    }
+  },
+  "dependency_records": {
+    "EXT-PARTIES-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Parties Maintainer",
+      "Repository": "`Hexalith.Parties`",
+      "TargetVersionOrCommit": "`TBD`",
+      "TargetIntegrationDate": "`TBD`",
+      "AcceptedStatus": "`Uncommitted`",
+      "complete_verification_command": "TBD"
+    },
+    "EXT-CONV-AI-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Conversations Maintainer",
+      "Repository": "`Hexalith.Conversations`",
+      "TargetVersionOrCommit": "`TBD`",
+      "TargetIntegrationDate": "`TBD`",
+      "AcceptedStatus": "`Uncommitted`",
+      "complete_verification_command": "TBD"
+    },
+    "EXT-SECRETS-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Platform Maintainer",
+      "Repository": "`Hexalith.Platform`",
+      "TargetVersionOrCommit": "`TBD`",
+      "TargetIntegrationDate": "`TBD`",
+      "AcceptedStatus": "`Uncommitted`",
+      "complete_verification_command": "TBD"
+    },
+    "EXT-HOST-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Platform Maintainer",
+      "Repository": "`Hexalith.Platform`",
+      "TargetVersionOrCommit": "`TBD`",
+      "TargetIntegrationDate": "`TBD`",
+      "AcceptedStatus": "`Uncommitted`",
+      "complete_verification_command": "TBD"
+    }
+  },
+  "baseline_protected_sha256": {
+    "_bmad-output/planning-artifacts/external-dependency-register.md": "7b5c24fc10db943be744ba579f96a44d9488f8f2ebc8cd8929ead73a2b6424e1",
+    "_bmad-output/implementation-artifacts/sprint-status.yaml": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+    "_bmad-output/implementation-artifacts/story-5-4-owner-commitments-2026-10-07.md": "27f66a256a3c529fbfc81f1c871c293d68c64781eef5505197eec45f29280c48",
+    "_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md": "b5a9e56d6c97c09c70ff4e4f81e8db13dee2b57b0b92b078df77e450d8b71415",
+    "_bmad-output/implementation-artifacts/epic-5-context.md": "b037ee2c91bbf498d7f7bcf79f1e6509193d67e27625a585059906000d331c6a",
+    "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md": "61945071e5369c1b74c173fba8f2c1275fdec3520caee607cd6df558098fd783"
+  },
+  "frozen_intent_sha256": "4274a26ce87edaad0fc45b03637b08ac281f90ba6e4534174943688911f98b39",
+  "selected_source_sha256": {
+    "src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs": "de60dde13e947de701529bc753a58fda983bff4d65a601725b27c22ce9dc30cf",
+    "src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs": "288f1d82a12febd22bf491621b9fc15413c1f0d074de8df21271492398124a9b",
+    "src/Hexalith.Agents.Server/Ports/DeferredTenantAccessReader.cs": "90449cf30e1b83073c8faf057f9e9dd68590687d6291a7d22e9663af63e76edc",
+    "src/Hexalith.Agents.Server/Ports/DeferredApproverPolicyResolver.cs": "df85401c03e22825838424eb3bb025539bb4cb895c464fee03e43056e252561e",
+    "src/Hexalith.Agents.Server/Application/Agents/ApproverPolicyVerdict.cs": "7d302890259f3ddb86b1be1f351b07b1e859e7020022b7f86afb13c46b18b993",
+    "src/Hexalith.Agents.Server/Application/Queries/AgentSetupQueryHandlerBase.cs": "159030316c3cf7e5db615c7323093d642b8dc799c66d9054144cb74a4b75fd82",
+    "src/Hexalith.Agents.Server/Application/Queries/AgentInteractionAuditQueryHandlerBase.cs": "2d98a441fdb9b178fead38a208fdbc169aa97619353fa3ad4ffc4b9d03572a79",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs": "f23c746367205d9dc65335e343570911da3d9e1290a5e7443777b9088d4b763e",
+    "src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs": "db1e6db6d408762bc139af820faf73f0d8e37e6380ff2f334e55a9779cf5827f",
+    "references/Hexalith.Tenants/src/Hexalith.Tenants/Authorization/TenantsGlobalAdministratorVerifier.cs": "03c3a6d90ee14b92bf9d5ef4e7ca6e773f9a74a65313b361c11851803824f81c",
+    "references/Hexalith.Tenants/src/Hexalith.Tenants.Client/Handlers/TenantProjectionEventHandler.cs": "d8b6261fd71962f16e44d4ccbbb46ace98f0d041149226ecbc8a6a4d3b156e3b",
+    "references/Hexalith.Tenants/src/Hexalith.Tenants.Client/Registration/TenantServiceCollectionExtensions.cs": "16100f8857e93d74ecd2c48c60b34b6ba6fcdf95d433837f36907be04e570def",
+    "references/Hexalith.Parties/src/Hexalith.Parties.Client/Abstractions/IPartiesIdentityClient.cs": "e2e976e151896b7a3daf56f52f7f0bd18586a1b7a1c777ed99fef1c02d7e0f02",
+    "references/Hexalith.Parties/eng/verify-ext-parties-1.ps1": "20e26ff57715d4a6915f98cb3bcde199215cccb428cbdf4ffd12caeb17aec36e",
+    "references/Hexalith.Conversations/eng/verify-ext-conv-ai-1.ps1": "3934603317c7a57817c038046eb97afe51c2772fa0be8ac22ec3550dc057bd19",
+    "references/Hexalith.Conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentServiceCollectionExtensions.cs": "cf26a74a54fafee591a02fc37504a232be4ecb6f9b39f63709e9bccbe5ac1f68",
+    "references/Hexalith.Platform/eng/verify-ext-secrets-1.ps1": "5c205ce0c82539786a14774454bd11ff0952d1168bf918626d71a6a722377726",
+    "references/Hexalith.Platform/eng/verify-agents-host.sh": "dd65e6a86a28315b8d22298e9e654e1c27426de1640ebcb698d539b4f43b3fb2",
+    "references/Hexalith.Platform/src/Hexalith.Platform.Custody/PlatformCustodyServiceCollectionExtensions.cs": "61321c8bbb32db758859aa5be182e9d2124781b7b8203ffec54373dd6b434ad6",
+    "references/Hexalith.Platform/apphost.cs": "7c140eb97bbc45e6ab0589ba3f186ea8eccc623bac9f8850bf2b42aadf136f9a",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs": "73342fcff1a19186340549cc8740eb34b7f2f313e376065b8e370299ebbdec5f",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Queries/PartyIdentityQueryDeadline.cs": "ce91ab42c8ef445a6955975582ca16f27826522d5c09085c238bcb66de3e809b",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Authorization/PartyIdentityOptions.cs": "13d53019d103f379159aa91371930d1504e8f95cdb8ca2941d88ec5b32e46689",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Authorization/PartyIdentityAuthority.cs": "73743d1799e8b8d6df246c2d027b67fbf5729d96dbc1f21273ab9c4960954e71",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Queries/PartyIdentitySourceFold.cs": "14bbb4de36e5378b4811f7f50567b3b19f182e7e4a9f12cc498615cf8ca89c34",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs": "bfa7ff1402b3641ca91cbc31a2902ea5fa5f8fdf41eb4ad672f786a2256d205f",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Program.cs": "6586fe56963122fb0efedbdf4f2f078ba7413c3d90bad8bc4ef2aef29995cc06",
+    "references/Hexalith.Conversations/src/Hexalith.Conversations/Aggregates/ConversationAggregate.Agents.cs": "ab12583e35b48956a653471ab18d2a31b2f99c0c0753db214cfa0545aa37b477",
+    "references/Hexalith.Platform/src/Hexalith.Platform.Custody/TrustedEnvelopeAuthenticator.cs": "c19e71232d64e58e9fda94b372fa99a010e8160c0ccea2b4d61c96b5f9bcaf7d",
+    "references/Hexalith.Platform/src/Hexalith.Platform.Custody/PlatformSigningProfile.cs": "b81e1119fad9b213ce405f496d6be85240ad41b80b4644781fcd58af3fd0ca25"
+  },
+  "changed_selected_sources_since_earlier_recheck": [
+    "references/Hexalith.Parties/eng/verify-ext-parties-1.ps1"
+  ],
+  "document_checks": {
+    "frozen_intent_unchanged": true,
+    "original_tasks_and_acceptance_unchanged": true,
+    "spec_draft_approval_entry_preserved": true,
+    "protected_register_sprint_owner_packet_parent_context_unchanged": true,
+    "exact_story_backlog_preserved": true,
+    "owner_prerequisite_parent_in_progress": true,
+    "root_revision_preserved": true,
+    "full_story_verifier_absent": true,
+    "all_four_records_uncommitted_and_incomplete": true,
+    "installed_owner_references_clean": true,
+    "cached_context_valid_and_current": true,
+    "git_diff_check": true,
+    "selected_source_hashes_stable_during_recording": true,
+    "local_markdown_links_resolve": true
+  },
+  "vcs_warnings": [
+    {
+      "repository": "/home/administrator/projects/hexalith/platform",
+      "command": [
+        "git",
+        "status",
+        "--short",
+        "--branch"
+      ],
+      "stderr": "warning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files"
+    }
+  ],
+  "owned_changes": [
+    "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md",
+    "_bmad-output/implementation-artifacts/story-5-4-build-entry-recheck-2026-10-07.md",
+    "_bmad-output/implementation-artifacts/story-5-4-build-entry-recheck-2026-10-07.json"
+  ],
+  "validation_commands": [
+    "python3 protected document/frozen intent/tasks/source hash/local link inspection",
+    "git diff --check",
+    "git status --short --branch"
+  ],
+  "validation_attempts": [
+    {
+      "result": "failed",
+      "check": "local_markdown_links_resolve",
+      "reason": "Validation preceded creation of the linked new evidence JSON; corrected order creates evidence before checking final links."
+    },
+    {
+      "result": "passed",
+      "check": "final document/source inspection"
+    }
+  ],
+  "evidence_limits": [
+    "Checkout HEADs and sibling changes are source observations, not accepted complete targets.",
+    "Prior HTTP/deadline/local tests are historical; no fresh execution in this resume.",
+    "No sibling mutation or whole-worktree qualification is claimed.",
+    "Existing approval, scope, Branch B and 365-day policy persist; accepted complete delivery fields remain unresolved."
+  ]
+}
