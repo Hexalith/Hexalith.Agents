@@ -1,0 +1,20 @@
+{
+  "checks": [
+    "complete-original-position-source-partition",
+    "exact-action-time-actor-and-version",
+    "original-binding-source-position",
+    "current-identity-ineligible"
+  ],
+  "incomplete": [
+    "P-01-P-10-installed-matrix",
+    "independent-erasure-certification",
+    "persisted-restart-restore",
+    "failure-injection",
+    "production-custody-destruction-and-copy-cleanup"
+  ],
+  "sourceHead": 4,
+  "qualification": "ReadinessOnly",
+  "observedAt": "2026-10-07T06:36:14.7532772+00:00",
+  "requestedTargetSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "bindingSourcePosition": 2
+}

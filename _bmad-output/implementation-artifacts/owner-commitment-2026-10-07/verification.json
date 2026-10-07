@@ -1,0 +1,48 @@
+{
+  "records": [
+    {
+      "record": "EXT-PARTIES-1",
+      "owner": "Project owner (user declaration 2026-10-07), acting as Parties Maintainer",
+      "repository": "`Hexalith.Parties`",
+      "status": "Uncommitted",
+      "contractFieldsUnchanged": true
+    },
+    {
+      "record": "EXT-CONV-AI-1",
+      "owner": "Project owner (user declaration 2026-10-07), acting as Conversations Maintainer",
+      "repository": "`Hexalith.Conversations`",
+      "status": "Uncommitted",
+      "contractFieldsUnchanged": true
+    },
+    {
+      "record": "EXT-SECRETS-1",
+      "owner": "Project owner (user declaration 2026-10-07), acting as Platform Maintainer",
+      "repository": "`Hexalith.Platform`",
+      "status": "Uncommitted",
+      "contractFieldsUnchanged": true
+    },
+    {
+      "record": "EXT-HOST-1",
+      "owner": "Project owner (user declaration 2026-10-07), acting as Platform Maintainer",
+      "repository": "`Hexalith.Platform`",
+      "status": "Uncommitted",
+      "contractFieldsUnchanged": true
+    }
+  ],
+  "frozenIntentUnchanged": true,
+  "acceptanceCriteriaUnchanged": true,
+  "sprintUnchanged": true,
+  "storyStatus": "draft",
+  "completeCommitment": false,
+  "verifiedLocalLinks": 8,
+  "whitespaceCommand": [
+    "git",
+    "-c",
+    "core.whitespace=cr-at-eol",
+    "diff",
+    "--check"
+  ],
+  "whitespaceExitCode": 0,
+  "sourceChanges": 0,
+  "liveSeamCalls": 0
+}

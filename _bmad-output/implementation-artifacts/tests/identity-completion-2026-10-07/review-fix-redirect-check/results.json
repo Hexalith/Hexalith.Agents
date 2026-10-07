@@ -1,0 +1,26 @@
+{
+  "qualification": "SyntheticScriptVerificationOnly",
+  "results": [
+    {
+      "scenario": "redirect-307",
+      "expected": "refused",
+      "exitCode": 1,
+      "requestCount": 1,
+      "successReceipt": false,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": 0,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    }
+  ]
+}

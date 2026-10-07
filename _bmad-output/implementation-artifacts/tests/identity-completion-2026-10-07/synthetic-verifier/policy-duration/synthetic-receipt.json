@@ -1,0 +1,11 @@
+{
+  "recordId": "EXT-PARTIES-1",
+  "targetVersionOrCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "compatibilityCommand": "synthetic compatibility command",
+  "outcome": "Pass",
+  "evidenceLevel": 4,
+  "prerequisitesAvailable": true,
+  "policyId": "synthetic-365-v1",
+  "retention": "366.00:00:00",
+  "expiryTrigger": "binding-effective-at"
+}

@@ -1,0 +1,122 @@
+{
+  "observedAtUtc": "2026-10-07T06:36:36.020272+00:00",
+  "qualification": "ReadOnlyGateRecheck",
+  "issues": [
+    {
+      "repository": "Parties",
+      "number": 54,
+      "state": "OPEN",
+      "comments": 0,
+      "url": "https://github.com/Hexalith/Hexalith.Parties/issues/54",
+      "command": [
+        "gh",
+        "issue",
+        "view",
+        "54",
+        "--repo",
+        "Hexalith/Hexalith.Parties",
+        "--json",
+        "number,title,state,url,body,comments"
+      ]
+    },
+    {
+      "repository": "Conversations",
+      "number": 4,
+      "state": "OPEN",
+      "comments": 0,
+      "url": "https://github.com/Hexalith/Hexalith.Conversations/issues/4",
+      "command": [
+        "gh",
+        "issue",
+        "view",
+        "4",
+        "--repo",
+        "Hexalith/Hexalith.Conversations",
+        "--json",
+        "number,title,state,url,body,comments"
+      ]
+    },
+    {
+      "repository": "Platform",
+      "number": 1,
+      "state": "OPEN",
+      "comments": 0,
+      "url": "https://github.com/Hexalith/Hexalith.Platform/issues/1",
+      "command": [
+        "gh",
+        "issue",
+        "view",
+        "1",
+        "--repo",
+        "Hexalith/Hexalith.Platform",
+        "--json",
+        "number,title,state,url,body,comments"
+      ]
+    },
+    {
+      "repository": "Platform",
+      "number": 2,
+      "state": "OPEN",
+      "comments": 0,
+      "url": "https://github.com/Hexalith/Hexalith.Platform/issues/2",
+      "command": [
+        "gh",
+        "issue",
+        "view",
+        "2",
+        "--repo",
+        "Hexalith/Hexalith.Platform",
+        "--json",
+        "number,title,state,url,body,comments"
+      ]
+    }
+  ],
+  "revisions": [
+    {
+      "checkout": "/home/administrator/projects/hexalith/agents",
+      "head": "44f98b14188640e69991079fb4379cf17c318733"
+    },
+    {
+      "checkout": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties",
+      "head": "b3794a4dcbe2fff3e9ea5c420a3c4695e2d1a8ca"
+    },
+    {
+      "checkout": "/home/administrator/projects/hexalith/parties",
+      "head": "b3794a4dcbe2fff3e9ea5c420a3c4695e2d1a8ca"
+    },
+    {
+      "checkout": "/home/administrator/projects/hexalith/agents/references/Hexalith.Tenants",
+      "head": "5a519cd73018067d9b444dd777034dc91f9bd4b2"
+    },
+    {
+      "checkout": "/home/administrator/projects/hexalith/tenants",
+      "head": "f92bf34159c40b6f7fe12eb746565868422dc035"
+    },
+    {
+      "checkout": "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations",
+      "head": "611a835af50d66ff1860c1497c16a19713cd5042"
+    },
+    {
+      "checkout": "/home/administrator/projects/hexalith/conversations",
+      "head": "51aa06b856bcb0aaf22013153cfe02a51b046156"
+    },
+    {
+      "checkout": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform",
+      "head": "fd5db04d48423bc30f5a5e141a9019fede5d736f"
+    },
+    {
+      "checkout": "/home/administrator/projects/hexalith/platform",
+      "head": "cabd1287280ec141b8cc5658a1e87f3eec04f138"
+    },
+    {
+      "checkout": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+      "head": "283b07a52c9c70e1c940164a7011ee8c3ad98b2d"
+    },
+    {
+      "checkout": "/home/administrator/projects/hexalith/agents/references/Hexalith.Builds",
+      "head": "397c94a4e246c90b21cf408790fa0d55bf32d795"
+    }
+  ],
+  "ownerMessagesSent": 0,
+  "acceptanceFieldsChanged": false
+}

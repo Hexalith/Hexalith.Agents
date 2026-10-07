@@ -1,0 +1,45 @@
+{
+  "identity": {
+    "tenantId": "synthetic-tenant",
+    "domain": "party",
+    "aggregateId": "synthetic-party"
+  },
+  "purpose": "party-actor-history-v1",
+  "head": 4,
+  "observedAt": "2026-10-07T06:33:51.559713Z",
+  "validUntil": "2026-10-07T06:44:01.559713Z",
+  "authorityRevision": "synthetic-r1",
+  "observationId": "synthetic-observation",
+  "events": [
+    {
+      "sequenceNumber": 2,
+      "eventTypeName": "Hexalith.Parties.Contracts.Events.HumanActorBindingEstablished",
+      "payload": "W3siYmluZGluZyI6IHsiZXZpZGVuY2UiOiB7InRlbmFudElkIjogInN5bnRoZXRpYy10ZW5hbnQiLCAicGFydHlJZCI6ICJzeW50aGV0aWMtcGFydHkiLCAiYWN0b3JJZCI6ICIwMUhYMDAwMDAwMDAwMDAwMDAwMDAwMDAwMSIsICJiaW5kaW5nVmVyc2lvbiI6IDEsICJhY3RvclJldmlzaW9uIjogMSwgInZhbGlkRnJvbSI6ICIyMDI2LTEwLTA2VDA2OjM0OjAxLjU1OTcxM1oiLCAidmFsaWRVbnRpbCI6ICIyMDI3LTEwLTA2VDA2OjM0OjAxLjU1OTcxM1oiLCAic291cmNlSWQiOiAic3ludGhldGljLXdyaXRlciIsICJwcm92ZW5hbmNlSWQiOiAic3ludGhldGljLW9wZXJhdG9yIiwgImN1c3RvZHkiOiB7InBvbGljeUlkIjogInN5bnRoZXRpYy0zNjUtdjEiLCAicHVycG9zZSI6ICJwYXJ0eS1hY3Rvci1oaXN0b3J5LXYxIiwgImV4cGlyZXNBdCI6ICIyMDI3LTEwLTA2VDA2OjM0OjAxLjU1OTcxM1oiLCAibGlmZWN5Y2xlUmV2aXNpb24iOiAxLCAiZXZpZGVuY2VJZCI6ICJzeW50aGV0aWMtY3VzdG9keSIsICJzb3VyY2VFeHBpcnlFbmZvcmNlZCI6IHRydWUsICJyZXN0b3JlU2FmZSI6IHRydWUsICJkZXJpdmVkQ29waWVzQ292ZXJlZCI6IHRydWV9fSwgImxvZ2ljYWxJZCI6ICJzeW50aGV0aWMtb3BlbiIsICJpbnRlbnREaWdlc3QiOiAic3ludGhldGljLWRpZ2VzdCJ9LCAiZWZmZWN0aXZlQXQiOiAiMjAyNi0xMC0wNlQwNjozNDowMS41NTk3MTNaIiwgImV4cGVjdGVkQmluZGluZ1ZlcnNpb24iOiAwfV0=",
+      "serializationFormat": "json",
+      "protectionMetadata": {
+        "state": "Unprotected"
+      },
+      "messageId": "",
+      "userId": null,
+      "correlationId": null,
+      "causationId": null
+    },
+    {
+      "sequenceNumber": 3,
+      "eventTypeName": "Hexalith.Parties.Contracts.Events.HumanActorBindingRevoked",
+      "payload": "eyJsb2dpY2FsSWQiOiAic3ludGhldGljLXJldm9rZSIsICJpbnRlbnREaWdlc3QiOiAic3ludGhldGljLXJldm9rZS1kaWdlc3QiLCAiZXhwZWN0ZWRCaW5kaW5nVmVyc2lvbiI6IDEsICJlZmZlY3RpdmVBdCI6ICIyMDI2LTEwLTA2VDA3OjM0OjAxLjU1OTcxM1oiLCAiY3VzdG9keSI6IHsicG9saWN5SWQiOiAic3ludGhldGljLTM2NS12MSIsICJwdXJwb3NlIjogInBhcnR5LWFjdG9yLWhpc3RvcnktdjEiLCAiZXhwaXJlc0F0IjogIjIwMjctMTAtMDZUMDc6MzQ6MDEuNTU5NzEzWiIsICJsaWZlY3ljbGVSZXZpc2lvbiI6IDEsICJldmlkZW5jZUlkIjogInN5bnRoZXRpYy1yZXZva2UtY3VzdG9keSIsICJzb3VyY2VFeHBpcnlFbmZvcmNlZCI6IHRydWUsICJyZXN0b3JlU2FmZSI6IHRydWUsICJkZXJpdmVkQ29waWVzQ292ZXJlZCI6IHRydWV9fQ==",
+      "serializationFormat": "json",
+      "protectionMetadata": {
+        "state": "Unprotected"
+      },
+      "messageId": "",
+      "userId": null,
+      "correlationId": null,
+      "causationId": null
+    }
+  ],
+  "excludedSequences": [
+    1,
+    4
+  ]
+}

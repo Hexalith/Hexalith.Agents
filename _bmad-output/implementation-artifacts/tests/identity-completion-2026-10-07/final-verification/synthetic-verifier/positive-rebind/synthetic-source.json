@@ -1,0 +1,45 @@
+{
+  "identity": {
+    "tenantId": "synthetic-tenant",
+    "domain": "party",
+    "aggregateId": "synthetic-party"
+  },
+  "purpose": "party-actor-history-v1",
+  "head": 4,
+  "observedAt": "2026-10-07T06:35:58.650831Z",
+  "validUntil": "2026-10-07T06:46:08.650831Z",
+  "authorityRevision": "synthetic-r1",
+  "observationId": "synthetic-observation",
+  "events": [
+    {
+      "sequenceNumber": 2,
+      "eventTypeName": "Hexalith.Parties.Contracts.Events.HumanActorBindingEstablished",
+      "payload": "eyJiaW5kaW5nIjogeyJldmlkZW5jZSI6IHsidGVuYW50SWQiOiAic3ludGhldGljLXRlbmFudCIsICJwYXJ0eUlkIjogInN5bnRoZXRpYy1wYXJ0eSIsICJhY3RvcklkIjogIjAxSFgwMDAwMDAwMDAwMDAwMDAwMDAwMDAxIiwgImJpbmRpbmdWZXJzaW9uIjogMSwgImFjdG9yUmV2aXNpb24iOiAxLCAidmFsaWRGcm9tIjogIjIwMjYtMTAtMDZUMDY6MzY6MDguNjUwODMxWiIsICJ2YWxpZFVudGlsIjogIjIwMjctMTAtMDZUMDY6MzY6MDguNjUwODMxWiIsICJzb3VyY2VJZCI6ICJzeW50aGV0aWMtd3JpdGVyIiwgInByb3ZlbmFuY2VJZCI6ICJzeW50aGV0aWMtb3BlcmF0b3IiLCAiY3VzdG9keSI6IHsicG9saWN5SWQiOiAic3ludGhldGljLTM2NS12MSIsICJwdXJwb3NlIjogInBhcnR5LWFjdG9yLWhpc3RvcnktdjEiLCAiZXhwaXJlc0F0IjogIjIwMjctMTAtMDZUMDY6MzY6MDguNjUwODMxWiIsICJsaWZlY3ljbGVSZXZpc2lvbiI6IDEsICJldmlkZW5jZUlkIjogInN5bnRoZXRpYy1jdXN0b2R5IiwgInNvdXJjZUV4cGlyeUVuZm9yY2VkIjogdHJ1ZSwgInJlc3RvcmVTYWZlIjogdHJ1ZSwgImRlcml2ZWRDb3BpZXNDb3ZlcmVkIjogdHJ1ZX19LCAibG9naWNhbElkIjogInN5bnRoZXRpYy1vcGVuIiwgImludGVudERpZ2VzdCI6ICJzeW50aGV0aWMtZGlnZXN0In0sICJlZmZlY3RpdmVBdCI6ICIyMDI2LTEwLTA2VDA2OjM2OjA4LjY1MDgzMVoiLCAiZXhwZWN0ZWRCaW5kaW5nVmVyc2lvbiI6IDB9",
+      "serializationFormat": "json",
+      "protectionMetadata": {
+        "state": "Unprotected"
+      },
+      "messageId": "",
+      "userId": null,
+      "correlationId": null,
+      "causationId": null
+    },
+    {
+      "sequenceNumber": 3,
+      "eventTypeName": "Hexalith.Parties.Contracts.Events.HumanActorBindingRebound",
+      "payload": "eyJiaW5kaW5nIjogeyJldmlkZW5jZSI6IHsidGVuYW50SWQiOiAic3ludGhldGljLXRlbmFudCIsICJwYXJ0eUlkIjogInN5bnRoZXRpYy1wYXJ0eSIsICJhY3RvcklkIjogIjAxSFgwMDAwMDAwMDAwMDAwMDAwMDAwMDAyIiwgImJpbmRpbmdWZXJzaW9uIjogMiwgImFjdG9yUmV2aXNpb24iOiAxLCAidmFsaWRGcm9tIjogIjIwMjYtMTAtMDZUMDc6MzY6MDguNjUwODMxWiIsICJ2YWxpZFVudGlsIjogIjIwMjctMTAtMDZUMDc6MzY6MDguNjUwODMxWiIsICJzb3VyY2VJZCI6ICJzeW50aGV0aWMtd3JpdGVyIiwgInByb3ZlbmFuY2VJZCI6ICJzeW50aGV0aWMtb3BlcmF0b3IiLCAiY3VzdG9keSI6IHsicG9saWN5SWQiOiAic3ludGhldGljLTM2NS12MSIsICJwdXJwb3NlIjogInBhcnR5LWFjdG9yLWhpc3RvcnktdjEiLCAiZXhwaXJlc0F0IjogIjIwMjctMTAtMDZUMDc6MzY6MDguNjUwODMxWiIsICJsaWZlY3ljbGVSZXZpc2lvbiI6IDEsICJldmlkZW5jZUlkIjogInN5bnRoZXRpYy1jdXN0b2R5IiwgInNvdXJjZUV4cGlyeUVuZm9yY2VkIjogdHJ1ZSwgInJlc3RvcmVTYWZlIjogdHJ1ZSwgImRlcml2ZWRDb3BpZXNDb3ZlcmVkIjogdHJ1ZX19LCAibG9naWNhbElkIjogInN5bnRoZXRpYy1yZWJpbmQiLCAiaW50ZW50RGlnZXN0IjogInN5bnRoZXRpYy1kaWdlc3QifSwgImVmZmVjdGl2ZUF0IjogIjIwMjYtMTAtMDZUMDc6MzY6MDguNjUwODMxWiIsICJleHBlY3RlZEJpbmRpbmdWZXJzaW9uIjogMX0=",
+      "serializationFormat": "json",
+      "protectionMetadata": {
+        "state": "Unprotected"
+      },
+      "messageId": "",
+      "userId": null,
+      "correlationId": null,
+      "causationId": null
+    }
+  ],
+  "excludedSequences": [
+    1,
+    4
+  ]
+}

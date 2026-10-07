@@ -1,0 +1,33 @@
+{
+  "ownerInstruction": "I owner do commitments",
+  "date": "2026-10-07",
+  "registerBeforeSha256": "6f04931762d2cc2f355dd709bd40f32fea28b72a647b31063d4014994b51bb14",
+  "acceptedContractBasis": {
+    "EXT-PARTIES-1": {
+      "RequiredArtifact": "80fb2a4ca9f8034e61e2b610ef244b0a31086a367cb268b3f728c7b04e9fdbbb",
+      "CompatibilityContractAndVerificationCommand": "d1c49b941f580371acd55a58b41582a60641a7712548388809eebca70fe75d2f",
+      "RequiredEvidenceLevel": "523a5c54afd5b2e2c9d7b56dacc50a3d2fad8241d98e838688b0d2ac0df00e10",
+      "ConsumingStories": "81096690c8a8c496beba073a017333990836ad3951afdd3caddbc767f0e61c09"
+    },
+    "EXT-CONV-AI-1": {
+      "RequiredArtifact": "4873d7401252ee6418ccaad70c74381bb02c5a306d0427f9d3e093207d763504",
+      "CompatibilityContractAndVerificationCommand": "fe10976fda2f1e11d7e7eeffa8edd0d4461b14aa488af9f7e57a810882decc78",
+      "RequiredEvidenceLevel": "523a5c54afd5b2e2c9d7b56dacc50a3d2fad8241d98e838688b0d2ac0df00e10",
+      "ConsumingStories": "2824e881d28405ae40001ebf5028055f6627858800f8fe3481a3490c5040cc81"
+    },
+    "EXT-SECRETS-1": {
+      "RequiredArtifact": "586917914263f959a0d6251967fabec06ca270fc80ee66de141c8fafe78f14e9",
+      "CompatibilityContractAndVerificationCommand": "d1d8907bc74a95f16ed9dc06e95b2478fc3a82ec8c7cab810b8f64e36b46fe44",
+      "RequiredEvidenceLevel": "523a5c54afd5b2e2c9d7b56dacc50a3d2fad8241d98e838688b0d2ac0df00e10",
+      "ConsumingStories": "ede7c8f508c1b843dcd013de5d0a018efce2f0f5968bc9e97111e581023cdc31"
+    },
+    "EXT-HOST-1": {
+      "RequiredArtifact": "56fc756a8179c906098e5f769286a73158d7ebc97b1cf23e4072b1a506490af0",
+      "CompatibilityContractAndVerificationCommand": "4482ce9a9de1832cf620661446fbc69a12723e406e1cd9dd4d08bc634375351b",
+      "RequiredEvidenceLevel": "523a5c54afd5b2e2c9d7b56dacc50a3d2fad8241d98e838688b0d2ac0df00e10",
+      "ConsumingStories": "9fb606a9d59a24ad0cfaa1e6653a3be9839b218bc886ccba42049c753b8b40ec"
+    }
+  },
+  "completeCommitment": false,
+  "availabilityClaimed": false
+}

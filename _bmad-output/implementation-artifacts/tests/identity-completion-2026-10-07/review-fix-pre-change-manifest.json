@@ -1,0 +1,16 @@
+[
+  {
+    "ownerPath": "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+    "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/review-fix-pre-change/eng/verify-ext-parties-history-readiness.ps1",
+    "sha256": "0f33adfc3e4a7e697ddc9bd5630a5d6a103cecb172870f75322c3454269ae613"
+  },
+  {
+    "ownerPath": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Client.Tests/DependencyInjectionTests.cs",
+    "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/review-fix-pre-change/tests/Hexalith.Parties.Client.Tests/DependencyInjectionTests.cs",
+    "sha256": "d058dafc1a788e36537d273916dbaa1ac4febb057e3b7f9a05f58151443096c8"
+  },
+  {
+    "ownerPath": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Client.Tests/IdentityReplyHttpMessageHandler.cs",
+    "preChangeState": "absent-new-helper"
+  }
+]

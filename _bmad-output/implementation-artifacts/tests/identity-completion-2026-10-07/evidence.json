@@ -1,0 +1,253 @@
+{
+  "title": "5.4 Identity completion and readiness verification fixes",
+  "date": "2026-10-07",
+  "ownerObservedBaseline": "b3794a4dcbe2fff3e9ea5c420a3c4695e2d1a8ca",
+  "baselineIsNotAcceptedTarget": true,
+  "qualification": "OwnerLocalCorrectionsOnly",
+  "passingLaneEvidenceReused": false,
+  "liveSeamCalls": 0,
+  "dependencyAcceptanceChanged": false,
+  "productionQualified": false,
+  "originalStoryClosed": false,
+  "focusedSourceLanes": [
+    {
+      "project": "Hexalith.Parties.Tests",
+      "qualification": "FocusedOwnerSourceExecutionOnly",
+      "total": 140,
+      "passed": 140,
+      "failed": 0,
+      "skipped": 0,
+      "notRun": 0,
+      "build": {
+        "executable": "dotnet",
+        "arguments": [
+          "build",
+          "tests/Hexalith.Parties.Tests/Hexalith.Parties.Tests.csproj",
+          "-c",
+          "Debug",
+          "--artifacts-path",
+          "/tmp/hexalith-agents54-completion-artifacts",
+          "-p:UseHexalithProjectReferences=true",
+          "-p:UseNuGetDeps=false",
+          "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+          "-p:HexalithCommonsRoot=/home/administrator/projects/hexalith/parties/references/Hexalith.Commons",
+          "-p:HexalithMemoriesRoot=/tmp/parties-no-memories-source",
+          "-p:NuGetAudit=false",
+          "-m:1",
+          "-p:MinVerVersionOverride=1.0.0"
+        ],
+        "workingDirectory": "/home/administrator/projects/hexalith/parties",
+        "exitCode": 0,
+        "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/query-build.log"
+      },
+      "test": {
+        "executable": "dotnet",
+        "arguments": [
+          "/tmp/hexalith-agents54-completion-artifacts/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "-class",
+          "*PartyIdentityQueryHandlerTests",
+          "-class",
+          "*PartyIdentityRetentionConfigurationTests",
+          "-class",
+          "*PartyIdentityAdmissionTests",
+          "-class",
+          "*PartySdkQueryHandlerTests",
+          "-result-xml",
+          "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/query-tests.xml"
+        ],
+        "workingDirectory": "/home/administrator/projects/hexalith/parties",
+        "exitCode": 0,
+        "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/query-tests.log",
+        "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/query-tests.xml"
+      },
+      "assembly": {
+        "path": "/tmp/hexalith-agents54-completion-artifacts/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "bytes": 1087488,
+        "sha256": "2c0cc4fc8cfb2cb4ca41f7fc1cfa8f3a7a4b7005d0340f639f34a83655e0f3ba"
+      }
+    },
+    {
+      "project": "Hexalith.Parties.Client.Tests",
+      "qualification": "FocusedOwnerSourceExecutionOnly",
+      "total": 96,
+      "passed": 96,
+      "failed": 0,
+      "skipped": 0,
+      "notRun": 0,
+      "build": {
+        "executable": "dotnet",
+        "arguments": [
+          "build",
+          "tests/Hexalith.Parties.Client.Tests/Hexalith.Parties.Client.Tests.csproj",
+          "-c",
+          "Debug",
+          "--artifacts-path",
+          "/tmp/hexalith-agents54-completion-artifacts",
+          "-p:UseHexalithProjectReferences=true",
+          "-p:UseNuGetDeps=false",
+          "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+          "-p:HexalithCommonsRoot=/home/administrator/projects/hexalith/parties/references/Hexalith.Commons",
+          "-p:HexalithMemoriesRoot=/tmp/parties-no-memories-source",
+          "-p:NuGetAudit=false",
+          "-m:1",
+          "-p:MinVerVersionOverride=1.0.0"
+        ],
+        "workingDirectory": "/home/administrator/projects/hexalith/parties",
+        "exitCode": 0,
+        "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/client-build.log"
+      },
+      "test": {
+        "executable": "dotnet",
+        "arguments": [
+          "/tmp/hexalith-agents54-completion-artifacts/bin/Hexalith.Parties.Client.Tests/debug/Hexalith.Parties.Client.Tests.dll",
+          "-class",
+          "*HttpPartiesIdentityClientTests",
+          "-class",
+          "*DependencyInjectionTests",
+          "-class",
+          "*HttpPartiesQueryClientTests",
+          "-class",
+          "*HttpPartiesCommandClientTests",
+          "-result-xml",
+          "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/client-tests.xml"
+        ],
+        "workingDirectory": "/home/administrator/projects/hexalith/parties",
+        "exitCode": 0,
+        "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/client-tests.log",
+        "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/client-tests.xml"
+      },
+      "assembly": {
+        "path": "/tmp/hexalith-agents54-completion-artifacts/bin/Hexalith.Parties.Client.Tests/debug/Hexalith.Parties.Client.Tests.dll",
+        "bytes": 246784,
+        "sha256": "7b7d0c6205d58bb1ec2787bd3b80fca067e34b8a9123f58cd2b7959e7eaa34b6"
+      }
+    }
+  ],
+  "focusedTotal": 236,
+  "correctedSourceFiles": [
+    {
+      "ownerPath": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs",
+      "snapshotBeforeSha256": "999280447dcd4969e19b62ace1d1f10328fff53d893c2c4dfac6fc93d6ebd928",
+      "postChangePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/post-change/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs",
+      "sha256": "de1947993b378db1fdd26894e1956bc349c2b83cabcdce615c244a3d0f0e7042",
+      "bytes": 15843
+    },
+    {
+      "ownerPath": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties.Client/HttpPartiesIdentityClient.cs",
+      "snapshotBeforeSha256": "2399209e396a6182f5aae0cb918df1a7de6ce71505106a5760dc699af2453f3e",
+      "postChangePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/post-change/src/Hexalith.Parties.Client/HttpPartiesIdentityClient.cs",
+      "sha256": "e1cf2f8f17e8ea87d0ab83348b5b5b1c806576f1981b3de90c0359ef38c2f483",
+      "bytes": 12763
+    },
+    {
+      "ownerPath": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+      "snapshotBeforeSha256": "0bb08d7cebf4e02e8ad284cd8dc274a634d39e83a710bc37a761fd2caff723d7",
+      "postChangePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/post-change/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+      "sha256": "a720814d366d4553874703c8129e5817c8c44a7cb5e7e66c38a462519e8fbd1f",
+      "bytes": 53860
+    },
+    {
+      "ownerPath": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs",
+      "snapshotBeforeSha256": "74db9bca1360fe9f2def41d995b444d7b7acc83edc5de1d7e98b543e82ace773",
+      "postChangePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/post-change/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs",
+      "sha256": "429e6592e4c06fb39efbdf585dca4e26814cb8f08670a571f100b5363e68bd0b",
+      "bytes": 11826
+    },
+    {
+      "ownerPath": "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+      "snapshotBeforeSha256": "0e080e653a931466a03c4597f7c2ff0551fc878d6d912b155d1e47cd2ccca230",
+      "postChangePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/post-change/eng/verify-ext-parties-history-readiness.ps1",
+      "sha256": "0f33adfc3e4a7e697ddc9bd5630a5d6a103cecb172870f75322c3454269ae613",
+      "bytes": 22180
+    },
+    {
+      "ownerPath": "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-1.ps1",
+      "snapshotBeforeSha256": "81e5340d2efe060616d594ff56b9a8736dc564edf872e2e18286f77269704352",
+      "postChangePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/post-change/eng/verify-ext-parties-1.ps1",
+      "sha256": "6469690d049c9c3990b5d5cdb3148732ae4caaabb5fa4c53296e4001b95a5a28",
+      "bytes": 8841
+    },
+    {
+      "ownerPath": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Client.Tests/DependencyInjectionTests.cs",
+      "snapshotBeforeSha256": "be6a548bba36e41c4ee30655a9873c2d1091c634aadea0d0c45368d4bd6de34e",
+      "postChangePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/post-change/tests/Hexalith.Parties.Client.Tests/DependencyInjectionTests.cs",
+      "sha256": "d058dafc1a788e36537d273916dbaa1ac4febb057e3b7f9a05f58151443096c8",
+      "bytes": 5943
+    }
+  ],
+  "historicalBroadLocalBlocker": {
+    "qualification": "HistoricalBlockerOnlyNoPassingLaneReused",
+    "executedInThisCorrection": false,
+    "sourceRecord": "/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/tests/ext-parties-1-owner-source-evidence-2026-10-06.json",
+    "sourceRecordSha256": "b95f7c27a440e6ad2573be8bffaa23d4f7a37b8c5ba294eb058ecc609ad619bf",
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "eng/verify-ext-parties-1.ps1",
+      "-Mode",
+      "Local",
+      "-ArtifactsDirectory",
+      "/tmp/parties-story54-local-verifier-20261006/artifacts",
+      "-EvidenceDirectory",
+      "/tmp/parties-story54-local-verifier-20261006"
+    ],
+    "workingDirectory": "/home/administrator/projects/hexalith/parties",
+    "exitCode": 1,
+    "blocker": "PartyDomainProcessorValidationTests.ProcessAsync_ProtectedHistoricalPayloadWithDestroyedKey_RedactsAndContinuesRehydration rejects json-redacted in the sibling EventStore strict replay path.",
+    "historicalExecuted": 490,
+    "historicalPassed": 489,
+    "historicalFailed": 1,
+    "preservedLog": {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/historical-local-blocker.log",
+      "sha256": "354abb32306389bda4881e0afdfe1780ff6f61f4b49a8d2cc0c8eafd52891f29"
+    }
+  },
+  "reproducibleSyntheticHarness": {
+    "command": [
+      "python3",
+      "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/verify-readiness-fixtures.py"
+    ],
+    "workingDirectory": "/home/administrator/projects/hexalith/agents",
+    "qualification": "SyntheticScriptVerificationOnly",
+    "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/synthetic-verifier.log",
+    "results": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/synthetic-verifier/results.json"
+  },
+  "syntheticVerifier": {
+    "qualification": "SyntheticScriptVerificationOnly",
+    "verifiedCases": 31,
+    "positiveControls": 3,
+    "httpGateCases": 28,
+    "wrapperPathAndLiveGateCases": 3,
+    "resultsPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/synthetic-verifier/results.json",
+    "liveSeamCalls": 0
+  },
+  "checks": {
+    "powershellParse": {
+      "exitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/powershell-parse.log"
+    },
+    "owningWhitespace": {
+      "command": [
+        "git",
+        "-c",
+        "core.whitespace=cr-at-eol",
+        "diff",
+        "--check",
+        "--",
+        "eng",
+        "src",
+        "tests"
+      ],
+      "workingDirectory": "/home/administrator/projects/hexalith/parties",
+      "exitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/whitespace-check.log"
+    }
+  },
+  "unchangedRegisterObserved": {
+    "path": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/external-dependency-register.md",
+    "sha256": "6f04931762d2cc2f355dd709bd40f32fea28b72a647b31063d4014994b51bb14",
+    "gateHTTPCalls": 0,
+    "acceptedStatusChanged": false
+  }
+}

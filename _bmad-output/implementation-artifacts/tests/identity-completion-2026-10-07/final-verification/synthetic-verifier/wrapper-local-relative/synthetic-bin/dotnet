@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+import json,os,sys
+from pathlib import Path
+if sys.argv[1].endswith("pwsh.dll"): os.execv(os.environ["SYNTHETIC_REAL_DOTNET"], ["dotnet"]+sys.argv[1:])
+Path(os.environ["SYNTHETIC_CAPTURE"]).write_text(json.dumps({"cwd":os.getcwd(),"args":sys.argv[1:]}))
+print("Synthetic path probe intentionally stops before any real build")
+sys.exit(1)

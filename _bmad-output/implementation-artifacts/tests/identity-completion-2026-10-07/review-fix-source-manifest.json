@@ -1,0 +1,36 @@
+{
+  "qualification": "ReviewedLocalCorrectionsOnly",
+  "ownerSnapshotsDirectory": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/review-fix-post-change",
+  "files": [
+    {
+      "ownerPath": "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+      "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/review-fix-post-change/eng/verify-ext-parties-history-readiness.ps1",
+      "sha256": "77682dfd9a522b8e3447f4fed995f25ade47781398236966586f7654aaff7893",
+      "bytes": 22733
+    },
+    {
+      "ownerPath": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Client.Tests/DependencyInjectionTests.cs",
+      "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/review-fix-post-change/tests/Hexalith.Parties.Client.Tests/DependencyInjectionTests.cs",
+      "sha256": "d83e56990e69dfa2d0fe96d5b96afcb979f642d0f19c3bd76445b1728f0c71b3",
+      "bytes": 9092
+    },
+    {
+      "ownerPath": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Client.Tests/IdentityReplyHttpMessageHandler.cs",
+      "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/review-fix-post-change/tests/Hexalith.Parties.Client.Tests/IdentityReplyHttpMessageHandler.cs",
+      "sha256": "8d909155f4300b4b757f915f85c9371f79d6e8b6e57eca5c291f2b7b2e6cf71c",
+      "bytes": 635
+    },
+    {
+      "packetPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/README.md",
+      "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/review-fix-post-change/README.md",
+      "sha256": "96f21f8c5e1cadc7038a15bd933bd63c0daff6399e8c0da2eae333d0209a1157",
+      "bytes": 8797
+    },
+    {
+      "packetPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/verify-readiness-fixtures.py",
+      "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/review-fix-post-change/verify-readiness-fixtures.py",
+      "sha256": "cd88bcfb013e986add2dd67fbcff5cec1a43b17a5c86e2a5506c5d156f1e1777",
+      "bytes": 22490
+    }
+  ]
+}

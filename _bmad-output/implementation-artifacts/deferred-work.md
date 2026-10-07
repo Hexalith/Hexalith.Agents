@@ -588,3 +588,7 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Readiness exact-target receipt coverage (V03) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: Accept the pre-verified gap: existing counting-server smoke cases fail before receipt validation. A synthetic Available register with a mismatched receipt needs a no-HTTP regression test before this earlier readiness gate can be relied upon.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-4-identity-completion-and-readiness-fixes.md`
+  summary: Owner retained-history privacy and schema-drift qualification must account for unexpected profile fields.
+  evidence: Before and after this correction, the readiness parser ignores additional payload members; PartiesJsonOptions itself permits unmapped fields while the SDK closes payloads through typed deserialize/serialize. Complete owner qualification must establish that every authenticated installed source emits only the purpose-separated identity schema; local read probes supply neither that production proof nor erasure certification.

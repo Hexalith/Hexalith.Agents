@@ -1,0 +1,33 @@
+{
+  "protectedArtifacts": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md",
+      "sha256": "ee4aa0ca2ef74c47d31e24f1c2acd429e43908daf4c333c5339abbdb964fb991",
+      "byteEquivalentToHEAD": true
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/sprint-status.yaml",
+      "sha256": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+      "byteEquivalentToHEAD": true
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/external-dependency-register.md",
+      "sha256": "6f04931762d2cc2f355dd709bd40f32fea28b72a647b31063d4014994b51bb14",
+      "byteEquivalentToHEAD": true
+    }
+  ],
+  "currentOwnerHashesMatch": true,
+  "focusedTotal": 238,
+  "syntheticCases": 42,
+  "childStatus": "done",
+  "parentStatus": "in-progress",
+  "currentLinksVerified": 10,
+  "rootWhitespaceCommand": [
+    "git",
+    "-c",
+    "core.whitespace=cr-at-eol",
+    "diff",
+    "--check"
+  ],
+  "rootWhitespaceExitCode": 0
+}

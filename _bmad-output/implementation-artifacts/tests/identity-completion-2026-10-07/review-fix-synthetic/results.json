@@ -1,0 +1,320 @@
+{
+  "qualification": "SyntheticScriptVerificationOnly",
+  "results": [
+    {
+      "scenario": "redirect-307",
+      "expected": "refused",
+      "exitCode": 1,
+      "requestCount": 1,
+      "successReceipt": false,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": 0,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "positive",
+      "expected": "synthetic-script-pass",
+      "exitCode": 0,
+      "requestCount": 3,
+      "successReceipt": true,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "positive-rebind",
+      "expected": "synthetic-script-pass",
+      "exitCode": 0,
+      "requestCount": 3,
+      "successReceipt": true,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "transition-revoke",
+      "expected": "refused",
+      "exitCode": 1,
+      "requestCount": 2,
+      "successReceipt": false,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "transition-rebind",
+      "expected": "refused",
+      "exitCode": 1,
+      "requestCount": 2,
+      "successReceipt": false,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "transition-array",
+      "expected": "refused",
+      "exitCode": 1,
+      "requestCount": 1,
+      "successReceipt": false,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "string-predecessor",
+      "expected": "refused",
+      "exitCode": 1,
+      "requestCount": 1,
+      "successReceipt": false,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "string-binding-version",
+      "expected": "refused",
+      "exitCode": 1,
+      "requestCount": 1,
+      "successReceipt": false,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "string-actor-revision",
+      "expected": "refused",
+      "exitCode": 1,
+      "requestCount": 1,
+      "successReceipt": false,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "timestamp-grammar",
+      "expected": "refused",
+      "exitCode": 1,
+      "requestCount": 1,
+      "successReceipt": false,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "timestamp-source-expiry-grammar",
+      "expected": "refused",
+      "exitCode": 1,
+      "requestCount": 1,
+      "successReceipt": false,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "revocation-wrong-expiry",
+      "expected": "refused",
+      "exitCode": 1,
+      "requestCount": 1,
+      "successReceipt": false,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "revocation-past-expiry",
+      "expected": "refused",
+      "exitCode": 1,
+      "requestCount": 1,
+      "successReceipt": false,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "opening-shortened-without-close",
+      "expected": "refused",
+      "exitCode": 1,
+      "requestCount": 1,
+      "successReceipt": false,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    },
+    {
+      "scenario": "positive-ticks",
+      "expected": "synthetic-script-pass",
+      "exitCode": 0,
+      "requestCount": 3,
+      "successReceipt": true,
+      "sentBytes": 0,
+      "disconnected": false,
+      "destinationRequestCount": null,
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+        "-EvidenceDirectory",
+        "relative-evidence",
+        "-DependencyRegisterPath",
+        "synthetic-register.md"
+      ],
+      "qualification": "SyntheticScriptVerificationOnly"
+    }
+  ]
+}

@@ -41,12 +41,12 @@ context:
 
 ## Open Questions
 
-- **Owner packets (delivery blocker; rechecked 2026-10-06):** Complete owner-accepted commitments for EXT-PARTIES-1, EXT-CONV-AI-1, EXT-SECRETS-1 and EXT-HOST-1 remain pending. Each needs the full contract, immutable target, integration date and executable verification command. Parties and Platform sibling implementation has advanced, but installed references and acceptance gates have not. Supply packet links to reconcile the register; until delivery, retain draft. The user approved this spec on 2026-10-04; full scope and Branch B are settled and need no further spec approval.
+- **Delivery fields (owner declaration recorded 2026-10-07):** The user declared project ownership and requested the four commitments. The [owner packet](story-5-4-owner-commitments-2026-10-07.md) records accountability for EXT-PARTIES-1, EXT-CONV-AI-1, EXT-SECRETS-1 and EXT-HOST-1, with secret-custody delivery assigned to Hexalith.Platform. Immutable complete targets, integration dates and complete executable verification commands remain unresolved. Current partial checkout revisions and local/synthetic tests cannot fill them. The records remain Uncommitted; retain draft/backlog. Full scope, Branch B, specification approval and the accepted 365-day policy need no repeat approval.
 
 ## Code Map
 
 - `src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs` — replace JWT role authority with fresh operation-specific evidence; Tenants `TenantProjectionEventHandler` still accepts sequence gaps/equal conflicts and has no global-administrator consumer.
-- `src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs` — verify explicit tenant/ID/freshness and preserve Organization ID. The installed Parties reference lacks the identity/history contract; sibling `IPartiesIdentityClient` and `PartyIdentityQueryService` are now committed, but production custody/retained-history and the Live verifier remain incomplete. Map provisioned Organization type and safe Agent classification only through the final accepted contract.
+- `src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs` — verify explicit tenant/ID/freshness and preserve Organization ID. The installed Parties reference now includes `IPartiesIdentityClient`, current/action-time evidence and binding transitions. Newer retained-history/policy/cancellation/completion work is selected local owner implementation; production custody/restore and complete exact-target Live qualification remain incomplete. Map provisioned Organization type and safe Agent classification only through the final accepted contract.
 - `src/Hexalith.Agents.Server/Ports/IApproverPolicyResolver.cs` and `src/Hexalith.Agents.Server/Application/Agents/ApproverPolicyVerdict.cs` — add actor/binding/source correspondence; reject unknown outcomes and Caller. Preserve historical deserialization/folds.
 - `src/Hexalith.Agents.Server/Application/Queries/{AgentSetupQueryHandlerBase,AgentInteractionAuditQueryHandlerBase}.cs` — replace global-admin flag bypasses before protected reads; `AgentInteractionGateOrchestrator` must stop downstream reads on authority denial.
 - `src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs` — replace unsigned flags; existing digest/identity primitives do not supply AD-30 custody/replay. Preserve Story 5.3 outcomes.
@@ -71,6 +71,7 @@ context:
 
 - 2026-10-04: Recorded the user's "I accept" as specification approval. No owner target, integration date or executable command was supplied by that response, and no dependency gate was waived. Preserve the approved frozen intent and acceptance criteria; retain draft/backlog pending complete owner commitments. Resume from this approval when the register's entry gate is satisfied.
 - 2026-10-06: Rechecked owner issues, installed references and sibling source. Parties identity/history and Platform identity hosting are now committed in sibling repositories; full live contracts and owner packets remain missing. Preserve prior approval, frozen intent, acceptance criteria, full scope and Branch B; retain draft/backlog. No implementation or consumer seam execution occurred.
+- 2026-10-07: Recorded the user's project-owner declaration and instruction to make the four complete commitments. Updated owner accountability and selected Hexalith.Platform for secret custody. [Commitment packet](story-5-4-owner-commitments-2026-10-07.md) retains missing target/date/complete-command fields explicitly; no current partial commit, delivery date or live success was invented. Direct owner instruction supersedes the need for another owner to respond on GitHub, while complete record and execution gates remain unchanged.
 
 ## Spec Change Log
 
@@ -80,6 +81,7 @@ context:
 - 2026-10-03: Rechecked latest references and sibling identity progress; history custody/live verification remain incomplete. KEEP all prior scope, intent, acceptance and dependency gates.
 - 2026-10-04: Rechecked four owner requests and reference/sibling contracts. New Tenants/Conversations owner revisions add no required authority/six-seam source contract; Parties Live verification and complete custody/host commitments remain missing. Expanded the Code Map; KEEP frozen intent, original acceptance, full scope, Branch B and draft/backlog.
 - 2026-10-06: Corrected the Code Map's stale description of sibling Parties work as uncommitted; its identity implementation and Platform identity hosting have since been committed. No complete acceptance packet or live verifier was delivered. KEEP approved frozen intent, original acceptance criteria, full scope, Branch B and all entry/execution gates.
+- 2026-10-07: Reconciled direct project-owner accountability and the custody repository into the register, and corrected the historical installed-Parties API description. KEEP frozen intent, original acceptance criteria, full scope, Branch B and draft/backlog until immutable targets, dates and complete verification commands are accepted.
 
 ## Review Triage Log
 

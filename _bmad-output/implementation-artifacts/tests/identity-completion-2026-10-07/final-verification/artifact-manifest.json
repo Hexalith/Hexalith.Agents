@@ -1,0 +1,1114 @@
+{
+  "artifacts": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/powershell-parse.log",
+      "bytes": 43,
+      "sha256": "75ace100e8fa915c6cd6801b766295d993d1c5095432b6305c3bf28ab9ceaa85"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/client-tests.log",
+      "bytes": 460,
+      "sha256": "bf8a56b2b3e8dd8f42d3f2b50604984cc386c1f77c0070ad2dfe5825018c34b9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/evidence.json",
+      "bytes": 15735,
+      "sha256": "db4f2dcd99a4ab95198edeb94c17eb5ab97d425e70dc11ff3ec1654c94caeb3b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/commands.json",
+      "bytes": 5607,
+      "sha256": "2df9e2c5d144eba63b352498b0052d7c3071059af5aeaf7305da7516edf5d072"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/client-build.log",
+      "bytes": 4038,
+      "sha256": "a5ec4acad2b959583033dc0da352c547c551a4e719830a0d258c396dda36f949"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/query-build.log",
+      "bytes": 9049,
+      "sha256": "c2ded5b0eaf6403c5e4d977d60321a390b422ba680914c2f39560b69a20d9bab"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/owning-whitespace.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/query-tests.log",
+      "bytes": 426,
+      "sha256": "96783ca42912f133fa21f50a2d5301dcc4fcf9e268e38728a134fb3dc98326f8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier.log",
+      "bytes": 1171,
+      "sha256": "6cccdb7180c69afbec3dc7c634d058e13b465b82b9fde69d4f524331a7042d4d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/client-tests.xml",
+      "bytes": 64742,
+      "sha256": "2d2d49d9a4c456b25ae13fdaf00ba142a33369ce109bac62cc00fe0dab4872f6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/query-tests.xml",
+      "bytes": 91004,
+      "sha256": "e1d9925b15601503cc8a8728eb3247914789ed260efbb823e9cf8ee416b9ec11"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/rerun.py",
+      "bytes": 6183,
+      "sha256": "ddded869feef51367e04bbf92c6718d41dec3f471c028fdc3dbafde08ce31ba4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/results.json",
+      "bytes": 28752,
+      "sha256": "ef1e2e7ac3914b3d4314c4933c8cc31fce1d06ee4519b0bd55c2faec36b093a5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/uncommitted-register/execution.log",
+      "bytes": 448,
+      "sha256": "5082b00cae4119f58d48f9659fcac5f573b8e9b912331bd7ddf82bbf406c76c7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/uncommitted-register/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "758f928ee7943e4bbb5efa0a4747eccd65027240e242a5528becec79a3edfc31"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/uncommitted-register/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "a920225d55849bd7c8c7b1e4e844a55fc167698797009776c05381a3b5c29d31"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/uncommitted-register/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/uncommitted-register/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-rebind/execution.log",
+      "bytes": 161,
+      "sha256": "42ad84661443c61461e8054e02b1662917e30c850c61470c8f98a56cd55c7a34"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-rebind/synthetic-source.json",
+      "bytes": 3092,
+      "sha256": "2d210c0ae3d769585874765843b7dff6d408f924e50f536821e1c4a5bc282dda"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-rebind/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "0df65c671010ae8c2a8b59c1b6ff246ca022554e0f40b1a7bc5baafe373815ce"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-rebind/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-rebind/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/provenance/execution.log",
+      "bytes": 361,
+      "sha256": "c7ad697dc01be229c9e5a790b6c2c2a1e4a35b08e5c1dbea3575f182320a6e82"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/provenance/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "a1739781c6b866f0f6f843fec42e5d3dad0fb7e8fc594caa91119461c8487b4f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/provenance/synthetic-query.json",
+      "bytes": 946,
+      "sha256": "526bc1a7e7d2c84905a1c1b891a95e31dc3a77d4697d405354c2d7ba508c9d54"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/provenance/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/provenance/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/revocation-past-expiry/execution.log",
+      "bytes": 348,
+      "sha256": "759d843171b69a7483a7c8acdd8898646a72d2f673891a6444e9271c83f5527a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/revocation-past-expiry/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "580de2f510cd78826feeb6c032b843c915b5b706c822c90f248a24fcac79832f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/revocation-past-expiry/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "cfc7eba95faed0e711e9615b42f47113831a0c786cbdab652244027f1371e340"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/revocation-past-expiry/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/revocation-past-expiry/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-revoke/execution.log",
+      "bytes": 372,
+      "sha256": "b23ec03efaffe9fcf2803ac98bc72d66bd248300bccc66f3fdfdca3400d2bf1e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-revoke/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "e05cd6229449e5fabc9a6a0fe3553ef9ba79fcb057c5975e9c9bcead254bf768"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-revoke/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "bd0bfe6289700f6822076eac4605834461529b998b0a6e62df03d0adf9042d80"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-revoke/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-revoke/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/timestamp-grammar/execution.log",
+      "bytes": 325,
+      "sha256": "caf23fe38bcaadf411bce51771a195afdc84b4ef31685c60c485e1361d6ca066"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/timestamp-grammar/synthetic-source.json",
+      "bytes": 2664,
+      "sha256": "61f9db01250f915053516dd5aade29c4b533e1335d4de90c162a0d51b9eeab66"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/timestamp-grammar/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "dbe1bec34426e5c3ac80d265d3decca8f15bdcf05322c90e00feec903953e3a0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/timestamp-grammar/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/timestamp-grammar/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/checkpoint-newer/execution.log",
+      "bytes": 388,
+      "sha256": "37751d3df4c24490269a784de7a0bca7bd0c051868bf7ca743e33449c7ad3a7c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/checkpoint-newer/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "71a7eaaae19c863ffbafb90b4f3bc4a16f912137de835cb00b547ee460ff29f5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/checkpoint-newer/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "e132cf81329e17c3c5a3d103d8a445a6418475327389ea77ac3318309e4c5c24"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/checkpoint-newer/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/checkpoint-newer/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-rebind/execution.log",
+      "bytes": 372,
+      "sha256": "b23ec03efaffe9fcf2803ac98bc72d66bd248300bccc66f3fdfdca3400d2bf1e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-rebind/synthetic-source.json",
+      "bytes": 3092,
+      "sha256": "a89b0239481a017215d3da3957b00b03e66d2ab1fb5159b0a2f156b377ec6227"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-rebind/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "914297ac3e8d3c5ed7b244197cb94ff6035d7e1518ea6f916d2dc2c3adba3934"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-rebind/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-rebind/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-exact-expiry/execution.log",
+      "bytes": 388,
+      "sha256": "37751d3df4c24490269a784de7a0bca7bd0c051868bf7ca743e33449c7ad3a7c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-exact-expiry/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "c2b968d3fd8ee3584b897b2cf74f523c07e68a7f6a6713f8f8fc79fd0f3e22a5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-exact-expiry/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "ea66608f70091d08e8098db37fa29fe25ae88b398264b62421c1eab8398231ab"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-exact-expiry/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-exact-expiry/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-lifecycle/execution.log",
+      "bytes": 380,
+      "sha256": "eb5e7552cd2c00ffe806aa6ac2fd6829e07a6478ae9901c70b6d773289220f09"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-lifecycle/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "13ea18828156a037126df584bf60fc310e3fe9bae2affbae8951da339db7e3b8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-lifecycle/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "378537f92c1376bb324212f0b9b8805e568b38b28621bc7ae38579002fcbd074"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-lifecycle/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-lifecycle/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/redirect-307/execution.log",
+      "bytes": 365,
+      "sha256": "b0e5cf6d1f9d2f9ee74cf6c99929201b756fc71a9bfd7825e50e7812bea7845d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/redirect-307/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "f4c27becf68f9c20fbc3fa8cdd0f9557b6d4c836ec04797cbc34e67b0feb7085"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/redirect-307/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "c6c149681c72f5dedb50f1a45459c71519ebf570875725cc0f96623bba8ebeec"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/redirect-307/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/redirect-307/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-scope/execution.log",
+      "bytes": 356,
+      "sha256": "c6d851c8b393be92630d66036cb7658c550dc73653a1db2051661ddcfc81987c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-scope/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "608b62f70ad1d1dd4f750c4dedfb7854818bb06ac722d53d861b4893f3f6cb64"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-scope/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "830342c20231fb509c363c03a2716fd6cf639d9fe61ef83ab9ed5c1f7f6de556"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-scope/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-scope/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-ticks/execution.log",
+      "bytes": 161,
+      "sha256": "42ad84661443c61461e8054e02b1662917e30c850c61470c8f98a56cd55c7a34"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-ticks/synthetic-source.json",
+      "bytes": 2682,
+      "sha256": "23f64d05df53a7d1324087ebfda0e287d5c0f32df6ffb013fe936c139511ca51"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-ticks/synthetic-query.json",
+      "bytes": 953,
+      "sha256": "abcb1d2e56d69d21fe51c288b6efb44bd7eca853e7ea89fc03e483ad1a457fe2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-ticks/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-ticks/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/actor-revision/execution.log",
+      "bytes": 351,
+      "sha256": "079e1e02d292be43544888fbdbfb9029828a154141051f84241039e44ee6c076"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/actor-revision/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "7ee915a3d531024cc60121927bbc084de38ea814a4160ec36ac4df706f34e3bd"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/actor-revision/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "6c7cbc8b896f429567a0d9de531520a7ba6db5d6f560d9d249bde5936acdab1a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/actor-revision/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/actor-revision/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/checkpoint-older/execution.log",
+      "bytes": 388,
+      "sha256": "37751d3df4c24490269a784de7a0bca7bd0c051868bf7ca743e33449c7ad3a7c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/checkpoint-older/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "a8093125490340d32375e7d21d9a0924de16d3bcc16e050866a73b1c9a258184"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/checkpoint-older/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "88d66b48725f161ce31cf0271d5d150314c4ce4e3fc7a1f64e20d03aca1d155e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/checkpoint-older/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/checkpoint-older/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-shortened-without-close/execution.log",
+      "bytes": 352,
+      "sha256": "a3c6e523a8dc20ba10f00f1498d3c011f2df9d9ffda1bbd28bd72c7a6ea5f69c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-shortened-without-close/synthetic-source.json",
+      "bytes": 1758,
+      "sha256": "e3e27f2a65f7d9ee70affa683253e982e2d2a0133033f5235ca470db4b5542d7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-shortened-without-close/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "ab50818a783b2c7505bfe59f2011266344c0e10946410442f5954780943fc8c5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-shortened-without-close/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-shortened-without-close/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/source-id/execution.log",
+      "bytes": 361,
+      "sha256": "c7ad697dc01be229c9e5a790b6c2c2a1e4a35b08e5c1dbea3575f182320a6e82"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/source-id/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "cbc9a85c03adf29ce92c11bb6815df87432bf7dba6695d40c24bc084c4753615"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/source-id/synthetic-query.json",
+      "bytes": 948,
+      "sha256": "1705f4947d05a79e9e266f69b6426c44d78b06d8e530e3242bd374b5bc00d482"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/source-id/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/source-id/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/wrapper-powershell-location/execution.log",
+      "bytes": 424,
+      "sha256": "bf3bf8737b3c5b82e393374336277da40153d74e0ad84646d7e0a66973a4667a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/wrapper-powershell-location/synthetic-dotnet-args.json",
+      "bytes": 963,
+      "sha256": "0790f15062d620ed165cbee904a5279f9f9872afedec7969009834587880a2d2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-duration/execution.log",
+      "bytes": 352,
+      "sha256": "a3c6e523a8dc20ba10f00f1498d3c011f2df9d9ffda1bbd28bd72c7a6ea5f69c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-duration/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "c71b155148f40f42750003dd9a167e272b48c91e56dd05e14d068f43b6bed3b2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-duration/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "24d3a8b91d866c59da2ceb0aa60e9dd2cc77990aa72169c5f0f00631e6fc62d7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-duration/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-duration/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/oversized-declared/execution.log",
+      "bytes": 323,
+      "sha256": "71a23888675ad8d742317718a46cb7e57dadf409e634c9ba846db0fa57746fad"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/oversized-declared/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "916fdd28c37cdd0720a8be544196faeeb6a50186e4236765921c975ddb2ed9c0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/oversized-declared/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "fd06bdeb3b9a7647c68f63cd4f6c6e42e0aee4197287b3ec0db0d5db3e845889"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/oversized-declared/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/oversized-declared/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-actor-revision/execution.log",
+      "bytes": 342,
+      "sha256": "698e00cb6d8147b1e9fe5267d7c6050203c797674caf446142fa7d4a75462ea7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-actor-revision/synthetic-source.json",
+      "bytes": 2676,
+      "sha256": "790f9663f7b6cc26513b6481f017208f54fff3afa88e6adb5b1baa17d0db54e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-actor-revision/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "f6397067750591e4b08004c509ce7448e9d76b3dc8e013022b5684df589ff2d2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-actor-revision/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-actor-revision/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-predecessor/execution.log",
+      "bytes": 342,
+      "sha256": "698e00cb6d8147b1e9fe5267d7c6050203c797674caf446142fa7d4a75462ea7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-predecessor/synthetic-source.json",
+      "bytes": 2676,
+      "sha256": "f35d284f82ae24d964917e71ee5850b16615f536ff05afcf95f4a74a72ee31a6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-predecessor/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "b9ea6268d37f7406dfbc296a9c4f9afa4989610e0712fb5940cd6ea2c76caf3f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-predecessor/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-predecessor/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/policy-duration/execution.log",
+      "bytes": 418,
+      "sha256": "e0bde24f7ed1b79971ee81aad74de7cbe570234ffb9a1c5ebe712a5c7c1b8930"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/policy-duration/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "5dc1dd814901061e76b162728f120d0ed6b776f7c5f9d50ec7992476acca397f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/policy-duration/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "128b12ea436a2f97a6b3055654d113524863fb94bd12fba25231dc2d1c4d7225"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/policy-duration/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/policy-duration/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "2cfb2dd7003b7703ecd5c306b5d0021101cb8e92032432eae7a819d28ff663f3"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive/execution.log",
+      "bytes": 161,
+      "sha256": "42ad84661443c61461e8054e02b1662917e30c850c61470c8f98a56cd55c7a34"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "4be1d913a30c6090358ef2fd271f1b0f598cdacf33a697211f0c99af362874e4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "552bd0e8ac512ba487e8929a2b655ce6ae8c928753d565c42887c1be15d4e47c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/decoded-oversize/execution.log",
+      "bytes": 344,
+      "sha256": "cf7e0d801acbe89af474211c2819b5d86e92ef869e0dbfece6dc04477b24e6f8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/decoded-oversize/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "dba03828bdfaee012f4e947cea82b566ae14f38eb0dfc46f4ec282b1da6dcb15"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/decoded-oversize/synthetic-source.json.gz",
+      "bytes": 22777,
+      "sha256": "3c95c85c66c9d38b6e2433f3d332e263caf3417ae83093fbe16e1a6deff8ca6f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/decoded-oversize/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/decoded-oversize/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/receipt-mismatch/execution.log",
+      "bytes": 408,
+      "sha256": "7e1bb68ae850cf43948b68a6d586313643b30b652486948a06d046466bea926e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/receipt-mismatch/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "6fab0c81f080e27f13bd2f3e537746b482f539f66778e18581a995ac3b44682f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/receipt-mismatch/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "b2c6f5615caf31ecf518cbfd8ccac9fe55111a49e93f84973599b2a88f3ef1cf"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/receipt-mismatch/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/receipt-mismatch/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "aae8388c245d70c50c67d17e21caf9d686adb395a723cbdc315b9bffa271f096"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-evidence-id/execution.log",
+      "bytes": 350,
+      "sha256": "844f6fbce1aaebc1ae0187a0e1de2424ffa80335eae795108f7623599b2eea45"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-evidence-id/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "f5a7c6e93e36b3f3257e7d48ca1896d54b506411decf7db3c03e1c9f297d05f0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-evidence-id/synthetic-query.json",
+      "bytes": 947,
+      "sha256": "e9c58e708991b28bd6a05566da31e80c0c37415a6eb1a40defab2c918a287b55"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-evidence-id/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-evidence-id/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-wrapper-relative/execution.log",
+      "bytes": 161,
+      "sha256": "42ad84661443c61461e8054e02b1662917e30c850c61470c8f98a56cd55c7a34"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-wrapper-relative/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "41a4cf2b3d4f67f621b631c334379acf4a69c37778ad8015f16b80aa902720b2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-wrapper-relative/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "0d6d9d16542f76a19b3afb774b39a49156503e7d0e1af5f46dfa46167f3c93f8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-wrapper-relative/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-wrapper-relative/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/oversized-streamed/execution.log",
+      "bytes": 323,
+      "sha256": "a055ec7f7758891d11deb3ee4eb69426d402abbbe8f9958d882b4410ef262c60"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/oversized-streamed/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "58df2da51101540d3322b343662dc4e09b4319ffa705ae4ebb8ac4e2817b9580"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/oversized-streamed/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "854f8ae4d83ed1ee909a560b6dc14da044e8e0eb591ea0a1d0057e41b6961c50"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/oversized-streamed/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/oversized-streamed/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/scope-party/execution.log",
+      "bytes": 361,
+      "sha256": "c7ad697dc01be229c9e5a790b6c2c2a1e4a35b08e5c1dbea3575f182320a6e82"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/scope-party/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "96161694765260d881c89dd90fd1b1a6d663328b7dad7d7e466de5b7eba18745"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/scope-party/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "35f26952abe30b257bdc836e57c47f5848971ff7a9e76625dfca18835d85266b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/scope-party/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/scope-party/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-array/execution.log",
+      "bytes": 330,
+      "sha256": "7527b8081ac8e6edcbd51c97b7e4a90e27f9e059801399dac0543f5bde474b49"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-array/synthetic-source.json",
+      "bytes": 2676,
+      "sha256": "7d0980c23d9ab80ea5f6fbcde97d0c018a3c3fbd3c1f2e1b67b1520a98612892"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-array/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "7ca531789602408f0f83894b57b28895198aef9f8cca9e29ce654e27bd928757"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-array/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/transition-array/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/wrapper-live-gate/execution.log",
+      "bytes": 377,
+      "sha256": "494a7f949c8dadf3383453f1a00e4a0de3f31274188ca5bf97fab7eb4391dafc"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/valid-until/execution.log",
+      "bytes": 372,
+      "sha256": "b23ec03efaffe9fcf2803ac98bc72d66bd248300bccc66f3fdfdca3400d2bf1e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/valid-until/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "14354e81d0ad59669bcb3ef24add8cfa0d55c670b4dc2805a5038d8a4bcacc30"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/valid-until/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "be28e49e610968b2b171a333d440d941ab3e3e31df887366b741f7580cf91f57"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/valid-until/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/valid-until/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/revocation-wrong-expiry/execution.log",
+      "bytes": 348,
+      "sha256": "759d843171b69a7483a7c8acdd8898646a72d2f673891a6444e9271c83f5527a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/revocation-wrong-expiry/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "3ff9e3d4c3431463d1629d0762be7a357fcffeb04c30891c6c7f023c8978aae5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/revocation-wrong-expiry/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "41bbba1836d8e5ee66c9edc7a152ec6d2c3cf2c19530357a32e4c3ea7d6d6e8b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/revocation-wrong-expiry/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/revocation-wrong-expiry/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-expiry/execution.log",
+      "bytes": 380,
+      "sha256": "eb5e7552cd2c00ffe806aa6ac2fd6829e07a6478ae9901c70b6d773289220f09"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-expiry/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "e29b16208d6a49ee684549cee269182ae765194fc1e6b9c7b9c5562c316b8b2d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-expiry/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "cacb0a0431a2272129fdb0ca849aba6d4de39ef128d31259f97b1d9181d8dd2a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-expiry/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/custody-expiry/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-binding-version/execution.log",
+      "bytes": 342,
+      "sha256": "698e00cb6d8147b1e9fe5267d7c6050203c797674caf446142fa7d4a75462ea7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-binding-version/synthetic-source.json",
+      "bytes": 2676,
+      "sha256": "2bd54b661e53fb08d94737581cf11856db2c7ab083897ca0877fbcae5aee2adc"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-binding-version/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "c9050ea9fa8c01fecce554d0c567144fe72e241e98edfecdbc886d8f04fe98dd"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-binding-version/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/string-binding-version/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/valid-from/execution.log",
+      "bytes": 372,
+      "sha256": "b23ec03efaffe9fcf2803ac98bc72d66bd248300bccc66f3fdfdca3400d2bf1e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/valid-from/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "54a511857eed8938f67bb5d492d5e0db03a60fc378fc224fdef70c64d8917f7c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/valid-from/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "64c7cf105bbcb6fe9932f53612cd1eca74bd03ebc804e1b0574b8fe0efd88f43"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/valid-from/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/valid-from/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-position/execution.log",
+      "bytes": 351,
+      "sha256": "2497d7854069490a757701421d81d423614cd2abb247f3ded4deac47e4457d5b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-position/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "609474051a6c568ca19dfa68370d071e12bffe7313125530dae994c7ac7d255d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-position/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "a9da192e1e9e0f3b9c04b86f75ca5f7e738182222120ed5e04d6909f1f16f54c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-position/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/opening-position/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/observation/execution.log",
+      "bytes": 388,
+      "sha256": "37751d3df4c24490269a784de7a0bca7bd0c051868bf7ca743e33449c7ad3a7c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/observation/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "bf734658cf2d12d223f68bd616b1015768f438cd8c7b8dd64fac4d0a33f6f222"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/observation/synthetic-query.json",
+      "bytes": 922,
+      "sha256": "ba1d6fd7d13c548606cd934b052d80887fd6334dafd83f726cc13fbd2293e9ef"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/observation/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/observation/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/wrapper-local-relative/execution.log",
+      "bytes": 424,
+      "sha256": "bf3bf8737b3c5b82e393374336277da40153d74e0ad84646d7e0a66973a4667a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/wrapper-local-relative/synthetic-dotnet-args.json",
+      "bytes": 953,
+      "sha256": "34e5baea7f16a965d1c896cf89037ba05ae19e76b321e5476d5711e017670996"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/scope-tenant/execution.log",
+      "bytes": 361,
+      "sha256": "c7ad697dc01be229c9e5a790b6c2c2a1e4a35b08e5c1dbea3575f182320a6e82"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/scope-tenant/synthetic-source.json",
+      "bytes": 2672,
+      "sha256": "032856d13f870283e6d78ceebbf377256875e325db8e60a3b8663e17cb697641"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/scope-tenant/synthetic-query.json",
+      "bytes": 948,
+      "sha256": "bf4559ea120890e95d362143c22e698164d30ed6e1d003909e2b62e0f7a75736"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/scope-tenant/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/scope-tenant/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/timestamp-source-expiry-grammar/execution.log",
+      "bytes": 325,
+      "sha256": "caf23fe38bcaadf411bce51771a195afdc84b4ef31685c60c485e1361d6ca066"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/timestamp-source-expiry-grammar/synthetic-source.json",
+      "bytes": 2664,
+      "sha256": "60e831b75db14a776a7444924f16fada8e2253da1341bf1bc0b460ef11c96739"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/timestamp-source-expiry-grammar/synthetic-query.json",
+      "bytes": 949,
+      "sha256": "7a224b59e45e4cca4689add8bf11d2554f80f4718f27d0b775bb97ab19d57bfa"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/timestamp-source-expiry-grammar/synthetic-register.md",
+      "bytes": 319,
+      "sha256": "99850519f17999035764c35250dfeb1b4f9e3f0ed0f7c021479131be11a480e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/timestamp-source-expiry-grammar/synthetic-receipt.json",
+      "bytes": 351,
+      "sha256": "8e5d25ff4ea45e3a5e3eb22f802bb552facbdda8bbce34fc112de3b3f268dfa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/wrapper-local-relative/relative-evidence/Hexalith.EventStore.Contracts.Tests-build.log",
+      "bytes": 63,
+      "sha256": "7f5a65fa3575cb981f2dc82030fa94c479512fce13de438717dc10177570e473"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/wrapper-local-relative/synthetic-bin/dotnet",
+      "bytes": 361,
+      "sha256": "fd16b27670d5567b9b08dab2d074e9d89ec70bc98574b08a58d04356150791ec"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/wrapper-live-gate/relative-evidence/live-gate.txt",
+      "bytes": 364,
+      "sha256": "b60753bd1e52b607eb2f91bdc4cb3bbd67b760c8a87814215fb91ceb2cd9bdfd"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-wrapper-relative/relative-evidence/live-readiness.json",
+      "bytes": 606,
+      "sha256": "85606f9568db337f1c5646c9fbeaa22ddfe7b4e1dd93c69cc7cde30a35c88c5e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive/relative-evidence/live-readiness.json",
+      "bytes": 606,
+      "sha256": "59947aa184f50954a6ec4d1ca775899af9a630a1a6e60714acc03354b71d1a51"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/wrapper-powershell-location/relative-evidence/Hexalith.EventStore.Contracts.Tests-build.log",
+      "bytes": 63,
+      "sha256": "7f5a65fa3575cb981f2dc82030fa94c479512fce13de438717dc10177570e473"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/wrapper-powershell-location/synthetic-bin/dotnet",
+      "bytes": 361,
+      "sha256": "fd16b27670d5567b9b08dab2d074e9d89ec70bc98574b08a58d04356150791ec"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-ticks/relative-evidence/live-readiness.json",
+      "bytes": 606,
+      "sha256": "64b834569442918339c8d680f6d9ee2996f674986b343481e1734d33bcaa8d1d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/final-verification/synthetic-verifier/positive-rebind/relative-evidence/live-readiness.json",
+      "bytes": 606,
+      "sha256": "e06343349de52e4b54b6702c71b47e699793ecf99532f94af3bcce3a88cdbbeb"
+    }
+  ]
+}

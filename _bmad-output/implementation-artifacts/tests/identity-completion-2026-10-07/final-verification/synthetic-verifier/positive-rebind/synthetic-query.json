@@ -1,0 +1,31 @@
+{
+  "outcome": "Resolved",
+  "contractVersion": 1,
+  "tenantId": "synthetic-tenant",
+  "partyId": "synthetic-party",
+  "actionAt": "2026-10-06T06:51:08.650831Z",
+  "sourcePosition": 4,
+  "bindingSourcePosition": 2,
+  "observationId": "synthetic-query-observation",
+  "evidence": {
+    "tenantId": "synthetic-tenant",
+    "partyId": "synthetic-party",
+    "actorId": "01HX0000000000000000000001",
+    "bindingVersion": 1,
+    "actorRevision": 1,
+    "validFrom": "2026-10-06T06:36:08.650831Z",
+    "validUntil": "2026-10-06T07:36:08.650831Z",
+    "sourceId": "synthetic-writer",
+    "provenanceId": "synthetic-operator",
+    "custody": {
+      "policyId": "synthetic-365-v1",
+      "purpose": "party-actor-history-v1",
+      "expiresAt": "2027-10-06T06:36:08.650831Z",
+      "lifecycleRevision": 1,
+      "evidenceId": "synthetic-custody",
+      "sourceExpiryEnforced": true,
+      "restoreSafe": true,
+      "derivedCopiesCovered": true
+    }
+  }
+}

@@ -1,0 +1,549 @@
+--- pre-change/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs
++++ post-change/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs
+@@ -110,9 +110,9 @@
+             IdentityAdmissionEvidence? currentAuthority = authority.Admit(envelope).Evidence;
+             cancellationToken.ThrowIfCancellationRequested();
+             DateTimeOffset completedAt = timeProvider.GetUtcNow();
+-            if (!SameAuthority(admitted, currentAuthority, completedAt)
++            if (completedAt < read.Stream!.ObservedAt || !SameAuthority(admitted, currentAuthority, completedAt)
+                 || requiresHumanPolicy && !PolicyIsCurrent(policy)
+-                || binding is not null && (!currentAuthority!.ActorActive || completedAt >= binding.ValidUntil
++                || binding is not null && (!currentAuthority!.ActorActive || completedAt < binding.ValidFrom || completedAt >= binding.ValidUntil
+                     || completedAt >= binding.Custody.ExpiresAt))
+             {
+                 cancellationToken.ThrowIfCancellationRequested();
+--- pre-change/src/Hexalith.Parties.Client/HttpPartiesIdentityClient.cs
++++ post-change/src/Hexalith.Parties.Client/HttpPartiesIdentityClient.cs
+@@ -12,12 +12,24 @@
+ using Hexalith.Parties.Contracts.Models;
+ using Hexalith.Parties.Contracts.Queries;
+ using Hexalith.Parties.Contracts.ValueObjects;
++using Microsoft.Extensions.DependencyInjection;
+ 
+ namespace Hexalith.Parties.Client;
+ 
+ /// <summary>Identity gateway client that never reads or mutates shared ambient tenant options.</summary>
+-public sealed class HttpPartiesIdentityClient(HttpClient httpClient) : IPartiesIdentityClient
++/// <param name="httpClient">The scoped gateway transport.</param>
++/// <param name="timeProvider">The clock used to validate evidence at completion.</param>
++[method: ActivatorUtilitiesConstructor]
++public sealed class HttpPartiesIdentityClient(HttpClient httpClient, TimeProvider? timeProvider = null) : IPartiesIdentityClient
+ {
++    private readonly TimeProvider _completionClock = timeProvider ?? TimeProvider.System;
++
++    /// <summary>Creates a gateway client using the system completion clock.</summary>
++    /// <param name="httpClient">The scoped gateway transport.</param>
++    public HttpPartiesIdentityClient(HttpClient httpClient) : this(httpClient, TimeProvider.System)
++    {
++    }
++
+     /// <inheritdoc/>
+     public async Task<AgentPartyProvisioningResult> ProvisionAgentPartyAsync(string tenantId, ProvisionAgentParty command,
+         CancellationToken cancellationToken = default)
+@@ -55,14 +67,16 @@
+         ArgumentNullException.ThrowIfNull(query);
+         ValidateScope(tenantId, query.TenantId, query.PartyId);
+         PartyIdentityResult result = await QueryAsync<ResolvePartyIdentity, PartyIdentityResult>(tenantId, query.PartyId, query, cancellationToken).ConfigureAwait(false);
++        DateTimeOffset completedAt = _completionClock.GetUtcNow();
+         if (!Enum.IsDefined(result.Outcome) || result.Outcome != PartyIdentityOutcome.Resolved && result.Evidence?.HumanBinding is not null
+             || result.Evidence is { } evidence && (evidence.ContractVersion != 1 || evidence.TenantId != tenantId
+             || evidence.PartyId != query.PartyId || evidence.SourcePosition <= 0 || string.IsNullOrWhiteSpace(evidence.ObservationId)
+-            || evidence.ObservedAt == default || evidence.Classification is not (PartyIdentityClassification.Human
++            || evidence.ObservedAt == default || evidence.ObservedAt > completedAt || evidence.Classification is not (PartyIdentityClassification.Human
+                 or PartyIdentityClassification.Organization)
+             || evidence.HumanBinding is { } binding && (evidence.Classification != PartyIdentityClassification.Human
+                 || binding.ActorId != query.ExpectedActorId || !Matches(binding, tenantId, query.PartyId)
+-                || evidence.ObservedAt < binding.ValidFrom || evidence.ObservedAt >= binding.ValidUntil))
++                || evidence.ObservedAt < binding.ValidFrom || evidence.ObservedAt >= binding.ValidUntil
++                || completedAt < binding.ValidFrom || completedAt >= binding.ValidUntil || completedAt >= binding.Custody.ExpiresAt))
+             || result.Outcome == PartyIdentityOutcome.Resolved && (result.Evidence is not { } resolved
+                 || !resolved.IsActive || resolved.IsRestricted || resolved.IsErasingOrErased
+                 || resolved.Classification == PartyIdentityClassification.Unknown
+@@ -81,10 +95,12 @@
+         ArgumentNullException.ThrowIfNull(query);
+         ValidateScope(tenantId, query.TenantId, query.PartyId);
+         HumanActorBindingResult result = await QueryAsync<ResolveHumanActorBindingAt, HumanActorBindingResult>(tenantId, query.PartyId, query, cancellationToken).ConfigureAwait(false);
++        DateTimeOffset completedAt = _completionClock.GetUtcNow();
+         if (!Enum.IsDefined(result.Outcome) || result.Outcome != HumanActorBindingOutcome.Resolved && result.Evidence is not null
+-            || result.ContractVersion != 1 || result.TenantId != tenantId || result.PartyId != query.PartyId || result.ActionAt != query.ActionAt
++            || query.ActionAt > completedAt || result.ContractVersion != 1 || result.TenantId != tenantId || result.PartyId != query.PartyId || result.ActionAt != query.ActionAt
+             || result.Evidence is { } binding && (!Matches(binding, tenantId, query.PartyId)
+                 || binding.ActorId != query.ExpectedActorId || binding.BindingVersion != query.ExpectedBindingVersion
++                || completedAt >= binding.Custody.ExpiresAt
+                 || query.ActionAt < binding.ValidFrom || binding.ValidUntil is { } until && query.ActionAt >= until)
+             || result.Outcome == HumanActorBindingOutcome.Resolved && (result.Evidence is null
+                 || result.SourcePosition <= 0 || result.BindingSourcePosition <= 0
+--- pre-change/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs
++++ post-change/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs
+@@ -49,6 +49,83 @@
+         IOptionsMonitor<PartyIdentityOptions> options = Substitute.For<IOptionsMonitor<PartyIdentityOptions>>();
+         options.CurrentValue.Returns(PolicyOptions());
+         return (new(authority, TimeProvider.System, reader, custody, historyReader, options), authority, reader, custody, historyReader, options);
++    }
++
++    /// <summary>Suspended current reads cannot release a binding outside its completion interval or source observation.</summary>
++    [Theory]
++    [InlineData("interval-expiry")]
++    [InlineData("custody-expiry")]
++    [InlineData("source-rollback")]
++    [InlineData("binding-rollback")]
++    public async Task CurrentCompletionTimeChangesDuringCustody_DenyEvidence(string change)
++    {
++        HumanActorBindingEvidence binding = Binding() with { ValidUntil = Start.AddDays(5) };
++        if (change == "custody-expiry")
++        {
++            binding = binding with { ValidUntil = binding.Custody.ExpiresAt };
++        }
++
++        var fixture = Service(Events()[0], new HumanActorBindingEstablished(new(binding, "logical", "digest"), Start, 0));
++        DateTimeOffset now = Start.AddDays(2);
++        TimeProvider clock = Substitute.For<TimeProvider>();
++        clock.GetUtcNow().Returns(_ => now);
++        var grant = new IdentityAdmissionEvidence(new("tenant-a", "party", "party-1", "Read", "c", "c", "d"),
++            "reader", null, Actor, 1, true, Start.AddDays(-1), Start.AddDays(20), 1);
++        fixture.Authority.Admit(Arg.Any<QueryEnvelope>()).Returns(new PartyIdentityAdmissionResult(grant, null));
++        AuthoritativeStreamReadResult source = await fixture.Reader.ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
++        DateTimeOffset observedAt = change == "binding-rollback" ? Start.AddHours(-1) : Start.AddDays(1);
++        fixture.Reader.ReadAsync(Arg.Any<Hexalith.EventStore.Contracts.Identity.AggregateIdentity>(), Arg.Any<CancellationToken>())
++            .Returns(source with { Stream = source.Stream! with { ObservedAt = observedAt } });
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var pending = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
++        fixture.Custody.CanReadAsync(Arg.Any<Hexalith.EventStore.Contracts.Identity.AggregateIdentity>(), Arg.Any<IdentityHistoryCustodyEvidence>(), Arg.Any<CancellationToken>())
++            .Returns(_ => { entered.SetResult(); return pending.Task; });
++        var service = new PartyIdentityQueryService(fixture.Authority, clock, fixture.Reader, fixture.Custody, identityOptions: fixture.Options);
++        Task<PartyIdentityResult> result = service.ResolveAsync(Envelope(new ResolvePartyIdentity("tenant-a", "party-1", Actor)), TestContext.Current.CancellationToken);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
++        now = change switch
++        {
++            "interval-expiry" => binding.ValidUntil!.Value,
++            "custody-expiry" => binding.Custody.ExpiresAt,
++            "source-rollback" => observedAt.AddTicks(-1),
++            _ => binding.ValidFrom.AddTicks(-1),
++        };
++        pending.SetResult(true);
++        PartyIdentityResult completed = await result.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
++        completed.Outcome.ShouldBe(PartyIdentityOutcome.Unavailable);
++        completed.Evidence.ShouldBeNull();
++    }
++
++    /// <summary>Authority withdrawn while either current dependency is suspended cannot release evidence.</summary>
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task CurrentAuthorityChangesDuringAwait_DenyEvidence(bool inCustody)
++    {
++        var fixture = Service(Events());
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        Action complete;
++        if (inCustody)
++        {
++            var pending = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
++            fixture.Custody.CanReadAsync(Arg.Any<Hexalith.EventStore.Contracts.Identity.AggregateIdentity>(), Arg.Any<IdentityHistoryCustodyEvidence>(), Arg.Any<CancellationToken>())
++                .Returns(_ => { entered.SetResult(); return pending.Task; });
++            complete = () => pending.SetResult(true);
++        }
++        else
++        {
++            AuthoritativeStreamReadResult source = await fixture.Reader.ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
++            var pending = new TaskCompletionSource<AuthoritativeStreamReadResult>(TaskCreationOptions.RunContinuationsAsynchronously);
++            fixture.Reader.ReadAsync(Arg.Any<Hexalith.EventStore.Contracts.Identity.AggregateIdentity>(), Arg.Any<CancellationToken>())
++                .Returns(_ => { entered.SetResult(); return pending.Task; });
++            complete = () => pending.SetResult(source);
++        }
++
++        Task result = AssertUnavailableAsync(fixture.Service, historical: false);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
++        fixture.Authority.Admit(Arg.Any<QueryEnvelope>()).Returns(new PartyIdentityAdmissionResult(null, "authority-withdrawn"));
++        complete();
++        await result.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
+     }
+ 
+     [Fact]
+--- pre-change/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs
++++ post-change/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs
+@@ -14,6 +14,73 @@
+ 
+ public sealed class HttpPartiesIdentityClientTests
+ {
++    /// <summary>Delayed replies must remain usable at the client completion instant.</summary>
++    [Theory]
++    [InlineData("current-valid")]
++    [InlineData("current-interval-expiry")]
++    [InlineData("current-custody-expiry")]
++    [InlineData("current-source-rollback")]
++    [InlineData("current-binding-rollback")]
++    [InlineData("current-future-observation")]
++    [InlineData("historical-closed-valid")]
++    [InlineData("historical-custody-expiry")]
++    [InlineData("historical-future-action")]
++    public async Task DelayedReply_ValidatesCompletionTime(string scenario)
++    {
++        ArgumentNullException.ThrowIfNull(scenario);
++        DateTimeOffset start = DateTimeOffset.UtcNow.AddDays(-1);
++        DateTimeOffset now = start.AddHours(2);
++        const string actor = "01HX0000000000000000000001";
++        var binding = new HumanActorBindingEvidence("tenant-a", "party-1", actor, 1, 1, start, start.AddDays(5), "writer", "operator",
++            new("synthetic", "party-actor-history-v1", start.AddDays(10), 1, "custody", true, true, true));
++        bool historical = scenario.StartsWith("historical", StringComparison.Ordinal);
++        if (historical)
++        {
++            binding = binding with { ValidUntil = start.AddHours(1) };
++        }
++        else if (scenario == "current-custody-expiry")
++        {
++            binding = binding with { ValidUntil = binding.Custody.ExpiresAt };
++        }
++
++        DateTimeOffset observedAt = scenario == "current-future-observation" ? now.AddHours(1) : start.AddHours(1);
++        var historicalResult = new HumanActorBindingResult(HumanActorBindingOutcome.Resolved, 1, "tenant-a", "party-1", start, 4, "observation", binding)
++            { BindingSourcePosition = 2 };
++        var currentResult = new PartyIdentityResult(PartyIdentityOutcome.Resolved,
++            new(1, "tenant-a", "party-1", PartyIdentityClassification.Human, true, false, false, 4, observedAt, "observation", binding));
++        JsonElement payload = historical ? JsonSerializer.SerializeToElement(historicalResult, PartiesJsonOptions.Default)
++            : JsonSerializer.SerializeToElement(currentResult, PartiesJsonOptions.Default);
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var pending = new TaskCompletionSource<HttpResponseMessage>(TaskCreationOptions.RunContinuationsAsynchronously);
++        using var http = new HttpClient(new Handler(_ => { entered.SetResult(); return pending.Task; }))
++            { BaseAddress = new Uri("https://gateway.test/") };
++        TimeProvider clock = NSubstitute.Substitute.For<TimeProvider>();
++        NSubstitute.SubstituteExtensions.Returns(clock.GetUtcNow(), _ => now);
++        var client = new HttpPartiesIdentityClient(http, clock);
++        Task result = historical
++            ? client.ResolveHumanActorBindingAtAsync("tenant-a", new("tenant-a", "party-1", start, actor, 1), TestContext.Current.CancellationToken)
++            : client.ResolvePartyIdentityAsync("tenant-a", new("tenant-a", "party-1", actor), TestContext.Current.CancellationToken);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
++        now = scenario switch
++        {
++            "current-interval-expiry" => binding.ValidUntil!.Value,
++            "current-custody-expiry" or "historical-custody-expiry" => binding.Custody.ExpiresAt,
++            "current-source-rollback" => observedAt.AddTicks(-1),
++            "current-binding-rollback" or "historical-future-action" => start.AddTicks(-1),
++            _ => now,
++        };
++        pending.SetResult(Json(new SubmitQueryResponse("c", payload)));
++        if (scenario is "current-valid" or "historical-closed-valid")
++        {
++            await result.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
++        }
++        else
++        {
++            PartiesClientException failure = await Should.ThrowAsync<PartiesClientException>(() => result.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken));
++            failure.Status.ShouldBe(503);
++        }
++    }
++
+     [Fact]
+     public async Task HistoricalReply_RequiresOriginalBindingPositionInsideCurrentCheckpoint()
+     {
+--- pre-change/eng/verify-ext-parties-history-readiness.ps1
++++ post-change/eng/verify-ext-parties-history-readiness.ps1
+@@ -4,6 +4,9 @@
+     [Parameter(Mandatory)][string]$DependencyRegisterPath
+ )
+ $ErrorActionPreference = 'Stop'
++$callerDirectory = (Get-Location).ProviderPath
++$EvidenceDirectory = [IO.Path]::GetFullPath($EvidenceDirectory, $callerDirectory)
++$DependencyRegisterPath = [IO.Path]::GetFullPath($DependencyRegisterPath, $callerDirectory)
+ $required = @('EXT_PARTIES_GATEWAY_URL', 'EXT_PARTIES_READER_HEADERS_JSON', 'EXT_PARTIES_TARGET_SHA', 'EXT_PARTIES_COMPATIBILITY_RECEIPT',
+     'EXT_PARTIES_TENANT_A', 'EXT_PARTIES_HISTORY_PARTY_ID', 'EXT_PARTIES_HISTORY_ACTOR_ID',
+     'EXT_PARTIES_HISTORY_ACTION_AT', 'EXT_PARTIES_HISTORY_BINDING_VERSION', 'EXT_PARTIES_POLICY_ID', 'EXT_PARTIES_RETENTION', 'EXT_PARTIES_EXPIRY_TRIGGER')
+@@ -39,7 +42,7 @@
+     throw 'DependencyNotAvailable: EXT-PARTIES-1 exact-target compatibility/prerequisite proof does not match the accepted record.'
+ }
+ $retention = [TimeSpan]::Zero
+-if (-not [TimeSpan]::TryParse($env:EXT_PARTIES_RETENTION, [ref]$retention) -or $retention -le [TimeSpan]::Zero -or
++if (-not [TimeSpan]::TryParse($env:EXT_PARTIES_RETENTION, [ref]$retention) -or $retention -ne [TimeSpan]::FromDays(365) -or
+     $env:EXT_PARTIES_EXPIRY_TRIGGER -cne 'binding-effective-at' -or
+     $receipt.policyId -cne $env:EXT_PARTIES_POLICY_ID -or $receipt.retention -cne $env:EXT_PARTIES_RETENTION -or
+     $receipt.expiryTrigger -cne $env:EXT_PARTIES_EXPIRY_TRIGGER) {
+@@ -66,13 +69,83 @@
+ function Invoke-OwnerRead([string]$RelativePath, [hashtable]$Payload) {
+     $target = [Uri]::new($base.AbsoluteUri.TrimEnd('/') + '/' + $RelativePath)
+     $body = ConvertTo-Json -InputObject $Payload -Depth 12 -Compress
+-    $response = Invoke-WebRequest -Uri $target -Method Post -Headers $headers -ContentType 'application/json' -Body $body -TimeoutSec 30 -SkipHttpErrorCheck
+-    if ([int]$response.StatusCode -lt 200 -or [int]$response.StatusCode -ge 300) {
+-        throw ('Owner read denied or unavailable at the authenticated transport (HTTP ' + [int]$response.StatusCode + ').')
+-    }
+-    if ([Text.Encoding]::UTF8.GetByteCount($response.Content) -gt 32MB) { throw 'Owner response exceeds the source bound.' }
+-    try { return ConvertFrom-Json -InputObject $response.Content -AsHashtable }
+-    catch { throw 'Owner response is malformed.' }
++    $handler = [Net.Http.HttpClientHandler]::new()
++    $handler.AllowAutoRedirect = $false
++    $client = [Net.Http.HttpClient]::new($handler)
++    $request = [Net.Http.HttpRequestMessage]::new([Net.Http.HttpMethod]::Post, $target)
++    $timeout = [Threading.CancellationTokenSource]::new([TimeSpan]::FromSeconds(30))
++    $response = $null
++    $stream = $null
++    $buffered = [IO.MemoryStream]::new()
++    try {
++        $client.Timeout = [TimeSpan]::FromSeconds(30)
++        foreach ($name in $headers.Keys) {
++            if (-not $request.Headers.TryAddWithoutValidation($name, [string]$headers[$name])) { throw 'Owner transport headers are invalid.' }
++        }
++        $request.Content = [Net.Http.StringContent]::new($body, [Text.Encoding]::UTF8, 'application/json')
++        $response = $client.SendAsync($request, [Net.Http.HttpCompletionOption]::ResponseHeadersRead, $timeout.Token).GetAwaiter().GetResult()
++        if (-not $response.IsSuccessStatusCode) {
++            throw ('Owner read denied or unavailable at the authenticated transport (HTTP ' + [int]$response.StatusCode + ').')
++        }
++        $limit = 32MB
++        if ($response.Content.Headers.ContentLength -gt $limit) { throw 'Owner response exceeds the source bound.' }
++        $stream = $response.Content.ReadAsStreamAsync($timeout.Token).GetAwaiter().GetResult()
++        $chunk = [byte[]]::new(64KB)
++        while ($true) {
++            # Read at most one byte beyond the limit, and reject before copying it into the buffer.
++            $count = [int][Math]::Min($chunk.Length, $limit - $buffered.Length + 1)
++            $received = $stream.ReadAsync($chunk, 0, $count, $timeout.Token).GetAwaiter().GetResult()
++            if ($received -eq 0) { break }
++            if ($buffered.Length + $received -gt $limit) { throw 'Owner response exceeds the source bound.' }
++            $buffered.Write($chunk, 0, $received)
++        }
++        $timeout.Token.ThrowIfCancellationRequested()
++        try {
++            $content = [Text.UTF8Encoding]::new($false, $true).GetString($buffered.ToArray())
++            return ConvertFrom-Json -InputObject $content -AsHashtable
++        }
++        catch { throw 'Owner response is malformed.' }
++    }
++    finally {
++        if ($null -ne $stream) { $stream.Dispose() }
++        if ($null -ne $response) { $response.Dispose() }
++        $buffered.Dispose()
++        $request.Dispose()
++        $timeout.Dispose()
++        $client.Dispose()
++    }
++}
++
++function Get-Instant($Value) {
++    # PowerShell may materialize JSON dates as DateTime; string conversion loses UTC and ticks.
++    if ($Value -is [DateTimeOffset] -or $Value -is [DateTime]) {
++        $parsed = [DateTimeOffset]$Value
++        if ($parsed -eq [DateTimeOffset]::MinValue) { throw 'The retained basis contains an invalid instant.' }
++        return $parsed
++    }
++    $parsed = [DateTimeOffset]::MinValue
++    if (-not [DateTimeOffset]::TryParse([string]$Value, [ref]$parsed) -or $parsed -eq [DateTimeOffset]::MinValue) {
++        throw 'The retained basis contains an invalid instant.'
++    }
++    return $parsed
++}
++
++function Get-Version($Value) {
++    $parsed = 0L
++    if ([string]$Value -cnotmatch '^(0|[1-9][0-9]*)$' -or -not [long]::TryParse([string]$Value, [ref]$parsed)) {
++        throw 'The retained basis contains an invalid version or position.'
++    }
++    return $parsed
++}
++
++function Assert-Custody($Custody) {
++    if ($null -eq $Custody -or $Custody.purpose -cne 'party-actor-history-v1' -or
++        $Custody.policyId -cne $env:EXT_PARTIES_POLICY_ID -or [string]::IsNullOrWhiteSpace($Custody.evidenceId) -or
++        (Get-Version $Custody.lifecycleRevision) -le 0) { throw 'The retained binding has no exact supported custody basis.' }
++    foreach ($field in @('sourceExpiryEnforced', 'restoreSafe', 'derivedCopiesCovered')) {
++        if ($Custody[$field] -isnot [bool] -or $Custody[$field] -ne $true) { throw 'The retained binding has incomplete custody assurances.' }
++    }
++    $null = Get-Instant $Custody.expiresAt
+ }
+ 
+ $identity = @{ tenantId=$env:EXT_PARTIES_TENANT_A; domain='party'; aggregateId=$env:EXT_PARTIES_HISTORY_PARTY_ID }
+@@ -81,7 +154,7 @@
+ if ($null -eq $source -or $retained.failureReason -or $source.purpose -ne 'party-actor-history-v1' -or
+     $source.identity.tenantId -cne $identity.tenantId -or $source.identity.domain -cne 'party' -or
+     $source.identity.aggregateId -cne $identity.aggregateId -or $source.head -le 0 -or $source.head -gt 10000 -or
+-    [string]::IsNullOrWhiteSpace($source.observationId) -or [string]::IsNullOrWhiteSpace($source.authorityRevision) -or
++    $null -eq $source.events -or $null -eq $source.excludedSequences -or [string]::IsNullOrWhiteSpace($source.observationId) -or [string]::IsNullOrWhiteSpace($source.authorityRevision) -or
+     -not $source.observedAt -or [DateTimeOffset]$source.observedAt -gt [DateTimeOffset]::UtcNow -or
+     -not $source.validUntil -or [DateTimeOffset]$source.validUntil -le [DateTimeOffset]::UtcNow) {
+     throw 'Independent retained history has no exact authoritative source certificate.'
+@@ -90,7 +163,7 @@
+ $payloadBytes = 0L
+ $previous = 0L
+ foreach ($item in $source.events) {
+-    $position = [long]$item.sequenceNumber
++    $position = Get-Version $item.sequenceNumber
+     if ($position -le $previous -or $position -gt $source.head -or -not $covered.Add($position) -or
+         $null -eq $item.protectionMetadata -or $item.protectionMetadata.state -notin @(0, 'Unprotected') -or
+         $item.eventTypeName -cnotmatch '^Hexalith\.Parties\.Contracts\.Events\.HumanActorBinding(Established|Rebound|Revoked)$' -or
+@@ -105,11 +178,74 @@
+ }
+ $previous = 0L
+ foreach ($excluded in $source.excludedSequences) {
+-    $position = [long]$excluded
++    $position = Get-Version $excluded
+     if ($position -le $previous -or $position -gt $source.head -or -not $covered.Add($position)) { throw 'The source exclusion certificate overlaps or is unordered.' }
+     $previous = $position
+ }
+ if ($covered.Count -ne $source.head) { throw 'The retained source certificate has a gap.' }
++
++# Independently reconstruct all recorded transitions before trusting a query result.
++$bindings = [Collections.Generic.List[hashtable]]::new()
++$logicalIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
++$version = 0L
++$observedAt = Get-Instant $source.observedAt
++foreach ($item in $source.events) {
++    try { $transition = ConvertFrom-Json -InputObject ([Text.UTF8Encoding]::new($false, $true).GetString([Convert]::FromBase64String($item.payload))) -AsHashtable }
++    catch { throw 'The retained transition is not readable JSON.' }
++    $at = Get-Instant $transition.effectiveAt
++    $expected = Get-Version $transition.expectedBindingVersion
++    if ($at -gt $observedAt -or $expected -ne $version) { throw 'The retained transition has an inconsistent predecessor or effective instant.' }
++    $revoked = $item.eventTypeName.EndsWith('HumanActorBindingRevoked', [StringComparison]::Ordinal)
++    $rebound = $item.eventTypeName.EndsWith('HumanActorBindingRebound', [StringComparison]::Ordinal)
++    if ($revoked -or $rebound) {
++        if ($version -eq 0) { throw 'The retained transition has no predecessor.' }
++        $predecessors = @($bindings | Where-Object { $_.evidence.bindingVersion -eq $expected })
++        if ($predecessors.Count -eq 0 -and $revoked) { throw 'The retained revocation has no live predecessor.' }
++        if ($predecessors.Count -gt 0) {
++            $predecessor = $predecessors[0].evidence
++            if ((Get-Instant $predecessor.validFrom) -ge $at -or $revoked -and (Get-Instant $predecessor.validUntil) -le $at) {
++                throw 'The retained transition cannot close its predecessor interval.'
++            }
++            if ((Get-Instant $predecessor.validUntil) -gt $at) { $predecessor.validUntil = $at.ToString('O') }
++        }
++    }
++    elseif ($version -ne 0) { throw 'A retained establishment cannot replace an existing binding.' }
++    if ($revoked) {
++        Assert-Custody $transition.custody
++        if ([string]::IsNullOrWhiteSpace($transition.logicalId) -or [string]::IsNullOrWhiteSpace($transition.intentDigest) -or
++            -not $logicalIds.Add($transition.logicalId)) { throw 'The retained revocation has an invalid logical identity.' }
++        if ($version -eq [long]::MaxValue) { throw 'The retained binding version overflows.' }
++        $version++
++        continue
++    }
++    $binding = $transition.binding
++    $candidate = $binding.evidence
++    if ($null -eq $candidate -or $candidate.tenantId -cne $identity.tenantId -or $candidate.partyId -cne $identity.aggregateId -or
++        $candidate.actorId -cnotmatch '^[0-7][0-9ABCDEFGHJKMNPQRSTVWXYZ]{25}$' -or (Get-Version $candidate.actorRevision) -le 0 -or
++        $version -eq [long]::MaxValue -or (Get-Version $candidate.bindingVersion) -ne $version + 1 -or
++        (Get-Instant $candidate.validFrom) -ne $at -or (Get-Instant $candidate.validUntil) -le $at -or
++        [string]::IsNullOrWhiteSpace($candidate.sourceId) -or [string]::IsNullOrWhiteSpace($candidate.provenanceId) -or
++        [string]::IsNullOrWhiteSpace($binding.logicalId) -or [string]::IsNullOrWhiteSpace($binding.intentDigest) -or
++        -not $logicalIds.Add($binding.logicalId)) { throw 'The retained opening binding is inconsistent or outside its scope.' }
++    Assert-Custody $candidate.custody
++    if ((Get-Instant $candidate.custody.expiresAt) -ne $at.Add($retention) -or
++        (Get-Instant $candidate.validUntil) -gt (Get-Instant $candidate.custody.expiresAt)) {
++        throw 'The retained opening binding differs from its exact retention policy.'
++    }
++    foreach ($previousBinding in $bindings) {
++        if ((Get-Instant $previousBinding.evidence.validFrom) -ge $at -or (Get-Instant $previousBinding.evidence.validUntil) -gt $at) {
++            throw 'The retained intervals overlap or are unordered.'
++        }
++    }
++    $bindings.Add(@{ evidence=$candidate; sourcePosition=(Get-Version $item.sequenceNumber) })
++    $version = Get-Version $candidate.bindingVersion
++}
++$matching = @($bindings | Where-Object { (Get-Instant $_.evidence.validFrom) -le $actionAt -and $actionAt -lt (Get-Instant $_.evidence.validUntil) })
++if ($matching.Count -ne 1 -or $matching[0].evidence.actorId -cne $env:EXT_PARTIES_HISTORY_ACTOR_ID -or
++    $matching[0].evidence.bindingVersion -ne $bindingVersion -or $actionAt -gt $observedAt) {
++    throw 'The independently retained source has no unique exact action-time binding.'
++}
++$verifiedBinding = $matching[0]
+ 
+ $queryPayload = @{ tenantId=$identity.tenantId; partyId=$identity.aggregateId; actionAt=$actionAt.ToString('O');
+     expectedActorId=$env:EXT_PARTIES_HISTORY_ACTOR_ID; expectedBindingVersion=$bindingVersion }
+@@ -121,7 +257,7 @@
+     $history.tenantId -cne $identity.tenantId -or $history.partyId -cne $identity.aggregateId -or
+     [DateTimeOffset]$history.actionAt -ne $actionAt -or $history.evidence.actorId -cne $env:EXT_PARTIES_HISTORY_ACTOR_ID -or
+     $history.evidence.bindingVersion -ne $bindingVersion -or $history.bindingSourcePosition -le 0 -or
+-    $history.bindingSourcePosition -gt $history.sourcePosition -or $history.sourcePosition -lt $source.head -or
++    $history.bindingSourcePosition -gt $history.sourcePosition -or $history.sourcePosition -ne $source.head -or [string]::IsNullOrWhiteSpace($history.observationId) -or
+     [DateTimeOffset]$history.evidence.validFrom -gt $actionAt -or $null -eq $history.evidence.validUntil -or
+     [DateTimeOffset]$history.evidence.validUntil -le $actionAt -or $history.evidence.custody.purpose -ne 'party-actor-history-v1' -or
+     $history.evidence.custody.policyId -cne $env:EXT_PARTIES_POLICY_ID -or
+@@ -130,12 +266,26 @@
+     [DateTimeOffset]$history.evidence.custody.expiresAt -le [DateTimeOffset]::UtcNow) {
+     throw 'The gateway did not reproduce the exact retained action-time binding and original source position.'
+ }
+-$openingEvent = @($source.events | Where-Object { $_.sequenceNumber -eq $history.bindingSourcePosition })
+-if ($openingEvent.Count -ne 1) { throw 'The returned opening position is absent from the independently read retained source.' }
+-$decoded = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($openingEvent[0].payload)) | ConvertFrom-Json -AsHashtable
+-if ($decoded.binding.evidence.actorId -cne $history.evidence.actorId -or $decoded.binding.evidence.bindingVersion -ne $bindingVersion -or
+-    $decoded.binding.evidence.tenantId -cne $identity.tenantId -or $decoded.binding.evidence.partyId -cne $identity.aggregateId) {
+-    throw 'The returned binding does not match its original retained source payload.'
++if ((Get-Version $history.bindingSourcePosition) -ne $verifiedBinding.sourcePosition -or
++    (Get-Version $history.sourcePosition) -ne (Get-Version $source.head)) {
++    throw 'The query checkpoint differs from the independently verified source.'
++}
++foreach ($field in @('tenantId', 'partyId', 'actorId', 'sourceId', 'provenanceId')) {
++    if ($history.evidence[$field] -cne $verifiedBinding.evidence[$field]) { throw 'The returned binding scope or provenance differs from retained history.' }
++}
++foreach ($field in @('bindingVersion', 'actorRevision')) {
++    if ((Get-Version $history.evidence[$field]) -ne (Get-Version $verifiedBinding.evidence[$field])) { throw 'The returned binding revision differs from retained history.' }
++}
++foreach ($field in @('validFrom', 'validUntil')) {
++    if ((Get-Instant $history.evidence[$field]) -ne (Get-Instant $verifiedBinding.evidence[$field])) { throw 'The returned interval differs from the reconstructed retained transitions.' }
++}
++Assert-Custody $history.evidence.custody
++foreach ($field in @('policyId', 'purpose', 'evidenceId')) {
++    if ($history.evidence.custody[$field] -cne $verifiedBinding.evidence.custody[$field]) { throw 'The returned custody identity differs from retained history.' }
++}
++if ((Get-Version $history.evidence.custody.lifecycleRevision) -ne (Get-Version $verifiedBinding.evidence.custody.lifecycleRevision) -or
++    (Get-Instant $history.evidence.custody.expiresAt) -ne (Get-Instant $verifiedBinding.evidence.custody.expiresAt)) {
++    throw 'The returned custody lifecycle or expiry differs from its original retained opening basis.'
+ }
+ 
+ $current = Invoke-OwnerRead 'api/v1/queries' @{ tenant=$identity.tenantId; domain='party'; aggregateId=$identity.aggregateId;
+@@ -146,7 +296,8 @@
+     $current.payload.outcome -notin @(0, 2, 'Unavailable', 'Ineligible') -or $current.payload.evidence.humanBinding) {
+     throw 'The owner erased-profile fixture unexpectedly remains currently eligible.'
+ }
+-if ([DateTimeOffset]$source.validUntil -le [DateTimeOffset]::UtcNow -or
++if ([DateTimeOffset]$source.observedAt -gt [DateTimeOffset]::UtcNow -or $actionAt -gt [DateTimeOffset]::UtcNow -or
++    [DateTimeOffset]$source.validUntil -le [DateTimeOffset]::UtcNow -or
+     [DateTimeOffset]$history.evidence.custody.expiresAt -le [DateTimeOffset]::UtcNow) {
+     throw 'The retained source certificate or custody expired during readiness probes.'
+ }
+--- pre-change/eng/verify-ext-parties-1.ps1
++++ post-change/eng/verify-ext-parties-1.ps1
+@@ -9,9 +9,14 @@
+     [string]$DependencyRegisterPath = (Join-Path $PSScriptRoot '../../agents/_bmad-output/planning-artifacts/external-dependency-register.md')
+ )
+ $ErrorActionPreference = 'Stop'
++$callerDirectory = (Get-Location).ProviderPath
+ $PartiesRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+-$EventStoreRoot = [System.IO.Path]::GetFullPath($EventStoreRoot)
+-$PlatformRoot = [System.IO.Path]::GetFullPath($PlatformRoot)
++$EventStoreRoot = [System.IO.Path]::GetFullPath($EventStoreRoot, $callerDirectory)
++$PlatformRoot = [System.IO.Path]::GetFullPath($PlatformRoot, $callerDirectory)
++$EvidenceDirectory = [System.IO.Path]::GetFullPath($EvidenceDirectory, $callerDirectory)
++$DependencyRegisterPath = [System.IO.Path]::GetFullPath($DependencyRegisterPath, $callerDirectory)
++if (-not [string]::IsNullOrWhiteSpace($ArtifactsDirectory)) { $ArtifactsDirectory = [System.IO.Path]::GetFullPath($ArtifactsDirectory, $callerDirectory) }
++if (-not [string]::IsNullOrWhiteSpace($MemoriesRoot)) { $MemoriesRoot = [System.IO.Path]::GetFullPath($MemoriesRoot, $callerDirectory) }
+ New-Item -ItemType Directory -Path $EvidenceDirectory -Force | Out-Null
+ 
+ if ($Mode -eq 'LiveReadiness') {
+@@ -36,7 +41,7 @@
+ 
+ if ([string]::IsNullOrWhiteSpace($ArtifactsDirectory)) { $ArtifactsDirectory = Join-Path $EvidenceDirectory 'artifacts' }
+ if ([string]::IsNullOrWhiteSpace($MemoriesRoot)) { $MemoriesRoot = Join-Path $EvidenceDirectory 'optional-memories-package-mode' }
+-$ArtifactsDirectory = [System.IO.Path]::GetFullPath($ArtifactsDirectory)
++$ArtifactsDirectory = [System.IO.Path]::GetFullPath($ArtifactsDirectory, $callerDirectory)
+ $flags = @('-c', 'Debug', '--artifacts-path', $ArtifactsDirectory, '-p:UseHexalithProjectReferences=true', '-p:UseNuGetDeps=false',
+     "-p:HexalithEventStoreRoot=$EventStoreRoot", "-p:HexalithCommonsRoot=$PartiesRoot/references/Hexalith.Commons",
+     "-p:HexalithMemoriesRoot=$MemoriesRoot", '-p:NuGetAudit=false', '-m:1')
+--- pre-change/tests/Hexalith.Parties.Client.Tests/DependencyInjectionTests.cs
++++ post-change/tests/Hexalith.Parties.Client.Tests/DependencyInjectionTests.cs
+@@ -11,6 +11,23 @@
+ 
+ public sealed class DependencyInjectionTests
+ {
++    /// <summary>The production typed identity client resolves with either the default or an injected completion clock.</summary>
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public void AddPartiesClient_ResolvesIPartiesIdentityClient(bool registerClock)
++    {
++        var services = new ServiceCollection();
++        if (registerClock)
++        {
++            services.AddSingleton(NSubstitute.Substitute.For<TimeProvider>());
++        }
++
++        services.AddPartiesClient(BuildConfiguration());
++        using ServiceProvider provider = services.BuildServiceProvider();
++        provider.GetRequiredService<IPartiesIdentityClient>().ShouldBeOfType<HttpPartiesIdentityClient>();
++    }
++
+     [Fact]
+     public void AddPartiesClient_ResolvesIPartiesCommandClient()
+     {

@@ -1,0 +1,102 @@
+[
+  {
+    "owner": "conversations",
+    "previousObservedHead": "ae1119456aa68849ab85b21b305f9d1f7ea16441",
+    "observedTarget": "51aa06b856bcb0aaf22013153cfe02a51b046156",
+    "command": [
+      "git",
+      "diff",
+      "--name-only",
+      "ae1119456aa68849ab85b21b305f9d1f7ea16441",
+      "51aa06b856bcb0aaf22013153cfe02a51b046156"
+    ],
+    "changedPaths": [
+      ".github/workflows/ci.yml",
+      "_bmad-output/implementation-artifacts/deferred-work.md",
+      "_bmad-output/implementation-artifacts/spec-9-1-freeze-the-conformance-assertion-inventory-tier-decisions-digest-and-approvals.md",
+      "_bmad/scripts/generate_conformance_tiering.py",
+      "_bmad/scripts/tests/conftest.py",
+      "_bmad/scripts/tests/test_conformance_tiering.py",
+      "_bmad/scripts/tests/test_generate_story_record.py",
+      "docs/release-evidence/story-9.1-final-record-v2.json",
+      "docs/release-evidence/story-9.1-final-record-v2.md",
+      "references/Hexalith.Folders",
+      "references/Hexalith.Memories",
+      "references/Hexalith.Projects"
+    ],
+    "contractSourceChanged": false
+  },
+  {
+    "owner": "platform",
+    "previousObservedHead": "fd5db04d48423bc30f5a5e141a9019fede5d736f",
+    "observedTarget": "cabd1287280ec141b8cc5658a1e87f3eec04f138",
+    "command": [
+      "git",
+      "diff",
+      "--name-only",
+      "fd5db04d48423bc30f5a5e141a9019fede5d736f",
+      "cabd1287280ec141b8cc5658a1e87f3eec04f138"
+    ],
+    "changedPaths": [
+      "_bmad-output/implementation-artifacts/4-2-close-public-admin-exposure-and-anonymous-registry-reads.md",
+      "_bmad-output/implementation-artifacts/deferred-work.md",
+      "_bmad-output/implementation-artifacts/evidence/epic-4/4-2/20261006t183639z-live-execution/admin-exposure-result.json",
+      "_bmad-output/implementation-artifacts/evidence/epic-4/4-2/20261006t183639z-live-execution/evidence-hashes.json",
+      "_bmad-output/implementation-artifacts/evidence/epic-4/4-2/20261006t183639z-live-execution/registry-auth-result.json",
+      "_bmad-output/implementation-artifacts/evidence/epic-4/4-2/20261006t183639z-live-execution/registry-gc-result.json",
+      "_bmad-output/implementation-artifacts/sprint-status.yaml",
+      "eng/admin-exposure/README.md",
+      "eng/admin-exposure/live/external_probe.py",
+      "eng/admin-exposure/live/keycloak_recovery_check.py",
+      "eng/admin-exposure/live/oci.py",
+      "eng/admin-exposure/live/oidc_smoke.py",
+      "eng/admin-exposure/live/registry_closure.py",
+      "eng/admin-exposure/live/test_live.py"
+    ],
+    "contractSourceChanged": false
+  },
+  {
+    "owner": "platform",
+    "laterObservedAtUtc": "2026-10-07T06:41:41.286543+00:00",
+    "laterHead": "9cb2dc13f8e993293810ccbd984772a1e2feb019",
+    "meaning": "External commit of previously verified local cleanup and reference updates; no complete owner packet supplied.",
+    "previousCleanupHashChecks": [
+      {
+        "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj",
+        "earlierSha256": "fb859c5efd25057f468faf592cdba587635c18cdec3bc93e3c40f6e537b586d2",
+        "currentSha256": "fb859c5efd25057f468faf592cdba587635c18cdec3bc93e3c40f6e537b586d2",
+        "match": true
+      },
+      {
+        "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryCleanup.cs",
+        "earlierSha256": "459bf37506ff2c5a3de43ced6e93b93f64abc14e2736e3f462044a7f6ff3c79a",
+        "currentSha256": "459bf37506ff2c5a3de43ced6e93b93f64abc14e2736e3f462044a7f6ff3c79a",
+        "match": true
+      },
+      {
+        "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryCleanupOutcome.cs",
+        "earlierSha256": "c86707b2bbb70980e9b1896653e2ceef7f08979e17041dfa719c4de56945f831",
+        "currentSha256": "c86707b2bbb70980e9b1896653e2ceef7f08979e17041dfa719c4de56945f831",
+        "match": true
+      },
+      {
+        "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformCustodyServiceCollectionExtensions.cs",
+        "earlierSha256": "564f7715fa04df908c1b49d0598a3eb9ca374c37338bd13d6c22d56cb0bf09f8",
+        "currentSha256": "564f7715fa04df908c1b49d0598a3eb9ca374c37338bd13d6c22d56cb0bf09f8",
+        "match": true
+      },
+      {
+        "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IdentityHistoryCleanupFixture.cs",
+        "earlierSha256": "10cd40f6c28ae5a6e317928cd1f17248dbbc3e86f5a5ce2ec67f2e15ddf62acc",
+        "currentSha256": "10cd40f6c28ae5a6e317928cd1f17248dbbc3e86f5a5ce2ec67f2e15ddf62acc",
+        "match": true
+      },
+      {
+        "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IdentityHistoryCleanupTests.cs",
+        "earlierSha256": "ae75d89cdde766da37820586233f24ec76a492a394e4e0e83f474f211372e36e",
+        "currentSha256": "ae75d89cdde766da37820586233f24ec76a492a394e4e0e83f474f211372e36e",
+        "match": true
+      }
+    ]
+  }
+]

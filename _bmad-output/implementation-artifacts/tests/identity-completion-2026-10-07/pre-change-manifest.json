@@ -1,0 +1,37 @@
+[
+  {
+    "ownerPath": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs",
+    "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/pre-change/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs",
+    "sha256": "999280447dcd4969e19b62ace1d1f10328fff53d893c2c4dfac6fc93d6ebd928"
+  },
+  {
+    "ownerPath": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties.Client/HttpPartiesIdentityClient.cs",
+    "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/pre-change/src/Hexalith.Parties.Client/HttpPartiesIdentityClient.cs",
+    "sha256": "2399209e396a6182f5aae0cb918df1a7de6ce71505106a5760dc699af2453f3e"
+  },
+  {
+    "ownerPath": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+    "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/pre-change/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+    "sha256": "0bb08d7cebf4e02e8ad284cd8dc274a634d39e83a710bc37a761fd2caff723d7"
+  },
+  {
+    "ownerPath": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs",
+    "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/pre-change/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs",
+    "sha256": "74db9bca1360fe9f2def41d995b444d7b7acc83edc5de1d7e98b543e82ace773"
+  },
+  {
+    "ownerPath": "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-history-readiness.ps1",
+    "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/pre-change/eng/verify-ext-parties-history-readiness.ps1",
+    "sha256": "0e080e653a931466a03c4597f7c2ff0551fc878d6d912b155d1e47cd2ccca230"
+  },
+  {
+    "ownerPath": "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-1.ps1",
+    "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/pre-change/eng/verify-ext-parties-1.ps1",
+    "sha256": "81e5340d2efe060616d594ff56b9a8736dc564edf872e2e18286f77269704352"
+  },
+  {
+    "ownerPath": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Client.Tests/DependencyInjectionTests.cs",
+    "snapshotPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/identity-completion-2026-10-07/pre-change/tests/Hexalith.Parties.Client.Tests/DependencyInjectionTests.cs",
+    "sha256": "be6a548bba36e41c4ee30655a9873c2d1091c634aadea0d0c45368d4bd6de34e"
+  }
+]
