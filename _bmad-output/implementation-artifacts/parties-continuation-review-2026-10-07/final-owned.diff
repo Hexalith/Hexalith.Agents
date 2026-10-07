@@ -1,0 +1,1004 @@
+# Repository: /home/administrator/projects/hexalith/parties; baseline: c5a0d3f27d8f2fd9037b693f540e70b7f3d905a5
+diff --git a/eng/verify-ext-parties-1.ps1 b/eng/verify-ext-parties-1.ps1
+index 1ef7a04f..8e0c4cd8 100644
+--- a/eng/verify-ext-parties-1.ps1
++++ b/eng/verify-ext-parties-1.ps1
+@@ -73,8 +73,14 @@ foreach ($lane in $lanes) {
+         foreach ($class in $lane.Classes) { $filter += @('-class', $class) }
+         $testLog = Join-Path $EvidenceDirectory "$($lane.Project)-tests.log"
+         $xmlLog = Join-Path $EvidenceDirectory "$($lane.Project)-tests.xml"
+-        & dotnet $assembly @filter -result-xml $xmlLog *> $testLog
+-        if ($LASTEXITCODE -ne 0) { Get-Content $testLog; throw "Tests failed: $($lane.Project)" }
++        $previousSourceRoot = [Environment]::GetEnvironmentVariable('HEXALITH_PARTIES_SOURCE_ROOT')
++        try {
++            [Environment]::SetEnvironmentVariable('HEXALITH_PARTIES_SOURCE_ROOT', $PartiesRoot)
++            & dotnet $assembly @filter -result-xml $xmlLog *> $testLog
++            $testExitCode = $LASTEXITCODE
++        }
++        finally { [Environment]::SetEnvironmentVariable('HEXALITH_PARTIES_SOURCE_ROOT', $previousSourceRoot) }
++        if ($testExitCode -ne 0) { Get-Content $testLog; throw "Tests failed: $($lane.Project)" }
+         $summary = (Get-Content $testLog | Where-Object { $_ -match 'Total: (\d+), Errors: (\d+), Failed: (\d+), Skipped: (\d+), Not Run: (\d+)' } | Select-Object -Last 1)
+         if (-not $summary -or $summary -notmatch 'Total: (\d+), Errors: (\d+), Failed: (\d+), Skipped: (\d+), Not Run: (\d+)') { throw "No execution evidence: $($lane.Project)" }
+         if ([int]$Matches[1] -le 0 -or [int]$Matches[2] -ne 0 -or [int]$Matches[3] -ne 0 -or [int]$Matches[4] -ne 0 -or [int]$Matches[5] -ne 0) { throw "Required lane incomplete: $summary" }
+diff --git a/src/Hexalith.Parties/Domain/PartyDomainProcessor.cs b/src/Hexalith.Parties/Domain/PartyDomainProcessor.cs
+index 8a15760f..25ef414c 100644
+--- a/src/Hexalith.Parties/Domain/PartyDomainProcessor.cs
++++ b/src/Hexalith.Parties/Domain/PartyDomainProcessor.cs
+@@ -96,34 +96,42 @@ internal sealed partial class PartyDomainProcessor(
+             || resolvedType == typeof(EstablishHumanActorBinding)
+             || resolvedType == typeof(RebindHumanActorBinding)
+             || resolvedType == typeof(RevokeHumanActorBinding);
++        try
++        {
++            currentState = DomainStateReplay.SnapshotAware(currentState) ?? currentState;
++        }
++        catch (JsonException) when (identityCommand)
++        {
++            return RejectionFor(command.CommandType, "Identity", "SourceUnavailable");
++        }
++
+         IdentityAdmissionEvidence? identityEvidence = null;
+         if (identityCommand)
+         {
+             identityEvidence = identityAuthority?.Admit(command).Evidence;
+-            if (identityEvidence is not null)
+-            {
+-                try
+-                {
+-                    currentState = DomainStateReplay.SnapshotAware(currentState) ?? currentState;
+-                }
+-                catch (JsonException)
+-                {
+-                    return RejectionFor(command.CommandType, "Identity", "SourceUnavailable");
+-                }
+-            }
+-
+             if (identityEvidence is null || !ValidateIdentityPayloadScope(command, resolvedType!)
+                 || currentState is not null && currentState is not DomainServiceCurrentState
+                 || currentState is DomainServiceCurrentState source && (source.LastSnapshotSequence < 0
+                     || source.CurrentSequence < source.LastSnapshotSequence
+-                    || source.Events.Count != source.CurrentSequence - source.LastSnapshotSequence
+-                    || source.Events.Where((item, index) => item.Metadata.SequenceNumber != source.LastSnapshotSequence + index + 1
+-                        || item.Metadata.TenantId != command.TenantId || item.Metadata.Domain != command.Domain
+-                        || item.Metadata.AggregateId != command.AggregateId).Any()))
++                    || source.Events.Count != source.CurrentSequence - source.LastSnapshotSequence))
+             {
+                 return RejectionFor(command.CommandType, "Identity", "AuthorityUnavailable");
+             }
+ 
++            if (currentState is DomainServiceCurrentState identitySource)
++            {
++                long sequence = identitySource.LastSnapshotSequence;
++                foreach (EventEnvelope envelope in identitySource.Events)
++                {
++                    cancellationToken.ThrowIfCancellationRequested();
++                    if (envelope.Metadata.SequenceNumber != ++sequence || envelope.Metadata.TenantId != command.TenantId
++                        || envelope.Metadata.Domain != command.Domain || envelope.Metadata.AggregateId != command.AggregateId)
++                    {
++                        return RejectionFor(command.CommandType, "Identity", "AuthorityUnavailable");
++                    }
++                }
++            }
++
+             if (resolvedType != typeof(ProvisionAgentParty)
+                 && (identityHistoryCustody is null || identityOptions?.Value.Policy is not { IsValid: true }))
+             {
+@@ -634,12 +642,48 @@ internal sealed partial class PartyDomainProcessor(
+             return currentState;
+         }
+ 
+-        object? snapshotState = state.SnapshotState is null
++        // Validate and detach the complete stored tail before invoking any provider.
++        // A redaction marker is an output of this boundary, never an admitted source format.
++        bool hasSnapshot = state.SnapshotState is not null
++            and not JsonElement { ValueKind: JsonValueKind.Null or JsonValueKind.Undefined };
++        if (state.LastSnapshotSequence < 0 || state.CurrentSequence < state.LastSnapshotSequence
++            || state.LastSnapshotSequence == 0 && hasSnapshot
++            || state.LastSnapshotSequence > 0 && !hasSnapshot
++            || state.Events.Count != state.CurrentSequence - state.LastSnapshotSequence)
++        {
++            throw new InvalidOperationException("Party replay source metadata, scope or checkpoint is inconsistent.");
++        }
++
++        var sourceEvents = new EventEnvelope[state.Events.Count];
++        int index = 0;
++        foreach (EventEnvelope envelope in state.Events)
++        {
++            cancellationToken.ThrowIfCancellationRequested();
++            if (envelope.Metadata.SequenceNumber != state.LastSnapshotSequence + index + 1
++                || envelope.Metadata.TenantId != command.TenantId || envelope.Metadata.Domain != command.Domain
++                || envelope.Metadata.AggregateId != command.AggregateId || envelope.Metadata.MetadataVersion != 1
++                || envelope.Metadata.EventContractType is not null || envelope.Metadata.PayloadVersion is not null
++                || envelope.Metadata.SerializationFormat is not ("json" or "json+pdenc-v1" or "json+identity-history-v1"))
++            {
++                throw new InvalidOperationException("Party replay source metadata, scope or checkpoint is inconsistent.");
++            }
++
++            sourceEvents[index++] = new EventEnvelope(envelope.Metadata, envelope.Payload.ToArray(), envelope.Extensions);
++            cancellationToken.ThrowIfCancellationRequested();
++        }
++
++        object? snapshotState = !hasSnapshot
+             ? null
+-            : await UnprotectSnapshotOrRedactAsync(command, state.SnapshotState, cancellationToken).ConfigureAwait(false);
++            : await payloadProtectionService.UnprotectSnapshotStateAsync(command.AggregateIdentity, state.SnapshotState!, cancellationToken)
++                .ConfigureAwait(false);
++        if (state.LastSnapshotSequence > 0
++            && snapshotState is null or JsonElement { ValueKind: JsonValueKind.Null or JsonValueKind.Undefined })
++        {
++            throw new InvalidOperationException("Party replay protection did not preserve the required snapshot.");
++        }
+ 
+         var events = new List<EventEnvelope>(state.Events.Count);
+-        foreach (EventEnvelope envelope in state.Events)
++        foreach (EventEnvelope envelope in sourceEvents)
+         {
+             // Per-iteration cancellation: streams of thousands of events were previously
+             // un-cancellable inside this loop because only the network call observed CT.
+@@ -647,28 +691,17 @@ internal sealed partial class PartyDomainProcessor(
+ 
+             PayloadProtectionResult result = await UnprotectEnvelopeOrRedactAsync(command, envelope, cancellationToken).ConfigureAwait(false);
+ 
+-            // Redacted bytes are valid application JSON. Adapt only this in-memory replay
+-            // copy to the SDK's JSON intake; persisted protection metadata and the
+-            // security service's distinct redaction marker remain untouched.
+-            if (string.Equals(result.SerializationFormat, "json-redacted", StringComparison.Ordinal))
++            if (result.SerializationFormat != "json"
++                || result.Metadata is not { State: PayloadProtectionState.Unprotected,
++                    MetadataVersion: EventStorePayloadProtectionMetadata.CurrentMetadataVersion })
+             {
+-                result = result with { SerializationFormat = "json" };
++                throw new InvalidOperationException("Party replay protection did not produce supported unprotected application JSON.");
+             }
+ 
+-            // The "no-op" fast path is signalled by the protection service returning the same
+-            // byte[] reference and the same serialization format. Reference-equality on byte[]
+-            // is fragile (a future defensive-clone change would silently break the optimization
+-            // and force re-allocation on every event), but format equality keeps us safe in the
+-            // common case where decryption was a no-op for un-protected events.
+-            bool isNoOp = ReferenceEquals(result.PayloadBytes, envelope.Payload)
+-                && string.Equals(result.SerializationFormat, envelope.Metadata.SerializationFormat, StringComparison.Ordinal);
+-
+-            events.Add(isNoOp
+-                ? envelope
+-                : new EventEnvelope(
+-                    envelope.Metadata with { SerializationFormat = result.SerializationFormat },
+-                    result.PayloadBytes,
+-                    envelope.Extensions));
++            events.Add(new EventEnvelope(
++                envelope.Metadata with { SerializationFormat = result.SerializationFormat },
++                result.PayloadBytes,
++                envelope.Extensions));
+         }
+ 
+         return state with { SnapshotState = snapshotState, Events = events };
+@@ -688,49 +721,34 @@ internal sealed partial class PartyDomainProcessor(
+     {
+         try
+         {
++            // Preserve the validated bytes for destroyed-profile redaction even if the provider mutates its input.
+             return await payloadProtectionService
+                 .UnprotectEventPayloadAsync(
+                     command.AggregateIdentity,
+                     envelope.Metadata.EventTypeName,
+-                    envelope.Payload,
++                    envelope.Payload.ToArray(),
+                     envelope.Metadata.SerializationFormat,
+                     cancellationToken)
+                 .ConfigureAwait(false);
+         }
+-        catch (Exception ex) when (PartyEncryptionKeyDestroyedException.IsMatch(ex))
++        catch (Exception ex) when (envelope.Metadata.SerializationFormat == "json+pdenc-v1"
++            && PartyEncryptionKeyDestroyedException.IsMatch(ex))
+         {
+             LogRehydrationFallbackToRedaction(
+                 envelope.Metadata.EventTypeName,
+                 ex.GetType().Name);
+-            return PartyPayloadProtectionService.RedactProtectedPayload(envelope.Payload, envelope.Metadata.SerializationFormat);
+-        }
+-    }
+-
+-    private async Task<object?> UnprotectSnapshotOrRedactAsync(
+-        CommandEnvelope command,
+-        object snapshotState,
+-        CancellationToken cancellationToken)
+-    {
+-        try
+-        {
+-            return await payloadProtectionService
+-                .UnprotectSnapshotStateAsync(command.AggregateIdentity, snapshotState, cancellationToken)
+-                .ConfigureAwait(false);
+-        }
+-        catch (Exception ex) when (PartyEncryptionKeyDestroyedException.IsMatch(ex))
+-        {
+-            LogSnapshotRehydrationFallbackToRedaction(
+-                ex.GetType().Name);
+-            return null;
++            PayloadProtectionResult redacted = PartyPayloadProtectionService.RedactProtectedPayload(envelope.Payload, envelope.Metadata.SerializationFormat);
++            // Only locally generated profile redaction may enter strict SDK JSON replay.
++            // Stored envelopes and the security service's audit marker remain unchanged.
++            return redacted.SerializationFormat == "json-redacted"
++                ? redacted with { SerializationFormat = "json" }
++                : throw new InvalidOperationException("Party profile redaction did not produce supported application JSON.");
+         }
+     }
+ 
+     [LoggerMessage(Level = LogLevel.Warning, Message = "Falling back to redacted event payload during rehydration for event {EventTypeName}: {ExceptionType}")]
+     private partial void LogRehydrationFallbackToRedaction(string eventTypeName, string exceptionType);
+ 
+-    [LoggerMessage(Level = LogLevel.Warning, Message = "Falling back to null snapshot during rehydration: {ExceptionType}")]
+-    private partial void LogSnapshotRehydrationFallbackToRedaction(string exceptionType);
+-
+     [LoggerMessage(Level = LogLevel.Warning, Message = "Rejecting Parties command with unresolved CommandType {CommandType}")]
+     private partial void LogUnresolvedCommandType(string commandType);
+ 
+diff --git a/tests/Hexalith.Parties.Tests/Domain/PartyDomainProcessorValidationTests.cs b/tests/Hexalith.Parties.Tests/Domain/PartyDomainProcessorValidationTests.cs
+index dfa48e35..cc3d0c73 100644
+--- a/tests/Hexalith.Parties.Tests/Domain/PartyDomainProcessorValidationTests.cs
++++ b/tests/Hexalith.Parties.Tests/Domain/PartyDomainProcessorValidationTests.cs
+@@ -9,6 +9,7 @@ using Hexalith.EventStore.Contracts.Events;
+ using Hexalith.EventStore.Contracts.Identity;
+ using Hexalith.EventStore.Contracts.Results;
+ using Hexalith.EventStore.Contracts.Security;
++using Hexalith.EventStore.Contracts.Serialization;
+ using Hexalith.Parties.Contracts.Commands;
+ using Hexalith.Parties.Contracts.Events;
+ using Hexalith.Parties.Contracts.Security;
+@@ -303,6 +304,315 @@ public sealed class PartyDomainProcessorValidationTests
+             Arg.Any<CancellationToken>());
+     }
+ 
++    [Theory]
++    [InlineData("stored-redacted")]
++    [InlineData("provider-redacted")]
++    [InlineData("provider-protected")]
++    [InlineData("provider-opaque")]
++    [InlineData("provider-version")]
++    [InlineData("metadata-version")]
++    [InlineData("event-contract")]
++    [InlineData("payload-version")]
++    [InlineData("tenant")]
++    [InlineData("domain")]
++    [InlineData("aggregate")]
++    [InlineData("sequence-gap")]
++    [InlineData("checkpoint")]
++    [InlineData("missing-snapshot")]
++    public async Task ProcessAsync_UntrustedReplayHistory_RejectsBeforeLifecycleEffect(string corruption)
++    {
++        string partyId = "party-1";
++        IEventPayloadProtectionService protection = Substitute.For<IEventPayloadProtectionService>();
++        protection.UnprotectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(),
++            Arg.Any<string>(), Arg.Any<CancellationToken>())
++            .Returns(call => new PayloadProtectionResult((byte[])call[2],
++                corruption == "provider-redacted" ? "json-redacted" : "json",
++                corruption switch
++                {
++                    "provider-protected" => EventStorePayloadProtectionMetadata.Unprotected(PayloadProtectionState.Protected),
++                    "provider-opaque" => EventStorePayloadProtectionMetadata.ProviderOpaque(),
++                    "provider-version" => EventStorePayloadProtectionMetadata.Unprotected() with { MetadataVersion = 2 },
++                    _ => EventStorePayloadProtectionMetadata.Unprotected(),
++                }));
++        CommandEnvelope command = CreateCommand(new MarkPartyEncryptionKeyDeleted
++        {
++            PartyId = partyId,
++            TenantId = "tenant-a",
++            DeletedAt = DateTimeOffset.Parse("2026-05-21T20:45:00Z"),
++        });
++        DomainServiceCurrentState valid = CreateErasurePendingStateWithProtectedCreatedEvent(command, partyId);
++        EventEnvelope created = CreateEventEnvelope(command, 1, typeof(PartyCreated).FullName!,
++            JsonSerializer.SerializeToUtf8Bytes(new PartyCreated { Type = PartyType.Person }),
++            corruption == "stored-redacted" ? "json-redacted" : "json", corruption == "metadata-version" ? 2 : 1);
++        EventMetadata metadata = corruption switch
++        {
++            "event-contract" => created.Metadata with { EventContractType = "future-event" },
++            "payload-version" => created.Metadata with { PayloadVersion = 2 },
++            "tenant" => created.Metadata with { TenantId = "tenant-b" },
++            "domain" => created.Metadata with { Domain = "other" },
++            "aggregate" => created.Metadata with { AggregateId = "foreign-party" },
++            _ => created.Metadata,
++        };
++        EventEnvelope requested = corruption == "sequence-gap"
++            ? CreateEventEnvelope(command, 3, typeof(ErasePartyRequested).FullName!, valid.Events[1].Payload, "json")
++            : valid.Events[1];
++        DomainServiceCurrentState untrusted = valid with
++        {
++            Events = corruption == "missing-snapshot" ? [requested] : [new(metadata, created.Payload, created.Extensions), requested],
++            CurrentSequence = corruption == "checkpoint" ? 3 : 2,
++            LastSnapshotSequence = corruption == "missing-snapshot" ? 1 : 0,
++        };
++        byte[] originalPayload = untrusted.Events[0].Payload.ToArray();
++
++        await Should.ThrowAsync<InvalidOperationException>(() => CreateInvoker(protection)
++            .ProcessAsync(command, untrusted, TestContext.Current.CancellationToken));
++
++        untrusted.Events[0].Payload.ShouldBe(originalPayload);
++        untrusted.Events[0].Metadata.ShouldBe(corruption == "missing-snapshot" ? requested.Metadata : metadata);
++        if (!corruption.StartsWith("provider-", StringComparison.Ordinal))
++        {
++            await protection.DidNotReceiveWithAnyArgs().UnprotectEventPayloadAsync(default!, default!, default!, default!, default);
++        }
++    }
++
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task ProcessAsync_SerializedLifecycleTail_UsesValidatedProtectionBoundary(bool invalidMetadata)
++    {
++        CommandEnvelope command = CreateCommand(new MarkPartyEncryptionKeyDeleted
++        {
++            PartyId = "party-1", TenantId = "tenant-a", DeletedAt = DateTimeOffset.Parse("2026-05-21T20:45:00Z"),
++        });
++        DomainServiceCurrentState state = CreateErasurePendingStateWithProtectedCreatedEvent(command, command.AggregateId);
++        if (invalidMetadata)
++        {
++            state = state with { Events = [state.Events[0], CreateEventEnvelope(command, 2,
++                typeof(ErasePartyRequested).FullName!, state.Events[1].Payload, "json", metadataVersion: 2)] };
++        }
++
++        byte[] wireBytes = JsonSerializer.SerializeToUtf8Bytes(new DomainServiceRequest(command, state), EventStorePayloadSerialization.Options);
++        DomainServiceRequest wireRequest = JsonSerializer.Deserialize<DomainServiceRequest>(wireBytes, EventStorePayloadSerialization.Options).ShouldNotBeNull();
++        wireRequest.CurrentState.ShouldBeOfType<JsonElement>();
++        IEventPayloadProtectionService protection = Substitute.For<IEventPayloadProtectionService>();
++        protection.UnprotectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(),
++            Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call => call.ArgAt<string>(3) == "json+pdenc-v1"
++                ? throw new PartyEncryptionKeyDestroyedException(command.TenantId, command.AggregateId)
++                : new PayloadProtectionResult(call.Arg<byte[]>(), "json"));
++
++        if (invalidMetadata)
++        {
++            await Should.ThrowAsync<InvalidOperationException>(() => CreateInvoker(protection)
++                .ProcessAsync(wireRequest.Command, wireRequest.CurrentState, TestContext.Current.CancellationToken));
++            await protection.DidNotReceiveWithAnyArgs().UnprotectEventPayloadAsync(default!, default!, default!, default!, default);
++        }
++        else
++        {
++            DomainResult result = await CreateInvoker(protection).ProcessAsync(wireRequest.Command, wireRequest.CurrentState, TestContext.Current.CancellationToken);
++            result.IsSuccess.ShouldBeTrue();
++            result.Events.OfType<PartyEncryptionKeyDeleted>().ShouldHaveSingleItem().PartyId.ShouldBe(command.AggregateId);
++            await protection.Received(2).UnprotectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(),
++                Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
++        }
++    }
++
++    [Theory]
++    [InlineData("null")]
++    [InlineData("json-null")]
++    [InlineData("json-undefined")]
++    [InlineData("destroyed-profile")]
++    [InlineData("destroyed-history")]
++    public async Task ProcessAsync_RequiredSnapshotUnavailable_RejectsIndependentValidTail(string failure)
++    {
++        ArgumentNullException.ThrowIfNull(failure);
++        CommandEnvelope command = CreateCommand(new MarkPartyEncryptionKeyDeleted
++        {
++            PartyId = "party-1", TenantId = "tenant-a", DeletedAt = DateTimeOffset.Parse("2026-05-21T20:45:00Z"),
++        });
++        DomainServiceCurrentState fullState = CreateErasurePendingStateWithProtectedCreatedEvent(command, command.AggregateId);
++        DomainServiceCurrentState state = fullState with
++        {
++            SnapshotState = new { Format = failure == "destroyed-history" ? "identity-history-snapshot-v1" : "json+pdenc-v1" },
++            Events = [fullState.Events[1]],
++            LastSnapshotSequence = 1,
++        };
++        IEventPayloadProtectionService protection = Substitute.For<IEventPayloadProtectionService>();
++        protection.UnprotectSnapshotStateAsync(Arg.Any<AggregateIdentity>(), Arg.Any<object>(), Arg.Any<CancellationToken>())
++            .Returns(_ => Task.FromResult<object>(failure switch
++            {
++                "destroyed-profile" or "destroyed-history" => throw new PartyEncryptionKeyDestroyedException(command.TenantId, command.AggregateId),
++                "json-null" => JsonSerializer.SerializeToElement<object?>(null),
++                "json-undefined" => default(JsonElement),
++                _ => null!,
++            }));
++        protection.UnprotectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(),
++            Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call => new PayloadProtectionResult(call.Arg<byte[]>(), "json"));
++
++        if (failure.StartsWith("destroyed-", StringComparison.Ordinal))
++        {
++            await Should.ThrowAsync<PartyEncryptionKeyDestroyedException>(() => CreateInvoker(protection)
++                .ProcessAsync(command, state, TestContext.Current.CancellationToken));
++        }
++        else
++        {
++            await Should.ThrowAsync<InvalidOperationException>(() => CreateInvoker(protection)
++                .ProcessAsync(command, state, TestContext.Current.CancellationToken));
++        }
++
++        await protection.DidNotReceiveWithAnyArgs().UnprotectEventPayloadAsync(default!, default!, default!, default!, default);
++        state.Events.ShouldHaveSingleItem().Metadata.SequenceNumber.ShouldBe(2);
++        state.CurrentSequence.ShouldBe(2);
++    }
++
++    [Fact]
++    public async Task ProcessAsync_ZeroCheckpointWithSnapshot_RejectsOtherwiseValidTail()
++    {
++        CommandEnvelope command = CreateCommand(new MarkPartyEncryptionKeyDeleted
++        {
++            PartyId = "party-1", TenantId = "tenant-a", DeletedAt = DateTimeOffset.Parse("2026-05-21T20:45:00Z"),
++        });
++        DomainServiceCurrentState state = CreateErasurePendingStateWithProtectedCreatedEvent(command, command.AggregateId)
++            with { SnapshotState = PartyTestState(command.AggregateId, ErasureStatus.Active) };
++        IEventPayloadProtectionService protection = Substitute.For<IEventPayloadProtectionService>();
++        protection.UnprotectSnapshotStateAsync(Arg.Any<AggregateIdentity>(), Arg.Any<object>(), Arg.Any<CancellationToken>())
++            .Returns(call => call.Arg<object>());
++        protection.UnprotectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(),
++            Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call => new PayloadProtectionResult(
++                call.ArgAt<string>(3) == "json+pdenc-v1"
++                    ? JsonSerializer.SerializeToUtf8Bytes(new PartyCreated { Type = PartyType.Person })
++                    : call.Arg<byte[]>(), "json"));
++
++        await Should.ThrowAsync<InvalidOperationException>(() => CreateInvoker(protection)
++            .ProcessAsync(command, state, TestContext.Current.CancellationToken));
++
++        await protection.DidNotReceiveWithAnyArgs().UnprotectSnapshotStateAsync(default!, default!, default);
++        await protection.DidNotReceiveWithAnyArgs().UnprotectEventPayloadAsync(default!, default!, default!, default!, default);
++    }
++
++    [Fact]
++    public async Task ProcessAsync_ValidSnapshotAndTail_PreservesCreationBeforeDispatch()
++    {
++        CommandEnvelope command = CreateCommand(new CreateParty
++        {
++            PartyId = "party-1", Type = PartyType.Person,
++            PersonDetails = new PersonDetails { FirstName = "Ada", LastName = "Lovelace" },
++        });
++        PartyState snapshot = PartyTestState(command.AggregateId, ErasureStatus.Active);
++        DomainServiceCurrentState state = new(snapshot,
++            [CreateEventEnvelope(command, 2, typeof(PartyDisplayNameDerived).FullName!,
++                JsonSerializer.SerializeToUtf8Bytes(new PartyDisplayNameDerived { DisplayName = "Ada Lovelace", SortName = "Lovelace, Ada" }), "json")],
++            LastSnapshotSequence: 1, CurrentSequence: 2);
++        IEventPayloadProtectionService protection = Substitute.For<IEventPayloadProtectionService>();
++        protection.UnprotectSnapshotStateAsync(Arg.Any<AggregateIdentity>(), Arg.Any<object>(), Arg.Any<CancellationToken>())
++            .Returns(call => call.Arg<object>());
++        protection.UnprotectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(),
++            Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call => new PayloadProtectionResult(call.Arg<byte[]>(), "json"));
++
++        DomainResult result = await CreateInvoker(protection).ProcessAsync(command, state, TestContext.Current.CancellationToken);
++
++        result.IsRejection.ShouldBeFalse();
++        result.Events.ShouldBeEmpty(); // Dropping the snapshot would create the party again.
++        await protection.Received(1).UnprotectSnapshotStateAsync(command.AggregateIdentity, snapshot, Arg.Any<CancellationToken>());
++        await protection.Received(1).UnprotectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(),
++            Arg.Any<byte[]>(), "json", Arg.Any<CancellationToken>());
++    }
++
++    [Fact]
++    public async Task ProcessAsync_CanceledDuringTailCapture_StopsBeforeReadingRemainderOrCallingProvider()
++    {
++        using var cancellation = new CancellationTokenSource();
++        CommandEnvelope command = CreateCommand(new MarkPartyEncryptionKeyDeleted
++        {
++            PartyId = "party-1", TenantId = "tenant-a", DeletedAt = DateTimeOffset.Parse("2026-05-21T20:45:00Z"),
++        });
++        DomainServiceCurrentState fullState = CreateErasurePendingStateWithProtectedCreatedEvent(command, command.AggregateId);
++        EventEnvelope[] events = [.. fullState.Events, CreateEventEnvelope(command, 3, typeof(PartyEncryptionKeyDeleted).FullName!,
++            command.Payload, "json")];
++        int visited = 0;
++        IEnumerable<EventEnvelope> Enumerate()
++        {
++            foreach (EventEnvelope envelope in events)
++            {
++                visited++;
++                if (visited == 2)
++                {
++                    cancellation.Cancel();
++                }
++
++                yield return envelope;
++            }
++        }
++
++        IReadOnlyList<EventEnvelope> tail = Substitute.For<IReadOnlyList<EventEnvelope>>();
++        tail.Count.Returns(events.Length);
++        tail.GetEnumerator().Returns(_ => Enumerate().GetEnumerator());
++        DomainServiceCurrentState state = fullState with { Events = tail, CurrentSequence = events.Length };
++        IEventPayloadProtectionService protection = Substitute.For<IEventPayloadProtectionService>();
++
++        OperationCanceledException exception = await Should.ThrowAsync<OperationCanceledException>(() => CreateInvoker(protection)
++            .ProcessAsync(command, state, cancellation.Token));
++
++        exception.CancellationToken.ShouldBe(cancellation.Token);
++        visited.ShouldBe(2);
++        await protection.DidNotReceiveWithAnyArgs().UnprotectEventPayloadAsync(default!, default!, default!, default!, default);
++        await protection.DidNotReceiveWithAnyArgs().UnprotectSnapshotStateAsync(default!, default!, default);
++    }
++
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task ProcessAsync_MutatingProvider_PreservesStoredBytesAndLifecycleReplay(bool destroyed)
++    {
++        CommandEnvelope command = CreateCommand(new MarkPartyEncryptionKeyDeleted
++        {
++            PartyId = "party-1", TenantId = "tenant-a", DeletedAt = DateTimeOffset.Parse("2026-05-21T20:45:00Z"),
++        });
++        DomainServiceCurrentState state = CreateErasurePendingStateWithProtectedCreatedEvent(command, command.AggregateId);
++        byte[][] originalPayloads = state.Events.Select(envelope => envelope.Payload.ToArray()).ToArray();
++        EventMetadata[] originalMetadata = state.Events.Select(envelope => envelope.Metadata with { }).ToArray();
++        IEventPayloadProtectionService protection = Substitute.For<IEventPayloadProtectionService>();
++        protection.UnprotectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(),
++            Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call =>
++            {
++                byte[] output = call.ArgAt<string>(1) == typeof(PartyCreated).FullName
++                    ? JsonSerializer.SerializeToUtf8Bytes(new PartyCreated { Type = PartyType.Person })
++                    : call.Arg<byte[]>().ToArray();
++                Array.Fill(call.Arg<byte[]>(), (byte)0);
++                return destroyed && call.ArgAt<string>(3) == "json+pdenc-v1"
++                    ? throw new PartyEncryptionKeyDestroyedException(command.TenantId, command.AggregateId)
++                    : new PayloadProtectionResult(output, "json");
++            });
++
++        DomainResult result = await CreateInvoker(protection).ProcessAsync(command, state, TestContext.Current.CancellationToken);
++
++        result.IsSuccess.ShouldBeTrue();
++        result.Events.OfType<PartyEncryptionKeyDeleted>().ShouldHaveSingleItem().PartyId.ShouldBe(command.AggregateId);
++        for (int index = 0; index < state.Events.Count; index++)
++        {
++            state.Events[index].Payload.ShouldBe(originalPayloads[index]);
++            state.Events[index].Metadata.ShouldBe(originalMetadata[index]);
++        }
++    }
++
++    [Fact]
++    public async Task ProcessAsync_DestroyedHistoryKey_CannotUseProfileRedactionFallback()
++    {
++        IEventPayloadProtectionService protection = Substitute.For<IEventPayloadProtectionService>();
++        protection.UnprotectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(),
++            "json+identity-history-v1", Arg.Any<CancellationToken>())
++            .ThrowsAsync(new PartyEncryptionKeyDestroyedException("tenant-a", "party-1"));
++        CommandEnvelope command = CreateCommand(new MarkPartyEncryptionKeyDeleted
++        {
++            PartyId = "party-1", TenantId = "tenant-a", DeletedAt = DateTimeOffset.Parse("2026-05-21T20:45:00Z"),
++        });
++        DomainServiceCurrentState state = CreateErasurePendingStateWithProtectedCreatedEvent(command, "party-1");
++        state = state with { Events = [CreateEventEnvelope(command, 1, typeof(HumanActorBindingEstablished).FullName!,
++            "{}"u8.ToArray(), "json+identity-history-v1"), state.Events[1]] };
++
++        await Should.ThrowAsync<PartyEncryptionKeyDestroyedException>(() => CreateInvoker(protection)
++            .ProcessAsync(command, state, TestContext.Current.CancellationToken));
++    }
++
+     [Fact]
+     public async Task ProcessAsync_UnknownCommandType_ReturnsUnresolvedCommandTypeRejection()
+     {
+@@ -721,7 +1031,8 @@ public sealed class PartyDomainProcessorValidationTests
+         long sequenceNumber,
+         string eventTypeName,
+         byte[] payload,
+-        string serializationFormat)
++        string serializationFormat,
++        int metadataVersion = 1)
+         => new(
+             new EventMetadata(
+                 MessageId: $"01HX0000000000000000000{sequenceNumber:00}",
+@@ -737,7 +1048,7 @@ public sealed class PartyDomainProcessorValidationTests
+                 UserId: command.UserId,
+                 DomainServiceVersion: "v1",
+                 EventTypeName: eventTypeName,
+-                MetadataVersion: 1,
++                MetadataVersion: metadataVersion,
+                 SerializationFormat: serializationFormat),
+             payload,
+             Extensions: null);
+diff --git a/tests/Hexalith.Parties.Tests/Gateway/PartiesProcessEndpointTests.cs b/tests/Hexalith.Parties.Tests/Gateway/PartiesProcessEndpointTests.cs
+index 9753aac8..ea73d583 100644
+--- a/tests/Hexalith.Parties.Tests/Gateway/PartiesProcessEndpointTests.cs
++++ b/tests/Hexalith.Parties.Tests/Gateway/PartiesProcessEndpointTests.cs
+@@ -5,6 +5,8 @@ using System.Text.Json;
+ 
+ using Hexalith.EventStore.Contracts.Commands;
+ using Hexalith.EventStore.Contracts.Events;
++using Hexalith.EventStore.Contracts.Identity;
++using Hexalith.EventStore.Contracts.Security;
+ using Hexalith.EventStore.Contracts.Replay;
+ using Hexalith.EventStore.Contracts.Results;
+ using Hexalith.EventStore.Client.Handlers;
+@@ -12,8 +14,10 @@ using Hexalith.Parties.Contracts.Commands;
+ using Hexalith.Parties.Contracts.Events;
+ using Hexalith.Parties.Contracts.Models;
+ using Hexalith.Parties.Contracts.Results;
++using Hexalith.Parties.Contracts.Security;
+ using Hexalith.Parties.Contracts.ValueObjects;
+ using Hexalith.Parties.Compliance;
++using Hexalith.Parties.Security;
+ 
+ using Microsoft.AspNetCore.Hosting;
+ using Microsoft.AspNetCore.Mvc.Testing;
+@@ -21,6 +25,8 @@ using Microsoft.AspNetCore.TestHost;
+ using Microsoft.Extensions.Configuration;
+ using Microsoft.Extensions.DependencyInjection;
+ 
++using NSubstitute;
++
+ using Shouldly;
+ 
+ namespace Hexalith.Parties.Tests.Gateway;
+@@ -163,6 +169,73 @@ public sealed class PartiesProcessEndpointTests
+         rejectionPayload.ShouldNotContain("party-invalid-payload");
+     }
+ 
++    [Theory]
++    [InlineData("none")]
++    [InlineData("metadata-version")]
++    [InlineData("event-contract")]
++    [InlineData("payload-version")]
++    public async Task PostProcess_SerializedLifecycleHistory_EnforcesProductionReplayBoundaryAsync(string corruption)
++    {
++        const string partyId = "party-endpoint-erasure";
++        IEventPayloadProtectionService protection = Substitute.For<IEventPayloadProtectionService>();
++        protection.UnprotectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(),
++            Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call => call.ArgAt<string>(3) == "json+pdenc-v1"
++                ? throw new PartyEncryptionKeyDestroyedException("tenant-a", partyId)
++                : new PayloadProtectionResult(call.Arg<byte[]>(), "json"));
++        using var factory = new PartiesProcessTestFactory(useProductionProcessor: true, payloadProtectionService: protection);
++        using HttpClient client = factory.CreateClient();
++        var command = new CommandEnvelope(
++            MessageId: "cmd-review-lifecycle", TenantId: "tenant-a", Domain: "party", AggregateId: partyId,
++            CommandType: typeof(MarkPartyEncryptionKeyDeleted).FullName!,
++            Payload: JsonSerializer.SerializeToUtf8Bytes(new MarkPartyEncryptionKeyDeleted
++            {
++                PartyId = partyId, TenantId = "tenant-a", DeletedAt = DateTimeOffset.Parse("2026-05-21T20:45:00Z"),
++            }),
++            CorrelationId: "cmd-review-lifecycle", CausationId: null, UserId: "admin", Extensions: null);
++        EventEnvelope Stored(long sequence, string type, byte[] payload, string format) => new(
++            new EventMetadata(MessageId: $"evt-review-{sequence}", AggregateId: partyId, AggregateType: "Party",
++                TenantId: command.TenantId, Domain: command.Domain, SequenceNumber: sequence, GlobalPosition: sequence,
++                Timestamp: DateTimeOffset.Parse("2026-05-21T20:40:00Z"), CorrelationId: command.CorrelationId,
++                CausationId: command.MessageId, UserId: command.UserId, DomainServiceVersion: "v1", EventTypeName: type,
++                MetadataVersion: sequence == 2 && corruption == "metadata-version" ? 2 : 1,
++                SerializationFormat: format), payload, Extensions: null);
++        EventEnvelope created = Stored(1, typeof(PartyCreated).FullName!, Encoding.UTF8.GetBytes(
++            """
++            {"type":1,"personDetails":{"$enc":true,"kid":"deleted-key","alg":"A256GCM","iv":"redacted","ct":"redacted"}}
++            """), "json+pdenc-v1");
++        EventEnvelope requested = Stored(2, typeof(ErasePartyRequested).FullName!,
++            JsonSerializer.SerializeToUtf8Bytes(new ErasePartyRequested
++            {
++                PartyId = partyId, TenantId = command.TenantId, RequestedAt = DateTimeOffset.Parse("2026-05-21T20:40:00Z"), RequestedBy = "admin",
++            }), "json");
++        EventMetadata metadata = corruption switch
++        {
++            "event-contract" => requested.Metadata with { EventContractType = "future-event" },
++            "payload-version" => requested.Metadata with { PayloadVersion = 2 },
++            _ => requested.Metadata,
++        };
++        requested = new EventEnvelope(metadata, requested.Payload, requested.Extensions);
++        var state = new DomainServiceCurrentState(null, [created, requested], LastSnapshotSequence: 0, CurrentSequence: 2);
++
++        // HTTP object binding presents CurrentState as JsonElement to the production processor.
++        HttpResponseMessage response = await client.PostAsJsonAsync("/process", new DomainServiceRequest(command, state));
++
++        if (corruption == "none")
++        {
++            response.StatusCode.ShouldBe(HttpStatusCode.OK);
++            DomainServiceWireResult result = (await response.Content.ReadFromJsonAsync<DomainServiceWireResult>()).ShouldNotBeNull();
++            result.IsRejection.ShouldBeFalse();
++            result.Events.ShouldHaveSingleItem().EventTypeName.ShouldBe(typeof(PartyEncryptionKeyDeleted).FullName);
++            await protection.Received(2).UnprotectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(),
++                Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
++        }
++        else
++        {
++            response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
++            await protection.DidNotReceiveWithAnyArgs().UnprotectEventPayloadAsync(default!, default!, default!, default!, default);
++        }
++    }
++
+     [Fact]
+     public async Task ProductionAsyncProcessor_AlreadyCanceledToken_ThrowsBeforeProducingEventsAsync()
+     {
+@@ -280,6 +353,7 @@ public sealed class PartiesProcessEndpointTests
+         private readonly IDomainProcessor? _registeredProcessor;
+         private readonly bool _gdprFeaturesActive;
+         private readonly bool _useProductionProcessor;
++        private readonly IEventPayloadProtectionService? _payloadProtectionService;
+ 
+         public PartiesProcessTestFactory(bool gdprFeaturesActive = false)
+         {
+@@ -288,9 +362,11 @@ public sealed class PartiesProcessEndpointTests
+             _gdprFeaturesActive = gdprFeaturesActive;
+         }
+ 
+-        public PartiesProcessTestFactory(bool useProductionProcessor, bool gdprFeaturesActive = false)
++        public PartiesProcessTestFactory(bool useProductionProcessor, bool gdprFeaturesActive = false,
++            IEventPayloadProtectionService? payloadProtectionService = null)
+         {
+             _useProductionProcessor = useProductionProcessor;
++            _payloadProtectionService = payloadProtectionService;
+             _gdprFeaturesActive = gdprFeaturesActive;
+         }
+ 
+@@ -312,6 +388,12 @@ public sealed class PartiesProcessEndpointTests
+             builder.UseSetting(MvpComplianceWarning.ActivationConfigurationKey, _gdprFeaturesActive.ToString());
+             builder.ConfigureTestServices(services =>
+             {
++                if (_payloadProtectionService is not null)
++                {
++                    services.AddSingleton(_payloadProtectionService);
++                    services.AddSingleton(Substitute.For<IPartyErasureRecordStore>());
++                }
++
+                 if (!_useProductionProcessor)
+                 {
+                     services.AddKeyedSingleton<IDomainProcessor>("party", (_, _) => _registeredProcessor!);
+diff --git a/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs b/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs
+index 7e99f67d..807ca498 100644
+--- a/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs
++++ b/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs
+@@ -780,6 +780,127 @@ public sealed class PartyIdentityQueryHandlerTests
+         }
+     }
+ 
++    /// <summary>Accepted 365-day intervals retain their exact boundary and source positions through serialized restore.</summary>
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task Accepted365DayPolicy_RebindAndRestoredHistoryPreserveOriginalBoundary(bool restored)
++    {
++        const string successorActor = "01HX0000000000000000000002";
++        DateTimeOffset boundary = Start.AddDays(180);
++        HumanActorBindingEvidence first = Binding() with
++        {
++            ValidUntil = Start.AddDays(365),
++            Custody = Binding().Custody with { PolicyId = "party-actor-retention-v1", ExpiresAt = Start.AddDays(365) },
++        };
++        HumanActorBindingEvidence second = first with
++        {
++            ActorId = successorActor, BindingVersion = 2, ValidFrom = boundary, ValidUntil = boundary.AddDays(365),
++            Custody = first.Custody with { ExpiresAt = boundary.AddDays(365), LifecycleRevision = 2, EvidenceId = "successor-custody" },
++        };
++        var fixture = Service(Events()[0], new HumanActorBindingEstablished(new(first, "first", "first-digest"), Start, 0),
++            new HumanActorBindingRebound(new(second, "second", "second-digest"), boundary, 1));
++        DateTimeOffset now = Start.AddDays(200);
++        var policy = new PartyIdentityOptions { PolicyId = "party-actor-retention-v1", Retention = TimeSpan.FromDays(365), ExpiryTrigger = "binding-effective-at" };
++        fixture.Options.CurrentValue.Returns(policy);
++        TimeProvider clock = Substitute.For<TimeProvider>();
++        clock.GetUtcNow().Returns(now);
++        RetainedIdentityHistoryReadResult captured = await fixture.HistoryReader.ReadAsync(new("tenant-a", "party", "party-1"),
++            RetainedIdentityHistoryReadRequest.AttributionPurpose, TestContext.Current.CancellationToken);
++        RetainedIdentityHistoryStream source = captured.Stream! with { ObservedAt = now, ValidUntil = now.AddMinutes(1) };
++        if (restored)
++        {
++            source = JsonSerializer.Deserialize<RetainedIdentityHistoryStream>(JsonSerializer.SerializeToUtf8Bytes(source, PartiesJsonOptions.Default), PartiesJsonOptions.Default)!;
++        }
++        fixture.HistoryReader.ReadAsync(Arg.Any<Hexalith.EventStore.Contracts.Identity.AggregateIdentity>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
++            .Returns(new RetainedIdentityHistoryReadResult(source, null));
++        string requestedActor = Actor;
++        fixture.Authority.Admit(Arg.Any<QueryEnvelope>()).Returns(_ => new PartyIdentityAdmissionResult(
++            new(new("tenant-a", "party", "party-1", "Read", "c", "c", "d"), "reader", null, requestedActor, 1, true,
++                Start, Start.AddDays(600), 1), null));
++        var service = new PartyIdentityQueryService(fixture.Authority, clock, custody: fixture.Custody, historyReader: fixture.HistoryReader, identityOptions: fixture.Options);
++        HumanActorBindingResult before = await service.ResolveAtAsync(Envelope(new ResolveHumanActorBindingAt("tenant-a", "party-1", boundary.AddTicks(-1), Actor, 1)), TestContext.Current.CancellationToken);
++        before.Outcome.ShouldBe(HumanActorBindingOutcome.Resolved);
++        before.BindingSourcePosition.ShouldBe(2);
++        before.Evidence!.ActorId.ShouldBe(Actor);
++        before.Evidence.ValidUntil.ShouldBe(boundary);
++        before.Evidence.Custody.ExpiresAt.ShouldBe(Start.AddDays(365));
++        requestedActor = successorActor;
++        HumanActorBindingResult at = await service.ResolveAtAsync(Envelope(new ResolveHumanActorBindingAt("tenant-a", "party-1", boundary, successorActor, 2)), TestContext.Current.CancellationToken);
++        at.Outcome.ShouldBe(HumanActorBindingOutcome.Resolved);
++        at.BindingSourcePosition.ShouldBe(3);
++        at.Evidence.ShouldBe(second);
++        await fixture.Reader.DidNotReceiveWithAnyArgs().ReadAsync(default!, default);
++    }
++
++    /// <summary>Restored readable bytes and optimistic custody cannot restart the accepted immutable expiry clock.</summary>
++    [Theory]
++    [InlineData(-1, HumanActorBindingOutcome.Resolved)]
++    [InlineData(0, HumanActorBindingOutcome.Expired)]
++    [InlineData(1, HumanActorBindingOutcome.Expired)]
++    public async Task Accepted365DayPolicy_RestoredBytesRespectExclusiveExpiry(int ticks, HumanActorBindingOutcome expected)
++    {
++        HumanActorBindingEvidence binding = Binding() with
++        {
++            ValidUntil = Start.AddDays(365),
++            Custody = Binding().Custody with { PolicyId = "party-actor-retention-v1", ExpiresAt = Start.AddDays(365) },
++        };
++        var fixture = Service(Events()[0], new HumanActorBindingEstablished(new(binding, "logical", "digest"), Start, 0));
++        fixture.Options.CurrentValue.Returns(new PartyIdentityOptions { PolicyId = "party-actor-retention-v1", Retention = TimeSpan.FromDays(365), ExpiryTrigger = "binding-effective-at" });
++        DateTimeOffset now = binding.Custody.ExpiresAt.AddTicks(ticks);
++        TimeProvider clock = Substitute.For<TimeProvider>();
++        clock.GetUtcNow().Returns(now);
++        RetainedIdentityHistoryReadResult captured = await fixture.HistoryReader.ReadAsync(new("tenant-a", "party", "party-1"), RetainedIdentityHistoryReadRequest.AttributionPurpose, TestContext.Current.CancellationToken);
++        RetainedIdentityHistoryStream restored = JsonSerializer.Deserialize<RetainedIdentityHistoryStream>(
++            JsonSerializer.SerializeToUtf8Bytes(captured.Stream! with { ObservedAt = now, ValidUntil = now.AddMinutes(1) }, PartiesJsonOptions.Default), PartiesJsonOptions.Default)!;
++        fixture.HistoryReader.ReadAsync(Arg.Any<Hexalith.EventStore.Contracts.Identity.AggregateIdentity>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(new RetainedIdentityHistoryReadResult(restored, null));
++        fixture.Authority.Admit(Arg.Any<QueryEnvelope>()).Returns(new PartyIdentityAdmissionResult(new(new("tenant-a", "party", "party-1", "Read", "c", "c", "d"), "reader", null, Actor, 1, true, Start, Start.AddDays(600), 1), null));
++        var service = new PartyIdentityQueryService(fixture.Authority, clock, custody: fixture.Custody, historyReader: fixture.HistoryReader, identityOptions: fixture.Options);
++
++        HumanActorBindingResult result = await service.ResolveAtAsync(Envelope(new ResolveHumanActorBindingAt("tenant-a", "party-1", Start, Actor, 1)), TestContext.Current.CancellationToken);
++
++        result.Outcome.ShouldBe(expected);
++        if (expected == HumanActorBindingOutcome.Expired)
++        {
++            result.Evidence.ShouldBeNull();
++            result.BindingSourcePosition.ShouldBe(0);
++            await fixture.Custody.DidNotReceiveWithAnyArgs().CanReadAsync(default!, default!, default);
++        }
++        restored.Events[0].Payload.ShouldBe(captured.Stream!.Events[0].Payload);
++    }
++
++    /// <summary>A profile exclusion cannot supply missing version evidence for a successor after predecessor destruction.</summary>
++    [Fact]
++    public async Task ExpiredPredecessorOmitted_SuccessorReadRemainsUnavailable()
++    {
++        const string successorActor = "01HX0000000000000000000002";
++        DateTimeOffset boundary = Start.AddDays(180);
++        HumanActorBindingEvidence successor = Binding() with
++        {
++            ActorId = successorActor, BindingVersion = 2, ValidFrom = boundary, ValidUntil = boundary.AddDays(365),
++            Custody = Binding().Custody with { PolicyId = "party-actor-retention-v1", ExpiresAt = boundary.AddDays(365), LifecycleRevision = 2 },
++        };
++        var fixture = Service(Events()[0], new HumanActorBindingEstablished(new(Binding(), "first", "digest"), Start, 0),
++            new HumanActorBindingRebound(new(successor, "second", "digest-2"), boundary, 1));
++        fixture.Options.CurrentValue.Returns(new PartyIdentityOptions { PolicyId = "party-actor-retention-v1", Retention = TimeSpan.FromDays(365), ExpiryTrigger = "binding-effective-at" });
++        DateTimeOffset now = Start.AddDays(366);
++        TimeProvider clock = Substitute.For<TimeProvider>();
++        clock.GetUtcNow().Returns(now);
++        RetainedIdentityHistoryReadResult captured = await fixture.HistoryReader.ReadAsync(new("tenant-a", "party", "party-1"), RetainedIdentityHistoryReadRequest.AttributionPurpose, TestContext.Current.CancellationToken);
++        RetainedIdentityHistoryStream missing = captured.Stream! with { ObservedAt = now, ValidUntil = now.AddMinutes(1), Events = [captured.Stream!.Events[1]], ExcludedSequences = [1, 2] };
++        RetainedIdentityHistoryValidator.IsComplete(new(missing.Identity, missing.Purpose), missing, now).ShouldBeTrue();
++        fixture.HistoryReader.ReadAsync(Arg.Any<Hexalith.EventStore.Contracts.Identity.AggregateIdentity>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(new RetainedIdentityHistoryReadResult(missing, null));
++        fixture.Authority.Admit(Arg.Any<QueryEnvelope>()).Returns(new PartyIdentityAdmissionResult(new(new("tenant-a", "party", "party-1", "Read", "c", "c", "d"), "reader", null, successorActor, 1, true, Start, Start.AddDays(600), 1), null));
++        var service = new PartyIdentityQueryService(fixture.Authority, clock, custody: fixture.Custody, historyReader: fixture.HistoryReader, identityOptions: fixture.Options);
++
++        HumanActorBindingResult result = await service.ResolveAtAsync(Envelope(new ResolveHumanActorBindingAt("tenant-a", "party-1", boundary, successorActor, 2)), TestContext.Current.CancellationToken);
++
++        result.Outcome.ShouldBe(HumanActorBindingOutcome.Unavailable);
++        result.Evidence.ShouldBeNull();
++        result.BindingSourcePosition.ShouldBe(0);
++        await fixture.Custody.DidNotReceiveWithAnyArgs().CanReadAsync(default!, default!, default);
++    }
++
+     private static PartyIdentityOptions PolicyOptions() => new()
+     {
+         PolicyId = "synthetic",
+diff --git a/tests/Hexalith.Parties.UI.Tests/IdentityBindingBoundaryTests.cs b/tests/Hexalith.Parties.UI.Tests/IdentityBindingBoundaryTests.cs
+index cdba7f30..cf29b4cf 100644
+--- a/tests/Hexalith.Parties.UI.Tests/IdentityBindingBoundaryTests.cs
++++ b/tests/Hexalith.Parties.UI.Tests/IdentityBindingBoundaryTests.cs
+@@ -87,7 +87,9 @@ public sealed class IdentityBindingBoundaryTests
+ 
+     private static string ProjectRoot(string? relativePath = null)
+     {
+-        string current = AppContext.BaseDirectory;
++        // xUnit runs from the assembly directory, which may be outside the source tree.
++        // The owner verifier supplies its exact repository; ordinary in-tree builds retain discovery.
++        string current = Environment.GetEnvironmentVariable("HEXALITH_PARTIES_SOURCE_ROOT") ?? AppContext.BaseDirectory;
+         while (!File.Exists(Path.Combine(current, "Hexalith.Parties.slnx")))
+         {
+             DirectoryInfo? parent = Directory.GetParent(current);
+
+# Repository: /home/administrator/projects/hexalith/eventstore; baseline: af2892e8cb58e844290e56563f9c2fcadaab90a7
+diff --git a/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs b/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs
+index 7875a0e7..1b4478ef 100644
+--- a/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs
++++ b/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs
+@@ -79,6 +79,12 @@ public sealed class RetainedIdentityHistorySourceReader(IActorProxyFactory actor
+                         return new(null, "history-source-gap-or-scope-mismatch");
+                     }
+ 
++                    if (item.MetadataVersion != 1 || item.EventContractType is not null || item.PayloadVersion is not null
++                        || item.SerializationFormat is not ("json" or "json+pdenc-v1" or "json+identity-history-v1"))
++                    {
++                        return new(null, "history-source-metadata-unsupported");
++                    }
++
+                     cursor++;
+                     bytes += item.Payload.Length;
+                     if (bytes > RetainedIdentityHistoryLimits.MaxPayloadBytes)
+@@ -104,7 +110,7 @@ public sealed class RetainedIdentityHistorySourceReader(IActorProxyFactory actor
+                     }
+ 
+                     PayloadProtectionResult readable = await custody.UnprotectEventAsync(request.Identity, item.EventTypeName,
+-                        item.Payload, item.SerializationFormat, readToken).WaitAsync(readToken).ConfigureAwait(false);
++                        item.Payload.ToArray(), item.SerializationFormat, readToken).WaitAsync(readToken).ConfigureAwait(false);
+                     readToken.ThrowIfCancellationRequested();
+                     readableBytes += readable.PayloadBytes.Length;
+                     if (readable.Metadata.State != PayloadProtectionState.Unprotected
+diff --git a/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs b/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs
+index 54973adb..b3987afa 100644
+--- a/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs
++++ b/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs
+@@ -349,6 +349,102 @@ public sealed class RetainedIdentityHistorySourceReaderTests
+         }
+     }
+ 
++    /// <summary>Protection output cannot legitimize unsupported stored metadata, even at excluded profile positions.</summary>
++    [Theory]
++    [InlineData("redacted", false)]
++    [InlineData("redacted", true)]
++    [InlineData("metadata-version", false)]
++    [InlineData("metadata-version", true)]
++    [InlineData("event-contract", false)]
++    [InlineData("event-contract", true)]
++    [InlineData("payload-version", false)]
++    [InlineData("payload-version", true)]
++    public async Task UnsupportedStoredMetadata_DeniesBeforeCustody(string corruption, bool excludedProfile)
++    {
++        RetainedIdentityHistorySourceReader reader = Arrange();
++        EventEnvelope history = Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "sealed-history");
++        EventEnvelope profile = Stored(1, "Profile", "sealed");
++        EventEnvelope changed = excludedProfile ? profile : history;
++        changed = corruption switch
++        {
++            "redacted" => changed with { SerializationFormat = "json-redacted" },
++            "metadata-version" => changed with { MetadataVersion = 2 },
++            "event-contract" => changed with { EventContractType = "future-event" },
++            _ => changed with { PayloadVersion = 2 },
++        };
++        _actor.ReadEventsRangeAsync(0, 2, 100).Returns(excludedProfile ? [changed, history] : [profile, changed]);
++
++        RetainedIdentityHistoryReadResult result = await reader.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken);
++
++        result.Stream.ShouldBeNull();
++        result.FailureReason.ShouldBe("history-source-metadata-unsupported");
++        await _custody.DidNotReceiveWithAnyArgs().UnprotectEventAsync(default!, default!, default!, default!, default);
++    }
++
++    /// <summary>Custody receives a copy so a mutating provider cannot overwrite sealed source bytes.</summary>
++    [Fact]
++    public async Task CustodyMutation_CannotOverwriteStoredSourcePayload()
++    {
++        RetainedIdentityHistorySourceReader reader = Arrange();
++        EventEnvelope history = Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "sealed-history");
++        byte[] original = history.Payload.ToArray();
++        _actor.ReadEventsRangeAsync(0, 2, 100).Returns([Stored(1, "Profile", "sealed"), history]);
++        _custody.UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
++            .Returns(call =>
++            {
++                Array.Fill(call.Arg<byte[]>(), (byte)0);
++                return new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence())), "json");
++            });
++
++        (await reader.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken)).IsAuthoritative.ShouldBeTrue();
++
++        history.Payload.ShouldBe(original);
++    }
++
++    /// <summary>Actual source reads cannot skip an expired predecessor to release a live successor without new lifecycle proof.</summary>
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task ExpiredPredecessor_BlocksSuccessorInsteadOfFabricatingExclusion(bool destroyed)
++    {
++        RetainedIdentityHistorySourceReader reader = Arrange();
++        _actor.GetStreamMetadataAsync().Returns(new AggregateStreamMetadata(true, 3));
++        EventEnvelope predecessor = Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "expired-predecessor");
++        EventEnvelope successor = Stored(3, typeof(HistoryCustodyProbeEvent).FullName!, "live-successor");
++        _actor.ReadEventsRangeAsync(0, 3, 100).Returns([Stored(1, "Profile", "sealed"), predecessor, successor]);
++        _custody.UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Is<byte[]>(bytes => Encoding.UTF8.GetString(bytes) == "expired-predecessor"), Arg.Any<string>(), Arg.Any<CancellationToken>())
++            .Returns(_ => destroyed ? throw new InvalidOperationException("synthetic destroyed retention unit")
++                : new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence() with { PolicyId = "party-actor-retention-v1", ExpiresAt = _now })), "json"));
++
++        RetainedIdentityHistoryReadResult result = await reader.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken);
++
++        result.Stream.ShouldBeNull();
++        result.FailureReason.ShouldBe(destroyed ? "history-unavailable" : "history-custody-unavailable-or-expired");
++        await _custody.DidNotReceive().UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(),
++            Arg.Is<byte[]>(bytes => Encoding.UTF8.GetString(bytes) == "live-successor"), Arg.Any<string>(), Arg.Any<CancellationToken>());
++        Encoding.UTF8.GetString(predecessor.Payload).ShouldBe("expired-predecessor");
++        Encoding.UTF8.GetString(successor.Payload).ShouldBe("live-successor");
++    }
++
++    /// <summary>Restarted source readers consult current independent lifecycle before releasing restored old-key history.</summary>
++    [Fact]
++    public async Task RestoredCiphertextAndReadableOldKey_CurrentLifecycleDenialPreventsResurrection()
++    {
++        RetainedIdentityHistorySourceReader reader = Arrange();
++        ArrangeCompleteSource();
++        (await reader.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken)).IsAuthoritative.ShouldBeTrue();
++        _custody.ClearReceivedCalls();
++        _custody.CanReadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<IdentityHistoryCustodyEvidence>(), Arg.Any<CancellationToken>()).Returns(false);
++        var restarted = new RetainedIdentityHistorySourceReader(_actors, _admission, _custody, _clock);
++
++        RetainedIdentityHistoryReadResult result = await restarted.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken);
++
++        result.Stream.ShouldBeNull();
++        result.FailureReason.ShouldBe("history-custody-unavailable-or-expired");
++        await _custody.Received(1).CanReadAsync(_identity, Evidence(), Arg.Any<CancellationToken>());
++        JsonSerializer.Serialize(result).ShouldNotContain("provider-evidence");
++    }
++
+     private void ArrangeCompleteSource()
+         => _actor.ReadEventsRangeAsync(0, 2, 100).Returns([Stored(1, "Profile", "sealed"), Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "sealed-history")]);
+ 

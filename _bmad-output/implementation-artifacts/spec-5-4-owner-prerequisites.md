@@ -137,3 +137,70 @@ Installed Parties now includes the earlier identity APIs; newer retained-history
 ## Direct owner commitment instruction — 2026-10-07
 
 The user subsequently stated “I owner do commitments”. [Recorded owner packet](story-5-4-owner-commitments-2026-10-07.md) now names the project owner acting in the four relevant maintainer responsibilities and makes Hexalith.Platform the secret-custody repository. This later instruction authorizes updating those acceptance fields; the preceding byte-equivalent register/spec observation describes the earlier correction completion, not the state after this owner update. Full delivery contracts, evidence levels, consumers, Branch B and the accepted retention policy remain intact. Immutable complete targets, integration dates and complete executable commands are still missing, so the records remain Uncommitted and this parent remains in-progress. No new source implementation, deployment, Git mutation, owner message or live seam execution accompanies the commitment record.
+
+## Active Parties continuation — 2026-10-07
+
+The user explicitly resumed this parent: first resolve the Parties protected-history replay failure, preserve strict retained-history validation, and capture verification evidence; then continue custody/expiry/restore qualification toward a complete Parties delivery target. This pass prioritizes the owning Parties and shared EventStore/Platform changes required for that single delivery. Other owner tasks remain in this parent and must not be marked complete by this pass. Existing implementation approval covers this continuation. Preserve original Story 5.4 draft/backlog and dependency availability until their actual gates pass.
+
+Active work:
+- [x] Reproduce `PartyDomainProcessorValidationTests.ProcessAsync_ProtectedHistoricalPayloadWithDestroyedKey_RedactsAndContinuesRehydration` using source Debug builds. Correct the replay/protection boundary in the owning technical/domain files; retain source-envelope immutability and strict metadata/tenant/domain/aggregate/sequence/checkpoint validation. Add focused negative regressions proving an untrusted redacted label or malformed history cannot bypass validation. Do not merely rename the failing test or alter its expected valid lifecycle behavior.
+- [x] Run the complete existing `../parties/eng/verify-ext-parties-1.ps1 -Mode Local` source matrix with fresh logs/XML, plus affected owning replay/security tests. Capture canonical repository HEADs, worktree changes, exact commands, source/artifact hashes, totals, and any separate environment blockers. Never suppress analyzers, skip the failed lane, or weaken the gate.
+- [ ] Continue qualification using the accepted 365-day effective-at policy and existing custody/cleanup/retained-history seams. Add meaningful executable missing expiry/rebind/successor-after-expired-predecessor and restore anti-resurrection checks and correct discovered source failures. Review current custody-provider and exact-target prerequisites from tracked source; implement feasible safe missing qualification seams in their owning technical module. Use isolated synthetic custody only as explicitly labelled source evidence. No credentials, production policy choices, deployment or live destructive actions are inferred.
+- [x] Produce a linked current Parties evidence packet and update this parent and the owner commitment packet with actual delivered coverage and exact remaining live target requirements. Keep incomplete production qualification and full delivery acceptance explicit. No staging, commit, push or submodule changes.
+
+
+## Current Parties replay and lifecycle continuation — 2026-10-07
+
+[Current Parties owner packet](../../../parties/_bmad-output/implementation-artifacts/ext-parties-1-replay-and-lifecycle-2026-10-07.md) and [fresh verification evidence](../../../parties/_bmad-output/implementation-artifacts/tests/owner-continuation-2026-10-07/README.md) supersede the historical broad Local replay blocker as current source evidence. The exact destroyed-profile test passed on the initial source Debug build; its existing committed JSON adapter was then hardened against stored/provider redaction labels, actor-history fallback, malformed source metadata, scope and checkpoint. Shared retained-source metadata and sealed-byte immutability were also hardened. Twelve Parties and six EventStore regressions failed before the corrections and passed afterward.
+
+The complete original Local matrix now passes **784/784** across all ten required lanes, with zero errors/failures/skips/not-run and all Debug builds reporting zero warnings/errors. Fresh unchanged Platform custody verification adds **115/115**: **899 distinct final passes**. Focused 29/36 results overlap that matrix and are not double-counted. Three failed attempts remain captured: a concurrent Client test compile error resolved by its owner, then two UI source-root discovery attempts; the final runner passes an explicit owning source root and restores its prior environment value while retaining every assertion and gate.
+
+New accepted-365-day source cases verify rebind boundaries and original positions through serialized restore, exclusive expiry despite restored readable bytes, and restarted source-reader denial under fresh lifecycle. The real source path explicitly denies live-successor access when an expired/destroyed predecessor prevents complete lifecycle proof. The current profile exclusion certificate cannot encode an expired transition/version/destruction receipt. A versioned actor-free continuation contract, exact custody receipts/all-copy coverage and qualified nonrollback restoration remain required; they were neither invented nor claimed complete. Active qualification work therefore remains unchecked.
+
+Some Parties changes/evidence were included by concurrent external commits during verification. Machine evidence preserves initial/final canonical HEAD observations, owned baseline diffs, source/artifact hashes and unrelated worktree observations. This workflow performed no staging, commit, push, submodule update, deployment, owner message or live seam invocation. Original Story 5.4 remains draft/backlog; all four records retain their existing status and missing complete delivery fields. This parent remains in-progress and other owner tasks remain open.
+
+## Continuation Review Triage Log — 2026-10-07
+
+All three context-free reviewers completed against the scoped seven-file owner diff and current delivery claims. Each finding was assessed before grouping. Full parent status remains in-progress; review applies to the delivered Parties continuation. These narrow corrections use existing private/SDK seams and the already accepted source-completeness, strict protection and cancellation requirements; no public contract or policy changes are introduced.
+
+| Finding | Verdict | Route | Evidence |
+| --- | --- | --- | --- |
+| B1 | medium | patch | Transport object state is JsonElement; SnapshotAware runs only for identity commands, so the new typed boundary is bypassed on ordinary lifecycle commands. Use the existing normalization seam for every admitted command. |
+| B2 | high | patch | Existing destroyed-key snapshot fallback returns null while retaining a positive checkpoint and tail. The new required-snapshot guarantee can be invalidated after validation; deny incomplete reconstruction instead. |
+| B3 | high | patch | The new output check admits JSON with Protected/ProviderOpaque or future metadata; PayloadProtectionResult couples bytes to protection state. Require current Unprotected metadata. |
+| B4 | medium | patch | DomainServiceCurrentState defines checkpoint zero as no snapshot, but a supplied snapshot is applied over a full prefix. Reject this inconsistent combination. |
+| B5 | medium | patch | The missing-snapshot case also violates event count/first sequence; it does not independently exercise required snapshot presence. Correct its tail. |
+| B6 | medium | patch | New LINQ validation and eager cloning do not observe cancellation until both full passes finish. Observe cancellation while validating/capturing each event. |
+| B7 | medium | patch | A provider can mutate the detached envelope bytes before throwing; local redaction then parses those corrupted bytes. Keep provider input separate from the validated fallback source. |
+| B8 | medium | patch | Excluded positions cover only the redacted variant; metadata-version/contract/payload-version guards at excluded positions lack independent regressions. Add those direct variants. |
+| E1 | medium | patch | Same demonstrated zero-checkpoint snapshot inconsistency as B4. |
+| E2 | high | patch | Same demonstrated positive-checkpoint loss after snapshot unprotection as B2, including a provider returning null. |
+| E3 | high | patch | Same demonstrated inconsistent JSON/protection-metadata admission as B3. |
+| E4 | medium | patch | Same demonstrated full capture cancellation gap as B6. |
+| V1 | medium | patch | Preverified gap: existing processor source-byte assertions use nonmutating providers, so removal of detachment would not fail them. Add a mutating successful-provider case. |
+| V2 | medium | patch | Preverified gap: the missing-snapshot fixture is rejected by independent sequence/count checks. Supply the otherwise valid sequence-2 tail. |
+
+Patch groups: transport normalization (B1), snapshot completeness (B2/B4/E1/E2), provider metadata (B3/E3), independent missing-snapshot fixture (B5/V2), cancellation during capture (B6/E4), provider mutation/fallback verification (B7/V1), and excluded metadata variants (B8). Preserve all passing original lifecycle semantics and fail closed when required checkpoint state is unreadable; never reconstruct a prefix from only its tail.
+
+## Reviewed Parties continuation — final result
+
+All three independent reviewers completed. All 14 individual findings above were resolved in seven narrow implementation/verification groups; a complete serialized DomainServiceRequest now enters the same strict boundary, unreadable required snapshots cannot become empty-tail reconstruction, provider metadata must describe supported plaintext, cancellation is observed during capture and provider mutation cannot corrupt local redaction. The missing-snapshot fixture now isolates its guard and excluded source metadata variants execute. Root read the final owner diff and independently verified **802/802** tests in all ten original Local lanes, each with zero-warning/error Debug builds. The unchanged Platform custody source/artifact hashes support retaining its 115/115 result: **917 distinct verified passes**. [Final evidence](../../../parties/_bmad-output/implementation-artifacts/tests/owner-continuation-2026-10-07/review-final/README.md) and [review record](parties-continuation-review-2026-10-07/README.md) preserve original and reviewed snapshots.
+
+Actual HTTP verification is separately blocked: all 13 endpoint cases fail at the current SDK startup audit before requests because the Parties pre-mapped Dapr/actor routes lack required sidecar policy and /healthz is anonymous outside the allowed probes. The complete serialized request fallback passes; no HTTP pass or policy waiver is claimed. Parties host/fixture adoption of the SDK sidecar/workload security contract is a further owner compatibility prerequisite.
+
+Positive successor access after predecessor destruction, qualified production custody, all-copy destruction receipts, nonrollback restore and complete P-01–P-10 exact-target qualification remain open. The active qualification checkbox remains unchecked, the full parent remains in-progress, and original Story 5.4/dependency gates are unchanged. No staging, commit, push, deployment or live seam invocation was performed by this workflow.
+
+### Review closure evidence
+
+| Findings | Executed coverage / final source correction |
+| --- | --- |
+| B1 | ProcessAsync_SerializedLifecycleTail_UsesValidatedProtectionBoundary round-trips a complete DomainServiceRequest; all validated command wrappers normalize before protection. Actual HTTP remains separately startup-blocked. |
+| B2/E2 | ProcessAsync_RequiredSnapshotUnavailable_RejectsIndependentValidTail covers null/JSON null/undefined and destroyed profile/history failures; required snapshots never fall back to an empty prefix. |
+| B3/E3 | Provider protected/opaque/future metadata variants reject in ProcessAsync_UntrustedReplayHistory_RejectsBeforeLifecycleEffect. |
+| B4/E1 | ProcessAsync_ZeroCheckpointWithSnapshot_RejectsOtherwiseValidTail; valid positive snapshot reconstruction also passes. |
+| B5/V2 | Corrected missing-snapshot case uses only sequence 2 with checkpoint 1/current 2, independently isolating snapshot presence. |
+| B6/E4 | ProcessAsync_CanceledDuringTailCapture_StopsBeforeReadingRemainderOrCallingProvider stops at the second visited event and preserves cancellation identity. |
+| B7/V1 | ProcessAsync_MutatingProvider_PreservesStoredBytesAndLifecycleReplay covers mutation plus successful JSON or destroyed-profile failure; source bytes/metadata stay intact. |
+| B8 | All retained/excluded metadata corruption variants execute in UnsupportedStoredMetadata_DeniesBeforeCustody; the final retained-source class has 39 passes. |
+
+Every source assertion above executed in root's final 802-test matrix. The four added HTTP cases remain part of the separately blocked 13-case class and are never counted as passing.

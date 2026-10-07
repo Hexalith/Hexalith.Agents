@@ -1,0 +1,613 @@
+
+# Repository: /home/administrator/projects/hexalith/parties ; initial HEAD: c5a0d3f27d8f2fd9037b693f540e70b7f3d905a5
+diff --git a/eng/verify-ext-parties-1.ps1 b/eng/verify-ext-parties-1.ps1
+index 1ef7a04f..8e0c4cd8 100644
+--- a/eng/verify-ext-parties-1.ps1
++++ b/eng/verify-ext-parties-1.ps1
+@@ -73,8 +73,14 @@ foreach ($lane in $lanes) {
+         foreach ($class in $lane.Classes) { $filter += @('-class', $class) }
+         $testLog = Join-Path $EvidenceDirectory "$($lane.Project)-tests.log"
+         $xmlLog = Join-Path $EvidenceDirectory "$($lane.Project)-tests.xml"
+-        & dotnet $assembly @filter -result-xml $xmlLog *> $testLog
+-        if ($LASTEXITCODE -ne 0) { Get-Content $testLog; throw "Tests failed: $($lane.Project)" }
++        $previousSourceRoot = [Environment]::GetEnvironmentVariable('HEXALITH_PARTIES_SOURCE_ROOT')
++        try {
++            [Environment]::SetEnvironmentVariable('HEXALITH_PARTIES_SOURCE_ROOT', $PartiesRoot)
++            & dotnet $assembly @filter -result-xml $xmlLog *> $testLog
++            $testExitCode = $LASTEXITCODE
++        }
++        finally { [Environment]::SetEnvironmentVariable('HEXALITH_PARTIES_SOURCE_ROOT', $previousSourceRoot) }
++        if ($testExitCode -ne 0) { Get-Content $testLog; throw "Tests failed: $($lane.Project)" }
+         $summary = (Get-Content $testLog | Where-Object { $_ -match 'Total: (\d+), Errors: (\d+), Failed: (\d+), Skipped: (\d+), Not Run: (\d+)' } | Select-Object -Last 1)
+         if (-not $summary -or $summary -notmatch 'Total: (\d+), Errors: (\d+), Failed: (\d+), Skipped: (\d+), Not Run: (\d+)') { throw "No execution evidence: $($lane.Project)" }
+         if ([int]$Matches[1] -le 0 -or [int]$Matches[2] -ne 0 -or [int]$Matches[3] -ne 0 -or [int]$Matches[4] -ne 0 -or [int]$Matches[5] -ne 0) { throw "Required lane incomplete: $summary" }
+diff --git a/src/Hexalith.Parties/Domain/PartyDomainProcessor.cs b/src/Hexalith.Parties/Domain/PartyDomainProcessor.cs
+index 8a15760f..1eed41fd 100644
+--- a/src/Hexalith.Parties/Domain/PartyDomainProcessor.cs
++++ b/src/Hexalith.Parties/Domain/PartyDomainProcessor.cs
+@@ -634,12 +634,28 @@ internal sealed partial class PartyDomainProcessor(
+             return currentState;
+         }
+ 
++        // Validate the complete stored tail before protection can transform metadata or bytes.
++        // A redaction marker is an output of this boundary, never an admitted source format.
++        if (state.LastSnapshotSequence < 0 || state.CurrentSequence < state.LastSnapshotSequence
++            || state.LastSnapshotSequence > 0 && state.SnapshotState is null
++            || state.Events.Count != state.CurrentSequence - state.LastSnapshotSequence
++            || state.Events.Where((item, index) => item.Metadata.SequenceNumber != state.LastSnapshotSequence + index + 1
++                || item.Metadata.TenantId != command.TenantId || item.Metadata.Domain != command.Domain
++                || item.Metadata.AggregateId != command.AggregateId || item.Metadata.MetadataVersion != 1
++                || item.Metadata.EventContractType is not null || item.Metadata.PayloadVersion is not null
++                || item.Metadata.SerializationFormat is not ("json" or "json+pdenc-v1" or "json+identity-history-v1")).Any())
++        {
++            throw new InvalidOperationException("Party replay source metadata, scope or checkpoint is inconsistent.");
++        }
++
++        EventEnvelope[] sourceEvents = [.. state.Events.Select(item =>
++            new EventEnvelope(item.Metadata, item.Payload.ToArray(), item.Extensions))];
+         object? snapshotState = state.SnapshotState is null
+             ? null
+             : await UnprotectSnapshotOrRedactAsync(command, state.SnapshotState, cancellationToken).ConfigureAwait(false);
+ 
+         var events = new List<EventEnvelope>(state.Events.Count);
+-        foreach (EventEnvelope envelope in state.Events)
++        foreach (EventEnvelope envelope in sourceEvents)
+         {
+             // Per-iteration cancellation: streams of thousands of events were previously
+             // un-cancellable inside this loop because only the network call observed CT.
+@@ -647,12 +663,9 @@ internal sealed partial class PartyDomainProcessor(
+ 
+             PayloadProtectionResult result = await UnprotectEnvelopeOrRedactAsync(command, envelope, cancellationToken).ConfigureAwait(false);
+ 
+-            // Redacted bytes are valid application JSON. Adapt only this in-memory replay
+-            // copy to the SDK's JSON intake; persisted protection metadata and the
+-            // security service's distinct redaction marker remain untouched.
+-            if (string.Equals(result.SerializationFormat, "json-redacted", StringComparison.Ordinal))
++            if (result.SerializationFormat != "json")
+             {
+-                result = result with { SerializationFormat = "json" };
++                throw new InvalidOperationException("Party replay protection did not produce supported application JSON.");
+             }
+ 
+             // The "no-op" fast path is signalled by the protection service returning the same
+@@ -697,12 +710,18 @@ internal sealed partial class PartyDomainProcessor(
+                     cancellationToken)
+                 .ConfigureAwait(false);
+         }
+-        catch (Exception ex) when (PartyEncryptionKeyDestroyedException.IsMatch(ex))
++        catch (Exception ex) when (envelope.Metadata.SerializationFormat == "json+pdenc-v1"
++            && PartyEncryptionKeyDestroyedException.IsMatch(ex))
+         {
+             LogRehydrationFallbackToRedaction(
+                 envelope.Metadata.EventTypeName,
+                 ex.GetType().Name);
+-            return PartyPayloadProtectionService.RedactProtectedPayload(envelope.Payload, envelope.Metadata.SerializationFormat);
++            PayloadProtectionResult redacted = PartyPayloadProtectionService.RedactProtectedPayload(envelope.Payload, envelope.Metadata.SerializationFormat);
++            // Only locally generated profile redaction may enter strict SDK JSON replay.
++            // Stored envelopes and the security service's audit marker remain unchanged.
++            return redacted.SerializationFormat == "json-redacted"
++                ? redacted with { SerializationFormat = "json" }
++                : throw new InvalidOperationException("Party profile redaction did not produce supported application JSON.");
+         }
+     }
+ 
+diff --git a/tests/Hexalith.Parties.Tests/Domain/PartyDomainProcessorValidationTests.cs b/tests/Hexalith.Parties.Tests/Domain/PartyDomainProcessorValidationTests.cs
+index dfa48e35..436050b0 100644
+--- a/tests/Hexalith.Parties.Tests/Domain/PartyDomainProcessorValidationTests.cs
++++ b/tests/Hexalith.Parties.Tests/Domain/PartyDomainProcessorValidationTests.cs
+@@ -303,6 +303,85 @@ public sealed class PartyDomainProcessorValidationTests
+             Arg.Any<CancellationToken>());
+     }
+ 
++    [Theory]
++    [InlineData("stored-redacted")]
++    [InlineData("provider-redacted")]
++    [InlineData("metadata-version")]
++    [InlineData("event-contract")]
++    [InlineData("payload-version")]
++    [InlineData("tenant")]
++    [InlineData("domain")]
++    [InlineData("aggregate")]
++    [InlineData("sequence-gap")]
++    [InlineData("checkpoint")]
++    [InlineData("missing-snapshot")]
++    public async Task ProcessAsync_UntrustedReplayHistory_RejectsBeforeLifecycleEffect(string corruption)
++    {
++        string partyId = "party-1";
++        IEventPayloadProtectionService protection = Substitute.For<IEventPayloadProtectionService>();
++        protection.UnprotectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(),
++            Arg.Any<string>(), Arg.Any<CancellationToken>())
++            .Returns(call => new PayloadProtectionResult((byte[])call[2], corruption == "provider-redacted" ? "json-redacted" : "json"));
++        CommandEnvelope command = CreateCommand(new MarkPartyEncryptionKeyDeleted
++        {
++            PartyId = partyId,
++            TenantId = "tenant-a",
++            DeletedAt = DateTimeOffset.Parse("2026-05-21T20:45:00Z"),
++        });
++        DomainServiceCurrentState valid = CreateErasurePendingStateWithProtectedCreatedEvent(command, partyId);
++        EventEnvelope created = CreateEventEnvelope(command, 1, typeof(PartyCreated).FullName!,
++            JsonSerializer.SerializeToUtf8Bytes(new PartyCreated { Type = PartyType.Person }),
++            corruption == "stored-redacted" ? "json-redacted" : "json", corruption == "metadata-version" ? 2 : 1);
++        EventMetadata metadata = corruption switch
++        {
++            "event-contract" => created.Metadata with { EventContractType = "future-event" },
++            "payload-version" => created.Metadata with { PayloadVersion = 2 },
++            "tenant" => created.Metadata with { TenantId = "tenant-b" },
++            "domain" => created.Metadata with { Domain = "other" },
++            "aggregate" => created.Metadata with { AggregateId = "foreign-party" },
++            _ => created.Metadata,
++        };
++        EventEnvelope requested = corruption == "sequence-gap"
++            ? CreateEventEnvelope(command, 3, typeof(ErasePartyRequested).FullName!, valid.Events[1].Payload, "json")
++            : valid.Events[1];
++        DomainServiceCurrentState untrusted = valid with
++        {
++            Events = [new(metadata, created.Payload, created.Extensions), requested],
++            CurrentSequence = corruption == "checkpoint" ? 3 : 2,
++            LastSnapshotSequence = corruption == "missing-snapshot" ? 1 : 0,
++        };
++        byte[] originalPayload = untrusted.Events[0].Payload.ToArray();
++
++        await Should.ThrowAsync<InvalidOperationException>(() => CreateInvoker(protection)
++            .ProcessAsync(command, untrusted, TestContext.Current.CancellationToken));
++
++        untrusted.Events[0].Payload.ShouldBe(originalPayload);
++        untrusted.Events[0].Metadata.ShouldBe(metadata);
++        if (corruption != "provider-redacted")
++        {
++            await protection.DidNotReceiveWithAnyArgs().UnprotectEventPayloadAsync(default!, default!, default!, default!, default);
++        }
++    }
++
++    [Fact]
++    public async Task ProcessAsync_DestroyedHistoryKey_CannotUseProfileRedactionFallback()
++    {
++        IEventPayloadProtectionService protection = Substitute.For<IEventPayloadProtectionService>();
++        protection.UnprotectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(),
++            "json+identity-history-v1", Arg.Any<CancellationToken>())
++            .ThrowsAsync(new PartyEncryptionKeyDestroyedException("tenant-a", "party-1"));
++        CommandEnvelope command = CreateCommand(new MarkPartyEncryptionKeyDeleted
++        {
++            PartyId = "party-1", TenantId = "tenant-a", DeletedAt = DateTimeOffset.Parse("2026-05-21T20:45:00Z"),
++        });
++        DomainServiceCurrentState state = CreateErasurePendingStateWithProtectedCreatedEvent(command, "party-1");
++        state = state with { Events = [CreateEventEnvelope(command, 1, typeof(HumanActorBindingEstablished).FullName!,
++            "{}"u8.ToArray(), "json+identity-history-v1"), state.Events[1]] };
++
++        await Should.ThrowAsync<PartyEncryptionKeyDestroyedException>(() => CreateInvoker(protection)
++            .ProcessAsync(command, state, TestContext.Current.CancellationToken));
++    }
++
+     [Fact]
+     public async Task ProcessAsync_UnknownCommandType_ReturnsUnresolvedCommandTypeRejection()
+     {
+@@ -721,7 +800,8 @@ public sealed class PartyDomainProcessorValidationTests
+         long sequenceNumber,
+         string eventTypeName,
+         byte[] payload,
+-        string serializationFormat)
++        string serializationFormat,
++        int metadataVersion = 1)
+         => new(
+             new EventMetadata(
+                 MessageId: $"01HX0000000000000000000{sequenceNumber:00}",
+@@ -737,7 +817,7 @@ public sealed class PartyDomainProcessorValidationTests
+                 UserId: command.UserId,
+                 DomainServiceVersion: "v1",
+                 EventTypeName: eventTypeName,
+-                MetadataVersion: 1,
++                MetadataVersion: metadataVersion,
+                 SerializationFormat: serializationFormat),
+             payload,
+             Extensions: null);
+diff --git a/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs b/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs
+index 7e99f67d..807ca498 100644
+--- a/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs
++++ b/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs
+@@ -780,6 +780,127 @@ public sealed class PartyIdentityQueryHandlerTests
+         }
+     }
+ 
++    /// <summary>Accepted 365-day intervals retain their exact boundary and source positions through serialized restore.</summary>
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task Accepted365DayPolicy_RebindAndRestoredHistoryPreserveOriginalBoundary(bool restored)
++    {
++        const string successorActor = "01HX0000000000000000000002";
++        DateTimeOffset boundary = Start.AddDays(180);
++        HumanActorBindingEvidence first = Binding() with
++        {
++            ValidUntil = Start.AddDays(365),
++            Custody = Binding().Custody with { PolicyId = "party-actor-retention-v1", ExpiresAt = Start.AddDays(365) },
++        };
++        HumanActorBindingEvidence second = first with
++        {
++            ActorId = successorActor, BindingVersion = 2, ValidFrom = boundary, ValidUntil = boundary.AddDays(365),
++            Custody = first.Custody with { ExpiresAt = boundary.AddDays(365), LifecycleRevision = 2, EvidenceId = "successor-custody" },
++        };
++        var fixture = Service(Events()[0], new HumanActorBindingEstablished(new(first, "first", "first-digest"), Start, 0),
++            new HumanActorBindingRebound(new(second, "second", "second-digest"), boundary, 1));
++        DateTimeOffset now = Start.AddDays(200);
++        var policy = new PartyIdentityOptions { PolicyId = "party-actor-retention-v1", Retention = TimeSpan.FromDays(365), ExpiryTrigger = "binding-effective-at" };
++        fixture.Options.CurrentValue.Returns(policy);
++        TimeProvider clock = Substitute.For<TimeProvider>();
++        clock.GetUtcNow().Returns(now);
++        RetainedIdentityHistoryReadResult captured = await fixture.HistoryReader.ReadAsync(new("tenant-a", "party", "party-1"),
++            RetainedIdentityHistoryReadRequest.AttributionPurpose, TestContext.Current.CancellationToken);
++        RetainedIdentityHistoryStream source = captured.Stream! with { ObservedAt = now, ValidUntil = now.AddMinutes(1) };
++        if (restored)
++        {
++            source = JsonSerializer.Deserialize<RetainedIdentityHistoryStream>(JsonSerializer.SerializeToUtf8Bytes(source, PartiesJsonOptions.Default), PartiesJsonOptions.Default)!;
++        }
++        fixture.HistoryReader.ReadAsync(Arg.Any<Hexalith.EventStore.Contracts.Identity.AggregateIdentity>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
++            .Returns(new RetainedIdentityHistoryReadResult(source, null));
++        string requestedActor = Actor;
++        fixture.Authority.Admit(Arg.Any<QueryEnvelope>()).Returns(_ => new PartyIdentityAdmissionResult(
++            new(new("tenant-a", "party", "party-1", "Read", "c", "c", "d"), "reader", null, requestedActor, 1, true,
++                Start, Start.AddDays(600), 1), null));
++        var service = new PartyIdentityQueryService(fixture.Authority, clock, custody: fixture.Custody, historyReader: fixture.HistoryReader, identityOptions: fixture.Options);
++        HumanActorBindingResult before = await service.ResolveAtAsync(Envelope(new ResolveHumanActorBindingAt("tenant-a", "party-1", boundary.AddTicks(-1), Actor, 1)), TestContext.Current.CancellationToken);
++        before.Outcome.ShouldBe(HumanActorBindingOutcome.Resolved);
++        before.BindingSourcePosition.ShouldBe(2);
++        before.Evidence!.ActorId.ShouldBe(Actor);
++        before.Evidence.ValidUntil.ShouldBe(boundary);
++        before.Evidence.Custody.ExpiresAt.ShouldBe(Start.AddDays(365));
++        requestedActor = successorActor;
++        HumanActorBindingResult at = await service.ResolveAtAsync(Envelope(new ResolveHumanActorBindingAt("tenant-a", "party-1", boundary, successorActor, 2)), TestContext.Current.CancellationToken);
++        at.Outcome.ShouldBe(HumanActorBindingOutcome.Resolved);
++        at.BindingSourcePosition.ShouldBe(3);
++        at.Evidence.ShouldBe(second);
++        await fixture.Reader.DidNotReceiveWithAnyArgs().ReadAsync(default!, default);
++    }
++
++    /// <summary>Restored readable bytes and optimistic custody cannot restart the accepted immutable expiry clock.</summary>
++    [Theory]
++    [InlineData(-1, HumanActorBindingOutcome.Resolved)]
++    [InlineData(0, HumanActorBindingOutcome.Expired)]
++    [InlineData(1, HumanActorBindingOutcome.Expired)]
++    public async Task Accepted365DayPolicy_RestoredBytesRespectExclusiveExpiry(int ticks, HumanActorBindingOutcome expected)
++    {
++        HumanActorBindingEvidence binding = Binding() with
++        {
++            ValidUntil = Start.AddDays(365),
++            Custody = Binding().Custody with { PolicyId = "party-actor-retention-v1", ExpiresAt = Start.AddDays(365) },
++        };
++        var fixture = Service(Events()[0], new HumanActorBindingEstablished(new(binding, "logical", "digest"), Start, 0));
++        fixture.Options.CurrentValue.Returns(new PartyIdentityOptions { PolicyId = "party-actor-retention-v1", Retention = TimeSpan.FromDays(365), ExpiryTrigger = "binding-effective-at" });
++        DateTimeOffset now = binding.Custody.ExpiresAt.AddTicks(ticks);
++        TimeProvider clock = Substitute.For<TimeProvider>();
++        clock.GetUtcNow().Returns(now);
++        RetainedIdentityHistoryReadResult captured = await fixture.HistoryReader.ReadAsync(new("tenant-a", "party", "party-1"), RetainedIdentityHistoryReadRequest.AttributionPurpose, TestContext.Current.CancellationToken);
++        RetainedIdentityHistoryStream restored = JsonSerializer.Deserialize<RetainedIdentityHistoryStream>(
++            JsonSerializer.SerializeToUtf8Bytes(captured.Stream! with { ObservedAt = now, ValidUntil = now.AddMinutes(1) }, PartiesJsonOptions.Default), PartiesJsonOptions.Default)!;
++        fixture.HistoryReader.ReadAsync(Arg.Any<Hexalith.EventStore.Contracts.Identity.AggregateIdentity>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(new RetainedIdentityHistoryReadResult(restored, null));
++        fixture.Authority.Admit(Arg.Any<QueryEnvelope>()).Returns(new PartyIdentityAdmissionResult(new(new("tenant-a", "party", "party-1", "Read", "c", "c", "d"), "reader", null, Actor, 1, true, Start, Start.AddDays(600), 1), null));
++        var service = new PartyIdentityQueryService(fixture.Authority, clock, custody: fixture.Custody, historyReader: fixture.HistoryReader, identityOptions: fixture.Options);
++
++        HumanActorBindingResult result = await service.ResolveAtAsync(Envelope(new ResolveHumanActorBindingAt("tenant-a", "party-1", Start, Actor, 1)), TestContext.Current.CancellationToken);
++
++        result.Outcome.ShouldBe(expected);
++        if (expected == HumanActorBindingOutcome.Expired)
++        {
++            result.Evidence.ShouldBeNull();
++            result.BindingSourcePosition.ShouldBe(0);
++            await fixture.Custody.DidNotReceiveWithAnyArgs().CanReadAsync(default!, default!, default);
++        }
++        restored.Events[0].Payload.ShouldBe(captured.Stream!.Events[0].Payload);
++    }
++
++    /// <summary>A profile exclusion cannot supply missing version evidence for a successor after predecessor destruction.</summary>
++    [Fact]
++    public async Task ExpiredPredecessorOmitted_SuccessorReadRemainsUnavailable()
++    {
++        const string successorActor = "01HX0000000000000000000002";
++        DateTimeOffset boundary = Start.AddDays(180);
++        HumanActorBindingEvidence successor = Binding() with
++        {
++            ActorId = successorActor, BindingVersion = 2, ValidFrom = boundary, ValidUntil = boundary.AddDays(365),
++            Custody = Binding().Custody with { PolicyId = "party-actor-retention-v1", ExpiresAt = boundary.AddDays(365), LifecycleRevision = 2 },
++        };
++        var fixture = Service(Events()[0], new HumanActorBindingEstablished(new(Binding(), "first", "digest"), Start, 0),
++            new HumanActorBindingRebound(new(successor, "second", "digest-2"), boundary, 1));
++        fixture.Options.CurrentValue.Returns(new PartyIdentityOptions { PolicyId = "party-actor-retention-v1", Retention = TimeSpan.FromDays(365), ExpiryTrigger = "binding-effective-at" });
++        DateTimeOffset now = Start.AddDays(366);
++        TimeProvider clock = Substitute.For<TimeProvider>();
++        clock.GetUtcNow().Returns(now);
++        RetainedIdentityHistoryReadResult captured = await fixture.HistoryReader.ReadAsync(new("tenant-a", "party", "party-1"), RetainedIdentityHistoryReadRequest.AttributionPurpose, TestContext.Current.CancellationToken);
++        RetainedIdentityHistoryStream missing = captured.Stream! with { ObservedAt = now, ValidUntil = now.AddMinutes(1), Events = [captured.Stream!.Events[1]], ExcludedSequences = [1, 2] };
++        RetainedIdentityHistoryValidator.IsComplete(new(missing.Identity, missing.Purpose), missing, now).ShouldBeTrue();
++        fixture.HistoryReader.ReadAsync(Arg.Any<Hexalith.EventStore.Contracts.Identity.AggregateIdentity>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(new RetainedIdentityHistoryReadResult(missing, null));
++        fixture.Authority.Admit(Arg.Any<QueryEnvelope>()).Returns(new PartyIdentityAdmissionResult(new(new("tenant-a", "party", "party-1", "Read", "c", "c", "d"), "reader", null, successorActor, 1, true, Start, Start.AddDays(600), 1), null));
++        var service = new PartyIdentityQueryService(fixture.Authority, clock, custody: fixture.Custody, historyReader: fixture.HistoryReader, identityOptions: fixture.Options);
++
++        HumanActorBindingResult result = await service.ResolveAtAsync(Envelope(new ResolveHumanActorBindingAt("tenant-a", "party-1", boundary, successorActor, 2)), TestContext.Current.CancellationToken);
++
++        result.Outcome.ShouldBe(HumanActorBindingOutcome.Unavailable);
++        result.Evidence.ShouldBeNull();
++        result.BindingSourcePosition.ShouldBe(0);
++        await fixture.Custody.DidNotReceiveWithAnyArgs().CanReadAsync(default!, default!, default);
++    }
++
+     private static PartyIdentityOptions PolicyOptions() => new()
+     {
+         PolicyId = "synthetic",
+diff --git a/tests/Hexalith.Parties.UI.Tests/IdentityBindingBoundaryTests.cs b/tests/Hexalith.Parties.UI.Tests/IdentityBindingBoundaryTests.cs
+index cdba7f30..cf29b4cf 100644
+--- a/tests/Hexalith.Parties.UI.Tests/IdentityBindingBoundaryTests.cs
++++ b/tests/Hexalith.Parties.UI.Tests/IdentityBindingBoundaryTests.cs
+@@ -87,7 +87,9 @@ public sealed class IdentityBindingBoundaryTests
+ 
+     private static string ProjectRoot(string? relativePath = null)
+     {
+-        string current = AppContext.BaseDirectory;
++        // xUnit runs from the assembly directory, which may be outside the source tree.
++        // The owner verifier supplies its exact repository; ordinary in-tree builds retain discovery.
++        string current = Environment.GetEnvironmentVariable("HEXALITH_PARTIES_SOURCE_ROOT") ?? AppContext.BaseDirectory;
+         while (!File.Exists(Path.Combine(current, "Hexalith.Parties.slnx")))
+         {
+             DirectoryInfo? parent = Directory.GetParent(current);
+
+# Repository: /home/administrator/projects/hexalith/eventstore ; initial HEAD: af2892e8cb58e844290e56563f9c2fcadaab90a7
+diff --git a/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs b/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs
+index 7875a0e7..1b4478ef 100644
+--- a/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs
++++ b/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs
+@@ -79,6 +79,12 @@ public sealed class RetainedIdentityHistorySourceReader(IActorProxyFactory actor
+                         return new(null, "history-source-gap-or-scope-mismatch");
+                     }
+ 
++                    if (item.MetadataVersion != 1 || item.EventContractType is not null || item.PayloadVersion is not null
++                        || item.SerializationFormat is not ("json" or "json+pdenc-v1" or "json+identity-history-v1"))
++                    {
++                        return new(null, "history-source-metadata-unsupported");
++                    }
++
+                     cursor++;
+                     bytes += item.Payload.Length;
+                     if (bytes > RetainedIdentityHistoryLimits.MaxPayloadBytes)
+@@ -104,7 +110,7 @@ public sealed class RetainedIdentityHistorySourceReader(IActorProxyFactory actor
+                     }
+ 
+                     PayloadProtectionResult readable = await custody.UnprotectEventAsync(request.Identity, item.EventTypeName,
+-                        item.Payload, item.SerializationFormat, readToken).WaitAsync(readToken).ConfigureAwait(false);
++                        item.Payload.ToArray(), item.SerializationFormat, readToken).WaitAsync(readToken).ConfigureAwait(false);
+                     readToken.ThrowIfCancellationRequested();
+                     readableBytes += readable.PayloadBytes.Length;
+                     if (readable.Metadata.State != PayloadProtectionState.Unprotected
+diff --git a/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs b/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs
+index 54973adb..a6a41b94 100644
+--- a/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs
++++ b/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs
+@@ -349,6 +349,99 @@ public sealed class RetainedIdentityHistorySourceReaderTests
+         }
+     }
+ 
++    /// <summary>Protection output cannot legitimize unsupported stored metadata, even at excluded profile positions.</summary>
++    [Theory]
++    [InlineData("redacted", false)]
++    [InlineData("redacted", true)]
++    [InlineData("metadata-version", false)]
++    [InlineData("event-contract", false)]
++    [InlineData("payload-version", false)]
++    public async Task UnsupportedStoredMetadata_DeniesBeforeCustody(string corruption, bool excludedProfile)
++    {
++        RetainedIdentityHistorySourceReader reader = Arrange();
++        EventEnvelope history = Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "sealed-history");
++        EventEnvelope profile = Stored(1, "Profile", "sealed");
++        EventEnvelope changed = excludedProfile ? profile : history;
++        changed = corruption switch
++        {
++            "redacted" => changed with { SerializationFormat = "json-redacted" },
++            "metadata-version" => changed with { MetadataVersion = 2 },
++            "event-contract" => changed with { EventContractType = "future-event" },
++            _ => changed with { PayloadVersion = 2 },
++        };
++        _actor.ReadEventsRangeAsync(0, 2, 100).Returns(excludedProfile ? [changed, history] : [profile, changed]);
++
++        RetainedIdentityHistoryReadResult result = await reader.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken);
++
++        result.Stream.ShouldBeNull();
++        result.FailureReason.ShouldBe("history-source-metadata-unsupported");
++        await _custody.DidNotReceiveWithAnyArgs().UnprotectEventAsync(default!, default!, default!, default!, default);
++    }
++
++    /// <summary>Custody receives a copy so a mutating provider cannot overwrite sealed source bytes.</summary>
++    [Fact]
++    public async Task CustodyMutation_CannotOverwriteStoredSourcePayload()
++    {
++        RetainedIdentityHistorySourceReader reader = Arrange();
++        EventEnvelope history = Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "sealed-history");
++        byte[] original = history.Payload.ToArray();
++        _actor.ReadEventsRangeAsync(0, 2, 100).Returns([Stored(1, "Profile", "sealed"), history]);
++        _custody.UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
++            .Returns(call =>
++            {
++                Array.Fill(call.Arg<byte[]>(), (byte)0);
++                return new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence())), "json");
++            });
++
++        (await reader.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken)).IsAuthoritative.ShouldBeTrue();
++
++        history.Payload.ShouldBe(original);
++    }
++
++    /// <summary>Actual source reads cannot skip an expired predecessor to release a live successor without new lifecycle proof.</summary>
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task ExpiredPredecessor_BlocksSuccessorInsteadOfFabricatingExclusion(bool destroyed)
++    {
++        RetainedIdentityHistorySourceReader reader = Arrange();
++        _actor.GetStreamMetadataAsync().Returns(new AggregateStreamMetadata(true, 3));
++        EventEnvelope predecessor = Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "expired-predecessor");
++        EventEnvelope successor = Stored(3, typeof(HistoryCustodyProbeEvent).FullName!, "live-successor");
++        _actor.ReadEventsRangeAsync(0, 3, 100).Returns([Stored(1, "Profile", "sealed"), predecessor, successor]);
++        _custody.UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Is<byte[]>(bytes => Encoding.UTF8.GetString(bytes) == "expired-predecessor"), Arg.Any<string>(), Arg.Any<CancellationToken>())
++            .Returns(_ => destroyed ? throw new InvalidOperationException("synthetic destroyed retention unit")
++                : new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence() with { PolicyId = "party-actor-retention-v1", ExpiresAt = _now })), "json"));
++
++        RetainedIdentityHistoryReadResult result = await reader.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken);
++
++        result.Stream.ShouldBeNull();
++        result.FailureReason.ShouldBe(destroyed ? "history-unavailable" : "history-custody-unavailable-or-expired");
++        await _custody.DidNotReceive().UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(),
++            Arg.Is<byte[]>(bytes => Encoding.UTF8.GetString(bytes) == "live-successor"), Arg.Any<string>(), Arg.Any<CancellationToken>());
++        Encoding.UTF8.GetString(predecessor.Payload).ShouldBe("expired-predecessor");
++        Encoding.UTF8.GetString(successor.Payload).ShouldBe("live-successor");
++    }
++
++    /// <summary>Restarted source readers consult current independent lifecycle before releasing restored old-key history.</summary>
++    [Fact]
++    public async Task RestoredCiphertextAndReadableOldKey_CurrentLifecycleDenialPreventsResurrection()
++    {
++        RetainedIdentityHistorySourceReader reader = Arrange();
++        ArrangeCompleteSource();
++        (await reader.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken)).IsAuthoritative.ShouldBeTrue();
++        _custody.ClearReceivedCalls();
++        _custody.CanReadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<IdentityHistoryCustodyEvidence>(), Arg.Any<CancellationToken>()).Returns(false);
++        var restarted = new RetainedIdentityHistorySourceReader(_actors, _admission, _custody, _clock);
++
++        RetainedIdentityHistoryReadResult result = await restarted.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken);
++
++        result.Stream.ShouldBeNull();
++        result.FailureReason.ShouldBe("history-custody-unavailable-or-expired");
++        await _custody.Received(1).CanReadAsync(_identity, Evidence(), Arg.Any<CancellationToken>());
++        JsonSerializer.Serialize(result).ShouldNotContain("provider-evidence");
++    }
++
+     private void ArrangeCompleteSource()
+         => _actor.ReadEventsRangeAsync(0, 2, 100).Returns([Stored(1, "Profile", "sealed"), Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "sealed-history")]);
+ 
+
+# Repository: /home/administrator/projects/hexalith/agents ; continuation baseline: ec5779a7c2f9d49c3f604224e3172f82ae7d6ba9
+diff --git a/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md b/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md
+index faf706a..9355666 100644
+--- a/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md
++++ b/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md
+@@ -137,3 +137,24 @@ Installed Parties now includes the earlier identity APIs; newer retained-history
+ ## Direct owner commitment instruction — 2026-10-07
+ 
+ The user subsequently stated “I owner do commitments”. [Recorded owner packet](story-5-4-owner-commitments-2026-10-07.md) now names the project owner acting in the four relevant maintainer responsibilities and makes Hexalith.Platform the secret-custody repository. This later instruction authorizes updating those acceptance fields; the preceding byte-equivalent register/spec observation describes the earlier correction completion, not the state after this owner update. Full delivery contracts, evidence levels, consumers, Branch B and the accepted retention policy remain intact. Immutable complete targets, integration dates and complete executable commands are still missing, so the records remain Uncommitted and this parent remains in-progress. No new source implementation, deployment, Git mutation, owner message or live seam execution accompanies the commitment record.
++
++## Active Parties continuation — 2026-10-07
++
++The user explicitly resumed this parent: first resolve the Parties protected-history replay failure, preserve strict retained-history validation, and capture verification evidence; then continue custody/expiry/restore qualification toward a complete Parties delivery target. This pass prioritizes the owning Parties and shared EventStore/Platform changes required for that single delivery. Other owner tasks remain in this parent and must not be marked complete by this pass. Existing implementation approval covers this continuation. Preserve original Story 5.4 draft/backlog and dependency availability until their actual gates pass.
++
++Active work:
++- [x] Reproduce `PartyDomainProcessorValidationTests.ProcessAsync_ProtectedHistoricalPayloadWithDestroyedKey_RedactsAndContinuesRehydration` using source Debug builds. Correct the replay/protection boundary in the owning technical/domain files; retain source-envelope immutability and strict metadata/tenant/domain/aggregate/sequence/checkpoint validation. Add focused negative regressions proving an untrusted redacted label or malformed history cannot bypass validation. Do not merely rename the failing test or alter its expected valid lifecycle behavior.
++- [x] Run the complete existing `../parties/eng/verify-ext-parties-1.ps1 -Mode Local` source matrix with fresh logs/XML, plus affected owning replay/security tests. Capture canonical repository HEADs, worktree changes, exact commands, source/artifact hashes, totals, and any separate environment blockers. Never suppress analyzers, skip the failed lane, or weaken the gate.
++- [ ] Continue qualification using the accepted 365-day effective-at policy and existing custody/cleanup/retained-history seams. Add meaningful executable missing expiry/rebind/successor-after-expired-predecessor and restore anti-resurrection checks and correct discovered source failures. Review current custody-provider and exact-target prerequisites from tracked source; implement feasible safe missing qualification seams in their owning technical module. Use isolated synthetic custody only as explicitly labelled source evidence. No credentials, production policy choices, deployment or live destructive actions are inferred.
++- [x] Produce a linked current Parties evidence packet and update this parent and the owner commitment packet with actual delivered coverage and exact remaining live target requirements. Keep incomplete production qualification and full delivery acceptance explicit. No staging, commit, push or submodule changes.
++
++
++## Current Parties replay and lifecycle continuation — 2026-10-07
++
++[Current Parties owner packet](../../../parties/_bmad-output/implementation-artifacts/ext-parties-1-replay-and-lifecycle-2026-10-07.md) and [fresh verification evidence](../../../parties/_bmad-output/implementation-artifacts/tests/owner-continuation-2026-10-07/README.md) supersede the historical broad Local replay blocker as current source evidence. The exact destroyed-profile test passed on the initial source Debug build; its existing committed JSON adapter was then hardened against stored/provider redaction labels, actor-history fallback, malformed source metadata, scope and checkpoint. Shared retained-source metadata and sealed-byte immutability were also hardened. Twelve Parties and six EventStore regressions failed before the corrections and passed afterward.
++
++The complete original Local matrix now passes **784/784** across all ten required lanes, with zero errors/failures/skips/not-run and all Debug builds reporting zero warnings/errors. Fresh unchanged Platform custody verification adds **115/115**: **899 distinct final passes**. Focused 29/36 results overlap that matrix and are not double-counted. Three failed attempts remain captured: a concurrent Client test compile error resolved by its owner, then two UI source-root discovery attempts; the final runner passes an explicit owning source root and restores its prior environment value while retaining every assertion and gate.
++
++New accepted-365-day source cases verify rebind boundaries and original positions through serialized restore, exclusive expiry despite restored readable bytes, and restarted source-reader denial under fresh lifecycle. The real source path explicitly denies live-successor access when an expired/destroyed predecessor prevents complete lifecycle proof. The current profile exclusion certificate cannot encode an expired transition/version/destruction receipt. A versioned actor-free continuation contract, exact custody receipts/all-copy coverage and qualified nonrollback restoration remain required; they were neither invented nor claimed complete. Active qualification work therefore remains unchecked.
++
++Some Parties changes/evidence were included by concurrent external commits during verification. Machine evidence preserves initial/final canonical HEAD observations, owned baseline diffs, source/artifact hashes and unrelated worktree observations. This workflow performed no staging, commit, push, submodule update, deployment, owner message or live seam invocation. Original Story 5.4 remains draft/backlog; all four records retain their existing status and missing complete delivery fields. This parent remains in-progress and other owner tasks remain open.
+diff --git a/_bmad-output/implementation-artifacts/story-5-4-owner-commitments-2026-10-07.md b/_bmad-output/implementation-artifacts/story-5-4-owner-commitments-2026-10-07.md
+index 7dbba79..a6e640f 100644
+--- a/_bmad-output/implementation-artifacts/story-5-4-owner-commitments-2026-10-07.md
++++ b/_bmad-output/implementation-artifacts/story-5-4-owner-commitments-2026-10-07.md
+@@ -40,9 +40,16 @@ Owner authority alone does not supply these values. Current checkout HEADs are i
+ 
+ ## Remaining delivery work
+ 
+-- Parties: complete production custody, source/actor freshness and retained-history expiry/destruction/restore, packaged consumer compatibility, P-01–P-10 and the unresolved strict json-redacted replay lane.
++- Parties: complete production custody, source/actor freshness and retained-history expiry/destruction/restore (including authenticated successor proof after expired predecessor destruction), packaged consumer compatibility and live P-01–P-10. The historical strict json-redacted replay blocker is superseded by the current complete passing Local source matrix linked below.
+ - Conversations: complete authenticated source/compare-append and catalogue/authority, all six seams, automatic approved-deletion publication discovery/backfill/pump, independent authenticated receiver/acknowledgement lookup and persisted failure/restart/race qualification.
+ - Secrets: qualified production custody; numeric trusted-envelope profile; independently governed decision-verification trust; full S1–S4/v23, issuer replay/credential restrictions, outcome lookup and live qualification.
+ - Host: complete H1–H4/v23 composition, replicated denial spool/recovery worker and private exact-target credentials; production protection binding/attestation and persisted migration/destruction/compromise/restore qualification.
+ 
+ This owner declaration does not choose unresolved independent Product/Governance/Security policies, manufacture approval evidence or deploy providers. It authorizes delivery under the already approved scope. Four records remain Uncommitted while target/date/complete-command fields are unknown. Story 5.4 stays draft/backlog. Once all nine fields per record are accepted, mark Committed; mark Available only after the complete installed target passes its accepted command. No owner issue comment, Git mutation, deployment or live seam invocation accompanies this record.
++
++
++## Current Parties source delivery observation — 2026-10-07
++
++[Parties replay/lifecycle owner packet](../../../parties/_bmad-output/implementation-artifacts/ext-parties-1-replay-and-lifecycle-2026-10-07.md) records the complete existing Local matrix passing 784 tests and fresh Platform custody verification passing 115 more, with zero-warning/error Debug builds. Original destroyed-profile replay already passed on the initial current source; new source boundary checks and 27 regression/qualification cases now pass. This clears that local replay blocker while preserving strict metadata and source completeness. Evidence includes initial failed attempts, exact commands, canonical HEAD/worktree observations and source/artifact hashes.
++
++Production providers, all-copy irreversible receipts, restore qualification, fresh actor authority and complete P-01–P-10 live delivery remain open. Expired predecessor destruction still prevents positive successor proof under the current certificate/custody contract; executed source cases return unavailable safely. No immutable complete target, date or full live command was substituted from these local results or concurrent external commits. All commitment/status fields above and the external register are unchanged by this delivery observation.
+diff --git a/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/ext-parties-1-replay-and-lifecycle-2026-10-07.md b/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/ext-parties-1-replay-and-lifecycle-2026-10-07.md
+new file mode 100644
+index 0000000..93f3c2f
+--- /dev/null
++++ b/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/ext-parties-1-replay-and-lifecycle-2026-10-07.md
+@@ -0,0 +1,41 @@
++# EXT-PARTIES-1 replay and lifecycle continuation — 2026-10-07
++
++Current local source verification passes the complete existing Parties owner matrix: **784/784**, with zero errors/failures/skips/not-run cases and ten warning-free Debug builds. Fresh unchanged Platform custody verification adds **115/115**, making **899 distinct final passing tests**. This supersedes the historical Local destroyed-profile replay failure as a current source blocker. Complete production delivery and Level 4 acceptance remain open.
++
++[Verification packet](tests/owner-continuation-2026-10-07/README.md) contains fresh logs/XML, exact commands, hashes, failed attempts and scoped baseline diffs. [Machine evidence](tests/owner-continuation-2026-10-07/evidence.json) captures canonical repository/worktree observations and the seven owned source/test/runner paths. This workflow did not stage, commit, push, update submodules, deploy, post owner messages or invoke live seams.
++
++## Delivered source behavior
++
++The original `ProcessAsync_ProtectedHistoricalPayloadWithDestroyedKey_RedactsAndContinuesRehydration` test passed in a fresh source Debug build before this continuation changed code. The current Parties baseline already contained an in-memory JSON adaptation. This work narrows that adaptation to locally generated destroyed-profile redaction. Stored or provider-returned `json-redacted` cannot enter SDK replay, and an actor-history key failure cannot use the profile fallback. Full stored event metadata, exact tenant/domain/aggregate, sequence/checkpoint and required snapshot presence are checked before unprotection. Protection receives detached bytes, preserving stored envelopes.
++
++The shared EventStore retained source now rejects unsupported stored application metadata/serialization at both retained and excluded source positions before custody. It passes a detached payload to custody, preserving sealed source bytes even when a provider mutates its input. Strict SDK JSON intake, original sequence partition, source/authority rechecks, expiry, cancellation and purpose rules remain enforced.
++
++The owner Local runner now passes an explicit repository source root to its test subprocess and restores the previous environment value in `finally`. Five existing UI architecture/privacy assertions therefore execute correctly when binaries reside outside the source repository. No required lane, class, assertion or analyzer was suppressed.
++
++## Executed policy and restore coverage
++
++The accepted policy remains `party-actor-retention-v1`, 365 fixed days from immutable binding-effective-at. New query tests establish/rebind at one shared boundary; a serialized restore returns the same old/new actor, version, interval and original source position before expiry. They exercise one tick before, at and after original exclusive expiry: restored readable bytes and optimistic synthetic custody cannot restart the clock or release the expired actor. A structurally complete profile-position partition still cannot replace missing predecessor transition/version proof.
++
++Actual shared retained-source tests exercise both expired-readable and destroyed-unreadable predecessor units followed by a live successor. The complete result remains unavailable; the reader does not decrypt the successor or manufacture an exclusion. A newly constructed reader with the same restored ciphertext/old readable key path consults current independent lifecycle and returns no history when that lifecycle denies. These are isolated source tests with synthetic custody; they do not qualify a backend or perform production backup/key restoration.
++
++Twelve processor and six shared security regressions were observed failing before the corrections. Final source lanes execute these plus six accepted-policy query cases and three shared lifecycle cases: 27 new cases total. Fresh 115 Platform tests cover bounded cleanup, exclusive expiry, exact units, changed evidence, missing providers, unknown/lost acknowledgements, and cancellation. Their fixture deliberately contains no keys and supplies no production receipt/copy/restore evidence.
++
++## Why a live successor after predecessor destruction is still blocked
++
++The SDK's `RetainedIdentityHistoryStream.ExcludedSequences` means excluded profile/non-attribution positions. It contains no transition kind, binding revision, immutable boundary, policy-bound expiry or authenticated irreversible-destruction receipt. `IIdentityHistoryCustody.UnprotectEventAsync` returns readable bytes or fails; `CanReadAsync`/`DestroyExpiredAsync` are booleans and do not expose an authenticated exact expired-transition outcome. The Parties fold requires the complete monotonic lifecycle and rejects a successor without its predecessor version proof. Reclassifying an expired binding as a profile exclusion would change the accepted certificate meaning and remove that proof.
++
++A safe owning extension therefore needs a separately versioned, authenticated actor-free continuation/checkpoint or expired-transition certificate, bound to exact tenant/Party, original source position/head, transition kind/version and immutable boundary, accepted policy and fresh nonrollback custody/destruction outcome. It must carry no expired ActorId, private profile, login mapping or recoverable relationship. EventStore owns the source partition/transport and complete authoritative check; Platform custody owns exact lifecycle/irreversible receipts; Parties owns strict version/boundary folding and current/rebind replay. Its allowed data lifetime and compatibility semantics require an explicit owner-approved contract; this packet proposes the required shape without publishing an invented API or policy decision. Current and command replay also need qualified reconstruction without expired predecessor decryption, not merely an attribution-query bypass.
++
++Until that extension is accepted, implemented and qualified, missing predecessor proof remains unavailable. The continuation did not weaken history completeness, retain an expired actor longer, substitute today's binding, or manufacture a tombstone/provider result.
++
++## Exact remaining delivery inputs
++
++Tracked Platform source registers the bounded cleanup operation but no production `IIdentityHistoryCustody` implementation. The only concrete implementation located is the synthetic Platform test fixture. Production activation requires an immutable full custody/source/actor-authority target, authenticated trust/credentials and revocation/freshness rules; exact retained-unit and all-copy inventory (events, snapshots, projections, caches, replicas and lifecycle-covered backups/exports); irreversible destruction and exact lost-ack lookup receipts; independently durable lifecycle/restore quarantine; and the missing continuation contract above.
++
++The complete owner command must exercise P-01–P-10 against that exact target, including persisted conditional creation/concurrency/lost acknowledgements, tenant/service denial, current source/actor authority, original historical boundary after restart, successor-after-expired-predecessor, expiry/destruction/copy coverage and restored old keys/snapshots/replicas/backups. The current `-Mode Live` intentionally refuses incomplete qualification. Final immutable full target, integration date and complete executable compatibility command remain TBD. No dependency becomes Committed/Available from these tests; Branch B's immutable Organization Party and original Story 5.4 draft/backlog remain unchanged.
++
++## Repository observations and ownership
++
++Initial observations: Parties `c5a0d3f27d8f2fd9037b693f540e70b7f3d905a5`; EventStore `af2892e8cb58e844290e56563f9c2fcadaab90a7`; Platform `f45d1cff8444b25d1dd8fb3018964e0372daa8b9`; Agents `ec5779a7c2f9d49c3f604224e3172f82ae7d6ba9`. Later external activity advanced Parties to `a3e5ef3b92a56fb03adc0e7e3235ff5ca158ab9a` and EventStore to `98da5a04e6df33ba026cbaae46d1777acdca7a21`. Some Parties source/test/evidence changes were included by that external activity; this workflow performed no Git mutation and does not interpret those commits as accepted delivery targets.
++
++Owned implementation changes are five Parties paths (processor, validation tests, query tests, UI boundary test source discovery and owner runner) and two EventStore retained-reader paths (source and tests), listed with initial/current hashes in machine evidence. Platform source is unchanged. Unrelated EventStore event-loader/planning changes, Platform admin-exposure work and Parties NuGet policy/spec changes are preserved and excluded from ownership claims. Source manifests capture final worktree hashes after verification and record concurrent-state limits; they do not manufacture one accepted immutable multi-repository target.
+diff --git a/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/tests/owner-continuation-2026-10-07/README.md b/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/tests/owner-continuation-2026-10-07/README.md
+new file mode 100644
+index 0000000..27c6bd3
+--- /dev/null
++++ b/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/tests/owner-continuation-2026-10-07/README.md
+@@ -0,0 +1,26 @@
++# Parties continuation verification — 2026-10-07
++
++The exact owner Local runner passed all ten required source lanes: **784 tests**, zero errors, failures, skips or not-run cases. All ten Debug builds report zero warnings/errors. Fresh Platform custody verification passed **115** more tests, for **899 distinct final passing tests**. Focused replay29 and retained-source36 results overlap the matrix and are not added to that total.
++
++[Machine evidence](evidence.json) records full canonical initial/final HEADs, worktree observations, seven owned paths and their baseline/current hashes, exact commands, artifact hashes and log/XML hashes. [Source manifest](source-manifest.json) records hashes only, captured after verification. Scoped [Parties diff](owned-parties.patch) and [EventStore diff](owned-eventstore.patch) preserve the initial-baseline comparison even where another concurrent workflow committed Parties changes. External commits and other worktree edits are observations; this workflow performed no staging, commit, push, deployment or submodule action.
++
++| Required lane | Passed | Errors / failures / skipped / not run |
++| --- | ---: | --- |
++| Hexalith.EventStore.Contracts.Tests | 23 | 0 / 0 / 0 / 0 |
++| Hexalith.EventStore.Client.Tests | 107 | 0 / 0 / 0 / 0 |
++| Hexalith.EventStore.Server.Tests | 156 | 0 / 0 / 0 / 0 |
++| Hexalith.Platform.Identity.Tests | 2 | 0 / 0 / 0 / 0 |
++| Hexalith.Parties.Contracts.Tests | 29 | 0 / 0 / 0 / 0 |
++| Hexalith.Parties.Server.Tests | 94 | 0 / 0 / 0 / 0 |
++| Hexalith.Parties.Tests | 173 | 0 / 0 / 0 / 0 |
++| Hexalith.Parties.Security.Tests | 30 | 0 / 0 / 0 / 0 |
++| Hexalith.Parties.Client.Tests | 98 | 0 / 0 / 0 / 0 |
++| Hexalith.Parties.UI.Tests | 72 | 0 / 0 / 0 / 0 |
++
++[Final runner log](local-matrix-run.log) and [per-lane manifest](local-matrix/local-evidence.json) link the individual build/test logs and XML. Platform [build](platform-cleanup/build.log), [test log](platform-cleanup/tests.log) and [XML](platform-cleanup/tests.xml) are fresh source evidence using synthetic custody.
++
++The historical destroyed-profile replay case already passed on the initial current source Debug build: [initial test log](replay-repro/tests.log). Its JSON adapter existed in Parties at the captured baseline. This continuation hardens that adapter; it does not claim to have newly fixed the original historical failure. Twelve new processor boundary cases [failed before](replay-repro/red-tests.xml) and [passed afterward](replay-repro/green-tests.xml). Six shared retained-source cases [failed before](shared-security/red-tests.xml) and [passed afterward](shared-security/green-tests.xml), with all 36 retained-source tests passing. Six additional accepted-policy query cases and three shared source lifecycle cases executed in the final matrix; all **27 new cases** are included in the 784 total.
++
++Earlier attempts remain intact. [Attempt 1](attempt-1/local-matrix-run.log) stopped on concurrent EventStore Client test CS1929; its owner corrected that unrelated source. [Attempt 2](attempt-2/local-matrix-run.log) reached UI and found five source-root discovery failures with external artifacts. [Attempt 3](attempt-3/local-matrix-run.log) showed that changing to process working-directory discovery still failed because xUnit runs from the assembly directory. The final owner runner explicitly passes its source root, restores the prior environment value in finally, and executes every original assertion and required class. Archived manifests retain the absolute locations they had at execution, before archival; their sibling logs/XML are preserved in the attempt folders.
++
++Production custody and full owner qualification remain unavailable. The tests prove pre-expiry rebind boundary/serialized restore, immutable exclusive 365-day expiry, source preservation, and fresh lifecycle denial after reader restart. They explicitly prove that an expired/destroyed predecessor cannot be skipped to authorize a successor. No positive successor-after-destruction, real keys, all-copy destruction, production restore or Level 4 result is claimed. See the [owner packet](../../ext-parties-1-replay-and-lifecycle-2026-10-07.md) for the exact missing contracts and qualification inputs.

@@ -1,0 +1,22 @@
+{
+  "blind": [
+    "Transport JsonElement wrapper bypasses typed normalization for ordinary commands.",
+    "Destroyed snapshot can become null while keeping a positive checkpoint tail.",
+    "JSON provider output does not validate protection metadata.",
+    "Checkpoint zero accepts a non-null snapshot.",
+    "Missing-snapshot fixture independently violates count and sequence.",
+    "Bulk validation and copying lack cancellation checks.",
+    "Provider mutation before destroyed-key exception can corrupt fallback input.",
+    "Excluded source metadata variants lack coverage beyond redacted format."
+  ],
+  "edge": [
+    "Zero checkpoint snapshot inconsistency.",
+    "Required snapshot loss after unprotection.",
+    "Inconsistent provider JSON/protection metadata.",
+    "Cancellation during full capture."
+  ],
+  "verification": [
+    "Processor source detachment lacks a successful mutating-provider regression.",
+    "Missing-snapshot regression is rejected by independent count and sequence guards."
+  ]
+}

@@ -592,3 +592,7 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-identity-completion-and-readiness-fixes.md`
   summary: Owner retained-history privacy and schema-drift qualification must account for unexpected profile fields.
   evidence: Before and after this correction, the readiness parser ignores additional payload members; PartiesJsonOptions itself permits unmapped fields while the SDK closes payloads through typed deserialize/serialize. Complete owner qualification must establish that every authenticated installed source emits only the purpose-separated identity schema; local read probes supply neither that production proof nor erasure certification.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
+  summary: Adopt the current EventStore SDK sidecar/workload security contract in the Parties host and authenticated process-endpoint fixture, then rerun all 13 endpoint cases without weakening the startup audit.
+  evidence: Root final run against the reviewed assembly fails before requests on missing EventStoreSidecarChannel for /dapr/subscribe, /dapr/config and actor routes, plus anonymous /healthz; Parties `tests/owner-continuation-2026-10-07/review-final/endpoint-tests.xml` and endpoint-tests.log record the exact audit. This concurrent SDK/host compatibility blocker is independent of the passing 802-test Local matrix and serialized DomainServiceRequest fallback.

@@ -40,9 +40,22 @@ Owner authority alone does not supply these values. Current checkout HEADs are i
 
 ## Remaining delivery work
 
-- Parties: complete production custody, source/actor freshness and retained-history expiry/destruction/restore, packaged consumer compatibility, P-01–P-10 and the unresolved strict json-redacted replay lane.
+- Parties: complete production custody, source/actor freshness and retained-history expiry/destruction/restore (including authenticated successor proof after expired predecessor destruction), packaged consumer compatibility and live P-01–P-10. The historical strict json-redacted replay blocker is superseded by the current complete passing Local source matrix linked below.
 - Conversations: complete authenticated source/compare-append and catalogue/authority, all six seams, automatic approved-deletion publication discovery/backfill/pump, independent authenticated receiver/acknowledgement lookup and persisted failure/restart/race qualification.
 - Secrets: qualified production custody; numeric trusted-envelope profile; independently governed decision-verification trust; full S1–S4/v23, issuer replay/credential restrictions, outcome lookup and live qualification.
 - Host: complete H1–H4/v23 composition, replicated denial spool/recovery worker and private exact-target credentials; production protection binding/attestation and persisted migration/destruction/compromise/restore qualification.
 
 This owner declaration does not choose unresolved independent Product/Governance/Security policies, manufacture approval evidence or deploy providers. It authorizes delivery under the already approved scope. Four records remain Uncommitted while target/date/complete-command fields are unknown. Story 5.4 stays draft/backlog. Once all nine fields per record are accepted, mark Committed; mark Available only after the complete installed target passes its accepted command. No owner issue comment, Git mutation, deployment or live seam invocation accompanies this record.
+
+
+## Current Parties source delivery observation — 2026-10-07
+
+[Parties replay/lifecycle owner packet](../../../parties/_bmad-output/implementation-artifacts/ext-parties-1-replay-and-lifecycle-2026-10-07.md) records the complete existing Local matrix passing 784 tests and fresh Platform custody verification passing 115 more, with zero-warning/error Debug builds. Original destroyed-profile replay already passed on the initial current source; new source boundary checks and 27 regression/qualification cases now pass. This clears that local replay blocker while preserving strict metadata and source completeness. Evidence includes initial failed attempts, exact commands, canonical HEAD/worktree observations and source/artifact hashes.
+
+Production providers, all-copy irreversible receipts, restore qualification, fresh actor authority and complete P-01–P-10 live delivery remain open. Expired predecessor destruction still prevents positive successor proof under the current certificate/custody contract; executed source cases return unavailable safely. No immutable complete target, date or full live command was substituted from these local results or concurrent external commits. All commitment/status fields above and the external register are unchanged by this delivery observation.
+
+## Reviewed Parties verification follow-through
+
+[Final reviewed evidence](../../../parties/_bmad-output/implementation-artifacts/tests/owner-continuation-2026-10-07/review-final/README.md) records 802 fresh required Local passes and the unchanged 115-test custody evidence, independently reviewed and hashed. All 14 review findings were corrected. The original replay failure is superseded as a current Local source blocker; strict retained-history and required-snapshot validation remain enforced. The original 784-test packet remains a pre-review snapshot.
+
+The separate 13-case HTTP class is still blocked by the current SDK startup audit before requests. Complete delivery must adopt the SDK sidecar/workload security contract in the Parties host/authenticated fixture and execute that class, in addition to the actor-free expired-transition continuation contract, qualified custody, irreversible all-copy destruction and nonrollback restore. Serialized full-request source coverage passes but cannot replace HTTP or live acceptance. Target/date/complete-command fields and record statuses remain unchanged.
