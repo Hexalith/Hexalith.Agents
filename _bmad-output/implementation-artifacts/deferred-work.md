@@ -596,3 +596,11 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
   summary: Adopt the current EventStore SDK sidecar/workload security contract in the Parties host and authenticated process-endpoint fixture, then rerun all 13 endpoint cases without weakening the startup audit.
   evidence: Root final run against the reviewed assembly fails before requests on missing EventStoreSidecarChannel for /dapr/subscribe, /dapr/config and actor routes, plus anonymous /healthz; Parties `tests/owner-continuation-2026-10-07/review-final/endpoint-tests.xml` and endpoint-tests.log record the exact audit. This concurrent SDK/host compatibility blocker is independent of the passing 802-test Local matrix and serialized DomainServiceRequest fallback.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
+  summary: B1 — Synchronous authority/fold responsiveness remains an owner qualification requirement.
+  evidence: Synchronous authority admission and local folding were already synchronous; the deadline guards refuse post-budget evidence but cannot forcibly terminate that work. Existing authority/processing responsiveness remains an owner qualification requirement, separate from the selected source/custody wait correction.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
+  summary: B4 — Noncooperative provider resource reclamation and bounded abandoned-work admission remain shared runtime/host qualification requirements.
+  evidence: Noncooperative synchronous provider invocations can retain workers after timeout. The previous direct invocation also retained a request worker indefinitely. The delivered source provider ports do not establish qualified cancellation/resource reclamation; bounded abandoned-work admission belongs to shared runtime/host qualification, not an invented local capacity policy.

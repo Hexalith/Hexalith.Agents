@@ -1,0 +1,16 @@
+{
+  "linksResolve": true,
+  "parentInProgress": true,
+  "parentBaselinePreserved": true,
+  "fullStoryDraftBacklog": true,
+  "fullOwnerTasksRemainOpen": true,
+  "selectedContinuationTasksComplete": true,
+  "noCommitmentTargetDateQualificationInvented": true,
+  "documents": {
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/parties-query-deadline-2026-10-07/README.md": "b7bdca729a8cc255ed191b8ec37635ff2eceb2780b23998e87fbdf61937116eb",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md": "b5a9e56d6c97c09c70ff4e4f81e8db13dee2b57b0b92b078df77e450d8b71415",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-owner-commitments-2026-10-07.md": "27f66a256a3c529fbfc81f1c871c293d68c64781eef5505197eec45f29280c48",
+    "/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/ext-parties-1-query-deadline-2026-10-07.md": "8f727b25da135623e3f17ddb93755cd16551f5286c8841adc3e0ae89b5473ab6",
+    "/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/tests/query-deadline-2026-10-07/README.md": "12cc57fc1e0392e72b07bc460c052cbbd7cf118042c358678230c3f6e9acf8fc"
+  }
+}

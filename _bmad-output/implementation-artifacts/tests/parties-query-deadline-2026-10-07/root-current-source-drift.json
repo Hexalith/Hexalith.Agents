@@ -1,0 +1,22 @@
+{
+  "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.DomainService/DomainServiceRequestRouter.cs": {
+    "verified": "2e2799777cfd6e36f046b782965641ce50411f166b413430bc6476d76bbb63bd",
+    "current": "b1c2b847b15d7abaf302c40dc478f5746f255829c115557350da1541db372d8c"
+  },
+  "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Hexalith.EventStore.Client.csproj": {
+    "verified": "cf6b9a806cb9499bc9fe3ae39d069add50886614cb7390dce7e64def7f8638d9",
+    "current": "3ba2a5670bd2ee86e11fad61ee55eaeaca82e9d65688e6667d6e5acb48137e29"
+  },
+  "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Aggregates/AggregateReplayer.cs": {
+    "verified": "3d9a26ff2aaf19129244756d77e97156163cdd1f6c49252be1f15368fbebd02b",
+    "current": "073a0a5c5ca89fe5c8c9ed3fb06193205bd5365d58030c0a9971e26175336f87"
+  },
+  "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Aggregates/EventStoreAggregate.cs": {
+    "verified": "4fe4d6ca85d223dd4d4d587f76ed0b9b5720e5b5333b7eb57a4acfcada66d77a",
+    "current": "46a703f2c92d6cbea15793514c3e3ab1db28834c9b6cda29a45bcc9599a9d853"
+  },
+  "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Registration/EventStoreServiceCollectionExtensions.cs": {
+    "verified": "ef79b7c9bbfb34f9c11549f943cd709665a1d29244cec24a3db88c7932078145",
+    "current": "e0971a761db9d80e6b4a2cdf9541f6ca134e2b2dc0b8c9fec951eee1d9a92ea7"
+  }
+}

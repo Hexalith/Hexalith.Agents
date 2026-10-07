@@ -1,0 +1,2 @@
+Working directory: /home/administrator/projects/hexalith/parties
+python3 /home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/tests/query-deadline-2026-10-07/review-final/verification-driver.py

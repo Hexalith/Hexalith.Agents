@@ -1,0 +1,25 @@
+{
+  "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md": "6bf0e4e0c7d641dfb3f208e7fbddfdec0efbde07a8c519ea0ea811accaefe9f9",
+  "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md": "61945071e5369c1b74c173fba8f2c1275fdec3520caee607cd6df558098fd783",
+  "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/sprint-status.yaml": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+  "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/external-dependency-register.md": "7b5c24fc10db943be744ba579f96a44d9488f8f2ebc8cd8929ead73a2b6424e1",
+  "/home/administrator/projects/hexalith/parties/_bmad-output/planning-artifacts/actor-history-retention-policy-v1.md": "8f6780d252154803343432e2126e596209e432284cfddf1c7f5b9eb596aa2fe1",
+  "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/appsettings.json": "3974bb0107f9c6789f27a2c82ce84685febd2e9e1394b3875146b005a64ab063",
+  "frozen_intent_sha256": "2080f4db5b1c212a408d0342f32585cc7f2e12aeb6f903a2dcacb52e22c80390",
+  "agents": {
+    "head": "c92cfdb5607fa15aa56a613e86c6227406504351",
+    "status": "## main...origin/main\n"
+  },
+  "parties": {
+    "head": "ba67abbc3a2ca7cc3e63697d0f5a3c6231668cc2",
+    "status": "## main...origin/main\n"
+  },
+  "eventstore": {
+    "head": "c60503c13069fde13f329f2166ff39c90c3661c4",
+    "status": "## main...origin/main\n M _bmad-output/planning-artifacts/ux-designs/ux-eventstore-2026-07-05/.memlog.md\n"
+  },
+  "platform": {
+    "head": "bed37580a4213edb3e4698525e530b85aa4a80ea",
+    "status": "## main...origin/main\nA  .github/CODEOWNERS\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T111755Z-local-preparation/SHA256SUMS\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T111755Z-local-preparation/local-validation.json\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T111755Z-local-preparation/proposed-changes.json\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T111755Z-local-preparation/retained-baseline-preflight.json\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T111755Z-local-preparation/retained-discovery-verification.json\nA  _bmad-output/implementation-artifacts/evidence/epic-4/4-4/20261007T111755Z-local-preparation/summary.md\nM  _bmad-output/implementation-artifacts/spec-4-4-apply-publication-and-operations-repository-controls.md\nM  _bmad-output/implementation-artifacts/sprint-status.yaml\nA  eng/repository-controls/README.md\nA  eng/repository-controls/controls.py\nA  eng/repository-controls/desired-state.json\nA  eng/repository-controls/test_controls.py\n"
+  }
+}
