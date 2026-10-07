@@ -1,0 +1,46 @@
+{
+  "capturedUtc": "2026-10-07T11:42:12.441967+00:00",
+  "checks": [
+    {
+      "cwd": "/home/administrator/projects/hexalith/agents",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0
+    },
+    {
+      "cwd": "/home/administrator/projects/hexalith/parties",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 2,
+      "reason": "CRLF source lines are interpreted as trailing whitespace by default Git whitespace settings; .editorconfig explicitly sets end_of_line = crlf."
+    },
+    {
+      "cwd": "/home/administrator/projects/hexalith/parties",
+      "argv": [
+        "git",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0
+    },
+    {
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs"
+      ],
+      "exitCode": 0
+    }
+  ]
+}

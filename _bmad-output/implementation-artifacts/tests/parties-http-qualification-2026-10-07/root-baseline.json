@@ -1,0 +1,19 @@
+{
+  "capturedUtc": "2026-10-07T11:01:03.467573+00:00",
+  "readOnlyGit": true,
+  "files": {
+    "agents/_bmad-output/implementation-artifacts/sprint-status.yaml": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+    "agents/_bmad-output/planning-artifacts/external-dependency-register.md": "7b5c24fc10db943be744ba579f96a44d9488f8f2ebc8cd8929ead73a2b6424e1",
+    "parties/src/Hexalith.Parties/appsettings.json": "3974bb0107f9c6789f27a2c82ce84685febd2e9e1394b3875146b005a64ab063",
+    "parties/src/Hexalith.Parties/Program.cs": "a20a3bf91324a25213328b8b94fc87280abe7c80b528df7624ebc00216528be8",
+    "agents/_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md": "882d583dd571918c2e4e28c2f2207e584e6f2a0bdb5abdf3132281f80df0f6e7",
+    "agents/_bmad-output/specs/spec-story-5-4-dependency-unblock/SPEC.md": "b7706993b6de0ed11b5bfe7a3f1884ec470a0cf5eae664ff2828f48d0230e980"
+  },
+  "frozenIntentSha256": "0cd11ddac96af9775593ea0aa24d969b235b32dfcc4a76a80e51d7eb9c82e2cb",
+  "repositoryHeads": {
+    "agents": "09d17fccfd564c9518486618c75b4505b474ec5f",
+    "parties": "34f57baccdf3e9fc2ec615f07499c6d274105851",
+    "eventstore": "4b1377a755636ec1eb0844de5901f0c73626ca59",
+    "platform": "bed37580a4213edb3e4698525e530b85aa4a80ea"
+  }
+}

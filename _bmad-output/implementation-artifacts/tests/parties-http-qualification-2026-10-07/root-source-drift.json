@@ -1,0 +1,20 @@
+{
+  "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Handlers/LegacyCommandReplayInput.cs": {
+    "recordedSha256": "6dd216574f33e2b4d01c4ff558e61553978d39090039f85475fa8de93ae1c344",
+    "currentSha256": "a62028d904d10d10a90624c87b4b92b8fe56940223ae091768dbc97861c60d39",
+    "ownedInImplementation": false,
+    "expectedRootDocumentationChange": false
+  },
+  "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Handlers/LegacyCommandReplayInputTests.cs": {
+    "recordedSha256": "4d231b55d1afe00056de1a3163d7516cfaadb07de3be3980ac73a0968848a18a",
+    "currentSha256": "57396c9914707dd1e948c2711464309dc4eadcf44be7f95040ae1ccdca9d4c97",
+    "ownedInImplementation": false,
+    "expectedRootDocumentationChange": false
+  },
+  "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md": {
+    "recordedSha256": "41969eb36435370dd8218f5014c5153b1387ddc6f0391e4568d0e3ca2b35f723",
+    "currentSha256": "51c4eaa41df1b133bbbf78e2b910dcb93ceb49b59beb4ac29c2828f1e7885fad",
+    "ownedInImplementation": false,
+    "expectedRootDocumentationChange": true
+  }
+}

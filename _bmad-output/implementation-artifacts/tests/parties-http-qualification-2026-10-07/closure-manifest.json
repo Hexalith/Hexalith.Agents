@@ -1,0 +1,21 @@
+{
+  "capturedUtc": "2026-10-07T11:45:36.565565+00:00",
+  "checkedLocalLinks": 87,
+  "brokenLinks": [],
+  "closureFiles": {
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/parties-http-qualification-2026-10-07/README.md": "dde51c109d4ceb293ce45ce3e5c7cdfb1a132fe053670ac42fa0146b9eb2227e",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/parties-http-qualification-2026-10-07/review/README.md": "0f7f6f53da4a0413fa43c48fb45d0e9b45669706740b3a0c0e78c4f6aa7cb0d0",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/parties-http-qualification-2026-10-07/qualification-status.md": "9d9b600bfd362ea252c7f83351ff7842e5176340430808e8b06834a30aed33f0",
+    "/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/tests/http-qualification-2026-10-07/review-final/README.md": "4018c773e97a95c9fa383f718e0df61ffab8ac2b8f41ac43f1a71e4e0d58b044",
+    "/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/tests/http-qualification-2026-10-07/review-final-source-drift-01/README.md": "2a04157cf801c4905310e86b88ebac32039c4d6ef9d4e19858726012779f6466",
+    "/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/tests/http-qualification-2026-10-07/review-final-source-drift-02/README.md": "3ac9cc2e667d2a6e39c3a928f7e3ae2af30bd843910fd4493fc948bf4325a02e",
+    "/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/tests/http-qualification-2026-10-07/review-follow-up-source-drift-03/README.md": "fedb84b2386a4196564383babbed552ba4a55d617aabbf43aae62ad3cdc8ba2b",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md": "6bf0e4e0c7d641dfb3f208e7fbddfdec0efbde07a8c519ea0ea811accaefe9f9",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-owner-commitments-2026-10-07.md": "65fc8d29934d5db2bf8cfac8f000ac2ed639f2e10fb1908e3b5b150390682398",
+    "/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/ext-parties-1-http-and-source-qualification-2026-10-07.md": "8ed2292bbc0bb75b83bcccb47698dc05d982e4c0dbc86a24068446d0d0c6c302"
+  },
+  "rootAuditSha256": "8efdbede27678418ad9bd168413228932098b164124c774c312cb84f27471bee",
+  "reviewDiffSha256": "ae90d7eafef6617de68c727b74a85eb51bc0e11fa8974cb8963a9f43fec54c1b",
+  "postClosureCheckSha256": "9d195e9597b4c2c5a5657b6a2dd46da144f20974baca2812f923c3857c4045e7",
+  "laterAttemptEvidenceSha256": "696dafa402e65a3311aee5942381713bf0e8ca9086b40c20e0bc159b66b33870"
+}

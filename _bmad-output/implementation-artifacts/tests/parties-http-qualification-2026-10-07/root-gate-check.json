@@ -1,0 +1,12 @@
+{
+  "protectedFilesUnchanged": {
+    "agents/_bmad-output/implementation-artifacts/sprint-status.yaml": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+    "agents/_bmad-output/planning-artifacts/external-dependency-register.md": "7b5c24fc10db943be744ba579f96a44d9488f8f2ebc8cd8929ead73a2b6424e1",
+    "parties/src/Hexalith.Parties/appsettings.json": "3974bb0107f9c6789f27a2c82ce84685febd2e9e1394b3875146b005a64ab063",
+    "agents/_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md": "882d583dd571918c2e4e28c2f2207e584e6f2a0bdb5abdf3132281f80df0f6e7",
+    "agents/_bmad-output/specs/spec-story-5-4-dependency-unblock/SPEC.md": "b7706993b6de0ed11b5bfe7a3f1884ec470a0cf5eae664ff2828f48d0230e980"
+  },
+  "frozenIntentUnchanged": true,
+  "additionalHostHealthPasses": 17,
+  "healthXmlSha256": "c5d54909ce8df1666324ccfa5bf2c7667e48778db2d16e08fdda8ccb159d2d13"
+}

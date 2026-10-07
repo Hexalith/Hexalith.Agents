@@ -1,0 +1,24 @@
+{
+  "capturedUtc": "2026-10-07T11:39:21.581743+00:00",
+  "reason": "A second read-only audit after evidence prose was written detected further external source changes after the successful stable-source run and first independent root audit. Prior root audit remains the timestamped verified snapshot.",
+  "sourceDelta": {
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Handlers/DomainProcessorStateRehydrator.cs": {
+      "verifiedSha256": "5075b8a75edc8a7f073a3917f5090c39ce8bf4817f7227af8a295382709f8e41",
+      "nowSha256": "365c5519884c104d8bdd592502d635d8a638d3b4120ee7be540f38b3773b5a30"
+    },
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Handlers/LegacyCommandReplayInput.cs": {
+      "verifiedSha256": "426f5adf3a1e855e4f7d4c8379d77965882c296155d39f52399bb92b0070f932",
+      "nowSha256": "74e45830ca90e84f95d2710423007bf0ba8f284fe2e56ba240687ca199ef74c5"
+    },
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Handlers/LegacyCommandReplayJsonAdmission.cs": {
+      "verifiedSha256": "823acc5382300876c38ae04aa4fb390d5440df3bb20362dfa172e8aa3a406ccf",
+      "nowSha256": "4a55aa2242b9c48c4cd4b2b9a4dd7a76dcbaed224a76d3e5a5ff3e758f998d08"
+    }
+  },
+  "repositoryHeads": {
+    "agents": "09d17fccfd564c9518486618c75b4505b474ec5f",
+    "parties": "d519cec885fe32e77452bfe66048e04db22ffd0e",
+    "eventstore": "02e99bfa282ace7d56a1d7d7ad5c0321f63293e3",
+    "platform": "bed37580a4213edb3e4698525e530b85aa4a80ea"
+  }
+}

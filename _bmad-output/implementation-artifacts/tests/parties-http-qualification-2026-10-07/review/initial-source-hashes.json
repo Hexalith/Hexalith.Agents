@@ -1,0 +1,42 @@
+{
+  "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Program.cs": {
+    "sha256": "b87128a2021779d8e79b99e0507fae891f3cf0f13b08b375bd9f80452953d043",
+    "baselineSha256": "a20a3bf91324a25213328b8b94fc87280abe7c80b528df7624ebc00216528be8"
+  },
+  "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Middleware/DegradedResponseMiddleware.cs": {
+    "sha256": "91977291c505c89a427f84a6c7436a19be67ecdae6a5b3bfeee37e7d1887603c",
+    "baselineSha256": "e4ae3db8a7228bca5010ad7c8252c9a88cdec4df6a31af20bd893286f783b466"
+  },
+  "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Gateway/PartiesProcessEndpointTests.cs": {
+    "sha256": "f9a578bc1d1560f9411a30e32ef5ee44ab823b6de1b3b41291375d7edda42e2f",
+    "baselineSha256": "f4a2fb4141326301109d110e773ea587df8dcdd97045f94243528099033aea32"
+  },
+  "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Gateway/PartiesProcessTestFactory.cs": {
+    "sha256": "f1b49dcb00b7d9565db1bfa1e390a9721d29d5edf3c39c513566cb6c34e180df",
+    "baselineSha256": null
+  },
+  "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Gateway/CapturingDomainProcessor.cs": {
+    "sha256": "228fc8faa146c1063624d7381d0a2265ebc855d7040450a1da45b823540ede17",
+    "baselineSha256": null
+  },
+  "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Gateway/PayloadProducingDomainProcessor.cs": {
+    "sha256": "1101ecb8ec12cd4e9ca468097e0b32335f606cd969ddab67ae388ff6c9737d6e",
+    "baselineSha256": null
+  },
+  "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Gateway/PartiesDomainServiceSecurityTests.cs": {
+    "sha256": "498804c3004ea3aef569de096a236c1dd8bc5f6ea5d4fa21b8957640959dcf2a",
+    "baselineSha256": null
+  },
+  "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/HealthChecks/DegradedResponseMiddlewareTests.cs": {
+    "sha256": "747af5c43aa0913e164e2c182d0c3abd32ac9affc873f527551115079090d572",
+    "baselineSha256": "a22bac07cbf20a1bd4ba4502eabe61a80101433f408c6bed74438c386d3bb022"
+  },
+  "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-1.ps1": {
+    "sha256": "d9f939321545cffac9125384b9eeaade5c5af6dd3f1dcca0b848c82a03ff2270",
+    "baselineSha256": "a2a054a34c172a7d1b9cd7f416f0ec361e19b553774071af9a0a789c1e720678"
+  },
+  "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs": {
+    "sha256": "d54434f298cd6ec3e873c96e14669f84dcb5cc682404d66363d3af6160542676",
+    "baselineSha256": "ef9b9588e73f570001796459daf569162affe841d0b477d966fde2b72abda760"
+  }
+}

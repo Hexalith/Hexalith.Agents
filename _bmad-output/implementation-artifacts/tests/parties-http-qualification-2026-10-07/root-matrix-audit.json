@@ -1,0 +1,125 @@
+{
+  "lanes": [
+    {
+      "project": "Hexalith.EventStore.Contracts.Tests",
+      "passed": 23,
+      "xmlSha256": "89fa064cd73696cea8c50e3e962d2f01f1f256ff356009fc561251b8c3de1692",
+      "buildSha256": "874e7606e18ae91c4e273915a8592884fd3677137e922c39ed36bdb6885a07fd",
+      "requiredClasses": [
+        "*StreamReadPageValidatorTests",
+        "*RetainedIdentityHistoryValidatorTests"
+      ]
+    },
+    {
+      "project": "Hexalith.EventStore.Client.Tests",
+      "passed": 107,
+      "xmlSha256": "b6a3453d3f645354a858e8b9be5fe2098fbde0b417c17db08e3c7c0969abf9d5",
+      "buildSha256": "f437b5269e1c8ee3723b5148b845b0c390b2ae1784f1e156f51a24a4436935b7",
+      "requiredClasses": [
+        "*AuthoritativeEventStreamReaderTests",
+        "*EventStoreGatewayClientTests",
+        "*EventStoreGatewayClientStreamTests",
+        "*RetainedIdentityHistoryReaderTests"
+      ]
+    },
+    {
+      "project": "Hexalith.EventStore.Server.Tests",
+      "passed": 166,
+      "xmlSha256": "82906572ca5c0c37f19f465950606d6e24f583fed55e8647fc0bb0ff7a38283c",
+      "buildSha256": "1366051b88b36a68dbd193056d1967d84424ec2b3b90dcfabbbb3a59a7ca2b7c",
+      "requiredClasses": [
+        "*IdentityAdmissionTests",
+        "*ActorRegistryTests",
+        "*IdentityGatewayDenialTests",
+        "*CommandsControllerTrustedExtensionTests",
+        "*QueriesControllerTests",
+        "*StreamsControllerTests",
+        "*RetainedIdentityHistorySourceReaderTests"
+      ]
+    },
+    {
+      "project": "Hexalith.Platform.Identity.Tests",
+      "passed": 2,
+      "xmlSha256": "598431b70da6a7b2782a0ec5ae221becfeccd2531130cd45135a7818e0585d2b",
+      "buildSha256": "bf17dd313b7c0f3a117f273b33dcda2c37c860b636f8d685210c8f765b227143",
+      "requiredClasses": [
+        "*PlatformIdentityAdmissionTests"
+      ]
+    },
+    {
+      "project": "Hexalith.Parties.Contracts.Tests",
+      "passed": 29,
+      "xmlSha256": "354ce97f7bfcf5769e261ad017693ddb0774beb7671f5b9fd32bd31fcbf03470",
+      "buildSha256": "d8b003b607b0435142c70f2b58b560a033d20d4aeac4783f52ff16135b519f19",
+      "requiredClasses": [
+        "*PartyStateTests",
+        "*PartyIdentityContractTests",
+        "*ContractsPublicApiSnapshotTests"
+      ]
+    },
+    {
+      "project": "Hexalith.Parties.Server.Tests",
+      "passed": 94,
+      "xmlSha256": "4135183573eae36b892b75e9a660c48bd893afadb8a035c1cd5271e73462ecbf",
+      "buildSha256": "507a7554cbc02eedbf62c231ef5f70ea7231ab9189aa888a8df5073003c38faf",
+      "requiredClasses": [
+        "*AgentPartyProvisioningTests",
+        "*HumanActorBindingTests",
+        "*PartyAggregateCreateTests",
+        "*PartyAggregateCompositeTests"
+      ]
+    },
+    {
+      "project": "Hexalith.Parties.Tests",
+      "passed": 229,
+      "xmlSha256": "862a179d7f62f8cea7bb6733f70206136a6eff2de5008ce4a88f9fe7a74f8d53",
+      "buildSha256": "604686831f1ae69d5ed077285a6cdc0fa4f7216e50b3b9276a1603f0acefabc5",
+      "requiredClasses": [
+        "*PartyIdentityAdmissionTests",
+        "*PartyIdentityQueryHandlerTests",
+        "*PartyDomainProcessorValidationTests",
+        "*PartySdkQueryHandlerTests",
+        "*PartiesProcessEndpointTests",
+        "*PartiesDomainServiceSecurityTests"
+      ]
+    },
+    {
+      "project": "Hexalith.Parties.Security.Tests",
+      "passed": 30,
+      "xmlSha256": "c76bb993d094e0edde3c5e949180e3452c72f33cf498fb62525e477aa0145b40",
+      "buildSha256": "1b08eb851cd3aef1d5d7bcbdc4cddf8e64b4a7f39124c776c19d37a6379a3bde",
+      "requiredClasses": [
+        "*IdentityHistoryProtectionTests",
+        "*PartyPayloadProtectionServiceTests"
+      ]
+    },
+    {
+      "project": "Hexalith.Parties.Client.Tests",
+      "passed": 98,
+      "xmlSha256": "ef676392269dfb5e85d51d35e4ee345e6c3d6d51d04d7d5b0aae3d721ecabf20",
+      "buildSha256": "cfae85aa11fb3b5fe759be12773ca670734c32c724f65687e42b278943332050",
+      "requiredClasses": [
+        "*HttpPartiesIdentityClientTests",
+        "*HttpPartiesCommandClientTests",
+        "*HttpPartiesQueryClientTests",
+        "*DependencyInjectionTests"
+      ]
+    },
+    {
+      "project": "Hexalith.Parties.UI.Tests",
+      "passed": 72,
+      "xmlSha256": "0b18ae3f9aa24f80e241d9589dc2acc7e0743cd3fd9d50f4bd22165dc862d26c",
+      "buildSha256": "b2557d15184f377ecf7916e84bb93c4cbd76094c53d9255548113f0058bbcb89",
+      "requiredClasses": [
+        "*IdentityBindingBoundaryTests",
+        "*IdentityBindingProvisioningServiceTests",
+        "*PartyIdClaimResolverTests",
+        "*SelfScopedPartiesClientTests"
+      ]
+    }
+  ],
+  "distinctPasses": 850,
+  "original13ExactNamesPreserved": true,
+  "allRequiredFiltersExecuted": true,
+  "allWarningFreeDebugBuilds": true
+}
