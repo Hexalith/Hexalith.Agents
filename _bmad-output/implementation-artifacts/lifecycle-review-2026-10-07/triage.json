@@ -1,0 +1,185 @@
+{
+  "findings": [
+    {
+      "id": "B01",
+      "verdict": "medium",
+      "route": "defer",
+      "group": "Packaged SDK transport is missing",
+      "evidence": "The pinned Client 3.113.0 has no retained-history reader while source mode supplies it. Contracts already contains the older custody seam, so the claim is narrowed to missing retained-stream/reader APIs; packaged release verification remains an earlier prerequisite.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "B02",
+      "verdict": "high",
+      "route": "defer",
+      "group": "Successor continuity after predecessor expiry",
+      "evidence": "RetainedHumanActorHistoryFold starts version at zero and rejects a Rebound with version zero. Removing an expired predecessor cannot reproduce a live successor. This previously recorded production blocker requires owner-authenticated continuity evidence; qualification alone is insufficient.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "B03",
+      "verdict": "high",
+      "route": "defer",
+      "group": "Client completion expiry",
+      "evidence": "HttpPartiesIdentityClient.Matches validates recorded interval/custody shape but has no current-clock comparison. A delayed historical response can pass after custody expiry. This is existing client behavior, separate from the new cleanup operation.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "B04",
+      "verdict": "maybe-false",
+      "route": "defer",
+      "group": "Version-one rollout compatibility",
+      "evidence": "The new field defaults to zero and the client rejects zero, but these identity APIs are documented as proposed/unpublished. No deployed older v1 producer was demonstrated. Medium if such a producer exists; settle with the owner publication/deployment inventory and explicit rollout contract.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "B05",
+      "verdict": "high",
+      "route": "defer",
+      "group": "Concrete actor revocation freshness",
+      "evidence": "PartyIdentityAuthority.Admit re-verifies the same signed proof without consulting the actor registry. SameAuthority cannot see revocation during its lifetime. This is an earlier authority seam/production qualification gap, not introduced by applying the duration.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "B06",
+      "verdict": "medium",
+      "route": "defer",
+      "group": "Party query deadline",
+      "evidence": "Current and retained-history custody waits use WaitAsync(cancellationToken) without an operation deadline. An ignoring provider with CancellationToken.None can stall indefinitely. This earlier query boundary needs its own bounded operation contract.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "B07",
+      "verdict": "high",
+      "route": "patch",
+      "group": "Synchronous cleanup invocation",
+      "evidence": "IdentityHistoryCleanup invokes operation() before WaitAsync. A synchronously blocking provider defeats the new bound and cancellation; the provider interface imposes no nonblocking restriction. Offload invocation within the same existing task boundary and test synchronous stalls in both provider phases.",
+      "resolution": "Fixed"
+    },
+    {
+      "id": "B08",
+      "verdict": "medium",
+      "route": "defer",
+      "group": "Readiness exact immutable expiry",
+      "evidence": "The readiness script parses retention but checks only a future returned expiry, not ValidFrom + retention or its interval bound. This pre-existing ReadinessOnly verifier can accept a wrong duration; it cannot qualify production.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "B09",
+      "verdict": "medium",
+      "route": "defer",
+      "group": "Readiness transition proof",
+      "evidence": "The verifier compares the opening actor/version/scope but does not reconstruct later revoke/rebind boundaries. An incorrectly open returned interval can pass. This is an earlier readiness verifier defect, not a cleanup/provider qualification result.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "B10",
+      "verdict": "medium",
+      "route": "defer",
+      "group": "Readiness streaming bound",
+      "evidence": "Invoke-WebRequest buffers the response before the UTF-8 byte-count check. The 32 MiB receive bound does not prevent oversized allocation; streaming enforcement is an earlier verifier prerequisite.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "B11",
+      "verdict": "medium",
+      "route": "defer",
+      "group": "Relative evidence paths",
+      "evidence": "The wrapper creates a caller-relative EvidenceDirectory then changes directory before resolving build/test outputs. Legal relative arguments can redirect or fail output. Normalize evidence and optional Memories paths before lane execution in the owning verifier slice.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "B12",
+      "verdict": "low",
+      "route": "patch",
+      "group": "ADR policy approval wording",
+      "evidence": "The ADR still says numeric duration/post-erasure scope are unapproved and suggests a pending different trigger. The accepted policy and host now supply 365 fixed days from binding-effective-at. Correct those current sentences while keeping trust/custody/restore qualification pending.",
+      "resolution": "Fixed"
+    },
+    {
+      "id": "E01",
+      "verdict": "high",
+      "route": "patch",
+      "group": "Synchronous cleanup invocation",
+      "evidence": "Same proven invocation gap as B07: Task is not obtained until operation() returns; neither timeout nor caller cancellation can bound a synchronous stall.",
+      "resolution": "Fixed"
+    },
+    {
+      "id": "E02",
+      "verdict": "high",
+      "route": "defer",
+      "group": "Current read lower time bound",
+      "evidence": "After custody, the current method checks upper expiry but not completedAt >= binding.ValidFrom or source.ObservedAt <= completedAt. An earlier-issued still-valid grant plus clock rollback can release future current evidence. This pre-existing current-read boundary remains a launch blocker.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "E03",
+      "verdict": "medium",
+      "route": "defer",
+      "group": "Relative evidence paths",
+      "evidence": "Same legal relative-path failure as B11, verified at Push-Location and the build/test Join-Path calls.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "E04",
+      "verdict": "medium",
+      "route": "defer",
+      "group": "Readiness nested binding scope",
+      "evidence": "The readiness response guard checks outer tenant/Party and actor/version but not the nested evidence tenant/Party. Comparing opening source scope to the expected scope does not compare the returned nested scope; another tenant can pass the verifier.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "E05",
+      "verdict": "medium",
+      "route": "defer",
+      "group": "Readiness exact immutable expiry",
+      "evidence": "Same missing immutable-expiry comparison as B08. The source opening custody expiry is not compared with returned expiry.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "E06",
+      "verdict": "high",
+      "route": "patch",
+      "group": "Synchronous cleanup invocation",
+      "evidence": "The reported 6,035 ms blocking invocation is consistent with the unbounded operation() call before the 5,000 ms wait. The same minimal fix and synchronous deadline/cancellation tests resolve this falsified new cleanup claim.",
+      "resolution": "Fixed"
+    },
+    {
+      "id": "V01",
+      "verdict": "medium",
+      "route": "defer",
+      "group": "Current authority regression coverage",
+      "evidence": "Accept the pre-verified gap: authority-change tests call ResolveAtAsync, while current policy/cancellation tests do not observe removal of SameAuthority in ResolveAsync. Add current source/custody authority-change cases in the owning query verification slice.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "V02",
+      "verdict": "medium",
+      "route": "defer",
+      "group": "Current completion-expiry coverage",
+      "evidence": "Accept the pre-verified gap: the clock-crossing test exercises historical resolution; client invalid replies do not execute the current service. Add current binding-closure and custody-expiry crossing cases with otherwise valid authority.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "V03",
+      "verdict": "medium",
+      "route": "defer",
+      "group": "Readiness exact-target receipt coverage",
+      "evidence": "Accept the pre-verified gap: existing counting-server smoke cases fail before receipt validation. A synthetic Available register with a mismatched receipt needs a no-HTTP regression test before this earlier readiness gate can be relied upon.",
+      "resolution": "DeferredUnresolved"
+    },
+    {
+      "id": "V04",
+      "verdict": "medium",
+      "route": "defer",
+      "group": "Readiness exact immutable expiry",
+      "evidence": "The verification reviewer independently confirms B08/E05: a 366-day returned deadline can pass a declared 365-day policy because only future expiry and opening actor/version/scope are checked.",
+      "resolution": "DeferredUnresolved"
+    }
+  ],
+  "patchGroups": 2,
+  "deferredGroups": 15,
+  "productionEnabled": false,
+  "status": "CompletedWithDeferredPrerequisites",
+  "evidence": "../tests/actor-history-lifecycle-review-fixes-2026-10-07/evidence.json"
+}

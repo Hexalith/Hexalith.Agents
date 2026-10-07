@@ -1,6 +1,6 @@
 # Concrete retention and custody proposal
 
-Prepared in response to the user's request to supply the missing retention/custody behavior and compare pragmatic solutions. **Status: concrete recommendation for review; no production configuration or qualification receipt is created.** The earlier approval covered the local implementation/design before a numeric duration was proposed.
+Prepared in response to the user's request to supply the missing retention/custody behavior and compare pragmatic solutions. **Original status on 2026-10-06: concrete recommendation for review. Accepted by the user’s “do recommended” instruction on 2026-10-07.** The earlier approval covered the local implementation/design before a numeric duration was proposed. The accepted period is now applied to the Parties host configuration; a production custody qualification receipt is still absent.
 
 ## Proposed retention
 
@@ -47,3 +47,9 @@ Qualify on an isolated owner-approved target using shortened synthetic intervals
 Prefer option 1. If no suitable custody exists, use option 2 in the current platform/cloud with the smallest adapter and already qualified independent lifecycle infrastructure. Use option 3 only if Vault is already operated. Do not build new self-managed custody or a generic policy system for this feature.
 
 Workspace investigation found interfaces and synthetic tests, but no production actor-history custody implementation. Azure account metadata was cached; actual vault enumeration failed because the account's MSAL token was unavailable. No deployment was selected, provisioned or exercised. The proposed policy parses and derives its deadline through the existing SDK contract; [configuration validation](tests/actor-retention-proposal-2026-10-06/configuration-validation.json) confirms 365 days and the expected exclusive deadline. The temporary PowerShell check initially could not load the Parties Web assembly because the ASP.NET runtime was absent from that host; it then used the SDK policy contract directly. This is not a new domain test or custody/restore qualification. Full Story 5.4 and the existing dependency register remain unchanged.
+
+## Application — 2026-10-07
+
+The user selected this concrete recommendation. `party-actor-retention-v1` now has an accepted duration of 365 fixed days from each binding’s effective instant, with the post-erasure scope and timing limitation above. [The implementation spec](spec-5-4-apply-365-day-lifecycle.md) records authorization and the bounded Platform cleanup operation. The original proposed JSON and its dated validation remain an archived pre-acceptance snapshot; runtime configuration is now [Parties appsettings](../../../parties/src/Hexalith.Parties/appsettings.json).
+
+No existing production actor-history custody implementation was found on reinspection. Azure vault enumeration was retried; deployment qualification remains contingent on actual authenticated resource discovery, independent lifecycle infrastructure, inventory and restore exercise results. No new self-managed vault, policy engine, database or deployed service is introduced.

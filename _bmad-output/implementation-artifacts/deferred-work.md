@@ -528,3 +528,63 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 
 - Platform-scope provider-catalog queries through EventStore `/query` now require `HttpAgentAdministrationContextProvider` to prove `Agents.PlatformOperator` and a matching `ActorUserId` from the ambient `HttpContext` (`ProviderCatalogQueryHandlerBase.IsProviderAdminAsync`). No `AddAuthentication`/JWT setup exists in `src/`, so in this repository's host the context is `Anonymous`. Unverified (high if true): every platform catalog query would return `NotAuthorized` in production. Settle under DW-21 by confirming the deployed domain-service host authenticates the bearer token EventStore forwards on the Dapr-invoked `/query` call.
 - `ProviderSelectionVerdict.HasValidPricing` switched to the ISO 4217 list without a selection-orchestrator test for a non-ISO currency (`ZZZ`, `XTS`) mapping to `Unpriced`. Aggregate and migration validate currency at write time, so only pre-validation data is exposed; add theory rows when the verdict is next touched.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Packaged SDK transport is missing (B01) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: The pinned Client 3.113.0 has no retained-history reader while source mode supplies it. Contracts already contains the older custody seam, so the claim is narrowed to missing retained-stream/reader APIs; packaged release verification remains an earlier prerequisite.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Successor continuity after predecessor expiry (B02) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: RetainedHumanActorHistoryFold starts version at zero and rejects a Rebound with version zero. Removing an expired predecessor cannot reproduce a live successor. This previously recorded production blocker requires owner-authenticated continuity evidence; qualification alone is insufficient.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Client completion expiry (B03) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: HttpPartiesIdentityClient.Matches validates recorded interval/custody shape but has no current-clock comparison. A delayed historical response can pass after custody expiry. This is existing client behavior, separate from the new cleanup operation.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Version-one rollout compatibility (B04) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: The new field defaults to zero and the client rejects zero, but these identity APIs are documented as proposed/unpublished. No deployed older v1 producer was demonstrated. Medium if such a producer exists; settle with the owner publication/deployment inventory and explicit rollout contract.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Concrete actor revocation freshness (B05) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: PartyIdentityAuthority.Admit re-verifies the same signed proof without consulting the actor registry. SameAuthority cannot see revocation during its lifetime. This is an earlier authority seam/production qualification gap, not introduced by applying the duration.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Party query deadline (B06) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: Current and retained-history custody waits use WaitAsync(cancellationToken) without an operation deadline. An ignoring provider with CancellationToken.None can stall indefinitely. This earlier query boundary needs its own bounded operation contract.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Readiness exact immutable expiry (B08, E05, V04) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: The readiness script parses retention but checks only a future returned expiry, not ValidFrom + retention or its interval bound. This pre-existing ReadinessOnly verifier can accept a wrong duration; it cannot qualify production. Same missing immutable-expiry comparison as B08. The source opening custody expiry is not compared with returned expiry. The verification reviewer independently confirms B08/E05: a 366-day returned deadline can pass a declared 365-day policy because only future expiry and opening actor/version/scope are checked.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Readiness transition proof (B09) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: The verifier compares the opening actor/version/scope but does not reconstruct later revoke/rebind boundaries. An incorrectly open returned interval can pass. This is an earlier readiness verifier defect, not a cleanup/provider qualification result.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Readiness streaming bound (B10) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: Invoke-WebRequest buffers the response before the UTF-8 byte-count check. The 32 MiB receive bound does not prevent oversized allocation; streaming enforcement is an earlier verifier prerequisite.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Relative evidence paths (B11, E03) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: The wrapper creates a caller-relative EvidenceDirectory then changes directory before resolving build/test outputs. Legal relative arguments can redirect or fail output. Normalize evidence and optional Memories paths before lane execution in the owning verifier slice. Same legal relative-path failure as B11, verified at Push-Location and the build/test Join-Path calls.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Current read lower time bound (E02) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: After custody, the current method checks upper expiry but not completedAt >= binding.ValidFrom or source.ObservedAt <= completedAt. An earlier-issued still-valid grant plus clock rollback can release future current evidence. This pre-existing current-read boundary remains a launch blocker.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Readiness nested binding scope (E04) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: The readiness response guard checks outer tenant/Party and actor/version but not the nested evidence tenant/Party. Comparing opening source scope to the expected scope does not compare the returned nested scope; another tenant can pass the verifier.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Current authority regression coverage (V01) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: Accept the pre-verified gap: authority-change tests call ResolveAtAsync, while current policy/cancellation tests do not observe removal of SameAuthority in ResolveAsync. Add current source/custody authority-change cases in the owning query verification slice.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Current completion-expiry coverage (V02) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: Accept the pre-verified gap: the clock-crossing test exercises historical resolution; client invalid replies do not execute the current service. Add current binding-closure and custody-expiry crossing cases with otherwise valid authority.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
+  summary: Readiness exact-target receipt coverage (V03) remains an earlier Story 5.4 prerequisite before owner qualification.
+  evidence: Accept the pre-verified gap: existing counting-server smoke cases fail before receipt validation. A synthetic Available register with a mismatched receipt needs a no-HTTP regression test before this earlier readiness gate can be relied upon.

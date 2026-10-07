@@ -1,0 +1,323 @@
+{
+  "status": "CompletedWithDeferredPrerequisites",
+  "productionEnabled": false,
+  "wholeStoryComplete": false,
+  "reviewExecution": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/lifecycle-review-2026-10-07/execution-2026-10-07.json",
+  "triage": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/lifecycle-review-2026-10-07/triage.json",
+  "frozenIntentSha256": "223228d7c0ba94c5fe3274ca8ee27f22437c5bbcb8d96c835b615c9d0ada417a",
+  "frozenIntentMatchesReviewedPrompt": true,
+  "fixes": {
+    "B07/E01/E06": "Bound synchronous provider invocation using Task.Run before WaitAsync; four red/green cases cover both phases.",
+    "B12": "ADR matches approved 365 fixed days from binding-effective-at."
+  },
+  "commands": {
+    "build": "dotnet build tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj -c Debug --artifacts-path /tmp/hexalith-platform54-lifecycle-artifacts -p:UseHexalithProjectReferences=true -p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore -p:NuGetAudit=false -p:MinVerVersionOverride=1.0.0 -m:1",
+    "redTests": "dotnet /tmp/hexalith-platform54-lifecycle-artifacts/bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll -result-xml /tmp/platform54-review-red-tests-20261007.xml -method '*SynchronousProviderBlocking*'",
+    "fixedTests": "dotnet /tmp/hexalith-platform54-lifecycle-artifacts/bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll -result-xml /tmp/platform54-review-fixed-tests-20261007.xml"
+  },
+  "builds": {
+    "red": {
+      "exitCode": 0,
+      "warnings": 0,
+      "errors": 0
+    },
+    "fixed": {
+      "exitCode": 0,
+      "warnings": 0,
+      "errors": 0
+    }
+  },
+  "red": {
+    "total": "4",
+    "passed": "0",
+    "errors": "0",
+    "failed": "4",
+    "skipped": "0",
+    "not-run": "0",
+    "time": "18.203"
+  },
+  "fixed": {
+    "total": "115",
+    "passed": "115",
+    "errors": "0",
+    "failed": "0",
+    "skipped": "0",
+    "not-run": "0",
+    "time": "20.214"
+  },
+  "reusedParties": {
+    "newRun": false,
+    "sourceHashesMatch": true,
+    "summary": {
+      "total": "80",
+      "passed": "80",
+      "errors": "0",
+      "failed": "0",
+      "skipped": "0",
+      "not-run": "0",
+      "time": "0.399"
+    },
+    "sourceCount": 11,
+    "evidence": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/actor-history-lifecycle-2026-10-07/evidence.json"
+  },
+  "sources": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md",
+      "sha256": "4c99d71bddc5cfca049900c14a097d922d07be16c7637eda7e7571979884a794"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-retention-application-2026-10-07.md",
+      "sha256": "a12fe945db0990241da7afdb8bb7c4a7c8b6c3982386ee2cf0f9bb6df77bc088"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-retention-custody-proposal-2026-10-06.md",
+      "sha256": "a46f6b5d9e9574f1553b9e735f27d072e4b013a6fe07f9b2eb99d48348f8d6c7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Identity/AggregateIdentity.cs",
+      "sha256": "eac15dd1466aa44cdb217794ca46321158325434a84508dcb9e46fc5ffb9906d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/IIdentityHistoryCustody.cs",
+      "sha256": "7b5f9494d3c060ba2e9a157ee349d8936830bc7903294ebe3598cb957ab07284"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/IdentityHistoryCustodyEvidence.cs",
+      "sha256": "299291c4c38f8c6c089d36529517a0f3946bd375a41ea8594a0ed150375b2b70"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/IdentityHistoryPolicy.cs",
+      "sha256": "d32c3ba4c1724b29b918793e0f566f1d2905d6268af5ebccf62476e99721df27"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/_bmad-output/planning-artifacts/actor-history-retention-policy-v1.md",
+      "sha256": "8f6780d252154803343432e2126e596209e432284cfddf1c7f5b9eb596aa2fe1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Authorization/PartyIdentityOptions.cs",
+      "sha256": "a67302db5f47ee45fb972ce0a1ae28204f3e153f4ccc5aee6000b4524257e77c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Domain/PartyDomainProcessor.cs",
+      "sha256": "b0fc58385a83dfb6ec3d10849a99db39cf3589444fd96df16c061f5d8b131a53"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Extensions/PartiesServiceCollectionExtensions.cs",
+      "sha256": "967c93a1d5acc22222884ebdcc31284de2129ed56c604ce34ee4cbabe4d35769"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs",
+      "sha256": "999280447dcd4969e19b62ace1d1f10328fff53d893c2c4dfac6fc93d6ebd928"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Queries/RetainedHumanActorBinding.cs",
+      "sha256": "8f5bd2a7de7fa65a54a2134efa33dfc62a03d7c212449f5f9c1230dc911d7349"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs",
+      "sha256": "bfa7ff1402b3641ca91cbc31a2902ea5fa5f8fdf41eb4ad672f786a2256d205f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/appsettings.json",
+      "sha256": "3974bb0107f9c6789f27a2c82ce84685febd2e9e1394b3875146b005a64ab063"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Domain/PartyIdentityAdmissionTests.cs",
+      "sha256": "0cd0c8b39f7ab7a1944fda955502de81f6f37ebadb8d59bbc87dbb21f2131d83"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+      "sha256": "0bb08d7cebf4e02e8ad284cd8dc274a634d39e83a710bc37a761fd2caff723d7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityRetentionConfigurationTests.cs",
+      "sha256": "15e024d3915c86570fdadcb3201d9ebefa890fc3a407ff8644250a2dec7acad7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Hexalith.Parties.Tests.csproj",
+      "sha256": "7565d2aab001cd862bb5533c6ded29724aaddbcb5a2f6cd72cb76ea1d1761a86"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/actor-history-lifecycle-2026-10-07.md",
+      "sha256": "78cf9ffe55eeea1eef02d861af2f6cac282f3c513207aa9064fe8dd4ad6bdd74"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyStatus.cs",
+      "sha256": "bdbba11231cfa282fc4069dfc0211fdf011e83f38a31e47a0e88b5a60be6fd0c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj",
+      "sha256": "fb859c5efd25057f468faf592cdba587635c18cdec3bc93e3c40f6e537b586d2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPlatformHmacKeyProvider.cs",
+      "sha256": "929b244db6cd2b7297f88d4b7b0981dea59859d6cf2f394b49e3272e98950224"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPlatformSigningProfileProvider.cs",
+      "sha256": "11e9cc3cd32526c383d669b39a94a732037ed9853a25cb8cbc7d8392eb37b97d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryCleanup.cs",
+      "sha256": "459bf37506ff2c5a3de43ced6e93b93f64abc14e2736e3f462044a7f6ff3c79a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryCleanupOutcome.cs",
+      "sha256": "c86707b2bbb70980e9b1896653e2ceef7f08979e17041dfa719c4de56945f831"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformCanonicalBytes.cs",
+      "sha256": "a4624fbc113d5cdc79fbf75e5875f2000a3821821e4eff8442c006fec186171a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformCustodyServiceCollectionExtensions.cs",
+      "sha256": "564f7715fa04df908c1b49d0598a3eb9ca374c37338bd13d6c22d56cb0bf09f8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacKeyMetadata.cs",
+      "sha256": "6871b94c140f917a2847b6e4fa88aef5d85267cb070ec48bfadb780fd3fd95c9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacKeyResolution.cs",
+      "sha256": "51f44587dec6ff4e854efbfefb2d23ba206be102d26fb73f122842b7840a0a30"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacKeySnapshot.cs",
+      "sha256": "0e8082c10791d7e5c318cb5fdf48bff7b5c2d8556cdc47587f91af6f4d69c26b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacKeyState.cs",
+      "sha256": "3ea583bddffecb3c583f733627f35d6bb39029cb7cf74caaeede572e649e81fe"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacPurpose.cs",
+      "sha256": "f5ac7f0ed2dbef0f7a30a0ddd938006017bf521a41e10b8e8df519e039c8a31b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacResult.cs",
+      "sha256": "30e70b6dc05abeb2493c4e874c73949b4f191208569083b2e961d91ed8dd6aa5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacScope.cs",
+      "sha256": "67a9ad4a570dd7b8311615fb0fb120917ee16fadabf949ec81504c10ccad7aa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacService.cs",
+      "sha256": "65050608d927fac05f13a26a0ec962498d4e422874bb2914898a08544f179721"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyResolution.cs",
+      "sha256": "46c5db43be142f848700711d0ed9061607cdcbd73b39433b5cf8f363d0def8c0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformSigningProfile.cs",
+      "sha256": "b81e1119fad9b213ce405f496d6be85240ad41b80b4644781fcd58af3fd0ca25"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelope.cs",
+      "sha256": "e056effa2d9745b5997ce314cdabe62afc76581429a5d7e2d4c33d627a4142cb"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeAuthenticator.cs",
+      "sha256": "c19e71232d64e58e9fda94b372fa99a010e8160c0ccea2b4d61c96b5f9bcaf7d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeCodec.cs",
+      "sha256": "6c6010b914fb315cd66108cc6d711cdd92235f70b0fa1245ffc02abd3f236780"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeIdentity.cs",
+      "sha256": "24a07db789e949f143f8ef02134304580d874ba15de74f47face4e8f1a37ad46"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeResult.cs",
+      "sha256": "8869687bb94c3c9ecb424df72e6480eb2332c2a5a69241b93a1c2f2109a8049f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedPrincipal.cs",
+      "sha256": "36dc110f0d9a4908b3146a2ab4f400e175b8f761f98727c067819de1d70b1b26"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedPrincipalKind.cs",
+      "sha256": "d24ae1b599acdc3a3e691822af71571672992556379d0ef257a6e81c46ddbe46"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/UnavailablePlatformHmacKeyProvider.cs",
+      "sha256": "cf1d4a65e130eb63f18cd8a635892055dd52ce6c7c5b5d72dd3cf3f5d9f362b6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/UnavailablePlatformSigningProfileProvider.cs",
+      "sha256": "c1fd8b528ecc563a35e470a55e693824c385466854dd9ae35004e3ddbcf2a75e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyFixtureClock.cs",
+      "sha256": "f4e1373fa2560a60c16a6a5d78b31d06c67d5440bd9340c37ea2482bed25429e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyFixtureKeyProvider.cs",
+      "sha256": "8e12fd716ec36b3c89d881935baf9ce8b503bb556f14bde0b36217905d7bfe45"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyFixtureProfileProvider.cs",
+      "sha256": "6561ffb22c4f852e8f0e1323d905efe589c4666ff71f21685c69a05412be83b4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyPrerequisiteTests.cs",
+      "sha256": "9c44e34e881a50592343a336f41ad2bed9777a5f90f985ddca807349cbc1bdca"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+      "sha256": "64a9ab9e89c6f6d8d312773f6da4b8fc20b650e475899b366dbd2bdfc2006048"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IdentityHistoryCleanupFixture.cs",
+      "sha256": "10cd40f6c28ae5a6e317928cd1f17248dbbc3e86f5a5ce2ec67f2e15ddf62acc"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IdentityHistoryCleanupTests.cs",
+      "sha256": "ae75d89cdde766da37820586233f24ec76a492a394e4e0e83f474f211372e36e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/_bmad-output/planning-artifacts/adr-consumer-party-id-binding.md",
+      "sha256": "33e140f5affe6d516e2998cb954867dec3786a93de63d840e7bb798034c1a985"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/actor-history-lifecycle-review-fixes-2026-10-07/fixed-build.log",
+      "sha256": "da1f4937a79b491a5b1b4dc538f77a7b3656b8e9d16a7ee58b5331e048eb7715"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/actor-history-lifecycle-review-fixes-2026-10-07/fixed-tests.log",
+      "sha256": "2a24a7805134ca590c039ae19fb35d8bb1ec7dc3eb0ed145101e514835f3f6c6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/actor-history-lifecycle-review-fixes-2026-10-07/fixed-tests.xml.gz",
+      "sha256": "1850be1e06c7c40c6269944a1671d545b2f43076df7c45f915fd4a273104b4ba"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/actor-history-lifecycle-review-fixes-2026-10-07/red-build.log",
+      "sha256": "b7cfbefad1aaa5be2f65e20e805ea90f126523983df18ad1bad9900162e09109"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/actor-history-lifecycle-review-fixes-2026-10-07/red-tests.log",
+      "sha256": "bc1859a34bdc85d97aec0702bc12476820fec66f0c6944c2cafe4a175ddba66f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/actor-history-lifecycle-review-fixes-2026-10-07/red-tests.xml.gz",
+      "sha256": "97d529cb27c67eafcf4e3aa67638fddfd0486fd42e1c1bbd794185d5b0a4c2c4"
+    }
+  ],
+  "priorEvidenceSha256": "1041d2acf28eb85de6ebcd6968db09495006d675de5eff69d7e1e18dac4dbcb2",
+  "reviewSnapshotSha256": "121b28932f9286dc9be33cecc892bf766c784e230ac93fb90695cfca0e841a4f",
+  "deferredFindings": 18,
+  "deferredGroups": 15,
+  "limits": [
+    "No production provider or independent lifecycle/restore target",
+    "No inventory/scheduler or deployed cleanup worker",
+    "No live crypto/copy destruction or backup/restore qualification; fixture intentionally cannot encrypt/decrypt",
+    "Existing strict Parties fold does not prove successor after predecessor expiry",
+    "Full Story 5.4 and owner availability commitments remain incomplete",
+    "Prior broad Parties protected historical payload replay test blocker remains separate"
+  ]
+}
