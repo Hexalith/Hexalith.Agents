@@ -1,0 +1,27 @@
+ M src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs
+ M src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs
+ M src/Hexalith.EventStore.Server/Security/IInteractionOccurrenceAuthority.cs
+ M tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationDispatcherTests.cs
+ M tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs
+ M tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs
+?? src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs
+?? src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendOutcome.cs
+?? src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendRequest.cs
+?? src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendState.cs
+?? src/Hexalith.EventStore.Client/Streams/IAtomicDirectoryAppendOwner.cs
+?? src/Hexalith.EventStore.Client/Streams/IDirectoryAtomicAppendAuthority.cs
+?? src/Hexalith.EventStore.Contracts/Security/DirectoryBoundaryOutcome.cs
+?? src/Hexalith.EventStore.Contracts/Security/DirectoryBoundaryOutcomeState.cs
+?? src/Hexalith.EventStore.Contracts/Security/DirectoryEpochActivation.cs
+?? src/Hexalith.EventStore.Contracts/Security/DirectoryEpochInstallation.cs
+?? src/Hexalith.EventStore.Contracts/Security/DirectoryEpochLedger.cs
+?? src/Hexalith.EventStore.Contracts/Security/DirectoryRepairBoundary.cs
+?? src/Hexalith.EventStore.Contracts/Security/DirectoryRepairCohortItem.cs
+?? src/Hexalith.EventStore.Contracts/Security/DirectoryRepairDrainReceipt.cs
+?? src/Hexalith.EventStore.Contracts/Security/DirectoryWriteKind.cs
+?? src/Hexalith.EventStore.Server/Security/DirectoryMigrationBoundaryActor.cs
+?? src/Hexalith.EventStore.Server/Security/IDirectoryMigrationBoundaryActor.cs
+?? src/Hexalith.EventStore.Server/Security/IDirectoryMigrationBoundaryAuthority.cs
+?? tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs
+?? tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryFixture.cs
+?? tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryTests.cs

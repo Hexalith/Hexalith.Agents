@@ -1,0 +1,325 @@
+[
+  {
+    "repository": "platform",
+    "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningOutcome.cs",
+    "existed": true,
+    "sha256": "d6314f8e5a1d05bc285f2a583d176e47f785f6e2bb6dbf26c32f70224c7d5e2a",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/capability-consumers-before.json"
+  },
+  {
+    "repository": "platform",
+    "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningActor.cs",
+    "existed": true,
+    "sha256": "c35d0ba97f8e691d5c9f498024b276cad440794cb648a9932a8f735dd262d1fb",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/capability-consumers-before.json"
+  },
+  {
+    "repository": "platform",
+    "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchCapabilityCodec.cs",
+    "existed": true,
+    "sha256": "9b17d9489680c66e007fc67a54ffb398065f4ad6fd6a34563292e4c6661ff9b7",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/capability-consumers-before.json"
+  },
+  {
+    "repository": "platform",
+    "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+    "existed": true,
+    "sha256": "4f7414b90fa1b854ba5e27e6feba264fd4d35800e9c12e66fa062f8e4a35bf6d",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/capability-consumers-before.json"
+  },
+  {
+    "repository": "platform",
+    "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningAuthority.cs",
+    "existed": true,
+    "sha256": "d7ca5306b8ffddbfc46df98e0661127f9296ec5c70f641a7425d54a264394e48",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/capability-consumers-before.json"
+  },
+  {
+    "repository": "platform",
+    "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningProvider.cs",
+    "existed": true,
+    "sha256": "f060f93ede87af6c7cb185540286df6652763e95787d5fe760b99146886add2f",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/capability-consumers-before.json"
+  },
+  {
+    "repository": "platform",
+    "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+    "existed": true,
+    "sha256": "45c6ba5e9a4b3863a06e67e0830717330aeed7551bad4ab3d8cc58fb83f2448b",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/capability-consumers-before.json"
+  },
+  {
+    "repository": "platform",
+    "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchCapabilityCodecTests.cs",
+    "existed": true,
+    "sha256": "72d8160f73c01583fbeb8915fe30713669c3fa48129780719c727f8c82d43a00",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/capability-consumers-before.json"
+  },
+  {
+    "observedAt": "2026-10-08T14:51:00.974351+00:00",
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceTestKeys.cs",
+    "existed": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/occurrence-test-keys-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/bounded-state-before/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+    "sha256": "e9b7634d5ba43dabc9e89af36589445322ca33a0317624d9acc3b1dc19cf3531",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/bounded-state-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/bounded-state-before/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs",
+    "sha256": "3a3bfa1e5dbf733601b13f49c201290d81430b5b4ac08455108dac8641e095af",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/bounded-state-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/bounded-state-before/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+    "sha256": "452685b7114a91e76e0dd3cbe0c914ec874638eba0db4fef864e371d1a93ff4b",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/bounded-state-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/bounded-state-before/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+    "sha256": "8f4d8ca9ce611154552057725ae73e3b905811cd347e75c2618d40cc8ccbe545",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/bounded-state-before.json"
+  },
+  {
+    "observedAt": "2026-10-08T15:04:42.514517+00:00",
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/mixed-identity-before/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+    "sha256": "4952b279f67e51e96f5184e5a653733019b287c0e3a55994a6ee8e784f79f5f4",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/mixed-identity-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs",
+    "sha256": "68cc1eb5c5d90f5ddaffbeab86d4762b03ad16c55476a931a368def5ba7a9aaa",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before/platform/src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+    "sha256": "7b9b1e20063240f7e56f984ce43fbab3743b0ca8f1c09479529c1d667ededc52",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs",
+    "sha256": "5ef5addea4c38697aff4c1c63260f70146ff11c8efd9ef1fb1b317258412a6a9",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before/platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+    "sha256": "0ebb23d85f6a9e6b96b4b03937598da14d88ea77faa2773cdf8c095caf46143b",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IInteractionOccurrenceAuthority.cs",
+    "sha256": "7c93000f369baa434bba5ce4d303251c0f1e6a163f2a4d2b187d5ad3c9d9db3d",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before/eventstore/src/Hexalith.EventStore.Server/Security/IInteractionOccurrenceAuthority.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs",
+    "sha256": "8f479bd9480da33dce78569677bb525b8aef407d32e4d24b66bc8870f10953db",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs",
+    "sha256": "42f5365e0bdb2f265fe1e43c37b770441746e93969da6ff1c7db3c9280fc6e89",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+    "sha256": "563bec2812ba72749e8eb0a150085c634771a493b33671ffa308c22ae66fa122",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/restore-digest-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyObjectIdentity.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyRegistration.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleAction.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleRequest.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleOutcome.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleStatus.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleEntry.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleLedger.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ICustodyKeyLifecycleActor.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ICustodyKeyLifecycleAuthority.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ICustodyKeyLifecycleProvider.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyWrapCore.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/WrappedCustodyKey.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleFixture.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+    "exists": false,
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/key-lifecycle-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/export-unknown-expiry-before/ExportKeyDeliveryActorTests.cs",
+    "sha256": "1deebef6f53c200a79751bbe5013130cf456c2a6681b8ccfa11f12008c5a5ec8",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/export-unknown-expiry-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs",
+    "sha256": "abb4cfeec311c8b9f29124d9d1f9a9e936c0b55827ee4af2c183431fcb2eb862",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+    "sha256": "07b3c93ea7149ff280d0a73c51d83896b3f48a11dff2dfe5c9647a5c60f5c74d",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs",
+    "sha256": "84c8e874d2972d2ef894fd20db0f78b61f32a44e35054dabd3bf72d1fcef4770",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+    "sha256": "e45175a7e2e34b1107636037019222366495f7672a9e4987af78baf3d66a767f",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPlatformKeyInventoryAuthority.cs",
+    "sha256": "9bf54e47332590d97e38c6603f75ca16f7ad5b576b00717a02bf48e12eaa411f",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/platform/src/Hexalith.Platform.Custody/IPlatformKeyInventoryAuthority.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryActor.cs",
+    "sha256": "52672b65ca15f45a322817bb8042c361a004264669e1e1aa558f952b7ca2c145",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryActor.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PlatformKeyInventoryActorTests.cs",
+    "sha256": "410eeee0eee7e2c9af7fe0d9e2e96ec663e836728459b498faff2097e1aca79a",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/platform/tests/Hexalith.Platform.Custody.Tests/PlatformKeyInventoryActorTests.cs",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/decision-terminal-before/platform/src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs",
+    "sha256": "fca6b339205bc180750c024e08bdcb3025ac950b19ef7e59a15619e0b4858606",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/decision-terminal-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IIndependentDecisionAuthority.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/decision-terminal-before/platform/src/Hexalith.Platform.Custody/IIndependentDecisionAuthority.cs",
+    "sha256": "b60b894837248ff124e74f712b576c2d1a25016cad2d31b34bed0303609427e2",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/decision-terminal-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/decision-terminal-before/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs",
+    "sha256": "55649bdc5c6ec7c05bad9e9f7a5eacd94d89c47a6405b4767cc155ae4b3174cf",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/decision-terminal-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IExportKeyDeliveryAuthority.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/outcome-restore-before/platform/src/Hexalith.Platform.Custody/IExportKeyDeliveryAuthority.cs",
+    "sha256": "84be27a1a69d8d356c4da6413aa21903f1188f00937541e5ded10f96125cb5eb",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/outcome-restore-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/outcome-restore-before/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+    "sha256": "43bcd62f85f6c7eea3e5af06a8de730e05c25edc87ac6d4173a5ecf47b793d19",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/outcome-restore-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningAuthority.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/outcome-restore-before/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningAuthority.cs",
+    "sha256": "7d2f02cddc2d1de4552c9813fd8946b9156e0e1721feda67b3d7fbb8473af8b1",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/outcome-restore-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/outcome-restore-before/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+    "sha256": "93413baf236b9c646dbfecae20b7028f54321bda5d0b2427f8219f86748211f4",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/outcome-restore-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/outcome-restore-before/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+    "sha256": "6edb020238a0c74ed6ae6626e7803c425ba480343606f464203c029dfad0f9e9",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/outcome-restore-before.json"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/outcome-restore-before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+    "sha256": "30a46a66f863ba0138c7c68cb286b596d22bed72f6654ab479c1aea035d30f78",
+    "originalCaptureMetadata": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/outcome-restore-before.json"
+  }
+]

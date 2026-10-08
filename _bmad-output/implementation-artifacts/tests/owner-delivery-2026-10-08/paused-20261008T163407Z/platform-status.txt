@@ -1,0 +1,6 @@
+ M src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs
+ M src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs
+ M src/Hexalith.Platform.Custody/IDeletionCapabilitySigningAuthority.cs
+ M src/Hexalith.Platform.Custody/IExportKeyDeliveryAuthority.cs
+ M tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs
+ M tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs
