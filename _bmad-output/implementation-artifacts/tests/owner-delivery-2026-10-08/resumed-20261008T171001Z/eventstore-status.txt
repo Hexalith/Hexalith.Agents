@@ -1,0 +1,17 @@
+## main...origin/main
+ M scripts/verify-event-evolution-runtime-options.py
+ M src/Hexalith.EventStore.Client/Events/EventEvolutionService.cs
+ M src/Hexalith.EventStore.Client/Events/EventImplementationBinding.cs
+ M src/Hexalith.EventStore.Client/Events/EventLogicalViewResolver.cs
+ M src/Hexalith.EventStore.Client/Events/EventUpcastChainExecutor.cs
+ M src/Hexalith.EventStore.Client/Events/RegisteredCurrentEventDeserializer.cs
+ M src/Hexalith.EventStore.Client/Events/RegisteredEventVersionValidation.cs
+ M src/Hexalith.EventStore.Server/Events/DaprLogicalEventReader.cs
+ M src/Hexalith.EventStore.Server/Events/DaprLogicalReplaySource.cs
+ M src/Hexalith.EventStore.Server/Events/DaprReplayOperationOwner.cs
+ M tests/Hexalith.EventStore.Client.Tests/Events/EventEvolutionServiceTests.cs
+ M tests/Hexalith.EventStore.Server.Tests/Events/DaprLogicalReconstructionUpcaster.cs
+ M tests/Hexalith.EventStore.Server.Tests/Events/DaprLogicalReplayFixture.cs
+?? src/Hexalith.EventStore.Client/Events/EventCallbackFence.cs
+?? src/Hexalith.EventStore.Client/Events/EventVersionValidatorAsync.cs
+?? tests/Hexalith.EventStore.Server.Tests/Events/DaprLogicalCallbackFenceTests.cs

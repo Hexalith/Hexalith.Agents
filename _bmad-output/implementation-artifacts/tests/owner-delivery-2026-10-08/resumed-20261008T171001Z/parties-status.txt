@@ -1,0 +1,4 @@
+## main...origin/main
+ M _bmad-output/implementation-artifacts/8-7-data-protection-extraction.md
+ M _bmad-output/implementation-artifacts/spec-8-7-data-protection-extraction.md
+ M _bmad-output/implementation-artifacts/tests/test-summary.md

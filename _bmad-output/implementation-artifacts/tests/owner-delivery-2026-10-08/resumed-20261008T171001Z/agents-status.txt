@@ -1,0 +1,2 @@
+## main...origin/main
+ M _bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md
