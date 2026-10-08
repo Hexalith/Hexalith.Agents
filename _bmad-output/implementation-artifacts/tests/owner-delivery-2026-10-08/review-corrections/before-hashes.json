@@ -1,0 +1,56 @@
+{
+  "capturedUtc": "2026-10-08T11:44:51.623960+00:00",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/AuthoritativeEventStreamReader.cs",
+      "sha256": "2b015cfcaf15b9bd352672099dd45322b88fa07025276d5432b58177ecb8d9e9"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs",
+      "sha256": "2f588182608abf75b1eccaea13cdb4e9e63e88d15827d724e90acdcfb37a721c"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs",
+      "sha256": "bb38a10fe907401a5cd33865bf0bda5a0e9b05a1ab3c1eb9023bfffabc1c99ae"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/RetainedIdentityHistoryReader.cs",
+      "sha256": "f5435575a42a9f698841663f1ef616014bf9dd4ae1f72195614e82791f635d5c"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/RetainedIdentityHistoryReaderTests.cs",
+      "sha256": "de9b34bc332d7a192bc8c9358db1d0daa19772e488431569207cca6c6e9ee9c4"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationAgentSourceReader.cs",
+      "sha256": "cca0ee9b304b2112c8110ec984eb70ed9d3c1a7b64682317759ba705c91a056c"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentSixSeamTests.cs",
+      "sha256": "1974821b45d1efc06b2750909ca0ab833c9da89df030083dd5b6248d914be863"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportManifestSignatureCore.cs",
+      "sha256": "256061a116980057509de2bb18921c899c2e48a4cb383c18ca66ac6a7d849a62"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ExportCustodyCryptographyTests.cs",
+      "sha256": "db781ed822a76717d291413d75f738c210faac039be65ccaace96c62adfb39b1"
+    },
+    {
+      "repository": "parties",
+      "relativePath": "eng/verify-ext-parties-1.ps1",
+      "sha256": "1a444d3dd2fa59d6c5a57e64477726e801f264f0189ffea7357c67184fd57249"
+    }
+  ],
+  "scope": "Narrow review patches plus separately scoped pre-existing E2 retained reader correction; original pre-review evidence remains immutable."
+}

@@ -1,0 +1,21 @@
+{
+  "capturedUtc": "2026-10-08T14:30:14.877962+00:00",
+  "scope": "Candidate root/subkey crypto against actual unchanged v2 core; registry real SDK state with synthetic independent authority",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceKeyDerivationTests.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+      "existed": false
+    }
+  ]
+}

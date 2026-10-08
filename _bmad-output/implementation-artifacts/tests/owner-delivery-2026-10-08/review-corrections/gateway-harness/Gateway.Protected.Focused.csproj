@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><IsPackable>false</IsPackable><AssemblyName>Hexalith.Owner.Gateway.Protected.Focused.Tests</AssemblyName></PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <Compile Include="/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentLocalFixture.cs" Link="ConversationAgentLocalFixture.cs" />
+    <ProjectReference Include="/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Gateway/Hexalith.EventStore.Gateway.csproj" />
+    <ProjectReference Include="/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Hexalith.Conversations.Server.csproj" />
+    <PackageReference Include="xunit.v3" /><PackageReference Include="Shouldly" /><PackageReference Include="NSubstitute" /><Using Include="Xunit" />
+  </ItemGroup>
+</Project>

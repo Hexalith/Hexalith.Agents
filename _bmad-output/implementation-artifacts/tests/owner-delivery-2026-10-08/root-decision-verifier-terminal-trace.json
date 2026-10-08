@@ -1,0 +1,16 @@
+{
+  "capturedUtc": "2026-10-08T16:23:33.707328+00:00",
+  "scope": "Read-only terminal time/current authority trace; no signing credentials or live issuer invoked",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs",
+      "sha256": "fca6b339205bc180750c024e08bdcb3025ac950b19ef7e59a15619e0b4858606"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs",
+      "sha256": "55649bdc5c6ec7c05bad9e9f7a5eacd94d89c47a6405b4767cc155ae4b3174cf"
+    }
+  ],
+  "verifiedSourceGap": "Current(final,owned) executes before the final awaited VerifyExpectedBasisAsync. A true final basis response arriving at/after manifest ExclusiveExpiry or profile ValidUntil permits true after expiry because terminal budget.Check only checks caller/deadline.",
+  "requestedCorrection": "Re-evaluate profile and manifest current time after the final authority await; controlled final-basis await expiry/profile-expiry cases. Audit coherent current role-revocation boundary separately."
+}

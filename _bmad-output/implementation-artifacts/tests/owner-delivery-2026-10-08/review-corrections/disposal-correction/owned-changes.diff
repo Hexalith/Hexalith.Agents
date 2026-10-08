@@ -1,0 +1,202 @@
+--- a/eventstore/src/Hexalith.EventStore.Client/Streams/RetainedIdentityHistoryReader.cs
++++ b/eventstore/src/Hexalith.EventStore.Client/Streams/RetainedIdentityHistoryReader.cs
+@@ -122,27 +122,23 @@
+         }
+         finally
+         {
+-            if (pendingOperation is not null)
+-            {
+-                // A noncooperative operation still owns its request/response/buffer. Observe its
+-                // eventual completion only to dispose transport material; never resume this read.
+-                _ = DisposeAfterCompletionAsync(pendingOperation, message, response, body);
+-            }
+-            else
+-            {
+-                body?.Dispose();
+-                response?.Dispose();
+-                message?.Dispose();
+-            }
++            // Provider Dispose can block even when the tracked operation already completed.
++            // Keep both direct and late owned cleanup off the query continuation and observe faults.
++            Task cleanup = Task.Run(() => DisposeAfterCompletionAsync(pendingOperation, message, response, body));
++            _ = cleanup.ContinueWith(static task => { _ = task.Exception; }, CancellationToken.None,
++                TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+         }
+     }
+ 
+-    private static async Task DisposeAfterCompletionAsync(Task operation, HttpRequestMessage? message,
++    private static async Task DisposeAfterCompletionAsync(Task? operation, HttpRequestMessage? message,
+         HttpResponseMessage? response, Stream? body)
+     {
+         try
+         {
+-            await operation.ConfigureAwait(false);
++            if (operation is not null)
++            {
++                await operation.ConfigureAwait(false);
++            }
+             if (operation is Task<HttpResponseMessage> sending)
+             {
+                 response = sending.Result;
+@@ -158,9 +154,21 @@
+         }
+         finally
+         {
+-            body?.Dispose();
+-            response?.Dispose();
+-            message?.Dispose();
++            try
++            {
++                body?.Dispose();
++            }
++            finally
++            {
++                try
++                {
++                    response?.Dispose();
++                }
++                finally
++                {
++                    message?.Dispose();
++                }
++            }
+         }
+     }
+ }
+--- a/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedContent.cs
++++ b/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedContent.cs
+@@ -11,6 +11,9 @@
+ 
+     /// <summary>Optional synchronous invocation or provider-cancellation hook, installed only by focused tests.</summary>
+     public Action<CancellationToken>? BeforeReturn { get; init; }
++
++    /// <summary>Optional blocking or failing provider disposal, installed only by focused tests.</summary>
++    public Action? BeforeDispose { get; init; }
+ 
+     /// <summary>Signals that the SDK attempted to acquire the body.</summary>
+     public TaskCompletionSource Started { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+@@ -52,10 +55,14 @@
+     /// <inheritdoc/>
+     protected override void Dispose(bool disposing)
+     {
+-        base.Dispose(disposing);
+-        if (disposing)
++        try
+         {
+-            Disposed.TrySetResult();
++            if (disposing) { BeforeDispose?.Invoke(); }
++        }
++        finally
++        {
++            base.Dispose(disposing);
++            if (disposing) { Disposed.TrySetResult(); }
+         }
+     }
+ }
+--- a/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedHandler.cs
++++ b/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedHandler.cs
+@@ -5,13 +5,17 @@
+ /// <summary>Ignores transport cancellation until its response is explicitly completed by the test.</summary>
+ /// <param name="suspendSend">Whether HTTP response headers remain pending.</param>
+ /// <param name="content">Owned transport content used by the response.</param>
+-internal sealed class RetainedHistorySuspendedHandler(bool suspendSend, HttpContent content) : HttpMessageHandler
++/// <param name="statusCode">The controlled completed response status.</param>
++internal sealed class RetainedHistorySuspendedHandler(bool suspendSend, HttpContent content, HttpStatusCode statusCode = HttpStatusCode.OK) : HttpMessageHandler
+ {
+     private readonly TaskCompletionSource<HttpResponseMessage> _completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
+-    private readonly HttpResponseMessage _response = new(HttpStatusCode.OK) { Content = content };
++    private readonly HttpResponseMessage _response = new(statusCode) { Content = content };
+ 
+     /// <summary>Optional synchronous invocation or provider-cancellation hook, installed only by focused tests.</summary>
+     public Action<CancellationToken>? BeforeReturn { get; init; }
++
++    /// <summary>Gets the exact transport-owned request for disposal assertions.</summary>
++    public HttpRequestMessage? CapturedRequest { get; private set; }
+ 
+     /// <summary>Signals that send has been invoked and can be cancelled by the test.</summary>
+     public TaskCompletionSource Started { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+@@ -25,6 +29,7 @@
+     /// <summary>Returns headers or a deliberately noncooperative pending send.</summary>
+     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+     {
++        CapturedRequest = request;
+         Started.TrySetResult();
+         BeforeReturn?.Invoke(cancellationToken);
+         return suspendSend ? _completion.Task : Task.FromResult(_response);
+--- a/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedIdentityHistoryReaderTests.cs
++++ b/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedIdentityHistoryReaderTests.cs
+@@ -291,6 +291,74 @@
+         result.FailureReason.ShouldBe("history-time-bound-exceeded");
+     }
+ 
++    /// <summary>Completed response disposal cannot retain direct failure or a deadline's completed late task.</summary>
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task CompletedResponseBlockingDisposalCannotRetainRead(bool completedAtDeadline)
++    {
++        var clock = new RetainedHistoryTimeProvider(_now);
++        using var release = new ManualResetEventSlim();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        using var body = new RetainedHistorySuspendedStream(false);
++        using var content = new RetainedHistorySuspendedContent(false, body)
++        {
++            BeforeDispose = () => { entered.TrySetResult(); release.Wait(); }
++        };
++        using var handler = new RetainedHistorySuspendedHandler(false, content,
++            completedAtDeadline ? System.Net.HttpStatusCode.OK : System.Net.HttpStatusCode.ServiceUnavailable)
++        {
++            BeforeReturn = completedAtDeadline ? _ => clock.Advance(TimeSpan.FromSeconds(30)) : null
++        };
++        using var client = new HttpClient(handler) { BaseAddress = new("https://owner.invalid/") };
++        var reading = Task.Run(() => new RetainedIdentityHistoryReader(client, clock).ReadAsync(_identity,
++            RetainedIdentityHistoryReadRequest.AttributionPurpose, TestContext.Current.CancellationToken));
++        try
++        {
++            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            var result = await reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++            result.Stream.ShouldBeNull();
++            result.FailureReason.ShouldBe(completedAtDeadline ? "history-time-bound-exceeded" : "history-unavailable");
++            content.Disposed.Task.IsCompleted.ShouldBeFalse();
++            content.AcquisitionCount.ShouldBe(0);
++        }
++        finally
++        {
++            release.Set();
++        }
++        await content.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++    }
++
++    /// <summary>Cleanup faults are observed away from the query and do not prevent request disposal.</summary>
++    [Fact]
++    public async Task CompletedResponseCleanupFailureStillDisposesOwnedRequest()
++    {
++        using var body = new RetainedHistorySuspendedStream(false);
++        // The query owns this content, including its failing Dispose implementation.
++        var content = new RetainedHistorySuspendedContent(false, body) { BeforeDispose = () => throw new IOException("Controlled cleanup failure.") };
++        using var handler = new RetainedHistorySuspendedHandler(false, content, System.Net.HttpStatusCode.ServiceUnavailable);
++        using var client = new HttpClient(handler) { BaseAddress = new("https://owner.invalid/") };
++        var result = await new RetainedIdentityHistoryReader(client, _clock).ReadAsync(_identity,
++            RetainedIdentityHistoryReadRequest.AttributionPurpose, TestContext.Current.CancellationToken);
++        result.FailureReason.ShouldBe("history-unavailable");
++        await content.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        await Task.Run(async () =>
++        {
++            while (true)
++            {
++                try
++                {
++                    _ = await handler.CapturedRequest!.Content!.ReadAsStringAsync(TestContext.Current.CancellationToken);
++                }
++                catch (ObjectDisposedException)
++                {
++                    return;
++                }
++                await Task.Yield();
++            }
++        }).WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++    }
++
+     private static RetainedIdentityHistoryStream Stream()
+         => new(_identity, RetainedIdentityHistoryReadRequest.AttributionPurpose, 2, _now,
+             [new StreamReadEvent(2, "History", "{}"u8.ToArray(), "json", 1, "", null, null,

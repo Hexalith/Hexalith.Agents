@@ -1,0 +1,33 @@
+{
+  "capturedUtc": "2026-10-08T14:54:00.902750+00:00",
+  "protected": [
+    {
+      "path": "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md",
+      "expectedSha256": "5b1de576274f93a464322c18ee977e8bc4d489c2b8569a64986de3c4fc5304b1",
+      "observedSha256": "5b1de576274f93a464322c18ee977e8bc4d489c2b8569a64986de3c4fc5304b1",
+      "matches": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/sprint-status.yaml",
+      "expectedSha256": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+      "observedSha256": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+      "matches": true
+    },
+    {
+      "path": "_bmad-output/planning-artifacts/external-dependency-register.md",
+      "expectedSha256": "184e16c05b57527abcdbd8588ae0c9fa10fe4c6093a53e66a509e9aa39fbcccb",
+      "observedSha256": "184e16c05b57527abcdbd8588ae0c9fa10fe4c6093a53e66a509e9aa39fbcccb",
+      "matches": true
+    },
+    {
+      "path": "../parties/_bmad-output/planning-artifacts/actor-history-retention-policy-v1.md",
+      "expectedSha256": "8f6780d252154803343432e2126e596209e432284cfddf1c7f5b9eb596aa2fe1",
+      "observedSha256": "8f6780d252154803343432e2126e596209e432284cfddf1c7f5b9eb596aa2fe1",
+      "matches": true
+    }
+  ],
+  "frozenParentMatches": true,
+  "frozenParentSha256": "0cd11ddac96af9775593ea0aa24d969b235b32dfcc4a76a80e51d7eb9c82e2cb",
+  "status": "in-progress",
+  "limits": "Preservation checkpoint during active engineering; no full target or live qualification."
+}

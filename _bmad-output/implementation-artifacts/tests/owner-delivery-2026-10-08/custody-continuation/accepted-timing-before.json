@@ -1,0 +1,16 @@
+{
+  "capturedUtc": "2026-10-08T14:00:51.196773+00:00",
+  "scope": "Owner accepted L5min S30sec future-only O10min healthy-only H24h R7days; no independent identity/trust inferred",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformAcceptedEnvelopeTiming.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PlatformAcceptedEnvelopeTimingTests.cs",
+      "existed": false
+    }
+  ]
+}

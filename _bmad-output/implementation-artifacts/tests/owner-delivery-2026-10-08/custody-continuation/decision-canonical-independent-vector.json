@@ -1,0 +1,58 @@
+{
+  "generator": "Python json.dumps sort_keys=True ensure_ascii=False separators=compact; SHA256 of public/nonsecret original manifest only",
+  "manifest": {
+    "Issuer": "independent-decision-issuer",
+    "Audience": "decision-verification",
+    "DecisionId": "decision-1",
+    "ContractId": "contract-1",
+    "ContractVersion": 2,
+    "OutcomeVersion": 3,
+    "EffectivePredecessorVersion": null,
+    "RootPolicyId": "root-policy-1",
+    "AffectedEvaluations": [
+      "readiness-1",
+      "readiness-2"
+    ],
+    "Approvers": [
+      {
+        "Role": "Architecture",
+        "ActorId": "stable-actor-Architecture",
+        "AuthoritySourceId": "independent-role-source",
+        "BindingVersion": "binding-v1",
+        "EvidenceId": "original-decision-evidence"
+      },
+      {
+        "Role": "Governance",
+        "ActorId": "stable-actor-Governance",
+        "AuthoritySourceId": "independent-role-source",
+        "BindingVersion": "binding-v1",
+        "EvidenceId": "original-decision-evidence"
+      },
+      {
+        "Role": "Maintainer:EventStore",
+        "ActorId": "stable-actor-Maintainer:EventStore",
+        "AuthoritySourceId": "independent-role-source",
+        "BindingVersion": "binding-v1",
+        "EvidenceId": "original-decision-evidence"
+      },
+      {
+        "Role": "Product",
+        "ActorId": "stable-actor-Product",
+        "AuthoritySourceId": "independent-role-source",
+        "BindingVersion": "binding-v1",
+        "EvidenceId": "original-decision-evidence"
+      },
+      {
+        "Role": "Security",
+        "ActorId": "stable-actor-Security",
+        "AuthoritySourceId": "independent-role-source",
+        "BindingVersion": "binding-v1",
+        "EvidenceId": "original-decision-evidence"
+      }
+    ],
+    "IssuedAt": "2026-10-06T12:00:00.0000000+00:00",
+    "ExclusiveExpiry": "2026-10-06T12:01:00.0000000+00:00",
+    "SigningKeyVersion": "independent-key-v1"
+  },
+  "canonicalSha256": "EF0DA8555EFC51E08D621CD397A4B091ADE7637B686168A22DB2C4934D88E16C"
+}

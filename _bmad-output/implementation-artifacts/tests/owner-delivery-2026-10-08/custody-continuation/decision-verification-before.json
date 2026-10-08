@@ -1,0 +1,34 @@
+[
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DecisionAuthorityApprover.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DecisionAuthorityManifest.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DecisionAuthorityExpectedBasis.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DecisionAuthorityPublishedProfile.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IIndependentDecisionAuthority.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DecisionAuthorityManifestCodec.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs",
+    "exists": false
+  }
+]

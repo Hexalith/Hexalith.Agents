@@ -1,0 +1,89 @@
+{
+  "observedAt": "2026-10-08T15:19:26.046042+00:00",
+  "sources": [
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityObservationIntent.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityObservationRecord.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityEventRecordReceipt.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityEventRecorderLookup.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityEventRecorderLookupState.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ReplicatedSecuritySpoolTarget.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecuritySpoolSnapshot.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ISecurityObservationRecorder.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj",
+      "existed": true,
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/spool-before/src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj",
+      "sha256": "e00e8db60a801f539970cd8f53e7545b320d5c04d3a9771eceef1be2cd14cd0a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    }
+  ]
+}

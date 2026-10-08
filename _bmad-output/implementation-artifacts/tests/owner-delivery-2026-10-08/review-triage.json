@@ -1,0 +1,125 @@
+{
+  "capturedUtc": "2026-10-08T11:41:44.198750+00:00",
+  "reviewInput": "independent-review-input.json",
+  "allThreeLayersReportedBeforeClassification": true,
+  "findingFloor": "Blind125566bytes/1000=125.566kB; min(floor(sqrt(125.566)+1),10)=10.",
+  "findings": [
+    {
+      "id": "B1",
+      "verdict": "high",
+      "route": "patch",
+      "rootCause": "Owned source snapshot",
+      "evidence": "Page validator and evidence capture enumerate provider collections separately; records can change while preserving sequence. Capture bounded owned records/metadata and validate that same snapshot before release."
+    },
+    {
+      "id": "B2",
+      "verdict": "medium",
+      "route": "patch",
+      "rootCause": "Supported source metadata",
+      "evidence": "The SDK checks only ProviderOpaque. Future/unknown metadata can be certified. Use defined readable states and shared current carrier validation on the owned snapshot."
+    },
+    {
+      "id": "B3",
+      "verdict": "medium",
+      "route": "patch",
+      "rootCause": "Conversations carrier validation",
+      "evidence": "State/version alone omit field/ASCII/flag carrier rules; custom authoritative adapters may provide malformed current metadata. Reuse the shared validator."
+    },
+    {
+      "id": "B4",
+      "verdict": "medium",
+      "route": "patch",
+      "rootCause": "Bounded metadata copy",
+      "evidence": "New ToDictionary copies a provider-controlled collection without enforcing eight-entry and key/value bounds. Bound traversal before retention and validate the captured carrier."
+    },
+    {
+      "id": "B5",
+      "verdict": "medium",
+      "route": "patch",
+      "rootCause": "Unexpected exceptional cancellation",
+      "evidence": "Only selected fault types reach terminal caller-first checking. NotSupportedException from a collection after caller cancellation escapes. Check original caller cancellation on every exceptional exit; uncancelled unexpected faults still propagate."
+    },
+    {
+      "id": "B6",
+      "verdict": "low",
+      "route": "patch",
+      "rootCause": "Provider cancellation classification",
+      "evidence": "A cancelled provider task with live caller/deadline is mislabeled timeout; evidence remains denied. Distinguish this from actual monotonic/timer expiry without changing public contracts."
+    },
+    {
+      "id": "B7",
+      "verdict": "medium",
+      "route": "defer",
+      "rootCause": "Noncooperative resource qualification",
+      "evidence": "Private Task.Run bounds verdict wait but cannot reclaim indefinitely blocking invocations/callbacks. Prior authority/provider paths already required cooperation. No qualified concurrency/execution-isolation/failure-model contract is supplied; shared host resource admission/reclamation remains required and unqualified."
+    },
+    {
+      "id": "B8",
+      "verdict": "medium",
+      "route": "patch",
+      "rootCause": "Cancellation during fold traversal",
+      "evidence": "Captured JSON iteration now checks cancellation, but the subsequent ReplayVerifier foreach receives a plain List. Feed its existing IEnumerable a private cancellation-aware traversal; no public replay API is required."
+    },
+    {
+      "id": "B9",
+      "verdict": "low",
+      "route": "patch",
+      "rootCause": "Bounded ES256 signature parsing",
+      "evidence": "Private candidate Verify decodes arbitrary signature text before checking64 bytes. Require the exact expected header framing and86-character signature before split/decode allocation; no new size policy is needed."
+    },
+    {
+      "id": "B10",
+      "verdict": "medium",
+      "route": "patch",
+      "rootCause": "Plaintext zeroing verification",
+      "evidence": "OwnedExportKey access denial still passes if ZeroMemory is deleted. The existing test friend assembly can retain a constructor buffer and assert every byte is zero after disposal."
+    },
+    {
+      "id": "B11",
+      "verdict": "low",
+      "route": "patch",
+      "rootCause": "Controlled blocking-provider tests",
+      "evidence": "The200ms real timer may expire before queued provider entry. Existing manual clock/timer fixture can start provider first then deterministically expire, retaining bounded observer watchdogs."
+    },
+    {
+      "id": "E1",
+      "verdict": "low",
+      "route": "patch",
+      "rootCause": "Full semantic source version",
+      "evidence": "The new version regex rejects a valid prerelease+build-metadata source version. Permit both suffixes in the existing validation; keep malformed versions rejected."
+    },
+    {
+      "id": "E2",
+      "verdict": "medium",
+      "route": "defer",
+      "rootCause": "Standalone retained transport invocation",
+      "evidence": "Pre-existing RetainedIdentityHistoryReader invokes SendAsync/body providers synchronously before bounded waits and shares provider callbacks with wait cancellation. Parties query wraps this provider under its own deadline, but standalone callers remain unqualified. This is additional feasible full-scope source work, to address after current review corrections without inventing resource reclamation."
+    },
+    {
+      "id": "V1",
+      "verdict": "medium",
+      "route": "patch",
+      "rootCause": "Admission caller regression",
+      "evidence": "Preverified gap: new iteration cancellation test only calls source ReadAsync; admission cancellation tests stop before replay/at provider waits. Add a direct admission mid-prefix case so reverting the token argument fails."
+    },
+    {
+      "id": "V2",
+      "verdict": "high",
+      "route": "patch",
+      "rootCause": "Readable protection provenance",
+      "evidence": "StreamsController returns successfully unprotected JSON with outcome.Metadata; PayloadUnprotectionOutcome explicitly preserves provider provenance. Current-version valid Protected metadata must remain readable from certified source. Preserve opaque/future/malformed denial and add actual gateway unprotection-path proof."
+    }
+  ],
+  "grouping": [
+    "B1/B2/B4: one bounded owned source snapshot and validated carrier",
+    "B3/V2: supported readable carrier validation",
+    "B5/B6: terminal cancellation classification",
+    "B8: private cancellation-aware fold traversal",
+    "B9: signature framing bound",
+    "B10: actual zeroing proof",
+    "B11: controlled deadline delivery",
+    "E1: direct source-version regex correction",
+    "V1: admission caller regression"
+  ],
+  "parentStatus": "in-progress: complete owner delivery remains incomplete; reviewed continuation does not promote full parent or originalStory5.4."
+}

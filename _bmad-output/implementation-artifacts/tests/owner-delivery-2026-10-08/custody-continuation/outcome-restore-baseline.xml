@@ -1,0 +1,127 @@
+<assemblies schema-version="3" id="3adbdbb6-8e1a-4c07-9b5c-5bc8c94b7139" computer="DESKTOP-VIOG240" user="administrator" start-rtf="2026-10-08T16:29:10.4008881+00:00" finish-rtf="2026-10-08T16:29:10.7344963+00:00" timestamp="10/08/2026 18:29:10"><assembly environment="64-bit (x64) .NET 10.0.12 [collection-per-class, parallel (collections, 14 threads)]" id="13536c7d-02c2-4bbf-9a39-800d6cd184d5" name="/tmp/hexalith-owner-outcome-restore-20261008/bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll" run-date="2026-10-08" run-time="16:29:10" start-rtf="2026-10-08T16:29:10.4008881+00:00" test-framework="xUnit.net v3 4.0.1+8ed8aa354c" target-framework=".NETCoreApp,Version=v10.0" errors="0" failed="6" finish-rtf="2026-10-08T16:29:10.7344963+00:00" not-run="0" passed="0" skipped="0" time="0.334" time-rtf="00:00:00.3340000" total="6"><collection name="Test collection for Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests (id: 26a29080ce36eb29592b356c911eda9be2c48a7d9d44b9e3d0a79ef8f1b8187c)" id="412b505a-00c2-4dd9-ab51-cdb8d2d90545" failed="3" not-run="0" passed="0" skipped="0" time="0.183" time-rtf="00:00:00.1830000" total="3"><test id="e91a28a2-d464-42fd-be04-b5526b6ba83b" name="Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests.RestoredDeliveryStateCannotReplaceOriginalTerminalOutcome(restore: \&quot;absent\&quot;)" result="Fail" time="0.181" time-rtf="00:00:00.1810000" start-rtf="2026-10-08T16:29:10.4977040+00:00" finish-rtf="2026-10-08T16:29:10.7031402+00:00" type="Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests" method="RestoredDeliveryStateCannotReplaceOriginalTerminalOutcome" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs" source-line="163"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `restarted.LookupAsync(identity)`
+    should throw
+System.InvalidOperationException
+    but did not</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests.RestoredDeliveryStateCannotReplaceOriginalTerminalOutcome(String restore) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs:line 174
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="ca41def0-dc2c-4309-a80b-fcd6a059dd19" name="Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests.RestoredDeliveryStateCannotReplaceOriginalTerminalOutcome(restore: \&quot;unknown\&quot;)" result="Fail" time="0.002" time-rtf="00:00:00.0020000" start-rtf="2026-10-08T16:29:10.7083453+00:00" finish-rtf="2026-10-08T16:29:10.7112402+00:00" type="Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests" method="RestoredDeliveryStateCannotReplaceOriginalTerminalOutcome" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs" source-line="163"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `restarted.LookupAsync(identity)`
+    should throw
+System.InvalidOperationException
+    but did not</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests.RestoredDeliveryStateCannotReplaceOriginalTerminalOutcome(String restore) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs:line 174
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="c7b9f42a-06f0-4027-80cc-ceff34afe0f8" name="Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests.RestoredDeliveryStateCannotReplaceOriginalTerminalOutcome(restore: \&quot;divergent\&quot;)" result="Fail" time="0" time-rtf="00:00:00.0000000" start-rtf="2026-10-08T16:29:10.7112691+00:00" finish-rtf="2026-10-08T16:29:10.7123373+00:00" type="Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests" method="RestoredDeliveryStateCannotReplaceOriginalTerminalOutcome" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs" source-line="163"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `restarted.LookupAsync(identity)`
+    should throw
+System.InvalidOperationException
+    but did not</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests.RestoredDeliveryStateCannotReplaceOriginalTerminalOutcome(String restore) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs:line 174
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test></collection><collection name="Test collection for Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests (id: 9141efdcc864809e788c4df69d1a41685e5bd3b6fe65b8ba1c1afbdfa259ccb6)" id="00a1107a-2c74-42f9-822f-f28fedacaea5" failed="3" not-run="0" passed="0" skipped="0" time="0.184" time-rtf="00:00:00.1840000" total="3"><test id="2acf1dda-37a6-42d1-84ad-213fbba7753c" name="Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests.RestoredSigningStateCannotReplaceOriginalArtifact(restore: \&quot;absent\&quot;)" result="Fail" time="0.181" time-rtf="00:00:00.1810000" start-rtf="2026-10-08T16:29:10.4977104+00:00" finish-rtf="2026-10-08T16:29:10.7031513+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests" method="RestoredSigningStateCannotReplaceOriginalArtifact" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs" source-line="247"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `restarted.LookupAsync(payload)`
+    should throw
+System.InvalidOperationException
+    but did not</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests.RestoredSigningStateCannotReplaceOriginalArtifact(String restore) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs:line 257
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="7d25a5fc-662c-4b3f-affd-c136a82aeb99" name="Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests.RestoredSigningStateCannotReplaceOriginalArtifact(restore: \&quot;unknown\&quot;)" result="Fail" time="0.002" time-rtf="00:00:00.0020000" start-rtf="2026-10-08T16:29:10.7083508+00:00" finish-rtf="2026-10-08T16:29:10.7112207+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests" method="RestoredSigningStateCannotReplaceOriginalArtifact" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs" source-line="247"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `restarted.LookupAsync(payload)`
+    should throw
+System.InvalidOperationException
+    but did not</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests.RestoredSigningStateCannotReplaceOriginalArtifact(String restore) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs:line 257
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="f5a299e6-5d24-4bca-8036-d2df777ca4be" name="Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests.RestoredSigningStateCannotReplaceOriginalArtifact(restore: \&quot;divergent\&quot;)" result="Fail" time="0.001" time-rtf="00:00:00.0010000" start-rtf="2026-10-08T16:29:10.7112532+00:00" finish-rtf="2026-10-08T16:29:10.7128838+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests" method="RestoredSigningStateCannotReplaceOriginalArtifact" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs" source-line="247"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `restarted.LookupAsync(payload)`
+    should throw
+System.InvalidOperationException
+    but did not</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests.RestoredSigningStateCannotReplaceOriginalArtifact(String restore) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs:line 257
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test></collection></assembly></assemblies>

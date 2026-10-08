@@ -1,0 +1,8 @@
+{
+  "capturedUtc": "2026-10-08T14:55:15.937412+00:00",
+  "source": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+  "sourceSha256": "e9b7634d5ba43dabc9e89af36589445322ca33a0317624d9acc3b1dc19cf3531",
+  "claim": "ReadAsync rejects Batches>1000 and Operations/Revocations>10000. Mutation paths append and SaveAsync persists before readback rejection; count limits must reject before mutation/effect so existing outcomes remain readable.",
+  "route": "Routine active-engineering correction sent to sole implementation agent; independent required review still pending.",
+  "limits": "No qualified production capacity or complete live delivery inferred."
+}

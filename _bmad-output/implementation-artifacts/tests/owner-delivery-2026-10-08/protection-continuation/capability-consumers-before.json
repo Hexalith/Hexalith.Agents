@@ -1,0 +1,53 @@
+{
+  "capturedUtc": "2026-10-08T13:49:45.768992+00:00",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningOutcome.cs",
+      "existed": true,
+      "sha256": "d6314f8e5a1d05bc285f2a583d176e47f785f6e2bb6dbf26c32f70224c7d5e2a"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningActor.cs",
+      "existed": true,
+      "sha256": "c35d0ba97f8e691d5c9f498024b276cad440794cb648a9932a8f735dd262d1fb"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchCapabilityCodec.cs",
+      "existed": true,
+      "sha256": "9b17d9489680c66e007fc67a54ffb398065f4ad6fd6a34563292e4c6661ff9b7"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "existed": true,
+      "sha256": "4f7414b90fa1b854ba5e27e6feba264fd4d35800e9c12e66fa062f8e4a35bf6d"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningAuthority.cs",
+      "existed": true,
+      "sha256": "d7ca5306b8ffddbfc46df98e0661127f9296ec5c70f641a7425d54a264394e48"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningProvider.cs",
+      "existed": true,
+      "sha256": "f060f93ede87af6c7cb185540286df6652763e95787d5fe760b99146886add2f"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "existed": true,
+      "sha256": "45c6ba5e9a4b3863a06e67e0830717330aeed7551bad4ab3d8cc58fb83f2448b"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchCapabilityCodecTests.cs",
+      "existed": true,
+      "sha256": "72d8160f73c01583fbeb8915fe30713669c3fa48129780719c727f8c82d43a00"
+    }
+  ]
+}

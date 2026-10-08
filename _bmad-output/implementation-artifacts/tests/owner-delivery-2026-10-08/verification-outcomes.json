@@ -1,0 +1,486 @@
+{
+  "capturedUtc": "2026-10-08T11:25:26.724379+00:00",
+  "scope": "Owner Local source simulations only. No production/live readiness or completed full owner target is inferred. Date2026-10-08 accepted separately.",
+  "currentFinalCommands": [
+    {
+      "name": "parties-eleven-lane-final",
+      "workingDirectory": "/home/administrator/projects/hexalith/parties",
+      "arguments": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-parties-1.ps1",
+        "-Mode",
+        "Local",
+        "-EvidenceDirectory",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent",
+        "-ArtifactsDirectory",
+        "/tmp/hexalith-owner-parties-owner-consistent-20261008"
+      ],
+      "exitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent-run.log",
+      "sourceVersion": "3.117.1",
+      "total": 1107,
+      "suites": [
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.EventStore.Client.Tests-tests.xml",
+          "xmlSha256": "e5b4d0152e29fabae69095727946566f8ba1c9306f8cb7a825892acf865eb7d7",
+          "total": 119,
+          "passed": 119,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:15:34.1375491+00:00",
+          "finishedUtc": "2026-10-08T11:15:34.9026996+00:00",
+          "testAssembly": "/tmp/hexalith-owner-parties-owner-consistent-20261008/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll"
+        },
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.EventStore.Contracts.Tests-tests.xml",
+          "xmlSha256": "f09d485235fea998ae59d02313080bffd1a41f1c65575c48da52bbe898a0ddac",
+          "total": 23,
+          "passed": 23,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:15:23.9928240+00:00",
+          "finishedUtc": "2026-10-08T11:15:24.1615886+00:00",
+          "testAssembly": "/tmp/hexalith-owner-parties-owner-consistent-20261008/bin/Hexalith.EventStore.Contracts.Tests/debug/Hexalith.EventStore.Contracts.Tests.dll"
+        },
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.EventStore.Server.Tests-tests.xml",
+          "xmlSha256": "6df7c253aa9efbe466eb5a163ab36d68bcda205994869fdd36453b9b49828f94",
+          "total": 168,
+          "passed": 168,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:15:47.8548501+00:00",
+          "finishedUtc": "2026-10-08T11:15:48.6708420+00:00",
+          "testAssembly": "/tmp/hexalith-owner-parties-owner-consistent-20261008/bin/Hexalith.EventStore.Server.Tests/debug/Hexalith.EventStore.Server.Tests.dll"
+        },
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Client.Tests-tests.xml",
+          "xmlSha256": "b4850a396f8bd7b7d6d58c388254c7df7922470b30e57854b5cb985c76bdb6a0",
+          "total": 98,
+          "passed": 98,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:17:42.4733955+00:00",
+          "finishedUtc": "2026-10-08T11:17:42.8434138+00:00",
+          "testAssembly": "/tmp/hexalith-owner-parties-owner-consistent-20261008/bin/Hexalith.Parties.Client.Tests/debug/Hexalith.Parties.Client.Tests.dll"
+        },
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Contracts.Tests-tests.xml",
+          "xmlSha256": "1f889c71724a41de93b7db14f09d67830cc0a08471cc8a67fdff411566a93930",
+          "total": 29,
+          "passed": 29,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:16:37.4946623+00:00",
+          "finishedUtc": "2026-10-08T11:16:37.7302442+00:00",
+          "testAssembly": "/tmp/hexalith-owner-parties-owner-consistent-20261008/bin/Hexalith.Parties.Contracts.Tests/debug/Hexalith.Parties.Contracts.Tests.dll"
+        },
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Security.Tests-tests.xml",
+          "xmlSha256": "55c9b9446f05141739be85e16df6e103c5426f3ab233e904beac818925a3dcb1",
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:17:34.2759469+00:00",
+          "finishedUtc": "2026-10-08T11:17:34.6051343+00:00",
+          "testAssembly": "/tmp/hexalith-owner-parties-owner-consistent-20261008/bin/Hexalith.Parties.Security.Tests/debug/Hexalith.Parties.Security.Tests.dll"
+        },
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Server.Tests-tests.xml",
+          "xmlSha256": "c67153f45e2e82984ff11a141ccdfac7fe8685d9dbb4ec57fedced7e032a8027",
+          "total": 94,
+          "passed": 94,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:16:55.8828414+00:00",
+          "finishedUtc": "2026-10-08T11:16:56.4042516+00:00",
+          "testAssembly": "/tmp/hexalith-owner-parties-owner-consistent-20261008/bin/Hexalith.Parties.Server.Tests/debug/Hexalith.Parties.Server.Tests.dll"
+        },
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Tests-tests.xml",
+          "xmlSha256": "b73530b92bb7ba797ce12d61b241e7a4ea3ed71c3290428f55c9e6225694424a",
+          "total": 357,
+          "passed": 357,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:17:21.0190948+00:00",
+          "finishedUtc": "2026-10-08T11:17:29.4798144+00:00",
+          "testAssembly": "/tmp/hexalith-owner-parties-owner-consistent-20261008/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll"
+        },
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.UI.Tests-tests.xml",
+          "xmlSha256": "a852844514024081f473f394fced311a8ebad3114a15bab3b33d918d3141f6dc",
+          "total": 72,
+          "passed": 72,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:17:56.0883781+00:00",
+          "finishedUtc": "2026-10-08T11:17:56.3691741+00:00",
+          "testAssembly": "/tmp/hexalith-owner-parties-owner-consistent-20261008/bin/Hexalith.Parties.UI.Tests/debug/Hexalith.Parties.UI.Tests.dll"
+        },
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Platform.Custody.Tests-tests.xml",
+          "xmlSha256": "3a97977b4497d086a18edfde56346b1437460cf2d91ce59924874add30dbc7a6",
+          "total": 115,
+          "passed": 115,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:15:59.8032026+00:00",
+          "finishedUtc": "2026-10-08T11:16:20.0386798+00:00",
+          "testAssembly": "/tmp/hexalith-owner-parties-owner-consistent-20261008/bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll"
+        },
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Platform.Identity.Tests-tests.xml",
+          "xmlSha256": "f1705732a04420c63f4259377f96debffc91f8afce1979592faff99ea439058f",
+          "total": 2,
+          "passed": 2,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:15:56.9953324+00:00",
+          "finishedUtc": "2026-10-08T11:15:57.2079510+00:00",
+          "testAssembly": "/tmp/hexalith-owner-parties-owner-consistent-20261008/bin/Hexalith.Platform.Identity.Tests/debug/Hexalith.Platform.Identity.Tests.dll"
+        }
+      ]
+    },
+    {
+      "name": "conversations-four-suites-final",
+      "workingDirectory": "/home/administrator/projects/hexalith/conversations",
+      "arguments": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-conv-ai-1.ps1",
+        "-Mode",
+        "Local",
+        "-ArtifactsPath",
+        "/tmp/hexalith-owner-conversations-owner-final-20261008"
+      ],
+      "exitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final-run.log",
+      "actualArtifactsPath": "/tmp/hexalith-owner-conversations-owner-final-20261008/run-20261008T1121206133116Z",
+      "total": 1553,
+      "suites": [
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final/Hexalith.Conversations.Contracts.Tests.xml",
+          "xmlSha256": "fcbd62b7dcdbc7fc2362c26d3007013d62d3cfa21ae1b6f9f5df27b9b82c4d37",
+          "total": 618,
+          "passed": 618,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:21:46.4381658+00:00",
+          "finishedUtc": "2026-10-08T11:21:50.0704394+00:00",
+          "testAssembly": "/home/administrator/projects/hexalith/conversations/.artifacts/ext-conv-ai-1-tests/Hexalith.Conversations.Contracts.Tests/debug/run/Hexalith.Conversations.Contracts.Tests.dll"
+        },
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final/Hexalith.Conversations.Tests.xml",
+          "xmlSha256": "464bb9475fddee083eec73385d9ff6f5960f18216764ad212358a50c4fd2e48d",
+          "total": 185,
+          "passed": 185,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:21:51.4253851+00:00",
+          "finishedUtc": "2026-10-08T11:22:08.4220815+00:00",
+          "testAssembly": "/home/administrator/projects/hexalith/conversations/.artifacts/ext-conv-ai-1-tests/Hexalith.Conversations.Tests/debug/run/Hexalith.Conversations.Tests.dll"
+        },
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final/Hexalith.Conversations.Server.Tests.xml",
+          "xmlSha256": "5c388f9e19b51b555e0704956a20e1d8b7169fdcc5628ec4cfa378746ff74a37",
+          "total": 711,
+          "passed": 711,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:22:09.9169166+00:00",
+          "finishedUtc": "2026-10-08T11:22:12.0218229+00:00",
+          "testAssembly": "/home/administrator/projects/hexalith/conversations/.artifacts/ext-conv-ai-1-tests/Hexalith.Conversations.Server.Tests/debug/run/Hexalith.Conversations.Server.Tests.dll"
+        },
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final/Hexalith.Conversations.Client.Tests.xml",
+          "xmlSha256": "1ab0d7add6f88998cabf47208a0595c9d188a045a372cf92aa76f904092035d1",
+          "total": 39,
+          "passed": 39,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:22:13.1075245+00:00",
+          "finishedUtc": "2026-10-08T11:22:13.4794004+00:00",
+          "testAssembly": "/home/administrator/projects/hexalith/conversations/.artifacts/ext-conv-ai-1-tests/Hexalith.Conversations.Client.Tests/debug/run/Hexalith.Conversations.Client.Tests.dll"
+        }
+      ],
+      "focusedOverlapping": {
+        "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final/local-six-seam.xml",
+        "xmlSha256": "164961938ee20e5c5e9114489baa8c177287e3d7653925618de27b3b9f1d8472",
+        "total": 27,
+        "passed": 27,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notRun": 0,
+        "startedUtc": "2026-10-08T11:21:44.6539923+00:00",
+        "finishedUtc": "2026-10-08T11:21:45.2006308+00:00",
+        "testAssembly": "/tmp/hexalith-owner-conversations-owner-final-20261008/run-20261008T1121206133116Z/bin/Hexalith.Conversations.Server.Tests/debug/Hexalith.Conversations.Server.Tests.dll"
+      }
+    },
+    {
+      "name": "custody-three-classes-final",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "arguments": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-secrets-1.ps1",
+        "-Mode",
+        "Local",
+        "-ArtifactsDirectory",
+        "/tmp/hexalith-owner-custody-owner-final-20261008",
+        "-EvidenceDirectory",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-owner-final",
+        "-EventStoreSourceRoot",
+        "/home/administrator/projects/hexalith/eventstore"
+      ],
+      "exitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-owner-final-run.log",
+      "total": 155,
+      "suites": [
+        {
+          "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-owner-final/local-tests.xml",
+          "xmlSha256": "6ba57b113b302db9416a0117ffe7bac04d8b4cca5ee643e2c902a753c16beb9b",
+          "total": 155,
+          "passed": 155,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "notRun": 0,
+          "startedUtc": "2026-10-08T11:22:28.8349938+00:00",
+          "finishedUtc": "2026-10-08T11:22:49.0179787+00:00",
+          "testAssembly": "/tmp/hexalith-owner-custody-owner-final-20261008/bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll"
+        }
+      ]
+    },
+    {
+      "name": "host-current-scaffold",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "arguments": [
+        "bash",
+        "eng/verify-agents-host.sh",
+        "--mode",
+        "LocalScaffold",
+        "--artifacts-path",
+        "/tmp/hexalith-owner-host-current-final-20261008"
+      ],
+      "exitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-current-scaffold.log",
+      "scope": "Current LocalScaffold only; no warnings/errors in log, TreatWarningsAsErrors=true, exact checked source hashes unchanged during build.",
+      "sourceStableDuringBuild": true
+    }
+  ],
+  "warningFreeBuildLogs": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Server.Tests-build.log",
+      "sha256": "ec26906ff8e79bf68cbe003f0eafc9e1eca904d79325e524ff7444c8901adf7f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.UI.Tests-build.log",
+      "sha256": "d9228d8daf5df332602dc16870bb1f73675388afc2e716652fc1ff19bdb2482c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.EventStore.Client.Tests-build.log",
+      "sha256": "f5190ff4cf9981c4cdbcfcd6de2580793717b9f72f49c6ade2ef99a74b4dd9c8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Client.Tests-build.log",
+      "sha256": "8c1489d1ad19ac996d8347dd111b09e1c2b0885a10d66325f30fb5899a8f9faf"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.EventStore.Contracts.Tests-build.log",
+      "sha256": "4cb4afe73dc0a11cae7e01418e0ba71aee9e01d8c727d07552363c7b7c541714"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Platform.Identity.Tests-build.log",
+      "sha256": "26c13076a46a21ec0089d0e496d739ab2d0ebd1fbac92db647d3f2734f8e7c43"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Tests-build.log",
+      "sha256": "96ee384795ae732c6f1cd0b072c2d96023ac155a59fe9cee225bcb3021548e3b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Platform.Custody.Tests-build.log",
+      "sha256": "f8e9c343158657b7059d052efacb681e452ae3ed37a814f1ea275a238019a0c6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Contracts.Tests-build.log",
+      "sha256": "60904c2accb6aa5a01924074377bcab4a38e8cabf2539075abfc4139f6680a1e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.EventStore.Server.Tests-build.log",
+      "sha256": "7b7edc10cd1d70dfec1802f362261f27bc27ef31f458921ff46eb926f378aa1f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Security.Tests-build.log",
+      "sha256": "e178423cb07d922b8503561e893b257a153e7c979cada7d46ff73d50b28d3e33"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final/Hexalith.Conversations.Tests-build.log",
+      "sha256": "c4291cec7176ea38393bc6d93427c55bab6d48fcdb0bce15b455e5bc373ad9e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final/Hexalith.Conversations.Server.Tests-build.log",
+      "sha256": "08c147e6a43f985d28387a2e51422b0c9d8def81df7568c6caccc8c858558b8b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final/Hexalith.Conversations.Contracts.Tests-build.log",
+      "sha256": "a7acd59fb9e79a592958c50bcadadc078105b1ca22b6fa786ff63f22d4596974"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final/Hexalith.Conversations.Client.Tests-build.log",
+      "sha256": "e081bc7df68965924f7d727986038c64cfbbd46c8090123dc8a1cf10c8c37d1a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-owner-final/local-build.log",
+      "sha256": "eb3492640085311cdb8d019a5afcedbe9acf29594fd3f93a62d20e9bdfc25d61"
+    }
+  ],
+  "currentOwnerReaderCases": 20,
+  "failedBeforePassedAfterRegressions": [
+    {
+      "name": "SDK-deadline-snapshot",
+      "before": {
+        "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/sdk-before-tests.xml",
+        "xmlSha256": "acd0eaa0415e7c04c0763eae8735e1e8957546680fd72b904913e3585351ab74",
+        "total": 17,
+        "passed": 10,
+        "failed": 7,
+        "errors": 0,
+        "skipped": 0,
+        "notRun": 0,
+        "startedUtc": "2026-10-08T10:45:18.8595977+00:00",
+        "finishedUtc": "2026-10-08T10:45:21.4970559+00:00",
+        "testAssembly": "/tmp/hexalith-owner-sdk-before-20261008/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll"
+      },
+      "after": {
+        "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/sdk-final-tests.xml",
+        "xmlSha256": "c725fe0adc5df44c59508508efff3dbe3adf932a87e98a92666ef4b6f3b0689a",
+        "total": 20,
+        "passed": 20,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notRun": 0,
+        "startedUtc": "2026-10-08T10:51:03.6562011+00:00",
+        "finishedUtc": "2026-10-08T10:51:04.4292048+00:00",
+        "testAssembly": "/tmp/hexalith-owner-sdk-final-20261008/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll"
+      },
+      "note": "Final20 adds3 ordered terminal-cancellation regressions beyond original17 cases; final owner Client119 includes all20."
+    },
+    {
+      "name": "Conversations-protection-and-cancellation",
+      "before": {
+        "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-before-tests.xml",
+        "xmlSha256": "a03caf7877c062d9b08ae18cf8a5d80ded5a4fb3d827e27be9f539d2c1fa15b5",
+        "total": 27,
+        "passed": 16,
+        "failed": 11,
+        "errors": 0,
+        "skipped": 0,
+        "notRun": 0,
+        "startedUtc": "2026-10-08T10:49:13.7843040+00:00",
+        "finishedUtc": "2026-10-08T10:49:14.5474044+00:00",
+        "testAssembly": "/tmp/hexalith-owner-conversations-before-20261008/bin/Hexalith.Conversations.Server.Tests/debug/Hexalith.Conversations.Server.Tests.dll"
+      },
+      "after": {
+        "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-after-tests.xml",
+        "xmlSha256": "a7f8f69ec154233c3f3631719bab09ef3e9845934e6e6ccbd109707564263b2b",
+        "total": 27,
+        "passed": 27,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notRun": 0,
+        "startedUtc": "2026-10-08T10:52:46.3712603+00:00",
+        "finishedUtc": "2026-10-08T10:52:47.0259846+00:00",
+        "testAssembly": "/tmp/hexalith-owner-conversations-after-20261008/bin/Hexalith.Conversations.Server.Tests/debug/Hexalith.Conversations.Server.Tests.dll"
+      },
+      "note": "27 focused cases overlap full current Server711."
+    },
+    {
+      "name": "S3-malformed-Unicode",
+      "before": {
+        "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-unicode-before/local-tests.xml",
+        "xmlSha256": "5f0c528a6adc98e55dc1fe93f953950d8e931a4b56cfad7ee727a321194b9a23",
+        "total": 155,
+        "passed": 149,
+        "failed": 6,
+        "errors": 0,
+        "skipped": 0,
+        "notRun": 0,
+        "startedUtc": "2026-10-08T11:08:41.5930085+00:00",
+        "finishedUtc": "2026-10-08T11:09:01.8813791+00:00",
+        "testAssembly": "/tmp/hexalith-owner-custody-unicode-before-20261008/bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll"
+      },
+      "after": {
+        "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-unicode-after/local-tests.xml",
+        "xmlSha256": "4d3bc5ec5318b2da2635a61b6458bbb598a3f339133ddae680c9e4d5741f732f",
+        "total": 155,
+        "passed": 155,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notRun": 0,
+        "startedUtc": "2026-10-08T11:09:34.3889682+00:00",
+        "finishedUtc": "2026-10-08T11:09:54.5942001+00:00",
+        "testAssembly": "/tmp/hexalith-owner-custody-unicode-after-20261008/bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll"
+      },
+      "note": "Before155=149pass/6fail; after155 allpass. New private cryptographic class has40 cases."
+    }
+  ],
+  "retainedAssemblyGraphFailure": {
+    "result": {
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-final/Hexalith.Parties.Contracts.Tests-tests.xml",
+      "xmlSha256": "1f2b11ecf9ffa0f724bcca8a4292115f6aec3547c981f4d7c15497a413d6d1d1",
+      "total": 28,
+      "passed": 3,
+      "failed": 25,
+      "errors": 0,
+      "skipped": 0,
+      "notRun": 0,
+      "startedUtc": "2026-10-08T11:12:31.3167579+00:00",
+      "finishedUtc": "2026-10-08T11:12:31.5103527+00:00",
+      "testAssembly": "/tmp/hexalith-owner-parties-owner-final-20261008/bin/Hexalith.Parties.Contracts.Tests/debug/Hexalith.Parties.Contracts.Tests.dll"
+    },
+    "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-final-run.log",
+    "cause": "Source3.117.1-referencing consumer and copiedSDK3.117.0 assembly in same output graph; corrected source-version consistency, no package pin change."
+  },
+  "overlap": "Do not sum counts: SDK20 overlap PartiesClient119; custody115 in Parties overlaps custody final155; Conversations focused27 overlaps Server711. Repeated test invocations are separate evidence, not additional distinct coverage.",
+  "drift": "owned19 review source hashes stable; whole-worktree hash stability not claimed (see final-source-drift.json). Final compiled DLLs and XML independently hashed."
+}

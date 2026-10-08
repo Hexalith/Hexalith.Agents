@@ -16,36 +16,36 @@ The authoritative behavior, evidence levels and consuming stories remain the com
 
 | Record | Accountable owner / delivery repository | Immutable complete target | Delivery date | Full verification entry point proposed from existing owner scripts |
 | --- | --- | --- | --- | --- |
-| EXT-PARTIES-1 | Project owner acting as Parties Maintainer; Hexalith.Parties | TBD | TBD | From the accepted Parties target: `pwsh -NoProfile -File ./eng/verify-ext-parties-1.ps1 -Mode Live` |
-| EXT-CONV-AI-1 | Project owner acting as Conversations Maintainer; Hexalith.Conversations | TBD | TBD | From the accepted Conversations target: `pwsh -NoProfile -File ./eng/verify-ext-conv-ai-1.ps1 -Mode Live` |
-| EXT-SECRETS-1 | Project owner acting as Platform Maintainer; Hexalith.Platform | TBD | TBD | From the accepted Platform target: `pwsh -NoProfile -File ./eng/verify-ext-secrets-1.ps1 -Mode Live` |
-| EXT-HOST-1 | Project owner acting as Platform Maintainer; Hexalith.Platform | TBD | TBD | From the accepted Platform target: `bash ./eng/verify-agents-host.sh --mode Full` |
+| EXT-PARTIES-1 | Project owner acting as Parties Maintainer; Hexalith.Parties | TBD | 2026-10-08 | From the accepted Parties target: `pwsh -NoProfile -File ./eng/verify-ext-parties-1.ps1 -Mode Live` |
+| EXT-CONV-AI-1 | Project owner acting as Conversations Maintainer; Hexalith.Conversations | TBD | 2026-10-08 | From the accepted Conversations target: `pwsh -NoProfile -File ./eng/verify-ext-conv-ai-1.ps1 -Mode Live` |
+| EXT-SECRETS-1 | Project owner acting as Platform Maintainer; Hexalith.Platform | TBD | 2026-10-08 | From the accepted Platform target: `pwsh -NoProfile -File ./eng/verify-ext-secrets-1.ps1 -Mode Live` |
+| EXT-HOST-1 | Project owner acting as Platform Maintainer; Hexalith.Platform | TBD | 2026-10-08 | From the accepted Platform target: `bash ./eng/verify-agents-host.sh --mode Full` |
 
 These are proposed future complete verification entry points, not accepted passing compatibility commands. All four scripts exist, but their Live/Full branches currently refuse because complete behavior/providers/qualification are absent. Local, LocalScaffold, LiveReadiness or synthetic passes cannot replace the complete commands. The complete target must contain the full executable required matrix; accepting today's partial source commit would not deliver it. The immutable target may still be in delivery when a complete commitment is accepted; availability requires installation and a passing exact-target command with live Level 4 evidence.
 
 ## Fields needed to finish the register commitments
 
-Supply one immutable version or full commit covering each complete contract and an integration date for each (a common date is acceptable if intended). For Platform host composition the owner handoff requests a full commit. Accept the final executable complete command for each target, including its reproducible prerequisite/credential/fixture setup and evidence-output contract. Do not put credential values in this document.
+The owner supplied the common integration date **2026-10-08**. Supply one immutable version or full commit covering each complete contract. For Platform host composition the owner handoff requests a full commit. Accept the final executable complete command for each target, including its reproducible prerequisite/credential/fixture setup and evidence-output contract. Do not put credential values in this document.
 
 A compact reply can provide:
 
 ```text
-EXT-PARTIES-1: target=<immutable version/full commit>; date=<YYYY-MM-DD>; command=<complete command>
-EXT-CONV-AI-1: target=<immutable version/full commit>; date=<YYYY-MM-DD>; command=<complete command>
-EXT-SECRETS-1: target=<immutable version/full commit>; date=<YYYY-MM-DD>; command=<complete command>
-EXT-HOST-1: target=<full commit>; date=<YYYY-MM-DD>; command=<complete command>
+EXT-PARTIES-1: target=<immutable version/full commit>; date=2026-10-08; command=<complete command>
+EXT-CONV-AI-1: target=<immutable version/full commit>; date=2026-10-08; command=<complete command>
+EXT-SECRETS-1: target=<immutable version/full commit>; date=2026-10-08; command=<complete command>
+EXT-HOST-1: target=<full commit>; date=2026-10-08; command=<complete command>
 ```
 
-Owner authority alone does not supply these values. Current checkout HEADs are inspected partial implementations and are not substituted for complete targets. Delivery dates are owner commitments, not dates inferred from this acceptance record.
+The date is now an explicit owner commitment. Current checkout HEADs are inspected partial implementations and are not substituted for complete targets; complete targets and accepted full commands remain missing.
 
 ## Remaining delivery work
 
 - Parties: complete production custody, source/actor freshness and retained-history expiry/destruction/restore (including authenticated successor proof after expired predecessor destruction), packaged consumer compatibility and live P-01–P-10. The historical strict json-redacted replay blocker is superseded by the current complete passing Local source matrix linked below.
 - Conversations: complete authenticated source/compare-append and catalogue/authority, all six seams, automatic approved-deletion publication discovery/backfill/pump, independent authenticated receiver/acknowledgement lookup and persisted failure/restart/race qualification.
-- Secrets: qualified production custody; numeric trusted-envelope profile; independently governed decision-verification trust; full S1–S4/v23, issuer replay/credential restrictions, outcome lookup and live qualification.
+- Secrets: qualified production custody; complete trusted-envelope profile binding the accepted numeric settings; independently governed decision-verification trust; full S1–S4/v23, issuer replay/credential restrictions, outcome lookup and live qualification.
 - Host: complete H1–H4/v23 composition, replicated denial spool/recovery worker and private exact-target credentials; production protection binding/attestation and persisted migration/destruction/compromise/restore qualification.
 
-This owner declaration does not choose unresolved independent Product/Governance/Security policies, manufacture approval evidence or deploy providers. It authorizes delivery under the already approved scope. Four records remain Uncommitted while target/date/complete-command fields are unknown. Story 5.4 stays draft/backlog. Once all nine fields per record are accepted, mark Committed; mark Available only after the complete installed target passes its accepted command. No owner issue comment, Git mutation, deployment or live seam invocation accompanies this record.
+This owner declaration does not choose unresolved independent Product/Governance/Security policies, manufacture approval evidence or deploy providers. It authorizes delivery under the already approved scope. Four records remain Uncommitted while complete target and accepted full-command fields are unknown. Story 5.4 stays draft/backlog. Once all nine fields per record are accepted, mark Committed; mark Available only after the complete installed target passes its accepted command. No owner issue comment, Git mutation, deployment or live seam invocation accompanies this record.
 
 
 ## Current Parties source delivery observation — 2026-10-07
@@ -78,3 +78,19 @@ Later unowned shared replay edits occurred after the successful stable run/root 
 The retained policy remains 365 fixed days from binding-effective-at with exclusive expiry; Branch B and previous approvals are preserved. Initial 893-pass evidence and later concurrent changes remain separate; final fresh source consistency passed. The package-mode Aspire baseline still fails on the SDK sidecar extension mismatch. Complete owner target/date/command fields, installed custody/current authority, actor-free successor continuation, irreversible all-copy/lost-ack receipts, nonrollback restore and full live P-01–P-10 remain unresolved. Source deadlines do not forcibly terminate arbitrary synchronous authority work or blocked provider workers.
 
 Every commitment/frontmatter field and external record status above is unchanged. No source checkout revision was promoted to a complete target, no integration date or acceptance was inferred, and original Story 5.4 remains draft/backlog while its prerequisite parent remains in-progress. No staging, commit, push, submodule update, deployment, live seam invocation or owner message accompanied this observation.
+
+
+## Integration dates supplied — 2026-10-08
+
+The project owner answered the four-record integration-date question with “today”. The accepted common integration date is **2026-10-08** for EXT-PARTIES-1, EXT-CONV-AI-1, EXT-SECRETS-1 and EXT-HOST-1. Their register date fields and the table above now record that input. Earlier missing-date observations remain historical; dates are no longer missing.
+
+Complete immutable targets and accepted executable full compatibility commands are still unresolved. Current source revisions and Local passing tests cannot replace those deliverables or live Level 4 qualification. Each record remains Uncommitted and Story 5.4 remains draft/backlog. This date input reopens none of the existing scope, Branch B, retention or implementation approvals.
+
+
+## Further owner inputs accepted — 2026-10-08
+
+The owner selected the existing environment 192.168.1.30, the existing creation-window Conversations count (currently open/undeleted, CreatedAt in[from,to), including zero Agent Calls), and a dedicated Conversations-owned service Party with explicit tenant enrollment/current machine binding. The owner also explicitly selected internal-request L=5 minutes, S=30 seconds future tolerance, O=10 minutes healthy routine old-key overlap, H=24 hours automatic recovery and R=7 days first-seen replay retention. Exclusive expiry has no grace; compromised/revoked keys fail immediately. Earlier missing-input observations are historical. These decisions are not requested again.
+
+Exact issuer/audience/profile version/validity, independently governed decision and actor/role authority, actual worker enrollment, production target bindings, all-copy custody/restore and live qualification remain required. Full immutable targets and accepted complete commands remain TBD; the four records remain Uncommitted and Story 5.4 remains draft/backlog. [Accepted input record](tests/owner-delivery-2026-10-08/accepted-owner-inputs-20261008.json) preserves the current basis. The 365-day Party policy and existing implementation approvals remain unchanged.
+
+The owner subsequently replied “I Jérôme Piquot approve” to the decision-role/signer assignment question. The approval-policy proposal and named human approver are recorded as accepted; no repeat approval is requested. [Approved proposal and enrollment/trust gaps](tests/owner-delivery-2026-10-08/approval-authority-proposal.md) distinguish Jérôme Piquot's named assignment from actual current application actor/role identifiers, separate signer account enrollment and qualified public trust/revocation bindings. Repository ownership references do not replace those runtime proofs. No owner status, full target or accepted complete command is promoted by this declaration.

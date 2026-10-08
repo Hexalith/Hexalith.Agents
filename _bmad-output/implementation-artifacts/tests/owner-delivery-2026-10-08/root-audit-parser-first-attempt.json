@@ -1,0 +1,90 @@
+{
+  "capturedUtc": "2026-10-08T11:31:40.890163+00:00",
+  "scope": "Independent root hash/XML/build-log preservation audit; does not assert whole-worktree stability or full live qualification.",
+  "checks": [
+    {
+      "command": "parties-eleven-lane-final",
+      "xmlTotals": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    {
+      "custodyClasses": {
+        "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests": 68,
+        "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests": 47
+      }
+    },
+    {
+      "command": "conversations-four-suites-final",
+      "xmlTotals": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    {
+      "command": "custody-three-classes-final",
+      "xmlTotals": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    {
+      "custodyClasses": {
+        "Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests": 40,
+        "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests": 47,
+        "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests": 68
+      }
+    }
+  ],
+  "buildLogs": 16,
+  "ownedFiles": 19,
+  "compiledFiles": 5045,
+  "evidenceFiles": 265,
+  "protected": [
+    {
+      "path": "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md",
+      "same": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/sprint-status.yaml",
+      "same": true
+    },
+    {
+      "path": "../parties/_bmad-output/planning-artifacts/actor-history-retention-policy-v1.md",
+      "same": true
+    }
+  ],
+  "registerDateOnlyDelta": false,
+  "errors": [
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.EventStore.Client.Tests-tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.EventStore.Contracts.Tests-tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.EventStore.Server.Tests-tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Client.Tests-tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Contracts.Tests-tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Security.Tests-tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Server.Tests-tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.Tests-tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Parties.UI.Tests-tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Platform.Custody.Tests-tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-owner-consistent/Hexalith.Platform.Identity.Tests-tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final/Hexalith.Conversations.Contracts.Tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final/Hexalith.Conversations.Tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final/Hexalith.Conversations.Server.Tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-owner-final/Hexalith.Conversations.Client.Tests.xml",
+    "total /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-owner-final/local-tests.xml",
+    "register date-only delta"
+  ]
+}

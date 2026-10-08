@@ -1,0 +1,37 @@
+[
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs",
+    "sha256": "abb4cfeec311c8b9f29124d9d1f9a9e936c0b55827ee4af2c183431fcb2eb862",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+    "sha256": "07b3c93ea7149ff280d0a73c51d83896b3f48a11dff2dfe5c9647a5c60f5c74d",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs",
+    "sha256": "84c8e874d2972d2ef894fd20db0f78b61f32a44e35054dabd3bf72d1fcef4770",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+    "sha256": "e45175a7e2e34b1107636037019222366495f7672a9e4987af78baf3d66a767f",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPlatformKeyInventoryAuthority.cs",
+    "sha256": "9bf54e47332590d97e38c6603f75ca16f7ad5b576b00717a02bf48e12eaa411f",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/platform/src/Hexalith.Platform.Custody/IPlatformKeyInventoryAuthority.cs"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryActor.cs",
+    "sha256": "52672b65ca15f45a322817bb8042c361a004264669e1e1aa558f952b7ca2c145",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryActor.cs"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PlatformKeyInventoryActorTests.cs",
+    "sha256": "410eeee0eee7e2c9af7fe0d9e2e96ec663e836728459b498faff2097e1aca79a",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/consumption-inventory-restore-before/platform/tests/Hexalith.Platform.Custody.Tests/PlatformKeyInventoryActorTests.cs"
+  }
+]

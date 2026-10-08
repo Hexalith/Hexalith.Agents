@@ -1,0 +1,28 @@
+{
+  "capturedUtc": "2026-10-08T13:46:23.096326+00:00",
+  "scope": "Separate independently resolved published deletion signing trust; before supplemental correction",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityPublishedTrust.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningTrustProvider.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "existed": true,
+      "sha256": "ebda946f634df34507f88561076a1bff9f40efc40fbce84ee474eaa80e6b21cc"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "existed": true,
+      "sha256": "4f98f412cd2252b85e74eaa4e0923bedb6043da52d5cf15dad4061f5667117ce"
+    }
+  ]
+}

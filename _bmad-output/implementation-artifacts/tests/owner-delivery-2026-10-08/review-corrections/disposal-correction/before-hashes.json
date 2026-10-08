@@ -1,0 +1,26 @@
+{
+  "capturedUtc": "2026-10-08T12:20:03.770218+00:00",
+  "scope": "Independently verified completed-response blocking disposal correction; original first review correction evidence remains historical and intact.",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/RetainedIdentityHistoryReader.cs",
+      "sha256": "7524b2c64d3586a91137ad20f2b7e4743f84c826e6414f06cfbb63d033ff1b4f"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/RetainedIdentityHistoryReaderTests.cs",
+      "sha256": "4ba6f48e99cbe0477022dfb962771c36048aa941a018885b0146d8977577d498"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedContent.cs",
+      "sha256": "94a5fbcd49bb7c67963e4fd90c6f7f27408ba6c0ab9069a126045fcca7a1d19e"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedHandler.cs",
+      "sha256": "128c5aa9f86e6d7922ce5505bf747e31c1b0a79da9df7df94e84988840170f46"
+    }
+  ]
+}

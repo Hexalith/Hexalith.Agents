@@ -1,0 +1,44 @@
+{
+  "capturedUtc": "2026-10-08T12:28:10.732980+00:00",
+  "integrationDate": "2026-10-08",
+  "environmentHost": "192.168.1.30",
+  "denominator": "Currently open, undeleted Conversations created in [from,to), including zero Agent Calls",
+  "workerProvenance": "Dedicated Conversations-owned service Party; explicit tenant enrollment and current authenticated machine-principal binding; separate from the provisioned Agents Party and approving human",
+  "source": "Explicit owner async replies; accepted decisions, not new implementation approval",
+  "limits": "Exact service Party ID/enrollment not inferred; environment metadata is discovery only, not provider or authority qualification.",
+  "timingAcceptance": {
+    "acceptedUtc": "2026-10-08T13:59:30.066175+00:00",
+    "source": "Explicit owner reply: Use the proposed five settings (recommended)",
+    "maximumLifetimeSeconds": 300,
+    "futureClockToleranceSeconds": 30,
+    "healthyRoutineRotationOverlapSeconds": 600,
+    "automaticRecoveryHorizonSeconds": 86400,
+    "replayFirstSeenRetentionSeconds": 604800,
+    "exclusiveExpiryHasNoGrace": true,
+    "revokedKeysFailImmediately": true,
+    "retentionInequalityVerified": true,
+    "limits": "Numeric settings accepted; issuer/audience/profile version+validity, independently governed issuer/role/actor authority, qualified providers and live recovery remain unestablished. Party365 and nonexpiring deletion capabilities unchanged."
+  },
+  "additionalDirections": {
+    "capturedUtc": "2026-10-08T14:59:40.911488+00:00",
+    "approvalPolicy": "Check Hexalith.Platform; otherwise prepare a proposal. Scoped inspection and a concrete unassigned draft are prepared.",
+    "workerEnrollment": "Check existing enrollment; otherwise do best. Scoped discovery and a narrow existing-identity enrollment proposal are prepared.",
+    "limits": "These directions authorize discovery/proposal work, not invented role assignments, issuer trust, tenant service-Party IDs or live qualification."
+  },
+  "approvalPolicyAcceptance": {
+    "recordedUtc": "2026-10-08T16:16:44.670596+00:00",
+    "source": "Explicit owner reply to approval-role and independent-signer assignment question",
+    "reply": "I Jérôme Piquot approve",
+    "namedHumanApprover": "Jérôme Piquot",
+    "decisionRoles": [
+      "Product",
+      "Governance",
+      "Security",
+      "Architecture"
+    ],
+    "proposalApprovalAccepted": true,
+    "stableApplicationActorId": null,
+    "independentSignerAccountOrProcessId": null,
+    "limits": "Named approval/assignments recorded; real current actor/role binding, independent signer enrollment/public trust/revocation profile and live qualification remain unestablished. No renewed implementation or other accepted approval is requested."
+  }
+}

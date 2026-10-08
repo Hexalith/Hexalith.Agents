@@ -1,0 +1,42 @@
+{
+  "observedUtc": "2026-10-08T11:10:53.920756+00:00",
+  "meaning": "Source observations only; these dirty checkouts and concurrent external HEAD changes are not accepted full owner targets. No git mutation by this workflow.",
+  "repositories": [
+    {
+      "repository": "eventstore",
+      "head": "b31c87fbca6280295593f6b0be8f8d4f950a01e1",
+      "status": "",
+      "branch": "main"
+    },
+    {
+      "repository": "parties",
+      "head": "890119f1b4ced37ccec34787c812f064199fb3ef",
+      "status": "",
+      "branch": "main"
+    },
+    {
+      "repository": "conversations",
+      "head": "b3a813b0ba0020a558a3779e4e88b65612850e82",
+      "status": " M .github/workflows/ci.yml\n M Directory.Packages.props\n M _bmad-output/implementation-artifacts/deferred-work.md\n M _bmad-output/implementation-artifacts/spec-9-2-make-the-portable-tier-structural-and-prove-complete-monotonic-tier-execution.md\n M _bmad-output/implementation-artifacts/spec-v17-implementation-hold-decision-authority.md\n M _bmad-output/implementation-artifacts/spec-v21-review-current-policy-disposition.md\n M _bmad-output/implementation-artifacts/sprint-status.yaml\n M _bmad/scripts/tests/test_conformance_tiering.py\n M _bmad/scripts/tests/test_generate_story_record.py\n M _bmad/scripts/verify_conformance_tiering.py\n M docs/runbooks/story-final-record-generation.md\n M docs/runbooks/v21-review-disposition.md\n M references/Hexalith.Builds\n M references/Hexalith.EventStore\n M references/Hexalith.FrontComposer\n M references/Hexalith.Memories\n M references/Hexalith.Parties\n M references/Hexalith.Tenants\n M src/Hexalith.Conversations.AppHost/ConversationsAppHostTopology.cs\n M src/Hexalith.Conversations.Server/Agents/ConversationAgentAdmissionStage.cs\n M src/Hexalith.Conversations.Server/Agents/ConversationAgentSourceReader.cs\n M tests/Hexalith.Conversations.AppHost.Tests/ConversationsAppHostRuntimeBoundaryTest.cs\n M tests/Hexalith.Conversations.Conformance.Portable.Tests/Story92TieringVerification.cs\n M tests/Hexalith.Conversations.IntegrationTests/Projections/ConversationGatewayLiveFixture.cs\n M tests/Hexalith.Conversations.IntegrationTests/ScaffoldSmokeTest.cs\n M tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentLocalFixture.cs\n M tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentSixSeamTests.cs\n?? _bmad-output/implementation-artifacts/spec-fix-ci-37750935721.md\n?? tests/Hexalith.Conversations.IntegrationTests/Projections/ConversationGatewayAdmissionTests.cs\n?? tests/Hexalith.Conversations.IntegrationTests/Projections/ConversationGatewayCommandAuthority.cs\n?? tests/Hexalith.Conversations.IntegrationTests/Projections/ConversationGatewayCommandAuthorityTests.cs\n?? tests/Hexalith.Conversations.IntegrationTests/Projections/ConversationGatewaySecurityTests.cs\n?? tests/Hexalith.Conversations.Server.Tests/Agents/ConversationSourceCancellationFixture.cs\n",
+      "branch": "main"
+    },
+    {
+      "repository": "platform",
+      "head": "eb864b75439371d2bd8fd8047bccb291c699d84c",
+      "status": " M eng/verify-ext-secrets-1.ps1\n M references/Hexalith.Builds\n M src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj\n?? src/Hexalith.Platform.Custody/ExportKeyWrapContext.cs\n?? src/Hexalith.Platform.Custody/ExportKeyWrappingCore.cs\n?? src/Hexalith.Platform.Custody/ExportManifestSignatureContext.cs\n?? src/Hexalith.Platform.Custody/ExportManifestSignatureCore.cs\n?? src/Hexalith.Platform.Custody/OwnedExportKey.cs\n?? src/Hexalith.Platform.Custody/WrappedExportKey.cs\n?? tests/Hexalith.Platform.Custody.Tests/ExportCustodyCryptographyTests.cs\n",
+      "branch": "main"
+    },
+    {
+      "repository": "commons",
+      "head": "b8ad13c83c334b03d1465cfbd43de8b0a975b3ea",
+      "status": "",
+      "branch": "main"
+    },
+    {
+      "repository": "tenants",
+      "head": "38c162e81839fb585d2cbd5763b9b7a2badfe1ea",
+      "status": " M _bmad-output/implementation-artifacts/deferred-work.md\n M _bmad-output/implementation-artifacts/dependency-refresh-eventstore-3.117.0-evidence-2026-10-08.json\n M _bmad-output/implementation-artifacts/spec-refresh-dependencies.md\n M _bmad-output/project-context.md\n M references/Hexalith.Builds\n M references/Hexalith.EventStore\n M references/Hexalith.Memories\n M references/Hexalith.Platform\n?? _bmad-output/implementation-artifacts/dependency-refresh-eventstore-3.117.0-final-evidence-2026-10-08.json\n?? _bmad-output/implementation-artifacts/dependency-refresh-eventstore-3.117.0-raw-logs-2026-10-08.zip\n?? _bmad-output/implementation-artifacts/dependency-refresh-eventstore-3.117.1-evidence-2026-10-08.json\n?? _bmad-output/implementation-artifacts/dependency-refresh-eventstore-3.117.1-raw-logs-2026-10-08.zip\n?? _bmad-output/implementation-artifacts/spec-eventstore-3-117-1.md\n",
+      "branch": "main"
+    }
+  ]
+}

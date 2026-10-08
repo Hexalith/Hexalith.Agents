@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><EnableDefaultCompileItems>false</EnableDefaultCompileItems><IsPackable>false</IsPackable><AssemblyName>Hexalith.EventStore.Streams.ReviewFocused.Tests</AssemblyName></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs" />
+    <Compile Include="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeReadTimeProvider.cs" />
+    <Compile Include="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedIdentityHistoryReaderTests.cs" />
+    <Compile Include="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistoryTimeProvider.cs" />
+    <Compile Include="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistoryTimer.cs" />
+    <Compile Include="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedHandler.cs" />
+    <Compile Include="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedContent.cs" />
+    <Compile Include="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedStream.cs" />
+    <Compile Include="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistoryResponseHandler.cs" />
+    <ProjectReference Include="/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Hexalith.EventStore.Client.csproj" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="NSubstitute" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

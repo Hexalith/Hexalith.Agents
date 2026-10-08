@@ -1,0 +1,35 @@
+{
+  "observedAt": "2026-10-08T15:07:18.301056+00:00",
+  "sources": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs",
+      "existed": false,
+      "copy": null,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationNamespaceActor.cs",
+      "existed": true,
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/discovery-continuation/private-operation-before/src/Hexalith.EventStore.Server/Streams/SourcePublicationNamespaceActor.cs",
+      "sha256": "a6228d21bb1ef594ba75927589114dabc657ebdb429f5604d9b5fab6291f436c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs",
+      "existed": true,
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/discovery-continuation/private-operation-before/src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs",
+      "sha256": "97410794b19e37196ebedc3508b9c895d752e3578225aa49540eed5ee5a51b9f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs",
+      "existed": true,
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/discovery-continuation/private-operation-before/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs",
+      "sha256": "0af3c77731613fb1dcb6d266a718726e49ad7f388f9b7012b46d1dba3de9d585"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs",
+      "existed": true,
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/discovery-continuation/private-operation-before/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs",
+      "sha256": "649a22b4fafcfba56d26e1c99ccb53c3ebc102b974827ce4b3cb479a3c401f5e"
+    }
+  ]
+}

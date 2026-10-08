@@ -1,0 +1,21 @@
+{
+  "capturedUtc": "2026-10-08T16:20:18.018283+00:00",
+  "scope": "Read-only current/revoked metadata restore tracing; no provider/key use/live qualification",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryActor.cs",
+      "sha256": "52672b65ca15f45a322817bb8042c361a004264669e1e1aa558f952b7ca2c145"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPlatformKeyInventoryAuthority.cs",
+      "sha256": "9bf54e47332590d97e38c6603f75ca16f7ad5b576b00717a02bf48e12eaa411f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PlatformKeyInventoryActorTests.cs",
+      "sha256": "410eeee0eee7e2c9af7fe0d9e2e96ec663e836728459b498faff2097e1aca79a"
+    }
+  ],
+  "verifiedSourceGap": "ReadStateAsync shape-validates only. A pre-revocation Active snapshot restored after Revoke is released as Active under still-valid private ReadKeyInventory credentials; no independently current revision/state-digest check exists. A physical signer may independently deny use, but that does not make the released current/revoked inventory accurate.",
+  "existingVerification": "RotationRetainsVersionsAndRevocationCannotBeUndone restores the latest already-revoked snapshot only, not an earlier snapshot or equal-revision divergent metadata.",
+  "requestedCorrection": "Independent exact installed state validation/conditional advance plus lower-revision and equal-revision divergent restore regressions; preserve correct latest outcomes and separate physical qualification."
+}

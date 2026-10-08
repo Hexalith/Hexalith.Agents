@@ -1,0 +1,21 @@
+{
+  "capturedUtc": "2026-10-08T12:36:54.971471+00:00",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/ISourcePublicationIndexActor.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationIndexWrite.cs",
+      "existed": false
+    }
+  ],
+  "reason": "Use actual DAPR actor turn+SaveState conditional owner, avoiding unqualified missing-ETag creation guarantees."
+}

@@ -1,0 +1,51 @@
+{
+  "observedUtc": "2026-10-08T12:05:52.606002+00:00",
+  "observedSourceRevision": "9542d3c9f48bf9ce1c57f2ef68904703eaba56cc",
+  "sourceMeaning": "Current source observation only; no accepted full delivery target or production authority inferred.",
+  "inspection": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/RetainedIdentityHistoryStream.cs",
+      "sha256": "e7ef927feb922641c296f7701e03d9dbb99a3726521444933db678f750e5d3c9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/RetainedIdentityHistoryValidator.cs",
+      "sha256": "e12c03a8eb4d6518467ccb65c3109bb5cc81220dfd9e0c62fc0f0fcff8639def"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistoryGrant.cs",
+      "sha256": "4ac9b5438783cf0c9b23dbf8b1ac7c68a932eff1f1c239002f613c1aaca02819"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "sha256": "e04124330ea1cafc8fdf70d309a5db55e62cbb534a273a85cedd864253d6731a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/IdentityHistoryCustodyEvidence.cs",
+      "sha256": "299291c4c38f8c6c089d36529517a0f3946bd375a41ea8594a0ed150375b2b70"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/IIdentityHistoryCustody.cs",
+      "sha256": "7b5f9494d3c060ba2e9a157ee349d8936830bc7903294ebe3598cb957ab07284"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "sha256": "a7b0c403a6a9d68bc1c516866a277f901d6143bdb8a2e3460ba85e29e09c7a03"
+    }
+  ],
+  "search": {
+    "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+    "arguments": [
+      "rg",
+      "-n",
+      "-g",
+      "*.cs",
+      "ActorFree|actor.free|SuccessorBinding|BindingContinuation",
+      "src"
+    ],
+    "exitCode": 1,
+    "matches": "",
+    "stderr": ""
+  },
+  "result": "No callable actor-free successor binding contract found in current retained stream/certificate/grant/authority models. Existing ExpiredPredecessor_BlocksSuccessorInsteadOfFabricatingExclusion test explicitly requires denial for expired/destroyed predecessor. Generic event-versioning replay selectors are not binding lifecycle proof.",
+  "next": "Minimal independently authenticated closure/successor checkpoint and lifecycle receipt binding proposed; no policy extension or recovering expired actor material."
+}

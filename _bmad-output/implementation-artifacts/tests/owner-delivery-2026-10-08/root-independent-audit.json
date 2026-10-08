@@ -1,0 +1,84 @@
+{
+  "capturedUtc": "2026-10-08T11:32:28.470159+00:00",
+  "scope": "Independent root hash/XML/build-log preservation audit; no whole-worktree stability/full live qualification claim.",
+  "parserCorrection": "First audit read assemblies root attributes and omitted literal backticks in date row; corrected to assembly children and exact register bytes. First parser attempt retained; no evidence or source was changed.",
+  "checks": [
+    {
+      "custodyClasses": {
+        "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests": 68,
+        "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests": 47
+      }
+    },
+    {
+      "command": "parties-eleven-lane-final",
+      "xmlTotals": {
+        "total": 1107,
+        "passed": 1107,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    {
+      "command": "conversations-four-suites-final",
+      "xmlTotals": {
+        "total": 1553,
+        "passed": 1553,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    {
+      "custodyClasses": {
+        "Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests": 40,
+        "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests": 47,
+        "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests": 68
+      }
+    },
+    {
+      "command": "custody-three-classes-final",
+      "xmlTotals": {
+        "total": 155,
+        "passed": 155,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    }
+  ],
+  "uniqueNamedCases": 2696,
+  "buildLogs": 16,
+  "ownedFiles": 19,
+  "compiledFiles": 5045,
+  "evidenceFiles": 265,
+  "protected": [
+    {
+      "path": "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md",
+      "same": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/sprint-status.yaml",
+      "same": true
+    },
+    {
+      "path": "../parties/_bmad-output/planning-artifacts/actor-history-retention-policy-v1.md",
+      "same": true
+    }
+  ],
+  "registerDateOnlyDelta": true,
+  "errors": [],
+  "coverageCounting": "Per-command total cases are authoritative. GovernanceMetadataJsonShouldRequireAuthorityFields has five distinct xUnit test IDs whose display names truncate to the same text. Thus 2696 unique display names are not a distinct-case total. SDK20, focusedConversations27 and Parties custody115 overlap; do not add repeated or overlapping evidence.",
+  "casesAfterKnownSuiteOverlap": 2700,
+  "negativeGateCases": 11,
+  "hostScope": "AppHost drift was repeated separately against captured current scaffold source; LocalScaffold is build-only, no full composition/live qualification.",
+  "externalDriftAssessment": {
+    "conversationsAppHostIntegrationTests": "These three paths are not in the four executed Local suites; their live tests were not claimed.",
+    "eventstoreEventManagedArtifact": "Managed event evolution loader is outside the stream reader call path; source drift is retained and whole-tree stability is not claimed. Any post-review reader graph repeat will freshly build the current Client.",
+    "platformApphost": "Final LocalScaffold repeated current captured AppHost after external drift; checked build source unchanged during that build."
+  },
+  "finalCapturedUtc": "2026-10-08T11:34:05.402354+00:00"
+}

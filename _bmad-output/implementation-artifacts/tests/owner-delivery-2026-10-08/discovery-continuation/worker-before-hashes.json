@@ -1,0 +1,43 @@
+{
+  "capturedUtc": "2026-10-08T12:59:51.066108+00:00",
+  "scope": "Configured dedicated service Party worker and persisted attempt/receipt lookup pump; real IDs and qualified receiver remain unavailable.",
+  "files": [
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Hexalith.Conversations.Server.csproj",
+      "existed": true,
+      "sha256": "47754e7ee0bcd04f24b1a9ea5590f018e37ec50cc98f0a22351d34b4eab6d6da",
+      "copy": "worker-before/conversations/src/Hexalith.Conversations.Server/Hexalith.Conversations.Server.csproj"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionWorkerRegistration.cs",
+      "existed": false
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionWorker.cs",
+      "existed": false
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/IConversationDeletionReceiver.cs",
+      "existed": false
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionReceiverResult.cs",
+      "existed": false
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs",
+      "existed": false
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "existed": false
+    }
+  ]
+}

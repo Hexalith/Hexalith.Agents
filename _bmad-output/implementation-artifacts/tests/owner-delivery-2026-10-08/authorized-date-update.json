@@ -1,0 +1,43 @@
+{
+  "instruction": "today",
+  "question_scope": [
+    "EXT-PARTIES-1",
+    "EXT-CONV-AI-1",
+    "EXT-SECRETS-1",
+    "EXT-HOST-1"
+  ],
+  "accepted_integration_date": "2026-10-08",
+  "timezone": "Europe/Paris",
+  "register_before_sha256": "7b5c24fc10db943be744ba579f96a44d9488f8f2ebc8cd8929ead73a2b6424e1",
+  "register_after_sha256": "184e16c05b57527abcdbd8588ae0c9fa10fe4c6093a53e66a509e9aa39fbcccb",
+  "changes": [
+    {
+      "record": "EXT-PARTIES-1",
+      "field": "TargetIntegrationDate",
+      "before": "TBD",
+      "after": "2026-10-08"
+    },
+    {
+      "record": "EXT-CONV-AI-1",
+      "field": "TargetIntegrationDate",
+      "before": "TBD",
+      "after": "2026-10-08"
+    },
+    {
+      "record": "EXT-SECRETS-1",
+      "field": "TargetIntegrationDate",
+      "before": "TBD",
+      "after": "2026-10-08"
+    },
+    {
+      "record": "EXT-HOST-1",
+      "field": "TargetIntegrationDate",
+      "before": "TBD",
+      "after": "2026-10-08"
+    }
+  ],
+  "other_register_text_preserved": true,
+  "commitment_before_sha256": "27f66a256a3c529fbfc81f1c871c293d68c64781eef5505197eec45f29280c48",
+  "commitment_after_sha256": "2c420b870c8a589a23f63be0115e26bee568f86785fba6b6862936ef38d3e2da",
+  "commitment_edits": "Record the four dates, update the current missing-field request, and append the dated owner-input observation; prior historical observations remain."
+}

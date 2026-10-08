@@ -1,0 +1,15 @@
+{
+  "capturedUtc": "2026-10-08T13:57:52.408961+00:00",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+      "existed": false
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "observedAt": "2026-10-08T14:49:26.293267+00:00",
+  "sources": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/Hexalith.EventStore.PayloadProtection.Tests.csproj",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/adapter-project-before/tests/Hexalith.EventStore.PayloadProtection.Tests/Hexalith.EventStore.PayloadProtection.Tests.csproj",
+      "sha256": "5b29d17454fd11c65965c6cc66deb70571f7c995d9512384f28b38d37185aed5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilityPublishedTrust.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/rotation-recovery-before/src/Hexalith.Platform.Custody/DeletionCapabilityPublishedTrust.cs",
+      "sha256": "724b90e378db293ce9c46ba1252c8c39e7c3bdd3e8324efbeeeda1c942611a2f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/rotation-recovery-before/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "sha256": "3d35255b2b93982453a82905e106c4b46046ca7469b99f3048c4a9c0b14fcef5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningTrustProvider.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/rotation-recovery-before/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningTrustProvider.cs",
+      "sha256": "1d9065ff61381a66a420195550272da5031ceb2ff5bf9ba3ca2ad31370f85042"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/rotation-recovery-before/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "sha256": "dc4afcf742a8bcccf8577491f6cc8860d109dd3ff40a6003a246928121801fd2"
+    }
+  ]
+}

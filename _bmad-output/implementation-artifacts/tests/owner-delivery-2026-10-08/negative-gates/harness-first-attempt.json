@@ -1,0 +1,5 @@
+{
+  "result": "Harness failed before verifier execution",
+  "reason": "Global-tool pwsh launcher itself resolved dotnet on the sentinel PATH, so the sentinel observed the PowerShell startup, not a verifier child call. Empty parties-live.log retained. No actual live or build invocation occurred.",
+  "correction": "Invoke the known real dotnet host and PowerShell DLL explicitly; child dotnet resolution remains sentinel-bound."
+}

@@ -1,0 +1,25 @@
+{
+  "observedAt": "2026-10-08T14:56:59.101514+00:00",
+  "sources": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/bounded-state-before/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "sha256": "e9b7634d5ba43dabc9e89af36589445322ca33a0317624d9acc3b1dc19cf3531"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/bounded-state-before/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs",
+      "sha256": "3a3bfa1e5dbf733601b13f49c201290d81430b5b4ac08455108dac8641e095af"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/bounded-state-before/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+      "sha256": "452685b7114a91e76e0dd3cbe0c914ec874638eba0db4fef864e371d1a93ff4b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/bounded-state-before/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+      "sha256": "8f4d8ca9ce611154552057725ae73e3b905811cd347e75c2618d40cc8ccbe545"
+    }
+  ]
+}

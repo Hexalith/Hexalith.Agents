@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><OutputType>Exe</OutputType><IsPackable>false</IsPackable><EnableDefaultCompileItems>false</EnableDefaultCompileItems><AssemblyName>Hexalith.Platform.Custody.Tests</AssemblyName></PropertyGroup>
+<ItemGroup><ProjectReference Include="/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj"/></ItemGroup>
+<ItemGroup><PackageReference Include="xunit.v3"/><PackageReference Include="Shouldly"/><PackageReference Include="NSubstitute"/><Using Include="Xunit"/></ItemGroup>
+<ItemGroup><Compile Include="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Deletion*Tests.cs"/><Compile Include="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs"/><Compile Include="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Platform*Tests.cs"/><Compile Include="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyFixtureClock.cs"/><Compile Include="/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Testing/Fakes/InMemoryStateManager.cs"/></ItemGroup>
+</Project>

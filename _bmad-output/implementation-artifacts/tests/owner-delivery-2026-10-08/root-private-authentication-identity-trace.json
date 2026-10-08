@@ -1,0 +1,9 @@
+{
+  "capturedUtc": "2026-10-08T15:04:45.973485+00:00",
+  "source": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+  "sourceSha256": "4952b279f67e51e96f5184e5a653733019b287c0e3a55994a6ee8e784f79f5f4",
+  "claim": "Count requires one authenticated identity, while FindAll selects claims from every identity including unauthenticated additions. Machine issuer/subject/client/audience must come from the actual authenticated identity.",
+  "demonstrableInput": "One authenticated ClaimsIdentity with no machine claims plus one unauthenticated ClaimsIdentity carrying enrolled worker claims; current One(ClaimsPrincipal,...) observes those untrusted additions.",
+  "route": "Small direct active-engineering correction sent to sole implementation agent; mixed-identity regression requested.",
+  "limits": "Private library boundary, not a reported live exploit. Production registration/enrollment remains unavailable."
+}

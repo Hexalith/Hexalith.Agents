@@ -1,0 +1,47 @@
+{
+  "Scope": "S1/S2 and private stateless S3 cryptographic prerequisites plus accepted-policy cleanup source simulations",
+  "Mode": "Local",
+  "LiveReady": false,
+  "XmlSha256": "672ad219aacaf961f762ae61119be62dcde61305f1e28bc171e488d5385ba649",
+  "RequiredClasses": [
+    {
+      "Passed": 68,
+      "Class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests"
+    },
+    {
+      "Passed": 47,
+      "Class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests"
+    },
+    {
+      "Passed": 31,
+      "Class": "Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests"
+    }
+  ],
+  "BuildArguments": [
+    "build",
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+    "-c",
+    "Debug",
+    "--artifacts-path",
+    "/tmp/hexalith-owner-custody-final-20261008",
+    "-m:1",
+    "-p:NuGetAudit=false",
+    "-p:MinVerVersionOverride=1.0.0",
+    "-p:UseHexalithProjectReferences=true",
+    "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore"
+  ],
+  "DependencyAvailable": false,
+  "TestArguments": [
+    "/tmp/hexalith-owner-custody-final-20261008/bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests",
+    "-result-xml",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-final/local-tests.xml"
+  ],
+  "Passed": 146,
+  "Total": 146
+}

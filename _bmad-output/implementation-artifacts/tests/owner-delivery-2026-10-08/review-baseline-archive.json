@@ -1,0 +1,51 @@
+{
+  "capturedUtc": "2026-10-08T11:43:29.341843+00:00",
+  "meaning": "Preserve byte-identical pre-review packets/source index/evidence manifest before corrected final packet claims. Original manifests remain historical; current archival paths identify those original bytes.",
+  "files": [
+    {
+      "originalPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/README.md",
+      "archivedPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-baseline-documents/README.md",
+      "sha256": "f600987b3a35366ca63366e0da2f6cdc44f73d26b4382f85581e60049c4cfc7a"
+    },
+    {
+      "originalPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+      "archivedPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-baseline-documents/ext-parties-1.md",
+      "sha256": "b18636a6b6ca064bce776ad4042cf963cd065f574dc5a0e8cf2fb74659f255ae"
+    },
+    {
+      "originalPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+      "archivedPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-baseline-documents/ext-conv-ai-1.md",
+      "sha256": "5b8f27009747bed1ac4f2caec4e37f49f2579354dbc57bea5ed72e097d462a15"
+    },
+    {
+      "originalPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+      "archivedPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-baseline-documents/ext-secrets-1.md",
+      "sha256": "16ac95b5b199928a08cf09b8da8da093017e3165d58cdb35faa5b3eb3488b2e0"
+    },
+    {
+      "originalPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+      "archivedPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-baseline-documents/ext-host-1.md",
+      "sha256": "8eb801c68fb09e5d80d906cf80d41155f64a42a58c6809146398b0cfd77a7fae"
+    },
+    {
+      "originalPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/owned-changes.json",
+      "archivedPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-baseline-documents/owned-changes.json",
+      "sha256": "32e23aa9bc4672d56a4be7994b19a410d178d51093bf9c7490bb03715be91418"
+    },
+    {
+      "originalPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/owned-changes.diff",
+      "archivedPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-baseline-documents/owned-changes.diff",
+      "sha256": "b936f17c39a2990d55b5b9c6e1545a05361b0a57918f2b3917388405d4154007"
+    },
+    {
+      "originalPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/artifact-manifest.json",
+      "archivedPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-baseline-documents/artifact-manifest.json",
+      "sha256": "2120462723a0db35ea66c2b99ddb7d52b389b2f4997b9acbb88b8408ccd77dcf"
+    },
+    {
+      "originalPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/verification-outcomes.json",
+      "archivedPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-baseline-documents/verification-outcomes.json",
+      "sha256": "6c036f348f2710a3db8cb4352200d38b206fc933fd13560b13064c4e02d2ea4d"
+    }
+  ]
+}

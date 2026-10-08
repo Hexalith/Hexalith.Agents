@@ -1,0 +1,84 @@
+{
+  "capturedUtc": "2026-10-08T14:15:02.251096+00:00",
+  "scope": "Supplemental independent private current caller/exact operation read authorization, not effect renewal",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IExportKeyDeliveryAuthority.cs",
+      "existed": true,
+      "sha256": "6e1c7efd0aee69f97d485dc3c852ca34a23297197a79f44d679f86a1b3765290"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningAuthority.cs",
+      "existed": true,
+      "sha256": "e7acf73e65fc1d1e7466e159db1c8d5eff4242bfa95d91eed3048afd4480cdac"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IPlatformKeyInventoryAuthority.cs",
+      "existed": true,
+      "sha256": "9a141c381204bc9e487e5d304bbd7e589d61909c42a406800bdc36b01e816099"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+      "existed": true,
+      "sha256": "a16855c01ddda2d5aadc84385458fc3b7d0a97aace99a5d5ec0c869869e83e4b"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "existed": true,
+      "sha256": "8fd36a0316cf721cd9529153ad732f06d4c61a3cdddff6141b6c61c47fdd1c3a"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformKeyInventoryActor.cs",
+      "existed": true,
+      "sha256": "3b8cbfaf877f99e3615ede38251b0f30679197f262879ac70df33405e9ca8435"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "existed": true,
+      "sha256": "3cea7d9ec9976f894fa4c68cd19596bed01cec7c6c670341a670721ad1110d7e"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "existed": true,
+      "sha256": "a69546f2cb31ce6a9b3d3cca1761ddfd8b3dcfeeea6a9e67d9a24b73162811e6"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PlatformKeyInventoryActorTests.cs",
+      "existed": true,
+      "sha256": "bb45eea0e438cd410b5a68902d0494950dfd71e6c91cfe694a0aa6717e32489a"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs",
+      "existed": true,
+      "sha256": "3ad47e961675a7a0ab07d508f99cb0527f527750c6c9c07d264b505cd05e54df"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "existed": true,
+      "sha256": "52020647ebb5911e30ea5c37501753e202b901b6da50be6a00d0af1579f8a4db"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs",
+      "existed": true,
+      "sha256": "3f47107ce6e4c78848c31c2e4be68469c725763b300789243cde273434657bc7"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+      "existed": true,
+      "sha256": "482db8ce8c4de64609ba302e6181e15268808a27d4d4f1d087710dfb07f88613"
+    }
+  ]
+}

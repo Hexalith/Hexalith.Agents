@@ -1,0 +1,35 @@
+{
+  "capturedUtc": "2026-10-08T15:35:15.106605+00:00",
+  "scope": "Root active-engineering integrity/recovery trace; new independent review and root verification remain required.",
+  "findings": [
+    {
+      "id": "ROOT-STATE-DIGEST",
+      "claim": "A monotonic revision alone does not bind an equal-revision restored vector to the anchored state digest. Validate the owned epoch/revision/digest together.",
+      "correction": "Source/occurrence authority contracts now receive safe state digest; same-revision divergent restore regression is running."
+    },
+    {
+      "id": "ROOT-OLD-SPOOL-LOOKUP",
+      "claim": "Skipping all records at24h before outcome lookup prevents exact reconciliation of an already-recorded original.",
+      "correction": "Exact original lookup/ack is allowed afterH; only new automatic append is denied; original pending/first-seen retained. Added explicit no-mutation intent lookup."
+    }
+  ],
+  "sourceObservations": [
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "sha256": "8886108f42bedd7258612508eca567431e5325d0be64e138ab3e88681e73ca13"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs",
+      "sha256": "97e713911d8fa1321e2f2b0f76d935589842f9fdaa9b6a311d79d460bbc5c873"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs",
+      "sha256": "c0ac18f686e4f2f70d9c9dcda2a408fc5c0a8318730650358bd8693fd17a26e6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IInteractionOccurrenceAuthority.cs",
+      "sha256": "b455486d745f0305fcecb7f6755bfbdfb56bc7e443680c63e0cee035a716e465"
+    }
+  ],
+  "limits": "These are source corrections; no physical replication, independent issuer or live restore qualification is inferred."
+}

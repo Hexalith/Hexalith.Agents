@@ -1,0 +1,33 @@
+{
+  "capturedUtc": "2026-10-08T11:23:41.553388+00:00",
+  "comparedFiles": 5763,
+  "owned19FilesMatchCapturedReviewCopy": true,
+  "nonmatchingFiles": [
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.AppHost.Tests/ConversationsAppHostRuntimeBoundaryTest.cs",
+      "beforeSha256": "c12d076cbcc5c68d1eaef1af7fb30236e5c3bb8e0f0d0b6d47f176cd1c2afa31",
+      "afterSha256": "1e7ce4612cfc6930f1a24e6e7671c4f77db771e3d235234c29d96203ceb9f9ed"
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.IntegrationTests/Projections/ConversationGatewayLiveFixture.cs",
+      "beforeSha256": "dc3524a60a58863875f6a0060f49254937b8fec578a3565b6fa72d6a5b4d9724",
+      "afterSha256": "111a38a53577f5e27e5f66456e0b70f204f708b7da33679877b3d8a49616169f"
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.IntegrationTests/Projections/ConversationGatewaySecurityTests.cs",
+      "beforeSha256": "ff2434ed737e068d0984fb34b42f22a6b2dcf291e0802b28b15d1ad79cd7bb60",
+      "afterSha256": "8121c44dde2cc4710860ce803b976c9d8ef1893d9f638b9dc35d737acc4f4a50"
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Events/EventManagedArtifact.cs",
+      "beforeSha256": "c40c9124b1baa54a8a6d014bb0ed6f8d2e4358c47e0dccefe9d150e1737f361b",
+      "afterSha256": "18b5ad99dfd919a9816dfb6ae5771db7a6e69404024deac0ed700978fe75f8f4"
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/apphost.cs",
+      "beforeSha256": "7c140eb97bbc45e6ab0589ba3f186ea8eccc623bac9f8850bf2b42aadf136f9a",
+      "afterSha256": "efb900745618692ed06c7698a2ab9a9b877eb3371b6c9e9a708e6f7270f3ea62"
+    }
+  ],
+  "limitation": "Whole-worktree hash stability is not claimed where external drift appears. These differences are not attributed to this implementation. Final test DLLs/logs/XML are independently bound by artifact hashes; stable owned review copies are in after/."
+}

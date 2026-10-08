@@ -1,0 +1,17 @@
+{
+  "capturedUtc": "2026-10-08T16:11:48.447343+00:00",
+  "scope": "Read-only source/test trace; no code defect alleged, no production release exercised",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+      "sha256": "43bcd62f85f6c7eea3e5af06a8de730e05c25edc87ac6d4173a5ecf47b793d19"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "sha256": "1deebef6f53c200a79751bbe5013130cf456c2a6681b8ccfa11f12008c5a5ec8"
+    }
+  ],
+  "sourceBehavior": "Existing Unknown resolves solely via provider original lookup before fresh-release expiry/authority gates; terminal historic Delivered retained with original ObservedAt. Separate current exact private method authorization remains required.",
+  "verificationGap": "Existing lost-ack case resolves Unknown before advancing expiry/revocation, then tests already-terminal evidence. A future expiry gate added only to unresolved recovery would evade it.",
+  "requestedFocusedCase": "Serialize/restart while Unknown; advance clock past exclusive expiry; withdraw fresh-release authorization; recover original exact Delivered via lookup once and assert no repeat release."
+}

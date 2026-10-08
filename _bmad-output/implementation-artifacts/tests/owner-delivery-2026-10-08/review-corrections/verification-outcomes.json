@@ -1,0 +1,248 @@
+{
+  "capturedUtc": "2026-10-08T12:12:20.398942+00:00",
+  "scope": "Targeted correction verification only. Root fresh full owner verification remains pending; no full prerequisite delivery, accepted immutable target, production profile/provider/authority or live qualification claim.",
+  "sourceIndex": "owned-changes.json",
+  "sourceIndexSha256": "6ada1736de79886b1b2f7c1e2d9a30978297fed12e46c87312d632abc47aed5b",
+  "builds": [
+    {
+      "label": "SDK focused harness final current build",
+      "log": "sdk-focused-build-current.log",
+      "repeatArgv": [
+        "dotnet",
+        "build",
+        "/tmp/hexalith-owner-review-sdk-focused-project-20261008/EventStore.Streams.Focused.csproj",
+        "-c",
+        "Debug",
+        "--artifacts-path",
+        "/tmp/hexalith-owner-review-sdk-focused-20261008",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "logSha256": "eff9c7b9c018c27611011fb81551d81cf87418c1d3526db39eb13698a09e74e3",
+      "exitCode": 0,
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "label": "Conversations Server.Tests focused-class build",
+      "log": "conversations-build.log",
+      "repeatArgv": [
+        "dotnet",
+        "build",
+        "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Hexalith.Conversations.Server.Tests.csproj",
+        "-c",
+        "Debug",
+        "--artifacts-path",
+        "/tmp/hexalith-owner-review-conversations-20261008",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:HexalithCommonsRoot=/home/administrator/projects/hexalith/commons",
+        "-p:HexalithTenantsRoot=/home/administrator/projects/hexalith/tenants",
+        "-p:HexalithEventStoreVersion=3.117.1"
+      ],
+      "logSha256": "db07e6b3c8d3eb72099fba48fc1b5679b3d2c4257c07ea435cdb3a1324bc7521",
+      "exitCode": 0,
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "label": "Platform Custody.Tests focused-class build",
+      "log": "custody-build.log",
+      "repeatArgv": [
+        "dotnet",
+        "build",
+        "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+        "-c",
+        "Debug",
+        "--artifacts-path",
+        "/tmp/hexalith-owner-review-custody-20261008",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore"
+      ],
+      "logSha256": "d8aa2215ebaaaabb88e4ff41e7a3bfe21ce320a06d9faf53a65885ce32600373",
+      "exitCode": 0,
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "label": "Actual gateway application-path harness build",
+      "log": "gateway-build.log",
+      "repeatArgv": [
+        "dotnet",
+        "build",
+        "/tmp/hexalith-owner-review-gateway-project-20261008/Gateway.Protected.Focused.csproj",
+        "-c",
+        "Debug",
+        "--artifacts-path",
+        "/tmp/hexalith-owner-review-gateway-20261008",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:HexalithCommonsRoot=/home/administrator/projects/hexalith/commons",
+        "-p:HexalithTenantsRoot=/home/administrator/projects/hexalith/tenants",
+        "-p:HexalithEventStoreVersion=3.117.1"
+      ],
+      "logSha256": "772cf077c7a924df058b897e3c82bdf6cdee5c49f384f787903030a63e4a5463",
+      "exitCode": 0,
+      "warnings": 0,
+      "errors": 0
+    }
+  ],
+  "results": [
+    {
+      "label": "Authoritative stream reader",
+      "scope": "Narrow review corrections",
+      "xml": "sdk-authoritative-current-tests.xml",
+      "xmlSha256": "8d5456f6de194579dfdd2039d6cc195c53dbebdf9f799931f3880bae3e7f1750",
+      "total": 36,
+      "passed": 36,
+      "failed": 0,
+      "skipped": 0,
+      "notRun": 0,
+      "assembly": "/tmp/hexalith-owner-review-sdk-focused-20261008/bin/EventStore.Streams.Focused/debug/Hexalith.EventStore.Streams.ReviewFocused.Tests.dll",
+      "assemblySha256": "8ef2c2580313ba0cb152150351f834bd9fbef64d9f93804026e52a821808395c",
+      "repeatArgv": [
+        "dotnet",
+        "/tmp/hexalith-owner-review-sdk-focused-20261008/bin/EventStore.Streams.Focused/debug/Hexalith.EventStore.Streams.ReviewFocused.Tests.dll",
+        "-class",
+        "*AuthoritativeEventStreamReaderTests",
+        "-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-corrections/sdk-authoritative-current-tests.xml"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "Retained identity history reader",
+      "scope": "Separate authorized pre-existing E2 continuation",
+      "xml": "sdk-retained-current-tests.xml",
+      "xmlSha256": "93af252cd69db35e34942155a26a4a14318f2c2a3f64e9a80f1d0c2d9f3daed8",
+      "total": 29,
+      "passed": 29,
+      "failed": 0,
+      "skipped": 0,
+      "notRun": 0,
+      "assembly": "/tmp/hexalith-owner-review-sdk-focused-20261008/bin/EventStore.Streams.Focused/debug/Hexalith.EventStore.Streams.ReviewFocused.Tests.dll",
+      "assemblySha256": "8ef2c2580313ba0cb152150351f834bd9fbef64d9f93804026e52a821808395c",
+      "repeatArgv": [
+        "dotnet",
+        "/tmp/hexalith-owner-review-sdk-focused-20261008/bin/EventStore.Streams.Focused/debug/Hexalith.EventStore.Streams.ReviewFocused.Tests.dll",
+        "-class",
+        "*RetainedIdentityHistoryReaderTests",
+        "-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-corrections/sdk-retained-current-tests.xml"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "Conversations six seams",
+      "scope": "Narrow review corrections",
+      "xml": "conversations-tests.xml",
+      "xmlSha256": "54eef058ab43c28208175b624261f793f7af3d84b2138403d71a2f2fda186593",
+      "total": 37,
+      "passed": 37,
+      "failed": 0,
+      "skipped": 0,
+      "notRun": 0,
+      "assembly": "/tmp/hexalith-owner-review-conversations-20261008/bin/Hexalith.Conversations.Server.Tests/debug/Hexalith.Conversations.Server.Tests.dll",
+      "assemblySha256": "8acf4dbc8c03c22321119c85b19741a00bc80be1337aff9a2a77d0f3aaea38ce",
+      "repeatArgv": [
+        "dotnet",
+        "/tmp/hexalith-owner-review-conversations-20261008/bin/Hexalith.Conversations.Server.Tests/debug/Hexalith.Conversations.Server.Tests.dll",
+        "-class",
+        "*ConversationAgentSixSeamTests",
+        "-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-corrections/conversations-tests.xml"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "Private export cryptography",
+      "scope": "Narrow review corrections",
+      "xml": "custody-tests.xml",
+      "xmlSha256": "fa7796f4d62faa407fe2ba32abf05895041702cda0f09c9501aec2c5a00e623a",
+      "total": 49,
+      "passed": 49,
+      "failed": 0,
+      "skipped": 0,
+      "notRun": 0,
+      "assembly": "/tmp/hexalith-owner-review-custody-20261008/bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll",
+      "assemblySha256": "573e167173537ff9a919d51f0e7206638183896d61b0413210c8dc238569ad7d",
+      "repeatArgv": [
+        "dotnet",
+        "/tmp/hexalith-owner-review-custody-20261008/bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll",
+        "-class",
+        "*ExportCustodyCryptographyTests",
+        "-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-corrections/custody-tests.xml"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "Actual gateway unprotection to Conversations replay",
+      "scope": "Focused temporary actual-production-source application-path harness; synthetic actor, protection provider and authorization ports, not HTTP/auth infrastructure or live persistence qualification",
+      "xml": "gateway-tests.xml",
+      "xmlSha256": "dc090bb1bb3ac4195d4f60129bb02cc139b859a1801cde0f8239ad998e789fb1",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "notRun": 0,
+      "assembly": "/tmp/hexalith-owner-review-gateway-20261008/bin/Gateway.Protected.Focused/debug/Hexalith.Owner.Gateway.Protected.Focused.Tests.dll",
+      "assemblySha256": "d4ddbdc634676a29df8f54d7b2c5cf6f39f0bcbee1922485fea52126433c333b",
+      "repeatArgv": [
+        "dotnet",
+        "/tmp/hexalith-owner-review-gateway-20261008/bin/Gateway.Protected.Focused/debug/Hexalith.Owner.Gateway.Protected.Focused.Tests.dll",
+        "-class",
+        "*ProtectedGatewayReplayTests",
+        "-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-corrections/gateway-tests.xml"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "Actual Parties source regex parse/representative evaluation",
+      "evidence": "parties-regex-check.json",
+      "evidenceSha256": "07ff126d3b0ea7acc8a2d9ff23d4a208162dbecf2fcbd0cf48e2b337b68b27b6",
+      "sourceSha256": "dd9a08565cc2e117ffc12ffcd132094d03c5051e9e9be0770d4473615e9541ba",
+      "acceptedCases": 4,
+      "rejectedCases": 8,
+      "exitCode": 0,
+      "scope": "AST-extracted actual source regex only; no implementation-mirroring test file or full owner command"
+    }
+  ],
+  "historicalFailures": [
+    {
+      "log": "sdk-build.log",
+      "failure": "Original normal SDK test-project build blocked by unowned concurrent EventLocalImplementationBindingTests.cs CS1503. Root now reports that current normal project builds; complete owning gate is still in progress. Historical failure stays intact and temporary focused source harness never substitutes for it."
+    },
+    {
+      "log": "gateway-build-failed-01.log",
+      "failure": "Temporary application-path harness ambiguous carrier null overload plus differing reference central Redis versions; fixed by typed null and actual EventStore central packages in temporary harness only. No repository package pin or compiler flags weakened."
+    },
+    {
+      "logs": [
+        "sdk-focused-build-failed-01.log",
+        "sdk-focused-build-failed-02.log",
+        "sdk-focused-build-failed-03.log"
+      ],
+      "failure": "Temporary harness setup attempts preserved; successful harness imports unchanged actual SDK tests/Directory.Build.props and root packages with existing standard flags."
+    }
+  ],
+  "limits": [
+    "These targeted counts overlap the full owner suites; do not sum them as extra unique coverage.",
+    "Temporary gateway ports simulate local authorized actor/provider data and exercise actual production application code; no live state-store, authenticated HTTP network or production backend claim.",
+    "Original pre-review source map excludes references and cannot prove whole graph stability. Root final checks broaden actual existing root-declared input roots without initialization.",
+    "E2 only bounds waiting and isolates synchronous invocation/callbacks while preserving late owned disposal. B7 provider termination/execution reclamation/capacity policy is unresolved.",
+    "Representative replay carrier tests accept known readable Protected provenance and deny opaque, future, unknown, malformed carrier/schema fields/flags."
+  ]
+}

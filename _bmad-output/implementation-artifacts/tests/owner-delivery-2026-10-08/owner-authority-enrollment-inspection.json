@@ -1,0 +1,162 @@
+{
+  "capturedUtc": "2026-10-08T14:58:57.117944+00:00",
+  "ownerDirection": "Check Hexalith.Platform for independent decision policy; otherwise prepare proposal. Check existing worker enrollment; otherwise do best.",
+  "searches": [
+    {
+      "repository": "platform",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "rg",
+        "-n",
+        "-i",
+        "--glob",
+        "*.cs",
+        "--glob",
+        "*.json",
+        "--glob",
+        "*.md",
+        "--glob",
+        "*.yml",
+        "--glob",
+        "*.yaml",
+        "--glob",
+        "!**/evidence/**",
+        "--glob",
+        "!**/tests/**",
+        "--glob",
+        "!**/bin/**",
+        "--glob",
+        "!**/obj/**",
+        "--glob",
+        "!**/references/**",
+        "--glob",
+        "!**/.agents/**",
+        "--glob",
+        "!**/.claude/**",
+        "decision.authority|approval.authority|independent.*issuer|governance.*approv|Product.*Governance.*Security.*Architecture|DecisionManifest|governance.manifest|required.approvers",
+        "src",
+        "docs",
+        "_bmad-output/planning-artifacts",
+        "eng"
+      ],
+      "exitCode": 0,
+      "output": "docs/implementation/ext-secrets-1-source-evidence-2026-10-06.json:288:    \"Independent decision issuer/authority trust\",\neng/runner-relocation/README.md:60:Under a new guard, rotate/revoke the exact old registration and every source-specific registry/job credential through their authoritative issuers and secret store. Independently test that the old runner identity can neither receive jobs nor authenticate. Rotation of an enrollment token alone may not revoke an already registered runner; bind the registered identity and its actual authentication credential. Retain sanitized issuer/audit/revocation receipts only. Stop if any credential cannot be revoked. Repair the isolated runner or provision another isolated host on failure; reopening the in-cluster runner is forbidden.\n_bmad-output/planning-artifacts/prds/prd-platform-2026-09-27/update-2026-09-28/review-rubric.md:87:  FR-6 (171), FR-7 (188) and NFR-1 (296) all point into it. A story set extracted from \"FR-8\" gets release-authorization and stop-governance rules mixed in with rollback. The two approval bullets (209, 210) are the densest sentences in the document. *Fix:* keep the existing IDs and append new ones, for example **FR-13 Promotion stop** (lines 207\u2013208, 214) and **FR-14 Administrator-approved production attempts** (lines 209, 210, 212, 213). Leave FR-8 as automatic and failed recovery. If no new IDs are wanted, at least add FR-4-style bold subgroups (\"Automatic recovery\", \"Promotion stop\", \"Approved attempts\", \"Baseline and incidents\").\n_bmad-output/planning-artifacts/architecture/architecture-platform-2026-09-27/reviews/update-2026-09-28-r4/review-security.md:23:| Deputy and restoration | Can recovery create production admission, acquire release-approval authority or reopen previously closed ingress? | **Pass.** Roles, AD-6 and Recovery sequence preserve the deputy's documented recovery powers while withholding new admission decisions, release approvals and stop clearance. Reconciliation removes unrecorded or revoked access; post-cut grants are listed for Administrator action and are never added by recovery. Signed Administrator revocations supply the authority for removal during restore. Step 7 restores only recorded pre-incident ingress and preserves pre-G2 closure. |\n_bmad-output/planning-artifacts/architecture/architecture-platform-2026-09-27/reviews/validate-2026-09-27-r2/review-reconcile.md:211:- **Consequence:** \"Obsolete migration source\" without a composition prohibition reads as permission to keep legacy hosted MCP (Memories.Mcp, Parties.Mcp) and EventStore Admin routes in Platform compositions during migration. The spine's decision authority is also broken.\n",
+      "stderr": ""
+    },
+    {
+      "repository": "platform",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "rg",
+        "-n",
+        "-i",
+        "--glob",
+        "*.json",
+        "--glob",
+        "*.md",
+        "--glob",
+        "*.yml",
+        "--glob",
+        "*.yaml",
+        "--glob",
+        "!**/evidence/**",
+        "--glob",
+        "!**/tests/**",
+        "--glob",
+        "!**/bin/**",
+        "--glob",
+        "!**/obj/**",
+        "--glob",
+        "!**/references/**",
+        "--glob",
+        "!**/.agents/**",
+        "--glob",
+        "!**/.claude/**",
+        "conversations-deletion|DeletionWorker|DeletionSourceWorker|ServicePartyId|AuthenticatedPrincipalId",
+        "src",
+        "docs",
+        "DaprComponents",
+        "_bmad-output/planning-artifacts"
+      ],
+      "exitCode": 1,
+      "output": "",
+      "stderr": ""
+    },
+    {
+      "repository": "conversations",
+      "cwd": "/home/administrator/projects/hexalith/conversations",
+      "argv": [
+        "rg",
+        "-n",
+        "-i",
+        "--glob",
+        "*.json",
+        "--glob",
+        "*.md",
+        "--glob",
+        "*.yml",
+        "--glob",
+        "*.yaml",
+        "--glob",
+        "!**/evidence/**",
+        "--glob",
+        "!**/tests/**",
+        "--glob",
+        "!**/bin/**",
+        "--glob",
+        "!**/obj/**",
+        "--glob",
+        "!**/references/**",
+        "--glob",
+        "!**/.agents/**",
+        "--glob",
+        "!**/.claude/**",
+        "conversations-deletion|DeletionWorker|DeletionSourceWorker|ServicePartyId|AuthenticatedPrincipalId",
+        "src",
+        "docs",
+        "_bmad-output/planning-artifacts"
+      ],
+      "exitCode": 1,
+      "output": "",
+      "stderr": ""
+    }
+  ],
+  "readSourceHashes": [
+    {
+      "repository": "platform",
+      "path": "eng/hexalith_github_decisions.py",
+      "sha256": "24b49c3e6c0f79135167a793b111b1a0f6cc847f2dee33d83057d3c4e01a0e15"
+    },
+    {
+      "repository": "platform",
+      "path": "src/Hexalith.Platform.Identity/PlatformIdentityOptions.cs",
+      "sha256": "e6e0de839aef698e6ff84e65afbfe18864cc6f3d6f9cc97a30800fd42e72ba39"
+    },
+    {
+      "repository": "platform",
+      "path": "src/Hexalith.Platform.Identity/PlatformBootstrapVerifier.cs",
+      "sha256": "19ea88be398c15bea76e222af47a79152782dcb3df710e13487e364ffd1d2c15"
+    },
+    {
+      "repository": "platform",
+      "path": "src/Hexalith.Platform.Identity/PlatformOperatorProvenanceVerifier.cs",
+      "sha256": "0cbae0cb829c4968942aed000e3047b2c30a37c964dcf5fe92c46352959cca17"
+    },
+    {
+      "repository": "platform",
+      "path": "docs/implementation/ext-secrets-1-source-evidence-2026-10-06.json",
+      "sha256": "e95e4db9effd230e1ef253decb2c3fd009b114f160295d8d1ba3090a95a26e5d"
+    },
+    {
+      "repository": "conversations",
+      "path": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionWorkerRegistration.cs",
+      "sha256": "31314985406d0175d97e8665ce127e7352584a96e3816874249ee3d43ceab961"
+    }
+  ],
+  "findings": [
+    "No applicable configured Product/Governance/Security/Architecture independent decision policy/issuer binding was established in the searched source/configuration paths.",
+    "Existing GitHub review transport authenticates exact review facts and explicitly leaves application authorization external; existing Platform identity bootstrap/operator provenance serves different narrow purposes.",
+    "No actual dedicated production Conversations deletion-worker enrollment was established from searched configuration and prior allowlisted realm/client observation."
+  ],
+  "limits": "Scoped source/configuration discovery, not proof of absence in all private/runtime systems. No Secret values, live realm admin objects, approval assignments or enrollment mutations were read/created."
+}

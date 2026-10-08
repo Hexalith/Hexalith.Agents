@@ -1,0 +1,41 @@
+{
+  "LiveReady": false,
+  "Passed": 115,
+  "BuildArguments": [
+    "build",
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+    "-c",
+    "Debug",
+    "--artifacts-path",
+    "/tmp/hexalith-owner-custody-20261008",
+    "-m:1",
+    "-p:NuGetAudit=false",
+    "-p:MinVerVersionOverride=1.0.0",
+    "-p:UseHexalithProjectReferences=true",
+    "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore"
+  ],
+  "Scope": "S1/S2 cryptographic fixtures and accepted-policy cleanup source simulations",
+  "XmlSha256": "07f1c3bea0c98a6e4bf67e907a3523df0afbcdb619ecfd5b165ee6373d5a0f07",
+  "Mode": "Local",
+  "DependencyAvailable": false,
+  "TestArguments": [
+    "/tmp/hexalith-owner-custody-20261008/bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+    "-result-xml",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-local/local-tests.xml"
+  ],
+  "Total": 115,
+  "RequiredClasses": [
+    {
+      "Passed": 68,
+      "Class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests"
+    },
+    {
+      "Passed": 47,
+      "Class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests"
+    }
+  ]
+}

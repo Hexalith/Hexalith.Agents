@@ -1,0 +1,107 @@
+{
+  "capturedUtc": "2026-10-08T12:16:37.342089+00:00",
+  "commands": [
+    {
+      "name": "Parties eleven-lane Local",
+      "cwd": "/home/administrator/projects/hexalith/parties",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-parties-1.ps1",
+        "-Mode",
+        "Local",
+        "-EvidenceDirectory",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final",
+        "-ArtifactsDirectory",
+        "/tmp/hexalith-owner-parties-root-final-20261008"
+      ],
+      "exitCode": 0,
+      "xmlFiles": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.EventStore.Client.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.EventStore.Contracts.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.EventStore.Server.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Parties.Client.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Parties.Contracts.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Parties.Security.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Parties.Server.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Parties.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Parties.UI.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Platform.Custody.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Platform.Identity.Tests-tests.xml"
+      ],
+      "buildLogs": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.EventStore.Client.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.EventStore.Contracts.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.EventStore.Server.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Parties.Client.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Parties.Contracts.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Parties.Security.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Parties.Server.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Parties.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Parties.UI.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Platform.Custody.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/parties-root-final/Hexalith.Platform.Identity.Tests-build.log"
+      ],
+      "artifactsPath": "/tmp/hexalith-owner-parties-root-final-20261008",
+      "scope": "Actual Local source simulation only; not accepted full target/complete live qualification."
+    },
+    {
+      "name": "Conversations four-suite Local",
+      "cwd": "/home/administrator/projects/hexalith/conversations",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-conv-ai-1.ps1",
+        "-Mode",
+        "Local",
+        "-ArtifactsPath",
+        "/tmp/hexalith-owner-conversations-root-final-20261008"
+      ],
+      "exitCode": 0,
+      "xmlFiles": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-root-final/Hexalith.Conversations.Client.Tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-root-final/Hexalith.Conversations.Contracts.Tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-root-final/Hexalith.Conversations.Server.Tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-root-final/Hexalith.Conversations.Tests.xml"
+      ],
+      "buildLogs": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-root-final/Hexalith.Conversations.Client.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-root-final/Hexalith.Conversations.Contracts.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-root-final/Hexalith.Conversations.Server.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/conversations-root-final/Hexalith.Conversations.Tests-build.log"
+      ],
+      "artifactsPath": "/tmp/hexalith-owner-conversations-root-final-20261008/run-20261008T1213307012883Z",
+      "scope": "Actual Local source simulation only; not accepted full target/complete live qualification."
+    },
+    {
+      "name": "Custody three-class Local",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-secrets-1.ps1",
+        "-Mode",
+        "Local",
+        "-ArtifactsDirectory",
+        "/tmp/hexalith-owner-custody-root-final-20261008",
+        "-EvidenceDirectory",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-root-final",
+        "-EventStoreSourceRoot",
+        "/home/administrator/projects/hexalith/eventstore"
+      ],
+      "exitCode": 0,
+      "xmlFiles": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-root-final/local-tests.xml"
+      ],
+      "buildLogs": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-root-final/local-build.log"
+      ],
+      "artifactsPath": "/tmp/hexalith-owner-custody-root-final-20261008",
+      "scope": "Actual Local source simulation only; not accepted full target/complete live qualification."
+    }
+  ],
+  "countingLimits": "Parties custody115 overlaps custody164; focused counts overlap these broader classes; synthetic gateway1 is distinct separately labeled."
+}

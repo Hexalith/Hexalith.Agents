@@ -1,0 +1,65 @@
+{
+  "capturedUtc": "2026-10-08T13:06:33.895729+00:00",
+  "scope": "Private installed roster, independent coverage qualification, actual committed heads/reconfirmation, pre-persistence writer registration. No installation/legacy completeness or all-writer qualification inferred.",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationNamespaceState.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationNamespaceAuthorization.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/ISourcePublicationWriterRegistration.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/ISourcePublicationNamespaceActor.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/ISourcePublicationNamespaceAuthority.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/SourcePublicationNamespaceActor.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationNamespaceSource.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationWriterRegistration.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Actors/AggregateActor.cs",
+      "existed": true,
+      "sha256": "3518bed73a81af6c7708f9182dd54b7428b80005dd6d4e11a51e5da10ab5f059",
+      "copy": "namespace-before/eventstore/src/Hexalith.EventStore.Server/Actors/AggregateActor.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Hexalith.EventStore.Client.csproj",
+      "existed": true,
+      "sha256": "3ba2a5670bd2ee86e11fad61ee55eaeaca82e9d65688e6667d6e5acb48137e29",
+      "copy": "namespace-before/eventstore/src/Hexalith.EventStore.Client/Hexalith.EventStore.Client.csproj"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs",
+      "existed": false
+    }
+  ]
+}

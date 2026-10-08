@@ -1,0 +1,17 @@
+[
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/decision-terminal-before/platform/src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs",
+    "sha256": "fca6b339205bc180750c024e08bdcb3025ac950b19ef7e59a15619e0b4858606"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IIndependentDecisionAuthority.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/decision-terminal-before/platform/src/Hexalith.Platform.Custody/IIndependentDecisionAuthority.cs",
+    "sha256": "b60b894837248ff124e74f712b576c2d1a25016cad2d31b34bed0303609427e2"
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/decision-terminal-before/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs",
+    "sha256": "55649bdc5c6ec7c05bad9e9f7a5eacd94d89c47a6405b4767cc155ae4b3174cf"
+  }
+]

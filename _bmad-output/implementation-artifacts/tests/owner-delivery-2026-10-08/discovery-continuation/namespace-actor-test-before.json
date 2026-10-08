@@ -1,0 +1,10 @@
+{
+  "capturedUtc": "2026-10-08T13:14:00.756916+00:00",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs",
+      "existed": false
+    }
+  ]
+}

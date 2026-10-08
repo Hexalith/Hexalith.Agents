@@ -1,0 +1,11 @@
+{
+  "eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeEventStreamReader.cs": "722e3fb5977ce95f396075125c8f5dda68904843bc17b9af34632e9ee80a186e",
+  "eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs": "d7211aca1c99b29dc1c0bd8640dcc768a77e85dd4370ae62f76549744b765de0",
+  "conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentSourceReader.cs": "d1c822cea6808c90e10204412e94dd86a1473e30cd7f6cb794e553e61211ac5b",
+  "conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentAdmissionStage.cs": "b7bdeaad1aa0cb1f64de82b79f469b9898756182c9e9ce04563e510fc9a985f0",
+  "conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentSixSeamTests.cs": "40a15f93ceed70af39e7bc2e18e7cba982ec4731dd3b833064939a3e5ff83f12",
+  "conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentLocalFixture.cs": "6770645734f95d7e4f3a04e9b444c6344c0e557af273d9a99ba7f425bc0c5fc0",
+  "conversations/eng/verify-ext-conv-ai-1.ps1": "9751e10bee34fecaed266d565d98abf20175e8864ef16c2d49ecf06de9c5be59",
+  "platform/eng/verify-ext-secrets-1.ps1": "5c205ce0c82539786a14774454bd11ff0952d1168bf918626d71a6a722377726",
+  "platform/eng/verify-agents-host.sh": "dd65e6a86a28315b8d22298e9e654e1c27426de1640ebcb698d539b4f43b3fb2"
+}

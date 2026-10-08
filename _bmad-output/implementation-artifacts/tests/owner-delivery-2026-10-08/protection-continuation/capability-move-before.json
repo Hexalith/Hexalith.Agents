@@ -1,0 +1,16 @@
+{
+  "capturedUtc": "2026-10-08T13:49:45.759031+00:00",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchCapabilityV1.cs",
+      "existed": true,
+      "sha256": "f63874780ec92017f619b8de82b77f4502f9eba53714baba04386f45d223b455"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionBatchCapabilityV1.cs",
+      "existed": false
+    }
+  ]
+}

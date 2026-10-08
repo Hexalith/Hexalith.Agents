@@ -604,3 +604,11 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
   summary: B4 — Noncooperative provider resource reclamation and bounded abandoned-work admission remain shared runtime/host qualification requirements.
   evidence: Noncooperative synchronous provider invocations can retain workers after timeout. The previous direct invocation also retained a request worker indefinitely. The delivered source provider ports do not establish qualified cancellation/resource reclamation; bounded abandoned-work admission belongs to shared runtime/host qualification, not an invented local capacity policy.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
+  summary: Noncooperative resource qualification remains part of full owner prerequisites (2026-10-08 review B7).
+  evidence: Private Task.Run bounds verdict wait but cannot reclaim indefinitely blocking invocations/callbacks. Prior authority/provider paths already required cooperation. No qualified concurrency/execution-isolation/failure-model contract is supplied; shared host resource admission/reclamation remains required and unqualified.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
+  summary: Standalone retained transport invocation remains part of full owner prerequisites (2026-10-08 review E2).
+  evidence: Pre-existing RetainedIdentityHistoryReader invokes SendAsync/body providers synchronously before bounded waits and shares provider callbacks with wait cancellation. Parties query wraps this provider under its own deadline, but standalone callers remain unqualified. This is additional feasible full-scope source work, to address after current review corrections without inventing resource reclamation.

@@ -1,0 +1,7 @@
+[
+  {
+    "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+    "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/export-unknown-expiry-before/ExportKeyDeliveryActorTests.cs",
+    "sha256": "1deebef6f53c200a79751bbe5013130cf456c2a6681b8ccfa11f12008c5a5ec8"
+  }
+]

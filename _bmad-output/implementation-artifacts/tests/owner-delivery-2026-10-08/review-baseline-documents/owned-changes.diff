@@ -1,0 +1,1381 @@
+--- a/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeEventStreamReader.cs
++++ b/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeEventStreamReader.cs
+@@ -8,7 +8,7 @@
+ /// <summary>Verifies an authorized contiguous prefix between two equal sampled heads.</summary>
+ /// <param name="gateway">The authenticated gateway client; each page is independently authorized.</param>
+ /// <param name="timeProvider">The observation clock.</param>
+-/// <param name="readTimeout">Optional stricter whole-read deadline, capped at thirty seconds.</param>
++/// <param name="readTimeout">Optional positive whole-read deadline of at most thirty seconds; invalid bounds fail closed.</param>
+ public sealed class AuthoritativeEventStreamReader(IEventStoreGatewayClient gateway, TimeProvider timeProvider, TimeSpan? readTimeout = null)
+     : IAuthoritativeEventStreamReader
+ {
+@@ -20,95 +20,126 @@
+     /// <inheritdoc/>
+     public async Task<AuthoritativeStreamReadResult> ReadAsync(AggregateIdentity identity, CancellationToken cancellationToken = default)
+     {
++        long startedAt = timeProvider.GetTimestamp();
+         ArgumentNullException.ThrowIfNull(identity);
+-        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+-        TimeSpan bound = readTimeout is { } requested && requested > TimeSpan.Zero && requested < TimeSpan.FromSeconds(30)
+-            ? requested : TimeSpan.FromSeconds(30);
+-        timeout.CancelAfter(bound);
+-        CancellationToken readToken = timeout.Token;
++        cancellationToken.ThrowIfCancellationRequested();
++        TimeSpan bound = readTimeout ?? TimeSpan.FromSeconds(30);
++        if (bound <= TimeSpan.Zero || bound > TimeSpan.FromSeconds(30))
++        {
++            return new(null, "source-invalid-time-bound");
++        }
++
++        using var deadline = new AuthoritativeStreamReadDeadline(bound, timeProvider, cancellationToken, startedAt);
+         try
+         {
+-            for (int attempt = 0; attempt < MaxAttempts; attempt++)
++            AuthoritativeStreamReadResult result;
++            try
+             {
+-                cancellationToken.ThrowIfCancellationRequested();
+-                long head = await ReadHeadAsync(identity, readToken).ConfigureAwait(false);
+-                if (head > MaxEvents)
+-                {
+-                    return new(null, "source-bound-exceeded");
+-                }
+-
+-                var events = new List<StreamReadEvent>();
+-                long cursor = 0;
+-                long bytes = 0;
+-                bool changed = false;
+-                while (cursor < head)
+-                {
+-                    var request = new StreamReadRequest(identity.TenantId, identity.Domain, identity.AggregateId,
+-                        cursor, head, PageSize: PageSize);
+-                    StreamReadPage page = await gateway.ReadStreamAsync(request, readToken).WaitAsync(readToken).ConfigureAwait(false);
+-                    long next = StreamReadPageValidator.ValidateAndGetNextSequence(request, page);
+-                    if (page.Metadata.LatestSequence != head)
+-                    {
+-                        changed = true;
+-                        break;
+-                    }
+-
+-                    if (page.Events.Count == 0)
+-                    {
+-                        return new(null, "source-gap");
+-                    }
+-
+-                    foreach (StreamReadEvent item in page.Events)
+-                    {
+-                        if (item.SequenceNumber != ++cursor
+-                            || item.ProtectionMetadata?.State == PayloadProtectionState.ProviderOpaque)
+-                        {
+-                            return new(null, "source-gap-or-unreadable");
+-                        }
+-
+-                        bytes += item.Payload.Length;
+-                        if (bytes > MaxPayloadBytes)
+-                        {
+-                            return new(null, "source-bound-exceeded");
+-                        }
+-
+-                        events.Add(item);
+-                    }
+-
+-                    if (next != cursor || (!page.Metadata.IsTruncated && cursor != head))
+-                    {
+-                        return new(null, "source-incomplete");
+-                    }
+-                }
+-
+-                if (!changed && await ReadHeadAsync(identity, readToken).ConfigureAwait(false) == head)
+-                {
+-                    return new(new AuthoritativeEventStream(identity, head, timeProvider.GetUtcNow(),
+-                        events.AsReadOnly(), Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(16))), null);
+-                }
++                result = await ReadCoreAsync(identity, deadline).ConfigureAwait(false);
++            }
++            catch (Exception exception) when (exception is HttpRequestException or InvalidOperationException or ArgumentException or System.Text.Json.JsonException)
++            {
++                result = new(null, "source-unavailable");
+             }
+ 
+-            return new(null, "source-head-changed");
++            // Every success, validation denial and provider-fault verdict observes the same
++            // caller-first completion boundary; elapsed processing cannot release evidence.
++            deadline.ThrowIfCancellationRequested();
++            return result;
+         }
+         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+         {
++            cancellationToken.ThrowIfCancellationRequested();
+             return new(null, "source-time-bound-exceeded");
+         }
+         catch (OperationCanceledException)
+         {
++            cancellationToken.ThrowIfCancellationRequested();
+             throw;
+-        }
+-        catch (Exception exception) when (exception is HttpRequestException or InvalidOperationException or ArgumentException or System.Text.Json.JsonException)
+-        {
+-            return new(null, "source-unavailable");
+         }
+     }
+ 
+-    private async Task<long> ReadHeadAsync(AggregateIdentity identity, CancellationToken cancellationToken)
++    private async Task<AuthoritativeStreamReadResult> ReadCoreAsync(AggregateIdentity identity, AuthoritativeStreamReadDeadline deadline)
++    {
++        for (int attempt = 0; attempt < MaxAttempts; attempt++)
++        {
++            deadline.ThrowIfCancellationRequested();
++            long head = await ReadHeadAsync(identity, deadline).ConfigureAwait(false);
++            if (head > MaxEvents)
++            {
++                return new(null, "source-bound-exceeded");
++            }
++
++            var events = new List<StreamReadEvent>();
++            long cursor = 0;
++            long bytes = 0;
++            bool changed = false;
++            while (cursor < head)
++            {
++                var request = new StreamReadRequest(identity.TenantId, identity.Domain, identity.AggregateId,
++                    cursor, head, PageSize: PageSize);
++                StreamReadPage page = await deadline.ReadAsync(token => gateway.ReadStreamAsync(request, token)).ConfigureAwait(false);
++                long next = StreamReadPageValidator.ValidateAndGetNextSequence(request, page);
++                if (page.Metadata.LatestSequence != head)
++                {
++                    changed = true;
++                    break;
++                }
++
++                if (page.Events.Count == 0)
++                {
++                    return new(null, "source-gap");
++                }
++
++                foreach (StreamReadEvent item in page.Events)
++                {
++                    deadline.ThrowIfCancellationRequested();
++                    if (item.SequenceNumber != ++cursor
++                        || item.ProtectionMetadata?.State == PayloadProtectionState.ProviderOpaque)
++                    {
++                        return new(null, "source-gap-or-unreadable");
++                    }
++
++                    bytes += item.Payload.Length;
++                    if (bytes > MaxPayloadBytes)
++                    {
++                        return new(null, "source-bound-exceeded");
++                    }
++
++                    events.Add(item with
++                    {
++                        Payload = item.Payload.ToArray(),
++                        ProtectionMetadata = item.ProtectionMetadata is { } metadata ? metadata with
++                        {
++                            CompatibilityFlags = metadata.CompatibilityFlags is { } flags
++                                ? new System.Collections.ObjectModel.ReadOnlyDictionary<string, string>(
++                                    flags.ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal)) : null,
++                        } : null,
++                    });
++                }
++
++                if (next != cursor || (!page.Metadata.IsTruncated && cursor != head))
++                {
++                    return new(null, "source-incomplete");
++                }
++            }
++
++            if (!changed && await ReadHeadAsync(identity, deadline).ConfigureAwait(false) == head)
++            {
++                deadline.ThrowIfCancellationRequested();
++                return new(new AuthoritativeEventStream(identity, head, timeProvider.GetUtcNow(),
++                    events.AsReadOnly(), Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(16))), null);
++            }
++        }
++
++        return new(null, "source-head-changed");
++    }
++
++    private async Task<long> ReadHeadAsync(AggregateIdentity identity, AuthoritativeStreamReadDeadline deadline)
+     {
+         var request = new StreamReadRequest(identity.TenantId, identity.Domain, identity.AggregateId,
+             ToSequence: 0, PageSize: 1);
+-        StreamReadPage page = await gateway.ReadStreamAsync(request, cancellationToken).WaitAsync(cancellationToken).ConfigureAwait(false);
++        StreamReadPage page = await deadline.ReadAsync(token => gateway.ReadStreamAsync(request, token)).ConfigureAwait(false);
+         _ = StreamReadPageValidator.ValidateAndGetNextSequence(request, page);
+         if (page.Events.Count != 0 || page.Metadata.IsTruncated)
+         {
+--- /dev/null
++++ b/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs
+@@ -0,0 +1,106 @@
++namespace Hexalith.EventStore.Client.Streams;
++
++/// <summary>One monotonic operational budget for gateway invocation, pagination and source evidence release.</summary>
++internal sealed class AuthoritativeStreamReadDeadline : IDisposable
++{
++    private readonly CancellationToken _callerToken;
++    private readonly TimeProvider _timeProvider;
++    private readonly long _startedAt;
++    private readonly TimeSpan _timeout;
++    private readonly CancellationTokenSource _timeoutSource;
++    private readonly CancellationTokenSource _linkedSource;
++    private readonly CancellationTokenSource _providerSource = new();
++    private Task? _providerCancellation;
++
++    /// <summary>Starts the remaining timer for one finite budget measured from query entry.</summary>
++    public AuthoritativeStreamReadDeadline(TimeSpan timeout, TimeProvider timeProvider, CancellationToken callerToken, long startedAt)
++    {
++        _callerToken = callerToken;
++        _timeProvider = timeProvider;
++        _startedAt = startedAt;
++        _timeout = timeout;
++        TimeSpan remaining = timeout - timeProvider.GetElapsedTime(startedAt);
++        _timeoutSource = new(remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero, timeProvider);
++        _linkedSource = CancellationTokenSource.CreateLinkedTokenSource(callerToken, _timeoutSource.Token);
++    }
++
++    /// <summary>Rejects caller cancellation first, then elapsed or timer-expired deadlines.</summary>
++    public void ThrowIfCancellationRequested()
++    {
++        if (_callerToken.IsCancellationRequested)
++        {
++            CancelProvider();
++        }
++
++        _callerToken.ThrowIfCancellationRequested();
++        if (_timeProvider.GetElapsedTime(_startedAt) >= _timeout)
++        {
++            _timeoutSource.Cancel();
++        }
++
++        if (_linkedSource.IsCancellationRequested)
++        {
++            CancelProvider();
++        }
++
++        _linkedSource.Token.ThrowIfCancellationRequested();
++    }
++
++    /// <summary>Bounds both synchronous provider invocation and its noncooperative returned task.</summary>
++    public async Task<T> ReadAsync<T>(Func<CancellationToken, Task<T>> read)
++    {
++        ThrowIfCancellationRequested();
++        CancellationToken token = _providerSource.Token;
++        Task<T> pending = Task.Run(() => read(token), token);
++        // A provider can fault after the caller has stopped waiting. Observe that fault
++        // without ever resuming the stream read or releasing its result.
++        _ = pending.ContinueWith(static task => { _ = task.Exception; }, CancellationToken.None,
++            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
++        try
++        {
++            // The query's private token has no provider callbacks. A provider may block
++            // indefinitely in its own cancellation callback without delaying this wait.
++            T result = await pending.WaitAsync(_linkedSource.Token).ConfigureAwait(false);
++            ThrowIfCancellationRequested();
++            return result;
++        }
++        finally
++        {
++            if (_linkedSource.IsCancellationRequested)
++            {
++                CancelProvider();
++            }
++        }
++    }
++
++    private void CancelProvider()
++    {
++        if (_providerCancellation is not null)
++        {
++            return;
++        }
++
++        // CancelAsync signals the token immediately and runs provider callbacks away
++        // from the query continuation. Callback failures must never release evidence.
++        _providerCancellation = _providerSource.CancelAsync();
++        _ = _providerCancellation.ContinueWith(static task => { _ = task.Exception; }, CancellationToken.None,
++            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
++    }
++
++    /// <inheritdoc/>
++    public void Dispose()
++    {
++        _linkedSource.Dispose();
++        _timeoutSource.Dispose();
++        if (_providerCancellation is { IsCompleted: false } cancellation)
++        {
++            // Cleanup also stays independent of callbacks that have not returned yet.
++            _ = cancellation.ContinueWith(static (_, state) => ((CancellationTokenSource)state!).Dispose(),
++                _providerSource, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
++        }
++        else
++        {
++            _providerSource.Dispose();
++        }
++    }
++}
+--- a/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs
++++ b/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs
+@@ -90,6 +90,202 @@
+             .ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken)).IsAuthoritative.ShouldBeFalse();
+     }
+ 
++
++    [Theory]
++    [InlineData(0)]
++    [InlineData(-1)]
++    [InlineData(30001)]
++    public async Task InvalidOperationalDeadline_DeniesBeforeGateway(int milliseconds)
++    {
++        IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
++        var reader = new AuthoritativeEventStreamReader(gateway, TimeProvider.System, TimeSpan.FromMilliseconds(milliseconds));
++        var result = await reader.ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
++        result.IsAuthoritative.ShouldBeFalse();
++        result.FailureReason.ShouldBe("source-invalid-time-bound");
++        await gateway.DidNotReceiveWithAnyArgs().ReadStreamAsync(default!);
++    }
++
++    [Fact]
++    public async Task BlockingProviderCancellationCallback_CannotRetainDeadlineWait()
++    {
++        IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
++        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        using var release = new ManualResetEventSlim();
++        CancellationToken providerToken = default;
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            providerToken = call.Arg<CancellationToken>();
++            providerToken.Register(() => { entered.TrySetResult(); release.Wait(); });
++            started.TrySetResult();
++            return new TaskCompletionSource<StreamReadPage>(TaskCreationOptions.RunContinuationsAsynchronously).Task;
++        });
++        var reader = new AuthoritativeEventStreamReader(gateway, TimeProvider.System, TimeSpan.FromMilliseconds(200));
++        Task<AuthoritativeStreamReadResult> pending = reader.ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
++        try
++        {
++            await started.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            var result = await pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++            result.Stream.ShouldBeNull();
++            result.FailureReason.ShouldBe("source-time-bound-exceeded");
++            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            providerToken.IsCancellationRequested.ShouldBeTrue();
++        }
++        finally
++        {
++            release.Set();
++        }
++    }
++
++    [Fact]
++    public async Task SynchronousGatewayInvocation_CannotRetainReadPastDeadline()
++    {
++        IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
++        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        using var release = new ManualResetEventSlim();
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            started.TrySetResult();
++            release.Wait();
++            return Page(call.Arg<StreamReadRequest>(), 0, []);
++        });
++        var reader = new AuthoritativeEventStreamReader(gateway, TimeProvider.System, TimeSpan.FromMilliseconds(200));
++        Task<AuthoritativeStreamReadResult> pending = Task.Run(() => reader.ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken), TestContext.Current.CancellationToken);
++        try
++        {
++            await started.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            var result = await pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++            result.Stream.ShouldBeNull();
++            result.FailureReason.ShouldBe("source-time-bound-exceeded");
++        }
++        finally
++        {
++            release.Set();
++        }
++    }
++
++    [Fact]
++    public async Task CumulativeBudget_AndDelayedTimerRejectLateFinalHead()
++    {
++        IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
++        var clock = new AuthoritativeReadTimeProvider();
++        int calls = 0;
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            calls++;
++            clock.Advance(TimeSpan.FromSeconds(1), fireTimers: false);
++            var request = call.Arg<StreamReadRequest>();
++            return Page(request, 1, request.ToSequence == 0 ? [] : [Event(1)]);
++        });
++        var reader = new AuthoritativeEventStreamReader(gateway, clock, TimeSpan.FromSeconds(3));
++        var result = await reader.ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
++        result.Stream.ShouldBeNull();
++        result.FailureReason.ShouldBe("source-time-bound-exceeded");
++        calls.ShouldBe(3);
++    }
++
++    [Fact]
++    public async Task ShortenedBudget_SucceedsImmediatelyBeforeExclusiveBoundary()
++    {
++        IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
++        var clock = new AuthoritativeReadTimeProvider();
++        int calls = 0;
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            if (++calls == 3) { clock.Advance(TimeSpan.FromSeconds(3) - TimeSpan.FromTicks(1), fireTimers: false); }
++            var request = call.Arg<StreamReadRequest>();
++            return Page(request, 1, request.ToSequence == 0 ? [] : [Event(1)]);
++        });
++        var result = await new AuthoritativeEventStreamReader(gateway, clock, TimeSpan.FromSeconds(3))
++            .ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
++        result.IsAuthoritative.ShouldBeTrue();
++        calls.ShouldBe(3);
++    }
++
++    [Fact]
++    public async Task CallerCancellationWithBlockingProviderCallback_PreservesOriginalToken()
++    {
++        IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
++        using var caller = new CancellationTokenSource();
++        using var release = new ManualResetEventSlim();
++        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            call.Arg<CancellationToken>().Register(() => release.Wait());
++            started.TrySetResult();
++            return new TaskCompletionSource<StreamReadPage>(TaskCreationOptions.RunContinuationsAsynchronously).Task;
++        });
++        var pending = new AuthoritativeEventStreamReader(gateway, TimeProvider.System)
++            .ReadAsync(new("tenant-a", "party", "party-1"), caller.Token);
++        try
++        {
++            await started.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            var cancel = caller.CancelAsync();
++            var exception = await Should.ThrowAsync<OperationCanceledException>(() => pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken));
++            exception.CancellationToken.ShouldBe(caller.Token);
++            await cancel.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++        }
++        finally
++        {
++            release.Set();
++        }
++    }
++
++    [Fact]
++    public async Task SampledPayload_CannotBeMutatedByFinalHeadProvider()
++    {
++        IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
++        StreamReadEvent retained = Event(1);
++        int calls = 0;
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            if (++calls == 3) { retained.Payload[0] = (byte)'!'; }
++            var request = call.Arg<StreamReadRequest>();
++            return Page(request, 1, request.ToSequence == 0 ? [] : [retained]);
++        });
++        var result = await new AuthoritativeEventStreamReader(gateway, TimeProvider.System)
++            .ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
++        result.IsAuthoritative.ShouldBeTrue();
++        result.Stream!.Events.Single().Payload.ShouldBe("{}"u8.ToArray());
++        retained.Payload[0].ShouldBe((byte)'!');
++    }
++
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task ProviderFaultBeforeCallerCancellation_PreservesCallerVerdict(bool expireFirst)
++    {
++        IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
++        var clock = new AuthoritativeReadTimeProvider();
++        using var caller = new CancellationTokenSource();
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns<StreamReadPage>(_ =>
++        {
++            if (expireFirst) { clock.Advance(TimeSpan.FromSeconds(3), fireTimers: false); }
++            caller.Cancel();
++            throw new HttpRequestException("Synthetic unavailable gateway.");
++        });
++        var exception = await Should.ThrowAsync<OperationCanceledException>(() =>
++            new AuthoritativeEventStreamReader(gateway, clock, TimeSpan.FromSeconds(3))
++                .ReadAsync(new("tenant-a", "party", "party-1"), caller.Token));
++        exception.CancellationToken.ShouldBe(caller.Token);
++    }
++
++    [Fact]
++    public async Task ExpiredProviderFault_ReturnsDeadlineWithoutEvidence()
++    {
++        IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
++        var clock = new AuthoritativeReadTimeProvider();
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns<StreamReadPage>(_ =>
++        {
++            clock.Advance(TimeSpan.FromSeconds(3), fireTimers: false);
++            throw new HttpRequestException("Synthetic unavailable gateway.");
++        });
++        var result = await new AuthoritativeEventStreamReader(gateway, clock, TimeSpan.FromSeconds(3))
++            .ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
++        result.Stream.ShouldBeNull();
++        result.FailureReason.ShouldBe("source-time-bound-exceeded");
++    }
++
+     private static StreamReadEvent Event(long sequence) => new(sequence, "Created", "{}"u8.ToArray(), "json", 1, "message", null, null, DateTimeOffset.UnixEpoch, "actor");
+     private static StreamReadPage Page(StreamReadRequest request, long head, IReadOnlyList<StreamReadEvent> events)
+         => new(request.Tenant, request.Domain, request.AggregateId, events,
+--- /dev/null
++++ b/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeReadTimeProvider.cs
+@@ -0,0 +1,36 @@
++namespace Hexalith.EventStore.Client.Tests.Streams;
++
++/// <summary>Manual monotonic clock with independently delayable SDK timer delivery.</summary>
++internal sealed class AuthoritativeReadTimeProvider : TimeProvider
++{
++    private readonly List<RetainedHistoryTimer> _timers = [];
++    private long _ticks;
++
++    /// <inheritdoc/>
++    public override long TimestampFrequency => TimeSpan.TicksPerSecond;
++
++    /// <inheritdoc/>
++    public override long GetTimestamp() => Interlocked.Read(ref _ticks);
++
++    /// <inheritdoc/>
++    public override DateTimeOffset GetUtcNow() => DateTimeOffset.UnixEpoch.AddTicks(GetTimestamp());
++
++    /// <inheritdoc/>
++    public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
++    {
++        var timer = new RetainedHistoryTimer(this, callback, state);
++        timer.Change(dueTime, period);
++        _timers.Add(timer);
++        return timer;
++    }
++
++    /// <summary>Moves monotonic time; callbacks may deliberately be delayed.</summary>
++    public void Advance(TimeSpan elapsed, bool fireTimers = true)
++    {
++        Interlocked.Add(ref _ticks, elapsed.Ticks);
++        if (fireTimers)
++        {
++            foreach (RetainedHistoryTimer timer in _timers.ToArray()) { timer.FireIfDue(GetUtcNow()); }
++        }
++    }
++}
+--- a/parties/eng/verify-ext-parties-1.ps1
++++ b/parties/eng/verify-ext-parties-1.ps1
+@@ -45,6 +45,18 @@
+ $flags = @('-c', 'Debug', '--artifacts-path', $ArtifactsDirectory, '-p:UseHexalithProjectReferences=true', '-p:UseNuGetDeps=false',
+     "-p:HexalithEventStoreRoot=$EventStoreRoot", "-p:HexalithCommonsRoot=$PartiesRoot/references/Hexalith.Commons",
+     "-p:HexalithMemoriesRoot=$MemoriesRoot", '-p:NuGetAudit=false', '-m:1')
++# Resolve one source version for the entire Local graph. Tenants forwards its EventStore
++# package version on project references; differing root pins otherwise overwrite a shared
++# output assembly with a version that does not satisfy another just-built consumer.
++$eventStoreProject = Join-Path $EventStoreRoot 'src/Hexalith.EventStore.Contracts/Hexalith.EventStore.Contracts.csproj'
++$versionArguments = @('msbuild', $eventStoreProject, '-nologo', '-getProperty:HexalithEventStoreVersion',
++    '-p:Configuration=Debug', '-p:UseHexalithProjectReferences=true', '-p:NuGetAudit=false')
++$eventStoreVersion = (& dotnet @versionArguments 2> (Join-Path $EvidenceDirectory 'eventstore-version.stderr.log') | Out-String).Trim()
++if ($LASTEXITCODE -ne 0 -or $eventStoreVersion -notmatch '^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$') {
++    throw 'Cannot resolve the selected EventStore source version for a consistent Local build graph.'
++}
++$eventStoreVersion | Set-Content -LiteralPath (Join-Path $EvidenceDirectory 'eventstore-version.log')
++$flags += "-p:HexalithEventStoreVersion=$eventStoreVersion"
+ $lanes = @(
+     @{ Root=$EventStoreRoot; Project='Hexalith.EventStore.Contracts.Tests'; Classes=@('*StreamReadPageValidatorTests', '*RetainedIdentityHistoryValidatorTests'); Matrix='Shared source contract validation' },
+     @{ Root=$EventStoreRoot; Project='Hexalith.EventStore.Client.Tests'; Classes=@('*AuthoritativeEventStreamReaderTests', '*EventStoreGatewayClientTests', '*EventStoreGatewayClientStreamTests', '*RetainedIdentityHistoryReaderTests'); Matrix='Shared source/isolation' },
+--- a/conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentSourceReader.cs
++++ b/conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentSourceReader.cs
+@@ -10,6 +10,7 @@
+ using Hexalith.Conversations.State;
+ using Hexalith.EventStore.Client.Streams;
+ using Hexalith.EventStore.Contracts.Identity;
++using Hexalith.EventStore.Contracts.Security;
+ using Hexalith.EventStore.Contracts.Streams;
+ 
+ namespace Hexalith.Conversations.Server.Agents;
+@@ -38,7 +39,7 @@
+         {
+             AuthoritativeStreamReadResult result = await streams.ReadAsync(identity, cancellationToken).WaitAsync(cancellationToken).ConfigureAwait(false);
+             cancellationToken.ThrowIfCancellationRequested();
+-            return result is { IsAuthoritative: true } ? ReplaySource(result.Stream, identity) : null;
++            return result is { IsAuthoritative: true } ? ReplaySource(result.Stream, identity, cancellationToken) : null;
+         }
+         catch (Exception) when (!cancellationToken.IsCancellationRequested)
+         {
+@@ -52,6 +53,24 @@
+     /// <returns>The valid complete state or null.</returns>
+     public static (AuthoritativeEventStream Source, ConversationState State)? ReplaySource(AuthoritativeEventStream? sourceInput,
+         AggregateIdentity identity)
++        => ReplaySource(sourceInput, identity, CancellationToken.None);
++
++    /// <summary>Replays the same exact source with caller-first completion and iteration cancellation.</summary>
++    /// <param name="sourceInput">Certified complete source.</param>
++    /// <param name="identity">Exact expected source.</param>
++    /// <param name="cancellationToken">Cancellation observed during capture and before state release.</param>
++    /// <returns>The valid complete state or null.</returns>
++    public static (AuthoritativeEventStream Source, ConversationState State)? ReplaySource(AuthoritativeEventStream? sourceInput,
++        AggregateIdentity identity, CancellationToken cancellationToken)
++    {
++        cancellationToken.ThrowIfCancellationRequested();
++        var result = ReplaySourceCore(sourceInput, identity, cancellationToken);
++        cancellationToken.ThrowIfCancellationRequested();
++        return result;
++    }
++
++    private static (AuthoritativeEventStream Source, ConversationState State)? ReplaySourceCore(AuthoritativeEventStream? sourceInput,
++        AggregateIdentity identity, CancellationToken cancellationToken)
+     {
+         var tenant = new TenantId(identity.TenantId);
+         var conversation = new ConversationId(identity.AggregateId);
+@@ -70,7 +89,10 @@
+             var records = new List<ConversationReplayEventRecord>();
+             foreach (StreamReadEvent item in source.Events)
+             {
+-                if (item is null || string.IsNullOrWhiteSpace(item.MessageId) || item.SequenceNumber != records.Count + 1 || item.MetadataVersion != 1
++                cancellationToken.ThrowIfCancellationRequested();
++                if (item is null || item.Payload is null
++                    || item.ProtectionMetadata is { } metadata && (metadata.State != PayloadProtectionState.Unprotected
++                        || metadata.MetadataVersion != EventStorePayloadProtectionMetadata.CurrentMetadataVersion) || string.IsNullOrWhiteSpace(item.MessageId) || item.SequenceNumber != records.Count + 1 || item.MetadataVersion != 1
+                     || !string.Equals(item.SerializationFormat, "json", StringComparison.OrdinalIgnoreCase)
+                     || !EventTypes.TryGetValue(item.EventTypeName, out Type? type))
+                 {
+@@ -81,9 +103,12 @@
+                 {
+                     return null;
+                 }
++                cancellationToken.ThrowIfCancellationRequested();
+                 records.Add(new(item.SequenceNumber, value));
+             }
++            cancellationToken.ThrowIfCancellationRequested();
+             ConversationReplayResult replay = ConversationReplayVerifier.Replay(tenant, conversation, records);
++            cancellationToken.ThrowIfCancellationRequested();
+             return replay.State is { HasCompleteEventPrefix: true } state && state.SourceRevision == source.Head
+                 ? (source, state) : null;
+         }
+--- a/conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentAdmissionStage.cs
++++ b/conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentAdmissionStage.cs
+@@ -138,7 +138,7 @@
+             var sourceProof = await commandSources.VerifyAsync(context.Request, cancellationToken).WaitAsync(cancellationToken).ConfigureAwait(false);
+             cancellationToken.ThrowIfCancellationRequested();
+             var source = sourceProof.IsAuthoritative
+-                ? ConversationAgentSourceReader.ReplaySource(sourceProof.Stream, envelope.AggregateIdentity) : null;
++                ? ConversationAgentSourceReader.ReplaySource(sourceProof.Stream, envelope.AggregateIdentity, cancellationToken) : null;
+             if (source is null || !MatchesCompleteState(context.CurrentState, source.Value.Source))
+             {
+                 return Reject(ConversationAgentsOutcome.Unavailable);
+--- a/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentSixSeamTests.cs
++++ b/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentSixSeamTests.cs
+@@ -15,6 +15,8 @@
+ using Hexalith.EventStore.Client.Handlers;
+ using Hexalith.EventStore.Contracts.Commands;
+ using Hexalith.EventStore.Contracts.Queries;
++using Hexalith.EventStore.Contracts.Security;
++using Hexalith.EventStore.Contracts.Streams;
+ using Hexalith.EventStore.Contracts.Projections;
+ using Hexalith.Conversations.Server.Projections;
+ using Hexalith.Conversations.Server.Queries;
+@@ -352,6 +354,86 @@
+         (await f.Admission.EvaluateAsync(new(new(f.Envelope(command), mismatch)), TestContext.Current.CancellationToken)).IsRejected.ShouldBeTrue();
+         f.CorruptHead = true;
+         (await f.Queries.ReadAsync("agents-service", new(F.Tenant, F.Conversation), cancellationToken: TestContext.Current.CancellationToken)).Outcome.ShouldBe(ConversationAgentsOutcome.Unavailable);
++    }
++
++    /// <summary>Unreadable/future protection metadata never becomes current evidence or deletion publication.</summary>
++    [Theory]
++    [InlineData(1, 1, false)]
++    [InlineData(2, 1, false)]
++    [InlineData(999, 1, false)]
++    [InlineData(0, 2, false)]
++    [InlineData(0, 0, false)]
++    [InlineData(1, 1, true)]
++    [InlineData(2, 1, true)]
++    [InlineData(999, 1, true)]
++    [InlineData(0, 2, true)]
++    [InlineData(0, 0, true)]
++    public async Task UnsupportedProtectionMetadata_DeniesCurrentAndDeletionEvidence(int state, int metadataVersion, bool deletionSource)
++    {
++        var f = new F();
++        f.Persist(ConversationAggregate.Handle(f.Membership, await f.ReplayAsync()));
++        var before = await f.ReplayAsync();
++        var approval = new ApproveConversationDeletion(new(f.CommandMetadata(F.Human, "approval"), F.Conversation,
++            "independent-approval", before.SourceRevision, F.At.AddMinutes(3), F.DeletionAudit(before.SourceRevision, F.At.AddMinutes(3))), "approval-event");
++        f.Persist(ConversationAggregate.Handle(approval, before));
++        f.TransformSource = source => source with
++        {
++            Events = source.Events.Select((e, index) => index == 0 ? e with
++            {
++                ProtectionMetadata = new((PayloadProtectionState)state, metadataVersion, null, null, null, null)
++            } : e).ToArray()
++        };
++        if (deletionSource)
++        {
++            var result = await f.Queries.DeletionSourceAsync("source-worker", new(F.Tenant, F.Conversation), TestContext.Current.CancellationToken);
++            result.Outcome.ShouldBe(ConversationAgentsOutcome.Unavailable);
++            result.Signal.ShouldBeNull();
++            result.Acknowledgement.ShouldBeNull();
++            result.AcknowledgedSourceRevision.ShouldBe(0);
++        }
++        else
++        {
++            var result = await f.Queries.ReadAsync("agents-service", new(F.Tenant, F.Conversation), TestContext.Current.CancellationToken);
++            result.Outcome.ShouldBe(ConversationAgentsOutcome.Unavailable);
++            result.SourceRevision.ShouldBeNull();
++            result.Messages.ShouldBeNull();
++            result.Participants.ShouldBeNull();
++        }
++    }
++
++    /// <summary>Supported plaintext metadata preserves existing complete source behavior.</summary>
++    [Fact]
++    public async Task SupportedPlaintextMetadata_PreservesMembershipEvidence()
++    {
++        var f = new F();
++        f.Persist(ConversationAggregate.Handle(f.Membership, await f.ReplayAsync()));
++        f.TransformSource = source => source with
++        {
++            Events = source.Events.Select(e => e with { ProtectionMetadata = EventStorePayloadProtectionMetadata.Unprotected() }).ToArray()
++        };
++        var result = await f.Queries.ReadAsync("agents-service", new(F.Tenant, F.Conversation), TestContext.Current.CancellationToken);
++        result.Outcome.ShouldBe(ConversationAgentsOutcome.Available);
++        result.AgentParticipantPresent.ShouldBeTrue();
++        result.SourceRevision.ShouldBe(2);
++    }
++
++    /// <summary>Cancellation during captured-prefix iteration stops before the remainder and releases no state.</summary>
++    [Fact]
++    public async Task CancellationDuringSourceReplay_StopsBeforeRemainingEvents()
++    {
++        var f = new F();
++        f.Persist(ConversationAggregate.Handle(f.Membership, await f.ReplayAsync()));
++        f.Persist(ConversationAggregate.Handle(f.Posting, await f.ReplayAsync()));
++        using var caller = new CancellationTokenSource();
++        ConversationSourceCancellationFixture? visited = null;
++        f.TransformSource = source => source with
++        {
++            Events = visited = new(source.Events, () => caller.Cancel())
++        };
++        var exception = await Should.ThrowAsync<OperationCanceledException>(() =>
++            new ConversationAgentSourceReader(f).ReadAsync(F.Tenant, F.Conversation, caller.Token));
++        exception.CancellationToken.ShouldBe(caller.Token);
++        visited.ShouldNotBeNull().Visited.ShouldBe(2);
+     }
+ 
+     /// <summary>Verifies current admission and sdk process query are runnable with local fixture.</summary>
+--- a/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentLocalFixture.cs
++++ b/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentLocalFixture.cs
+@@ -130,6 +130,9 @@
+         get;
+         set;
+     }
++    /// <summary>Mutates only synthetic returned source evidence for boundary regressions.</summary>
++    public Func<AuthoritativeEventStream, AuthoritativeEventStream>? TransformSource { get; set; }
++
+     /// <summary>Whether source head evidence is incomplete.</summary>
+     public bool CorruptHead
+     {
+@@ -277,8 +280,9 @@
+         var events = PersistedEvents.Select((e, index) => new StreamReadEvent(index + 1, e.GetType().FullName!,
+             JsonSerializer.SerializeToUtf8Bytes(e, e.GetType(), Options), "json", 1, $"persisted-{index + 1}",
+             "correlation-1", null, At.AddMinutes(index), "human")).ToArray();
+-        return new AuthoritativeStreamReadResult(new AuthoritativeEventStream(identity,
+-            events.Length + (CorruptHead ? 1 : 0), At.AddHours(1), events, "stable-source-observation"), null);
++        var source = new AuthoritativeEventStream(identity,
++            events.Length + (CorruptHead ? 1 : 0), At.AddHours(1), events, "stable-source-observation");
++        return new AuthoritativeStreamReadResult(TransformSource?.Invoke(source) ?? source, null);
+     }
+ 
+     /// <summary>Builds the complete SDK prefix for local transport simulation.</summary>
+--- /dev/null
++++ b/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationSourceCancellationFixture.cs
+@@ -0,0 +1,33 @@
++using System.Collections;
++using Hexalith.EventStore.Contracts.Streams;
++
++namespace Hexalith.Conversations.Server.Tests.Agents;
++
++/// <summary>Count-correct synthetic source collection which cancels upon its second visited event.</summary>
++/// <param name="events">Otherwise valid contiguous source events.</param>
++/// <param name="cancel">Independent caller cancellation.</param>
++internal sealed class ConversationSourceCancellationFixture(IReadOnlyList<StreamReadEvent> events, Action cancel)
++    : IReadOnlyList<StreamReadEvent>
++{
++    /// <summary>Gets the number of events actually visited.</summary>
++    public int Visited { get; private set; }
++
++    /// <inheritdoc/>
++    public int Count => events.Count;
++
++    /// <inheritdoc/>
++    public StreamReadEvent this[int index] => events[index];
++
++    /// <inheritdoc/>
++    public IEnumerator<StreamReadEvent> GetEnumerator()
++    {
++        foreach (var item in events)
++        {
++            if (++Visited == 2) { cancel(); }
++            yield return item;
++        }
++    }
++
++    /// <inheritdoc/>
++    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
++}
+--- a/platform/eng/verify-ext-secrets-1.ps1
++++ b/platform/eng/verify-ext-secrets-1.ps1
+@@ -5,12 +5,16 @@
+     [string]$EvidenceDirectory = '/tmp/hexalith-agents54-custody-evidence',
+     [string]$EventStoreSourceRoot = '/home/administrator/projects/hexalith/eventstore'
+ )
++Set-StrictMode -Version Latest
+ $ErrorActionPreference = 'Stop'
++$PSNativeCommandUseErrorActionPreference = $false
+ # No manifest can unlock code, providers and full persisted-state qualification that do not exist.
+ if ($Mode -eq 'Live') {
+     throw 'DependencyNotAvailable: EXT-SECRETS-1. Complete S1-S4/v23, production custody/profile, independent authority, accepted targets/commands and persisted qualification are unavailable.'
+ }
++$callerDirectory = (Get-Location).ProviderPath
+ $root = Split-Path $PSScriptRoot -Parent
++$EventStoreSourceRoot = [IO.Path]::GetFullPath($EventStoreSourceRoot, $callerDirectory)
+ $ArtifactsDirectory = [IO.Path]::GetFullPath($ArtifactsDirectory)
+ $EvidenceDirectory = [IO.Path]::GetFullPath($EvidenceDirectory)
+ New-Item -ItemType Directory -Force -Path $EvidenceDirectory | Out-Null
+@@ -21,8 +25,17 @@
+ $buildArgs = @('build', $project, '-c', 'Debug', '--artifacts-path', $ArtifactsDirectory, '-m:1', '-p:NuGetAudit=false', '-p:MinVerVersionOverride=1.0.0', '-p:UseHexalithProjectReferences=true', "-p:HexalithEventStoreRoot=$EventStoreSourceRoot")
+ & dotnet @buildArgs *> $buildLog
+ if ($LASTEXITCODE -ne 0) { throw "Local custody build failed; see $buildLog" }
++$buildOutput = Get-Content -LiteralPath $buildLog -Raw
++if ($buildOutput -notmatch '(?m)^\s*0 Warning\(s\)\s*$' -or $buildOutput -notmatch '(?m)^\s*0 Error\(s\)\s*$') {
++    throw "Local custody build was not warning/error free; see $buildLog"
++}
+ $assemblyPath = Join-Path $ArtifactsDirectory 'bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll'
+-$testArgs = @($assemblyPath, '-class', '*CustodyPrerequisiteTests', '-result-xml', $xmlPath)
++$requiredClasses = @('Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests',
++    'Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests',
++    'Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests')
++$testArgs = @($assemblyPath)
++foreach ($class in $requiredClasses) { $testArgs += @('-class', $class) }
++$testArgs += @('-result-xml', $xmlPath)
+ & dotnet @testArgs *> $testLog
+ if ($LASTEXITCODE -ne 0) { throw "Local custody tests failed; see $testLog" }
+ [xml]$results = Get-Content -Raw $xmlPath
+@@ -30,10 +43,21 @@
+ if ($null -eq $assembly -or [int]$assembly.total -le 0 -or [int]$assembly.passed -ne [int]$assembly.total -or [int]$assembly.failed -ne 0 -or [int]$assembly.errors -ne 0 -or [int]$assembly.skipped -ne 0 -or [int]$assembly.'not-run' -ne 0) {
+     throw 'Local custody XML contains missing, failed, skipped or unrun tests.'
+ }
++$executed = @($results.SelectNodes('//test'))
++if ($executed.Count -ne [int]$assembly.total -or @($executed | Where-Object { $_.result -ne 'Pass' -or $_.type -notin $requiredClasses }).Count -ne 0) {
++    throw 'Local custody XML contains unexpected, missing or nonpassing execution.'
++}
++$classEvidence = @()
++foreach ($class in $requiredClasses) {
++    $tests = @($executed | Where-Object { $_.type -eq $class })
++    if ($tests.Count -eq 0) { throw "Required custody/cleanup class did not execute: $class" }
++    $classEvidence += @{ Class = $class; Passed = $tests.Count }
++}
+ @{
+     Mode = 'Local'; LiveReady = $false; DependencyAvailable = $false
+-    Scope = 'S1/S2 cryptographic fixtures only'; Total = [int]$assembly.total
++    Scope = 'S1/S2 and private stateless S3 cryptographic prerequisites plus accepted-policy cleanup source simulations'; RequiredClasses = $classEvidence
++    Total = [int]$assembly.total
+     Passed = [int]$assembly.passed; BuildArguments = $buildArgs; TestArguments = $testArgs
+     XmlSha256 = (Get-FileHash $xmlPath -Algorithm SHA256).Hash.ToLowerInvariant()
+ } | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $EvidenceDirectory 'local-evidence.json')
+-Write-Output "Local custody fixture checks passed: $($assembly.passed). Full EXT-SECRETS-1 remains unavailable."
++Write-Output "Local custody cryptographic/cleanup source checks passed: $($assembly.passed). Full EXT-SECRETS-1 remains unavailable."
+--- a/platform/src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj
++++ b/platform/src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj
+@@ -7,4 +7,5 @@
+   <ItemGroup Condition="'$(UseHexalithProjectReferences)' != 'true'">
+     <PackageReference Include="Hexalith.EventStore.Contracts" />
+   </ItemGroup>
++  <ItemGroup><InternalsVisibleTo Include="Hexalith.Platform.Custody.Tests" /></ItemGroup>
+ </Project>
+--- /dev/null
++++ b/platform/src/Hexalith.Platform.Custody/ExportKeyWrapContext.cs
+@@ -0,0 +1,7 @@
++namespace Hexalith.Platform.Custody;
++
++/// <summary>Private exact context for export-key encryption, separate from HMAC or approval keys.</summary>
++/// <param name="TenantId">The exact owner tenant.</param>
++/// <param name="ExportId">The immutable export identity.</param>
++/// <param name="KekVersion">The exact wrapping-key version.</param>
++internal sealed record ExportKeyWrapContext(string TenantId, string ExportId, string KekVersion);
+--- /dev/null
++++ b/platform/src/Hexalith.Platform.Custody/WrappedExportKey.cs
+@@ -0,0 +1,8 @@
++namespace Hexalith.Platform.Custody;
++
++/// <summary>Private encrypted key bytes; this value is not an Agents response or lifecycle receipt.</summary>
++/// <param name="Context">Authenticated exact wrapping identity.</param>
++/// <param name="Nonce">The fresh twelve-byte GCM nonce.</param>
++/// <param name="Ciphertext">The encrypted thirty-two-byte export key.</param>
++/// <param name="Tag">The sixteen-byte authentication tag.</param>
++internal sealed record WrappedExportKey(ExportKeyWrapContext Context, byte[] Nonce, byte[] Ciphertext, byte[] Tag);
+--- /dev/null
++++ b/platform/src/Hexalith.Platform.Custody/OwnedExportKey.cs
+@@ -0,0 +1,33 @@
++using System.Security.Cryptography;
++
++namespace Hexalith.Platform.Custody;
++
++/// <summary>Private short-lived owned key copy; no raw property, serialization or diagnostic export.</summary>
++internal sealed class OwnedExportKey : IDisposable
++{
++    private readonly byte[] _bytes;
++    private bool _disposed;
++
++    /// <summary>Takes ownership of an exact decrypted key buffer.</summary>
++    internal OwnedExportKey(byte[] bytes) => _bytes = bytes;
++
++    /// <summary>Copies only inside a future authenticated custody backend; never a public response.</summary>
++    internal void CopyTo(Span<byte> destination)
++    {
++        ObjectDisposedException.ThrowIf(_disposed, this);
++        _bytes.CopyTo(destination);
++    }
++
++    /// <inheritdoc/>
++    public void Dispose()
++    {
++        if (!_disposed)
++        {
++            CryptographicOperations.ZeroMemory(_bytes);
++            _disposed = true;
++        }
++    }
++
++    /// <inheritdoc/>
++    public override string ToString() => nameof(OwnedExportKey);
++}
+--- /dev/null
++++ b/platform/src/Hexalith.Platform.Custody/ExportKeyWrappingCore.cs
+@@ -0,0 +1,67 @@
++using System.Security.Cryptography;
++
++namespace Hexalith.Platform.Custody;
++
++/// <summary>Stateless private AES-256-GCM prerequisite; it grants no pin, destruction or delivery authority.</summary>
++internal static class ExportKeyWrappingCore
++{
++    /// <summary>Wraps one exact export key with fresh nonce and purpose/tenant/export/version authenticated data.</summary>
++    internal static WrappedExportKey Wrap(ExportKeyWrapContext context, ReadOnlySpan<byte> exportKey, ReadOnlySpan<byte> kek)
++    {
++        byte[] aad = ContextBytes(context);
++        try
++        {
++            if (exportKey.Length != 32 || kek.Length != 32)
++            {
++                throw new ArgumentException("Export wrapping requires exact AES-256 keys.");
++            }
++
++            byte[] nonce = RandomNumberGenerator.GetBytes(12);
++            byte[] ciphertext = new byte[32];
++            byte[] tag = new byte[16];
++            using var aes = new AesGcm(kek, 16);
++            aes.Encrypt(nonce, exportKey, ciphertext, tag, aad);
++            return new(context, nonce, ciphertext, tag);
++        }
++        finally
++        {
++            CryptographicOperations.ZeroMemory(aad);
++        }
++    }
++
++    /// <summary>Unwraps only matching complete identity into a short-lived owned private key copy.</summary>
++    internal static OwnedExportKey Unwrap(ExportKeyWrapContext expected, WrappedExportKey wrapped, ReadOnlySpan<byte> kek)
++    {
++        ArgumentNullException.ThrowIfNull(wrapped);
++        byte[] aad = ContextBytes(expected);
++        byte[] plaintext = new byte[32];
++        try
++        {
++            if (wrapped.Context != expected || kek.Length != 32 || wrapped.Nonce is not { Length: 12 }
++                || wrapped.Ciphertext is not { Length: 32 } || wrapped.Tag is not { Length: 16 })
++            {
++                throw new CryptographicException("Export wrapping scope or format is invalid.");
++            }
++
++            using var aes = new AesGcm(kek, 16);
++            aes.Decrypt(wrapped.Nonce, wrapped.Ciphertext, wrapped.Tag, plaintext, aad);
++            var owned = new OwnedExportKey(plaintext);
++            plaintext = [];
++            return owned;
++        }
++        finally
++        {
++            CryptographicOperations.ZeroMemory(aad);
++            CryptographicOperations.ZeroMemory(plaintext);
++        }
++    }
++
++    private static byte[] ContextBytes(ExportKeyWrapContext context)
++    {
++        ArgumentNullException.ThrowIfNull(context);
++        ArgumentException.ThrowIfNullOrWhiteSpace(context.TenantId);
++        ArgumentException.ThrowIfNullOrWhiteSpace(context.ExportId);
++        ArgumentException.ThrowIfNullOrWhiteSpace(context.KekVersion);
++        return PlatformCanonicalBytes.Components(["ExportKeyWrapV1", context.TenantId, context.ExportId, context.KekVersion]);
++    }
++}
+--- /dev/null
++++ b/platform/src/Hexalith.Platform.Custody/ExportManifestSignatureContext.cs
+@@ -0,0 +1,8 @@
++namespace Hexalith.Platform.Custody;
++
++/// <summary>Private export-manifest signature context; no decision-approval signing purpose exists.</summary>
++/// <param name="TenantId">The exact owner tenant.</param>
++/// <param name="ExportId">The immutable export identity.</param>
++/// <param name="ManifestVersion">The positive frozen manifest version.</param>
++/// <param name="SigningKeyVersion">The exact export-manifest signing-key version.</param>
++internal sealed record ExportManifestSignatureContext(string TenantId, string ExportId, long ManifestVersion, string SigningKeyVersion);
+--- /dev/null
++++ b/platform/src/Hexalith.Platform.Custody/ExportManifestSignatureCore.cs
+@@ -0,0 +1,102 @@
++using System.Security.Cryptography;
++using System.Text;
++using System.Text.Json;
++
++namespace Hexalith.Platform.Custody;
++
++/// <summary>Private stateless detached ES256 JWS primitive; persistence and key/anchor authorization remain separate.</summary>
++internal static class ExportManifestSignatureCore
++{
++    private const string CurveOid = "1.2.840.10045.3.1.7";
++    private static readonly UTF8Encoding StrictUtf8 = new(false, true);
++
++    /// <summary>Signs supplied owner manifest bytes under an export-only, exact-identity protected header.</summary>
++    internal static string Sign(ExportManifestSignatureContext context, ReadOnlySpan<byte> manifest, ECDsa signingKey)
++    {
++        ArgumentNullException.ThrowIfNull(signingKey);
++        if (!IsP256(signingKey))
++        {
++            throw new CryptographicException("Export manifest signatures require P-256.");
++        }
++
++        string header = Header(context);
++        byte[] input = SigningInput(header, manifest);
++        try
++        {
++            byte[] signature = signingKey.SignData(input, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
++            return header + ".." + Base64Url(signature);
++        }
++        finally
++        {
++            CryptographicOperations.ZeroMemory(input);
++        }
++    }
++
++    /// <summary>Verifies offline with an independently supplied public anchor and exact expected manifest identity.</summary>
++    internal static bool Verify(ExportManifestSignatureContext expected, ReadOnlySpan<byte> manifest, string detachedJws, ECDsa publicAnchor)
++    {
++        ArgumentNullException.ThrowIfNull(publicAnchor);
++        byte[]? input = null;
++        try
++        {
++            if (string.IsNullOrWhiteSpace(detachedJws) || !IsP256(publicAnchor))
++            {
++                return false;
++            }
++
++            string[] parts = detachedJws.Split('.');
++            if (parts.Length != 3 || parts[1].Length != 0 || parts[0] != Header(expected))
++            {
++                return false;
++            }
++
++            byte[] signature = DecodeBase64Url(parts[2]);
++            if (signature.Length != 64 || Base64Url(signature) != parts[2])
++            {
++                return false;
++            }
++
++            input = SigningInput(parts[0], manifest);
++            return publicAnchor.VerifyData(input, signature, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
++        }
++        catch (Exception exception) when (exception is FormatException or CryptographicException or ArgumentException)
++        {
++            return false;
++        }
++        finally
++        {
++            if (input is not null) { CryptographicOperations.ZeroMemory(input); }
++        }
++    }
++
++    private static bool IsP256(ECDsa key) => key.KeySize == 256 && key.ExportParameters(false).Curve.Oid.Value == CurveOid;
++
++    private static string Header(ExportManifestSignatureContext context)
++    {
++        ArgumentNullException.ThrowIfNull(context);
++        ArgumentException.ThrowIfNullOrWhiteSpace(context.TenantId);
++        ArgumentException.ThrowIfNullOrWhiteSpace(context.ExportId);
++        ArgumentException.ThrowIfNullOrWhiteSpace(context.SigningKeyVersion);
++        if (context.ManifestVersion <= 0) { throw new ArgumentException("Export manifest version must be positive."); }
++        // JsonSerializer replaces malformed UTF-16; reject it before distinct identities can collapse.
++        _ = StrictUtf8.GetByteCount(context.TenantId);
++        _ = StrictUtf8.GetByteCount(context.ExportId);
++        _ = StrictUtf8.GetByteCount(context.SigningKeyVersion);
++        // This private candidate signature format is not an accepted production trust profile.
++        // Its fixed type does not authorize a provider key family or confer decision/deletion authority.
++        return Base64Url(JsonSerializer.SerializeToUtf8Bytes(new Dictionary<string, object>
++        {
++            ["alg"] = "ES256", ["typ"] = "hexalith-export-manifest-v1", ["kid"] = context.SigningKeyVersion,
++            ["tenant"] = context.TenantId, ["export"] = context.ExportId, ["manifestVersion"] = context.ManifestVersion,
++        }));
++    }
++
++    private static byte[] SigningInput(string header, ReadOnlySpan<byte> manifest)
++        => Encoding.ASCII.GetBytes(header + "." + Base64Url(manifest));
++
++    private static string Base64Url(ReadOnlySpan<byte> bytes)
++        => Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
++
++    private static byte[] DecodeBase64Url(string value)
++        => Convert.FromBase64String(value.Replace('-', '+').Replace('_', '/') + new string('=', (4 - value.Length % 4) % 4));
++}
+--- /dev/null
++++ b/platform/tests/Hexalith.Platform.Custody.Tests/ExportCustodyCryptographyTests.cs
+@@ -0,0 +1,246 @@
++using System.Security.Cryptography;
++using System.Text;
++using System.Text.Json;
++
++using Shouldly;
++
++namespace Hexalith.Platform.Custody.Tests;
++
++/// <summary>Private stateless S3 cryptographic prerequisites using ephemeral keys; no production custody claims.</summary>
++public sealed class ExportCustodyCryptographyTests
++{
++    private static readonly ExportKeyWrapContext WrapContext = new("tenant-a", "export-1", "kek-1");
++    private static readonly ExportManifestSignatureContext SignatureContext = new("tenant-a", "export-1", 1, "manifest-key-1");
++
++    /// <summary>Wrapping authenticates bytes with fresh nonces and clears the owned plaintext capability on disposal.</summary>
++    [Fact]
++    public void WrappedKeyRoundTripAndFreshNonceKeepPlaintextPrivate()
++    {
++        byte[] key = RandomNumberGenerator.GetBytes(32);
++        byte[] kek = RandomNumberGenerator.GetBytes(32);
++        var first = ExportKeyWrappingCore.Wrap(WrapContext, key, kek);
++        var second = ExportKeyWrappingCore.Wrap(WrapContext, key, kek);
++        first.Ciphertext.ShouldNotBe(key);
++        first.Nonce.ShouldNotBe(second.Nonce);
++        using var owned = ExportKeyWrappingCore.Unwrap(WrapContext, first, kek);
++        byte[] restored = new byte[32];
++        owned.CopyTo(restored);
++        restored.ShouldBe(key);
++        JsonSerializer.Serialize(owned).ShouldBe("{}");
++        owned.ToString().ShouldBe("OwnedExportKey");
++        owned.Dispose();
++        Should.Throw<ObjectDisposedException>(() => owned.CopyTo(restored));
++    }
++
++    /// <summary>Changing any exact context denies unwrap even when the original key remains available.</summary>
++    [Theory]
++    [InlineData("tenant")]
++    [InlineData("export")]
++    [InlineData("version")]
++    public void ChangedWrapIdentityCannotReleaseKey(string field)
++    {
++        byte[] kek = RandomNumberGenerator.GetBytes(32);
++        var wrapped = ExportKeyWrappingCore.Wrap(WrapContext, RandomNumberGenerator.GetBytes(32), kek);
++        var changed = field switch
++        {
++            "tenant" => WrapContext with { TenantId = "tenant-b" },
++            "export" => WrapContext with { ExportId = "export-2" },
++            _ => WrapContext with { KekVersion = "kek-2" },
++        };
++        Should.Throw<CryptographicException>(() => ExportKeyWrappingCore.Unwrap(changed, wrapped, kek));
++        // Also reject an attacker relabelling the ciphertext's context to match the requested substitution.
++        Should.Throw<CryptographicException>(() => ExportKeyWrappingCore.Unwrap(changed, wrapped with { Context = changed }, kek));
++    }
++
++    /// <summary>Independent nonce/ciphertext/tag corruption and a wrong KEK cannot yield plaintext.</summary>
++    [Theory]
++    [InlineData("nonce")]
++    [InlineData("ciphertext")]
++    [InlineData("tag")]
++    [InlineData("key")]
++    public void TamperedWrappedBytesCannotReleaseKey(string field)
++    {
++        byte[] kek = RandomNumberGenerator.GetBytes(32);
++        var wrapped = ExportKeyWrappingCore.Wrap(WrapContext, RandomNumberGenerator.GetBytes(32), kek);
++        if (field == "nonce") { wrapped.Nonce[0] ^= 1; }
++        if (field == "ciphertext") { wrapped.Ciphertext[0] ^= 1; }
++        if (field == "tag") { wrapped.Tag[0] ^= 1; }
++        if (field == "key") { kek[0] ^= 1; }
++        Should.Throw<CryptographicException>(() => ExportKeyWrappingCore.Unwrap(WrapContext, wrapped, kek));
++    }
++
++    /// <summary>Malformed envelopes and key sizes fail before a plaintext capability exists.</summary>
++    [Theory]
++    [InlineData("nonce")]
++    [InlineData("ciphertext")]
++    [InlineData("tag")]
++    [InlineData("null-nonce")]
++    [InlineData("null-ciphertext")]
++    [InlineData("null-tag")]
++    public void InvalidWrappedFormatFailsClosed(string field)
++    {
++        byte[] kek = RandomNumberGenerator.GetBytes(32);
++        var wrapped = ExportKeyWrappingCore.Wrap(WrapContext, RandomNumberGenerator.GetBytes(32), kek);
++        var invalid = field switch
++        {
++            "nonce" => wrapped with { Nonce = new byte[11] },
++            "ciphertext" => wrapped with { Ciphertext = new byte[31] },
++            "tag" => wrapped with { Tag = new byte[15] },
++            "null-nonce" => wrapped with { Nonce = null! },
++            "null-ciphertext" => wrapped with { Ciphertext = null! },
++            _ => wrapped with { Tag = null! },
++        };
++        Should.Throw<CryptographicException>(() => ExportKeyWrappingCore.Unwrap(WrapContext, invalid, kek));
++    }
++
++    /// <summary>AES-256 is mandatory, rather than accepting weaker AES material or arbitrary key lengths.</summary>
++    [Theory]
++    [InlineData(16)]
++    [InlineData(24)]
++    [InlineData(31)]
++    [InlineData(33)]
++    public void UnsupportedKeySizesCannotWrapOrUnwrap(int length)
++    {
++        byte[] key = new byte[32];
++        byte[] kek = new byte[32];
++        Should.Throw<ArgumentException>(() => ExportKeyWrappingCore.Wrap(WrapContext, new byte[length], kek));
++        Should.Throw<ArgumentException>(() => ExportKeyWrappingCore.Wrap(WrapContext, key, new byte[length]));
++        var wrapped = ExportKeyWrappingCore.Wrap(WrapContext, key, kek);
++        Should.Throw<CryptographicException>(() => ExportKeyWrappingCore.Unwrap(WrapContext, wrapped, new byte[length]));
++    }
++
++    /// <summary>Separate public-key-only offline verification uses RFC JWS signing input and the 64-byte ES256 wire shape.</summary>
++    [Fact]
++    public void DetachedEs256SignatureVerifiesWithIndependentPublicOnlyAnchor()
++    {
++        using var signer = ECDsa.Create(ECCurve.NamedCurves.nistP256);
++        using var anchor = ECDsa.Create();
++        anchor.ImportSubjectPublicKeyInfo(signer.ExportSubjectPublicKeyInfo(), out _);
++        byte[] manifest = "{\"objectCount\":2,\"encrypted\":true}"u8.ToArray();
++        string jws = ExportManifestSignatureCore.Sign(SignatureContext, manifest, signer);
++        ExportManifestSignatureCore.Verify(SignatureContext, manifest, jws, anchor).ShouldBeTrue();
++        string[] parts = jws.Split('.');
++        parts.Length.ShouldBe(3);
++        parts[1].ShouldBeEmpty();
++        byte[] signature = Decode(parts[2]);
++        signature.Length.ShouldBe(64);
++        using var header = JsonDocument.Parse(Decode(parts[0]));
++        header.RootElement.GetProperty("alg").GetString().ShouldBe("ES256");
++        header.RootElement.GetProperty("typ").GetString().ShouldBe("hexalith-export-manifest-v1");
++        // Independently assemble RFC 7515's encoded protected-header + '.' + encoded payload.
++        byte[] input = Encoding.ASCII.GetBytes(parts[0] + "." + Encode(manifest));
++        anchor.VerifyData(input, signature, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation).ShouldBeTrue();
++        Should.Throw<CryptographicException>(() => anchor.ExportParameters(true));
++    }
++
++    /// <summary>Signature identity substitutions are rejected before a future lifecycle consumer can accept them.</summary>
++    [Theory]
++    [InlineData("tenant")]
++    [InlineData("export")]
++    [InlineData("version")]
++    [InlineData("key")]
++    public void ChangedSignatureIdentityCannotVerify(string field)
++    {
++        using var signer = ECDsa.Create(ECCurve.NamedCurves.nistP256);
++        byte[] manifest = "{}"u8.ToArray();
++        string jws = ExportManifestSignatureCore.Sign(SignatureContext, manifest, signer);
++        var changed = field switch
++        {
++            "tenant" => SignatureContext with { TenantId = "tenant-b" },
++            "export" => SignatureContext with { ExportId = "export-2" },
++            "version" => SignatureContext with { ManifestVersion = 2 },
++            _ => SignatureContext with { SigningKeyVersion = "manifest-key-2" },
++        };
++        ExportManifestSignatureCore.Verify(changed, manifest, jws, signer).ShouldBeFalse();
++    }
++
++    /// <summary>Altered payload, tag, header purpose, algorithm, and trust anchor do not verify.</summary>
++    [Theory]
++    [InlineData("payload")]
++    [InlineData("signature")]
++    [InlineData("purpose")]
++    [InlineData("algorithm")]
++    [InlineData("anchor")]
++    [InlineData("embedded")]
++    [InlineData("padded")]
++    public void ChangedJwsOrPublicAnchorCannotVerify(string field)
++    {
++        using var signer = ECDsa.Create(ECCurve.NamedCurves.nistP256);
++        using var foreignAnchor = ECDsa.Create(ECCurve.NamedCurves.nistP256);
++        byte[] manifest = "{}"u8.ToArray();
++        string[] parts = ExportManifestSignatureCore.Sign(SignatureContext, manifest, signer).Split('.');
++        if (field == "payload") { manifest[0] = (byte)'!'; }
++        if (field == "signature") { byte[] signature = Decode(parts[2]); signature[0] ^= 1; parts[2] = Encode(signature); }
++        if (field is "purpose" or "algorithm")
++        {
++            string header = Encoding.UTF8.GetString(Decode(parts[0]));
++            header = field == "purpose" ? header.Replace("hexalith-export-manifest-v1", "decision-approval-v1", StringComparison.Ordinal)
++                : header.Replace("ES256", "HS256", StringComparison.Ordinal);
++            parts[0] = Encode(Encoding.UTF8.GetBytes(header));
++        }
++        if (field == "embedded") { parts[1] = Encode(manifest); }
++        if (field == "padded") { parts[2] += "=="; }
++        string changed = string.Join('.', parts);
++        ExportManifestSignatureCore.Verify(SignatureContext, manifest, changed, field == "anchor" ? foreignAnchor : signer).ShouldBeFalse();
++    }
++
++    /// <summary>Invalid UTF-16 identities cannot collide with a signed replacement character or another malformed identity.</summary>
++    [Theory]
++    [InlineData("tenant", "high")]
++    [InlineData("export", "high")]
++    [InlineData("key", "high")]
++    [InlineData("tenant", "low")]
++    [InlineData("export", "low")]
++    [InlineData("key", "low")]
++    public void MalformedSignatureIdentityCannotSignOrVerify(string field, string kind)
++    {
++        using var signer = ECDsa.Create(ECCurve.NamedCurves.nistP256);
++        byte[] manifest = "{}"u8.ToArray();
++        var replacement = WithSignatureIdentity(field, "identity-\uFFFD");
++        string replacementSignature = ExportManifestSignatureCore.Sign(replacement, manifest, signer);
++        foreach (string invalid in kind == "high" ? new[] { "identity-\uD800", "identity-\uD801" } : new[] { "identity-\uDC00", "identity-\uDC01" })
++        {
++            var malformed = WithSignatureIdentity(field, invalid);
++            Should.Throw<EncoderFallbackException>(() => ExportManifestSignatureCore.Sign(malformed, manifest, signer));
++            ExportManifestSignatureCore.Verify(malformed, manifest, replacementSignature, signer).ShouldBeFalse();
++        }
++    }
++
++    /// <summary>Valid Unicode remains exactly bound without silently normalizing distinct identities.</summary>
++    [Theory]
++    [InlineData("tenant")]
++    [InlineData("export")]
++    [InlineData("key")]
++    public void ValidUnicodeSignatureIdentityIsExact(string field)
++    {
++        using var signer = ECDsa.Create(ECCurve.NamedCurves.nistP256);
++        byte[] manifest = "{}"u8.ToArray();
++        var composed = WithSignatureIdentity(field, "identity-\u00E9-\U0001F512");
++        string signature = ExportManifestSignatureCore.Sign(composed, manifest, signer);
++        ExportManifestSignatureCore.Verify(composed, manifest, signature, signer).ShouldBeTrue();
++        ExportManifestSignatureCore.Verify(WithSignatureIdentity(field, "identity-e\u0301-\U0001F512"), manifest, signature, signer).ShouldBeFalse();
++    }
++
++    private static ExportManifestSignatureContext WithSignatureIdentity(string field, string value)
++        => field switch
++        {
++            "tenant" => SignatureContext with { TenantId = value },
++            "export" => SignatureContext with { ExportId = value },
++            _ => SignatureContext with { SigningKeyVersion = value },
++        };
++
++    /// <summary>ES256 never admits a different curve or missing exact identity.</summary>
++    [Fact]
++    public void WrongCurveOrInvalidContextCannotSign()
++    {
++        using var wrongCurve = ECDsa.Create(ECCurve.NamedCurves.nistP384);
++        using var signer = ECDsa.Create(ECCurve.NamedCurves.nistP256);
++        Should.Throw<CryptographicException>(() => ExportManifestSignatureCore.Sign(SignatureContext, "{}"u8.ToArray(), wrongCurve));
++        ExportManifestSignatureCore.Verify(SignatureContext, "{}"u8.ToArray(), "invalid", wrongCurve).ShouldBeFalse();
++        Should.Throw<ArgumentException>(() => ExportManifestSignatureCore.Sign(SignatureContext with { ManifestVersion = 0 }, "{}"u8.ToArray(), signer));
++        Should.Throw<ArgumentException>(() => ExportKeyWrappingCore.Wrap(WrapContext with { TenantId = " " }, new byte[32], new byte[32]));
++    }
++
++    private static string Encode(byte[] value) => Convert.ToBase64String(value).TrimEnd('=').Replace('+', '-').Replace('/', '_');
++    private static byte[] Decode(string value) => Convert.FromBase64String(value.Replace('-', '+').Replace('_', '/') + new string('=', (4 - value.Length % 4) % 4));
++}

@@ -1,0 +1,23 @@
+{
+  "capturedUtc": "2026-10-08T16:29:20.927023+00:00",
+  "scope": "Root read-only tracing of current corrections; not a fresh execution or final review",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs",
+      "sha256": "5fd53a1cd36e4508f00c289c8b3f8f6c2be106bf599d5ec7c98aff1c4e328532"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryActor.cs",
+      "sha256": "671a7fdaad2d237da66b4981ad00141524e590b93ba870200b0c9b97a998fa53"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "sha256": "76f585a1c38d4cccfcc10b69d51d36b67865bd06dd325f26304b814cbe911c2d"
+    }
+  ],
+  "findings": {
+    "inventory": "ReadState validates the independent revision and owned state digest, including absent initial state; mutation conditionally advances the independent anchor before Save and confirms durable exact readback.",
+    "consumption": "Current source includes independent revision/digest anchoring; terminal verification remains subject to final review and fresh tests.",
+    "decision": "Current source adds independent coherent final authority boundary and checks manifest/profile time again after its final awaited operation. Focused expiry/revocation regressions are still awaiting execution confirmation."
+  }
+}

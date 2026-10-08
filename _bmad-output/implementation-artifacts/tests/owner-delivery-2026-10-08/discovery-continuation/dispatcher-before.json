@@ -1,0 +1,34 @@
+[
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/ISourcePublicationDelivery.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationDeliveryStatus.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationDispatchResult.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationDispatcher.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationDispatcherFixture.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationDispatcherTests.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionPublicationDelivery.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionPublicationDeliveryTests.cs",
+    "exists": false
+  }
+]

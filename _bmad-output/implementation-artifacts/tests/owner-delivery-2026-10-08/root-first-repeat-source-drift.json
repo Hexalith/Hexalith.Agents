@@ -1,0 +1,62 @@
+{
+  "capturedUtc": "2026-10-08T12:19:13.737777+00:00",
+  "checkedPaths": 57116,
+  "changed": [
+    {
+      "path": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/FitnessTests/PlatformApiPrerequisitesTests.cs",
+      "before": "0f4e0e1331fc4313c89a6d607c86033e86ad9e7e3d34a38dac19fe0ed6aaf7c5",
+      "after": "f3d04b4a43ecef59f37bce1e12f5bb110f5b3469315540e89e1c7d8251701bba"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/Tools/G4PackageQualification.functions.ps1",
+      "before": "e280e50487aaa03e2163d46e6d2023b5a6ff7b0cc0a40e146f3aeef77c426c91",
+      "after": "804986b5f4a3a1fe843619968f0878c095a23001d89eca13de35efa1e0974204"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/Tools/test-g4-tool-package-contracts.ps1",
+      "before": "721b1bc461ebbd6083c3f601cfb0b7fac06e83b4e17a03305a3d2ae88acf5b61",
+      "after": "13d2cad48959d13df414eccf72b89ed5dd658a4713e4d3ebe305f1f1855596e2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/Tools/test-publish-g4-tool-packages.ps1",
+      "before": "351bb7b5944cbe912bf9629a517141c278feb5db9bb647fc4bf8d4a96c1e7415",
+      "after": "f42363a21e4cc30aad8e666868bb7a68937ee0b4874648b2876e7266ddc2653d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/tenants/references/Hexalith.Builds/Tools/G4PackageQualification.functions.ps1",
+      "before": "e280e50487aaa03e2163d46e6d2023b5a6ff7b0cc0a40e146f3aeef77c426c91",
+      "after": "804986b5f4a3a1fe843619968f0878c095a23001d89eca13de35efa1e0974204"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/tenants/references/Hexalith.Builds/Tools/test-g4-tool-package-contracts.ps1",
+      "before": "721b1bc461ebbd6083c3f601cfb0b7fac06e83b4e17a03305a3d2ae88acf5b61",
+      "after": "13d2cad48959d13df414eccf72b89ed5dd658a4713e4d3ebe305f1f1855596e2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/tenants/references/Hexalith.Builds/Tools/test-publish-g4-tool-packages.ps1",
+      "before": "351bb7b5944cbe912bf9629a517141c278feb5db9bb647fc4bf8d4a96c1e7415",
+      "after": "f42363a21e4cc30aad8e666868bb7a68937ee0b4874648b2876e7266ddc2653d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/tenants/references/Hexalith.Builds/schemas/hexalith.module-manifest.v2.json",
+      "before": "5155318d20abff69ea70a6509aaaa4e31ea998854fb23ad33d217bc2db617d7c",
+      "after": "7e4f7998863aa61117dd7f5b98bb6349c5d28eaa803e2e39e29edf08a49e667a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/tenants/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Manifest/PlatformManifestValidator.cs",
+      "before": "13c0193f63278beb7625a4a61e42fb514c91cd2b0e42d2f533162d3c8806f99d",
+      "after": "be4a5d1940e4f254187f074764567dd775db37ac109cf1a0e9930d493e13f989"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/tenants/references/Hexalith.Builds/test/Hexalith.Builds.Module.Tests/PlatformManifestCommandTests.cs",
+      "before": "2f4c3fc7ce531049a3ddd42d1ad9e7d30c0135d54890ce2c9e37b01b67ed4e97",
+      "after": "89b33468a9a2ff6f349d04821aa258cff6a0a311fcf0f0f820cd265e911e80b7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/tenants/references/Hexalith.Builds/test/Hexalith.Builds.Module.Tests/PlatformManifestValidationTests.cs",
+      "before": "a6e73d4b6fe5a096cddcca50b33857216d2401ff28e898041b627434c9d8b66b",
+      "after": "e6af1e12921cb28cb8816ffe5786f906a254035f3bf463afe76884534b471058"
+    }
+  ],
+  "meaning": "First root full Local repeat source observation only. Source changes for residual E2 and next authorized engineering will be tracked separately; no complete target/live qualification."
+}

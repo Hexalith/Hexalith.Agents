@@ -1,0 +1,9 @@
+{
+  "isolatedDirectory": "/tmp/hexalith-owner-baseline-20261008-c1wkcilu",
+  "sourceCopies": {
+    "global.json": "fc4602f9d88c9440f70f72732343a88c5e4190223fb9b77f9b8ac8eb1c4c8c2d",
+    "aspire.config.json": "7eb051d14eb7974933be8a8ba2eb51d8ce75290e65409eb8b05fe4310199bf2e",
+    "DaprSelfHostedMtls.cs": "da581231124eb7afe3c4e25943d713202c01597c56462ca18e705e7f175e87d5",
+    "apphost.cs": "7c140eb97bbc45e6ab0589ba3f186ea8eccc623bac9f8850bf2b42aadf136f9a"
+  }
+}

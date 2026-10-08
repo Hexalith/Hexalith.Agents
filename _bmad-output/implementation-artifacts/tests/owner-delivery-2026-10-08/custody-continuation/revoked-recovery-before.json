@@ -1,0 +1,29 @@
+{
+  "observedAt": "2026-10-08T15:11:21.501342+00:00",
+  "sources": [
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/revoked-recovery-before/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "existed": true,
+      "sha256": "f536a38e2ca8910108954b36218d6e29921b71d76ada29f48b389494b261d99b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningResult.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/revoked-recovery-before/src/Hexalith.Platform.Custody/DeletionCapabilitySigningResult.cs",
+      "existed": true,
+      "sha256": "d32a675258da5e779aeb2cbd13906b3312978b9490baf6f0d0bdcf2dcde2d479"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilityOriginalSigningReceiptAuthority.cs",
+      "copy": null,
+      "existed": false,
+      "sha256": null
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/revoked-recovery-before/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "existed": true,
+      "sha256": "de122fe510b66003dc42c1a60968a32e42b487a945a3e98ddd58739eac20f883"
+    }
+  ]
+}

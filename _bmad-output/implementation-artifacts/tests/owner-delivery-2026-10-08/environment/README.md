@@ -1,0 +1,11 @@
+# Existing environment discovery
+
+The owner selected `192.168.1.30`. Existing Kubernetes context `jpiquot@local` targets `https://192.168.1.30:6443`. Retained kubectl 1.34.12 performed six metadata reads against current Kubernetes 1.34.9. All succeeded. Existing default administrator SSH was refused; independent Kubernetes access succeeds.
+
+[Allowlisted observation](metadata-observation.json) records exact workload UIDs, resourceVersions, image digests, public ingress hosts, configuration key names and Dapr component types, versions and scopes. [Assessment](discovery-assessment.json) binds its hash. The [reproducible collector](inspect-existing-environment.py) retains no Secret objects or values, credential values, raw configuration or specifications, or workload logs. No cluster resource changed.
+
+OpenBao `openbao/hexalith-keys` has three Ready replicas of `quay.io/openbao/openbao:2.6.2` at the recorded image digest. Keycloak has two Ready replicas and ingress `auth.tache.ai`. The Dapr control plane is 1.18.1. OpenBao, Keycloak and Memories pods are all observed on `node1`. Existing Memories telemetry PostgreSQL has one replica, and its Dapr `state.postgresql/v2` component is scoped only to Memories telemetry. This does not prove an independently replicated Agents denial spool, all-copy key destruction or nonrollback restore, current Party/role authorities, dedicated service Party enrollment or a complete signing profile. Workload names matching Agents, Parties, Conversations or the spool were not discovered; an exact owner target manifest is still required before claiming equivalent services absent or usable.
+
+Historical generic OpenBao recovery evidence exists in Platform. It does not qualify actor-history expiry against every decrypting key generation in immutable backups. Existing Memories component scopes must not become Agents credentials implicitly. Current issuer, trust profile and exact all-copy lifecycle/restore authority references remain missing inputs. Specified generic infrastructure source work continues under existing authorization.
+
+This is read-only target discovery. It does not establish a passing complete owner compatibility command or an immutable full delivery target. The four records stay Uncommitted and Story 5.4 stays draft/backlog.

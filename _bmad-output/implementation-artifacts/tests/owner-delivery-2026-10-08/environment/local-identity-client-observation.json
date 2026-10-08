@@ -1,0 +1,74 @@
+{
+  "capturedUtc": "2026-10-08T13:54:34.004519+00:00",
+  "scope": "Local AppHost example client configuration identifiers/flow flags only; no credential, subject, user or role assignments; not current production authority or enrollment proof.",
+  "observations": [
+    {
+      "file": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties.AppHost/KeycloakRealms/hexalith-realm.json",
+      "sha256": "6531a4f528a8017380aa4e9c26791fd7b201229cd30f6cbc8ca2d61e4ab65049",
+      "realm": "hexalith",
+      "clients": [
+        {
+          "clientId": "hexalith-parties",
+          "enabled": true,
+          "publicClient": true,
+          "serviceAccountsEnabled": false,
+          "protocol": null,
+          "standardFlowEnabled": false,
+          "directAccessGrantsEnabled": true
+        },
+        {
+          "clientId": "hexalith-eventstore",
+          "enabled": true,
+          "publicClient": true,
+          "serviceAccountsEnabled": false,
+          "protocol": null,
+          "standardFlowEnabled": false,
+          "directAccessGrantsEnabled": true
+        },
+        {
+          "clientId": "hexalith-parties-ui",
+          "enabled": true,
+          "publicClient": false,
+          "serviceAccountsEnabled": false,
+          "protocol": null,
+          "standardFlowEnabled": true,
+          "directAccessGrantsEnabled": false
+        }
+      ]
+    },
+    {
+      "file": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.AppHost/KeycloakRealms/hexalith-realm.json",
+      "sha256": "858e57b863fb5c3dca55c01e3d7972db9b637dd4d94d389c1b0bb1d4f00d0d91",
+      "realm": "hexalith",
+      "clients": [
+        {
+          "clientId": "hexalith-eventstore",
+          "enabled": true,
+          "publicClient": true,
+          "serviceAccountsEnabled": false,
+          "protocol": null,
+          "standardFlowEnabled": false,
+          "directAccessGrantsEnabled": true
+        },
+        {
+          "clientId": "hexalith-frontshell",
+          "enabled": true,
+          "publicClient": true,
+          "serviceAccountsEnabled": false,
+          "protocol": null,
+          "standardFlowEnabled": true,
+          "directAccessGrantsEnabled": false
+        },
+        {
+          "clientId": "eventstore",
+          "enabled": true,
+          "publicClient": false,
+          "serviceAccountsEnabled": true,
+          "protocol": null,
+          "standardFlowEnabled": false,
+          "directAccessGrantsEnabled": false
+        }
+      ]
+    }
+  ]
+}

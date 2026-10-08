@@ -1,0 +1,171 @@
+<assemblies schema-version="3" id="800655e7-157d-42cb-944e-5aa9b819e41c" computer="DESKTOP-VIOG240" user="administrator" start-rtf="2026-10-08T14:31:19.5122037+00:00" finish-rtf="2026-10-08T14:31:19.7582156+00:00" timestamp="10/08/2026 16:31:19"><assembly environment="64-bit (x64) .NET 10.0.12 [collection-per-class, parallel (collections, 14 threads)]" id="15ef34ae-4534-4f13-8e1c-d88ab8ff1d0c" name="/tmp/hexalith-owner-protection-focused-20261008/bin/ProtectionFocused/debug/ProtectionFocused.dll" run-date="2026-10-08" run-time="14:31:19" start-rtf="2026-10-08T14:31:19.5122037+00:00" test-framework="xUnit.net v3 4.0.1+8ed8aa354c" target-framework=".NETCoreApp,Version=v10.0" errors="0" failed="8" finish-rtf="2026-10-08T14:31:19.7582156+00:00" not-run="0" passed="0" skipped="0" time="0.246" time-rtf="00:00:00.2460000" total="8"><collection name="Test collection for Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests (id: 41f44c3531a943c9f05ac739bfc444a1869bb2783eff77840f32d7b05919af2f)" id="5f402a14-75bc-4c93-91ec-046e9c6ea1dd" failed="8" not-run="0" passed="0" skipped="0" time="0.137" time-rtf="00:00:00.1370000" total="8"><test id="6ce7b436-a086-49de-bd7f-460ceb485ca5" name="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.DurableUniqueReservationAndOriginalSealedRetrySurviveRestart" result="Fail" time="0.069" time-rtf="00:00:00.0690000" start-rtf="2026-10-08T14:31:19.5749646+00:00" finish-rtf="2026-10-08T14:31:19.6617357+00:00" type="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests" method="DurableUniqueReservationAndOriginalSealedRetrySurviveRestart" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs" source-line="15"><failure exception-type="NSubstitute.Exceptions.AmbiguousArgumentsException"><message>NSubstitute.Exceptions.AmbiguousArgumentsException : There is more than one argument of type System.String to this call.
+The call signature is (String, String, Int64, CancellationToken)
+  and was called with (String, String, Int64, CancellationToken)</message><stack-trace>   at NSubstitute.Core.CallInfo.ThrowIfMoreThanOne[T](IEnumerable`1 arguments)
+   at NSubstitute.Core.CallInfo.TryGetArg[T](Func`2 condition, T&amp; value)
+   at NSubstitute.Core.CallInfo.Arg[T]()
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceFixture.&lt;.ctor&gt;b__17_1(CallInfo call) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs:line 25
+   at NSubstitute.SubstituteExtensions.&lt;&gt;c__DisplayClass20_0`1.&lt;WrapFuncInTask&gt;b__0(CallInfo x)
+   at NSubstitute.Core.ReturnValueFromFunc`1.ReturnFor(CallInfo info)
+   at NSubstitute.Core.CallResults.ResultForCallSpec.GetResult(ICall call, ICallInfoFactory callInfoFactory)
+   at NSubstitute.Core.CallResults.TryGetResult(ICall call, Object&amp; result)
+   at NSubstitute.Routing.Handlers.ReturnConfiguredResultHandler.Handle(ICall call)
+   at NSubstitute.Routing.Route.Handle(ICall call)
+   at NSubstitute.Core.CallRouter.Route(ICall call)
+   at NSubstitute.Proxies.CastleDynamicProxy.CastleForwardingInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at NSubstitute.Proxies.CastleDynamicProxy.ProxyIdInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at Castle.Proxies.ObjectProxy.ValidateStateAsync(String tenantId, String epochId, Int64 revision, CancellationToken cancellationToken)
+   at Hexalith.EventStore.Server.Security.InteractionOccurrenceRegistryActor.ReadAsync(String tenant) in /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs:line 96
+   at Hexalith.EventStore.Server.Security.InteractionOccurrenceRegistryActor.ReserveAsync(InteractionOccurrenceRequest request) in /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs:line 26
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.DurableUniqueReservationAndOriginalSealedRetrySurviveRestart() in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs:line 18
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="d4a092da-e23f-47aa-a98d-571668dcd02d" name="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.WriterProofIsRequiredAndBoundToOriginalReference" result="Fail" time="0.002" time-rtf="00:00:00.0020000" start-rtf="2026-10-08T14:31:19.6660643+00:00" finish-rtf="2026-10-08T14:31:19.6687699+00:00" type="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests" method="WriterProofIsRequiredAndBoundToOriginalReference" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs" source-line="29"><failure exception-type="NSubstitute.Exceptions.AmbiguousArgumentsException"><message>NSubstitute.Exceptions.AmbiguousArgumentsException : There is more than one argument of type System.String to this call.
+The call signature is (String, String, Int64, CancellationToken)
+  and was called with (String, String, Int64, CancellationToken)</message><stack-trace>   at NSubstitute.Core.CallInfo.ThrowIfMoreThanOne[T](IEnumerable`1 arguments)
+   at NSubstitute.Core.CallInfo.TryGetArg[T](Func`2 condition, T&amp; value)
+   at NSubstitute.Core.CallInfo.Arg[T]()
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceFixture.&lt;.ctor&gt;b__17_1(CallInfo call) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs:line 25
+   at NSubstitute.SubstituteExtensions.&lt;&gt;c__DisplayClass20_0`1.&lt;WrapFuncInTask&gt;b__0(CallInfo x)
+   at NSubstitute.Core.ReturnValueFromFunc`1.ReturnFor(CallInfo info)
+   at NSubstitute.Core.CallResults.ResultForCallSpec.GetResult(ICall call, ICallInfoFactory callInfoFactory)
+   at NSubstitute.Core.CallResults.TryGetResult(ICall call, Object&amp; result)
+   at NSubstitute.Routing.Handlers.ReturnConfiguredResultHandler.Handle(ICall call)
+   at NSubstitute.Routing.Route.Handle(ICall call)
+   at NSubstitute.Core.CallRouter.Route(ICall call)
+   at NSubstitute.Proxies.CastleDynamicProxy.CastleForwardingInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at NSubstitute.Proxies.CastleDynamicProxy.ProxyIdInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at Castle.Proxies.ObjectProxy.ValidateStateAsync(String tenantId, String epochId, Int64 revision, CancellationToken cancellationToken)
+   at Hexalith.EventStore.Server.Security.InteractionOccurrenceRegistryActor.ReadAsync(String tenant) in /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs:line 96
+   at Hexalith.EventStore.Server.Security.InteractionOccurrenceRegistryActor.ReserveAsync(InteractionOccurrenceRequest request) in /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs:line 26
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.WriterProofIsRequiredAndBoundToOriginalReference() in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs:line 32
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="d744e681-57f9-4545-98d9-a926773dcb34" name="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.IndependentMonotonicAnchorDeniesRollbackAndRestoredEpoch" result="Fail" time="0" time-rtf="00:00:00.0000000" start-rtf="2026-10-08T14:31:19.6689903+00:00" finish-rtf="2026-10-08T14:31:19.6703090+00:00" type="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests" method="IndependentMonotonicAnchorDeniesRollbackAndRestoredEpoch" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs" source-line="66"><failure exception-type="NSubstitute.Exceptions.AmbiguousArgumentsException"><message>NSubstitute.Exceptions.AmbiguousArgumentsException : There is more than one argument of type System.String to this call.
+The call signature is (String, String, Int64, CancellationToken)
+  and was called with (String, String, Int64, CancellationToken)</message><stack-trace>   at NSubstitute.Core.CallInfo.ThrowIfMoreThanOne[T](IEnumerable`1 arguments)
+   at NSubstitute.Core.CallInfo.TryGetArg[T](Func`2 condition, T&amp; value)
+   at NSubstitute.Core.CallInfo.Arg[T]()
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceFixture.&lt;.ctor&gt;b__17_1(CallInfo call) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs:line 25
+   at NSubstitute.SubstituteExtensions.&lt;&gt;c__DisplayClass20_0`1.&lt;WrapFuncInTask&gt;b__0(CallInfo x)
+   at NSubstitute.Core.ReturnValueFromFunc`1.ReturnFor(CallInfo info)
+   at NSubstitute.Core.CallResults.ResultForCallSpec.GetResult(ICall call, ICallInfoFactory callInfoFactory)
+   at NSubstitute.Core.CallResults.TryGetResult(ICall call, Object&amp; result)
+   at NSubstitute.Routing.Handlers.ReturnConfiguredResultHandler.Handle(ICall call)
+   at NSubstitute.Routing.Route.Handle(ICall call)
+   at NSubstitute.Core.CallRouter.Route(ICall call)
+   at NSubstitute.Proxies.CastleDynamicProxy.CastleForwardingInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at NSubstitute.Proxies.CastleDynamicProxy.ProxyIdInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at Castle.Proxies.ObjectProxy.ValidateStateAsync(String tenantId, String epochId, Int64 revision, CancellationToken cancellationToken)
+   at Hexalith.EventStore.Server.Security.InteractionOccurrenceRegistryActor.ReadAsync(String tenant) in /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs:line 96
+   at Hexalith.EventStore.Server.Security.InteractionOccurrenceRegistryActor.ReserveAsync(InteractionOccurrenceRequest request) in /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs:line 26
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.IndependentMonotonicAnchorDeniesRollbackAndRestoredEpoch() in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs:line 69
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="afbe7241-001f-41ce-8836-cc8b24f4e4e2" name="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.MissingOrWithdrawnAuthorityFailsClosed" result="Fail" time="0.003" time-rtf="00:00:00.0030000" start-rtf="2026-10-08T14:31:19.6704372+00:00" finish-rtf="2026-10-08T14:31:19.6742622+00:00" type="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests" method="MissingOrWithdrawnAuthorityFailsClosed" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs" source-line="78"><failure exception-type="NSubstitute.Exceptions.AmbiguousArgumentsException"><message>NSubstitute.Exceptions.AmbiguousArgumentsException : There is more than one argument of type System.String to this call.
+The call signature is (String, String, Int64, CancellationToken)
+  and was called with (String, String, Int64, CancellationToken)</message><stack-trace>   at NSubstitute.Core.CallInfo.ThrowIfMoreThanOne[T](IEnumerable`1 arguments)
+   at NSubstitute.Core.CallInfo.TryGetArg[T](Func`2 condition, T&amp; value)
+   at NSubstitute.Core.CallInfo.Arg[T]()
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceFixture.&lt;.ctor&gt;b__17_1(CallInfo call) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs:line 25
+   at NSubstitute.SubstituteExtensions.&lt;&gt;c__DisplayClass20_0`1.&lt;WrapFuncInTask&gt;b__0(CallInfo x)
+   at NSubstitute.Core.ReturnValueFromFunc`1.ReturnFor(CallInfo info)
+   at NSubstitute.Core.CallResults.ResultForCallSpec.GetResult(ICall call, ICallInfoFactory callInfoFactory)
+   at NSubstitute.Core.CallResults.TryGetResult(ICall call, Object&amp; result)
+   at NSubstitute.Routing.Handlers.ReturnConfiguredResultHandler.Handle(ICall call)
+   at NSubstitute.Routing.Route.Handle(ICall call)
+   at NSubstitute.Core.CallRouter.Route(ICall call)
+   at NSubstitute.Proxies.CastleDynamicProxy.CastleForwardingInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at NSubstitute.Proxies.CastleDynamicProxy.ProxyIdInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at Castle.Proxies.ObjectProxy.ValidateStateAsync(String tenantId, String epochId, Int64 revision, CancellationToken cancellationToken)
+   at Hexalith.EventStore.Server.Security.InteractionOccurrenceRegistryActor.ReadAsync(String tenant) in /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs:line 96
+   at Hexalith.EventStore.Server.Security.InteractionOccurrenceRegistryActor.ReserveAsync(InteractionOccurrenceRequest request) in /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs:line 26
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.MissingOrWithdrawnAuthorityFailsClosed() in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs:line 83
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="c2ee570c-c141-470f-8739-9bc4bd7f162a" name="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.FailedOrLostAckReservationNeverUsesStagedCache(commitBeforeFault: False)" result="Fail" time="0.061" time-rtf="00:00:00.0610000" start-rtf="2026-10-08T14:31:19.6796169+00:00" finish-rtf="2026-10-08T14:31:19.7437277+00:00" type="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests" method="FailedOrLostAckReservationNeverUsesStagedCache" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs" source-line="89"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `InteractionOccurrenceFixture.Create(manager, f.Authority).ReserveAsync(request)`
+    should throw
+System.Net.Http.HttpRequestException
+    but threw
+NSubstitute.Exceptions.AmbiguousArgumentsException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.FailedOrLostAckReservationNeverUsesStagedCache(Boolean commitBeforeFault) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs:line 99
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="4eec1af5-266a-425f-97b0-af627845b341" name="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.FailedOrLostAckReservationNeverUsesStagedCache(commitBeforeFault: True)" result="Fail" time="0.002" time-rtf="00:00:00.0020000" start-rtf="2026-10-08T14:31:19.7441876+00:00" finish-rtf="2026-10-08T14:31:19.7469032+00:00" type="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests" method="FailedOrLostAckReservationNeverUsesStagedCache" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs" source-line="89"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `InteractionOccurrenceFixture.Create(manager, f.Authority).ReserveAsync(request)`
+    should throw
+System.Net.Http.HttpRequestException
+    but threw
+NSubstitute.Exceptions.AmbiguousArgumentsException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.FailedOrLostAckReservationNeverUsesStagedCache(Boolean commitBeforeFault) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs:line 99
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="57fd6315-4f5a-410e-a89b-5881cc4040b3" name="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.CollisionAndChangedIntentCannotAuthorizeEncryption" result="Fail" time="0" time-rtf="00:00:00.0000000" start-rtf="2026-10-08T14:31:19.7487699+00:00" finish-rtf="2026-10-08T14:31:19.7500802+00:00" type="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests" method="CollisionAndChangedIntentCannotAuthorizeEncryption" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs" source-line="42"><failure exception-type="NSubstitute.Exceptions.AmbiguousArgumentsException"><message>NSubstitute.Exceptions.AmbiguousArgumentsException : There is more than one argument of type System.String to this call.
+The call signature is (String, String, Int64, CancellationToken)
+  and was called with (String, String, Int64, CancellationToken)</message><stack-trace>   at NSubstitute.Core.CallInfo.ThrowIfMoreThanOne[T](IEnumerable`1 arguments)
+   at NSubstitute.Core.CallInfo.TryGetArg[T](Func`2 condition, T&amp; value)
+   at NSubstitute.Core.CallInfo.Arg[T]()
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceFixture.&lt;.ctor&gt;b__17_1(CallInfo call) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs:line 25
+   at NSubstitute.SubstituteExtensions.&lt;&gt;c__DisplayClass20_0`1.&lt;WrapFuncInTask&gt;b__0(CallInfo x)
+   at NSubstitute.Core.ReturnValueFromFunc`1.ReturnFor(CallInfo info)
+   at NSubstitute.Core.CallResults.ResultForCallSpec.GetResult(ICall call, ICallInfoFactory callInfoFactory)
+   at NSubstitute.Core.CallResults.TryGetResult(ICall call, Object&amp; result)
+   at NSubstitute.Routing.Handlers.ReturnConfiguredResultHandler.Handle(ICall call)
+   at NSubstitute.Routing.Route.Handle(ICall call)
+   at NSubstitute.Core.CallRouter.Route(ICall call)
+   at NSubstitute.Proxies.CastleDynamicProxy.CastleForwardingInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at NSubstitute.Proxies.CastleDynamicProxy.ProxyIdInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at Castle.Proxies.ObjectProxy.ValidateStateAsync(String tenantId, String epochId, Int64 revision, CancellationToken cancellationToken)
+   at Hexalith.EventStore.Server.Security.InteractionOccurrenceRegistryActor.ReadAsync(String tenant) in /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs:line 96
+   at Hexalith.EventStore.Server.Security.InteractionOccurrenceRegistryActor.ReserveAsync(InteractionOccurrenceRequest request) in /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs:line 26
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.CollisionAndChangedIntentCannotAuthorizeEncryption() in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs:line 45
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="19fd4fbf-deb3-4c86-8dbb-4ceee298ce08" name="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.AbortedAttemptNeverReusesReferenceAndRequiresGapFreeSuccessor" result="Fail" time="0" time-rtf="00:00:00.0000000" start-rtf="2026-10-08T14:31:19.7503241+00:00" finish-rtf="2026-10-08T14:31:19.7515033+00:00" type="Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests" method="AbortedAttemptNeverReusesReferenceAndRequiresGapFreeSuccessor" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs" source-line="53"><failure exception-type="NSubstitute.Exceptions.AmbiguousArgumentsException"><message>NSubstitute.Exceptions.AmbiguousArgumentsException : There is more than one argument of type System.String to this call.
+The call signature is (String, String, Int64, CancellationToken)
+  and was called with (String, String, Int64, CancellationToken)</message><stack-trace>   at NSubstitute.Core.CallInfo.ThrowIfMoreThanOne[T](IEnumerable`1 arguments)
+   at NSubstitute.Core.CallInfo.TryGetArg[T](Func`2 condition, T&amp; value)
+   at NSubstitute.Core.CallInfo.Arg[T]()
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceFixture.&lt;.ctor&gt;b__17_1(CallInfo call) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs:line 25
+   at NSubstitute.SubstituteExtensions.&lt;&gt;c__DisplayClass20_0`1.&lt;WrapFuncInTask&gt;b__0(CallInfo x)
+   at NSubstitute.Core.ReturnValueFromFunc`1.ReturnFor(CallInfo info)
+   at NSubstitute.Core.CallResults.ResultForCallSpec.GetResult(ICall call, ICallInfoFactory callInfoFactory)
+   at NSubstitute.Core.CallResults.TryGetResult(ICall call, Object&amp; result)
+   at NSubstitute.Routing.Handlers.ReturnConfiguredResultHandler.Handle(ICall call)
+   at NSubstitute.Routing.Route.Handle(ICall call)
+   at NSubstitute.Core.CallRouter.Route(ICall call)
+   at NSubstitute.Proxies.CastleDynamicProxy.CastleForwardingInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at NSubstitute.Proxies.CastleDynamicProxy.ProxyIdInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at Castle.Proxies.ObjectProxy.ValidateStateAsync(String tenantId, String epochId, Int64 revision, CancellationToken cancellationToken)
+   at Hexalith.EventStore.Server.Security.InteractionOccurrenceRegistryActor.ReadAsync(String tenant) in /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs:line 96
+   at Hexalith.EventStore.Server.Security.InteractionOccurrenceRegistryActor.ReserveAsync(InteractionOccurrenceRequest request) in /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs:line 26
+   at Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.AbortedAttemptNeverReusesReferenceAndRequiresGapFreeSuccessor() in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs:line 56
+--- End of stack trace from previous location ---</stack-trace></failure></test></collection></assembly></assemblies>

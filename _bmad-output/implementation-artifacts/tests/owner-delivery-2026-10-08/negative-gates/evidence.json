@@ -1,0 +1,166 @@
+{
+  "meaning": "Actual verifier invocations with child-dotnet sentinel; required unavailable/full and invalid modes refused without build/live calls. Real dotnet exec starts the PowerShell tool itself, as identified separately.",
+  "cases": [
+    {
+      "name": "parties-live",
+      "workingDirectory": "/home/administrator/projects/hexalith/parties",
+      "arguments": [
+        "/home/administrator/.dotnet/dotnet",
+        "exec",
+        "/home/administrator/.dotnet/tools/.store/powershell/7.6.2/powershell/7.6.2/tools/net10.0/any/unix/pwsh.dll",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-parties-1.ps1",
+        "-Mode",
+        "Live",
+        "-EvidenceDirectory",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/negative-gates/parties-live"
+      ],
+      "exitCode": 1,
+      "dotnetChildInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/negative-gates/parties-live.log"
+    },
+    {
+      "name": "conversations-live",
+      "workingDirectory": "/home/administrator/projects/hexalith/conversations",
+      "arguments": [
+        "/home/administrator/.dotnet/dotnet",
+        "exec",
+        "/home/administrator/.dotnet/tools/.store/powershell/7.6.2/powershell/7.6.2/tools/net10.0/any/unix/pwsh.dll",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-conv-ai-1.ps1",
+        "-Mode",
+        "Live"
+      ],
+      "exitCode": 1,
+      "dotnetChildInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/negative-gates/conversations-live.log"
+    },
+    {
+      "name": "custody-default",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "arguments": [
+        "/home/administrator/.dotnet/dotnet",
+        "exec",
+        "/home/administrator/.dotnet/tools/.store/powershell/7.6.2/powershell/7.6.2/tools/net10.0/any/unix/pwsh.dll",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-secrets-1.ps1"
+      ],
+      "exitCode": 1,
+      "dotnetChildInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/negative-gates/custody-default.log"
+    },
+    {
+      "name": "custody-live",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "arguments": [
+        "/home/administrator/.dotnet/dotnet",
+        "exec",
+        "/home/administrator/.dotnet/tools/.store/powershell/7.6.2/powershell/7.6.2/tools/net10.0/any/unix/pwsh.dll",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-secrets-1.ps1",
+        "-Mode",
+        "Live"
+      ],
+      "exitCode": 1,
+      "dotnetChildInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/negative-gates/custody-live.log"
+    },
+    {
+      "name": "custody-invalid",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "arguments": [
+        "/home/administrator/.dotnet/dotnet",
+        "exec",
+        "/home/administrator/.dotnet/tools/.store/powershell/7.6.2/powershell/7.6.2/tools/net10.0/any/unix/pwsh.dll",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-secrets-1.ps1",
+        "-Mode",
+        "Invalid"
+      ],
+      "exitCode": 1,
+      "dotnetChildInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/negative-gates/custody-invalid.log"
+    },
+    {
+      "name": "host-default",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "arguments": [
+        "bash",
+        "eng/verify-agents-host.sh"
+      ],
+      "exitCode": 1,
+      "dotnetChildInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/negative-gates/host-default.log"
+    },
+    {
+      "name": "host-full",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "arguments": [
+        "bash",
+        "eng/verify-agents-host.sh",
+        "--mode",
+        "Full"
+      ],
+      "exitCode": 1,
+      "dotnetChildInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/negative-gates/host-full.log"
+    },
+    {
+      "name": "host-invalid",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "arguments": [
+        "bash",
+        "eng/verify-agents-host.sh",
+        "--mode",
+        "Live"
+      ],
+      "exitCode": 1,
+      "dotnetChildInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/negative-gates/host-invalid.log"
+    },
+    {
+      "name": "host-missing-mode",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "arguments": [
+        "bash",
+        "eng/verify-agents-host.sh",
+        "--mode"
+      ],
+      "exitCode": 1,
+      "dotnetChildInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/negative-gates/host-missing-mode.log"
+    },
+    {
+      "name": "host-empty-artifacts",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "arguments": [
+        "bash",
+        "eng/verify-agents-host.sh",
+        "--mode",
+        "LocalScaffold",
+        "--artifacts-path",
+        ""
+      ],
+      "exitCode": 1,
+      "dotnetChildInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/negative-gates/host-empty-artifacts.log"
+    },
+    {
+      "name": "host-unknown-argument",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "arguments": [
+        "bash",
+        "eng/verify-agents-host.sh",
+        "--unknown"
+      ],
+      "exitCode": 1,
+      "dotnetChildInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/negative-gates/host-unknown-argument.log"
+    }
+  ]
+}

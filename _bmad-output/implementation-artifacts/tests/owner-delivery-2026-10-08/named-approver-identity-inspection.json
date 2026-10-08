@@ -1,0 +1,35 @@
+{
+  "capturedUtc": "2026-10-08T16:16:44.670596+00:00",
+  "scope": "Read-only existing public repository owner identity references; not production application identity or approval issuer qualification",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/platform/.github/CODEOWNERS",
+      "sha256": "2b338e90f00d9d29582065320a7a7d38bd68e7b33598516d894be9d966eefc21"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/eng/repository-controls/desired-state.json",
+      "sha256": "c90a2660fedf6533f102469a87a25abe54aa7703190d5c287bf7132d8554cf74"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/docs/release-evidence/preservation-traceability-manifest-v3-owner-approval.json",
+      "sha256": "23e07e8339d8822c35ef665d44a60238e237c4c29e37560d6f475585dd27df5a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/docs/release-evidence/conformance-oracle-tiering-approvals-v2.json",
+      "sha256": "314d2341525fe9e8cae4fd9c66ad453d78597c39819bfd04e8e4a0f5b7c51700"
+    }
+  ],
+  "observations": {
+    "repositoryIdentity": {
+      "login": "jpiquot",
+      "githubUserId": 6775094
+    },
+    "conversationsOwnerReference": {
+      "displayName": "Jérôme Piquot",
+      "stableExternalIdentifier": null,
+      "externalIdentityVerification": "not-performed"
+    },
+    "conformanceQualityOwner": "Jerome Piquot"
+  },
+  "limits": "No stable application actor/Party binding or independent issuer profile was established. No Secret objects, keys, credential values or runtime authority grants were read/created."
+}

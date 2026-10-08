@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><OutputType>Exe</OutputType><IsPackable>false</IsPackable><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup>
+<ItemGroup><FrameworkReference Include="Microsoft.AspNetCore.App"/><ProjectReference Include="/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Hexalith.EventStore.Contracts.csproj"/></ItemGroup>
+<ItemGroup><PackageReference Include="Dapr.Actors"/><PackageReference Include="xunit.v3"/><PackageReference Include="Shouldly"/><PackageReference Include="NSubstitute"/><Using Include="Xunit"/></ItemGroup>
+<ItemGroup><Compile Include="/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumption*.cs"/><Compile Include="/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumption*.cs"/><Compile Include="/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IAtomicDeletionManifestProvider.cs"/><Compile Include="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumption*.cs"/><Compile Include="/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Testing/Fakes/InMemoryStateManager.cs"/></ItemGroup>
+</Project>

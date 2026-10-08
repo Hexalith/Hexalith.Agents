@@ -1,0 +1,205 @@
+{
+  "observed_at_utc": "2026-10-08T09:02:00.149168+00:00",
+  "spec_sha256": "5b1de576274f93a464322c18ee977e8bc4d489c2b8569a64986de3c4fc5304b1",
+  "frozen_sha256": "4274a26ce87edaad0fc45b03637b08ac281f90ba6e4534174943688911f98b39",
+  "tasks_acceptance_sha256": "7dec60af75ad5153e4d8c07098badce992d68e3259ec99578592cb71865ea657",
+  "gate_files": {
+    "_bmad-output/planning-artifacts/external-dependency-register.md": "7b5c24fc10db943be744ba579f96a44d9488f8f2ebc8cd8929ead73a2b6424e1",
+    "_bmad-output/implementation-artifacts/sprint-status.yaml": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+    "_bmad-output/implementation-artifacts/story-5-4-owner-commitments-2026-10-07.md": "27f66a256a3c529fbfc81f1c871c293d68c64781eef5505197eec45f29280c48",
+    "_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md": "b5a9e56d6c97c09c70ff4e4f81e8db13dee2b57b0b92b078df77e450d8b71415"
+  },
+  "repositories": {
+    "/home/administrator/projects/hexalith/agents": {
+      "head": "f0d6e0ff5a20f674c3ad78d4a5a6dac7885db18a",
+      "status": "## main...origin/main\n M _bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md\n?? _bmad-output/implementation-artifacts/story-5-4-build-entry-recheck-2026-10-08.md",
+      "git_stderr": ""
+    },
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties": {
+      "head": "28fff255a18a7de540631c792034a8df5a33c980",
+      "status": "## main...origin/main",
+      "git_stderr": ""
+    },
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Tenants": {
+      "head": "86aa888301b40cda12b000f68d9292d53cd93efe",
+      "status": "## main...origin/main",
+      "git_stderr": ""
+    },
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations": {
+      "head": "b3a813b0ba0020a558a3779e4e88b65612850e82",
+      "status": "## main...origin/main",
+      "git_stderr": ""
+    },
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform": {
+      "head": "fd5db04d48423bc30f5a5e141a9019fede5d736f",
+      "status": "## main...origin/main",
+      "git_stderr": ""
+    },
+    "/home/administrator/projects/hexalith/parties": {
+      "head": "28fff255a18a7de540631c792034a8df5a33c980",
+      "status": "## main...origin/main\n M _bmad-output/implementation-artifacts/ext-parties-1-implementation-notes.md\n M _bmad-output/implementation-artifacts/spec-ext-parties-1-branch-b-authoritative-identity.md\n M _bmad-output/implementation-artifacts/spec-unblock-eventstore-api-publication.md\n M _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/results.json\n M eng/verify-ext-parties-1.ps1\n M references/Hexalith.EventStore\n M src/Hexalith.Parties.AdminPortal/Components/ConsentManagementPanel.razor\n M src/Hexalith.Parties.AdminPortal/Components/CreateEditPartyPage.razor\n M src/Hexalith.Parties.AdminPortal/Components/PartiesAdminPortal.razor\n M src/Hexalith.Parties.AdminPortal/Components/PartiesAdminPortal.razor.css\n M src/Hexalith.Parties.AdminPortal/Components/PartyGdprOperationsPanel.razor\n M src/Hexalith.Parties.AdminPortal/wwwroot/party-form-picker.js\n M src/Hexalith.Parties.UI/Components/App.razor\n M tests/Hexalith.Parties.AdminPortal.Tests/Components/PartiesAdminPortalComponentTests.cs\n M tests/e2e/specs/admin-parties-list.spec.ts\n M tests/e2e/specs/party-picker.spec.ts\n M tests/e2e/specs/shared-portal-display-formatters.spec.ts\n?? _bmad-output/implementation-artifacts/tests/branch-b-resume-2026-10-08/platform-custody/\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/full-ci-success.json\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/next-full-ci-success.json\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/next-sidecar-security-ci.json\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/release-evidence/\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/release-success.json\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/release-v3.117.0.json\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/sidecar-security-ci.json\n?? src/Hexalith.Parties.AdminPortal/wwwroot/portal-dropdowns.js\n?? src/Hexalith.Parties.UI/wwwroot/admin-privacy-export.js",
+      "git_stderr": ""
+    },
+    "/home/administrator/projects/hexalith/tenants": {
+      "head": "94c6a89c01bedce23cbeacfae5dae3b4c49cd2fa",
+      "status": "## main...origin/main [ahead 3]\n m references/Hexalith.FrontComposer\n M tests/Hexalith.Tenants.UI.Tests/Components/TenantListSurfaceTests.cs\n M tests/Hexalith.Tenants.UI.Tests/TenantsWorkspaceTests.cs",
+      "git_stderr": ""
+    },
+    "/home/administrator/projects/hexalith/conversations": {
+      "head": "b3a813b0ba0020a558a3779e4e88b65612850e82",
+      "status": "## main...origin/main\n M _bmad-output/implementation-artifacts/spec-9-2-make-the-portable-tier-structural-and-prove-complete-monotonic-tier-execution.md\n M _bmad-output/implementation-artifacts/spec-v17-implementation-hold-decision-authority.md\n M _bmad-output/implementation-artifacts/spec-v21-review-current-policy-disposition.md\n M _bmad-output/implementation-artifacts/sprint-status.yaml\n M docs/runbooks/v21-review-disposition.md",
+      "git_stderr": ""
+    },
+    "/home/administrator/projects/hexalith/platform": {
+      "head": "f043a2f242762233091abdaa5bbe1ab777bd0f12",
+      "status": "## main...origin/main\n M _bmad-output/implementation-artifacts/deferred-work.md\nMM _bmad-output/implementation-artifacts/spec-1-1-validate-module-declarations.md\nM  _bmad-output/implementation-artifacts/sprint-status.yaml\n m references/Hexalith.Builds",
+      "git_stderr": "warning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files\n"
+    }
+  },
+  "dependency_records": {
+    "EXT-PARTIES-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Parties Maintainer",
+      "Repository": "`Hexalith.Parties`",
+      "TargetVersionOrCommit": "`TBD`",
+      "TargetIntegrationDate": "`TBD`",
+      "AcceptedStatus": "`Uncommitted`",
+      "complete_verification_command": "TBD"
+    },
+    "EXT-CONV-AI-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Conversations Maintainer",
+      "Repository": "`Hexalith.Conversations`",
+      "TargetVersionOrCommit": "`TBD`",
+      "TargetIntegrationDate": "`TBD`",
+      "AcceptedStatus": "`Uncommitted`",
+      "complete_verification_command": "TBD"
+    },
+    "EXT-SECRETS-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Platform Maintainer",
+      "Repository": "`Hexalith.Platform`",
+      "TargetVersionOrCommit": "`TBD`",
+      "TargetIntegrationDate": "`TBD`",
+      "AcceptedStatus": "`Uncommitted`",
+      "complete_verification_command": "TBD"
+    },
+    "EXT-HOST-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Platform Maintainer",
+      "Repository": "`Hexalith.Platform`",
+      "TargetVersionOrCommit": "`TBD`",
+      "TargetIntegrationDate": "`TBD`",
+      "AcceptedStatus": "`Uncommitted`",
+      "complete_verification_command": "TBD"
+    }
+  },
+  "selected_source_sha256": {
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/src/Hexalith.Parties/Domain/PartyDomainProcessor.cs": "f88a5c782a5055d2476acf76565424e95642dacc1cc5bb600cf17cfab9bb5ee5",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/src/Hexalith.Parties/Queries/PartyIdentitySourceFold.cs": "dd73d29bf327506bf9bdf846d8e202ce3ef07fb149944799759c461c64608120",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs": "73342fcff1a19186340549cc8740eb34b7f2f313e376065b8e370299ebbdec5f",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/src/Hexalith.Parties/Queries/PartyIdentityQueryDeadline.cs": "ce91ab42c8ef445a6955975582ca16f27826522d5c09085c238bcb66de3e809b",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/eng/verify-ext-parties-1.ps1": "20e26ff57715d4a6915f98cb3bcde199215cccb428cbdf4ffd12caeb17aec36e",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Tenants/src/Hexalith.Tenants.Client/Handlers/TenantProjectionEventHandler.cs": "d8b6261fd71962f16e44d4ccbbb46ace98f0d041149226ecbc8a6a4d3b156e3b",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Tenants/src/Hexalith.Tenants/Authorization/TenantsGlobalAdministratorVerifier.cs": "03c3a6d90ee14b92bf9d5ef4e7ca6e773f9a74a65313b361c11851803824f81c",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations/src/Hexalith.Conversations/Aggregates/ConversationAggregate.Agents.cs": "6b8019124caf8ea874db3f9d175b4e6f134b386daad0efd78a0efdec594ca23b",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations/src/Hexalith.Conversations/State/ConversationState.Agents.cs": "08cccffd00e141281ea804520e0e03bf9bb3ffd329ef87241aaa54d9eb1d8d36",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations/eng/verify-ext-conv-ai-1.ps1": "9751e10bee34fecaed266d565d98abf20175e8864ef16c2d49ecf06de9c5be59",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/apphost.cs": "7c140eb97bbc45e6ab0589ba3f186ea8eccc623bac9f8850bf2b42aadf136f9a",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/eng/verify-ext-secrets-1.ps1": "5c205ce0c82539786a14774454bd11ff0952d1168bf918626d71a6a722377726",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/eng/verify-agents-host.sh": "dd65e6a86a28315b8d22298e9e654e1c27426de1640ebcb698d539b4f43b3fb2",
+    "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs": "de60dde13e947de701529bc753a58fda983bff4d65a601725b27c22ce9dc30cf",
+    "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs": "288f1d82a12febd22bf491621b9fc15413c1f0d074de8df21271492398124a9b",
+    "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Ports/DeferredTenantAccessReader.cs": "90449cf30e1b83073c8faf057f9e9dd68590687d6291a7d22e9663af63e76edc",
+    "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Ports/DeferredApproverPolicyResolver.cs": "df85401c03e22825838424eb3bb025539bb4cb895c464fee03e43056e252561e",
+    "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Application/Queries/AgentSetupQueryHandlerBase.cs": "159030316c3cf7e5db615c7323093d642b8dc799c66d9054144cb74a4b75fd82",
+    "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs": "f23c746367205d9dc65335e343570911da3d9e1290a5e7443777b9088d4b763e",
+    "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Application/Agents/ApproverPolicyVerdict.cs": "7d302890259f3ddb86b1be1f351b07b1e859e7020022b7f86afb13c46b18b993",
+    "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs": "db1e6db6d408762bc139af820faf73f0d8e37e6380ff2f334e55a9779cf5827f",
+    "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryCleanup.cs": "459bf37506ff2c5a3de43ced6e93b93f64abc14e2736e3f462044a7f6ff3c79a",
+    "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformCustodyServiceCollectionExtensions.cs": "564f7715fa04df908c1b49d0598a3eb9ca374c37338bd13d6c22d56cb0bf09f8",
+    "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj": "fb859c5efd25057f468faf592cdba587635c18cdec3bc93e3c40f6e537b586d2",
+    "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-1.ps1": "57fe2b64c9467dfdae1a3a2d86d63752967f8ac5f0004dc77b52900068f80d46"
+  },
+  "workflow_state": {
+    "spec_status": "'draft'",
+    "human_approval": "'accepted'",
+    "implementation_entry": "'blocked-external-commitments'",
+    "story_status": "backlog",
+    "story_verifier_exists": false
+  },
+  "workflow": "bmad-build",
+  "workflow_step": "step-02-plan",
+  "story_key": "5-4-prove-trusted-principal-tenant-party-and-approver-readiness",
+  "evidence_kind": "ReadOnlySourceAndEntryGateInspection",
+  "fresh_tests_run": false,
+  "live_seams_executed": false,
+  "production_qualification": false,
+  "independent_investigations": [
+    "identity_entry_check",
+    "conversations_entry_check",
+    "platform_entry_check"
+  ],
+  "before": {
+    "spec_sha256": "d182cf15d736e0bac1e47104962302f930fe48f363383bc3fb01fcf51294825a",
+    "frozen_sha256": "4274a26ce87edaad0fc45b03637b08ac281f90ba6e4534174943688911f98b39",
+    "tasks_acceptance_sha256": "7dec60af75ad5153e4d8c07098badce992d68e3259ec99578592cb71865ea657",
+    "gate_files": {
+      "_bmad-output/planning-artifacts/external-dependency-register.md": "7b5c24fc10db943be744ba579f96a44d9488f8f2ebc8cd8929ead73a2b6424e1",
+      "_bmad-output/implementation-artifacts/sprint-status.yaml": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+      "_bmad-output/implementation-artifacts/story-5-4-owner-commitments-2026-10-07.md": "27f66a256a3c529fbfc81f1c871c293d68c64781eef5505197eec45f29280c48",
+      "_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md": "b5a9e56d6c97c09c70ff4e4f81e8db13dee2b57b0b92b078df77e450d8b71415"
+    },
+    "repositories": {
+      "/home/administrator/projects/hexalith/agents": {
+        "head": "f0d6e0ff5a20f674c3ad78d4a5a6dac7885db18a",
+        "status": "## main...origin/main",
+        "git_stderr": ""
+      },
+      "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties": {
+        "head": "28fff255a18a7de540631c792034a8df5a33c980",
+        "status": "## main...origin/main",
+        "git_stderr": ""
+      },
+      "/home/administrator/projects/hexalith/agents/references/Hexalith.Tenants": {
+        "head": "86aa888301b40cda12b000f68d9292d53cd93efe",
+        "status": "## main...origin/main",
+        "git_stderr": ""
+      },
+      "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations": {
+        "head": "b3a813b0ba0020a558a3779e4e88b65612850e82",
+        "status": "## main...origin/main",
+        "git_stderr": ""
+      },
+      "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform": {
+        "head": "fd5db04d48423bc30f5a5e141a9019fede5d736f",
+        "status": "## main...origin/main",
+        "git_stderr": ""
+      },
+      "/home/administrator/projects/hexalith/parties": {
+        "head": "28fff255a18a7de540631c792034a8df5a33c980",
+        "status": "## main...origin/main\n M _bmad-output/implementation-artifacts/ext-parties-1-implementation-notes.md\n M _bmad-output/implementation-artifacts/spec-ext-parties-1-branch-b-authoritative-identity.md\n M _bmad-output/implementation-artifacts/spec-unblock-eventstore-api-publication.md\n M _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/results.json\n M eng/verify-ext-parties-1.ps1\n M references/Hexalith.EventStore\n M src/Hexalith.Parties.AdminPortal/Components/ConsentManagementPanel.razor\n M src/Hexalith.Parties.AdminPortal/Components/CreateEditPartyPage.razor\n M src/Hexalith.Parties.AdminPortal/Components/PartiesAdminPortal.razor\n M src/Hexalith.Parties.AdminPortal/Components/PartiesAdminPortal.razor.css\n M src/Hexalith.Parties.AdminPortal/Components/PartyGdprOperationsPanel.razor\n M src/Hexalith.Parties.AdminPortal/wwwroot/party-form-picker.js\n M tests/Hexalith.Parties.AdminPortal.Tests/Components/PartiesAdminPortalComponentTests.cs\n M tests/e2e/specs/admin-parties-list.spec.ts\n M tests/e2e/specs/party-picker.spec.ts\n M tests/e2e/specs/shared-portal-display-formatters.spec.ts\n?? _bmad-output/implementation-artifacts/tests/branch-b-resume-2026-10-08/platform-custody/\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/full-ci-success.json\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/next-full-ci-success.json\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/next-sidecar-security-ci.json\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/release-evidence/\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/release-success.json\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/release-v3.117.0.json\n?? _bmad-output/implementation-artifacts/tests/eventstore-ci-unblock-2026-10-08/sidecar-security-ci.json\n?? src/Hexalith.Parties.AdminPortal/wwwroot/portal-dropdowns.js",
+        "git_stderr": ""
+      },
+      "/home/administrator/projects/hexalith/tenants": {
+        "head": "94c6a89c01bedce23cbeacfae5dae3b4c49cd2fa",
+        "status": "## main...origin/main [ahead 3]",
+        "git_stderr": ""
+      },
+      "/home/administrator/projects/hexalith/conversations": {
+        "head": "b3a813b0ba0020a558a3779e4e88b65612850e82",
+        "status": "## main...origin/main\n M _bmad-output/implementation-artifacts/spec-9-2-make-the-portable-tier-structural-and-prove-complete-monotonic-tier-execution.md\n M _bmad-output/implementation-artifacts/spec-v17-implementation-hold-decision-authority.md\n M _bmad-output/implementation-artifacts/spec-v21-review-current-policy-disposition.md\n M _bmad-output/implementation-artifacts/sprint-status.yaml\n M docs/runbooks/v21-review-disposition.md",
+        "git_stderr": ""
+      },
+      "/home/administrator/projects/hexalith/platform": {
+        "head": "f043a2f242762233091abdaa5bbe1ab777bd0f12",
+        "status": "## main...origin/main\n M _bmad-output/implementation-artifacts/deferred-work.md\nMM _bmad-output/implementation-artifacts/spec-1-1-validate-module-declarations.md\nM  _bmad-output/implementation-artifacts/sprint-status.yaml\n m references/Hexalith.Builds",
+        "git_stderr": "warning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files\n"
+      }
+    }
+  },
+  "preservation_checks": {
+    "frozen_sha256": true,
+    "tasks_acceptance_sha256": true,
+    "gate_files": true,
+    "all_four_records_uncommitted": true,
+    "draft_approval_and_backlog": true,
+    "installed_heads_unchanged": true
+  }
+}

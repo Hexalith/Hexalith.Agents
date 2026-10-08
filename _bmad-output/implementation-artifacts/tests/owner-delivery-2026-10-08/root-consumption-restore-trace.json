@@ -1,0 +1,31 @@
+{
+  "capturedUtc": "2026-10-08T16:17:51.580727+00:00",
+  "scope": "Source tracing of restored ownership state; no physical effect or live qualification invoked",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "sha256": "07b3c93ea7149ff280d0a73c51d83896b3f48a11dff2dfe5c9647a5c60f5c74d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs",
+      "sha256": "abb4cfeec311c8b9f29124d9d1f9a9e936c0b55827ee4af2c183431fcb2eb862"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IAtomicDeletionManifestProvider.cs",
+      "sha256": "3fdcfa4cb6899213a770020e022ae40ca6514fcb9d43dcc77eeb8c925dfeffdc"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+      "sha256": "e45175a7e2e34b1107636037019222366495f7672a9e4987af78baf3d66a767f"
+    }
+  ],
+  "verifiedSourceGap": "DeletionConsumptionActor.ReadAsync shape-validates persisted ledger but has no independently installed tenant/revision/safe-state-digest anchor. Earlier registered Unconsumed state restored after accepted AdmissionIntegrity block reaches fresh ReserveAndConsume with still-valid dispatch/private-method proofs. Physical provider contract preserves destruction outcomes, not the missing unconsumed admission block.",
+  "trace": [
+    "Register exact batch; preserve committed Unconsumed snapshot",
+    "Commit AdmissionIntegrity block at owner",
+    "Restore preserved earlier shape-valid snapshot",
+    "Current private-method authorization and original committed dispatch proof remain valid",
+    "ReserveAndConsume sees Unconsumed and constructs a new reservation before physical Consume"
+  ],
+  "requestedCorrection": "Independently validate installed exact state and conditionally advance anchor before persistence; test lower-revision and equal-revision divergent restores, no new effect, and retained original outcomes. Missing qualification remains unavailable."
+}

@@ -1,0 +1,1075 @@
+--- a/conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentSourceReader.cs
++++ b/conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentSourceReader.cs
+@@ -91,8 +91,8 @@
+             {
+                 cancellationToken.ThrowIfCancellationRequested();
+                 if (item is null || item.Payload is null
+-                    || item.ProtectionMetadata is { } metadata && (metadata.State != PayloadProtectionState.Unprotected
+-                        || metadata.MetadataVersion != EventStorePayloadProtectionMetadata.CurrentMetadataVersion) || string.IsNullOrWhiteSpace(item.MessageId) || item.SequenceNumber != records.Count + 1 || item.MetadataVersion != 1
++                    || item.ProtectionMetadata is { } metadata && (metadata.State is not (PayloadProtectionState.Unprotected or PayloadProtectionState.Protected)
++                        || !EventStorePayloadProtectionMetadataCarrier.TryValidate(metadata, out _)) || string.IsNullOrWhiteSpace(item.MessageId) || item.SequenceNumber != records.Count + 1 || item.MetadataVersion != 1
+                     || !string.Equals(item.SerializationFormat, "json", StringComparison.OrdinalIgnoreCase)
+                     || !EventTypes.TryGetValue(item.EventTypeName, out Type? type))
+                 {
+@@ -107,7 +107,7 @@
+                 records.Add(new(item.SequenceNumber, value));
+             }
+             cancellationToken.ThrowIfCancellationRequested();
+-            ConversationReplayResult replay = ConversationReplayVerifier.Replay(tenant, conversation, records);
++            ConversationReplayResult replay = ConversationReplayVerifier.Replay(tenant, conversation, CancellationChecked(records, cancellationToken));
+             cancellationToken.ThrowIfCancellationRequested();
+             return replay.State is { HasCompleteEventPrefix: true } state && state.SourceRevision == source.Head
+                 ? (source, state) : null;
+@@ -117,4 +117,18 @@
+             return null;
+         }
+     }
++
++    private static IEnumerable<ConversationReplayEventRecord> CancellationChecked(IEnumerable<ConversationReplayEventRecord> records,
++        CancellationToken cancellationToken)
++    {
++        using var iterator = records.GetEnumerator();
++        while (true)
++        {
++            cancellationToken.ThrowIfCancellationRequested();
++            if (!iterator.MoveNext()) { yield break; }
++            cancellationToken.ThrowIfCancellationRequested();
++            yield return iterator.Current;
++        }
++    }
++
+ }
+--- a/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentSixSeamTests.cs
++++ b/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentSixSeamTests.cs
+@@ -4,6 +4,8 @@
+ // </copyright>
+ 
+ using System.Text.Json;
++using System.Reflection;
++using Hexalith.Conversations.Replay;
+ using Hexalith.Conversations.Aggregates;
+ using Hexalith.Conversations.Commands;
+ using Hexalith.Conversations.Contracts.Agents;
+@@ -401,15 +403,19 @@
+         }
+     }
+ 
+-    /// <summary>Supported plaintext metadata preserves existing complete source behavior.</summary>
+-    [Fact]
+-    public async Task SupportedPlaintextMetadata_PreservesMembershipEvidence()
++    /// <summary>Readable plaintext and gateway-unprotected Protected provenance preserve complete source behavior.</summary>
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task SupportedReadableMetadata_PreservesMembershipEvidence(bool protectedProvenance)
+     {
+         var f = new F();
+         f.Persist(ConversationAggregate.Handle(f.Membership, await f.ReplayAsync()));
+         f.TransformSource = source => source with
+         {
+-            Events = source.Events.Select(e => e with { ProtectionMetadata = EventStorePayloadProtectionMetadata.Unprotected() }).ToArray()
++            Events = source.Events.Select(e => e with { ProtectionMetadata = protectedProvenance
++                ? new(PayloadProtectionState.Protected, 1, "aes-gcm-256", "alias", "application/json", null)
++                : EventStorePayloadProtectionMetadata.Unprotected() }).ToArray()
+         };
+         var result = await f.Queries.ReadAsync("agents-service", new(F.Tenant, F.Conversation), TestContext.Current.CancellationToken);
+         result.Outcome.ShouldBe(ConversationAgentsOutcome.Available);
+@@ -434,6 +440,78 @@
+             new ConversationAgentSourceReader(f).ReadAsync(F.Tenant, F.Conversation, caller.Token));
+         exception.CancellationToken.ShouldBe(caller.Token);
+         visited.ShouldNotBeNull().Visited.ShouldBe(2);
++    }
++
++    /// <summary>Admission observes the original caller cancellation in prefix replay before visiting any remainder.</summary>
++    [Fact]
++    public async Task CancellationDuringAdmissionReplay_StopsBeforeRemainingEvents()
++    {
++        var f = new F();
++        f.Persist(ConversationAggregate.Handle(f.Membership, await f.ReplayAsync()));
++        f.Persist(ConversationAggregate.Handle(f.Posting, await f.ReplayAsync()));
++        var current = await f.CurrentStateAsync();
++        using var caller = new CancellationTokenSource();
++        ConversationSourceCancellationFixture? visited = null;
++        f.TransformSource = source => source with { Events = visited = new(source.Events, caller.Cancel) };
++        var exception = await Should.ThrowAsync<OperationCanceledException>(() =>
++            f.Admission.EvaluateAsync(new(new(f.Envelope(f.Membership), current)), caller.Token));
++        exception.CancellationToken.ShouldBe(caller.Token);
++        visited.ShouldNotBeNull().Visited.ShouldBe(2);
++    }
++
++    /// <summary>The existing fold stops between records through its private cancellation-aware enumeration.</summary>
++    [Fact]
++    public async Task CancellationDuringSecondFold_StopsBeforeRemainingRecords()
++    {
++        var f = new F();
++        f.Persist(ConversationAggregate.Handle(f.Membership, await f.ReplayAsync()));
++        f.Persist(ConversationAggregate.Handle(f.Posting, await f.ReplayAsync()));
++        using var caller = new CancellationTokenSource();
++        int visited = 0;
++        IEnumerable<ConversationReplayEventRecord> CancellingRecords()
++        {
++            foreach (var value in f.PersistedEvents)
++            {
++                if (++visited == 2) { caller.Cancel(); }
++                yield return new(visited, value);
++            }
++        }
++        // Exercise the private adapter with the actual verifier rather than exposing a product replay hook.
++        var method = typeof(ConversationAgentSourceReader).GetMethod("CancellationChecked", BindingFlags.Static | BindingFlags.NonPublic)!;
++        var checkedRecords = (IEnumerable<ConversationReplayEventRecord>)method.Invoke(null, [CancellingRecords(), caller.Token])!;
++        var exception = Should.Throw<OperationCanceledException>(() => ConversationReplayVerifier.Replay(F.Tenant, F.Conversation, checkedRecords));
++        exception.CancellationToken.ShouldBe(caller.Token);
++        visited.ShouldBe(2);
++    }
++
++    /// <summary>Carrier field limits and forbidden secret-shaped flags deny current evidence.</summary>
++    [Theory]
++    [InlineData("scheme-length")]
++    [InlineData("scheme-secret")]
++    [InlineData("alias-length")]
++    [InlineData("hint-control")]
++    [InlineData("flag-count")]
++    [InlineData("flag-key")]
++    [InlineData("flag-value")]
++    public async Task MalformedCurrentProtectionCarrier_DeniesEvidence(string variant)
++    {
++        var f = new F();
++        var metadata = EventStorePayloadProtectionMetadata.Unprotected();
++        metadata = variant switch
++        {
++            "scheme-length" => metadata with { Scheme = new string('a', 65) },
++            "scheme-secret" => metadata with { Scheme = "private-key" },
++            "alias-length" => metadata with { KeyAlias = new string('a', 257) },
++            "hint-control" => metadata with { ContentHint = "application/\njson" },
++            "flag-count" => metadata with { CompatibilityFlags = Enumerable.Range(0, 9).ToDictionary(x => $"flag{x}", _ => "safe") },
++            "flag-key" => metadata with { CompatibilityFlags = new Dictionary<string, string> { ["nonce"] = "safe" } },
++            _ => metadata with { CompatibilityFlags = new Dictionary<string, string> { ["mode"] = "secret" } },
++        };
++        f.TransformSource = source => source with { Events = source.Events.Select(e => e with { ProtectionMetadata = metadata }).ToArray() };
++        var result = await f.Queries.ReadAsync("agents-service", new(F.Tenant, F.Conversation), TestContext.Current.CancellationToken);
++        result.Outcome.ShouldBe(ConversationAgentsOutcome.Unavailable);
++        result.SourceRevision.ShouldBeNull();
++        result.Participants.ShouldBeNull();
+     }
+ 
+     /// <summary>Verifies current admission and sdk process query are runnable with local fixture.</summary>
+--- a/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeEventStreamReader.cs
++++ b/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeEventStreamReader.cs
+@@ -20,40 +20,44 @@
+     /// <inheritdoc/>
+     public async Task<AuthoritativeStreamReadResult> ReadAsync(AggregateIdentity identity, CancellationToken cancellationToken = default)
+     {
+-        long startedAt = timeProvider.GetTimestamp();
+-        ArgumentNullException.ThrowIfNull(identity);
+-        cancellationToken.ThrowIfCancellationRequested();
+-        TimeSpan bound = readTimeout ?? TimeSpan.FromSeconds(30);
+-        if (bound <= TimeSpan.Zero || bound > TimeSpan.FromSeconds(30))
+-        {
+-            return new(null, "source-invalid-time-bound");
+-        }
+-
+-        using var deadline = new AuthoritativeStreamReadDeadline(bound, timeProvider, cancellationToken, startedAt);
+         try
+         {
+-            AuthoritativeStreamReadResult result;
++            cancellationToken.ThrowIfCancellationRequested();
++            long startedAt = timeProvider.GetTimestamp();
++            ArgumentNullException.ThrowIfNull(identity);
++            TimeSpan bound = readTimeout ?? TimeSpan.FromSeconds(30);
++            if (bound <= TimeSpan.Zero || bound > TimeSpan.FromSeconds(30))
++            {
++                cancellationToken.ThrowIfCancellationRequested();
++                return new(null, "source-invalid-time-bound");
++            }
++
++            using var deadline = new AuthoritativeStreamReadDeadline(bound, timeProvider, cancellationToken, startedAt);
+             try
+             {
+-                result = await ReadCoreAsync(identity, deadline).ConfigureAwait(false);
+-            }
+-            catch (Exception exception) when (exception is HttpRequestException or InvalidOperationException or ArgumentException or System.Text.Json.JsonException)
+-            {
+-                result = new(null, "source-unavailable");
+-            }
+-
+-            // Every success, validation denial and provider-fault verdict observes the same
+-            // caller-first completion boundary; elapsed processing cannot release evidence.
+-            deadline.ThrowIfCancellationRequested();
+-            return result;
+-        }
+-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+-        {
+-            cancellationToken.ThrowIfCancellationRequested();
+-            return new(null, "source-time-bound-exceeded");
+-        }
+-        catch (OperationCanceledException)
+-        {
++                AuthoritativeStreamReadResult result;
++                try
++                {
++                    result = await ReadCoreAsync(identity, deadline).ConfigureAwait(false);
++                }
++                catch (Exception exception) when (exception is HttpRequestException or InvalidOperationException or ArgumentException or System.Text.Json.JsonException)
++                {
++                    result = new(null, "source-unavailable");
++                }
++
++                deadline.ThrowIfCancellationRequested();
++                return result;
++            }
++            catch (OperationCanceledException)
++            {
++                cancellationToken.ThrowIfCancellationRequested();
++                return new(null, deadline.IsExpired ? "source-time-bound-exceeded" : "source-unavailable");
++            }
++        }
++        catch (Exception)
++        {
++            // Even unexpected provider/clock/snapshot faults preserve caller-first cancellation.
++            // Without caller cancellation, unexpected faults keep their original type and identity.
+             cancellationToken.ThrowIfCancellationRequested();
+             throw;
+         }
+@@ -78,7 +82,8 @@
+             {
+                 var request = new StreamReadRequest(identity.TenantId, identity.Domain, identity.AggregateId,
+                     cursor, head, PageSize: PageSize);
+-                StreamReadPage page = await deadline.ReadAsync(token => gateway.ReadStreamAsync(request, token)).ConfigureAwait(false);
++                StreamReadPage supplied = await deadline.ReadAsync(token => gateway.ReadStreamAsync(request, token)).ConfigureAwait(false);
++                StreamReadPage page = CapturePage(supplied, request.PageSize, deadline, ref bytes);
+                 long next = StreamReadPageValidator.ValidateAndGetNextSequence(request, page);
+                 if (page.Metadata.LatestSequence != head)
+                 {
+@@ -94,28 +99,12 @@
+                 foreach (StreamReadEvent item in page.Events)
+                 {
+                     deadline.ThrowIfCancellationRequested();
+-                    if (item.SequenceNumber != ++cursor
+-                        || item.ProtectionMetadata?.State == PayloadProtectionState.ProviderOpaque)
++                    if (item.SequenceNumber != ++cursor)
+                     {
+                         return new(null, "source-gap-or-unreadable");
+                     }
+ 
+-                    bytes += item.Payload.Length;
+-                    if (bytes > MaxPayloadBytes)
+-                    {
+-                        return new(null, "source-bound-exceeded");
+-                    }
+-
+-                    events.Add(item with
+-                    {
+-                        Payload = item.Payload.ToArray(),
+-                        ProtectionMetadata = item.ProtectionMetadata is { } metadata ? metadata with
+-                        {
+-                            CompatibilityFlags = metadata.CompatibilityFlags is { } flags
+-                                ? new System.Collections.ObjectModel.ReadOnlyDictionary<string, string>(
+-                                    flags.ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal)) : null,
+-                        } : null,
+-                    });
++                    events.Add(item);
+                 }
+ 
+                 if (next != cursor || (!page.Metadata.IsTruncated && cursor != head))
+@@ -139,7 +128,9 @@
+     {
+         var request = new StreamReadRequest(identity.TenantId, identity.Domain, identity.AggregateId,
+             ToSequence: 0, PageSize: 1);
+-        StreamReadPage page = await deadline.ReadAsync(token => gateway.ReadStreamAsync(request, token)).ConfigureAwait(false);
++        StreamReadPage supplied = await deadline.ReadAsync(token => gateway.ReadStreamAsync(request, token)).ConfigureAwait(false);
++        long bytes = 0;
++        StreamReadPage page = CapturePage(supplied, request.PageSize, deadline, ref bytes);
+         _ = StreamReadPageValidator.ValidateAndGetNextSequence(request, page);
+         if (page.Events.Count != 0 || page.Metadata.IsTruncated)
+         {
+@@ -148,4 +139,83 @@
+ 
+         return page.Metadata.LatestSequence;
+     }
++
++    private static StreamReadPage CapturePage(StreamReadPage supplied, int limit, AuthoritativeStreamReadDeadline deadline, ref long bytes)
++    {
++        deadline.ThrowIfCancellationRequested();
++        ArgumentNullException.ThrowIfNull(supplied);
++        var metadata = supplied.Metadata ?? throw new InvalidOperationException("Missing page metadata.");
++        var providerEvents = supplied.Events ?? throw new InvalidOperationException("Missing page events.");
++        if (providerEvents.Count < 0 || providerEvents.Count > limit || metadata.EventCount < 0 || metadata.EventCount > limit)
++        {
++            throw new InvalidOperationException("Page event bound exceeded.");
++        }
++
++        var owned = new List<StreamReadEvent>();
++        foreach (StreamReadEvent item in providerEvents)
++        {
++            deadline.ThrowIfCancellationRequested();
++            if (owned.Count >= limit || item is null || item.Payload is null || item.Payload.Length > MaxPayloadBytes - bytes)
++            {
++                throw new InvalidOperationException("Page payload or event bound exceeded.");
++            }
++
++            byte[] payload = item.Payload.ToArray();
++            bytes += payload.Length;
++            var protection = CaptureProtection(item.ProtectionMetadata, deadline);
++            deadline.ThrowIfCancellationRequested();
++            owned.Add(item with { Payload = payload, ProtectionMetadata = protection });
++        }
++
++        deadline.ThrowIfCancellationRequested();
++        return supplied with { Metadata = metadata with { }, Events = owned.AsReadOnly() };
++    }
++
++    private static EventStorePayloadProtectionMetadata? CaptureProtection(EventStorePayloadProtectionMetadata? metadata,
++        AuthoritativeStreamReadDeadline deadline)
++    {
++        if (metadata is null) { return null; }
++        deadline.ThrowIfCancellationRequested();
++        if (metadata.Scheme?.Length > EventStorePayloadProtectionMetadata.MaxSchemeLength
++            || metadata.KeyAlias?.Length > EventStorePayloadProtectionMetadata.MaxKeyAliasLength
++            || metadata.ContentHint?.Length > EventStorePayloadProtectionMetadata.MaxContentHintLength)
++        {
++            throw new InvalidOperationException("Protection metadata field bound exceeded.");
++        }
++
++        IReadOnlyDictionary<string, string>? flags = null;
++        if (metadata.CompatibilityFlags is { } supplied)
++        {
++            if (supplied.Count < 0 || supplied.Count > EventStorePayloadProtectionMetadata.MaxCompatibilityFlagCount)
++            {
++                throw new InvalidOperationException("Protection metadata flag bound exceeded.");
++            }
++
++            var captured = new Dictionary<string, string>(StringComparer.Ordinal);
++            foreach (var pair in supplied)
++            {
++                deadline.ThrowIfCancellationRequested();
++                if (captured.Count >= EventStorePayloadProtectionMetadata.MaxCompatibilityFlagCount
++                    || pair.Key is null || pair.Key.Length > EventStorePayloadProtectionMetadata.MaxCompatibilityFlagKeyLength
++                    || pair.Value is null || pair.Value.Length > EventStorePayloadProtectionMetadata.MaxCompatibilityFlagValueLength
++                    || !captured.TryAdd(pair.Key, pair.Value))
++                {
++                    throw new InvalidOperationException("Protection metadata flag is invalid.");
++                }
++            }
++
++            flags = new System.Collections.ObjectModel.ReadOnlyDictionary<string, string>(captured);
++        }
++
++        var owned = metadata with { CompatibilityFlags = flags };
++        if (owned.State is not (PayloadProtectionState.Unprotected or PayloadProtectionState.Protected)
++            || !EventStorePayloadProtectionMetadataCarrier.TryValidate(owned, out _))
++        {
++            throw new InvalidOperationException("Protection metadata is unreadable or malformed.");
++        }
++
++        deadline.ThrowIfCancellationRequested();
++        return owned;
++    }
++
+ }
+--- a/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs
++++ b/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs
+@@ -24,6 +24,9 @@
+         _linkedSource = CancellationTokenSource.CreateLinkedTokenSource(callerToken, _timeoutSource.Token);
+     }
+ 
++    /// <summary>Distinguishes the actual whole-read budget from a provider's independent cancellation.</summary>
++    public bool IsExpired => _timeoutSource.IsCancellationRequested || _timeProvider.GetElapsedTime(_startedAt) >= _timeout;
++
+     /// <summary>Rejects caller cancellation first, then elapsed or timer-expired deadlines.</summary>
+     public void ThrowIfCancellationRequested()
+     {
+@@ -47,7 +50,7 @@
+     }
+ 
+     /// <summary>Bounds both synchronous provider invocation and its noncooperative returned task.</summary>
+-    public async Task<T> ReadAsync<T>(Func<CancellationToken, Task<T>> read)
++    public async Task<T> ReadAsync<T>(Func<CancellationToken, Task<T>> read, Action<Task<T>>? operationStarted = null)
+     {
+         ThrowIfCancellationRequested();
+         CancellationToken token = _providerSource.Token;
+@@ -56,6 +59,7 @@
+         // without ever resuming the stream read or releasing its result.
+         _ = pending.ContinueWith(static task => { _ = task.Exception; }, CancellationToken.None,
+             TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
++        operationStarted?.Invoke(pending);
+         try
+         {
+             // The query's private token has no provider callbacks. A provider may block
+--- a/eventstore/src/Hexalith.EventStore.Client/Streams/RetainedIdentityHistoryReader.cs
++++ b/eventstore/src/Hexalith.EventStore.Client/Streams/RetainedIdentityHistoryReader.cs
+@@ -18,33 +18,65 @@
+     public async Task<RetainedIdentityHistoryReadResult> ReadAsync(AggregateIdentity identity, string purpose,
+         CancellationToken cancellationToken = default)
+     {
+-        ArgumentNullException.ThrowIfNull(identity);
+-        ArgumentException.ThrowIfNullOrWhiteSpace(purpose);
+-        if (purpose != RetainedIdentityHistoryReadRequest.AttributionPurpose)
++        try
+         {
+-            return new(null, "history-purpose-denied");
++            cancellationToken.ThrowIfCancellationRequested();
++            long startedAt = _clock.GetTimestamp();
++            ArgumentNullException.ThrowIfNull(identity);
++            ArgumentException.ThrowIfNullOrWhiteSpace(purpose);
++            if (purpose != RetainedIdentityHistoryReadRequest.AttributionPurpose)
++            {
++                cancellationToken.ThrowIfCancellationRequested();
++                return new(null, "history-purpose-denied");
++            }
++
++            using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), _clock, cancellationToken, startedAt);
++            try
++            {
++                RetainedIdentityHistoryReadResult result;
++                try
++                {
++                    result = await ReadCoreAsync(new(identity, purpose), deadline).ConfigureAwait(false);
++                }
++                catch (Exception exception) when (exception is HttpRequestException or JsonException or InvalidOperationException or ArgumentException or IOException)
++                {
++                    result = new(null, "history-unavailable");
++                }
++
++                deadline.ThrowIfCancellationRequested();
++                return result;
++            }
++            catch (OperationCanceledException)
++            {
++                cancellationToken.ThrowIfCancellationRequested();
++                return new(null, deadline.IsExpired ? "history-time-bound-exceeded" : "history-unavailable");
++            }
+         }
++        catch (Exception)
++        {
++            cancellationToken.ThrowIfCancellationRequested();
++            throw;
++        }
++    }
+ 
+-        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30), _clock);
+-        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
++    private async Task<RetainedIdentityHistoryReadResult> ReadCoreAsync(RetainedIdentityHistoryReadRequest request,
++        AuthoritativeStreamReadDeadline deadline)
++    {
+         HttpRequestMessage? message = null;
+         HttpResponseMessage? response = null;
+         Stream? body = null;
+         Task? pendingOperation = null;
+         try
+         {
+-            deadline.Token.ThrowIfCancellationRequested();
+-            var request = new RetainedIdentityHistoryReadRequest(identity, purpose);
++            deadline.ThrowIfCancellationRequested();
+             message = new HttpRequestMessage(HttpMethod.Post, "api/v1/identity-history/read")
+             {
+                 Content = JsonContent.Create(request),
+             };
+-            Task<HttpResponseMessage> sending = httpClient.SendAsync(message,
+-                HttpCompletionOption.ResponseHeadersRead, deadline.Token);
+-            pendingOperation = sending;
+-            response = await sending.WaitAsync(deadline.Token).ConfigureAwait(false);
++            response = await deadline.ReadAsync(token => httpClient.SendAsync(message,
++                HttpCompletionOption.ResponseHeadersRead, token), operation => pendingOperation = operation).ConfigureAwait(false);
+             pendingOperation = null;
+-            deadline.Token.ThrowIfCancellationRequested();
++            deadline.ThrowIfCancellationRequested();
+             if (!response.IsSuccessStatusCode)
+             {
+                 return new(null, "history-unavailable");
+@@ -55,21 +87,19 @@
+                 return new(null, "history-response-bound-exceeded");
+             }
+ 
+-            Task<Stream> acquiring = response.Content.ReadAsStreamAsync(deadline.Token);
+-            pendingOperation = acquiring;
+-            body = await acquiring.WaitAsync(deadline.Token).ConfigureAwait(false);
++            body = await deadline.ReadAsync(token => response.Content.ReadAsStreamAsync(token),
++                operation => pendingOperation = operation).ConfigureAwait(false);
+             pendingOperation = null;
+-            deadline.Token.ThrowIfCancellationRequested();
++            deadline.ThrowIfCancellationRequested();
+             using var buffer = new MemoryStream();
+             var chunk = new byte[8192];
+             while (true)
+             {
+-                deadline.Token.ThrowIfCancellationRequested();
+-                Task<int> reading = body.ReadAsync(chunk.AsMemory(), deadline.Token).AsTask();
+-                pendingOperation = reading;
+-                int count = await reading.WaitAsync(deadline.Token).ConfigureAwait(false);
++                deadline.ThrowIfCancellationRequested();
++                int count = await deadline.ReadAsync(token => body.ReadAsync(chunk.AsMemory(), token).AsTask(),
++                    operation => pendingOperation = operation).ConfigureAwait(false);
+                 pendingOperation = null;
+-                deadline.Token.ThrowIfCancellationRequested();
++                deadline.ThrowIfCancellationRequested();
+                 if (count == 0)
+                 {
+                     break;
+@@ -87,20 +117,8 @@
+                 buffer.GetBuffer().AsSpan(0, checked((int)buffer.Length)), _jsonOptions);
+             bool complete = result is { IsAuthoritative: true }
+                 && RetainedIdentityHistoryValidator.IsComplete(request, result.Stream, _clock.GetUtcNow());
+-            deadline.Token.ThrowIfCancellationRequested();
++            deadline.ThrowIfCancellationRequested();
+             return complete ? result! : new(null, "history-incomplete-or-unavailable");
+-        }
+-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+-        {
+-            return new(null, "history-time-bound-exceeded");
+-        }
+-        catch (OperationCanceledException)
+-        {
+-            throw;
+-        }
+-        catch (Exception exception) when (exception is HttpRequestException or JsonException or InvalidOperationException or ArgumentException or IOException)
+-        {
+-            return new(null, "history-unavailable");
+         }
+         finally
+         {
+--- a/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs
++++ b/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs
+@@ -2,6 +2,7 @@
+ using Hexalith.EventStore.Client.Streams;
+ using Hexalith.EventStore.Contracts.Identity;
+ using Hexalith.EventStore.Contracts.Streams;
++using Hexalith.EventStore.Contracts.Security;
+ using NSubstitute;
+ using Shouldly;
+ 
+@@ -59,10 +60,18 @@
+     public async Task WholeReadDeadline_StopsUncooperativeGateway()
+     {
+         IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
+-        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>())
+-            .Returns(new TaskCompletionSource<StreamReadPage>().Task);
+-        var reader = new AuthoritativeEventStreamReader(gateway, TimeProvider.System, TimeSpan.FromMilliseconds(20));
+-        (await reader.ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken))
++        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var clock = new AuthoritativeReadTimeProvider();
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns(_ =>
++        {
++            started.TrySetResult();
++            return new TaskCompletionSource<StreamReadPage>().Task;
++        });
++        var reader = new AuthoritativeEventStreamReader(gateway, clock, TimeSpan.FromSeconds(3));
++        var pending = reader.ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
++        await started.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        clock.Advance(TimeSpan.FromSeconds(3));
++        (await pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken))
+             .FailureReason.ShouldBe("source-time-bound-exceeded");
+     }
+ 
+@@ -120,11 +129,13 @@
+             started.TrySetResult();
+             return new TaskCompletionSource<StreamReadPage>(TaskCreationOptions.RunContinuationsAsynchronously).Task;
+         });
+-        var reader = new AuthoritativeEventStreamReader(gateway, TimeProvider.System, TimeSpan.FromMilliseconds(200));
++        var clock = new AuthoritativeReadTimeProvider();
++        var reader = new AuthoritativeEventStreamReader(gateway, clock, TimeSpan.FromSeconds(3));
+         Task<AuthoritativeStreamReadResult> pending = reader.ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
+         try
+         {
+             await started.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            clock.Advance(TimeSpan.FromSeconds(3));
+             var result = await pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
+             result.Stream.ShouldBeNull();
+             result.FailureReason.ShouldBe("source-time-bound-exceeded");
+@@ -149,11 +160,13 @@
+             release.Wait();
+             return Page(call.Arg<StreamReadRequest>(), 0, []);
+         });
+-        var reader = new AuthoritativeEventStreamReader(gateway, TimeProvider.System, TimeSpan.FromMilliseconds(200));
++        var clock = new AuthoritativeReadTimeProvider();
++        var reader = new AuthoritativeEventStreamReader(gateway, clock, TimeSpan.FromSeconds(3));
+         Task<AuthoritativeStreamReadResult> pending = Task.Run(() => reader.ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken), TestContext.Current.CancellationToken);
+         try
+         {
+             await started.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            clock.Advance(TimeSpan.FromSeconds(3));
+             var result = await pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
+             result.Stream.ShouldBeNull();
+             result.FailureReason.ShouldBe("source-time-bound-exceeded");
+@@ -286,6 +299,151 @@
+         result.FailureReason.ShouldBe("source-time-bound-exceeded");
+     }
+ 
++    [Fact]
++    public async Task ProviderCollectionIsCapturedOnceThenExactSnapshotValidated()
++    {
++        var changing = Substitute.For<IReadOnlyList<StreamReadEvent>>();
++        changing.Count.Returns(1);
++        changing[0].Returns(Event(1));
++        int traversals = 0;
++        changing.GetEnumerator().Returns(_ => new[]
++        {
++            ++traversals == 1 ? Event(1) : Event(1) with { EventTypeName = "", MessageId = "", MetadataVersion = 0 },
++        }.AsEnumerable().GetEnumerator());
++        var gateway = Substitute.For<IEventStoreGatewayClient>();
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            var request = call.Arg<StreamReadRequest>();
++            return Page(request, 1, request.ToSequence == 0 ? [] : changing);
++        });
++        var result = await new AuthoritativeEventStreamReader(gateway, TimeProvider.System)
++            .ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
++        result.IsAuthoritative.ShouldBeTrue();
++        traversals.ShouldBe(1);
++        result.Stream!.Events.Single().EventTypeName.ShouldBe("Created");
++        result.Stream.Events.Single().MetadataVersion.ShouldBe(1);
++    }
++
++    [Fact]
++    public async Task MisreportedFlagCountCannotCauseUnboundedCapture()
++    {
++        var flags = Substitute.For<IReadOnlyDictionary<string, string>>();
++        flags.Count.Returns(0);
++        int visited = 0;
++        flags.GetEnumerator().Returns(_ => Enumerable.Range(0, 100).Select(index =>
++        {
++            visited++;
++            return new KeyValuePair<string, string>($"flag{index}", "safe");
++        }).GetEnumerator());
++        var gateway = Substitute.For<IEventStoreGatewayClient>();
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            var request = call.Arg<StreamReadRequest>();
++            return Page(request, 1, request.ToSequence == 0 ? [] : [Event(1) with
++            {
++                ProtectionMetadata = new(PayloadProtectionState.Unprotected, 1, null, null, null, flags),
++            }]);
++        });
++        var result = await new AuthoritativeEventStreamReader(gateway, TimeProvider.System)
++            .ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
++        result.Stream.ShouldBeNull();
++        visited.ShouldBe(EventStorePayloadProtectionMetadata.MaxCompatibilityFlagCount + 1);
++    }
++
++    [Theory]
++    [InlineData("state")]
++    [InlineData("opaque")]
++    [InlineData("future")]
++    [InlineData("scheme")]
++    [InlineData("scheme-secret")]
++    [InlineData("alias")]
++    [InlineData("hint")]
++    [InlineData("flag-key")]
++    [InlineData("flag-value")]
++    [InlineData("missing-protected-scheme")]
++    public async Task MalformedProtectionMetadataNeverBecomesAuthoritative(string variant)
++    {
++        var metadata = new EventStorePayloadProtectionMetadata(PayloadProtectionState.Unprotected, 1, null, null, null, null);
++        metadata = variant switch
++        {
++            "state" => metadata with { State = (PayloadProtectionState)999 },
++            "opaque" => metadata with { State = PayloadProtectionState.ProviderOpaque },
++            "future" => metadata with { MetadataVersion = 2 },
++            "scheme" => metadata with { Scheme = new string('a', 65) },
++            "scheme-secret" => metadata with { Scheme = "private-key" },
++            "alias" => metadata with { KeyAlias = new string('a', 257) },
++            "hint" => metadata with { ContentHint = "application/\njson" },
++            "flag-key" => metadata with { CompatibilityFlags = new Dictionary<string, string> { ["nonce"] = "safe" } },
++            "flag-value" => metadata with { CompatibilityFlags = new Dictionary<string, string> { ["mode"] = "secret" } },
++            _ => metadata with { State = PayloadProtectionState.Protected },
++        };
++        var gateway = Substitute.For<IEventStoreGatewayClient>();
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            var request = call.Arg<StreamReadRequest>();
++            return Page(request, 1, request.ToSequence == 0 ? [] : [Event(1) with { ProtectionMetadata = metadata }]);
++        });
++        (await new AuthoritativeEventStreamReader(gateway, TimeProvider.System)
++            .ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken)).Stream.ShouldBeNull();
++    }
++
++    [Fact]
++    public async Task SupportedProtectedGatewayProvenanceAndCapturedFlagsRemainReadable()
++    {
++        var flags = new Dictionary<string, string> { ["mode"] = "safe" };
++        var metadata = new EventStorePayloadProtectionMetadata(PayloadProtectionState.Protected, 1, "aes-gcm-256", "alias", "application/json", flags);
++        var gateway = Substitute.For<IEventStoreGatewayClient>();
++        int calls = 0;
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            if (++calls == 3) { flags["mode"] = "secret"; }
++            var request = call.Arg<StreamReadRequest>();
++            return Page(request, 1, request.ToSequence == 0 ? [] : [Event(1) with { ProtectionMetadata = metadata }]);
++        });
++        var result = await new AuthoritativeEventStreamReader(gateway, TimeProvider.System)
++            .ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
++        result.IsAuthoritative.ShouldBeTrue();
++        result.Stream!.Events.Single().ProtectionMetadata!.State.ShouldBe(PayloadProtectionState.Protected);
++        result.Stream.Events.Single().ProtectionMetadata!.CompatibilityFlags!["mode"].ShouldBe("safe");
++    }
++
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task UnexpectedFaultPreservesUncancelledFaultOrOriginalCallerToken(bool cancel)
++    {
++        var gateway = Substitute.For<IEventStoreGatewayClient>();
++        using var caller = new CancellationTokenSource();
++        var failure = new FormatException("Unexpected synthetic provider fault.");
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns<StreamReadPage>(_ =>
++        {
++            if (cancel) { caller.Cancel(); }
++            throw failure;
++        });
++        var reader = new AuthoritativeEventStreamReader(gateway, TimeProvider.System);
++        if (cancel)
++        {
++            var exception = await Should.ThrowAsync<OperationCanceledException>(() => reader.ReadAsync(new("tenant-a", "party", "party-1"), caller.Token));
++            exception.CancellationToken.ShouldBe(caller.Token);
++        }
++        else
++        {
++            (await Should.ThrowAsync<FormatException>(() => reader.ReadAsync(new("tenant-a", "party", "party-1"), caller.Token))).ShouldBeSameAs(failure);
++        }
++    }
++
++    [Fact]
++    public async Task ProviderOnlyCancellationIsUnavailableWithoutClaimingBudgetExpired()
++    {
++        var gateway = Substitute.For<IEventStoreGatewayClient>();
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns<StreamReadPage>(_ =>
++            throw new OperationCanceledException(new CancellationToken(true)));
++        var result = await new AuthoritativeEventStreamReader(gateway, new AuthoritativeReadTimeProvider())
++            .ReadAsync(new("tenant-a", "party", "party-1"), TestContext.Current.CancellationToken);
++        result.FailureReason.ShouldBe("source-unavailable");
++        result.Stream.ShouldBeNull();
++    }
++
+     private static StreamReadEvent Event(long sequence) => new(sequence, "Created", "{}"u8.ToArray(), "json", 1, "message", null, null, DateTimeOffset.UnixEpoch, "actor");
+     private static StreamReadPage Page(StreamReadRequest request, long head, IReadOnlyList<StreamReadEvent> events)
+         => new(request.Tenant, request.Domain, request.AggregateId, events,
+--- a/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedContent.cs
++++ b/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedContent.cs
+@@ -8,6 +8,9 @@
+ internal sealed class RetainedHistorySuspendedContent(bool suspendAcquisition, Stream stream) : HttpContent
+ {
+     private readonly TaskCompletionSource<Stream> _completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
++
++    /// <summary>Optional synchronous invocation or provider-cancellation hook, installed only by focused tests.</summary>
++    public Action<CancellationToken>? BeforeReturn { get; init; }
+ 
+     /// <summary>Signals that the SDK attempted to acquire the body.</summary>
+     public TaskCompletionSource Started { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+@@ -29,6 +32,7 @@
+     {
+         AcquisitionCount++;
+         Started.TrySetResult();
++        BeforeReturn?.Invoke(cancellationToken);
+         return suspendAcquisition ? _completion.Task : Task.FromResult(stream);
+     }
+ 
+--- a/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedHandler.cs
++++ b/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedHandler.cs
+@@ -9,6 +9,9 @@
+ {
+     private readonly TaskCompletionSource<HttpResponseMessage> _completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
+     private readonly HttpResponseMessage _response = new(HttpStatusCode.OK) { Content = content };
++
++    /// <summary>Optional synchronous invocation or provider-cancellation hook, installed only by focused tests.</summary>
++    public Action<CancellationToken>? BeforeReturn { get; init; }
+ 
+     /// <summary>Signals that send has been invoked and can be cancelled by the test.</summary>
+     public TaskCompletionSource Started { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+@@ -23,6 +26,7 @@
+     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+     {
+         Started.TrySetResult();
++        BeforeReturn?.Invoke(cancellationToken);
+         return suspendSend ? _completion.Task : Task.FromResult(_response);
+     }
+ }
+--- a/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedStream.cs
++++ b/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedStream.cs
+@@ -5,6 +5,9 @@
+ internal sealed class RetainedHistorySuspendedStream(bool useTaskRead) : Stream
+ {
+     private readonly TaskCompletionSource<int> _completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
++
++    /// <summary>Optional synchronous invocation or provider-cancellation hook, installed only by focused tests.</summary>
++    public Action<CancellationToken>? BeforeReturn { get; init; }
+ 
+     /// <summary>Signals a pending read before the test advances or cancels the operation.</summary>
+     public TaskCompletionSource Started { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+@@ -46,6 +49,7 @@
+ 
+         ReadCount++;
+         Started.TrySetResult();
++        BeforeReturn?.Invoke(cancellationToken);
+         return new(_completion.Task);
+     }
+ 
+@@ -54,6 +58,7 @@
+     {
+         ReadCount++;
+         Started.TrySetResult();
++        BeforeReturn?.Invoke(cancellationToken);
+         return _completion.Task;
+     }
+ 
+--- a/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistoryTimeProvider.cs
++++ b/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistoryTimeProvider.cs
+@@ -5,13 +5,19 @@
+ internal sealed class RetainedHistoryTimeProvider(DateTimeOffset now) : TimeProvider
+ {
+     private readonly List<RetainedHistoryTimer> _timers = [];
+-    private DateTimeOffset _now = now;
++    private long _ticks;
+ 
+     /// <summary>Gets the last deadline duration requested by the SDK.</summary>
+     public TimeSpan LastDueTime { get; private set; }
+ 
+     /// <inheritdoc/>
+-    public override DateTimeOffset GetUtcNow() => _now;
++    public override DateTimeOffset GetUtcNow() => now.AddTicks(Interlocked.Read(ref _ticks));
++
++    /// <inheritdoc/>
++    public override long TimestampFrequency => TimeSpan.TicksPerSecond;
++
++    /// <inheritdoc/>
++    public override long GetTimestamp() => Interlocked.Read(ref _ticks);
+ 
+     /// <inheritdoc/>
+     public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+@@ -24,12 +30,13 @@
+     }
+ 
+     /// <summary>Moves source time and fires every timer due at the resulting instant.</summary>
+-    public void Advance(TimeSpan elapsed)
++    public void Advance(TimeSpan elapsed, bool fireTimers = true)
+     {
+-        _now += elapsed;
++        Interlocked.Add(ref _ticks, elapsed.Ticks);
++        if (!fireTimers) { return; }
+         foreach (RetainedHistoryTimer timer in _timers.ToArray())
+         {
+-            timer.FireIfDue(_now);
++            timer.FireIfDue(GetUtcNow());
+         }
+     }
+ }
+--- a/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedIdentityHistoryReaderTests.cs
++++ b/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedIdentityHistoryReaderTests.cs
+@@ -16,7 +16,11 @@
+     private readonly TimeProvider _clock = Substitute.For<TimeProvider>();
+ 
+     /// <summary>Verifies retained Identity History Reader Tests.</summary>
+-    public RetainedIdentityHistoryReaderTests() => _clock.GetUtcNow().Returns(_now);
++    public RetainedIdentityHistoryReaderTests()
++    {
++        _clock.GetUtcNow().Returns(_now);
++        _clock.TimestampFrequency.Returns(TimeSpan.TicksPerSecond);
++    }
+ 
+     /// <summary>Verifies complete Authenticated Sparse Source Retains Its Original Head And Positions.</summary>
+     [Fact]
+@@ -187,6 +191,106 @@
+         }
+     }
+ 
++    /// <summary>Synchronous send, stream acquisition and both body-read overloads cannot retain caller/deadline waits.</summary>
++    [Theory]
++    [InlineData(0, false)]
++    [InlineData(1, false)]
++    [InlineData(2, false)]
++    [InlineData(3, false)]
++    [InlineData(0, true)]
++    [InlineData(1, true)]
++    [InlineData(2, true)]
++    [InlineData(3, true)]
++    public async Task SynchronousTransportInvocationIsBoundedAndLateOwnedMaterialDisposed(int stage, bool expire)
++    {
++        var clock = new RetainedHistoryTimeProvider(_now);
++        using var release = new ManualResetEventSlim();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        Action<CancellationToken> block = _ => { entered.TrySetResult(); release.Wait(); };
++        using var body = new RetainedHistorySuspendedStream(stage == 3) { BeforeReturn = stage >= 2 ? block : null };
++        using var content = new RetainedHistorySuspendedContent(false, body) { BeforeReturn = stage == 1 ? block : null };
++        using var handler = new RetainedHistorySuspendedHandler(false, content) { BeforeReturn = stage == 0 ? block : null };
++        using var client = new HttpClient(handler) { BaseAddress = new("https://owner.invalid/") };
++        using var caller = new CancellationTokenSource();
++        var reading = new RetainedIdentityHistoryReader(client, clock).ReadAsync(_identity, RetainedIdentityHistoryReadRequest.AttributionPurpose, caller.Token);
++        try
++        {
++            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            if (expire)
++            {
++                clock.Advance(TimeSpan.FromSeconds(30));
++                (await reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).FailureReason.ShouldBe("history-time-bound-exceeded");
++            }
++            else
++            {
++                caller.Cancel();
++                var exception = await Should.ThrowAsync<OperationCanceledException>(() => reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken));
++                exception.CancellationToken.ShouldBe(caller.Token);
++            }
++            content.Disposed.Task.IsCompleted.ShouldBeFalse();
++        }
++        finally
++        {
++            release.Set(); body.Complete(); content.Complete(); handler.Complete();
++        }
++        await content.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        if (stage > 0) { await body.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); }
++        content.AcquisitionCount.ShouldBe(stage == 0 ? 0 : 1);
++        body.ReadCount.ShouldBe(stage < 2 ? 0 : 1);
++    }
++
++    /// <summary>Blocked provider cancellation callbacks cannot retain the private deadline wait or release late evidence.</summary>
++    [Theory]
++    [InlineData(0)]
++    [InlineData(1)]
++    [InlineData(2)]
++    [InlineData(3)]
++    public async Task BlockingProviderCancellationCannotRetainTransportDeadline(int stage)
++    {
++        var clock = new RetainedHistoryTimeProvider(_now);
++        using var release = new ManualResetEventSlim();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var registered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        Action<CancellationToken> register = token =>
++        {
++            token.Register(() => { entered.TrySetResult(); release.Wait(); });
++            registered.TrySetResult();
++        };
++        using var body = new RetainedHistorySuspendedStream(stage == 3) { BeforeReturn = stage >= 2 ? register : null };
++        using var content = new RetainedHistorySuspendedContent(stage == 1, body) { BeforeReturn = stage == 1 ? register : null };
++        using var handler = new RetainedHistorySuspendedHandler(stage == 0, content) { BeforeReturn = stage == 0 ? register : null };
++        using var client = new HttpClient(handler) { BaseAddress = new("https://owner.invalid/") };
++        var reading = new RetainedIdentityHistoryReader(client, clock).ReadAsync(_identity, RetainedIdentityHistoryReadRequest.AttributionPurpose, TestContext.Current.CancellationToken);
++        try
++        {
++            await registered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            clock.Advance(TimeSpan.FromSeconds(30));
++            (await reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).FailureReason.ShouldBe("history-time-bound-exceeded");
++            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            content.Disposed.Task.IsCompleted.ShouldBeFalse();
++        }
++        finally
++        {
++            release.Set(); body.Complete(); content.Complete(); handler.Complete();
++        }
++        await content.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        if (stage > 0) { await body.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); }
++    }
++
++    /// <summary>Delayed timer delivery cannot permit a complete certificate at the exclusive whole-read boundary.</summary>
++    [Fact]
++    public async Task CumulativeTerminalValidationCannotReleaseAtReadBudgetBoundary()
++    {
++        long ticks = 0;
++        _clock.GetTimestamp().Returns(_ => Interlocked.Read(ref ticks));
++        _clock.GetUtcNow().Returns(_ => { Interlocked.Exchange(ref ticks, TimeSpan.FromSeconds(30).Ticks); return _now; });
++        using var handler = new RetainedHistoryResponseHandler(new(Stream(), null));
++        using var client = new HttpClient(handler) { BaseAddress = new("https://owner.invalid/") };
++        var result = await new RetainedIdentityHistoryReader(client, _clock).ReadAsync(_identity, RetainedIdentityHistoryReadRequest.AttributionPurpose, TestContext.Current.CancellationToken);
++        result.Stream.ShouldBeNull();
++        result.FailureReason.ShouldBe("history-time-bound-exceeded");
++    }
++
+     private static RetainedIdentityHistoryStream Stream()
+         => new(_identity, RetainedIdentityHistoryReadRequest.AttributionPurpose, 2, _now,
+             [new StreamReadEvent(2, "History", "{}"u8.ToArray(), "json", 1, "", null, null,
+--- a/parties/eng/verify-ext-parties-1.ps1
++++ b/parties/eng/verify-ext-parties-1.ps1
+@@ -52,7 +52,7 @@
+ $versionArguments = @('msbuild', $eventStoreProject, '-nologo', '-getProperty:HexalithEventStoreVersion',
+     '-p:Configuration=Debug', '-p:UseHexalithProjectReferences=true', '-p:NuGetAudit=false')
+ $eventStoreVersion = (& dotnet @versionArguments 2> (Join-Path $EvidenceDirectory 'eventstore-version.stderr.log') | Out-String).Trim()
+-if ($LASTEXITCODE -ne 0 -or $eventStoreVersion -notmatch '^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$') {
++if ($LASTEXITCODE -ne 0 -or $eventStoreVersion -notmatch '\A\d+\.\d+\.\d+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?\z') {
+     throw 'Cannot resolve the selected EventStore source version for a consistent Local build graph.'
+ }
+ $eventStoreVersion | Set-Content -LiteralPath (Join-Path $EvidenceDirectory 'eventstore-version.log')
+--- a/platform/src/Hexalith.Platform.Custody/ExportManifestSignatureCore.cs
++++ b/platform/src/Hexalith.Platform.Custody/ExportManifestSignatureCore.cs
+@@ -39,24 +39,29 @@
+         byte[]? input = null;
+         try
+         {
+-            if (string.IsNullOrWhiteSpace(detachedJws) || !IsP256(publicAnchor))
++            if (detachedJws is null || !IsP256(publicAnchor))
+             {
+                 return false;
+             }
+ 
+-            string[] parts = detachedJws.Split('.');
+-            if (parts.Length != 3 || parts[1].Length != 0 || parts[0] != Header(expected))
++            string header = Header(expected);
++            // A detached ES256 JWS has this exact header, two dots and an unpadded
++            // 86-character signature. Reject size/framing before splitting or decoding.
++            if (detachedJws.Length != (long)header.Length + 88
++                || !detachedJws.AsSpan(0, header.Length).SequenceEqual(header)
++                || detachedJws[header.Length] != '.' || detachedJws[header.Length + 1] != '.')
+             {
+                 return false;
+             }
+ 
+-            byte[] signature = DecodeBase64Url(parts[2]);
+-            if (signature.Length != 64 || Base64Url(signature) != parts[2])
++            ReadOnlySpan<char> signatureText = detachedJws.AsSpan(header.Length + 2);
++            byte[] signature = DecodeBase64Url(signatureText.ToString());
++            if (signature.Length != 64 || !Base64Url(signature).AsSpan().SequenceEqual(signatureText))
+             {
+                 return false;
+             }
+ 
+-            input = SigningInput(parts[0], manifest);
++            input = SigningInput(header, manifest);
+             return publicAnchor.VerifyData(input, signature, HashAlgorithmName.SHA256, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
+         }
+         catch (Exception exception) when (exception is FormatException or CryptographicException or ArgumentException)
+--- a/platform/tests/Hexalith.Platform.Custody.Tests/ExportCustodyCryptographyTests.cs
++++ b/platform/tests/Hexalith.Platform.Custody.Tests/ExportCustodyCryptographyTests.cs
+@@ -30,6 +30,48 @@
+         owned.ToString().ShouldBe("OwnedExportKey");
+         owned.Dispose();
+         Should.Throw<ObjectDisposedException>(() => owned.CopyTo(restored));
++    }
++
++    /// <summary>Disposal actually overwrites the retained owned plaintext buffer, not only its disposed flag.</summary>
++    [Fact]
++    public void DisposalZeroesEveryOwnedKeyByte()
++    {
++        byte[] retained = Enumerable.Range(1, 32).Select(x => (byte)x).ToArray();
++        using var owned = new OwnedExportKey(retained);
++        owned.Dispose();
++        retained.ShouldAllBe(value => value == 0);
++        owned.Dispose();
++        retained.ShouldAllBe(value => value == 0);
++    }
++
++    /// <summary>Malformed large text/framing is denied before any unbounded split or signature decode.</summary>
++    [Theory]
++    [InlineData("large-signature")]
++    [InlineData("large-header")]
++    [InlineData("many-segments")]
++    [InlineData("whitespace")]
++    [InlineData("short")]
++    [InlineData("long")]
++    [InlineData("dot")]
++    [InlineData("invalid-base64")]
++    public void BoundedMalformedJwsCannotVerify(string variant)
++    {
++        using var signer = ECDsa.Create(ECCurve.NamedCurves.nistP256);
++        byte[] manifest = "{}"u8.ToArray();
++        string valid = ExportManifestSignatureCore.Sign(SignatureContext, manifest, signer);
++        string header = valid[..valid.IndexOf('.', StringComparison.Ordinal)];
++        string malformed = variant switch
++        {
++            "large-signature" => header + ".." + new string('A', 1_000_000),
++            "large-header" => new string('A', 1_000_000) + ".." + new string('A', 86),
++            "many-segments" => new string('.', 1_000_000),
++            "whitespace" => new string(' ', 1_000_000),
++            "short" => valid[..^1],
++            "long" => valid + "A",
++            "dot" => header + ".A." + new string('A', 85),
++            _ => header + ".." + new string('!', 86),
++        };
++        ExportManifestSignatureCore.Verify(SignatureContext, manifest, malformed, signer).ShouldBeFalse();
+     }
+ 
+     /// <summary>Changing any exact context denies unwrap even when the original key remains available.</summary>

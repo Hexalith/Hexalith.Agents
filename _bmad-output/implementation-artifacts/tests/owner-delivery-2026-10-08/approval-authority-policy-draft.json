@@ -1,0 +1,102 @@
+{
+  "status": "OwnerApprovedProposalNotInstalled",
+  "contractVersion": 1,
+  "proposedPolicyId": "agents-decision-authority",
+  "environmentHost": "192.168.1.30",
+  "integrationDate": "2026-10-08",
+  "policyRevision": null,
+  "effectiveFromUtc": null,
+  "exclusiveValidUntilUtc": null,
+  "independentIssuer": {
+    "accountOrProcessId": null,
+    "ownerActorId": null,
+    "verificationProfileRef": null,
+    "currentRevocationSourceRef": null,
+    "proposedAccountName": "agents-decision-issuer",
+    "proposedOperatorDisplayName": "Jérôme Piquot",
+    "enrollmentStatus": "NotEstablished"
+  },
+  "roleAuthoritySourceRef": null,
+  "roles": [
+    {
+      "role": "Product",
+      "authorizedStableActorIds": [],
+      "authorityRevisionRef": null,
+      "namedHumanApprovers": [
+        "Jérôme Piquot"
+      ]
+    },
+    {
+      "role": "Governance",
+      "authorizedStableActorIds": [],
+      "authorityRevisionRef": null,
+      "namedHumanApprovers": [
+        "Jérôme Piquot"
+      ]
+    },
+    {
+      "role": "Security",
+      "authorizedStableActorIds": [],
+      "authorityRevisionRef": null,
+      "namedHumanApprovers": [
+        "Jérôme Piquot"
+      ]
+    },
+    {
+      "role": "Architecture",
+      "authorizedStableActorIds": [],
+      "authorityRevisionRef": null,
+      "namedHumanApprovers": [
+        "Jérôme Piquot"
+      ]
+    },
+    {
+      "role": "PartiesMaintainer",
+      "authorizedStableActorIds": [],
+      "authorityRevisionRef": null
+    },
+    {
+      "role": "ConversationsMaintainer",
+      "authorizedStableActorIds": [],
+      "authorityRevisionRef": null
+    },
+    {
+      "role": "PlatformMaintainer",
+      "authorizedStableActorIds": [],
+      "authorityRevisionRef": null
+    }
+  ],
+  "forbiddenApprovalIssuersAndRequesters": [
+    "ReleaseOperatorRecorder",
+    "PlatformKeyCustodian",
+    "ConversationsDeletionWorker",
+    "AgentsWorkflow",
+    "AgentsTargetHandler"
+  ],
+  "manifestRequirements": [
+    "Exact decision contract/version/digest",
+    "Effective predecessor or independently authorized root policy",
+    "Nonempty required approvals and contract-defined quorum/distinctness",
+    "Affected evaluations and stable actor/current role evidence",
+    "Inclusive validity start, exclusive expiry and current revocation",
+    "Independently published public anchor; approval private key outside Agents and platform-host custody"
+  ],
+  "activationPrerequisites": [
+    "Fill exact public identity/profile/authority references from actual policy and enrollment",
+    "Record the independently governed policy activation and signing-key custody boundary",
+    "Pass verifier and requester-denial tests on the complete immutable delivery target",
+    "Pass live current-authority/revocation/restore qualification; fixtures do not activate this draft"
+  ],
+  "ownerApproval": {
+    "displayName": "Jérôme Piquot",
+    "reply": "I Jérôme Piquot approve",
+    "recordedUtc": "2026-10-08T16:16:44.670596+00:00",
+    "basis": "Owner chat declaration; no cryptographic manifest or runtime role-grant claim"
+  },
+  "existingRepositoryIdentityCandidate": {
+    "login": "jpiquot",
+    "githubUserId": 6775094,
+    "source": "Hexalith.Platform/eng/repository-controls/desired-state.json and .github/CODEOWNERS",
+    "limits": "Repository identity reference only; no mapping to application stable actor, current role proof or independent signing identity established."
+  }
+}

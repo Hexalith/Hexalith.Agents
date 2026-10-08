@@ -1,0 +1,360 @@
+{
+  "observedAt": "2026-10-08T15:27:02.020918+00:00",
+  "classification": "Focused actual owned production source subset and selected real EventStore project graph. Preserved normal CS0102 is not waived; this is not a normal project/full owner gate.",
+  "compiledOwnedSources": [
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyStatus.cs",
+      "sha256": "bdbba11231cfa282fc4069dfc0211fdf011e83f38a31e47a0e88b5a60be6fd0c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionBatchCapabilityCodec.cs",
+      "sha256": "49a462929aa7594eef13caa588bd4893c5e25a32e946e7eb21ecb012db92cdd4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilityPublishedTrust.cs",
+      "sha256": "f2e28ec561e964466f2c606a658bbfc6977a350e3751e4e400e4f77a24ca43a6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "sha256": "93413baf236b9c646dbfecae20b7028f54321bda5d0b2427f8219f86748211f4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningOutcome.cs",
+      "sha256": "3cbac0c218c64f224a824f3e5a4757640b7c0601fa05f4318b54497d1032d7f4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningResult.cs",
+      "sha256": "a2905b11b5dee5c0b9d7087b29ae16a623a79e13ee58bdb1d5bedaa0b3153da1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningState.cs",
+      "sha256": "7d1681d9d98b727eb3462168110e50abd2ed45cb702e4a4bc30e736bf24773f8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilityTrustProfile.cs",
+      "sha256": "cb4ab421cbf95f470615a7e62efedcb5505e1054786e2f2f57d4590a19c4b7c5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DetachedEs256JwsCore.cs",
+      "sha256": "67ca22b9262bee59cd7b71cd78ada37de1da51d0d6567e914934dddd8b2588f5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+      "sha256": "43bcd62f85f6c7eea3e5af06a8de730e05c25edc87ac6d4173a5ecf47b793d19"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryIdentity.cs",
+      "sha256": "680326d462e891e88a0a04f2b3136b727e7a3a3ca015b10611062552dc70d31f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryOutcome.cs",
+      "sha256": "0917df1b0406538b81ef323d07d5d0ab71b417baee52e2a3c37e3badbe747cb5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryState.cs",
+      "sha256": "e03850937db3730f8bdb236c70b1570616cf0fda940e3857e7ccb7df75f15b6e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyWrapContext.cs",
+      "sha256": "c031461abae326899081b1e1af46e38e40ca1af11e0d806b4a728347b9771b49"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyWrappingCore.cs",
+      "sha256": "d911042db4b32e28f3f81ed24d1f4e1dd70481276e06f14f02e152cdc248cbf6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportManifestSignatureContext.cs",
+      "sha256": "6821454a856001c18495604b50abcaa80f86edc48e0bb55edc5f6ce140fd409d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportManifestSignatureCore.cs",
+      "sha256": "c6adb0ed286bb397273358be71db49c09202cddb592ac4e24cf59f67277d3aaa"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilityOriginalSigningReceiptAuthority.cs",
+      "sha256": "db812aefebfea8f85ddcae2c4ee29f05c7b05c6be83c8f0868719e4d4a59be36"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningActor.cs",
+      "sha256": "ac16e59e82f55f5bc978fc30024e02210620a736a5cc8f2bbc7ac24c61c04c1a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningAuthority.cs",
+      "sha256": "7d2f02cddc2d1de4552c9813fd8946b9156e0e1721feda67b3d7fbb8473af8b1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningProvider.cs",
+      "sha256": "9b848b26668b5842cf969106f97451e7f8fceabcd92b8b4cc0933ec9f2b7ce30"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningTrustProvider.cs",
+      "sha256": "0db1af23249feaeadb035998049fc94828819b2f0a82771c1873004afa771ed8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IExportKeyDeliveryActor.cs",
+      "sha256": "79039c630c9143c388150035f957cde043a8aa0463ece57b0444ac520000235c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IExportKeyDeliveryAuthority.cs",
+      "sha256": "84be27a1a69d8d356c4da6413aa21903f1188f00937541e5ded10f96125cb5eb"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IExportKeyDirectDeliveryProvider.cs",
+      "sha256": "0b631ff42fcf9e645d6f410a5328caefb6d68a79e30f1a7fbd507bae3ddeee24"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPlatformHmacKeyProvider.cs",
+      "sha256": "929b244db6cd2b7297f88d4b7b0981dea59859d6cf2f394b49e3272e98950224"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPlatformKeyInventoryActor.cs",
+      "sha256": "0dbb5ddbcbaaf3cf3d0ce1aa937a2efdf23a488134a8352be1594a860adaa03f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPlatformKeyInventoryAuthority.cs",
+      "sha256": "9bf54e47332590d97e38c6603f75ca16f7ad5b576b00717a02bf48e12eaa411f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPlatformSigningProfileProvider.cs",
+      "sha256": "11e9cc3cd32526c383d669b39a94a732037ed9853a25cb8cbc7d8392eb37b97d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPrivateOwnerOperationGrantSource.cs",
+      "sha256": "1aa450bf684e3c7838897833023c9cf17e80ca4bbd2dd870c3ea07f87348da14"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs",
+      "sha256": "68cc1eb5c5d90f5ddaffbeab86d4762b03ad16c55476a931a368def5ba7a9aaa"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ISecurityObservationRecorder.cs",
+      "sha256": "add1f9311aa32f0ea1b6ccfbfece519dee9e7dbd6f3eda053e05ffa9e740005b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryCleanup.cs",
+      "sha256": "459bf37506ff2c5a3de43ced6e93b93f64abc14e2736e3f462044a7f6ff3c79a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryCleanupOutcome.cs",
+      "sha256": "c86707b2bbb70980e9b1896653e2ceef7f08979e17041dfa719c4de56945f831"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/OwnedExportKey.cs",
+      "sha256": "f71b697f704a049d078b06cb21a1d90c8085ff71db6d074c58f13850024ef7c3"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformAcceptedEnvelopeTiming.cs",
+      "sha256": "6174b0186506271094ca90a4b0285c8b5bfe73290e16e9a86f1a5907edb7cc96"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformCanonicalBytes.cs",
+      "sha256": "a4624fbc113d5cdc79fbf75e5875f2000a3821821e4eff8442c006fec186171a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformCustodyServiceCollectionExtensions.cs",
+      "sha256": "564f7715fa04df908c1b49d0598a3eb9ca374c37338bd13d6c22d56cb0bf09f8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacKeyMetadata.cs",
+      "sha256": "6871b94c140f917a2847b6e4fa88aef5d85267cb070ec48bfadb780fd3fd95c9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacKeyResolution.cs",
+      "sha256": "51f44587dec6ff4e854efbfefb2d23ba206be102d26fb73f122842b7840a0a30"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacKeySnapshot.cs",
+      "sha256": "0e8082c10791d7e5c318cb5fdf48bff7b5c2d8556cdc47587f91af6f4d69c26b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacKeyState.cs",
+      "sha256": "3ea583bddffecb3c583f733627f35d6bb39029cb7cf74caaeede572e649e81fe"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacPurpose.cs",
+      "sha256": "f5ac7f0ed2dbef0f7a30a0ddd938006017bf521a41e10b8e8df519e039c8a31b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacResult.cs",
+      "sha256": "30e70b6dc05abeb2493c4e874c73949b4f191208569083b2e961d91ed8dd6aa5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacScope.cs",
+      "sha256": "67a9ad4a570dd7b8311615fb0fb120917ee16fadabf949ec81504c10ccad7aa8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformHmacService.cs",
+      "sha256": "65050608d927fac05f13a26a0ec962498d4e422874bb2914898a08544f179721"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryAction.cs",
+      "sha256": "52d9372504c4514765ce3ac8fe5f897f7c1f59f23224ef82eec38f4f0f0afec7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryActor.cs",
+      "sha256": "52672b65ca15f45a322817bb8042c361a004264669e1e1aa558f952b7ca2c145"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryChange.cs",
+      "sha256": "0d3ce3ad0641b79a1bdc590db198f1398689cc6bb235df6369964413be68a138"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryEntry.cs",
+      "sha256": "777811790b32fa18d3de97d1789c83a21c95adb07938438f80748ba358527de2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventorySignal.cs",
+      "sha256": "1788b0822b3f00cd2a43b9e5122898b3da17eb3112ed4899ec80f35a66e86563"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventorySnapshot.cs",
+      "sha256": "7b39865a93a13e8d994bdf6320ba7dabe1399e9d00a599eb58a3947cf741068a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyPurpose.cs",
+      "sha256": "abcf087ee4f5ec1b2821848fab9567dcc7a2a2690ccff29647339a8958d5a15d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyResolution.cs",
+      "sha256": "46c5db43be142f848700711d0ed9061607cdcbd73b39433b5cf8f363d0def8c0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyVersion.cs",
+      "sha256": "90067f867ac8dda8b94a61abbd79c88146fc765783fef80f5f9e17609b6a0971"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformSigningProfile.cs",
+      "sha256": "b81e1119fad9b213ce405f496d6be85240ad41b80b4644781fcd58af3fd0ca25"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+      "sha256": "98a54c3f59d0d46544c3b260b07e6ec10a200a50f2d7c1f5a233817f286395d8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationCredential.cs",
+      "sha256": "1d81c90aa66a819c686d1435dab49efae9e6d1f2691d5370c7ee54ff16ac1b5b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs",
+      "sha256": "048b694522065deecb52fedcef44d3f61b38040db46a74171e0967a4a457f3b7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationGrant.cs",
+      "sha256": "bb8ee04d48ddad2cc650918e28ee013cd44e326a06d446e19e43d250ab10494c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationScope.cs",
+      "sha256": "9759119564a9ab6ddde3bf82f90d69d276ca322e4cf56eb7ffafc0884c3820e4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "sha256": "7b9b1e20063240f7e56f984ce43fbab3743b0ca8f1c09479529c1d667ededc52"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ReplicatedSecuritySpoolTarget.cs",
+      "sha256": "10f32fffdb169fac85db5de6a61c4558abb8b280587618ae7a4755ea724dd03d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityEventRecordReceipt.cs",
+      "sha256": "eee27da2dd7a951dd87a144dfdedd40ef36deb3a4ba1196768c5b4f3b37e84f7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityEventRecorderLookup.cs",
+      "sha256": "3e300f850aa3491787f68a70933c093bdee921b9f5851c2b0233b6e698b24b3f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityEventRecorderLookupState.cs",
+      "sha256": "eed18ae93d65a4b57998b39d0887f9c707aac7d9ad48d57038f9651dee8dca89"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityObservationIntent.cs",
+      "sha256": "10b85f66b6a1aa1726322b1c554ae2f1b41c69a7801616897525a371701248f2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityObservationRecord.cs",
+      "sha256": "40361907671920295f32d28d86fc902110e58fca2cf6799df6d4fd9c94fc34f6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecuritySpoolSnapshot.cs",
+      "sha256": "f01a1f730bf4dccdfe726b3f3e7658001fa774475bb53356286879bd5ebdd9a5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelope.cs",
+      "sha256": "e056effa2d9745b5997ce314cdabe62afc76581429a5d7e2d4c33d627a4142cb"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeAuthenticator.cs",
+      "sha256": "c19e71232d64e58e9fda94b372fa99a010e8160c0ccea2b4d61c96b5f9bcaf7d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeCodec.cs",
+      "sha256": "6c6010b914fb315cd66108cc6d711cdd92235f70b0fa1245ffc02abd3f236780"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeIdentity.cs",
+      "sha256": "24a07db789e949f143f8ef02134304580d874ba15de74f47face4e8f1a37ad46"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeResult.cs",
+      "sha256": "8869687bb94c3c9ecb424df72e6480eb2332c2a5a69241b93a1c2f2109a8049f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedPrincipal.cs",
+      "sha256": "36dc110f0d9a4908b3146a2ab4f400e175b8f761f98727c067819de1d70b1b26"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedPrincipalKind.cs",
+      "sha256": "d24ae1b599acdc3a3e691822af71571672992556379d0ef257a6e81c46ddbe46"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/UnavailablePlatformHmacKeyProvider.cs",
+      "sha256": "cf1d4a65e130eb63f18cd8a635892055dd52ce6c7c5b5d72dd3cf3f5d9f362b6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/UnavailablePlatformSigningProfileProvider.cs",
+      "sha256": "c1fd8b528ecc563a35e470a55e693824c385466854dd9ae35004e3ddbcf2a75e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/WrappedExportKey.cs",
+      "sha256": "688d4b90872bcb1a69f862775a5e621512d6b964bb548ae384bfe530ba8058e4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "sha256": "30a46a66f863ba0138c7c68cb286b596d22bed72f6654ab479c1aea035d30f78"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs",
+      "sha256": "439fe31155eb4cd3aa71fd6c1b20ecccb6c11574907ec94d49090bb02de91438"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+      "sha256": "0ebb23d85f6a9e6b96b4b03937598da14d88ea77faa2773cdf8c095caf46143b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs",
+      "sha256": "5ef5addea4c38697aff4c1c63260f70146ff11c8efd9ef1fb1b317258412a6a9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyFixtureClock.cs",
+      "sha256": "f4e1373fa2560a60c16a6a5d78b31d06c67d5440bd9340c37ea2482bed25429e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyFixtureProfileProvider.cs",
+      "sha256": "6561ffb22c4f852e8f0e1323d905efe589c4666ff71f21685c69a05412be83b4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyFixtureKeyProvider.cs",
+      "sha256": "8e12fd716ec36b3c89d881935baf9ce8b503bb556f14bde0b36217905d7bfe45"
+    }
+  ],
+  "excludedUnownedConcurrentIdentityHistorySources": [
+    "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryClassOutcome.cs",
+    "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryCopyRecord.cs",
+    "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryCopyRegistration.cs",
+    "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryCustodyOptions.cs",
+    "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryCustodyUnit.cs",
+    "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryDestructionReceipt.cs",
+    "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryLifecycleRecord.cs",
+    "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IdentityHistoryLifecycleState.cs"
+  ]
+}

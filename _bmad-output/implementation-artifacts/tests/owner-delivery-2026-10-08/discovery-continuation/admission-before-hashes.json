@@ -1,0 +1,35 @@
+{
+  "capturedUtc": "2026-10-08T13:18:51.439594+00:00",
+  "scope": "Concrete dedicated worker/receiver delivery admission and actual client-serialization boundary; update accepted creation-window XML text. Fixture is a newly owned file moved from the worker test.",
+  "files": [
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs",
+      "existed": false
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationAgentQueryService.cs",
+      "existed": true,
+      "copy": "admission-before/conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentQueryService.cs",
+      "sha256": "a9402b866ad6cbd162a4e05d181c89df306db1d2c8edc4b7732558046ea98c09"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs",
+      "existed": false
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerBoundaryHandler.cs",
+      "existed": false
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "existed": true,
+      "copy": "admission-before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "sha256": "9158944be15f07ede69864951c7983a9cafa759c12a5d531ffa696bc246f5088"
+    }
+  ]
+}

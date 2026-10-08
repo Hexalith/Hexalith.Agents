@@ -1,0 +1,86 @@
+[
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryWriteKind.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryEpochInstallation.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryRepairCohortItem.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryRepairBoundary.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryRepairDrainReceipt.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryEpochActivation.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryBoundaryOutcome.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryBoundaryOutcomeState.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryEpochLedger.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDirectoryMigrationBoundaryActor.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDirectoryMigrationBoundaryAuthority.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DirectoryMigrationBoundaryActor.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendRequest.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendOutcome.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendState.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/IAtomicDirectoryAppendOwner.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/IDirectoryAtomicAppendAuthority.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryFixture.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryTests.cs",
+    "exists": false
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs",
+    "exists": false
+  }
+]

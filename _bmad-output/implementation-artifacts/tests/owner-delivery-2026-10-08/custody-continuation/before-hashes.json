@@ -1,0 +1,92 @@
+{
+  "capturedUtc": "2026-10-08T13:21:36.394171+00:00",
+  "scope": "S3 durable exact principal delivery outcomes and closed S4 RFC8785/ES256 capability codec. Providers/authority/physical lifecycle remain unqualified and unregistered.",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj",
+      "existed": true,
+      "copy": "before/platform/src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj",
+      "sha256": "aa73b396a35b40c212c85749e58a989fee03fd2d6777da399cf6a500b8b2c1d7"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+      "existed": true,
+      "copy": "before/platform/tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+      "sha256": "64a9ab9e89c6f6d8d312773f6da4b8fc20b650e475899b366dbd2bdfc2006048"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportManifestSignatureCore.cs",
+      "existed": true,
+      "copy": "before/platform/src/Hexalith.Platform.Custody/ExportManifestSignatureCore.cs",
+      "sha256": "91f2c29c2a1ccee22ab41bc9b74107b6f94f37880f1b5ce3b603d5fb4132f9e1"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DetachedEs256JwsCore.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchCapabilityV1.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityTrustProfile.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchCapabilityCodec.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyDeliveryIdentity.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyDeliveryOutcome.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyDeliveryState.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IExportKeyDirectDeliveryProvider.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IExportKeyDeliveryAuthority.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IExportKeyDeliveryActor.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchCapabilityCodecTests.cs",
+      "existed": false
+    }
+  ]
+}

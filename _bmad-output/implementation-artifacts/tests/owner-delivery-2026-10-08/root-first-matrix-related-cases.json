@@ -1,0 +1,1439 @@
+{
+  "scope": "Executed related cases only; not a complete matrix/full owner qualification claim. Denial-spool persisted recovery remains absent.",
+  "cases": [
+    {
+      "xml": "Hexalith.Parties.Security.Tests-tests.xml",
+      "class": "Hexalith.Parties.Security.Tests.PartyPayloadProtectionServiceTests",
+      "name": "Hexalith.Parties.Security.Tests.PartyPayloadProtectionServiceTests.ProtectEventPayload_OrganizationIsNaturalPerson_EncryptsAllStringFields",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Security.Tests-tests.xml",
+      "class": "Hexalith.Parties.Security.Tests.PartyPayloadProtectionServiceTests",
+      "name": "Hexalith.Parties.Security.Tests.PartyPayloadProtectionServiceTests.ProtectEventPayload_OrganizationCreated_DoesNotEncryptEntityFields",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.CallerComponentsMutationWhileProviderSuspended_DoesNotChangeAuthenticatedInput(digest: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.CallerComponentsMutationWhileProviderSuspended_DoesNotChangeAuthenticatedInput(digest: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.FreshProviderRejectsScopeVersionRevocationAndOutage(condition: \\\"tenant\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.FreshProviderRejectsScopeVersionRevocationAndOutage(condition: \\\"purpose\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.FreshProviderRejectsScopeVersionRevocationAndOutage(condition: \\\"version\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.FreshProviderRejectsScopeVersionRevocationAndOutage(condition: \\\"revoked\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.FreshProviderRejectsScopeVersionRevocationAndOutage(condition: \\\"outage\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.CancellationBoundsNonCooperativeProviderAndDisposesLateKey(secondResolution: False, digest: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.CancellationBoundsNonCooperativeProviderAndDisposesLateKey(secondResolution: True, digest: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.CancellationBoundsNonCooperativeProviderAndDisposesLateKey(secondResolution: False, digest: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.CancellationBoundsNonCooperativeProviderAndDisposesLateKey(secondResolution: True, digest: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.AtOrAfterExpiry_ConfirmsExactUnitAndFreshDenial(offsetTicks: 0)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.AtOrAfterExpiry_ConfirmsExactUnitAndFreshDenial(offsetTicks: 1)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.AtOrAfterExpiry_ConfirmsExactUnitAndFreshDenial(offsetTicks: 864000000000)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.SynchronousProviderBlocking_CancellationRemainsPrompt(finalCheck: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.SynchronousProviderBlocking_CancellationRemainsPrompt(finalCheck: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.CancelledWhileProviderIgnoresToken_PreservesCancellation(finalCheck: False, lateFault: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.CancelledWhileProviderIgnoresToken_PreservesCancellation(finalCheck: False, lateFault: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.CancelledWhileProviderIgnoresToken_PreservesCancellation(finalCheck: True, lateFault: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.CancelledWhileProviderIgnoresToken_PreservesCancellation(finalCheck: True, lateFault: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.FailedFreshDenial_RemainsPending(failure: \\\"readable\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.FailedFreshDenial_RemainsPending(failure: \\\"sync-throw\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.FailedFreshDenial_RemainsPending(failure: \\\"async-throw\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Platform.Custody.Tests-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.FailedFreshDenial_RemainsPending(failure: \\\"provider-cancel\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.HumanActorBindingTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.HumanActorBindingTests.MissingPolicyWrongActorOrOrganization_Denies",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.HumanActorBindingTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.HumanActorBindingTests.ValidRevocation_ClosesOriginalAndRefreshedProofKeepsOriginalRetryResult",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.AgentPartyProvisioningTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.AgentPartyProvisioningTests.RejectionOnlyStream_AllowsCreationWhileUnmarkedOrganizationConflicts",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests.Handle_CreateOrganizationParty_EmitsPartyCreatedAndDisplayNameDerived",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests.Handle_CreateOrganizationWithOnlyPersonDetails_ReturnsRejectionOnly",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests.Handle_CreateOrganizationWithoutOrgDetails_ReturnsRejection",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests.Handle_CreatePersonWithOnlyOrganizationDetails_ReturnsRejectionOnly",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests.Handle_CreateOrganizationParty_ApplyEventsToState_ProducesCorrectState",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests.Handle_CreateOrganizationParty_DisplayNameUsesLegalName",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCreateTests.Handle_CreateOrganizationParty_NullTradingName_UsesLegalName",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCompositeTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCompositeTests.Handle_UpdatePartyComposite_OrganizationDetailsOnly_EmitsOrganizationDetailsUpdatedAndDisplayName",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCompositeTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCompositeTests.Handle_UpdatePartyComposite_OrganizationDetailsOnPerson_ReturnsTypeMismatch",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCompositeTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCompositeTests.Handle_CreatePartyComposite_OrganizationWithChannelsAndIdentifiers_EmitsExpectedEvents",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Server.Tests-tests.xml",
+      "class": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCompositeTests",
+      "name": "Hexalith.Parties.Server.Tests.Aggregates.PartyAggregateCompositeTests.Handle_UpdatePartyComposite_PersonDetailsOnOrganization_ReturnsTypeMismatch",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithDuplicateNotModifiedLifecycle_DefaultsUnknown(conflicting: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithDuplicateNotModifiedLifecycle_DefaultsUnknown(conflicting: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithUnsafeSuccessLifecycle_DefaultsUnknown(bodyLifecycle: null, headerLifecycle: null)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithUnsafeSuccessLifecycle_DefaultsUnknown(bodyLifecycle: \\\"\\\\\\\"current\\\\\\\"\\\", headerLifecycle: \\\"current\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithUnsafeSuccessLifecycle_DefaultsUnknown(bodyLifecycle: \\\"1\\\", headerLifecycle: \\\"1\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithUnsafeSuccessLifecycle_DefaultsUnknown(bodyLifecycle: \\\"\\\\\\\"Unexpected\\\\\\\"\\\", headerLifecycle: \\\"Unexpected\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithMismatchedLifecycle_DefaultsUnknown",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithDuplicateSuccessLifecycle_DefaultsUnknown(conflicting: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithDuplicateSuccessLifecycle_DefaultsUnknown(conflicting: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithDuplicateSuccessProvenance_DefaultsUnknownAndClearsProjectionEvidence",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.GetCommandStatusAsync_RejectsContradictoryOrNonCanonicalStatusRepresentations(status: \\\"Unknown\\\", statusCode: 999)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithContradictorySuccessProvenance_DefaultsUnknownAndClearsProjectionEvidence(headerProvenance: null)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithContradictorySuccessProvenance_DefaultsUnknownAndClearsProjectionEvidence(headerProvenance: \\\"Unexpected\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithContradictorySuccessProvenance_DefaultsUnknownAndClearsProjectionEvidence(headerProvenance: \\\"HandlerComputed\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithUnsafeNotModifiedLifecycle_DefaultsUnknown(lifecycle: null)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithUnsafeNotModifiedLifecycle_DefaultsUnknown(lifecycle: \\\"Unexpected\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithUnsafeNotModifiedLifecycle_DefaultsUnknown(lifecycle: \\\"current\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests",
+      "name": "Hexalith.EventStore.Client.Tests.Gateway.EventStoreGatewayClientTests.SubmitQueryAsync_WithNonProjectionProvenance_SanitizesProjectionEvidence(provenance: \\\"Unknown\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.CallerCancellationWithBlockingProviderCallback_PreservesOriginalToken",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.BlockingProviderCancellationCallback_CannotRetainDeadlineWait",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.UnexpectedFaultPreservesUncancelledFaultOrOriginalCallerToken(cancel: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.UnexpectedFaultPreservesUncancelledFaultOrOriginalCallerToken(cancel: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.ProviderOnlyCancellationIsUnavailableWithoutClaimingBudgetExpired",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.CallerCancellation_Propagates",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.ProviderFaultBeforeCallerCancellation_PreservesCallerVerdict(expireFirst: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.ProviderFaultBeforeCallerCancellation_PreservesCallerVerdict(expireFirst: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CancellationDuringCertificateValidationCannotReleaseHistory",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.BlockingProviderCancellationCannotRetainTransportDeadline(stage: 0)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.BlockingProviderCancellationCannotRetainTransportDeadline(stage: 1)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.BlockingProviderCancellationCannotRetainTransportDeadline(stage: 2)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.BlockingProviderCancellationCannotRetainTransportDeadline(stage: 3)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Client.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+      "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CallerCancellationPropagates",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.UI.Tests-tests.xml",
+      "class": "Hexalith.Parties.UI.Tests.SelfScopedPartiesClientTests",
+      "name": "Hexalith.Parties.UI.Tests.SelfScopedPartiesClientTests.GetMyPartyAsync_BoundPrincipal_ForwardsCallerCancellationToken",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.UI.Tests-tests.xml",
+      "class": "Hexalith.Parties.UI.Tests.SelfScopedPartiesClientTests",
+      "name": "Hexalith.Parties.UI.Tests.SelfScopedPartiesClientTests.GrantMyConsentAsync_BoundPrincipal_InjectsResolvedPartyIdAndForwardsCallerArguments",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.UI.Tests-tests.xml",
+      "class": "Hexalith.Parties.UI.Tests.IdentityBindingProvisioningServiceTests",
+      "name": "Hexalith.Parties.UI.Tests.IdentityBindingProvisioningServiceTests.RotateAsync_ExpectedVersionMatches_SupersedesActivePartyIdAndIncrementsVersionAsync",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.UI.Tests-tests.xml",
+      "class": "Hexalith.Parties.UI.Tests.IdentityBindingProvisioningServiceTests",
+      "name": "Hexalith.Parties.UI.Tests.IdentityBindingProvisioningServiceTests.RotateAsync_StaleExpectedVersion_FailsClosedWithoutChangingIdpAttributeAsync",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyDomainProcessorValidationTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyDomainProcessorValidationTests.ProcessAsync_UnknownCommandType_ReturnsUnresolvedCommandTypeRejection",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ProvisionedOrganization_KeepsBranchBClassificationAndNeverCarriesHumanBinding",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict(historical: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict(historical: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken(historical: False, trigger: \\\"deadline\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken(historical: True, trigger: \\\"deadline\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken(historical: False, trigger: \\\"fault\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken(historical: True, trigger: \\\"fault\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: False, trigger: \\\"timer\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: False, trigger: \\\"timer\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: True, trigger: \\\"timer\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: True, trigger: \\\"timer\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: False, trigger: \\\"elapsed\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: False, trigger: \\\"elapsed\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: True, trigger: \\\"elapsed\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: True, trigger: \\\"elapsed\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: False, trigger: \\\"caller\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: False, trigger: \\\"caller\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: True, trigger: \\\"caller\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: True, trigger: \\\"caller\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken(historical: False, expire: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken(historical: True, expire: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken(historical: False, expire: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken(historical: True, expire: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.NonCooperativeReaderOrCustody_CallerCanCancelOutstandingRead(historical: False, inCustody: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.NonCooperativeReaderOrCustody_CallerCanCancelOutstandingRead(historical: True, inCustody: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.NonCooperativeReaderOrCustody_CallerCanCancelOutstandingRead(historical: False, inCustody: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.NonCooperativeReaderOrCustody_CallerCanCancelOutstandingRead(historical: True, inCustody: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentAuthorityChangesDuringAwait_DenyEvidence(inCustody: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentAuthorityChangesDuringAwait_DenyEvidence(inCustody: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CustodyFailureOrNetworkFailure_IsUnavailableAndCancellationPropagates",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ExpiredPredecessorOmitted_SuccessorReadRemainsUnavailable",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.RevocationWithoutLivePredecessor_DeniesWithNoEvidence(missingPredecessor: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.RevocationWithoutLivePredecessor_DeniesWithNoEvidence(missingPredecessor: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ValidRevocationReplay_PreservesBeforeBoundaryAndReturnsGapAtBoundary",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.UncreatedInactiveRestrictedUnknownAndErased_AreNeverResolved",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.ProviderReturnsAfterCallerCancellation_DoesNotDispatchIdentityCommand(operation: \\\"provision\\\", provider: \\\"unprotect\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.ProviderReturnsAfterCallerCancellation_DoesNotDispatchIdentityCommand(operation: \\\"establish\\\", provider: \\\"unprotect\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.ProviderReturnsAfterCallerCancellation_DoesNotDispatchIdentityCommand(operation: \\\"rebind\\\", provider: \\\"unprotect\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.ProviderReturnsAfterCallerCancellation_DoesNotDispatchIdentityCommand(operation: \\\"revoke\\\", provider: \\\"unprotect\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.ProviderReturnsAfterCallerCancellation_DoesNotDispatchIdentityCommand(operation: \\\"establish\\\", provider: \\\"custody\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.ProviderReturnsAfterCallerCancellation_DoesNotDispatchIdentityCommand(operation: \\\"rebind\\\", provider: \\\"custody\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.ProviderReturnsAfterCallerCancellation_DoesNotDispatchIdentityCommand(operation: \\\"revoke\\\", provider: \\\"custody\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.FinalAuthorityCheckCancelsCaller_DoesNotDispatchIdentityCommand(operation: \\\"provision\\\", provider: \\\"unprotect\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.FinalAuthorityCheckCancelsCaller_DoesNotDispatchIdentityCommand(operation: \\\"establish\\\", provider: \\\"unprotect\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.FinalAuthorityCheckCancelsCaller_DoesNotDispatchIdentityCommand(operation: \\\"rebind\\\", provider: \\\"unprotect\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.FinalAuthorityCheckCancelsCaller_DoesNotDispatchIdentityCommand(operation: \\\"revoke\\\", provider: \\\"unprotect\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.FinalAuthorityCheckCancelsCaller_DoesNotDispatchIdentityCommand(operation: \\\"establish\\\", provider: \\\"custody\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.FinalAuthorityCheckCancelsCaller_DoesNotDispatchIdentityCommand(operation: \\\"rebind\\\", provider: \\\"custody\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests",
+      "name": "Hexalith.Parties.Tests.Domain.PartyIdentityAdmissionTests.FinalAuthorityCheckCancelsCaller_DoesNotDispatchIdentityCommand(operation: \\\"revoke\\\", provider: \\\"custody\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartySdkQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartySdkQueryHandlerTests.DetailHandler_UnknownProjectionTimestampReportsUnavailableFreshnessAsync",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartySdkQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartySdkQueryHandlerTests.SearchHandler_UnknownPayloadFieldFailsClosedBeforeStoreReadAsync",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Tests-tests.xml",
+      "class": "Hexalith.Parties.Tests.Gateway.PartySdkQueryHandlerTests",
+      "name": "Hexalith.Parties.Tests.Gateway.PartySdkQueryHandlerTests.IndexHandler_CursorBoundToDifferentCallerFailsClosedBeforeStoreReadAsync",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Client.Tests-tests.xml",
+      "class": "Hexalith.Parties.Client.Tests.HttpPartiesCommandClientTests",
+      "name": "Hexalith.Parties.Client.Tests.HttpPartiesCommandClientTests.DeactivatePartyAsync_WhenCancelled_PropagatesCancellationAsync",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Client.Tests-tests.xml",
+      "class": "Hexalith.Parties.Client.Tests.HttpPartiesCommandClientTests",
+      "name": "Hexalith.Parties.Client.Tests.HttpPartiesCommandClientTests.RoutePartyIdMethods_OverrideStalePayloadPartyIdAsync(methodName: \\\"UpdateOrganizationDetailsAsync\\\", expectedCommandType: typeof(Hexalith.Parties.Contracts.Commands.UpdateOrganizationDetails))",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Client.Tests-tests.xml",
+      "class": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+      "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.UnknownOutcomeClassificationForeignOrDegradedReply_IsUnavailable(outcome: 999, classification: 1, tenant: \\\"tenant-a\\\", degraded: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Client.Tests-tests.xml",
+      "class": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+      "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.UnknownOutcomeClassificationForeignOrDegradedReply_IsUnavailable(outcome: 1, classification: 999, tenant: \\\"tenant-a\\\", degraded: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Client.Tests-tests.xml",
+      "class": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+      "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.UnknownOutcomeClassificationForeignOrDegradedReply_IsUnavailable(outcome: 1, classification: 3, tenant: \\\"tenant-a\\\", degraded: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Client.Tests-tests.xml",
+      "class": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+      "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.UnknownOutcomeClassificationForeignOrDegradedReply_IsUnavailable(outcome: 1, classification: 2, tenant: \\\"tenant-b\\\", degraded: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Client.Tests-tests.xml",
+      "class": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+      "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.UnknownOutcomeClassificationForeignOrDegradedReply_IsUnavailable(outcome: 1, classification: 2, tenant: \\\"tenant-a\\\", degraded: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Client.Tests-tests.xml",
+      "class": "Hexalith.Parties.Client.Tests.HttpPartiesQueryClientTests",
+      "name": "Hexalith.Parties.Client.Tests.HttpPartiesQueryClientTests.SearchPartiesAsync_WhenCancelled_PropagatesCancellationAsync",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Client.Tests-tests.xml",
+      "class": "Hexalith.Parties.Client.Tests.HttpPartiesQueryClientTests",
+      "name": "Hexalith.Parties.Client.Tests.HttpPartiesQueryClientTests.ListPartiesAsync_WhenCancelled_PropagatesCancellationAsync",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Client.Tests-tests.xml",
+      "class": "Hexalith.Parties.Client.Tests.HttpPartiesQueryClientTests",
+      "name": "Hexalith.Parties.Client.Tests.HttpPartiesQueryClientTests.GetPartyAsync_WhenCancelled_PropagatesCancellationAsync",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Contracts.Tests-tests.xml",
+      "class": "Hexalith.Parties.Contracts.Tests.State.PartyStateTests",
+      "name": "Hexalith.Parties.Contracts.Tests.State.PartyStateTests.Apply_CreationEventsForOrganization_PreservesRehydratedCreationState",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Contracts.Tests-tests.xml",
+      "class": "Hexalith.Parties.Contracts.Tests.State.PartyStateTests",
+      "name": "Hexalith.Parties.Contracts.Tests.State.PartyStateTests.Apply_ContactChannelUpdated_IgnoresUnknownId",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Contracts.Tests-tests.xml",
+      "class": "Hexalith.Parties.Contracts.Tests.State.PartyStateTests",
+      "name": "Hexalith.Parties.Contracts.Tests.State.PartyStateTests.Apply_OrganizationDetailsUpdated_UpdatesOrganization",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Parties.Contracts.Tests-tests.xml",
+      "class": "Hexalith.Parties.Contracts.Tests.State.PartyStateTests",
+      "name": "Hexalith.Parties.Contracts.Tests.State.PartyStateTests.Apply_IdentifierRemoved_UnknownId_DoesNotChangeIdentifiers",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Controllers.CommandsControllerTrustedExtensionTests",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.CommandsControllerTrustedExtensionTests.Caller_supplied_global_admin_extension_is_ignored_without_policy_evaluation",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Controllers.IdentityGatewayDenialTests",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.IdentityGatewayDenialTests.IdentityQueryMissingProviderOrForeignEntity_DeniesBeforeAdmissionAndMediator(install: False, entity: \\\"party-1\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Controllers.IdentityGatewayDenialTests",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.IdentityGatewayDenialTests.IdentityQueryMissingProviderOrForeignEntity_DeniesBeforeAdmissionAndMediator(install: True, entity: \\\"party-other\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Controllers.IdentityGatewayDenialTests",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.IdentityGatewayDenialTests.IdentityCommandWithoutProvider_DeniesBeforeMediator",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Identity.IdentityAdmissionTests",
+      "name": "Hexalith.EventStore.Server.Tests.Identity.IdentityAdmissionTests.OverflowAndWrongExpiry_AreSafeDenials",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Controllers.QueriesControllerTests",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.QueriesControllerTests.Submit_UnrecognizedProvenance_NormalizesToUnknownAndDoesNotFetchETag",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Controllers.QueriesControllerTests",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.QueriesControllerTests.Submit_FreshnessPolicyWithUnknownFreshness_FailsClosed",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Controllers.QueriesControllerTests",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.QueriesControllerTests.Submit_UnknownOrInvalidLifecycle_NormalizesToUnknownAndOmitsHeader(lifecycle: Unknown)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Controllers.QueriesControllerTests",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.QueriesControllerTests.Submit_UnknownOrInvalidLifecycle_NormalizesToUnknownAndOmitsHeader(lifecycle: 99)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests",
+      "name": "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests.RestoredCiphertextAndReadableOldKey_CurrentLifecycleDenialPreventsResurrection",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests",
+      "name": "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests.CustodyRevocationDuringFinalAuthorityReadPreventsRelease",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests",
+      "name": "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests.DenialPerformsNoTargetLookup",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests",
+      "name": "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests.CancellationDuringFinalAuthorityReadCannotReturnSuccess",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests",
+      "name": "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests.ExpiredPredecessor_BlocksSuccessorInsteadOfFabricatingExclusion(destroyed: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.EventStore.Server.Tests-tests.xml",
+      "class": "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests",
+      "name": "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests.ExpiredPredecessor_BlocksSuccessorInsteadOfFabricatingExclusion(destroyed: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.CancellationBoundsNonCooperativeProviderAndDisposesLateKey(secondResolution: False, digest: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.CancellationBoundsNonCooperativeProviderAndDisposesLateKey(secondResolution: True, digest: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.CancellationBoundsNonCooperativeProviderAndDisposesLateKey(secondResolution: False, digest: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.CancellationBoundsNonCooperativeProviderAndDisposesLateKey(secondResolution: True, digest: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.CallerComponentsMutationWhileProviderSuspended_DoesNotChangeAuthenticatedInput(digest: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.CallerComponentsMutationWhileProviderSuspended_DoesNotChangeAuthenticatedInput(digest: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.FreshProviderRejectsScopeVersionRevocationAndOutage(condition: \\\"tenant\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.FreshProviderRejectsScopeVersionRevocationAndOutage(condition: \\\"purpose\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.FreshProviderRejectsScopeVersionRevocationAndOutage(condition: \\\"version\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.FreshProviderRejectsScopeVersionRevocationAndOutage(condition: \\\"revoked\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+      "name": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests.FreshProviderRejectsScopeVersionRevocationAndOutage(condition: \\\"outage\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.CancelledWhileProviderIgnoresToken_PreservesCancellation(finalCheck: False, lateFault: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.CancelledWhileProviderIgnoresToken_PreservesCancellation(finalCheck: False, lateFault: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.CancelledWhileProviderIgnoresToken_PreservesCancellation(finalCheck: True, lateFault: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.CancelledWhileProviderIgnoresToken_PreservesCancellation(finalCheck: True, lateFault: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.FailedFreshDenial_RemainsPending(failure: \\\"readable\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.FailedFreshDenial_RemainsPending(failure: \\\"sync-throw\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.FailedFreshDenial_RemainsPending(failure: \\\"async-throw\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.FailedFreshDenial_RemainsPending(failure: \\\"provider-cancel\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.AtOrAfterExpiry_ConfirmsExactUnitAndFreshDenial(offsetTicks: 0)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.AtOrAfterExpiry_ConfirmsExactUnitAndFreshDenial(offsetTicks: 1)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.AtOrAfterExpiry_ConfirmsExactUnitAndFreshDenial(offsetTicks: 864000000000)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.SynchronousProviderBlocking_CancellationRemainsPrompt(finalCheck: False)",
+      "result": "Pass"
+    },
+    {
+      "xml": "local-tests.xml",
+      "class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+      "name": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests.SynchronousProviderBlocking_CancellationRemainsPrompt(finalCheck: True)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Governance.ConversationBuyerAcceptanceDemoServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.Governance.ConversationBuyerAcceptanceDemoServiceTest.DemoRunnerShouldNotTreatSameTenantHiddenReadAsCrossTenantDenial",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Governance.ConversationBuyerAcceptanceDemoServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.Governance.ConversationBuyerAcceptanceDemoServiceTest.DemoRunnerShouldFailClosedWhenCallerAuthorityIsMissing",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Queries.ConversationQueryHandlerTest",
+      "name": "Hexalith.Conversations.Server.Tests.Queries.ConversationQueryHandlerTest.CallerMismatchedCursorShouldNotFallBackToFirstPage",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Queries.ConversationQueryHandlerTest",
+      "name": "Hexalith.Conversations.Server.Tests.Queries.ConversationQueryHandlerTest.DetailDenialPathsShouldShareSameShape",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests",
+      "name": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests.CancellationAfterIgnoringProviderCannotReturnValidResult",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests",
+      "name": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests.CancellationDuringSourceReplay_StopsBeforeRemainingEvents",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests",
+      "name": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests.CancellationDuringSecondFold_StopsBeforeRemainingRecords",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests",
+      "name": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests.NeverCompletingProvidersRespectCallerCancellation",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests",
+      "name": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests.CancellationDuringAdmissionReplay_StopsBeforeRemainingEvents",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest.CheckAccessAsyncShouldFailClosedBeforeStoreLookupForUnsafeInputs(tenantId: TenantId { Value = tenant-a }, caller: null, expectedReason: MissingCaller)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest.CheckAccessAsyncShouldFailClosedBeforeStoreLookupForUnsafeInputs(tenantId: TenantId { Value = tenant-a }, caller: \\\"\\\", expectedReason: MissingCaller)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest.CheckAccessAsyncShouldFailClosedBeforeStoreLookupForUnsafeInputs(tenantId: TenantId { Value = tenant-a }, caller: \\\" \\\", expectedReason: MissingCaller)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest.ToSafeErrorResultShouldNotExposeInternalDenialOrProtectedMetadata",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest.CheckAccessAsyncShouldThrowForUnknownRequirement",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest.CheckAccessAsyncShouldDenyUnsafeProjectionStates(state: null, requirement: Read, expectedReason: UnknownTenant)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest.ToRejectionShouldEmitCollapsedNonDisclosingReasonCode(reason: UnknownTenant, expectedReasonCode: \\\"tenant_isolation_violation\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest.CheckAccessAsyncShouldRejectMalformedCallerPrincipalIds(callerValue: \\\" user-1\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest.CheckAccessAsyncShouldRejectMalformedCallerPrincipalIds(callerValue: \\\"user-1 \\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest.CheckAccessAsyncShouldRejectMalformedCallerPrincipalIds(callerValue: \\\"user-1\\\\t\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.TenantAccess.ConversationTenantAccessServiceTest.CheckAccessAsyncShouldRejectMalformedCallerPrincipalIds(callerValue: \\\"user-1\\\\0\\\")",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationConformanceStatusClassifierTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationConformanceStatusClassifierTest.Classify_ConformantUnknown_ReturnsUnknownAccepted",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationConformanceStatusClassifierTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationConformanceStatusClassifierTest.ClassifyGate_UnknownAccepted_ReturnsUnknownAccepted",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest.FreshnessOrAvailabilityAccessDenialShouldStaySideChannelEquivalentToHiddenUnknown(reason: TenantAccessStale)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest.FreshnessOrAvailabilityAccessDenialShouldStaySideChannelEquivalentToHiddenUnknown(reason: TenantAccessGapDetected)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest.FreshnessOrAvailabilityAccessDenialShouldStaySideChannelEquivalentToHiddenUnknown(reason: TenantAccessRolledBack)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest.FreshnessOrAvailabilityAccessDenialShouldStaySideChannelEquivalentToHiddenUnknown(reason: TenantProjectionPoisoned)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest.FreshnessOrAvailabilityAccessDenialShouldStaySideChannelEquivalentToHiddenUnknown(reason: TenantAccessUnavailable)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest.DeniedAccessShouldBeSideChannelEquivalentToHiddenUnknown",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest.NonValidPartyDirectoryStatusesShouldDegradeAndStayRetryable(status: Unknown)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationOnboardingDiagnosticsServiceTest.MissingTenantContextShouldReturnHiddenUnknownWithoutDisclosure",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Idempotency.AddParticipantCommandHandlerIdempotencyTest",
+      "name": "Hexalith.Conversations.Server.Tests.Idempotency.AddParticipantCommandHandlerIdempotencyTest.TenantDenialShouldRunBeforeIdempotencyLookup",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Projections.ConversationAsyncProjectionHandlerTest",
+      "name": "Hexalith.Conversations.Server.Tests.Projections.ConversationAsyncProjectionHandlerTest.LateCallerCancellationShouldNotInterruptDispatchCompletion",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Api.ConversationReadApiTest",
+      "name": "Hexalith.Conversations.Server.Tests.Api.ConversationReadApiTest.DetailRequestShouldBindTenantAndCallerOnlyFromTrustedClaims",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Idempotency.IdempotentConversationCommandExecutorTest",
+      "name": "Hexalith.Conversations.Server.Tests.Idempotency.IdempotentConversationCommandExecutorTest.DuplicateReplayPayloadShouldExcludeCallerSuppliedCorrelationAndScope",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Api.ConversationCommandApiTest",
+      "name": "Hexalith.Conversations.Server.Tests.Api.ConversationCommandApiTest.UnauthenticatedCallerShouldReturnTypedBindingError",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.TenantAccess.AddParticipantCommandHandlerTenantAccessTest",
+      "name": "Hexalith.Conversations.Server.Tests.TenantAccess.AddParticipantCommandHandlerTenantAccessTest.HandleAsyncShouldPropagateCancellation",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationRejectionTelemetryTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationRejectionTelemetryTest.RecordTenantDenial_LogMessageContainsOnlyBoundedFields_NoCrosstenantData",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationRejectionTelemetryTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationRejectionTelemetryTest.RecordTenantDenial_EmitsCounterWithBoundedDimensions_NoTargetTenantValue",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationRejectionTelemetryTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationRejectionTelemetryTest.RecordTenantDenial_NoneClass_ThrowsArgumentException",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest.ClassifyDenialReason_UnknownTenant_ReturnsUnknownOrDisabled",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest.ClassifyDenialReason_TenantMismatch_ReturnsContextMismatch",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest.ClassifyDenialReason_MalformedTenant_ReturnsMissingContext",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest.ClassifyDenialReason_TenantAccessStale_ReturnsProjectionUnavailable",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest.ClassifyDenialReason_InsufficientRole_ReturnsInsufficientAccess",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest.ClassifyDenialReason_MissingTenant_ReturnsMissingContext",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest.ClassifyDenialReason_TenantAccessUnavailable_ReturnsProjectionUnavailable",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest",
+      "name": "Hexalith.Conversations.Server.Tests.Diagnostics.ConversationCommandRejectionClassifierTest.ClassifyDenialReason_TenantDisabled_ReturnsUnknownOrDisabled",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Projections.ConversationProjectionMaterializerTest",
+      "name": "Hexalith.Conversations.Server.Tests.Projections.ConversationProjectionMaterializerTest.UnknownEventTypeShouldDowngradeProjectionWithoutThrowing",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Projections.ConversationProjectionDurableEventCoverageTest",
+      "name": "Hexalith.Conversations.Server.Tests.Projections.ConversationProjectionDurableEventCoverageTest.UnknownEventNamesShouldStillBeRejected",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.AddParticipantCommandHandlerTest",
+      "name": "Hexalith.Conversations.Server.Tests.AddParticipantCommandHandlerTest.PartyValidationFailuresShouldFailClosedBeforeAggregateInvocation(status: Unknown)",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.ReassignConversationProjectCommandHandlerTest",
+      "name": "Hexalith.Conversations.Server.Tests.ReassignConversationProjectCommandHandlerTest.TenantDenialShouldRunBeforeIdempotencyLookupOrAggregateLoad",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Projections.ConversationProjectionHandlerTest",
+      "name": "Hexalith.Conversations.Server.Tests.Projections.ConversationProjectionHandlerTest.UnknownEventTypeNameShouldFailClosedDuringDecode",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Publication.CallerMetadataPublicationTest",
+      "name": "Hexalith.Conversations.Server.Tests.Publication.CallerMetadataPublicationTest.ValidCallerMetadataShouldFlowThroughIntactAsProvenance",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Publication.CallerMetadataPublicationTest",
+      "name": "Hexalith.Conversations.Server.Tests.Publication.CallerMetadataPublicationTest.CallerMetadataClaimingOtherTenantShouldNotOverrideClaimsDerivedTenant",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Publication.CallerMetadataPublicationTest",
+      "name": "Hexalith.Conversations.Server.Tests.Publication.CallerMetadataPublicationTest.AppendedTransportMetadataShouldNotCarryCallerSuppliedProvenanceValues",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Publication.CallerMetadataPublicationTest",
+      "name": "Hexalith.Conversations.Server.Tests.Publication.CallerMetadataPublicationTest.TransportMetadataShouldNotCarryCallerSuppliedProvenanceValues",
+      "result": "Pass"
+    },
+    {
+      "xml": "Hexalith.Conversations.Server.Tests.xml",
+      "class": "Hexalith.Conversations.Server.Tests.Publication.CallerMetadataPublicationTest",
+      "name": "Hexalith.Conversations.Server.Tests.Publication.CallerMetadataPublicationTest.CallerMetadataSpoofingOnAppendRouteShouldNotOverrideClaimsDerivedTenant",
+      "result": "Pass"
+    }
+  ]
+}

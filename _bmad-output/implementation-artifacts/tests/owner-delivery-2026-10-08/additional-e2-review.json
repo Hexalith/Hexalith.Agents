@@ -1,0 +1,11 @@
+{
+  "capturedUtc": "2026-10-08T12:20:01.189363+00:00",
+  "reviewer": "owner_edge_review",
+  "scope": "Independent additional E2 retained-transport correction review",
+  "finding": "E3",
+  "verdict": "medium",
+  "route": "patch",
+  "evidence": "In-memory probe against current EventStore.Client.dll reproduces completed503 response blocking in direct finally Dispose with cancelled caller, and completed200 response exactlyat30sec blocking in DisposeAfterCompletionAsync on query continuation. Both public reads remain incomplete until disposal is released, then correct terminal verdict appears. Root traced the synchronous completed-await/direct-finally paths. This concerns caller latency, separately from forcible resource reclamation.",
+  "patch": "Execute direct/late owned cleanup off the query continuation, observe cleanup faults, preserve ownership; controlled blocked-disposal regressions.",
+  "status": "correction in progress; no complete/live target implied"
+}

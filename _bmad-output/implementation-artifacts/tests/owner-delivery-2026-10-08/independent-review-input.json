@@ -1,0 +1,28 @@
+{
+  "diff": "/tmp/hexalith-owner-delivery-review-20261008.diff",
+  "diffSha256": "80ec0689e9e206b415a2776ed26df178b1b4e9116e71c85c9c2a87e47052b402",
+  "bytes": 125566,
+  "scope": "19 owned source files against captured initial copies plus five new full owner packet/evidence documents. No unowned external changes. Parent remains in-progress because full owner delivery is incomplete; independent review applies to this delivered continuation.",
+  "packetFiles": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/README.md",
+      "sha256": "f600987b3a35366ca63366e0da2f6cdc44f73d26b4382f85581e60049c4cfc7a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+      "sha256": "b18636a6b6ca064bce776ad4042cf963cd065f574dc5a0e8cf2fb74659f255ae"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+      "sha256": "5b8f27009747bed1ac4f2caec4e37f49f2579354dbc57bea5ed72e097d462a15"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+      "sha256": "16ac95b5b199928a08cf09b8da8da093017e3165d58cdb35faa5b3eb3488b2e0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+      "sha256": "8eb801c68fb09e5d80d906cf80d41155f64a42a58c6809146398b0cfd77a7fae"
+    }
+  ]
+}

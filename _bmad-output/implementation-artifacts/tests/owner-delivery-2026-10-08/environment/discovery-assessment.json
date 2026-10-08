@@ -1,0 +1,155 @@
+{
+  "capturedUtc": "2026-10-08T12:30:48.198028+00:00",
+  "environment": "192.168.1.30",
+  "metadataSha256": "59217202104b908623f046b0e15b2de0bd78986c12ee4fab4cad393eaa000daa",
+  "infraCandidates": [
+    {
+      "kind": "Deployment",
+      "namespace": "dapr-system",
+      "name": "dapr-operator",
+      "uid": "247e8dc9-72a0-4500-980b-2178dd8acb1c",
+      "resourceVersion": "22791208",
+      "replicas": 3,
+      "readyReplicas": 3,
+      "images": [
+        "ghcr.io/dapr/operator:1.18.1"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "dapr-system",
+      "name": "dapr-sentry",
+      "uid": "7611713d-8be3-49a0-a300-b575c2d96ebb",
+      "resourceVersion": "22466614",
+      "replicas": 3,
+      "readyReplicas": 3,
+      "images": [
+        "ghcr.io/dapr/sentry:1.18.1"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "dapr-system",
+      "name": "dapr-sidecar-injector",
+      "uid": "5f654759-30a9-4a30-88b3-a3a591324bdb",
+      "resourceVersion": "22791168",
+      "replicas": 3,
+      "readyReplicas": 3,
+      "images": [
+        "ghcr.io/dapr/injector:1.18.1"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "keycloak",
+      "name": "keycloak",
+      "uid": "98fc84f3-918f-46d9-ae22-7584fb31ff9b",
+      "resourceVersion": "27894571",
+      "replicas": 2,
+      "readyReplicas": 2,
+      "images": [
+        "quay.io/keycloak/keycloak@sha256:82a77884f3af238beab1e7afd63b5f530e1b5c0590bd7aa60b40a40463e29b2c"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "keycloak",
+      "name": "postgres",
+      "uid": "d9712f4b-d289-479c-916d-ae5ff80af177",
+      "resourceVersion": "22425967",
+      "replicas": 0,
+      "readyReplicas": 0,
+      "images": [
+        "docker.io/library/postgres@sha256:86d2fe3ed4d43250d2865b551fca46478361c4cd7e359939ad6e8663be274f3a"
+      ]
+    },
+    {
+      "kind": "StatefulSet",
+      "namespace": "dapr-system",
+      "name": "dapr-placement-server",
+      "uid": "8cf281cb-7fb3-4f97-92cb-de83b4f33761",
+      "resourceVersion": "22791188",
+      "replicas": 3,
+      "readyReplicas": 3,
+      "images": [
+        "ghcr.io/dapr/placement:1.18.1"
+      ]
+    },
+    {
+      "kind": "StatefulSet",
+      "namespace": "dapr-system",
+      "name": "dapr-scheduler-server",
+      "uid": "c7a7c0b3-2cc0-4617-8746-5d38b49b167a",
+      "resourceVersion": "22791097",
+      "replicas": 3,
+      "readyReplicas": 3,
+      "images": [
+        "ghcr.io/dapr/scheduler:1.18.1"
+      ]
+    },
+    {
+      "kind": "StatefulSet",
+      "namespace": "openbao",
+      "name": "hexalith-keys",
+      "uid": "df2bbbbe-1fe8-4e0b-a8a6-174bd3287806",
+      "resourceVersion": "22791138",
+      "replicas": 3,
+      "readyReplicas": 3,
+      "images": [
+        "quay.io/openbao/openbao:2.6.2@sha256:11fd73a2102cda9c55d5d881a8c3210303146a7ec1e8ac76f526e175c6d24641"
+      ]
+    },
+    {
+      "kind": "Ingress",
+      "namespace": "keycloak",
+      "name": "keycloak-ingress",
+      "uid": "34608abc-9b13-483b-9bb8-7f35d97115cf",
+      "resourceVersion": "27897125",
+      "hosts": [
+        "auth.tache.ai"
+      ],
+      "className": "nginx-public"
+    },
+    {
+      "kind": "Ingress",
+      "namespace": "keycloak",
+      "name": "keycloak-reset-rate-limit",
+      "uid": "4907a06a-ff44-418c-b5fb-4d9880b2b136",
+      "resourceVersion": "22082273",
+      "hosts": [
+        "auth.tache.ai"
+      ],
+      "className": "nginx-public"
+    }
+  ],
+  "requestedWorkloadNamesNotDiscovered": [
+    "agents",
+    "parties",
+    "conversations",
+    "security-audit-spool"
+  ],
+  "observedOpenBaoPodNodeNames": [
+    "node1"
+  ],
+  "allCommandsReadOnly": true,
+  "commandCount": 6,
+  "sshObservation": {
+    "argv": [
+      "ssh",
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "ConnectTimeout=5",
+      "-o",
+      "StrictHostKeyChecking=yes",
+      "-o",
+      "UpdateHostKeys=no",
+      "192.168.1.30",
+      "uname",
+      "-s"
+    ],
+    "exitCode": 255,
+    "outcome": "Existing default administrator authentication denied; independent existing Kubernetes access succeeds."
+  },
+  "qualification": "No full owner/live runtime qualification. Workload name search alone does not prove absence of equivalent services; current target manifest/bindings still required."
+}

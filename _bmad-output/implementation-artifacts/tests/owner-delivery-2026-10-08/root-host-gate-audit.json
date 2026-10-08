@@ -1,0 +1,74 @@
+{
+  "capturedUtc": "2026-10-08T11:34:35.999426+00:00",
+  "hostCurrentFiveSourceHashesStable": true,
+  "negativeCases": [
+    {
+      "case": "parties-live",
+      "refused": true,
+      "noVerifierDotnetChild": true,
+      "nonemptyLog": true
+    },
+    {
+      "case": "conversations-live",
+      "refused": true,
+      "noVerifierDotnetChild": true,
+      "nonemptyLog": true
+    },
+    {
+      "case": "custody-default",
+      "refused": true,
+      "noVerifierDotnetChild": true,
+      "nonemptyLog": true
+    },
+    {
+      "case": "custody-live",
+      "refused": true,
+      "noVerifierDotnetChild": true,
+      "nonemptyLog": true
+    },
+    {
+      "case": "custody-invalid",
+      "refused": true,
+      "noVerifierDotnetChild": true,
+      "nonemptyLog": true
+    },
+    {
+      "case": "host-default",
+      "refused": true,
+      "noVerifierDotnetChild": true,
+      "nonemptyLog": true
+    },
+    {
+      "case": "host-full",
+      "refused": true,
+      "noVerifierDotnetChild": true,
+      "nonemptyLog": true
+    },
+    {
+      "case": "host-invalid",
+      "refused": true,
+      "noVerifierDotnetChild": true,
+      "nonemptyLog": true
+    },
+    {
+      "case": "host-missing-mode",
+      "refused": true,
+      "noVerifierDotnetChild": true,
+      "nonemptyLog": true
+    },
+    {
+      "case": "host-empty-artifacts",
+      "refused": true,
+      "noVerifierDotnetChild": true,
+      "nonemptyLog": true
+    },
+    {
+      "case": "host-unknown-argument",
+      "refused": true,
+      "noVerifierDotnetChild": true,
+      "nonemptyLog": true
+    }
+  ],
+  "errors": [],
+  "scope": "Audits exact current scaffold and recorded negative-gate command/log data; no live consuming call or infrastructure qualification."
+}

@@ -1,0 +1,20 @@
+# Remaining owner inputs
+
+The common integration date is **2026-10-08**, supplied as “today”. Full scope, Branch B, Platform custody ownership, the 365-day binding-effective-at policy with exclusive expiry, and existing implementation approvals are accepted. These choices do not need another approval.
+
+The owner confirmed that an existing environment should be used; its name/configuration location is pending. The technical questions have been translated into a [pragmatic proposal with tradeoffs](pragmatic-owner-decisions.md). No new production policy or contract choice is inferred from the request for explanations. Supply configuration locations rather than secret values.
+
+| Input still missing | Why it is needed | Owner response |
+| --- | --- | --- |
+| Qualified custody backend, payload-protection engine/FR-34 attestation, independent replicated denial spool and failure model, current actor/role authority, service credential targets | Actual provider bindings, release authorization, copy inventory, recovery and live qualification cannot be inferred from library fixtures. | Existing environment name/configuration location first; we will inspect its targets. No credentials or keys. |
+| Trusted-envelope lifetime L, skew S, overlap O, recovery horizon H and replay retention R; issuer/audience/trust profile | Must satisfy `R >= max(L+S+O,H)`. This replay retention is separate from the accepted Party history policy. | Inspect existing environment profile first; plain-language timing proposal is prepared if none exists. |
+| Independent decision issuer, public trust anchors/profile and stable actor/role authority | Custodians, recorders and export signers cannot mint governance approval. | Independently governed authority and contract references. |
+| Authenticated actor-free successor continuation after expired predecessor destruction | A later valid binding must be provable without returning or recovering expired actor data. | Root inspected EventStore; no implemented contract exists. The minimal continuation proposal and required authority/receipt binding are documented. |
+| Conversations denominator window semantics | Current proposal counts open/undeleted Conversations created in `[from,to)`, including zero Agent Calls. An activity-over-window interpretation changes the contract. | Tradeoffs prepared; recommendation is the existing creation-window rule. Owner choice remains pending. |
+| Conversations source-worker provenance | Delivery metadata requires a stable PartyId; the current source-worker authority result has no PartyId. | Tradeoffs prepared; recommendation is a designated service Party. Inspect existing enrollment when the environment is identified; owner choice remains pending. |
+| Complete ordered deletion discovery/checkpoint and actual receiver receipt lookup | A known-aggregate reader/count catalogue cannot prove tenant-wide backfill completeness; a submission receipt is not an independently authenticated remote acceptance. | Existing feed/high-water/checkpoint contract and Agents 8.3 receiver/lookup reference. |
+| Exact current-source/conditional append, guard issue/dispatch/no-issue lookup and protection block/reserve/activate contracts | These technical owners must bind joint atomicity and immutable outcome lookup; a clean read or generic effect receipt cannot replace them. | Existing accepted technical contract references, or owner decisions settling those bindings. |
+
+Remaining durable implementation is explicitly mapped in the [Parties](ext-parties-1.md), [Conversations](ext-conv-ai-1.md), [custody](ext-secrets-1.md) and [host](ext-host-1.md) packets. Missing providers alone do not excuse that engineering. Full immutable targets and accepted complete verification commands can be recorded only when the completed artifacts support them; current source observations and Local checks cannot fill those fields.
+
+All four records remain Uncommitted. The prerequisite parent remains in-progress and Story 5.4 remains draft/backlog until its entry gates pass.

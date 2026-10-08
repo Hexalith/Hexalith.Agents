@@ -1,0 +1,5516 @@
+{
+  "capturedUtc": "2026-10-08T12:26:31.205019+00:00",
+  "ownerSuppliedEnvironment": "192.168.1.30",
+  "context": "jpiquot@local",
+  "endpoint": "https://192.168.1.30:6443",
+  "clientBinary": "/home/administrator/hexalith-upgrade-evidence/tools/v1.34.12/kubectl",
+  "clientBinarySha256": "90b7b9058ffeb5c10710bb1c73f541eaf426fb1b4e87df435db669de9a2564a2",
+  "serverVersion": "v1.34.9",
+  "namespaces": [
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "calico-system",
+      "uid": "42958036-c1b3-4d34-9d2d-7377597af7e0",
+      "resourceVersion": "599"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "cert-manager",
+      "uid": "97817f62-8343-40bf-a394-ec50788ddb9e",
+      "resourceVersion": "11324"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "cnpg-system",
+      "uid": "295a5c06-468f-464a-8f54-dcc4e6bdaae0",
+      "resourceVersion": "22422940"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "dapr-system",
+      "uid": "d34bd740-5550-4990-a065-649cfba4a2b8",
+      "resourceVersion": "848488"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "default",
+      "uid": "85863d93-4721-4181-8de1-19d26528cf72",
+      "resourceVersion": "7489"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "forgejo",
+      "uid": "03865066-cf21-4d75-a392-1592c72647f5",
+      "resourceVersion": "20783"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "forgejo-runner",
+      "uid": "fe61971b-ebec-4aaa-8550-bdd3b8737db2",
+      "resourceVersion": "5811670"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "hexalith-memories",
+      "uid": "b4890577-70a6-4296-8025-d1e43de1e0e4",
+      "resourceVersion": "883131"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "keycloak",
+      "uid": "22744997-bdad-4ac5-85bf-631fc700d4ea",
+      "resourceVersion": "12902024"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "kube-node-lease",
+      "uid": "d072cec3-e83f-4108-b2db-fbabe4d00b49",
+      "resourceVersion": "7530"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "kube-public",
+      "uid": "104e6456-019d-478b-a930-e864cdeac9e5",
+      "resourceVersion": "7547"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "kube-system",
+      "uid": "b5860674-1d1e-4a3b-b413-e1bb3b9a4557",
+      "resourceVersion": "7573"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "kubekey-system",
+      "uid": "0918ddf7-5d87-4cc2-83ae-a0c5f9aabb78",
+      "resourceVersion": "8326"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "kubesphere-controls-system",
+      "uid": "219b0323-e99b-4053-9fe4-df9d90f9bc7c",
+      "resourceVersion": "7458"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "kubesphere-system",
+      "uid": "6ef44069-08e0-4caa-8dc0-55296d8599f2",
+      "resourceVersion": "7429"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "llm",
+      "uid": "2ae562fd-a05f-44f0-a51b-7644e7199c91",
+      "resourceVersion": "20798"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "openbao",
+      "uid": "76fac957-024c-4028-a832-d528dcd40068",
+      "resourceVersion": "883133"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "registry-distribution",
+      "uid": "4eed62db-7d25-4d17-98ab-bf4989a21537",
+      "resourceVersion": "12893605"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "registry-private",
+      "uid": "544ef3fd-185d-44cb-a520-5327e51442fd",
+      "resourceVersion": "12893607"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "stalwart",
+      "uid": "121af2b0-b461-427e-96dd-a3a18d247f68",
+      "resourceVersion": "20788"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "tigera-operator",
+      "uid": "4e5eae4a-3bd5-43aa-9036-359c2eabf393",
+      "resourceVersion": "499"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "traefik",
+      "uid": "c9aac11d-22e0-4712-b238-23d790dbe1d2",
+      "resourceVersion": "11755"
+    },
+    {
+      "kind": "Namespace",
+      "namespace": null,
+      "name": "velero",
+      "uid": "9f5ab700-41dd-4315-bfac-13eb7150d127",
+      "resourceVersion": "15463"
+    }
+  ],
+  "workloads": [
+    {
+      "kind": "Deployment",
+      "namespace": "calico-system",
+      "name": "calico-apiserver",
+      "uid": "bf124385-7679-4b10-ac81-879a9145031d",
+      "resourceVersion": "22791230",
+      "replicas": 2,
+      "readyReplicas": 2,
+      "images": [
+        "docker.io/calico/apiserver:v3.31.3"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "calico-system",
+      "name": "calico-kube-controllers",
+      "uid": "7a0f1a11-5179-48e6-9008-6d585c63c50b",
+      "resourceVersion": "22466540",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "docker.io/calico/kube-controllers:v3.31.3"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "calico-system",
+      "name": "calico-typha",
+      "uid": "f6d52d06-42ec-453f-88b7-c98ab53ca7e3",
+      "resourceVersion": "22466944",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "docker.io/calico/typha:v3.31.3"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "calico-system",
+      "name": "goldmane",
+      "uid": "35973db2-8559-4fc8-bdb9-13dffa7c0fd6",
+      "resourceVersion": "22791416",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "docker.io/calico/goldmane:v3.31.3"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "calico-system",
+      "name": "whisker",
+      "uid": "5dbb908b-4037-40af-a2a5-493a2ffa6291",
+      "resourceVersion": "22466359",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "docker.io/calico/whisker:v3.31.3",
+        "docker.io/calico/whisker-backend:v3.31.3"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "cert-manager",
+      "name": "cert-manager",
+      "uid": "649a9400-676a-4037-93d6-324a88b04aa4",
+      "resourceVersion": "22466504",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "quay.io/jetstack/cert-manager-controller:v1.21.2@sha256:70f532fd9cfde0b09d55687200942399d89838bc2d5d5b45152eb799a15912b8"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "cert-manager",
+      "name": "cert-manager-cainjector",
+      "uid": "751bca31-801e-4e3a-851e-8d37daac12c9",
+      "resourceVersion": "22466289",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "quay.io/jetstack/cert-manager-cainjector:v1.21.2@sha256:c85268c64f2e0e76684bf5fe8906caff34b82523561c6affe0fae3546bd87562"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "cert-manager",
+      "name": "cert-manager-webhook",
+      "uid": "3920f5a9-339d-4be2-9a97-719f6b207afd",
+      "resourceVersion": "22791076",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "quay.io/jetstack/cert-manager-webhook:v1.21.2@sha256:a60e2dac46dbb8a7f3df95c54ce941012f54c2fe022f0ee55aaa1ab40ed957ae"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "cnpg-system",
+      "name": "barman-cloud",
+      "uid": "b9f1b826-f93b-4c6d-a373-cefb579e80d4",
+      "resourceVersion": "24447278",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "ghcr.io/cloudnative-pg/plugin-barman-cloud:v0.15.0@sha256:563c680fe7fda3466ca2b1f55a1397ed2ddc9e760360107dd7724f1959c1a536"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "cnpg-system",
+      "name": "cnpg-controller-manager",
+      "uid": "f0a3408a-825a-45ac-82ab-aae0bd792c84",
+      "resourceVersion": "25252648",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "ghcr.io/cloudnative-pg/cloudnative-pg:1.30.0@sha256:a2701eb97cdd2a34b1fdb2cb51987f544b706e40bec72ae7146cd8580efefebb"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "dapr-system",
+      "name": "dapr-operator",
+      "uid": "247e8dc9-72a0-4500-980b-2178dd8acb1c",
+      "resourceVersion": "22791208",
+      "replicas": 3,
+      "readyReplicas": 3,
+      "images": [
+        "ghcr.io/dapr/operator:1.18.1"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "dapr-system",
+      "name": "dapr-sentry",
+      "uid": "7611713d-8be3-49a0-a300-b575c2d96ebb",
+      "resourceVersion": "22466614",
+      "replicas": 3,
+      "readyReplicas": 3,
+      "images": [
+        "ghcr.io/dapr/sentry:1.18.1"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "dapr-system",
+      "name": "dapr-sidecar-injector",
+      "uid": "5f654759-30a9-4a30-88b3-a3a591324bdb",
+      "resourceVersion": "22791168",
+      "replicas": 3,
+      "readyReplicas": 3,
+      "images": [
+        "ghcr.io/dapr/injector:1.18.1"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "forgejo-runner",
+      "name": "forgejo-runner",
+      "uid": "7721f550-9873-487f-a617-e827b5c9f0c9",
+      "resourceVersion": "28452607",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "data.forgejo.org/forgejo/runner@sha256:eb6e7bc21973382d261e6eb883dbd27b8cb56939d33a3bfd79a1352b7f9a33a0",
+        "docker.io/library/docker@sha256:084e385b0c9b7ab35d5a46dfedd033721448c000dbec71adcf13da8a9e71baa8",
+        "docker.io/library/docker@sha256:084e385b0c9b7ab35d5a46dfedd033721448c000dbec71adcf13da8a9e71baa8"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "forgejo",
+      "name": "forgejo",
+      "uid": "33a039c3-1aa1-4c01-8562-f22e30e89f65",
+      "resourceVersion": "22791183",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "codeberg.org/forgejo/forgejo:16.0.5@sha256:cf5f5ae6acf2ababca0ee3d255705b83a47f35b25e07fc931d694d60664053fe"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "hexalith-memories",
+      "name": "memories",
+      "uid": "f6d05934-7a44-4920-8fd3-8351752dbdee",
+      "resourceVersion": "25249548",
+      "replicas": 2,
+      "readyReplicas": 2,
+      "images": [
+        "registry.hexalith.com/memories@sha256:71e49b6e806ec2fa7c221e58600ba02115693923db05915663396be01b1c042c"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "hexalith-memories",
+      "name": "memories-access-telemetry",
+      "uid": "ce58cb74-9118-414c-8a62-801802deb9ab",
+      "resourceVersion": "27637966",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "registry.hexalith.com/memories-access-telemetry@sha256:b3790e08c0091dfb723f6819e4706a6b1ef36a051b8c4afe38f5e362c5bdf8ea"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "hexalith-memories",
+      "name": "memories-access-telemetry-clock",
+      "uid": "d4efbcd9-c537-448f-8189-ac2f68ea712f",
+      "resourceVersion": "1308994",
+      "replicas": 0,
+      "readyReplicas": 0,
+      "images": [
+        "registry.hexalith.com/memories-access-telemetry-clock@sha256:50413b716ca051fad7c4d68119527a1fc5f64c566eea22827769fd85d9de4c70"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "hexalith-memories",
+      "name": "memories-mcp",
+      "uid": "a9bf6dde-593d-4313-af47-c55670e2a0a7",
+      "resourceVersion": "25883950",
+      "replicas": 2,
+      "readyReplicas": 2,
+      "images": [
+        "registry.hexalith.com/memories-mcp@sha256:4d5cd738a89fdca71b7202d7661cecea8bab6b6e45d4fe505670cf7287205bb7"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "keycloak",
+      "name": "keycloak",
+      "uid": "98fc84f3-918f-46d9-ae22-7584fb31ff9b",
+      "resourceVersion": "27894571",
+      "replicas": 2,
+      "readyReplicas": 2,
+      "images": [
+        "quay.io/keycloak/keycloak@sha256:82a77884f3af238beab1e7afd63b5f530e1b5c0590bd7aa60b40a40463e29b2c"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "keycloak",
+      "name": "postgres",
+      "uid": "d9712f4b-d289-479c-916d-ae5ff80af177",
+      "resourceVersion": "22425967",
+      "replicas": 0,
+      "readyReplicas": 0,
+      "images": [
+        "docker.io/library/postgres@sha256:86d2fe3ed4d43250d2865b551fca46478361c4cd7e359939ad6e8663be274f3a"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "kube-system",
+      "name": "coredns",
+      "uid": "604add4f-493c-4987-8d76-af4c88cabf6c",
+      "resourceVersion": "22466396",
+      "replicas": 2,
+      "readyReplicas": 2,
+      "images": [
+        "registry.k8s.io/coredns/coredns:v1.12.1"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "kube-system",
+      "name": "localpv-provisioner",
+      "uid": "0fd5b7ed-869c-437c-aeac-9153803f21fa",
+      "resourceVersion": "22466535",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "docker.io/openebs/provisioner-localpv:4.4.0"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "kube-system",
+      "name": "metrics-server",
+      "uid": "694f5e27-272d-47a2-a1dd-dab1ac401510",
+      "resourceVersion": "22791289",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "registry.k8s.io/metrics-server/metrics-server:v0.9.0@sha256:d9862115e7c7881280d3d75ca26bda8ffc0fc213315979575bf23ce9826205c0"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "kubesphere-system",
+      "name": "extensions-museum",
+      "uid": "f330e131-2e6c-49f9-bdac-5e15b0154bc5",
+      "resourceVersion": "22466051",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "registry.cn-beijing.aliyuncs.com/kse/extensions-museum:v11.1.3"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "kubesphere-system",
+      "name": "ks-apiserver",
+      "uid": "d2ad3748-8ce8-4fb3-beff-c10665f9352b",
+      "resourceVersion": "22466390",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "registry.cn-beijing.aliyuncs.com/kse/ks-apiserver:v4.2.1"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "kubesphere-system",
+      "name": "ks-console",
+      "uid": "52eb8d84-ebf7-4cf3-b5b9-f57d46356cc7",
+      "resourceVersion": "22466063",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "registry.cn-beijing.aliyuncs.com/kse/ks-console:v4.2.1"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "kubesphere-system",
+      "name": "ks-console-embed",
+      "uid": "a46e993e-2a9e-4c5e-880e-7a01946cfd26",
+      "resourceVersion": "22465969",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "registry.cn-beijing.aliyuncs.com/kse/ks-console-embed:v4.2.1"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "kubesphere-system",
+      "name": "ks-controller-manager",
+      "uid": "99473d49-f274-414a-9572-7e5c0986390d",
+      "resourceVersion": "22466308",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "registry.cn-beijing.aliyuncs.com/kse/ks-controller-manager:v4.2.1"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "llm",
+      "name": "envoy-gateway",
+      "uid": "332ab0bb-ae00-452d-b5b0-534c63520001",
+      "resourceVersion": "67705",
+      "replicas": 0,
+      "readyReplicas": 0,
+      "images": [
+        "docker.io/envoyproxy/envoy@sha256:caa5b411be1633b90023592a34a7e010c933d6e60206c758f631485e53006865"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "llm",
+      "name": "llm-healthz",
+      "uid": "c2a75f7f-eef0-4eea-b307-fac7a8ac78ae",
+      "resourceVersion": "67710",
+      "replicas": 0,
+      "readyReplicas": 0,
+      "images": [
+        "docker.io/library/busybox@sha256:73aaf090f3d85aa34ee199857f03fa3a95c8ede2ffd4cc2cdb5b94e566b11662"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "llm",
+      "name": "ollama",
+      "uid": "d03aa425-ee9b-4674-aa4e-42addddd4548",
+      "resourceVersion": "67715",
+      "replicas": 0,
+      "readyReplicas": 0,
+      "images": [
+        "docker.io/ollama/ollama@sha256:05ab093b257a54318fba39293f1640d53b507d1edec8fa6ca2d3e1817c02e53b"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "registry-distribution",
+      "name": "distribution-registry",
+      "uid": "20bb657c-b622-4e1b-81a2-f97bc353a811",
+      "resourceVersion": "27899261",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "ghcr.io/project-zot/zot-linux-amd64@sha256:95a837a0afacf5b7edc0c92493f04beee6891989b8d2fd50a00cf65a1e6d4fd5"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "registry-private",
+      "name": "private-registry",
+      "uid": "c22899ad-bce8-41f1-8ee3-513b136e9e63",
+      "resourceVersion": "22856709",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "ghcr.io/project-zot/zot-linux-amd64@sha256:95a837a0afacf5b7edc0c92493f04beee6891989b8d2fd50a00cf65a1e6d4fd5"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "stalwart",
+      "name": "stalwart",
+      "uid": "9999fe40-c3bd-4d91-b02b-d484c178ec68",
+      "resourceVersion": "22849877",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "docker.io/stalwartlabs/stalwart:v0.16.23@sha256:be215678796691bc39bdda918ecc50d14a9032a099a1d1950e51950aec7e2592"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "tigera-operator",
+      "name": "tigera-operator",
+      "uid": "fa8bd053-3aa7-4b02-8bea-bcc05c2c8b2f",
+      "resourceVersion": "22465777",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "quay.io/tigera/operator:v1.40.3"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "traefik",
+      "name": "hexalith-tache-ai-relay",
+      "uid": "be7b3397-dab5-4f3c-8b8e-dd1fe498537a",
+      "resourceVersion": "22465759",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "docker.io/library/traefik:v3.7.13@sha256:24841fe2de7304c149343d877d2923b4c8800a38ba015dea9174c23b20e344a0"
+      ]
+    },
+    {
+      "kind": "Deployment",
+      "namespace": "velero",
+      "name": "velero",
+      "uid": "c3bdaf16-757e-4ef9-9f1c-b60171fcde8d",
+      "resourceVersion": "24436582",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "docker.io/velero/velero@sha256:b839e52bc2c69eb3b5a84b010b8b3c7f714f3c5ef50b77ec7770a382a8f2e0ab"
+      ]
+    },
+    {
+      "kind": "StatefulSet",
+      "namespace": "dapr-system",
+      "name": "dapr-placement-server",
+      "uid": "8cf281cb-7fb3-4f97-92cb-de83b4f33761",
+      "resourceVersion": "22791188",
+      "replicas": 3,
+      "readyReplicas": 3,
+      "images": [
+        "ghcr.io/dapr/placement:1.18.1"
+      ]
+    },
+    {
+      "kind": "StatefulSet",
+      "namespace": "dapr-system",
+      "name": "dapr-scheduler-server",
+      "uid": "c7a7c0b3-2cc0-4617-8746-5d38b49b167a",
+      "resourceVersion": "22791097",
+      "replicas": 3,
+      "readyReplicas": 3,
+      "images": [
+        "ghcr.io/dapr/scheduler:1.18.1"
+      ]
+    },
+    {
+      "kind": "StatefulSet",
+      "namespace": "hexalith-memories",
+      "name": "access-telemetry-postgresql",
+      "uid": "747db81b-04e5-4d22-b747-89d4c6d4d1f4",
+      "resourceVersion": "27582807",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "docker.io/library/postgres:18.6-trixie@sha256:5a5a84b19854a9ffaa54082c166ff4ec27473a361e496e5ea167f298f2da9722"
+      ]
+    },
+    {
+      "kind": "StatefulSet",
+      "namespace": "hexalith-memories",
+      "name": "falkordb",
+      "uid": "3dfd84ae-b4d7-47e8-b7fd-7934782603e6",
+      "resourceVersion": "25249436",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "falkordb/falkordb:v4.12.0@sha256:7927eb194df0fadf70e2deb6c20c8178743ec92aacd739c790f8a35ce5dee613"
+      ]
+    },
+    {
+      "kind": "StatefulSet",
+      "namespace": "hexalith-memories",
+      "name": "redis-stack",
+      "uid": "6eb1484c-fe20-4efe-b13e-57245a81324e",
+      "resourceVersion": "25249439",
+      "replicas": 1,
+      "readyReplicas": 1,
+      "images": [
+        "redis/redis-stack-server:7.4.0-v8@sha256:798ab84d9f266936b034ab11c4d04a2b8e4b441884c5aa7d17ac951eefdf742a"
+      ]
+    },
+    {
+      "kind": "StatefulSet",
+      "namespace": "openbao",
+      "name": "hexalith-keys",
+      "uid": "df2bbbbe-1fe8-4e0b-a8a6-174bd3287806",
+      "resourceVersion": "22791138",
+      "replicas": 3,
+      "readyReplicas": 3,
+      "images": [
+        "quay.io/openbao/openbao:2.6.2@sha256:11fd73a2102cda9c55d5d881a8c3210303146a7ec1e8ac76f526e175c6d24641"
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "calico-system",
+      "name": "calico-apiserver-5497f697fb-f2b4r",
+      "uid": "371417fb-3afd-4b38-8cf9-70e20ea02d61",
+      "resourceVersion": "22790554",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "calico-apiserver",
+          "image": "docker.io/calico/apiserver:v3.31.3",
+          "environmentVariableNames": [
+            "DATASTORE_TYPE",
+            "KUBERNETES_SERVICE_HOST",
+            "KUBERNETES_SERVICE_PORT",
+            "LOG_LEVEL",
+            "MULTI_INTERFACE_MODE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "calico-system",
+      "name": "calico-apiserver-5497f697fb-zstzs",
+      "uid": "f8c15468-543f-49f0-8eb7-b24e39439c10",
+      "resourceVersion": "22791225",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "calico-apiserver",
+          "image": "docker.io/calico/apiserver:v3.31.3",
+          "environmentVariableNames": [
+            "DATASTORE_TYPE",
+            "KUBERNETES_SERVICE_HOST",
+            "KUBERNETES_SERVICE_PORT",
+            "LOG_LEVEL",
+            "MULTI_INTERFACE_MODE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "calico-system",
+      "name": "calico-kube-controllers-64f84946d-b7mgl",
+      "uid": "25b5094c-9d18-409f-b432-6fc08cded052",
+      "resourceVersion": "22790686",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "calico-kube-controllers",
+          "image": "docker.io/calico/kube-controllers:v3.31.3",
+          "environmentVariableNames": [
+            "KUBE_CONTROLLERS_CONFIG_NAME",
+            "DATASTORE_TYPE",
+            "ENABLED_CONTROLLERS",
+            "DISABLE_KUBE_CONTROLLERS_CONFIG_API",
+            "KUBERNETES_SERVICE_HOST",
+            "KUBERNETES_SERVICE_PORT",
+            "CA_CRT_PATH"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "calico-system",
+      "name": "calico-node-8swc5",
+      "uid": "1e9c9346-587e-4086-9e18-7f2b00068e1b",
+      "resourceVersion": "22791309",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "calico-node",
+          "image": "docker.io/calico/node:v3.31.3",
+          "environmentVariableNames": [
+            "DATASTORE_TYPE",
+            "WAIT_FOR_DATASTORE",
+            "CLUSTER_TYPE",
+            "CALICO_DISABLE_FILE_LOGGING",
+            "FELIX_DEFAULTENDPOINTTOHOSTACTION",
+            "FELIX_HEALTHENABLED",
+            "FELIX_HEALTHPORT",
+            "NODENAME",
+            "NAMESPACE",
+            "FELIX_TYPHAK8SNAMESPACE",
+            "FELIX_TYPHAK8SSERVICENAME",
+            "FELIX_TYPHACAFILE",
+            "FELIX_TYPHACERTFILE",
+            "FELIX_TYPHAKEYFILE",
+            "NO_DEFAULT_POOLS",
+            "FELIX_FLOWLOGSGOLDMANESERVER",
+            "FELIX_FLOWLOGSFLUSHINTERVAL",
+            "FELIX_TYPHACN",
+            "CALICO_MANAGE_CNI",
+            "CALICO_NETWORKING_BACKEND",
+            "IP",
+            "IP_AUTODETECTION_METHOD",
+            "IP6",
+            "FELIX_IPV6SUPPORT",
+            "KUBERNETES_SERVICE_HOST",
+            "KUBERNETES_SERVICE_PORT"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "calico-system",
+      "name": "calico-typha-774c8dc76-5lf8p",
+      "uid": "da9efc28-d797-427c-b1d2-e084720d9771",
+      "resourceVersion": "22790784",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "calico-typha",
+          "image": "docker.io/calico/typha:v3.31.3",
+          "environmentVariableNames": [
+            "TYPHA_LOGSEVERITYSCREEN",
+            "TYPHA_LOGFILEPATH",
+            "TYPHA_LOGSEVERITYSYS",
+            "TYPHA_CONNECTIONREBALANCINGMODE",
+            "TYPHA_DATASTORETYPE",
+            "TYPHA_HEALTHENABLED",
+            "TYPHA_HEALTHPORT",
+            "TYPHA_K8SNAMESPACE",
+            "TYPHA_CAFILE",
+            "TYPHA_SERVERCERTFILE",
+            "TYPHA_SERVERKEYFILE",
+            "TYPHA_SHUTDOWNTIMEOUTSECS",
+            "TYPHA_CLIENTCN",
+            "KUBERNETES_SERVICE_HOST",
+            "KUBERNETES_SERVICE_PORT"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "calico-system",
+      "name": "goldmane-7449f766bd-2s4hj",
+      "uid": "e714dcdd-14da-4d25-ae9e-95ce38032e88",
+      "resourceVersion": "22791411",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "goldmane",
+          "image": "docker.io/calico/goldmane:v3.31.3",
+          "environmentVariableNames": [
+            "LOG_LEVEL",
+            "PORT",
+            "SERVER_CERT_PATH",
+            "SERVER_KEY_PATH",
+            "CA_CERT_PATH",
+            "PUSH_URL",
+            "FILE_CONFIG_PATH",
+            "HEALTH_ENABLED"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "calico-system",
+      "name": "whisker-6c7f4c4844-7ffkw",
+      "uid": "cfd910f8-52d3-4e80-9ed0-8328bd15fbb4",
+      "resourceVersion": "22790640",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "whisker",
+          "image": "docker.io/calico/whisker:v3.31.3",
+          "environmentVariableNames": [
+            "LOG_LEVEL",
+            "CALICO_VERSION",
+            "CLUSTER_ID",
+            "CLUSTER_TYPE",
+            "NOTIFICATIONS"
+          ]
+        },
+        {
+          "name": "whisker-backend",
+          "image": "docker.io/calico/whisker-backend:v3.31.3",
+          "environmentVariableNames": [
+            "LOG_LEVEL",
+            "PORT",
+            "GOLDMANE_HOST",
+            "TLS_CERT_PATH",
+            "TLS_KEY_PATH"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "cert-manager",
+      "name": "cert-manager-58b9ddb94b-q7br4",
+      "uid": "626b9afe-cb6d-492b-b148-c95d48129fac",
+      "resourceVersion": "22790352",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "cert-manager-controller",
+          "image": "quay.io/jetstack/cert-manager-controller:v1.21.2@sha256:70f532fd9cfde0b09d55687200942399d89838bc2d5d5b45152eb799a15912b8",
+          "environmentVariableNames": [
+            "POD_NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "cert-manager",
+      "name": "cert-manager-cainjector-7f8cd56994-bbhnx",
+      "uid": "3f9213d2-2deb-47e4-bafc-db31e7c3d722",
+      "resourceVersion": "22790154",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "cert-manager-cainjector",
+          "image": "quay.io/jetstack/cert-manager-cainjector:v1.21.2@sha256:c85268c64f2e0e76684bf5fe8906caff34b82523561c6affe0fae3546bd87562",
+          "environmentVariableNames": [
+            "POD_NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "cert-manager",
+      "name": "cert-manager-webhook-54797cd4c8-2n5jx",
+      "uid": "680870b3-73ce-43fa-a275-f1b1dac747ab",
+      "resourceVersion": "22791071",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "cert-manager-webhook",
+          "image": "quay.io/jetstack/cert-manager-webhook:v1.21.2@sha256:a60e2dac46dbb8a7f3df95c54ce941012f54c2fe022f0ee55aaa1ab40ed957ae",
+          "environmentVariableNames": [
+            "POD_NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "cnpg-system",
+      "name": "barman-cloud-54568989bf-ldqv7",
+      "uid": "8ccc7572-46ce-4cfd-a9c4-b5db4d3c444d",
+      "resourceVersion": "24447274",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "barman-cloud",
+          "image": "ghcr.io/cloudnative-pg/plugin-barman-cloud:v0.15.0@sha256:563c680fe7fda3466ca2b1f55a1397ed2ddc9e760360107dd7724f1959c1a536",
+          "environmentVariableNames": [
+            "SIDECAR_IMAGE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "cnpg-system",
+      "name": "cnpg-controller-manager-5d78fcc98c-w5jmn",
+      "uid": "610c927c-c882-40fc-bf5f-fb4e8c760946",
+      "resourceVersion": "25252632",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "manager",
+          "image": "ghcr.io/cloudnative-pg/cloudnative-pg:1.30.0@sha256:a2701eb97cdd2a34b1fdb2cb51987f544b706e40bec72ae7146cd8580efefebb",
+          "environmentVariableNames": [
+            "OPERATOR_IMAGE_NAME",
+            "OPERATOR_NAMESPACE",
+            "MONITORING_QUERIES_CONFIGMAP",
+            "WATCH_NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-operator-58bfcd4f54-kvg9q",
+      "uid": "724f6a65-9030-4812-94e6-f0593f0fa6fb",
+      "resourceVersion": "22791118",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-operator",
+          "image": "ghcr.io/dapr/operator:1.18.1",
+          "environmentVariableNames": [
+            "NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-operator-58bfcd4f54-s6bxk",
+      "uid": "17961fd8-8033-440c-aa0b-651173b5da08",
+      "resourceVersion": "22791108",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-operator",
+          "image": "ghcr.io/dapr/operator:1.18.1",
+          "environmentVariableNames": [
+            "NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-operator-58bfcd4f54-zqj95",
+      "uid": "1458ade1-59d8-43c1-9fd0-4cc37d9427b6",
+      "resourceVersion": "22791201",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-operator",
+          "image": "ghcr.io/dapr/operator:1.18.1",
+          "environmentVariableNames": [
+            "NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-placement-server-0",
+      "uid": "0f9e76c0-0522-4f9c-9f9e-38628d5fd248",
+      "resourceVersion": "22791098",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-placement-server",
+          "image": "ghcr.io/dapr/placement:1.18.1",
+          "environmentVariableNames": [
+            "PLACEMENT_ID",
+            "NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-placement-server-1",
+      "uid": "9cd56d83-1488-429d-b988-e22cd02cbc93",
+      "resourceVersion": "22791185",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-placement-server",
+          "image": "ghcr.io/dapr/placement:1.18.1",
+          "environmentVariableNames": [
+            "PLACEMENT_ID",
+            "NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-placement-server-2",
+      "uid": "cbaa2d39-f037-49df-9009-4078a334d5a2",
+      "resourceVersion": "22791158",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-placement-server",
+          "image": "ghcr.io/dapr/placement:1.18.1",
+          "environmentVariableNames": [
+            "PLACEMENT_ID",
+            "NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-scheduler-server-0",
+      "uid": "70b986a0-1a87-4cea-87be-698471c3c643",
+      "resourceVersion": "22791093",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-scheduler-server",
+          "image": "ghcr.io/dapr/scheduler:1.18.1",
+          "environmentVariableNames": [
+            "SCHEDULER_ID",
+            "NAMESPACE",
+            "POD_IP"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-scheduler-server-1",
+      "uid": "15240cc1-1b5d-4d87-a3a6-e6c20c303069",
+      "resourceVersion": "22791088",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-scheduler-server",
+          "image": "ghcr.io/dapr/scheduler:1.18.1",
+          "environmentVariableNames": [
+            "SCHEDULER_ID",
+            "NAMESPACE",
+            "POD_IP"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-scheduler-server-2",
+      "uid": "59cce0eb-ba14-43c6-9b3f-e0115144871c",
+      "resourceVersion": "22791080",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-scheduler-server",
+          "image": "ghcr.io/dapr/scheduler:1.18.1",
+          "environmentVariableNames": [
+            "SCHEDULER_ID",
+            "NAMESPACE",
+            "POD_IP"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-sentry-68fc6cf899-59gqp",
+      "uid": "9de7bfc7-0296-4bb9-b0ab-4f396e380cd5",
+      "resourceVersion": "22790520",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-sentry",
+          "image": "ghcr.io/dapr/sentry:1.18.1",
+          "environmentVariableNames": [
+            "NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-sentry-68fc6cf899-8fn2c",
+      "uid": "37b5717f-8fd3-4230-93af-4630cd024323",
+      "resourceVersion": "22790509",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-sentry",
+          "image": "ghcr.io/dapr/sentry:1.18.1",
+          "environmentVariableNames": [
+            "NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-sentry-68fc6cf899-k7tww",
+      "uid": "69dc6485-24d6-4f63-a70d-23000aafd0ef",
+      "resourceVersion": "22790747",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-sentry",
+          "image": "ghcr.io/dapr/sentry:1.18.1",
+          "environmentVariableNames": [
+            "NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-sidecar-injector-c46dfc499-vxjsg",
+      "uid": "86cbb85d-489b-4b6d-928b-2d5000a56a8e",
+      "resourceVersion": "22791141",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-sidecar-injector",
+          "image": "ghcr.io/dapr/injector:1.18.1",
+          "environmentVariableNames": [
+            "DAPR_TRUST_ANCHORS_FILE",
+            "DAPR_CONTROL_PLANE_TRUST_DOMAIN",
+            "DAPR_SENTRY_ADDRESS",
+            "KUBE_CLUSTER_DOMAIN",
+            "SIDECAR_IMAGE",
+            "SIDECAR_IMAGE_PULL_POLICY",
+            "SIDECAR_RUN_AS_NON_ROOT",
+            "ENABLE_K8S_DOWNWARD_APIS",
+            "SIDECAR_DROP_ALL_CAPABILITIES",
+            "SIDECAR_READ_ONLY_ROOT_FILESYSTEM",
+            "NATIVE_SIDECAR_ENABLED",
+            "NAMESPACE",
+            "IGNORE_ENTRYPOINT_TOLERATIONS",
+            "ACTORS_ENABLED",
+            "ACTORS_SERVICE_NAME",
+            "ACTORS_SERVICE_ADDRESS"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-sidecar-injector-c46dfc499-xlqnm",
+      "uid": "a12f2ed1-3d06-47c9-8dfd-09e164768876",
+      "resourceVersion": "22791059",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-sidecar-injector",
+          "image": "ghcr.io/dapr/injector:1.18.1",
+          "environmentVariableNames": [
+            "DAPR_TRUST_ANCHORS_FILE",
+            "DAPR_CONTROL_PLANE_TRUST_DOMAIN",
+            "DAPR_SENTRY_ADDRESS",
+            "KUBE_CLUSTER_DOMAIN",
+            "SIDECAR_IMAGE",
+            "SIDECAR_IMAGE_PULL_POLICY",
+            "SIDECAR_RUN_AS_NON_ROOT",
+            "ENABLE_K8S_DOWNWARD_APIS",
+            "SIDECAR_DROP_ALL_CAPABILITIES",
+            "SIDECAR_READ_ONLY_ROOT_FILESYSTEM",
+            "NATIVE_SIDECAR_ENABLED",
+            "NAMESPACE",
+            "IGNORE_ENTRYPOINT_TOLERATIONS",
+            "ACTORS_ENABLED",
+            "ACTORS_SERVICE_NAME",
+            "ACTORS_SERVICE_ADDRESS"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "dapr-system",
+      "name": "dapr-sidecar-injector-c46dfc499-zmjz2",
+      "uid": "e324bf66-b322-4099-9e37-fc529a146f83",
+      "resourceVersion": "22791163",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "dapr-sidecar-injector",
+          "image": "ghcr.io/dapr/injector:1.18.1",
+          "environmentVariableNames": [
+            "DAPR_TRUST_ANCHORS_FILE",
+            "DAPR_CONTROL_PLANE_TRUST_DOMAIN",
+            "DAPR_SENTRY_ADDRESS",
+            "KUBE_CLUSTER_DOMAIN",
+            "SIDECAR_IMAGE",
+            "SIDECAR_IMAGE_PULL_POLICY",
+            "SIDECAR_RUN_AS_NON_ROOT",
+            "ENABLE_K8S_DOWNWARD_APIS",
+            "SIDECAR_DROP_ALL_CAPABILITIES",
+            "SIDECAR_READ_ONLY_ROOT_FILESYSTEM",
+            "NATIVE_SIDECAR_ENABLED",
+            "NAMESPACE",
+            "IGNORE_ENTRYPOINT_TOLERATIONS",
+            "ACTORS_ENABLED",
+            "ACTORS_SERVICE_NAME",
+            "ACTORS_SERVICE_ADDRESS"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "forgejo-runner",
+      "name": "forgejo-runner-bc8b8dfc5-f4hq2",
+      "uid": "e2779a1c-e5f4-4b52-8724-e3c866e6087d",
+      "resourceVersion": "28452605",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "runner",
+          "image": "data.forgejo.org/forgejo/runner@sha256:eb6e7bc21973382d261e6eb883dbd27b8cb56939d33a3bfd79a1352b7f9a33a0",
+          "environmentVariableNames": [
+            "HOME",
+            "DOCKER_HOST",
+            "CREDENTIALS_DIRECTORY"
+          ]
+        },
+        {
+          "name": "dind",
+          "image": "docker.io/library/docker@sha256:084e385b0c9b7ab35d5a46dfedd033721448c000dbec71adcf13da8a9e71baa8",
+          "environmentVariableNames": [
+            "DOCKER_TLS_CERTDIR"
+          ]
+        },
+        {
+          "name": "docker-gc",
+          "image": "docker.io/library/docker@sha256:084e385b0c9b7ab35d5a46dfedd033721448c000dbec71adcf13da8a9e71baa8",
+          "environmentVariableNames": [
+            "DOCKER_HOST",
+            "HOME"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "forgejo",
+      "name": "forgejo-7995c56876-8bgnz",
+      "uid": "f0b24dba-b9fd-4455-a8cd-bfeb29669799",
+      "resourceVersion": "22791177",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "forgejo",
+          "image": "codeberg.org/forgejo/forgejo:16.0.5@sha256:cf5f5ae6acf2ababca0ee3d255705b83a47f35b25e07fc931d694d60664053fe",
+          "environmentVariableNames": [
+            "USER_UID",
+            "USER_GID",
+            "FORGEJO__SERVER__DOMAIN",
+            "FORGEJO__SERVER__SSH_DOMAIN",
+            "FORGEJO__SERVER__ROOT_URL",
+            "FORGEJO__SERVER__SSH_PORT",
+            "FORGEJO__SECURITY__REVERSE_PROXY_TRUSTED_PROXIES",
+            "FORGEJO__OAUTH2_CLIENT__ENABLE_AUTO_REGISTRATION",
+            "FORGEJO__OAUTH2_CLIENT__ACCOUNT_LINKING",
+            "FORGEJO__OAUTH2_CLIENT__USERNAME",
+            "FORGEJO__OAUTH2__ACCESS_TOKEN_EXPIRATION_TIME"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "hexalith-memories",
+      "name": "access-telemetry-postgresql-0",
+      "uid": "cda5a0ef-d1c2-4cd1-9d05-ac091d6f3816",
+      "resourceVersion": "27582802",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "postgresql",
+          "image": "docker.io/library/postgres:18.6-trixie@sha256:5a5a84b19854a9ffaa54082c166ff4ec27473a361e496e5ea167f298f2da9722",
+          "environmentVariableNames": [
+            "POSTGRES_USER",
+            "POSTGRES_DB",
+            "POSTGRES_PASSWORD_FILE",
+            "POSTGRES_INITDB_ARGS",
+            "PGDATA"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "hexalith-memories",
+      "name": "falkordb-0",
+      "uid": "860f0e27-b912-4cc9-aa12-c6df28e0a3cb",
+      "resourceVersion": "25249432",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "falkordb",
+          "image": "falkordb/falkordb:v4.12.0@sha256:7927eb194df0fadf70e2deb6c20c8178743ec92aacd739c790f8a35ce5dee613",
+          "environmentVariableNames": [
+            "FALKORDB_PERSISTENCE_ARGS",
+            "FALKORDB_PASSWORD",
+            "REDIS_ARGS"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "hexalith-memories",
+      "name": "memories-675fd5d64-5zqpv",
+      "uid": "3d1bd011-ddbe-484e-8692-96d4b2daf3c9",
+      "resourceVersion": "25249508",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "memories",
+          "image": "registry.hexalith.com/memories@sha256:71e49b6e806ec2fa7c221e58600ba02115693923db05915663396be01b1c042c",
+          "environmentVariableNames": [
+            "ASPNETCORE_URLS",
+            "DOTNET_ENVIRONMENT",
+            "REDIS_PASSWORD",
+            "FALKORDB_PASSWORD",
+            "ConnectionStrings__redis",
+            "ConnectionStrings__falkordb",
+            "APP_API_TOKEN",
+            "DAPR_API_TOKEN",
+            "DAPR_API_TOKEN_MODE",
+            "Authentication__JwtBearer__Authority",
+            "Authentication__JwtBearer__Issuer",
+            "Authentication__JwtBearer__Audience",
+            "Authentication__JwtBearer__TenantClaimName",
+            "Authentication__JwtBearer__RequireHttpsMetadata",
+            "Authentication__JwtBearer__ValidAlgorithms__0",
+            "Authentication__JwtBearer__ValidAlgorithms__1",
+            "MEMORIES_EVENTSTORE_TOPIC",
+            "NaturalLanguage__DaprComponentName",
+            "AccessTelemetryLifecycle__Enabled",
+            "AccessTelemetryLifecycle__RetentionSource",
+            "AccessTelemetryLifecycle__ComponentProfileHash",
+            "DAPR_HTTP_PORT",
+            "DAPR_GRPC_PORT",
+            "APP_PROTOCOL"
+          ]
+        },
+        {
+          "name": "daprd",
+          "image": "ghcr.io/dapr/daprd:1.18.1",
+          "environmentVariableNames": [
+            "NAMESPACE",
+            "DAPR_TRUST_ANCHORS",
+            "POD_NAME",
+            "DAPR_CONTROLPLANE_NAMESPACE",
+            "DAPR_CONTROLPLANE_TRUST_DOMAIN",
+            "DAPR_API_TOKEN",
+            "APP_API_TOKEN"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "hexalith-memories",
+      "name": "memories-675fd5d64-jtd8v",
+      "uid": "3dfc08e7-9dac-4ad5-8e06-3a874bde62c9",
+      "resourceVersion": "25249542",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "memories",
+          "image": "registry.hexalith.com/memories@sha256:71e49b6e806ec2fa7c221e58600ba02115693923db05915663396be01b1c042c",
+          "environmentVariableNames": [
+            "ASPNETCORE_URLS",
+            "DOTNET_ENVIRONMENT",
+            "REDIS_PASSWORD",
+            "FALKORDB_PASSWORD",
+            "ConnectionStrings__redis",
+            "ConnectionStrings__falkordb",
+            "APP_API_TOKEN",
+            "DAPR_API_TOKEN",
+            "DAPR_API_TOKEN_MODE",
+            "Authentication__JwtBearer__Authority",
+            "Authentication__JwtBearer__Issuer",
+            "Authentication__JwtBearer__Audience",
+            "Authentication__JwtBearer__TenantClaimName",
+            "Authentication__JwtBearer__RequireHttpsMetadata",
+            "Authentication__JwtBearer__ValidAlgorithms__0",
+            "Authentication__JwtBearer__ValidAlgorithms__1",
+            "MEMORIES_EVENTSTORE_TOPIC",
+            "NaturalLanguage__DaprComponentName",
+            "AccessTelemetryLifecycle__Enabled",
+            "AccessTelemetryLifecycle__RetentionSource",
+            "AccessTelemetryLifecycle__ComponentProfileHash",
+            "DAPR_HTTP_PORT",
+            "DAPR_GRPC_PORT",
+            "APP_PROTOCOL"
+          ]
+        },
+        {
+          "name": "daprd",
+          "image": "ghcr.io/dapr/daprd:1.18.1",
+          "environmentVariableNames": [
+            "NAMESPACE",
+            "DAPR_TRUST_ANCHORS",
+            "POD_NAME",
+            "DAPR_CONTROLPLANE_NAMESPACE",
+            "DAPR_CONTROLPLANE_TRUST_DOMAIN",
+            "DAPR_API_TOKEN",
+            "APP_API_TOKEN"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "hexalith-memories",
+      "name": "memories-access-telemetry-cb49f44d-cscb4",
+      "uid": "e5800b59-f089-46c9-b6c7-b65e3c66c546",
+      "resourceVersion": "27637960",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "lifecycle",
+          "image": "registry.hexalith.com/memories-access-telemetry@sha256:b3790e08c0091dfb723f6819e4706a6b1ef36a051b8c4afe38f5e362c5bdf8ea",
+          "environmentVariableNames": [
+            "ASPNETCORE_URLS",
+            "DOTNET_ENVIRONMENT",
+            "APP_API_TOKEN",
+            "DAPR_API_TOKEN",
+            "DAPR_API_TOKEN_MODE",
+            "AccessTelemetryLifecycle__Enabled",
+            "AccessTelemetryLifecycle__RetentionSource",
+            "AccessTelemetryLifecycle__ComponentProfileHash",
+            "AccessTelemetryLifecycle__MarkerKeyReference",
+            "AccessTelemetryLifecycle__MarkerKeyGeneration",
+            "AccessTelemetryLifecycle__AttestationVerificationKey",
+            "AccessTelemetryLifecycle__ClockSignerKeyEpoch",
+            "AccessTelemetryLifecycle__CapabilityEvidence__ExactVersionPinned",
+            "AccessTelemetryLifecycle__DeploymentId",
+            "AccessTelemetryLifecycle__ConfigurationEpoch",
+            "AccessTelemetryLifecycle__CapacityEvidenceId",
+            "AccessTelemetryLifecycle__PhysicalReclamationEvidenceId",
+            "AccessTelemetryLifecycle__CapabilityEvidence__ValidUntilUtc",
+            "AccessTelemetryLifecycle__ComponentIsAlpha",
+            "AccessTelemetryLifecycle__AllowAlphaComponent",
+            "DAPR_HTTP_PORT",
+            "DAPR_GRPC_PORT",
+            "APP_PROTOCOL"
+          ]
+        },
+        {
+          "name": "daprd",
+          "image": "ghcr.io/dapr/daprd:1.18.1",
+          "environmentVariableNames": [
+            "NAMESPACE",
+            "DAPR_TRUST_ANCHORS",
+            "POD_NAME",
+            "DAPR_CONTROLPLANE_NAMESPACE",
+            "DAPR_CONTROLPLANE_TRUST_DOMAIN",
+            "DAPR_API_TOKEN",
+            "APP_API_TOKEN"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "hexalith-memories",
+      "name": "memories-mcp-55d65d86d6-gwlj9",
+      "uid": "d6cbcef7-ae25-484e-9235-367b6d515d03",
+      "resourceVersion": "25883944",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "memories-mcp",
+          "image": "registry.hexalith.com/memories-mcp@sha256:4d5cd738a89fdca71b7202d7661cecea8bab6b6e45d4fe505670cf7287205bb7",
+          "environmentVariableNames": [
+            "ASPNETCORE_URLS",
+            "DOTNET_ENVIRONMENT",
+            "APP_API_TOKEN",
+            "DAPR_API_TOKEN",
+            "DAPR_API_TOKEN_MODE",
+            "MEMORIES_MCP_UPSTREAM_APP_ID",
+            "Authentication__JwtBearer__Authority",
+            "Authentication__JwtBearer__Issuer",
+            "Authentication__JwtBearer__Audience",
+            "Authentication__JwtBearer__TenantClaimName",
+            "Authentication__JwtBearer__RequireHttpsMetadata",
+            "Authentication__JwtBearer__ValidAlgorithms__0",
+            "Authentication__JwtBearer__ValidAlgorithms__1",
+            "DAPR_HTTP_PORT",
+            "DAPR_GRPC_PORT",
+            "APP_PROTOCOL"
+          ]
+        },
+        {
+          "name": "daprd",
+          "image": "ghcr.io/dapr/daprd:1.18.1",
+          "environmentVariableNames": [
+            "NAMESPACE",
+            "DAPR_TRUST_ANCHORS",
+            "POD_NAME",
+            "DAPR_CONTROLPLANE_NAMESPACE",
+            "DAPR_CONTROLPLANE_TRUST_DOMAIN",
+            "DAPR_API_TOKEN",
+            "APP_API_TOKEN"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "hexalith-memories",
+      "name": "memories-mcp-55d65d86d6-wz9n5",
+      "uid": "fdc906a5-67be-44af-ac33-250190ed5c76",
+      "resourceVersion": "25250536",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "memories-mcp",
+          "image": "registry.hexalith.com/memories-mcp@sha256:4d5cd738a89fdca71b7202d7661cecea8bab6b6e45d4fe505670cf7287205bb7",
+          "environmentVariableNames": [
+            "ASPNETCORE_URLS",
+            "DOTNET_ENVIRONMENT",
+            "APP_API_TOKEN",
+            "DAPR_API_TOKEN",
+            "DAPR_API_TOKEN_MODE",
+            "MEMORIES_MCP_UPSTREAM_APP_ID",
+            "Authentication__JwtBearer__Authority",
+            "Authentication__JwtBearer__Issuer",
+            "Authentication__JwtBearer__Audience",
+            "Authentication__JwtBearer__TenantClaimName",
+            "Authentication__JwtBearer__RequireHttpsMetadata",
+            "Authentication__JwtBearer__ValidAlgorithms__0",
+            "Authentication__JwtBearer__ValidAlgorithms__1",
+            "DAPR_HTTP_PORT",
+            "DAPR_GRPC_PORT",
+            "APP_PROTOCOL"
+          ]
+        },
+        {
+          "name": "daprd",
+          "image": "ghcr.io/dapr/daprd:1.18.1",
+          "environmentVariableNames": [
+            "NAMESPACE",
+            "DAPR_TRUST_ANCHORS",
+            "POD_NAME",
+            "DAPR_CONTROLPLANE_NAMESPACE",
+            "DAPR_CONTROLPLANE_TRUST_DOMAIN",
+            "DAPR_API_TOKEN",
+            "APP_API_TOKEN"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "hexalith-memories",
+      "name": "postgresql-tls-reloader-29857583-ghd96",
+      "uid": "43b89034-a339-4001-9ef0-24d956ba5fd7",
+      "resourceVersion": "28444258",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "reloader",
+          "image": "docker.io/alpine/k8s:1.34.9@sha256:72c921a10c53ab749674e828ad12b776d006481c852bba7dd89e149ceed666f3",
+          "environmentVariableNames": [
+            "POD_NAMESPACE",
+            "HOME"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "hexalith-memories",
+      "name": "postgresql-tls-reloader-29857643-f2dj5",
+      "uid": "c4a5ecae-f981-4b35-8e03-160ad3c785d4",
+      "resourceVersion": "28462961",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "reloader",
+          "image": "docker.io/alpine/k8s:1.34.9@sha256:72c921a10c53ab749674e828ad12b776d006481c852bba7dd89e149ceed666f3",
+          "environmentVariableNames": [
+            "POD_NAMESPACE",
+            "HOME"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "hexalith-memories",
+      "name": "postgresql-tls-reloader-29857703-qzg4k",
+      "uid": "74e73a2f-23b6-44bc-88c4-a70b81a9a597",
+      "resourceVersion": "28481634",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "reloader",
+          "image": "docker.io/alpine/k8s:1.34.9@sha256:72c921a10c53ab749674e828ad12b776d006481c852bba7dd89e149ceed666f3",
+          "environmentVariableNames": [
+            "POD_NAMESPACE",
+            "HOME"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "hexalith-memories",
+      "name": "redis-stack-0",
+      "uid": "d6f6ab94-16a7-43ed-8f8c-ffc8f9461fb9",
+      "resourceVersion": "25249435",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "redis",
+          "image": "redis/redis-stack-server:7.4.0-v8@sha256:798ab84d9f266936b034ab11c4d04a2b8e4b441884c5aa7d17ac951eefdf742a",
+          "environmentVariableNames": [
+            "REDIS_PASSWORD",
+            "REDIS_ARGS"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "keycloak",
+      "name": "keycloak-6875d766ff-n9m52",
+      "uid": "ef74d073-bd15-47c6-ac25-6b18c6057b04",
+      "resourceVersion": "27894401",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "keycloak",
+          "image": "quay.io/keycloak/keycloak@sha256:82a77884f3af238beab1e7afd63b5f530e1b5c0590bd7aa60b40a40463e29b2c",
+          "environmentVariableNames": [
+            "KC_HOSTNAME",
+            "KC_PROXY_HEADERS",
+            "KC_PROXY_TRUSTED_ADDRESSES",
+            "KC_DB",
+            "KC_HEALTH_ENABLED",
+            "KC_METRICS_ENABLED",
+            "KC_DB_URL",
+            "KC_DB_USERNAME",
+            "KC_DB_PASSWORD",
+            "KC_DB_POOL_INITIAL_SIZE",
+            "KC_DB_POOL_MIN_SIZE",
+            "KC_DB_POOL_MAX_SIZE",
+            "KC_CACHE",
+            "KC_CACHE_STACK",
+            "KC_SHUTDOWN_DELAY",
+            "KC_SHUTDOWN_TIMEOUT",
+            "KC_HOSTNAME_ADMIN"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "keycloak",
+      "name": "keycloak-6875d766ff-zgkfw",
+      "uid": "976d19ac-6875-46fe-b0f5-a893db37aafb",
+      "resourceVersion": "27894029",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "keycloak",
+          "image": "quay.io/keycloak/keycloak@sha256:82a77884f3af238beab1e7afd63b5f530e1b5c0590bd7aa60b40a40463e29b2c",
+          "environmentVariableNames": [
+            "KC_HOSTNAME",
+            "KC_PROXY_HEADERS",
+            "KC_PROXY_TRUSTED_ADDRESSES",
+            "KC_DB",
+            "KC_HEALTH_ENABLED",
+            "KC_METRICS_ENABLED",
+            "KC_DB_URL",
+            "KC_DB_USERNAME",
+            "KC_DB_PASSWORD",
+            "KC_DB_POOL_INITIAL_SIZE",
+            "KC_DB_POOL_MIN_SIZE",
+            "KC_DB_POOL_MAX_SIZE",
+            "KC_CACHE",
+            "KC_CACHE_STACK",
+            "KC_SHUTDOWN_DELAY",
+            "KC_SHUTDOWN_TIMEOUT",
+            "KC_HOSTNAME_ADMIN"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "keycloak",
+      "name": "keycloak-postgres-1",
+      "uid": "bcb6c291-20d8-4d87-ba02-e53fb333de3f",
+      "resourceVersion": "24450258",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "postgres",
+          "image": "docker.io/library/postgres:15.15@sha256:86d2fe3ed4d43250d2865b551fca46478361c4cd7e359939ad6e8663be274f3a",
+          "environmentVariableNames": [
+            "PGDATA",
+            "POD_NAME",
+            "NAMESPACE",
+            "CLUSTER_NAME",
+            "PSQL_HISTORY",
+            "PGPORT",
+            "PGHOST",
+            "TMPDIR"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "keycloak",
+      "name": "keycloak-postgres-2",
+      "uid": "497af8ee-89c3-45b0-a3d3-369a11009627",
+      "resourceVersion": "24451382",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "postgres",
+          "image": "docker.io/library/postgres:15.15@sha256:86d2fe3ed4d43250d2865b551fca46478361c4cd7e359939ad6e8663be274f3a",
+          "environmentVariableNames": [
+            "PGDATA",
+            "POD_NAME",
+            "NAMESPACE",
+            "CLUSTER_NAME",
+            "PSQL_HISTORY",
+            "PGPORT",
+            "PGHOST",
+            "TMPDIR"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kube-system",
+      "name": "coredns-57cbfcd5b7-qw8w8",
+      "uid": "9469f4fd-1e58-4b0f-9e7c-4c149bc8f4c8",
+      "resourceVersion": "22790761",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "coredns",
+          "image": "registry.k8s.io/coredns/coredns:v1.12.1",
+          "environmentVariableNames": []
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kube-system",
+      "name": "coredns-57cbfcd5b7-wtx2m",
+      "uid": "cedf08de-137b-4a9d-8cf0-b3db06c6395c",
+      "resourceVersion": "22790559",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "coredns",
+          "image": "registry.k8s.io/coredns/coredns:v1.12.1",
+          "environmentVariableNames": []
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kube-system",
+      "name": "kube-apiserver-node1",
+      "uid": "513b26ca-8e99-4fa5-9cc8-46554c324975",
+      "resourceVersion": "22790476",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "kube-apiserver",
+          "image": "registry.k8s.io/kube-apiserver:v1.34.9",
+          "environmentVariableNames": []
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kube-system",
+      "name": "kube-controller-manager-node1",
+      "uid": "24332d18-f997-496a-8468-a2aaf2fac082",
+      "resourceVersion": "22790138",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "kube-controller-manager",
+          "image": "registry.k8s.io/kube-controller-manager:v1.34.9",
+          "environmentVariableNames": []
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kube-system",
+      "name": "kube-proxy-6fxfx",
+      "uid": "328156eb-3dc1-4583-b5c1-1b41e2696f37",
+      "resourceVersion": "22790177",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "kube-proxy",
+          "image": "registry.k8s.io/kube-proxy:v1.34.9",
+          "environmentVariableNames": [
+            "NODE_NAME"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kube-system",
+      "name": "kube-scheduler-node1",
+      "uid": "70c9aa73-842f-4da1-ac15-8331d357b102",
+      "resourceVersion": "22790328",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "kube-scheduler",
+          "image": "registry.k8s.io/kube-scheduler:v1.34.9",
+          "environmentVariableNames": []
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kube-system",
+      "name": "localpv-provisioner-69bbbc59bf-k5756",
+      "uid": "a79fa37c-4327-4a79-bfc9-b60ed8b396ba",
+      "resourceVersion": "22790658",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "localpv-provisioner",
+          "image": "docker.io/openebs/provisioner-localpv:4.4.0",
+          "environmentVariableNames": [
+            "OPENEBS_NAMESPACE",
+            "NODE_NAME",
+            "OPENEBS_SERVICE_ACCOUNT",
+            "OPENEBS_IO_ENABLE_ANALYTICS",
+            "OPENEBS_IO_BASE_PATH",
+            "OPENEBS_IO_HELPER_IMAGE",
+            "OPENEBS_IO_HELPER_POD_HOST_NETWORK",
+            "OPENEBS_IO_INSTALLER_TYPE",
+            "LEADER_ELECTION_ENABLED"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kube-system",
+      "name": "metrics-server-5bc456dd79-zb6g8",
+      "uid": "05bab62e-9dce-46e2-ada1-2752235b8b7f",
+      "resourceVersion": "22791282",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "metrics-server",
+          "image": "registry.k8s.io/metrics-server/metrics-server:v0.9.0@sha256:d9862115e7c7881280d3d75ca26bda8ffc0fc213315979575bf23ce9826205c0",
+          "environmentVariableNames": []
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kube-system",
+      "name": "nodelocaldns-l6v88",
+      "uid": "65eaf62f-0b5e-48e1-bdc1-de3dc7c369d2",
+      "resourceVersion": "22790465",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "node-cache",
+          "image": "registry.k8s.io/dns/k8s-dns-node-cache:1.26.4",
+          "environmentVariableNames": []
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kubesphere-system",
+      "name": "extensions-museum-74b7ddbdc4-7rwfd",
+      "uid": "d26f584c-3fdd-4983-abd5-268a226004a0",
+      "resourceVersion": "22790771",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "extensions-museum",
+          "image": "registry.cn-beijing.aliyuncs.com/kse/extensions-museum:v11.1.3",
+          "environmentVariableNames": []
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kubesphere-system",
+      "name": "ks-apiserver-5cc56cf596-gczzj",
+      "uid": "4eb67677-2cf8-4bd6-bed6-3777428f3065",
+      "resourceVersion": "22790444",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "ks-apiserver",
+          "image": "registry.cn-beijing.aliyuncs.com/kse/ks-apiserver:v4.2.1",
+          "environmentVariableNames": [
+            "KUBESPHERE_AUTHENTICATION_ISSUER_JWTSECRET"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kubesphere-system",
+      "name": "ks-console-77c96c4765-fm25w",
+      "uid": "6eeb10f6-7089-4b7f-85e2-ea2167086b42",
+      "resourceVersion": "22790642",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "ks-console",
+          "image": "registry.cn-beijing.aliyuncs.com/kse/ks-console:v4.2.1",
+          "environmentVariableNames": []
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kubesphere-system",
+      "name": "ks-console-embed-675c98bc58-hdkxj",
+      "uid": "dca41ff1-3871-4c5e-8ef9-d8b60fb6e6ed",
+      "resourceVersion": "22790763",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "ks-console-embed",
+          "image": "registry.cn-beijing.aliyuncs.com/kse/ks-console-embed:v4.2.1",
+          "environmentVariableNames": []
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "kubesphere-system",
+      "name": "ks-controller-manager-c87b45dbd-w264z",
+      "uid": "1f32c684-90b7-4168-ba2c-7fbbc2426c43",
+      "resourceVersion": "22790439",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "ks-controller-manager",
+          "image": "registry.cn-beijing.aliyuncs.com/kse/ks-controller-manager:v4.2.1",
+          "environmentVariableNames": [
+            "KUBESPHERE_AUTHENTICATION_ISSUER_JWTSECRET"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "openbao",
+      "name": "hexalith-keys-0",
+      "uid": "01cae80b-4142-4d85-b8ba-e6295371b832",
+      "resourceVersion": "22791131",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "openbao",
+          "image": "quay.io/openbao/openbao:2.6.2@sha256:11fd73a2102cda9c55d5d881a8c3210303146a7ec1e8ac76f526e175c6d24641",
+          "environmentVariableNames": [
+            "HOST_IP",
+            "POD_IP",
+            "BAO_K8S_POD_NAME",
+            "BAO_K8S_NAMESPACE",
+            "BAO_ADDR",
+            "BAO_API_ADDR",
+            "SKIP_CHOWN",
+            "SKIP_SETCAP",
+            "HOSTNAME",
+            "BAO_CLUSTER_ADDR",
+            "BAO_RAFT_NODE_ID",
+            "HOME",
+            "BAO_LOG_LEVEL",
+            "BAO_LOG_FORMAT",
+            "BAO_CACERT"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "openbao",
+      "name": "hexalith-keys-1",
+      "uid": "f89ff29e-0a36-4e46-bff0-6e545bfb4001",
+      "resourceVersion": "22791149",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "openbao",
+          "image": "quay.io/openbao/openbao:2.6.2@sha256:11fd73a2102cda9c55d5d881a8c3210303146a7ec1e8ac76f526e175c6d24641",
+          "environmentVariableNames": [
+            "HOST_IP",
+            "POD_IP",
+            "BAO_K8S_POD_NAME",
+            "BAO_K8S_NAMESPACE",
+            "BAO_ADDR",
+            "BAO_API_ADDR",
+            "SKIP_CHOWN",
+            "SKIP_SETCAP",
+            "HOSTNAME",
+            "BAO_CLUSTER_ADDR",
+            "BAO_RAFT_NODE_ID",
+            "HOME",
+            "BAO_LOG_LEVEL",
+            "BAO_LOG_FORMAT",
+            "BAO_CACERT"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "openbao",
+      "name": "hexalith-keys-2",
+      "uid": "3ef0013e-6a88-433c-ba88-974b9a3047c2",
+      "resourceVersion": "22790849",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "openbao",
+          "image": "quay.io/openbao/openbao:2.6.2@sha256:11fd73a2102cda9c55d5d881a8c3210303146a7ec1e8ac76f526e175c6d24641",
+          "environmentVariableNames": [
+            "HOST_IP",
+            "POD_IP",
+            "BAO_K8S_POD_NAME",
+            "BAO_K8S_NAMESPACE",
+            "BAO_ADDR",
+            "BAO_API_ADDR",
+            "SKIP_CHOWN",
+            "SKIP_SETCAP",
+            "HOSTNAME",
+            "BAO_CLUSTER_ADDR",
+            "BAO_RAFT_NODE_ID",
+            "HOME",
+            "BAO_LOG_LEVEL",
+            "BAO_LOG_FORMAT",
+            "BAO_CACERT"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "openbao",
+      "name": "openbao-raft-snapshot-29855550-8jdfk",
+      "uid": "6657a61d-0cb0-49d3-9ed8-abe78899d876",
+      "resourceVersion": "27811364",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "snapshot",
+          "image": "quay.io/openbao/openbao:2.6.2@sha256:11fd73a2102cda9c55d5d881a8c3210303146a7ec1e8ac76f526e175c6d24641",
+          "environmentVariableNames": [
+            "BAO_ADDR",
+            "BAO_CACERT",
+            "HOME"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "openbao",
+      "name": "openbao-raft-snapshot-29856990-rwc7h",
+      "uid": "905b03ac-1fea-4432-9e6c-22f163c91eda",
+      "resourceVersion": "28259694",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "snapshot",
+          "image": "quay.io/openbao/openbao:2.6.2@sha256:11fd73a2102cda9c55d5d881a8c3210303146a7ec1e8ac76f526e175c6d24641",
+          "environmentVariableNames": [
+            "BAO_ADDR",
+            "BAO_CACERT",
+            "HOME"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "registry-distribution",
+      "name": "distribution-registry-5798dc5f94-f7n65",
+      "uid": "e30cbbb4-9ea3-4eba-bf3e-666613dc198f",
+      "resourceVersion": "27899257",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "zot",
+          "image": "ghcr.io/project-zot/zot-linux-amd64@sha256:95a837a0afacf5b7edc0c92493f04beee6891989b8d2fd50a00cf65a1e6d4fd5",
+          "environmentVariableNames": [
+            "TMPDIR"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "registry-private",
+      "name": "private-registry-58bfc64f6-z27bt",
+      "uid": "0a336f4a-036f-48aa-be0b-71778e16c663",
+      "resourceVersion": "22856705",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "zot",
+          "image": "ghcr.io/project-zot/zot-linux-amd64@sha256:95a837a0afacf5b7edc0c92493f04beee6891989b8d2fd50a00cf65a1e6d4fd5",
+          "environmentVariableNames": [
+            "TMPDIR"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "stalwart",
+      "name": "stalwart-df97b564c-5tzgw",
+      "uid": "b20bda67-a30b-450f-a27e-b81fe49e726d",
+      "resourceVersion": "22849873",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "stalwart",
+          "image": "docker.io/stalwartlabs/stalwart:v0.16.23@sha256:be215678796691bc39bdda918ecc50d14a9032a099a1d1950e51950aec7e2592",
+          "environmentVariableNames": [
+            "RUST_LOG"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "stalwart",
+      "name": "stalwart-tls-reloader-29794457-s6lft",
+      "uid": "0720e085-c5a7-4ee7-83c7-f877a337a9b3",
+      "resourceVersion": "16038041",
+      "phase": "Failed",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "reloader",
+          "image": "docker.io/alpine/k8s@sha256:72c921a10c53ab749674e828ad12b776d006481c852bba7dd89e149ceed666f3",
+          "environmentVariableNames": [
+            "POD_NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "stalwart",
+      "name": "stalwart-tls-reloader-29794457-xd2wl",
+      "uid": "994cda9f-e1b8-45e7-ab7a-1b42ee8cff7b",
+      "resourceVersion": "16038102",
+      "phase": "Failed",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "reloader",
+          "image": "docker.io/alpine/k8s@sha256:72c921a10c53ab749674e828ad12b776d006481c852bba7dd89e149ceed666f3",
+          "environmentVariableNames": [
+            "POD_NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "stalwart",
+      "name": "stalwart-tls-reloader-29794517-hbfpj",
+      "uid": "a408c381-2073-4520-8262-0936828a7bfc",
+      "resourceVersion": "16038068",
+      "phase": "Failed",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "reloader",
+          "image": "docker.io/alpine/k8s@sha256:72c921a10c53ab749674e828ad12b776d006481c852bba7dd89e149ceed666f3",
+          "environmentVariableNames": [
+            "POD_NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "stalwart",
+      "name": "stalwart-tls-reloader-29794517-rzw94",
+      "uid": "6a01eb96-7645-476b-8c76-7fae0b022c96",
+      "resourceVersion": "16037804",
+      "phase": "Failed",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "reloader",
+          "image": "docker.io/alpine/k8s@sha256:72c921a10c53ab749674e828ad12b776d006481c852bba7dd89e149ceed666f3",
+          "environmentVariableNames": [
+            "POD_NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "stalwart",
+      "name": "stalwart-tls-reloader-29857577-kk2b8",
+      "uid": "a771987f-8557-4183-af0b-83b4da0f122c",
+      "resourceVersion": "28442339",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "reloader",
+          "image": "docker.io/alpine/k8s@sha256:72c921a10c53ab749674e828ad12b776d006481c852bba7dd89e149ceed666f3",
+          "environmentVariableNames": [
+            "POD_NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "stalwart",
+      "name": "stalwart-tls-reloader-29857637-4tbsf",
+      "uid": "ec1b60ab-0180-478c-8526-69855c551159",
+      "resourceVersion": "28461043",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "reloader",
+          "image": "docker.io/alpine/k8s@sha256:72c921a10c53ab749674e828ad12b776d006481c852bba7dd89e149ceed666f3",
+          "environmentVariableNames": [
+            "POD_NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "stalwart",
+      "name": "stalwart-tls-reloader-29857697-bpww5",
+      "uid": "ff39a78b-cafe-44a2-9462-ef05e630108e",
+      "resourceVersion": "28479682",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "reloader",
+          "image": "docker.io/alpine/k8s@sha256:72c921a10c53ab749674e828ad12b776d006481c852bba7dd89e149ceed666f3",
+          "environmentVariableNames": [
+            "POD_NAMESPACE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "tigera-operator",
+      "name": "tigera-operator-85979684d8-lpw88",
+      "uid": "b034e3bc-dc70-45c7-8163-68ee7899b596",
+      "resourceVersion": "22790230",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "tigera-operator",
+          "image": "quay.io/tigera/operator:v1.40.3",
+          "environmentVariableNames": [
+            "WATCH_NAMESPACE",
+            "POD_NAME",
+            "OPERATOR_NAME",
+            "TIGERA_OPERATOR_INIT_IMAGE_VERSION"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "traefik",
+      "name": "hexalith-tache-ai-relay-78df5dbc99-vdrhb",
+      "uid": "53874f04-3d8c-4e0e-9e4b-8e4be3c0be70",
+      "resourceVersion": "22790244",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "traefik",
+          "image": "docker.io/library/traefik:v3.7.13@sha256:24841fe2de7304c149343d877d2923b4c8800a38ba015dea9174c23b20e344a0",
+          "environmentVariableNames": []
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "traefik",
+      "name": "traefik-x8j6k",
+      "uid": "1833354c-5bfc-4210-9512-7fb9cd61bb12",
+      "resourceVersion": "22790829",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "traefik",
+          "image": "docker.io/library/traefik@sha256:24841fe2de7304c149343d877d2923b4c8800a38ba015dea9174c23b20e344a0",
+          "environmentVariableNames": [
+            "POD_NAME",
+            "POD_NAMESPACE",
+            "USER",
+            "GOMAXPROCS",
+            "GOMEMLIMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "forgejo-scaleway-kube-green-kopia-maintain-job-17914542008mpkdv",
+      "uid": "05a1a7d5-77ab-44da-ad4f-1768f9fa4475",
+      "resourceVersion": "28440214",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero@sha256:b839e52bc2c69eb3b5a84b010b8b3c7f714f3c5ef50b77ec7770a382a8f2e0ab",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "forgejo-scaleway-kube-green-kopia-maintain-job-17914581082ggtj5",
+      "uid": "8192ad2f-c5b3-4501-81b4-3dfdefc39a2c",
+      "resourceVersion": "28460527",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero@sha256:b839e52bc2c69eb3b5a84b010b8b3c7f714f3c5ef50b77ec7770a382a8f2e0ab",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "forgejo-scaleway-kube-green-kopia-maintain-job-17914620008jmk8v",
+      "uid": "38e09282-ecab-4e82-8957-e455358b06ea",
+      "resourceVersion": "28480674",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero@sha256:b839e52bc2c69eb3b5a84b010b8b3c7f714f3c5ef50b77ec7770a382a8f2e0ab",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "keycloak-scaleway-kube-green-kopia-maintain-job-1787189041842ms",
+      "uid": "bb6bc391-f152-485c-aff8-fd3df8200d47",
+      "resourceVersion": "16038092",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "keycloak-scaleway-kube-green-kopia-maintain-job-1787207972cbggq",
+      "uid": "2cb9ab69-1385-4d88-863e-cfb8ab9d6dae",
+      "resourceVersion": "16037957",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "keycloak-scaleway-kube-green-kopia-maintain-job-1787211913zm8qc",
+      "uid": "b1242d0b-8c87-4372-ba7f-68bf2a3ce264",
+      "resourceVersion": "16038114",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "node-agent-g5dnl",
+      "uid": "51c0dc44-1f7f-40e8-95a1-29b29f7343bb",
+      "resourceVersion": "24436415",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "node-agent",
+          "image": "docker.io/velero/velero@sha256:b839e52bc2c69eb3b5a84b010b8b3c7f714f3c5ef50b77ec7770a382a8f2e0ab",
+          "environmentVariableNames": [
+            "VELERO_NAMESPACE",
+            "NODE_NAME",
+            "VELERO_SCRATCH_DIR",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "openbao-scaleway-kube-green-kopia-maintain-job-178718905867ccvd",
+      "uid": "3c546d44-2e68-4b6e-b169-fc2d196d150b",
+      "resourceVersion": "16038036",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "openbao-scaleway-kube-green-kopia-maintain-job-178720799276dkc5",
+      "uid": "16904534-2eb9-47f8-a948-eca28e97e83b",
+      "resourceVersion": "16038046",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "openbao-scaleway-kube-green-kopia-maintain-job-178721183967bxts",
+      "uid": "241db4d6-a4e3-44d8-85ee-f09b0edcef1c",
+      "resourceVersion": "16038131",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787189031586-z2nhg",
+      "uid": "5f17e1ee-b339-4d02-87a3-6ea216296086",
+      "resourceVersion": "16038035",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787189050633-n8g9p",
+      "uid": "0fda691b-629b-47a0-93f3-baf9ebdabc3f",
+      "resourceVersion": "16038058",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787192941622-4rqph",
+      "uid": "e9bcfdd0-8d10-455a-a2e1-8e071e699298",
+      "resourceVersion": "16037864",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787207963711-545w5",
+      "uid": "2e01fd52-2df0-4baf-991e-550eb9a874be",
+      "resourceVersion": "16038104",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787207983756-k8fr9",
+      "uid": "1a057101-10f0-4b1f-b1a0-db0dc1c31f3c",
+      "resourceVersion": "16038123",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787208027861-l6qlc",
+      "uid": "34c3bc9a-efb0-4258-8f72-bb6207d3ce3e",
+      "resourceVersion": "16037984",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787211831652-q8qrr",
+      "uid": "3b204797-3922-40c3-8a25-9afd6e49f4f9",
+      "resourceVersion": "16038063",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787211875777-4rlfj",
+      "uid": "24623a9c-9d6b-4c38-a4fa-dabe20af0d9e",
+      "resourceVersion": "16037923",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787211906875-kw8gt",
+      "uid": "daacf127-eeb6-4d16-9787-3a869ce4561d",
+      "resourceVersion": "16038113",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787726032919-sgcrq",
+      "uid": "8a9b8a0b-2506-4f88-b0bc-aaecb9777c7b",
+      "resourceVersion": "16037932",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787726042952-s6gxx",
+      "uid": "7d7c5a56-e5ba-4ee9-9cfc-39a81c001237",
+      "resourceVersion": "16037987",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787729932930-cjkvc",
+      "uid": "70efe0b5-37a1-4157-b4c8-b54d9158eb88",
+      "resourceVersion": "16037834",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787729941958-r2czt",
+      "uid": "b3e7ca65-5a5d-4a03-8e8e-70ed7e9b0fbb",
+      "resourceVersion": "16038069",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787733832939-mqk2j",
+      "uid": "b196ae2f-7180-441f-a438-99233f37151f",
+      "resourceVersion": "16038054",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "repo-maintain-job-1787733841962-xc52b",
+      "uid": "fb221e0f-74df-420c-88e6-10abc414e2d3",
+      "resourceVersion": "16038088",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "stalwart-scaleway-kube-green-kopia-maintain-job-17871891208pwfg",
+      "uid": "4b170793-3827-4588-ab02-2f7abc8b3cc1",
+      "resourceVersion": "16037766",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "stalwart-scaleway-kube-green-kopia-maintain-job-1787207953b7j48",
+      "uid": "591a940a-2115-459b-a094-c3b8fb2f89ca",
+      "resourceVersion": "16037910",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "stalwart-scaleway-kube-green-kopia-maintain-job-17872118972lfc2",
+      "uid": "0d1969f6-2eea-4b8a-b896-13e6f087250d",
+      "resourceVersion": "16037771",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "traefik-scaleway-kube-green-kopia-maintain-job-17871890686v2x8d",
+      "uid": "7821d59b-9069-4402-be78-0b895e1a3dc5",
+      "resourceVersion": "16037770",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "traefik-scaleway-kube-green-kopia-maintain-job-17872080007g9hvl",
+      "uid": "104ebeeb-adf5-488a-8574-f07a2631bd52",
+      "resourceVersion": "16037765",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "traefik-scaleway-kube-green-kopia-maintain-job-17872118537hj599",
+      "uid": "3da118da-638a-4892-9843-6ffb8ea56249",
+      "resourceVersion": "16038100",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "velero-669d4c75cd-sbm6d",
+      "uid": "cb573e4c-c4a6-45a3-8f34-be4b5cdc7b2b",
+      "resourceVersion": "24436578",
+      "phase": "Running",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero",
+          "image": "docker.io/velero/velero@sha256:b839e52bc2c69eb3b5a84b010b8b3c7f714f3c5ef50b77ec7770a382a8f2e0ab",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "wireguard-scaleway-kube-green-kopia-maintain-job-178718907ppwvc",
+      "uid": "b28bc8fb-4866-4a47-9cb5-6c17ceef35cf",
+      "resourceVersion": "16038125",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "wireguard-scaleway-kube-green-kopia-maintain-job-178720800znbpn",
+      "uid": "070888a4-5b25-4e9b-be21-30a3831080b4",
+      "resourceVersion": "16038060",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Pod",
+      "namespace": "velero",
+      "name": "wireguard-scaleway-kube-green-kopia-maintain-job-178721185xkk2b",
+      "uid": "7288fa26-8007-487a-b1c1-468d6ffc40c9",
+      "resourceVersion": "16038096",
+      "phase": "Succeeded",
+      "nodeName": "node1",
+      "containers": [
+        {
+          "name": "velero-repo-maintenance-container",
+          "image": "docker.io/velero/velero:v1.18.2",
+          "environmentVariableNames": [
+            "VELERO_SCRATCH_DIR",
+            "VELERO_NAMESPACE",
+            "LD_LIBRARY_PATH",
+            "AWS_SHARED_CREDENTIALS_FILE",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "AZURE_CREDENTIALS_FILE",
+            "ALIBABA_CLOUD_CREDENTIALS_FILE"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "calico-system",
+      "name": "calico-api",
+      "uid": "4ce674de-2659-4f2f-8f46-64438499b481",
+      "resourceVersion": "624",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "apiserver",
+          "port": 443,
+          "targetPort": 5443,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "calico-system",
+      "name": "calico-kube-controllers-metrics",
+      "uid": "60aaeebb-bfeb-4857-a8d0-c7e8c92d8d94",
+      "resourceVersion": "1097",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "metrics-port",
+          "port": 9094,
+          "targetPort": 9094,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "calico-system",
+      "name": "calico-typha",
+      "uid": "1a5daf8c-f2b2-491b-a91a-6dcb662167c0",
+      "resourceVersion": "694",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "calico-typha",
+          "port": 5473,
+          "targetPort": "calico-typha",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "calico-system",
+      "name": "goldmane",
+      "uid": "9e0fa96b-7c59-404e-bc9e-937f118c2e3a",
+      "resourceVersion": "657",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": null,
+          "port": 7443,
+          "targetPort": 7443,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "calico-system",
+      "name": "whisker",
+      "uid": "e2ce7cc9-4dc9-4091-b4c2-bc4a1294655c",
+      "resourceVersion": "619",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": null,
+          "port": 8081,
+          "targetPort": 8081,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "cert-manager",
+      "name": "cert-manager-webhook",
+      "uid": "8aa69c2b-6db4-46e3-a606-f86c78b4fbfe",
+      "resourceVersion": "22083203",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "https",
+          "port": 443,
+          "targetPort": "https",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "cnpg-system",
+      "name": "barman-cloud",
+      "uid": "8f355ab9-5bc0-4a1b-aae7-42690921c685",
+      "resourceVersion": "24448616",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": null,
+          "port": 9090,
+          "targetPort": 9090,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "cnpg-system",
+      "name": "cnpg-webhook-service",
+      "uid": "b0eedff9-cc79-48cb-9efd-f664fe131ae6",
+      "resourceVersion": "22423079",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": null,
+          "port": 443,
+          "targetPort": 9443,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "dapr-system",
+      "name": "dapr-api",
+      "uid": "4e56c3ef-9c3e-40fb-93d1-8ded4da1408b",
+      "resourceVersion": "848596",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "grpc",
+          "port": 443,
+          "targetPort": 6500,
+          "protocol": "TCP"
+        },
+        {
+          "name": "legacy",
+          "port": 80,
+          "targetPort": 6500,
+          "protocol": "TCP"
+        },
+        {
+          "name": "metrics",
+          "port": 9090,
+          "targetPort": 9090,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "dapr-system",
+      "name": "dapr-placement-server",
+      "uid": "0d53f693-52e2-4a40-ae5a-646c21e5d65d",
+      "resourceVersion": "848574",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "api",
+          "port": 50005,
+          "targetPort": 50005,
+          "protocol": "TCP"
+        },
+        {
+          "name": "raft-node",
+          "port": 8201,
+          "targetPort": 8201,
+          "protocol": "TCP"
+        },
+        {
+          "name": "metrics",
+          "port": 9090,
+          "targetPort": 9090,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "dapr-system",
+      "name": "dapr-scheduler-server",
+      "uid": "a8243275-e8a4-47bb-a796-012ee3d1f1ac",
+      "resourceVersion": "848576",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "api",
+          "port": 50006,
+          "targetPort": 50006,
+          "protocol": "TCP"
+        },
+        {
+          "name": "etcd-client",
+          "port": 2379,
+          "targetPort": 2379,
+          "protocol": "TCP"
+        },
+        {
+          "name": "etcd-peer",
+          "port": 2380,
+          "targetPort": 2380,
+          "protocol": "TCP"
+        },
+        {
+          "name": "metrics",
+          "port": 9090,
+          "targetPort": 9090,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "dapr-system",
+      "name": "dapr-scheduler-server-a",
+      "uid": "73f04198-9ab6-46bc-ac3a-2530508cf609",
+      "resourceVersion": "848577",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "api",
+          "port": 443,
+          "targetPort": 50006,
+          "protocol": "TCP"
+        },
+        {
+          "name": "etcd-client",
+          "port": 2379,
+          "targetPort": 2379,
+          "protocol": "TCP"
+        },
+        {
+          "name": "etcd-peer",
+          "port": 2380,
+          "targetPort": 2380,
+          "protocol": "TCP"
+        },
+        {
+          "name": "metrics",
+          "port": 9090,
+          "targetPort": 9090,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "dapr-system",
+      "name": "dapr-sentry",
+      "uid": "e0338ce4-f97d-46b8-a25d-d8d23f32b24f",
+      "resourceVersion": "848582",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "grpc",
+          "port": 443,
+          "targetPort": 50001,
+          "protocol": "TCP"
+        },
+        {
+          "name": "metrics",
+          "port": 9090,
+          "targetPort": 9090,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "dapr-system",
+      "name": "dapr-sidecar-injector",
+      "uid": "57e21b7c-c86b-4cb4-b7e8-cdbacf7a012b",
+      "resourceVersion": "848580",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "https",
+          "port": 443,
+          "targetPort": "https",
+          "protocol": "TCP"
+        },
+        {
+          "name": "metrics",
+          "port": 9090,
+          "targetPort": 9090,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "dapr-system",
+      "name": "dapr-webhook",
+      "uid": "b3c16505-1ba6-451f-817b-27af87fbb2f3",
+      "resourceVersion": "848578",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": null,
+          "port": 443,
+          "targetPort": 19443,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "default",
+      "name": "kubernetes",
+      "uid": "ff79ce2a-7616-4c1f-b775-067595c56c11",
+      "resourceVersion": "203",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "https",
+          "port": 443,
+          "targetPort": 6443,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "forgejo",
+      "name": "forgejo-http",
+      "uid": "16d14b7e-b967-4d3c-bd20-d783d005bf77",
+      "resourceVersion": "20889",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "http",
+          "port": 3000,
+          "targetPort": 3000,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "forgejo",
+      "name": "forgejo-ssh",
+      "uid": "2f8def5c-f19f-4eb3-bf7c-6944e89bf30c",
+      "resourceVersion": "20894",
+      "serviceType": "NodePort",
+      "ports": [
+        {
+          "name": "ssh",
+          "port": 22,
+          "targetPort": 22,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "hexalith-memories",
+      "name": "access-telemetry-postgresql",
+      "uid": "98510fc2-af95-48b8-adc3-c2beb3ef0cb5",
+      "resourceVersion": "1115687",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "postgresql",
+          "port": 5432,
+          "targetPort": "postgresql",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "hexalith-memories",
+      "name": "access-telemetry-postgresql-headless",
+      "uid": "2ee4957c-4ca3-449b-8c28-b4005842fc19",
+      "resourceVersion": "1115688",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "postgresql",
+          "port": 5432,
+          "targetPort": "postgresql",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "hexalith-memories",
+      "name": "falkordb",
+      "uid": "2a096dfe-b463-4d6b-8a81-d326126b4547",
+      "resourceVersion": "855195",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "redis",
+          "port": 6379,
+          "targetPort": "redis",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "hexalith-memories",
+      "name": "memories",
+      "uid": "4b30e632-be03-4f9a-8f84-620d340701ed",
+      "resourceVersion": "855199",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "dapr-http",
+          "port": 80,
+          "targetPort": 3500,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "hexalith-memories",
+      "name": "memories-access-telemetry",
+      "uid": "b582a9fb-25ae-4054-b22a-daf3b8babbf1",
+      "resourceVersion": "855203",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "dapr-http",
+          "port": 80,
+          "targetPort": 3500,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "hexalith-memories",
+      "name": "memories-access-telemetry-clock",
+      "uid": "ea799a5e-ff17-4747-9a04-bf92d2074e2c",
+      "resourceVersion": "855207",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "dapr-http",
+          "port": 80,
+          "targetPort": 3500,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "hexalith-memories",
+      "name": "memories-access-telemetry-clock-dapr",
+      "uid": "f542b295-71c6-4426-85c2-eb7ae904f037",
+      "resourceVersion": "855233",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "dapr-http",
+          "port": 80,
+          "targetPort": 3500,
+          "protocol": "TCP"
+        },
+        {
+          "name": "dapr-grpc",
+          "port": 50001,
+          "targetPort": 50001,
+          "protocol": "TCP"
+        },
+        {
+          "name": "dapr-internal",
+          "port": 50002,
+          "targetPort": 50002,
+          "protocol": "TCP"
+        },
+        {
+          "name": "dapr-metrics",
+          "port": 9090,
+          "targetPort": 9090,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "hexalith-memories",
+      "name": "memories-access-telemetry-dapr",
+      "uid": "927be857-6afc-4894-b902-1986b697af76",
+      "resourceVersion": "855226",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "dapr-http",
+          "port": 80,
+          "targetPort": 3500,
+          "protocol": "TCP"
+        },
+        {
+          "name": "dapr-grpc",
+          "port": 50001,
+          "targetPort": 50001,
+          "protocol": "TCP"
+        },
+        {
+          "name": "dapr-internal",
+          "port": 50002,
+          "targetPort": 50002,
+          "protocol": "TCP"
+        },
+        {
+          "name": "dapr-metrics",
+          "port": 9090,
+          "targetPort": 9090,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "hexalith-memories",
+      "name": "memories-dapr",
+      "uid": "cae1e5e2-bb84-41aa-a85b-6548f107422f",
+      "resourceVersion": "855218",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "dapr-http",
+          "port": 80,
+          "targetPort": 3500,
+          "protocol": "TCP"
+        },
+        {
+          "name": "dapr-grpc",
+          "port": 50001,
+          "targetPort": 50001,
+          "protocol": "TCP"
+        },
+        {
+          "name": "dapr-internal",
+          "port": 50002,
+          "targetPort": 50002,
+          "protocol": "TCP"
+        },
+        {
+          "name": "dapr-metrics",
+          "port": 9090,
+          "targetPort": 9090,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "hexalith-memories",
+      "name": "memories-mcp",
+      "uid": "adb435ac-ceb2-457c-b671-5b99749c7a30",
+      "resourceVersion": "855211",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "dapr-http",
+          "port": 80,
+          "targetPort": 3500,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "hexalith-memories",
+      "name": "memories-mcp-dapr",
+      "uid": "a7448bb1-80e0-442e-aab6-af4ef53a7627",
+      "resourceVersion": "855241",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "dapr-http",
+          "port": 80,
+          "targetPort": 3500,
+          "protocol": "TCP"
+        },
+        {
+          "name": "dapr-grpc",
+          "port": 50001,
+          "targetPort": 50001,
+          "protocol": "TCP"
+        },
+        {
+          "name": "dapr-internal",
+          "port": 50002,
+          "targetPort": 50002,
+          "protocol": "TCP"
+        },
+        {
+          "name": "dapr-metrics",
+          "port": 9090,
+          "targetPort": 9090,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "hexalith-memories",
+      "name": "redis",
+      "uid": "1c0625e6-0390-42cd-8dc9-9714f9a03deb",
+      "resourceVersion": "855214",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "redis",
+          "port": 6379,
+          "targetPort": "redis",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "keycloak",
+      "name": "keycloak",
+      "uid": "0ac9cd04-9d7e-41ed-8ac7-5a74ca659fd0",
+      "resourceVersion": "12902031",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "http",
+          "port": 8080,
+          "targetPort": "http",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "keycloak",
+      "name": "keycloak-postgres-r",
+      "uid": "32b6a332-fe31-4357-855b-1702bc013aa8",
+      "resourceVersion": "22423520",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "postgres",
+          "port": 5432,
+          "targetPort": 5432,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "keycloak",
+      "name": "keycloak-postgres-ro",
+      "uid": "f93ac050-31c8-4d60-8e54-20f46d1e6af3",
+      "resourceVersion": "22423527",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "postgres",
+          "port": 5432,
+          "targetPort": 5432,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "keycloak",
+      "name": "keycloak-postgres-rw",
+      "uid": "f35b67ad-7f3d-4224-847e-e61b401888c9",
+      "resourceVersion": "22423532",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "postgres",
+          "port": 5432,
+          "targetPort": 5432,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "keycloak",
+      "name": "postgres",
+      "uid": "868aa2c1-2986-4166-9bcf-b85efbeeb7e3",
+      "resourceVersion": "22425985",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "postgres",
+          "port": 5432,
+          "targetPort": 5432,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "kube-system",
+      "name": "coredns",
+      "uid": "2ba2b707-f416-447d-971d-0de303a420da",
+      "resourceVersion": "292",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "dns",
+          "port": 53,
+          "targetPort": 53,
+          "protocol": "UDP"
+        },
+        {
+          "name": "dns-tcp",
+          "port": 53,
+          "targetPort": 53,
+          "protocol": "TCP"
+        },
+        {
+          "name": "metrics",
+          "port": 9153,
+          "targetPort": 9153,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "kube-system",
+      "name": "metrics-server",
+      "uid": "e1de6375-61f0-4807-8429-d630555e51d0",
+      "resourceVersion": "22387256",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "https",
+          "port": 443,
+          "targetPort": "https",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "kubesphere-system",
+      "name": "extensions-museum",
+      "uid": "d8a73a4b-3b82-4ed9-8078-a811c4618f13",
+      "resourceVersion": "6389",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": null,
+          "port": 443,
+          "targetPort": 8080,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "kubesphere-system",
+      "name": "ks-apiserver",
+      "uid": "2c25d5ec-3d92-49a6-983f-e1434b75eef1",
+      "resourceVersion": "6381",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": null,
+          "port": 80,
+          "targetPort": 9090,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "kubesphere-system",
+      "name": "ks-console",
+      "uid": "bd77e81a-6bfd-409f-9444-cbade4e0f2af",
+      "resourceVersion": "22447113",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "nginx",
+          "port": 80,
+          "targetPort": 8000,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "kubesphere-system",
+      "name": "ks-console-embed",
+      "uid": "4eb10a0b-3e18-4d9e-a226-109471755c73",
+      "resourceVersion": "7065",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "http",
+          "port": 80,
+          "targetPort": "http",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "kubesphere-system",
+      "name": "ks-controller-manager",
+      "uid": "de59cb2a-ed73-4376-9f9c-8cd587bb89e3",
+      "resourceVersion": "6385",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": null,
+          "port": 443,
+          "targetPort": 8443,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "llm",
+      "name": "envoy-gateway",
+      "uid": "67bd02aa-30ca-4e4b-82c3-44edd30313c3",
+      "resourceVersion": "20965",
+      "serviceType": "NodePort",
+      "ports": [
+        {
+          "name": "http",
+          "port": 4000,
+          "targetPort": 4000,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "llm",
+      "name": "llm-healthz",
+      "uid": "5d3ce46c-2bd3-4632-804e-fc4b0592dc41",
+      "resourceVersion": "20969",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "http",
+          "port": 80,
+          "targetPort": 8080,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "llm",
+      "name": "ollama",
+      "uid": "f52e21ac-6935-437d-b91f-dbf83e52e860",
+      "resourceVersion": "20973",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "http",
+          "port": 11434,
+          "targetPort": 11434,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "openbao",
+      "name": "deployment-seal-transit",
+      "uid": "70e73eb1-999d-4876-8452-5b796f073031",
+      "resourceVersion": "9368557",
+      "serviceType": "NodePort",
+      "ports": [
+        {
+          "name": "https",
+          "port": 8200,
+          "targetPort": 8200,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "openbao",
+      "name": "hexalith-keys",
+      "uid": "785b7809-be9a-4e1b-ad64-1921e1219f81",
+      "resourceVersion": "21791800",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "https",
+          "port": 8200,
+          "targetPort": 8200,
+          "protocol": "TCP"
+        },
+        {
+          "name": "https-internal",
+          "port": 8201,
+          "targetPort": 8201,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "openbao",
+      "name": "hexalith-keys-active",
+      "uid": "8da386d7-635a-4c27-98f5-bd7451baecdb",
+      "resourceVersion": "21791791",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "https",
+          "port": 8200,
+          "targetPort": 8200,
+          "protocol": "TCP"
+        },
+        {
+          "name": "https-internal",
+          "port": 8201,
+          "targetPort": 8201,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "openbao",
+      "name": "hexalith-keys-internal",
+      "uid": "d79bab74-8285-4fc0-b5b1-decf5a3cc8d2",
+      "resourceVersion": "21791797",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "https",
+          "port": 8200,
+          "targetPort": 8200,
+          "protocol": "TCP"
+        },
+        {
+          "name": "https-internal",
+          "port": 8201,
+          "targetPort": 8201,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "openbao",
+      "name": "hexalith-keys-standby",
+      "uid": "b8a5b9e7-a1b6-49a3-96df-7a113e75d8a9",
+      "resourceVersion": "21791792",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "https",
+          "port": 8200,
+          "targetPort": 8200,
+          "protocol": "TCP"
+        },
+        {
+          "name": "https-internal",
+          "port": 8201,
+          "targetPort": 8201,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "registry-distribution",
+      "name": "distribution-registry",
+      "uid": "fc2954d6-c151-4fd0-b701-7136ad265797",
+      "resourceVersion": "12893613",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "registry",
+          "port": 5000,
+          "targetPort": "registry",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "registry-private",
+      "name": "private-registry",
+      "uid": "808e2c59-deec-4b22-84c8-a0778e32fc63",
+      "resourceVersion": "12893614",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "registry",
+          "port": 5000,
+          "targetPort": "registry",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "stalwart",
+      "name": "stalwart",
+      "uid": "82280067-7bc9-43ce-b943-65450c683af5",
+      "resourceVersion": "20914",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "smtp",
+          "port": 25,
+          "targetPort": 25,
+          "protocol": "TCP"
+        },
+        {
+          "name": "http",
+          "port": 8080,
+          "targetPort": 8080,
+          "protocol": "TCP"
+        },
+        {
+          "name": "https",
+          "port": 443,
+          "targetPort": 443,
+          "protocol": "TCP"
+        },
+        {
+          "name": "smtps",
+          "port": 465,
+          "targetPort": 465,
+          "protocol": "TCP"
+        },
+        {
+          "name": "submission",
+          "port": 587,
+          "targetPort": 587,
+          "protocol": "TCP"
+        },
+        {
+          "name": "pop3",
+          "port": 110,
+          "targetPort": 110,
+          "protocol": "TCP"
+        },
+        {
+          "name": "imap",
+          "port": 143,
+          "targetPort": 143,
+          "protocol": "TCP"
+        },
+        {
+          "name": "imaps",
+          "port": 993,
+          "targetPort": 993,
+          "protocol": "TCP"
+        },
+        {
+          "name": "pop3s",
+          "port": 995,
+          "targetPort": 995,
+          "protocol": "TCP"
+        },
+        {
+          "name": "sieve",
+          "port": 4190,
+          "targetPort": 4190,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "traefik",
+      "name": "hexalith-tache-ai-relay",
+      "uid": "c3fd5e2d-3c2b-418c-baf7-d75e62abce4d",
+      "resourceVersion": "12545205",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "relay",
+          "port": 9443,
+          "targetPort": "relay",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "traefik",
+      "name": "traefik",
+      "uid": "e3ebe82f-beb9-4186-bb6d-c6a710c33d94",
+      "resourceVersion": "11766",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "web",
+          "port": 80,
+          "targetPort": "web",
+          "protocol": "TCP"
+        },
+        {
+          "name": "websecure",
+          "port": 443,
+          "targetPort": "websecure",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Service",
+      "namespace": "velero",
+      "name": "velero",
+      "uid": "38049e43-ed79-43ef-b9bc-4a3dce70ea4c",
+      "resourceVersion": "15608",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "http-monitoring",
+          "port": 8085,
+          "targetPort": "http-monitoring",
+          "protocol": "TCP"
+        }
+      ]
+    },
+    {
+      "kind": "Ingress",
+      "namespace": "forgejo",
+      "name": "forgejo-ingress",
+      "uid": "deeb1051-a9ff-4d81-b03a-96f16fb08616",
+      "resourceVersion": "22082268",
+      "hosts": [
+        "repository.tache.ai"
+      ],
+      "className": "nginx-public"
+    },
+    {
+      "kind": "Ingress",
+      "namespace": "keycloak",
+      "name": "keycloak-ingress",
+      "uid": "34608abc-9b13-483b-9bb8-7f35d97115cf",
+      "resourceVersion": "27897125",
+      "hosts": [
+        "auth.tache.ai"
+      ],
+      "className": "nginx-public"
+    },
+    {
+      "kind": "Ingress",
+      "namespace": "keycloak",
+      "name": "keycloak-reset-rate-limit",
+      "uid": "4907a06a-ff44-418c-b5fb-4d9880b2b136",
+      "resourceVersion": "22082273",
+      "hosts": [
+        "auth.tache.ai"
+      ],
+      "className": "nginx-public"
+    },
+    {
+      "kind": "Ingress",
+      "namespace": "llm",
+      "name": "llm-ingress",
+      "uid": "bf784065-f50d-459e-add2-0c43014ded0c",
+      "resourceVersion": "22082269",
+      "hosts": [
+        "llm.tache.ai"
+      ],
+      "className": "nginx-public"
+    },
+    {
+      "kind": "Ingress",
+      "namespace": "registry-distribution",
+      "name": "distribution-registry-ingress",
+      "uid": "83d794cb-e033-4f89-b23b-97326ad55713",
+      "resourceVersion": "22082266",
+      "hosts": [
+        "registry.hexalith.com"
+      ],
+      "className": "nginx-public"
+    },
+    {
+      "kind": "Ingress",
+      "namespace": "registry-private",
+      "name": "private-registry-ingress",
+      "uid": "63f4f4fd-0ab7-436b-abaa-a9df282310a9",
+      "resourceVersion": "22082265",
+      "hosts": [
+        "registry.tache.ai"
+      ],
+      "className": "nginx-public"
+    }
+  ],
+  "configMaps": [
+    {
+      "kind": "ConfigMap",
+      "namespace": "calico-system",
+      "name": "active-operator",
+      "uid": "82c50bff-044a-4b17-b77d-2c92a216feb4",
+      "resourceVersion": "678",
+      "dataKeyNames": [
+        "active-namespace"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "calico-system",
+      "name": "cni-config",
+      "uid": "d5f895f2-bb85-43e6-9b04-1caf9c9cd786",
+      "resourceVersion": "718",
+      "dataKeyNames": [
+        "config"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "calico-system",
+      "name": "goldmane",
+      "uid": "6ee2b114-57f7-45f5-b232-15a352e96652",
+      "resourceVersion": "654",
+      "dataKeyNames": [
+        "config.json"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "calico-system",
+      "name": "goldmane-ca-bundle",
+      "uid": "4d90b451-0470-4f6b-9ca5-e55a942ae202",
+      "resourceVersion": "606",
+      "dataKeyNames": [
+        "ca-bundle.crt",
+        "ca.crt",
+        "tigera-ca-bundle.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "calico-system",
+      "name": "kube-root-ca.crt",
+      "uid": "8a3c61c7-43b8-48da-bf27-6bc29fdb7ece",
+      "resourceVersion": "602",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "calico-system",
+      "name": "tigera-ca-bundle",
+      "uid": "9ed32746-1cea-4afe-b9bc-f2ea07d66ae0",
+      "resourceVersion": "679",
+      "dataKeyNames": [
+        "ca-bundle.crt",
+        "ca.crt",
+        "tigera-ca-bundle.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "calico-system",
+      "name": "whisker-ca-bundle",
+      "uid": "d48133b4-cf26-4764-a38e-647e79397ee6",
+      "resourceVersion": "603",
+      "dataKeyNames": [
+        "ca-bundle.crt",
+        "ca.crt",
+        "tigera-ca-bundle.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "calico-system",
+      "name": "whisker-nginx-config",
+      "uid": "95da498e-b9ae-461c-b46a-c14c5043f579",
+      "resourceVersion": "610",
+      "dataKeyNames": [
+        "default.conf"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "cert-manager",
+      "name": "kube-root-ca.crt",
+      "uid": "11a76dd0-c1b4-4251-9cb4-00dd4063cbdf",
+      "resourceVersion": "11326",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "cnpg-system",
+      "name": "cnpg-default-monitoring",
+      "uid": "8dc0c769-b02b-4041-9552-c4e6b42ebb73",
+      "resourceVersion": "22423077",
+      "dataKeyNames": [
+        "queries"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "cnpg-system",
+      "name": "kube-root-ca.crt",
+      "uid": "adcfcd82-1eb1-4ddc-a53e-2937723055ba",
+      "resourceVersion": "22422942",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "dapr-system",
+      "name": "dapr-trust-bundle",
+      "uid": "100ca4a0-f340-4b06-837f-7c678c467df9",
+      "resourceVersion": "848824",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "dapr-system",
+      "name": "kube-root-ca.crt",
+      "uid": "0e77260a-5712-46f5-8e81-87d9ea64df82",
+      "resourceVersion": "848490",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "default",
+      "name": "kube-root-ca.crt",
+      "uid": "de280cfc-5a1a-4107-97a1-e468fecc7bbb",
+      "resourceVersion": "321",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "forgejo-runner",
+      "name": "forgejo-runner-config",
+      "uid": "a891b761-0496-4700-ab5d-483ce5bd2f7a",
+      "resourceVersion": "11578891",
+      "dataKeyNames": [
+        "runner-config.yml"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "forgejo-runner",
+      "name": "kube-root-ca.crt",
+      "uid": "8cd788e1-751f-49a0-8871-8a2788d43b88",
+      "resourceVersion": "5811672",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "forgejo",
+      "name": "kube-root-ca.crt",
+      "uid": "57c3ffe7-4ab5-487e-b6dc-b1ae5d7f28e2",
+      "resourceVersion": "20786",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "hexalith-memories",
+      "name": "access-telemetry-postgresql-config",
+      "uid": "b493210d-8f11-40b2-86fb-2849914a4624",
+      "resourceVersion": "1116483",
+      "dataKeyNames": [
+        "010-access-telemetry.sh",
+        "pg_hba.conf",
+        "pg_ident.conf"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "hexalith-memories",
+      "name": "falkordb-config-f2t6fbdc46",
+      "uid": "c1b156fc-f82a-4f7f-9264-5a7490fb6bd8",
+      "resourceVersion": "855192",
+      "dataKeyNames": [
+        "FALKORDB_PERSISTENCE_ARGS"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "hexalith-memories",
+      "name": "hexalith-internal-root-ca",
+      "uid": "f3316e80-a99c-4038-ac52-964f8f8c42c5",
+      "resourceVersion": "1194102",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "hexalith-memories",
+      "name": "kube-root-ca.crt",
+      "uid": "083cbc5a-a849-4f67-9896-5206e6f5c5f9",
+      "resourceVersion": "848485",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "hexalith-memories",
+      "name": "memories-production-config-4fk2cbg78f",
+      "uid": "99c5a027-8fdc-4d3f-a7df-6c7087f53702",
+      "resourceVersion": "12902590",
+      "dataKeyNames": [
+        "ACCESS_TELEMETRY_COMPONENT_PROFILE_HASH",
+        "ACCESS_TELEMETRY_ENABLED",
+        "OIDC_AUDIENCE",
+        "OIDC_AUTHORITY",
+        "OIDC_ISSUER",
+        "OIDC_TENANT_CLAIM"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "hexalith-memories",
+      "name": "postgresql-tls-reload-state",
+      "uid": "c034e795-80c5-4fbf-82ef-6c43457aab62",
+      "resourceVersion": "20614800",
+      "dataKeyNames": [
+        "resourceVersion"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "hexalith-memories",
+      "name": "redis-stack-config-tfmk6ftkcm",
+      "uid": "08a1cea3-5324-46e1-b974-0c2c62731289",
+      "resourceVersion": "855194",
+      "dataKeyNames": [
+        "redis-stack.conf"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "keycloak",
+      "name": "cnpg-default-monitoring",
+      "uid": "73efa0d2-a258-4381-be25-3ce52f5731cb",
+      "resourceVersion": "22423546",
+      "dataKeyNames": [
+        "queries"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "keycloak",
+      "name": "keycloak-password-blacklist",
+      "uid": "9d3ca6c7-1932-4b94-bf79-7549149f4abe",
+      "resourceVersion": "12902028",
+      "dataKeyNames": [
+        "common-passwords.txt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "keycloak",
+      "name": "kube-root-ca.crt",
+      "uid": "e065e0d2-22d3-43c8-acae-79c51875e151",
+      "resourceVersion": "20780",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kube-node-lease",
+      "name": "kube-root-ca.crt",
+      "uid": "9a0c1ba0-95a2-45e3-a76a-1405081868a4",
+      "resourceVersion": "322",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kube-public",
+      "name": "cluster-info",
+      "uid": "60b69b56-67d6-415f-8d27-5b3b16fe2788",
+      "resourceVersion": "337391",
+      "dataKeyNames": [
+        "kubeconfig"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kube-public",
+      "name": "kube-root-ca.crt",
+      "uid": "0f2fa35a-413d-4d22-b98e-b663f7928fb3",
+      "resourceVersion": "323",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kube-system",
+      "name": "coredns",
+      "uid": "cf1dab58-fcfa-4788-872d-6cc65c6fe08f",
+      "resourceVersion": "12900238",
+      "dataKeyNames": [
+        "Corefile"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kube-system",
+      "name": "extension-apiserver-authentication",
+      "uid": "1540a5ed-a2dd-489a-9834-94e10f01ef65",
+      "resourceVersion": "25",
+      "dataKeyNames": [
+        "client-ca-file",
+        "requestheader-allowed-names",
+        "requestheader-client-ca-file",
+        "requestheader-extra-headers-prefix",
+        "requestheader-group-headers",
+        "requestheader-username-headers"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kube-system",
+      "name": "kube-apiserver-legacy-service-account-token-tracking",
+      "uid": "9393596b-6ba8-42d1-8dd1-0098bcb0fe89",
+      "resourceVersion": "14",
+      "dataKeyNames": [
+        "since"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kube-system",
+      "name": "kube-proxy",
+      "uid": "f0289f71-e0cf-438c-9e5a-df4dadd7e397",
+      "resourceVersion": "64492",
+      "dataKeyNames": [
+        "config.conf",
+        "kubeconfig.conf"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kube-system",
+      "name": "kube-root-ca.crt",
+      "uid": "74c3b963-3e11-4144-8ba0-ff6c36e758ee",
+      "resourceVersion": "324",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kube-system",
+      "name": "kubeadm-config",
+      "uid": "6b30ae18-90e3-4d77-b1a7-36d3b82224b7",
+      "resourceVersion": "63502",
+      "dataKeyNames": [
+        "ClusterConfiguration"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kube-system",
+      "name": "kubelet-config",
+      "uid": "d52960d5-4fe6-4490-828d-dd3411a50263",
+      "resourceVersion": "210",
+      "dataKeyNames": [
+        "kubelet"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kube-system",
+      "name": "metrics-server-kubelet-ca",
+      "uid": "ade0d653-eb69-474c-a97e-0a5460e8194f",
+      "resourceVersion": "22387176",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kube-system",
+      "name": "nodelocaldns",
+      "uid": "e04f0df5-6394-4928-99ba-9d1f548734d3",
+      "resourceVersion": "12900239",
+      "dataKeyNames": [
+        "Corefile"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kubekey-system",
+      "name": "kube-root-ca.crt",
+      "uid": "bc187064-d5e3-4698-841c-54be2aaf5d12",
+      "resourceVersion": "8316",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kubesphere-controls-system",
+      "name": "kube-root-ca.crt",
+      "uid": "ffb715f5-bda9-4719-b379-54ac2593a792",
+      "resourceVersion": "7397",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kubesphere-system",
+      "name": "extension-ks-console-embed-1.2.0-chart",
+      "uid": "dfe55352-419f-4fce-a8e0-3afa8f96a563",
+      "resourceVersion": "6374",
+      "dataKeyNames": [],
+      "binaryDataKeyNames": [
+        "chart.tgz"
+      ]
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kubesphere-system",
+      "name": "helm-install-ks-console-embed-qjq2pq",
+      "uid": "d91d6db4-1623-4a2e-ac47-b801adb6407a",
+      "resourceVersion": "6819",
+      "dataKeyNames": [],
+      "binaryDataKeyNames": [
+        "ca-helm.crt",
+        "helm-post-render.sh",
+        "ks-console-embed.tgz",
+        "kube.config",
+        "kustomization.yaml",
+        "values.yaml"
+      ]
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kubesphere-system",
+      "name": "ks-console-config",
+      "uid": "46731a3e-53af-4312-95c6-985764acbf60",
+      "resourceVersion": "26306",
+      "dataKeyNames": [
+        "local_config.yaml"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kubesphere-system",
+      "name": "kube-root-ca.crt",
+      "uid": "49a12faa-83f5-4648-9b4b-215175217aad",
+      "resourceVersion": "6358",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "kubesphere-system",
+      "name": "kubesphere-config",
+      "uid": "502710b9-7bae-4180-a288-3966ac86e298",
+      "resourceVersion": "22447111",
+      "dataKeyNames": [
+        "kubesphere.yaml"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "llm",
+      "name": "envoy-config",
+      "uid": "12d79c25-6dbd-408e-9de9-871be988f305",
+      "resourceVersion": "20959",
+      "dataKeyNames": [
+        "envoy.yaml"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "llm",
+      "name": "kube-root-ca.crt",
+      "uid": "0d55c430-6bac-4452-b624-0367d9aeb6c1",
+      "resourceVersion": "20799",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "openbao",
+      "name": "deployment-seal-ca",
+      "uid": "8bcd9de4-b3d0-4781-8654-2012f4ff07b6",
+      "resourceVersion": "9368561",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "openbao",
+      "name": "hexalith-keys-config",
+      "uid": "4de8e509-ca76-4a03-bed6-a33a2c2358c5",
+      "resourceVersion": "21791787",
+      "dataKeyNames": [
+        "extraconfig-from-values.hcl"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "openbao",
+      "name": "kube-root-ca.crt",
+      "uid": "d9646d2d-cd00-4d97-9bd9-9018389fd19c",
+      "resourceVersion": "879442",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "registry-distribution",
+      "name": "distribution-registry-config",
+      "uid": "d00eeb4b-f507-440f-8328-fb838a7d5da3",
+      "resourceVersion": "27899151",
+      "dataKeyNames": [
+        "config.json"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "registry-distribution",
+      "name": "kube-root-ca.crt",
+      "uid": "2383f7a0-90ee-4b70-a1bf-ca5a4e9d1388",
+      "resourceVersion": "20775",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "registry-private",
+      "name": "kube-root-ca.crt",
+      "uid": "c6189c3a-79bf-402b-baa4-91f4ff38cc42",
+      "resourceVersion": "20778",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "registry-private",
+      "name": "private-registry-config",
+      "uid": "024d83c4-a39c-45c3-ba4a-852bfd1c2284",
+      "resourceVersion": "22856624",
+      "dataKeyNames": [
+        "config.json"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "stalwart",
+      "name": "kube-root-ca.crt",
+      "uid": "f202273b-0d9f-469c-8707-02e6ac7f50dd",
+      "resourceVersion": "20790",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "stalwart",
+      "name": "stalwart-config",
+      "uid": "bd3c66b1-5a3a-46aa-924a-5fca44ad3dce",
+      "resourceVersion": "20908",
+      "dataKeyNames": [
+        "RUST_LOG"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "stalwart",
+      "name": "stalwart-tls-reload-state",
+      "uid": "aaaf58dc-e29d-4359-8776-2e48e6619cb1",
+      "resourceVersion": "12911381",
+      "dataKeyNames": [
+        "resourceVersion"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "tigera-operator",
+      "name": "kube-root-ca.crt",
+      "uid": "05635ed2-0f01-42bb-9acf-64b6edeb258d",
+      "resourceVersion": "501",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "traefik",
+      "name": "hexalith-tache-ai-relay",
+      "uid": "200af971-829f-4c82-86a5-006a8fda69ad",
+      "resourceVersion": "12545199",
+      "dataKeyNames": [
+        "dynamic.yaml"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "traefik",
+      "name": "kube-root-ca.crt",
+      "uid": "7ea6c0b1-6111-47eb-ba0c-f9858ac72d0d",
+      "resourceVersion": "11757",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "velero",
+      "name": "kube-root-ca.crt",
+      "uid": "5b8cab0f-f71d-4d8e-b24f-d494cbf8d918",
+      "resourceVersion": "15467",
+      "dataKeyNames": [
+        "ca.crt"
+      ],
+      "binaryDataKeyNames": []
+    },
+    {
+      "kind": "ConfigMap",
+      "namespace": "velero",
+      "name": "velero-repo-maintenance",
+      "uid": "f6f83089-1731-4af8-a1ef-33a66c350312",
+      "resourceVersion": "15603",
+      "dataKeyNames": [
+        "global"
+      ],
+      "binaryDataKeyNames": []
+    }
+  ],
+  "daprComponents": [
+    {
+      "kind": "Component",
+      "namespace": "hexalith-memories",
+      "name": "access-telemetry-config",
+      "uid": "ff1ae5e4-d964-4f56-985e-3f39caa24eda",
+      "resourceVersion": "855267",
+      "componentType": "configuration.redis",
+      "version": "v1",
+      "metadataFieldNames": [
+        "redisHost",
+        "redisPassword"
+      ],
+      "scopes": [
+        "memories",
+        "memories-access-telemetry"
+      ]
+    },
+    {
+      "kind": "Component",
+      "namespace": "hexalith-memories",
+      "name": "access-telemetry-secrets",
+      "uid": "1f1b326f-769b-4e97-8808-8d1062c62cc1",
+      "resourceVersion": "880742",
+      "componentType": "secretstores.hashicorp.vault",
+      "version": "v1",
+      "metadataFieldNames": [
+        "vaultAddr",
+        "caPem",
+        "skipVerify",
+        "tlsServerName",
+        "vaultToken",
+        "vaultKVPrefix",
+        "vaultKVUsePrefix",
+        "enginePath",
+        "vaultValueType"
+      ],
+      "scopes": [
+        "memories",
+        "memories-access-telemetry",
+        "memories-access-telemetry-clock"
+      ]
+    },
+    {
+      "kind": "Component",
+      "namespace": "hexalith-memories",
+      "name": "access-telemetry-store",
+      "uid": "e4fc5aee-c10f-4079-8ad9-be71b1841649",
+      "resourceVersion": "27585424",
+      "componentType": "state.postgresql",
+      "version": "v2",
+      "metadataFieldNames": [
+        "connectionString",
+        "sslRootCert",
+        "tablePrefix",
+        "metadataTableName",
+        "timeout",
+        "cleanupInterval",
+        "maxConns",
+        "connectionMaxIdleTime",
+        "actorStateStore"
+      ],
+      "scopes": [
+        "memories-access-telemetry"
+      ]
+    },
+    {
+      "kind": "Component",
+      "namespace": "hexalith-memories",
+      "name": "llm-openai",
+      "uid": "0fa3e5d7-5c11-42e8-b612-3bcb2e29e998",
+      "resourceVersion": "855309",
+      "componentType": "conversation.openai",
+      "version": "v1",
+      "metadataFieldNames": [
+        "key",
+        "model",
+        "responseCacheTTL"
+      ],
+      "scopes": [
+        "memories"
+      ]
+    },
+    {
+      "kind": "Component",
+      "namespace": "hexalith-memories",
+      "name": "pubsub",
+      "uid": "27003eb8-a362-4fb7-9df7-16f627375061",
+      "resourceVersion": "855314",
+      "componentType": "pubsub.redis",
+      "version": "v1",
+      "metadataFieldNames": [
+        "redisHost",
+        "redisPassword",
+        "allowedTopics",
+        "protectedTopics",
+        "publishingScopes",
+        "subscriptionScopes"
+      ],
+      "scopes": [
+        "eventstore",
+        "memories"
+      ]
+    },
+    {
+      "kind": "Component",
+      "namespace": "hexalith-memories",
+      "name": "secretstore",
+      "uid": "295e1c07-ce62-4846-93c7-23a08e46cee9",
+      "resourceVersion": "880741",
+      "componentType": "secretstores.hashicorp.vault",
+      "version": "v1",
+      "metadataFieldNames": [
+        "vaultAddr",
+        "caPem",
+        "skipVerify",
+        "tlsServerName",
+        "vaultToken",
+        "vaultKVPrefix",
+        "vaultKVUsePrefix",
+        "enginePath",
+        "vaultValueType"
+      ],
+      "scopes": [
+        "eventstore",
+        "memories"
+      ]
+    },
+    {
+      "kind": "Component",
+      "namespace": "hexalith-memories",
+      "name": "statestore",
+      "uid": "911ca7bd-aae4-4071-bd07-0cbb1568705c",
+      "resourceVersion": "855317",
+      "componentType": "state.redis",
+      "version": "v1",
+      "metadataFieldNames": [
+        "redisHost",
+        "redisPassword",
+        "actorStateStore"
+      ],
+      "scopes": [
+        "memories"
+      ]
+    }
+  ],
+  "daprConfigurations": [
+    {
+      "kind": "Configuration",
+      "namespace": "dapr-system",
+      "name": "daprsystem",
+      "uid": "e4be8268-0841-43c5-9376-0a7da57c1791",
+      "resourceVersion": "848608"
+    },
+    {
+      "kind": "Configuration",
+      "namespace": "hexalith-memories",
+      "name": "memories-access-telemetry-clock-config",
+      "uid": "f3f79d98-bc25-470c-a89a-66f9618aba28",
+      "resourceVersion": "855318"
+    },
+    {
+      "kind": "Configuration",
+      "namespace": "hexalith-memories",
+      "name": "memories-access-telemetry-config",
+      "uid": "7b145831-d789-4fba-90c0-0bf77263b516",
+      "resourceVersion": "872776"
+    },
+    {
+      "kind": "Configuration",
+      "namespace": "hexalith-memories",
+      "name": "memories-config",
+      "uid": "646de936-22ba-40bf-8e72-c7f67017085c",
+      "resourceVersion": "872775"
+    },
+    {
+      "kind": "Configuration",
+      "namespace": "hexalith-memories",
+      "name": "memories-mcp-config",
+      "uid": "be772637-9639-48cb-9362-f24a34af5942",
+      "resourceVersion": "855321"
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "/home/administrator/hexalith-upgrade-evidence/tools/v1.34.12/kubectl",
+        "--context=jpiquot@local",
+        "--request-timeout=10s",
+        "get",
+        "--raw=/version"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/home/administrator/hexalith-upgrade-evidence/tools/v1.34.12/kubectl",
+        "--context=jpiquot@local",
+        "--request-timeout=10s",
+        "get",
+        "namespaces",
+        "-o",
+        "json"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/home/administrator/hexalith-upgrade-evidence/tools/v1.34.12/kubectl",
+        "--context=jpiquot@local",
+        "--request-timeout=10s",
+        "get",
+        "deployments,statefulsets,pods,services,ingresses",
+        "-A",
+        "-o",
+        "json"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/home/administrator/hexalith-upgrade-evidence/tools/v1.34.12/kubectl",
+        "--context=jpiquot@local",
+        "--request-timeout=10s",
+        "get",
+        "configmaps",
+        "-A",
+        "-o",
+        "json"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/home/administrator/hexalith-upgrade-evidence/tools/v1.34.12/kubectl",
+        "--context=jpiquot@local",
+        "--request-timeout=10s",
+        "get",
+        "components.dapr.io",
+        "-A",
+        "-o",
+        "json"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/home/administrator/hexalith-upgrade-evidence/tools/v1.34.12/kubectl",
+        "--context=jpiquot@local",
+        "--request-timeout=10s",
+        "get",
+        "configurations.dapr.io",
+        "-A",
+        "-o",
+        "json"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "limits": [
+    "Read-only target discovery, not full dependency/live security qualification.",
+    "No Secret objects, secret values, raw configuration, environment values, credentials, certificates or workload logs retained.",
+    "Replicas/readiness do not prove independent failure domains, all-copy key destruction, nonrollback authority or audit-spool qualification.",
+    "Sequential metadata observations are not an atomic cluster snapshot."
+  ]
+}

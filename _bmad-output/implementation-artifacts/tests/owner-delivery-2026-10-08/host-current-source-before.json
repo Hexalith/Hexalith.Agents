@@ -1,0 +1,10 @@
+{
+  "capturedUtc": "2026-10-08T11:24:22.526127+00:00",
+  "hashes": {
+    "/home/administrator/projects/hexalith/platform/apphost.cs": "efb900745618692ed06c7698a2ab9a9b877eb3371b6c9e9a708e6f7270f3ea62",
+    "/home/administrator/projects/hexalith/platform/DaprSelfHostedMtls.cs": "da581231124eb7afe3c4e25943d713202c01597c56462ca18e705e7f175e87d5",
+    "/home/administrator/projects/hexalith/platform/aspire.config.json": "7eb051d14eb7974933be8a8ba2eb51d8ce75290e65409eb8b05fe4310199bf2e",
+    "/home/administrator/projects/hexalith/platform/global.json": "fc4602f9d88c9440f70f72732343a88c5e4190223fb9b77f9b8ac8eb1c4c8c2d",
+    "/home/administrator/projects/hexalith/platform/eng/verify-agents-host.sh": "dd65e6a86a28315b8d22298e9e654e1c27426de1640ebcb698d539b4f43b3fb2"
+  }
+}

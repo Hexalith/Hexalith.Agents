@@ -1,0 +1,42 @@
+{
+  "capturedUtc": "2026-10-08T12:30:59.468719+00:00",
+  "scope": "Separate completed-response disposal correction; root first full Local results and first correction source index remain historical intact.",
+  "files": [
+    {
+      "path": "eventstore/src/Hexalith.EventStore.Client/Streams/RetainedIdentityHistoryReader.cs",
+      "beforeSha256": "7524b2c64d3586a91137ad20f2b7e4743f84c826e6414f06cfbb63d033ff1b4f",
+      "afterSha256": "b3f66811fc4e604653812363b79b760f5c6d87b1fe8862d706b93edf91c551d9"
+    },
+    {
+      "path": "eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedContent.cs",
+      "beforeSha256": "94a5fbcd49bb7c67963e4fd90c6f7f27408ba6c0ab9069a126045fcca7a1d19e",
+      "afterSha256": "aafa35fbe6b318ff13eb36d61ddfce0ed04957e5f67e5633a0e59679952f08ec"
+    },
+    {
+      "path": "eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedHandler.cs",
+      "beforeSha256": "128c5aa9f86e6d7922ce5505bf747e31c1b0a79da9df7df94e84988840170f46",
+      "afterSha256": "b654040bdcce48cf8ee5aba6d53f5469595d6e19a47b2cfa36812a727df585fc"
+    },
+    {
+      "path": "eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedIdentityHistoryReaderTests.cs",
+      "beforeSha256": "4ba6f48e99cbe0477022dfb962771c36048aa941a018885b0146d8977577d498",
+      "afterSha256": "78fa161a2b75f16d7da07abd78c9eefda0285fe0ad452c499569984a90e0aac8"
+    }
+  ],
+  "verification": {
+    "project": "eventstore/tests/Hexalith.EventStore.Client.Tests/Hexalith.EventStore.Client.Tests.csproj",
+    "assembly": "/tmp/hexalith-owner-disposal-focused-20261008/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+    "class": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+    "total": 32,
+    "passed": 32,
+    "buildWarnings": 0,
+    "buildErrors": 0,
+    "xml": "tests.xml",
+    "log": "tests.log",
+    "buildLog": "build.log"
+  },
+  "limits": [
+    "Both owned cleanup branches queue off the query continuation; failures are observed and nested cleanup finally preserves request disposal.",
+    "No forced provider termination or capacity/resource-reclamation policy; B7 remains open."
+  ]
+}
