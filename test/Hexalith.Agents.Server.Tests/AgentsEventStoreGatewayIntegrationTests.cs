@@ -690,17 +690,9 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
 
         using JsonDocument failure = JsonDocument.Parse(
             await response.Content.ReadAsStringAsync().ConfigureAwait(true));
-#if HEXALITH_EVENTSTORE_FROM_SOURCE
         response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
         failure.RootElement.GetProperty("retryable").GetBoolean().ShouldBeFalse();
         failure.RootElement.GetProperty("clientAction").GetString().ShouldBe("correct_request");
-#else
-        // Published EventStore packages still report an adapter rejection as a retryable outage. When the
-        // package floor moves past EventStore commit 42a7ff05 this branch fails; delete it and keep the one above.
-        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.ServiceUnavailable);
-        failure.RootElement.GetProperty("retryable").GetBoolean().ShouldBeTrue();
-        failure.RootElement.GetProperty("clientAction").GetString().ShouldBe("retry_later");
-#endif
         domainExecutions.ShouldBe(0);
         ledger.ExecutionCount.ShouldBe(0);
     }
