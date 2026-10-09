@@ -1,0 +1,18 @@
+{
+  "cwd": "/home/administrator/projects/hexalith/platform",
+  "argv": [
+    "dotnet",
+    "run",
+    "--project",
+    "tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+    "--no-build",
+    "--",
+    "-class",
+    "*ReplicatedSecurityObservationSpoolTests",
+    "-class",
+    "*PlatformSecurityDenialRecorderTests",
+    "-result-xml",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-9/verification/platform-receipt-capacity-final.xml"
+  ],
+  "exit_code": 0
+}

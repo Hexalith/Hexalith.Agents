@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-09T12:42:41.352679+00:00",
+  "scope": "Exact pre-edit bytes reconstructed by removing new WaitAsync insertion from current file, byte-identical to frozen revision7 current source copy",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs",
+      "existed": true,
+      "sha256": "7ca2617ca5a1a570e84d23913a83f1f62da225e9940a06bc5302b76a78cf6c04",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-8/deadline-helper-before/before/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs"
+    }
+  ]
+}

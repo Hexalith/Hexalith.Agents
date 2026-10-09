@@ -1,0 +1,20 @@
+{
+  "eventstore-guard-actor": {
+    "file": "revision9-eventstore-initial.xml",
+    "total": 122,
+    "passed": 122,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "sha256": "dfa97c85b1e09e2ef5de545aa91d5a50f30ebc51ebc0efc7efe2d397eca49fed"
+  },
+  "platform-affected-final": {
+    "file": "revision9-platform-affected-final.xml",
+    "total": 95,
+    "passed": 95,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "sha256": "72d24b2473198c645bd58991c7fd6d6fee0397ac41d1bd171f162ece81ddb8d4"
+  }
+}

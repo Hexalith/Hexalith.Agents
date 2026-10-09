@@ -1,0 +1,19 @@
+[
+  "platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+  "platform/src/Hexalith.Platform.Custody/SecuritySpoolSnapshot.cs",
+  "platform/src/Hexalith.Platform.Custody/SecuritySpoolArchivePage.cs",
+  "platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+  "platform/tests/Hexalith.Platform.Custody.Tests/PlatformSecurityDenialRecorderTests.cs",
+  "platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+  "eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+  "eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+  "eventstore/src/Hexalith.EventStore.Server/Security/DeadlineDeletionConsumptionAuthority.cs",
+  "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+  "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+  "platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionFixture.cs",
+  "agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md",
+  "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+  "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+  "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+  "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md"
+]

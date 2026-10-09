@@ -1,0 +1,110 @@
+[
+  {
+    "path": "platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+    "sha256": "dd21984dac5f2a083275a707e1f26be5f84aa71c6f3103a550e48b855d1ca90e",
+    "bytes": 41997,
+    "changed_from_before": true
+  },
+  {
+    "path": "platform/src/Hexalith.Platform.Custody/SecuritySpoolSnapshot.cs",
+    "sha256": "dc707e24caae265c9e2d545487cfc29ea8648e184d6ca79e2e95cf63e6ed41e7",
+    "bytes": 1588,
+    "changed_from_before": true
+  },
+  {
+    "path": "platform/src/Hexalith.Platform.Custody/SecuritySpoolArchivePage.cs",
+    "sha256": "70ee7c03cb6568b85afee4f0ec14c430d69d5d30cada7e0313afc2693ef53b77",
+    "bytes": 546,
+    "changed_from_before": true
+  },
+  {
+    "path": "platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+    "sha256": "b9ffe1d771cdf54c444f3db99f6dc362d84406694e3dcc3166862891d7ed27a0",
+    "bytes": 49306,
+    "changed_from_before": true
+  },
+  {
+    "path": "platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs",
+    "sha256": "50bd817389223105dec3b23a08f17767abadee87e87ce2996e530f88738ed3b3",
+    "bytes": 11674,
+    "changed_from_before": false
+  },
+  {
+    "path": "platform/tests/Hexalith.Platform.Custody.Tests/PlatformSecurityDenialRecorderTests.cs",
+    "sha256": "d6f55c6e145aa1ea71dcd281764176d214f555f70e24372c7ec23a90f1198436",
+    "bytes": 12177,
+    "changed_from_before": true
+  },
+  {
+    "path": "platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+    "sha256": "8f81091e0fa54737727cb6f3f70de3950fb17155ffe10b60b51496a32c0ed537",
+    "bytes": 48250,
+    "changed_from_before": true
+  },
+  {
+    "path": "eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+    "sha256": "9556acd92e15ee7d2d116d7534ed26bb7fc82da4c7cea78e8d26e1d9253068a9",
+    "bytes": 53870,
+    "changed_from_before": true
+  },
+  {
+    "path": "eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+    "sha256": "6fc5a0ac0e0ac18a6daad8dd87833d9654a8861ca26ef2fde8895f858bc92509",
+    "bytes": 17779,
+    "changed_from_before": true
+  },
+  {
+    "path": "eventstore/src/Hexalith.EventStore.Server/Security/DeadlineDeletionConsumptionAuthority.cs",
+    "sha256": "22c634dd9bc72875286cb787cadb72dfd4c43c8d49efbf9ca1c8025f4fe74601",
+    "bytes": 1403,
+    "changed_from_before": true
+  },
+  {
+    "path": "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+    "sha256": "250a27232b7140d041f335bb350431d9640624279880f0d2696908f3d37c5f53",
+    "bytes": 51290,
+    "changed_from_before": true
+  },
+  {
+    "path": "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+    "sha256": "074510c0e88c17666a82b565e255a33146aeaf74ac11d42fefb980b68fbd5c29",
+    "bytes": 50727,
+    "changed_from_before": true
+  },
+  {
+    "path": "platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionFixture.cs",
+    "sha256": "15602f4a2a4849f8d6d2ece79ea774b0c37ba58fc911bc9d7b7ef2441515480d",
+    "bytes": 9107,
+    "changed_from_before": true
+  },
+  {
+    "path": "agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md",
+    "sha256": "a82983b3f95f917b920ec27ad60a165383efd6eceaf4171b2db6ec0173e028b8",
+    "bytes": 266540,
+    "changed_from_before": true
+  },
+  {
+    "path": "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+    "sha256": "50fc5063108fa76544c1a8c28accbd76d5195220ca5745388d464dab0a26292e",
+    "bytes": 23681,
+    "changed_from_before": true
+  },
+  {
+    "path": "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+    "sha256": "5ab519a2162cd2836f72a3000ebd369150613b0f9b178681c102251c990d5618",
+    "bytes": 25029,
+    "changed_from_before": true
+  },
+  {
+    "path": "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+    "sha256": "910bb84b760cd9031fa26a0f36c5df901f572963e8963210ac9c3e0082c67b37",
+    "bytes": 31818,
+    "changed_from_before": true
+  },
+  {
+    "path": "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+    "sha256": "45a34512cb8d1d2b75dc2044ffc820be64f159c18676376f34e8a8ecb2aeb805",
+    "bytes": 38271,
+    "changed_from_before": true
+  }
+]

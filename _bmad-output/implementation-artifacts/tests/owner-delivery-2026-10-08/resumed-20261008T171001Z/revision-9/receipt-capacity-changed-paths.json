@@ -1,0 +1,9 @@
+[
+  "platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+  "platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+  "agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md",
+  "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+  "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+  "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+  "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md"
+]

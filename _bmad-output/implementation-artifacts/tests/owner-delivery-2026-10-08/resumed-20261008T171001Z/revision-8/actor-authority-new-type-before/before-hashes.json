@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-09T12:59:40.796511+00:00",
+  "scope": "New named helper did not exist before revision-8 actor edit; recorded after edit as an absent-before path",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeadlineDeletionConsumptionAuthority.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "Mode": "Local",
+  "SourceRevision": "afe58a608d1902e91faf9d708eeeee92bea82c7f",
+  "RemainingGates": [
+    "Owner full target/date/command acceptance",
+    "Real current authority and immutable Party",
+    "Independently qualified SDK complete command-source attestation and actor compare/append",
+    "Installed complete authenticated tenant catalogue under the accepted creation window",
+    "Independent deletion approval with authentic policy/source-bound logical-deletion audit evidence",
+    "Qualified runtime publication discovery/backfill/pump binding and actual dedicated service-Party enrollment",
+    "Authenticated receiver, independent remote receipt lookup and accepted exact target",
+    "Live storage/restart/replica/race evidence"
+  ],
+  "EvidenceKind": "SerializedLocalSimulation",
+  "LiveReady": false,
+  "Lanes": [
+    {
+      "Result": "Pass",
+      "Name": "Membership",
+      "ExecutedMethod": "MembershipRetryRemovalAndSerializedReplay",
+      "Xml": "/tmp/hexalith-owner-root-revision9-full-local-20261009T140723Z/conversations/run-20261009T1408407074275Z/local-six-seam.xml",
+      "ExecutedClass": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests"
+    },
+    {
+      "Result": "Pass",
+      "Name": "Posting",
+      "ExecutedMethod": "DeterministicPostingLostAcknowledgementAndConcurrentIntent",
+      "Xml": "/tmp/hexalith-owner-root-revision9-full-local-20261009T140723Z/conversations/run-20261009T1408407074275Z/local-six-seam.xml",
+      "ExecutedClass": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests"
+    },
+    {
+      "Result": "Pass",
+      "Name": "Facilitator",
+      "ExecutedMethod": "FacilitatorRosterAndCurrentEditedDeletedRedactedContent",
+      "Xml": "/tmp/hexalith-owner-root-revision9-full-local-20261009T140723Z/conversations/run-20261009T1408407074275Z/local-six-seam.xml",
+      "ExecutedClass": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests"
+    },
+    {
+      "Result": "Pass",
+      "Name": "ActiveCount",
+      "ExecutedMethod": "CompleteTenantActiveCountIncludesZeroAgentCallsAndMissingCatalogueIsUnavailable",
+      "Xml": "/tmp/hexalith-owner-root-revision9-full-local-20261009T140723Z/conversations/run-20261009T1408407074275Z/local-six-seam.xml",
+      "ExecutedClass": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests"
+    },
+    {
+      "Result": "Pass",
+      "Name": "CurrentReads",
+      "ExecutedMethod": "FacilitatorRosterAndCurrentEditedDeletedRedactedContent",
+      "Xml": "/tmp/hexalith-owner-root-revision9-full-local-20261009T140723Z/conversations/run-20261009T1408407074275Z/local-six-seam.xml",
+      "ExecutedClass": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests"
+    },
+    {
+      "Result": "Pass",
+      "Name": "ApprovedDeletionDelivery",
+      "ExecutedMethod": "ApprovedDeletionPublicationDeliveryBackfillRolloverAndPoison",
+      "Xml": "/tmp/hexalith-owner-root-revision9-full-local-20261009T140723Z/conversations/run-20261009T1408407074275Z/local-six-seam.xml",
+      "ExecutedClass": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests"
+    },
+    {
+      "Result": "Pass",
+      "Name": "CrossTenant",
+      "ExecutedMethod": "CrossTenantUnrelatedPartyAndRevokedAuthorityFailBeforeDisclosure",
+      "Xml": "/tmp/hexalith-owner-root-revision9-full-local-20261009T140723Z/conversations/run-20261009T1408407074275Z/local-six-seam.xml",
+      "ExecutedClass": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests"
+    }
+  ]
+}

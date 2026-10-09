@@ -1,0 +1,159 @@
+{
+  "commands": 14,
+  "exitCodes": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0
+  ],
+  "allZero": false,
+  "sourceDriftCount": 38,
+  "sourceDrift": [
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Aggregates/AggregateReplayer.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Events/EventPayloadEvolutionRegistry.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Handlers/DomainProcessorStateRehydrator.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/PayloadCompatibilityClassifier.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/PayloadCompatibilityRouter.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Aggregates/EventStoreAggregateTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Subscriptions/EventEvolutionSubscriptionAdmissionTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Subscriptions/EventStoreDomainEventProcessorTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/Packaging/ContractsPackageDependencyTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.DomainService.Tests/EventEvolutionLegacyIntakeTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.DomainService.Tests/EventStoreDomainServiceExtensionsTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/CompatibilityEventRoutingTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/CompatibilityMixedHistoryTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/CompatibilitySnapshotRoutingTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorGetEventsTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorInfrastructureFailureTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorTestHelper.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/BackpressureTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/Dw8DrainReasonClassifierTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/EventDrainRecoveryTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/StateMachineIntegrationTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/DaprProductionLogicalEventReaderTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/EventStreamReaderTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/SnapshotRehydrationTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Projections/EventStoreProjectionDeliveryHistoryReaderTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Projections/ProjectionDeliveryRetryWorkerTests.cs",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Projections/ProjectionUpdateOrchestratorTests.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Module.Cli/ModuleCommandApplication.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Runtime/CompositionRunPlanFactory.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Workspace/GitWorkspaceProcess.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Workspace/SourceMapping.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Workspace/SourceMappingMaterializer.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Workspace/SubmoduleInitializer.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Workspace/WorkspaceMappingException.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Workspace/WorkspaceRootResolver.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/test/Hexalith.Builds.Module.Tests/Workspace/WorkspaceGitFixture.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/test/Hexalith.Builds.Module.Tests/Workspace/WorkspaceRootResolverTests.cs",
+    "/home/administrator/projects/hexalith/tenants/tests/Hexalith.Tenants.IntegrationTests/AspireTopologyTests.cs"
+  ],
+  "xml": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T141430Z/parties/Hexalith.EventStore.Client.Tests-tests.xml",
+      "total": 343,
+      "passed": 343,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T141430Z/parties/Hexalith.EventStore.Contracts.Tests-tests.xml",
+      "total": 37,
+      "passed": 37,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T141430Z/parties/Hexalith.EventStore.Server.Tests-tests.xml",
+      "total": 395,
+      "passed": 393,
+      "failed": 2,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T141430Z/conversations/Hexalith.Conversations.Client.Tests.xml",
+      "total": 39,
+      "passed": 39,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T141430Z/conversations/Hexalith.Conversations.Contracts.Tests.xml",
+      "total": 618,
+      "passed": 618,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T141430Z/conversations/Hexalith.Conversations.Server.Tests.xml",
+      "total": 848,
+      "passed": 848,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T141430Z/conversations/Hexalith.Conversations.Tests.xml",
+      "total": 185,
+      "passed": 185,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T141430Z/custody/local-tests.xml",
+      "total": 666,
+      "passed": 666,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T141430Z/Hexalith.EventStore.Contracts.Tests/tests.xml",
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T141430Z/Hexalith.EventStore.Client.Tests/tests.xml",
+      "total": 260,
+      "passed": 260,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T141430Z/Hexalith.EventStore.Server.Tests/tests.xml",
+      "total": 275,
+      "passed": 273,
+      "failed": 2,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T141430Z/Hexalith.EventStore.PayloadProtection.Tests/tests.xml",
+      "total": 609,
+      "passed": 609,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "commands": 14,
+  "exitCodes": [
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0
+  ],
+  "allZero": false,
+  "sourceDriftCount": 14,
+  "sourceDrift": [
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/AadCodec.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/BoundedJsonDocument.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/CompatibilityClassification.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/CompatibilityEventReadResult.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/CompatibilityEventRecord.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/CompatibilityReadRoute.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/CompatibilityReaderCapability.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/CompatibilitySnapshotReadResult.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/CompatibilitySnapshotRecord.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/CompatibilityStreamReadResult.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/ILegacyPayloadReader.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/PayloadProtectionWireFormat.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/SnapshotTypeRegistration.cs",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/SnapshotTypeRegistry.cs"
+  ],
+  "xml": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision8-full-local-20261009T131124Z/parties/Hexalith.EventStore.Client.Tests-tests.xml",
+      "total": 343,
+      "passed": 343,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision8-full-local-20261009T131124Z/parties/Hexalith.EventStore.Contracts.Tests-tests.xml",
+      "total": 37,
+      "passed": 37,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision8-full-local-20261009T131124Z/parties/Hexalith.EventStore.Server.Tests-tests.xml",
+      "total": 390,
+      "passed": 388,
+      "failed": 2,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision8-full-local-20261009T131124Z/conversations/Hexalith.Conversations.Client.Tests.xml",
+      "total": 39,
+      "passed": 39,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision8-full-local-20261009T131124Z/conversations/Hexalith.Conversations.Contracts.Tests.xml",
+      "total": 618,
+      "passed": 618,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision8-full-local-20261009T131124Z/conversations/Hexalith.Conversations.Server.Tests.xml",
+      "total": 848,
+      "passed": 848,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision8-full-local-20261009T131124Z/conversations/Hexalith.Conversations.Tests.xml",
+      "total": 185,
+      "passed": 185,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision8-full-local-20261009T131124Z/custody/local-tests.xml",
+      "total": 658,
+      "passed": 657,
+      "failed": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision8-full-local-20261009T131124Z/Hexalith.EventStore.Contracts.Tests/tests.xml",
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision8-full-local-20261009T131124Z/Hexalith.EventStore.Client.Tests/tests.xml",
+      "total": 260,
+      "passed": 260,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision8-full-local-20261009T131124Z/Hexalith.EventStore.Server.Tests/tests.xml",
+      "total": 270,
+      "passed": 268,
+      "failed": 2,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision8-full-local-20261009T131124Z/Hexalith.EventStore.PayloadProtection.Tests/tests.xml",
+      "total": 357,
+      "passed": 357,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ]
+}

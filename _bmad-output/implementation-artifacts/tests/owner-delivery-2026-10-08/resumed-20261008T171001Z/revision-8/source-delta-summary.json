@@ -1,0 +1,236 @@
+[
+  {
+    "path": "parties/src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs",
+    "beforeSha256": "b34518af329b998d12b6dc699f593828015ab196c546b6ce0f91e547b11e988a",
+    "afterSha256": "9dbb51ce5afc84e8e14fea9e061602e5a0c6cedb9a2911f1246f16646e02423e",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 3,
+    "normalizedRemovedLines": 1
+  },
+  {
+    "path": "parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+    "beforeSha256": "9e924ea422f800761c46ed4bfaace8f0e5681e9d9a797b525b50c3b80c688209",
+    "afterSha256": "2e98deb3cf14ed668d645c532fb2b8571760b4b0148cef7230811d0ecf2bdd20",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 9,
+    "normalizedRemovedLines": 4
+  },
+  {
+    "path": "conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs",
+    "beforeSha256": "4b3832597b1a6ca13921512b3a6efc5a8466294b89b2b01759e57c429aa4101d",
+    "afterSha256": "5474a054a9e24370fc2c8ba141b87a49ed6a9e9c2ddb544a12cdf096872fc1f9",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 24,
+    "normalizedRemovedLines": 0
+  },
+  {
+    "path": "eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs",
+    "beforeSha256": "7ca2617ca5a1a570e84d23913a83f1f62da225e9940a06bc5302b76a78cf6c04",
+    "afterSha256": "3b1fd11388be573c01de5a552d9632a8465a83fcd8f6a6f385da9e488bf10ff1",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 21,
+    "normalizedRemovedLines": 0
+  },
+  {
+    "path": "eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceAdmissionAttribution.cs",
+    "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "afterSha256": "302a52200a72f169648853e09277d6b7250c1fd50c50b65ce0e9701fd037ff0a",
+    "beforeExisted": false,
+    "changed": true,
+    "normalizedAddedLines": 6,
+    "normalizedRemovedLines": 0
+  },
+  {
+    "path": "eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceProtocolReceipt.cs",
+    "beforeSha256": "bfa05295632bbe4f4e63cd91dcb518af65afcee1a91a7e38a525e7427027bfa6",
+    "afterSha256": "12099ba3717d4604532156af10cf59e700847fa4b6c4957cfd414fda891a34ed",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 2,
+    "normalizedRemovedLines": 0
+  },
+  {
+    "path": "eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceDeletionState.cs",
+    "beforeSha256": "6f884ccc8d80289b43ee43d7c6d8305d5bc19e09bc6db75a3a4fcd3db8ee7c99",
+    "afterSha256": "5aeb4a49e45f0166eaa0a41ad2b8b8132fb0ac179d12804966217fedf21698bc",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 5,
+    "normalizedRemovedLines": 1
+  },
+  {
+    "path": "eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceViolation.cs",
+    "beforeSha256": "36730b794efd7f2a48f0379c3b417bc460773805bc9d2fd140d7720ea6cbc273",
+    "afterSha256": "e4e7cd0187e9a393298d3f0fef2208cd89642bb0ae3338cb643d051cb305b7f5",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 2,
+    "normalizedRemovedLines": 0
+  },
+  {
+    "path": "eventstore/src/Hexalith.EventStore.Contracts/Security/RecoverableAnchoredState.cs",
+    "beforeSha256": "2b154e23099515fe5f5ec2391069fb71a95484f1fb9003e8add7bd09a7c67715",
+    "afterSha256": "d5cbb4ab257155a4dc294f72aa74082f07e07426bf2c5e7dd8d10d0b568eb72b",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 20,
+    "normalizedRemovedLines": 8
+  },
+  {
+    "path": "eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+    "beforeSha256": "ba705bc03ff309d974224e07c3bd70611c85f7f6df1dd342832966ac428cb381",
+    "afterSha256": "7e00e0a6f88dfd0fccd0822fa65d79058c5f88743c7db2510382133c220c52d2",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 28,
+    "normalizedRemovedLines": 6
+  },
+  {
+    "path": "eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+    "beforeSha256": "39e259700e3adcfeb66e31189c030adfcbdd7cd9dcac462acb874ef2ecd3d220",
+    "afterSha256": "16528d6b2e9e16a84a46985fb2b20c5f552ad39ec77a85f134620206dfff420e",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 120,
+    "normalizedRemovedLines": 39
+  },
+  {
+    "path": "eventstore/src/Hexalith.EventStore.Server/Security/DeadlineDeletionConsumptionAuthority.cs",
+    "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "afterSha256": "ed39a023f37013971fa57f5a5b337cd67c30da319fe9ae5c4ac116c8b5a91dac",
+    "beforeExisted": false,
+    "changed": true,
+    "normalizedAddedLines": 24,
+    "normalizedRemovedLines": 0
+  },
+  {
+    "path": "eventstore/tests/Hexalith.EventStore.Contracts.Tests/Security/RecoverableAnchoredStateTests.cs",
+    "beforeSha256": "f8744b071bb49405718594cc8e96b69f8ac1ddf89ddb0fdfb6b1242011d281f2",
+    "afterSha256": "62ea2091ba4bb450836ed6511510be01d2986c06e1ecc6600b912570e724e0bc",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 30,
+    "normalizedRemovedLines": 0
+  },
+  {
+    "path": "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+    "beforeSha256": "399b3fab6c4b9b50a09a783655e4876375ec8499864dfdcfe6402e71cbf0412b",
+    "afterSha256": "c08884297d7608a28e7f3e671314d0dced170f093508080239fce2d4cfb9f6a2",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 48,
+    "normalizedRemovedLines": 1
+  },
+  {
+    "path": "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs",
+    "beforeSha256": "30c8223455c052f94424ecee897d610d19c4d6038a718cc629cb7619bc96f1cd",
+    "afterSha256": "b87f789816db0ca0ef5ada6e7f0ddf403f2bb4afd039b9129ac057dc716df10d",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 1,
+    "normalizedRemovedLines": 1
+  },
+  {
+    "path": "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+    "beforeSha256": "7502abc12f19bd39cc51e8a86c821fada93614408a4d42cf589710e0566bc6e9",
+    "afterSha256": "85f9623ef5bfe5cada0ffbfd59972a64256b1b0abed6fcd09f5befa8e360e7d9",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 53,
+    "normalizedRemovedLines": 1
+  },
+  {
+    "path": "platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs",
+    "beforeSha256": "df2a8c62414decf25c90f015c39a00c333b224a001c5c6677dccc3829f389e2e",
+    "afterSha256": "64281a90682764a86faab2c65080d90cf98f0f7acd6f24d83c2e9d713a0bd9d5",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 18,
+    "normalizedRemovedLines": 6
+  },
+  {
+    "path": "platform/src/Hexalith.Platform.Custody/Fr34PersistedCanary.cs",
+    "beforeSha256": "ab4ed8dc7b9766c87249996986caa95cf6a7346345a6c44452cef521aced0ae9",
+    "afterSha256": "ab4ed8dc7b9766c87249996986caa95cf6a7346345a6c44452cef521aced0ae9",
+    "beforeExisted": true,
+    "changed": false,
+    "normalizedAddedLines": 0,
+    "normalizedRemovedLines": 0
+  },
+  {
+    "path": "platform/src/Hexalith.Platform.Custody/IFr34PersistedCanaryReader.cs",
+    "beforeSha256": "b595cb70e697d66a0f6ec15960b69544422f2afa770268f562d10e86e1e7324a",
+    "afterSha256": "e25225b8c0b28903ae1d8a6a3e2e17e6f6c4dcfa8561f8709466876a00a7313d",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 2,
+    "normalizedRemovedLines": 1
+  },
+  {
+    "path": "platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+    "beforeSha256": "0757dd63bd2a2fccf7e54f008cae28c2b841d675fbadbfa37be28fe120b7e781",
+    "afterSha256": "24ea0280917d383adb7e529773f9374e889f95aedead28071c69f979aa4c8081",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 3,
+    "normalizedRemovedLines": 2
+  },
+  {
+    "path": "platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+    "beforeSha256": "1a384bf3366c0ceee05a2f8f8d080dbaf6d11a7da95eb25f91d0ed330970db3b",
+    "afterSha256": "954acf4e8eb8f706c737108146440628bd0ff0b6e859b71acc2ea179628e0067",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 91,
+    "normalizedRemovedLines": 10
+  },
+  {
+    "path": "platform/src/Hexalith.Platform.Custody/SecuritySpoolSnapshot.cs",
+    "beforeSha256": "fe51162a1ad576105ee3d1e96aa022aafa9ccd0287fa24c58de9f444a6adc67d",
+    "afterSha256": "87bfd6594ae5d49c7ec6402c22e1535191d9c72b148e745638227547ec47dbe1",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 8,
+    "normalizedRemovedLines": 0
+  },
+  {
+    "path": "platform/src/Hexalith.Platform.Custody/SecuritySpoolArchivePage.cs",
+    "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "afterSha256": "3adc995c5370768b4ce47281f7e482c858767330deb9408c95620a3c08409a43",
+    "beforeExisted": false,
+    "changed": true,
+    "normalizedAddedLines": 7,
+    "normalizedRemovedLines": 0
+  },
+  {
+    "path": "platform/tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs",
+    "beforeSha256": "93c936e47def7e07e618fef758c3e6424a87c6090302ee756d966475c7f1956b",
+    "afterSha256": "1671d973d1ba3c73a5d26a0755d710042ecd02a827237acbf94bf7f6d2c6d98c",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 22,
+    "normalizedRemovedLines": 1
+  },
+  {
+    "path": "platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+    "beforeSha256": "40bb122328fd26dc8467ce180fb2482359ecff36ee65b07c2dfcc9d0da78fcd9",
+    "afterSha256": "f390812dfbfe37adc434f3585d3c2c12f1b2e44e3b55504fdbaee8041ce9e5d8",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 15,
+    "normalizedRemovedLines": 6
+  },
+  {
+    "path": "platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs",
+    "beforeSha256": "e5b719ed90d8bdb4245a49be53cbe203c2b4a8955a3415f2dcf52e509813d813",
+    "afterSha256": "50bd817389223105dec3b23a08f17767abadee87e87ce2996e530f88738ed3b3",
+    "beforeExisted": true,
+    "changed": true,
+    "normalizedAddedLines": 16,
+    "normalizedRemovedLines": 0
+  }
+]

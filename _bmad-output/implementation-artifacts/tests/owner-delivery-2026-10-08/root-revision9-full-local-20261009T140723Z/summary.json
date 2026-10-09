@@ -1,0 +1,97 @@
+{
+  "commands": 14,
+  "exitCodes": [
+    1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0
+  ],
+  "allZero": false,
+  "sourceDriftCount": 8,
+  "sourceDrift": [
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Workspace/GitWorkspaceProcess.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Workspace/SourceMapping.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Workspace/SourceMappingEntry.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Workspace/SubmoduleInitializer.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Workspace/WorkspaceMappingException.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Workspace/WorkspaceMode.cs",
+    "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Tooling/Workspace/WorkspaceRootResolver.cs",
+    "/home/administrator/projects/hexalith/tenants/tests/Hexalith.Tenants.IntegrationTests/AspireTopologyTests.cs"
+  ],
+  "xml": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T140723Z/parties/Hexalith.EventStore.Client.Tests-tests.xml",
+      "total": 343,
+      "passed": 343,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T140723Z/parties/Hexalith.EventStore.Contracts.Tests-tests.xml",
+      "total": 37,
+      "passed": 37,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T140723Z/parties/Hexalith.EventStore.Server.Tests-tests.xml",
+      "total": 395,
+      "passed": 393,
+      "failed": 2,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T140723Z/conversations/Hexalith.Conversations.Client.Tests.xml",
+      "total": 39,
+      "passed": 39,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T140723Z/conversations/Hexalith.Conversations.Contracts.Tests.xml",
+      "total": 618,
+      "passed": 618,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T140723Z/conversations/Hexalith.Conversations.Server.Tests.xml",
+      "total": 848,
+      "passed": 848,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T140723Z/conversations/Hexalith.Conversations.Tests.xml",
+      "total": 185,
+      "passed": 185,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision9-full-local-20261009T140723Z/Hexalith.EventStore.PayloadProtection.Tests/tests.xml",
+      "total": 589,
+      "passed": 589,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+--- initial-after/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md
++++ receipt-capacity-after/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md
+@@ -88,3 +88,7 @@
+ ## Engineering revision 9 — 2026-10-09
+ 
+ The shared EventStore guard and consumption authority now enforce bounded accepted attributions, refuse zero-fence deletion state at ingress, and forward the private deadline token to cooperative journal calls. The Platform spool uses a finite 16-page authenticated archive envelope and exact pending-transition byte capacity. No Conversations domain, catalogue or Local runner source changed. [Exact revision 9 source/evidence](resumed-20261008T171001Z/revision-9/README.md) records selected focused Local verification; root's full matrix and independent review remain pending. This dependency remains **Uncommitted**; complete target version/commit and accepted compatibility commands are TBD. Runtime enrollment, authority/backend/replica/isolation/nonrollback, all-copy destruction/restore and Live qualification remain unestablished.
++
++### Revision 9 receipt-capacity correction — 2026-10-09
++
++The shared spool admission now reserves worst-case serialized future receipts for every pending original under the 32 MiB transition bound. Its authoritative recorder `EventId` must be nonblank, valid strict UTF-8 and at most 2,048 bytes; larger or malformed proof fails closed with the original retained. The new near-limit rollover/drain regression passes. This source contract does not qualify an actual production recorder or preexisting pending state. No Conversations source changed; this dependency stays Uncommitted with target version/commit and accepted compatibility commands TBD. [Updated focused evidence](resumed-20261008T171001Z/revision-9/README.md). Runtime enrollment and Live qualification remain unestablished.

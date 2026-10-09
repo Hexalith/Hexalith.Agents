@@ -1,0 +1,63 @@
+--- initial-after/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs
++++ receipt-capacity-after/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs
+@@ -14,6 +14,9 @@
+ {
+     private const int RecordBound = 10000;
+     private const int ArchivePageBound = 16;
++    private const int ReceiptEventIdByteBound = 2048;
++    private static readonly System.Text.UTF8Encoding StrictUtf8 = new(false, true);
++    private static readonly string MaximumEscapedEventId = new('\0', ReceiptEventIdByteBound);
+     private static string Key(ReplicatedSecuritySpoolTarget target) => "system/security-observations/" + target.InstallationEpoch;
+     /// <summary>Retains an original safe observation before processed-denial can be reported; duplicates reuse stored first-seen/day/sequence.</summary>
+     public async Task<SecurityObservationRecord?> ObserveAsync(SecurityObservationIntent intent, CancellationToken cancellationToken = default)
+@@ -32,7 +35,7 @@
+             SecurityObservationRecord record = new(intent, observed, observed.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), checked(state.ArchivedObservedCount + state.Records.Count + 1L), null);
+             var next = state with { Revision = checked(state.Revision + 1), Records = state.Records.Append(record).ToArray() };
+             budget.Check();
+-            if (next.Records.Count > RecordBound || JsonSerializer.SerializeToUtf8Bytes(next).Length > RecoverableAnchoredState.MaximumPendingBytes)
++            if (!FitsWithReceiptReserve(next, budget))
+             {
+                 if (!await ArchiveAcknowledgedPageAsync(target, state, etag, budget).ConfigureAwait(false)) { return null; }
+                 (state, etag) = await ReadAsync(target, budget, true).ConfigureAwait(false);
+@@ -40,7 +43,7 @@
+                 record = record with { Sequence = checked(state.ArchivedObservedCount + state.Records.Count + 1L) };
+                 next = state with { Revision = checked(state.Revision + 1), Records = state.Records.Append(record).ToArray() };
+                 budget.Check();
+-                if (next.Records.Count > RecordBound || JsonSerializer.SerializeToUtf8Bytes(next).Length > RecoverableAnchoredState.MaximumPendingBytes) { return null; }
++                if (!FitsWithReceiptReserve(next, budget)) { return null; }
+             }
+             var (retainedStage, _) = await budget.ReadAsync(() => client.GetStateAndETagAsync<AnchoredStateTransition>(target.ComponentName, PendingKey(target), ConsistencyMode.Strong, cancellationToken: CancellationToken.None)).ConfigureAwait(false);
+             if (retainedStage is not null)
+@@ -403,9 +406,31 @@
+         { throw new InvalidOperationException("Malformed private spool revision."); }
+         return source with { Records = Array.AsReadOnly(owned.ToArray()) };
+     }
++    // Reserve the worst JSON representation of every future exact receipt before admitting a pending original.
++    // The authoritative recorder must return an EventId within the same UTF-8 bound; larger proofs fail closed.
++    private static bool FitsWithReceiptReserve(SecuritySpoolSnapshot snapshot, PrivateOwnerOperationDeadline budget)
++    {
++        if (snapshot.Records.Count > RecordBound) { return false; }
++        var records = snapshot.Records.Select(record =>
++        {
++            budget.Check();
++            return record.Receipt is not null ? record : record with { Receipt = new SecurityEventRecordReceipt(
++                record.Intent.ObservationId, record.Intent.RoutingTenantId, record.UtcDay, IntentDigest(record.Intent),
++                SourceStream(record), long.MaxValue, MaximumEscapedEventId) };
++        }).ToArray();
++        var upper = snapshot with { Revision = long.MaxValue, DrainRevision = long.MaxValue, DrainAfterSequence = long.MaxValue, Records = records };
++        budget.Check();
++        return JsonSerializer.SerializeToUtf8Bytes(upper).Length <= RecoverableAnchoredState.MaximumPendingBytes;
++    }
++    private static bool ValidReceiptEventId(string? eventId)
++    {
++        if (string.IsNullOrWhiteSpace(eventId) || eventId.Length > ReceiptEventIdByteBound) { return false; }
++        try { return StrictUtf8.GetByteCount(eventId) <= ReceiptEventIdByteBound; }
++        catch (System.Text.EncoderFallbackException) { return false; }
++    }
+     private static bool Exact(SecurityObservationRecord record, SecurityEventRecordReceipt? receipt) => receipt is not null
+         && receipt.ObservationId == record.Intent.ObservationId && receipt.RoutingTenantId == record.Intent.RoutingTenantId && receipt.UtcDay == record.UtcDay
+-        && receipt.OriginalIntentDigest == IntentDigest(record.Intent) && receipt.SourceStreamId == SourceStream(record) && receipt.SourceRevision > 0 && !string.IsNullOrWhiteSpace(receipt.EventId);
++        && receipt.OriginalIntentDigest == IntentDigest(record.Intent) && receipt.SourceStreamId == SourceStream(record) && receipt.SourceRevision > 0 && ValidReceiptEventId(receipt.EventId);
+     private static void ValidateIntent(SecurityObservationIntent intent)
+     {
+         ArgumentNullException.ThrowIfNull(intent); foreach (string field in new[] { intent.ObservationId, intent.RoutingTenantId, intent.DigestKeyVersion }) { Text(field); }

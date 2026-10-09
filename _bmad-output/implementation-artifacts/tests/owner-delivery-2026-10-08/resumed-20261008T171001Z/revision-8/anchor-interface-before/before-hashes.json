@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T12:31:30.194992+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IAnchoredStateTransitionAuthority.cs",
+      "existed": true,
+      "sha256": "90f96f039d0288afefcbbc8a4394a063600771274eab8d9e911e42148d2ae8cd",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-8/anchor-interface-before/before/eventstore/src/Hexalith.EventStore.Contracts/Security/IAnchoredStateTransitionAuthority.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/AnchoredStateTransition.cs",
+      "existed": true,
+      "sha256": "083ee9fa48c4e0f5c298dfd3e5727000a07e8548b9641536d25417d04258ece8",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-8/anchor-interface-before/before/eventstore/src/Hexalith.EventStore.Contracts/Security/AnchoredStateTransition.cs"
+    }
+  ]
+}

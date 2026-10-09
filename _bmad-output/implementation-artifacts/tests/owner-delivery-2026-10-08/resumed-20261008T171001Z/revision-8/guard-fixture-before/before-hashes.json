@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-09T12:38:30.927506+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs",
+      "existed": true,
+      "sha256": "30c8223455c052f94424ecee897d610d19c4d6038a718cc629cb7619bc96f1cd",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-8/guard-fixture-before/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs"
+    }
+  ]
+}

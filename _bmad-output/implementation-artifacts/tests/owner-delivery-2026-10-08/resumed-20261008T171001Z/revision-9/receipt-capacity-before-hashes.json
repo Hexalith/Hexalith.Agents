@@ -1,0 +1,37 @@
+[
+  {
+    "path": "platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+    "sha256": "53a437401dfb03adbef743eb0714cc1e59841283d1af3cefee24042cf1adf8a9",
+    "bytes": 40458
+  },
+  {
+    "path": "platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+    "sha256": "185a0ed84970b4d4df33458455fa242aea73d1220d2e114cc0be894479338d49",
+    "bytes": 44543
+  },
+  {
+    "path": "agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md",
+    "sha256": "0bb2ccd2ff2c81b3cec42c7f69e7da7145c069d7eb98a3081b23762d21a9118d",
+    "bytes": 265388
+  },
+  {
+    "path": "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+    "sha256": "c97a37953c3b19c8cb375a0606ff739d67adf03410c40e817a7a74573359ba10",
+    "bytes": 22896
+  },
+  {
+    "path": "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+    "sha256": "67ef8c495e08b36cfafa8996d93e866d1ae837f846bcea159549600c3e810924",
+    "bytes": 24238
+  },
+  {
+    "path": "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+    "sha256": "274d10e75a9601a85e1b4de08acbce91767520bdb15968f3814d99b85a5733d9",
+    "bytes": 31004
+  },
+  {
+    "path": "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+    "sha256": "f180590312db2aaf9c474cfce8fccc1b1a40edcb6f2e33baa554786598324f8d",
+    "bytes": 37232
+  }
+]

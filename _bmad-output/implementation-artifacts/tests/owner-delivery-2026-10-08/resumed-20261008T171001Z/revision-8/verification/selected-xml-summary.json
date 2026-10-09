@@ -1,0 +1,42 @@
+[
+  {
+    "file": "revision8-anchor-final.xml",
+    "total": 14,
+    "passed": 14,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "file": "revision8-conversations.xml",
+    "total": 8,
+    "passed": 8,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "file": "revision8-eventstore-final.xml",
+    "total": 117,
+    "passed": 117,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "file": "revision8-parties-final.xml",
+    "total": 172,
+    "passed": 172,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "file": "revision8-platform-final.xml",
+    "total": 134,
+    "passed": 134,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+]

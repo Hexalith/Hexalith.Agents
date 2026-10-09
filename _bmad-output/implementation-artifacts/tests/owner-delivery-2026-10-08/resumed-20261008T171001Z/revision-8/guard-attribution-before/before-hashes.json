@@ -1,0 +1,34 @@
+{
+  "capturedUtc": "2026-10-09T12:36:55.238024+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceProtocolReceipt.cs",
+      "existed": true,
+      "sha256": "bfa05295632bbe4f4e63cd91dcb518af65afcee1a91a7e38a525e7427027bfa6",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-8/guard-attribution-before/before/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceProtocolReceipt.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceViolation.cs",
+      "existed": true,
+      "sha256": "36730b794efd7f2a48f0379c3b417bc460773805bc9d2fd140d7720ea6cbc273",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-8/guard-attribution-before/before/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceViolation.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceDeletionState.cs",
+      "existed": true,
+      "sha256": "6f884ccc8d80289b43ee43d7c6d8305d5bc19e09bc6db75a3a4fcd3db8ee7c99",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-8/guard-attribution-before/before/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceDeletionState.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceAdmissionAttribution.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    }
+  ]
+}
