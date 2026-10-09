@@ -612,3 +612,9 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
   summary: Standalone retained transport invocation remains part of full owner prerequisites (2026-10-08 review E2).
   evidence: Pre-existing RetainedIdentityHistoryReader invokes SendAsync/body providers synchronously before bounded waits and shares provider callbacks with wait cancellation. Parties query wraps this provider under its own deadline, but standalone callers remain unqualified. This is additional feasible full-scope source work, to address after current review corrections without inventing resource reclamation.
+
+## Deferred from: code review of spec-5-4-owner-prerequisites.md (2026-10-09, revisions 8+9 cumulative owner slice)
+
+- Spool archive history scan: `FindArchivedAsync`/`ArchivesCompleteAsync` read and fully revalidate every linked page (up to 16 × 32 MiB) on non-duplicate observe, lookup misses and readiness, all under one 30 s budget. Unverified (medium if true): ordinary operations may time out well before the 16-page ceiling. Settle by measuring 16 full pages on the selected Dapr state backend; revision 9 explicitly leaves throughput unqualified and forbids a new index now.
+- R9-B8 carry: an already persisted acknowledged receipt whose `EventId` exceeds the new 2,048-byte strict UTF-8 bound would make `Capture` reject its head or archive page, so every spool operation would fail. Unverified (medium if true): settle with an actual retained pre-revision-9 receipt or an accepted migration contract.
+- R8-B7 carry: a stored violation with the new `AcceptanceReceiptId` defaulted to empty makes `RecordViolation` deny every later violation for that deletion. Unverified (medium if true): settle with actual persisted legacy violation state or an accepted migration contract.
