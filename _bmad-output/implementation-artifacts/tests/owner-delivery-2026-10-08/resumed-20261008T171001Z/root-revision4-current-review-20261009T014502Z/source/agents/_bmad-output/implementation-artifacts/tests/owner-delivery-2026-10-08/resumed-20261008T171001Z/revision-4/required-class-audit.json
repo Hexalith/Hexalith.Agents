@@ -1,0 +1,155 @@
+{
+  "capturedUtc": "2026-10-09T01:34:29.737931+00:00",
+  "newPublicTestClasses": [],
+  "editedPublicTestClassesRemainExisting": true,
+  "paths": [
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs",
+      "beforePublicClasses": [
+        "DaprSourcePublicationIndexStoreTests"
+      ],
+      "currentPublicClasses": [
+        "DaprSourcePublicationIndexStoreTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs",
+      "beforePublicClasses": [
+        "SourceNamespaceSnapshotReaderTests"
+      ],
+      "currentPublicClasses": [
+        "SourceNamespaceSnapshotReaderTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs",
+      "beforePublicClasses": [
+        "SourcePublicationNamespaceTests"
+      ],
+      "currentPublicClasses": [
+        "SourcePublicationNamespaceTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs",
+      "beforePublicClasses": [
+        "InteractionOccurrenceProtectorTests"
+      ],
+      "currentPublicClasses": [
+        "InteractionOccurrenceProtectorTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+      "beforePublicClasses": [
+        "DeletionConsumptionActorTests"
+      ],
+      "currentPublicClasses": [
+        "DeletionConsumptionActorTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "beforePublicClasses": [
+        "GovernanceScopeGuardTests"
+      ],
+      "currentPublicClasses": [
+        "GovernanceScopeGuardTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleFixture.cs",
+      "beforePublicClasses": [],
+      "currentPublicClasses": [],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "beforePublicClasses": [
+        "CustodyKeyLifecycleTests"
+      ],
+      "currentPublicClasses": [
+        "CustodyKeyLifecycleTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs",
+      "beforePublicClasses": [
+        "DeletionCapabilityRevocationSubscriberTests"
+      ],
+      "currentPublicClasses": [
+        "DeletionCapabilityRevocationSubscriberTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "beforePublicClasses": [
+        "DeletionCapabilitySigningActorTests"
+      ],
+      "currentPublicClasses": [
+        "DeletionCapabilitySigningActorTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "beforePublicClasses": [
+        "ExportKeyDeliveryActorTests"
+      ],
+      "currentPublicClasses": [
+        "ExportKeyDeliveryActorTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs",
+      "beforePublicClasses": [
+        "IndependentDecisionManifestVerifierTests"
+      ],
+      "currentPublicClasses": [
+        "IndependentDecisionManifestVerifierTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerDeadlineTestClock.cs",
+      "beforePublicClasses": [],
+      "currentPublicClasses": [],
+      "newPublicClasses": []
+    }
+  ],
+  "partiesRunner": {
+    "sourcePath": "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-1.ps1",
+    "retainedPriorProjectLanes": 11,
+    "currentProjectLanes": 12,
+    "fiveNewlyRequiredClasses": {
+      "Hexalith.EventStore.Contracts.Tests": {
+        "RecoverableAnchoredStateTests": 12
+      },
+      "Hexalith.EventStore.Client.Tests": {
+        "DirectoryAtomicAppendTests": 11
+      },
+      "Hexalith.EventStore.Server.Tests": {
+        "AggregateActorPublicationRegistrationTests": 7
+      },
+      "Hexalith.EventStore.PayloadProtection.Tests": {
+        "InteractionOccurrenceKeyDerivationTests": 16,
+        "InteractionOccurrenceProtectorTests": 11
+      }
+    },
+    "focusedCases": 57,
+    "scriptParseAndStatic": "passed",
+    "logs": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness",
+    "fullRunnerExecution": "pending root"
+  },
+  "otherOwnerLocalMappings": "All affected public test classes already exist in their respective owner map; no new public class was added. Root dynamically detects owned SDK classes and audits owner Platform/Conversations coverage.",
+  "rootFullLocalExecution": "pending"
+}

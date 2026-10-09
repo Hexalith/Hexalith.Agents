@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-09T00:09:13.491879+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "parties",
+      "relativePath": "tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+      "existed": true,
+      "sha256": "6c2d5241019c9f51b21288ac4d555b20072db2af65ff9bdd4b451e04c35f9ae8",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/multiple-expired-prefix/before/parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs"
+    }
+  ]
+}

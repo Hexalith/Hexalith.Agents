@@ -1,0 +1,27 @@
+{
+  "capturedUtc": "2026-10-08T21:38:39.483882+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/README.md",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/commands.json",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/engineering-handoff.json",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    }
+  ]
+}

@@ -1,0 +1,190 @@
+{
+  "capturedUtc": "2026-10-08T23:24:54.983332+00:00",
+  "cases": [
+    {
+      "name": "parties-live",
+      "cwd": "/home/administrator/projects/hexalith/parties",
+      "argv": [
+        "/home/administrator/.dotnet/dotnet",
+        "exec",
+        "/home/administrator/.dotnet/tools/.store/powershell/7.6.2/powershell/7.6.2/tools/net10.0/any/unix/pwsh.dll",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-parties-1.ps1",
+        "-Mode",
+        "Live",
+        "-EvidenceDirectory",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/root-negative-gates/parties-live"
+      ],
+      "exitCode": 1,
+      "childToolInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/root-negative-gates/parties-live.log",
+      "expectedRejectionObserved": true,
+      "logSha256": "494a7f949c8dadf3383453f1a00e4a0de3f31274188ca5bf97fab7eb4391dafc"
+    },
+    {
+      "name": "conversations-live",
+      "cwd": "/home/administrator/projects/hexalith/conversations",
+      "argv": [
+        "/home/administrator/.dotnet/dotnet",
+        "exec",
+        "/home/administrator/.dotnet/tools/.store/powershell/7.6.2/powershell/7.6.2/tools/net10.0/any/unix/pwsh.dll",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-conv-ai-1.ps1",
+        "-Mode",
+        "Live"
+      ],
+      "exitCode": 1,
+      "childToolInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/root-negative-gates/conversations-live.log",
+      "expectedRejectionObserved": true,
+      "logSha256": "7942651614cd4bf8b909379e060f20b470115999a76a84f5d14711ad3b595958"
+    },
+    {
+      "name": "custody-default",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "/home/administrator/.dotnet/dotnet",
+        "exec",
+        "/home/administrator/.dotnet/tools/.store/powershell/7.6.2/powershell/7.6.2/tools/net10.0/any/unix/pwsh.dll",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-secrets-1.ps1"
+      ],
+      "exitCode": 1,
+      "childToolInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/root-negative-gates/custody-default.log",
+      "expectedRejectionObserved": true,
+      "logSha256": "81f1dc1b519f342c41543f0c90564ab393bf3432ee1654ec10e9afb064959741"
+    },
+    {
+      "name": "custody-live",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "/home/administrator/.dotnet/dotnet",
+        "exec",
+        "/home/administrator/.dotnet/tools/.store/powershell/7.6.2/powershell/7.6.2/tools/net10.0/any/unix/pwsh.dll",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-secrets-1.ps1",
+        "-Mode",
+        "Live"
+      ],
+      "exitCode": 1,
+      "childToolInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/root-negative-gates/custody-live.log",
+      "expectedRejectionObserved": true,
+      "logSha256": "81f1dc1b519f342c41543f0c90564ab393bf3432ee1654ec10e9afb064959741"
+    },
+    {
+      "name": "custody-invalid",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "/home/administrator/.dotnet/dotnet",
+        "exec",
+        "/home/administrator/.dotnet/tools/.store/powershell/7.6.2/powershell/7.6.2/tools/net10.0/any/unix/pwsh.dll",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-secrets-1.ps1",
+        "-Mode",
+        "Invalid"
+      ],
+      "exitCode": 1,
+      "childToolInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/root-negative-gates/custody-invalid.log",
+      "expectedRejectionObserved": true,
+      "logSha256": "80fbe57db291d7d0400a0dde1f259707bddee58b25c5e4ac9da641d1cabbcc85"
+    },
+    {
+      "name": "host-default",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "bash",
+        "eng/verify-agents-host.sh"
+      ],
+      "exitCode": 1,
+      "childToolInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/root-negative-gates/host-default.log",
+      "expectedRejectionObserved": true,
+      "logSha256": "4f6950206f72a8ce027e5e17c969e68f4495c4a6fc1a3800eba4df38b16a5029"
+    },
+    {
+      "name": "host-full",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "bash",
+        "eng/verify-agents-host.sh",
+        "--mode",
+        "Full"
+      ],
+      "exitCode": 1,
+      "childToolInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/root-negative-gates/host-full.log",
+      "expectedRejectionObserved": true,
+      "logSha256": "4f6950206f72a8ce027e5e17c969e68f4495c4a6fc1a3800eba4df38b16a5029"
+    },
+    {
+      "name": "host-invalid",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "bash",
+        "eng/verify-agents-host.sh",
+        "--mode",
+        "Live"
+      ],
+      "exitCode": 1,
+      "childToolInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/root-negative-gates/host-invalid.log",
+      "expectedRejectionObserved": true,
+      "logSha256": "652ce414507eb825b98b67a209c98a028cc89f6fda269ef7c904a0e416f8b47a"
+    },
+    {
+      "name": "host-missing-mode",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "bash",
+        "eng/verify-agents-host.sh",
+        "--mode"
+      ],
+      "exitCode": 1,
+      "childToolInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/root-negative-gates/host-missing-mode.log",
+      "expectedRejectionObserved": true,
+      "logSha256": "71c8d3196e288a6062c9dc2f9b468fbbf109436c0ab16b1e1efee57dac4ccb68"
+    },
+    {
+      "name": "host-empty-artifacts",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "bash",
+        "eng/verify-agents-host.sh",
+        "--mode",
+        "LocalScaffold",
+        "--artifacts-path",
+        ""
+      ],
+      "exitCode": 1,
+      "childToolInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/root-negative-gates/host-empty-artifacts.log",
+      "expectedRejectionObserved": true,
+      "logSha256": "6bac495b0985153a8799a9d23fcad5ae07e3ccca37d6e434e1f0b613355bd06e"
+    },
+    {
+      "name": "host-unknown-argument",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "bash",
+        "eng/verify-agents-host.sh",
+        "--unknown"
+      ],
+      "exitCode": 1,
+      "childToolInvoked": false,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/root-negative-gates/host-unknown-argument.log",
+      "expectedRejectionObserved": true,
+      "logSha256": "7a0eb5b50597677766cfcf39b55b159000958b8b76d6f66d239b9039a01a7591"
+    }
+  ],
+  "scope": "Actual incomplete verifiers invoked with blocked child tools. Real dotnet only bootstraps PowerShell; no live lane is enabled.",
+  "pass": true
+}

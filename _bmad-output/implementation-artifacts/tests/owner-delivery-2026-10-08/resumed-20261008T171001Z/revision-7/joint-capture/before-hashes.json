@@ -1,0 +1,34 @@
+{
+  "capturedUtc": "2026-10-09T09:09:08.185054+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "existed": true,
+      "sha256": "c445b5653b6a2ad1363135ed39a2cc9b570bd61248f6eb133b157dcd59874319",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/joint-capture/before/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs",
+      "existed": true,
+      "sha256": "f631865e05aa9d09ef592adaf2d595504455dd9add030ffc6308f289f118668e",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/joint-capture/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "existed": true,
+      "sha256": "4003edce371090f2284663ff47af49366a10d0107353ffc49696d587e196f7e1",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/joint-capture/before/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "existed": true,
+      "sha256": "6d0087a1b82bfa920cd41543929981641b2bb628eb1290d21d2e815aab127e5f",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/joint-capture/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs"
+    }
+  ]
+}

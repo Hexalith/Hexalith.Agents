@@ -1,0 +1,34 @@
+{
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningActor.cs",
+      "existed": true,
+      "sha256": "ec56495cacdeee697c451d4e7f8bdd946549961051179b02c35d263e988e428c"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "existed": true,
+      "sha256": "d56269aee795a700c95793fdc0de2d40adf93c57dc630d653a97faff26beab79"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs",
+      "existed": true,
+      "sha256": "0db060b3a449882d1d42c34c7cfe34b12693bccf294a578944d9fc14dbc5f596"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "existed": true,
+      "sha256": "9bd7790d438651213fbf840afe2ae42351a43baf1c343fa135fb1f384f4a8ff4"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "existed": true,
+      "sha256": "e72625a0abecd2fb0e422feeef1b0151761fb65b329006b02e9a6498d62ebd8f"
+    }
+  ]
+}

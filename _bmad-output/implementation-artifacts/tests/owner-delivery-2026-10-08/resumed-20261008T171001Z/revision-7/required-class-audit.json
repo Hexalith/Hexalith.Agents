@@ -1,0 +1,128 @@
+{
+  "capturedUtc": "2026-10-09T09:33:07.662648+00:00",
+  "newPublicTestClasses": [],
+  "editedPublicTestClassesRemainExisting": true,
+  "allEditedClassesActuallyExecutedInCorrectProject": true,
+  "paths": [
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs",
+      "beforePublicClasses": [
+        "ConversationDeletionWorkerAdmissionTests"
+      ],
+      "currentPublicClasses": [
+        "ConversationDeletionWorkerAdmissionTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs",
+      "beforePublicClasses": [
+        "EventStoreConversationTenantCatalogueTests"
+      ],
+      "currentPublicClasses": [
+        "EventStoreConversationTenantCatalogueTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs",
+      "beforePublicClasses": [
+        "SourcePublicationNamespaceTests"
+      ],
+      "currentPublicClasses": [
+        "SourcePublicationNamespaceTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "beforePublicClasses": [
+        "GovernanceScopeGuardTests"
+      ],
+      "currentPublicClasses": [
+        "GovernanceScopeGuardTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs",
+      "beforePublicClasses": [
+        "GuardedStateTransactionTests"
+      ],
+      "currentPublicClasses": [
+        "GuardedStateTransactionTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "beforePublicClasses": [
+        "RetainedIdentityHistorySourceReaderTests"
+      ],
+      "currentPublicClasses": [
+        "RetainedIdentityHistorySourceReaderTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "beforePublicClasses": [
+        "CustodyKeyLifecycleTests"
+      ],
+      "currentPublicClasses": [
+        "CustodyKeyLifecycleTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "beforePublicClasses": [
+        "DeletionBatchExecutionCoordinatorTests"
+      ],
+      "currentPublicClasses": [
+        "DeletionBatchExecutionCoordinatorTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationDeadlineTests.cs",
+      "beforePublicClasses": [
+        "PrivateOwnerOperationDeadlineTests"
+      ],
+      "currentPublicClasses": [
+        "PrivateOwnerOperationDeadlineTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests"
+      ]
+    }
+  ],
+  "ownerRunnerSourceChanges": false,
+  "priorRequiredMappingsPreserved": true,
+  "prior44ClassExecutionRequirement": "Preserved; root recomputes all44 and actual current full matrix execution after handoff."
+}

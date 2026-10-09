@@ -1,0 +1,34 @@
+{
+  "capturedUtc": "2026-10-09T01:16:31.502680+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+      "existed": true,
+      "sha256": "989cd29f1578b2b2b41fdb0e195b1c909a18e79ad09611cf3eef122baaf71abf",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/delivery-signing-provider-bound/before/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "existed": true,
+      "sha256": "2b0df2dc689d6bd512d8624bde7bbb7785bda07c785a91a19b2eb3d259b1a693",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/delivery-signing-provider-bound/before/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "existed": true,
+      "sha256": "b3845999e32dde5e3b8d55ebd4f05629a8a90b370c0eeea8c67ae59ba857fa69",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/delivery-signing-provider-bound/before/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "existed": true,
+      "sha256": "033d9e5545fc2fe3ef550735e72ceefcfa0888212189e502767cd7e8562cda08",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/delivery-signing-provider-bound/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs"
+    }
+  ]
+}

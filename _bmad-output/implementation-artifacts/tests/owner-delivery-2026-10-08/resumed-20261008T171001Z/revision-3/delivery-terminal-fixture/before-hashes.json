@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-09T00:01:04.484643+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "existed": true,
+      "sha256": "a2882bf8c7117d1845e61b4c0011069ac4304103fe50f1d20d0d0030e2fe3608",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/delivery-terminal-fixture/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs"
+    }
+  ]
+}

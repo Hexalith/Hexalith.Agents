@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-09T01:26:36.053356+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PrivateOwnerDeadlineTestClock.cs",
+      "existed": true,
+      "sha256": "54e75f5b306169e419853154ed3ddbf9dd3db59b3a2f6f66bb548056b3b96e09",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/private-clock-registration/before/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerDeadlineTestClock.cs"
+    }
+  ]
+}

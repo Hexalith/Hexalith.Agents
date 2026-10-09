@@ -1,0 +1,35 @@
+{
+  "capturedUtc": "2026-10-09T09:09:22.036502+00:00",
+  "rootReadFullPreviewDiff": true,
+  "previewLines": 279,
+  "previewSha256": "ca841f6f63b882e1093b19f8796d9499902904187bfc6fd703e6576d25388f92",
+  "pathsRead": 2,
+  "actualFocusedXml": [
+    {
+      "phase": "red",
+      "xml": "/tmp/revision7-history-grant-red.xml",
+      "sha256": "d18047762c60309948fde247bb49ce1296a088ad80573f187f59e94dac6166e5",
+      "total": 19,
+      "passed": 0,
+      "failed": 19,
+      "classes": [
+        "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests"
+      ]
+    },
+    {
+      "phase": "green",
+      "xml": "/tmp/revision7-history-grant-green.xml",
+      "sha256": "bd42c4a754d32043d0cb403e972a2afafa933f2c0a493940a539f400191b4569",
+      "total": 78,
+      "passed": 78,
+      "failed": 0,
+      "classes": [
+        "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests"
+      ]
+    }
+  ],
+  "greenBuildLog": "/tmp/revision7-history-grant-green-build.log",
+  "greenBuildSha256": "0e5c531cffe631dd95a39f1169c6f93fc870b2d7910d2824470bd24b0ec42b9a",
+  "cleanNormalBuildObserved": true,
+  "scope": "Preliminary source/read and actual red-green XML only. Final stable hashes, exact command linkage, packaged artifacts, cumulative review and full Local matrix remain required."
+}

@@ -1,0 +1,55 @@
+{
+  "capturedUtc": "2026-10-09T07:39:58.366718+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementReconciliation.cs",
+      "existed": true,
+      "sha256": "3be85080b6e42b0e644d1f8892f2170f89f42ed7533ab5417281f439ddaaac20",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/new-type-file-layout/before/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementReconciliation.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementResult.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "existed": true,
+      "sha256": "964981415bf6e0dd049053bdbf5620415973b9fdca26e94953a1a58a9372e398",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/new-type-file-layout/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/PumpClock.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/PumpTimer.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+      "existed": true,
+      "sha256": "b748ded574d0a7c3fe37766ac8efd1ec0cbcd1632d66c645a0d6772bba7d1e6a",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/new-type-file-layout/before/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PrivateOwnerOperationMachine.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    }
+  ]
+}

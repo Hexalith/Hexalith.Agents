@@ -1,0 +1,14 @@
+[
+  {
+    "location": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DaprInteractionOccurrenceRegistry.cs:36",
+    "trigger_condition": "Any occurrence operation uses the real DAPR transport.",
+    "guard_snippet": "new ActorId(InteractionOccurrenceRegistryActor.GetActorId(identity.Target.TenantId))",
+    "potential_consequence": "The actor rejects every request as a scope mismatch; occurrence protection never progresses."
+  },
+  {
+    "location": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs:98",
+    "trigger_condition": "The configured projector blocks synchronously or ignores cancellation.",
+    "guard_snippet": "candidates = await deadline.ReadAsync(token => Task.FromResult(projector.Project(source with { Head = target.Head, Events = prefix.AsReadOnly() }, token))).ConfigureAwait(false);",
+    "potential_consequence": "A blocked projector prevents read completion and caller cancellation, exhausting worker requests."
+  }
+]

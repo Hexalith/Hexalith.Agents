@@ -1,0 +1,186 @@
+<assemblies schema-version="3" id="b9a3713a-80d3-4a60-b78f-781fcd220cf2" computer="DESKTOP-VIOG240" user="administrator" start-rtf="2026-10-09T06:32:54.8044791+00:00" finish-rtf="2026-10-09T06:33:11.3777831+00:00" timestamp="10/09/2026 08:33:11"><assembly environment="64-bit (x64) .NET 10.0.12 [collection-per-class, parallel (collections, 14 threads)]" id="b4eaf050-43e2-45d7-a464-b3f9b6fde141" name="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.Tests.dll" run-date="2026-10-09" run-time="06:32:54" start-rtf="2026-10-09T06:32:54.8044791+00:00" test-framework="xUnit.net v3 4.0.1+8ed8aa354c" target-framework=".NETCoreApp,Version=v10.0" errors="0" failed="15" finish-rtf="2026-10-09T06:33:11.3777831+00:00" not-run="0" passed="2" skipped="0" time="16.561" time-rtf="00:00:16.5610000" total="17"><collection name="Test collection for Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests (id: 79c85c3c9ee18988d02556566688ecaee6df96855d3fe2cff34235fefea100d5)" id="87205cad-c1db-4d5f-852c-cf8b468cb8de" failed="15" not-run="0" passed="2" skipped="0" time="16.324" time-rtf="00:00:16.3240000" total="17"><test id="37d49af3-deea-4ebe-93f8-aa041a374260" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.CompletedCapturedPayloadIsRetired(vector: \&quot;accepted\&quot;)" result="Fail" time="0.274" time-rtf="00:00:00.2740000" start-rtf="2026-10-09T06:32:54.9399298+00:00" finish-rtf="2026-10-09T06:32:55.2383436+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="CompletedCapturedPayloadIsRetired" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="93"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : captured.ShouldNotBeNull(); captured.All(b =&gt; b == 0)
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.CompletedCapturedPayloadIsRetired(String vector) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 118
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="58631dea-5a7d-4945-96d9-4e65e23ada5e" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.CompletedCapturedPayloadIsRetired(vector: \&quot;denied\&quot;)" result="Fail" time="0.005" time-rtf="00:00:00.0050000" start-rtf="2026-10-09T06:32:55.2430771+00:00" finish-rtf="2026-10-09T06:32:55.2486924+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="CompletedCapturedPayloadIsRetired" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="93"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : captured.ShouldNotBeNull(); captured.All(b =&gt; b == 0)
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.CompletedCapturedPayloadIsRetired(String vector) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 118
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="cd95face-4bc4-46e3-9e25-8366581f7c23" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.CompletedCapturedPayloadIsRetired(vector: \&quot;unknown\&quot;)" result="Fail" time="0.001" time-rtf="00:00:00.0010000" start-rtf="2026-10-09T06:32:55.2487463+00:00" finish-rtf="2026-10-09T06:32:55.2499695+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="CompletedCapturedPayloadIsRetired" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="93"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : captured.ShouldNotBeNull(); captured.All(b =&gt; b == 0)
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.CompletedCapturedPayloadIsRetired(String vector) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 118
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="6a97ad56-31f0-4580-bc73-b7be9ea3a0de" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.CompletedCapturedPayloadIsRetired(vector: \&quot;fault\&quot;)" result="Fail" time="0.002" time-rtf="00:00:00.0020000" start-rtf="2026-10-09T06:32:55.2500182+00:00" finish-rtf="2026-10-09T06:32:55.2527732+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="CompletedCapturedPayloadIsRetired" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="93"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : captured.ShouldNotBeNull(); captured.All(b =&gt; b == 0)
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.CompletedCapturedPayloadIsRetired(String vector) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 118
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="6188e572-6374-4aa4-8b28-1f106a0cd628" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.CompletedCapturedPayloadIsRetired(vector: \&quot;withdrawn\&quot;)" result="Fail" time="0" time-rtf="00:00:00.0000000" start-rtf="2026-10-09T06:32:55.2528710+00:00" finish-rtf="2026-10-09T06:32:55.2540826+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="CompletedCapturedPayloadIsRetired" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="93"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : captured.ShouldNotBeNull(); captured.All(b =&gt; b == 0)
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.CompletedCapturedPayloadIsRetired(String vector) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 118
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="96d6a9d7-313d-4e95-b06e-3b65301ef60f" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.OptionalCausationUsesExistingIdentityCarrier(vector: \&quot;oversized\&quot;)" result="Fail" time="0.008" time-rtf="00:00:00.0080000" start-rtf="2026-10-09T06:32:55.2609823+00:00" finish-rtf="2026-10-09T06:32:55.2696295+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="OptionalCausationUsesExistingIdentityCarrier" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="171"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `client.AppendAsync(request, TestContext.Current.CancellationToken)`
+    should throw
+System.ArgumentException
+    but did not</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.OptionalCausationUsesExistingIdentityCarrier(String vector) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 182
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="5bc066e0-5277-465d-bffc-3f161ccfa565" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.OptionalCausationUsesExistingIdentityCarrier(vector: \&quot;malformed\&quot;)" result="Fail" time="0.001" time-rtf="00:00:00.0010000" start-rtf="2026-10-09T06:32:55.2697405+00:00" finish-rtf="2026-10-09T06:32:55.2719735+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="OptionalCausationUsesExistingIdentityCarrier" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="171"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `client.AppendAsync(request, TestContext.Current.CancellationToken)`
+    should throw
+System.ArgumentException
+    but did not</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.OptionalCausationUsesExistingIdentityCarrier(String vector) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 182
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="2af06245-3cac-4d39-abbc-eb26d7cd858a" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.OptionalCausationUsesExistingIdentityCarrier(vector: \&quot;null\&quot;)" result="Pass" time="0.013" time-rtf="00:00:00.0130000" start-rtf="2026-10-09T06:32:55.2720220+00:00" finish-rtf="2026-10-09T06:32:55.2855047+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="OptionalCausationUsesExistingIdentityCarrier" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="171" /><test id="23d288c8-10d0-4718-9aa9-55ae7457747b" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.OptionalCausationUsesExistingIdentityCarrier(vector: \&quot;boundary\&quot;)" result="Pass" time="0.001" time-rtf="00:00:00.0010000" start-rtf="2026-10-09T06:32:55.2855971+00:00" finish-rtf="2026-10-09T06:32:55.2867501+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="OptionalCausationUsesExistingIdentityCarrier" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="171" /><test id="cea3ef89-6d99-4d11-bf70-e724dcc85514" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(stage: \&quot;admission\&quot;, expires: False)" result="Fail" time="2.007" time-rtf="00:00:02.0070000" start-rtf="2026-10-09T06:32:55.2874718+00:00" finish-rtf="2026-10-09T06:32:57.2952710+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="122"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : SpinWait.SpinUntil(captured.All(b =&gt; b == 0), TimeSpan.FromSeconds(2))
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(String stage, Boolean expires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 157
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="5335dee3-6a8b-48bc-a8a3-af08cc651c6f" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(stage: \&quot;admission\&quot;, expires: True)" result="Fail" time="2.003" time-rtf="00:00:02.0030000" start-rtf="2026-10-09T06:32:57.2953624+00:00" finish-rtf="2026-10-09T06:32:59.2996928+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="122"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : SpinWait.SpinUntil(captured.All(b =&gt; b == 0), TimeSpan.FromSeconds(2))
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(String stage, Boolean expires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 157
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="63550598-7c7b-4214-a1eb-b0cdaeae8dc4" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(stage: \&quot;owner\&quot;, expires: False)" result="Fail" time="2.007" time-rtf="00:00:02.0070000" start-rtf="2026-10-09T06:32:59.2998009+00:00" finish-rtf="2026-10-09T06:33:01.3077680+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="122"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : SpinWait.SpinUntil(captured.All(b =&gt; b == 0), TimeSpan.FromSeconds(2))
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(String stage, Boolean expires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 157
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="663345b1-2507-497b-86ed-8f7ef5754fe9" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(stage: \&quot;owner\&quot;, expires: True)" result="Fail" time="1.999" time-rtf="00:00:01.9990000" start-rtf="2026-10-09T06:33:01.3078900+00:00" finish-rtf="2026-10-09T06:33:03.3078169+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="122"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : SpinWait.SpinUntil(captured.All(b =&gt; b == 0), TimeSpan.FromSeconds(2))
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(String stage, Boolean expires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 157
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="839251ac-cfa7-40fe-9ce9-a51383d0b17d" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(stage: \&quot;verification\&quot;, expires: False)" result="Fail" time="2.006" time-rtf="00:00:02.0059999" start-rtf="2026-10-09T06:33:03.3079227+00:00" finish-rtf="2026-10-09T06:33:05.3135147+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="122"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : SpinWait.SpinUntil(captured.All(b =&gt; b == 0), TimeSpan.FromSeconds(2))
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(String stage, Boolean expires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 157
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="b537411a-8279-4e47-8578-a78a6a5ed6ab" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(stage: \&quot;verification\&quot;, expires: True)" result="Fail" time="1.999" time-rtf="00:00:01.9990000" start-rtf="2026-10-09T06:33:05.3139019+00:00" finish-rtf="2026-10-09T06:33:07.3133101+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="122"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : SpinWait.SpinUntil(captured.All(b =&gt; b == 0), TimeSpan.FromSeconds(2))
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(String stage, Boolean expires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 157
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="6b00df8c-9e44-4893-bdbf-464584dd17c6" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(stage: \&quot;final-admission\&quot;, expires: False)" result="Fail" time="1.999" time-rtf="00:00:01.9990000" start-rtf="2026-10-09T06:33:07.3134210+00:00" finish-rtf="2026-10-09T06:33:09.3132096+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="122"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : SpinWait.SpinUntil(captured.All(b =&gt; b == 0), TimeSpan.FromSeconds(2))
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(String stage, Boolean expires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 157
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="6b6500a6-97ea-42b6-b325-550ee043dae9" name="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(stage: \&quot;final-admission\&quot;, expires: True)" result="Fail" time="1.999" time-rtf="00:00:01.9990000" start-rtf="2026-10-09T06:33:09.3133181+00:00" finish-rtf="2026-10-09T06:33:11.3135817+00:00" type="Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests" method="AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs" source-line="122"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : SpinWait.SpinUntil(captured.All(b =&gt; b == 0), TimeSpan.FromSeconds(2))
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion(String stage, Boolean expires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs:line 157
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test></collection></assembly></assemblies>

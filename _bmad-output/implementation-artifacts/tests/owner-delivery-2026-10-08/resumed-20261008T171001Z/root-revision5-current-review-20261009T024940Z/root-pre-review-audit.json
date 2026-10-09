@@ -1,0 +1,133 @@
+{
+  "capturedUtc": "2026-10-09T02:50:14.219989+00:00",
+  "reviewRevision": 5,
+  "frozenSourcePaths": 395,
+  "captureHashesChecked": 125,
+  "errors": [],
+  "csharpChangedPaths": [
+    {
+      "repository": "eventstore",
+      "path": "src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs",
+      "deltaLines": 32,
+      "bareLf": false
+    },
+    {
+      "repository": "eventstore",
+      "path": "src/Hexalith.EventStore.Contracts/Security/IIdentityHistoryCustody.cs",
+      "deltaLines": 13,
+      "bareLf": false
+    },
+    {
+      "repository": "eventstore",
+      "path": "src/Hexalith.EventStore.PayloadProtection/InteractionOccurrenceProtector.cs",
+      "deltaLines": 22,
+      "bareLf": false
+    },
+    {
+      "repository": "eventstore",
+      "path": "src/Hexalith.EventStore.Server/Actors/AggregateActor.cs",
+      "deltaLines": 10,
+      "bareLf": false
+    },
+    {
+      "repository": "eventstore",
+      "path": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "deltaLines": 10,
+      "bareLf": false
+    },
+    {
+      "repository": "eventstore",
+      "path": "src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs",
+      "deltaLines": 25,
+      "bareLf": false
+    },
+    {
+      "repository": "eventstore",
+      "path": "src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "deltaLines": 66,
+      "bareLf": false
+    },
+    {
+      "repository": "eventstore",
+      "path": "tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs",
+      "deltaLines": 76,
+      "bareLf": false
+    },
+    {
+      "repository": "eventstore",
+      "path": "tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs",
+      "deltaLines": 82,
+      "bareLf": false
+    },
+    {
+      "repository": "eventstore",
+      "path": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "deltaLines": 57,
+      "bareLf": false
+    },
+    {
+      "repository": "eventstore",
+      "path": "tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+      "deltaLines": 63,
+      "bareLf": false
+    },
+    {
+      "repository": "eventstore",
+      "path": "tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "deltaLines": 151,
+      "bareLf": false
+    },
+    {
+      "repository": "platform",
+      "path": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "deltaLines": 16,
+      "bareLf": false
+    },
+    {
+      "repository": "platform",
+      "path": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningState.cs",
+      "deltaLines": 11,
+      "bareLf": false
+    },
+    {
+      "repository": "platform",
+      "path": "src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+      "deltaLines": 34,
+      "bareLf": false
+    },
+    {
+      "repository": "platform",
+      "path": "src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "deltaLines": 22,
+      "bareLf": false
+    },
+    {
+      "repository": "platform",
+      "path": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "deltaLines": 70,
+      "bareLf": false
+    },
+    {
+      "repository": "platform",
+      "path": "tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "deltaLines": 54,
+      "bareLf": false
+    },
+    {
+      "repository": "platform",
+      "path": "tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs",
+      "deltaLines": 73,
+      "bareLf": false
+    },
+    {
+      "repository": "platform",
+      "path": "tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+      "deltaLines": 47,
+      "bareLf": false
+    }
+  ],
+  "csharpDeltaLines": 934,
+  "csharpDeltaSha256": "aab14c587203469ce88360ef3f5e6558b1f1bc0f924d888e10b483dc2cf5bcbd",
+  "fullRootLocal": "mandatory, not started",
+  "reviewPhase": "root source inspection before fresh layers; full parent remains in-progress"
+}

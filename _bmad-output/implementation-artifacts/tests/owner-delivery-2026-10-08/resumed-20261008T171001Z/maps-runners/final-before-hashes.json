@@ -1,0 +1,64 @@
+{
+  "files": [
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+      "existed": true,
+      "sha256": "d58068b76db26f6fd59732e9849ea6f524c3128d4b4be6bc34ed8ecfe053554c",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/historical-documents/ext-parties-1.md"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+      "existed": true,
+      "sha256": "bd39889989730eeec80389c695aea0489a7219fb18d18d3fee8977b376cd830b",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/historical-documents/ext-conv-ai-1.md"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+      "existed": true,
+      "sha256": "9d10b81e00b14eb00836e97b6ff777216a10d915bdfb3d566cc9da963bc96de4",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/historical-documents/ext-secrets-1.md"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+      "existed": true,
+      "sha256": "e95a26838369a61667fc8bdc143b4541c63091cf773c796cf1d133af1beec8d0",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/historical-documents/ext-host-1.md"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/README.md",
+      "existed": true,
+      "sha256": "f0be46801cf106883019988f2364d54e3cdac14962eedc3bd1f74fc8da439fa1",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/historical-documents/README.md"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/README.md",
+      "existed": true,
+      "sha256": "bab6ee957effe377c0fb873b74dc2c2aeca9e6e32a4a329ea0265ad004ea5635",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/historical-documents/resumed-20261008T171001Z/README.md"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "eng/verify-ext-conv-ai-1.ps1",
+      "existed": true,
+      "sha256": "1add3555ee055bff9aabf4fa6c9b19f5cd6fd1d27977073be1f1b0da18f6f37e"
+    },
+    {
+      "repository": "parties",
+      "relativePath": "eng/verify-ext-parties-1.ps1",
+      "existed": true,
+      "sha256": "8cdd242ba34e01f5cb87940c5040738773165bb8b2958179b2cd506348d8ea5b"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "eng/verify-ext-secrets-1.ps1",
+      "existed": true,
+      "sha256": "69fa38e5a3b99e49808d6eb29daa5a11c10f7e058ef78953772cb2d609d21c25"
+    }
+  ]
+}

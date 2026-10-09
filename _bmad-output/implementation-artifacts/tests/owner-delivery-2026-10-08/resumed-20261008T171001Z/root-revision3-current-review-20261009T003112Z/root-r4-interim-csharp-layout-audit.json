@@ -1,0 +1,281 @@
+{
+  "auditedUtc": "2026-10-09T01:34:22.289634+00:00",
+  "freshCSharpPathsChecked": 39,
+  "paths": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourceNamespaceSnapshotReader.cs",
+      "sha256": "c1a2e6ce19f7f791c2e012c87267b56f4fefba5e797bea585cd718fce1725427",
+      "declaredTypes": [
+        "SourceNamespaceSnapshotReader"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs",
+      "sha256": "9bb76b97ecddca694bd5081ee49b7b5d342441274ece41da49bae1b30587b402",
+      "declaredTypes": [
+        "SourcePublicationFeed"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryRepairOriginalIdentity.cs",
+      "sha256": "4cc7b560905bf1ffe60986152658afaa7f924a477c1ef8da83d9a0ba5ddecfc7",
+      "declaredTypes": [
+        "DirectoryRepairOriginalIdentity"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardTransition.cs",
+      "sha256": "ca4bb2cb2b4e484113b36e8f63f765fc39a9ebf2aa95d0a32fc045d65452e119",
+      "declaredTypes": [
+        "GovernanceGuardTransition"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceRepairState.cs",
+      "sha256": "9729613d26c499ab5c547114872fcf930332b442f9fc9bb519989ff0e71bec64",
+      "declaredTypes": [
+        "GovernanceRepairState"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationAdvance.cs",
+      "sha256": "8ec07385279270ac10f55d0643e12df4b0f9df64dc7c0ed8979a403269d4150d",
+      "declaredTypes": [
+        "SourcePublicationReconciliationAdvance"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationProgress.cs",
+      "sha256": "3d8c436a570ccb3d800165c91f2e2707febca5279bf4fead6ee3b0d7e08be87c",
+      "declaredTypes": [
+        "SourcePublicationReconciliationProgress"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs",
+      "sha256": "a37329c57fba1ffb94d2e6190a3b0d74699949354eac99329fd0a52d8a281379",
+      "declaredTypes": [
+        "DeletionConsumptionIdentity"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "sha256": "01c95082d4efde6106e62a5f73f32d65f695f4ea6d783fa251660c0af6c8a83a",
+      "declaredTypes": [
+        "GovernanceScopeGuardReducer"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs",
+      "sha256": "5b4898497e8bd37916451f4ec11c1991d2e26462447d8876d8aa3661270e7186",
+      "declaredTypes": [
+        "IDeletionConsumptionAuthority"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDirectoryMigrationBoundaryAuthority.cs",
+      "sha256": "1cdce2f72132c77515f0547ef1a0b84bfc8e8f748853cea036be98f66ed485e9",
+      "declaredTypes": [
+        "IDirectoryMigrationBoundaryAuthority"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IInteractionOccurrenceAuthority.cs",
+      "sha256": "6c3b532fdef3e3d676a9da2954ac3a3fa9b3e735cf89d34a1bac2640f09c1386",
+      "declaredTypes": [
+        "IInteractionOccurrenceAuthority"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationNamespaceSource.cs",
+      "sha256": "9ef2162175b9ee91cb9c13884bea0c60b62be13cc113f95d19f25df8ca1d5e1e",
+      "declaredTypes": [
+        "DaprSourcePublicationNamespaceSource"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs",
+      "sha256": "52c5ccccb0eb944d2be3bd0e3f819c9dadfe91c0a3a9e35ac0514a188ba45aa2",
+      "declaredTypes": [
+        "ISourcePublicationOperationAuthority"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs",
+      "sha256": "8622c6f6cc7b9d240f85b519038fba076475623c0d42c1709a41475c39adb6fe",
+      "declaredTypes": [
+        "SourcePublicationIndexActor"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs",
+      "sha256": "5cd88041702a9fc87f538ad2f583c5e466bfc6d895b791051f6f2b763e33fe1a",
+      "declaredTypes": [
+        "DaprSourcePublicationIndexStoreTests"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs",
+      "sha256": "5be0d5002592323220b62c555792980a124f92e5a9dcb11bce19e184c3a0d991",
+      "declaredTypes": [
+        "SourceNamespaceSnapshotReaderTests"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs",
+      "sha256": "a46b095533991dde206410576ccb67380af3a11116fabc34df0b8cac21aaf9ea",
+      "declaredTypes": [
+        "SourcePublicationNamespaceTests"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs",
+      "sha256": "415a842daa18bdf6a2728d652149487079821a7d7710ff7a0500b69f1793897f",
+      "declaredTypes": [
+        "InteractionOccurrenceProtectorTests"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+      "sha256": "7502abc12f19bd39cc51e8a86c821fada93614408a4d42cf589710e0566bc6e9",
+      "declaredTypes": [
+        "DeletionConsumptionActorTests"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "sha256": "3199d48f408a9c21d7e4944dca9de1329e0f3601e86bc1f79fa26b574b76eb1f",
+      "declaredTypes": [
+        "GovernanceScopeGuardTests"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs",
+      "sha256": "7799a8819a599ce579577afd53ad2a8dadaf2b557013d3aecb0c954953407159",
+      "declaredTypes": [
+        "CustodyKeyLifecycleActor"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilityRevocationSubscriber.cs",
+      "sha256": "bf1d9ec61d6bc2f5906e35a93255828f40e32f3b863f70a8b66d12da57792db8",
+      "declaredTypes": [
+        "DeletionCapabilityRevocationSubscriber"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "sha256": "7d64482a0bc9f3420c6b87265ff3a033e2d7a5466f59fce0e59e08cb6dc249d5",
+      "declaredTypes": [
+        "DeletionCapabilitySigningActor"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs",
+      "sha256": "b5dd22d45a8323dd371ba609f884a7748f58bc97105b7e6acbae392a865d270d",
+      "declaredTypes": [
+        "DeletionCapabilitySigningSuccessor"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+      "sha256": "51f7f58b91ac258a13cfe7a4ab65a1b3b8be0e14dcf5cf6e0d02f248d3b774c0",
+      "declaredTypes": [
+        "ExportKeyDeliveryActor"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ICustodyKeyLifecycleAuthority.cs",
+      "sha256": "f173db92e6ba0f4d663cdcd2655a98b172dd9f6be5dc23f99690d60fab159a0c",
+      "declaredTypes": [
+        "ICustodyKeyLifecycleAuthority"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningAuthority.cs",
+      "sha256": "e8fffb92475dd8a2b3113fe467a8327f4f88ecfd06589a9003bdd5e9e930bb93",
+      "declaredTypes": [
+        "IDeletionCapabilitySigningAuthority"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IExportKeyDeliveryAuthority.cs",
+      "sha256": "7f8305b83a3c70787342ab3c0144c2fa25c9a6e64d552152f950c4679688a520",
+      "declaredTypes": [
+        "IExportKeyDeliveryAuthority"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPlatformKeyInventoryAuthority.cs",
+      "sha256": "0a4965c87837eea8fa4eca4e6e676de1d0b747e77f2efc21b8eba8b534a320cc",
+      "declaredTypes": [
+        "IPlatformKeyInventoryAuthority"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs",
+      "sha256": "286f7e5b1be1e0a9391ecd347c7e6ee63ee87d53c586f9525a5d65efdda08175",
+      "declaredTypes": [
+        "IReplicatedSecuritySpoolAuthority"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs",
+      "sha256": "324bc0322406284e6ee315ed8291139e6eb886b7d7f980eb199431bc7d609ee6",
+      "declaredTypes": [
+        "IndependentDecisionManifestVerifier"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleFixture.cs",
+      "sha256": "f10c5dd6977a69da1283a8038d239cf83f289711e4778e23ed450994dfac74d5",
+      "declaredTypes": [
+        "CustodyKeyLifecycleFixture"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "sha256": "089708c2a9db5413ee867c9912bf709c120ea3f1362376c498b7f17b159a2760",
+      "declaredTypes": [
+        "CustodyKeyLifecycleTests"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs",
+      "sha256": "a3d0953bb423d0fb9d4bda82bda3a91b3bf784aab4a204c60a374eaa9e1db3de",
+      "declaredTypes": [
+        "DeletionCapabilityRevocationSubscriberTests"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "sha256": "9a25e8a28fabe1718ed68596ef3bf9daceb734233948e8eb2d1e981b26d5811b",
+      "declaredTypes": [
+        "DeletionCapabilitySigningActorTests"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "sha256": "412e875408e29b52f4c441cf294e9ba36d978058ae3575d814f461ae679fbc0b",
+      "declaredTypes": [
+        "ExportKeyDeliveryActorTests"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs",
+      "sha256": "69dbcba12c22152cade35d54209c780e764012955381847a9a3af0d2064fcdab",
+      "declaredTypes": [
+        "IndependentDecisionManifestVerifierTests"
+      ]
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerDeadlineTestClock.cs",
+      "sha256": "7326924ade34f07579b676b8bf10cee7a1d3037ba456638c95b6bd5699e527fc",
+      "declaredTypes": [
+        "PrivateOwnerDeadlineTestClock"
+      ]
+    }
+  ],
+  "errors": [],
+  "scope": "Interim fresh-owned C# layout/current hashes only; packaging is active and this is not the final freeze."
+}

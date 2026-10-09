@@ -1,0 +1,109 @@
+{
+  "capturedUtc": "2026-10-09T09:30:51.234475+00:00",
+  "rootReadCompletePreliminaryDelta": true,
+  "readDeltaLines": 978,
+  "changedSourceTestPathsRead": 17,
+  "units": [
+    {
+      "unit": "root-history-grant-preview",
+      "lines": 279,
+      "diff": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-history-grant-preview/delta.diff",
+      "sha256": "ca841f6f63b882e1093b19f8796d9499902904187bfc6fd703e6576d25388f92"
+    },
+    {
+      "unit": "root-namespace-preview",
+      "lines": 63,
+      "diff": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-namespace-preview/delta.diff",
+      "sha256": "6e88e5cab1800037fc7210950c00fc8af8934546bdd035796564a441922b570f"
+    },
+    {
+      "unit": "root-joint-preview",
+      "lines": 218,
+      "diff": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-joint-preview/delta.diff",
+      "sha256": "322e76a3c9c41c905a3141312ea56113c9cbd9023887c8fca939b655c3e95e8b"
+    },
+    {
+      "unit": "root-platform-preview",
+      "lines": 117,
+      "diff": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-platform-preview/delta.diff",
+      "sha256": "159f86f2271391bc17579ce2a3b9d71d21d7587a573b5037cf207e1235a43f34"
+    },
+    {
+      "unit": "root-conversations-preview",
+      "lines": 301,
+      "diff": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-conversations-preview/delta.diff",
+      "sha256": "be0d28ce47c2a6484d770bb0ab4237b9d819302a377a31921e906afd11080fd0"
+    }
+  ],
+  "source": {
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs": {
+      "previewSha256": "c15585bca371eb0eb5d3894e2989edf5fae6370afefe0ab7dd36c393ed3c9c90",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-history-grant-preview/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs"
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs": {
+      "previewSha256": "96d0b8e78b3880f96727678515f684ec41784e23ac48930e4942484bfb711e60",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-history-grant-preview/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs"
+    },
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationNamespaceActor.cs": {
+      "previewSha256": "48cb63db45f69d0bde6f30b1e030ee0c6bf5fe8b5f40491985e3d46414e33756",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-namespace-preview/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationNamespaceActor.cs"
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs": {
+      "previewSha256": "1e81c71a0355329599edae0df7c215857a774646ea7bf9ebdb6179d7509ac13c",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-namespace-preview/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs"
+    },
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs": {
+      "previewSha256": "43ea2403240fa282a64e88bb76b451796ac27970a7968c1cee9633810a40ac48",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-joint-preview/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs"
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs": {
+      "previewSha256": "1ec2b385510da431cc1733319ef67c265c5f5fff3ede7680d4dca39b9ac00654",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-joint-preview/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs"
+    },
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs": {
+      "previewSha256": "171e1dcc7c07e3053ff5c273396a92bd76932c7c91dfdd9343e6413d27af6d22",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-joint-preview/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs"
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs": {
+      "previewSha256": "399b3fab6c4b9b50a09a783655e4876375ec8499864dfdcfe6402e71cbf0412b",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-joint-preview/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs"
+    },
+    "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs": {
+      "previewSha256": "84ccceb3ee3c727767a7bcfe3da62d90bbacc29a12fc8f4af37130f7e7c10e02",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-platform-preview/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs"
+    },
+    "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs": {
+      "previewSha256": "f16b069b16888c6511a39b5ec91069830d384ffa0fd8712d45a66e2b84cbde2d",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-platform-preview/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs"
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationDeadlineTests.cs": {
+      "previewSha256": "f8421f3245cfe8c51ffcc7a6613b3ba2982d9540b2bf865aa36529f359771f27",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-platform-preview/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationDeadlineTests.cs"
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs": {
+      "previewSha256": "fa21501141b271d1bd58c7a2696afda1788c09d4a4bac419a2b8bb4e0d33d38b",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-platform-preview/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs"
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs": {
+      "previewSha256": "0e4cf5784e83eab2cf873648c8f4a296c69db54868cf8d86d765ba6cc3ea274a",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-platform-preview/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs"
+    },
+    "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionWorker.cs": {
+      "previewSha256": "ae384425b84c013da830802e7fd0fb34c1e92f6242af13fa5f682b6fe4954c74",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-conversations-preview/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionWorker.cs"
+    },
+    "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs": {
+      "previewSha256": "44979399958da740f849c7fb96fe88f14090a5503ba9b06a8d44fb924a81abec",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-conversations-preview/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs"
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs": {
+      "previewSha256": "e7cc42adf539ba5839c39a1266c6753c95cdeb38ba701ca7ed1724132056def7",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-conversations-preview/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs"
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs": {
+      "previewSha256": "4b3832597b1a6ca13921512b3a6efc5a8466294b89b2b01759e57c429aa4101d",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-conversations-preview/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs"
+    }
+  },
+  "scope": "Settled preliminary source only. Compare every source hash to final sealed delivery, read all further deltas and four complete packets, then audit commands/artifacts and current cumulative freeze; no final acceptance or full Local pass claimed."
+}

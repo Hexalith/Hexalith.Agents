@@ -1,0 +1,257 @@
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+using Dapr.Actors;
+using Dapr.Actors.Client;
+
+using Hexalith.EventStore.Client.Streams;
+using Hexalith.EventStore.Contracts.Security;
+using Hexalith.EventStore.Contracts.Streams;
+using Hexalith.EventStore.Server.Actors;
+using Hexalith.EventStore.Server.Events;
+
+namespace Hexalith.EventStore.Server.Security;
+
+/// <summary>Reads sealed source positions and decrypts only admitted independently retained attribution.</summary>
+/// <param name="actors">The SDK actor transport.</param>
+/// <param name="admission">Current exact-source retained-purpose authorization.</param>
+/// <param name="custody">The independent finite history lifecycle and protection owner.</param>
+/// <param name="clock">The authoritative observation clock.</param>
+public sealed class RetainedIdentityHistorySourceReader(IActorProxyFactory actors, IRetainedIdentityHistoryAdmission admission,
+    IIdentityHistoryCustody custody, TimeProvider clock)
+{
+    private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+    };
+
+    /// <summary>Observes a complete stable partition; no partial response or profile plaintext is returned.</summary>
+    public async Task<RetainedIdentityHistoryReadResult> ReadAsync(ClaimsPrincipal principal,
+        RetainedIdentityHistoryReadRequest request, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(principal);
+        ArgumentNullException.ThrowIfNull(request);
+        using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+        try
+        {
+            deadline.ThrowIfCancellationRequested();
+            RetainedIdentityHistoryGrant? grant = await deadline.ReadAsync(token => admission.AdmitAsync(principal, request, token)).ConfigureAwait(false);
+            deadline.ThrowIfCancellationRequested();
+            if (!ValidGrant(grant, request, clock.GetUtcNow()))
+            {
+                return new(null, "history-denied");
+            }
+
+            IAggregateActor actor = actors.CreateActorProxy<IAggregateActor>(new ActorId(request.Identity.ActorId), "AggregateActor");
+            AggregateStreamMetadata head = await deadline.ReadAsync(_ => actor.GetStreamMetadataAsync()).ConfigureAwait(false);
+            deadline.ThrowIfCancellationRequested();
+            if (!head.Exists || head.CurrentSequence is < 0 or > RetainedIdentityHistoryLimits.MaxSourcePositions)
+            {
+                return new(null, "history-unavailable");
+            }
+
+            var events = new List<StreamReadEvent>();
+            var excluded = new List<long>();
+            long cursor = 0;
+            long bytes = 0;
+            long readableBytes = 0;
+            var retainedEvidence = new List<IdentityHistoryCustodyEvidence>();
+            var expiredEvents = new List<(ExpiredIdentityHistoryCertificate Certificate, byte[] Payload, string Format)>();
+            while (cursor < head.CurrentSequence)
+            {
+                EventEnvelope[] page = await deadline.ReadAsync(_ => actor.ReadEventsRangeAsync(cursor, head.CurrentSequence, 100)).ConfigureAwait(false);
+                deadline.ThrowIfCancellationRequested();
+                if (page.Length is 0 or > 100)
+                {
+                    return new(null, "history-source-gap");
+                }
+
+                foreach (EventEnvelope item in page)
+                {
+                    deadline.ThrowIfCancellationRequested();
+                    if (item is null || item.Identity != request.Identity || item.SequenceNumber != cursor + 1
+                        || item.SequenceNumber > head.CurrentSequence || item.Payload is null)
+                    {
+                        return new(null, "history-source-gap-or-scope-mismatch");
+                    }
+
+                    if (item.MetadataVersion != 1 || item.EventContractType is not null || item.PayloadVersion is not null
+                        || item.SerializationFormat is not ("json" or "json+pdenc-v1" or "json+identity-history-v1"))
+                    {
+                        return new(null, "history-source-metadata-unsupported");
+                    }
+
+                    cursor++;
+                    bytes += item.Payload.Length;
+                    if (bytes > RetainedIdentityHistoryLimits.MaxPayloadBytes)
+                    {
+                        return new(null, "history-source-bound-exceeded");
+                    }
+
+                    Type? type = grant!.EventTypes.SingleOrDefault(candidate => item.EventTypeName == candidate.FullName);
+                    if (type is null)
+                    {
+                        if (!grant.ExcludedEventTypeNames.Contains(item.EventTypeName, StringComparer.Ordinal))
+                        {
+                            return new(null, "history-source-contract-unavailable");
+                        }
+
+                        excluded.Add(item.SequenceNumber);
+                        continue;
+                    }
+
+                    if (EventStorePayloadProtectionMetadataCarrier.Read(item.Extensions).State != PayloadProtectionState.Protected)
+                    {
+                        return new(null, "history-source-protection-missing");
+                    }
+
+                    // Retain only detached existing ciphertext metadata for actor-free continuity.
+                    // An optional independently qualified terminal receipt must precede any skip;
+                    // failure/null never turns an unreadable predecessor into a profile exclusion.
+                    byte[] sealedPayload = item.Payload.ToArray();
+                    if (custody is IExpiredIdentityHistoryCustody expiredCustody)
+                    {
+                        var expired = await deadline.ReadAsync(token => expiredCustody.ReadExpiredAsync(request.Identity,
+                            item.EventTypeName, item.SequenceNumber, sealedPayload.ToArray(), item.SerializationFormat, token)).ConfigureAwait(false);
+                        deadline.ThrowIfCancellationRequested();
+                        if (expired is not null)
+                        {
+                            if (!ValidExpired(expired, request, item.EventTypeName, item.SequenceNumber, sealedPayload, clock.GetUtcNow()))
+                            { return new(null, "history-expired-proof-unavailable"); }
+                            expiredEvents.Add((expired, sealedPayload, item.SerializationFormat));
+                            continue;
+                        }
+                    }
+                    PayloadProtectionResult readable = await deadline.ReadAsync(token => custody.UnprotectEventAsync(request.Identity, item.EventTypeName,
+                        sealedPayload.ToArray(), item.SerializationFormat, token),
+                        abandonedResultCleanup: static value => CryptographicOperations.ZeroMemory(value.PayloadBytes)).ConfigureAwait(false);
+                    try
+                    {
+                        deadline.ThrowIfCancellationRequested();
+                        readableBytes += readable.PayloadBytes.Length;
+                        if (readable.Metadata.State != PayloadProtectionState.Unprotected
+                            || readable.SerializationFormat != "json"
+                            || readableBytes > RetainedIdentityHistoryLimits.MaxPayloadBytes
+                            || JsonSerializer.Deserialize(readable.PayloadBytes, type, _jsonOptions) is not IIdentityHistoryEvent value
+                            || value.Custody is not { SourceExpiryEnforced: true, RestoreSafe: true, DerivedCopiesCovered: true, LifecycleRevision: > 0 } evidence
+                            || string.IsNullOrWhiteSpace(evidence.PolicyId) || string.IsNullOrWhiteSpace(evidence.EvidenceId)
+                            || evidence.Purpose != request.Purpose || evidence.ExpiresAt <= clock.GetUtcNow())
+                        {
+                            return new(null, "history-custody-unavailable-or-expired");
+                        }
+    
+                        bool allowed = await deadline.ReadAsync(token => custody.CanReadAsync(request.Identity, evidence, token)).ConfigureAwait(false);
+                        deadline.ThrowIfCancellationRequested();
+                        if (!allowed)
+                        {
+                            return new(null, "history-custody-unavailable-or-expired");
+                        }
+    
+                        retainedEvidence.Add(evidence);
+                        byte[] closedPayload = JsonSerializer.SerializeToUtf8Bytes(value, type, _jsonOptions);
+                        events.Add(new StreamReadEvent(item.SequenceNumber, item.EventTypeName, closedPayload,
+                            readable.SerializationFormat, item.MetadataVersion, string.Empty, null, null, item.Timestamp, null,
+                            EventStorePayloadProtectionMetadata.Unprotected()));
+                    }
+                    finally { CryptographicOperations.ZeroMemory(readable.PayloadBytes); }
+                }
+            }
+
+            AggregateStreamMetadata confirmed = await deadline.ReadAsync(_ => actor.GetStreamMetadataAsync()).ConfigureAwait(false);
+            deadline.ThrowIfCancellationRequested();
+            RetainedIdentityHistoryGrant? finalGrant = await deadline.ReadAsync(token => admission.AdmitAsync(principal, request, token)).ConfigureAwait(false);
+            deadline.ThrowIfCancellationRequested();
+            if (confirmed != head || !ValidGrant(finalGrant, request, clock.GetUtcNow())
+                || finalGrant!.AuthorityRevision != grant!.AuthorityRevision || finalGrant.ExpiresAt != grant.ExpiresAt
+                || !finalGrant.EventTypes.SequenceEqual(grant.EventTypes)
+                || !finalGrant.ExcludedEventTypeNames.SequenceEqual(grant.ExcludedEventTypeNames)
+                || retainedEvidence.Any(evidence => evidence.ExpiresAt <= clock.GetUtcNow()))
+            {
+                return new(null, "history-source-or-authority-changed");
+            }
+
+            // Lifecycle validation must follow the awaited source/authority checks. The owner provider
+            // is responsible for a current, version-bound release observation, including restore fences.
+            foreach (IdentityHistoryCustodyEvidence evidence in retainedEvidence)
+            {
+                bool allowed = await deadline.ReadAsync(token => custody.CanReadAsync(request.Identity, evidence, token)).ConfigureAwait(false);
+                deadline.ThrowIfCancellationRequested();
+                if (!allowed)
+                {
+                    return new(null, "history-custody-unavailable-or-expired");
+                }
+            }
+
+            foreach (var expired in expiredEvents)
+            {
+                var cert = expired.Certificate;
+                var final = await deadline.ReadAsync(token => ((IExpiredIdentityHistoryCustody)custody).ReadExpiredAsync(request.Identity,
+                    cert.EventTypeName, cert.SourceSequence, expired.Payload.ToArray(), expired.Format, token)).ConfigureAwait(false);
+                deadline.ThrowIfCancellationRequested();
+                if (final is null || !ValidExpired(final, request, cert.EventTypeName, cert.SourceSequence, expired.Payload, clock.GetUtcNow())
+                    || final with { ObservedAt = cert.ObservedAt } != cert)
+                { return new(null, "history-expired-proof-changed"); }
+            }
+
+            DateTimeOffset observedAt = clock.GetUtcNow();
+            DateTimeOffset validUntil = retainedEvidence.Aggregate(finalGrant.ExpiresAt,
+                (earliest, evidence) => evidence.ExpiresAt < earliest ? evidence.ExpiresAt : earliest);
+            validUntil = expiredEvents.Aggregate(validUntil,
+                (earliest, expired) => expired.Certificate.ValidUntil < earliest ? expired.Certificate.ValidUntil : earliest);
+            var stream = new RetainedIdentityHistoryStream(request.Identity, request.Purpose, head.CurrentSequence,
+                observedAt, events.AsReadOnly(), excluded.AsReadOnly(), Convert.ToHexString(RandomNumberGenerator.GetBytes(16)))
+            {
+                AuthorityRevision = finalGrant.AuthorityRevision,
+                ValidUntil = validUntil,
+                ExpiredEvents = Array.AsReadOnly(expiredEvents.Select(e => e.Certificate).ToArray()),
+            };
+            var result = new RetainedIdentityHistoryReadResult(stream, null);
+            bool complete = RetainedIdentityHistoryValidator.IsComplete(request, stream, clock.GetUtcNow());
+            bool bounded = complete && JsonSerializer.SerializeToUtf8Bytes(result, _jsonOptions).Length <= RetainedIdentityHistoryLimits.MaxResponseBytes;
+            bool valid = bounded && validUntil > clock.GetUtcNow();
+            deadline.ThrowIfCancellationRequested();
+            return valid ? result : new(null, "history-source-incomplete-or-expired");
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return new(null, deadline.IsExpired ? "history-time-bound-exceeded" : "history-unavailable");
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return new(null, "history-unavailable");
+        }
+    }
+
+    private static bool ValidExpired(ExpiredIdentityHistoryCertificate certificate, RetainedIdentityHistoryReadRequest request,
+        string type, long position, byte[] sealedPayload, DateTimeOffset now)
+        => certificate.ContractVersion == 1 && certificate.Identity == request.Identity && certificate.Purpose == request.Purpose
+            && !string.IsNullOrWhiteSpace(certificate.PolicyId) && certificate.PolicyId.Length <= 2048
+            && certificate.SourceSequence == position && certificate.EventTypeName == type
+            && certificate.SealedPayloadDigest == Convert.ToHexString(SHA256.HashData(sealedPayload))
+            && certificate.LifecycleRevision > 0 && certificate.ObservedAt != default && certificate.ObservedAt <= now && certificate.ValidUntil > now
+            && !string.IsNullOrWhiteSpace(certificate.AuthorityRevision) && certificate.AuthorityRevision.Length <= 2048
+            && !string.IsNullOrWhiteSpace(certificate.DestructionReceiptId) && certificate.DestructionReceiptId.Length <= 2048;
+
+    private static bool ValidGrant(RetainedIdentityHistoryGrant? grant, RetainedIdentityHistoryReadRequest request, DateTimeOffset now)
+        => grant is not null && request.Identity is not null && grant.Identity == request.Identity
+            && request.Purpose == RetainedIdentityHistoryReadRequest.AttributionPurpose && grant.Purpose == request.Purpose
+            && !string.IsNullOrWhiteSpace(grant.AuthorityRevision) && grant.ExpiresAt > now
+            && grant.EventTypes is { Count: > 0 and <= 32 }
+            && grant.EventTypes.Distinct().Count() == grant.EventTypes.Count
+            && grant.EventTypes.Select(type => type?.FullName).Distinct(StringComparer.Ordinal).Count() == grant.EventTypes.Count
+            && grant.EventTypes.All(type => type is not null && !type.IsAbstract && !type.IsInterface
+                && type.FullName is { Length: > 0 and <= RetainedIdentityHistoryLimits.MaxContractNameLength }
+                && typeof(IIdentityHistoryEvent).IsAssignableFrom(type))
+            && grant.ExcludedEventTypeNames is { Count: <= 512 }
+            && grant.ExcludedEventTypeNames.Distinct(StringComparer.Ordinal).Count() == grant.ExcludedEventTypeNames.Count
+            && grant.ExcludedEventTypeNames.All(name => !string.IsNullOrWhiteSpace(name)
+                && name.Length <= RetainedIdentityHistoryLimits.MaxContractNameLength
+                && !grant.EventTypes.Any(type => type.FullName == name));
+}

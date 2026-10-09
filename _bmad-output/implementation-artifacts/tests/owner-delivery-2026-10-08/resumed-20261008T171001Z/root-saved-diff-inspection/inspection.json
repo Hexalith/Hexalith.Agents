@@ -1,0 +1,12 @@
+{
+  "inspectedUtc": "2026-10-08T18:20:08.279342+00:00",
+  "basis": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/paused-20261008T163407Z/saved-source/review-input.json",
+  "basisSha256": "371a82da7236adecbd23b0128b4f71f0dea3aade181087b1b69d9f803e5b7013",
+  "exactRawDiff": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/paused-20261008T163407Z/saved-source/owned-current.diff",
+  "exactRawDiffSha256": "4ab155065b332466b73bcbeb1874bcd8b4521410b4d9207be177dea5f3caff0e",
+  "readableDiff": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-saved-diff-inspection/owned-saved-readable.diff",
+  "readableDiffSha256": "b2520ac6c0dec126e856c63ad7c2e34d36567c558ea414a6a14df2b8fdd148cc",
+  "readableLines": 11252,
+  "inspection": "Root read the cumulative saved owned diff in bounded ranges. The readable reconstruction normalizes line endings only; exact raw source/diff hashes remain authoritative. The large AggregateActor line-ending replacement was inspected as the semantic five-line optional pre-registration addition. Truncated ranges were completed through separate source/range reads.",
+  "limits": "This is inspection of the saved checkpoint, not a final current-source freeze, independent review or root verification. Resumed source units and saved-to-current differences require separate inspection. The initial pre-existing Platform wrapper delta is not attributed automatically."
+}

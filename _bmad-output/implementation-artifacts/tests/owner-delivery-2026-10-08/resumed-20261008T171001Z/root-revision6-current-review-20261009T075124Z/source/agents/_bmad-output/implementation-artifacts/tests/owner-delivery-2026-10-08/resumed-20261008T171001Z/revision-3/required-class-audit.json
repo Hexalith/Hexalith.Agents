@@ -1,0 +1,123 @@
+{
+  "capturedUtc": "2026-10-09T00:24:01.432170+00:00",
+  "newPublicTestClasses": [],
+  "editedPublicTestClassesRemainExisting": true,
+  "paths": [
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "beforePublicClasses": [],
+      "currentPublicClasses": [],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "beforePublicClasses": [
+        "ConversationDeletionDeliveryPumpTests"
+      ],
+      "currentPublicClasses": [
+        "ConversationDeletionDeliveryPumpTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs",
+      "beforePublicClasses": [
+        "AuthoritativeEventStreamReaderTests"
+      ],
+      "currentPublicClasses": [
+        "AuthoritativeEventStreamReaderTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs",
+      "beforePublicClasses": [
+        "DaprSourcePublicationIndexStoreTests"
+      ],
+      "currentPublicClasses": [
+        "DaprSourcePublicationIndexStoreTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs",
+      "beforePublicClasses": [
+        "AggregateActorPublicationRegistrationTests"
+      ],
+      "currentPublicClasses": [
+        "AggregateActorPublicationRegistrationTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+      "beforePublicClasses": [
+        "DeletionConsumptionActorTests"
+      ],
+      "currentPublicClasses": [
+        "DeletionConsumptionActorTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+      "beforePublicClasses": [
+        "PartyIdentityQueryHandlerTests"
+      ],
+      "currentPublicClasses": [
+        "PartyIdentityQueryHandlerTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs",
+      "beforePublicClasses": [],
+      "currentPublicClasses": [],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "beforePublicClasses": [
+        "DeletionBatchExecutionCoordinatorTests"
+      ],
+      "currentPublicClasses": [
+        "DeletionBatchExecutionCoordinatorTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs",
+      "beforePublicClasses": [
+        "Fr34ProtectionGateTests"
+      ],
+      "currentPublicClasses": [
+        "Fr34ProtectionGateTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+      "beforePublicClasses": [
+        "ReplicatedSecurityObservationSpoolTests"
+      ],
+      "currentPublicClasses": [
+        "ReplicatedSecurityObservationSpoolTests"
+      ],
+      "newPublicClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs",
+      "beforePublicClasses": [],
+      "currentPublicClasses": [],
+      "newPublicClasses": []
+    }
+  ],
+  "ownerLocalMappings": {
+    "platform": "Existing explicit Fr34ProtectionGateTests, ReplicatedSecurityObservationSpoolTests and DeletionBatchExecutionCoordinatorTests entries in eng/verify-ext-secrets-1.ps1.",
+    "parties": "Existing PartyIdentityQueryHandlerTests entry in eng/verify-ext-parties-1.ps1.",
+    "conversations": "Existing eng/verify-ext-conv-ai-1.ps1 runs every Server.Tests class, including existing delivery/backfill classes.",
+    "eventstore": "Root full matrix dynamically detects owned SDK classes, including all existing edited reader, registration, index-store and physical actor classes."
+  },
+  "runnerEditsRequired": false,
+  "rootFullLocalExecution": "pending"
+}

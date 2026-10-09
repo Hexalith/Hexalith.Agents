@@ -1,0 +1,1162 @@
+{
+  "capturedUtc": "2026-10-09T07:49:03.081733+00:00",
+  "scope": "Every stable revision-6 file except this manifest and its separate verification seal, avoiding circular hashes. Prefix/history hashes and external exact sources are independently verified in preservation/current-owned-source.",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/README.md",
+      "sha256": "47a4ee0ae29547b7e1feeeaf79162a69350aa8034980f58d6153d8bedebbf647"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-late-state-recovery/before/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "sha256": "ba705bc03ff309d974224e07c3bd70611c85f7f6df1dd342832966ac428cb381"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-late-state-recovery/before/platform/tests/Hexalith.Platform.Custody.Tests/AnchoredFixtureJournal.cs",
+      "sha256": "eeba6713f60467c995d734f9af0a6bb85f7850e930c4169088de886235f1f64d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-late-state-recovery/before/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "sha256": "a1687608f2e35c153ccab0ff43badc8d4c6e30e0a8100dd92bd0f64319325e3d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-late-state-recovery/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "sha256": "9b373b74af2f62bb753db3685ad745735ffa7a27179c9738bb37eec57d5a4327"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-late-state-recovery/before/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "sha256": "0eee382e2b8a2103a8ea4b3f4b68b053737e81e952a7e2c4abb9d01dcb02d189"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-late-state-recovery/before-hashes.json",
+      "sha256": "3f1b33f08a39484777d7c7e69c32451a9d5b422ef55f3be1bc0c075a7bb28390"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs",
+      "sha256": "7799a8819a599ce579577afd53ad2a8dadaf2b557013d3aecb0c954953407159"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "sha256": "77dfd9daa1e835897209986e68fefb1171d5d9b2f7a87800304dbdcf055050f3"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+      "sha256": "51f7f58b91ac258a13cfe7a4ab65a1b3b8be0e14dcf5cf6e0d02f248d3b774c0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs",
+      "sha256": "60c8c6f71d54bed3a675ae731e8ce001d2612feea5a928473d6d804925f66ead"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/tests/Hexalith.Platform.Custody.Tests/ActorPendingFixture.cs",
+      "sha256": "2b82bce3cceb91a2f1ee7e0b6bcf1f4fe1474c0b78b8879c3cbb8603745b106e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "sha256": "089708c2a9db5413ee867c9912bf709c120ea3f1362376c498b7f17b159a2760"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "sha256": "1c1e1df7a28c31e831c976e6a1e43575ae03ba3d4162f35601c5c2b4cf9a45df"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "sha256": "826cf04873741c7cc2d3125ad375e05b13de6c6082299d0f74a3f268f108e418"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before-hashes.json",
+      "sha256": "b53f900524f1cbc46f13ab61bbac22c7745fa1cf0d0b4047c5dd2e3dac4f2a2b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+      "sha256": "21aaeb049f9e374e953d6795e6046abffe37b550ad7a561aecd1877662f2b3ac"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+      "sha256": "809980ecb2017cd7584579684992452c5fa28474b592133353f188d03c9378ba"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+      "sha256": "d96c6ea5c88e26aae91e3f8bf9e45972691b8adb73d8a970344f19230e599813"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+      "sha256": "72a96b8fc3cec30361c989e6f4ab7d78d4fd5ddd3b49e34c39ef7d6066c157d3"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs",
+      "sha256": "9586f42ab102e301106584cda45f90c773b71c8d94aa30c0e80d2741fe111aff"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "sha256": "67fb5c853e3cb8c77fc42cb098152038abaa55fa76272b1791fa90c6d53d1e26"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "sha256": "0e017649b3743aec463038ea138a32a771af1921df112b7ce92dad51e1910825"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/PumpClock.cs",
+      "sha256": "ef3914b66c8918746f823c606661221c8ce0ee3e7e71c731934c4268298b64d6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/PumpTimer.cs",
+      "sha256": "e353aef1ac67e67cd8914eaa07de3bca16f80061466bcc9278eb7621c47b6b5e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Client/Hexalith.EventStore.Client.csproj",
+      "sha256": "c4cbfb20d51cbf0d4019e90d66f076f2ed65a63bdea8c75404a5762099d3f05f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs",
+      "sha256": "1caff9f18b93d2ea24beb9969d025928064fc0b0f8f098a52f81b068f40572a4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendPayloadLifetime.cs",
+      "sha256": "174713317974e8a7678901b6498d521363f141ba694409c48491dd9099bd9d30"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Client/Streams/IAtomicDirectoryAppendOwner.cs",
+      "sha256": "d204a5bd5d602ff9a56081ed55662f9cf60bdde9e75a46ced3822a97a715b3fc"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Client/Streams/IDirectoryAtomicAppendAuthority.cs",
+      "sha256": "8b56d979aade91fef036b68137dca73ea23a7a5a1d291808ca6ac93f166ca390"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionActivationComparison.cs",
+      "sha256": "75db400fd5b9e27d9966e39a1f3879497a6720acae8a18c92ac4f4749d2d46d6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementReconciliation.cs",
+      "sha256": "2432c8c900a2254a052b43c8bc6f1de352de1093b3b0ce30fe847bf4574d0953"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementResult.cs",
+      "sha256": "13fc322c50da711527a564eeb69bf14e6c48bae7a2b218146cbee84671e79be1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs",
+      "sha256": "ed900ed989f90ec59b718bc81295791d7a0744d242e3b297cc9e0513f975b867"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Contracts/Security/IDeletionProtectionOwner.cs",
+      "sha256": "014b799b807f136a9d3d4c76a8fff7df292e82f4171c701bf11999fc3e718ae5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Server/Security/DaprDeletionProtectionOwner.cs",
+      "sha256": "4dcdf0f7d6380fb8fe033477f07c852ace2ec1e730399f9be27d522663a89dda"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "sha256": "832e3f5dc23f619918d2314128b2290981d3fca6e876fed607f03256712b59c0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionBatch.cs",
+      "sha256": "3b24b5d10531b3b2d0377a27f80d2bf93d55a49badccb09b9a956f01f954e140"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs",
+      "sha256": "3365118f17be29fecb253facd646283c4aea554afdb712c9290a971d78d0d35c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionOperation.cs",
+      "sha256": "2f4a3bfdab148efa5ce8638cda53a820d2130be6d8d8275c28a3e2128ae7b56c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "sha256": "4003edce371090f2284663ff47af49366a10d0107353ffc49696d587e196f7e1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "sha256": "ba705bc03ff309d974224e07c3bd70611c85f7f6df1dd342832966ac428cb381"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionActor.cs",
+      "sha256": "a8f9d1d6ca260d0a338bdbabe69226c95d72af0a752cb4ea95af60f347101dd0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs",
+      "sha256": "a73cddc06a701f53e154b2e18688d2c003af71671564052eb207739aae596117"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "sha256": "65bc21a4596b9c8b87b5d36762aacdb96150af5cb4df058431139d8a3e8ecd34"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs",
+      "sha256": "f4d1a6a6353668749ee3d5ed7ed43312c5c9e4fc2926fb876e32a95f22566240"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "sha256": "6fca87b490bc5e6e994452bdfdb537028ebb010437b818f85252440fb540b8b5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs",
+      "sha256": "76acb865e740c9259020cccae2c53a478298f7dc8a64ad29016097e72f1e8213"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "sha256": "bec766bdd47e3cf5ec7e811c4e46c8d4b2a1af739eb55ae2454d737017f4aa03"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "sha256": "e2697f6fa1d03df3ba390badc1c22f1ce56c51ff928c9d8c5fb57737c86af64f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/src/Hexalith.Platform.Custody/EventStoreDeletionBatchGuardPort.cs",
+      "sha256": "90b1bb1ed4450844fc5f11b48cca468209c70414955578ba918b2b27669b1b54"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+      "sha256": "21a8569482d1e7808d876b8b38c14a16f76bdf827fa35442d7a7b12368c81e4b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/src/Hexalith.Platform.Custody/IDeletionBatchGuardPort.cs",
+      "sha256": "a712c5b7c9af24a51e369e1912098baa7ff8dcc82d716f104de266e70c1c2405"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/src/Hexalith.Platform.Custody/PrivateActorStateIoLifetime.cs",
+      "sha256": "c52054de973614974eb2e7342907a9fbb8dd55497b9d1a628638dab6a2817bd5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+      "sha256": "0757dd63bd2a2fccf7e54f008cae28c2b841d675fbadbfa37be28fe120b7e781"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs",
+      "sha256": "bc9a89171a657d1efc0832f517dbbddd10fcc01ada1e95184ab4958dc29fb19f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationMachine.cs",
+      "sha256": "bb49a48a63a9cd20b5b4e884ef0b6a910d86b5fae6e84b685471e0014cc24615"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeReplayVerifier.cs",
+      "sha256": "3140fd15a33db5bf8540a61e6b58d2ad03024eea184cf2deed2e495537e117d8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/tests/Hexalith.Platform.Custody.Tests/ActorPendingFixture.cs",
+      "sha256": "b30cb21d337ec6bdfbd85bc3b8b2b5978b2a7ed62daad11c9113aac1e8c44459"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/tests/Hexalith.Platform.Custody.Tests/AnchoredFixtureJournal.cs",
+      "sha256": "d272b73fd16db43c4037e41bd55234d7a935a74aaa3138afbbb1632edf31ec04"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "sha256": "a35a52fed18a261b38ea2835bfca8e0cd241532d9df73308501781e6239a4ea5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs",
+      "sha256": "f23c336ab178de638e4622ff02d4d261088335136fc577eed5587575a8946a2b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "sha256": "dbb6c9a3a9f9f4c25f6f50ace57b26191b3153b7d72ea06a176aad934ebad11c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "sha256": "7fb17df9a8d809da384c1c2a22003ff1cadcd4914fca52eec447da1bf934eba2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "sha256": "503df974108a36e294fdc4abd61aa2618dada12d479c4c70b192b0d34dfbbe0b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs",
+      "sha256": "3e13eebd423fd3ff95501ebaa1fa341a45eb1c977ea0d99c221bbbb64cc1a141"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/after/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs",
+      "sha256": "ebe3d0126de623d40e7a33fb50a9803b25c623dd9570f93eabc4d5ef40e69f3b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/before/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs",
+      "sha256": "c8d23e79c4f0e825076d59d5b8970c9be3b5694323a5d365f9b8328ae340865d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/before/eventstore/src/Hexalith.EventStore.Client/Streams/IAtomicDirectoryAppendOwner.cs",
+      "sha256": "a907a2abaf372ecdfdd663409d44efd17ac86e4e7d5014eec98b215a6300ad1d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/before/eventstore/src/Hexalith.EventStore.Client/Streams/IDirectoryAtomicAppendAuthority.cs",
+      "sha256": "1b9234facdcc0b6568e85cf4babc2a795d8c44bf06df755b4d5c6bbe0ef400ac"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/before/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs",
+      "sha256": "1e064f0171c318fe659ffbe858d9c0e17a0f1d2ebcc8a49be6b57fdd8fb57269"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/before-hashes.json",
+      "sha256": "4853d345d571aa23365b996c1bc2577bf11d2544e47c19e9c6ae7c2d1a4b08a3"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/revision6-atomic-build.log",
+      "sha256": "e58e8ad4a15f37e38f9e2dbd443ebcb1f65ae39478fe02268108d79f839e4e79"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/revision6-atomic-red-build.log",
+      "sha256": "f37dc99990c1106d778224144a00e35b667a0ea75066cdb3a4c67ed6f8bd4f3e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/revision6-atomic-red-tests.log",
+      "sha256": "d9b8f5a99390d8812e9bd9285a0d7443dfdb0c6149d2306699ec04b3e2bb55f7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/revision6-atomic-red-tests.xml",
+      "sha256": "976f56d1c9c99a30d8068f58f1fbcc2b8c65666301717553de3945f09aaa9f7d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/revision6-atomic-tests.log",
+      "sha256": "bb31928a0bf998314b75b547f9ed72e0a1cec09fc9e4ef489576ac8968ba8be2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/revision6-atomic-tests.xml",
+      "sha256": "b94af708d3ed315408596aec78bd53fb819380feb7f91e63753f585fecde50b4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-activation-current-comparison/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "sha256": "eb42605e9287246258fb2d6be50fa92dbb70b92116b697154e9ddeab9d2192f3"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-activation-current-comparison/before-hashes.json",
+      "sha256": "f74025dfcb6c6c08fd47a013fa1b3212c37b99645bfbccee5cb0b1a6f558d992"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-activation-race-original/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "sha256": "036aef8fa9ef740265dd43f4e53c85f05ca8a2c948ddd9ad24011e953a229788"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-activation-race-original/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionOperation.cs",
+      "sha256": "da1a84c4bff170a11d674dd388892f36a7f38c19433558a08c75c5695480fbd8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-activation-race-original/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "sha256": "8417f3f75b956d25313baf500e4401a85e6c70d36a6b031aea346a864fa948b6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-activation-race-original/before-hashes.json",
+      "sha256": "69ee03ee160d831f62fec8d96563fd6a2104004c5bcba0f42c55fa23acc6dbc3"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs",
+      "sha256": "073e54b575b9858a867d94e83bd6ef897792f090d7fb7f044d6265becb6f7ba1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Contracts/Security/IDeletionProtectionOwner.cs",
+      "sha256": "e7f8c60dcaecf4af8efdc4a125b67dac924c0fc4caf3a251b138eab45d00ea99"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/DaprDeletionProtectionOwner.cs",
+      "sha256": "ffb6ee5513ec1270ad59209739a57e8185dba871b90183c9b6506f646dadca69"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "sha256": "d878ff09464b03a54aae246defd22fadac958e40553923da1c65c9bb9fa3c781"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionBatch.cs",
+      "sha256": "0361ef5888f950f7b4324b7d8f15ed6a972b65ecb9893fc7476de7321e664b70"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs",
+      "sha256": "a37329c57fba1ffb94d2e6190a3b0d74699949354eac99329fd0a52d8a281379"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "sha256": "c524b886b3a13e301083e672a6c2d9b9c274005988cea45884abf56930649d66"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionActor.cs",
+      "sha256": "21625b638723c59d08a22aa2b450386a687a35a5b3d96600808ee4af3ea6baca"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs",
+      "sha256": "5b4898497e8bd37916451f4ec11c1991d2e26462447d8876d8aa3661270e7186"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "sha256": "1ac886c059fce78e224997b2de5b9f899038c86d011c53d309cd064dfe17a5c0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/platform/src/Hexalith.Platform.Custody/EventStoreDeletionBatchGuardPort.cs",
+      "sha256": "0f3654a6df167ba3b773034d694cd941de2e3ab7f340da247936c9ea442f788b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/platform/src/Hexalith.Platform.Custody/IDeletionBatchGuardPort.cs",
+      "sha256": "9b8fd9f406b1f9feb0f4a41572fe1789ee36fd52f1d6959b1b29bd0a08fa6bf6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs",
+      "sha256": "b709d269b7e4d1ee39e4d870cb2873efad2c612a2aec1889df2ee22ce4e41e08"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "sha256": "29434989d0939095dceaa5e95ec928e4c034246cac67080b114f5819db443d15"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before-hashes.json",
+      "sha256": "3a6b742aae27204d21f9dd0673742bc289d6a0fe1d9480fc56fb003141ef3b73"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-comparison/before/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionActivationComparison.cs",
+      "sha256": "2471ecdd503c69c2f51bdd16baa600d869ccaf462c33f7b89103daaad1a0e612"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-comparison/before-hashes.json",
+      "sha256": "8ce6674c0cfc025c050187957386d37f25cf73ed9eb9fc7214d18358ffe99d88"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-evidence-capture/before/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "sha256": "90e901f9ed4b4be02254c0167d3f595e5dff629630b3ee4b990da81cbc372d24"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-evidence-capture/before-hashes.json",
+      "sha256": "b17fa576c75b5a892b8b1ef789cf6e65a858d85078a63c21306dfe697ffe05ba"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-original-recovery/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "sha256": "290391112d1ea08bb7ca918e7fbacd357807411762566a39a57faaa97e6b91e0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-original-recovery/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionOperation.cs",
+      "sha256": "7548e244885a6a029677d23d2edb77e059bed5e478dd7211211baae9db7bee74"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-original-recovery/before/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "sha256": "dde8bab33836b9d316a56518a9a8722afd8751cdcbcac8a52bb1d8976de1f3a7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-original-recovery/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "sha256": "f923561b4c9ad0fb740e0bcad024824460a92e010b6cddf5b2f8b50939c1ea04"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-original-recovery/before-hashes.json",
+      "sha256": "6137df1eea381c4eebced62f0eeeb6d6a2aa349d936d6d46f26c6b8b46a296a1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/closed-history-ownership/before/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "sha256": "ecd0c5a53fb79f9f012fd844ec94e30884e19f9ed39da956e1710a85dd9ca35f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/closed-history-ownership/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "sha256": "3c21619544596bd4027a0388d0f57b88594284ac4f759965d81837b8ee2ef9ca"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/closed-history-ownership/before-hashes.json",
+      "sha256": "93b4360e4c8c3eae3684a790da452e919a29dbd4480bdde1bd2c310ad9860a5e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/closed-history-ownership/revision6-history-build.log",
+      "sha256": "53a7a57108e8dec53fccc49129c139f06b07cdc307771d5464f8fd067ff787f0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/closed-history-ownership/revision6-history-red-build.log",
+      "sha256": "fbec017630adea0114692ce4f4d997bf3192c4e14799bb489ac2676ef7644e0f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/closed-history-ownership/revision6-history-red-tests.log",
+      "sha256": "1f3c01d7394453a0915c9b211e08c1fc53908616699fd0c09c6bd9b51e50ddaf"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/closed-history-ownership/revision6-history-red-tests.xml",
+      "sha256": "e0133ab61e3e946965ec167f90a5f7692d2a7682e3ad817aeb08f254b0b5506d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/closed-history-ownership/revision6-history-tests.log",
+      "sha256": "922be6ce223c0886d1f5ec1a32810ea30924dc11949e7c5178a69410947b6656"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/closed-history-ownership/revision6-history-tests.xml",
+      "sha256": "7c01aa9878f8953292dfaf0a35cd765408a2a650b27e8c070c2539ff2b94f51a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/commands.json",
+      "sha256": "3c089c95fcd8161a671b484afd80190b0cc1ff0a47a22615d84fe499f5494ceb"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/coordinator-factory-bound/before/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "sha256": "2a4990877feb2471179adae2aeafa66438e4124d3cd28735b4fba26edb41c39a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/coordinator-factory-bound/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "sha256": "237a56ad46b084ce750d64d43e6b5091a7bf7e0ae818773ea5de7ad717469c04"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/coordinator-factory-bound/before-hashes.json",
+      "sha256": "987538e2d29508b735a7163716aad4c76b5250e162e85d7821bf7a372cd09036"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/coordinator-factory-bound/revision6-factory-red-build.log",
+      "sha256": "a81b61879bbea6d46ac5e30cae40fc18c4bb0b12995831a8e4dee2c1b7b2b609"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/coordinator-factory-bound/revision6-factory-red-tests.log",
+      "sha256": "bb5b2e347eac06f1675ec50a21f120987a1ae77ec280399041befa2bab8a41e7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/coordinator-factory-bound/revision6-factory-red-tests.xml",
+      "sha256": "86240270841f017ac47c5e4eeee589ee2bfc0889b2b9bafc5e28bf69d72d1061"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/current-owned-source.json",
+      "sha256": "147a62fe77624aa8f29f8b70b83eac465ae1135ea775d6e965d9f548f7a59100"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/engineering-handoff.json",
+      "sha256": "da0f38daafc521c752dfc6f051b57a03c82190077f37c6fb5849a020a5e1d8a1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-build-second.log",
+      "sha256": "817702f898b94cc8e0a3e5a5848fd48e2d9246023c0b5a25483f61e88991d35d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-build-third.log",
+      "sha256": "c6110d5605b47b7eade045718fb58b1bdffd564c9843f985862d7aefd4e76bec"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-build.log",
+      "sha256": "8196750c376b8ba693986704733e76b94a6c81b961ceb1aff75f3848541c8f74"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-recovery-build.log",
+      "sha256": "30a153c93cf675b29291c95c8efffdd5b6075758d3b9255c1b24071c09162af0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-recovery-tests-second.log",
+      "sha256": "a66d0f0674d21afd5e51743ec312e9ec76a8629e8faf1d640d0bc893aab03a38"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-recovery-tests-second.xml",
+      "sha256": "0dc5a70ae1632a6a7ad6030b2b56f8cd34e1ffbe6d89e001a5a770628a55ebbc"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-recovery-tests.log",
+      "sha256": "acf632b4d13614b7eb1cf17999859092a33fcd285db3021aa858f6ab82941fde"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-red-build-second.log",
+      "sha256": "dac4b7b30bd1ef221b92aca9d937e677680e92ad03a3bdcc97ea458ee775e92a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-red-build.log",
+      "sha256": "2e6206690d2edb6b5dcb3ab00e7b99303b78c9ca1799f892f8ad1e604637e709"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-red-tests-second.log",
+      "sha256": "d2d43d4598461523bf71121b15906ae3840790bbd4981be6ab88e5c58f6e832a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-red-tests-second.xml",
+      "sha256": "3998ae8492995e50da0a5c99209bd34d069dd9d670ea75f210df21f12bf5c13e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-red-tests.log",
+      "sha256": "d6a6a68e6e992cce82a9eb6cd6dc0ca468020061616aa0c2be724502024de02a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-red-tests.xml",
+      "sha256": "6b302c22257795cf22f2ea5f52cab4a9c4e2ec65acfb223fa707089db5f28f13"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-tests-second.log",
+      "sha256": "f3d88d4423150fe5aeeae7b2682e1c0274455197baf3c8a33f403964947a5cc8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-tests-second.xml",
+      "sha256": "308a354f5008d1ef10c8dc2dd6e00d657c73b82c5f2e8ff170f8fca099771725"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-tests.log",
+      "sha256": "62d69b21f74457c48a72cc027be7b1f6f18dde437687514dcfe7397baaae77a0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-tests.xml",
+      "sha256": "317d66b5c9d00fcd14594fc39e894ac65ab2b1b3d428ca6e8e7b0b5af84e499f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-atomic-build.log",
+      "sha256": "e58e8ad4a15f37e38f9e2dbd443ebcb1f65ae39478fe02268108d79f839e4e79"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-atomic-red-build.log",
+      "sha256": "f37dc99990c1106d778224144a00e35b667a0ea75066cdb3a4c67ed6f8bd4f3e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-atomic-red-tests.log",
+      "sha256": "d9b8f5a99390d8812e9bd9285a0d7443dfdb0c6149d2306699ec04b3e2bb55f7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-atomic-red-tests.xml",
+      "sha256": "976f56d1c9c99a30d8068f58f1fbcc2b8c65666301717553de3945f09aaa9f7d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-atomic-tests.log",
+      "sha256": "bb31928a0bf998314b75b547f9ed72e0a1cec09fc9e4ef489576ac8968ba8be2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-atomic-tests.xml",
+      "sha256": "b94af708d3ed315408596aec78bd53fb819380feb7f91e63753f585fecde50b4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-carrier-red-build.log",
+      "sha256": "b138b28e3a083ae0cc3d9ff46d8376aec11b36d9da6c236a48e89dda462f2783"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-carrier-red-tests.log",
+      "sha256": "65f99048bb80d26e259dad5d85a390fbea6bb6b69daff1b53449ac629fce4c14"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-carrier-red-tests.xml",
+      "sha256": "952feb4b70b33127d1112ce5b5dd8dbc10726bd4c6d38c6e690f590207b26c06"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-client-final-build.log",
+      "sha256": "10e886d307b2f690fbd4524e129691af86d49d7075c93ad495bde8d681395136"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-client-final-tests.log",
+      "sha256": "e7cfae8638788fbc9ee71808a481049c04e4877b335e37d3579e03b8348b01ad"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-client-final-tests.xml",
+      "sha256": "838e06ab1ff88789b1776382d2ca1055fd8cbf35699c5d6ee406b17eab6c7c46"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-conversations-final-build.log",
+      "sha256": "e8f2c2acd4aedb66e72ae50a2f0900dc7417e4f506d28286294663735ca62600"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-conversations-final-tests.log",
+      "sha256": "3049b6ecd432e50b53b5992496e178dc4e86c946436cd3fa454c4badabd57f00"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-conversations-final-tests.xml",
+      "sha256": "da4085a30c295405f34bfdf253a5bd834ba3bbc6f5f92c8aa0d3cf5274c34029"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-conversations-layout-build.log",
+      "sha256": "90285e15fd1372aceff8cd36b38cd634cc6d6d8b03c416ea2d4e8ee41adfdef7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-conversations-layout-tests.log",
+      "sha256": "a5206c4b85f07d412e4dfb635c00d3c3413bdb6bd519ea70b81c4648aaaa5eaa"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-conversations-layout-tests.xml",
+      "sha256": "400611f2067c3b2793ec63ac9cb76fa0c48bfb6d6783f9e4864d930fc7601c82"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-factory-red-build.log",
+      "sha256": "a81b61879bbea6d46ac5e30cae40fc18c4bb0b12995831a8e4dee2c1b7b2b609"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-factory-red-tests.log",
+      "sha256": "bb5b2e347eac06f1675ec50a21f120987a1ae77ec280399041befa2bab8a41e7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-factory-red-tests.xml",
+      "sha256": "86240270841f017ac47c5e4eeee589ee2bfc0889b2b9bafc5e28bf69d72d1061"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-history-build.log",
+      "sha256": "53a7a57108e8dec53fccc49129c139f06b07cdc307771d5464f8fd067ff787f0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-history-final-build.log",
+      "sha256": "1aae48c973e6eea02fba6010973dc0c14159a5651ee98f62a2bea36d39e6e81c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-history-final-tests.log",
+      "sha256": "2db7cc4e846e9f4ecfbf18927b82667f775a856610146e5b2648a3e4a1f9a291"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-history-final-tests.xml",
+      "sha256": "345f13f2ba500b8a677c6a7234ff743fe733113cc7d460e73bfb49d37d4c12df"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-history-red-build.log",
+      "sha256": "fbec017630adea0114692ce4f4d997bf3192c4e14799bb489ac2676ef7644e0f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-history-red-tests.log",
+      "sha256": "1f3c01d7394453a0915c9b211e08c1fc53908616699fd0c09c6bd9b51e50ddaf"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-history-red-tests.xml",
+      "sha256": "e0133ab61e3e946965ec167f90a5f7692d2a7682e3ad817aeb08f254b0b5506d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-history-tests.log",
+      "sha256": "922be6ce223c0886d1f5ec1a32810ea30924dc11949e7c5178a69410947b6656"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-history-tests.xml",
+      "sha256": "7c01aa9878f8953292dfaf0a35cd765408a2a650b27e8c070c2539ff2b94f51a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-initial-server-build.log",
+      "sha256": "0cb0a44ba3c6615e5c84c36534a3ac344f9d593d3eb5004e298e92c7050f7053"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-bounds-build.log",
+      "sha256": "32eced36794eede3000832535b170402bbde1d697ec567f32bf30c6dc566e0b2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-bounds-tests.log",
+      "sha256": "4f854ea210b376a5c66196e8e5f2c7bc607e865314a73b2be9b135212f9279a8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-bounds-tests.xml",
+      "sha256": "279bebd0658d1048be69a4184cfc2f6fae7007e0582305ca6544caa3d4a1b404"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-final-build-second.log",
+      "sha256": "729a2c5b3744b8afb56632a0f3b2589a0a49e3b202c24bdd6aa2a1263dd57fef"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-final-build.log",
+      "sha256": "2c795c4369d0d2bd74ba1cee3534cbcc94f3820d4c0d2fc602e8e4ad0c146039"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-final-tests-second.log",
+      "sha256": "3966c8c096c1292ec4b112d012a11823303003916f6dfc8b04dbae7df1493bef"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-final-tests-second.xml",
+      "sha256": "c4e368bbe1d719ca91098bf2a649aeacfc2a0243faac091fb41396849a7934b9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-final-tests.log",
+      "sha256": "a56f05aaacafe0635d3aea088712c1f996dfb9d35ddfb70378bafdcbae9a474b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-final-tests.xml",
+      "sha256": "f340ec015fa599a3d3d7801acdb16ca5c3ecc3b3bb28f6cb87c114737be2b105"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-layout-build.log",
+      "sha256": "00bf0ccd0d879cedfbaa6faecb59b01de2fdda3db260aa7fe5bd0ce2cafb3f3f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-layout-tests.log",
+      "sha256": "9e532419d0d00b472eab1afa7a145c3b3ad0c5e8d7bce0432e60ace2834529d1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-layout-tests.xml",
+      "sha256": "7b684ffdae369283da4e1ce6ab4bdce323dcca50da6ffc77d9f609ec5c54e657"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-build-second.log",
+      "sha256": "807d251ebf5c01a4bbde2f509e87309634ba9b9a65822797a67f0b8f95cb329f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-build.log",
+      "sha256": "a0a2b00a5f9a4b97cd333e60657d59d9acd48de5e0b2aafe975f4ceb595b6ec7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-red-build-second.log",
+      "sha256": "d6bb7c56c901f445aabbdcf64295f6a2ad222624e052fd69891fa4ccb7e30d59"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-red-build.log",
+      "sha256": "e08a181180b7d214fee6d66247088a26f8103e7f333b8843123dd0565e9f84c5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-red-tests.log",
+      "sha256": "bc3183e5c9bc3d8bfb337d978fe24704e24e37c414b9c514f5edec5313643aea"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-red-tests.xml",
+      "sha256": "85aef6315ceff86974419f5eeecaad40e55448b5937ebb8da76697ed29c8a8a8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-tests-second.log",
+      "sha256": "3f615b0ec3761decf8b32a2209f337a3c49fd159dfc201a12a35d3fa207ce4c7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-tests-second.xml",
+      "sha256": "d02835af510c908a591764aeec1928e30b9b19348376d1ebb094510dc7e1d1f7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-tests.log",
+      "sha256": "b0963a524a83b04b61330e176e8e257a13cdd02fb85c463a8733d131afbc2580"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-tests.xml",
+      "sha256": "23c724193c923316cd9aa2eee9a1db2ca0d8071ca8ec334bce2a449fb1c392a7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-build-second.log",
+      "sha256": "006451969b870786429a42111b2acea97874bb9707586e3ecbbabe210e697386"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-build-third.log",
+      "sha256": "ef984f0618ba31e90139273053f9e29fd2aa43a983e0e4f6a38b232e31cf697c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-build.log",
+      "sha256": "f02aee147328b23d04cd6f39a86d2ad96458f5e1867e4c3fc4d79a3c1d17ee71"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-negative-tests-second.log",
+      "sha256": "75b82a7763a44632c6cc118082a82081bdfa8e4262a06355cc145efac6273e71"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-negative-tests-second.xml",
+      "sha256": "6e9a53c54fdd0b3a9259fdd2b1ec526ddc4a4cb92a4f411393eb5e8e9cdaa2ff"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-negative-tests.log",
+      "sha256": "d6a6a68e6e992cce82a9eb6cd6dc0ca468020061616aa0c2be724502024de02a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-negative-tests.xml",
+      "sha256": "bd7ab7446c6592d4a1bb9d06cc5f8bff3fa57fa2ea0c19a3b74a505739d57579"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-race-red-build-second.log",
+      "sha256": "b21ae2cc237b8e1bcb6a133d748f9a8ba9c54124db7ab629193f0f5349db71d8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-race-red-build.log",
+      "sha256": "e69609e0b06a4a1fbbadb6cd24ac568ffe8af16b9670554897f090f91466a95b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-race-red-tests.log",
+      "sha256": "ec6d4935f88b030971c723c5e93cd832f6edb9a38a9f3c64314a0a7b68fe4fec"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-race-red-tests.xml",
+      "sha256": "a16b7e92ff206f5462ef2d1cc60148f60c8a26616e2afe9f7a147b85cbb8ba24"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-recovery-build.log",
+      "sha256": "0c3c5ec360e80fdf15cae3e4760338cc750fc680a6809901948d7bfa6b0944c0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-recovery-red-build.log",
+      "sha256": "ce8b9908ca5aba9a43251a01f0db5876a06e7b7e267adde5d3f5522ee2bdbd31"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-recovery-red-tests.log",
+      "sha256": "4d25f018be7299ba5222853f5264215896e8bea0839665966089e61dc0484da3"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-recovery-red-tests.xml",
+      "sha256": "4ae73a91e85ae125ae7a9c91c1c02ca8f14a40bb5f5a67b399f98e3c28ae1f28"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-recovery-tests.log",
+      "sha256": "88caceaace92f20d69a61e287caff817b2b08b1e00554fb02d9ee9406a2db8ea"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-recovery-tests.xml",
+      "sha256": "3b9fb0252e91aeee85833cae309e6b7b891652f1c0c870a073fdb4effd6905df"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-red-build.log",
+      "sha256": "58ddcbd93c4271bdb7137c6e437bab39baab3d6c6bf3dcfb5c4e55ce043797f5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-red-tests.log",
+      "sha256": "b1f0dfd28a692a70c02e0505cb516cd96153d31717388f33e235c7d40f0e5c2f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-red-tests.xml",
+      "sha256": "e8f52026216f25a5207cffd426af1c782068a067d73e86bbaae71a199102faf3"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-tests.log",
+      "sha256": "90a79b71d641d85b7d1241f5101effe014d7612443719cb85a188c16c6b50526"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-tests.xml",
+      "sha256": "e35c0506cc5d8609c1df1471586b70b5f16125f55a16b9b9578d7499d165c1fe"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replay-red-build.log",
+      "sha256": "3a072b4fd94e8c29ee266e7bb8104205c994c992680169e73e874c8fdc2a124a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replay-red-tests.log",
+      "sha256": "b854116ec2f6d6523c4c9cb6571c7727e32df6da6bd08d690ee855f892983a90"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replay-red-tests.xml",
+      "sha256": "93c30b5afc29980e34e7df6784ec8ebe24bfdbfe010688b1d5bc4dd9cd605dc5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-server-final-build-second.log",
+      "sha256": "97447599323b8e7b1f58d4f464a55bf72249e6d758432a42da966ba8b8cf22b1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-server-final-build.log",
+      "sha256": "db25ade23c72b2f600c2b727ba26146a51f1c110001bde52c50e5920e2b314de"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-server-final-tests-second.log",
+      "sha256": "5ad73fab137b4e57c9bf06a527d60ee5986e7e5e817e470bfeaa053347603409"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-server-final-tests-second.xml",
+      "sha256": "3060415957e294bcce2f14f44abcd6b61f07acb88452084031fe38d8db227bf0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-server-final-tests.log",
+      "sha256": "8a359757d3900a0a701d07cff963d5ade8792e985a1646afc000c7fdb32592ee"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-server-final-tests.xml",
+      "sha256": "ea3fa8c9455667fb4ba0239f4b2dd4a87630b52490b1706429fb610118dce2b4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-server-layout-build.log",
+      "sha256": "477247adc8377e592e57a56993eaf8966888501b593fd71b130cddccb5e6b3f5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-server-layout-tests.log",
+      "sha256": "1564567dcbd4236775cdd9930c6ede76c845a6e06d0a3e1f218886c994e76967"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-server-layout-tests.xml",
+      "sha256": "ad03ca51c6ccd1f9e31fbfff57705a6c64660def3c508fe002c05d52b2830f56"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/extract-revision6-commands.py",
+      "sha256": "a7f214e0dc1b4bff5332917e94e396b4a3cff8a4695d1123bdf8b1f73ee827ea"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/final-focused-results.json",
+      "sha256": "21f4f2e73c1408d72418acaf5b8fed7462049d9a1e36f75f0ea7c6c7af4fd841"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/final-reviewed-source-comparison.json",
+      "sha256": "1a438f654058a427573a291ce68497c01fcd042701b6a102cb7826f178254579"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/finalize-revision6.py",
+      "sha256": "5992faf1b2691e3e2e62c2786c0a26a10f0fdc6d6ff9566eaa821c016b4ed0a9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/finding-status.json",
+      "sha256": "b4af4e398748ba3d8e4cb563d1487212b97446960bbba9232a5469c858b1451b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/historical-attempts.json",
+      "sha256": "d802c3ba21ef717d6e4a6669068c3b599c9f4f9405b3edaa6ebf190593cdd97d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/initial-checks/revision6-initial-server-build.log",
+      "sha256": "0cb0a44ba3c6615e5c84c36534a3ac344f9d593d3eb5004e298e92c7050f7053"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/new-type-file-layout/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "sha256": "964981415bf6e0dd049053bdbf5620415973b9fdca26e94953a1a58a9372e398"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/new-type-file-layout/before/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementReconciliation.cs",
+      "sha256": "3be85080b6e42b0e644d1f8892f2170f89f42ed7533ab5417281f439ddaaac20"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/new-type-file-layout/before/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+      "sha256": "b748ded574d0a7c3fe37766ac8efd1ec0cbcd1632d66c645a0d6772bba7d1e6a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/new-type-file-layout/before-hashes.json",
+      "sha256": "5c9ea2fa6ed8d3c544c672b66577fe4ed3b43780021dcbb4f47c5d7a09ada1fb"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/ordered-baselines.json",
+      "sha256": "64383402a7135b6cdfe99f30fc02083a6caf2d62be497ed92911ae75ec72ee3d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/owner-packets/before/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+      "sha256": "e6347c0b47dbf3a5f86cd20fdf4acbbdf585500b0a25311a3cc0a0d083e6be53"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/owner-packets/before/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+      "sha256": "b7ba326ce2137222d64da63a847c1d008df426b02064f0890b758b811a7f9842"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/owner-packets/before/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+      "sha256": "032a5bfe098fd15ef9108b245a7a51ecb8fc59b49bfbe733f31ea7a35bf0ccf1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/owner-packets/before/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+      "sha256": "44b10df79062b3857ccf6220696cf19c1222cdbc159595171fd075eeecb74cf5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/owner-packets/before-hashes.json",
+      "sha256": "d660b15a50addaba334f3f675ecefaad199732c51f5eec8d6359f55f37ebe52e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/package-revision6.py",
+      "sha256": "069ce07c62848a2f910ba32fc7a33d6898cdd116f3f6c40f87674f253d17af2a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/preservation.json",
+      "sha256": "97fe69a35dfce2563b228032fc9a98a5545595596578058999c1274b15e104a2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/previous-reviewed-source-comparison.json",
+      "sha256": "0ce87c61bc4814f6c1056df568b060e87d8be65c710f4f35a9137b92862dace0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/private-identifier-authorization/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionOperation.cs",
+      "sha256": "2f4a3bfdab148efa5ce8638cda53a820d2130be6d8d8275c28a3e2128ae7b56c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/private-identifier-authorization/before/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs",
+      "sha256": "34e068d180dbd4f70d33a7475f707a6fa13e5c8560b8d77047b2488dae961f2f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/private-identifier-authorization/before-hashes.json",
+      "sha256": "2033f430355717df4dfb6755e8541a8e6540bdd6f6df381fc8f172951e8380f7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/private-identifier-carrier/before/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+      "sha256": "9e6aa75bec4788d42ef3b0a368b13b94d6ef253eadf907d26a20dd2b6387157b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/private-identifier-carrier/before/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs",
+      "sha256": "d3b046a1bef33db23bd5966ce483bd6870ea5d7147184f31b260f4c9cd1c29ce"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/private-identifier-carrier/before-hashes.json",
+      "sha256": "045539c76351cd4e8c555d48bf40e60e14a6c54111bf031ef1f47fbb4f5eedeb"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/private-identifier-carrier/revision6-carrier-red-build.log",
+      "sha256": "b138b28e3a083ae0cc3d9ff46d8376aec11b36d9da6c236a48e89dda462f2783"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/private-identifier-carrier/revision6-carrier-red-tests.log",
+      "sha256": "65f99048bb80d26e259dad5d85a390fbea6bb6b69daff1b53449ac629fce4c14"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/private-identifier-carrier/revision6-carrier-red-tests.xml",
+      "sha256": "952feb4b70b33127d1112ce5b5dd8dbc10726bd4c6d38c6e690f590207b26c06"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/replay-profile-bound/before/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeReplayVerifier.cs",
+      "sha256": "dcab969cc188516ba3d427a0e04607f5b63467faf7e49552123f053bc1004f15"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/replay-profile-bound/before/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs",
+      "sha256": "05e1543ee28d6de64ea20268bacd06ae1eeeb10130e28208c407b53a449c6b98"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/replay-profile-bound/before-hashes.json",
+      "sha256": "a04dee97c70511650caa59fd07760e363eb3a97c762f58ecb867f98bb577f7a8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/replay-profile-bound/revision6-replay-red-build.log",
+      "sha256": "3a072b4fd94e8c29ee266e7bb8104205c994c992680169e73e874c8fdc2a124a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/replay-profile-bound/revision6-replay-red-tests.log",
+      "sha256": "b854116ec2f6d6523c4c9cb6571c7727e32df6da6bd08d690ee855f892983a90"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/replay-profile-bound/revision6-replay-red-tests.xml",
+      "sha256": "93c30b5afc29980e34e7df6784ec8ebe24bfdbfe010688b1d5bc4dd9cd605dc5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/required-class-audit.json",
+      "sha256": "e6db80a777265fbbf8ed75aa2303253d53743e0a79d6943c551ac1c4fb65e88f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-actor-recovery-tests.py",
+      "sha256": "ed8c084bec3c17b7eb823cc5197b536ae2f23eb71034f6855176d2b124413702"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-actor-tests.py",
+      "sha256": "635e117a330d847bc2eb9900a4af672f745e9c3dd6f2ca03ef4de629b43ed772"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-actors-production.py",
+      "sha256": "8dd80e4eb1c4a9a8e21360a8989e4b474702ed2bb0026f3242315daa4c7f94b0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-actors-uncertainty.py",
+      "sha256": "df0ebb33a6a64637a84b9851154846a949a25b82d7955a95e4f054511614a95e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-atomic-production.py",
+      "sha256": "d872bbbe8ad72ed91859db0e9638bce14e743f97f85f98fbc1087cd1ce02252c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-atomic-tests.py",
+      "sha256": "e82c7bb5e31dfa68066451243e5072d4755c90ab47c015b84b339017f6f3a6f8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-carrier-production.py",
+      "sha256": "f0a0450344020f855228c398c8a6e3cf2ebe31b530ae30ce9eb9fc5cbbe66dda"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-history-tests.py",
+      "sha256": "2e98e2c1c20ac66f1b2a78479b3d4e2744e610a0439905efe1537b01abdbc379"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-packets.py",
+      "sha256": "734c6e52989d8834b719b3ac9a1fe215c9675cfa901af3a70257a5d4841c3fe3"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-pump-production.py",
+      "sha256": "0b98bb2d008dd48e055a97a87ed0432a49f0aeb411f4d1640a8921cb49809e09"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-pump-tests.py",
+      "sha256": "413edacc6ae40fc440afdc3100869e9547d530063a8aaa145765da1dbf7c81f9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-replacement-fixture.py",
+      "sha256": "40956c21534c68dfb9c0be3d8bf786a478015ea2700ac0ac57807e9938800a8b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-replacement-negative-tests.py",
+      "sha256": "bc5a2441c94b3393b127ac2eb8db0bd477964d418b9e2d1e99ac6dab0aa890b9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-replacement-production.py",
+      "sha256": "faa2a293e9e2316e4b04e350f89ee614a85b6fc40ca7ae0d8ddcd249ebd30c9f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-replacement-race-production.py",
+      "sha256": "5186cbe2504e65391a6e075c901b80998aad4a2136816ead857e36647841d816"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-replacement-recovery-production.py",
+      "sha256": "eb8c8424cbde7091aa93501e78bb438fb581a3ae011e22c1cdb76957408efc3b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-replay-tests.py",
+      "sha256": "b282b95977e4eac854d9c0d40b622d4b0b7bf90711da980ebb25d8b8366b8663"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/revision6-type-layout.py",
+      "sha256": "d615c8228d8d031088f6bf114dfdfd56fe2468cf0702db859cc79c6ef94f8cb7"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/standalone-delivery-pump-budget/before/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs",
+      "sha256": "ed4a5e0b4f1665b7c9da047edb3e53667290536782408f230b3f2839d2d8a515"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/standalone-delivery-pump-budget/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "sha256": "ce08d99d4ef5e9d30a9a0a6938a38b15bd5a10a885972a3027de52cf8054f04e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/standalone-delivery-pump-budget/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "sha256": "9928df2eedbaffa916558bae1f57977a9a6022df86c3c240bff24554358e150f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/standalone-delivery-pump-budget/before/eventstore/src/Hexalith.EventStore.Client/Hexalith.EventStore.Client.csproj",
+      "sha256": "b9f5657e342473b941d70b14114cb41d8a1a5d96b6b9b90bcad98ca13d3cb239"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/standalone-delivery-pump-budget/before-hashes.json",
+      "sha256": "affb58aa833aaca179ccb4e86cb20c826bac99821d07c223ee18dc52b720259c"
+    }
+  ]
+}

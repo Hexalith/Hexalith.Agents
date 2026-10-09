@@ -1,0 +1,55 @@
+{
+  "capturedUtc": "2026-10-08T21:06:09.688361+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs",
+      "existed": true,
+      "sha256": "3e3a14b150f55d896a66fb0b57ff10897bcf668863c64239f20fd6131eadf355",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/conversations-delivery/before/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionPublicationDelivery.cs",
+      "existed": true,
+      "sha256": "68c7dc04ad5a194d56e04f61ef260143f1f0855016ea751ddfe9ce4bec32152e",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/conversations-delivery/before/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionPublicationDelivery.cs"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs",
+      "existed": true,
+      "sha256": "7e15661332e214a30694195aac785aa1cce411b7eb21f2d4d57f95c70c121313",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/conversations-delivery/before/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionPublicationDeliveryTests.cs",
+      "existed": true,
+      "sha256": "cb5645515074681c0082b735460ac4d96d3b1d2bcb418e4b55b5680e3bb253f1",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/conversations-delivery/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionPublicationDeliveryTests.cs"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "existed": true,
+      "sha256": "2a479e818513674e6e8d9b548dc79072b98314072fae9124630599fb5be951ea",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/conversations-delivery/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs",
+      "existed": true,
+      "sha256": "514b40f293496eff876f3f82a16f125df8c4d24eae9b61b11d7944021a097046",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/conversations-delivery/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs",
+      "existed": true,
+      "sha256": "97c3aa6f0fe037daa67d49ef4f97c748398e90a870a448b189ff675a54bbcf21",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/conversations-delivery/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "reviewRevision": 4,
+  "reviewInputSha256": "ad0b2f16e15bda7b04b7858dd63ec328e77476a40e15af7430ab0c8d6315a28a",
+  "sourcePathsFrozen": 394,
+  "orderedCaptures": 114,
+  "allThreeFreshLayersLaunchedBeforeAnyReportHandling": true,
+  "allThreeFinalReportsReceivedBeforeTriage": true,
+  "status": "triage completed; revision-5 engineering active",
+  "individuallyClassifiedFindings": 13,
+  "badSpecEntries": 2,
+  "directPatchesRequiredInRevision5": 8,
+  "falseRejected": 2,
+  "carriedPriorLowComplexityRejection": 1,
+  "deferred": 0,
+  "currentReviewLoopIteration": 5,
+  "sourceEngineer": "owner_rederivation",
+  "rootFullLocalMatrix": "mandatory, never yet run, pending stable revised source and review clearance",
+  "negativeGateEvidence": "../root-revision4-negative-gates-20261009T014300Z/evidence.json: 11 actual refusals passed",
+  "engineeringFocusedEvidence": "revision-4 corrected stable audit: 492 distinct passes, 64 dotnet commands, 177 artifact hashes; no full root verification inferred",
+  "runtimeQualification": "unestablished; original Story 5.4 draft/backlog and parent in-progress preserved",
+  "concreteCallerTriageCorrection": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/triage-correction-concrete-extensions",
+  "provisionalLocalMapping": "root-local-class-mapping-plan-r4.json: 44/44 mapped; no actual full execution inferred"
+}

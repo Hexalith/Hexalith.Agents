@@ -1,0 +1,33 @@
+{
+  "capturedUtc": "2026-10-09T09:16:45.358156+00:00",
+  "rootReadFullPreviewDiff": true,
+  "previewLines": 218,
+  "previewSha256": "322e76a3c9c41c905a3141312ea56113c9cbd9023887c8fca939b655c3e95e8b",
+  "pathsRead": 4,
+  "actualFocusedXml": [
+    {
+      "xml": "/tmp/revision7-joint-green.xml",
+      "sha256": "8a80f80913d0ba1f43404b380f05c95572cc99fd4dcee1a9e920ca1e80eae347",
+      "total": 173,
+      "passed": 173,
+      "failed": 0,
+      "classCounts": {
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests": 65,
+        "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests": 78,
+        "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests": 30
+      }
+    },
+    {
+      "xml": "/tmp/revision7-joint-red.xml",
+      "sha256": "c8cf5053ff87ee578309500e855adb165b490acaf76bd611dc88da61e0640fed",
+      "total": 22,
+      "passed": 3,
+      "failed": 19,
+      "classCounts": {
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests": 7,
+        "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests": 15
+      }
+    }
+  ],
+  "scope": "Preliminary settled joint/guard source and XML only; final stable source, exact completed command linkage, cumulative review and full matrix remain required."
+}

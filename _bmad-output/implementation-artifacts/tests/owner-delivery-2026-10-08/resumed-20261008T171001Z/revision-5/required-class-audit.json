@@ -1,0 +1,129 @@
+{
+  "capturedUtc": "2026-10-09T02:47:41.496472+00:00",
+  "newPublicTestClasses": [],
+  "editedPublicTestClassesRemainExisting": true,
+  "allEditedClassesActuallyExecutedInCorrectProject": true,
+  "paths": [
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs",
+      "beforePublicClasses": [
+        "InteractionOccurrenceProtectorTests"
+      ],
+      "currentPublicClasses": [
+        "InteractionOccurrenceProtectorTests"
+      ],
+      "newPublicClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs",
+      "beforePublicClasses": [
+        "AggregateActorPublicationRegistrationTests"
+      ],
+      "currentPublicClasses": [
+        "AggregateActorPublicationRegistrationTests"
+      ],
+      "newPublicClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "beforePublicClasses": [
+        "GovernanceScopeGuardTests"
+      ],
+      "currentPublicClasses": [
+        "GovernanceScopeGuardTests"
+      ],
+      "newPublicClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+      "beforePublicClasses": [
+        "InteractionOccurrenceRegistryActorTests"
+      ],
+      "currentPublicClasses": [
+        "InteractionOccurrenceRegistryActorTests"
+      ],
+      "newPublicClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "beforePublicClasses": [
+        "RetainedIdentityHistorySourceReaderTests"
+      ],
+      "currentPublicClasses": [
+        "RetainedIdentityHistorySourceReaderTests"
+      ],
+      "newPublicClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "beforePublicClasses": [
+        "DeletionCapabilitySigningActorTests"
+      ],
+      "currentPublicClasses": [
+        "DeletionCapabilitySigningActorTests"
+      ],
+      "newPublicClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "beforePublicClasses": [
+        "ExportKeyDeliveryActorTests"
+      ],
+      "currentPublicClasses": [
+        "ExportKeyDeliveryActorTests"
+      ],
+      "newPublicClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs",
+      "beforePublicClasses": [
+        "PrivateOwnerOperationAuthenticatorTests"
+      ],
+      "currentPublicClasses": [
+        "PrivateOwnerOperationAuthenticatorTests"
+      ],
+      "newPublicClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationAuthenticatorTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+      "beforePublicClasses": [
+        "ReplicatedSecurityObservationSpoolTests"
+      ],
+      "currentPublicClasses": [
+        "ReplicatedSecurityObservationSpoolTests"
+      ],
+      "newPublicClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests"
+      ]
+    }
+  ],
+  "ownerRunnerSourceChanges": false,
+  "priorRequiredMappingsPreserved": true,
+  "rootProvisionalMappingPlan": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/root-local-class-mapping-plan-r4.json",
+  "rootFullLocalExecution": "pending; root recomputes cumulative execution and maps after source freeze"
+}

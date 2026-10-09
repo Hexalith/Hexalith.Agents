@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-08T23:58:59.750121+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs",
+      "existed": true,
+      "sha256": "246bfb11cc666a18523bb71165af0340842139d213da05ce2aeac9d089497d37",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/physical-actual-coordinator/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "capturedUtc": "2026-10-09T06:30:44.028701+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs",
+      "existed": true,
+      "sha256": "c8d23e79c4f0e825076d59d5b8970c9be3b5694323a5d365f9b8328ae340865d",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/before/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/IAtomicDirectoryAppendOwner.cs",
+      "existed": true,
+      "sha256": "a907a2abaf372ecdfdd663409d44efd17ac86e4e7d5014eec98b215a6300ad1d",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/before/eventstore/src/Hexalith.EventStore.Client/Streams/IAtomicDirectoryAppendOwner.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/IDirectoryAtomicAppendAuthority.cs",
+      "existed": true,
+      "sha256": "1b9234facdcc0b6568e85cf4babc2a795d8c44bf06df755b4d5c6bbe0ef400ac",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/before/eventstore/src/Hexalith.EventStore.Client/Streams/IDirectoryAtomicAppendAuthority.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendPayloadLifetime.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs",
+      "existed": true,
+      "sha256": "1e064f0171c318fe659ffbe858d9c0e17a0f1d2ebcc8a49be6b57fdd8fb57269",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/atomic-request-lifetime/before/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs"
+    }
+  ]
+}

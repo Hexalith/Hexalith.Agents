@@ -1,0 +1,265 @@
+<assemblies schema-version="3" id="98c14633-451a-4df1-a50f-34b29786df01" computer="DESKTOP-VIOG240" user="administrator" start-rtf="2026-10-09T01:12:47.1757957+00:00" finish-rtf="2026-10-09T01:13:35.5003306+00:00" timestamp="10/09/2026 03:13:35"><assembly environment="64-bit (x64) .NET 10.0.12 [collection-per-class, parallel (collections, 14 threads)]" id="7de20b1c-69b2-44e3-82c5-de6a0a71a4c7" name="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll" run-date="2026-10-09" run-time="01:12:47" start-rtf="2026-10-09T01:12:47.1757957+00:00" test-framework="xUnit.net v3 4.0.1+8ed8aa354c" target-framework=".NETCoreApp,Version=v10.0" errors="0" failed="24" finish-rtf="2026-10-09T01:13:35.5003306+00:00" not-run="0" passed="0" skipped="0" time="48.328" time-rtf="00:00:48.3280000" total="24"><collection name="Test collection for Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests (id: 21b8165d8ba5f7d36edb29d6207d4c2327f9ff16ccc5b162e6923c62467aba36)" id="db660574-57ea-42be-90a4-b9056d283f5c" failed="24" not-run="0" passed="0" skipped="0" time="48.171" time-rtf="00:00:48.1710000" total="24"><test id="7ac74005-31bd-444b-b2fd-b468db614c9c" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;manifest-evaluations\&quot;, traversal: False, cancelCaller: False)" result="Fail" time="2.101" time-rtf="00:00:02.1010000" start-rtf="2026-10-09T01:12:47.2495506+00:00" finish-rtf="2026-10-09T01:12:49.3945259+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 201
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="4a28f8d0-ac35-4d4e-a985-8506e5ceaf5c" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;final-profile\&quot;, traversal: False, cancelCaller: True)" result="Fail" time="2.027" time-rtf="00:00:02.0270000" start-rtf="2026-10-09T01:12:49.3967811+00:00" finish-rtf="2026-10-09T01:12:51.4263422+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 198
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="438d2400-b9f1-492f-af45-8fe1f9e07b96" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;final-profile\&quot;, traversal: False, cancelCaller: False)" result="Fail" time="2.003" time-rtf="00:00:02.0030000" start-rtf="2026-10-09T01:12:51.4264601+00:00" finish-rtf="2026-10-09T01:12:53.4309728+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 201
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="b4728b0c-81b6-4a69-b578-d0a229f70f48" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;initial-profile\&quot;, traversal: True, cancelCaller: True)" result="Fail" time="2.003" time-rtf="00:00:02.0030000" start-rtf="2026-10-09T01:12:53.4310810+00:00" finish-rtf="2026-10-09T01:12:55.4344934+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 198
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="86e58a3e-1e8f-49e6-8296-68cef18c419f" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;initial-profile\&quot;, traversal: True, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:12:55.4345861+00:00" finish-rtf="2026-10-09T01:12:57.4367869+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 201
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="04fe8990-550d-43a0-932e-a0c866ab01e1" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;initial-profile\&quot;, traversal: False, cancelCaller: True)" result="Fail" time="2.002" time-rtf="00:00:02.0019999" start-rtf="2026-10-09T01:12:57.4368909+00:00" finish-rtf="2026-10-09T01:12:59.4395359+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 198
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="2c0e39e0-2fe3-4399-a1fe-2d6513d034d7" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;initial-profile\&quot;, traversal: False, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:12:59.4396277+00:00" finish-rtf="2026-10-09T01:13:01.4417872+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 201
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="0bc28662-d267-41c6-b4cf-6fd164610312" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;basis-roles\&quot;, traversal: True, cancelCaller: True)" result="Fail" time="2.002" time-rtf="00:00:02.0019999" start-rtf="2026-10-09T01:13:01.4418799+00:00" finish-rtf="2026-10-09T01:13:03.4442943+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 198
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="1b3c1523-05ba-4baa-b79b-900ebf53ef3d" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;basis-roles\&quot;, traversal: True, cancelCaller: False)" result="Fail" time="2.003" time-rtf="00:00:02.0030000" start-rtf="2026-10-09T01:13:03.4443827+00:00" finish-rtf="2026-10-09T01:13:05.4473998+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 201
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="8dfe62f4-d328-4156-9411-a25012af34a9" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;basis-roles\&quot;, traversal: False, cancelCaller: True)" result="Fail" time="2" time-rtf="00:00:02.0000000" start-rtf="2026-10-09T01:13:05.4475041+00:00" finish-rtf="2026-10-09T01:13:07.4480824+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 198
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="95b19b02-7333-47de-afbc-92fe7e127211" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;basis-roles\&quot;, traversal: False, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:13:07.4482582+00:00" finish-rtf="2026-10-09T01:13:09.4502671+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 201
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="9eb094ae-08cf-4532-8edf-05d40f8801b0" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;basis-evaluations\&quot;, traversal: True, cancelCaller: True)" result="Fail" time="2.002" time-rtf="00:00:02.0019999" start-rtf="2026-10-09T01:13:09.4503817+00:00" finish-rtf="2026-10-09T01:13:11.4530132+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 198
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="a63d5734-07b3-4959-b068-a24c7d24a59d" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;basis-evaluations\&quot;, traversal: True, cancelCaller: False)" result="Fail" time="2.004" time-rtf="00:00:02.0040000" start-rtf="2026-10-09T01:13:11.4531205+00:00" finish-rtf="2026-10-09T01:13:13.4584966+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 201
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="8ba89035-b1d9-4237-98c0-af369c724fef" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;basis-evaluations\&quot;, traversal: False, cancelCaller: True)" result="Fail" time="2.002" time-rtf="00:00:02.0019999" start-rtf="2026-10-09T01:13:13.4585928+00:00" finish-rtf="2026-10-09T01:13:15.4612102+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 198
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="a1702af7-cc97-4f49-a63c-e29e89f79200" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;basis-evaluations\&quot;, traversal: False, cancelCaller: False)" result="Fail" time="2.003" time-rtf="00:00:02.0030000" start-rtf="2026-10-09T01:13:15.4612984+00:00" finish-rtf="2026-10-09T01:13:17.4650346+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 201
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="72e493e8-18a5-4bc4-b65f-2119987c7ca4" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;manifest-approvers\&quot;, traversal: True, cancelCaller: True)" result="Fail" time="2.004" time-rtf="00:00:02.0040000" start-rtf="2026-10-09T01:13:17.4652110+00:00" finish-rtf="2026-10-09T01:13:19.4701215+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 198
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="e25878dd-ef4d-44ef-bf97-277271d15c2b" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;manifest-approvers\&quot;, traversal: True, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:13:19.4702108+00:00" finish-rtf="2026-10-09T01:13:21.4722404+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 201
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="a8846daf-5967-4449-a7d8-5d8201b09da8" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;manifest-approvers\&quot;, traversal: False, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:13:21.4723229+00:00" finish-rtf="2026-10-09T01:13:23.4745910+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 198
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="dc5c074d-22c0-4cd9-9483-4671553817ef" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;manifest-approvers\&quot;, traversal: False, cancelCaller: False)" result="Fail" time="2.003" time-rtf="00:00:02.0030000" start-rtf="2026-10-09T01:13:23.4746521+00:00" finish-rtf="2026-10-09T01:13:25.4786057+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 201
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="9f6821c0-c677-427d-9231-4c84f25e148a" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;manifest-evaluations\&quot;, traversal: True, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:13:25.4786976+00:00" finish-rtf="2026-10-09T01:13:27.4807335+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 198
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="27677be3-00da-49f6-aa0b-b6d83d0c564b" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;manifest-evaluations\&quot;, traversal: True, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:13:27.4808186+00:00" finish-rtf="2026-10-09T01:13:29.4826263+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 201
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="cf448eaf-5a89-4f9c-bdc2-f8044b1dcf42" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;manifest-evaluations\&quot;, traversal: False, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:13:29.4827056+00:00" finish-rtf="2026-10-09T01:13:31.4849517+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 198
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="f8d81ed0-ec4a-4b7a-a406-d470796c0678" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;final-profile\&quot;, traversal: True, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:13:31.4850201+00:00" finish-rtf="2026-10-09T01:13:33.4871562+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 201
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="d8a90b8b-29c1-4f6d-86ae-6cff3e9a3214" name="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(vector: \&quot;final-profile\&quot;, traversal: True, cancelCaller: True)" result="Fail" time="2.003" time-rtf="00:00:02.0030000" start-rtf="2026-10-09T01:13:33.4872522+00:00" finish-rtf="2026-10-09T01:13:35.4894700+00:00" type="Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests" method="SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs" source-line="134"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests.SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs:line 198
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test></collection></assembly></assemblies>

@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T02:27:08.944892+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs",
+      "existed": true,
+      "sha256": "314cdc0626974336c20e424ac200ee5e965d5b663b53b7241e35ebd040e42d0b",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/registry-byte-bound/before/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+      "existed": true,
+      "sha256": "852f4fa004ae1fe6191469c2ec7635505e6521eec893382d143566057b307fb9",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/registry-byte-bound/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+[
+  "dotnet",
+  "/tmp/hexalith-resume-guarded-transaction-20261008/bin/Hexalith.EventStore.Server.Tests/debug/Hexalith.EventStore.Server.Tests.dll",
+  "-class",
+  "*GuardedStateTransactionTests",
+  "-result-xml",
+  "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/guarded-transaction/tests.xml"
+]

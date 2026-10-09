@@ -1,0 +1,100 @@
+<assemblies schema-version="3" id="2f614c39-b276-4c24-8fe3-8099c5112597" computer="DESKTOP-VIOG240" user="administrator" start-rtf="2026-10-09T02:28:21.2338463+00:00" finish-rtf="2026-10-09T02:28:33.4443714+00:00" timestamp="10/09/2026 04:28:33"><assembly environment="64-bit (x64) .NET 10.0.12 [collection-per-class, parallel (collections, 14 threads)]" id="46831369-897d-4c93-8942-b87a284e90e7" name="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/bin/Debug/net10.0/Hexalith.EventStore.PayloadProtection.Tests.dll" run-date="2026-10-09" run-time="02:28:21" start-rtf="2026-10-09T02:28:21.2338463+00:00" test-framework="xUnit.net v3 4.0.1+8ed8aa354c" target-framework=".NETCoreApp,Version=v10.0" errors="0" failed="6" finish-rtf="2026-10-09T02:28:33.4443714+00:00" not-run="0" passed="0" skipped="0" time="12.211" time-rtf="00:00:12.2110000" total="6"><collection name="Test collection for Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests (id: f43432df4d008d2bafdc6e580a5662465dfc34af686dd6557ca7eb6023f72d7b)" id="73d2573e-2978-4ea6-bc66-9a8df03ac628" failed="6" not-run="0" passed="0" skipped="0" time="12.111" time-rtf="00:00:12.1110000" total="6"><test id="7faea690-00d1-430a-8e0c-be6bfb717a19" name="Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests.SuspendedPathTraversalIsBounded(stage: \&quot;enumerator\&quot;, deadlineExpires: False)" result="Fail" time="2.097" time-rtf="00:00:02.0970000" start-rtf="2026-10-09T02:28:21.2999577+00:00" finish-rtf="2026-10-09T02:28:23.4096496+00:00" type="Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests" method="SuspendedPathTraversalIsBounded" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs" source-line="129"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests.SuspendedPathTraversalIsBounded(String stage, Boolean deadlineExpires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs:line 166
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="cbe0a825-9028-458a-981b-88f8ad914f9c" name="Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests.SuspendedPathTraversalIsBounded(stage: \&quot;enumerator\&quot;, deadlineExpires: True)" result="Fail" time="2.007" time-rtf="00:00:02.0070000" start-rtf="2026-10-09T02:28:23.4125048+00:00" finish-rtf="2026-10-09T02:28:25.4201344+00:00" type="Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests" method="SuspendedPathTraversalIsBounded" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs" source-line="129"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : operation.IsCompleted
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests.SuspendedPathTraversalIsBounded(String stage, Boolean deadlineExpires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs:line 169
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="d04d31a7-c9af-409d-9d89-db7cd8f7d250" name="Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests.SuspendedPathTraversalIsBounded(stage: \&quot;move\&quot;, deadlineExpires: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T02:28:25.4202644+00:00" finish-rtf="2026-10-09T02:28:27.4227365+00:00" type="Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests" method="SuspendedPathTraversalIsBounded" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs" source-line="129"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests.SuspendedPathTraversalIsBounded(String stage, Boolean deadlineExpires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs:line 166
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="a16fe685-6b4e-4a20-85c0-2e1770b572f6" name="Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests.SuspendedPathTraversalIsBounded(stage: \&quot;move\&quot;, deadlineExpires: True)" result="Fail" time="2.004" time-rtf="00:00:02.0040000" start-rtf="2026-10-09T02:28:27.4228368+00:00" finish-rtf="2026-10-09T02:28:29.4273401+00:00" type="Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests" method="SuspendedPathTraversalIsBounded" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs" source-line="129"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : operation.IsCompleted
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests.SuspendedPathTraversalIsBounded(String stage, Boolean deadlineExpires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs:line 169
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="26242cf5-a9d0-4bf4-a25c-e47ead850755" name="Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests.SuspendedPathTraversalIsBounded(stage: \&quot;current\&quot;, deadlineExpires: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T02:28:29.4274646+00:00" finish-rtf="2026-10-09T02:28:31.4297321+00:00" type="Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests" method="SuspendedPathTraversalIsBounded" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs" source-line="129"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests.SuspendedPathTraversalIsBounded(String stage, Boolean deadlineExpires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs:line 166
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="4b32490e-4204-4766-b14a-98758e341c3a" name="Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests.SuspendedPathTraversalIsBounded(stage: \&quot;current\&quot;, deadlineExpires: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T02:28:31.4298369+00:00" finish-rtf="2026-10-09T02:28:33.4321813+00:00" type="Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests" method="SuspendedPathTraversalIsBounded" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs" source-line="129"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : operation.IsCompleted
+    should be
+True
+    but was
+False</message><stack-trace>   at Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests.SuspendedPathTraversalIsBounded(String stage, Boolean deadlineExpires) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs:line 169
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test></collection></assembly></assemblies>

@@ -1,0 +1,35 @@
+{
+  "capturedUtc": "2026-10-09T09:24:20.125131+00:00",
+  "rootReadFullPreviewDiff": true,
+  "previewLines": 117,
+  "previewSha256": "159f86f2271391bc17579ce2a3b9d71d21d7587a573b5037cf207e1235a43f34",
+  "pathsRead": 5,
+  "unchangedAdditionalCapturedPath": "DaprGuardedStateTransaction.cs, zero delta",
+  "actualFocusedXml": [
+    {
+      "xml": "/tmp/revision7-private-wait-green.xml",
+      "sha256": "e6508b5285b94bf441943e2d16d05e3a3916017d693deae16be2c5e912726a40",
+      "total": 89,
+      "passed": 89,
+      "failed": 0,
+      "classCounts": {
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests": 9,
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests": 42,
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests": 38
+      }
+    },
+    {
+      "xml": "/tmp/revision7-private-wait-red.xml",
+      "sha256": "5bb2dbd80dab17035bba0118e41d182da8ac5b2513e0ec966f982a263783dc4f",
+      "total": 9,
+      "passed": 8,
+      "failed": 1,
+      "classCounts": {
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests": 6,
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests": 2,
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests": 1
+      }
+    }
+  ],
+  "scope": "Preliminary current source and actual XML only. Earlier red evidence is not claimed to use the subsequently strengthened assertions; final command/package/source/complete review still required."
+}

@@ -1,0 +1,277 @@
+{
+  "auditedUtc": "2026-10-09T00:56:16.846347+00:00",
+  "originalFailures": 24,
+  "currentClassPassed": 35,
+  "exactOriginalFailuresNowPass": true,
+  "cleanBuildLog": "/tmp/revision4-namespace-capture-build.log",
+  "buildSha256": "4e480f9094739bc0a4ceedf749f0f28daaa6f5b8f1b55dc295bacc14ab2ee5bd",
+  "orderedCaptureCount": 99,
+  "exact97EntryPrefixPreserved": true,
+  "xml": [
+    {
+      "path": "/tmp/revision4-namespace-capture-red-tests.xml",
+      "sha256": "2c522f6f96619acc7542c8e140a91fd3acae29d1dad1a2f347d882f11a04141d",
+      "totals": {
+        "total": "24",
+        "passed": "0",
+        "failed": "24",
+        "errors": "0",
+        "skipped": "0",
+        "not-run": "0"
+      },
+      "cases": [
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"initial-cut-count\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-flags-count\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-flags-count\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-flags-items\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-flags-items\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-flags-count\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-flags-count\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-source-items\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-source-items\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-source-count\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-source-count\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-source-items\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-source-items\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-source-count\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-source-count\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"final-cut-items\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"final-cut-items\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"final-cut-count\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"final-cut-count\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"initial-cut-items\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"initial-cut-items\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"initial-cut-count\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-flags-items\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-flags-items\\\", cancelCaller: True)",
+          "Fail"
+        ]
+      ]
+    },
+    {
+      "path": "/tmp/revision4-namespace-capture-tests.xml",
+      "sha256": "2400dd6519c2c0557c21eb39d2350b13eed8bc55f391c1bfdc1918524f118ddc",
+      "totals": {
+        "total": "35",
+        "passed": "35",
+        "failed": "0",
+        "errors": "0",
+        "skipped": "0",
+        "not-run": "0"
+      },
+      "cases": [
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.CallerCancellationStopsNoncooperativeNamespaceWait",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.CompleteSnapshotDetachesBytesAndPreservesRegisteredEmptySources",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.AdvancedSourceReleasesOnlyCertifiedConsecutivePrefix(gapped: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.AdvancedSourceReleasesOnlyCertifiedConsecutivePrefix(gapped: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.NamespaceChangesDuringSourceReadDenyRelease(headChanges: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.NamespaceChangesDuringSourceReadDenyRelease(headChanges: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.FoldReleasesEachPrefixBeforeNextAndRawSnapshotBoundsAggregateBytes",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"initial-cut-count\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-flags-count\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-flags-count\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-flags-items\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-flags-items\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-flags-count\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-flags-count\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-source-items\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-source-items\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-source-count\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-source-count\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-source-items\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-source-items\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-source-count\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"first-source-count\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"final-cut-items\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"final-cut-items\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"final-cut-count\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"final-cut-count\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"initial-cut-items\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"initial-cut-items\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"initial-cut-count\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-flags-items\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \\\"last-flags-items\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.InvalidCutDeniesBeforeSourceReads(vector: \\\"partial\\\")",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.InvalidCutDeniesBeforeSourceReads(vector: \\\"foreign\\\")",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.InvalidCutDeniesBeforeSourceReads(vector: \\\"expired\\\")",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.InvalidCutDeniesBeforeSourceReads(vector: \\\"duplicate\\\")",
+          "Pass"
+        ]
+      ]
+    }
+  ],
+  "scope": "Interim B1 actual XML/build inspection while engineering continues. Not a stable source freeze, review clearance or full Local verification."
+}

@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T01:06:13.502655+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs",
+      "existed": true,
+      "sha256": "10a36414cfc2418ec84e1bd35794eda1f15860d4421cd846e5f19e7258520dcb",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/protection-target-order/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+      "existed": true,
+      "sha256": "8c72f82aa9a78e35deb98e7ecb33d705892cac18d49b27957ab2e1f50b513c5e",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/protection-target-order/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs"
+    }
+  ]
+}

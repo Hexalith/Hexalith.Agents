@@ -1,0 +1,54 @@
+{
+  "capturedUtc": "2026-10-09T08:58:57.840876+00:00",
+  "reviewRevision": 7,
+  "status": "provisional static planning; engineering source is not frozen and no full matrix execution is claimed",
+  "finalSourceFreezeRequired": true,
+  "requiredTopLevelCommands": [
+    "Parties complete mapped Local lanes",
+    "Conversations four-suite Local",
+    "Custody expanded Local",
+    "SDK current source version",
+    "Hexalith.EventStore.Contracts.Tests normal build",
+    "Hexalith.EventStore.Contracts.Tests owned consumer tests",
+    "Hexalith.EventStore.Client.Tests normal build",
+    "Hexalith.EventStore.Client.Tests owned consumer tests",
+    "Hexalith.EventStore.Server.Tests normal build",
+    "Hexalith.EventStore.Server.Tests owned consumer tests",
+    "Hexalith.EventStore.PayloadProtection.Tests normal build",
+    "Hexalith.EventStore.PayloadProtection.Tests owned consumer tests",
+    "Host LocalScaffold",
+    "Host normal Debug diagnostic build"
+  ],
+  "expectedTopLevelCommandCount": 14,
+  "requiredNestedEvidence": {
+    "parties": {
+      "buildLogs": 12,
+      "xmlFiles": 12
+    },
+    "conversations": {
+      "buildLogs": 4,
+      "fullSuiteXmlFiles": 4
+    },
+    "custody": {
+      "buildLogs": 1,
+      "xmlFiles": 1
+    },
+    "sdk": {
+      "buildLogs": 4,
+      "xmlFiles": 4
+    },
+    "hostScaffold": {
+      "buildLogs": 0
+    },
+    "hostNormalDiagnostics": {
+      "buildLogs": 1
+    }
+  },
+  "limits": "Final frozen runner maps may add lanes. Final actual shape must match those maps and every required class must actually execute. Before/after source, all frozen copies/capture hashes, protected state and XML/log audit are mandatory. Historical passes never mask source drift or a failed fresh build; overlapping lanes are not unique coverage.",
+  "hostOwnerGate": "Required original LocalScaffold command is retained; its warning/error summary comes from separately recorded normal Debug diagnostic build in a fresh artifact directory.",
+  "rootRunnerSha256": "b57c41bbc63d896c766070d82c9b7c3ca713353b33ec2f89a702bf744f2b0c15",
+  "requiredClassPolicy": "Recompute from complete final ordered capture freeze; retain all prior 44 actual classes and include every new public owning test class in its correct Local project map. Mapping and complete command shape are audited separately from aggregate exit codes.",
+  "expectedCleanBuildLogCount": 22,
+  "expectedXmlFileCount": 21,
+  "reviewedOwnerClassesBeforeRevision7": 44
+}

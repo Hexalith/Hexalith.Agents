@@ -1,0 +1,9 @@
+{
+  "status": "false/rejected per root concrete type correction; both captured files restored unchanged",
+  "sourceUnchanged": true,
+  "testRestoredToExactUnitBeforeBytes": true,
+  "compileAttempt": "Unable to assign IReadOnlyDictionary to concrete CommandEnvelope.Extensions Dictionary; no reachable supplied Count/MoveNext stall. No test seam or public API added.",
+  "finalSourceChange": false,
+  "noTestSeamOrPublicApiAdded": true,
+  "currentSpecSha256": "60eb78110670ee4c2bebe3874e8e0b0116141db6af17566cd3309ea3ae6634f3"
+}

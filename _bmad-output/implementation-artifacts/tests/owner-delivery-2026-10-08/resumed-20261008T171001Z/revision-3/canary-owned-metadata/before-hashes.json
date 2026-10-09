@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T00:07:44.113750+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs",
+      "existed": true,
+      "sha256": "3badb4b680523c46552ca550bcfc9409e3f141771f27c34994eea4eea5ea62ed",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/canary-owned-metadata/before/platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs",
+      "existed": true,
+      "sha256": "fb0b34291f9edfacfa531af79a59c3758acb763799caa417d1582f3dfe52cba3",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/canary-owned-metadata/before/platform/tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs"
+    }
+  ]
+}

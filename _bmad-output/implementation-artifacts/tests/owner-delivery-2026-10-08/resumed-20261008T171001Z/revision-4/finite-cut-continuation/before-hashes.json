@@ -1,0 +1,48 @@
+{
+  "capturedUtc": "2026-10-09T00:58:38.343491+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs",
+      "existed": true,
+      "sha256": "54a5a45073dd8f8f6439213502de8a77f7f15e6fcd846b95ca4427dcaf2b5adb",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/before/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationProgress.cs",
+      "existed": true,
+      "sha256": "06176e49fb6e4eb9f8d63fe38cde18e83b9c2c76e3306529140999665c58ff7a",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/before/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationProgress.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationAdvance.cs",
+      "existed": true,
+      "sha256": "da6bd287f63753112d347e0fd8e7ecabaef14c6ea50d4dcf8c1a8b71e090c921",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/before/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationAdvance.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs",
+      "existed": true,
+      "sha256": "19085793a61ad28ba6043986005d40e1d2e9ba7fa039a360bdebf3f4187d4a44",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/before/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs",
+      "existed": true,
+      "sha256": "c689b0ad399483c78a9b0dc1054bf649a6a09ae10777ab396854251d9b78afec",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/before/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs",
+      "existed": true,
+      "sha256": "2cb37a7f6d86e1f05a12aaa472fae4c686272f166ed01e6679ac262fcc0e4b1b",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/before/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs"
+    }
+  ]
+}

@@ -1,0 +1,934 @@
+--- prior/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs
++++ current/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs
+@@ -50,7 +50,7 @@
+     }
+ 
+     /// <summary>Bounds both synchronous provider invocation and its noncooperative returned task.</summary>
+-    public async Task<T> ReadAsync<T>(Func<CancellationToken, Task<T>> read, Action<Task<T>>? operationStarted = null)
++    public async Task<T> ReadAsync<T>(Func<CancellationToken, Task<T>> read, Action<Task<T>>? operationStarted = null, Action<T>? abandonedResultCleanup = null)
+     {
+         ThrowIfCancellationRequested();
+         CancellationToken token = _providerSource.Token;
+@@ -67,6 +67,20 @@
+             T result = await pending.WaitAsync(_linkedSource.Token).ConfigureAwait(false);
+             ThrowIfCancellationRequested();
+             return result;
++        }
++        catch
++        {
++            if (abandonedResultCleanup is not null)
++            {
++                // Ownership transfers only when the provider terminates. One continuation also covers
++                // completion followed by a failed terminal deadline check; no result was returned.
++                _ = pending.ContinueWith(task =>
++                {
++                    try { if (task.IsCompletedSuccessfully) { abandonedResultCleanup(task.Result); } }
++                    catch (Exception) { /* Cleanup cannot resume or release abandoned evidence. */ }
++                }, CancellationToken.None, TaskContinuationOptions.None, TaskScheduler.Default);
++            }
++            throw;
+         }
+         finally
+         {
+--- prior/eventstore/src/Hexalith.EventStore.Contracts/Security/IIdentityHistoryCustody.cs
++++ current/eventstore/src/Hexalith.EventStore.Contracts/Security/IIdentityHistoryCustody.cs
+@@ -22,6 +22,10 @@
+         byte[] payload, string format, IdentityHistoryCustodyEvidence evidence, CancellationToken cancellationToken = default);
+ 
+     /// <summary>Unprotects retained attribution only under current non-rollback lifecycle authority.</summary>
++    /// <remarks>The provider may use the supplied input until its task terminates. A completed result transfers
++    /// exclusive ownership of its detached PayloadBytes to the caller: it must not alias the input, stored ciphertext,
++    /// or provider-shared memory. The caller clears transient readable bytes after use or abandoned completion;
++    /// a caller forwarding the result transfers that responsibility to its consumer.</remarks>
+     Task<PayloadProtectionResult> UnprotectEventAsync(AggregateIdentity identity, string eventType,
+         byte[] payload, string format, CancellationToken cancellationToken = default);
+ 
+--- prior/eventstore/src/Hexalith.EventStore.PayloadProtection/InteractionOccurrenceProtector.cs
++++ current/eventstore/src/Hexalith.EventStore.PayloadProtection/InteractionOccurrenceProtector.cs
+@@ -85,7 +85,9 @@
+             { throw new PayloadProtectionFormatException(); }
+             AadCodec.ValidateContext(Context(identity), identity.Kind);
+             owned = payload.ToArray();
+-            manifest = ProtectedPathManifestCodec.Create(paths, snapshot: identity.Kind == PayloadProtectionPayloadKind.Snapshot, cancellationToken: token);
++            manifest = await AwaitAsync(() => Task.FromResult(ProtectedPathManifestCodec.Create(paths,
++                snapshot: identity.Kind == PayloadProtectionPayloadKind.Snapshot, cancellationToken: token)), start, token,
++                static value => { CryptographicOperations.ZeroMemory(value.Encoded); CryptographicOperations.ZeroMemory(value.Commitment); }).ConfigureAwait(false);
+             using var digest = await AwaitAsync(() => keys.ResolveDigestAsync(identity, digestVersion, CancellationToken.None), start, token,
+                 static key => key?.Dispose()).ConfigureAwait(false);
+             if (!ValidKey(digest, identity, "tenant-digest", digestVersion)) { return null; }
+@@ -192,7 +194,7 @@
+         try
+         {
+             var result = await pending.WaitAsync(TimeSpan.FromSeconds(30) - clock.GetElapsedTime(start), clock, token).ConfigureAwait(false);
+-            try { CheckBudget(start, token); return result; } catch { abandoned?.Invoke(result); throw; }
++            CheckBudget(start, token); return result;
+         }
+         catch (Exception)
+         {
+--- prior/eventstore/src/Hexalith.EventStore.Server/Actors/AggregateActor.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Actors/AggregateActor.cs
+@@ -1392,6 +1392,7 @@
+                         if (serviceProvider?.GetService(typeof(Hexalith.EventStore.Client.Streams.ISourcePublicationWriterRegistration))
+                             is Hexalith.EventStore.Client.Streams.ISourcePublicationWriterRegistration publicationRegistration) {
+                             await publicationRegistration.RegisterBeforeWriteAsync(command.AggregateIdentity, cancellationToken).ConfigureAwait(false);
++                            await EnsureExecutionFenceAsync(executionContext, command, cancellationToken).ConfigureAwait(false);
+                         }
+                         persistResult = await eventPersister
+                             .PersistEventsAsync(
+--- prior/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs
+@@ -47,6 +47,7 @@
+                 break;
+             case GovernanceGuardOperation.ActivateSuccessor:
+                 if (state.Repair is null || !Text(command.EpochId) || command.EpochId == state.EpochId
++                    || state.RepairHistory.Any(retired => retired.EpochId == command.EpochId)
+                     || !state.Repair.Cohort.All(value => state.Repair.DrainedOriginals.Contains(Original(value)))
+                     || !Text(evidence.LegacyRevocationReceipt) || !Text(evidence.WriterEnforcementReceipt)) { return Denied(); }
+                 state = state with { EpochId = command.EpochId, LegacyRevocationReceipt = evidence.LegacyRevocationReceipt,
+--- prior/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs
+@@ -141,6 +141,7 @@
+     {
+         if (state.Revision <= 0 || state.Records is null || state.Records.Count > 10000) { throw new InvalidOperationException("Malformed candidate registry."); }
+         var records = new List<InteractionOccurrenceRecord>();
++        long sealedBytes = 0;
+         foreach (var record in state.Records)
+         {
+             if (records.Count >= 10000 || record is null) { throw new InvalidOperationException("Malformed candidate registry."); }
+@@ -152,6 +153,14 @@
+                 || record.WriterState is InteractionOccurrenceWriterState.Active or InteractionOccurrenceWriterState.Aborted && string.IsNullOrWhiteSpace(record.WriterProofId)
+                 || record.WriterState is InteractionOccurrenceWriterState.Reserved or InteractionOccurrenceWriterState.SealedPending && record.WriterProofId is not null)
+             { throw new InvalidOperationException("Malformed candidate occurrence."); }
++            if (record.Sealed is { } carrier)
++            {
++                // The existing admitted pending carrier also bounds aggregate transient ciphertext copies.
++                // Check before taking another detached copy, including restored states lacking an anchor.
++                sealedBytes = checked(sealedBytes + (carrier.PayloadBytes?.LongLength ?? 0));
++                if (sealedBytes > RecoverableAnchoredState.MaximumPendingBytes)
++                { throw new InvalidOperationException("Candidate registry aggregate ciphertext bound exceeded."); }
++            }
+             records.Add(record with { Sealed = record.Sealed is null ? null : CaptureSealed(record.Sealed) });
+         }
+         if (records.Select(r => r.KeyReference).Distinct(StringComparer.Ordinal).Count() != records.Count
+--- prior/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs
+@@ -125,32 +125,37 @@
+                         }
+                     }
+                     PayloadProtectionResult readable = await deadline.ReadAsync(token => custody.UnprotectEventAsync(request.Identity, item.EventTypeName,
+-                        sealedPayload.ToArray(), item.SerializationFormat, token)).ConfigureAwait(false);
+-                    deadline.ThrowIfCancellationRequested();
+-                    readableBytes += readable.PayloadBytes.Length;
+-                    if (readable.Metadata.State != PayloadProtectionState.Unprotected
+-                        || readable.SerializationFormat != "json"
+-                        || readableBytes > RetainedIdentityHistoryLimits.MaxPayloadBytes
+-                        || JsonSerializer.Deserialize(readable.PayloadBytes, type, _jsonOptions) is not IIdentityHistoryEvent value
+-                        || value.Custody is not { SourceExpiryEnforced: true, RestoreSafe: true, DerivedCopiesCovered: true, LifecycleRevision: > 0 } evidence
+-                        || string.IsNullOrWhiteSpace(evidence.PolicyId) || string.IsNullOrWhiteSpace(evidence.EvidenceId)
+-                        || evidence.Purpose != request.Purpose || evidence.ExpiresAt <= clock.GetUtcNow())
+-                    {
+-                        return new(null, "history-custody-unavailable-or-expired");
+-                    }
+-
+-                    bool allowed = await deadline.ReadAsync(token => custody.CanReadAsync(request.Identity, evidence, token)).ConfigureAwait(false);
+-                    deadline.ThrowIfCancellationRequested();
+-                    if (!allowed)
+-                    {
+-                        return new(null, "history-custody-unavailable-or-expired");
+-                    }
+-
+-                    retainedEvidence.Add(evidence);
+-                    byte[] closedPayload = JsonSerializer.SerializeToUtf8Bytes(value, type, _jsonOptions);
+-                    events.Add(new StreamReadEvent(item.SequenceNumber, item.EventTypeName, closedPayload,
+-                        readable.SerializationFormat, item.MetadataVersion, string.Empty, null, null, item.Timestamp, null,
+-                        EventStorePayloadProtectionMetadata.Unprotected()));
++                        sealedPayload.ToArray(), item.SerializationFormat, token),
++                        abandonedResultCleanup: static value => CryptographicOperations.ZeroMemory(value.PayloadBytes)).ConfigureAwait(false);
++                    try
++                    {
++                        deadline.ThrowIfCancellationRequested();
++                        readableBytes += readable.PayloadBytes.Length;
++                        if (readable.Metadata.State != PayloadProtectionState.Unprotected
++                            || readable.SerializationFormat != "json"
++                            || readableBytes > RetainedIdentityHistoryLimits.MaxPayloadBytes
++                            || JsonSerializer.Deserialize(readable.PayloadBytes, type, _jsonOptions) is not IIdentityHistoryEvent value
++                            || value.Custody is not { SourceExpiryEnforced: true, RestoreSafe: true, DerivedCopiesCovered: true, LifecycleRevision: > 0 } evidence
++                            || string.IsNullOrWhiteSpace(evidence.PolicyId) || string.IsNullOrWhiteSpace(evidence.EvidenceId)
++                            || evidence.Purpose != request.Purpose || evidence.ExpiresAt <= clock.GetUtcNow())
++                        {
++                            return new(null, "history-custody-unavailable-or-expired");
++                        }
++    
++                        bool allowed = await deadline.ReadAsync(token => custody.CanReadAsync(request.Identity, evidence, token)).ConfigureAwait(false);
++                        deadline.ThrowIfCancellationRequested();
++                        if (!allowed)
++                        {
++                            return new(null, "history-custody-unavailable-or-expired");
++                        }
++    
++                        retainedEvidence.Add(evidence);
++                        byte[] closedPayload = JsonSerializer.SerializeToUtf8Bytes(value, type, _jsonOptions);
++                        events.Add(new StreamReadEvent(item.SequenceNumber, item.EventTypeName, closedPayload,
++                            readable.SerializationFormat, item.MetadataVersion, string.Empty, null, null, item.Timestamp, null,
++                            EventStorePayloadProtectionMetadata.Unprotected()));
++                    }
++                    finally { CryptographicOperations.ZeroMemory(readable.PayloadBytes); }
+                 }
+             }
+ 
+--- prior/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs
+@@ -125,4 +125,73 @@
+         }
+         finally { release.Set(); }
+     }
++    /// <summary>Only pure local path capture runs after abandonment; no late key, reservation, encryption or writer mutation occurs.</summary>
++    [Theory]
++    [InlineData("enumerator", false)]
++    [InlineData("enumerator", true)]
++    [InlineData("move", false)]
++    [InlineData("move", true)]
++    [InlineData("current", false)]
++    [InlineData("current", true)]
++    public async Task SuspendedPathTraversalIsBounded(string stage, bool deadlineExpires)
++    {
++        var f = new InteractionOccurrenceProtectorFixture();
++        var (clock, advance) = CaptureClock();
++        var adapter = new InteractionOccurrenceProtector(f.Registry, f.Keys, clock);
++        using var release = new ManualResetEventSlim(); using var caller = new CancellationTokenSource();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        void Suspend() { entered.TrySetResult(); release.Wait(); finished.TrySetResult(); }
++        var paths = Substitute.For<IReadOnlyCollection<string>>();
++        // The normative codec consumes IEnumerable; Count is deliberately not consulted.
++        paths.Count.Returns(1);
++        var iterator = Substitute.For<IEnumerator<string>>(); int moves = 0;
++        paths.GetEnumerator().Returns(_ => { if (stage == "enumerator") { Suspend(); } return iterator; });
++        iterator.MoveNext().Returns(_ => { if (++moves > 1) { return false; } if (stage == "move") { Suspend(); } return true; });
++        iterator.Current.Returns(_ => { if (stage == "current") { Suspend(); } return "/ProtectedContent"; });
++        byte[] source = Payload(); byte[] original = source.ToArray();
++        var operation = Task.Run(() => adapter.ProtectEventAsync(source, paths, f.Identity, "digest-v1", 1,
++            InteractionOccurrenceProtectorFixture.Reference, caller.Token), TestContext.Current.CancellationToken);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++        try
++        {
++            if (deadlineExpires)
++            {
++                advance(TimeSpan.FromSeconds(30));
++                await Should.ThrowAsync<TimeoutException>(() => operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken));
++            }
++            else
++            {
++                caller.Cancel();
++                var error = await Should.ThrowAsync<OperationCanceledException>(() => operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken));
++                error.CancellationToken.ShouldBe(caller.Token);
++            }
++            operation.IsCompleted.ShouldBeTrue();
++            release.Set(); await finished.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++            source.ShouldBe(original); f.Record.ShouldBeNull(); f.Registry.ReceivedCalls().ShouldBeEmpty();
++            f.OwnedBuffers.ShouldBeEmpty(); f.Keys.Leases.ShouldBe(0); f.Keys.WriteRoots.ShouldBe(0);
++            _ = paths.DidNotReceive().Count;
++        }
++        finally { release.Set(); }
++    }
++
++    private static (TimeProvider Clock, Action<TimeSpan> Advance) CaptureClock()
++    {
++        var clock = Substitute.For<TimeProvider>(); long ticks = 0;
++        var observations = new System.Collections.Concurrent.ConcurrentDictionary<int, long>();
++        var timers = new System.Collections.Concurrent.ConcurrentDictionary<int, (long Due, Action Fire)>(); int next = 0;
++        clock.TimestampFrequency.Returns(TimeSpan.TicksPerSecond);
++        clock.GetTimestamp().Returns(_ => { long current = Interlocked.Read(ref ticks); observations[Environment.CurrentManagedThreadId] = current; return current; });
++        clock.CreateTimer(Arg.Any<TimerCallback>(), Arg.Any<object?>(), Arg.Any<TimeSpan>(), Arg.Any<TimeSpan>()).Returns(call =>
++        {
++            int id = Interlocked.Increment(ref next); var timer = Substitute.For<ITimer>();
++            timers[id] = (observations.GetValueOrDefault(Environment.CurrentManagedThreadId) + call.ArgAt<TimeSpan>(2).Ticks,
++                () => call.Arg<TimerCallback>()(call.ArgAt<object?>(1)));
++            timer.When(value => value.Dispose()).Do(callInfo => timers.TryRemove(id, out _));
++            if (timers[id].Due <= Interlocked.Read(ref ticks)) { timers[id].Fire(); }
++            return timer;
++        });
++        return (clock, elapsed => { long current = Interlocked.Add(ref ticks, elapsed.Ticks); foreach (var timer in timers.Values) { if (timer.Due <= current) { timer.Fire(); } } });
++    }
++
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs
+@@ -121,4 +121,79 @@
+         authorizedRosters.Count.ShouldBe(2); authorizedRosters[0].Sources.ShouldBeEmpty();
+         System.Text.Json.JsonSerializer.Serialize(authorizedRosters[1]).ShouldBe(System.Text.Json.JsonSerializer.Serialize(retained));
+     }
++    /// <summary>Registration may complete durably while the exact execution capability expires/withdraws; protection and event staging must not begin.</summary>
++    [Theory]
++    [InlineData("withdraw")]
++    [InlineData("expire")]
++    [InlineData("current")]
++    public async Task RegistrationAwaitRechecksExecutionBeforeProtection(string change)
++    {
++        var clock = new FakeTimeProvider(DateTimeOffset.Parse("2026-10-09T00:00:00Z", System.Globalization.CultureInfo.InvariantCulture));
++        DateTimeOffset validUntil = clock.GetUtcNow().AddSeconds(10); bool current = true;
++        var envelope = CreateTestEnvelope();
++        var capabilityOwner = Substitute.For<IIdempotencyAdmissionActor>();
++        capabilityOwner.ValidateAuthorityAsync(Arg.Any<IdempotencyAdmissionAuthorityRequest>()).Returns(call =>
++        {
++            var request = call.Arg<IdempotencyAdmissionAuthorityRequest>();
++            request.FencingToken.ShouldBe(7); request.ExecutionMessageId.ShouldBe(envelope.MessageId);
++            request.ExecutionCorrelationId.ShouldBe(envelope.CorrelationId);
++            return current && clock.GetUtcNow() < validUntil ? Task.CompletedTask
++                : Task.FromException(new InvalidOperationException("Current exact execution authority withdrawn or expired"));
++        });
++        var proxies = Substitute.For<IActorProxyFactory>();
++        proxies.CreateActorProxy<IIdempotencyAdmissionActor>(Arg.Any<ActorId>(), IdempotencyAdmissionActor.ActorTypeName).Returns(capabilityOwner);
++        var protector = new Hexalith.EventStore.Server.Commands.IdempotencyExecutionContextProtector(
++            new Hexalith.EventStore.Server.Commands.StaticIdempotencyDigestKeyProvider("v1",
++                new Dictionary<string, byte[]> { ["v1"] = "0123456789abcdef0123456789abcdef"u8.ToArray() }, []), proxies);
++        var execution = await protector.ProtectAsync("test-tenant:v1:retained-key-digest", 7, "v1",
++            new Hexalith.EventStore.Server.Pipeline.Commands.SubmitCommand(envelope.MessageId, envelope.TenantId, envelope.Domain,
++                envelope.AggregateId, envelope.CommandType, envelope.Payload, envelope.CorrelationId, envelope.UserId), TestContext.Current.CancellationToken);
++        var identity = envelope.AggregateIdentity;
++        var scope = new SourcePublicationScope(identity.TenantId, identity.Domain, "deletion", "installation-1");
++        var namespaceBackend = new InMemoryStateManager(); var namespacePermission = Substitute.For<ISourcePublicationOperationAuthority>();
++        namespacePermission.ReadNamespaceAsync(scope).Returns(true); namespacePermission.InstallNamespaceAsync(Arg.Any<SourcePublicationNamespaceState>()).Returns(true);
++        namespacePermission.RegisterSourceAsync(scope, 1, identity).Returns(true);
++        var namespaceActor = new SourcePublicationNamespaceActor(ActorHost.CreateForTest<SourcePublicationNamespaceActor>(new ActorTestOptions { ActorId = new(scope.ActorId) }), namespacePermission);
++        ActorStateManagerTestHelper.SetStateManager(namespaceActor, namespaceBackend);
++        (await namespaceActor.InstallAsync(new(scope, 1, "installed", "coverage", "writers", []))).ShouldBeTrue();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var registration = Substitute.For<ISourcePublicationWriterRegistration>();
++        registration.RegisterBeforeWriteAsync(identity, Arg.Any<CancellationToken>()).Returns(async _ =>
++        {
++            (await namespaceActor.RegisterAsync(scope, 1, identity)).ShouldBeTrue(); entered.TrySetResult(); await release.Task;
++        });
++        var backend = new InMemoryStateManager(); var protection = Substitute.For<IEventPayloadProtectionService>();
++        protection.ProtectEventPayloadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<Hexalith.EventStore.Contracts.Events.IEventPayload>(), Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
++            .Returns(call => new PayloadProtectionResult(call.Arg<byte[]>().ToArray(), call.ArgAt<string>(4)));
++        var context = CreateActor(stateManager: backend);
++        context.Invoker.InvokeAsync(Arg.Any<Hexalith.EventStore.Contracts.Commands.CommandEnvelope>(), Arg.Any<object?>(), Arg.Any<CancellationToken>()).Returns(DomainResult.Success([new TestEvent()]));
++        using var services = new ServiceCollection().AddSingleton(registration).BuildServiceProvider();
++        var actor = new AggregateActor(ActorHost.CreateForTest<AggregateActor>(new ActorTestOptions { ActorId = new(identity.ActorId) }),
++            context.Logger, context.Invoker, context.SnapshotManager, protection, context.StatusStore, context.EventPublisher,
++            Options.Create(new EventDrainOptions()), Options.Create(new BackpressureOptions()), context.DeadLetterPublisher,
++            serviceProvider: services, commandAggregateTypeResolver: context.AggregateTypeResolver, executionContextProtector: protector);
++        ActorStateManagerTestHelper.SetStateManager(actor, backend);
++        var pending = actor.ProcessFencedCommandAsync(new(envelope, execution));
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++        byte[] namespaceOriginal = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(namespaceBackend.CommittedState.Single().Value);
++        protection.ReceivedCalls().ShouldBeEmpty(); backend.CommittedState.Values.OfType<EventEnvelope>().ShouldBeEmpty();
++        if (change == "withdraw") { current = false; }
++        if (change == "expire") { clock.Advance(TimeSpan.FromSeconds(11)); }
++        release.TrySetResult();
++        try
++        {
++            var result = await pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++            result.Accepted.ShouldBe(change == "current");
++        }
++        catch (InvalidOperationException) when (change != "current") { }
++        System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(namespaceBackend.CommittedState.Single().Value).ShouldBe(namespaceOriginal);
++        if (change == "current") { backend.CommittedState.Values.OfType<EventEnvelope>().Count().ShouldBe(1); }
++        else
++        {
++            protection.ReceivedCalls().ShouldBeEmpty();
++            backend.CommittedState.Values.OfType<EventEnvelope>().ShouldBeEmpty();
++        }
++    }
++
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs
+@@ -320,4 +320,54 @@
+         (await restarted.ExecuteAsync(appendA, [mutationA], TestContext.Current.CancellationToken)).ShouldBe(acceptedA);
+         f.State.RepairHistory.Single().DrainedOriginals.ShouldBe(new[] { identityA, identityB });
+     }
++    /// <summary>Two exact finite repairs cannot reactivate a retired epoch after serialized restart; only a fresh successor restores writes.</summary>
++    [Fact]
++    public async Task RetiredEpochCannotBeReactivatedByASecondRepair()
++    {
++        var f = new GovernanceGuardFixture();
++        var source = new AggregateIdentity("tenant-a", "directory", "directory-a");
++        async Task<(GovernanceGuardTransition Original, GovernanceProtocolReceipt Receipt, GuardedStateMutation Mutation)> RepairAsync(string originalId)
++        {
++            var cohort = new DirectoryRepairCohortItem(source, originalId, DirectoryWriteKind.Permit, "conversation-a", "permit-a", "effect-a", 1, "Authorized");
++            var install = f.Command(GovernanceGuardOperation.InstallRepairFence);
++            install = install with { Repair = new("tenant-a", install.OperationId, f.State.EpochId, install.ExpectedGuardRevision,
++                "checkpoint-" + originalId, "repair-revocation", [cohort]) };
++            (await f.Apply(install)).Status.ShouldBe("Committed");
++            var original = f.Command(GovernanceGuardOperation.AppendWrite, write: f.Facts(DirectoryWriteKind.Permit), reference: originalId)
++                with { BridgeOriginal = new(source, originalId) };
++            var mutation = new GuardedStateMutation("source-" + originalId, 0, GuardedTransactionFixture.Hash([]), "sealed-original"u8.ToArray());
++            var receipt = await f.Apply(original, [mutation]); receipt.Status.ShouldBe("Accepted");
++            (await f.Apply(f.Command(GovernanceGuardOperation.RecordBridgeDrain, reference: originalId) with { BridgeOriginal = new(source, originalId) })).Status.ShouldBe("Committed");
++            return (original, receipt, mutation);
++        }
++        var first = await RepairAsync("original-a");
++        (await f.Apply(f.Command(GovernanceGuardOperation.ActivateSuccessor) with { EpochId = "epoch-b" })).Status.ShouldBe("Committed");
++        await RepairAsync("original-b");
++        // Restore every independently anchored technical cell exactly, including original result and repair cohort.
++        foreach (var pair in f.Backend.Stored.ToArray())
++        { f.Backend.Stored[pair.Key] = JsonSerializer.SerializeToUtf8Bytes(JsonSerializer.Deserialize<JsonElement>(pair.Value)); }
++        var restarted = new GovernanceScopeGuardOwner(f.Backend.Owner, TimeProvider.System, f.Authority);
++        string retained = JsonSerializer.Serialize(f.State);
++        var reuse = f.Command(GovernanceGuardOperation.ActivateSuccessor) with { EpochId = "epoch-a" };
++        (await restarted.ExecuteAsync(reuse, [], TestContext.Current.CancellationToken))!.Status.ShouldBe("Blocked");
++        JsonSerializer.Serialize(f.State).ShouldBe(retained);
++        var oldWrite = f.Command(GovernanceGuardOperation.AppendWrite, write: f.Facts(DirectoryWriteKind.Permit) with { EpochId = "epoch-a" }) with { EpochId = "epoch-a" };
++        (await restarted.ExecuteAsync(oldWrite, [first.Mutation with { CellId = "old-a" }], TestContext.Current.CancellationToken))!.Status.ShouldBe("Blocked");
++        f.Backend.Stored.ContainsKey(f.Backend.Key("old-a")).ShouldBeFalse();
++        (await restarted.ExecuteAsync(f.Command(GovernanceGuardOperation.ActivateSuccessor) with { EpochId = "epoch-c" }, [], TestContext.Current.CancellationToken))!.Status.ShouldBe("Committed");
++        f.State.EpochId.ShouldBe("epoch-c"); f.State.Repair.ShouldBeNull();
++        f.State.RepairHistory.Select(value => value.EpochId).ShouldBe(new[] { "epoch-a", "epoch-b" });
++        f.State.RepairHistory.ShouldAllBe(value => value.DrainedOriginals.Count == value.Cohort.Count);
++        foreach (string retired in new[] { "epoch-a", "epoch-b" })
++        {
++            var denied = f.Command(GovernanceGuardOperation.AppendWrite, write: f.Facts(DirectoryWriteKind.Permit) with { EpochId = retired }) with { EpochId = retired };
++            (await restarted.ExecuteAsync(denied, [first.Mutation with { CellId = "late-" + retired }], TestContext.Current.CancellationToken))!.Status.ShouldBe("Blocked");
++            f.Backend.Stored.ContainsKey(f.Backend.Key("late-" + retired)).ShouldBeFalse();
++        }
++        (await restarted.ExecuteAsync(f.Command(GovernanceGuardOperation.AppendWrite, write: f.Facts(DirectoryWriteKind.Permit)),
++            [first.Mutation with { CellId = "fresh-c" }], TestContext.Current.CancellationToken))!.Status.ShouldBe("Accepted");
++        f.DenyEffects = true;
++        (await restarted.ExecuteAsync(first.Original, [first.Mutation], TestContext.Current.CancellationToken)).ShouldBe(first.Receipt);
++    }
++
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs
+@@ -180,4 +180,60 @@
+         JsonSerializer.Serialize(original).ShouldBe(JsonSerializer.Serialize(sealedOriginal));
+         f.Backend.CommittedState.Single().Value.ShouldBeOfType<InteractionOccurrenceRegistrySnapshot>().Records.Single().Request.ShouldBe(request);
+     }
++    /// <summary>Aggregate restored carriers must be refused before independent state validation or mutation, without changing original arrays.</summary>
++    [Fact]
++    public async Task RestoredCumulativeCiphertextBoundPrecedesIndependentStateCalls()
++    {
++        var f = new InteractionOccurrenceFixture();
++        var records = Enumerable.Range(1, 3).Select(n =>
++        {
++            string reference = "01ARZ3NDEKTSV4RRF" + n.ToString("D9", System.Globalization.CultureInfo.InvariantCulture);
++            var request = InteractionOccurrenceFixture.Request((ulong)n, reference);
++            return new InteractionOccurrenceRecord(request, reference, n, InteractionOccurrenceWriterState.SealedPending,
++                new(reference, Enumerable.Repeat((byte)n, 12 * 1024 * 1024).ToArray(), "json+pdenc-v2", 1), null);
++        }).ToArray();
++        var state = new InteractionOccurrenceRegistrySnapshot("tenant-a", "epoch-1", 3, records);
++        await f.Backend.SetStateAsync("candidate-interaction-occurrences-v1", state, TestContext.Current.CancellationToken);
++        await f.Backend.SaveStateAsync(TestContext.Current.CancellationToken);
++        byte[][] hashes = records.Select(r => System.Security.Cryptography.SHA256.HashData(r.Sealed!.PayloadBytes)).ToArray();
++        f.Authority.ClearReceivedCalls();
++
++        await Should.ThrowAsync<InvalidOperationException>(() => f.Actor.LookupAsync(records[0].Request.Identity));
++
++        await f.Authority.DidNotReceiveWithAnyArgs().ValidateStateAsync(default!, default!, default, default!, default);
++        await f.Authority.DidNotReceiveWithAnyArgs().AdmitTransitionAsync(default!, default);
++        await f.Authority.DidNotReceiveWithAnyArgs().RecordTransitionAsync(default!, default);
++        await f.Authority.DidNotReceiveWithAnyArgs().AuthorizeReservationAsync(default!, default);
++        f.Head.ShouldBe(0); f.Backend.CommittedState.Single().Value.ShouldBeSameAs(state);
++        for (int n = 0; n < records.Length; n++) { System.Security.Cryptography.SHA256.HashData(records[n].Sealed!.PayloadBytes).ShouldBe(hashes[n]); }
++    }
++
++    /// <summary>Several exact carriers within the existing aggregate budget retain detached ciphertext after serialized restart.</summary>
++    [Fact]
++    public async Task WithinBoundMultiCarrierRestartKeepsExactOriginals()
++    {
++        var f = new InteractionOccurrenceFixture();
++        for (int n = 1; n <= 3; n++)
++        {
++            string reference = "01ARZ3NDEKTSV4RRF" + n.ToString("D9", System.Globalization.CultureInfo.InvariantCulture);
++            var request = InteractionOccurrenceFixture.Request((ulong)n, reference);
++            await f.Actor.ReserveAsync(request);
++            await f.Actor.RetainSealedAsync(request.Identity, InteractionOccurrenceFixture.Sealed(reference));
++        }
++        var saved = f.Backend.CommittedState.Single(); byte[] exact = JsonSerializer.SerializeToUtf8Bytes(saved.Value);
++        var restored = new InMemoryStateManager();
++        await restored.SetStateAsync(saved.Key, JsonSerializer.Deserialize<InteractionOccurrenceRegistrySnapshot>(exact)!, TestContext.Current.CancellationToken);
++        await restored.SaveStateAsync(TestContext.Current.CancellationToken);
++        var restarted = InteractionOccurrenceFixture.Create(restored, f.Authority);
++        var original = JsonSerializer.Deserialize<InteractionOccurrenceRegistrySnapshot>(exact)!;
++        foreach (var record in original.Records)
++        {
++            var result = await restarted.LookupAsync(record.Request.Identity);
++            result.Status.ShouldBe(InteractionOccurrenceReservationStatus.Sealed);
++            result.Record!.Sealed!.PayloadBytes.ShouldBe(record.Sealed!.PayloadBytes);
++            result.Record.Sealed.PayloadBytes.ShouldNotBeSameAs(record.Sealed.PayloadBytes);
++        }
++        JsonSerializer.SerializeToUtf8Bytes(restored.CommittedState.Single().Value).ShouldBe(exact);
++    }
++
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs
+@@ -111,7 +111,7 @@
+         RetainedIdentityHistorySourceReader reader = Arrange();
+         _actor.ReadEventsRangeAsync(0, 2, 100).Returns([Stored(1, "Profile", "sealed"), Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "sealed-history")]);
+         _custody.UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+-            .Returns(new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence() with { ExpiresAt = _now })), "json"));
++            .Returns(_ => new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence() with { ExpiresAt = _now })), "json"));
+ 
+         RetainedIdentityHistoryReadResult result = await reader.ReadAsync(_principal, Request());
+ 
+@@ -138,7 +138,7 @@
+         RetainedIdentityHistorySourceReader reader = Arrange();
+         _actor.ReadEventsRangeAsync(0, 2, 100).Returns([Stored(1, "Profile", "sealed"), Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "sealed-history")]);
+         _custody.UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+-            .Returns(new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence() with { PolicyId = "" })), "json"));
++            .Returns(_ => new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence() with { PolicyId = "" })), "json"));
+         (await reader.ReadAsync(_principal, Request())).Stream.ShouldBeNull();
+     }
+ 
+@@ -149,7 +149,7 @@
+         RetainedIdentityHistorySourceReader reader = Arrange();
+         _actor.ReadEventsRangeAsync(0, 2, 100).Returns([Stored(1, "Profile", "sealed"), Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "sealed-history")]);
+         _custody.UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+-            .Returns(new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence() with { ExpiresAt = _now.AddSeconds(30) })), "json"));
++            .Returns(_ => new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence() with { ExpiresAt = _now.AddSeconds(30) })), "json"));
+         _custody.CanReadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<IdentityHistoryCustodyEvidence>(), Arg.Any<CancellationToken>())
+             .Returns(_ => Task.FromResult(true), _ => { _clock.GetUtcNow().Returns(_now.AddSeconds(31)); return Task.FromResult(true); });
+         (await reader.ReadAsync(_principal, Request())).Stream.ShouldBeNull();
+@@ -176,7 +176,7 @@
+         JsonNode payload = JsonSerializer.SerializeToNode(new HistoryCustodyProbeEvent(Evidence()), new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
+         (nested ? payload["custody"]! : payload)["profile"] = "private-profile-content";
+         _custody.UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+-            .Returns(new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(payload), "json"));
++            .Returns(_ => new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(payload), "json"));
+ 
+         RetainedIdentityHistoryReadResult result = await reader.ReadAsync(_principal, Request());
+         result.Stream.ShouldBeNull();
+@@ -478,7 +478,7 @@
+             _ => original,
+         };
+         _custody.UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+-            .Returns(new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(copied)), "json"));
++            .Returns(_ => new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(copied)), "json"));
+         _custody.CanReadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<IdentityHistoryCustodyEvidence>(), Arg.Any<CancellationToken>())
+             .Returns(call => fault == "unavailable" ? throw new IOException("synthetic lifecycle outage")
+                 : fault != "missing-receipt" && call.Arg<AggregateIdentity>() == _identity
+@@ -514,7 +514,7 @@
+         IdentityHistoryCustodyEvidence accepted = decoded;
+         _actor.ReadEventsRangeAsync(0, 2, 100).Returns(stored);
+         _custody.UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+-            .Returns(new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(decoded)), "json"));
++            .Returns(_ => new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(decoded)), "json"));
+         _custody.CanReadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<IdentityHistoryCustodyEvidence>(), Arg.Any<CancellationToken>())
+             .Returns(call => call.Arg<AggregateIdentity>() == _identity && call.Arg<IdentityHistoryCustodyEvidence>() == accepted);
+         (await reader.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken)).IsAuthoritative.ShouldBeTrue();
+@@ -533,6 +533,85 @@
+         await _custody.Received(1).CanReadAsync(_identity, decoded, Arg.Any<CancellationToken>());
+         JsonSerializer.SerializeToUtf8Bytes(restored).ShouldBe(backup);
+         JsonSerializer.Serialize(result).ShouldNotContain(accepted.EvidenceId);
++    }
++
++    /// <summary>Custody transfers one transient buffer; closed history survives clearing on every completed path.</summary>
++    [Theory]
++    [InlineData("success")]
++    [InlineData("parse")]
++    [InlineData("validation")]
++    public async Task OwnedReadableBufferIsClearedAfterCompletedUse(string outcome)
++    {
++        RetainedIdentityHistorySourceReader reader = Arrange();
++        ArrangeCompleteSource();
++        byte[] bytes = outcome == "parse" ? Encoding.UTF8.GetBytes("invalid-json")
++            : JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(outcome == "validation"
++                ? Evidence() with { RestoreSafe = false } : Evidence()));
++        byte[] exact = bytes.ToArray();
++        _custody.UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
++            .Returns(new PayloadProtectionResult(bytes, "json"));
++
++        RetainedIdentityHistoryReadResult result = await reader.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken);
++
++        bytes.ShouldBe(new byte[bytes.Length]);
++        if (outcome == "success")
++        {
++            result.IsAuthoritative.ShouldBeTrue();
++            result.Stream!.Events.Single().Payload.ShouldBe(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence()), new JsonSerializerOptions(JsonSerializerDefaults.Web)));
++            exact.ShouldNotBe(new byte[exact.Length]);
++        }
++        else
++        {
++            result.Stream.ShouldBeNull();
++        }
++    }
++
++    /// <summary>Abandonment does not touch a live provider's input and clears only its eventual transferred result.</summary>
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task AbandonedCustodyResultIsClearedAtProviderCompletion(bool deadlineExpires)
++    {
++        Arrange();
++        ArrangeCompleteSource();
++        var clock = new RetainedHistoryTimeProvider(_now);
++        using var cancellation = new CancellationTokenSource();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var completed = new TaskCompletionSource<PayloadProtectionResult>(TaskCreationOptions.RunContinuationsAsynchronously);
++        byte[] readable = JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence()));
++        byte[] exactReadable = readable.ToArray();
++        byte[]? providerInput = null;
++        _custody.UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
++            .Returns(call => { providerInput = call.Arg<byte[]>(); entered.SetResult(); return completed.Task; });
++        var reader = new RetainedIdentityHistorySourceReader(_actors, _admission, _custody, clock);
++        Task<RetainedIdentityHistoryReadResult> reading = reader.ReadAsync(_principal, Request(), cancellation.Token);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2));
++        try
++        {
++            if (deadlineExpires)
++            {
++                clock.Advance(TimeSpan.FromSeconds(30));
++                (await reading.WaitAsync(TimeSpan.FromSeconds(2))).FailureReason.ShouldBe("history-time-bound-exceeded");
++            }
++            else
++            {
++                cancellation.Cancel();
++                await Should.ThrowAsync<OperationCanceledException>(() => reading.WaitAsync(TimeSpan.FromSeconds(2)));
++            }
++            completed.Task.IsCompleted.ShouldBeFalse();
++            Encoding.UTF8.GetString(providerInput!).ShouldBe("sealed-history");
++            readable.ShouldBe(exactReadable);
++        }
++        finally { completed.TrySetResult(new PayloadProtectionResult(readable, "json")); }
++
++        await completed.Task;
++        DateTime until = DateTime.UtcNow.AddSeconds(2);
++        while (readable.Any(value => value != 0) && DateTime.UtcNow < until) { await Task.Yield(); }
++        readable.ShouldBe(new byte[readable.Length]);
++        Encoding.UTF8.GetString(providerInput!).ShouldBe("sealed-history");
++        await _custody.DidNotReceiveWithAnyArgs().CanReadAsync(default!, default!, default);
++        await _custody.Received(1).UnprotectEventAsync(_identity, typeof(HistoryCustodyProbeEvent).FullName!, Arg.Any<byte[]>(), "json", Arg.Any<CancellationToken>());
++        await _actor.Received(1).GetStreamMetadataAsync();
+     }
+ 
+     private void ArrangeCompleteSource()
+@@ -551,7 +630,7 @@
+         _actor.GetStreamMetadataAsync().Returns(new AggregateStreamMetadata(true, 2));
+         _custody.CanReadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<IdentityHistoryCustodyEvidence>(), Arg.Any<CancellationToken>()).Returns(true);
+         _custody.UnprotectEventAsync(Arg.Any<AggregateIdentity>(), Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+-            .Returns(new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence())), "json"));
++            .Returns(_ => new PayloadProtectionResult(JsonSerializer.SerializeToUtf8Bytes(new HistoryCustodyProbeEvent(Evidence())), "json"));
+         return new(_actors, _admission, _custody, _clock);
+     }
+ 
+--- prior/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs
++++ current/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs
+@@ -51,7 +51,12 @@
+         await SaveAsync(new(requestId, payload, DeletionCapabilitySigningState.Unknown)).ConfigureAwait(false);
+         if (!await authority.AuthorizeAsync(payload, requestId).ConfigureAwait(false))
+         { return await SaveAsync(new(requestId, payload, DeletionCapabilitySigningState.Denied)).ConfigureAwait(false); }
+-        if (await ResolveTrustAsync(payload).ConfigureAwait(false) is null) { return new(requestId, payload, DeletionCapabilitySigningState.Unavailable); }
++        // No backend call has begun: missing post-intent trust is a known negative original,
++        // not an uncertain signature. The independent journal admits this exact terminal outcome.
++        DeletionCapabilityPublishedTrust? admittedTrust;
++        try { admittedTrust = await ResolveTrustAsync(payload).ConfigureAwait(false); }
++        catch (Exception) { admittedTrust = null; }
++        if (admittedTrust is null) { return await SaveAsync(new(requestId, payload, DeletionCapabilitySigningState.Denied)).ConfigureAwait(false); }
+         try { return await RetainAsync(payload, requestId, await budget.ReadAsync(async () => CaptureProviderResult(await provider.SignAsync(payload, requestId).ConfigureAwait(false))).ConfigureAwait(false), budget).ConfigureAwait(false); }
+         catch (Exception) { return new(requestId, payload, DeletionCapabilitySigningState.Unknown); }
+     }
+--- prior/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningState.cs
++++ current/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningState.cs
+@@ -7,7 +7,7 @@
+     Signed,
+     /// <summary>A durable request exists, but no exact signer result is known.</summary>
+     Unknown,
+-    /// <summary>Recorded current signing authorization denied before provider invocation.</summary>
++    /// <summary>Independently retained known noninvoked original: current signing authorization or post-intent trust denied.</summary>
+     Denied,
+     /// <summary>Required authority/backend is unavailable.</summary>
+     Unavailable,
+--- prior/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs
++++ current/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs
+@@ -26,7 +26,8 @@
+         try
+         {
+             token.ThrowIfCancellationRequested(); ArgumentNullException.ThrowIfNull(caller); ArgumentNullException.ThrowIfNull(expected);
+-            if (grants is null || caller.Identities.Count(i => i.IsAuthenticated) != 1 || profiles.GetCurrent() is not { } profile || !profile.IsValid(clock.GetUtcNow())) { return null; }
++            if (grants is null || caller.Identities.Count(i => i.IsAuthenticated) != 1
++                || await AwaitAsync(() => Task.FromResult(profiles.GetCurrent()), start, token).ConfigureAwait(false) is not { } profile || !profile.IsValid(clock.GetUtcNow())) { return null; }
+             ClaimsIdentity machine = caller.Identities.Single(i => i.IsAuthenticated);
+             string? issuer = One(machine, "iss"), subject = One(machine, "sub"), client = One(machine, "azp"), audience = One(machine, "aud");
+             if (issuer is null || subject is null || client is null || audience is null) { return null; }
+@@ -52,8 +53,10 @@
+             try { if (!CryptographicOperations.FixedTimeEquals(tag, currentTag)) { return null; } } finally { CryptographicOperations.ZeroMemory(currentTag); }
+             var currentGrant = await AwaitAsync(() => grants.ResolveCurrentAsync(issuer, subject, client, expected, CancellationToken.None), start, token).ConfigureAwait(false);
+             if (currentGrant != grant || !ValidGrant(currentGrant, issuer, subject, client, audience, expected, clock.GetUtcNow())
+-                || profiles.GetCurrent() != profile || !profile.IsValid(clock.GetUtcNow()) || !ValidTime(credential, profile, clock.GetUtcNow())) { return null; }
+-            token.ThrowIfCancellationRequested(); return credential with { Tag = Convert.ToHexStringLower(tag) };
++                || await AwaitAsync(() => Task.FromResult(profiles.GetCurrent()), start, token).ConfigureAwait(false) != profile || !profile.IsValid(clock.GetUtcNow()) || !ValidTime(credential, profile, clock.GetUtcNow())) { return null; }
++            token.ThrowIfCancellationRequested();
++            if (clock.GetElapsedTime(start) >= TimeSpan.FromSeconds(30)) { return null; }
++            return credential with { Tag = Convert.ToHexStringLower(tag) };
+         }
+         catch (Exception) { token.ThrowIfCancellationRequested(); return null; }
+         finally { if (canonical is not null) { CryptographicOperations.ZeroMemory(canonical); } if (tag is not null) { CryptographicOperations.ZeroMemory(tag); } if (supplied is not null) { CryptographicOperations.ZeroMemory(supplied); } }
+@@ -94,7 +97,7 @@
+         {
+             TimeSpan remaining = TimeSpan.FromSeconds(30) - clock.GetElapsedTime(start); if (remaining <= TimeSpan.Zero) { throw new TimeoutException(); }
+             var result = await pending.WaitAsync(remaining, clock, token).ConfigureAwait(false);
+-            if (token.IsCancellationRequested || clock.GetElapsedTime(start) >= TimeSpan.FromSeconds(30)) { abandoned?.Invoke(result); token.ThrowIfCancellationRequested(); throw new TimeoutException(); }
++            if (token.IsCancellationRequested || clock.GetElapsedTime(start) >= TimeSpan.FromSeconds(30)) { token.ThrowIfCancellationRequested(); throw new TimeoutException(); }
+             return result;
+         }
+         catch (Exception)
+--- prior/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs
++++ current/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs
+@@ -194,16 +194,17 @@
+         => proof is not null && (proof.State == SecurityEventRecorderLookupState.NotRecorded && proof.Receipt is null
+             || proof.State == SecurityEventRecorderLookupState.Recorded && Exact(original, proof.Receipt));
+ 
+-    /// <summary>Readiness requires qualified current complete spool state with every original observation durably recorded; missing/stale/unknown state always blocks.</summary>
++    /// <summary>Readiness requires a recorder, remaining admission capacity and qualified current complete acknowledged state; missing/stale/unknown state always blocks.</summary>
+     public async Task<bool> IsReadyAsync(CancellationToken cancellationToken = default)
+     {
+         var budget = new PrivateOwnerOperationDeadline(clock, cancellationToken);
+         try
+         {
++            budget.Check(); if (recorder is null) { return false; }
+             var target = await CurrentAsync("Readiness", null, budget).ConfigureAwait(false); if (target is null) { return false; }
+             var (state, _) = await ReadAsync(target, budget).ConfigureAwait(false);
+             var (pending, _) = await budget.ReadAsync(() => client.GetStateAndETagAsync<AnchoredStateTransition>(target.ComponentName, PendingKey(target), ConsistencyMode.Strong, cancellationToken: CancellationToken.None)).ConfigureAwait(false);
+-            return state is not null && pending is null && state.Records.All(record => record.Receipt is not null) && await StillCurrentAsync(target, "Readiness", null, budget).ConfigureAwait(false);
++            return state is not null && pending is null && state.Records.Count < RecordBound && state.Records.All(record => record.Receipt is not null) && await StillCurrentAsync(target, "Readiness", null, budget).ConfigureAwait(false);
+         }
+         catch (Exception) { cancellationToken.ThrowIfCancellationRequested(); return false; }
+     }
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs
+@@ -12,6 +12,67 @@
+ /// <summary>Actual signer intent/outcome durability with synthetic qualified guard/key ports and real BCL signatures.</summary>
+ public sealed class DeletionCapabilitySigningActorTests
+ {
++    /// <summary>Trust loss after durable intent is an exact independently retained noninvoked disposition, actionable by the coordinator.</summary>
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task PostIntentTrustLossRetainsKnownDeniedOriginal(bool providerThrows)
++    {
++        var payload = Payload(); string id = DeletionBatchCapabilityCodec.SigningRequestId(payload);
++        var backend = new InMemoryStateManager(); var authority = Authority();
++        using var key = ECDsa.Create(ECCurve.NamedCurves.nistP256);
++        var trust = Trust(payload, key);
++        var current = await trust.ResolveAsync(payload.TenantId, "DeletionBatchCapabilitySigningKey", payload.CapabilityKeyVersion, TestContext.Current.CancellationToken);
++        int reads = 0;
++        trust.ResolveAsync(payload.TenantId, "DeletionBatchCapabilitySigningKey", payload.CapabilityKeyVersion, Arg.Any<CancellationToken>())
++            .Returns(_ => ++reads == 1 ? Task.FromResult(current)
++                : providerThrows ? Task.FromException<DeletionCapabilityPublishedTrust?>(new IOException("Post-intent trust unavailable"))
++                    : Task.FromResult<DeletionCapabilityPublishedTrust?>(null));
++        var provider = Substitute.For<IDeletionCapabilitySigningProvider>();
++        var actor = Actor(payload, backend, authority, provider, trust);
++        var guard = Substitute.For<IDeletionBatchGuardPort>();
++        var protection = Substitute.For<IDeletionProtectionOwner>();
++        var coordinator = new DeletionBatchExecutionCoordinator(new CustodyFixtureClock(), guard, _ => actor, _ => protection);
++
++        var result = await coordinator.ExecuteAsync(payload, cancellationToken: TestContext.Current.CancellationToken);
++        result.Status.ShouldBe("Denied");
++        var original = result.Signing!;
++        original.ShouldBe(new DeletionCapabilitySigningOutcome(id, payload, DeletionCapabilitySigningState.Denied));
++        original.DetachedJws.ShouldBeNull(); original.NoIssueProof.ShouldBeNull(); result.NextAttempt.ShouldBeNull();
++        var persisted = backend.CommittedState.Single();
++        persisted.Value.ShouldBe(original);
++        var restored = new InMemoryStateManager();
++        await restored.SetStateAsync(persisted.Key, JsonSerializer.Deserialize<DeletionCapabilitySigningOutcome>(JsonSerializer.SerializeToUtf8Bytes(persisted.Value))!, TestContext.Current.CancellationToken);
++        await restored.SaveStateAsync(TestContext.Current.CancellationToken);
++        var restarted = Actor(payload, restored, authority, provider, trust);
++        (await restarted.LookupAsync(payload)).ShouldBe(original);
++        (await new DeletionBatchExecutionCoordinator(new CustodyFixtureClock(), guard, _ => restarted, _ => protection)
++            .ExecuteAsync(payload, cancellationToken: TestContext.Current.CancellationToken)).Signing.ShouldBe(original);
++        JsonSerializer.SerializeToUtf8Bytes(restored.CommittedState.Single().Value).ShouldBe(JsonSerializer.SerializeToUtf8Bytes(original));
++        provider.ReceivedCalls().ShouldBeEmpty(); guard.ReceivedCalls().ShouldBeEmpty(); protection.ReceivedCalls().ShouldBeEmpty();
++    }
++
++    /// <summary>A possibly executed signature never borrows an unproven negative backend lookup to issue a new attempt.</summary>
++    [Fact]
++    public async Task UncertainSignatureDoesNotBorrowProviderDeniedAbsence()
++    {
++        var payload = Payload(); string id = DeletionBatchCapabilityCodec.SigningRequestId(payload);
++        var backend = new InMemoryStateManager(); var authority = Authority();
++        using var key = ECDsa.Create(ECCurve.NamedCurves.nistP256);
++        var provider = Substitute.For<IDeletionCapabilitySigningProvider>();
++        provider.SignAsync(payload, id, Arg.Any<CancellationToken>()).Returns(Task.FromException<DeletionCapabilitySigningResult>(new IOException("Possibly signed")));
++        provider.LookupAsync(payload, id, Arg.Any<CancellationToken>()).Returns(new DeletionCapabilitySigningResult(new(id, payload, DeletionCapabilitySigningState.Denied), null));
++        var actor = Actor(payload, backend, authority, provider, Trust(payload, key));
++        (await actor.SignAsync(payload)).State.ShouldBe(DeletionCapabilitySigningState.Unknown);
++        byte[] original = JsonSerializer.SerializeToUtf8Bytes(backend.CommittedState.Single().Value);
++        var restarted = Actor(payload, backend, authority, provider, Trust(payload, key));
++        (await restarted.LookupAsync(payload)).State.ShouldBe(DeletionCapabilitySigningState.Unknown);
++        (await restarted.SignAsync(payload)).State.ShouldBe(DeletionCapabilitySigningState.Unknown);
++        JsonSerializer.SerializeToUtf8Bytes(backend.CommittedState.Single().Value).ShouldBe(original);
++        await provider.Received(1).SignAsync(payload, id, Arg.Any<CancellationToken>());
++        await provider.Received(2).LookupAsync(payload, id, Arg.Any<CancellationToken>());
++    }
++
+     /// <summary>A separately authorized mutation recovers the independently admitted exact stage after restart without the original caller; read-only evidence cannot advance it and physical effects are not duplicated.</summary>
+     [Fact]
+     public async Task LaterMutationRecoversPreJournalOriginalWithoutItsCaller()
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs
+@@ -255,4 +255,51 @@
+ 
+     private static string Digest<T>(T value) => Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(value)));
+ 
++    /// <summary>Withdrawing only the in-flight method credential withholds response evidence while retaining the exact completed original.</summary>
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task InFlightMethodCredentialWithdrawalRetainsOriginalButWithholdsResponse(bool lookup)
++    {
++        var clock = new CustodyFixtureClock(); var identity = Identity(clock); var backend = new InMemoryStateManager();
++        var authority = Authority(); var provider = Substitute.For<IExportKeyDirectDeliveryProvider>();
++        var original = new ExportKeyDeliveryOutcome(identity, ExportKeyDeliveryState.Delivered, clock.Now);
++        if (lookup)
++        {
++            provider.ReleaseAsync(identity, Arg.Any<CancellationToken>()).Returns(Task.FromException<ExportKeyDeliveryOutcome>(new IOException("Original release acknowledgement lost")));
++            (await Actor(identity, backend, clock, authority, provider).DeliverAsync(identity)).State.ShouldBe(ExportKeyDeliveryState.Unknown);
++        }
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var release = new TaskCompletionSource<ExportKeyDeliveryOutcome>(TaskCreationOptions.RunContinuationsAsynchronously);
++        if (lookup) { provider.LookupAsync(identity, Arg.Any<CancellationToken>()).Returns(_ => { entered.TrySetResult(); return release.Task; }); }
++        else { provider.ReleaseAsync(identity, Arg.Any<CancellationToken>()).Returns(_ => { entered.TrySetResult(); return release.Task; }); }
++        string method = lookup ? "LookupExportKey" : "DeliverExportKey"; bool methodAllowed = true;
++        authority.AuthorizeOperationAsync(identity, method, Arg.Any<CancellationToken>()).Returns(_ => methodAllowed);
++        var actor = Actor(identity, backend, clock, authority, provider);
++        var operation = lookup ? actor.LookupAsync(identity) : actor.DeliverAsync(identity);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++        backend.CommittedState.Single().Value.ShouldBeOfType<ExportKeyDeliveryOutcome>().State.ShouldBe(ExportKeyDeliveryState.Unknown);
++        methodAllowed = false; clock.Now = clock.Now.AddSeconds(1);
++        release.TrySetResult(original);
++
++        var response = await operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++        response.State.ShouldBe(ExportKeyDeliveryState.Unavailable); response.ObservedAt.ShouldBeNull();
++        var saved = backend.CommittedState.Single(); saved.Value.ShouldBe(original);
++        var restored = new InMemoryStateManager();
++        await restored.SetStateAsync(saved.Key, JsonSerializer.Deserialize<ExportKeyDeliveryOutcome>(JsonSerializer.SerializeToUtf8Bytes(saved.Value))!, TestContext.Current.CancellationToken);
++        await restored.SaveStateAsync(TestContext.Current.CancellationToken);
++        var restarted = Actor(identity, restored, clock, authority, provider);
++        (lookup ? await restarted.LookupAsync(identity) : await restarted.DeliverAsync(identity)).State.ShouldBe(ExportKeyDeliveryState.Unavailable);
++        JsonSerializer.SerializeToUtf8Bytes(restored.CommittedState.Single().Value).ShouldBe(JsonSerializer.SerializeToUtf8Bytes(original));
++        methodAllowed = true; clock.Now = identity.ExclusiveExpiry.AddDays(1);
++        (await restarted.LookupAsync(identity)).ShouldBe(original);
++        var retained = restored.CommittedState.Single().Value.ShouldBeOfType<ExportKeyDeliveryOutcome>();
++        retained.ObservedAt.ShouldBe(original.ObservedAt); retained.Identity.ExclusiveExpiry.ShouldBe(identity.ExclusiveExpiry);
++        await provider.Received(1).ReleaseAsync(identity, Arg.Any<CancellationToken>());
++        if (lookup) { await provider.Received(1).LookupAsync(identity, Arg.Any<CancellationToken>()); }
++        else { await provider.DidNotReceive().LookupAsync(identity, Arg.Any<CancellationToken>()); }
++        // Physical release authority stays independently allowed throughout this method-only withdrawal.
++        (await authority.AuthorizeAsync(identity, TestContext.Current.CancellationToken)).ShouldBeTrue();
++    }
++
+ }
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs
+@@ -84,4 +84,70 @@
+         using var watchdog = new CancellationTokenSource(TimeSpan.FromSeconds(5)); while (!late.Key!.IsDisposed) { await Task.Delay(10, watchdog.Token); }
+         late.Key.IsDisposed.ShouldBeTrue();
+     }
++    /// <summary>Both synchronous profile observations stay within the original caller/budget and cannot release a late credential.</summary>
++    [Theory]
++    [InlineData(false, false)]
++    [InlineData(false, true)]
++    [InlineData(true, false)]
++    [InlineData(true, true)]
++    public async Task SuspendedProfileReadIsBounded(bool finalRead, bool deadlineExpires)
++    {
++        var (clock, advance) = PrivateOwnerDeadlineTestClock.Create();
++        var fixture = new CustodyFixtureClock { Now = clock.GetUtcNow() };
++        var keys = new CustodyFixtureKeyProvider(fixture);
++        var profile = new CustodyFixtureProfileProvider(fixture).Profile;
++        var profiles = Substitute.For<IPlatformSigningProfileProvider>();
++        var grants = Substitute.For<IPrivateOwnerOperationGrantSource>();
++        grants.ResolveCurrentAsync("machine-issuer", "dedicated-machine", "private-verifier", Scope(), Arg.Any<CancellationToken>()).Returns(Grant(fixture));
++        using var release = new ManualResetEventSlim();
++        using var cancellation = new CancellationTokenSource();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        int reads = 0;
++        profiles.GetCurrent().Returns(_ =>
++        {
++            if (Interlocked.Increment(ref reads) != (finalRead ? 2 : 1)) { return profile; }
++            entered.SetResult(); release.Wait(); finished.SetResult(); return profile;
++        });
++        var authenticator = new PrivateOwnerOperationAuthenticator(keys, profiles, clock, grants);
++        var operation = Task.Run(() => authenticator.IssueAsync(Caller(), Scope(), cancellation.Token), TestContext.Current.CancellationToken);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++        try
++        {
++            if (deadlineExpires)
++            {
++                advance(TimeSpan.FromSeconds(30));
++                (await operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).ShouldBeNull();
++            }
++            else
++            {
++                cancellation.Cancel();
++                var error = await Should.ThrowAsync<OperationCanceledException>(() => operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken));
++                error.CancellationToken.ShouldBe(cancellation.Token);
++            }
++            keys.Snapshots.ShouldAllBe(key => key.IsDisposed);
++            int calls = keys.Calls;
++            release.Set(); await finished.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++            keys.Calls.ShouldBe(calls);
++            if (!finalRead) { calls.ShouldBe(0); }
++        }
++        finally { release.Set(); }
++    }
++
++    /// <summary>A final completed profile cannot release credentials after elapsed time exhausts the original budget.</summary>
++    [Fact]
++    public async Task FinalProfileCompletingAfterBudgetCannotReleaseCredential()
++    {
++        var (clock, advance) = PrivateOwnerDeadlineTestClock.Create();
++        var fixture = new CustodyFixtureClock { Now = clock.GetUtcNow() };
++        var keys = new CustodyFixtureKeyProvider(fixture);
++        var profile = new CustodyFixtureProfileProvider(fixture).Profile;
++        var profiles = Substitute.For<IPlatformSigningProfileProvider>(); int reads = 0;
++        profiles.GetCurrent().Returns(_ => { if (++reads == 2) { advance(TimeSpan.FromSeconds(30)); } return profile; });
++        var grants = Substitute.For<IPrivateOwnerOperationGrantSource>();
++        grants.ResolveCurrentAsync("machine-issuer", "dedicated-machine", "private-verifier", Scope(), Arg.Any<CancellationToken>()).Returns(Grant(fixture));
++        (await new PrivateOwnerOperationAuthenticator(keys, profiles, clock, grants).IssueAsync(Caller(), Scope(), TestContext.Current.CancellationToken)).ShouldBeNull();
++        keys.Snapshots.ShouldAllBe(key => key.IsDisposed);
++    }
++
+ }
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs
+@@ -9,6 +9,44 @@
+ /// <summary>Actual component/CAS/recovery source and serialized persisted end-state under synthetic authorities/backends; no replica, backup or production proof.</summary>
+ public sealed class ReplicatedSecurityObservationSpoolTests
+ {
++    /// <summary>Readiness needs the existing recorder on both an empty and fully acknowledged namespace.</summary>
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task RecorderBindingIsRequiredForReadiness(bool acknowledged)
++    {
++        var f = new SecuritySpoolFixture();
++        if (acknowledged)
++        {
++            await f.Spool.ObserveAsync(SecuritySpoolFixture.Intent(), TestContext.Current.CancellationToken);
++            (await f.Spool.DrainAsync(1, TestContext.Current.CancellationToken)).ShouldBe(1);
++        }
++        (await f.Spool.IsReadyAsync(TestContext.Current.CancellationToken)).ShouldBeTrue();
++        (await new ReplicatedSecurityObservationSpool(f.Client, f.Clock, f.Authority).IsReadyAsync(TestContext.Current.CancellationToken)).ShouldBeFalse();
++    }
++
++    /// <summary>Retained acknowledged originals still support exact lookup/duplicates, but cannot claim capacity for another identity.</summary>
++    [Fact]
++    public async Task FullAcknowledgedSpoolIsNotReadyAndKeepsOriginals()
++    {
++        var f = new SecuritySpoolFixture();
++        var records = Enumerable.Range(1, 10000).Select(sequence =>
++        {
++            var original = new SecurityObservationRecord(SecuritySpoolFixture.Intent("observation-" + sequence), f.Clock.Now,
++                f.Clock.Now.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture), sequence, null);
++            return original with { Receipt = SecuritySpoolFixture.Receipt(original) };
++        }).ToArray();
++        var state = new SecuritySpoolSnapshot(f.Target.InstallationEpoch, 20000, records);
++        f.Persisted = JsonSerializer.SerializeToUtf8Bytes(state); f.Anchor = state.Revision; f.AnchorDigest = ReplicatedSecurityObservationSpool.StateDigest(state);
++        byte[] exact = f.Persisted.ToArray();
++
++        (await f.Spool.IsReadyAsync(TestContext.Current.CancellationToken)).ShouldBeFalse();
++        (await f.Spool.LookupAsync(records[0].Intent, TestContext.Current.CancellationToken)).ShouldBe(records[0]);
++        (await f.Spool.ObserveAsync(records[0].Intent, TestContext.Current.CancellationToken)).ShouldBe(records[0]);
++        (await f.Spool.ObserveAsync(SecuritySpoolFixture.Intent("new-original"), TestContext.Current.CancellationToken)).ShouldBeNull();
++        f.Persisted.ShouldBe(exact); f.PendingBytes.ShouldBeNull(); f.PhysicalAppends.ShouldBe(0);
++    }
++
+     /// <summary>A separately authorized mutation recovers the independently admitted exact stage after restart without the original caller; read-only evidence cannot advance it and physical effects are not duplicated.</summary>
+     [Fact]
+     public async Task LaterMutationRecoversPreJournalOriginalWithoutItsCaller()

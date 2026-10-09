@@ -1,0 +1,73 @@
+{
+  "auditedUtc": "2026-10-09T01:04:55.490930+00:00",
+  "actualIndexClassPassed": 65,
+  "compatibleFeedDispatcherPassed": 27,
+  "originalFailureNowPasses": true,
+  "selectedCases": {
+    "MonotonicAppends": [
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.MonotonicAppendsCompleteOriginalCutAcrossActualOwnerRestart",
+        "result": "Pass"
+      }
+    ],
+    "FiniteCutContinuationDenies": [
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FiniteCutContinuationDeniesUnprovenPreservation(vector: \\\"scope\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FiniteCutContinuationDeniesUnprovenPreservation(vector: \\\"installation\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FiniteCutContinuationDeniesUnprovenPreservation(vector: \\\"missing\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FiniteCutContinuationDeniesUnprovenPreservation(vector: \\\"regressed\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FiniteCutContinuationDeniesUnprovenPreservation(vector: \\\"forged-receipt\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FiniteCutContinuationDeniesUnprovenPreservation(vector: \\\"forged-publication\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FiniteCutContinuationDeniesUnprovenPreservation(vector: \\\"expired\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FiniteCutContinuationDeniesUnprovenPreservation(vector: \\\"withdrawn\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FiniteCutContinuationDeniesUnprovenPreservation(vector: \\\"unbound\\\")",
+        "result": "Pass"
+      }
+    ],
+    "FinalFiniteCutRelease": [
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FinalFiniteCutReleaseReconfirmsCurrentContinuationPermission(indexedPage: False, vector: \\\"state\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FinalFiniteCutReleaseReconfirmsCurrentContinuationPermission(indexedPage: False, vector: \\\"cut\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FinalFiniteCutReleaseReconfirmsCurrentContinuationPermission(indexedPage: True, vector: \\\"state\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FinalFiniteCutReleaseReconfirmsCurrentContinuationPermission(indexedPage: True, vector: \\\"cut\\\")",
+        "result": "Pass"
+      }
+    ]
+  },
+  "xmlSha256": "2d89c1783059dff731050d77f309149465b81463b76af75d9313ffdbcbcadea9",
+  "compatibilityXmlSha256": "0f2491d1f415a51351cd74903cd170876217c19222d583441178aef3da7d1d43",
+  "sourceLimits": "Modeled independent proof authority and actual serialized owning index/dispatcher. Runtime continuation enrollment unestablished. Engineering is still active; no stable freeze/full Local claim."
+}

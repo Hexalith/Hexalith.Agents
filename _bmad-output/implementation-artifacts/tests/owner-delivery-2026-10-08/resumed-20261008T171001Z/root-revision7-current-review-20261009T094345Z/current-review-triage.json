@@ -1,0 +1,213 @@
+{
+  "reviewIteration": 7,
+  "reviewersAllFinal": true,
+  "individualVerdictsFile": "current-review-individual-verdicts.json",
+  "individualVerdictsSha256": "7318cc9585261384bb40e690392fe7d9ba598bafa1c18edf903f6a246819229a",
+  "individualVerdictsCount": 16,
+  "groupingPerformedAfterAllIndividualVerdicts": true,
+  "priorSameLocationSameClaimMatches": [],
+  "relatedPriorClaimsReadAndDistinguished": [
+    "Earlier spool-full false-readiness claim versus current acknowledged-record lifetime exhaustion",
+    "Earlier rejected FR34 expired-original late cleanup versus current persisted reader shared-byte ownership",
+    "Earlier fabricated concrete Dictionary callback versus current negligible malformed-input cancellation race"
+  ],
+  "groups": [
+    {
+      "id": "D1",
+      "members": [
+        "B1"
+      ],
+      "rootCause": "Approved decision-manifest interoperability profile and genuine independent Unicode signature are unestablished",
+      "highestVerdict": "maybe-false",
+      "route": "defer",
+      "evidence": "The codec uses UnsafeRelaxedJsonEscaping and says RFC-8785-style; RFC 8785 section 3.2.2.2 requires literal non-control Unicode. However, DecisionAuthorityManifest and its candidate profile explicitly supply no accepted public wire/profile, and the register's mandatory RFC 8785 profile applies to DeletionBatchCapabilityV1, a different codec. No accepted independent decision signer/profile or genuine incompatible manifest is installed. Establish the actual approved decision wire algorithm and verify its independently signed Unicode bytes before claiming operational interoperability harm.",
+      "correction": "Only an actually accepted exact decision wire/profile can settle whether this candidate encoding must change; do not silently impose the deletion-capability profile on decision approvals.",
+      "unverifiedSeverity": "medium",
+      "disposition": "Moot because bad_spec triggers re-derivation; do not patch or append deferred ledger in this halted cycle"
+    },
+    {
+      "id": "G1",
+      "members": [
+        "B3"
+      ],
+      "rootCause": "Missing retained identity for one original violation observation under a changed caller ViolationId",
+      "highestVerdict": "medium",
+      "route": "bad_spec",
+      "evidence": "RecordViolation retains and checks only ViolationId for duplication, then validates the same original accepted operation/resource/facts/mutation and allocates deletion.Ordinal+1. Updating command.Ordinal to the current ordinal and supplying a new ViolationId/no-cut receipt does not change that original acceptance; no retained original-acceptance identity prevents another successor and obligation. GovernanceOrdinalCommand does not define an independently derived violation identity. Repeated observation of one genuine accepted write can therefore produce spurious recuts/owner obligations.",
+      "correction": "Specify and retain or deterministically derive exact per-request original acceptance/resource/kind identity, with stable retry under changed caller operation/violation IDs. Preserve truly distinct acceptances and all prior violation/owner-cycle history.",
+      "disposition": "Trigger loopback; mandatory >5 checkpoint before re-engagement or technical amendment"
+    },
+    {
+      "id": "G2",
+      "members": [
+        "B4"
+      ],
+      "rootCause": "One scalar ordinal cannot represent the original per-request attribution of overlapping installed deletion scopes",
+      "highestVerdict": "medium",
+      "route": "bad_spec",
+      "evidence": "ValidScope permits both ExactInteraction and SourceDeletionExactConversation. CommitAdmissionFence permits distinct request IDs without an overlap exclusion. Matching ContentAppend remains accepted while both requests lack a content binding, including when their per-request ordinals differ. AppendWrite then stamps only Max matching.Ordinal, although the two request ledgers have different actual installed ordinals. The scalar receipt cannot recover the other request's original attribution. Later original-acceptance checks merely compare that same scalar; they do not reconstruct each request's linearization.",
+      "correction": "Define coherent per-request original ordinal attribution for legitimately overlapping installed scopes; preserve each ledger and original receipts. Do not add an invented Product ban on overlapping requests or fabricate one scope's ordinal from another.",
+      "disposition": "Trigger loopback; mandatory >5 checkpoint before re-engagement or technical amendment"
+    },
+    {
+      "id": "G3",
+      "members": [
+        "B5"
+      ],
+      "rootCause": "The consumption actor bounds physical recovery but leaves pre-recovery actor-turn waits unbounded",
+      "highestVerdict": "medium",
+      "route": "bad_spec",
+      "evidence": "Register/Reserve/Block/Revocation/Activate/Lookup await AdmitAsync directly. ReadAsync directly awaits StateManager cache/read/pending and RecoverableAnchoredState authority/journal work; SaveAsync also remains on unbounded state/journal calls. The only thirty-second actor deadline is constructed inside RecoverAsync for provider invocation/receipt capture. A stalled AuthorizeOperationAsync or state/journal Task before that point occupies the same non-reentrant tenant actor, so later revocation/block entries cannot run even after the client adapter abandons its caller.",
+      "correction": "Use one whole-entry actor budget through admission, pure capture, state/journal and terminal release, retaining on-turn StateManager execution and exclusion until any unfinished state I/O actually ends. Recover immutable originals only; preserve reservation-winner completion and zero duplicate effects.",
+      "disposition": "Trigger loopback; mandatory >5 checkpoint before re-engagement or technical amendment"
+    },
+    {
+      "id": "G4",
+      "members": [
+        "B6"
+      ],
+      "rootCause": "The anchored commit helper borrows mutable transition bytes across proof, staging and journal boundaries",
+      "highestVerdict": "medium",
+      "route": "bad_spec",
+      "evidence": "Unlike ReconcileAsync's explicit detached owned array, CommitAsync validates transition once and sends the same TargetBytes array to read/admission/persist/confirmation/journal across awaits. A caller retaining this public array can mutate it after independent original admission; persistence then receives mutated staging bytes. Exact compares byte equality to the same mutated input without rehashing, and an exact independent journal may refuse recording, leaving an invalid primary pending stage that ReconcileAsync.Validate rejects. The authority's immutable proof cannot repair this helper's mutable staging input.",
+      "correction": "Establish detached exact helper ownership and read-only provider borrowing; isolate mutable external input and revalidate exact owned carrier/digest at staging/confirmation/journal boundaries. Preserve genuine current conditional original proofs, bounded bytes and no unanchored release.",
+      "disposition": "Trigger loopback; mandatory >5 checkpoint before re-engagement or technical amendment"
+    },
+    {
+      "id": "G5",
+      "members": [
+        "B7"
+      ],
+      "rootCause": "The FR34 persisted reader and gate lack a safe common carrier ownership/snapshot boundary",
+      "highestVerdict": "medium",
+      "route": "bad_spec",
+      "evidence": "CaptureObservation detaches metadata but returns supplied with the same Bytes. EvaluateAsync scans that original array; ProveCarrierAsync awaits another authority read before copying it. The scan and exact proof can therefore consume different contents if a reader-held buffer changes, and finally clears the supplied buffer. IFr34PersistedCanaryReader and Fr34PersistedCanary contain no transfer/read-only lifetime rule. The current gate comment alone does not establish a safe provider ownership boundary or a single exact carrier snapshot.",
+      "correction": "Define safe persisted-reader ownership/borrowing, capture one bounded owned byte snapshot before scanning, and use that exact snapshot for proof and cleanup. Preserve independent persisted-format/key proof, safe provider lifetime and all existing canary destruction/late-cleanup constraints.",
+      "disposition": "Trigger loopback; mandatory >5 checkpoint before re-engagement or technical amendment"
+    },
+    {
+      "id": "P1",
+      "members": [
+        "B9"
+      ],
+      "rootCause": "Remaining operation time is sampled after a new provider invocation is queued",
+      "highestVerdict": "low",
+      "route": "patch",
+      "evidence": "AwaitAsync first checks caller cancellation, schedules Task.Run(operation), and only then samples remaining elapsed time and rejects a nonpositive duration. If synchronous intervening work or scheduling exhausts the existing budget, another grant/key/profile read can start despite immediate outer timeout. Final release still denies and late keys are disposed, so this is minor unnecessary provider work rather than unauthorized credentials.",
+      "correction": "Move the existing remaining-time sample/nonpositive check before scheduling the pure provider operation; retain original cancellation and safe cleanup for actually started work.",
+      "disposition": "Moot because bad_spec triggers re-derivation; do not patch or append deferred ledger in this halted cycle"
+    },
+    {
+      "id": "G6",
+      "members": [
+        "B10"
+      ],
+      "rootCause": "The spool retains acknowledged originals in a single permanently finite installation carrier without a continuation protocol",
+      "highestVerdict": "medium",
+      "route": "bad_spec",
+      "evidence": "ObserveAsync refuses new identities at 10000, DrainAsync changes only Receipt/scheduling fields, and no path retires or archives records. IsReadyAsync correctly refuses the full state even when every record is acknowledged. Key selects only the current InstallationEpoch; switching epochs has no integrated historical-original routing and cannot be assumed to preserve exact lookup or pending work. This is distinct from revision-4 B2's false-readiness bug: that direct correction required no rollover, and remains correct. The new verified issue is ordinary cumulative lifetime exhaustion, not false readiness at the existing bound.",
+      "correction": "Specify a bounded durable continuation/partition or archival protocol preserving every original receipt/routing/pending record and independently current authority. Keep the 10000 per-carrier bound and refuse unavailable capacity; do not purge, reset history, invent a retention policy or claim runtime capacity qualification.",
+      "disposition": "Trigger loopback; mandatory >5 checkpoint before re-engagement or technical amendment"
+    },
+    {
+      "id": "P2",
+      "members": [
+        "B11"
+      ],
+      "rootCause": "An unresolved covering reservation is exposed under the covering batch identity instead of the requesting identity",
+      "highestVerdict": "medium",
+      "route": "patch",
+      "evidence": "FindCoveredReservation accepts another original whose targets cover the requested targets. If RecoverAsync remains ConsumptionReserved, RegisterAsyncCoreAsync's false ternary branch returns that original outcome, including the covering BatchId/ReceiptId, after admission was checked for the requested batch. The coordinator's Exact requires payload.BatchId, so it rejects the mismatched response; only the Consumed branch correctly retains requesting-batch AlreadyDestroyed evidence.",
+      "correction": "Keep covering recovery internal and return a restrictive outcome naming the requesting tenant/batch until complete exact covered receipts can be retained; never fabricate a receipt or repeat physical consumption.",
+      "disposition": "Moot because bad_spec triggers re-derivation; do not patch or append deferred ledger in this halted cycle"
+    },
+    {
+      "id": "D2",
+      "members": [
+        "B12"
+      ],
+      "rootCause": "A genuine authenticated original registration and timing schedule proving early replay-retention harm is unestablished",
+      "highestVerdict": "maybe-false",
+      "route": "defer",
+      "evidence": "Exact checks original intent, UTC/order, source position and exact R retention but not a lower envelope issuance bound. However, the private registrar contract requires FirstSeenAt to be the original verifier evaluation time, and its intent digest binds the complete authenticated delivery bytes; the only registration path authenticates before passing evaluatedAt. No actual Agents-owned registrar/source or genuine authenticated impossible original was supplied. A fabricated timestamp returned by an always-accepting fixture does not establish the filed producer/consumer harm. Verify a genuine original source receipt and timing/clock schedule, then show premature replay-retention harm before prescribing an extra policy check.",
+      "correction": "Settle from actual authenticated original registration/lookup and delivery timing evidence, preserving legitimate unchanged original retries and accepted L/S/O/H/R.",
+      "unverifiedSeverity": "medium",
+      "disposition": "Moot because bad_spec triggers re-derivation; do not patch or append deferred ledger in this halted cycle"
+    },
+    {
+      "id": "P3",
+      "members": [
+        "E2"
+      ],
+      "rootCause": "The retained-human fold equates an empty binding list with no readable transition having occurred",
+      "highestVerdict": "medium",
+      "route": "patch",
+      "evidence": "A certified expired establishment increments version without adding a binding. The explicitly supported readable revocation then closes that certified version and increments version, still with zero bindings. A later expired rebound/revocation therefore passes the existing bindings.Count==0 prefix check. RetainedIdentityHistoryValidator verifies complete disjoint positions but not global readable/expired ordering, so no upstream guard closes the stated branch. The fold accepts a forbidden suffix (and can continue to a later readable successor) rather than rejecting inconsistent history.",
+      "correction": "Track that any readable transition was consumed and reject subsequent expired transitions, preserving certified expired prefixes followed by readable revocation/successor and exact source positions/365-day policy.",
+      "disposition": "Moot because bad_spec triggers re-derivation; do not patch or append deferred ledger in this halted cycle"
+    },
+    {
+      "id": "P4",
+      "members": [
+        "V1"
+      ],
+      "rootCause": "Catalogue tests bypass the opt-in production service composition",
+      "highestVerdict": "medium",
+      "route": "patch",
+      "evidence": "Accepted as filed without re-verification: the reviewer searched AddConversationTenantCatalogue/registration/consumers; existing catalogue tests directly construct adapters/query services and SixSeamTests registers a fixture. Removing Replace leaves the default unavailable catalogue in an opted-in host, while those tests stay green. Add a composed scoped query-service assertion using the existing actual source/authority fixtures and both registration methods.",
+      "correction": "In the existing catalogue test class execute AddConversationAgentServices and AddConversationTenantCatalogue, resolve the scoped query service and assert complete active count over persisted source. Keep denied defaults and actual required class mapping.",
+      "disposition": "Moot because bad_spec triggers re-derivation; do not patch or append deferred ledger in this halted cycle"
+    },
+    {
+      "id": "P5",
+      "members": [
+        "R1"
+      ],
+      "rootCause": "Four revision7 owner evidence links contain spaces in the timestamp path",
+      "highestVerdict": "low",
+      "route": "patch",
+      "evidence": "Each current packet links revision7 evidence to resumed-20261008 T 171001 Z/revision-7/README.md. The sealed engineering evidence directory is resumed-20261008T171001Z/revision-7/README.md. Root read all four complete packets and checked current/frozen bytes, so the reproducibility link is directly broken.",
+      "correction": "Correct only the four revision7 evidence link targets to the existing exact directory; retain packet content/history and capture before bytes.",
+      "disposition": "Moot because bad_spec triggers re-derivation; do not patch or append deferred ledger in this halted cycle"
+    }
+  ],
+  "rejected": [
+    {
+      "id": "B2",
+      "layer": "blind",
+      "path": "../platform/src/Hexalith.Platform.Custody/EventStoreDeletionBatchGuardPort.cs:29",
+      "claim": "Snapshot original receipt recovery bypasses result-specific lookup permission and discloses unauthorized results.",
+      "verdict": "false",
+      "route": "reject-false",
+      "evidence": "IGovernanceScopeGuard.ReadAsync explicitly exposes the entire independently qualified content-free guard, including Receipts. GovernanceScopeGuardOwner reconfirms its exact state through DaprGuardedStateTransaction, whose AuthorizeReadAsync authorizes this installed cell read for the restricted coordinator. Thus the proposed reader already legitimately received these receipts before the adapter selects one; selection adds no disclosure or new effect. ReadLookupAsync/AuthorizeLookupAsync protect the separate operation lookup API. The shortcut's fact receipt does not grant a dispatch, reservation or mutation; those independently authorize their own owning transition. The filed additional disclosure is disproved by the existing authorized read surface."
+    },
+    {
+      "id": "B8",
+      "layer": "blind",
+      "path": "../eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs:22",
+      "claim": "Concurrent cancellation and malformed capture can escape as the malformed-input exception.",
+      "verdict": "low",
+      "route": "reject-low-complexity",
+      "evidence": "Capture/digest run before the existing terminal catch, so cancellation arriving after the initial check but before a malformed-carrier exception is not rechecked on that exception. The concrete Dictionary has no supplied blocking callback; active malformed arguments intentionally throw outside the availability catch and the logged preservation constraint retains that behavior. This negligible concurrent-invalid-input boundary is unlikely in ordinary valid calls. Preserving that exception behavior while adding caller-first handling requires another catch/guard, beyond a direct correction; reject under the low-complexity rule. Do not introduce artificial collection callbacks."
+    },
+    {
+      "id": "E1",
+      "layer": "edge",
+      "path": "../eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationDispatcher.cs:64-70",
+      "claim": "Null progress admission wrongly permits dispatch completion.",
+      "verdict": "false",
+      "route": "reject-false",
+      "evidence": "SourcePublicationDispatchResult explicitly means the largest consecutively authenticated acknowledged offset in this pass, not a separately stored delivery ledger. ISourcePublicationDelivery requires each Acknowledged status to be an independently authenticated durable exact source acknowledgement. Every advanced entry is checked before advancing; an unavailable retained progress proof starts reconstruction at zero. Null advancement loses the optional retained optimization but grants no skipped acknowledgement or durable progress proof. Existing executed reconnect/103-original tests intentionally cover this safe reconstruction fallback. The proposed null guard would change that valid behavior rather than fix an unauthenticated checkpoint."
+    }
+  ],
+  "counts": {
+    "bad_spec": 6,
+    "patch": 5,
+    "defer": 2,
+    "reject": 3
+  },
+  "reviewLoopIterationBefore": 7,
+  "reviewLoopIterationAfterRequiredLoopback": 8,
+  "process": "Six independent bad_spec groups; each has a different defect and remains separate. Lower five patch and two unverified medium defer entries are moot. No deferred ledger amendment. HALT at 8 before re-engagement, source patching, rollback or technical spec amendment.",
+  "limits": "No accepted runtime, owner delivery, full parent completion or original Story5.4 readiness inferred."
+}

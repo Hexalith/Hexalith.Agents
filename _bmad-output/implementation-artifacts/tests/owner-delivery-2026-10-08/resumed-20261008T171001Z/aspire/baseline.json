@@ -1,0 +1,56 @@
+{
+  "capturedUtc": "2026-10-08T17:13:07.576010+00:00",
+  "isolatedDirectory": "/tmp/hexalith-54-resume-aspire-pd3kxkp3",
+  "sourceCopies": {
+    "apphost.cs": "efb900745618692ed06c7698a2ab9a9b877eb3371b6c9e9a708e6f7270f3ea62",
+    "DaprSelfHostedMtls.cs": "da581231124eb7afe3c4e25943d713202c01597c56462ca18e705e7f175e87d5",
+    "global.json": "fc4602f9d88c9440f70f72732343a88c5e4190223fb9b77f9b8ac8eb1c4c8c2d",
+    "aspire.config.json": "7eb051d14eb7974933be8a8ba2eb51d8ce75290e65409eb8b05fe4310199bf2e"
+  },
+  "commands": [
+    {
+      "name": "start",
+      "argv": [
+        "aspire",
+        "start",
+        "--apphost",
+        "/tmp/hexalith-54-resume-aspire-pd3kxkp3/apphost.cs",
+        "--isolated",
+        "--non-interactive",
+        "--format",
+        "Json"
+      ],
+      "exitCode": 0,
+      "redactedLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/aspire/start.log"
+    },
+    {
+      "name": "describe",
+      "argv": [
+        "aspire",
+        "describe",
+        "--apphost",
+        "/tmp/hexalith-54-resume-aspire-pd3kxkp3/apphost.cs",
+        "--non-interactive",
+        "--format",
+        "Json"
+      ],
+      "exitCode": 0,
+      "redactedLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/aspire/describe.log"
+    },
+    {
+      "name": "stop",
+      "argv": [
+        "aspire",
+        "stop",
+        "--apphost",
+        "/tmp/hexalith-54-resume-aspire-pd3kxkp3/apphost.cs",
+        "--non-interactive"
+      ],
+      "exitCode": 0,
+      "redactedLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/aspire/stop.log"
+    }
+  ],
+  "scope": "Exact-source isolated scaffold baseline with Agents/Works explicitly disabled. No production composition or live qualification.",
+  "describeSucceeded": true,
+  "describeSummary": "Inspect redacted describe log for resources; no readiness claimed"
+}

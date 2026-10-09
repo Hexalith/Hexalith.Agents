@@ -1,0 +1,7 @@
+# Joint EventStore transaction design
+
+The candidate uses a separate explicitly installed EventStore general-state namespace on an existing qualified backend. It never accesses another actor's storage keys or bypasses AggregateActor's IActorStateManager. Installation must prove complete source migration/routing and exclusion of every prior/direct writer. Existing writers remain unchanged by default.
+
+Every effect atomically updates the same preinstalled tenant guard with its required nonempty current ETag, all target/source/outbox/phase cells, and one exact original outcome. New target/outcome writes may omit ETags only because that mandatory guard compare serializes every installed writer. No omitted ETag is treated as create-only. The general Dapr API makes missing ETags unconditional; transactions and ETag checks depend on the selected component. See [Dapr state API](https://docs.dapr.io/reference/api/state_api/) and [state overview](https://docs.dapr.io/developing-applications/building-blocks/state-management/state-management-overview/).
+
+Actual SDK 1.18.1 XML inspected: Dapr.Client ExecuteStateTransactionAsync and StateTransactionRequest constructor expose per-operation ETag, StateOptions and transaction/per-operation metadata. Source fixture tests model atomic ETag compares and serialized restart; they do not qualify a real store, its partition boundaries, replication or restore. No production component/endpoint is installed or invoked.

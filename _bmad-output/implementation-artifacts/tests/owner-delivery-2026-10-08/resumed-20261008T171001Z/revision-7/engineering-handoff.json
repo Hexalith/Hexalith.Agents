@@ -1,0 +1,107 @@
+{
+  "capturedUtc": "2026-10-09T09:33:07.662648+00:00",
+  "status": "stable final source engineering handoff; packaged hash check passed; root full Local and next independent review pending",
+  "spec": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md",
+  "specSha256": "5a2306cc05ef34fa820604be3490d5180d907b2e59e3d1e4a17c5676741188cd",
+  "revision": 7,
+  "sourceEngineer": "owner_rederivation",
+  "orderedBaselines": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/ordered-baselines.json",
+  "orderedCaptureCount": 148,
+  "preservedExactPrefixCount": 142,
+  "freshUnits": 6,
+  "uniqueCapturedSourceTestPacketPaths": 21,
+  "changedSourceTestPacketPaths": 21,
+  "focusedDistinctPassedCases": 400,
+  "focusedLanes": [
+    {
+      "lane": "server-final",
+      "passed": 173,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "2.653",
+      "classes": {
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests": 65,
+        "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests": 30,
+        "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests": 78
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-joint-green-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-joint-green.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-joint-green.xml"
+    },
+    {
+      "lane": "platform-final",
+      "passed": 89,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "2.186",
+      "classes": {
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests": 42,
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests": 38,
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests": 9
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-private-wait-green-build-second.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-private-wait-green.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-private-wait-green.xml"
+    },
+    {
+      "lane": "client-final",
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "0.280",
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests": 24
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-client-final-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-client-final.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-client-final.xml"
+    },
+    {
+      "lane": "conversations-final",
+      "passed": 114,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "8.751",
+      "classes": {
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests": 9,
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests": 57,
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests": 41,
+        "Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests": 7
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-conversation-green-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-conversation-green.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-conversation-green.xml"
+    }
+  ],
+  "exactDotnetCommands": 25,
+  "selectedLaneCommandLinksVerified": 4,
+  "currentBuilds": "Four clean normal Debug/local-reference builds, zero warnings/errors; analyzer/XML defaults retained.",
+  "findingStatus": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/finding-status.json",
+  "commands": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/commands.json",
+  "sourceHashes": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/current-owned-source.json",
+  "preservation": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/preservation.json",
+  "historicalAttempts": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/historical-attempts.json",
+  "priorPacketBytes": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/owner-packets/before/agents",
+  "verificationMap": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/required-class-audit.json",
+  "reviewFreezeOwner": "Root independently freezes cumulative source, reads complete delta, runs three fresh review layers and mandatory full Local matrix.",
+  "remainingWork": [
+    "Fresh root complete Local matrix and three-layer review.",
+    "Current enrollment/authority, qualified provider/backend/replica/isolation/nonrollback/all-copy destruction/restore/Live acceptance unestablished.",
+    "Original Story 5.4 draft/backlog; parent in-progress; four dependencies Uncommitted, complete target/accepted full command TBD."
+  ],
+  "limits": [
+    "Finite budgets release callers, never qualify provider forced termination/reclamation or backend isolation.",
+    "Existing unfinished actor state-I/O exclusion and exact independently retained recovery remain mandatory.",
+    "Modeled authorities/backends/providers do not establish runtime enrollment or owner acceptance."
+  ],
+  "preserved": "Frozen intent/protected source, exact 142 capture prefix and all previous artifacts, documented concurrent bytes without attribution. No source/artifact edits after final delivery.",
+  "finalCheckUtc": "2026-10-09T09:38:11.240794+00:00"
+}

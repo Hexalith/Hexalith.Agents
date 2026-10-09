@@ -1,0 +1,56 @@
+{
+  "capturedUtc": "2026-10-09T08:57:32.864248+00:00",
+  "classifications": [
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "reviewSha256": "67fb5c853e3cb8c77fc42cb098152038abaa55fa76272b1791fa90c6d53d1e26",
+      "currentSha256": "2ac0420bfc3469dae9db8203b684d386727adf04523010a5d415295a1416ca0d",
+      "preservedCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/current-before-engineering/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "lineEndingsOnly": false,
+      "blankAndTrailingWhitespaceOnly": true
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Hexalith.EventStore.Client.csproj",
+      "reviewSha256": "c4cbfb20d51cbf0d4019e90d66f076f2ed65a63bdea8c75404a5762099d3f05f",
+      "currentSha256": "a1dce85420fd2a7e7f4154a32e7276d519639ff25fe368de33876aa4c75445e4",
+      "preservedCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/current-before-engineering/eventstore/src/Hexalith.EventStore.Client/Hexalith.EventStore.Client.csproj",
+      "lineEndingsOnly": true,
+      "blankAndTrailingWhitespaceOnly": true
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementReconciliation.cs",
+      "reviewSha256": "2432c8c900a2254a052b43c8bc6f1de352de1093b3b0ce30fe847bf4574d0953",
+      "currentSha256": "b7f74b16ea6e1f4e134bb899fb1f479ca7bdce06d73c7a9f6cb8b5c2900e63f6",
+      "preservedCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/current-before-engineering/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementReconciliation.cs",
+      "lineEndingsOnly": true,
+      "blankAndTrailingWhitespaceOnly": true
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementResult.cs",
+      "reviewSha256": "13fc322c50da711527a564eeb69bf14e6c48bae7a2b218146cbee84671e79be1",
+      "currentSha256": "1b05b7111fd6fccbb2ea439525ae768f1159af456df6767ebe738e722efe401d",
+      "preservedCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/current-before-engineering/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementResult.cs",
+      "lineEndingsOnly": true,
+      "blankAndTrailingWhitespaceOnly": true
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "reviewSha256": "832e3f5dc23f619918d2314128b2290981d3fca6e876fed607f03256712b59c0",
+      "currentSha256": "39e259700e3adcfeb66e31189c030adfcbdd7cd9dcac462acb874ef2ecd3d220",
+      "preservedCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/current-before-engineering/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "lineEndingsOnly": true,
+      "blankAndTrailingWhitespaceOnly": true
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionOperation.cs",
+      "reviewSha256": "2f4a3bfdab148efa5ce8638cda53a820d2130be6d8d8275c28a3e2128ae7b56c",
+      "currentSha256": "8c44c1455d542344555fc5e21f4d2ed4ca732be3fb77a35d98531648eea5399f",
+      "preservedCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/current-before-engineering/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionOperation.cs",
+      "lineEndingsOnly": true,
+      "blankAndTrailingWhitespaceOnly": true
+    }
+  ],
+  "rootReadCompleteDiff": "concurrent-pre-engineering.diff;240 lines",
+  "scope": "Five additional owned paths changed line endings during authorization preparation; preserve actual bytes without attribution. Prior fixture formatting remains preserved. No functional source delta.",
+  "errors": []
+}

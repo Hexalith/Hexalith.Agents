@@ -1,0 +1,121 @@
+{
+  "capturedUtc": "2026-10-08T23:35:08.852277+00:00",
+  "allThreeFinalBeforeTriage": true,
+  "manifestSha256": "37e9a608fae5766fe6bf4c44580246950df46608bc8a5e352f1a4c6a16b1416d",
+  "stagedDiffSha256": "233586353f9dcff25741f48f4deb2ce5b3e288ab363a0b4f56c24f32acdb84b0",
+  "individualFindings": [
+    {
+      "finding": "B1",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "ConversationDeletionDeliveryPump.cs:39, AcknowledgeAsync/QuarantineAsync",
+      "evidence": "Available from a previously retained acknowledgement and terminal persisted source reads are released after the final source await without StillAuthorizedAsync. The separate LookupAcknowledgementAsync does reconfirm, but DeliverAsync and its terminal helpers do not. Current upstream source admission cannot settle worker withdrawal during its outstanding read. Reconfirm exact admitted worker before terminal release; execute controlled source-read withdrawal.",
+      "priorCarry": "No same-location/same-claim unchanged prior row: earlier B5 concerned receiver/receipt-verifier awaits and this code changed."
+    },
+    {
+      "finding": "B2",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "DaprSourcePublicationWriterRegistration.cs:45",
+      "evidence": "Qualification is sampled before RegisterAsync; the final persisted roster is neither captured nor passed to namespace qualification again before aggregate persistence. Namespace actor Read/Register permissions are distinct from complete installation qualification. Expiry or withdrawal during those waits can release registration success; freshly qualify the exact captured final roster.",
+      "priorCarry": "No same-location/same-claim unchanged prior triage row."
+    },
+    {
+      "finding": "B3",
+      "verdict": "false",
+      "route": "reject",
+      "location": "GovernanceScopeGuardReducer.cs:224",
+      "evidence": "The claimed absence of a typed ActivationProof at equal comparison does not demonstrate unauthorized activation: GovernanceScopeGuardOwner requires IGovernanceGuardAuthority.ReadAsync to authenticate the exact closed phase transition and original protection receipt, matches AuthorityReceiptId, and reconfirms identical current evidence after commit. RecordProtectionAsync consumes the actual typed Unconsumed result under exact active signed batch. Changed global comparison needs the additional typed reconciliation proof; equal current comparison is already authenticated. An always-approving inconsistent authority would violate that qualified contract.",
+      "priorCarry": "No same-location/same-claim unchanged prior triage row."
+    },
+    {
+      "finding": "B4",
+      "verdict": "false",
+      "route": "reject",
+      "location": "GovernanceScopeGuardReducer.cs:238",
+      "evidence": "Ordinary terminal mirroring does not accept unauthenticated receipt strings: the guard owner independently authenticates the exact closed phase/result and original protection receipts before and after its joint commit. The actual guard port validates signed active batch, tenant/batch/owner revision and complete exact target vector from typed protection outcomes. OriginalTerminalProof adds the exceptional original-reservation/compromise correlation when current compromise would otherwise deny; its optional use on ordinary healthy current authority is not an authentication bypass. No bad ordinary result with a conforming independent authority was demonstrated.",
+      "priorCarry": "No same-location/same-claim unchanged prior triage row."
+    },
+    {
+      "finding": "B5",
+      "verdict": "high",
+      "route": "bad_spec",
+      "location": "Fr34ProtectionGate.cs:48",
+      "evidence": "The independent reader proves actual persisted bytes/metadata and ownership proves the dedicated original key, but no independent proof authenticates that this exact carrier uses the enrolled protection format/key. A base64 wrapper can avoid literal challenge/plaintext matching, return plaintext from Unseal and typed unreadability after Destroy while these current checks pass. FR34 explicitly requires rejection of encoding wrappers; add exact independently authenticated persisted protection evidence without trusting engine self-report.",
+      "priorCarry": "No same-location/same-claim unchanged prior triage row."
+    },
+    {
+      "finding": "B6",
+      "verdict": "low",
+      "route": "reject-low-complexity",
+      "location": "Fr34ProtectionGate.cs:98",
+      "evidence": "An originally owned late canary finishing after its authorization expires cannot be destroyed by this gate; cleanup failure is not durably scheduled. This concerns fresh random canary material only and confers no readiness. Original exclusive lifetime/current authority checks are explicitly required by revision-2 constraints. The proposed durable cleanup subsystem/fresh-grant lifecycle adds public protocol and storage complexity for a rare boundary; reject under the low-severity complexity rule, preserving denial after expiry.",
+      "priorCarry": "No same-location/same-claim unchanged prior triage row."
+    },
+    {
+      "finding": "B7",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "DeletionConsumptionActor.cs:261",
+      "evidence": "The physical provider task is bounded, but Count and foreach of TargetReceipts run afterward on the actor continuation. A synchronously suspended supplied vector retains the same-tenant turn despite deadline expiry. Capture the bounded ordered vector entirely inside the existing deadline operation, retaining Reservation and restricting late work to local captured bytes; execute blocked enumerator/end-state/no second consume.",
+      "priorCarry": "No same-location/same-claim unchanged prior triage row."
+    },
+    {
+      "finding": "B8",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "DeletionConsumptionActor.cs:263",
+      "evidence": "The physical owner validates per-target identity and nonempty receipt IDs but permits duplicate IDs for distinct targets; the guard's Terminal/RecordProtectionOutcome requires Unique. Such an irreversible Consumed original cannot complete through its concrete downstream guard. Align the existing contract with duplicate denial before owner persistence, retaining restrictive reservation and immutable original vector; no new public surface is needed.",
+      "priorCarry": "No same-location/same-claim unchanged prior triage row."
+    },
+    {
+      "finding": "B9",
+      "verdict": "medium",
+      "route": "bad_spec",
+      "location": "ReplicatedSecurityObservationSpool.cs:112",
+      "evidence": "Automatic append correctly stops at accepted H=24h and an already Recorded original can still reconcile afterward. However, an exact NotRecorded original aged beyond H has no separately authorized recovery/resolution source path at all, so it remains pending permanently and blocks readiness. The existing test explicitly says it retains work for separate authorization, and full recoverable spool intent requires that feasible technical path. Add default-deny fresh exact-original recovery authority; preserve H and never infer a grant or discard pending records.",
+      "priorCarry": "No same-location/same-claim unchanged prior triage row."
+    },
+    {
+      "finding": "B10",
+      "verdict": "high",
+      "route": "bad_spec",
+      "location": "SourcePublicationFeed.cs:64",
+      "evidence": "Every dispatcher pass performs complete initial source reconciliation before loading retained acknowledgement progress. Forty finite independently completing source reads/projectors at one second each exceed the 30s pass budget, so no index/checkpoint is released and every retry restarts the same work. Existing progress tests add latency only to acknowledgement lookup. Persist/authenticate bounded reconciliation progress or an equally sound incremental certified source path across restart, without skipping unverified changes or broadening current complete-cut/source authority.",
+      "priorCarry": "No same-location/same-claim unchanged prior triage row."
+    },
+    {
+      "finding": "E1",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "AuthoritativeEventStreamReader.cs:85-86, ReadHeadAsync/CaptureProtection",
+      "evidence": "The filed guard snippet is a proposed correction, not current source: current CapturePage executes directly outside deadline.ReadAsync in page and head reads, and a blocked event/flag enumerator cannot reach its internal cancellation checks. Independently verified actual frozen source has this exact gap and no review drift. Move owned collection capture inside the existing deadline and execute suspended event/flag traversals.",
+      "priorCarry": "No same-location/same-claim unchanged prior triage row."
+    },
+    {
+      "finding": "E2",
+      "verdict": "low",
+      "route": "reject-low-complexity",
+      "location": "ReplicatedSecurityObservationSpoolWorker.cs:10",
+      "evidence": "The filed interval upper-bound guard is proposed, not current source. The constructor accepts any positive interval; a value above 4294967294ms faults Task.Delay after the first pass. Current configured ordinary worker intervals are seconds; a greater-than-49-day recovery retry is unlikely in everyday use. Adding an extra operational range guard for this rare unsupported configuration is more than direct deletion/correction under the skill's low-severity complexity rule; reject with evidence.",
+      "priorCarry": "No same-location/same-claim unchanged prior triage row."
+    },
+    {
+      "finding": "V1",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "PartyIdentityQueryHandlerTests.cs:1090,1141 / RetainedHumanActorHistoryFold.cs:46",
+      "evidence": "Preverified regression gap: successful serialized query fixtures cover only one expired establishment, including a readable revocation. No successful fixture covers multiple independently certified expired establishment+rebound/revocation transitions before a retained successor. Restricting the expired branch to establishment would retain all checked expected outcomes while denying valid retained version3. Add parameterized actual ResolveAtAsync cases with exact successor actor/version/source position; existing Local class map covers them.",
+      "priorCarry": "No same-location/same-claim unchanged prior triage row."
+    }
+  ],
+  "grouping": "All nine survivors retain distinct root causes; no grouping or prior carry. Three bad_spec entries require revision3; six direct patches/test gaps remain mandatory in re-derivation. Four rejected findings need no source change.",
+  "rootFullMatrix": "pending revised stable source and fresh review",
+  "reviewLoopIteration": 3,
+  "finalReportFiles": [
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/blind-final.md",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/edge-final.json",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/verification-final.md"
+  ],
+  "reportPresentation": "Complete filed claims/evidence retained; Markdown inline-code formatting normalized in archived text. Floor arithmetic is report metadata, not an issue."
+}

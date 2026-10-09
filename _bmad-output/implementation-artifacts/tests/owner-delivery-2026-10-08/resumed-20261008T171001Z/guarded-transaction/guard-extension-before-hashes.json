@@ -1,0 +1,34 @@
+{
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitRequest.cs",
+      "existed": true,
+      "sha256": "4f1fed9d4eb3ad0ef9a60c0db9895e1a977aa00a44c1a94818f9c66b698e04b6"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "existed": true,
+      "sha256": "1eef532ed2b513633185ded29ac399413e7aa9625eb97b6b14e5c1d67e3c7e16"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IGuardedStateTransactionAuthority.cs",
+      "existed": true,
+      "sha256": "23c11d29e6568394bca59df82e610b00d1099de08595d9c2a5b1909d3cca2861"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs",
+      "existed": true,
+      "sha256": "7b37e1b59b4b98a52c1ff3b1c638eb189e7126e1884d5bbf4b132708785cc397"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GuardedTransactionFixture.cs",
+      "existed": true,
+      "sha256": "f8637c0098ba1da6186d10ef3ffa5774e0b71c14fcb039546a1435d7e03380f8"
+    }
+  ]
+}

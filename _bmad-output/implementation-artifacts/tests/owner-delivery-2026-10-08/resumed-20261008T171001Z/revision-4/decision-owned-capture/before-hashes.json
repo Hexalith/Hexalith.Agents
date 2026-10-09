@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T01:11:24.787382+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs",
+      "existed": true,
+      "sha256": "5fd53a1cd36e4508f00c289c8b3f8f6c2be106bf599d5ec7c98aff1c4e328532",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/decision-owned-capture/before/platform/src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs",
+      "existed": true,
+      "sha256": "f4a8ce0f0f87d82ebe367235afdbbf2a70113ca9da4d79519dd453c6bf28a89f",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/decision-owned-capture/before/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs"
+    }
+  ]
+}

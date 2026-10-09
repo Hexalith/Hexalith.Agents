@@ -1,0 +1,343 @@
+{
+  "scope": "Earlier nonpassing invocations retained verbatim. True source regressions distinguished from assertion-only, weak-watchdog and rejected-review-premise attempts; excluded from current pass count.",
+  "genuineFailingBeforeCases": 25,
+  "attempts": [
+    {
+      "timestamp": "2026-10-09T02:16:35.091Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.EventStore.Server.Tests/Hexalith.EventStore.Server.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/history-owned-results/revision5-history-red-build.log",
+      "logSha256": "e9c28f413ee9cdfdc1998cc1a377976c3a15bb1e78be95333466fae640d0f333",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "0eb58f",
+      "firstDiagnostic": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs(560,44): error CS1061: 'StreamReadEvent' does not contain a definition for 'PayloadBytes' and no accessible extension method 'PayloadBytes' accepting a first argument of type 'StreamReadEvent' could be found (are you missing a using directive or an assembly reference?) [/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Hexalith.EventStore.Server.Tests.csproj]",
+      "interpretation": "Historical test compilation/analyzer correction, with no checks disabled; superseded by clean normal build."
+    },
+    {
+      "timestamp": "2026-10-09T02:17:27.148Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests.dll",
+        "-method",
+        "*OwnedReadableBufferIsClearedAfterCompletedUse",
+        "-method",
+        "*AbandonedCustodyResultIsClearedAtProviderCompletion",
+        "-result-xml",
+        "/tmp/revision5-history-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/history-owned-results/revision5-history-red-tests.log",
+      "logSha256": "5f6bf274ebed49c3bf290799a7fb66529b84cb7d656f59a623a413d8ef0ef148",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "854d8a",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/history-owned-results/revision5-history-red-tests.xml",
+      "result": {
+        "total": 5,
+        "passed": 0,
+        "failed": 5,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "interpretation": "Five genuine failed-before buffer lifetime regressions; provider-owned original input remains unchanged until termination."
+    },
+    {
+      "timestamp": "2026-10-09T02:18:11.668Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests.dll",
+        "-class",
+        "*RetainedIdentityHistorySourceReaderTests",
+        "-class",
+        "*ExpiredIdentityHistorySourceTests",
+        "-result-xml",
+        "/tmp/revision5-history-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/history-owned-results/revision5-history-tests.log",
+      "logSha256": "8d11fbd0e065970a6220075e1b4c6bd370516918f976a713dcd1d544f18b7a25",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "fdc7d4",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/history-owned-results/revision5-history-tests.xml",
+      "result": {
+        "total": 60,
+        "passed": 59,
+        "failed": 1,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "interpretation": "One assertion-only JSON casing mismatch: successful closed output intentionally uses web serialization; corrected exact expected web bytes. No production lifetime failure remaining."
+    },
+    {
+      "timestamp": "2026-10-09T02:19:21.465Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/signing-never-invoked/revision5-signing-red-build.log",
+      "logSha256": "07ef62d2c15b06c4ddfaf13db6b0c2ebdd1571305eff5a2bbdbf8d2091577ed7",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "bd0940",
+      "firstDiagnostic": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs(45,15): error xUnit1051: Calls to methods which accept CancellationToken should use TestContext.Current.CancellationToken to allow test cancellation to be more responsive. (https://xunit.net/xunit.analyzers/rules/xUnit1051) [/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj]",
+      "interpretation": "Historical test compilation/analyzer correction, with no checks disabled; superseded by clean normal build."
+    },
+    {
+      "timestamp": "2026-10-09T02:20:25.783Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-method",
+        "*PostIntentTrustLossRetainsKnownDeniedOriginal",
+        "-method",
+        "*UncertainSignatureDoesNotBorrowProviderDeniedAbsence",
+        "-result-xml",
+        "/tmp/revision5-signing-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/signing-never-invoked/revision5-signing-red-tests.log",
+      "logSha256": "154164bb7385cfb4953d0718f9905bffe5532afe71026000f0427346b9dc6061",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "cbc8a9",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/signing-never-invoked/revision5-signing-red-tests.xml",
+      "result": {
+        "total": 3,
+        "passed": 1,
+        "failed": 2,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "interpretation": "Two genuine post-intent trust-loss regressions; uncertain-sign control already passes."
+    },
+    {
+      "timestamp": "2026-10-09T02:21:21.597Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-method",
+        "*RecorderBindingIsRequiredForReadiness",
+        "-method",
+        "*FullAcknowledgedSpoolIsNotReadyAndKeepsOriginals",
+        "-result-xml",
+        "/tmp/revision5-spool-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/spool-readiness/revision5-spool-red-tests.log",
+      "logSha256": "6bb68323d70018a3dd5401ed7f6e9bfbc6c957e2c6d243152c741fcf1d9345e6",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "b8f549",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/spool-readiness/revision5-spool-red-tests.xml",
+      "result": {
+        "total": 3,
+        "passed": 0,
+        "failed": 3,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "interpretation": "Three genuine missing recorder/full retained capacity readiness regressions."
+    },
+    {
+      "timestamp": "2026-10-09T02:22:38.963Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-method",
+        "*SuspendedProfileReadIsBounded",
+        "-method",
+        "*FinalProfileCompletingAfterBudgetCannotReleaseCredential",
+        "-result-xml",
+        "/tmp/revision5-private-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/private-profile-bound/revision5-private-red-tests.log",
+      "logSha256": "fc0a51b1f955e4b30b47e230cca4a0783fa69340e1a2c23119855ebd883e0516",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "6bb6eb",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/private-profile-bound/revision5-private-red-tests.xml",
+      "result": {
+        "total": 5,
+        "passed": 0,
+        "failed": 5,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "interpretation": "Five genuine unbounded initial/final synchronous profile and late release regressions."
+    },
+    {
+      "timestamp": "2026-10-09T02:23:33.736Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.EventStore.Client.Tests/Hexalith.EventStore.Client.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/atomic-request-capture/revision5-atomic-red-build.log",
+      "logSha256": "abc6438a0216c2192d4d91051b56c8857adfdd3beeb7513d9c2374f5606bf01c",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "5a6efb",
+      "firstDiagnostic": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs(114,80): error CS0266: Cannot implicitly convert type 'System.Collections.Generic.IReadOnlyDictionary<string, string>' to 'System.Collections.Generic.Dictionary<string, string>'. An explicit conversion exists (are you missing a cast?) [/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Hexalith.EventStore.Client.Tests.csproj]",
+      "interpretation": "Rejected B4 review premise: concrete Extensions Dictionary cannot accept the proposed supplied interface collection. Original source/test bytes restored; no seam or API added."
+    },
+    {
+      "timestamp": "2026-10-09T02:27:07.683Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.PayloadProtection.Tests/bin/Debug/net10.0/Hexalith.EventStore.PayloadProtection.Tests.dll",
+        "-method",
+        "*SuspendedPathTraversalIsBounded",
+        "-result-xml",
+        "/tmp/revision5-path-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/protected-path-capture/revision5-path-red-tests.log",
+      "logSha256": "5d8b83dcf3ab9ce7af25388a48a94f0f0c13110b7ef2ebc8b635c26b82c413a8",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "95069d",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/protected-path-capture/revision5-path-red-tests.xml",
+      "result": {
+        "total": 6,
+        "passed": 3,
+        "failed": 3,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "interpretation": "First test attempt was too weak: three caller vectors fail, while three deadline vectors falsely accept external watchdog timeout. Retained honestly; not counted as independent genuine red evidence."
+    },
+    {
+      "timestamp": "2026-10-09T02:28:20.595Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.PayloadProtection.Tests/bin/Debug/net10.0/Hexalith.EventStore.PayloadProtection.Tests.dll",
+        "-method",
+        "*SuspendedPathTraversalIsBounded",
+        "-result-xml",
+        "/tmp/revision5-path-red-tests-second.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/protected-path-capture/revision5-path-red-tests-second.log",
+      "logSha256": "e00b601e571e6018626cf8a6621bc9a9694f8f3810a150359278e592f03344e4",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "86717a",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/protected-path-capture/revision5-path-red-tests-second.xml",
+      "result": {
+        "total": 6,
+        "passed": 0,
+        "failed": 6,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "interpretation": "Six strict genuine traversal GetEnumerator/MoveNext/Current caller/deadline failures; operation must complete before provider release, Count unused."
+    },
+    {
+      "timestamp": "2026-10-09T02:28:47.435Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests.dll",
+        "-method",
+        "*RestoredCumulativeCiphertextBoundPrecedesIndependentStateCalls",
+        "-method",
+        "*WithinBoundMultiCarrierRestartKeepsExactOriginals",
+        "-result-xml",
+        "/tmp/revision5-registry-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/registry-byte-bound/revision5-registry-red-tests.log",
+      "logSha256": "9c94d9cb7088e87040ebc8e4a3cbb41acd95ebd815940e39fbac27fedc2147a2",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "a99cad",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/registry-byte-bound/revision5-registry-red-tests.xml",
+      "result": {
+        "total": 2,
+        "passed": 1,
+        "failed": 1,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "interpretation": "One genuine cumulative sealed-copy bound failure; valid within-bound restart control passes."
+    },
+    {
+      "timestamp": "2026-10-09T02:32:27.726Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests.dll",
+        "-method",
+        "*RegistrationAwaitRechecksExecutionBeforeProtection",
+        "-result-xml",
+        "/tmp/revision5-aggregate-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/aggregate-registration-fence/revision5-aggregate-red-tests.log",
+      "logSha256": "d7f49b488c5df6ef9614fc4c6765757f3e77ba7d8d5b3bb8ff2bed960a0bc135",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "1b937e",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/aggregate-registration-fence/revision5-aggregate-red-tests.xml",
+      "result": {
+        "total": 3,
+        "passed": 1,
+        "failed": 2,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "interpretation": "Two genuine protection-before-postregistration-fence failures; current-authority control passes."
+    },
+    {
+      "timestamp": "2026-10-09T02:33:53.500Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests.dll",
+        "-method",
+        "*RetiredEpochCannotBeReactivatedByASecondRepair",
+        "-result-xml",
+        "/tmp/revision5-epoch-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/retired-repair-epoch/revision5-epoch-red-tests.log",
+      "logSha256": "014a406d12fdd80175d91b50145b696cd82cd3c37ebec76ca1fea7c10ee6ef16",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "e91e45",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/retired-repair-epoch/revision5-epoch-red-tests.xml",
+      "result": {
+        "total": 1,
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "interpretation": "One genuine retired A epoch reactivation failure through actual two-repair owner path after serialization."
+    }
+  ],
+  "V1Evidence": "Two current actual-owner in-flight method-only withdrawal cases. Root preverified the revision-4 20-case mutant gap; engineer did not perform another source mutation or claim a new failed-before run."
+}

@@ -1,0 +1,34 @@
+{
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/TrustedEnvelopeReplayIntent.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/TrustedEnvelopeReplayReceipt.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ITrustedEnvelopeReplayRegistrar.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/TrustedEnvelopeReplayVerifier.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformPrivateCapabilityComposition.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs",
+      "existed": false
+    }
+  ]
+}

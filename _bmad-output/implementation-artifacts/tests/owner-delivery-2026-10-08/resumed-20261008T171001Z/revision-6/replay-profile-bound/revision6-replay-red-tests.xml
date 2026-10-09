@@ -1,0 +1,79 @@
+<assemblies schema-version="3" id="d0458b0f-04df-45c9-a35d-24fc6021f816" computer="DESKTOP-VIOG240" user="administrator" start-rtf="2026-10-09T06:41:42.1376191+00:00" finish-rtf="2026-10-09T06:41:50.3760067+00:00" timestamp="10/09/2026 08:41:50"><assembly environment="64-bit (x64) .NET 10.0.12 [collection-per-class, parallel (collections, 14 threads)]" id="26405b11-e7c6-45d7-a369-f77a0068a70d" name="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll" run-date="2026-10-09" run-time="06:41:42" start-rtf="2026-10-09T06:41:42.1376191+00:00" test-framework="xUnit.net v3 4.0.1+8ed8aa354c" target-framework=".NETCoreApp,Version=v10.0" errors="0" failed="6" finish-rtf="2026-10-09T06:41:50.3760067+00:00" not-run="0" passed="0" skipped="0" time="8.239" time-rtf="00:00:08.2390000" total="6"><collection name="Test collection for Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests (id: f0d8db502799c838e02ef54ae362a4a5e522c50d136a4e21722e259cb7d6092b)" id="abc15310-9ef0-42e8-b88d-247553aa6931" failed="6" not-run="0" passed="0" skipped="0" time="8.127" time-rtf="00:00:08.1270000" total="6"><test id="dea1e441-cb26-4f01-aaf6-79998a5adcd0" name="Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests.FinalProfileMustReconfirmWholeBudget(cancellation: False)" result="Fail" time="0.109" time-rtf="00:00:00.1090000" start-rtf="2026-10-09T06:41:42.2149459+00:00" finish-rtf="2026-10-09T06:41:42.3359394+00:00" type="Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests" method="FinalProfileMustReconfirmWholeBudget" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs" source-line="133"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : else { var result = await verifier.VerifyAsync(envelope, expected, caller.Token); result.Status
+    should be
+CustodyStatus.Unavailable
+    but was
+CustodyStatus.Succeeded</message><stack-trace>   at Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests.FinalProfileMustReconfirmWholeBudget(Boolean cancellation) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs:line 144
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="80a953ff-fb42-4a1b-adff-4ecc05f62e60" name="Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests.FinalProfileMustReconfirmWholeBudget(cancellation: True)" result="Fail" time="0.006" time-rtf="00:00:00.0060000" start-rtf="2026-10-09T06:41:42.3387273+00:00" finish-rtf="2026-10-09T06:41:42.3453229+00:00" type="Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests" method="FinalProfileMustReconfirmWholeBudget" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs" source-line="133"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `verifier.VerifyAsync(envelope, expected, caller.Token)`
+    should throw
+System.OperationCanceledException
+    but did not</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests.FinalProfileMustReconfirmWholeBudget(Boolean cancellation) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs:line 143
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="0aca9e6e-3136-4b0f-a3a1-2532875f13f4" name="Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests.SuspendedReplayProfileUsesWholeBudget(final: False, cancellation: False)" result="Fail" time="2.003" time-rtf="00:00:02.0030000" start-rtf="2026-10-09T06:41:42.3502394+00:00" finish-rtf="2026-10-09T06:41:44.3546626+00:00" type="Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests" method="SuspendedReplayProfileUsesWholeBudget" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs" source-line="106"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests.SuspendedReplayProfileUsesWholeBudget(Boolean final, Boolean cancellation) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs:line 125
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="c78429f9-8787-4dd7-90e6-2aafe63db588" name="Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests.SuspendedReplayProfileUsesWholeBudget(final: False, cancellation: True)" result="Fail" time="2.005" time-rtf="00:00:02.0050000" start-rtf="2026-10-09T06:41:44.3547910+00:00" finish-rtf="2026-10-09T06:41:46.3603995+00:00" type="Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests" method="SuspendedReplayProfileUsesWholeBudget" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs" source-line="106"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests.SuspendedReplayProfileUsesWholeBudget(Boolean final, Boolean cancellation) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs:line 124
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="4b3902e2-e975-4a87-ac31-7d98c12de4c9" name="Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests.SuspendedReplayProfileUsesWholeBudget(final: True, cancellation: False)" result="Fail" time="2.002" time-rtf="00:00:02.0019999" start-rtf="2026-10-09T06:41:46.3606294+00:00" finish-rtf="2026-10-09T06:41:48.3638845+00:00" type="Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests" method="SuspendedReplayProfileUsesWholeBudget" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs" source-line="106"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests.SuspendedReplayProfileUsesWholeBudget(Boolean final, Boolean cancellation) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs:line 125
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="768f8b3e-a960-48d1-b597-aaf02c9fc4fb" name="Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests.SuspendedReplayProfileUsesWholeBudget(final: True, cancellation: True)" result="Fail" time="2.002" time-rtf="00:00:02.0019999" start-rtf="2026-10-09T06:41:48.3640028+00:00" finish-rtf="2026-10-09T06:41:50.3673056+00:00" type="Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests" method="SuspendedReplayProfileUsesWholeBudget" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs" source-line="106"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests.SuspendedReplayProfileUsesWholeBudget(Boolean final, Boolean cancellation) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs:line 124
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test></collection></assembly></assemblies>

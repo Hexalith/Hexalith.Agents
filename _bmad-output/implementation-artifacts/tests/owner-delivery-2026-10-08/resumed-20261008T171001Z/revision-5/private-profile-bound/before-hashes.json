@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T02:21:21.637791+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+      "existed": true,
+      "sha256": "98a54c3f59d0d46544c3b260b07e6ec10a200a50f2d7c1f5a233817f286395d8",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/private-profile-bound/before/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs",
+      "existed": true,
+      "sha256": "439fe31155eb4cd3aa71fd6c1b20ecccb6c11574907ec94d49090bb02de91438",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/private-profile-bound/before/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs"
+    }
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "reviewRevision": 4,
+  "allThreeLayersLaunchedBeforeAnyReportHandling": true,
+  "allThreeFinalReportsReceivedBeforeIndividualTriage": true,
+  "diffFile": "/tmp/hexalith-owner-source-review-6x63lh88.diff",
+  "diffSha256": "bdf041b164095a262853bb28517f04d29da39560f112dcac6e1ba7cea6e85254",
+  "individualVerdicts": [
+    {
+      "id": "B1",
+      "layer": "blind",
+      "location": "ReplicatedSecurityObservationSpool.cs:203",
+      "claim": "Readiness succeeds with no recorder on an empty or acknowledged spool.",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "IsReadyAsync checks authority, durable state, no pending stage and acknowledgements, but never recorder; DrainAsync returns zero whenever recorder is absent. Private composition checks do not close the public constructor path. Require the existing recorder binding, without fabricating runtime qualification."
+    },
+    {
+      "id": "B2",
+      "layer": "blind",
+      "location": "ReplicatedSecurityObservationSpool.cs:206",
+      "claim": "Fully acknowledged 10,000-record state reports ready despite permanent new-observation refusal.",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "ObserveAsync refuses a new identity at RecordBound; IsReadyAsync admits the same full state, and no purge removes records. The smallest correction is readiness refusal at the existing bound, preserving exact duplicate/original lookup and retained records; no rollover protocol is required."
+    },
+    {
+      "id": "B3",
+      "layer": "blind",
+      "location": "PrivateOwnerOperationAuthenticator.cs:29,55",
+      "claim": "Unbounded initial/final signing-profile acquisition defeats the shared deadline and permits late credential release.",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "Both GetCurrent calls execute directly outside AwaitAsync; the final call follows the last bounded grant read, and terminal release checks only caller cancellation. A synchronous provider can suspend either call or advance the clock past 30 seconds. Use existing bounded helper and final elapsed-time check."
+    },
+    {
+      "id": "B4",
+      "layer": "blind",
+      "location": "DirectoryAtomicAppendClient.cs:21",
+      "claim": "Request Extensions capture runs synchronously outside the deadline worker.",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "ExecuteAsync creates a deadline but directly calls Capture before try; Capture reads Extensions.Count and enumerates caller-supplied IReadOnlyDictionary. Per-item cancellation cannot interrupt a blocked Count/MoveNext. Bound this existing capture while preserving malformed-input behavior and cancellation precedence."
+    },
+    {
+      "id": "B5",
+      "layer": "blind",
+      "location": "InteractionOccurrenceProtector.cs:87",
+      "claim": "Synchronous protected-path manifest capture defeats the whole operation budget.",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "ProtectAsync calls ProtectedPathManifestCodec.Create(paths) directly before AwaitAsync. A blocked provider-owned collection retains the caller. Existing AwaitAsync supports pure local capture and abandoned cleanup; do not move registry/encryption/persistence onto a late worker."
+    },
+    {
+      "id": "B6",
+      "layer": "blind",
+      "location": "InteractionOccurrenceRegistryActor.cs:155",
+      "claim": "Registry capture copies individually bounded ciphertext records without a cumulative byte bound.",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "CaptureState permits 10,000 records and CaptureSealed copies up to 16 MiB each before independent exact-state validation or the 32 MiB pending-state limit. Several individually valid carriers already exceed the existing admitted carrier budget; malformed restored state may repeatedly allocate copies. Check cumulative bytes before each copy using the existing operational carrier budget, not a new deployment capacity policy."
+    },
+    {
+      "id": "B7",
+      "layer": "blind",
+      "location": "RetainedIdentityHistorySourceReader.cs:127",
+      "claim": "Custody-returned transient plaintext lacks completed and abandoned-result cleanup.",
+      "verdict": "medium",
+      "route": "bad_spec",
+      "evidence": "The source reader's deadline call supplies no abandoned-result cleanup, and no finally clears readable.PayloadBytes after deserialization, validation failures or later cancellation. The custody seam does not describe transfer ownership. A coherent narrow ownership/cleanup correction is needed; preserve provider access until termination, persisted ciphertext and intentionally returned detached closed history."
+    },
+    {
+      "id": "B8",
+      "layer": "blind",
+      "location": "AggregateActor.cs:1394",
+      "claim": "Publication registration separates execution-fence validation from protection/event staging.",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "The new registration await follows EnsureExecutionFenceAsync and precedes EventPersister.PersistEventsAsync. The next existing fence is before snapshot or SaveStateAsync, after protection/reservation staging has begun. Revalidate the same execution context immediately after registration; the later commit fence remains required."
+    },
+    {
+      "id": "B9",
+      "layer": "blind",
+      "location": "DeletionBatchCapabilityIdentity.cs:12",
+      "claim": "Hash helper accepting invalid manifest vectors causes inconsistent public primitive guarantees.",
+      "verdict": "false",
+      "route": "reject-false",
+      "evidence": "This method is explicitly a byte identity primitive granting no authority; it preserves exact supplied order rather than treating vectors as sets. Actual guard ValidBatch and protection Capture enforce nonempty, same-tenant, strict ordinal ordering/uniqueness before issue/consume; the coordinator passes authenticated guard targets into the same protection validation. No named caller authorizes an invalid manifest merely from this digest, so the claimed behavioral harm is absent."
+    },
+    {
+      "id": "B10",
+      "layer": "blind",
+      "location": "Fr34ProtectionGate.cs:156 (same late-cleanup path as revision-2 B6)",
+      "claim": "Expired originally owned late canary cannot clean up without a fresh grant/durable orphan recovery.",
+      "verdict": "low",
+      "route": "reject-low-complexity",
+      "carried": true,
+      "evidence": "carried revision-2 B6: same original lifetime/current-authority cleanup path and same proposed new durable/fresh-grant recovery subsystem. Fresh random canary material confers no readiness after expiry; exclusive original authority remains required. Rare cleanup failure does not justify the rejected protocol/storage expansion. Do not patch or defer it again."
+    },
+    {
+      "id": "E1",
+      "layer": "edge",
+      "location": "DeletionCapabilitySigningActor.cs:51-55",
+      "claim": "Known noninvoked signing intent is stranded in Unknown after trust disappears.",
+      "verdict": "medium",
+      "route": "bad_spec",
+      "evidence": "Unknown is durably saved, then the second trust read may return unavailable without a Sign call. Subsequent Sign/Lookup only resolve provider.Lookup; every nonsigned result remains Unknown, and obsolescence requires Signed. This conflates known nonissue with a genuinely uncertain attempted effect. Correct the original-owner disposition/consumer behavior coherently using sound existing negative outcomes where sufficient; never blindly repeat a possibly executed signature or fabricate a signed no-issue proof."
+    },
+    {
+      "id": "E2",
+      "layer": "edge",
+      "location": "GovernanceScopeGuardReducer.cs:49-53",
+      "claim": "Successor activation can reuse a previously retired epoch.",
+      "verdict": "high",
+      "route": "patch",
+      "evidence": "ActivateSuccessor only excludes current EpochId, appends retired repair epochs to RepairHistory, and AppendWrite then accepts the new current epoch. The complete original guard history is available but never checked here; DirectoryMigrationBoundaryActor already excludes its prior epochs. Deny reuse of retained repair epochs at the same owning guard transition, with actual two-repair/restart/old-writer tests. Independent current evidence does not replace the reducer's epoch invariant."
+    },
+    {
+      "id": "V1",
+      "layer": "verification",
+      "location": "ExportKeyDeliveryActor.cs:26,58 / ExportKeyDeliveryActorTests",
+      "claim": "Final private operation credential withdrawal during delivery/lookup lacks regression coverage.",
+      "verdict": "medium",
+      "route": "patch",
+      "preverified": true,
+      "evidence": "Accepted as filed: symbol searches and isolated mutation deleting both terminal method-authorization checks still yield 20 passing actor tests. Existing denial changes credentials before another invocation, and physical-authority withdrawal tests a different permission. Add actually suspended in-flight Deliver/Lookup withdrawal tests preserving durable original outcomes and denying response evidence; production terminal checks already exist."
+    }
+  ],
+  "groups": [
+    {
+      "members": [
+        "B1"
+      ],
+      "verdict": "medium",
+      "route": "patch"
+    },
+    {
+      "members": [
+        "B2"
+      ],
+      "verdict": "medium",
+      "route": "patch"
+    },
+    {
+      "members": [
+        "B3"
+      ],
+      "verdict": "medium",
+      "route": "patch"
+    },
+    {
+      "members": [
+        "B4"
+      ],
+      "verdict": "medium",
+      "route": "patch"
+    },
+    {
+      "members": [
+        "B5"
+      ],
+      "verdict": "medium",
+      "route": "patch"
+    },
+    {
+      "members": [
+        "B6"
+      ],
+      "verdict": "medium",
+      "route": "patch"
+    },
+    {
+      "members": [
+        "B7"
+      ],
+      "verdict": "medium",
+      "route": "bad_spec"
+    },
+    {
+      "members": [
+        "B8"
+      ],
+      "verdict": "medium",
+      "route": "patch"
+    },
+    {
+      "members": [
+        "E1"
+      ],
+      "verdict": "medium",
+      "route": "bad_spec"
+    },
+    {
+      "members": [
+        "E2"
+      ],
+      "verdict": "high",
+      "route": "patch"
+    },
+    {
+      "members": [
+        "V1"
+      ],
+      "verdict": "medium",
+      "route": "patch"
+    }
+  ],
+  "counts": {
+    "findings": 13,
+    "bad_spec": 2,
+    "patch": 9,
+    "reject_false": 1,
+    "carried_reject_low_complexity": 1,
+    "defer": 0
+  },
+  "nextReviewLoopIteration": 5,
+  "sourceFullVerification": "Root full Local matrix remains mandatory and pending stable revised source. Focused evidence does not satisfy it.",
+  "runtimeQualification": "unestablished; no status promotion"
+}

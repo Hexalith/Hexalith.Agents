@@ -1,0 +1,531 @@
+{
+  "capturedUtc": "2026-10-09T08:06:38.963528+00:00",
+  "reviewManifest": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/review-input.json",
+  "reviewManifestSha256": "ac0018daa6d3d200a3dcc13301346ee8cd221b52c6c0cc55faf9bc48133303b7",
+  "commands": [
+    {
+      "name": "Parties complete mapped Local lanes",
+      "cwd": "/home/administrator/projects/hexalith/parties",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-parties-1.ps1",
+        "-Mode",
+        "Local",
+        "-EvidenceDirectory",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties",
+        "-ArtifactsDirectory",
+        "/tmp/hexalith-owner-root-revision6-full-local-20261009075941z-20261008/parties"
+      ],
+      "startedUtc": "2026-10-09T07:59:41.235839+00:00",
+      "finishedUtc": "2026-10-09T08:02:57.582740+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/root-invocation.log",
+      "buildLogs": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.EventStore.Client.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.EventStore.Contracts.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.EventStore.PayloadProtection.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.EventStore.Server.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Parties.Client.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Parties.Contracts.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Parties.Security.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Parties.Server.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Parties.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Parties.UI.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Platform.Custody.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Platform.Identity.Tests-build.log"
+      ],
+      "xmlFiles": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.EventStore.Client.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.EventStore.Contracts.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.EventStore.PayloadProtection.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.EventStore.Server.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Parties.Client.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Parties.Contracts.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Parties.Security.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Parties.Server.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Parties.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Parties.UI.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Platform.Custody.Tests-tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/parties/Hexalith.Platform.Identity.Tests-tests.xml"
+      ],
+      "requiredClasses": []
+    },
+    {
+      "name": "Conversations four-suite Local",
+      "cwd": "/home/administrator/projects/hexalith/conversations",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-conv-ai-1.ps1",
+        "-Mode",
+        "Local",
+        "-ArtifactsPath",
+        "/tmp/hexalith-owner-root-revision6-full-local-20261009075941z-20261008/conversations"
+      ],
+      "startedUtc": "2026-10-09T08:02:57.585904+00:00",
+      "finishedUtc": "2026-10-09T08:04:08.594463+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/conversations/root-invocation.log",
+      "buildLogs": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/conversations/Hexalith.Conversations.Client.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/conversations/Hexalith.Conversations.Contracts.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/conversations/Hexalith.Conversations.Server.Tests-build.log",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/conversations/Hexalith.Conversations.Tests-build.log"
+      ],
+      "xmlFiles": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/conversations/Hexalith.Conversations.Client.Tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/conversations/Hexalith.Conversations.Contracts.Tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/conversations/Hexalith.Conversations.Server.Tests.xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/conversations/Hexalith.Conversations.Tests.xml"
+      ],
+      "requiredClasses": [
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationDeliveryTests",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationProjectorTests",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests",
+        "Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests"
+      ],
+      "actualArtifactsPath": "/tmp/hexalith-owner-root-revision6-full-local-20261009075941z-20261008/conversations/run-20261009T0802588645980Z"
+    },
+    {
+      "name": "Custody expanded Local",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "eng/verify-ext-secrets-1.ps1",
+        "-Mode",
+        "Local",
+        "-ArtifactsDirectory",
+        "/tmp/hexalith-owner-root-revision6-full-local-20261009075941z-20261008/custody",
+        "-EvidenceDirectory",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/custody",
+        "-EventStoreSourceRoot",
+        "/home/administrator/projects/hexalith/eventstore"
+      ],
+      "startedUtc": "2026-10-09T08:04:08.602343+00:00",
+      "finishedUtc": "2026-10-09T08:05:51.601812+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/custody/root-invocation.log",
+      "buildLogs": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/custody/local-build.log"
+      ],
+      "xmlFiles": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/custody/local-tests.xml"
+      ],
+      "requiredClasses": [
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests",
+        "Hexalith.Platform.Custody.Tests.DeletionBatchCapabilityCodecTests",
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests",
+        "Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests",
+        "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests",
+        "Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests",
+        "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests",
+        "Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests",
+        "Hexalith.Platform.Custody.Tests.PlatformAcceptedEnvelopeTimingTests",
+        "Hexalith.Platform.Custody.Tests.PlatformKeyInventoryActorTests",
+        "Hexalith.Platform.Custody.Tests.PlatformSecurityDenialRecorderTests",
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationAuthenticatorTests",
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests",
+        "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests",
+        "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolWorkerTests",
+        "Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests"
+      ]
+    },
+    {
+      "name": "SDK current source version",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "msbuild",
+        "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Hexalith.EventStore.Contracts.csproj",
+        "-nologo",
+        "-getProperty:HexalithEventStoreVersion",
+        "-p:Configuration=Debug",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:NuGetAudit=false"
+      ],
+      "startedUtc": "2026-10-09T08:05:51.602742+00:00",
+      "finishedUtc": "2026-10-09T08:05:52.034884+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/eventstore-version.stdout.log",
+      "stderrLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/eventstore-version.stderr.log",
+      "buildLogs": [],
+      "xmlFiles": [],
+      "requiredClasses": []
+    },
+    {
+      "name": "Hexalith.EventStore.Contracts.Tests normal build",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "build",
+        "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/Hexalith.EventStore.Contracts.Tests.csproj",
+        "-c",
+        "Debug",
+        "--artifacts-path",
+        "/tmp/hexalith-owner-root-revision6-full-local-20261009075941z-20261008/eventstore",
+        "-m:1",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:UseNuGetDeps=false",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:HexalithEventStoreVersion=3.117.1"
+      ],
+      "startedUtc": "2026-10-09T08:05:52.036774+00:00",
+      "finishedUtc": "2026-10-09T08:06:00.529813+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.Contracts.Tests/root-invocation.log",
+      "buildLogs": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.Contracts.Tests/root-invocation.log"
+      ],
+      "xmlFiles": [],
+      "requiredClasses": []
+    },
+    {
+      "name": "Hexalith.EventStore.Contracts.Tests owned consumer tests",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "/tmp/hexalith-owner-root-revision6-full-local-20261009075941z-20261008/eventstore/bin/Hexalith.EventStore.Contracts.Tests/debug/Hexalith.EventStore.Contracts.Tests.dll",
+        "-class",
+        "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests",
+        "-result-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.Contracts.Tests/tests.xml"
+      ],
+      "startedUtc": "2026-10-09T08:06:00.530954+00:00",
+      "finishedUtc": "2026-10-09T08:06:01.046767+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.Contracts.Tests/execution/root-invocation.log",
+      "buildLogs": [],
+      "xmlFiles": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.Contracts.Tests/tests.xml"
+      ],
+      "requiredClasses": [
+        "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests"
+      ]
+    },
+    {
+      "name": "Hexalith.EventStore.Client.Tests normal build",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "build",
+        "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Hexalith.EventStore.Client.Tests.csproj",
+        "-c",
+        "Debug",
+        "--artifacts-path",
+        "/tmp/hexalith-owner-root-revision6-full-local-20261009075941z-20261008/eventstore",
+        "-m:1",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:UseNuGetDeps=false",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:HexalithEventStoreVersion=3.117.1"
+      ],
+      "startedUtc": "2026-10-09T08:06:01.048511+00:00",
+      "finishedUtc": "2026-10-09T08:06:06.896447+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.Client.Tests/root-invocation.log",
+      "buildLogs": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.Client.Tests/root-invocation.log"
+      ],
+      "xmlFiles": [],
+      "requiredClasses": []
+    },
+    {
+      "name": "Hexalith.EventStore.Client.Tests owned consumer tests",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "/tmp/hexalith-owner-root-revision6-full-local-20261009075941z-20261008/eventstore/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests",
+        "-result-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.Client.Tests/tests.xml"
+      ],
+      "startedUtc": "2026-10-09T08:06:06.898644+00:00",
+      "finishedUtc": "2026-10-09T08:06:09.872063+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.Client.Tests/execution/root-invocation.log",
+      "buildLogs": [],
+      "xmlFiles": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.Client.Tests/tests.xml"
+      ],
+      "requiredClasses": [
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests",
+        "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests"
+      ]
+    },
+    {
+      "name": "Hexalith.EventStore.Server.Tests normal build",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "build",
+        "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Hexalith.EventStore.Server.Tests.csproj",
+        "-c",
+        "Debug",
+        "--artifacts-path",
+        "/home/administrator/projects/hexalith/eventstore/.artifacts/owner-r6-root-server-refresh-20261009t0818z",
+        "-m:1",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:UseNuGetDeps=false",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:HexalithEventStoreVersion=3.117.1"
+      ],
+      "startedUtc": "2026-10-09T08:18:30.135452+00:00",
+      "finishedUtc": "2026-10-09T08:18:44.644219+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/supplemental-exact-repo-layout-verification/1.log",
+      "buildLogs": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/supplemental-exact-repo-layout-verification/1.log"
+      ],
+      "xmlFiles": [],
+      "requiredClasses": []
+    },
+    {
+      "name": "Hexalith.EventStore.Server.Tests owned consumer tests",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "/home/administrator/projects/hexalith/eventstore/.artifacts/owner-r6-root-server-refresh-20261009t0818z/bin/Hexalith.EventStore.Server.Tests/debug/Hexalith.EventStore.Server.Tests.dll",
+        "-class",
+        "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests",
+        "-class",
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests",
+        "-class",
+        "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests",
+        "-class",
+        "Hexalith.EventStore.Server.Tests.Security.ExpiredIdentityHistorySourceTests",
+        "-class",
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests",
+        "-class",
+        "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests",
+        "-class",
+        "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests",
+        "-class",
+        "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests",
+        "-class",
+        "Hexalith.EventStore.Server.Tests.Security.SecretsProtectionTests",
+        "-result-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/supplemental-exact-repo-layout-verification/server-tests.xml"
+      ],
+      "startedUtc": "2026-10-09T08:18:44.644677+00:00",
+      "finishedUtc": "2026-10-09T08:21:21.323173+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/supplemental-exact-repo-layout-verification/2.log",
+      "buildLogs": [],
+      "xmlFiles": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/supplemental-exact-repo-layout-verification/server-tests.xml"
+      ],
+      "requiredClasses": [
+        "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests",
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests",
+        "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests",
+        "Hexalith.EventStore.Server.Tests.Security.ExpiredIdentityHistorySourceTests",
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests",
+        "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests",
+        "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests",
+        "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests",
+        "Hexalith.EventStore.Server.Tests.Security.SecretsProtectionTests"
+      ],
+      "additionalChangedUnownedClass": "Meaningful affected verification for a concurrent edit; not attributed to this build."
+    },
+    {
+      "name": "Hexalith.EventStore.PayloadProtection.Tests normal build",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "build",
+        "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/Hexalith.EventStore.PayloadProtection.Tests.csproj",
+        "-c",
+        "Debug",
+        "--artifacts-path",
+        "/tmp/hexalith-owner-root-revision6-full-local-20261009075941z-20261008/eventstore",
+        "-m:1",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:UseNuGetDeps=false",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:HexalithEventStoreVersion=3.117.1"
+      ],
+      "startedUtc": "2026-10-09T08:06:27.699190+00:00",
+      "finishedUtc": "2026-10-09T08:06:31.038155+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.PayloadProtection.Tests/root-invocation.log",
+      "buildLogs": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.PayloadProtection.Tests/root-invocation.log"
+      ],
+      "xmlFiles": [],
+      "requiredClasses": []
+    },
+    {
+      "name": "Hexalith.EventStore.PayloadProtection.Tests owned consumer tests",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "/tmp/hexalith-owner-root-revision6-full-local-20261009075941z-20261008/eventstore/bin/Hexalith.EventStore.PayloadProtection.Tests/debug/Hexalith.EventStore.PayloadProtection.Tests.dll",
+        "-result-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.PayloadProtection.Tests/tests.xml"
+      ],
+      "startedUtc": "2026-10-09T08:06:31.039437+00:00",
+      "finishedUtc": "2026-10-09T08:06:35.015480+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.PayloadProtection.Tests/execution/root-invocation.log",
+      "buildLogs": [],
+      "xmlFiles": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/Hexalith.EventStore.PayloadProtection.Tests/tests.xml"
+      ],
+      "requiredClasses": [
+        "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceKeyDerivationTests",
+        "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests"
+      ]
+    },
+    {
+      "name": "Host LocalScaffold",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "bash",
+        "eng/verify-agents-host.sh",
+        "--mode",
+        "LocalScaffold",
+        "--artifacts-path",
+        "/tmp/hexalith-owner-root-revision6-full-local-20261009075941z-20261008/host"
+      ],
+      "startedUtc": "2026-10-09T08:06:35.017551+00:00",
+      "finishedUtc": "2026-10-09T08:06:36.989425+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/host-scaffold/root-invocation.log",
+      "buildLogs": [],
+      "xmlFiles": [],
+      "requiredClasses": [],
+      "normalBuildDiagnosticCommand": "Host normal Debug diagnostic build"
+    },
+    {
+      "name": "Host normal Debug diagnostic build",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "build",
+        "./apphost.cs",
+        "-c",
+        "Debug",
+        "--artifacts-path",
+        "/tmp/hexalith-owner-root-revision6-full-local-20261009075941z-20261008/host-diagnostics",
+        "-p:TreatWarningsAsErrors=true",
+        "-p:AspireUseCliBundle=true",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0",
+        "-v",
+        "normal"
+      ],
+      "startedUtc": "2026-10-09T08:06:36.992247+00:00",
+      "finishedUtc": "2026-10-09T08:06:38.962690+00:00",
+      "exitCode": 0,
+      "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/host-normal-diagnostics/root-invocation.log",
+      "buildLogs": [
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/host-normal-diagnostics/root-invocation.log"
+      ],
+      "xmlFiles": [],
+      "requiredClasses": []
+    }
+  ],
+  "requiredOwnedClasses": {
+    "Hexalith.Conversations.Server.Tests": [
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationDeliveryTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationProjectorTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests",
+      "Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests"
+    ],
+    "Hexalith.EventStore.Client.Tests": [
+      "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests",
+      "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests",
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests"
+    ],
+    "Hexalith.EventStore.Contracts.Tests": [
+      "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests"
+    ],
+    "Hexalith.EventStore.PayloadProtection.Tests": [
+      "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceKeyDerivationTests",
+      "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests"
+    ],
+    "Hexalith.EventStore.Server.Tests": [
+      "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests",
+      "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests",
+      "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests",
+      "Hexalith.EventStore.Server.Tests.Security.ExpiredIdentityHistorySourceTests",
+      "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests",
+      "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests",
+      "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests",
+      "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests"
+    ],
+    "Hexalith.Parties.Tests": [
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests"
+    ],
+    "Hexalith.Platform.Custody.Tests": [
+      "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests",
+      "Hexalith.Platform.Custody.Tests.DeletionBatchCapabilityCodecTests",
+      "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests",
+      "Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests",
+      "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests",
+      "Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests",
+      "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests",
+      "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests",
+      "Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests",
+      "Hexalith.Platform.Custody.Tests.PlatformAcceptedEnvelopeTimingTests",
+      "Hexalith.Platform.Custody.Tests.PlatformKeyInventoryActorTests",
+      "Hexalith.Platform.Custody.Tests.PlatformSecurityDenialRecorderTests",
+      "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationAuthenticatorTests",
+      "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests",
+      "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests",
+      "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolWorkerTests",
+      "Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests"
+    ]
+  },
+  "scope": "Original complete Local matrix with actual fresh affected Server build/tests plus concurrent SecretsProtectionTests; unrelated drift classified separately. No live qualification.",
+  "countingLimits": "Parties custody/SDK and dedicated owner lanes overlap. Do not sum as unique coverage.",
+  "originalCommandIndex": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision6-full-local-20261009075941z/command-index.json",
+  "originalCommandIndexSha256": "d5be3305ef9cef60fb4fea10e98b11ff1e06992cf21801ab0148151438b523a9",
+  "supplementalCommandIndex": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/supplemental-exact-repo-layout-verification/command-index.json"
+}

@@ -1,0 +1,100 @@
+--- /home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs (root read preview)
++++ /home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs (final freeze)
+@@ -296,26 +296,4 @@
+         }
+         finally { unblock.Set(); released.TrySetResult(); }
+     }
+-
+-    private sealed class PumpClock : TimeProvider
+-    {
+-        private long _ticks;
+-        private readonly List<PumpTimer> _timers = [];
+-        public override long TimestampFrequency => TimeSpan.TicksPerSecond;
+-        public override long GetTimestamp() => Interlocked.Read(ref _ticks);
+-        public override DateTimeOffset GetUtcNow() => F.At.AddTicks(GetTimestamp());
+-        public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+-        { var timer = new PumpTimer(callback, state, GetTimestamp() + dueTime.Ticks); lock (_timers) { _timers.Add(timer); } return timer; }
+-        internal void Advance(TimeSpan elapsed)
+-        { long now = Interlocked.Add(ref _ticks, elapsed.Ticks); PumpTimer[] timers; lock (_timers) { timers = _timers.ToArray(); } foreach (var timer in timers) { timer.Fire(now); } }
+-        private sealed class PumpTimer(TimerCallback callback, object? state, long due) : ITimer
+-        {
+-            private int _disposed;
+-            internal void Fire(long now) { if (now >= due && Interlocked.Exchange(ref _disposed, 1) == 0) { callback(state); } }
+-            public bool Change(TimeSpan dueTime, TimeSpan period) => false;
+-            public void Dispose() => Interlocked.Exchange(ref _disposed, 1);
+-            public ValueTask DisposeAsync() { Dispose(); return ValueTask.CompletedTask; }
+-        }
+-    }
+-
+ }
+--- /home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/PumpClock.cs (root read preview)
++++ /home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/PumpClock.cs (final freeze)
+@@ -0,0 +1,17 @@
++using F = Hexalith.Conversations.Server.Tests.Agents.ConversationAgentLocalFixture;
++
++namespace Hexalith.Conversations.Server.Tests.Agents;
++
++/// <summary>Controlled monotonic test clock for the pump whole-operation budget.</summary>
++internal sealed class PumpClock : TimeProvider
++{
++    private long _ticks;
++    private readonly List<PumpTimer> _timers = [];
++    public override long TimestampFrequency => TimeSpan.TicksPerSecond;
++    public override long GetTimestamp() => Interlocked.Read(ref _ticks);
++    public override DateTimeOffset GetUtcNow() => F.At.AddTicks(GetTimestamp());
++    public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
++    { var timer = new PumpTimer(callback, state, GetTimestamp() + dueTime.Ticks); lock (_timers) { _timers.Add(timer); } return timer; }
++    internal void Advance(TimeSpan elapsed)
++    { long now = Interlocked.Add(ref _ticks, elapsed.Ticks); PumpTimer[] timers; lock (_timers) { timers = _timers.ToArray(); } foreach (var timer in timers) { timer.Fire(now); } }
++}
+--- /home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/PumpTimer.cs (root read preview)
++++ /home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/PumpTimer.cs (final freeze)
+@@ -0,0 +1,11 @@
++namespace Hexalith.Conversations.Server.Tests.Agents;
++
++/// <summary>Single controlled test-clock deadline signal.</summary>
++internal sealed class PumpTimer(TimerCallback callback, object? state, long due) : ITimer
++{
++    private int _disposed;
++    internal void Fire(long now) { if (now >= due && Interlocked.Exchange(ref _disposed, 1) == 0) { callback(state); } }
++    public bool Change(TimeSpan dueTime, TimeSpan period) => false;
++    public void Dispose() => Interlocked.Exchange(ref _disposed, 1);
++    public ValueTask DisposeAsync() { Dispose(); return ValueTask.CompletedTask; }
++}
+--- /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementReconciliation.cs (root read preview)
++++ /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementReconciliation.cs (final freeze)
+@@ -9,7 +9,3 @@
+ public sealed record DeletionBlockedReplacementReconciliation(string OperationId, string CompromiseBlockReceiptId, long ExpectedKeyBlockSetRevision,
+     string GuardReplacementReceiptId, DeletionBatchCapabilityV1 Capability, string DetachedJws, string SigningRequestId,
+     long CommittedIssuedGuardRevision, IReadOnlyList<ProtectionTarget> Targets, DeletionCapabilityRevocationReceipt RevocationReceipt);
+-
+-/// <summary>Only an independently retained original blocked disposition; never a dispatch or physical effect receipt.</summary>
+-/// <param name="Original">Exact original no-effect reconciliation.</param><param name="Outcome">Its original immutable owner outcome.</param>
+-public sealed record DeletionBlockedReplacementResult(DeletionBlockedReplacementReconciliation Original, DeletionConsumptionOutcome Outcome);
+--- /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementResult.cs (root read preview)
++++ /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementResult.cs (final freeze)
+@@ -0,0 +1,5 @@
++namespace Hexalith.EventStore.Contracts.Security;
++
++/// <summary>Only an independently retained original blocked disposition; never a dispatch or physical effect receipt.</summary>
++/// <param name="Original">Exact original no-effect reconciliation.</param><param name="Outcome">Its original immutable owner outcome.</param>
++public sealed record DeletionBlockedReplacementResult(DeletionBlockedReplacementReconciliation Original, DeletionConsumptionOutcome Outcome);
+--- /home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs (root read preview)
++++ /home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs (final freeze)
+@@ -76,8 +76,7 @@
+         }
+         return value;
+     }
+-    private sealed record Machine(string Issuer, string Subject, string Client, string Audience);
+-    private static Machine? CaptureMachine(ClaimsPrincipal caller)
++    private static PrivateOwnerOperationMachine? CaptureMachine(ClaimsPrincipal caller)
+     {
+         ClaimsIdentity? identity = null;
+         foreach (ClaimsIdentity candidate in caller.Identities)
+--- /home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationMachine.cs (root read preview)
++++ /home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationMachine.cs (final freeze)
+@@ -0,0 +1,4 @@
++namespace Hexalith.Platform.Custody;
++
++/// <summary>Owned bounded snapshot of the four exact authenticated machine claim values.</summary>
++internal sealed record PrivateOwnerOperationMachine(string Issuer, string Subject, string Client, string Audience);

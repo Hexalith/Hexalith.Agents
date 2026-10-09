@@ -1,0 +1,23 @@
+{
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourceNamespaceSnapshotReader.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/catalogue/before-streaming/eventstore/src/Hexalith.EventStore.Client/Streams/SourceNamespaceSnapshotReader.cs",
+      "beforeSha256": "f5fb4dcca54eab5666f48518a7f74c41540f3cdcd7558c1c6786265fca6ae01a"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourceNamespaceFold.cs",
+      "existed": false
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/EventStoreConversationTenantCatalogue.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/catalogue/before-streaming/conversations/src/Hexalith.Conversations.Server/Agents/EventStoreConversationTenantCatalogue.cs",
+      "beforeSha256": "d440a091292b6e2d6298f5aaadd79e92843d56ff390dda7c69bfc02132e68541"
+    }
+  ]
+}

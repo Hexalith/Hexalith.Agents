@@ -1,0 +1,1 @@
+<Project><Target Name="ReviewExportAuthorizationMutation" BeforeTargets="CoreCompile" Condition="'$(MSBuildProjectName)' == 'Hexalith.Platform.Custody'"><ItemGroup><Compile Remove="ExportKeyDeliveryActor.cs"/><Compile Include="/tmp/hexalith-export-authorization-review-e0jr9ik6/ExportKeyDeliveryActor.cs"/></ItemGroup></Target></Project>

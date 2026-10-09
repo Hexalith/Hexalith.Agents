@@ -1,0 +1,3 @@
+#!/bin/sh
+printf '%s\n' 'dapr' >> "$OWNER_GATE_CHILD_MARKER"
+exit 97

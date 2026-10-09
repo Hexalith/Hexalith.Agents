@@ -1,0 +1,173 @@
+{
+  "auditedUtc": "2026-10-09T00:59:01.968984+00:00",
+  "xml": [
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-roster-capture/revision4-namespace-roster-red-tests.xml",
+      "sha256": "491556fe3e99cef321d736b5262a80ddd5faf5807d96e289af0d4921d9b8238f",
+      "totals": {
+        "total": "12",
+        "passed": "0",
+        "failed": "12",
+        "errors": "0",
+        "skipped": "0",
+        "not-run": "0"
+      },
+      "cases": [
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"initial-count\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"initial-count\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"initial-items\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"initial-items\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"initial-installation-items\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"initial-installation-items\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"final-count\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"final-count\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"final-items\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"final-items\\\", cancelCaller: False)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"final-installation-items\\\", cancelCaller: True)",
+          "Fail"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"final-installation-items\\\", cancelCaller: False)",
+          "Fail"
+        ]
+      ]
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-roster-capture/revision4-namespace-roster-tests.xml",
+      "sha256": "fc91e08e415ee0c213ce6c9a8ef2adbbfa9ec29366301d2d8a9f69e18b5d7bb0",
+      "totals": {
+        "total": "21",
+        "passed": "21",
+        "failed": "0",
+        "errors": "0",
+        "skipped": "0",
+        "not-run": "0"
+      },
+      "cases": [
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.InstallationAndPreCreateRegistrationPersistAcrossRestart",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.UnqualifiedCoverageReturnsNoCutAndBlocksConfiguredWriter",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.ConcurrentChangesCannotCertifyFiniteCut(vector: \\\"roster\\\")",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.ConcurrentChangesCannotCertifyFiniteCut(vector: \\\"head\\\")",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.ConcurrentChangesCannotCertifyFiniteCut(vector: \\\"authority\\\")",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.MissingOrWithdrawnPrivateOperationCredentialDeniesNamespace",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.QualifiedRosterUsesCommittedHeadsIncludingUnusedRegistration",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"initial-count\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"initial-count\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"initial-items\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"initial-items\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"initial-installation-items\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"initial-installation-items\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"final-count\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"final-count\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"final-items\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"final-items\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"final-installation-items\\\", cancelCaller: True)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.SuspendedRosterCaptureReleasesCallerWithoutLateCut(vector: \\\"final-installation-items\\\", cancelCaller: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.FailedInstallationSaveReadsOnlyCommittedInventory(commitBeforeFault: False)",
+          "Pass"
+        ],
+        [
+          "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests.FailedInstallationSaveReadsOnlyCommittedInventory(commitBeforeFault: True)",
+          "Pass"
+        ]
+      ]
+    }
+  ],
+  "originalFailures": 12,
+  "currentClassPassed": 21,
+  "exactOriginalFailuresNowPass": true,
+  "cleanBuildLogs": [
+    "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-roster-capture/revision4-namespace-roster-build.log",
+    "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-roster-capture/revision4-namespace-roster-red-build-second.log"
+  ],
+  "scope": "Interim B2 actual archived evidence. Engineering continues; no stable source freeze or final root matrix claim."
+}

@@ -1,0 +1,41 @@
+{
+  "capturedUtc": "2026-10-09T07:23:47.747712+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "existed": true,
+      "sha256": "ba705bc03ff309d974224e07c3bd70611c85f7f6df1dd342832966ac428cb381",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-late-state-recovery/before/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "existed": true,
+      "sha256": "9b373b74af2f62bb753db3685ad745735ffa7a27179c9738bb37eec57d5a4327",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-late-state-recovery/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "existed": true,
+      "sha256": "0eee382e2b8a2103a8ea4b3f4b68b053737e81e952a7e2c4abb9d01dcb02d189",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-late-state-recovery/before/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "existed": true,
+      "sha256": "a1687608f2e35c153ccab0ff43badc8d4c6e30e0a8100dd92bd0f64319325e3d",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-late-state-recovery/before/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/AnchoredFixtureJournal.cs",
+      "existed": true,
+      "sha256": "eeba6713f60467c995d734f9af0a6bb85f7850e930c4169088de886235f1f64d",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-late-state-recovery/before/platform/tests/Hexalith.Platform.Custody.Tests/AnchoredFixtureJournal.cs"
+    }
+  ]
+}

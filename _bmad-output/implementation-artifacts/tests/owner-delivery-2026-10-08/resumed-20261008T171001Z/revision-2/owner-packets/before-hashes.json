@@ -1,0 +1,34 @@
+{
+  "capturedUtc": "2026-10-08T23:09:21.612688+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+      "existed": true,
+      "sha256": "3c6f49b388eb569ff576923cf641ee60ddb1e055d2f296d7e4d7cae3e2f99ca9",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/owner-packets/before/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+      "existed": true,
+      "sha256": "0e1a8f3e6e9713d0db46c7de22af1e5a9f575358e585ef085a6de1ff516d7319",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/owner-packets/before/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+      "existed": true,
+      "sha256": "26823f9f5546dc26412ff2d60987ed932bfb35bcc5ef33dd7c3d924c5ec19d18",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/owner-packets/before/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+      "existed": true,
+      "sha256": "4d54170926908f9963184ec3f82bfee7e7d7f7c6e5a38bddb377bd9bd1bb806c",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/owner-packets/before/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md"
+    }
+  ]
+}

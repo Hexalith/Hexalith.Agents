@@ -1,0 +1,111 @@
+{
+  "capturedUtc": "2026-10-09T06:46:21.330260+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementReconciliation.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IDeletionProtectionOwner.cs",
+      "existed": true,
+      "sha256": "e7f8c60dcaecf4af8efdc4a125b67dac924c0fc4caf3a251b138eab45d00ea99",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Contracts/Security/IDeletionProtectionOwner.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs",
+      "existed": true,
+      "sha256": "073e54b575b9858a867d94e83bd6ef897792f090d7fb7f044d6265becb6f7ba1",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "existed": true,
+      "sha256": "d878ff09464b03a54aae246defd22fadac958e40553923da1c65c9bb9fa3c781",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionBatch.cs",
+      "existed": true,
+      "sha256": "0361ef5888f950f7b4324b7d8f15ed6a972b65ecb9893fc7476de7321e664b70",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionBatch.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IDeletionConsumptionActor.cs",
+      "existed": true,
+      "sha256": "21625b638723c59d08a22aa2b450386a687a35a5b3d96600808ee4af3ea6baca",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionActor.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs",
+      "existed": true,
+      "sha256": "5b4898497e8bd37916451f4ec11c1991d2e26462447d8876d8aa3661270e7186",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs",
+      "existed": true,
+      "sha256": "a37329c57fba1ffb94d2e6190a3b0d74699949354eac99329fd0a52d8a281379",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprDeletionProtectionOwner.cs",
+      "existed": true,
+      "sha256": "ffb6ee5513ec1270ad59209739a57e8185dba871b90183c9b6506f646dadca69",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/DaprDeletionProtectionOwner.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "existed": true,
+      "sha256": "c524b886b3a13e301083e672a6c2d9b9c274005988cea45884abf56930649d66",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "existed": true,
+      "sha256": "1ac886c059fce78e224997b2de5b9f899038c86d011c53d309cd064dfe17a5c0",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionBatchGuardPort.cs",
+      "existed": true,
+      "sha256": "9b8fd9f406b1f9feb0f4a41572fe1789ee36fd52f1d6959b1b29bd0a08fa6bf6",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/platform/src/Hexalith.Platform.Custody/IDeletionBatchGuardPort.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/EventStoreDeletionBatchGuardPort.cs",
+      "existed": true,
+      "sha256": "0f3654a6df167ba3b773034d694cd941de2e3ab7f340da247936c9ea442f788b",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/platform/src/Hexalith.Platform.Custody/EventStoreDeletionBatchGuardPort.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "existed": true,
+      "sha256": "29434989d0939095dceaa5e95ec928e4c034246cac67080b114f5819db443d15",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs",
+      "existed": true,
+      "sha256": "b709d269b7e4d1ee39e4d870cb2873efad2c612a2aec1889df2ee22ce4e41e08",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-issued-replacement/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs"
+    }
+  ]
+}

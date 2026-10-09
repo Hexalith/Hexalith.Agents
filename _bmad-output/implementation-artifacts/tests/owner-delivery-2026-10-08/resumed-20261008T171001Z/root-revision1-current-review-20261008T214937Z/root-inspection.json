@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-08T21:50:34.871356+00:00",
+  "reviewStatus": "in-review",
+  "parentStatus": "in-progress retained per explicit full-delivery user requirement",
+  "reviewLoopIteration": 1,
+  "baselineCommit": "b252fcfde51bd04317ce5843a0a42bfe4dce5170",
+  "manifest": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision1-current-review-20261008T214937Z/review-input.json",
+  "manifestSha256": "e042fb2d20895e5a16848783fb28a0ff377316dce23823e80a892976c4ef82ab",
+  "rootInspection": "Complete prior revision delta (3105 lines) plus final delta (821 lines), final handoff, exact argv and four updated packets read. Current owned code has no further correction identified by root; independent findings and root matrix are pending.",
+  "sourceDrift": [],
+  "nonCrlfCapturedCs": [
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Queries/DaprLogicalQueryFixture.cs"
+  ],
+  "externalOverlap": {
+    "path": "eventstore/tests/Hexalith.EventStore.Server.Tests/Queries/DaprLogicalQueryFixture.cs",
+    "owned": "Only the explicit OriginHook = null initializer",
+    "unattributed": "DaprClient registration, later query-fixture fields/schema controls and all other query work are concurrent external source; preserved, not attributed to owner delivery."
+  },
+  "preservation": "No Git mutations, submodule operations, deployment or unavailable consuming seam; captured root artifacts only."
+}

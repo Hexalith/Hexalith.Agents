@@ -1,0 +1,54 @@
+{
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateTransactionTarget.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateMutation.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitRequest.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitReceipt.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitResult.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitStatus.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCell.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IGuardedStateTransactionAuthority.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs",
+      "existed": false
+    }
+  ]
+}

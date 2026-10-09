@@ -1,0 +1,1083 @@
+--- prior/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md
++++ current/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md
+@@ -66,3 +66,11 @@
+ Both standalone deletion delivery and exact acknowledgement lookup now use one thirty-second SDK operation budget, with an optional TimeProvider preserving existing caller composition. Provider invocation and noncooperative Tasks are bounded separately from the pump continuation. Abandoned results cannot initiate a later attempt, Submit, acknowledgement or quarantine write. An already invoked idempotent source command may finish only its original durable outcome. Thirty-two suspended invocation/task and cancellation/deadline schedules execute through actual serialized Conversation source; original receiver lookup after restart and existing dispatcher/backfill cases retain consecutive acknowledgement behavior. The selected pump/backfill lane passes 66 cases, with a clean normal Debug build using the explicit sibling EventStore graph. Production worker, receiver and namespace authorities remain unestablished.
+ 
+ [Revision 6 exact commands, current source hashes, preserved before bytes and focused results](resumed-20261008T171001Z/revision-6/README.md) supersede only these corrected source claims. Prior packet bytes are archived in revision-6/owner-packets/before/agents. Four selected lanes contain **575 distinct passing cases**, with no failures/skips/errors/not-run and four clean normal Debug/local-reference builds; repeated historical attempts are excluded. Root full Local matrix and the next fresh independent three-layer review remain pending. The nine surviving requirements are source/focused verified; rejected B6/B10/E2 and moot B11 were not implemented. Runtime authorities/providers/backends/replicas/nonrollback anchors/isolation/all-copy destruction/restore/enrollment/Live qualification remain unestablished. Original Story 5.4 stays draft/backlog, parent in-progress, four dependencies Uncommitted, complete TargetVersionOrCommit and accepted compatibility command TBD. Accepted Branch B, 365-day effective-at/exclusive-expiry policy, L/S/O/H/R, catalogue, dedicated service Party and named human approval remain unchanged. No Git/submodule mutation, deployment, Live invocation or external message occurred.
++
++## Engineering review revision 7 — 2026-10-09
++
++Standalone dedicated worker resolution now bounds authority invocation and returned Tasks under one 30-second SDK budget. The configured receipt verifier has its own cumulative whole-entry budget through initial/final worker authority and receiver target/acknowledgement acquisition, preserving original cancellation and unavailable timeout. Actual admission-stage vectors exercise the repaired verifier; late pure results cannot release admission or start a later phase. The 41 worker-admission cases pass, with 57 pump and 9 actual-source backfill cases. A serialized creation plus deletion-approval stream reconstructs Open-but-IsDeleted state, remains inactive and is excluded from the complete accepted count; all 7 catalogue cases pass. The correct production predicate remains unchanged. Shared namespace capture rejects inconsistent revision-one initial/complete rosters while retaining registered growth and original-install retry; all 24 namespace cases pass.
++
++[Revision 7 exact commands, current source hashes, preserved before bytes and focused results](resumed-20261008 T 171001 Z/revision-7/README.md) supersede only these corrected source claims. Exact prior packet bytes remain in revision-7/owner-packets/before/agents. Four selected focused lanes contain **400 distinct passing cases**: Server 173, Platform 89, Client 24 and Conversations 114, with no failures/errors/skips/not-run and four clean normal Debug/local-reference builds. Historical attempts and repeated execution are excluded from that count; the initial private-wait regression used an insufficient watchdog-only timeout assertion and is not claimed as B 5 failed-before proof. Strengthened completed-operation/actual suspended-admission cases pass in the selected current lane.
++
++Root completed the preceding revision 6 Local matrix and three-layer review; those results are historical after these edits. Fresh revision 7 root full Local verification and all three independent review layers remain pending. Runtime authorities/enrollment, qualified providers/backends/replicas/nonrollback anchors/isolation/all-copy destruction/restore/Live acceptance remain unestablished. Original Story 5.4 stays draft/backlog, parent in-progress, four dependencies Uncommitted, complete TargetVersionOrCommit and accepted compatibility command TBD. Accepted Branch B,365-day effective-at/exclusive-expiry policy,L/S/O/H/R,catalogue,dedicated service Party and named approval remain unchanged. Documented concurrent formatting is preserved without engineer attribution. Rejected B 2/B 7/B 9/B 10 and moot unverified B 8 were not implemented. No Git/submodule mutation, deployment, Live invocation, external message or deferred-ledger amendment occurred.
+--- prior/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md
++++ current/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md
+@@ -80,3 +80,11 @@
+ The shared atomic append client explicitly owns and retires its captured payload copy after every started provider borrower actually finishes; abandoned providers retain unchanged original input until completion, then clear the captured copy once. Caller payload bytes and exact keyed content intent remain unchanged. Optional CausationId uses the existing strict 2048-byte carrier guard. The Client atomic class passes 29 cases. The exact typed/default-unavailable blocked-replacement phase and independent proof ports grant no dispatch, reservation, physical effect or fresh signature. Actor state-I/O exclusion bounds caller release without asserting backend isolation qualification. No AppHost source/resource, runtime enrollment or owner Local runner was changed.
+ 
+ [Revision 6 exact commands, current source hashes, preserved before bytes and focused results](resumed-20261008T171001Z/revision-6/README.md) supersede only these corrected source claims. Prior packet bytes are archived in revision-6/owner-packets/before/agents. Four selected lanes contain **575 distinct passing cases**, with no failures/skips/errors/not-run and four clean normal Debug/local-reference builds; repeated historical attempts are excluded. Root full Local matrix and the next fresh independent three-layer review remain pending. The nine surviving requirements are source/focused verified; rejected B6/B10/E2 and moot B11 were not implemented. Runtime authorities/providers/backends/replicas/nonrollback anchors/isolation/all-copy destruction/restore/enrollment/Live qualification remain unestablished. Original Story 5.4 stays draft/backlog, parent in-progress, four dependencies Uncommitted, complete TargetVersionOrCommit and accepted compatibility command TBD. Accepted Branch B, 365-day effective-at/exclusive-expiry policy, L/S/O/H/R, catalogue, dedicated service Party and named human approval remain unchanged. No Git/submodule mutation, deployment, Live invocation or external message occurred.
++
++## Engineering review revision 7 — 2026-10-09
++
++The joint transaction captures only its pure owned request inside the existing deadline; blocked supplied Count/traversal cannot authorize or write after cancellation/expiry. Both exact original/request outcome lookups check the existing 16 MiB Outcome bound before cloning a backend buffer. The guard target Count check stays inside its existing pure bounded capture. Demonstrated disabled guard Read/Execute/ReadNoIssue and transaction original/request/guard read entries check caller cancellation before normal restrictive returns. The 30 joint transaction and 65 guard cases pass with immutable stored joint originals and no late effects. Shared retained-history grant capture and revision-one namespace consistency retain their existing source/authority rules. No AppHost resource, owner runner, new authority policy or public test seam was added.
++
++[Revision 7 exact commands, current source hashes, preserved before bytes and focused results](resumed-20261008 T 171001 Z/revision-7/README.md) supersede only these corrected source claims. Exact prior packet bytes remain in revision-7/owner-packets/before/agents. Four selected focused lanes contain **400 distinct passing cases**: Server 173, Platform 89, Client 24 and Conversations 114, with no failures/errors/skips/not-run and four clean normal Debug/local-reference builds. Historical attempts and repeated execution are excluded from that count; the initial private-wait regression used an insufficient watchdog-only timeout assertion and is not claimed as B 5 failed-before proof. Strengthened completed-operation/actual suspended-admission cases pass in the selected current lane.
++
++Root completed the preceding revision 6 Local matrix and three-layer review; those results are historical after these edits. Fresh revision 7 root full Local verification and all three independent review layers remain pending. Runtime authorities/enrollment, qualified providers/backends/replicas/nonrollback anchors/isolation/all-copy destruction/restore/Live acceptance remain unestablished. Original Story 5.4 stays draft/backlog, parent in-progress, four dependencies Uncommitted, complete TargetVersionOrCommit and accepted compatibility command TBD. Accepted Branch B,365-day effective-at/exclusive-expiry policy,L/S/O/H/R,catalogue,dedicated service Party and named approval remain unchanged. Documented concurrent formatting is preserved without engineer attribution. Rejected B 2/B 7/B 9/B 10 and moot unverified B 8 were not implemented. No Git/submodule mutation, deployment, Live invocation, external message or deferred-ledger amendment occurred.
+--- prior/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md
++++ current/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md
+@@ -72,3 +72,11 @@
+ The shared retained-history reader owns newly serialized closed event payloads until a successful stream result transfers them. Final authority/custody withdrawal, source change, exclusive expiry and cancellation discard and clear accumulated arrays; temporary serialized response-size probes are also cleared. Successful closed output, stored ciphertext and provider input remain exact. The current history class passes 59 cases; the selected Server lane passes 165 and Client lane 109, including prior read regressions. No Parties domain, retention policy or owner Local runner changed.
+ 
+ [Revision 6 exact commands, current source hashes, preserved before bytes and focused results](resumed-20261008T171001Z/revision-6/README.md) supersede only these corrected source claims. Prior packet bytes are archived in revision-6/owner-packets/before/agents. Four selected lanes contain **575 distinct passing cases**, with no failures/skips/errors/not-run and four clean normal Debug/local-reference builds; repeated historical attempts are excluded. Root full Local matrix and the next fresh independent three-layer review remain pending. The nine surviving requirements are source/focused verified; rejected B6/B10/E2 and moot B11 were not implemented. Runtime authorities/providers/backends/replicas/nonrollback anchors/isolation/all-copy destruction/restore/enrollment/Live qualification remain unestablished. Original Story 5.4 stays draft/backlog, parent in-progress, four dependencies Uncommitted, complete TargetVersionOrCommit and accepted compatibility command TBD. Accepted Branch B, 365-day effective-at/exclusive-expiry policy, L/S/O/H/R, catalogue, dedicated service Party and named human approval remain unchanged. No Git/submodule mutation, deployment, Live invocation or external message occurred.
++
++## Engineering review revision 7 — 2026-10-09
++
++The shared retained-history reader validates and detaches both initial and final admitted type/exclusion vectors inside its original SDK deadline, before source selection or final comparison. Actually blocked Count/traversal now releases cancellation or expiry without a late stream. The 19 added vectors genuinely fail against the prior reader; all 78 current history cases pass, including detached reuse, original caller cancellation and readable/closed buffer ownership. Branch B, actor-free expired continuity and the accepted 365-day policy are unchanged. No Parties domain or Local runner was changed.
++
++[Revision 7 exact commands, current source hashes, preserved before bytes and focused results](resumed-20261008 T 171001 Z/revision-7/README.md) supersede only these corrected source claims. Exact prior packet bytes remain in revision-7/owner-packets/before/agents. Four selected focused lanes contain **400 distinct passing cases**: Server 173, Platform 89, Client 24 and Conversations 114, with no failures/errors/skips/not-run and four clean normal Debug/local-reference builds. Historical attempts and repeated execution are excluded from that count; the initial private-wait regression used an insufficient watchdog-only timeout assertion and is not claimed as B 5 failed-before proof. Strengthened completed-operation/actual suspended-admission cases pass in the selected current lane.
++
++Root completed the preceding revision 6 Local matrix and three-layer review; those results are historical after these edits. Fresh revision 7 root full Local verification and all three independent review layers remain pending. Runtime authorities/enrollment, qualified providers/backends/replicas/nonrollback anchors/isolation/all-copy destruction/restore/Live acceptance remain unestablished. Original Story 5.4 stays draft/backlog, parent in-progress, four dependencies Uncommitted, complete TargetVersionOrCommit and accepted compatibility command TBD. Accepted Branch B,365-day effective-at/exclusive-expiry policy,L/S/O/H/R,catalogue,dedicated service Party and named approval remain unchanged. Documented concurrent formatting is preserved without engineer attribution. Rejected B 2/B 7/B 9/B 10 and moot unverified B 8 were not implemented. No Git/submodule mutation, deployment, Live invocation, external message or deferred-ledger amendment occurred.
+--- prior/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md
++++ current/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md
+@@ -73,3 +73,11 @@
+ Signing, direct delivery and key lifecycle actor entries share one thirty-second monotonic budget through private admission, trust, independent journal/state checks and terminal release. StateManager calls stay on the actor turn; an unfinished abandoned state Task excludes subsequent actor calls until actual completion. Late save/journal schedules retain exact admitted Unknown originals and pins, permit only independently authorized original recovery and never repeat Sign/Release/Execute. Completed originals survive withheld replies and serialized restart. Replay profile calls and coordinator factory acquisition use their existing bounded helper. Private credentials enforce strict 2048-byte UTF-8 identity carriers before grant/key or canonical use, retaining exact closed fingerprints/tags/nonces and key cleanup. The selected seven-class custody lane passes 235 cases. The actual guard/subscriber/protection/coordinator replacement vectors preserve the original compromise block while ordinal 2 awaits activation, reconcile an independently proved no-effect blocked disposition before/after dispatch or a completed blocked-activation reply, retain original phase outcomes across restart/lost replies, and complete healthy ordinal 3 once with zero compromised-key reservations.
+ 
+ [Revision 6 exact commands, current source hashes, preserved before bytes and focused results](resumed-20261008T171001Z/revision-6/README.md) supersede only these corrected source claims. Prior packet bytes are archived in revision-6/owner-packets/before/agents. Four selected lanes contain **575 distinct passing cases**, with no failures/skips/errors/not-run and four clean normal Debug/local-reference builds; repeated historical attempts are excluded. Root full Local matrix and the next fresh independent three-layer review remain pending. The nine surviving requirements are source/focused verified; rejected B6/B10/E2 and moot B11 were not implemented. Runtime authorities/providers/backends/replicas/nonrollback anchors/isolation/all-copy destruction/restore/enrollment/Live qualification remain unestablished. Original Story 5.4 stays draft/backlog, parent in-progress, four dependencies Uncommitted, complete TargetVersionOrCommit and accepted compatibility command TBD. Accepted Branch B, 365-day effective-at/exclusive-expiry policy, L/S/O/H/R, catalogue, dedicated service Party and named human approval remain unchanged. No Git/submodule mutation, deployment, Live invocation or external message occurred.
++
++## Engineering review revision 7 — 2026-10-09
++
++The existing private ReadAsync and actor-turn WaitAsync compute one remaining duration per wait and throw TimeoutException before a nonpositive timeout can reach the runtime, preserving caller-first cancellation, late-fault observation and safe owned cleanup. Controlled exact-boundary/negative/infinite-sentinel clock cases and an actually suspended lifecycle admission verify the restrictive actor outcome with no state/effect continuation. The private helper has 9 passes, actual lifecycle 42 and actual coordinator 38. Disabled coordinator entry now preserves an already canceled original caller token. Existing Unknown/terminal originals, unfinished state-I/O exclusion, lookup-only uncertain recovery and signing/physical authority remain unchanged.
++
++[Revision 7 exact commands, current source hashes, preserved before bytes and focused results](resumed-20261008 T 171001 Z/revision-7/README.md) supersede only these corrected source claims. Exact prior packet bytes remain in revision-7/owner-packets/before/agents. Four selected focused lanes contain **400 distinct passing cases**: Server 173, Platform 89, Client 24 and Conversations 114, with no failures/errors/skips/not-run and four clean normal Debug/local-reference builds. Historical attempts and repeated execution are excluded from that count; the initial private-wait regression used an insufficient watchdog-only timeout assertion and is not claimed as B 5 failed-before proof. Strengthened completed-operation/actual suspended-admission cases pass in the selected current lane.
++
++Root completed the preceding revision 6 Local matrix and three-layer review; those results are historical after these edits. Fresh revision 7 root full Local verification and all three independent review layers remain pending. Runtime authorities/enrollment, qualified providers/backends/replicas/nonrollback anchors/isolation/all-copy destruction/restore/Live acceptance remain unestablished. Original Story 5.4 stays draft/backlog, parent in-progress, four dependencies Uncommitted, complete TargetVersionOrCommit and accepted compatibility command TBD. Accepted Branch B,365-day effective-at/exclusive-expiry policy,L/S/O/H/R,catalogue,dedicated service Party and named approval remain unchanged. Documented concurrent formatting is preserved without engineer attribution. Rejected B 2/B 7/B 9/B 10 and moot unverified B 8 were not implemented. No Git/submodule mutation, deployment, Live invocation, external message or deferred-ledger amendment occurred.
+--- prior/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs
++++ current/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs
+@@ -1,20 +1,24 @@
+ using Hexalith.Conversations.Contracts.Agents;
+ using Hexalith.EventStore.Contracts.Commands;
++using Hexalith.EventStore.Client.Streams;
+ 
+ namespace Hexalith.Conversations.Server.Agents;
+ 
+ /// <summary>Concrete private delivery admission: exact enrolled worker/current Party, source scope, target and independent receipt lookup.</summary>
+ /// <remarks>Configuration never authenticates a principal. Gateway identity, independent authority, source-prefix verification and receiver credentials remain qualified host bindings.</remarks>
+ public sealed class ConfiguredConversationDeletionReceiptVerifier(ConfiguredConversationDeletionWorker worker,
+-    IConversationDeletionReceiver receiver) : IConversationDeletionReceiptVerifier
++    IConversationDeletionReceiver receiver, TimeProvider? clock = null) : IConversationDeletionReceiptVerifier
+ {
++    private readonly TimeProvider _clock = clock ?? TimeProvider.System;
++
+     /// <inheritdoc/>
+     public async Task<ConversationAgentsOutcome> VerifyAsync(CommandEnvelope envelope, RecordConversationDeletionDeliveryCommand command,
+         CancellationToken cancellationToken = default)
+     {
++        using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), _clock, cancellationToken, _clock.GetTimestamp());
+         try
+         {
+-            cancellationToken.ThrowIfCancellationRequested();
++            deadline.ThrowIfCancellationRequested();
+             ArgumentNullException.ThrowIfNull(envelope); ArgumentNullException.ThrowIfNull(command);
+             if (envelope.Domain != "conversation" || envelope.TenantId != command.Metadata.TenantId.Value
+                 || envelope.AggregateId != command.ConversationId.Value || command.Metadata.SchemaVersion.Value != 1
+@@ -23,36 +27,37 @@
+                 || command.Signal.SourceContractVersion != 1 || string.IsNullOrWhiteSpace(command.DeliveryAttemptId)
+                 || string.IsNullOrWhiteSpace(command.TargetVersion) || !Enum.IsDefined(command.Action))
+             { return ConversationAgentsOutcome.Denied; }
+-            var admitted = await worker.AuthorizeDeliveryAsync(command.Metadata.TenantId, command.ConversationId, cancellationToken).ConfigureAwait(false);
+-            cancellationToken.ThrowIfCancellationRequested();
++            var admitted = await deadline.ReadAsync(token => worker.AuthorizeDeliveryAsync(command.Metadata.TenantId, command.ConversationId, token)).ConfigureAwait(false);
++            deadline.ThrowIfCancellationRequested();
+             if (admitted is null || admitted.PrincipalId != envelope.UserId || admitted.PartyId != command.Metadata.ActorPartyId)
+             { return ConversationAgentsOutcome.Denied; }
+             if (command.Action == ConversationDeletionDeliveryAction.Acknowledge)
+             {
+-                var current = await receiver.LookupAsync(command.Signal, command.DeliveryAttemptId, command.TargetVersion, cancellationToken)
+-                    .WaitAsync(cancellationToken).ConfigureAwait(false);
+-                cancellationToken.ThrowIfCancellationRequested();
++                var current = await deadline.ReadAsync(token => receiver.LookupAsync(command.Signal, command.DeliveryAttemptId, command.TargetVersion, token)).ConfigureAwait(false);
++                deadline.ThrowIfCancellationRequested();
+                 bool exact = current.Outcome == ConversationAgentsOutcome.Available && current.Acknowledgement is { } receipt
+                     && receipt == command.Acknowledgement && receipt.SignalId == command.Signal.ConversationDeletionSignalId
+                     && receipt.SourceRevision == command.Signal.SourceRevision && receipt.ProtectedDeletionRevision > 0
+                     && receipt.TargetVersion == command.TargetVersion && !string.IsNullOrWhiteSpace(receipt.Evidence)
+-                    && await worker.AuthorizeDeliveryAsync(command.Metadata.TenantId, command.ConversationId, cancellationToken).ConfigureAwait(false) == admitted
++                    && await deadline.ReadAsync(token => worker.AuthorizeDeliveryAsync(command.Metadata.TenantId, command.ConversationId, token)).ConfigureAwait(false) == admitted
+                     ;
+-                cancellationToken.ThrowIfCancellationRequested();
++                deadline.ThrowIfCancellationRequested();
+                 return exact ? ConversationAgentsOutcome.Available : ConversationAgentsOutcome.Denied;
+             }
+             if (command.Acknowledgement is not null) { return ConversationAgentsOutcome.Denied; }
+             if (command.Action == ConversationDeletionDeliveryAction.Attempt)
+             {
+-                string? target = await receiver.CurrentTargetAsync(command.Metadata.TenantId, cancellationToken).WaitAsync(cancellationToken).ConfigureAwait(false);
+-                cancellationToken.ThrowIfCancellationRequested();
++                string? target = await deadline.ReadAsync(token => receiver.CurrentTargetAsync(command.Metadata.TenantId, token)).ConfigureAwait(false);
++                deadline.ThrowIfCancellationRequested();
+                 if (target != command.TargetVersion) { return ConversationAgentsOutcome.Denied; }
+             }
+             // Only an authenticated dedicated worker can request safe quarantine; pure source replay binds immutable fields.
+-            var final = await worker.AuthorizeDeliveryAsync(command.Metadata.TenantId, command.ConversationId, cancellationToken).ConfigureAwait(false);
+-            cancellationToken.ThrowIfCancellationRequested();
++            var final = await deadline.ReadAsync(token => worker.AuthorizeDeliveryAsync(command.Metadata.TenantId, command.ConversationId, token)).ConfigureAwait(false);
++            deadline.ThrowIfCancellationRequested();
+             return final == admitted ? ConversationAgentsOutcome.Available : ConversationAgentsOutcome.Denied;
+         }
++        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && deadline.IsExpired)
++        { return ConversationAgentsOutcome.Unavailable; }
+         catch (Exception exception) when (exception is HttpRequestException or InvalidOperationException or ArgumentException)
+         { cancellationToken.ThrowIfCancellationRequested(); return ConversationAgentsOutcome.Unavailable; }
+         catch (Exception) { cancellationToken.ThrowIfCancellationRequested(); throw; }
+--- prior/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionWorker.cs
++++ current/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionWorker.cs
+@@ -1,5 +1,6 @@
+ using Hexalith.Conversations.Contracts.Agents;
+ using Hexalith.Conversations.Contracts.Identifiers;
++using Hexalith.EventStore.Client.Streams;
+ 
+ namespace Hexalith.Conversations.Server.Agents;
+ 
+@@ -9,15 +10,16 @@
+ {
+     private readonly ConversationDeletionWorkerRegistration? _registration;
+     private readonly IConversationAgentAuthority _authority;
++    private readonly TimeProvider _clock;
+ 
+     /// <summary>Creates the disabled-by-default exact binding. A missing registration cannot authorize work.</summary>
+-    public ConfiguredConversationDeletionWorker(ConversationDeletionWorkerRegistration? registration, IConversationAgentAuthority authority)
++    public ConfiguredConversationDeletionWorker(ConversationDeletionWorkerRegistration? registration, IConversationAgentAuthority authority, TimeProvider? clock = null)
+     {
+         ArgumentNullException.ThrowIfNull(authority);
+         if (registration is not null && (registration.TenantId is null || registration.ServicePartyId is null
+             || string.IsNullOrWhiteSpace(registration.AuthenticatedPrincipalId)))
+         { throw new ArgumentException("Malformed worker registration.", nameof(registration)); }
+-        _registration = registration; _authority = authority;
++        _registration = registration; _authority = authority; _clock = clock ?? TimeProvider.System;
+     }
+ 
+     /// <summary>Resolves current exact Conversation authority for the dedicated service Party, without any human-role fallback.</summary>
+@@ -32,16 +34,19 @@
+     private async Task<ConversationAgentAuthorization?> ResolveAsync(TenantId tenant, ConversationId conversation, string operation,
+         CancellationToken cancellationToken)
+     {
++        using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), _clock, cancellationToken, _clock.GetTimestamp());
+         try
+         {
+-            cancellationToken.ThrowIfCancellationRequested();
++            deadline.ThrowIfCancellationRequested();
+             if (_registration is null || _registration.TenantId != tenant) { return null; }
+-            ConversationAgentAuthorization result = await _authority.AuthorizeAsync(_registration.AuthenticatedPrincipalId,
+-                tenant, conversation, operation, cancellationToken).WaitAsync(cancellationToken).ConfigureAwait(false);
+-            cancellationToken.ThrowIfCancellationRequested();
+-            return ConversationAgentQueryService.CheckAuthority(result, _registration.AuthenticatedPrincipalId, tenant, true)
++            ConversationAgentAuthorization result = await deadline.ReadAsync(token => _authority.AuthorizeAsync(_registration.AuthenticatedPrincipalId,
++                tenant, conversation, operation, token)).ConfigureAwait(false);
++            deadline.ThrowIfCancellationRequested();
++            var admitted = ConversationAgentQueryService.CheckAuthority(result, _registration.AuthenticatedPrincipalId, tenant, true)
+                 == ConversationAgentsOutcome.Available && result.PartyId == _registration.ServicePartyId ? result : null;
++            deadline.ThrowIfCancellationRequested(); return admitted;
+         }
++        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && deadline.IsExpired) { return null; }
+         catch (Exception) { cancellationToken.ThrowIfCancellationRequested(); throw; }
+     }
+ }
+--- prior/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs
++++ current/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs
+@@ -49,7 +49,6 @@
+                 BadBinding == "tenant" ? new TenantId("other-tenant") : tenant,
+                 BadBinding == "principal" ? "wrong-principal" : principal,
+                 BadBinding == "party" ? F.Agent : ConversationDeletionDeliveryPumpTests.ServiceParty, "current-independent-authority", BadBinding != "organization");
+-        
+             }
+             finally { OperationFinished?.Invoke("authority"); }
+         }
+@@ -61,7 +60,6 @@
+             var state = await source.ReplayAsync();
+             if (SourceReads == BlockSourceCall) { SourceEntered.TrySetResult(); await SourcePending.Task; state = await source.ReplayAsync(); }
+             return state.DeletionSource;
+-        
+             }
+             finally { OperationFinished?.Invoke("source"); }
+         }
+@@ -74,13 +72,12 @@
+             if (PersistCommands) { source.Persist(ConversationAggregate.Handle(new RecordConversationDeletionDelivery(command,
+                 command.Metadata.IdempotencyKey!), await source.ReplayAsync())); }
+             return new(ConversationAgentsOutcome.Available);
+-        
+             }
+             finally { OperationFinished?.Invoke("record:" + command.Action); }
+         }
+         public async Task<string?> CurrentTargetAsync(TenantId tenant, CancellationToken token) {
+             try
+-            { token.ThrowIfCancellationRequested(); await (OperationHook?.Invoke("target") ?? Task.CompletedTask); ReceiverReads++; TargetCalls++; if (BlockTarget || BlockTargetCall == TargetCalls) { TargetEntered.TrySetResult(); return await TargetPending.Task; } return Target; 
++            { token.ThrowIfCancellationRequested(); await (OperationHook?.Invoke("target") ?? Task.CompletedTask); ReceiverReads++; TargetCalls++; if (BlockTarget || BlockTargetCall == TargetCalls) { TargetEntered.TrySetResult(); return await TargetPending.Task; } return Target;
+             }
+             finally { OperationFinished?.Invoke("target"); }
+         }
+@@ -93,7 +90,6 @@
+             if (UnknownLookup) { return new ConversationDeletionReceiverResult(ConversationAgentsOutcome.Unavailable); }
+             return Receipts.TryGetValue(target, out var receipt) ? new(ConversationAgentsOutcome.Available, receipt)
+                 : new ConversationDeletionReceiverResult(ConversationAgentsOutcome.Absent);
+-        
+             }
+             finally { OperationFinished?.Invoke("lookup"); }
+         }
+@@ -109,7 +105,6 @@
+                 signal.SourceRevision, 19, target, "synthetic-authenticated-receiver-receipt"); Receipts[target] = receipt;
+             if (LoseReceiverResponse) { LoseReceiverResponse = false; throw new HttpRequestException("Controlled lost receiver response."); }
+             return new ConversationDeletionReceiverResult(ConversationAgentsOutcome.Available, receipt);
+-        
+             }
+             finally { OperationFinished?.Invoke("submit"); }
+         }
+--- prior/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs
++++ current/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs
+@@ -96,4 +96,135 @@
+         (await f.Source.ReplayAsync()).DeletionSource.DeliveryRevision.ShouldBe(0); f.AttemptCommands.ShouldBeEmpty();
+     }
+ 
++    /// <summary>The standalone exact source and delivery worker bounds an actually synchronous authority invocation with original cancellation.</summary>
++    [Theory]
++    [InlineData(false)][InlineData(true)]
++    public async Task WorkerInvocationCannotOutliveCanceledCaller(bool delivery)
++    {
++        var f = await Approved(); using var caller = new CancellationTokenSource(); using var release = new ManualResetEventSlim();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        f.OperationHook = _ => { entered.TrySetResult(); release.Wait(); return Task.CompletedTask; };
++        f.OperationFinished = _ => finished.TrySetResult();
++        var worker = new ConfiguredConversationDeletionWorker(new(F.Tenant, "conversations-worker", ConversationDeletionDeliveryPumpTests.ServiceParty), f);
++        var pending = Task.Run(() => delivery ? worker.AuthorizeDeliveryAsync(F.Tenant, F.Conversation, caller.Token)
++            : worker.AuthorizeAsync(F.Tenant, F.Conversation, caller.Token), CancellationToken.None);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++        try
++        {
++            caller.Cancel(); var error = await Should.ThrowAsync<OperationCanceledException>(() => pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken));
++            error.CancellationToken.ShouldBe(caller.Token);
++        }
++        finally { release.Set(); }
++        await finished.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++        f.Submissions.ShouldBe(0); f.AttemptCommands.ShouldBeEmpty(); (await f.Source.ReplayAsync()).DeletionSource.DeliveryRevision.ShouldBe(0);
++    }
++
++    /// <summary>Both standalone operations bound invocation and returned tasks with cancellation and uncancelled deadline expiry.</summary>
++    [Theory]
++    [InlineData(false, false, false)][InlineData(false, false, true)][InlineData(false, true, false)][InlineData(false, true, true)]
++    [InlineData(true, false, false)][InlineData(true, false, true)][InlineData(true, true, false)][InlineData(true, true, true)]
++    public async Task StandaloneWorkerHasOneBoundedAuthorityAcquisition(bool delivery, bool invocation, bool expires)
++    {
++        var f = await Approved(); var clock = new PumpClock(); using var caller = new CancellationTokenSource(); using var release = new ManualResetEventSlim();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var released = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously); int calls = 0;
++        f.OperationHook = _ => { Interlocked.Increment(ref calls); entered.TrySetResult(); if (invocation) { release.Wait(); return Task.CompletedTask; } return released.Task; };
++        f.OperationFinished = _ => finished.TrySetResult();
++        var worker = new ConfiguredConversationDeletionWorker(new(F.Tenant, "conversations-worker", ConversationDeletionDeliveryPumpTests.ServiceParty), f, clock);
++        var pending = delivery ? worker.AuthorizeDeliveryAsync(F.Tenant, F.Conversation, expires ? CancellationToken.None : caller.Token)
++            : worker.AuthorizeAsync(F.Tenant, F.Conversation, expires ? CancellationToken.None : caller.Token);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++        try
++        {
++            if (expires) { clock.Advance(TimeSpan.FromSeconds(30)); (await pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).ShouldBeNull(); }
++            else { caller.Cancel(); var error = await Should.ThrowAsync<OperationCanceledException>(() => pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)); error.CancellationToken.ShouldBe(caller.Token); }
++            calls.ShouldBe(1);
++        }
++        finally { release.Set(); released.TrySetResult(); }
++        await finished.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++        calls.ShouldBe(1); f.Submissions.ShouldBe(0); f.AttemptCommands.ShouldBeEmpty();
++    }
++
++    /// <summary>The concrete receipt verifier bounds every external phase; the actual admission stage receives the repaired unavailable/canceled result.</summary>
++    [Theory]
++    [InlineData("initial", false, false, false)][InlineData("initial", false, true, false)][InlineData("initial", true, false, false)][InlineData("initial", true, true, false)]
++    [InlineData("final", false, false, false)][InlineData("final", false, true, false)][InlineData("final", true, false, false)][InlineData("final", true, true, false)]
++    [InlineData("lookup", false, false, false)][InlineData("lookup", false, true, false)][InlineData("lookup", true, false, false)][InlineData("lookup", true, true, false)]
++    [InlineData("target", false, false, false)][InlineData("target", false, true, false)][InlineData("target", true, false, false)][InlineData("target", true, true, false)]
++    [InlineData("initial", false, true, true)][InlineData("target", true, false, true)]
++    public async Task StandaloneReceiptBudgetStopsEveryPhaseWithoutLateAdmission(string phase, bool invocation, bool expires, bool throughAdmission)
++    {
++        var f = await Approved(); var signal = (await f.Source.ReplayAsync()).DeletionSource.Signal!;
++        bool acknowledge = phase == "lookup";
++        var receipt = new ConversationDeletionAcknowledgement(signal.ConversationDeletionSignalId, signal.SourceRevision, 19, f.Target, "independent-receipt");
++        f.Receipts[f.Target] = receipt;
++        var command = new RecordConversationDeletionDeliveryCommand(f.Source.CommandMetadata(ConversationDeletionDeliveryPumpTests.ServiceParty, "bounded-receipt"), F.Conversation,
++            signal, acknowledge ? ConversationDeletionDeliveryAction.Acknowledge : ConversationDeletionDeliveryAction.Attempt, "original-attempt", f.Target, acknowledge ? 1 : 0, acknowledge ? receipt : null);
++        var envelope = f.Source.Envelope(new RecordConversationDeletionDelivery(command, "original-event"), "conversations-worker");
++        byte[] original = JsonSerializer.SerializeToUtf8Bytes(f.Source.PersistedEvents, F.Options);
++        var clock = new PumpClock(); using var caller = new CancellationTokenSource(); using var release = new ManualResetEventSlim();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously); var released = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously); int authorities = 0; int calls = 0;
++        string stopped = phase is "initial" or "final" ? "authority" : phase;
++        f.OperationHook = label =>
++        {
++            Interlocked.Increment(ref calls); int authority = label == "authority" ? Interlocked.Increment(ref authorities) : 0;
++            if (label != stopped || phase == "initial" && authority != 1 || phase == "final" && authority != 2) { return Task.CompletedTask; }
++            entered.TrySetResult(); if (invocation) { release.Wait(); return Task.CompletedTask; } return released.Task;
++        };
++        f.OperationFinished = label => { if (label == stopped && entered.Task.IsCompleted) { finished.TrySetResult(); } };
++        var worker = new ConfiguredConversationDeletionWorker(new(F.Tenant, "conversations-worker", ConversationDeletionDeliveryPumpTests.ServiceParty), f, clock);
++        var verifier = new ConfiguredConversationDeletionReceiptVerifier(worker, f, clock);
++        var token = expires ? CancellationToken.None : caller.Token;
++        async Task<ConversationAgentsOutcome> Run()
++        {
++            if (!throughAdmission) { return await verifier.VerifyAsync(envelope, command, token); }
++            var stage = new ConversationAgentAdmissionStage(f, f.Source, verifier, f.Source);
++            var result = await stage.EvaluateAsync(new DomainServiceAdmissionContext(new(envelope, await f.Source.CurrentStateAsync())), token);
++            return result.IsAccepted ? ConversationAgentsOutcome.Available : ConversationAgentsOutcome.Unavailable;
++        }
++        var pending = Run(); await entered.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++        int atTermination;
++        try
++        {
++            if (expires) { clock.Advance(TimeSpan.FromSeconds(30)); (await pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).ShouldBe(ConversationAgentsOutcome.Unavailable); }
++            else { caller.Cancel(); var error = await Should.ThrowAsync<OperationCanceledException>(() => pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)); error.CancellationToken.ShouldBe(caller.Token); }
++            atTermination = Volatile.Read(ref calls);
++        }
++        finally { release.Set(); released.TrySetResult(); }
++        await finished.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++        Volatile.Read(ref calls).ShouldBe(atTermination); f.Submissions.ShouldBe(0); f.AttemptCommands.ShouldBeEmpty();
++        (await f.Source.ReplayAsync()).DeletionSource.DeliveryRevision.ShouldBe(0);
++        JsonSerializer.SerializeToUtf8Bytes(f.Source.PersistedEvents, F.Options).ShouldBe(original);
++    }
++
++    /// <summary>New dependency calls cannot reset the verifier's elapsed budget or override final original caller cancellation.</summary>
++    [Theory]
++    [InlineData(false, false)][InlineData(true, false)][InlineData(false, true)][InlineData(true, true)]
++    public async Task ReceiptBudgetIsCumulativeThroughFinalAuthorization(bool acknowledge, bool cancelFinal)
++    {
++        var f = await Approved(); var signal = (await f.Source.ReplayAsync()).DeletionSource.Signal!;
++        var receipt = new ConversationDeletionAcknowledgement(signal.ConversationDeletionSignalId, signal.SourceRevision, 19, f.Target, "independent-receipt"); f.Receipts[f.Target] = receipt;
++        var command = new RecordConversationDeletionDeliveryCommand(f.Source.CommandMetadata(ConversationDeletionDeliveryPumpTests.ServiceParty, "cumulative"), F.Conversation,
++            signal, acknowledge ? ConversationDeletionDeliveryAction.Acknowledge : ConversationDeletionDeliveryAction.Attempt, "original-attempt", f.Target, acknowledge ? 1 : 0, acknowledge ? receipt : null);
++        var clock = new PumpClock(); using var caller = new CancellationTokenSource(); int authorities = 0;
++        f.OperationHook = label =>
++        {
++            if (label == "authority")
++            {
++                if (++authorities == 1) { clock.Advance(TimeSpan.FromSeconds(20)); }
++                else if (cancelFinal) { caller.Cancel(); } else { clock.Advance(TimeSpan.FromSeconds(5)); }
++            }
++            else { clock.Advance(TimeSpan.FromSeconds(5)); }
++            return Task.CompletedTask;
++        };
++        var verifier = new ConfiguredConversationDeletionReceiptVerifier(new(new(F.Tenant, "conversations-worker", ConversationDeletionDeliveryPumpTests.ServiceParty), f, clock), f, clock);
++        var pending = verifier.VerifyAsync(f.Source.Envelope(new RecordConversationDeletionDelivery(command, "original-event"), "conversations-worker"), command, caller.Token);
++        if (cancelFinal) { var error = await Should.ThrowAsync<OperationCanceledException>(() => pending); error.CancellationToken.ShouldBe(caller.Token); }
++        else { (await pending).ShouldBe(ConversationAgentsOutcome.Unavailable); }
++        authorities.ShouldBe(2); f.Submissions.ShouldBe(0); f.AttemptCommands.ShouldBeEmpty();
++    }
++
+ }
+--- prior/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs
++++ current/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs
+@@ -125,4 +125,29 @@
+         result.Outcome.ShouldBe(gap ? ConversationAgentsOutcome.Unavailable : ConversationAgentsOutcome.Available);
+         if (!gap) { result.Complete.ShouldBeTrue(); result.Entries!.Single().Active.ShouldBeTrue(); }
+     }
++    /// <summary>A serialized approved deletion leaves lifecycle Open but is excluded from the complete accepted active denominator.</summary>
++    [Fact]
++    public async Task DeletedOpenConversationIsExcludedFromCompleteActiveCount()
++    {
++        var fixture = new F(); var before = await fixture.ReplayAsync();
++        fixture.Persist(Hexalith.Conversations.Aggregates.ConversationAggregate.Handle(new Hexalith.Conversations.Commands.ApproveConversationDeletion(
++            new(fixture.CommandMetadata(F.Human, "catalogue-deletion"), F.Conversation, "independent-approved-deletion", before.SourceRevision,
++                F.At.AddMinutes(1), F.DeletionAudit(before.SourceRevision, F.At.AddMinutes(1))), "catalogue-deletion-event"), before));
++        var identity = new AggregateIdentity(F.Tenant.Value, "conversation", F.Conversation.Value);
++        var source = (await fixture.ReadAsync(identity, TestContext.Current.CancellationToken)).Stream!;
++        byte[] saved = JsonSerializer.SerializeToUtf8Bytes(source, F.Options);
++        _sources[identity] = JsonSerializer.Deserialize<AuthoritativeEventStream>(saved, F.Options)!;
++        var reconstructed = ConversationAgentSourceReader.ReplaySource(_sources[identity], identity, TestContext.Current.CancellationToken)!.Value.State;
++        reconstructed.Lifecycle.ToString().ShouldBe("Open"); reconstructed.IsDeleted.ShouldBeTrue();
++        await AddAsync("ordinary-open-zero-calls");
++        var catalogue = await Catalogue().ReadAsync(new(F.Tenant, F.At, F.At.AddDays(1)), TestContext.Current.CancellationToken);
++        catalogue.Outcome.ShouldBe(ConversationAgentsOutcome.Available); catalogue.Complete.ShouldBeTrue();
++        catalogue.Entries!.Single(entry => entry.ConversationId == F.Conversation).Active.ShouldBeFalse();
++        catalogue.Entries!.Single(entry => entry.ConversationId.Value == "ordinary-open-zero-calls").Active.ShouldBeTrue();
++        var service = new ConversationAgentQueryService(fixture, new(fixture), Catalogue());
++        var count = await service.CountAsync("agents-service", new(F.Tenant, F.At, F.At.AddMinutes(1)), TestContext.Current.CancellationToken);
++        count.Outcome.ShouldBe(ConversationAgentsOutcome.Available); count.CatalogCheckpoint.ShouldNotBeNullOrWhiteSpace(); count.Count.ShouldBe(1);
++        JsonSerializer.SerializeToUtf8Bytes(_sources[identity], F.Options).ShouldBe(saved);
++    }
++
+ }
+--- prior/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs
+@@ -27,11 +27,13 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
++            deadline.ThrowIfCancellationRequested();
+             if (authority is null || !Text(tenantId) || !Text(operationId) || !Hex(intentDigest)) { return new(GuardedStateCommitStatus.Unavailable); }
+             var target = await deadline.ReadAsync(token => authority.GetCurrentAsync(tenantId, token)).ConfigureAwait(false);
+             if (!ValidTarget(target, tenantId) || !await deadline.ReadAsync(token => authority.AuthorizeLookupAsync(target!, operationId, intentDigest, token)).ConfigureAwait(false))
+             { return new(GuardedStateCommitStatus.Unavailable); }
+             var read = await deadline.ReadAsync(token => client.GetStateAsync<GuardedStateCommitReceipt>(target!.ComponentName, OutcomeKey(target, operationId), ConsistencyMode.Strong, Metadata(target), token)).ConfigureAwait(false);
++            if (read is not null && read.Outcome is not { Length: <= MaxBytes }) { return new(GuardedStateCommitStatus.Unavailable); }
+             var receipt = read is null ? null : read with { Outcome = read.Outcome?.ToArray()! };
+             if (receipt is not null && (!ValidReceipt(receipt, target!, operationId) || !await deadline.ReadAsync(token => authority.ValidateReceiptAsync(target!, receipt with { Outcome = receipt.Outcome.ToArray() }, token)).ConfigureAwait(false)))
+             { return new(GuardedStateCommitStatus.Unavailable); }
+@@ -51,6 +53,7 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
++            deadline.ThrowIfCancellationRequested();
+             if (authority is null || !Text(tenantId)) { return null; }
+             var target = await deadline.ReadAsync(token => authority.GetCurrentAsync(tenantId, token)).ConfigureAwait(false);
+             if (!ValidTarget(target, tenantId) || !await deadline.ReadAsync(token => authority.AuthorizeReadAsync(target!, target!.GuardCellId, token)).ConfigureAwait(false)) { return null; }
+@@ -72,7 +75,8 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
+-            request = Capture(request, deadline); string digest = Digest(request);
++            deadline.ThrowIfCancellationRequested();
++            request = await deadline.ReadAsync(_ => Task.FromResult(Capture(request, deadline))).ConfigureAwait(false); string digest = Digest(request);
+             var target = await CurrentAsync(request, digest, "Commit", deadline).ConfigureAwait(false);
+             if (target is null) { return new(GuardedStateCommitStatus.Unavailable); }
+             if (request.Guard.CellId != target.GuardCellId || request.Guard.ExpectedRevision <= 0) { return new(GuardedStateCommitStatus.Unavailable); }
+@@ -124,7 +128,8 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
+-            request = Capture(request, deadline); string digest = Digest(request); var target = await CurrentAsync(request, digest, "Lookup", deadline).ConfigureAwait(false);
++            deadline.ThrowIfCancellationRequested();
++            request = await deadline.ReadAsync(_ => Task.FromResult(Capture(request, deadline))).ConfigureAwait(false); string digest = Digest(request); var target = await CurrentAsync(request, digest, "Lookup", deadline).ConfigureAwait(false);
+             if (target is null) { return new(GuardedStateCommitStatus.Unavailable); }
+             var result = await LookupCoreAsync(target, request, digest, deadline).ConfigureAwait(false);
+             return await CurrentAsync(request, digest, "Lookup", deadline).ConfigureAwait(false) == target
+@@ -138,6 +143,7 @@
+     {
+         var read = await deadline.ReadAsync(token => client.GetStateAsync<GuardedStateCommitReceipt>(target.ComponentName,
+             OutcomeKey(target, request.OperationId), ConsistencyMode.Strong, Metadata(target), token)).ConfigureAwait(false);
++        if (read is not null && read.Outcome is not { Length: <= MaxBytes }) { return new(GuardedStateCommitStatus.Unavailable); }
+         var receipt = read is null ? null : read with { Outcome = read.Outcome?.ToArray()! };
+         if (receipt is null) { return null; }
+         if (!ValidReceipt(receipt, target, request.OperationId) || authority is null
+--- prior/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs
+@@ -16,6 +16,7 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
++            deadline.ThrowIfCancellationRequested();
+             if (authority is null) { return null; }
+             var cell = await deadline.ReadAsync(token => transaction.ReadGuardAsync(tenantId, token)).ConfigureAwait(false);
+             if (cell is null) { return null; }
+@@ -32,6 +33,7 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
++            deadline.ThrowIfCancellationRequested();
+             if (authority is null || payload is null || signingRequestId != DeletionBatchCapabilityIdentity.SigningRequestId(payload)
+                 || detachedJwsDigest is not { Length: 64 } || !detachedJwsDigest.All(char.IsAsciiHexDigit)) { return null; }
+             string operationId = "issue-" + Hash(new[] { signingRequestId, detachedJwsDigest });
+@@ -62,10 +64,12 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
+-            if (authority is null || transition is null || !GovernanceScopeGuardReducer.IsClosedCommand(transition) || targets is null || targets.Count > 1000) { return null; }
++            deadline.ThrowIfCancellationRequested();
++            if (authority is null || transition is null || !GovernanceScopeGuardReducer.IsClosedCommand(transition) || targets is null) { return null; }
+             transition = await deadline.ReadAsync(_ => Task.FromResult(Capture(transition))).ConfigureAwait(false);
+             targets = await deadline.ReadAsync(_ =>
+             {
++                if (targets.Count > 1000) { throw new ArgumentException("Oversized joint write."); }
+                 long bytes = 0; var capturedTargets = new List<GuardedStateMutation>();
+                 foreach (var value in targets)
+                 {
+--- prior/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs
+@@ -42,14 +42,21 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         var ownedClosedPayloads = new List<byte[]>();
+         bool transferred = false;
++        RetainedIdentityHistoryReadResult Denied(string reason)
++        {
++            deadline.ThrowIfCancellationRequested();
++            return new(null, reason);
++        }
+         try
+         {
+             deadline.ThrowIfCancellationRequested();
+             RetainedIdentityHistoryGrant? grant = await deadline.ReadAsync(token => admission.AdmitAsync(principal, request, token)).ConfigureAwait(false);
+             deadline.ThrowIfCancellationRequested();
+-            if (!ValidGrant(grant, request, clock.GetUtcNow()))
+-            {
+-                return new(null, "history-denied");
++            grant = await deadline.ReadAsync(_ => Task.FromResult(CaptureGrant(grant, request, clock.GetUtcNow(), deadline))).ConfigureAwait(false);
++            deadline.ThrowIfCancellationRequested();
++            if (grant is null || grant.ExpiresAt <= clock.GetUtcNow())
++            {
++                return Denied("history-denied");
+             }
+ 
+             IAggregateActor actor = actors.CreateActorProxy<IAggregateActor>(new ActorId(request.Identity.ActorId), "AggregateActor");
+@@ -57,7 +64,7 @@
+             deadline.ThrowIfCancellationRequested();
+             if (!head.Exists || head.CurrentSequence is < 0 or > RetainedIdentityHistoryLimits.MaxSourcePositions)
+             {
+-                return new(null, "history-unavailable");
++                return Denied("history-unavailable");
+             }
+ 
+             var events = new List<StreamReadEvent>();
+@@ -73,7 +80,7 @@
+                 deadline.ThrowIfCancellationRequested();
+                 if (page.Length is 0 or > 100)
+                 {
+-                    return new(null, "history-source-gap");
++                    return Denied("history-source-gap");
+                 }
+ 
+                 foreach (EventEnvelope item in page)
+@@ -82,20 +89,20 @@
+                     if (item is null || item.Identity != request.Identity || item.SequenceNumber != cursor + 1
+                         || item.SequenceNumber > head.CurrentSequence || item.Payload is null)
+                     {
+-                        return new(null, "history-source-gap-or-scope-mismatch");
++                        return Denied("history-source-gap-or-scope-mismatch");
+                     }
+ 
+                     if (item.MetadataVersion != 1 || item.EventContractType is not null || item.PayloadVersion is not null
+                         || item.SerializationFormat is not ("json" or "json+pdenc-v1" or "json+identity-history-v1"))
+                     {
+-                        return new(null, "history-source-metadata-unsupported");
++                        return Denied("history-source-metadata-unsupported");
+                     }
+ 
+                     cursor++;
+                     bytes += item.Payload.Length;
+                     if (bytes > RetainedIdentityHistoryLimits.MaxPayloadBytes)
+                     {
+-                        return new(null, "history-source-bound-exceeded");
++                        return Denied("history-source-bound-exceeded");
+                     }
+ 
+                     Type? type = grant!.EventTypes.SingleOrDefault(candidate => item.EventTypeName == candidate.FullName);
+@@ -103,7 +110,7 @@
+                     {
+                         if (!grant.ExcludedEventTypeNames.Contains(item.EventTypeName, StringComparer.Ordinal))
+                         {
+-                            return new(null, "history-source-contract-unavailable");
++                            return Denied("history-source-contract-unavailable");
+                         }
+ 
+                         excluded.Add(item.SequenceNumber);
+@@ -112,7 +119,7 @@
+ 
+                     if (EventStorePayloadProtectionMetadataCarrier.Read(item.Extensions).State != PayloadProtectionState.Protected)
+                     {
+-                        return new(null, "history-source-protection-missing");
++                        return Denied("history-source-protection-missing");
+                     }
+ 
+                     // Retain only detached existing ciphertext metadata for actor-free continuity.
+@@ -127,7 +134,7 @@
+                         if (expired is not null)
+                         {
+                             if (!ValidExpired(expired, request, item.EventTypeName, item.SequenceNumber, sealedPayload, clock.GetUtcNow()))
+-                            { return new(null, "history-expired-proof-unavailable"); }
++                            { return Denied("history-expired-proof-unavailable"); }
+                             expiredEvents.Add((expired, sealedPayload, item.SerializationFormat));
+                             continue;
+                         }
+@@ -147,14 +154,14 @@
+                             || string.IsNullOrWhiteSpace(evidence.PolicyId) || string.IsNullOrWhiteSpace(evidence.EvidenceId)
+                             || evidence.Purpose != request.Purpose || evidence.ExpiresAt <= clock.GetUtcNow())
+                         {
+-                            return new(null, "history-custody-unavailable-or-expired");
++                            return Denied("history-custody-unavailable-or-expired");
+                         }
+     
+                         bool allowed = await deadline.ReadAsync(token => custody.CanReadAsync(request.Identity, evidence, token)).ConfigureAwait(false);
+                         deadline.ThrowIfCancellationRequested();
+                         if (!allowed)
+                         {
+-                            return new(null, "history-custody-unavailable-or-expired");
++                            return Denied("history-custody-unavailable-or-expired");
+                         }
+     
+                         retainedEvidence.Add(evidence);
+@@ -173,13 +180,15 @@
+             deadline.ThrowIfCancellationRequested();
+             RetainedIdentityHistoryGrant? finalGrant = await deadline.ReadAsync(token => admission.AdmitAsync(principal, request, token)).ConfigureAwait(false);
+             deadline.ThrowIfCancellationRequested();
+-            if (confirmed != head || !ValidGrant(finalGrant, request, clock.GetUtcNow())
++            finalGrant = await deadline.ReadAsync(_ => Task.FromResult(CaptureGrant(finalGrant, request, clock.GetUtcNow(), deadline))).ConfigureAwait(false);
++            deadline.ThrowIfCancellationRequested();
++            if (confirmed != head || finalGrant is null || finalGrant.ExpiresAt <= clock.GetUtcNow()
+                 || finalGrant!.AuthorityRevision != grant!.AuthorityRevision || finalGrant.ExpiresAt != grant.ExpiresAt
+                 || !finalGrant.EventTypes.SequenceEqual(grant.EventTypes)
+                 || !finalGrant.ExcludedEventTypeNames.SequenceEqual(grant.ExcludedEventTypeNames)
+                 || retainedEvidence.Any(evidence => evidence.ExpiresAt <= clock.GetUtcNow()))
+             {
+-                return new(null, "history-source-or-authority-changed");
++                return Denied("history-source-or-authority-changed");
+             }
+ 
+             // Lifecycle validation must follow the awaited source/authority checks. The owner provider
+@@ -190,7 +199,7 @@
+                 deadline.ThrowIfCancellationRequested();
+                 if (!allowed)
+                 {
+-                    return new(null, "history-custody-unavailable-or-expired");
++                    return Denied("history-custody-unavailable-or-expired");
+                 }
+             }
+ 
+@@ -202,7 +211,7 @@
+                 deadline.ThrowIfCancellationRequested();
+                 if (final is null || !ValidExpired(final, request, cert.EventTypeName, cert.SourceSequence, expired.Payload, clock.GetUtcNow())
+                     || final with { ObservedAt = cert.ObservedAt } != cert)
+-                { return new(null, "history-expired-proof-changed"); }
++                { return Denied("history-expired-proof-changed"); }
+             }
+ 
+             DateTimeOffset observedAt = clock.GetUtcNow();
+@@ -232,7 +241,7 @@
+             }
+             bool valid = bounded && validUntil > clock.GetUtcNow();
+             deadline.ThrowIfCancellationRequested();
+-            if (!valid) { return new(null, "history-source-incomplete-or-expired"); }
++            if (!valid) { return Denied("history-source-incomplete-or-expired"); }
+             transferred = true;
+             return result;
+         }
+@@ -268,6 +277,34 @@
+             && certificate.LifecycleRevision > 0 && certificate.ObservedAt != default && certificate.ObservedAt <= now && certificate.ValidUntil > now
+             && !string.IsNullOrWhiteSpace(certificate.AuthorityRevision) && certificate.AuthorityRevision.Length <= 2048
+             && !string.IsNullOrWhiteSpace(certificate.DestructionReceiptId) && certificate.DestructionReceiptId.Length <= 2048;
++
++    private static RetainedIdentityHistoryGrant? CaptureGrant(RetainedIdentityHistoryGrant? grant,
++        RetainedIdentityHistoryReadRequest request, DateTimeOffset now, AuthoritativeStreamReadDeadline deadline)
++    {
++        deadline.ThrowIfCancellationRequested();
++        if (grant?.EventTypes is null || grant.ExcludedEventTypeNames is null) { return null; }
++        int typeCount = grant.EventTypes.Count;
++        int excludedCount = grant.ExcludedEventTypeNames.Count;
++        if (typeCount is < 1 or > 32 || excludedCount is < 0 or > 512) { return null; }
++        var types = new List<Type>(typeCount);
++        foreach (Type type in grant.EventTypes)
++        {
++            deadline.ThrowIfCancellationRequested();
++            if (types.Count >= typeCount) { return null; }
++            types.Add(type);
++        }
++        var excluded = new List<string>(excludedCount);
++        foreach (string name in grant.ExcludedEventTypeNames)
++        {
++            deadline.ThrowIfCancellationRequested();
++            if (excluded.Count >= excludedCount) { return null; }
++            excluded.Add(name);
++        }
++        deadline.ThrowIfCancellationRequested();
++        if (types.Count != typeCount || excluded.Count != excludedCount) { return null; }
++        var captured = grant with { EventTypes = types.AsReadOnly(), ExcludedEventTypeNames = excluded.AsReadOnly() };
++        return ValidGrant(captured, request, now) ? captured : null;
++    }
+ 
+     private static bool ValidGrant(RetainedIdentityHistoryGrant? grant, RetainedIdentityHistoryReadRequest request, DateTimeOffset now)
+         => grant is not null && request.Identity is not null && grant.Identity == request.Identity
+--- prior/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationNamespaceActor.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationNamespaceActor.cs
+@@ -88,6 +88,8 @@
+             { throw new InvalidOperationException("Malformed initial namespace roster."); }
+             initial.Add(identity);
+         }
++        if (state.Revision == 1 && initial.Count != owned.Count)
++        { throw new InvalidOperationException("Initial installation must contain its complete roster."); }
+         return state with { Sources = Array.AsReadOnly(owned.OrderBy(s => s.ActorId, StringComparer.Ordinal).ToArray()),
+             InitialSources = Array.AsReadOnly(initial.OrderBy(s => s.ActorId, StringComparer.Ordinal).ToArray()) };
+     }
+--- prior/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs
+@@ -71,6 +71,49 @@
+         restarted.CommittedState.Single().Value.ShouldBeOfType<SourcePublicationNamespaceState>().Revision.ShouldBe(2);
+     }
+ 
++    /// <summary>A revision-one installation cannot authenticate a smaller initial vector than its complete requested roster.</summary>
++    [Theory]
++    [InlineData(false)][InlineData(true)]
++    public async Task RevisionOneSubsetCannotInstallOrCertifyRestoredState(bool restored)
++    {
++        var backend = new InMemoryStateManager(); var actor = Actor(backend);
++        var inconsistent = Installation() with { Sources = [Existing, Created], InitialSources = [Existing] };
++        if (restored)
++        {
++            await backend.SetStateAsync("source-publication-namespace-v1", JsonSerializer.Deserialize<SourcePublicationNamespaceState>(JsonSerializer.SerializeToUtf8Bytes(inconsistent))!);
++            await backend.SaveStateAsync();
++            byte[] original = JsonSerializer.SerializeToUtf8Bytes(backend.CommittedState.Single().Value);
++            await Should.ThrowAsync<InvalidOperationException>(() => actor.ReadAsync(Scope));
++            await Should.ThrowAsync<InvalidOperationException>(() => actor.InstallAsync(Installation()));
++            JsonSerializer.SerializeToUtf8Bytes(backend.CommittedState.Single().Value).ShouldBe(original);
++        }
++        else
++        {
++            await Should.ThrowAsync<InvalidOperationException>(() => actor.InstallAsync(inconsistent));
++            backend.CommittedState.ShouldBeEmpty();
++            (await actor.InstallAsync(Installation() with { InitialSources = [Existing] })).ShouldBeTrue();
++            byte[] original = JsonSerializer.SerializeToUtf8Bytes(backend.CommittedState.Single().Value);
++            await Should.ThrowAsync<InvalidOperationException>(() => actor.InstallAsync(inconsistent));
++            JsonSerializer.SerializeToUtf8Bytes(backend.CommittedState.Single().Value).ShouldBe(original);
++        }
++    }
++
++    /// <summary>Registered growth keeps its original installation vector through serialized retry without replacing the complete persisted roster.</summary>
++    [Fact]
++    public async Task PostRegistrationGrowthAndOriginalInstallationRetryRemainExact()
++    {
++        var backend = new InMemoryStateManager(); var actor = Actor(backend);
++        var original = Installation() with { InitialSources = [Existing] };
++        (await actor.InstallAsync(original)).ShouldBeTrue(); (await actor.RegisterAsync(Scope, 1, Created)).ShouldBeTrue();
++        var stored = backend.CommittedState.Single(); byte[] saved = JsonSerializer.SerializeToUtf8Bytes(stored.Value);
++        var restored = new InMemoryStateManager();
++        await restored.SetStateAsync(stored.Key, JsonSerializer.Deserialize<SourcePublicationNamespaceState>(saved)!); await restored.SaveStateAsync();
++        var restarted = Actor(restored); (await restarted.InstallAsync(original)).ShouldBeTrue();
++        var read = (await restarted.ReadAsync(Scope))!; read.Revision.ShouldBe(2);
++        read.InitialSources!.ShouldBe(new[] { Existing }); read.Sources.ShouldBe(new[] { Existing, Created }.OrderBy(source => source.ActorId, StringComparer.Ordinal));
++        JsonSerializer.SerializeToUtf8Bytes(restored.CommittedState.Single().Value).ShouldBe(saved);
++    }
++
+     /// <summary>Neither precommit failure nor a lost acknowledgement can certify staged inventory.</summary>
+     [Theory]
+     [InlineData(false)]
+--- prior/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs
+@@ -370,4 +370,50 @@
+         (await restarted.ExecuteAsync(first.Original, [first.Mutation], TestContext.Current.CancellationToken)).ShouldBe(first.Receipt);
+     }
+ 
++    /// <summary>The actual InstallEpoch entry bounds supplied target Count and traversal before any independent guard authority or joint effect.</summary>
++    [Theory]
++    [InlineData("count", false)][InlineData("count", true)][InlineData("traversal", false)][InlineData("traversal", true)]
++    public async Task SuspendedTargetsCannotAuthorizeOrMutateGuard(string access, bool expires)
++    {
++        var fixture = new GovernanceGuardFixture(); var command = fixture.Command(GovernanceGuardOperation.InstallEpoch);
++        var stored = fixture.Backend.Stored.ToDictionary(pair => pair.Key, pair => pair.Value.ToArray());
++        var clock = new RetainedHistoryTimeProvider(fixture.Backend.Now); using var caller = new CancellationTokenSource();
++        using var release = new ManualResetEventSlim(); var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        void Block() { entered.TrySetResult(); release.Wait(); finished.TrySetResult(); }
++        var supplied = Substitute.For<IReadOnlyList<GuardedStateMutation>>();
++        supplied.Count.Returns(_ => { if (access == "count") { Block(); } return 0; });
++        supplied.GetEnumerator().Returns(_ => { if (access == "traversal") { Block(); } return ((IEnumerable<GuardedStateMutation>)Array.Empty<GuardedStateMutation>()).GetEnumerator(); });
++        fixture.Authority.ClearReceivedCalls(); fixture.Backend.Authority.ClearReceivedCalls();
++        var owner = new GovernanceScopeGuardOwner(fixture.Backend.Owner, clock, fixture.Authority);
++        var pending = Task.Run(() => owner.ExecuteAsync(command, supplied, caller.Token), CancellationToken.None);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2));
++        try
++        {
++            if (expires) { clock.Advance(TimeSpan.FromSeconds(30)); (await pending.WaitAsync(TimeSpan.FromSeconds(2))).ShouldBeNull(); }
++            else { caller.Cancel(); var error = await Should.ThrowAsync<OperationCanceledException>(() => pending.WaitAsync(TimeSpan.FromSeconds(2))); error.CancellationToken.ShouldBe(caller.Token); }
++        }
++        finally { release.Set(); }
++        await finished.Task.WaitAsync(TimeSpan.FromSeconds(2));
++        fixture.Authority.ReceivedCalls().ShouldBeEmpty(); fixture.Backend.Authority.ReceivedCalls().ShouldBeEmpty(); fixture.Backend.TransactionCalls.ShouldBe(0);
++        foreach (var pair in stored) { fixture.Backend.Stored[pair.Key].ShouldBe(pair.Value); }
++    }
++
++    /// <summary>Every demonstrated disabled owner entry preserves original cancellation and remains null for an active caller.</summary>
++    [Theory]
++    [InlineData("read")][InlineData("execute")][InlineData("no-issue")]
++    public async Task DisabledOwnerEntriesCheckOriginalCancellation(string entry)
++    {
++        var fixture = new GovernanceGuardFixture(); var owner = new GovernanceScopeGuardOwner(fixture.Backend.Owner, TimeProvider.System);
++        var command = fixture.Command(GovernanceGuardOperation.InstallEpoch);
++        var payload = new DeletionBatchCapabilityV1("issuer", "audience", "tenant-a", "deletion-a", new string('A', 64), "AcceptedSet", 0,
++            new string('B', 64), new string('C', 64), "guard", 1, 1, 1, "key");
++        string requestId = DeletionBatchCapabilityIdentity.SigningRequestId(payload);
++        using var caller = new CancellationTokenSource(); caller.Cancel();
++        async Task<bool> Run(CancellationToken token) => entry == "read" ? await owner.ReadAsync("tenant-a", token) is null
++            : entry == "execute" ? await owner.ExecuteAsync(command, [], token) is null : await owner.ReadNoIssueAsync(payload, requestId, new string('D', 64), token) is null;
++        var error = await Should.ThrowAsync<OperationCanceledException>(() => Run(caller.Token)); error.CancellationToken.ShouldBe(caller.Token);
++        (await Run(CancellationToken.None)).ShouldBeTrue(); fixture.Backend.TransactionCalls.ShouldBe(0);
++    }
++
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs
+@@ -165,4 +165,78 @@
+         var restart = await fixture.Owner.LookupByIntentAsync(fixture.Target.TenantId, first.OperationId, first.LogicalIntentDigest, TestContext.Current.CancellationToken);
+         restart.Status.ShouldBe(winner.Status); restart.Receipt!.RequestDigest.ShouldBe(winner.Receipt!.RequestDigest); restart.Receipt.Outcome.ShouldBe(winner.Receipt.Outcome);
+     }
++    /// <summary>Oversized backend outcomes are denied before another full buffer allocation on every public original lookup path.</summary>
++    [Theory]
++    [InlineData("original")][InlineData("intent")][InlineData("request")]
++    public async Task OversizedReceiptOutcomeIsRejectedBeforeCopy(string path)
++    {
++        var fixture = new GuardedTransactionFixture(); var request = fixture.Request();
++        var committed = await fixture.Owner.CommitAsync(request, TestContext.Current.CancellationToken);
++        committed.Status.ShouldBe(GuardedStateCommitStatus.Committed);
++        byte[] oversizedBytes = new byte[16 * 1024 * 1024 + 1]; oversizedBytes[0] = 17; oversizedBytes[^1] = 23;
++        var oversized = committed.Receipt! with { Outcome = oversizedBytes };
++        fixture.ReceiptRead = _ => Task.FromResult<GuardedStateCommitReceipt?>(oversized);
++        fixture.Authority.ClearReceivedCalls(); var stored = fixture.Stored.ToDictionary(pair => pair.Key, pair => pair.Value.ToArray());
++        long allocatedBefore = GC.GetTotalAllocatedBytes(true);
++        var result = path == "request" ? await fixture.Owner.LookupAsync(request, TestContext.Current.CancellationToken)
++            : path == "intent" ? await fixture.Owner.LookupByIntentAsync(request.TenantId, request.OperationId, GuardedTransactionFixture.Hash("intent"u8.ToArray()), TestContext.Current.CancellationToken)
++            : await fixture.Owner.LookupOriginalAsync(request.TenantId, request.OperationId, GuardedTransactionFixture.Hash("scope"u8.ToArray()), TestContext.Current.CancellationToken);
++        long allocation = GC.GetTotalAllocatedBytes(true) - allocatedBefore;
++        result.Status.ShouldBe(GuardedStateCommitStatus.Unavailable); result.Receipt.ShouldBeNull();
++        allocation.ShouldBeLessThan(oversizedBytes.Length);
++        oversizedBytes[0].ShouldBe((byte)17); oversizedBytes[^1].ShouldBe((byte)23);
++        await fixture.Authority.DidNotReceiveWithAnyArgs().ValidateReceiptAsync(default!, default!, default);
++        fixture.TransactionCalls.ShouldBe(1); foreach (var pair in stored) { fixture.Stored[pair.Key].ShouldBe(pair.Value); }
++    }
++
++    /// <summary>Pure supplied request capture is bounded; terminated entries cannot authorize or change an existing joint original.</summary>
++    [Theory]
++    [InlineData("commit", "count", false)][InlineData("commit", "count", true)]
++    [InlineData("commit", "traversal", false)][InlineData("commit", "traversal", true)]
++    [InlineData("lookup", "count", false)][InlineData("lookup", "count", true)]
++    [InlineData("lookup", "traversal", false)][InlineData("lookup", "traversal", true)]
++    public async Task SuspendedRequestCaptureNeverContinuesJointTransaction(string operation, string access, bool expires)
++    {
++        var fixture = new GuardedTransactionFixture(); var request = fixture.Request();
++        (await fixture.Owner.CommitAsync(request, TestContext.Current.CancellationToken)).Status.ShouldBe(GuardedStateCommitStatus.Committed);
++        var stored = fixture.Stored.ToDictionary(pair => pair.Key, pair => pair.Value.ToArray());
++        byte[] guard = request.Guard.NextValue.ToArray(); byte[] source = request.Targets.Single().NextValue.ToArray();
++        var clock = new RetainedHistoryTimeProvider(fixture.Now); using var caller = new CancellationTokenSource();
++        using var release = new ManualResetEventSlim(); var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        void Block() { entered.TrySetResult(); release.Wait(); finished.TrySetResult(); }
++        var supplied = Substitute.For<IReadOnlyList<GuardedStateMutation>>();
++        supplied.Count.Returns(_ => { if (access == "count") { Block(); } return 1; });
++        supplied.GetEnumerator().Returns(_ => { if (access == "traversal") { Block(); } return request.Targets.GetEnumerator(); });
++        var input = request with { Targets = supplied }; var owner = new DaprGuardedStateTransaction(fixture.Client, clock, fixture.Authority);
++        fixture.Authority.ClearReceivedCalls(); fixture.Client.ClearReceivedCalls();
++        Task<GuardedStateCommitResult> pending = Task.Run(() => operation == "commit" ? owner.CommitAsync(input, caller.Token) : owner.LookupAsync(input, caller.Token), CancellationToken.None);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2));
++        try
++        {
++            if (expires) { clock.Advance(TimeSpan.FromSeconds(30)); (await pending.WaitAsync(TimeSpan.FromSeconds(2))).Status.ShouldBe(GuardedStateCommitStatus.Unavailable); }
++            else { caller.Cancel(); var error = await Should.ThrowAsync<OperationCanceledException>(() => pending.WaitAsync(TimeSpan.FromSeconds(2))); error.CancellationToken.ShouldBe(caller.Token); }
++        }
++        finally { release.Set(); }
++        await finished.Task.WaitAsync(TimeSpan.FromSeconds(2));
++        fixture.Authority.ReceivedCalls().ShouldBeEmpty(); fixture.Client.ReceivedCalls().ShouldBeEmpty(); fixture.TransactionCalls.ShouldBe(1);
++        foreach (var pair in stored) { fixture.Stored[pair.Key].ShouldBe(pair.Value); }
++        request.Guard.NextValue.ShouldBe(guard); request.Targets.Single().NextValue.ShouldBe(source);
++    }
++
++    /// <summary>Disabled direct original/request/guard read entries still honor the original caller token, with unchanged restrictive active defaults.</summary>
++    [Theory]
++    [InlineData("original")][InlineData("intent")][InlineData("request")][InlineData("guard")]
++    public async Task DisabledLookupEntriesCheckOriginalCancellation(string entry)
++    {
++        var fixture = new GuardedTransactionFixture(); var owner = new DaprGuardedStateTransaction(fixture.Client, TimeProvider.System);
++        var request = fixture.Request(); using var caller = new CancellationTokenSource(); caller.Cancel();
++        async Task<bool> Run(CancellationToken token) => entry == "guard" ? await owner.ReadGuardAsync(request.TenantId, token) is null
++            : (entry == "request" ? await owner.LookupAsync(request, token)
++                : entry == "intent" ? await owner.LookupByIntentAsync(request.TenantId, request.OperationId, GuardedTransactionFixture.Hash("intent"u8.ToArray()), token)
++                : await owner.LookupOriginalAsync(request.TenantId, request.OperationId, GuardedTransactionFixture.Hash("scope"u8.ToArray()), token)).Status == GuardedStateCommitStatus.Unavailable;
++        var error = await Should.ThrowAsync<OperationCanceledException>(() => Run(caller.Token)); error.CancellationToken.ShouldBe(caller.Token);
++        (await Run(CancellationToken.None)).ShouldBeTrue(); fixture.TransactionCalls.ShouldBe(0);
++    }
++
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs
+@@ -659,6 +659,83 @@
+         for (int n = 0; n < stored.Length; n++) { stored[n].Payload.ShouldBe(originals[n]); }
+     }
+ 
++    /// <summary>Initial and final independently returned grant collections cannot retain the whole read beyond its original budget.</summary>
++    /// <param name="phase">The initial or final grant.</param>
++    /// <param name="field">The admitted types or excluded names.</param>
++    /// <param name="access">The actually suspended collection operation.</param>
++    /// <param name="expires">Whether the thirty-second operation expires instead of caller cancellation.</param>
++    /// <param name="invalid">Whether the released carrier is invalid.</param>
++    [Theory]
++    [InlineData("initial", "types", "count", false, false)][InlineData("initial", "types", "count", true, false)]
++    [InlineData("initial", "types", "traversal", false, false)][InlineData("initial", "types", "traversal", true, false)]
++    [InlineData("initial", "excluded", "count", false, false)][InlineData("initial", "excluded", "count", true, false)]
++    [InlineData("initial", "excluded", "traversal", false, false)][InlineData("initial", "excluded", "traversal", true, false)]
++    [InlineData("final", "types", "count", false, false)][InlineData("final", "types", "count", true, false)]
++    [InlineData("final", "types", "traversal", false, false)][InlineData("final", "types", "traversal", true, false)]
++    [InlineData("final", "excluded", "count", false, false)][InlineData("final", "excluded", "count", true, false)]
++    [InlineData("final", "excluded", "traversal", false, false)][InlineData("final", "excluded", "traversal", true, false)]
++    [InlineData("initial", "types", "count", false, true)][InlineData("final", "excluded", "traversal", false, true)]
++    public async Task SuspendedGrantCaptureCannotReturnHistoryOrContinueAfterAbandonment(string phase, string field, string access, bool expires, bool invalid)
++    {
++        Arrange(); ArrangeCompleteSource();
++        var clock = new RetainedHistoryTimeProvider(_now);
++        using var caller = new CancellationTokenSource(); using var release = new ManualResetEventSlim();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        void Block() { entered.TrySetResult(); release.Wait(); finished.TrySetResult(); }
++        Type[] types = [invalid ? null! : typeof(HistoryCustodyProbeEvent)];
++        string[] names = [invalid ? string.Empty : "Profile", "ErasedProfile"];
++        var suppliedTypes = Substitute.For<IReadOnlyList<Type>>();
++        var suppliedNames = Substitute.For<IReadOnlyList<string>>();
++        suppliedTypes.Count.Returns(_ => { if (field == "types" && access == "count") { Block(); } return types.Length; });
++        suppliedNames.Count.Returns(_ => { if (field == "excluded" && access == "count") { Block(); } return names.Length; });
++        suppliedTypes.GetEnumerator().Returns(_ => { if (field == "types" && access == "traversal") { Block(); } return ((IEnumerable<Type>)types).GetEnumerator(); });
++        suppliedNames.GetEnumerator().Returns(_ => { if (field == "excluded" && access == "traversal") { Block(); } return ((IEnumerable<string>)names).GetEnumerator(); });
++        var supplied = Grant() with { EventTypes = suppliedTypes, ExcludedEventTypeNames = suppliedNames };
++        int admissions = 0; var owned = new List<byte[]>();
++        _admission.AdmitAsync(_principal, Arg.Any<RetainedIdentityHistoryReadRequest>(), Arg.Any<CancellationToken>())
++            .Returns(_ => ++admissions == (phase == "initial" ? 1 : 2) ? supplied : Grant());
++        var reader = new RetainedIdentityHistorySourceReader(_actors, _admission, _custody, clock, owned.Add);
++        var reading = reader.ReadAsync(_principal, Request(), caller.Token);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2));
++        int sourceCalls = _actor.ReceivedCalls().Count(); int providerCalls = _custody.ReceivedCalls().Count();
++        try
++        {
++            if (expires)
++            {
++                clock.Advance(TimeSpan.FromSeconds(30));
++                var result = await reading.WaitAsync(TimeSpan.FromSeconds(2));
++                result.Stream.ShouldBeNull(); result.FailureReason.ShouldBe("history-time-bound-exceeded");
++            }
++            else
++            {
++                caller.Cancel();
++                var error = await Should.ThrowAsync<OperationCanceledException>(() => reading.WaitAsync(TimeSpan.FromSeconds(2)));
++                error.CancellationToken.ShouldBe(caller.Token);
++            }
++            if (phase == "final") { owned.ShouldNotBeEmpty(); owned.All(bytes => bytes.All(value => value == 0)).ShouldBeTrue(); }
++        }
++        finally { release.Set(); }
++        await finished.Task.WaitAsync(TimeSpan.FromSeconds(2));
++        _actor.ReceivedCalls().Count().ShouldBe(sourceCalls); _custody.ReceivedCalls().Count().ShouldBe(providerCalls);
++        if (phase == "initial") { _actors.DidNotReceive().CreateActorProxy<IAggregateActor>(Arg.Any<ActorId>(), Arg.Any<string>()); }
++    }
++
++    /// <summary>Only detached admitted collections are used after the independently owned originals change.</summary>
++    [Fact]
++    public async Task GrantTypeAndExclusionSnapshotsRemainExactAcrossSourceAwaits()
++    {
++        Arrange(); ArrangeCompleteSource();
++        Type[] types = [typeof(HistoryCustodyProbeEvent)]; string[] excluded = ["Profile", "ErasedProfile"];
++        var first = Grant() with { EventTypes = types, ExcludedEventTypeNames = excluded };
++        _admission.AdmitAsync(_principal, Arg.Any<RetainedIdentityHistoryReadRequest>(), Arg.Any<CancellationToken>()).Returns(first, Grant());
++        _actor.GetStreamMetadataAsync().Returns(_ => { types[0] = null!; excluded[0] = "changed-provider-name"; return new AggregateStreamMetadata(true, 2); });
++        var reader = new RetainedIdentityHistorySourceReader(_actors, _admission, _custody, _clock);
++        var result = await reader.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken);
++        result.IsAuthoritative.ShouldBeTrue(); result.Stream!.ExcludedSequences.ShouldBe([1L]);
++        result.Stream.Events.Single().EventTypeName.ShouldBe(typeof(HistoryCustodyProbeEvent).FullName);
++    }
++
+     private void ArrangeCompleteSource()
+         => _actor.ReadEventsRangeAsync(0, 2, 100).Returns([Stored(1, "Profile", "sealed"), Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "sealed-history")]);
+ 
+--- prior/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs
++++ current/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs
+@@ -16,6 +16,7 @@
+         var providerCancellation = new CancellationTokenSource();
+         try
+         {
++            deadline.Check();
+             ArgumentNullException.ThrowIfNull(payload); string id = DeletionBatchCapabilityIdentity.SigningRequestId(payload);
+             if (guard is null || signers is null || protectionOwners is null) { return new("Unavailable"); }
+             var signer = await deadline.ReadAsync(() => Task.FromResult(signers(payload))).ConfigureAwait(false);
+--- prior/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs
++++ current/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs
+@@ -14,7 +14,10 @@
+         var pending = Task.Run(operation, CancellationToken.None);
+         try
+         {
+-            var result = await pending.WaitAsync(TimeSpan.FromSeconds(30) - clock.GetElapsedTime(_start), clock, token).ConfigureAwait(false);
++            TimeSpan remaining = TimeSpan.FromSeconds(30) - clock.GetElapsedTime(_start);
++            token.ThrowIfCancellationRequested();
++            if (remaining <= TimeSpan.Zero) { throw new TimeoutException("Private owner operation unavailable."); }
++            var result = await pending.WaitAsync(remaining, clock, token).ConfigureAwait(false);
+             Check(); return result;
+         }
+         catch (Exception)
+@@ -31,7 +34,10 @@
+         Check();
+         try
+         {
+-            await pending.WaitAsync(TimeSpan.FromSeconds(30) - clock.GetElapsedTime(_start), clock, token).ConfigureAwait(false);
++            TimeSpan remaining = TimeSpan.FromSeconds(30) - clock.GetElapsedTime(_start);
++            token.ThrowIfCancellationRequested();
++            if (remaining <= TimeSpan.Zero) { throw new TimeoutException("Private owner operation unavailable."); }
++            await pending.WaitAsync(remaining, clock, token).ConfigureAwait(false);
+             Check();
+         }
+         catch (Exception) { token.ThrowIfCancellationRequested(); throw; }
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs
+@@ -330,4 +330,21 @@
+         finally { io.Release.TrySetResult(); pending.TrySetResult(true); }
+     }
+ 
++    /// <summary>An actual actor admission crossing the helper boundary returns its restrictive original form without a negative wait or state/effect continuation.</summary>
++    [Theory]
++    [InlineData(10000)][InlineData(20000)]
++    public async Task AdmissionClockCrossingReturnsUnavailableWithoutStateOrEffect(long overrunTicks)
++    {
++        var fixture = new CustodyKeyLifecycleFixture(); var clock = Substitute.For<TimeProvider>();
++        clock.TimestampFrequency.Returns(TimeSpan.TicksPerSecond); int reads = 0;
++        clock.GetTimestamp().Returns(_ => Interlocked.Increment(ref reads) >= 4 ? TimeSpan.FromSeconds(30).Ticks + overrunTicks : 0L);
++        var suspended = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
++        fixture.Authority.AuthorizeOperationAsync(Arg.Any<CustodyKeyObjectIdentity>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(suspended.Task);
++        var actor = CustodyKeyLifecycleFixture.Create(fixture.Backend, fixture.Authority, fixture, clock);
++        CustodyKeyLifecycleOutcome result;
++        try { result = await actor.RegisterWrappedAsync(CustodyKeyLifecycleFixture.Registration()).WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken); }
++        finally { suspended.TrySetResult(true); }
++        result.Status.ShouldBe(CustodyKeyLifecycleStatus.Unavailable); fixture.Backend.CommittedState.ShouldBeEmpty(); fixture.Effects.ShouldBe(0); fixture.Anchor.ShouldBe(0);
++    }
++
+ }
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs
+@@ -424,4 +424,16 @@
+         f.Reservations.ShouldBe(0); f.State.Deletions.Single().Batches.Single().ProtectionReceiptId.ShouldBe(block);
+     }
+ 
++    /// <summary>Disabled composition preserves an already canceled caller token and its active restrictive default without touching any original owner.</summary>
++    [Fact]
++    public async Task DisabledCoordinatorChecksOriginalCancellation()
++    {
++        using var fixture = new DeletionBatchExecutionFixture(); using var caller = new CancellationTokenSource(); caller.Cancel();
++        var coordinator = new DeletionBatchExecutionCoordinator(TimeProvider.System);
++        var error = await Should.ThrowAsync<OperationCanceledException>(() => coordinator.ExecuteAsync(fixture.Payload, cancellationToken: caller.Token));
++        error.CancellationToken.ShouldBe(caller.Token);
++        (await coordinator.ExecuteAsync(fixture.Payload, cancellationToken: CancellationToken.None)).Status.ShouldBe("Unavailable");
++        fixture.Signatures.ShouldBe(0); fixture.Reservations.ShouldBe(0); fixture.Source.ReceivedCalls().ShouldBeEmpty();
++    }
++
+ }
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationDeadlineTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationDeadlineTests.cs
+@@ -1,3 +1,4 @@
++using NSubstitute;
+ using Shouldly;
+ 
+ namespace Hexalith.Platform.Custody.Tests;
+@@ -28,4 +29,30 @@
+         finally { cleanupRelease.Set(); }
+         await cleanupFinished.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); cleanups.ShouldBe(1);
+     }
++    /// <summary>A clock crossing the budget after Check cannot construct a negative or infinite wait on either helper.</summary>
++    [Theory]
++    [InlineData(false, 0)][InlineData(false, 1)][InlineData(false, 10000)][InlineData(false, 20000)]
++    [InlineData(true, 0)][InlineData(true, 1)][InlineData(true, 10000)][InlineData(true, 20000)]
++    public async Task NonpositiveRemainingTimeIsTimeoutWithSafeLateCompletion(bool turnOwned, long overrunTicks)
++    {
++        var clock = Substitute.For<TimeProvider>(); clock.TimestampFrequency.Returns(TimeSpan.TicksPerSecond);
++        int reads = 0; clock.GetTimestamp().Returns(_ => Interlocked.Increment(ref reads) >= 3 ? TimeSpan.FromSeconds(30).Ticks + overrunTicks : 0L);
++        var deadline = new PrivateOwnerOperationDeadline(clock, CancellationToken.None);
++        var pending = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
++        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var cleaned = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously); int cleanups = 0;
++        Task operation = turnOwned ? deadline.WaitAsync(pending.Task)
++            : deadline.ReadAsync(() => { started.TrySetResult(); return pending.Task; }, value => { value.ShouldBe(17); Interlocked.Increment(ref cleanups); cleaned.TrySetResult(); });
++        try
++        {
++            var error = await Should.ThrowAsync<TimeoutException>(() => operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken));
++            error.Message.ShouldBe("Private owner operation unavailable."); operation.IsCompleted.ShouldBeTrue();
++            pending.Task.IsCompleted.ShouldBeFalse();
++            clock.DidNotReceive().CreateTimer(Arg.Any<TimerCallback>(), Arg.Any<object?>(), Arg.Any<TimeSpan>(), Arg.Any<TimeSpan>());
++        }
++        finally { pending.TrySetResult(17); }
++        if (!turnOwned) { await started.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken); await cleaned.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken); cleanups.ShouldBe(1); }
++        else { (await pending.Task).ShouldBe(17); cleanups.ShouldBe(0); }
++    }
++
+ }

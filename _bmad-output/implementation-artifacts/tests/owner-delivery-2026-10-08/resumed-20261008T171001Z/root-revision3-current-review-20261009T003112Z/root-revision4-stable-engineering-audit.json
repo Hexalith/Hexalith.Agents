@@ -1,0 +1,114 @@
+{
+  "auditedUtc": "2026-10-09T01:40:47.631646+00:00",
+  "revision": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4",
+  "previousRevision": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3",
+  "orderedCapturesVerified": 114,
+  "exactPriorPrefixCount": 97,
+  "suppliedBeforeCopiesChecked": 449,
+  "currentHandoffPathsChecked": 44,
+  "engineeringArtifactsChecked": 171,
+  "commandsChecked": 63,
+  "historicalNonpassingCommandsRetained": 18,
+  "distinctPassingSelectedCases": 492,
+  "lanes": [
+    {
+      "lane": "namespace-reader",
+      "selectedPassed": 35,
+      "combinedXmlTotal": 35,
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests": 35
+      }
+    },
+    {
+      "lane": "namespace-roster",
+      "selectedPassed": 21,
+      "combinedXmlTotal": 21,
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests": 21
+      }
+    },
+    {
+      "lane": "finite-cut",
+      "selectedPassed": 65,
+      "combinedXmlTotal": 65,
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests": 65
+      }
+    },
+    {
+      "lane": "feed-dispatch-compatibility",
+      "selectedPassed": 27,
+      "combinedXmlTotal": 27,
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests": 11,
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests": 16
+      }
+    },
+    {
+      "lane": "repair-owner-original",
+      "selectedPassed": 69,
+      "combinedXmlTotal": 69,
+      "classes": {
+        "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests": 12,
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests": 57
+      }
+    },
+    {
+      "lane": "protection-target-order",
+      "selectedPassed": 48,
+      "combinedXmlTotal": 48,
+      "classes": {
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests": 48
+      }
+    },
+    {
+      "lane": "platform-owner-final",
+      "selectedPassed": 170,
+      "combinedXmlTotal": 170,
+      "classes": {
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests": 35,
+        "Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests": 26,
+        "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests": 42,
+        "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests": 20,
+        "Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests": 47
+      }
+    },
+    {
+      "lane": "runner-contracts",
+      "selectedPassed": 12,
+      "combinedXmlTotal": 12,
+      "classes": {
+        "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests": 12
+      }
+    },
+    {
+      "lane": "runner-client",
+      "selectedPassed": 11,
+      "combinedXmlTotal": 11,
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests": 11
+      }
+    },
+    {
+      "lane": "runner-server",
+      "selectedPassed": 7,
+      "combinedXmlTotal": 7,
+      "classes": {
+        "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests": 7
+      }
+    },
+    {
+      "lane": "runner-payload",
+      "selectedPassed": 27,
+      "combinedXmlTotal": 27,
+      "classes": {
+        "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceKeyDerivationTests": 16,
+        "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests": 11
+      }
+    }
+  ],
+  "errors": [
+    "No successful exact test command: /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-payload-tests.log"
+  ],
+  "scope": "Engineering integrity and selected focused evidence only. Root source review, full Local matrix, protected-state audit and runtime qualification require separate evidence."
+}

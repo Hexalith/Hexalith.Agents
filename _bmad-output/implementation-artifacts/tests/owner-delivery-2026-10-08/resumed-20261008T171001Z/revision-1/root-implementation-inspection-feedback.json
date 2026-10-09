@@ -1,0 +1,47 @@
+{
+  "scope": "Root source tracing feedback during authorized review re-derivation; not a replacement for the required next three independent layers.",
+  "items": [
+    {
+      "id": "R1",
+      "location": "RecoverableAnchoredState.ReconcileAsync",
+      "finding": "Returning an in-memory prospective target after the final persistence await lacked fresh durable byte and current-anchor confirmation.",
+      "required": "Read durable bytes, capture and match exact target digest, then independently reconfirm original transition and current anchor.",
+      "currentInspection": "Source now returns the freshly read durable value only after all three checks; executable regression coverage remains pending."
+    },
+    {
+      "id": "R2",
+      "location": "RecoverableAnchoredState.Prepare",
+      "finding": "SerializeToUtf8Bytes allocated the full candidate before applying the pending-byte limit.",
+      "required": "Enforce the output carrier bound while serializing.",
+      "currentInspection": "BoundedPendingStateStream now stops writes before output capacity exceeds the carrier; executable oversized-state coverage remains pending."
+    },
+    {
+      "id": "R3",
+      "location": "GovernanceScopeGuardReducer.RecordKeyCompromise",
+      "finding": "A newer same-key event with an empty affected vector overwrote original batch block receipts; global/per-key maxima also prevented authentic historical events from mirroring after reordered delivery.",
+      "required": "Preserve original batch block proof and retain exact historical event proof without reopening blocked batches or regressing newer state; run ordered same-key and unordered different-key/subscriber cases.",
+      "currentInspection": "Sent to implementation agent; final source and executable coverage pending."
+    },
+    {
+      "id": "R4",
+      "location": "ReplicatedSecurityObservationSpool.ObserveAsync / RecoverableAnchoredState.CommitAsync",
+      "finding": "After a pending CAS succeeds but journal advancement fails, original Observe retry creates a later ObservedAt/day and conflicts with its retained stage.",
+      "required": "Authenticated matching original retry reuses exact staged first-seen/day/sequence and predecessor/prefix without accepting a changed intent or read-side advancement; exercise clock change plus restart.",
+      "currentInspection": "Implementation agent confirmed schedule; correction and executable cases pending."
+    },
+    {
+      "id": "R5",
+      "location": "ReplicatedSecurityObservationSpool.ReadAsync/TryWriteAsync",
+      "finding": "Passing raw journal authority to shared helper bypasses the original whole-operation deadline for RecordTransitionAsync and VerifyTransitionAsync.",
+      "required": "Bound journal calls under the same operation deadline; use actually suspended providers to prove prompt caller cancellation/timeout and no processed-success claim.",
+      "currentInspection": "Implementation agent confirmed schedule; private deadline adapter and executable cases pending."
+    },
+    {
+      "id": "R6",
+      "location": "CustodyKeyLifecycleTests.NegativePhysicalPinAndUnpinRetainTheCorrectRestrictiveHold",
+      "finding": "The negative pin schedule has no independent existing hold, so it does not establish that only its own provisional pin is removed.",
+      "required": "Use a distinct already confirmed hold, authenticated NotPerformed/lost-ack lookup for a new pin, serialized restart, exact original hold retention and blocked later destruction.",
+      "currentInspection": "Existing source filters only the original OperationId; focused V1 executable coverage requested from the implementation agent."
+    }
+  ]
+}

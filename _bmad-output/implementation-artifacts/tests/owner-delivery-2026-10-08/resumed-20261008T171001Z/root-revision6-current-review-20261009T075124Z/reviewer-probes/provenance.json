@@ -1,0 +1,26 @@
+{
+  "capturedUtc": "2026-10-09T08:20:11.685269+00:00",
+  "files": [
+    {
+      "source": "/tmp/hexalith-owner-edge-count-probe/Program.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/reviewer-probes/count-Program.cs",
+      "sha256": "f393fb3d6ddcd2166cdfc8917813aee74027a07afb4518b2c26e534bfe6e70ce"
+    },
+    {
+      "source": "/tmp/hexalith-owner-edge-count-probe/probe.csproj",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/reviewer-probes/count-probe.csproj",
+      "sha256": "1d14000117203a04a38d531f74d463653a1ef3b553c06a1dc6b88a977b1b9881"
+    },
+    {
+      "source": "/tmp/hexalith-owner-edge-worker-probe/Program.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/reviewer-probes/worker-Program.cs",
+      "sha256": "4ff056d66f8be6eec5b2b1779460c2465d6fe50a03c5535e10b7859d2f62400c"
+    },
+    {
+      "source": "/tmp/hexalith-owner-edge-worker-probe/probe.csproj",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/reviewer-probes/worker-probe.csproj",
+      "sha256": "81592daeef521f2b6978fc62334315dc4219ebeb2322a9d47599bb108d21e8c6"
+    }
+  ],
+  "scope": "Read-only copies of reviewer temporary probe code/project. Reviewer reported actual cancellation probes; root traced source, but no independent root execution or archived reviewer console output is claimed. Edge final guard_snippet fields propose fixes; current source still invokes these boundaries directly."
+}

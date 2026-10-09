@@ -1,0 +1,271 @@
+<assemblies schema-version="3" id="346396bd-7ee6-4c38-906f-dad1ba590c94" computer="DESKTOP-VIOG240" user="administrator" start-rtf="2026-10-09T00:52:34.3497232+00:00" finish-rtf="2026-10-09T00:53:22.6379349+00:00" timestamp="10/09/2026 02:53:22"><assembly environment="64-bit (x64) .NET 10.0.12 [collection-per-class, parallel (collections, 14 threads)]" id="2aec63c9-017d-4d60-a01c-b17b6de8800e" name="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.Tests.dll" run-date="2026-10-09" run-time="00:52:34" start-rtf="2026-10-09T00:52:34.3497232+00:00" test-framework="xUnit.net v3 4.0.1+8ed8aa354c" target-framework=".NETCoreApp,Version=v10.0" errors="0" failed="24" finish-rtf="2026-10-09T00:53:22.6379349+00:00" not-run="0" passed="0" skipped="0" time="48.291" time-rtf="00:00:48.2909999" total="24"><collection name="Test collection for Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests (id: 7e7e7f3bd9be3ebebb317a069e872048573aba5322c8b0a9319f9a257c6ccc8e)" id="513ec93f-5420-40e8-825f-1e2a178efa66" failed="24" not-run="0" passed="0" skipped="0" time="48.162" time-rtf="00:00:48.1620000" total="24"><test id="eece2118-fef3-4e88-99a6-8993bc585a9d" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;initial-cut-count\&quot;, cancelCaller: False)" result="Fail" time="2.076" time-rtf="00:00:02.0760000" start-rtf="2026-10-09T00:52:34.4188517+00:00" finish-rtf="2026-10-09T00:52:36.5142996+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 208
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="ec5ed98d-0756-4fb3-9673-472143436461" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;last-flags-count\&quot;, cancelCaller: True)" result="Fail" time="2.069" time-rtf="00:00:02.0690000" start-rtf="2026-10-09T00:52:36.5170366+00:00" finish-rtf="2026-10-09T00:52:38.5883189+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 203
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="a51b1dbb-a921-4df5-92c9-0255467e8bbd" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;last-flags-count\&quot;, cancelCaller: False)" result="Fail" time="2" time-rtf="00:00:02.0000000" start-rtf="2026-10-09T00:52:38.5884259+00:00" finish-rtf="2026-10-09T00:52:40.5898430+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 208
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="a96eb88f-1c5f-4028-a4c3-b0a357fb05e9" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;first-flags-items\&quot;, cancelCaller: True)" result="Fail" time="1.998" time-rtf="00:00:01.9980000" start-rtf="2026-10-09T00:52:40.5899499+00:00" finish-rtf="2026-10-09T00:52:42.5889440+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 203
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="a8edcab7-f1cf-4f75-9e41-f151abf0dcb7" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;first-flags-items\&quot;, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:52:42.5890433+00:00" finish-rtf="2026-10-09T00:52:44.5911165+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 208
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="0331f59d-321a-49ec-ba5d-bea5c9e834a5" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;first-flags-count\&quot;, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:52:44.5912726+00:00" finish-rtf="2026-10-09T00:52:46.5933947+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 203
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="9b44a07b-9d10-4456-a1ec-6e91b5f23c95" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;first-flags-count\&quot;, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:52:46.5934947+00:00" finish-rtf="2026-10-09T00:52:48.5953815+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 208
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="d2cfc1da-0c91-4ea7-8a71-3d02a4d683dd" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;last-source-items\&quot;, cancelCaller: True)" result="Fail" time="2.002" time-rtf="00:00:02.0019999" start-rtf="2026-10-09T00:52:48.5954748+00:00" finish-rtf="2026-10-09T00:52:50.5984169+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 203
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="8aa6519d-e118-406e-9e74-b198d1d2de2b" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;last-source-items\&quot;, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:52:50.5985124+00:00" finish-rtf="2026-10-09T00:52:52.6007972+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 208
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="dfdd5e13-8630-4b7a-b781-dc304ab4be51" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;last-source-count\&quot;, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:52:52.6009012+00:00" finish-rtf="2026-10-09T00:52:54.6029779+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 203
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="b1e2bc4c-65a7-4cc5-a93d-3a1058495e6e" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;last-source-count\&quot;, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:52:54.6030871+00:00" finish-rtf="2026-10-09T00:52:56.6050513+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 208
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="0e4c2118-e78a-41de-9fbd-a407aca2443f" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;first-source-items\&quot;, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:52:56.6051527+00:00" finish-rtf="2026-10-09T00:52:58.6070152+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 203
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="3a1d144d-5bfc-4a2f-9e34-d192053c87de" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;first-source-items\&quot;, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:52:58.6071332+00:00" finish-rtf="2026-10-09T00:53:00.6085055+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 208
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="a98114dd-a511-4170-ad03-9577efcb6961" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;first-source-count\&quot;, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:53:00.6085902+00:00" finish-rtf="2026-10-09T00:53:02.6106774+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 203
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="035dd08f-4645-4d48-b88c-765c6ac3c95d" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;first-source-count\&quot;, cancelCaller: False)" result="Fail" time="2.005" time-rtf="00:00:02.0050000" start-rtf="2026-10-09T00:53:02.6107711+00:00" finish-rtf="2026-10-09T00:53:04.6153516+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 208
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="88868cb5-9cf1-4ca8-adc8-cb92fbff47d7" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;final-cut-items\&quot;, cancelCaller: True)" result="Fail" time="1.999" time-rtf="00:00:01.9990000" start-rtf="2026-10-09T00:53:04.6154308+00:00" finish-rtf="2026-10-09T00:53:06.6155964+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 203
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="3f350770-92d1-449f-a64b-dd4668cddee9" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;final-cut-items\&quot;, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:53:06.6158708+00:00" finish-rtf="2026-10-09T00:53:08.6174219+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 208
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="4828f484-3708-4aff-b8e7-299711bc03a3" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;final-cut-count\&quot;, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:53:08.6175120+00:00" finish-rtf="2026-10-09T00:53:10.6195742+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 203
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="a7117e21-9391-4bca-8804-c7a9aa41a602" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;final-cut-count\&quot;, cancelCaller: False)" result="Fail" time="1.999" time-rtf="00:00:01.9990000" start-rtf="2026-10-09T00:53:10.6196583+00:00" finish-rtf="2026-10-09T00:53:12.6191015+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 208
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="9d42f054-2538-4909-9628-f852d0ffbab9" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;initial-cut-items\&quot;, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:53:12.6191792+00:00" finish-rtf="2026-10-09T00:53:14.6207332+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 203
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="eb1fc15d-57c4-419e-9ce4-b573b2559328" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;initial-cut-items\&quot;, cancelCaller: False)" result="Fail" time="2" time-rtf="00:00:02.0000000" start-rtf="2026-10-09T00:53:14.6208199+00:00" finish-rtf="2026-10-09T00:53:16.6220359+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 208
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="b5629993-4303-407b-91cb-19771df2ffa6" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;initial-cut-count\&quot;, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:53:16.6221880+00:00" finish-rtf="2026-10-09T00:53:18.6236964+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 203
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="6a10989a-dfcd-41fd-ade6-3f0c958fd266" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;last-flags-items\&quot;, cancelCaller: False)" result="Fail" time="2" time-rtf="00:00:02.0000000" start-rtf="2026-10-09T00:53:18.6237637+00:00" finish-rtf="2026-10-09T00:53:20.6253703+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 208
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="6398758e-5f5a-4316-83b8-1b56cc3a7f18" name="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(vector: \&quot;last-flags-items\&quot;, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T00:53:20.6254760+00:00" finish-rtf="2026-10-09T00:53:22.6271908+00:00" type="Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests" method="SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs" source-line="140"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests.SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs:line 203
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test></collection></assembly></assemblies>

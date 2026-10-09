@@ -1,0 +1,76 @@
+{
+  "capturedUtc": "2026-10-08T20:53:14.999349+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IAnchoredStateTransitionAuthority.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs",
+      "existed": true,
+      "sha256": "71952ee38f50b99a3849e9c55dbd5ef67eae1d69929752cf6d902e418c5a0769",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-anchor-supplement/before/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IDirectoryMigrationBoundaryAuthority.cs",
+      "existed": true,
+      "sha256": "4bea4055e23c535c226dd37d5de984577b7623090a25222c0d4346836edf420d",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-anchor-supplement/before/eventstore/src/Hexalith.EventStore.Server/Security/IDirectoryMigrationBoundaryAuthority.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IInteractionOccurrenceAuthority.cs",
+      "existed": true,
+      "sha256": "379399fc3918f0e1c10cb4c3e608ec33cae184b7db530834e9ad7d0f17120c2b",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-anchor-supplement/before/eventstore/src/Hexalith.EventStore.Server/Security/IInteractionOccurrenceAuthority.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs",
+      "existed": true,
+      "sha256": "ecd09e7c37832435c870224dfbf6f5120934e8b1254e38e89f06254d8d925199",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-anchor-supplement/before/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs",
+      "existed": true,
+      "sha256": "b3d8e7596460804cb01b8afe31cfc8241ccb2aaa7808a4682835f3c3846e74c8",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-anchor-supplement/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryFixture.cs",
+      "existed": true,
+      "sha256": "b9056f0dbfc6ddf3a57c4d6ddd6a542561d02683731ff3af60763a192c28800b",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-anchor-supplement/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryFixture.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs",
+      "existed": true,
+      "sha256": "ce37a475f79e4df19d5e2cc308be427d9745518594da131531d44c9b171b31e4",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-anchor-supplement/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryTests.cs",
+      "existed": true,
+      "sha256": "ffeee2312e3b9cc592b68e5be81ea489d42a32b895de4e9fc7bf7602192df10c",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-anchor-supplement/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryTests.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs",
+      "existed": true,
+      "sha256": "8111eedb9d07b7f357545645b34a2cee36db7eb600841ed43a15ea50b7df8bf7",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-anchor-supplement/before/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs"
+    }
+  ]
+}

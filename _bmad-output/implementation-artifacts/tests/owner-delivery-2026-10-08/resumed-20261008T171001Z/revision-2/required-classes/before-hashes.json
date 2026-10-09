@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-08T22:59:49.839627+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "eng/verify-ext-secrets-1.ps1",
+      "existed": true,
+      "sha256": "be785e2c58b66b9ee8de7eb6d23f5e9b3cebe1c08507761b98f982d5c3715d77",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/required-classes/before/platform/eng/verify-ext-secrets-1.ps1"
+    }
+  ]
+}

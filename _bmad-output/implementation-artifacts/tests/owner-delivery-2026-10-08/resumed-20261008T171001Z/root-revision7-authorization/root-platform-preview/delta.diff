@@ -1,0 +1,117 @@
+--- /home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs (before)
++++ /home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs (preview)
+@@ -14,7 +14,10 @@
+         var pending = Task.Run(operation, CancellationToken.None);
+         try
+         {
+-            var result = await pending.WaitAsync(TimeSpan.FromSeconds(30) - clock.GetElapsedTime(_start), clock, token).ConfigureAwait(false);
++            TimeSpan remaining = TimeSpan.FromSeconds(30) - clock.GetElapsedTime(_start);
++            token.ThrowIfCancellationRequested();
++            if (remaining <= TimeSpan.Zero) { throw new TimeoutException("Private owner operation unavailable."); }
++            var result = await pending.WaitAsync(remaining, clock, token).ConfigureAwait(false);
+             Check(); return result;
+         }
+         catch (Exception)
+@@ -31,7 +34,10 @@
+         Check();
+         try
+         {
+-            await pending.WaitAsync(TimeSpan.FromSeconds(30) - clock.GetElapsedTime(_start), clock, token).ConfigureAwait(false);
++            TimeSpan remaining = TimeSpan.FromSeconds(30) - clock.GetElapsedTime(_start);
++            token.ThrowIfCancellationRequested();
++            if (remaining <= TimeSpan.Zero) { throw new TimeoutException("Private owner operation unavailable."); }
++            await pending.WaitAsync(remaining, clock, token).ConfigureAwait(false);
+             Check();
+         }
+         catch (Exception) { token.ThrowIfCancellationRequested(); throw; }
+--- /home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs (before)
++++ /home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs (preview)
+@@ -16,6 +16,7 @@
+         var providerCancellation = new CancellationTokenSource();
+         try
+         {
++            deadline.Check();
+             ArgumentNullException.ThrowIfNull(payload); string id = DeletionBatchCapabilityIdentity.SigningRequestId(payload);
+             if (guard is null || signers is null || protectionOwners is null) { return new("Unavailable"); }
+             var signer = await deadline.ReadAsync(() => Task.FromResult(signers(payload))).ConfigureAwait(false);
+--- /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationDeadlineTests.cs (before)
++++ /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationDeadlineTests.cs (preview)
+@@ -1,3 +1,4 @@
++using NSubstitute;
+ using Shouldly;
+ 
+ namespace Hexalith.Platform.Custody.Tests;
+@@ -28,4 +29,30 @@
+         finally { cleanupRelease.Set(); }
+         await cleanupFinished.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); cleanups.ShouldBe(1);
+     }
++    /// <summary>A clock crossing the budget after Check cannot construct a negative or infinite wait on either helper.</summary>
++    [Theory]
++    [InlineData(false, 0)][InlineData(false, 1)][InlineData(false, 10000)][InlineData(false, 20000)]
++    [InlineData(true, 0)][InlineData(true, 1)][InlineData(true, 10000)][InlineData(true, 20000)]
++    public async Task NonpositiveRemainingTimeIsTimeoutWithSafeLateCompletion(bool turnOwned, long overrunTicks)
++    {
++        var clock = Substitute.For<TimeProvider>(); clock.TimestampFrequency.Returns(TimeSpan.TicksPerSecond);
++        int reads = 0; clock.GetTimestamp().Returns(_ => Interlocked.Increment(ref reads) >= 3 ? TimeSpan.FromSeconds(30).Ticks + overrunTicks : 0L);
++        var deadline = new PrivateOwnerOperationDeadline(clock, CancellationToken.None);
++        var pending = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
++        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var cleaned = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously); int cleanups = 0;
++        Task operation = turnOwned ? deadline.WaitAsync(pending.Task)
++            : deadline.ReadAsync(() => { started.TrySetResult(); return pending.Task; }, value => { value.ShouldBe(17); Interlocked.Increment(ref cleanups); cleaned.TrySetResult(); });
++        try
++        {
++            var error = await Should.ThrowAsync<TimeoutException>(() => operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken));
++            error.Message.ShouldBe("Private owner operation unavailable."); operation.IsCompleted.ShouldBeTrue();
++            pending.Task.IsCompleted.ShouldBeFalse();
++            clock.DidNotReceive().CreateTimer(Arg.Any<TimerCallback>(), Arg.Any<object?>(), Arg.Any<TimeSpan>(), Arg.Any<TimeSpan>());
++        }
++        finally { pending.TrySetResult(17); }
++        if (!turnOwned) { await started.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken); await cleaned.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken); cleanups.ShouldBe(1); }
++        else { (await pending.Task).ShouldBe(17); cleanups.ShouldBe(0); }
++    }
++
+ }
+--- /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs (before)
++++ /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs (preview)
+@@ -330,4 +330,21 @@
+         finally { io.Release.TrySetResult(); pending.TrySetResult(true); }
+     }
+ 
++    /// <summary>An actual actor admission crossing the helper boundary returns its restrictive original form without a negative wait or state/effect continuation.</summary>
++    [Theory]
++    [InlineData(10000)][InlineData(20000)]
++    public async Task AdmissionClockCrossingReturnsUnavailableWithoutStateOrEffect(long overrunTicks)
++    {
++        var fixture = new CustodyKeyLifecycleFixture(); var clock = Substitute.For<TimeProvider>();
++        clock.TimestampFrequency.Returns(TimeSpan.TicksPerSecond); int reads = 0;
++        clock.GetTimestamp().Returns(_ => Interlocked.Increment(ref reads) >= 4 ? TimeSpan.FromSeconds(30).Ticks + overrunTicks : 0L);
++        var suspended = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
++        fixture.Authority.AuthorizeOperationAsync(Arg.Any<CustodyKeyObjectIdentity>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(suspended.Task);
++        var actor = CustodyKeyLifecycleFixture.Create(fixture.Backend, fixture.Authority, fixture, clock);
++        CustodyKeyLifecycleOutcome result;
++        try { result = await actor.RegisterWrappedAsync(CustodyKeyLifecycleFixture.Registration()).WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken); }
++        finally { suspended.TrySetResult(true); }
++        result.Status.ShouldBe(CustodyKeyLifecycleStatus.Unavailable); fixture.Backend.CommittedState.ShouldBeEmpty(); fixture.Effects.ShouldBe(0); fixture.Anchor.ShouldBe(0);
++    }
++
+ }
+--- /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs (before)
++++ /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs (preview)
+@@ -424,4 +424,16 @@
+         f.Reservations.ShouldBe(0); f.State.Deletions.Single().Batches.Single().ProtectionReceiptId.ShouldBe(block);
+     }
+ 
++    /// <summary>Disabled composition preserves an already canceled caller token and its active restrictive default without touching any original owner.</summary>
++    [Fact]
++    public async Task DisabledCoordinatorChecksOriginalCancellation()
++    {
++        using var fixture = new DeletionBatchExecutionFixture(); using var caller = new CancellationTokenSource(); caller.Cancel();
++        var coordinator = new DeletionBatchExecutionCoordinator(TimeProvider.System);
++        var error = await Should.ThrowAsync<OperationCanceledException>(() => coordinator.ExecuteAsync(fixture.Payload, cancellationToken: caller.Token));
++        error.CancellationToken.ShouldBe(caller.Token);
++        (await coordinator.ExecuteAsync(fixture.Payload, cancellationToken: CancellationToken.None)).Status.ShouldBe("Unavailable");
++        fixture.Signatures.ShouldBe(0); fixture.Reservations.ShouldBe(0); fixture.Source.ReceivedCalls().ShouldBeEmpty();
++    }
++
+ }

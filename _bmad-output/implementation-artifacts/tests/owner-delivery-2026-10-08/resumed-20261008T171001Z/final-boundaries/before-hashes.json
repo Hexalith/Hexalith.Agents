@@ -1,0 +1,34 @@
+{
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "existed": true,
+      "sha256": "877ab96834d33befbf0ae603f3bb67f62466f6f2023b7ca0b027e46faf2528c8"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/EventStoreDeletionCapabilityGuardRevocationMirror.cs",
+      "existed": true,
+      "sha256": "0813fc295b0ce65de281de897fc4ced054975476a9ae6edc093e9535ae32cc0c"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformSecurityDenialRecorder.cs",
+      "existed": true,
+      "sha256": "c6137ee94346acca2995774d1916a7a61d45ef2a343ec31e43fde3f21ec5f2b3"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "existed": true,
+      "sha256": "1d805edffac571b3993eb7881553bee321acbeab341f6a8625f3cf552d20efb0"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs",
+      "existed": true,
+      "sha256": "a64c5f19664bf91b538d66f93c0b20b852206fc49a0cdeff76e3653f74cc5988"
+    }
+  ]
+}

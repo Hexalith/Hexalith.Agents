@@ -1,0 +1,48 @@
+{
+  "capturedUtc": "2026-10-08T22:40:24.583214+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs",
+      "existed": true,
+      "sha256": "048b694522065deecb52fedcef44d3f61b38040db46a74171e0967a4a457f3b7",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/canary-ownership-cleanup/before/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IFr34CanaryAuthority.cs",
+      "existed": true,
+      "sha256": "2035405618aa9bbade3ee038999306d174807cde2ba83c7c5de8dae9f73d6056",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/canary-ownership-cleanup/before/platform/src/Hexalith.Platform.Custody/IFr34CanaryAuthority.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs",
+      "existed": true,
+      "sha256": "cc6996527ca4c672a638690578aaac54b5e9a1ad0dac091e0e0c5b28bc358285",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/canary-ownership-cleanup/before/platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs",
+      "existed": true,
+      "sha256": "eb9f8bdaf1d3fc63bad23af785a2b879bfd610570a284f0576f511691798cf72",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/canary-ownership-cleanup/before/platform/tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/CompletionCancellationClock.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationDeadlineTests.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    }
+  ]
+}

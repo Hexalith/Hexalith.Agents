@@ -76,7 +76,7 @@ platform = workspace.parent / "platform"
 eventstore = workspace.parent / "eventstore"
 
 parties_output = output / "parties"
-row = run("Parties eleven-lane Local", parties, ["pwsh", "-NoProfile", "-File", "eng/verify-ext-parties-1.ps1", "-Mode", "Local",
+row = run("Parties complete mapped Local lanes", parties, ["pwsh", "-NoProfile", "-File", "eng/verify-ext-parties-1.ps1", "-Mode", "Local",
     "-EvidenceDirectory", str(parties_output), "-ArtifactsDirectory", str(artifacts / "parties")], parties_output)
 row["buildLogs"] = sorted(str(p) for p in parties_output.glob("*-build.log"))
 row["xmlFiles"] = sorted(str(p) for p in parties_output.glob("*-tests.xml"))
@@ -106,9 +106,19 @@ row = run("Custody expanded Local", platform, ["pwsh", "-NoProfile", "-File", "e
 
 version_args = ["dotnet", "msbuild", str(eventstore / "src/Hexalith.EventStore.Contracts/Hexalith.EventStore.Contracts.csproj"), "-nologo",
                 "-getProperty:HexalithEventStoreVersion", "-p:Configuration=Debug", "-p:UseHexalithProjectReferences=true", "-p:NuGetAudit=false"]
+version_started = datetime.datetime.now(datetime.timezone.utc).isoformat()
 version = subprocess.run(version_args, cwd=eventstore, text=True, capture_output=True)
+version_finished = datetime.datetime.now(datetime.timezone.utc).isoformat()
 (output / "eventstore-version.stdout.log").write_text(version.stdout)
 (output / "eventstore-version.stderr.log").write_text(version.stderr)
+commands.append({
+    "name": "SDK current source version", "cwd": str(eventstore), "argv": version_args,
+    "startedUtc": version_started, "finishedUtc": version_finished, "exitCode": version.returncode,
+    "invocationLog": str(output / "eventstore-version.stdout.log"),
+    "stderrLog": str(output / "eventstore-version.stderr.log"),
+    "buildLogs": [], "xmlFiles": [], "requiredClasses": [],
+})
+save_index()
 if version.returncode or not re.fullmatch(r"\d+\.\d+\.\d+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?", version.stdout.strip()):
     raise RuntimeError("Cannot resolve current selected SDK source version")
 sdk_flags = ["-c", "Debug", "--artifacts-path", str(artifacts / "eventstore"), "-m:1", "-p:NuGetAudit=false",
@@ -133,6 +143,16 @@ for project in ["Hexalith.EventStore.Contracts.Tests", "Hexalith.EventStore.Clie
 
 host_output = output / "host-scaffold"
 row = run("Host LocalScaffold", platform, ["bash", "eng/verify-agents-host.sh", "--mode", "LocalScaffold", "--artifacts-path", str(artifacts / "host")], host_output)
-row["buildLogs"] = [row["invocationLog"]]
+# File-based AppHost builds suppress the normal build summary at minimal verbosity.
+# Keep the real owner gate and record a separate normal diagnostic build rather
+# than infer zero warnings/errors from the wrapper's successful exit.
+save_index()
+host_diagnostics = output / "host-normal-diagnostics"
+diagnostic = run("Host normal Debug diagnostic build", platform,
+    ["dotnet", "build", "./apphost.cs", "-c", "Debug", "--artifacts-path", str(artifacts / "host-diagnostics"),
+     "-p:TreatWarningsAsErrors=true", "-p:AspireUseCliBundle=true", "-p:NuGetAudit=false", "-p:MinVerVersionOverride=1.0.0", "-v", "normal"],
+    host_diagnostics)
+diagnostic["buildLogs"] = [diagnostic["invocationLog"]]
+row["normalBuildDiagnosticCommand"] = diagnostic["name"]
 save_index()
 print(json.dumps({"commandIndex": str(index), "commands": len(commands), "state": "Commands finished; independent XML/source/protected-state audit still required"}), flush=True)

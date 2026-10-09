@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-09T07:31:44.076312+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "existed": true,
+      "sha256": "eb42605e9287246258fb2d6be50fa92dbb70b92116b697154e9ddeab9d2192f3",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-activation-current-comparison/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs"
+    }
+  ]
+}

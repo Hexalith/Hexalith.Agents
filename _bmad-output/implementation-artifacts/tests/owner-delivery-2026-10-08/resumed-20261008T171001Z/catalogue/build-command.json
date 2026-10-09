@@ -1,0 +1,18 @@
+[
+  "dotnet",
+  "build",
+  "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Hexalith.Conversations.Server.Tests.csproj",
+  "-c",
+  "Debug",
+  "--artifacts-path",
+  "/tmp/hexalith-resume-catalogue-20261008",
+  "-m:1",
+  "-p:NuGetAudit=false",
+  "-p:MinVerVersionOverride=1.0.0",
+  "-p:UseHexalithProjectReferences=true",
+  "-p:UseNuGetDeps=false",
+  "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+  "-p:HexalithCommonsRoot=/home/administrator/projects/hexalith/conversations/references/Hexalith.Commons",
+  "-p:HexalithTenantsRoot=/home/administrator/projects/hexalith/conversations/references/Hexalith.Tenants",
+  "-p:HexalithPartiesRoot=/home/administrator/projects/hexalith/parties"
+]

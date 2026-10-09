@@ -1,0 +1,201 @@
+{
+  "capturedUtc": "2026-10-09T08:00:53.445999+00:00",
+  "protected": [
+    {
+      "path": "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md",
+      "sha256": "5b1de576274f93a464322c18ee977e8bc4d489c2b8569a64986de3c4fc5304b1",
+      "expected": "5b1de576274f93a464322c18ee977e8bc4d489c2b8569a64986de3c4fc5304b1"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/sprint-status.yaml",
+      "sha256": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+      "expected": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691"
+    },
+    {
+      "path": "_bmad-output/planning-artifacts/external-dependency-register.md",
+      "sha256": "184e16c05b57527abcdbd8588ae0c9fa10fe4c6093a53e66a509e9aa39fbcccb",
+      "expected": "184e16c05b57527abcdbd8588ae0c9fa10fe4c6093a53e66a509e9aa39fbcccb"
+    },
+    {
+      "path": "../parties/_bmad-output/planning-artifacts/actor-history-retention-policy-v1.md",
+      "sha256": "8f6780d252154803343432e2126e596209e432284cfddf1c7f5b9eb596aa2fe1",
+      "expected": "8f6780d252154803343432e2126e596209e432284cfddf1c7f5b9eb596aa2fe1"
+    }
+  ],
+  "parentSha256": "abf0d054eef53086596d2d3bfe848132d0615ae2b790eb41c1cecb915e487382",
+  "frozenIntentSha256": "0cd11ddac96af9775593ea0aa24d969b235b32dfcc4a76a80e51d7eb9c82e2cb",
+  "rootCompleteCSharpRead": {
+    "preview": {
+      "capturedUtc": "2026-10-09T07:43:35.104521+00:00",
+      "copiedCSharpDeltaReadFully": true,
+      "lines": 2791,
+      "paths": 42,
+      "diffSha256": "6a3a160ed928cf1c6323285229ed5738835b2bbae92f2055fc73a1f12f0293ad",
+      "readRanges": [
+        "1-639 with truncation gap reread125-456",
+        "640-1218 with truncation gap reread819-959",
+        "1219-1533",
+        "1534-1841",
+        "1842-2220",
+        "2221-2530",
+        "2531-2791"
+      ],
+      "requiredBeforeFinalAssessment": "Confirm preview code hashes against the complete stable final handoff and read every resulting declaration/layout delta plus every four updated owner packet; no final review or full matrix claimed.",
+      "newTypeLayoutCorrectionsForwardedToSoleEngineer": [
+        "DeletionBlockedReplacementResult",
+        "PumpClock",
+        "PumpTimer",
+        "Machine"
+      ]
+    },
+    "finalLayoutDeltaLines": 100,
+    "finalLayoutDeltaSha256": "41b2a3a26c9978045bfc600be15a335f93b5a92ac5699e8e4a67aa42ac0d7498",
+    "finalLayoutDeltaReadFully": true
+  },
+  "newTypesInNamedFiles": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendPayloadLifetime.cs",
+      "types": [
+        "DirectoryAtomicAppendPayloadLifetime"
+      ],
+      "sha256": "174713317974e8a7678901b6498d521363f141ba694409c48491dd9099bd9d30"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateActorStateIoLifetime.cs",
+      "types": [
+        "PrivateActorStateIoLifetime"
+      ],
+      "sha256": "c52054de973614974eb2e7342907a9fbb8dd55497b9d1a628638dab6a2817bd5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementReconciliation.cs",
+      "types": [
+        "DeletionBlockedReplacementReconciliation"
+      ],
+      "sha256": "2432c8c900a2254a052b43c8bc6f1de352de1093b3b0ce30fe847bf4574d0953"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementResult.cs",
+      "types": [
+        "DeletionBlockedReplacementResult"
+      ],
+      "sha256": "13fc322c50da711527a564eeb69bf14e6c48bae7a2b218146cbee84671e79be1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationMachine.cs",
+      "types": [
+        "PrivateOwnerOperationMachine"
+      ],
+      "sha256": "bb49a48a63a9cd20b5b4e884ef0b6a910d86b5fae6e84b685471e0014cc24615"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/PumpClock.cs",
+      "types": [
+        "PumpClock"
+      ],
+      "sha256": "ef3914b66c8918746f823c606661221c8ce0ee3e7e71c731934c4268298b64d6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/PumpTimer.cs",
+      "types": [
+        "PumpTimer"
+      ],
+      "sha256": "e353aef1ac67e67cd8914eaa07de3bca16f80061466bcc9278eb7621c47b6b5e"
+    }
+  ],
+  "existingNestedTypes": "Preserved; no unrelated type migration. The preliminary and final declaration delta was read fully.",
+  "requiredOwnedClasses": {
+    "Hexalith.Conversations.Server.Tests": [
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationDeliveryTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationProjectorTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests",
+      "Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests"
+    ],
+    "Hexalith.EventStore.Client.Tests": [
+      "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests",
+      "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests",
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests"
+    ],
+    "Hexalith.EventStore.Contracts.Tests": [
+      "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests"
+    ],
+    "Hexalith.EventStore.PayloadProtection.Tests": [
+      "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceKeyDerivationTests",
+      "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests"
+    ],
+    "Hexalith.EventStore.Server.Tests": [
+      "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests",
+      "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests",
+      "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests",
+      "Hexalith.EventStore.Server.Tests.Security.ExpiredIdentityHistorySourceTests",
+      "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests",
+      "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests",
+      "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests",
+      "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests"
+    ],
+    "Hexalith.Parties.Tests": [
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests"
+    ],
+    "Hexalith.Platform.Custody.Tests": [
+      "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests",
+      "Hexalith.Platform.Custody.Tests.DeletionBatchCapabilityCodecTests",
+      "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests",
+      "Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests",
+      "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests",
+      "Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests",
+      "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests",
+      "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests",
+      "Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests",
+      "Hexalith.Platform.Custody.Tests.PlatformAcceptedEnvelopeTimingTests",
+      "Hexalith.Platform.Custody.Tests.PlatformKeyInventoryActorTests",
+      "Hexalith.Platform.Custody.Tests.PlatformSecurityDenialRecorderTests",
+      "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationAuthenticatorTests",
+      "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests",
+      "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests",
+      "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolWorkerTests",
+      "Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests"
+    ]
+  },
+  "requiredClassCount": 44,
+  "ownerPackets": [
+    {
+      "name": "ext-parties-1.md",
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/source/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+      "sha256": "d96c6ea5c88e26aae91e3f8bf9e45972691b8adb73d8a970344f19230e599813",
+      "lines": 74,
+      "readFully": true
+    },
+    {
+      "name": "ext-conv-ai-1.md",
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/source/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+      "sha256": "21aaeb049f9e374e953d6795e6046abffe37b550ad7a561aecd1877662f2b3ac",
+      "lines": 68,
+      "readFully": true
+    },
+    {
+      "name": "ext-secrets-1.md",
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/source/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+      "sha256": "72a96b8fc3cec30361c989e6f4ab7d78d4fd5ddd3b49e34c39ef7d6066c157d3",
+      "lines": 75,
+      "readFully": true
+    },
+    {
+      "name": "ext-host-1.md",
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/source/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+      "sha256": "809980ecb2017cd7584579684992452c5fa28474b592133353f188d03c9378ba",
+      "lines": 82,
+      "readFully": true
+    }
+  ],
+  "errors": [
+    "Frozen source/copy drift: /home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs"
+  ]
+}

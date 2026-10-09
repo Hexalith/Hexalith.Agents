@@ -1,0 +1,14 @@
+{
+  "capturedUtc": "2026-10-09T06:27:51.057971+00:00",
+  "protectedHashes": {
+    "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md": "5b1de576274f93a464322c18ee977e8bc4d489c2b8569a64986de3c4fc5304b1",
+    "_bmad-output/implementation-artifacts/sprint-status.yaml": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+    "_bmad-output/planning-artifacts/external-dependency-register.md": "184e16c05b57527abcdbd8588ae0c9fa10fe4c6093a53e66a509e9aa39fbcccb",
+    "../parties/_bmad-output/planning-artifacts/actor-history-retention-policy-v1.md": "8f6780d252154803343432e2126e596209e432284cfddf1c7f5b9eb596aa2fe1"
+  },
+  "frozenIntentSha256": "0cd11ddac96af9775593ea0aa24d969b235b32dfcc4a76a80e51d7eb9c82e2cb",
+  "reviewCounterRetained": 6,
+  "override": "explicit one additional revision; no reset",
+  "errors": [],
+  "scope": "Post-authorization protected-state audit; historical review checkpoint retained, full parent in-progress"
+}

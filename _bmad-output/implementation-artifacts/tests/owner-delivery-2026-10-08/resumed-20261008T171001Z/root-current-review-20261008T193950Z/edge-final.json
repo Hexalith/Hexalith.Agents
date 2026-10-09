@@ -1,0 +1,28 @@
+[
+  {
+    "location": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs:197-200",
+    "trigger_condition": "Key compromise arrives after irreversible reservation or consumption but before guard outcome mirroring",
+    "guard_snippet": "Block unconsumed batches; preserve independently verified original reservation winners and accept their terminal receipts.",
+    "potential_consequence": "Physically consumed batches cannot recover, mirror their original outcome, or complete."
+  },
+  {
+    "location": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs:35-49",
+    "trigger_condition": "Certified expired establishment precedes a retained revocation and subsequent retained rebound",
+    "guard_snippet": "Close(version, value.EffectiveAt, requireLivePredecessor: !certifiedExpiredVersions.Contains(version));",
+    "potential_consequence": "The revocation rejects the entire history, preventing resolution of the retained successor."
+  },
+  {
+    "location": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs:190-196",
+    "trigger_condition": "Protection owner accepts a newer revocation revision for an already compromised key",
+    "guard_snippet": "Deduplicate exact revocation events; retain newer same-key receipts without reopening blocked batches.",
+    "potential_consequence": "The newer authenticated revocation cannot mirror, so its subscriber never acknowledges completion."
+  },
+  {
+    "location": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs:35-49",
+    "trigger_condition": "Complete current/historical correctness",
+    "guard_snippet": "Expired establishment advances version without materializing a binding; retained revocation still requires that missing binding.",
+    "potential_consequence": "Valid retained successor histories become unavailable after their predecessor expires.",
+    "kind": "claim",
+    "confidence": "high"
+  }
+]

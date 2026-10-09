@@ -1,0 +1,39 @@
+<assemblies schema-version="3" id="e57d584a-e7dc-4046-a00e-21895d3f28b6" computer="DESKTOP-VIOG240" user="administrator" start-rtf="2026-10-09T02:20:26.4140311+00:00" finish-rtf="2026-10-09T02:20:26.6692420+00:00" timestamp="10/09/2026 04:20:26"><assembly environment="64-bit (x64) .NET 10.0.12 [collection-per-class, parallel (collections, 14 threads)]" id="48ed3d7c-fcbe-4366-88a0-db52c6c306be" name="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll" run-date="2026-10-09" run-time="02:20:26" start-rtf="2026-10-09T02:20:26.4140311+00:00" test-framework="xUnit.net v3 4.0.1+8ed8aa354c" target-framework=".NETCoreApp,Version=v10.0" errors="0" failed="2" finish-rtf="2026-10-09T02:20:26.6692420+00:00" not-run="0" passed="1" skipped="0" time="0.256" time-rtf="00:00:00.2560000" total="3"><collection name="Test collection for Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests (id: 9141efdcc864809e788c4df69d1a41685e5bd3b6fe65b8ba1c1afbdfa259ccb6)" id="ed6d81ef-8dfc-46f5-ac97-b3d500c25484" failed="2" not-run="0" passed="1" skipped="0" time="0.163" time-rtf="00:00:00.1630000" total="3"><test id="de367dec-5717-4e5f-bf55-a4f1add133aa" name="Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests.PostIntentTrustLossRetainsKnownDeniedOriginal(providerThrows: False)" result="Fail" time="0.149" time-rtf="00:00:00.1490000" start-rtf="2026-10-09T02:20:26.4791356+00:00" finish-rtf="2026-10-09T02:20:26.6399523+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests" method="PostIntentTrustLossRetainsKnownDeniedOriginal" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs" source-line="16"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : result.Status
+    should be
+\"Denied\"
+    but was
+\"Unavailable\"
+    difference
+Difference     |  |    |    |    |    |    |    |    |    |    |    |   
+               | \\|/  \\|/  \\|/  \\|/  \\|/  \\|/  \\|/  \\|/  \\|/  \\|/  \\|/  
+Index          | 0    1    2    3    4    5    6    7    8    9    10   
+Expected Value | D    e    n    i    e    d                             
+Actual Value   | U    n    a    v    a    i    l    a    b    l    e    
+Expected Code  | 68   101  110  105  101  100                           
+Actual Code    | 85   110  97   118  97   105  108  97   98   108  101  </message><stack-trace>   at Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests.PostIntentTrustLossRetainsKnownDeniedOriginal(Boolean providerThrows) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs:line 38
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="021810bb-3065-4e34-82d6-8f530b31b493" name="Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests.PostIntentTrustLossRetainsKnownDeniedOriginal(providerThrows: True)" result="Fail" time="0.004" time-rtf="00:00:00.0040000" start-rtf="2026-10-09T02:20:26.6421457+00:00" finish-rtf="2026-10-09T02:20:26.6468976+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests" method="PostIntentTrustLossRetainsKnownDeniedOriginal" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs" source-line="16"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : result.Status
+    should be
+\"Denied\"
+    but was
+\"Unavailable\"
+    difference
+Difference     |  |    |    |    |    |    |    |    |    |    |    |   
+               | \\|/  \\|/  \\|/  \\|/  \\|/  \\|/  \\|/  \\|/  \\|/  \\|/  \\|/  
+Index          | 0    1    2    3    4    5    6    7    8    9    10   
+Expected Value | D    e    n    i    e    d                             
+Actual Value   | U    n    a    v    a    i    l    a    b    l    e    
+Expected Code  | 68   101  110  105  101  100                           
+Actual Code    | 85   110  97   118  97   105  108  97   98   108  101  </message><stack-trace>   at Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests.PostIntentTrustLossRetainsKnownDeniedOriginal(Boolean providerThrows) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs:line 38
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="f7052472-a4a0-493c-b35f-0336e4745f31" name="Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests.UncertainSignatureDoesNotBorrowProviderDeniedAbsence" result="Pass" time="0.01" time-rtf="00:00:00.0100000" start-rtf="2026-10-09T02:20:26.6516823+00:00" finish-rtf="2026-10-09T02:20:26.6623671+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests" method="UncertainSignatureDoesNotBorrowProviderDeniedAbsence" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs" source-line="56" /></collection></assembly></assemblies>

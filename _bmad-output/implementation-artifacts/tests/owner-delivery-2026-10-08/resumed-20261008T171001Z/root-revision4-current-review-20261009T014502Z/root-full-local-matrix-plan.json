@@ -1,0 +1,44 @@
+{
+  "capturedUtc": "2026-10-09T02:29:55.051578+00:00",
+  "reviewRevision": 4,
+  "status": "provisional static planning, no commands executed",
+  "finalSourceFreezeRequired": true,
+  "requiredTopLevelCommands": [
+    "Parties complete mapped Local lanes",
+    "Conversations four-suite Local",
+    "Custody expanded Local",
+    "SDK current source version",
+    "Hexalith.EventStore.Contracts.Tests normal build",
+    "Hexalith.EventStore.Contracts.Tests owned consumer tests",
+    "Hexalith.EventStore.Client.Tests normal build",
+    "Hexalith.EventStore.Client.Tests owned consumer tests",
+    "Hexalith.EventStore.Server.Tests normal build",
+    "Hexalith.EventStore.Server.Tests owned consumer tests",
+    "Hexalith.EventStore.PayloadProtection.Tests normal build",
+    "Hexalith.EventStore.PayloadProtection.Tests owned consumer tests",
+    "Host LocalScaffold"
+  ],
+  "expectedTopLevelCommandCount": 13,
+  "requiredNestedEvidence": {
+    "parties": {
+      "buildLogs": 12,
+      "xmlFiles": 12
+    },
+    "conversations": {
+      "buildLogs": 4,
+      "fullSuiteXmlFiles": 4
+    },
+    "custody": {
+      "buildLogs": 1,
+      "xmlFiles": 1
+    },
+    "sdk": {
+      "buildLogs": 4,
+      "xmlFiles": 4
+    },
+    "hostScaffold": {
+      "buildLogs": 1
+    }
+  },
+  "limits": "Final actual runner/source mapping may add required classes. Require every top-level command exit zero, complete matrix shape, normal clean builds, actual nonempty passing XML per required class, frozen owned source equality and independent before/after source/protected-state comparison. Partial index cannot establish full verification; overlapping lanes cannot be summed as unique coverage."
+}

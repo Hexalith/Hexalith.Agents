@@ -1,0 +1,36 @@
+{
+  "capturedUtc": "2026-10-09T09:26:47.827034+00:00",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionWorker.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-conversations-preview/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionWorker.cs",
+      "beforeSha256": "7a0d17cc90113b7d258e04096ca0a18446a8a4fe8475d99fe36a9c04f05b3d66",
+      "previewSha256": "ae384425b84c013da830802e7fd0fb34c1e92f6242af13fa5f682b6fe4954c74",
+      "deltaLines": 53
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-conversations-preview/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs",
+      "beforeSha256": "bb274ec6798ab817aa1a30cb202a82c7bd0c7c20e44b53321a1c57444c2fd005",
+      "previewSha256": "44979399958da740f849c7fb96fe88f14090a5503ba9b06a8d44fb924a81abec",
+      "deltaLines": 78
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-conversations-preview/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs",
+      "beforeSha256": "6b87866a6b50f03c0a4919f3d7b960e8fa9f8e55b127a7c7c40e6a0e3aa0f744",
+      "previewSha256": "e7cc42adf539ba5839c39a1266c6753c95cdeb38ba701ca7ed1724132056def7",
+      "deltaLines": 138
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-conversations-preview/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs",
+      "beforeSha256": "a83fff83e51c5bb85ffed2cead0256e4fdf35875466ac15aa1199d3a89d8457c",
+      "previewSha256": "4b3832597b1a6ca13921512b3a6efc5a8466294b89b2b01759e57c429aa4101d",
+      "deltaLines": 32
+    }
+  ],
+  "lines": 301,
+  "diffSha256": "be0d28ce47c2a6484d770bb0ab4237b9d819302a377a31921e906afd11080fd0",
+  "scope": "Preliminary settled Conversations only; compare against final stable freeze"
+}

@@ -1,0 +1,34 @@
+{
+  "capturedUtc": "2026-10-09T07:10:14.962907+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs",
+      "existed": true,
+      "sha256": "ed4a5e0b4f1665b7c9da047edb3e53667290536782408f230b3f2839d2d8a515",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/standalone-delivery-pump-budget/before/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Hexalith.EventStore.Client.csproj",
+      "existed": true,
+      "sha256": "b9f5657e342473b941d70b14114cb41d8a1a5d96b6b9b90bcad98ca13d3cb239",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/standalone-delivery-pump-budget/before/eventstore/src/Hexalith.EventStore.Client/Hexalith.EventStore.Client.csproj"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "existed": true,
+      "sha256": "ce08d99d4ef5e9d30a9a0a6938a38b15bd5a10a885972a3027de52cf8054f04e",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/standalone-delivery-pump-budget/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "existed": true,
+      "sha256": "9928df2eedbaffa916558bae1f57977a9a6022df86c3c240bff24554358e150f",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/standalone-delivery-pump-budget/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "capturedUtc": "2026-10-09T09:15:32.021043+00:00",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-joint-preview/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "beforeSha256": "c445b5653b6a2ad1363135ed39a2cc9b570bd61248f6eb133b157dcd59874319",
+      "previewSha256": "43ea2403240fa282a64e88bb76b451796ac27970a7968c1cee9633810a40ac48",
+      "deltaLines": 52
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-joint-preview/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs",
+      "beforeSha256": "f631865e05aa9d09ef592adaf2d595504455dd9add030ffc6308f289f118668e",
+      "previewSha256": "1ec2b385510da431cc1733319ef67c265c5f5fff3ede7680d4dca39b9ac00654",
+      "deltaLines": 81
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-joint-preview/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "beforeSha256": "4003edce371090f2284663ff47af49366a10d0107353ffc49696d587e196f7e1",
+      "previewSha256": "171e1dcc7c07e3053ff5c273396a92bd76932c7c91dfdd9343e6413d27af6d22",
+      "deltaLines": 32
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-joint-preview/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "beforeSha256": "6d0087a1b82bfa920cd41543929981641b2bb628eb1290d21d2e815aab127e5f",
+      "previewSha256": "399b3fab6c4b9b50a09a783655e4876375ec8499864dfdcfe6402e71cbf0412b",
+      "deltaLines": 53
+    }
+  ],
+  "lines": 218,
+  "diffSha256": "322e76a3c9c41c905a3141312ea56113c9cbd9023887c8fca939b655c3e95e8b",
+  "scope": "Preliminary settled joint/guard only; compare against final stable freeze"
+}

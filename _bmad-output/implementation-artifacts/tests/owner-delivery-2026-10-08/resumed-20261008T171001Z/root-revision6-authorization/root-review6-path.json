@@ -1,0 +1,6 @@
+{
+  "reviewDirectory": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z",
+  "reviewManifest": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/review-input.json",
+  "sourceFreeze": "complete stable engineering handoff after FINAL",
+  "specStatusOverride": "Prior accepted full-parent in-progress override remains; source review recorded separately."
+}

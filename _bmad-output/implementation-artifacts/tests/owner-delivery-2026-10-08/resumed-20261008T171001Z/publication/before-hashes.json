@@ -1,0 +1,34 @@
+{
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs",
+      "existed": true,
+      "sha256": "6e7bf0563e5647b07b71ec74e965f7d8581988bee76d6b8d9b869bba4cde758b"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs",
+      "existed": true,
+      "sha256": "3dbe2b8370ef21a8844548edcbb7cb441b8eca547a8afbf79dc70e650b8bc103"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs",
+      "existed": true,
+      "sha256": "37888725f6ea89b6a3fe178cdc39f734bcfa936186ccfed651ed2cb8b84f8627"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationFeedTests.cs",
+      "existed": true,
+      "sha256": "41505d0a6a74ff7962c8d43df3163bf8a6644b4d3dbd031391cb93110755e60d"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs",
+      "existed": true,
+      "sha256": "7f16d301b110c795419814fd6417f28285ff1a1d3cf630bc01392f3af818531a"
+    }
+  ]
+}

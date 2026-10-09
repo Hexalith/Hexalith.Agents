@@ -1,0 +1,17 @@
+[
+  "dotnet",
+  "build",
+  "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Hexalith.Parties.Tests.csproj",
+  "-c",
+  "Debug",
+  "--artifacts-path",
+  "/tmp/hexalith-resume-expired-parties-20261008",
+  "-m:1",
+  "-p:NuGetAudit=false",
+  "-p:MinVerVersionOverride=1.0.0",
+  "-p:UseHexalithProjectReferences=true",
+  "-p:UseNuGetDeps=false",
+  "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+  "-p:HexalithTenantsRoot=/home/administrator/projects/hexalith/parties/references/Hexalith.Tenants",
+  "-p:HexalithCommonsRoot=/home/administrator/projects/hexalith/parties/references/Hexalith.Commons"
+]

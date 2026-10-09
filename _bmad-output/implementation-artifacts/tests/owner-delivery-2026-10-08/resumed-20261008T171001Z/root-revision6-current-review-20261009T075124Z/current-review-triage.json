@@ -1,0 +1,312 @@
+{
+  "capturedUtc": "2026-10-09T08:24:39.686741+00:00",
+  "allThreeFinalReportsReceivedBeforeTriage": true,
+  "reviewedDiff": "/tmp/hexalith-owner-source-review-bphb2h84.diff",
+  "reviewedDiffSha256": "5acb005766f5a95c3cd24970329dfb6c3c9280b0d6a9205b3d27630b32f15ace",
+  "reviewManifest": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/review-input.json",
+  "reports": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/blind-final.md",
+      "sha256": "7eb1ef45d76b28660e0c9d896a0d91db0a62c2d9d55a7b737cdd3f1e36c1a6b6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/edge-final.json",
+      "sha256": "9b9e24014f8d17fe309dc69a60d621546c6e2754cae3c35c897672bab7ad8825"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/verification-final.md",
+      "sha256": "d4b8a1e2cf3fc9ef97bc08b9f2d83d1da3e71b72076c916ca7ce888def68bc9f"
+    }
+  ],
+  "findingCount": 15,
+  "individualVerdicts": [
+    {
+      "id": "B1",
+      "layer": "blind",
+      "location": "../conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs:26",
+      "verdict": "medium",
+      "proposedRoute": "bad_spec",
+      "evidence": "VerifyAsync directly awaits worker authorization and invokes receiver LookupAsync/CurrentTargetAsync before token-only WaitAsync. The public entry defaults to CancellationToken.None, and ConversationAgentAdmissionStage also invokes it before its token-only wait; no finite budget bounds these invocations or the complete admission. The corrected pump bounds its own caller but does not bound a directly admitted receiver/verifier operation.",
+      "smallestCorrection": "One existing thirty-second whole-entry SDK budget must bound worker/receiver invocation, returned tasks and final evidence without abandoning the complete admission continuation; caller cancellation retains its original token.",
+      "carried": false,
+      "preverified": false
+    },
+    {
+      "id": "B2",
+      "layer": "blind",
+      "location": "../eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs:71",
+      "verdict": "false",
+      "proposedRoute": "reject-false",
+      "evidence": "The concrete SourcePublicationIndexActor.ReadReconciliationProgressAsync returns null when CurrentReconciliationAsync rejects the old roster/authority. The feed then permits fresh reconciliation because the old progress does not MatchesCut(initial). AdvanceReconciliationProgressAsync explicitly starts predecessor zero on the new current cut and admits a new exact independent proof; TryWriteAsync preserves existing entries/sources while accepting non-null replacement progress. DaprSourcePublicationNamespaceSource changes the cut authority with roster revision. One new registration therefore does not permanently strand the qualified concrete path; returning unauthenticated old progress would violate the store contract.",
+      "smallestCorrection": "",
+      "carried": false,
+      "preverified": false
+    },
+    {
+      "id": "B3",
+      "layer": "blind",
+      "location": "../eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationNamespaceActor.cs:85",
+      "verdict": "medium",
+      "proposedRoute": "patch",
+      "evidence": "Capture allows a revision-one explicit InitialSources subset, while InstallAsync compares only that immutable initial vector. Two revision-one requests with different Sources but the same explicit InitialSources can both receive true under the same independently admitted installation receipts, leaving the caller's complete requested roster unapplied. Normal post-registration revisions must retain the smaller original initial vector.",
+      "smallestCorrection": "At revision one require captured initial and complete rosters to be equal; preserve legitimate revision>1 registered growth and original installation retry. Cover inconsistent initial and restored revision-one shapes.",
+      "carried": false,
+      "preverified": false
+    },
+    {
+      "id": "B4",
+      "layer": "blind",
+      "location": "../eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs:35",
+      "verdict": "medium",
+      "proposedRoute": "patch",
+      "evidence": "LookupOriginalCoreAsync and LookupCoreAsync call read.Outcome.ToArray before ValidReceipt enforces MaxBytes. Backend-returned oversized arrays incur another full allocation before rejection; the current target/private authority checks establish scope, not the returned array length. The existing sixteen-MiB shape guard can run before either clone.",
+      "smallestCorrection": "Apply the existing receipt/outcome bound before copying in both original and request lookup paths; preserve exact independent receipt authentication and normal lookup results.",
+      "carried": false,
+      "preverified": false
+    },
+    {
+      "id": "B5",
+      "layer": "blind",
+      "location": "../platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs:17",
+      "verdict": "medium",
+      "proposedRoute": "patch",
+      "evidence": "ReadAsync and turn-owned WaitAsync call Check, then independently sample elapsed time to construct the WaitAsync duration. Time can pass thirty seconds between those samples, producing an invalid negative timeout (including the special infinite sentinel). Initial lifecycle/signing/export entry wrappers catch TimeoutException only, so ArgumentOutOfRangeException can escape instead of the existing unavailable/original outcome.",
+      "smallestCorrection": "Capture remaining time once and throw TimeoutException when nonpositive before each wait; preserve observed late faults, safe input ownership and exact original actor outcomes. Exercise an advancing clock between Check and wait creation.",
+      "carried": false,
+      "preverified": false
+    },
+    {
+      "id": "B6",
+      "layer": "blind",
+      "location": "../platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs:20",
+      "verdict": "low",
+      "proposedRoute": "patch",
+      "evidence": "ExecuteAsync constructs its budget without checking it, canonicalizes a valid payload and returns Unavailable when its dependencies are absent. No exception reaches the catch, so an already canceled caller receives a normal result. GovernanceScopeGuardOwner's absent-authority read/execute returns and DaprGuardedStateTransaction's absent-authority direct lookup similarly bypass their first deadline check. This is a real but minor cancellation-contract inconsistency; the correction is direct.",
+      "smallestCorrection": "Check the existing caller/budget at entry before disabled-dependency early returns in the demonstrated entries, preserving their default unavailable behavior for an active caller.",
+      "carried": false,
+      "preverified": false
+    },
+    {
+      "id": "B7",
+      "layer": "blind",
+      "location": "../platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs:148",
+      "verdict": "low",
+      "proposedRoute": "reject-low-complexity",
+      "evidence": "carried revision-5 B10 / revision-4 B10 / revision-2 B6: same expired-original authorization and process-only late canary cleanup claim on identical gate bytes. Preserve reject-low-complexity: random canary material grants no readiness; durable cleanup tracking or fresh exact-original cleanup authority is the already rejected subsystem. Claim verification skipped; do not patch or defer again.",
+      "smallestCorrection": "",
+      "carried": true,
+      "preverified": false
+    },
+    {
+      "id": "B8",
+      "layer": "blind",
+      "location": "../eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs:367",
+      "verdict": "maybe-false",
+      "proposedRoute": "defer",
+      "evidence": "ValidBatch rejects empty targets before either destruction-start authorization/effect, and CompleteProof requires a sealed terminal batch. This proves the shape is unsupported, but not that an accepted deletion consumer submits it and becomes stuck: the original Agents deletion/candidate consumer and qualified complete-target authority remain unimplemented/gated. To establish medium operational harm, trace a genuine complete authenticated zero-target candidate from that consumer through an installed fence and its required acknowledgement/completion contract. An empty caller vector alone must not become complete absence proof.",
+      "smallestCorrection": "If the actual consumer requires this case, supply independently authenticated complete empty-set behavior without fabricating a destruction target, capability or receipt; settle the consumer contract first.",
+      "carried": false,
+      "preverified": false,
+      "wouldBeSeverity": "medium",
+      "severityUnverified": true
+    },
+    {
+      "id": "B9",
+      "layer": "blind",
+      "location": "../platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpoolWorker.cs:10",
+      "verdict": "low",
+      "proposedRoute": "reject-low-complexity",
+      "evidence": "carried revision-5 B6/E2 and revision-2 E2: same oversized positive Task.Delay interval claim, with identical worker bytes. Preserve reject-low-complexity: ordinary intervals are seconds, and a greater-than-49-day setting does not justify added operational range policy. Claim verification skipped; do not patch or defer again.",
+      "smallestCorrection": "",
+      "carried": true,
+      "preverified": false
+    },
+    {
+      "id": "B10",
+      "layer": "blind",
+      "location": "../eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs:141",
+      "verdict": "low",
+      "proposedRoute": "reject-low-complexity",
+      "evidence": "Copy does allocate the serialized representation before checking sixteen MiB. Its current callers first bound target vectors/bytes, returned evidence strings (individual16384, aggregate8MiB) and lists1000, or deserialize an already sixteen-MiB bounded guard cell; the demonstrated harm is extra bounded transient allocation on unusually large private evidence that still denies. A bounded serialization stream adds new buffer/stream guards and ownership complexity for this rare case; no everyday caller divergence or accepted effect is shown.",
+      "smallestCorrection": "",
+      "carried": false,
+      "preverified": false
+    },
+    {
+      "id": "E1",
+      "layer": "edge",
+      "location": "../eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs:158-176",
+      "verdict": "medium",
+      "proposedRoute": "patch",
+      "evidence": "CommitAsync and LookupAsync invoke Capture directly. GuardedStateCommitRequest.Targets is IReadOnlyList<GuardedStateMutation>, so its Count/iterator can be custom and suspend before the existing deadline checks inside Copy. The synchronous call prevents caller cancellation/expiry from reaching the catch. This is unlike the previously rejected concrete Dictionary Extensions premise. Reviewer reported an actual canceled-call probe; root read its code and traced both entries, without claiming independent root probe execution.",
+      "smallestCorrection": "Run only the pure owned request capture inside the existing deadline.ReadAsync at both entries; preserve joint state transaction and forbid late continuation/effect after abandonment.",
+      "carried": false,
+      "preverified": false
+    },
+    {
+      "id": "E2",
+      "layer": "edge",
+      "location": "../eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs:65",
+      "verdict": "medium",
+      "proposedRoute": "patch",
+      "evidence": "ExecuteAsync evaluates caller-provided IReadOnlyList Targets.Count in its early condition before entering the existing bounded target capture. The later deadline-controlled enumeration cannot bound that preceding getter. The reviewer cancellation probe reaches the getter with a closed InstallEpoch command and a non-null authority; no effect/authorization guard precedes it. Root traced that exact path.",
+      "smallestCorrection": "Move the existing target count/limit check into the already bounded pure target capture, keeping null/closed-shape checks and the same vector/byte limits.",
+      "carried": false,
+      "preverified": false
+    },
+    {
+      "id": "E3",
+      "layer": "edge",
+      "location": "../conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionWorker.cs:39-40",
+      "verdict": "medium",
+      "proposedRoute": "bad_spec",
+      "evidence": "ResolveAsync invokes IConversationAgentAuthority.AuthorizeAsync synchronously before receiving a Task for WaitAsync(cancellationToken). The interface permits a blocking invocation; direct worker calls and receipt admission remain blocked after the original caller cancels. The pump's outer wrapper releases its caller only and does not repair this standalone entry. Reviewer reported an actual canceled-call probe, whose source root read; current source confirms the invocation boundary.",
+      "smallestCorrection": "Give worker resolution its existing thirty-second operational budget and bound the pure external authority invocation/task, preserving exact current Organization/service Party/operation admission, original cancellation and no late evidence. Reuse shared SDK mechanics, never abandon a mutable actor/admission continuation.",
+      "carried": false,
+      "preverified": false
+    },
+    {
+      "id": "E4",
+      "layer": "edge",
+      "location": "../eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs:48-52",
+      "verdict": "medium",
+      "proposedRoute": "bad_spec",
+      "evidence": "After bounded AdmitAsync, ReadAsync calls ValidGrant directly. RetainedIdentityHistoryGrant.EventTypes/ExcludedEventTypeNames are provider-owned IReadOnlyLists: Count, Distinct/All and later SingleOrDefault/Contains traversals can suspend outside the deadline. An invalid carrier released after cancellation takes the direct history-denied return without another caller check. The reviewer reproduced that exact Count schedule; root read the probe and source. This directly undermines the checked bounded retained-history source surface.",
+      "smallestCorrection": "Bound and detach current grant validation/capture under the original SDK budget before any outside traversal, using existing32/512/name limits; reuse owned carriers at later comparisons and enforce original caller/budget checks before every early denial or final release. Preserve exact admitted type/purpose/custody/expiry evidence and safe history buffers.",
+      "carried": false,
+      "preverified": false
+    },
+    {
+      "id": "V1",
+      "layer": "verification",
+      "location": "../conversations/src/Hexalith.Conversations.Server/Agents/EventStoreConversationTenantCatalogue.cs:36",
+      "verdict": "medium",
+      "proposedRoute": "patch",
+      "evidence": "Preverified regression gap: concrete EventStoreConversationTenantCatalogueTests exercise creation/closed/window streams, while SixSeam count fixtures supply precomputed Active. Deletion approval can leave Lifecycle Open with IsDeleted true, so removing the adapter's deletion predicate passes those tests and violates the accepted denominator. Trust the layer's filed complete-test/read-search evidence; no root mutation execution is claimed.",
+      "smallestCorrection": "Add a serialized creation+deletion-approval case in the existing catalogue test class; assert Active false and exclusion from complete CountAsync, retaining the open/undeleted created-in-window rule.",
+      "carried": false,
+      "preverified": true
+    }
+  ],
+  "groups": [
+    {
+      "id": "G1",
+      "members": [
+        "B1"
+      ],
+      "verdict": "medium",
+      "route": "bad_spec",
+      "rootCause": "VerifyAsync directly awaits worker authorization and invokes receiver LookupAsync/CurrentTargetAsync before token-only WaitAsync. The public entry defaults to CancellationToken.None, and ConversationAgentAdmissionStage also invokes it before its token-only wait; no finite budget bounds these invocations or the complete admission. The corrected pump bounds its own caller but does not bound a directly admitted receiver/verifier operation.",
+      "correction": "One existing thirty-second whole-entry SDK budget must bound worker/receiver invocation, returned tasks and final evidence without abandoning the complete admission continuation; caller cancellation retains its original token."
+    },
+    {
+      "id": "G2",
+      "members": [
+        "B3"
+      ],
+      "verdict": "medium",
+      "route": "patch",
+      "rootCause": "Capture allows a revision-one explicit InitialSources subset, while InstallAsync compares only that immutable initial vector. Two revision-one requests with different Sources but the same explicit InitialSources can both receive true under the same independently admitted installation receipts, leaving the caller's complete requested roster unapplied. Normal post-registration revisions must retain the smaller original initial vector.",
+      "correction": "At revision one require captured initial and complete rosters to be equal; preserve legitimate revision>1 registered growth and original installation retry. Cover inconsistent initial and restored revision-one shapes."
+    },
+    {
+      "id": "G3",
+      "members": [
+        "B4"
+      ],
+      "verdict": "medium",
+      "route": "patch",
+      "rootCause": "LookupOriginalCoreAsync and LookupCoreAsync call read.Outcome.ToArray before ValidReceipt enforces MaxBytes. Backend-returned oversized arrays incur another full allocation before rejection; the current target/private authority checks establish scope, not the returned array length. The existing sixteen-MiB shape guard can run before either clone.",
+      "correction": "Apply the existing receipt/outcome bound before copying in both original and request lookup paths; preserve exact independent receipt authentication and normal lookup results."
+    },
+    {
+      "id": "G4",
+      "members": [
+        "B5"
+      ],
+      "verdict": "medium",
+      "route": "patch",
+      "rootCause": "ReadAsync and turn-owned WaitAsync call Check, then independently sample elapsed time to construct the WaitAsync duration. Time can pass thirty seconds between those samples, producing an invalid negative timeout (including the special infinite sentinel). Initial lifecycle/signing/export entry wrappers catch TimeoutException only, so ArgumentOutOfRangeException can escape instead of the existing unavailable/original outcome.",
+      "correction": "Capture remaining time once and throw TimeoutException when nonpositive before each wait; preserve observed late faults, safe input ownership and exact original actor outcomes. Exercise an advancing clock between Check and wait creation."
+    },
+    {
+      "id": "G5",
+      "members": [
+        "B6"
+      ],
+      "verdict": "low",
+      "route": "patch",
+      "rootCause": "ExecuteAsync constructs its budget without checking it, canonicalizes a valid payload and returns Unavailable when its dependencies are absent. No exception reaches the catch, so an already canceled caller receives a normal result. GovernanceScopeGuardOwner's absent-authority read/execute returns and DaprGuardedStateTransaction's absent-authority direct lookup similarly bypass their first deadline check. This is a real but minor cancellation-contract inconsistency; the correction is direct.",
+      "correction": "Check the existing caller/budget at entry before disabled-dependency early returns in the demonstrated entries, preserving their default unavailable behavior for an active caller."
+    },
+    {
+      "id": "G6",
+      "members": [
+        "B8"
+      ],
+      "verdict": "maybe-false",
+      "route": "defer",
+      "rootCause": "ValidBatch rejects empty targets before either destruction-start authorization/effect, and CompleteProof requires a sealed terminal batch. This proves the shape is unsupported, but not that an accepted deletion consumer submits it and becomes stuck: the original Agents deletion/candidate consumer and qualified complete-target authority remain unimplemented/gated. To establish medium operational harm, trace a genuine complete authenticated zero-target candidate from that consumer through an installed fence and its required acknowledgement/completion contract. An empty caller vector alone must not become complete absence proof.",
+      "correction": "If the actual consumer requires this case, supply independently authenticated complete empty-set behavior without fabricating a destruction target, capability or receipt; settle the consumer contract first."
+    },
+    {
+      "id": "G7",
+      "members": [
+        "E1"
+      ],
+      "verdict": "medium",
+      "route": "patch",
+      "rootCause": "CommitAsync and LookupAsync invoke Capture directly. GuardedStateCommitRequest.Targets is IReadOnlyList<GuardedStateMutation>, so its Count/iterator can be custom and suspend before the existing deadline checks inside Copy. The synchronous call prevents caller cancellation/expiry from reaching the catch. This is unlike the previously rejected concrete Dictionary Extensions premise. Reviewer reported an actual canceled-call probe; root read its code and traced both entries, without claiming independent root probe execution.",
+      "correction": "Run only the pure owned request capture inside the existing deadline.ReadAsync at both entries; preserve joint state transaction and forbid late continuation/effect after abandonment."
+    },
+    {
+      "id": "G8",
+      "members": [
+        "E2"
+      ],
+      "verdict": "medium",
+      "route": "patch",
+      "rootCause": "ExecuteAsync evaluates caller-provided IReadOnlyList Targets.Count in its early condition before entering the existing bounded target capture. The later deadline-controlled enumeration cannot bound that preceding getter. The reviewer cancellation probe reaches the getter with a closed InstallEpoch command and a non-null authority; no effect/authorization guard precedes it. Root traced that exact path.",
+      "correction": "Move the existing target count/limit check into the already bounded pure target capture, keeping null/closed-shape checks and the same vector/byte limits."
+    },
+    {
+      "id": "G9",
+      "members": [
+        "E3"
+      ],
+      "verdict": "medium",
+      "route": "bad_spec",
+      "rootCause": "ResolveAsync invokes IConversationAgentAuthority.AuthorizeAsync synchronously before receiving a Task for WaitAsync(cancellationToken). The interface permits a blocking invocation; direct worker calls and receipt admission remain blocked after the original caller cancels. The pump's outer wrapper releases its caller only and does not repair this standalone entry. Reviewer reported an actual canceled-call probe, whose source root read; current source confirms the invocation boundary.",
+      "correction": "Give worker resolution its existing thirty-second operational budget and bound the pure external authority invocation/task, preserving exact current Organization/service Party/operation admission, original cancellation and no late evidence. Reuse shared SDK mechanics, never abandon a mutable actor/admission continuation."
+    },
+    {
+      "id": "G10",
+      "members": [
+        "E4"
+      ],
+      "verdict": "medium",
+      "route": "bad_spec",
+      "rootCause": "After bounded AdmitAsync, ReadAsync calls ValidGrant directly. RetainedIdentityHistoryGrant.EventTypes/ExcludedEventTypeNames are provider-owned IReadOnlyLists: Count, Distinct/All and later SingleOrDefault/Contains traversals can suspend outside the deadline. An invalid carrier released after cancellation takes the direct history-denied return without another caller check. The reviewer reproduced that exact Count schedule; root read the probe and source. This directly undermines the checked bounded retained-history source surface.",
+      "correction": "Bound and detach current grant validation/capture under the original SDK budget before any outside traversal, using existing32/512/name limits; reuse owned carriers at later comparisons and enforce original caller/budget checks before every early denial or final release. Preserve exact admitted type/purpose/custody/expiry evidence and safe history buffers."
+    },
+    {
+      "id": "G11",
+      "members": [
+        "V1"
+      ],
+      "verdict": "medium",
+      "route": "patch",
+      "rootCause": "Preverified regression gap: concrete EventStoreConversationTenantCatalogueTests exercise creation/closed/window streams, while SixSeam count fixtures supply precomputed Active. Deletion approval can leave Lifecycle Open with IsDeleted true, so removing the adapter's deletion predicate passes those tests and violates the accepted denominator. Trust the layer's filed complete-test/read-search evidence; no root mutation execution is claimed.",
+      "correction": "Add a serialized creation+deletion-approval case in the existing catalogue test class; assert Active false and exclusion from complete CountAsync, retaining the open/undeleted created-in-window rule."
+    }
+  ],
+  "groupingRule": "Independent defects remain separate. Same broad deadline theme, nearby location or similar correction is not a shared producing defect.",
+  "counts": {
+    "bad_spec": 3,
+    "patch": 7,
+    "defer": 1,
+    "rejected": 4
+  },
+  "cascadingDisposition": "Three bad_spec entries require loopback. Counter6->7 exceeds5: mandatory HALT, one further-cycle authorization required. Lower patch/defer entries moot; no source/spec requirement amendment or deferred ledger mutation.",
+  "verificationLimits": "Root traced new blind/edge claims and actual callers; unchanged carried claims skipped. V1 preverified. Reviewer probe code archived; no independent root probe or mutation execution claimed. Root Local command/XML/source evidence recorded separately."
+}

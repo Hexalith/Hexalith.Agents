@@ -1,0 +1,74 @@
+{
+  "distinctPassedCases": 390,
+  "lanes": [
+    {
+      "lane": "contracts",
+      "passed": 12,
+      "classes": [
+        "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests"
+      ],
+      "buildWarnings": 0,
+      "buildErrors": 0
+    },
+    {
+      "lane": "publication",
+      "passed": 55,
+      "classes": [
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests"
+      ],
+      "buildWarnings": 0,
+      "buildErrors": 0
+    },
+    {
+      "lane": "actors-guard",
+      "passed": 121,
+      "classes": [
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests",
+        "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests",
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests",
+        "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests"
+      ],
+      "buildWarnings": 0,
+      "buildErrors": 0
+    },
+    {
+      "lane": "platform",
+      "passed": 162,
+      "classes": [
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests",
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests",
+        "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests",
+        "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests",
+        "Hexalith.Platform.Custody.Tests.PlatformKeyInventoryActorTests",
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests",
+        "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests"
+      ],
+      "buildWarnings": 0,
+      "buildErrors": 0
+    },
+    {
+      "lane": "conversation",
+      "passed": 29,
+      "classes": [
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests"
+      ],
+      "buildWarnings": 0,
+      "buildErrors": 0
+    },
+    {
+      "lane": "downstream-append",
+      "passed": 11,
+      "classes": [
+        "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests"
+      ],
+      "buildWarnings": 0,
+      "buildErrors": 0
+    }
+  ],
+  "allResultsPass": true,
+  "noOverlappingCases": true
+}

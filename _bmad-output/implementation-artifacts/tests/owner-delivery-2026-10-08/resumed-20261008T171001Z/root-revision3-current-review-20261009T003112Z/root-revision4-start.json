@@ -1,0 +1,13 @@
+{
+  "recordedUtc": "2026-10-09T00:45:29.222282+00:00",
+  "reviewLoopIteration": 4,
+  "parentStatus": "in-progress",
+  "baselinePreserved": "b252fcfde51bd04317ce5843a0a42bfe4dce5170",
+  "frozenPreserved": true,
+  "parentSha256": "cfcce798ddf8a87b5e24aacea389a25302de941555acb87f2812b0c27d0dd735",
+  "rootReadmeBeforeSha256": "fe9c79927304469a1602911a62a2377b6c1524a39c024ad2343f2e49f03ee4e3",
+  "rootReadmeCurrentSha256": "1985c551154c9ee28c2d01f5e8acba65de83db9e9c9e65120d1918e89c3c16d9",
+  "engineer": "owner_rederivation",
+  "fullLocalMatrix": "pending",
+  "runtimeQualification": "unestablished"
+}

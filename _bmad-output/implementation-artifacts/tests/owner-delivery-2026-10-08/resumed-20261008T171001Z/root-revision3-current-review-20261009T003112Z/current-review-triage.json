@@ -1,0 +1,123 @@
+{
+  "triagedUtc": "2026-10-09T00:43:17.914507+00:00",
+  "allThreeFinalBeforeTriage": true,
+  "reviewIteration": 3,
+  "findings": [
+    {
+      "id": "B1",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "SourceNamespaceSnapshotReader.cs:45,56-81,87",
+      "evidence": "Initial/final CaptureCut and event/flag Count/traversal run directly after bounded provider tasks. The injected namespace/source interfaces can return suspended collections; internal cancellation checks cannot run while Count/MoveNext blocks. Existing fold worker does not bound the earlier capture. Wrap all provider-owned captures in the existing deadline, committing local byte counters only on successful capture.",
+      "carried": false
+    },
+    {
+      "id": "B2",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "DaprSourcePublicationNamespaceSource.cs:27,47",
+      "evidence": "Both initial/final roster Capture calls execute outside deadline.ReadAsync. Upstream actor-task waiting and private actor permissions do not bound a supplied proxy collection. Directly reuse the bounded capture pattern already required by writer registration; preserve current exact roster/qualification and cancellation.",
+      "carried": false
+    },
+    {
+      "id": "B3",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "DeletionCapabilityRevocationSubscriber.cs:31,38,41,47",
+      "evidence": "Every registrar/mirror receipt is captured directly after budget.ReadAsync; AffectedBatchIds Count/traversal can stall the caller before budget.Check. Same-owner block and final issuer authentication do not bound that traversal. Move complete detached receipt capture inside the original budget and prove no late mirror/success.",
+      "carried": false
+    },
+    {
+      "id": "B4",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "IndependentDecisionManifestVerifier.cs:12-15,22",
+      "evidence": "Manifest/expected-basis collections and resolved ForbiddenApprovalActors are captured directly outside the budget worker. A stalled collection defeats the otherwise bounded authority awaits. Bound the existing pure capture operations, keeping expected-basis/role/current-boundary checks and original cancellation.",
+      "carried": false
+    },
+    {
+      "id": "B5",
+      "verdict": "medium",
+      "route": "bad_spec",
+      "location": "CustodyKeyLifecycleActor.cs:65,82",
+      "evidence": "After durable Unknown reservation, ExecuteAsync and original LookupAsync are awaited directly in a non-reentrant tenant actor. A noncompleting physical provider retains the whole tenant turn, including independent other-key operations. The shared anchored-state journal cannot release that separate provider wait. Specify actor-side bounded physical invocation/lookup, retained Unknown and exact original recovery without background StateManager access.",
+      "carried": false
+    },
+    {
+      "id": "B6",
+      "verdict": "medium",
+      "route": "bad_spec",
+      "location": "ExportKeyDeliveryActor.cs:45,74; DeletionCapabilitySigningActor.cs:56,89",
+      "evidence": "Both actors directly await first physical effect and recovery lookup after retaining Unknown. Outer coordinator/adapter waits cannot release these actor turns, so later exact lookup is unavailable while the first task stalls. Specify isolated bounded provider work and immutable original outcomes/no repeated release or signing, with actor end-state interleavings.",
+      "carried": false
+    },
+    {
+      "id": "B7",
+      "verdict": "high",
+      "route": "bad_spec",
+      "location": "SourcePublicationFeed.cs:64-80,111; SourcePublicationIndexActor.cs:111-116",
+      "evidence": "Retained reconciliation must MatchesCut against the newly observed entire head vector. A partial pass stops after twenty sources; a monotonic append between each otherwise stable forty-source pass invalidates the prior vector and resets verified progress. Current authority checks correctly deny unchecked reuse but no authenticated original-cut completion path exists. Add independently authenticated finite-cut continuation under current authority; quiescence cannot be assumed for automatic delivery.",
+      "carried": false
+    },
+    {
+      "id": "B8",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "parties/eng/verify-ext-parties-1.ps1:61-74",
+      "evidence": "The documented Local filters omit RecoverableAnchoredStateTests, DirectoryAtomicAppendTests, AggregateActorPublicationRegistrationTests and both occurrence protection classes. Searches of the other documented owner runners find none. The root dynamic supplemental matrix would execute them, but does not repair the reproducible owner command. Extend explicit existing project/class lanes and require nonempty executed cases; retain all previous lanes and refusal modes.",
+      "carried": false
+    },
+    {
+      "id": "B9",
+      "verdict": "low",
+      "route": "patch",
+      "location": "IDeletionCapabilitySigningAuthority.cs:13; nine legacy RecordState/RecordRevision/RecordIndex authority declarations",
+      "evidence": "These legacy methods are unused by source actors yet XML summaries still claim that they advance current state. The actual actors require the inherited default-deny admission/record/recovery/verification journal. An implementer following the obsolete member documentation alone leaves mutation unavailable. The direct correction is to explicitly document/deprecate the compatibility-only members and identify the required inherited protocol; retain source compatibility and restrictive defaults.",
+      "carried": false
+    },
+    {
+      "id": "B10",
+      "verdict": "medium",
+      "route": "bad_spec",
+      "location": "GovernanceScopeGuardReducer.cs:37-59,357-360",
+      "evidence": "ValidCohort requires global original OperationId uniqueness and drains/activation track only that string. DirectoryMigrationBoundaryActor instead admits canonical distinct Owner.ActorId/OperationId originals and its drain receipts retain the complete item. Therefore a qualified two-owner cohort sharing one original operation ID is rejected, and merely relaxing uniqueness would conflate drains. Specify complete owner/operation correlation throughout membership/drain/activation under exact independent proof.",
+      "carried": false
+    },
+    {
+      "id": "E1",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "DeletionConsumptionIdentity.cs:31-34; GovernanceScopeGuardReducer.cs:361-364",
+      "evidence": "Guard order is ordinal interaction ID then key alias; the protection capture compares JSON-encoded tuples. Valid key+v1/key-v1 aliases reverse after JSON escaping and pass guard ordering but fail protection registration. No upstream identity rule forbids those aliases. Replace the encoded ordering comparator with the same raw ordinal tuple order and assert actual register/consume/lookup original vector.",
+      "carried": false
+    },
+    {
+      "id": "E2",
+      "verdict": "low",
+      "route": "patch",
+      "location": "DeletionCapabilitySigningSuccessor.cs:24-26; DeletionBatchCapabilityIdentity.cs:24,47",
+      "evidence": "Maximum canonical SigningAttemptOrdinal 9007199254740991 is a valid input, but the existing long.MaxValue guard allows construction of 9007199254740992; SigningRequestId then rejects it. This rare bound has a direct correction: use the existing canonical maximum in the existing successor guard, and prove null at the bound plus the final valid successor. No expanded operational policy or lifetime is needed.",
+      "carried": false
+    },
+    {
+      "id": "V1",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "InteractionOccurrenceProtectorTests.cs:52,64,74; InteractionOccurrenceProtector.cs:57",
+      "evidence": "Preverified regression gap, trusted as filed: successful event/snapshot replay tests keep Read authority current and the withdrawal test exercises only ProtectAsync. Deleting the final Read check would retain all checked outcomes while exposing decrypted bytes after withdrawal. Add active event/snapshot replay withdrawal cases asserting unreadable/no PayloadBytes; use the existing class and matrix coverage.",
+      "carried": false
+    }
+  ],
+  "grouping": "Every row was classified individually before grouping. Distinct affected protocols retain separate entries; shared coding patterns alone do not merge defects.",
+  "routes": {
+    "bad_spec": 4,
+    "patch": 9,
+    "defer": 0,
+    "rejected": 0,
+    "carried": 0
+  },
+  "deferredLedgerEntriesAdded": 0,
+  "nextEngineeringRevision": 4,
+  "fullLocalVerification": "pending stable corrected source and review",
+  "runtimeQualification": "unestablished"
+}

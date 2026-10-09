@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T02:22:41.330107+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs",
+      "existed": true,
+      "sha256": "c8d23e79c4f0e825076d59d5b8970c9be3b5694323a5d365f9b8328ae340865d",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/atomic-request-capture/before/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs",
+      "existed": true,
+      "sha256": "1e064f0171c318fe659ffbe858d9c0e17a0f1d2ebcc8a49be6b57fdd8fb57269",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/atomic-request-capture/before/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs"
+    }
+  ]
+}

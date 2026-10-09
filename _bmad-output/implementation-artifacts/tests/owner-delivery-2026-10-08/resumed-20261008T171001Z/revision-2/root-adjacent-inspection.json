@@ -1,0 +1,14 @@
+{
+  "capturedUtc": "2026-10-08T22:12:02.131204+00:00",
+  "scope": "Read-only adjacent routing inspection after complete revision-1 triage; no extra source correction or source edit by root.",
+  "checkedAdapters": {
+    "DaprInteractionOccurrenceRegistry": "Known E1 raw tenant actor address; current engineer correction pending.",
+    "DaprDeletionProtectionOwner.InvokeAsync": "Canonical DeletionConsumptionActor.GetActorId(tenantId); preverified V1 coverage correction pending.",
+    "DaprDeletionProtectionOwner.ReadActivationComparisonAsync": "Canonical DeletionConsumptionActor.GetActorId(tenantId).",
+    "DaprDeletionCapabilityCompromiseRegistrar.Register": "Canonical DeletionConsumptionActor.GetActorId(envelope.TenantId).",
+    "DaprDeletionCapabilityCompromiseRegistrar.Lookup": "Canonical DeletionConsumptionActor.GetActorId(envelope.TenantId).",
+    "RetainedIdentityHistorySourceReader": "Original request.Identity.ActorId, matching AggregateActor source identity."
+  },
+  "additionalCorrections": [],
+  "B1DesignFeedback": "Engineer will independently retain exact original admission before stage persistence and conditionally recover only on a separately authorized mutation/recovery path. Read-only lookup/readiness cannot elevate unanchored candidates. Root requested focused pre-admission/after-admission-before-stage/pre-journal failures, original-caller absence and zero read-side journal writes; this refines existing required verification without changing policy."
+}

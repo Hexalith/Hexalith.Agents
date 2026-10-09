@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-09T01:23:25.115327+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "parties",
+      "relativePath": "eng/verify-ext-parties-1.ps1",
+      "existed": true,
+      "sha256": "ad3a7b3e86638378c2d932263c82a9b91721b292a7576ce7a7b08c0fe91dea4a",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/before/parties/eng/verify-ext-parties-1.ps1"
+    }
+  ]
+}

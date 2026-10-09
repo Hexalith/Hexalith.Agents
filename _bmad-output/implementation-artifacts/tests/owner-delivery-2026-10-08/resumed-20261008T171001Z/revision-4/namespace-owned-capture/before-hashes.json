@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T00:50:46.181590+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourceNamespaceSnapshotReader.cs",
+      "existed": true,
+      "sha256": "25fed811d4fba9b8557312e97ad9fe401de8867ed5b779bee74676cd71ae2e99",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-owned-capture/before/eventstore/src/Hexalith.EventStore.Client/Streams/SourceNamespaceSnapshotReader.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs",
+      "existed": true,
+      "sha256": "a3f1bf4f58d6d6d89f87ce1cfdbe2dc5792c3be3e858f145327b51607656b340",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-owned-capture/before/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs"
+    }
+  ]
+}

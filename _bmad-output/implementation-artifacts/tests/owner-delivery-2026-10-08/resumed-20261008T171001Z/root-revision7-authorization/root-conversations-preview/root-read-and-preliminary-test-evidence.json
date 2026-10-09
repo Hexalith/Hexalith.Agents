@@ -1,0 +1,38 @@
+{
+  "capturedUtc": "2026-10-09T09:28:00.660292+00:00",
+  "rootReadFullPreviewDiff": true,
+  "previewLines": 301,
+  "previewSha256": "be0d28ce47c2a6484d770bb0ab4237b9d819302a377a31921e906afd11080fd0",
+  "readRanges": [
+    "1-215",
+    "216-301"
+  ],
+  "pathsRead": 4,
+  "actualFocusedXml": [
+    {
+      "xml": "/tmp/revision7-conversation-green.xml",
+      "sha256": "87b71f8c1f12db250369778a6abd34975da7619cb3b7eaff055c6375a2a9d749",
+      "total": 114,
+      "passed": 114,
+      "failed": 0,
+      "classCounts": {
+        "Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests": 7,
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests": 57,
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests": 41,
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests": 9
+      }
+    },
+    {
+      "xml": "/tmp/revision7-conversation-red.xml",
+      "sha256": "988375a668650f1e1e791852f1ab42b110edeb26231e77024773f30191216915",
+      "total": 3,
+      "passed": 1,
+      "failed": 2,
+      "classCounts": {
+        "Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests": 1,
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests": 2
+      }
+    }
+  ],
+  "scope": "Preliminary current source and actual XML only; final command/package/source/full review and matrix still required."
+}

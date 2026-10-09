@@ -1,0 +1,68 @@
+{
+  "capturedUtc": "2026-10-08T23:59:33.604666+00:00",
+  "finding": "B10 revision2",
+  "execution": {
+    "path": "/tmp/revision3-source-reconciliation-tests-second.xml",
+    "sha256": "8334bfb9dfd818cea89a3b6a0bb90ce8b8a6479e0735219c4eed0f630c1909e6",
+    "passed": 87,
+    "classes": {
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests": 51,
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests": 16,
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests": 9,
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests": 11
+    },
+    "requiredNewCases": {
+      "SlowInitialSourceReconciliationProgressesAcrossActualOwnerRestart": 1,
+      "RetainedReconciliationCannotAuthenticateDifferentOrForgedCut": 8,
+      "SuspendedReconciliationSnapshotsReleaseCallerWithoutLateCheckpoint": 10,
+      "FinalReconciliationReleaseReconfirmsIndependentSourceProof": 4
+    },
+    "executedNewNames": [
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FinalReconciliationReleaseReconfirmsIndependentSourceProof(indexedPage: False, vector: \\\"state\\\")",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FinalReconciliationReleaseReconfirmsIndependentSourceProof(indexedPage: False, vector: \\\"cut\\\")",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FinalReconciliationReleaseReconfirmsIndependentSourceProof(indexedPage: True, vector: \\\"state\\\")",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.FinalReconciliationReleaseReconfirmsIndependentSourceProof(indexedPage: True, vector: \\\"cut\\\")",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.SuspendedReconciliationSnapshotsReleaseCallerWithoutLateCheckpoint(vector: \\\"cut-count\\\", cancelCaller: False)",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.SuspendedReconciliationSnapshotsReleaseCallerWithoutLateCheckpoint(vector: \\\"cut-count\\\", cancelCaller: True)",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.SuspendedReconciliationSnapshotsReleaseCallerWithoutLateCheckpoint(vector: \\\"state-count\\\", cancelCaller: False)",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.SuspendedReconciliationSnapshotsReleaseCallerWithoutLateCheckpoint(vector: \\\"state-count\\\", cancelCaller: True)",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.SuspendedReconciliationSnapshotsReleaseCallerWithoutLateCheckpoint(vector: \\\"source-events\\\", cancelCaller: False)",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.SuspendedReconciliationSnapshotsReleaseCallerWithoutLateCheckpoint(vector: \\\"source-events\\\", cancelCaller: True)",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.SuspendedReconciliationSnapshotsReleaseCallerWithoutLateCheckpoint(vector: \\\"candidate-count\\\", cancelCaller: False)",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.SuspendedReconciliationSnapshotsReleaseCallerWithoutLateCheckpoint(vector: \\\"candidate-count\\\", cancelCaller: True)",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.SuspendedReconciliationSnapshotsReleaseCallerWithoutLateCheckpoint(vector: \\\"progress-count\\\", cancelCaller: False)",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.SuspendedReconciliationSnapshotsReleaseCallerWithoutLateCheckpoint(vector: \\\"progress-count\\\", cancelCaller: True)",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.SlowInitialSourceReconciliationProgressesAcrossActualOwnerRestart",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.RetainedReconciliationCannotAuthenticateDifferentOrForgedCut(vector: \\\"scope\\\")",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.RetainedReconciliationCannotAuthenticateDifferentOrForgedCut(vector: \\\"installation\\\")",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.RetainedReconciliationCannotAuthenticateDifferentOrForgedCut(vector: \\\"authority\\\")",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.RetainedReconciliationCannotAuthenticateDifferentOrForgedCut(vector: \\\"cut\\\")",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.RetainedReconciliationCannotAuthenticateDifferentOrForgedCut(vector: \\\"head\\\")",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.RetainedReconciliationCannotAuthenticateDifferentOrForgedCut(vector: \\\"forged-receipt\\\")",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.RetainedReconciliationCannotAuthenticateDifferentOrForgedCut(vector: \\\"forged-publication\\\")",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.RetainedReconciliationCannotAuthenticateDifferentOrForgedCut(vector: \\\"stale\\\")"
+    ]
+  },
+  "build": {
+    "path": "/tmp/revision3-source-reconciliation-build-sixth.log",
+    "sha256": "83a56b4ca16a1530b3580dcf084a50355da11af593b9aea63701f2d19e07538a",
+    "warnings": 0,
+    "errors": 0,
+    "mappingLimit": "Latest clean build precedes passing XML; exact argv/source-at-execution pairing remains subject to final engineer command-ledger audit."
+  },
+  "rootInspection": "Root read progress carriers, independent default-deny authority declarations, actor progress read/advance, feed reconciliation/checkpoint paths and complete 23 added regression cases. Full frozen final delta inspection remains pending. Actual fixture proofs retain exact original serialized carriers independently of owner storage; current cut/proof withdrawal is separate from structural validity.",
+  "currentSourceHashes": {
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationProgress.cs": "06176e49fb6e4eb9f8d63fe38cde18e83b9c2c76e3306529140999665c58ff7a",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationAdvance.cs": "da6bd287f63753112d347e0fd8e7ecabaef14c6ea50d4dcf8c1a8b71e090c921",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationIndexState.cs": "22e103c388d177e84174ae2a0e5cc07a32a05d03ac11e722e3a9f0b3b0dde4d5",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/ISourcePublicationIndexStore.cs": "785879546e03fa1fadf6d42d135445333eb9367497818ffb273614dd8d1d8f9a",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs": "54a5a45073dd8f8f6439213502de8a77f7f15e6fcd846b95ca4427dcaf2b5adb",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationIndexActor.cs": "2f135b1e46fb4c61cff0e3df6c1a0d69b3a6c32ef9414e985d9b1ba612c940ec",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs": "19085793a61ad28ba6043986005d40e1d2e9ba7fa039a360bdebf3f4187d4a44",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationIndexStore.cs": "ef5f64969bd61817f83ab5bf912209ee74362d5502d87d6a5be9f325ae1b80ce",
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs": "c689b0ad399483c78a9b0dc1054bf649a6a09ae10777ab396854251d9b78afec",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs": "2cb37a7f6d86e1f05a12aaa472fae4c686272f166ed01e6679ac262fcc0e4b1b"
+  },
+  "historicalAttempt": "Earlier 83-case attempt retained eight setup/address failures, alongside earlier compile attempts. These are preserved separately; no failing-before-source proof inferred.",
+  "scope": "Interim root execution inspection only; downstream engineer source remains active. Full Local matrix, next independent review and final stable source remain pending. No runtime qualification or parent completion inferred."
+}

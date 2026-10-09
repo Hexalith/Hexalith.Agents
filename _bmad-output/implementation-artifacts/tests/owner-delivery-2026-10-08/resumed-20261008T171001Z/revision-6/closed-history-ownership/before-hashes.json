@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T06:37:27.049469+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "existed": true,
+      "sha256": "ecd0c5a53fb79f9f012fd844ec94e30884e19f9ed39da956e1710a85dd9ca35f",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/closed-history-ownership/before/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "existed": true,
+      "sha256": "3c21619544596bd4027a0388d0f57b88594284ac4f759965d81837b8ee2ef9ca",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/closed-history-ownership/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs"
+    }
+  ]
+}

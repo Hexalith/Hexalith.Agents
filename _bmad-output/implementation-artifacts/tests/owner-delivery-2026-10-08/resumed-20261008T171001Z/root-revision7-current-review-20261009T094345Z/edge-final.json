@@ -1,0 +1,15 @@
+[
+  {
+    "location": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationDispatcher.cs:64-70",
+    "trigger_condition": "Independent dispatch-progress admission returns null after a reported acknowledgement.",
+    "guard_snippet": "if (progress is null) return new(predecessor, false, \"publication-progress-unavailable\");",
+    "potential_consequence": "Dispatch advances and reports completion despite refused or unconfirmed durable progress."
+  },
+  {
+    "location": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs:34-53",
+    "trigger_condition": "An expired certificate follows a readable revocation after an entirely expired binding prefix.",
+    "guard_snippet": "if (transition.Event is not null) sawReadableTransition = true; if (transition.Expired is not null && sawReadableTransition) throw InvalidHistory();",
+    "potential_consequence": "Expired suffixes pass validation because readable revocations leave bindings.Count at zero."
+  }
+]
+

@@ -1,0 +1,13 @@
+### Protection-owner routing is bypassed by the apparent integration coverage
+
+- **Changed surface:** `eventstore/src/Hexalith.EventStore.Server/Security/DaprDeletionProtectionOwner.cs:36` routes protection operations to the tenant’s canonical deletion-consumption actor.
+- **Impacted consumer or site:** `platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs:79` registers and consumes the batch through this adapter.
+- **Existing test evidence:** `Broken-verification gap`: `DeletionBatchExecutionCoordinatorTests.cs:95` checks actual owner results, restart recovery, and physical reservation counts. However, `DeletionBatchActualOwnerFixture.cs:85` returns the same `ProtectionActor` for **any actor ID**, bypassing the routing behavior. Symbol and interface-reference searches across `/home/administrator/projects/hexalith` found no separate current test exercising this adapter through actor-ID-sensitive routing; the other execution fixture substitutes `IDeletionProtectionOwner`.
+- **Missing verification:** A successful register/consume/lookup result reached through the actual canonical actor address.
+- **Demonstration:** Replace `new(DeletionConsumptionActor.GetActorId(tenantId))` with `new(tenantId)` in `InvokeAsync`. The checked coordinator tests still receive the correctly hosted `ProtectionActor` and pass. Actual routing instead reaches an actor whose host ID fails `DeletionConsumptionActor.Check` at `DeletionConsumptionActor.cs:274`.
+- **Consequence:** Configured protection calls stop working while the apparent owner integration suite remains green.
+- **Disposition:** `patch` — add `DaprDeletionProtectionOwnerRoutingTests` using an actor-ID-sensitive synthetic transport and real hosted protection actors; assert resulting persisted registration, consumption, and original lookup outcomes.
+
+## Other findings
+
+- `conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs:74` checks worker authority **before** awaiting the final `receiver.CurrentTargetAsync`, then calls `SubmitAsync` at line 78 without checking authority again. If the dedicated worker’s Party or operation authority is withdrawn during that wait and the same target returns, the pump still submits the deletion signal. The later check in `AcknowledgeAsync` prevents acknowledgement but occurs after submission. The tests I read cover withdrawal after attempt persistence and during receipt-verifier waits, but none block the pump’s second target lookup, withdraw authority, and assert zero submissions. Recheck worker authority after that await and add that controlled interleaving to `ConversationDeletionDeliveryPumpTests`.

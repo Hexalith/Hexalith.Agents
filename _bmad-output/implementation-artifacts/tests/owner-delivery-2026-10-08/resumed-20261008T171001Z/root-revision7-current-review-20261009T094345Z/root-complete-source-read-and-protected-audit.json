@@ -1,0 +1,52 @@
+{
+  "capturedUtc": "2026-10-09T09:46:35.276785+00:00",
+  "manifestSha256": "c928e8b74d5973634408e117c98ce0b16afa70ef467ae9f2301847a366e130fa",
+  "cumulativeOwnedFiles": 402,
+  "orderedCapturesChecked": 148,
+  "complete978Line17PathCorrectionDeltaReadAndHashesMatch": true,
+  "completeRemaining49LineFormattingDeltaRead": true,
+  "allFourCompleteCurrentOwnerPacketsRead": [
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+      "currentSha256": "088b99a968a80d618cdd0a086e0f7d183ecf8748de2bae017f8183ce701bc586"
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+      "currentSha256": "ea0407a994066b890d2ed9cbd470d62cf1174a7a66192f7a886712e2793c8b6e"
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+      "currentSha256": "ff3f3a71b7979b8731f38111edfcc192028d48c8018fa2eb028e1b6d3e646ff3"
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+      "currentSha256": "bdf85aa26e53a9d4e8347e870b9c1810af4de51be8f8f3ca04c94a41b1d8eb13"
+    }
+  ],
+  "all402CurrentMatchFrozen": true,
+  "noNewDeclaredTypesVsRevision6": true,
+  "protected": {
+    "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md": {
+      "expected": "5b1de576274f93a464322c18ee977e8bc4d489c2b8569a64986de3c4fc5304b1",
+      "actual": "5b1de576274f93a464322c18ee977e8bc4d489c2b8569a64986de3c4fc5304b1"
+    },
+    "_bmad-output/implementation-artifacts/sprint-status.yaml": {
+      "expected": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+      "actual": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691"
+    },
+    "_bmad-output/planning-artifacts/external-dependency-register.md": {
+      "expected": "184e16c05b57527abcdbd8588ae0c9fa10fe4c6093a53e66a509e9aa39fbcccb",
+      "actual": "184e16c05b57527abcdbd8588ae0c9fa10fe4c6093a53e66a509e9aa39fbcccb"
+    },
+    "../parties/_bmad-output/planning-artifacts/actor-history-retention-policy-v1.md": {
+      "expected": "8f6780d252154803343432e2126e596209e432284cfddf1c7f5b9eb596aa2fe1",
+      "actual": "8f6780d252154803343432e2126e596209e432284cfddf1c7f5b9eb596aa2fe1"
+    }
+  },
+  "frozenIntentSha256": "0cd11ddac96af9775593ea0aa24d969b235b32dfcc4a76a80e51d7eb9c82e2cb",
+  "parentSha256": "5a2306cc05ef34fa820604be3490d5180d907b2e59e3d1e4a17c5676741188cd",
+  "reviewLoopIteration": 7,
+  "engineeringAudit": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-stable-engineering-audit.json",
+  "errors": [],
+  "pending": "three fresh independent review layers and complete root full Local matrix; source/full parent acceptance not established"
+}

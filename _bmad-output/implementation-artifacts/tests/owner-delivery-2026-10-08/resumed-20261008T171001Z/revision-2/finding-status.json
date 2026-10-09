@@ -1,0 +1,245 @@
+{
+  "scope": "Individual revision-2 engineering resolutions; root acceptance and next review remain pending.",
+  "findings": [
+    {
+      "finding": "B1",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "pending-original-resolution",
+        "publication-durable-progress"
+      ],
+      "change": "All nine writers retain independently admitted bounded exact original bytes before staging and recover orphaned pre-journal originals only under separately authorized current mutation/recovery; read-only paths do not advance anchors.",
+      "executedCases": [
+        "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests.AdmissionAndPreStageFailureDoNotCreateOrAdvanceUnperformedOriginal(failurePoint: \\\"denied\\\")",
+        "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests.AdmissionAndPreStageFailureDoNotCreateOrAdvanceUnperformedOriginal(failurePoint: \\\"before-admission\\\")",
+        "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests.AdmissionAndPreStageFailureDoNotCreateOrAdvanceUnperformedOriginal(failurePoint: \\\"before-stage\\\")",
+        "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests.AbsentOriginalCallerRecoveryRequiresRetainedExactAdmissionAndSeparateMutation(vector: \\\"valid\\\")",
+        "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests.AbsentOriginalCallerRecoveryRequiresRetainedExactAdmissionAndSeparateMutation(vector: \\\"not-admitted\\\")",
+        "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests.AbsentOriginalCallerRecoveryRequiresRetainedExactAdmissionAndSeparateMutation(vector: \\\"unknown\\\")",
+        "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests.AbsentOriginalCallerRecoveryRequiresRetainedExactAdmissionAndSeparateMutation(vector: \\\"different-target\\\")",
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.ReadOnlyProgressProposalNeverElevatesPendingOriginalAuthority",
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.LaterMutationRecoversPreJournalOriginalAfterRestartWithoutOriginalCaller",
+        "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.LaterMutationRecoversPreJournalOriginalWithoutItsCaller",
+        "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests.LaterMutationRecoversPreJournalOriginalWithoutItsCaller",
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests.LaterMutationRecoversPreJournalOriginalWithoutItsCaller",
+        "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests.LaterMutationRecoversPreJournalOriginalWithoutItsCaller",
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests.LaterMutationRecoversPreJournalOriginalWithoutItsCaller",
+        "Hexalith.Platform.Custody.Tests.PlatformKeyInventoryActorTests.LaterMutationRecoversPreJournalOriginalWithoutItsCaller",
+        "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests.StagedOriginalSurvivesJournalFailureClockChangeAndConcurrentOtherIntent",
+        "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests.LaterMutationRecoversPreJournalOriginalWithoutItsCaller",
+        "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests.LaterMutationRecoversPreJournalOriginalWithoutItsCaller"
+      ]
+    },
+    {
+      "finding": "B2",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "committed-violation-provenance"
+      ],
+      "change": "The guard compares caller Admission/Content classification to the independently authenticated closed concrete write kind and denies both substitutions without state change.",
+      "executedCases": [
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests.ViolationClassificationCannotSubstituteTheIndependentWriteKind(kind: Permit, substituted: \\\"Content\\\")",
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests.ViolationClassificationCannotSubstituteTheIndependentWriteKind(kind: ContentAppend, substituted: \\\"Admission\\\")"
+      ]
+    },
+    {
+      "finding": "B3",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "committed-violation-provenance",
+        "deletion-routing-and-provenance-fixture",
+        "downstream-append-contract"
+      ],
+      "change": "The joint append retains original operation/resource/facts/target mutation correlation; violations require that exact genuine original. Missing or genuinely unrelated original provenance denies. Ordinary out-of-scope ordinal-zero append remains accepted with the new complete safe contract.",
+      "executedCases": [
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests.PostSealContentContainmentCanCompleteWithoutReopeningAcceptedOwnerCycles",
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests.ViolationRequiresItsOwnExactCommittedAcceptanceProvenance(changed: \\\"operation\\\")",
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests.ViolationRequiresItsOwnExactCommittedAcceptanceProvenance(changed: \\\"resource\\\")",
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests.ViolationRequiresItsOwnExactCommittedAcceptanceProvenance(changed: \\\"facts\\\")",
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests.ViolationRequiresItsOwnExactCommittedAcceptanceProvenance(changed: \\\"mutation\\\")",
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests.ViolationRequiresItsOwnExactCommittedAcceptanceProvenance(changed: \\\"missing\\\")",
+        "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests.OutOfScopeCommittedWriteAcceptsOrdinalZero"
+      ]
+    },
+    {
+      "finding": "B4",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "conversation-submission-authority"
+      ],
+      "change": "The pump reconfirms exact delivery-command authority immediately before submission; source read permission alone cannot release an attempt.",
+      "executedCases": [
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests.DeliveryPermissionWithdrawalAfterAttemptMakesZeroSubmissions"
+      ]
+    },
+    {
+      "finding": "B5",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "spool-fair-schedule"
+      ],
+      "change": "The anchored spool retains durable fair scheduling progress before recorder work while preserving Unknown, original time/day/sequence and required per-source order.",
+      "executedCases": [
+        "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests.DurableFairDrainRetainsUnknownAndAdvancesOtherTenantAfterRestart"
+      ]
+    },
+    {
+      "finding": "B6",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "publication-durable-progress"
+      ],
+      "change": "The anchored index authenticates exact bounded prefix progress under independent qualified current complete-cut/scope/installation/target/authority proof. Dispatcher restarts resume authenticated progress without rescanning old acknowledgement history on each page/pass; Unknown/Quarantined are not skipped.",
+      "executedCases": [
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.CancelledProgressTransportDoesNotReleaseLateProof(advancing: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.CancelledProgressTransportDoesNotReleaseLateProof(advancing: True)",
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests.QualifiedProgressTransportPreservesOriginalAcrossRestartAndWithdrawal",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests.BoundedPassAdvancesBeyondAcknowledgedOriginalsAfterRestart",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests.FirstUnresolvedSignalStopsWithoutSkipping(poison: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests.FirstUnresolvedSignalStopsWithoutSkipping(poison: True)",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests.ActualDurableProgressIsDeniedForChangedCurrentDeliveryBinding(changed: \\\"target\\\")",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests.ActualDurableProgressIsDeniedForChangedCurrentDeliveryBinding(changed: \\\"authority\\\")",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests.ActualDurableProgressIsDeniedForChangedCurrentDeliveryBinding(changed: \\\"unavailable\\\")",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests.ActualDurableProgressIsDeniedForChangedCurrentDeliveryBinding(changed: \\\"scope\\\")",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests.ActualDurableProgressIsDeniedForChangedCurrentDeliveryBinding(changed: \\\"installation\\\")",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests.ActualDurableProgressIsDeniedForChangedCurrentDeliveryBinding(changed: \\\"cut\\\")",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests.ActualDurableProgressIsDeniedForChangedCurrentDeliveryBinding(changed: \\\"unowned\\\")",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests.ActualSourceLongAcknowledgedPrefixMakesDurableDeadlineProgressAcrossRestart"
+      ]
+    },
+    {
+      "finding": "B7",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "feed-idle-and-projection"
+      ],
+      "change": "Freshly reconfirmed identical logical publication index polls retain the existing revision and do not write; changed discovery/poison remains conditional work.",
+      "executedCases": [
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests.BackfillRestartAndPagingReuseOriginalOffsets",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests.LostCommitAcknowledgementRequiresRereadWithoutDuplicatePublication"
+      ]
+    },
+    {
+      "finding": "B8",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "canary-ownership-cleanup"
+      ],
+      "change": "Abandoned-result cleanup executes at most once asynchronously after completed-result cancellation/deadline failure; original caller cancellation has precedence.",
+      "executedCases": [
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests.CancellationAtCompletedResultRunsAbandonedCleanupOnlyOnce"
+      ]
+    },
+    {
+      "finding": "B9",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "canary-ownership-cleanup"
+      ],
+      "change": "All destruction paths require independent original canary committed-record/dedicated-key ownership proof under current initial authority/lifetime. The late foreign-key assertion awaits actual private cleanup completion before checking zero Destroy.",
+      "executedCases": [
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.FreshFullObservationRequiresEveryIndependentExactProof(vector: \\\"valid\\\", expected: True)",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.FreshFullObservationRequiresEveryIndependentExactProof(vector: \\\"no-op\\\", expected: False)",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.FreshFullObservationRequiresEveryIndependentExactProof(vector: \\\"wrong-target\\\", expected: False)",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.FreshFullObservationRequiresEveryIndependentExactProof(vector: \\\"foreign-canary\\\", expected: False)",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.FreshFullObservationRequiresEveryIndependentExactProof(vector: \\\"foreign-key\\\", expected: False)",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.FreshFullObservationRequiresEveryIndependentExactProof(vector: \\\"malformed-metadata\\\", expected: False)",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.FreshFullObservationRequiresEveryIndependentExactProof(vector: \\\"wrong-unseal\\\", expected: False)",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.FreshFullObservationRequiresEveryIndependentExactProof(vector: \\\"missing-destruction\\\", expected: False)",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.FreshFullObservationRequiresEveryIndependentExactProof(vector: \\\"readable-replay\\\", expected: False)",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.FreshFullObservationRequiresEveryIndependentExactProof(vector: \\\"wrong-erasure-kind\\\", expected: False)",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.FreshFullObservationRequiresEveryIndependentExactProof(vector: \\\"expiry\\\", expected: False)",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.FreshFullObservationRequiresEveryIndependentExactProof(vector: \\\"authority-change\\\", expected: False)",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.LateForeignKeyNeverDestroysEvenWithTheExactOriginalCanary",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.LateOwnedSealIsCleanedWithoutResumingReadiness"
+      ]
+    },
+    {
+      "finding": "B10",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "canary-ownership-cleanup"
+      ],
+      "change": "Actual seal input and returned storage/opened/replay arrays are wiped on completed ownership boundaries, including failed, cancelled and late operations; outstanding seal input stays valid until provider termination.",
+      "executedCases": [
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.LateForeignKeyNeverDestroysEvenWithTheExactOriginalCanary",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.CancelledLateObservationClearsTheActualReturnedBuffer(phase: \\\"storage\\\")",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.CancelledLateObservationClearsTheActualReturnedBuffer(phase: \\\"opened\\\")",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.CancelledLateObservationClearsTheActualReturnedBuffer(phase: \\\"replay\\\")",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.FailedSealClearsItsCompletedOwnedInput",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.CompletedCanaryInputAndObservationBuffersAreCleared(vector: \\\"valid\\\")",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.CompletedCanaryInputAndObservationBuffersAreCleared(vector: \\\"malformed-metadata\\\")",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.CompletedCanaryInputAndObservationBuffersAreCleared(vector: \\\"wrong-unseal\\\")",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.CompletedCanaryInputAndObservationBuffersAreCleared(vector: \\\"readable-replay\\\")",
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests.LateOwnedSealIsCleanedWithoutResumingReadiness"
+      ]
+    },
+    {
+      "finding": "B11",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "actor-provider-and-routing"
+      ],
+      "change": "Physical Consume/Lookup invocation and tasks are bounded inside the owner actor turn; durable original reservation remains restrictive, same-tenant later mutations can proceed, abandoned providers cannot write StateManager, and exact lookup recovers without another consume.",
+      "executedCases": [
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests.PhysicalRecoveryDeadlinePreservesReservationAndAllowsSameTenantProgress(lookup: False, synchronous: False)",
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests.PhysicalRecoveryDeadlinePreservesReservationAndAllowsSameTenantProgress(lookup: False, synchronous: True)",
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests.PhysicalRecoveryDeadlinePreservesReservationAndAllowsSameTenantProgress(lookup: True, synchronous: False)",
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests.PhysicalRecoveryDeadlinePreservesReservationAndAllowsSameTenantProgress(lookup: True, synchronous: True)"
+      ]
+    },
+    {
+      "finding": "E1",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "actor-provider-and-routing"
+      ],
+      "change": "Occurrence proxy routing uses canonical GetActorId and actual ID-sensitive hosted actors retain original persisted Reserve/Seal/Lookup outcomes.",
+      "executedCases": [
+        "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests.PrivateRegistryTransportUsesCanonicalHostedActorAndRetainsOriginal"
+      ]
+    },
+    {
+      "finding": "E2",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "feed-idle-and-projection"
+      ],
+      "change": "Synchronous/noncooperative projector invocation runs inside the existing whole-read deadline. Actually suspended projections release caller cancellation/deadline without a late page/checkpoint.",
+      "executedCases": [
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests.SuspendedProjectionCannotRetainTheFeedContinuation(callerCancellation: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests.SuspendedProjectionCannotRetainTheFeedContinuation(callerCancellation: True)"
+      ]
+    },
+    {
+      "finding": "V1",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "deletion-routing-and-provenance-fixture"
+      ],
+      "change": "Actual coordinator protection proxies enforce the canonical tenant actor ID. Persisted ledger assertions retain the original request/dispatch/capability, Consumed receipt/vector and unchanged original lookup end-state.",
+      "executedCases": [
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests.ActualOwnersAndSharedTransactionPreserveOriginalResultsThroughRestart"
+      ]
+    },
+    {
+      "finding": "V2",
+      "status": "implemented-and-focused-passed; independent review pending",
+      "units": [
+        "conversation-submission-authority"
+      ],
+      "change": "Both source/worker and delivery authority are reconfirmed after the actually suspended second current-target await; withdrawn authority preserves the original attempt and yields zero submissions.",
+      "executedCases": [
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests.AuthorityWithdrawalDuringFinalTargetLookupMakesZeroSubmissions(deliveryOnly: False)",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests.AuthorityWithdrawalDuringFinalTargetLookupMakesZeroSubmissions(deliveryOnly: True)"
+      ]
+    },
+    {
+      "finding": "B12",
+      "status": "rejected per spec; no raw-content/Extensions hashing added",
+      "units": [],
+      "change": "The existing qualified tenant-keyed ContentIntentHmac and original command/target/writer authority remain the contract; no source change from this rejected claim.",
+      "executedCases": []
+    }
+  ]
+}

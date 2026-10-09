@@ -1,0 +1,43 @@
+{
+  "capturedUtc": "2026-10-09T02:26:43.095095+00:00",
+  "beforeSha256": {
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md": "1b938e51b4a80e4d3b930caca82a5944dc777ff75c3e3d32832a89faf3d2ea34",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/current-review-triage.json": "72cecc443638c8f9ce308b0693b9da05b1a21489a28950b6edd1aeaf2b8edc1c",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/current-review-triage.md": "9e720e6d51c4ab5c29cbecc416f39cfe78f140c66a0ec65ef8dcd0638264236f",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/root-review-progress.json": "b1e1b98716d9516fa95d91448f06e0afbb6c88e5331ad5bcb0a4be864fd85611"
+  },
+  "afterSha256": {
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md": "60eb78110670ee4c2bebe3874e8e0b0116141db6af17566cd3309ea3ae6634f3",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/current-review-triage.json": "00dd418d724c388932ccab537c096462516ed0dfb499ee69b791352cfc23691a",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/current-review-triage.md": "dc784a5633daa7c7d68dccd5bf0202918f3b3c109da4358718ed4f4b30f62e59",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/root-review-progress.json": "66bf6067d9d7906e992546620cc6fe343b57996f1759efff7646bb33490fa5d4"
+  },
+  "frozenIntentSha256": "0cd11ddac96af9775593ea0aa24d969b235b32dfcc4a76a80e51d7eb9c82e2cb",
+  "frozenIntentPreserved": true,
+  "reviewIteration": 5,
+  "sourceEdits": false,
+  "B4Verdict": "false/reject",
+  "B5RequiredAccesses": [
+    "GetEnumerator",
+    "MoveNext",
+    "Current"
+  ],
+  "sources": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Commands/CommandEnvelope.cs",
+      "sha256": "4acdb00e6bb86c7e58c9a4658538688c635acffa6ac940edb53ed524a7901d7f",
+      "archive": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/triage-correction-concrete-extensions/CommandEnvelope.cs"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendRequest.cs",
+      "sha256": "8673aef15753a2ae04dd7a55236e1b06e0a5a00a2f30e7363c6a0f8173631eec",
+      "archive": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/triage-correction-concrete-extensions/DirectoryAtomicAppendRequest.cs"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/ProtectedPathManifestCodec.cs",
+      "sha256": "53bfdb2d240d866289b129b4e2eca501c3b92ad805ec74741e0faffdbe9eed68",
+      "archive": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/triage-correction-concrete-extensions/ProtectedPathManifestCodec.cs"
+    }
+  ],
+  "rootFullLocalMatrix": "mandatory, never yet run"
+}

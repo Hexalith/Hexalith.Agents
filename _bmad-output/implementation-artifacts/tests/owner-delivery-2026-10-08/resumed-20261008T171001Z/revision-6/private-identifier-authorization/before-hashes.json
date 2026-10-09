@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T07:29:23.172081+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionOperation.cs",
+      "existed": true,
+      "sha256": "2f4a3bfdab148efa5ce8638cda53a820d2130be6d8d8275c28a3e2128ae7b56c",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/private-identifier-authorization/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionOperation.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs",
+      "existed": true,
+      "sha256": "34e068d180dbd4f70d33a7475f707a6fa13e5c8560b8d77047b2488dae961f2f",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/private-identifier-authorization/before/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs"
+    }
+  ]
+}

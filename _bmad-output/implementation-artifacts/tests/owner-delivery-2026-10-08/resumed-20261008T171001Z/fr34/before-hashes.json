@@ -1,0 +1,59 @@
+{
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionTarget.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34CanaryAuthorization.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34CanaryReference.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34PersistedCanary.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IFr34CanaryAuthority.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IFr34ProtectionCanaryEngine.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IFr34PersistedCanaryReader.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionReadinessCheck.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionStartupGate.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs",
+      "existed": false
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-08T23:13:52.785034+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs",
+      "existed": true,
+      "sha256": "4148e806b905f88e62ee0d1c674e13d34ca9757925e0716a162b61aa969e4372",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/downstream-append-contract/before/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs"
+    }
+  ]
+}

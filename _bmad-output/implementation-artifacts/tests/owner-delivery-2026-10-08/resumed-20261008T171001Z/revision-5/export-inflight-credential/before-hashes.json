@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-09T02:33:04.689567+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "existed": true,
+      "sha256": "412e875408e29b52f4c441cf294e9ba36d978058ae3575d814f461ae679fbc0b",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/export-inflight-credential/before/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "capturedUtc": "2026-10-08T22:13:40.727907+00:00",
+  "scope": "Read-only current recheck of a concurrent external compiler blocker; source not owned or edited by root.",
+  "buildLog": "/tmp/revision2-eventstore-index-red-build.log",
+  "buildLogSha256": "9c34f9da2f10577bdf8d49ac2d9c15fe5e81e2766bea10a3bb90ec9a12c37636",
+  "diagnostic": "CS8604 at line 42, column 227",
+  "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Events/DaprLogicalReplayAnchorOrigin.cs",
+  "currentSourceSha256": "7d77c5ba29fb2ff5f35fac3f0737a44b13d168f7c72c16ecb9bf4d1e02188e9a",
+  "currentFlaggedExpressions": "Both CanonicalStateHash.ToArray calls now have the external nullable assertion. No pass is inferred until the next normal build.",
+  "rootSourceEdits": false,
+  "requiredNextAction": "Engineer rechecks the current ordinary focused build before any necessary separately captured compiler correction."
+}

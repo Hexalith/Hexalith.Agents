@@ -1,0 +1,28 @@
+[
+  {
+    "location": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs:158-176",
+    "trigger_condition": "Commit or lookup receives a Targets carrier whose Count or enumeration blocks synchronously.",
+    "guard_snippet": "request = await deadline.ReadAsync(_ => Task.FromResult(Capture(request, deadline)));",
+    "potential_consequence": "Thirty-second expiry and caller cancellation cannot complete the transaction call until the carrier returns."
+  },
+  {
+    "location": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs:65",
+    "trigger_condition": "Targets.Count blocks before the owner enters its deadline-controlled capture.",
+    "guard_snippet": "if (await deadline.ReadAsync(_ => Task.FromResult(targets.Count > 1000))) return null;",
+    "potential_consequence": "A canceled or expired owner operation remains blocked before authorization or effect."
+  },
+  {
+    "location": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionWorker.cs:39-40",
+    "trigger_condition": "Authority invocation blocks synchronously before returning its Task; the caller then cancels.",
+    "guard_snippet": "var result = await deadline.ReadAsync(t => _authority.AuthorizeAsync(principal, tenant, conversation, operation, t));",
+    "potential_consequence": "Worker authorization and receipt admission remain blocked despite caller cancellation."
+  },
+  {
+    "location": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs:48-52",
+    "trigger_condition": "Completed bounded authenticated retained-history source verification.",
+    "guard_snippet": "if (!ValidGrant(grant, request, clock.GetUtcNow())) return new(null, \"history-denied\");",
+    "potential_consequence": "Grant validation can block indefinitely and later return history-denied despite original caller cancellation.",
+    "kind": "claim",
+    "confidence": "high"
+  }
+]

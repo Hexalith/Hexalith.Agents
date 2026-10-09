@@ -1,0 +1,69 @@
+{
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardTransition.cs",
+      "existed": true,
+      "sha256": "55f994dfcaa78f34ab401c623e07131ba8a383927aa0719e9fda649f1c870343"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs",
+      "existed": true,
+      "sha256": "cd7d855afc745799372559954afab9d7fcee8e78081884699b987b3349282aee"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/TenantGovernanceGuardState.cs",
+      "existed": true,
+      "sha256": "5e956e534cc949958baae59655d3070db4ab5817333457f7c6933981ebc05bf4"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "existed": true,
+      "sha256": "5fb08625c5b067e9c3a751fc24e0bbda5cb4fabe8ad3cc07559009c0198b9ad9"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "existed": true,
+      "sha256": "4a729edbd2640be544eefe4a5d4f84d60be207c582e7a2d4a1fac92b002020a6"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "existed": true,
+      "sha256": "2620ddc9bdac8ac49489fafbdd510f2fd2d8943ecf81194975eee619b50af0a7"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs",
+      "existed": true,
+      "sha256": "36b3d48280807facc216b3aea8099b12d24a639d0a90cfdf076ecbc644cdaa4c"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/EventStoreDeletionCapabilityGuardRevocationMirror.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilityGuardRevocationMirror.cs",
+      "existed": true,
+      "sha256": "e15e2ef84421d4a48a3b276c624e3a684cd2f5c0333d72029c596c3d074b6b67"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs",
+      "existed": true,
+      "sha256": "81e0d89ab14dff01a0218078c1386467b0864cc9244bacd1a2c4050f0ccf5a39"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "existed": true,
+      "sha256": "7ec0fa0021e9d962a9763e7d2cae139ffee94d101072460602ae1682f50b8b9c"
+    }
+  ]
+}

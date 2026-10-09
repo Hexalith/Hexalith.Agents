@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T06:41:27.059100+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "existed": true,
+      "sha256": "2a4990877feb2471179adae2aeafa66438e4124d3cd28735b4fba26edb41c39a",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/coordinator-factory-bound/before/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "existed": true,
+      "sha256": "237a56ad46b084ce750d64d43e6b5091a7bf7e0ae818773ea5de7ad717469c04",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/coordinator-factory-bound/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T06:38:51.665157+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/TrustedEnvelopeReplayVerifier.cs",
+      "existed": true,
+      "sha256": "dcab969cc188516ba3d427a0e04607f5b63467faf7e49552123f053bc1004f15",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/replay-profile-bound/before/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeReplayVerifier.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs",
+      "existed": true,
+      "sha256": "05e1543ee28d6de64ea20268bacd06ae1eeeb10130e28208c407b53a449c6b98",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/replay-profile-bound/before/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs"
+    }
+  ]
+}

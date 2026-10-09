@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-08T22:44:25.428447+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs",
+      "existed": true,
+      "sha256": "993384321e77d2618e171aa62d138974ac43fac2070bc17df5f3e3206154dacf",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/deletion-routing-and-provenance-fixture/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "existed": true,
+      "sha256": "a99794c98e0fcba22c411e2ff7ea9118017deb4372c8730ec296280a60b6cae1",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/deletion-routing-and-provenance-fixture/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs"
+    }
+  ]
+}

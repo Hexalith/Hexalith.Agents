@@ -1,0 +1,18 @@
+[
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs",
+    "r5Sha256": "df2a8c62414decf25c90f015c39a00c333b224a001c5c6677dccc3829f389e2e",
+    "r6FrozenSha256": "df2a8c62414decf25c90f015c39a00c333b224a001c5c6677dccc3829f389e2e",
+    "currentSha256": "df2a8c62414decf25c90f015c39a00c333b224a001c5c6677dccc3829f389e2e",
+    "sameCode": true,
+    "claimVerification": "Skipped; unchanged location/claim carries prior verdict and route."
+  },
+  {
+    "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpoolWorker.cs",
+    "r5Sha256": "7f2a370e2cf0c65ca116fa77635c69463e8d2099e4032a656cb35f31fcc792a7",
+    "r6FrozenSha256": "7f2a370e2cf0c65ca116fa77635c69463e8d2099e4032a656cb35f31fcc792a7",
+    "currentSha256": "7f2a370e2cf0c65ca116fa77635c69463e8d2099e4032a656cb35f31fcc792a7",
+    "sameCode": true,
+    "claimVerification": "Skipped; unchanged location/claim carries prior verdict and route."
+  }
+]

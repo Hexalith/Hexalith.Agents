@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-09T06:48:43.223449+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "existed": true,
+      "sha256": "90e901f9ed4b4be02254c0167d3f595e5dff629630b3ee4b990da81cbc372d24",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-evidence-capture/before/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "files": [
+    {
+      "repository": "parties",
+      "relativePath": "eng/verify-ext-parties-1.ps1",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/before/parties/eng/verify-ext-parties-1.ps1",
+      "beforeSha256": "19f76f5e5ca919760159c72a830604d67be69d0485b7aac03e83061ad35e9962"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "eng/verify-ext-secrets-1.ps1",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/before/platform/eng/verify-ext-secrets-1.ps1",
+      "beforeSha256": "8d24066c7cd311c541113e21cac434ed328308c9d0008c2490089c6a8667382b"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "eng/verify-ext-conv-ai-1.ps1",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/before/conversations/eng/verify-ext-conv-ai-1.ps1",
+      "beforeSha256": "9751e10bee34fecaed266d565d98abf20175e8864ef16c2d49ecf06de9c5be59"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/before/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+      "beforeSha256": "d58068b76db26f6fd59732e9849ea6f524c3128d4b4be6bc34ed8ecfe053554c"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/before/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+      "beforeSha256": "bd39889989730eeec80389c695aea0489a7219fb18d18d3fee8977b376cd830b"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/before/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+      "beforeSha256": "9d10b81e00b14eb00836e97b6ff777216a10d915bdfb3d566cc9da963bc96de4"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/before/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+      "beforeSha256": "e95a26838369a61667fc8bdc143b4541c63091cf773c796cf1d133af1beec8d0"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/README.md",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/before/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/README.md",
+      "beforeSha256": "f0be46801cf106883019988f2364d54e3cdac14962eedc3bd1f74fc8da439fa1"
+    }
+  ]
+}

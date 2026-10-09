@@ -1,0 +1,11 @@
+--- /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/source/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs
++++ /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/closing-owned-concurrent-drift/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs
+@@ -92,7 +92,7 @@
+                         return Denied("history-source-gap-or-scope-mismatch");
+                     }
+ 
+-                    if (item.MetadataVersion != 1 || item.EventContractType is not null || item.PayloadVersion is not null
++                    if (item.MetadataVersion != 1 || item.EventContractType is not null || item.PayloadVersion is < 1 or > 1024
+                         || item.SerializationFormat is not ("json" or "json+pdenc-v1" or "json+identity-history-v1"))
+                     {
+                         return Denied("history-source-metadata-unsupported");

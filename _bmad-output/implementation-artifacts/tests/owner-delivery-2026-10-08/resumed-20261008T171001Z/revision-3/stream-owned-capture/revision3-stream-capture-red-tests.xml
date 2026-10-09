@@ -1,0 +1,139 @@
+<assemblies schema-version="3" id="346ab94f-3b49-4ed8-a43c-d0e213e7de9e" computer="DESKTOP-VIOG240" user="administrator" start-rtf="2026-10-08T23:43:38.8538805+00:00" finish-rtf="2026-10-08T23:44:03.2045327+00:00" timestamp="10/09/2026 01:44:03"><assembly environment="64-bit (x64) .NET 10.0.12 [collection-per-class, parallel (collections, 14 threads)]" id="56651dcb-72ef-49b8-b3c1-5a4539af3e99" name="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.Tests.dll" run-date="2026-10-08" run-time="23:43:38" start-rtf="2026-10-08T23:43:38.8538805+00:00" test-framework="xUnit.net v3 4.0.1+8ed8aa354c" target-framework=".NETCoreApp,Version=v10.0" errors="0" failed="12" finish-rtf="2026-10-08T23:44:03.2045327+00:00" not-run="0" passed="0" skipped="0" time="24.352" time-rtf="00:00:24.3520000" total="12"><collection name="Test collection for Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests (id: 1b8cffb7b96ef53da18288d1cd4db8c12ed03acae92b8e397fdfed35e4317c8e)" id="6e894d83-b405-4262-9b68-af2d07240bd9" failed="12" not-run="0" passed="0" skipped="0" time="24.204" time-rtf="00:00:24.2040000" total="12"><test id="fc4db742-b7af-4fda-87d7-fa9f6c38c65a" name="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \&quot;head-count\&quot;, cancelCaller: False)" result="Fail" time="2.091" time-rtf="00:00:02.0910000" start-rtf="2026-10-08T23:43:38.9512554+00:00" finish-rtf="2026-10-08T23:43:41.0621508+00:00" type="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests" method="SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs" source-line="448"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs:line 497
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="09b656f8-dccf-4b65-a2d6-6cf5681f0e29" name="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \&quot;head-count\&quot;, cancelCaller: True)" result="Fail" time="2.087" time-rtf="00:00:02.0870000" start-rtf="2026-10-08T23:43:41.0644662+00:00" finish-rtf="2026-10-08T23:43:43.1556415+00:00" type="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests" method="SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs" source-line="448"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs:line 493
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="3269f772-53de-48cc-be93-356809ed96e8" name="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \&quot;head-events\&quot;, cancelCaller: False)" result="Fail" time="2.003" time-rtf="00:00:02.0030000" start-rtf="2026-10-08T23:43:43.1558288+00:00" finish-rtf="2026-10-08T23:43:45.1599973+00:00" type="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests" method="SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs" source-line="448"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs:line 497
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="fbeabbe3-f6e3-449d-aab6-407418205a53" name="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \&quot;head-events\&quot;, cancelCaller: True)" result="Fail" time="2.003" time-rtf="00:00:02.0030000" start-rtf="2026-10-08T23:43:45.1600968+00:00" finish-rtf="2026-10-08T23:43:47.1645071+00:00" type="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests" method="SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs" source-line="448"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs:line 493
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="fe762b7c-ef9f-41e0-91b8-5a7dc7ab2eb0" name="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \&quot;page-count\&quot;, cancelCaller: False)" result="Fail" time="2.002" time-rtf="00:00:02.0019999" start-rtf="2026-10-08T23:43:47.1646306+00:00" finish-rtf="2026-10-08T23:43:49.1681772+00:00" type="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests" method="SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs" source-line="448"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs:line 497
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="17f9e71d-5666-4197-8b16-fbb3ed3c4ea5" name="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \&quot;page-count\&quot;, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-08T23:43:49.1682783+00:00" finish-rtf="2026-10-08T23:43:51.1705922+00:00" type="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests" method="SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs" source-line="448"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs:line 493
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="de2f21a3-fc84-40d7-9c19-bf61b04afd50" name="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \&quot;page-events\&quot;, cancelCaller: False)" result="Fail" time="2.006" time-rtf="00:00:02.0059999" start-rtf="2026-10-08T23:43:51.1706793+00:00" finish-rtf="2026-10-08T23:43:53.1778420+00:00" type="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests" method="SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs" source-line="448"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs:line 497
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="0d606717-b22b-4c8c-81b9-dd9c4a64f62a" name="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \&quot;page-events\&quot;, cancelCaller: True)" result="Fail" time="2.003" time-rtf="00:00:02.0030000" start-rtf="2026-10-08T23:43:53.1779766+00:00" finish-rtf="2026-10-08T23:43:55.1814233+00:00" type="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests" method="SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs" source-line="448"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs:line 493
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="6cb1005c-1dba-40a2-9fee-ee6d27d70e71" name="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \&quot;flags-count\&quot;, cancelCaller: False)" result="Fail" time="2.004" time-rtf="00:00:02.0040000" start-rtf="2026-10-08T23:43:55.1815089+00:00" finish-rtf="2026-10-08T23:43:57.1861912+00:00" type="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests" method="SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs" source-line="448"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs:line 497
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="25977f14-9228-4bf1-b2ae-94519a0c498a" name="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \&quot;flags-count\&quot;, cancelCaller: True)" result="Fail" time="2.002" time-rtf="00:00:02.0019999" start-rtf="2026-10-08T23:43:57.1863067+00:00" finish-rtf="2026-10-08T23:43:59.1888095+00:00" type="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests" method="SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs" source-line="448"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs:line 493
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="6d0afeba-759d-4763-846f-a2dfdb984f85" name="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \&quot;flags-events\&quot;, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-08T23:43:59.1889373+00:00" finish-rtf="2026-10-08T23:44:01.1911672+00:00" type="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests" method="SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs" source-line="448"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs:line 497
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="af8ddb34-c4e1-45a5-a188-a8cda3916e97" name="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \&quot;flags-events\&quot;, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-08T23:44:01.1912719+00:00" finish-rtf="2026-10-08T23:44:03.1933115+00:00" type="Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests" method="SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline" source-file="/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs" source-line="448"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(String vector, Boolean cancelCaller) in /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs:line 493
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test></collection></assembly></assemblies>

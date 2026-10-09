@@ -1,0 +1,96 @@
+{
+  "capturedUtc": "2026-10-09T10:42:54.149234+00:00",
+  "historicalStrictAudit": "root-final-matrix-shape-and-drift-audit.json",
+  "historicalFailureRetained": true,
+  "allActualCommandsPassed": true,
+  "commands": 14,
+  "normalBuildLogs": 22,
+  "passingXmlFiles": 21,
+  "passingTestExecutions": 4907,
+  "requiredClassesExecuted": 44,
+  "rows": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Results/DomainServiceWireResult.cs",
+      "before": "f78e43e44c9b8409a7045803335df78a34553c2056ae3d606cf702c65c722be5",
+      "after": "e59920018e449363e51573db136f8106fab9c4501d06b6c9faa55ae3e8ed98ae",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/final-concurrent-drift/eventstore/src/Hexalith.EventStore.Contracts/Results/DomainServiceWireResult.cs",
+      "currentCopySha256": "e59920018e449363e51573db136f8106fab9c4501d06b6c9faa55ae3e8ed98ae",
+      "copyMatchesAfterSnapshot": true,
+      "ownedReviewPath": false,
+      "classification": "Unowned shared production source changed during final refresh; current full consuming graph remains unqualified",
+      "nextAction": "After concurrent work stabilizes, refresh affected normal builds and owning compatibility checks; do not use this passing run as source-stable current qualification"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.DomainService/BoundedV1DomainResultProducer.cs",
+      "before": "1b3aa52fcc3837c3f76862d29284a13dfd719ff427fd4fadc3cf542d88b3bb81",
+      "after": "288b35b546ee92bba17aa9c9048c25b553444aa138b3881a7cd6eca46f80bb41",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/final-concurrent-drift/eventstore/src/Hexalith.EventStore.DomainService/BoundedV1DomainResultProducer.cs",
+      "currentCopySha256": "288b35b546ee92bba17aa9c9048c25b553444aa138b3881a7cd6eca46f80bb41",
+      "copyMatchesAfterSnapshot": true,
+      "ownedReviewPath": false,
+      "classification": "Unowned shared production source changed during final refresh; current full consuming graph remains unqualified",
+      "nextAction": "After concurrent work stabilizes, refresh affected normal builds and owning compatibility checks; do not use this passing run as source-stable current qualification"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Events/EventPersister.cs",
+      "before": "1d37ed7912ae9523e32ac68bd73250dd2770990b95a7d4869295ecb42beba855",
+      "after": "06b1b227c5a5b2921026b861b6fefbaeb9f58d333452e1c087691bfc01d49f31",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/final-concurrent-drift/eventstore/src/Hexalith.EventStore.Server/Events/EventPersister.cs",
+      "currentCopySha256": "06b1b227c5a5b2921026b861b6fefbaeb9f58d333452e1c087691bfc01d49f31",
+      "copyMatchesAfterSnapshot": true,
+      "ownedReviewPath": false,
+      "classification": "Unowned shared production source changed during final refresh; current full consuming graph remains unqualified",
+      "nextAction": "After concurrent work stabilizes, refresh affected normal builds and owning compatibility checks; do not use this passing run as source-stable current qualification"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Events/EventPayloadEvolutionRegistryTests.cs",
+      "before": "b21563b52533699ed1cad0fd79f177bdcf436b14ee308a93a6b13d267407080c",
+      "after": "822398aee1f68896e12080e816dc203144ea3b094b0ee50df2fa8a3b7fd03732",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/final-concurrent-drift/eventstore/tests/Hexalith.EventStore.Client.Tests/Events/EventPayloadEvolutionRegistryTests.cs",
+      "currentCopySha256": "822398aee1f68896e12080e816dc203144ea3b094b0ee50df2fa8a3b7fd03732",
+      "copyMatchesAfterSnapshot": true,
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test source changed during final refresh; consuming project input remains unfrozen",
+      "nextAction": "After concurrent work stabilizes, refresh affected normal builds and owning compatibility checks; do not use this passing run as source-stable current qualification"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/Results/DomainServiceWireResultTests.cs",
+      "before": "f7408d6d104d8e272cd35da91570df622dcb513a243844d91b21f4062dc4412e",
+      "after": "57bf8fb165aa9e97ff729604686c0cce4497d3a59950354f8dfd1dc6c6c06b73",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/final-concurrent-drift/eventstore/tests/Hexalith.EventStore.Contracts.Tests/Results/DomainServiceWireResultTests.cs",
+      "currentCopySha256": "57bf8fb165aa9e97ff729604686c0cce4497d3a59950354f8dfd1dc6c6c06b73",
+      "copyMatchesAfterSnapshot": true,
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test source changed during final refresh; consuming project input remains unfrozen",
+      "nextAction": "After concurrent work stabilizes, refresh affected normal builds and owning compatibility checks; do not use this passing run as source-stable current qualification"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPayloadVersionRoundTripTests.cs",
+      "before": "5b4a2aa8992fb0c904dd2e8f48bcfe3291955a12d140faedd17003b5ceb5646a",
+      "after": "7bb85236c93ee039ad6130f4ba8910797a8215903a9fa02625e17d04706f311e",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/final-concurrent-drift/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPayloadVersionRoundTripTests.cs",
+      "currentCopySha256": "7bb85236c93ee039ad6130f4ba8910797a8215903a9fa02625e17d04706f311e",
+      "copyMatchesAfterSnapshot": true,
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test source changed during final refresh; consuming project input remains unfrozen",
+      "nextAction": "After concurrent work stabilizes, refresh affected normal builds and owning compatibility checks; do not use this passing run as source-stable current qualification"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/EventPersisterTests.cs",
+      "before": "8dca3638778a63eabae3e7d5a4b6765474387bf84871ff6de26ebd421a5d8ec2",
+      "after": "82aa2f184a84e7b9c86465e9cb9fe51575dbbc03f69d98c605ac0b38be818d58",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/final-concurrent-drift/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/EventPersisterTests.cs",
+      "currentCopySha256": "82aa2f184a84e7b9c86465e9cb9fe51575dbbc03f69d98c605ac0b38be818d58",
+      "copyMatchesAfterSnapshot": true,
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test source changed during final refresh; consuming project input remains unfrozen",
+      "nextAction": "After concurrent work stabilizes, refresh affected normal builds and owning compatibility checks; do not use this passing run as source-stable current qualification"
+    }
+  ],
+  "ownedChanges": 0,
+  "currentFullConsumingGraphStable": false,
+  "sourceAcceptance": false,
+  "reasonToHalt": "Fresh global source checks repeatedly show independent upstream work still changing. The completed review independently requires the mandatory >5 human checkpoint at counter8 before another engineering cycle; do not repeatedly certify a moving graph or alter upstream work.",
+  "errors": [],
+  "limits": "This classification preserves the actual failing freshness gate and all successful execution evidence. It does not dismiss consumed source changes as unused or fabricate a stable matrix."
+}

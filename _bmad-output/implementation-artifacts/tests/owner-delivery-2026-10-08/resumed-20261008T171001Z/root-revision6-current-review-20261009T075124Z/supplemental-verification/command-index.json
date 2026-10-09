@@ -1,0 +1,58 @@
+[
+  {
+    "name": "Hexalith.EventStore.Server.Tests normal build",
+    "cwd": "/home/administrator/projects/hexalith/eventstore",
+    "argv": [
+      "dotnet",
+      "build",
+      "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Hexalith.EventStore.Server.Tests.csproj",
+      "-c",
+      "Debug",
+      "--artifacts-path",
+      "/tmp/hexalith-owner-r6-root-server-refresh-20261009t0813z/eventstore",
+      "-m:1",
+      "-p:NuGetAudit=false",
+      "-p:MinVerVersionOverride=1.0.0",
+      "-p:UseHexalithProjectReferences=true",
+      "-p:UseNuGetDeps=false",
+      "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+      "-p:HexalithEventStoreVersion=3.117.1"
+    ],
+    "startedUtc": "2026-10-09T08:13:06.488310+00:00",
+    "finishedUtc": "2026-10-09T08:13:25.729490+00:00",
+    "exitCode": 0,
+    "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/supplemental-verification/1.log"
+  },
+  {
+    "name": "Hexalith.EventStore.Server.Tests owned consumer tests",
+    "cwd": "/home/administrator/projects/hexalith/eventstore",
+    "argv": [
+      "dotnet",
+      "/tmp/hexalith-owner-r6-root-server-refresh-20261009t0813z/eventstore/bin/Hexalith.EventStore.Server.Tests/debug/Hexalith.EventStore.Server.Tests.dll",
+      "-class",
+      "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests",
+      "-class",
+      "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests",
+      "-class",
+      "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests",
+      "-class",
+      "Hexalith.EventStore.Server.Tests.Security.ExpiredIdentityHistorySourceTests",
+      "-class",
+      "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests",
+      "-class",
+      "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests",
+      "-class",
+      "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests",
+      "-class",
+      "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests",
+      "-class",
+      "Hexalith.EventStore.Server.Tests.Security.SecretsProtectionTests",
+      "-result-xml",
+      "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/supplemental-verification/server-tests.xml"
+    ],
+    "startedUtc": "2026-10-09T08:13:25.730095+00:00",
+    "finishedUtc": "2026-10-09T08:13:31.162528+00:00",
+    "exitCode": 1,
+    "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/supplemental-verification/2.log"
+  }
+]

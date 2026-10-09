@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-09T08:35:23.767849+00:00",
+  "frozenPathsChecked": 402,
+  "captureInputsChecked": 142,
+  "approvedFormattingExceptions": 1,
+  "individualFindingsInSpec": 15,
+  "reviewLoopIteration": 7,
+  "parentSha256": "f28cf512087fcaa987d1a089dd70e7c87f91d004e561b150dc4d658563633d4a",
+  "frozenIntentSha256": "0cd11ddac96af9775593ea0aa24d969b235b32dfcc4a76a80e51d7eb9c82e2cb",
+  "sourceReview": "not accepted; three bad_spec entries at mandatory checkpoint",
+  "requiredLocalVerification": "completed with classified preserved drift;4977 actual passing overlapping executions",
+  "errors": []
+}

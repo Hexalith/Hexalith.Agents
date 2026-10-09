@@ -1,0 +1,279 @@
+--- /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs (before)
++++ /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs (preview)
+@@ -42,14 +42,21 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         var ownedClosedPayloads = new List<byte[]>();
+         bool transferred = false;
++        RetainedIdentityHistoryReadResult Denied(string reason)
++        {
++            deadline.ThrowIfCancellationRequested();
++            return new(null, reason);
++        }
+         try
+         {
+             deadline.ThrowIfCancellationRequested();
+             RetainedIdentityHistoryGrant? grant = await deadline.ReadAsync(token => admission.AdmitAsync(principal, request, token)).ConfigureAwait(false);
+             deadline.ThrowIfCancellationRequested();
+-            if (!ValidGrant(grant, request, clock.GetUtcNow()))
+-            {
+-                return new(null, "history-denied");
++            grant = await deadline.ReadAsync(_ => Task.FromResult(CaptureGrant(grant, request, clock.GetUtcNow(), deadline))).ConfigureAwait(false);
++            deadline.ThrowIfCancellationRequested();
++            if (grant is null || grant.ExpiresAt <= clock.GetUtcNow())
++            {
++                return Denied("history-denied");
+             }
+ 
+             IAggregateActor actor = actors.CreateActorProxy<IAggregateActor>(new ActorId(request.Identity.ActorId), "AggregateActor");
+@@ -57,7 +64,7 @@
+             deadline.ThrowIfCancellationRequested();
+             if (!head.Exists || head.CurrentSequence is < 0 or > RetainedIdentityHistoryLimits.MaxSourcePositions)
+             {
+-                return new(null, "history-unavailable");
++                return Denied("history-unavailable");
+             }
+ 
+             var events = new List<StreamReadEvent>();
+@@ -73,7 +80,7 @@
+                 deadline.ThrowIfCancellationRequested();
+                 if (page.Length is 0 or > 100)
+                 {
+-                    return new(null, "history-source-gap");
++                    return Denied("history-source-gap");
+                 }
+ 
+                 foreach (EventEnvelope item in page)
+@@ -82,20 +89,20 @@
+                     if (item is null || item.Identity != request.Identity || item.SequenceNumber != cursor + 1
+                         || item.SequenceNumber > head.CurrentSequence || item.Payload is null)
+                     {
+-                        return new(null, "history-source-gap-or-scope-mismatch");
++                        return Denied("history-source-gap-or-scope-mismatch");
+                     }
+ 
+                     if (item.MetadataVersion != 1 || item.EventContractType is not null || item.PayloadVersion is not null
+                         || item.SerializationFormat is not ("json" or "json+pdenc-v1" or "json+identity-history-v1"))
+                     {
+-                        return new(null, "history-source-metadata-unsupported");
++                        return Denied("history-source-metadata-unsupported");
+                     }
+ 
+                     cursor++;
+                     bytes += item.Payload.Length;
+                     if (bytes > RetainedIdentityHistoryLimits.MaxPayloadBytes)
+                     {
+-                        return new(null, "history-source-bound-exceeded");
++                        return Denied("history-source-bound-exceeded");
+                     }
+ 
+                     Type? type = grant!.EventTypes.SingleOrDefault(candidate => item.EventTypeName == candidate.FullName);
+@@ -103,7 +110,7 @@
+                     {
+                         if (!grant.ExcludedEventTypeNames.Contains(item.EventTypeName, StringComparer.Ordinal))
+                         {
+-                            return new(null, "history-source-contract-unavailable");
++                            return Denied("history-source-contract-unavailable");
+                         }
+ 
+                         excluded.Add(item.SequenceNumber);
+@@ -112,7 +119,7 @@
+ 
+                     if (EventStorePayloadProtectionMetadataCarrier.Read(item.Extensions).State != PayloadProtectionState.Protected)
+                     {
+-                        return new(null, "history-source-protection-missing");
++                        return Denied("history-source-protection-missing");
+                     }
+ 
+                     // Retain only detached existing ciphertext metadata for actor-free continuity.
+@@ -127,7 +134,7 @@
+                         if (expired is not null)
+                         {
+                             if (!ValidExpired(expired, request, item.EventTypeName, item.SequenceNumber, sealedPayload, clock.GetUtcNow()))
+-                            { return new(null, "history-expired-proof-unavailable"); }
++                            { return Denied("history-expired-proof-unavailable"); }
+                             expiredEvents.Add((expired, sealedPayload, item.SerializationFormat));
+                             continue;
+                         }
+@@ -147,14 +154,14 @@
+                             || string.IsNullOrWhiteSpace(evidence.PolicyId) || string.IsNullOrWhiteSpace(evidence.EvidenceId)
+                             || evidence.Purpose != request.Purpose || evidence.ExpiresAt <= clock.GetUtcNow())
+                         {
+-                            return new(null, "history-custody-unavailable-or-expired");
++                            return Denied("history-custody-unavailable-or-expired");
+                         }
+     
+                         bool allowed = await deadline.ReadAsync(token => custody.CanReadAsync(request.Identity, evidence, token)).ConfigureAwait(false);
+                         deadline.ThrowIfCancellationRequested();
+                         if (!allowed)
+                         {
+-                            return new(null, "history-custody-unavailable-or-expired");
++                            return Denied("history-custody-unavailable-or-expired");
+                         }
+     
+                         retainedEvidence.Add(evidence);
+@@ -173,13 +180,15 @@
+             deadline.ThrowIfCancellationRequested();
+             RetainedIdentityHistoryGrant? finalGrant = await deadline.ReadAsync(token => admission.AdmitAsync(principal, request, token)).ConfigureAwait(false);
+             deadline.ThrowIfCancellationRequested();
+-            if (confirmed != head || !ValidGrant(finalGrant, request, clock.GetUtcNow())
++            finalGrant = await deadline.ReadAsync(_ => Task.FromResult(CaptureGrant(finalGrant, request, clock.GetUtcNow(), deadline))).ConfigureAwait(false);
++            deadline.ThrowIfCancellationRequested();
++            if (confirmed != head || finalGrant is null || finalGrant.ExpiresAt <= clock.GetUtcNow()
+                 || finalGrant!.AuthorityRevision != grant!.AuthorityRevision || finalGrant.ExpiresAt != grant.ExpiresAt
+                 || !finalGrant.EventTypes.SequenceEqual(grant.EventTypes)
+                 || !finalGrant.ExcludedEventTypeNames.SequenceEqual(grant.ExcludedEventTypeNames)
+                 || retainedEvidence.Any(evidence => evidence.ExpiresAt <= clock.GetUtcNow()))
+             {
+-                return new(null, "history-source-or-authority-changed");
++                return Denied("history-source-or-authority-changed");
+             }
+ 
+             // Lifecycle validation must follow the awaited source/authority checks. The owner provider
+@@ -190,7 +199,7 @@
+                 deadline.ThrowIfCancellationRequested();
+                 if (!allowed)
+                 {
+-                    return new(null, "history-custody-unavailable-or-expired");
++                    return Denied("history-custody-unavailable-or-expired");
+                 }
+             }
+ 
+@@ -202,7 +211,7 @@
+                 deadline.ThrowIfCancellationRequested();
+                 if (final is null || !ValidExpired(final, request, cert.EventTypeName, cert.SourceSequence, expired.Payload, clock.GetUtcNow())
+                     || final with { ObservedAt = cert.ObservedAt } != cert)
+-                { return new(null, "history-expired-proof-changed"); }
++                { return Denied("history-expired-proof-changed"); }
+             }
+ 
+             DateTimeOffset observedAt = clock.GetUtcNow();
+@@ -232,7 +241,7 @@
+             }
+             bool valid = bounded && validUntil > clock.GetUtcNow();
+             deadline.ThrowIfCancellationRequested();
+-            if (!valid) { return new(null, "history-source-incomplete-or-expired"); }
++            if (!valid) { return Denied("history-source-incomplete-or-expired"); }
+             transferred = true;
+             return result;
+         }
+@@ -268,6 +277,34 @@
+             && certificate.LifecycleRevision > 0 && certificate.ObservedAt != default && certificate.ObservedAt <= now && certificate.ValidUntil > now
+             && !string.IsNullOrWhiteSpace(certificate.AuthorityRevision) && certificate.AuthorityRevision.Length <= 2048
+             && !string.IsNullOrWhiteSpace(certificate.DestructionReceiptId) && certificate.DestructionReceiptId.Length <= 2048;
++
++    private static RetainedIdentityHistoryGrant? CaptureGrant(RetainedIdentityHistoryGrant? grant,
++        RetainedIdentityHistoryReadRequest request, DateTimeOffset now, AuthoritativeStreamReadDeadline deadline)
++    {
++        deadline.ThrowIfCancellationRequested();
++        if (grant?.EventTypes is null || grant.ExcludedEventTypeNames is null) { return null; }
++        int typeCount = grant.EventTypes.Count;
++        int excludedCount = grant.ExcludedEventTypeNames.Count;
++        if (typeCount is < 1 or > 32 || excludedCount is < 0 or > 512) { return null; }
++        var types = new List<Type>(typeCount);
++        foreach (Type type in grant.EventTypes)
++        {
++            deadline.ThrowIfCancellationRequested();
++            if (types.Count >= typeCount) { return null; }
++            types.Add(type);
++        }
++        var excluded = new List<string>(excludedCount);
++        foreach (string name in grant.ExcludedEventTypeNames)
++        {
++            deadline.ThrowIfCancellationRequested();
++            if (excluded.Count >= excludedCount) { return null; }
++            excluded.Add(name);
++        }
++        deadline.ThrowIfCancellationRequested();
++        if (types.Count != typeCount || excluded.Count != excludedCount) { return null; }
++        var captured = grant with { EventTypes = types.AsReadOnly(), ExcludedEventTypeNames = excluded.AsReadOnly() };
++        return ValidGrant(captured, request, now) ? captured : null;
++    }
+ 
+     private static bool ValidGrant(RetainedIdentityHistoryGrant? grant, RetainedIdentityHistoryReadRequest request, DateTimeOffset now)
+         => grant is not null && request.Identity is not null && grant.Identity == request.Identity
+--- /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs (before)
++++ /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs (preview)
+@@ -659,6 +659,83 @@
+         for (int n = 0; n < stored.Length; n++) { stored[n].Payload.ShouldBe(originals[n]); }
+     }
+ 
++    /// <summary>Initial and final independently returned grant collections cannot retain the whole read beyond its original budget.</summary>
++    /// <param name="phase">The initial or final grant.</param>
++    /// <param name="field">The admitted types or excluded names.</param>
++    /// <param name="access">The actually suspended collection operation.</param>
++    /// <param name="expires">Whether the thirty-second operation expires instead of caller cancellation.</param>
++    /// <param name="invalid">Whether the released carrier is invalid.</param>
++    [Theory]
++    [InlineData("initial", "types", "count", false, false)][InlineData("initial", "types", "count", true, false)]
++    [InlineData("initial", "types", "traversal", false, false)][InlineData("initial", "types", "traversal", true, false)]
++    [InlineData("initial", "excluded", "count", false, false)][InlineData("initial", "excluded", "count", true, false)]
++    [InlineData("initial", "excluded", "traversal", false, false)][InlineData("initial", "excluded", "traversal", true, false)]
++    [InlineData("final", "types", "count", false, false)][InlineData("final", "types", "count", true, false)]
++    [InlineData("final", "types", "traversal", false, false)][InlineData("final", "types", "traversal", true, false)]
++    [InlineData("final", "excluded", "count", false, false)][InlineData("final", "excluded", "count", true, false)]
++    [InlineData("final", "excluded", "traversal", false, false)][InlineData("final", "excluded", "traversal", true, false)]
++    [InlineData("initial", "types", "count", false, true)][InlineData("final", "excluded", "traversal", false, true)]
++    public async Task SuspendedGrantCaptureCannotReturnHistoryOrContinueAfterAbandonment(string phase, string field, string access, bool expires, bool invalid)
++    {
++        Arrange(); ArrangeCompleteSource();
++        var clock = new RetainedHistoryTimeProvider(_now);
++        using var caller = new CancellationTokenSource(); using var release = new ManualResetEventSlim();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        void Block() { entered.TrySetResult(); release.Wait(); finished.TrySetResult(); }
++        Type[] types = [invalid ? null! : typeof(HistoryCustodyProbeEvent)];
++        string[] names = [invalid ? string.Empty : "Profile", "ErasedProfile"];
++        var suppliedTypes = Substitute.For<IReadOnlyList<Type>>();
++        var suppliedNames = Substitute.For<IReadOnlyList<string>>();
++        suppliedTypes.Count.Returns(_ => { if (field == "types" && access == "count") { Block(); } return types.Length; });
++        suppliedNames.Count.Returns(_ => { if (field == "excluded" && access == "count") { Block(); } return names.Length; });
++        suppliedTypes.GetEnumerator().Returns(_ => { if (field == "types" && access == "traversal") { Block(); } return ((IEnumerable<Type>)types).GetEnumerator(); });
++        suppliedNames.GetEnumerator().Returns(_ => { if (field == "excluded" && access == "traversal") { Block(); } return ((IEnumerable<string>)names).GetEnumerator(); });
++        var supplied = Grant() with { EventTypes = suppliedTypes, ExcludedEventTypeNames = suppliedNames };
++        int admissions = 0; var owned = new List<byte[]>();
++        _admission.AdmitAsync(_principal, Arg.Any<RetainedIdentityHistoryReadRequest>(), Arg.Any<CancellationToken>())
++            .Returns(_ => ++admissions == (phase == "initial" ? 1 : 2) ? supplied : Grant());
++        var reader = new RetainedIdentityHistorySourceReader(_actors, _admission, _custody, clock, owned.Add);
++        var reading = reader.ReadAsync(_principal, Request(), caller.Token);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2));
++        int sourceCalls = _actor.ReceivedCalls().Count(); int providerCalls = _custody.ReceivedCalls().Count();
++        try
++        {
++            if (expires)
++            {
++                clock.Advance(TimeSpan.FromSeconds(30));
++                var result = await reading.WaitAsync(TimeSpan.FromSeconds(2));
++                result.Stream.ShouldBeNull(); result.FailureReason.ShouldBe("history-time-bound-exceeded");
++            }
++            else
++            {
++                caller.Cancel();
++                var error = await Should.ThrowAsync<OperationCanceledException>(() => reading.WaitAsync(TimeSpan.FromSeconds(2)));
++                error.CancellationToken.ShouldBe(caller.Token);
++            }
++            if (phase == "final") { owned.ShouldNotBeEmpty(); owned.All(bytes => bytes.All(value => value == 0)).ShouldBeTrue(); }
++        }
++        finally { release.Set(); }
++        await finished.Task.WaitAsync(TimeSpan.FromSeconds(2));
++        _actor.ReceivedCalls().Count().ShouldBe(sourceCalls); _custody.ReceivedCalls().Count().ShouldBe(providerCalls);
++        if (phase == "initial") { _actors.DidNotReceive().CreateActorProxy<IAggregateActor>(Arg.Any<ActorId>(), Arg.Any<string>()); }
++    }
++
++    /// <summary>Only detached admitted collections are used after the independently owned originals change.</summary>
++    [Fact]
++    public async Task GrantTypeAndExclusionSnapshotsRemainExactAcrossSourceAwaits()
++    {
++        Arrange(); ArrangeCompleteSource();
++        Type[] types = [typeof(HistoryCustodyProbeEvent)]; string[] excluded = ["Profile", "ErasedProfile"];
++        var first = Grant() with { EventTypes = types, ExcludedEventTypeNames = excluded };
++        _admission.AdmitAsync(_principal, Arg.Any<RetainedIdentityHistoryReadRequest>(), Arg.Any<CancellationToken>()).Returns(first, Grant());
++        _actor.GetStreamMetadataAsync().Returns(_ => { types[0] = null!; excluded[0] = "changed-provider-name"; return new AggregateStreamMetadata(true, 2); });
++        var reader = new RetainedIdentityHistorySourceReader(_actors, _admission, _custody, _clock);
++        var result = await reader.ReadAsync(_principal, Request(), TestContext.Current.CancellationToken);
++        result.IsAuthoritative.ShouldBeTrue(); result.Stream!.ExcludedSequences.ShouldBe([1L]);
++        result.Stream.Events.Single().EventTypeName.ShouldBe(typeof(HistoryCustodyProbeEvent).FullName);
++    }
++
+     private void ArrangeCompleteSource()
+         => _actor.ReadEventsRangeAsync(0, 2, 100).Returns([Stored(1, "Profile", "sealed"), Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "sealed-history")]);
+ 

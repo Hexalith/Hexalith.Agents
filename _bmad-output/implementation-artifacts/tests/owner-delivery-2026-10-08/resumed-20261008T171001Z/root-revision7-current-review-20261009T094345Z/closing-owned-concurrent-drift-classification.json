@@ -1,0 +1,34 @@
+{
+  "capturedUtc": "2026-10-09T10:45:15.851324+00:00",
+  "failedClosingAudit": "root-final-integrity-audit.json",
+  "failedAuditRetained": true,
+  "rows": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "frozenExpected": "c15585bca371eb0eb5d3894e2989edf5fae6370afefe0ab7dd36c393ed3c9c90",
+      "actual": "a2a1318e1fb624a03820688ef7ef133d86738fc14386b73fe9d363322b7dd34a",
+      "frozenCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/source/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "frozenCopySha256": "c15585bca371eb0eb5d3894e2989edf5fae6370afefe0ab7dd36c393ed3c9c90",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/closing-owned-concurrent-drift/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "diff": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/closing-owned-concurrent-drift/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs.diff",
+      "deltaLines": 11,
+      "mtimeUtc": "2026-10-09T10:43:19.262504+00:00",
+      "class": "Concurrent source change after final matrix snapshot on two previously owned E4 history paths; not attributed to sealed engineer or root and not reverted"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "frozenExpected": "96d0b8e78b3880f96727678515f684ec41784e23ac48930e4942484bfb711e60",
+      "actual": "38eb43e0c624df59b072aa01ed84751595ab80c1aaf82104cd81312c48fea001",
+      "frozenCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/source/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "frozenCopySha256": "96d0b8e78b3880f96727678515f684ec41784e23ac48930e4942484bfb711e60",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/closing-owned-concurrent-drift/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "diff": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/closing-owned-concurrent-drift/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs.diff",
+      "deltaLines": 31,
+      "mtimeUtc": "2026-10-09T10:43:35.975989+00:00",
+      "class": "Concurrent source change after final matrix snapshot on two previously owned E4 history paths; not attributed to sealed engineer or root and not reverted"
+    }
+  ],
+  "frozenCopyChanges": 0,
+  "currentSourceQualification": false,
+  "action": "Archive exact current bytes and read complete normalized delta; preserve sealed engineering/history and all current work. Counter8 HALT before re-engagement or technical amendment; next authorized cycle must capture and verify current paths."
+}

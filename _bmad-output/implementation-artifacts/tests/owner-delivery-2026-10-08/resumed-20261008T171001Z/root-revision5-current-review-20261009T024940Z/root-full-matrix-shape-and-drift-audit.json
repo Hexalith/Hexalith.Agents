@@ -1,0 +1,46 @@
+{
+  "capturedUtc": "2026-10-09T03:16:38.822058+00:00",
+  "topLevelCommands": 13,
+  "normalBuildLogs": 22,
+  "actualFullSuiteXmlFiles": 21,
+  "passingTestExecutions": 4607,
+  "requiredOwnedClassesExecuted": 44,
+  "errors": [],
+  "supplementalSourceDrift": {
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/DaprLogicalSnapshotRewitnessTests.cs": {
+      "before": null,
+      "after": "8538708052125e3bf8c3b727239ea9a93b3defa4a0dcdbf798f49df62c2ba2b3"
+    },
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Events/DaprLogicalSnapshotRewitnessPolicy.cs": {
+      "before": "037a17acee58dbf51445f6b4c370b986b41d8b653e4a0c7759d4c6cacf1a2fb6",
+      "after": "0b15f084fe63f18c14cbc5063f370ca223ed66a2c015113ca1cd19009e381d4f"
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/DaprLogicalSnapshotRewitnessFixture.cs": {
+      "before": "b7d7f5128e53110dafe1dd048b4c99b9fa198c2b9dc80bc0bea026d502fe69a7",
+      "after": "4affb0232c20df1b0e495e5eded6cabb52ff7f0014e480eb46d3a08f76a52c7b"
+    },
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Actors/AggregateActor.LogicalSnapshotRewitness.cs": {
+      "before": "5c2714de2c170276d84bab4346bedd87af5ce0ad376d8845c126718e66eb4956",
+      "after": "3c83bbe7313b5e9b36f4bd6ac613d1932e056da870d56c7010ceb78e904dc539"
+    }
+  },
+  "carriedFindingEligibility": [
+    {
+      "name": "ReplicatedSecurityObservationSpoolWorker.cs",
+      "revision2Sha": "7f2a370e2cf0c65ca116fa77635c69463e8d2099e4032a656cb35f31fcc792a7",
+      "revision5Sha": "7f2a370e2cf0c65ca116fa77635c69463e8d2099e4032a656cb35f31fcc792a7",
+      "unchanged": true
+    },
+    {
+      "name": "Fr34ProtectionGate.cs",
+      "revision2Sha": "652fc45fb4a5c1d33b357d8b64f1c260990dc2c120e153556f8b0c5a4d474ddd",
+      "revision5Sha": "df2a8c62414decf25c90f015c39a00c333b224a001c5c6677dccc3829f389e2e",
+      "unchanged": false,
+      "carriedRow": "revision4 B10 (itself carried from revision2 B6)",
+      "revision4Sha": "df2a8c62414decf25c90f015c39a00c333b224a001c5c6677dccc3829f389e2e",
+      "unchangedSinceCarriedRow": true,
+      "note": "Revision2-to4 positive format/ownership fixes changed other code. Eligibility uses latest logged revision4 row and unchanged revision4-to5 file; the earlier digest difference does not describe current drift."
+    }
+  ],
+  "limits": "Historical first matrix only. Executions overlap and are not unique coverage. Subsequent Server refresh failed; current whole-workspace verification is incomplete."
+}

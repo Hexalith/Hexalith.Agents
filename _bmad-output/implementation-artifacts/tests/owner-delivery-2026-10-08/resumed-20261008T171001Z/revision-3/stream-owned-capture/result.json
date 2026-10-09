@@ -1,0 +1,9 @@
+{
+  "finding": "E1",
+  "status": "corrected",
+  "focusedClass": "AuthoritativeEventStreamReaderTests",
+  "passed": 48,
+  "failed": 0,
+  "beforeRegressionFailed": 12,
+  "fullRootVerification": "pending"
+}

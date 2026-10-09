@@ -1,0 +1,11 @@
+{
+  "capturedUtc": "2026-10-09T06:30:02.544031+00:00",
+  "beforeSha256": "75130548ecd82fbfac70330af2a7250741adf3bab53797027e414effe5db5305",
+  "afterSha256": "b57c41bbc63d896c766070d82c9b7c3ca713353b33ec2f89a702bf744f2b0c15",
+  "change": "Retain exact owner LocalScaffold gate and add separately recorded normal Debug diagnostics using a fresh Host artifact root; no weakened build flags or test filters.",
+  "expectedFullMatrixCommands": 14,
+  "expectedCleanBuildLogs": 22,
+  "expectedXmlFilesBeforeAnyOwnerLaneExpansion": 21,
+  "sourceOwnerFilesEdited": false,
+  "syntaxValidation": "Python AST parse passed; actual execution follows stable revised source."
+}

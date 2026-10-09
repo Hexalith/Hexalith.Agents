@@ -1,0 +1,27 @@
+{
+  "capturedUtc": "2026-10-08T21:20:36.363140+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeadlineAnchoredStateAuthority.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs",
+      "existed": true,
+      "sha256": "dfe513ca1831b917248927687b881181a4f2e820791f951f03787cc2c8430c23",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/spool-deadline/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolWorkerTests.cs",
+      "existed": true,
+      "sha256": "a7de77ac56ab55d218fc878238544335a6500121916b2fac9e245513a2302676",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/spool-deadline/before/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolWorkerTests.cs"
+    }
+  ]
+}

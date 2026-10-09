@@ -1,0 +1,41 @@
+{
+  "capturedUtc": "2026-10-08T22:34:31.347433+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "existed": true,
+      "sha256": "e6750a66ac6e722a37ba3ff8df64f91a11ac200de25211f392d0b325d7600b83",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/actor-provider-and-routing/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprInteractionOccurrenceRegistry.cs",
+      "existed": true,
+      "sha256": "6535772d4b6f52e32c2e25bd4ad54a5b642f4c4349727d05b385bf765d0713b3",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/actor-provider-and-routing/before/eventstore/src/Hexalith.EventStore.Server/Security/DaprInteractionOccurrenceRegistry.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs",
+      "existed": true,
+      "sha256": "c623fc57183f639c5f2b39d25405c3ca6af24679513aa79a77ec8724ae7cd62a",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/actor-provider-and-routing/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+      "existed": true,
+      "sha256": "5df4831886a4f38fb0d26b0622f789f957740c863399f44b1a64cf82afa6980a",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/actor-provider-and-routing/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+      "existed": true,
+      "sha256": "2fafe52b2a3ebec575f87ec46edb7652ab66747deba4790ea7bf1a1eb49e07b6",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/actor-provider-and-routing/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/RetainedHistoryTimeProvider.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/expired-continuation/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedHistoryTimeProvider.cs",
+      "beforeSha256": "6e435f3781661341f6a1f59ef75cfa4ded40651e8084c2843aff1542507b2852"
+    }
+  ]
+}

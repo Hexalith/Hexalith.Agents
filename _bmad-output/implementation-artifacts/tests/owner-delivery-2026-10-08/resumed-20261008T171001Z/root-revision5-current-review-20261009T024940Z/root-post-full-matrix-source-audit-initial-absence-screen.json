@@ -1,0 +1,74 @@
+{
+  "capturedUtc": "2026-10-09T03:12:44.234033+00:00",
+  "ownedFrozenSourceAndCopies": 395,
+  "captureInputs": 125,
+  "errors": [
+    [
+      "sourcePath",
+      "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendClientTests.cs",
+      null,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    [
+      "sourcePath",
+      "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryActorTests.cs",
+      null,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    [
+      "sourcePath",
+      "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardProtocolTests.cs",
+      null,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    [
+      "sourcePath",
+      "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Streams/SourcePublicationIndexActorTests.cs",
+      null,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    [
+      "sourcePath",
+      "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionBatchCapabilityV1.cs",
+      null,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    [
+      "sourcePath",
+      "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleActorTests.cs",
+      null,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    [
+      "sourcePath",
+      "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateFixture.cs",
+      null,
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ]
+  ],
+  "existingPathsBefore": 58865,
+  "existingPathsAfter": 58868,
+  "concurrentUnownedDrift": {
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Events/DaprLogicalSnapshotRewitnessPolicy.cs": {
+      "before": null,
+      "after": "037a17acee58dbf51445f6b4c370b986b41d8b653e4a0c7759d4c6cacf1a2fb6"
+    },
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Events/DaprLogicalSnapshotWrite.cs": {
+      "before": "a9fde5a4512ac1ea187bb7849df6ed77105044fd970e3d6addaabd16e1fd0694",
+      "after": "fcd8b7550e765f3106d26b5fc4d9157b5198c694725158b50ffcaeca666a2fbd"
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/DaprLogicalSnapshotRewitnessFixture.cs": {
+      "before": null,
+      "after": "cc19498c747a2067a4dd7da6334779c1b0403d106844e556f63561bb7baab52b"
+    },
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Actors/AggregateActor.LogicalSnapshotRewitness.cs": {
+      "before": null,
+      "after": "5c2714de2c170276d84bab4346bedd87af5ce0ad376d8845c126718e66eb4956"
+    },
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Actors/AggregateActor.LogicalSnapshot.cs": {
+      "before": "2053557e8844094279a14777bae9806a98b42e78884fedb06fa6c37873addeee",
+      "after": "711ac7aa715710fbc88809265d05777c362d7e631567745a1a194dade83ec6fa"
+    }
+  },
+  "scope": "All owned frozen source/copies/captures unchanged. Five unrelated logical snapshot paths changed during first matrix; preserve concurrent edits and refresh affected Server compilation/tests."
+}

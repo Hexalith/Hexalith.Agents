@@ -1,0 +1,31 @@
+{
+  "capturedUtc": "2026-10-08T23:51:21.900858+00:00",
+  "finding": "B2 revision2",
+  "sourceInspection": "Root read complete registration source and actual aggregate test class. Exact final persisted roster is captured under the original deadline and freshly independently qualified; required original qualification revision and installation coverage receipts are retained. Four suspended Register/final Read withdrawal/expiry cases deny aggregate event append; unchanged qualification case permits one append. Actual namespace owner retains registration revision2/source identity in all cases.",
+  "execution": {
+    "path": "/tmp/revision3-writer-registration-tests-second.xml",
+    "sha256": "2e4aa987c2312be225587afd9f3cc80ab5985f54178e51c5c4625b956e0edbd3",
+    "passed": 7,
+    "cases": [
+      "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests.FinalRegistrationRosterRequiresFreshIndependentQualification(suspendedOperation: \\\"register\\\", change: \\\"withdraw\\\")",
+      "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests.FinalRegistrationRosterRequiresFreshIndependentQualification(suspendedOperation: \\\"register\\\", change: \\\"expire\\\")",
+      "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests.FinalRegistrationRosterRequiresFreshIndependentQualification(suspendedOperation: \\\"read\\\", change: \\\"withdraw\\\")",
+      "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests.FinalRegistrationRosterRequiresFreshIndependentQualification(suspendedOperation: \\\"read\\\", change: \\\"expire\\\")",
+      "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests.FinalRegistrationRosterRequiresFreshIndependentQualification(suspendedOperation: \\\"read\\\", change: \\\"current\\\")",
+      "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests.ConfiguredRegistrationPrecedesEventCommitAndRefusalPreventsAppend(refuse: False)",
+      "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests.ConfiguredRegistrationPrecedesEventCommitAndRefusalPreventsAppend(refuse: True)"
+    ]
+  },
+  "build": {
+    "path": "/tmp/revision3-writer-registration-build-second.log",
+    "sha256": "7c7528a16933492b6e12ad3dd838f67bc1b9bbff150267629fcb0d032749d36a",
+    "warnings": 0,
+    "errors": 0
+  },
+  "historicalAttempt": "Earlier five new cases failed at collection-reference comparison despite correct append outcomes. Engineer changed that assertion to exact serialized roster equality; the historical failure is not claimed as a failing-before-source regression.",
+  "currentSourceHashes": {
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationWriterRegistration.cs": "7b6b89246b96a8f2b2702b482c7239f9165bd28f35034262b35e63c8d99cbae9",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs": "f532aab464afc23b5cb373151f4ab6117b415f24edaaa2e29a9aa7d322a86d99"
+  },
+  "scope": "Interim source/XML/build inspection only. Full Local matrix, next independent review and final stable source remain pending; no runtime qualification or complete parent inferred."
+}

@@ -1,0 +1,24 @@
+{
+  "capturedUtc": "2026-10-08T21:38:31.187674+00:00",
+  "stage": "preliminary root source inspection while focused engineering checks run",
+  "reviewManifest": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision1-preliminary-20261008T213334Z/review-input.json",
+  "manifestSha256": "a3b5636853bf142d96858eec1420fc81d192b1fafc0f3d8fbe82784ad0b03a6a",
+  "deltaSha256": "f5943e743f4c9159d111d92dfe66e1def111106032e183d128e60b787eb68e93",
+  "deltaLinesRead": 3105,
+  "basis": "Previous full cumulative owned source inspection plus the complete revision delta; truncated ranges were completed by narrower reads and full current type reads.",
+  "inspected": "All nine recoverable writers and shared exact pending/journal carrier; durable final confirmation; source acknowledgement dispatcher/actual owner tests; certified source prefix/catalogue; replay retention; Parties expired predecessor continuity; original compromise/reservation terminal proof; higher/unordered revocations; refreshed activation; covered-target original outcomes; re-completion; negative physical custody receipts and holds.",
+  "notClaimed": [
+    "Final stable source handoff",
+    "Independent three-layer review after revision",
+    "Fresh root Local matrix",
+    "Qualified runtime authority or provider",
+    "Full Story 5.4 entry or execution"
+  ],
+  "externalOverlap": [
+    {
+      "path": "eventstore/tests/Hexalith.EventStore.Server.Tests/Queries/DaprLogicalQueryFixture.cs",
+      "ownedCorrection": "OriginHook explicit null initialization only; no semantic change",
+      "concurrentPreservedChange": "Dapr.Client.DaprClient service registration was external, independently confirmed by implementation agent; captured-path deltas are not all authored by this run."
+    }
+  ]
+}

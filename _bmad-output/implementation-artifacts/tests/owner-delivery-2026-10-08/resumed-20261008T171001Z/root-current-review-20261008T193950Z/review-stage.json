@@ -1,0 +1,21 @@
+{
+  "capturedUtc": "2026-10-08T19:43:21.841938+00:00",
+  "reviewStatus": "in-review",
+  "specFile": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md",
+  "parentStatus": "in-progress",
+  "statusReason": "The user explicitly preserves the unfinished full prerequisite parent in-progress and original Story 5.4 draft/backlog; only this concrete source review enters in-review.",
+  "baselineCommit": "b252fcfde51bd04317ce5843a0a42bfe4dce5170",
+  "reviewManifest": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-current-review-20261008T193950Z/review-input.json",
+  "reviewManifestSha256": "b6df82fe3467962b3d1f0129beb97c02a6f094ba5955b817da8a7baceb45e7f8",
+  "diffFile": "/tmp/hexalith-owner-source-review-cjkoqcfq.diff",
+  "diffSha256": "eef5859b13e3be91f982bbc282d19b23142062108ee3f1b86059eb2ece9feb33",
+  "scope": "Cumulative explicitly owned before-capture-to-current source, including new files. External HEAD changes do not redefine ownership. Headers use absolute source paths; line endings normalized only for readability. Exact raw source/diff retained in review manifest.",
+  "inspectionBasis": [
+    "root-saved-diff-inspection/inspection.json",
+    "root-preliminary-current-review-20261008T185500Z/resumed-delta-index.json",
+    "root-current-review-20261008T193950Z/root-readable-review-index.json"
+  ],
+  "rootInspection": "Root read the cumulative saved owned diff, resumed units/delta, final normalized delta and full current packets. Truncated delta ranges were completed by narrower ranges and full current-unit reads.",
+  "ownedSourceDrift": [],
+  "preexistingExternalDelta": "Platform DeletionBatchCapabilityV1 wrapper was absent at resumed initial inspection; its removal is not attributed to this invocation. Shared EventStore.Contracts type is current."
+}

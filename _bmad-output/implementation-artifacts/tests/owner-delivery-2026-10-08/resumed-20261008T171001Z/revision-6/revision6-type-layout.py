@@ -1,0 +1,12 @@
+from pathlib import Path
+import json,re
+root=Path('/home/administrator/projects/hexalith')
+r=root/'agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6';p=r/'ordered-baselines.json';v=json.loads(p.read_text());v.append(str(r/'new-type-file-layout/before-hashes.json'));p.write_text(json.dumps(v,indent=2)+'\n')
+def write(p,s):p.write_bytes(s.replace('\n','\r\n').encode())
+p=root/'eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementReconciliation.cs';s=p.read_text();i=s.index('/// <summary>Only an independently retained');write(p,s[:i].rstrip()+'\n');write(p.with_name('DeletionBlockedReplacementResult.cs'),'namespace Hexalith.EventStore.Contracts.Security;\n\n'+s[i:])
+p=root/'platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs';s=p.read_text().replace('    private sealed record Machine(string Issuer, string Subject, string Client, string Audience);\n','');s=re.sub(r'\bMachine\b','PrivateOwnerOperationMachine',s);write(p,s);write(p.with_name('PrivateOwnerOperationMachine.cs'),'''namespace Hexalith.Platform.Custody;
+
+/// <summary>Owned bounded snapshot of the four exact authenticated machine claim values.</summary>
+internal sealed record PrivateOwnerOperationMachine(string Issuer, string Subject, string Client, string Audience);
+''')
+p=root/'conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs';s=p.read_text();i=s.index('    private sealed class PumpClock');block=s[i:s.rfind('\n}')];j=block.index('        private sealed class PumpTimer');timer=block[j:block.rfind('\n    }')];clock=block[:j].rstrip()+'\n    }\n';clock=clock.replace('private sealed class PumpClock','internal sealed class PumpClock');timer=timer.replace('private sealed class PumpTimer','internal sealed class PumpTimer');clock='\n'.join(line[4:] if line.startswith('    ') else line for line in clock.splitlines())+'\n';timer='\n'.join(line[8:] if line.startswith('        ') else line for line in timer.splitlines())+'\n';write(p,s[:i].rstrip()+'\n}\n');write(p.with_name('PumpClock.cs'),'using F = Hexalith.Conversations.Server.Tests.Agents.ConversationAgentLocalFixture;\n\nnamespace Hexalith.Conversations.Server.Tests.Agents;\n\n/// <summary>Controlled monotonic test clock for the pump whole-operation budget.</summary>\n'+clock);write(p.with_name('PumpTimer.cs'),'namespace Hexalith.Conversations.Server.Tests.Agents;\n\n/// <summary>Single controlled test-clock deadline signal.</summary>\n'+timer)

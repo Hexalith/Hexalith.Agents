@@ -1,0 +1,28 @@
+{
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecurityObservationIntent.cs",
+      "existed": true,
+      "sha256": "10b85f66b6a1aa1726322b1c554ae2f1b41c69a7801616897525a371701248f2"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecurityObservationOriginalLookup.cs",
+      "existed": true,
+      "sha256": "4424eef7ddeef93e8d4860703a6bc5e95aef93881a988481b9583b5ddd0971f1"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "existed": true,
+      "sha256": "9cd49f0f4f7de8e47b35daad02d9730c6b17a9af43be5f17f9e89effb9de5308"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformSecurityDenialRecorder.cs",
+      "existed": true,
+      "sha256": "7b8a95a9ff83ffc7c887e3cd96fab2249390e1d953e61c3ddead047e2252eba9"
+    }
+  ]
+}

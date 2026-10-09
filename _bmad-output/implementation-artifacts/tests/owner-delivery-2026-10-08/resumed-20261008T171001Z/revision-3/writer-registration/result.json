@@ -1,0 +1,9 @@
+{
+  "finding": "B2",
+  "status": "corrected",
+  "focusedClass": "AggregateActorPublicationRegistrationTests",
+  "passed": 7,
+  "failed": 0,
+  "historicalFailure": "five record-equality assertion-only failures; all semantic denial/no append checks had passed",
+  "fullRootVerification": "pending"
+}

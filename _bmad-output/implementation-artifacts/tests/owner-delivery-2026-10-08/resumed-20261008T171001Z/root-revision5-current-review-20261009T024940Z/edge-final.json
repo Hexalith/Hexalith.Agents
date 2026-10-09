@@ -1,0 +1,14 @@
+[
+  {
+    "location": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs:208-211",
+    "trigger_condition": "Replacement key is revoked before protection activates its pending attestation.",
+    "guard_snippet": "if (item.ProtectionOutcome == \"ReplacementAwaitingActivation\") { PreserveOriginalBlock(item); RequireProtectionReconciliationBeforeSuccessor(item); }",
+    "potential_consequence": "Original block receipt disappears; activation and successor attestation cannot reconcile across owners."
+  },
+  {
+    "location": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpoolWorker.cs:12",
+    "trigger_condition": "Configured polling interval exceeds Task.Delay's maximum supported duration.",
+    "guard_snippet": "_interval = interval > TimeSpan.Zero && interval.TotalMilliseconds <= 4294967294 ? interval : throw new ArgumentOutOfRangeException(nameof(interval));",
+    "potential_consequence": "The hosted drain worker faults after its first pass."
+  }
+]

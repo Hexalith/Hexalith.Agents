@@ -1,0 +1,237 @@
+{
+  "scope": "Exact final focused argv as supplied; shell redirected stdout/stderr to the corresponding /tmp log before exact-byte archival. Earlier logs/XML are historical attempts, retained separately.",
+  "commands": [
+    {
+      "lane": "contracts",
+      "kind": "build",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.EventStore.Contracts.Tests/Hexalith.EventStore.Contracts.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "stdoutAndStderrLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-eventstore-contracts-final-build.log",
+      "exitCode": 0
+    },
+    {
+      "lane": "contracts",
+      "kind": "test",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.Tests.dll",
+        "-class",
+        "*RecoverableAnchoredStateTests",
+        "-result-xml",
+        "/tmp/revision2-eventstore-contracts-final-tests.xml"
+      ],
+      "stdoutAndStderrLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-eventstore-contracts-final-tests.log",
+      "resultXml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-eventstore-contracts-final-tests.xml",
+      "exitCode": 0
+    },
+    {
+      "lane": "publication",
+      "kind": "build",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.EventStore.Client.Tests/Hexalith.EventStore.Client.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "stdoutAndStderrLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-eventstore-progress-build-third.log",
+      "exitCode": 0
+    },
+    {
+      "lane": "publication",
+      "kind": "test",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.Tests.dll",
+        "-class",
+        "*SourcePublicationFeedTests",
+        "-class",
+        "*SourcePublicationDispatcherTests",
+        "-class",
+        "*DaprSourcePublicationIndexStoreTests",
+        "-result-xml",
+        "/tmp/revision2-eventstore-progress-tests-third.xml"
+      ],
+      "stdoutAndStderrLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-eventstore-progress-tests-third.log",
+      "resultXml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-eventstore-progress-tests-third.xml",
+      "exitCode": 0
+    },
+    {
+      "lane": "actors-guard",
+      "kind": "build",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.EventStore.Server.Tests/Hexalith.EventStore.Server.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "stdoutAndStderrLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-eventstore-server-final-build.log",
+      "exitCode": 0
+    },
+    {
+      "lane": "actors-guard",
+      "kind": "test",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests.dll",
+        "-class",
+        "*DeletionConsumptionActorTests",
+        "-class",
+        "*InteractionOccurrenceRegistryActorTests",
+        "-class",
+        "*DirectoryMigrationBoundaryTests",
+        "-class",
+        "*GovernanceScopeGuardTests",
+        "-result-xml",
+        "/tmp/revision2-eventstore-server-final-tests.xml"
+      ],
+      "stdoutAndStderrLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-eventstore-server-final-tests.log",
+      "resultXml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-eventstore-server-final-tests.xml",
+      "exitCode": 0
+    },
+    {
+      "lane": "platform",
+      "kind": "build",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "stdoutAndStderrLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-platform-final-build-second.log",
+      "exitCode": 0
+    },
+    {
+      "lane": "platform",
+      "kind": "test",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-class",
+        "*CustodyKeyLifecycleTests",
+        "-class",
+        "*DeletionCapabilitySigningActorTests",
+        "-class",
+        "*ExportKeyDeliveryActorTests",
+        "-class",
+        "*PlatformKeyInventoryActorTests",
+        "-class",
+        "*ReplicatedSecurityObservationSpoolTests",
+        "-class",
+        "*Fr34ProtectionGateTests",
+        "-class",
+        "*PrivateOwnerOperationDeadlineTests",
+        "-class",
+        "*DeletionBatchExecutionCoordinatorTests",
+        "-result-xml",
+        "/tmp/revision2-platform-final-tests.xml"
+      ],
+      "stdoutAndStderrLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-platform-final-tests.log",
+      "resultXml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-platform-final-tests.xml",
+      "exitCode": 0
+    },
+    {
+      "lane": "conversation",
+      "kind": "build",
+      "cwd": "/home/administrator/projects/hexalith/conversations",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.Conversations.Server.Tests/Hexalith.Conversations.Server.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "stdoutAndStderrLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-conversations-final-build.log",
+      "exitCode": 0
+    },
+    {
+      "lane": "conversation",
+      "kind": "test",
+      "cwd": "/home/administrator/projects/hexalith/conversations",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Server.Tests.dll",
+        "-class",
+        "*ConversationDeletionBackfillTests",
+        "-class",
+        "*ConversationDeletionDeliveryPumpTests",
+        "-result-xml",
+        "/tmp/revision2-conversations-final-tests.xml"
+      ],
+      "stdoutAndStderrLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-conversations-final-tests.log",
+      "resultXml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-conversations-final-tests.xml",
+      "exitCode": 0
+    },
+    {
+      "lane": "downstream-append",
+      "kind": "build",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.EventStore.Client.Tests/Hexalith.EventStore.Client.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "stdoutAndStderrLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-eventstore-client-final-build.log",
+      "exitCode": 0
+    },
+    {
+      "lane": "downstream-append",
+      "kind": "test",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.Tests.dll",
+        "-class",
+        "*DirectoryAtomicAppendTests",
+        "-result-xml",
+        "/tmp/revision2-eventstore-downstream-tests.xml"
+      ],
+      "stdoutAndStderrLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-eventstore-downstream-tests.log",
+      "resultXml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/execution/revision2-eventstore-downstream-tests.xml",
+      "exitCode": 0
+    }
+  ]
+}

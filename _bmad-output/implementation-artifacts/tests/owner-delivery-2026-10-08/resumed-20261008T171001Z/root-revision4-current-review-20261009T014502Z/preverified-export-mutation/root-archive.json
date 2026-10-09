@@ -1,0 +1,26 @@
+{
+  "capturedUtc": "2026-10-09T02:11:44.166559+00:00",
+  "source": "verification-gap reviewer isolated mutation; root archives existing evidence without re-running or changing production source",
+  "caseCount": 20,
+  "allPassed": true,
+  "files": [
+    {
+      "original": "/tmp/hexalith-export-authorization-review-e0jr9ik6/ExportKeyDeliveryActor.cs",
+      "archived": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/preverified-export-mutation/ExportKeyDeliveryActor.cs",
+      "sha256": "c5e0314f55d3cdd293af3d0a1df50d42f16198115d6441ab1fa8a3ea8dbb27c2",
+      "bytes": 11247
+    },
+    {
+      "original": "/tmp/hexalith-export-authorization-review-e0jr9ik6/mutation-results.xml",
+      "archived": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/preverified-export-mutation/mutation-results.xml",
+      "sha256": "1a1d078c158e75516922a4d8280c731cac0ec2b7353a8ab41e3d824846995c99",
+      "bytes": 13443
+    },
+    {
+      "original": "/tmp/hexalith-export-authorization-review-e0jr9ik6/mutation.targets",
+      "archived": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/preverified-export-mutation/mutation.targets",
+      "sha256": "3b45601e3be9d69e2a6ea9507487d7862c64aa67fd805d9d99452931bd270fc0",
+      "bytes": 337
+    }
+  ]
+}

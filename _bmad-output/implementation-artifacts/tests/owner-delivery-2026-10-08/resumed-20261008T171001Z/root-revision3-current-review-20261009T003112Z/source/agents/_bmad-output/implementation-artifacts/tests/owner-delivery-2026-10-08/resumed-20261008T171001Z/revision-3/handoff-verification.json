@@ -1,0 +1,19 @@
+{
+  "verifiedUtc": "2026-10-09T00:25:35.472671+00:00",
+  "sourceTestPacketHashesVerified": 37,
+  "changedSourceTestPacketPaths": 35,
+  "explicitAbsenceRows": [
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateFixture.cs"
+  ],
+  "orderedCapturesVerified": 97,
+  "exactPreservedPrefixVerified": 84,
+  "freshSuppliedBeforeCopiesVerified": 35,
+  "engineerArtifactHashesVerified": 115,
+  "artifactManifestSha256": "087d6c661734915094e3f9a458f1c1109f073a8318d23f292ac0b942d4ca0e31",
+  "distinctPassingFocusedCases": 484,
+  "zeroFailedSkippedErrorsOrNotRunInCurrentSelectedXml": true,
+  "exactExecutedCommandInvocationsRetained": 39,
+  "outsideFreshOwnershipSourceDrift": [],
+  "remainingWork": "Root full final Local matrix/current independent three-layer review and unestablished runtime qualification remain pending.",
+  "scope": "Packaged engineering integrity/source preservation and focused evidence only; no root matrix/review/production completion claim."
+}

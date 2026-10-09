@@ -1,0 +1,14 @@
+{
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformSecurityDenialRecorder.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PlatformSecurityDenialRecorderTests.cs",
+      "existed": false
+    }
+  ]
+}

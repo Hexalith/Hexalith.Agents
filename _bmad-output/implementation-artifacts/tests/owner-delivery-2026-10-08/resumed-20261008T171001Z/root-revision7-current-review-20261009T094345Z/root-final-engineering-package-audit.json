@@ -1,0 +1,56 @@
+{
+  "auditedUtc": "2026-10-09T10:41:43.712086+00:00",
+  "revision": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7",
+  "previousRevision": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6",
+  "orderedCapturesVerified": 148,
+  "exactPriorPrefixCount": 142,
+  "suppliedBeforeCopiesChecked": 559,
+  "currentHandoffPathsChecked": 21,
+  "engineeringArtifactsChecked": 100,
+  "commandsChecked": 25,
+  "historicalNonpassingCommandsRetained": 7,
+  "distinctPassingSelectedCases": 400,
+  "lanes": [
+    {
+      "lane": "server-final",
+      "selectedPassed": 173,
+      "combinedXmlTotal": 173,
+      "classes": {
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests": 65,
+        "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests": 30,
+        "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests": 78
+      }
+    },
+    {
+      "lane": "platform-final",
+      "selectedPassed": 89,
+      "combinedXmlTotal": 89,
+      "classes": {
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests": 42,
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests": 38,
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests": 9
+      }
+    },
+    {
+      "lane": "client-final",
+      "selectedPassed": 24,
+      "combinedXmlTotal": 24,
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests": 24
+      }
+    },
+    {
+      "lane": "conversations-final",
+      "selectedPassed": 114,
+      "combinedXmlTotal": 114,
+      "classes": {
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests": 9,
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests": 57,
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests": 41,
+        "Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests": 7
+      }
+    }
+  ],
+  "errors": [],
+  "scope": "Engineering integrity and selected focused evidence only. Root source review, full Local matrix, protected-state audit and runtime qualification require separate evidence."
+}

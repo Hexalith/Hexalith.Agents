@@ -1,0 +1,680 @@
+{
+  "scope": "All earlier nonpassing/zero-execution attempts preserved verbatim, with genuine source regressions distinguished from response compatibility, fixture synchronization, dependency graph, compiler and invalid-filter attempts. Earlier overlapping successes remain archived but excluded from selected count.",
+  "attempts": [
+    {
+      "timestamp": "2026-10-09T06:32:53.650Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "*CompletedCapturedPayloadIsRetired",
+        "-method",
+        "*AbandonedCapturedPayloadRetiresOnlyAfterBorrowerCompletion",
+        "-method",
+        "*OptionalCausationUsesExistingIdentityCarrier",
+        "-result-xml",
+        "/tmp/revision6-atomic-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-atomic-red-tests.log",
+      "logSha256": "d9b8f5a99390d8812e9bd9285a0d7443dfdb0c6149d2306699ec04b3e2bb55f7",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "92663a",
+      "result": {
+        "total": 17,
+        "passed": 2,
+        "failed": 15,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-atomic-red-tests.xml",
+      "interpretation": "Seventeen executed schedules, fifteen genuine failures for abandoned/completed payload cleanup and malformed/oversized optional causation; two valid controls pass."
+    },
+    {
+      "timestamp": "2026-10-09T06:39:10.405Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests.dll",
+        "-method",
+        "*ClosedSerializedPayloadTransfersOnlyWithSuccessfulStream",
+        "-result-xml",
+        "/tmp/revision6-history-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-history-red-tests.log",
+      "logSha256": "1f3c01d7394453a0915c9b211e08c1fc53908616699fd0c09c6bd9b51e50ddaf",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "0096cc",
+      "result": {
+        "total": 6,
+        "passed": 1,
+        "failed": 5,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-history-red-tests.xml",
+      "interpretation": "Five genuine failing-before owned closed-payload cleanup schedules; successful transfer control passes."
+    },
+    {
+      "timestamp": "2026-10-09T06:40:54.832Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests.dll",
+        "-class",
+        "*RetainedIdentityHistorySourceReaderTests",
+        "-result-xml",
+        "/tmp/revision6-history-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-history-tests.log",
+      "logSha256": "922be6ce223c0886d1f5ec1a32810ea30924dc11949e7c5178a69410947b6656",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "81e83f",
+      "result": {
+        "total": 59,
+        "passed": 58,
+        "failed": 1,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-history-tests.xml",
+      "interpretation": "One original-caller token assertion exposed linked token release; source now rethrows exact original cancellation token."
+    },
+    {
+      "timestamp": "2026-10-09T06:41:41.329Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-method",
+        "*SuspendedReplayProfileUsesWholeBudget",
+        "-method",
+        "*FinalProfileMustReconfirmWholeBudget",
+        "-result-xml",
+        "/tmp/revision6-replay-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replay-red-tests.log",
+      "logSha256": "b854116ec2f6d6523c4c9cb6571c7727e32df6da6bd08d690ee855f892983a90",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "994cac",
+      "result": {
+        "total": 6,
+        "passed": 0,
+        "failed": 6,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replay-red-tests.xml",
+      "interpretation": "Six genuine suspended initial/final profile and final caller/clock boundary failures."
+    },
+    {
+      "timestamp": "2026-10-09T06:42:41.139Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-method",
+        "*SuspendedOwnerFactoryCannotRetainOrResumeCoordinator",
+        "-result-xml",
+        "/tmp/revision6-factory-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-factory-red-tests.log",
+      "logSha256": "bb5b2e347eac06f1675ec50a21f120987a1ae77ec280399041befa2bab8a41e7",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "4058c3",
+      "result": {
+        "total": 4,
+        "passed": 0,
+        "failed": 4,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-factory-red-tests.xml",
+      "interpretation": "Four genuine synchronous owner factory cancellation/deadline failures; no late owner call."
+    },
+    {
+      "timestamp": "2026-10-09T06:45:39.511Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-method",
+        "*InvalidIdentityCarrierDeniesBeforeGrantAndKey",
+        "-method",
+        "*InvalidReturnedIdentityCannotReleaseCredential",
+        "-method",
+        "*ValidMaximumIdentityCarrierStillIssuesAndAuthorizes",
+        "-result-xml",
+        "/tmp/revision6-carrier-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-carrier-red-tests.log",
+      "logSha256": "65f99048bb80d26e259dad5d85a390fbea6bb6b69daff1b53449ac629fce4c14",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "c5dcad",
+      "result": {
+        "total": 31,
+        "passed": 2,
+        "failed": 29,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-carrier-red-tests.xml",
+      "interpretation": "Twenty-nine genuine strict identity carrier/provider ordering failures; two valid controls pass."
+    },
+    {
+      "timestamp": "2026-10-09T06:48:41.999Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-method",
+        "*ActualIssuedReplacementRevocationCanReconcileAndAdvanceHealthyNext",
+        "-result-xml",
+        "/tmp/revision6-replacement-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-red-tests.log",
+      "logSha256": "b1f0dfd28a692a70c02e0505cb516cd96153d31717388f33e235c7d40f0e5c2f",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "6035ef",
+      "result": {
+        "total": 2,
+        "passed": 0,
+        "failed": 2,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-red-tests.xml",
+      "interpretation": "Two genuine actual issued-replacement revocation failures losing its preceding original block proof."
+    },
+    {
+      "timestamp": "2026-10-09T06:53:35.137Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-build.log",
+      "logSha256": "f02aee147328b23d04cd6f39a86d2ad96458f5e1867e4c3fc4d79a3c1d17ee71",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "649626",
+      "result": {
+        "buildSucceeded": false,
+        "normalDebugAnalyzersAndXmlChecks": true,
+        "localProjectReferences": true,
+        "warningSummary": [
+          "0 Warning(s)"
+        ],
+        "errorSummary": [
+          "1 Error(s)"
+        ]
+      },
+      "firstDiagnostic": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/IDeletionProtectionOwner.cs(17,59): error CA1062: In externally visible method 'Task<DeletionConsumptionOutcome> IDeletionProtectionOwner.ReconcileBlockedReplacementAsync(DeletionBlockedReplacementReconciliation request, CancellationToken cancellationToken = default(CancellationToken))', validate parameter 'request' is non-null before using it. If appropriate, throw an 'ArgumentNullException' when the argument is 'null'. (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca1062) [/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Hexalith.EventStore.Contracts.csproj]",
+      "interpretation": "Historical owned compile/nullability/analyzer correction; no diagnostic checks disabled, superseded by clean normal build."
+    },
+    {
+      "timestamp": "2026-10-09T06:54:19.325Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-build-second.log",
+      "logSha256": "006451969b870786429a42111b2acea97874bb9707586e3ecbbabe210e697386",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "ad1fdc",
+      "result": {
+        "buildSucceeded": false,
+        "normalDebugAnalyzersAndXmlChecks": true,
+        "localProjectReferences": true,
+        "warningSummary": [
+          "0 Warning(s)"
+        ],
+        "errorSummary": [
+          "1 Error(s)"
+        ]
+      },
+      "firstDiagnostic": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs(206,15): error CA1062: In externally visible method 'Task<DeletionBlockedReplacementResult?> DeletionConsumptionActor.ReadBlockedReplacementAsync(DeletionBatchCapabilityV1 capability)', validate parameter 'capability' is non-null before using it. If appropriate, throw an 'ArgumentNullException' when the argument is 'null'. (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca1062) [/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Hexalith.EventStore.Server.csproj]",
+      "interpretation": "Historical owned compile/nullability/analyzer correction; no diagnostic checks disabled, superseded by clean normal build."
+    },
+    {
+      "timestamp": "2026-10-09T07:00:24.224Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-red-build.log",
+      "logSha256": "2e6206690d2edb6b5dcb3ab00e7b99303b78c9ca1799f892f8ad1e604637e709",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "fd2a6b",
+      "result": {
+        "buildSucceeded": false,
+        "normalDebugAnalyzersAndXmlChecks": true,
+        "localProjectReferences": true,
+        "warningSummary": [
+          "0 Warning(s)"
+        ],
+        "errorSummary": [
+          "6 Error(s)"
+        ]
+      },
+      "firstDiagnostic": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs(311,66): error xUnit1051: Calls to methods which accept CancellationToken should use TestContext.Current.CancellationToken to allow test cancellation to be more responsive. (https://xunit.net/xunit.analyzers/rules/xUnit1051) [/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj]",
+      "interpretation": "Historical owned compile/nullability/analyzer correction; no diagnostic checks disabled, superseded by clean normal build."
+    },
+    {
+      "timestamp": "2026-10-09T07:02:08.958Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-method",
+        "*WholeSigningActorBudgetPreservesOriginalAndStateIoBoundary",
+        "-method",
+        "*WholeDeliveryActorBudgetPreservesOriginalAndStateIoBoundary",
+        "-method",
+        "*WholeLifecycleActorBudgetPreservesOriginalAndStateIoBoundary",
+        "-result-xml",
+        "/tmp/revision6-actors-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-red-tests.log",
+      "logSha256": "d6a6a68e6e992cce82a9eb6cd6dc0ca468020061616aa0c2be724502024de02a",
+      "actualExitCode": 0,
+      "actualCompletionChunkId": "a84b5b",
+      "result": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-red-tests.xml",
+      "interpretation": "Zero executed cases from stale binary after failed build; retained as historical only, never a red/pass claim."
+    },
+    {
+      "timestamp": "2026-10-09T07:02:08.958Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-method",
+        "*InvalidBlockedReplacementProofPreservesOriginalLedgers",
+        "-result-xml",
+        "/tmp/revision6-replacement-negative-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-negative-tests.log",
+      "logSha256": "d6a6a68e6e992cce82a9eb6cd6dc0ca468020061616aa0c2be724502024de02a",
+      "actualExitCode": 0,
+      "actualCompletionChunkId": "bc17dc",
+      "result": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-negative-tests.xml",
+      "interpretation": "Zero executed cases from stale binary after failed build; retained as historical only, never a red/pass claim."
+    },
+    {
+      "timestamp": "2026-10-09T07:02:46.477Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-method",
+        "*WholeSigningActorBudgetPreservesOriginalAndStateIoBoundary",
+        "-method",
+        "*WholeDeliveryActorBudgetPreservesOriginalAndStateIoBoundary",
+        "-method",
+        "*WholeLifecycleActorBudgetPreservesOriginalAndStateIoBoundary",
+        "-result-xml",
+        "/tmp/revision6-actors-red-tests-second.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-red-tests-second.log",
+      "logSha256": "d2d43d4598461523bf71121b15906ae3840790bbd4981be6ab88e5c58f6e832a",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "818b9b",
+      "result": {
+        "total": 17,
+        "passed": 0,
+        "failed": 17,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-red-tests-second.xml",
+      "interpretation": "Seventeen genuine suspended admission/trust/journal/state/final whole-budget failures through actual actors."
+    },
+    {
+      "timestamp": "2026-10-09T07:05:00.104Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-build.log",
+      "logSha256": "8196750c376b8ba693986704733e76b94a6c81b961ceb1aff75f3848541c8f74",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "f70b82",
+      "result": {
+        "buildSucceeded": false,
+        "normalDebugAnalyzersAndXmlChecks": true,
+        "localProjectReferences": true,
+        "warningSummary": [
+          "0 Warning(s)"
+        ],
+        "errorSummary": [
+          "1 Error(s)"
+        ]
+      },
+      "firstDiagnostic": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs(269,94): error CS8602: Dereference of a possibly null reference. [/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj]",
+      "interpretation": "Historical owned compile/nullability/analyzer correction; no diagnostic checks disabled, superseded by clean normal build."
+    },
+    {
+      "timestamp": "2026-10-09T07:06:13.422Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-class",
+        "*DeletionCapabilitySigningActorTests",
+        "-class",
+        "*ExportKeyDeliveryActorTests",
+        "-class",
+        "*CustodyKeyLifecycleTests",
+        "-class",
+        "*DeletionBatchExecutionCoordinatorTests",
+        "-class",
+        "*PrivateOwnerOperationDeadlineTests",
+        "-result-xml",
+        "/tmp/revision6-actors-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-tests.log",
+      "logSha256": "62d69b21f74457c48a72cc027be7b1f6f18dde437687514dcfe7397baaae77a0",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "683460",
+      "result": {
+        "total": 155,
+        "passed": 143,
+        "failed": 12,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-tests.xml",
+      "interpretation": "Twelve compatibility response mismatches: genuine unresolved physical effects previously retain Unknown; final source preserves original Unknown rather than broadening typed outcome."
+    },
+    {
+      "timestamp": "2026-10-09T07:11:49.324Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/conversations",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.Conversations.Server.Tests/Hexalith.Conversations.Server.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-red-build.log",
+      "logSha256": "e08a181180b7d214fee6d66247088a26f8103e7f333b8843123dd0565e9f84c5",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "5789c2",
+      "result": {
+        "buildSucceeded": false,
+        "normalDebugAnalyzersAndXmlChecks": true,
+        "localProjectReferences": true,
+        "warningSummary": [
+          "0 Warning(s)"
+        ],
+        "errorSummary": [
+          "21 Error(s)"
+        ]
+      },
+      "firstDiagnostic": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionBackfillTests.cs(51,16): error CS0246: The type or namespace name 'IAnchoredStateTransitionAuthority' could not be found (are you missing a using directive or an assembly reference?) [/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Hexalith.Conversations.Server.Tests.csproj]",
+      "interpretation": "Conversations default dependency graph selected its separate reference EventStore; explicit sibling EventStoreRoot resolves missing types/interfaces without unrelated source edits."
+    },
+    {
+      "timestamp": "2026-10-09T07:18:32.587Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/conversations",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Server.Tests.dll",
+        "-method",
+        "*StandalonePumpBudgetBoundsEveryDependency",
+        "-result-xml",
+        "/tmp/revision6-pump-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-red-tests.log",
+      "logSha256": "bc3183e5c9bc3d8bfb337d978fe24704e24e37c414b9c514f5edec5313643aea",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "0b7b50",
+      "result": {
+        "total": 32,
+        "passed": 8,
+        "failed": 24,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-red-tests.xml",
+      "interpretation": "Thirty-two actual standalone invocation/task schedules: twenty-four genuine deadline/noncooperative invocation failures; eight existing caller-cancellation controls pass."
+    },
+    {
+      "timestamp": "2026-10-09T07:20:23.907Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/conversations",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Server.Tests.dll",
+        "-class",
+        "*ConversationDeletionDeliveryPumpTests",
+        "-class",
+        "*ConversationDeletionBackfillTests",
+        "-result-xml",
+        "/tmp/revision6-pump-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-tests.log",
+      "logSha256": "b0963a524a83b04b61330e176e8e257a13cdd02fb85c463a8733d131afbc2580",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "003cd8",
+      "result": {
+        "total": 66,
+        "passed": 65,
+        "failed": 1,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-pump-tests.xml",
+      "interpretation": "One fixture-only synchronization failure: completion signaled before original serialized source append finished. Final fixture waits for the actual provider completion; behavior unchanged."
+    },
+    {
+      "timestamp": "2026-10-09T07:21:59.483Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-method",
+        "*ActualIssuedReplacementRevocationCanReconcileAndAdvanceHealthyNext",
+        "-result-xml",
+        "/tmp/revision6-replacement-recovery-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-recovery-red-tests.log",
+      "logSha256": "4d25f018be7299ba5222853f5264215896e8bea0839665966089e61dc0484da3",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "987fbb",
+      "result": {
+        "total": 4,
+        "passed": 0,
+        "failed": 4,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-recovery-red-tests.xml",
+      "interpretation": "Four genuine already-mirrored blocked original retry failures; final owner also retains exact historical phase after healthy successor."
+    },
+    {
+      "timestamp": "2026-10-09T07:26:36.655Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-method",
+        "*Whole*ActorBudgetPreservesOriginalAndStateIoBoundary",
+        "-result-xml",
+        "/tmp/revision6-actors-recovery-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-actors-recovery-tests.log",
+      "logSha256": "acf632b4d13614b7eb1cf17999859092a33fcd285db3021aa858f6ab82941fde",
+      "actualExitCode": 3,
+      "actualCompletionChunkId": "28fba2",
+      "result": {
+        "total": 0,
+        "result": "invalid runner filter; no test executed; no XML produced"
+      },
+      "interpretation": "Invalid interior-wildcard runner filter; no test executed, corrected exact method filters subsequently execute seventeen passing cases."
+    },
+    {
+      "timestamp": "2026-10-09T07:27:25.642Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-race-red-build.log",
+      "logSha256": "e69609e0b06a4a1fbbadb6cd24ac568ffe8af16b9670554897f090f91466a95b",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "838f05",
+      "result": {
+        "buildSucceeded": false,
+        "normalDebugAnalyzersAndXmlChecks": true,
+        "localProjectReferences": true,
+        "warningSummary": [
+          "0 Warning(s)"
+        ],
+        "errorSummary": [
+          "1 Error(s)"
+        ]
+      },
+      "firstDiagnostic": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs(367,136): error CS1061: 'TenantGovernanceGuardState' does not contain a definition for 'KeyBlockSetRevision' and no accessible extension method 'KeyBlockSetRevision' accepting a first argument of type 'TenantGovernanceGuardState' could be found (are you missing a using directive or an assembly reference?) [/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj]",
+      "interpretation": "Historical owned compile/nullability/analyzer correction; no diagnostic checks disabled, superseded by clean normal build."
+    },
+    {
+      "timestamp": "2026-10-09T07:28:47.287Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-method",
+        "*ActualIssuedReplacementRevocationCanReconcileAndAdvanceHealthyNext",
+        "-result-xml",
+        "/tmp/revision6-replacement-race-red-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-race-red-tests.log",
+      "logSha256": "ec6d4935f88b030971c723c5e93cd832f6edb9a38a9f3c64314a0a7b68fe4fec",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "772e1e",
+      "result": {
+        "total": 6,
+        "passed": 4,
+        "failed": 2,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-replacement-race-red-tests.xml",
+      "interpretation": "Two genuine races where original dispatched activation completed as blocked before resumption; four prior no-effect reconciliation controls pass."
+    },
+    {
+      "timestamp": "2026-10-09T07:29:58.014Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-class",
+        "*DeletionCapabilitySigningActorTests",
+        "-class",
+        "*ExportKeyDeliveryActorTests",
+        "-class",
+        "*CustodyKeyLifecycleTests",
+        "-class",
+        "*DeletionBatchExecutionCoordinatorTests",
+        "-class",
+        "*PrivateOwnerOperationDeadlineTests",
+        "-class",
+        "*PrivateOwnerOperationAuthenticatorTests",
+        "-class",
+        "*TrustedEnvelopeReplayVerifierTests",
+        "-result-xml",
+        "/tmp/revision6-platform-final-tests.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-final-tests.log",
+      "logSha256": "a56f05aaacafe0635d3aea088712c1f996dfb9d35ddfb70378bafdcbae9a474b",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "a35f5d",
+      "result": {
+        "total": 235,
+        "passed": 233,
+        "failed": 2,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-final-tests.xml",
+      "interpretation": "The same two blocked-activation races still required their exact preceding original block on current comparison; fixed narrowly from independently retained original activation, no fresh dispatch/effect."
+    }
+  ],
+  "aggregateRedUniqueCount": "not claimed; distinct failing-before schedule counts remain per actual XML and notes, overlapping runs excluded from current verification."
+}

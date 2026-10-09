@@ -1,0 +1,22 @@
+{
+  "capturedUtc": "2026-10-09T09:08:23.737048+00:00",
+  "scope": "Preliminary settled E4 source only; must compare against final stable freeze",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-history-grant-preview/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "beforeSha256": "65bc21a4596b9c8b87b5d36762aacdb96150af5cb4df058431139d8a3e8ecd34",
+      "previewSha256": "c15585bca371eb0eb5d3894e2989edf5fae6370afefe0ab7dd36c393ed3c9c90",
+      "deltaLines": 193
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-history-grant-preview/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "beforeSha256": "6fca87b490bc5e6e994452bdfdb537028ebb010437b818f85252440fb540b8b5",
+      "previewSha256": "96d0b8e78b3880f96727678515f684ec41784e23ac48930e4942484bfb711e60",
+      "deltaLines": 86
+    }
+  ],
+  "diffSha256": "ca841f6f63b882e1093b19f8796d9499902904187bfc6fd703e6576d25388f92",
+  "deltaLines": 279
+}

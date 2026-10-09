@@ -1,0 +1,12 @@
+{
+  "findings": [
+    "truthful-delivery-documents"
+  ],
+  "status": "completed",
+  "finalResults": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/final-focused-results.json",
+  "commands": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/commands.json",
+  "findingStatus": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/finding-status.json",
+  "currentSource": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/current-owned-source.json",
+  "failedBeforeAttemptsRetained": true,
+  "scope": "Current focused source observations only. Root full matrix/fresh review and runtime qualification remain pending."
+}

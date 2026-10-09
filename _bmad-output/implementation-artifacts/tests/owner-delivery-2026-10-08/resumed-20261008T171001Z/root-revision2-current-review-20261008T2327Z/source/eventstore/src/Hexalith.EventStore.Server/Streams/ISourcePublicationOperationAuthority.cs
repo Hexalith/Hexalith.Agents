@@ -1,0 +1,29 @@
+using Hexalith.EventStore.Contracts.Security;
+using Hexalith.EventStore.Contracts.Identity;
+using Hexalith.EventStore.Contracts.Streams;
+
+namespace Hexalith.EventStore.Server.Streams;
+
+/// <summary>Independent private current caller/resource/method admission, separate from finite-namespace coverage qualification.
+/// Missing credentials deny raw actors; actor address and stored receipt strings never authenticate a caller.</summary>
+public interface ISourcePublicationOperationAuthority : IAnchoredStateTransitionAuthority
+{
+    /// <summary>Authenticates this independently retained original consecutive acknowledgement proof and exact current installation/complete-cut/target/delivery authority. A stored digest or caller status alone is insufficient. Omission disables resume.</summary>
+    Task<bool> VerifyDispatchProgressAsync(SourcePublicationCheckpoint cut, SourcePublicationDispatchProgress progress) => Task.FromResult(false);
+    /// <summary>Independently reads actual durable original source acknowledgements for the bounded advance, verifies predecessor proof and fresh complete cut/current delivery target and authority, then issues their exact conditional prefix proof. Missing, Unknown, Quarantined or changed authority denies; omission disables progress.</summary>
+    Task<SourcePublicationDispatchProgress?> AuthorizeDispatchAdvanceAsync(SourcePublicationDispatchAdvance advance, SourcePublicationIndexState current) => Task.FromResult<SourcePublicationDispatchProgress?>(null);
+    /// <summary>Authenticates only the exact index read.</summary>
+    Task<bool> ReadIndexAsync(SourcePublicationScope scope);
+    /// <summary>Authenticates the exact conditional index request, including immutable publication vector and expected revision.</summary>
+    Task<bool> WriteIndexAsync(SourcePublicationIndexWrite request);
+    /// <summary>Independently validates exact persisted index revision/state digest, including revision zero and the serialized null digest for initial absence. Missing nonrollback anchors deny.</summary>
+    Task<bool> ValidateIndexStateAsync(SourcePublicationScope scope, long revision, string stateDigest) => Task.FromResult(false);
+    /// <summary>Conservatively advances the independent exact-state anchor before persistence; ambiguity denies old/divergent state until exact reconciliation.</summary>
+    Task<bool> RecordIndexRevisionAsync(SourcePublicationScope scope, long expectedRevision, long nextRevision, string stateDigest) => Task.FromResult(false);
+    /// <summary>Authenticates only the exact installed namespace read.</summary>
+    Task<bool> ReadNamespaceAsync(SourcePublicationScope scope);
+    /// <summary>Authenticates exact initial inventory and independent installation receipts.</summary>
+    Task<bool> InstallNamespaceAsync(SourcePublicationNamespaceState installation);
+    /// <summary>Authenticates only the exact pre-create registered source/revision within this installed scope.</summary>
+    Task<bool> RegisterSourceAsync(SourcePublicationScope scope, long expectedRevision, AggregateIdentity identity);
+}

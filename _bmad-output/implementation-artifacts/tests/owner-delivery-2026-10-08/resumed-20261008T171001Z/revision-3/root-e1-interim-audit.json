@@ -1,0 +1,60 @@
+{
+  "capturedUtc": "2026-10-08T23:48:05.846155+00:00",
+  "finding": "E1 revision2",
+  "sourceInspection": "Root read complete reader and complete added regression delta. Head and page provider Count/traversal/flag capture plus snapshot validation are inside existing deadline operations; byte counters remain local until successful completion. All twelve schedules suspend provider collection access after gateway return.",
+  "execution": [
+    {
+      "path": "/tmp/revision3-stream-capture-red-tests.xml",
+      "sha256": "9eeef1e858aa49ec2e3d54e0ebf2a0584016d31a5793d4652f0a5361c0d60022",
+      "total": 12,
+      "passed": 0,
+      "failed": 12,
+      "regressionCases": [
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"head-count\\\", cancelCaller: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"head-count\\\", cancelCaller: True)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"head-events\\\", cancelCaller: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"head-events\\\", cancelCaller: True)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"page-count\\\", cancelCaller: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"page-count\\\", cancelCaller: True)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"page-events\\\", cancelCaller: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"page-events\\\", cancelCaller: True)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"flags-count\\\", cancelCaller: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"flags-count\\\", cancelCaller: True)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"flags-events\\\", cancelCaller: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"flags-events\\\", cancelCaller: True)"
+      ]
+    },
+    {
+      "path": "/tmp/revision3-stream-capture-tests.xml",
+      "sha256": "29b0866507868ebe3f31194cb3dd975cae4a06069fcb91f91d907ff4355682f3",
+      "total": 48,
+      "passed": 48,
+      "failed": 0,
+      "regressionCases": [
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"head-count\\\", cancelCaller: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"head-count\\\", cancelCaller: True)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"head-events\\\", cancelCaller: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"head-events\\\", cancelCaller: True)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"page-count\\\", cancelCaller: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"page-count\\\", cancelCaller: True)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"page-events\\\", cancelCaller: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"page-events\\\", cancelCaller: True)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"flags-count\\\", cancelCaller: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"flags-count\\\", cancelCaller: True)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"flags-events\\\", cancelCaller: False)",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests.SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(vector: \\\"flags-events\\\", cancelCaller: True)"
+      ]
+    }
+  ],
+  "build": {
+    "path": "/tmp/revision3-stream-capture-build-second.log",
+    "sha256": "a11694a30a8e77156674f8a9695262f2dea136cff6235a02580f60457f8107cf",
+    "warnings": 0,
+    "errors": 0
+  },
+  "currentSourceHashes": {
+    "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeEventStreamReader.cs": "94f2a831247b990d07d0d5a5a10017ec243fe8b8af54653f4f3e32edd6782474",
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs": "c091ecf8e4e114daa94b71b77207b75524f5350eca37d985149b111819d21d69"
+  },
+  "scope": "Interim root read-only source/XML/build evidence for E1 only; source engineer remains active. No root full Local matrix, independent revision3 review, stable final snapshot, runtime qualification or parent completion inferred."
+}

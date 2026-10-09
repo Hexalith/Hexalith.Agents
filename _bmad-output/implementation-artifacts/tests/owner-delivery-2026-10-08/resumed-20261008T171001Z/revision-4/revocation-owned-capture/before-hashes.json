@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T01:08:20.099184+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityRevocationSubscriber.cs",
+      "existed": true,
+      "sha256": "cec6e8b392c17a829dc2455196ed11efe1f8fab2698649b7c9816691e43bbe70",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/revocation-owned-capture/before/platform/src/Hexalith.Platform.Custody/DeletionCapabilityRevocationSubscriber.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs",
+      "existed": true,
+      "sha256": "dfe513ca1831b917248927687b881181a4f2e820791f951f03787cc2c8430c23",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/revocation-owned-capture/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs"
+    }
+  ]
+}

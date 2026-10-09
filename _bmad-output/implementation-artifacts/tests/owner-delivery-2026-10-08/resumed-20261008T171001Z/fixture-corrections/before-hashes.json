@@ -1,0 +1,16 @@
+{
+  "files": [
+    {
+      "repository": "parties",
+      "relativePath": "tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+      "existed": true,
+      "sha256": "8400be4c3d5be409c5140fffbe3d11152f3d7962c68e6976eb6daa1fec001fd1"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs",
+      "existed": true,
+      "sha256": "5f1595bb6b869bd81c78b1ad7feccef3755eba3141e0458c1ccac4ae3716220d"
+    }
+  ]
+}

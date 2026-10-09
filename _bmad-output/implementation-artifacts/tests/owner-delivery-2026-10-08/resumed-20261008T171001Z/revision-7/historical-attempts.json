@@ -1,0 +1,237 @@
+{
+  "scope": "Exact historical failures preserved, genuine source failures distinguished from test carrier/analyzer corrections and insufficient preliminary watchdog assertions. No synthetic red/mutation or aggregate unique failing count claimed.",
+  "attempts": [
+    {
+      "timestamp": "2026-10-09T09:05:53.221Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests.dll",
+        "-class",
+        "*RetainedIdentityHistorySourceReaderTests",
+        "-method",
+        "*SuspendedGrantCaptureCannotReturnHistoryOrContinueAfterAbandonment",
+        "-method",
+        "*GrantTypeAndExclusionSnapshotsRemainExactAcrossSourceAwaits",
+        "-result-xml",
+        "/tmp/revision7-history-grant-red.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-history-grant-red.log",
+      "logSha256": "d644050a599bd3e1458751e733e82fc94e183b3317a5d54b75b2b258d2c17b90",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "8532d7",
+      "result": {
+        "total": 19,
+        "passed": 0,
+        "failed": 19,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-history-grant-red.xml",
+      "interpretation": "19 actual prior-source failures:18 initial/final grant vector cancellation/deadline/invalid-carrier cases and one detached-snapshot reuse case."
+    },
+    {
+      "timestamp": "2026-10-09T09:09:44.405Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.Tests.dll",
+        "-class",
+        "*SourcePublicationNamespaceTests",
+        "-method",
+        "*RevisionOneSubsetCannotInstallOrCertifyRestoredState",
+        "-method",
+        "*PostRegistrationGrowthAndOriginalInstallationRetryRemainExact",
+        "-result-xml",
+        "/tmp/revision7-namespace-red.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-namespace-red.log",
+      "logSha256": "bba6feb0e286edbb4c2023034cb7f76b21db60c47e446007a94f8f9fa4f0d9e6",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "98a7e1",
+      "result": {
+        "total": 3,
+        "passed": 1,
+        "failed": 2,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-namespace-red.xml",
+      "interpretation": "Two actual inconsistent revision-one install/restored failures; registered growth control passes."
+    },
+    {
+      "timestamp": "2026-10-09T09:12:35.850Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests.dll",
+        "-class",
+        "*GuardedStateTransactionTests",
+        "-class",
+        "*GovernanceScopeGuardTests",
+        "-method",
+        "*OversizedReceiptOutcomeIsRejectedBeforeCopy",
+        "-method",
+        "*SuspendedRequestCaptureNeverContinuesJointTransaction",
+        "-method",
+        "*DisabledLookupEntriesCheckOriginalCancellation",
+        "-method",
+        "*SuspendedTargetsCannotAuthorizeOrMutateGuard",
+        "-method",
+        "*DisabledOwnerEntriesCheckOriginalCancellation",
+        "-result-xml",
+        "/tmp/revision7-joint-red.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-joint-red.log",
+      "logSha256": "fe9caeb02c7e77a6c78f8b6953608ac6383a0d1fc572500e6cdfa81f5c0a14f3",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "5c2c31",
+      "result": {
+        "total": 22,
+        "passed": 3,
+        "failed": 19,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-joint-red.xml",
+      "interpretation": "19 actual failures across22 selected cases: oversized outcome allocation, blocked request/guard collection and disabled-entry cancellation. Three already-safe traversal/request paths pass."
+    },
+    {
+      "timestamp": "2026-10-09T09:15:17.625Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-private-wait-red-build.log",
+      "logSha256": "f11d3dba7ff291163fc329481d22a07f56f062a10a28069a37441a4d630c6cb6",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "64f343",
+      "result": {
+        "buildSucceeded": false,
+        "normalDebugAnalyzersAndXmlChecks": true,
+        "localProjectReferences": true,
+        "warningSummary": [
+          "0 Warning(s)"
+        ],
+        "errorSummary": [
+          "3 Error(s)"
+        ]
+      },
+      "interpretation": "Owned test compile/API/nullability/analyzer correction; retained historical failure, no diagnostic checks weakened.",
+      "firstDiagnostic": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs(342,28): error xUnit1051: Calls to methods which accept CancellationToken should use TestContext.Current.CancellationToken to allow test cancellation to be more responsive. (https://xunit.net/xunit.analyzers/rules/xUnit1051) [/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj]"
+    },
+    {
+      "timestamp": "2026-10-09T09:17:21.908Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/platform",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+        "-class",
+        "*PrivateOwnerOperationDeadlineTests",
+        "-class",
+        "*CustodyKeyLifecycleTests",
+        "-class",
+        "*DeletionBatchExecutionCoordinatorTests",
+        "-method",
+        "*NonpositiveRemainingTimeIsTimeoutWithSafeLateCompletion",
+        "-method",
+        "*AdmissionClockCrossingReturnsUnavailableWithoutStateOrEffect",
+        "-method",
+        "*DisabledCoordinatorChecksOriginalCancellation",
+        "-result-xml",
+        "/tmp/revision7-private-wait-red.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-private-wait-red.log",
+      "logSha256": "b5a418490b7ab9d197bc0eee9b3a9b41b86ec36d1f981f718942afc6589184f0",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "915555",
+      "result": {
+        "total": 9,
+        "passed": 8,
+        "failed": 1,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-private-wait-red.xml",
+      "interpretation": "Only disabled coordinator original cancellation genuinely failed. Eight prior clock cases used watchdog-only TimeoutException assertions, insufficient to prove helper timeout; do not claim them as B5 failed-before proof. Final assertions require the helper-specific completed operation, and actual actor cases suspend admission and cover negative/infinite-sentinel durations."
+    },
+    {
+      "timestamp": "2026-10-09T09:21:09.947Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/conversations",
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Hexalith.Conversations.Server.Tests/Hexalith.Conversations.Server.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-conversation-red-build.log",
+      "logSha256": "2f6bf8c27bd837e91dd5f3c0bd07e601c27d3c928a9d731403820bd88289bf56",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "c5c82e",
+      "result": {
+        "buildSucceeded": false,
+        "normalDebugAnalyzersAndXmlChecks": true,
+        "localProjectReferences": true,
+        "warningSummary": [
+          "0 Warning(s)"
+        ],
+        "errorSummary": [
+          "2 Error(s)"
+        ]
+      },
+      "interpretation": "Owned test compile/API/nullability/analyzer correction; retained historical failure, no diagnostic checks weakened.",
+      "firstDiagnostic": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs(149,76): error CS1061: 'ConversationActiveCountResult' does not contain a definition for 'Complete' and no accessible extension method 'Complete' accepting a first argument of type 'ConversationActiveCountResult' could be found (are you missing a using directive or an assembly reference?) [/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Hexalith.Conversations.Server.Tests.csproj]"
+    },
+    {
+      "timestamp": "2026-10-09T09:22:43.468Z",
+      "workingDirectory": "/home/administrator/projects/hexalith/conversations",
+      "argv": [
+        "dotnet",
+        "tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Server.Tests.dll",
+        "-class",
+        "*ConversationDeletionWorkerAdmissionTests",
+        "-class",
+        "*EventStoreConversationTenantCatalogueTests",
+        "-method",
+        "*WorkerInvocationCannotOutliveCanceledCaller",
+        "-method",
+        "*DeletedOpenConversationIsExcludedFromCompleteActiveCount",
+        "-result-xml",
+        "/tmp/revision7-conversation-red.xml"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-conversation-red.log",
+      "logSha256": "6855e744469401578adb76d5df0f1bf4aa2bcdfa8faa85c3fa63efe6b85fe09d",
+      "actualExitCode": 1,
+      "actualCompletionChunkId": "58e723",
+      "result": {
+        "total": 3,
+        "passed": 1,
+        "failed": 2,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      },
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/evidence/revision7-conversation-red.xml",
+      "interpretation": "Two standalone actual synchronous worker invocation cancellation cases genuinely fail; existing serialized deleted-open predicate control passes."
+    }
+  ]
+}

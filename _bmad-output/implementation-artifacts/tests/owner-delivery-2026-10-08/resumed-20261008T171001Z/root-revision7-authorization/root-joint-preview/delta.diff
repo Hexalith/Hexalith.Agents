@@ -1,0 +1,218 @@
+--- /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs (before)
++++ /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs (preview)
+@@ -27,11 +27,13 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
++            deadline.ThrowIfCancellationRequested();
+             if (authority is null || !Text(tenantId) || !Text(operationId) || !Hex(intentDigest)) { return new(GuardedStateCommitStatus.Unavailable); }
+             var target = await deadline.ReadAsync(token => authority.GetCurrentAsync(tenantId, token)).ConfigureAwait(false);
+             if (!ValidTarget(target, tenantId) || !await deadline.ReadAsync(token => authority.AuthorizeLookupAsync(target!, operationId, intentDigest, token)).ConfigureAwait(false))
+             { return new(GuardedStateCommitStatus.Unavailable); }
+             var read = await deadline.ReadAsync(token => client.GetStateAsync<GuardedStateCommitReceipt>(target!.ComponentName, OutcomeKey(target, operationId), ConsistencyMode.Strong, Metadata(target), token)).ConfigureAwait(false);
++            if (read is not null && read.Outcome is not { Length: <= MaxBytes }) { return new(GuardedStateCommitStatus.Unavailable); }
+             var receipt = read is null ? null : read with { Outcome = read.Outcome?.ToArray()! };
+             if (receipt is not null && (!ValidReceipt(receipt, target!, operationId) || !await deadline.ReadAsync(token => authority.ValidateReceiptAsync(target!, receipt with { Outcome = receipt.Outcome.ToArray() }, token)).ConfigureAwait(false)))
+             { return new(GuardedStateCommitStatus.Unavailable); }
+@@ -51,6 +53,7 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
++            deadline.ThrowIfCancellationRequested();
+             if (authority is null || !Text(tenantId)) { return null; }
+             var target = await deadline.ReadAsync(token => authority.GetCurrentAsync(tenantId, token)).ConfigureAwait(false);
+             if (!ValidTarget(target, tenantId) || !await deadline.ReadAsync(token => authority.AuthorizeReadAsync(target!, target!.GuardCellId, token)).ConfigureAwait(false)) { return null; }
+@@ -72,7 +75,8 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
+-            request = Capture(request, deadline); string digest = Digest(request);
++            deadline.ThrowIfCancellationRequested();
++            request = await deadline.ReadAsync(_ => Task.FromResult(Capture(request, deadline))).ConfigureAwait(false); string digest = Digest(request);
+             var target = await CurrentAsync(request, digest, "Commit", deadline).ConfigureAwait(false);
+             if (target is null) { return new(GuardedStateCommitStatus.Unavailable); }
+             if (request.Guard.CellId != target.GuardCellId || request.Guard.ExpectedRevision <= 0) { return new(GuardedStateCommitStatus.Unavailable); }
+@@ -124,7 +128,8 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
+-            request = Capture(request, deadline); string digest = Digest(request); var target = await CurrentAsync(request, digest, "Lookup", deadline).ConfigureAwait(false);
++            deadline.ThrowIfCancellationRequested();
++            request = await deadline.ReadAsync(_ => Task.FromResult(Capture(request, deadline))).ConfigureAwait(false); string digest = Digest(request); var target = await CurrentAsync(request, digest, "Lookup", deadline).ConfigureAwait(false);
+             if (target is null) { return new(GuardedStateCommitStatus.Unavailable); }
+             var result = await LookupCoreAsync(target, request, digest, deadline).ConfigureAwait(false);
+             return await CurrentAsync(request, digest, "Lookup", deadline).ConfigureAwait(false) == target
+@@ -138,6 +143,7 @@
+     {
+         var read = await deadline.ReadAsync(token => client.GetStateAsync<GuardedStateCommitReceipt>(target.ComponentName,
+             OutcomeKey(target, request.OperationId), ConsistencyMode.Strong, Metadata(target), token)).ConfigureAwait(false);
++        if (read is not null && read.Outcome is not { Length: <= MaxBytes }) { return new(GuardedStateCommitStatus.Unavailable); }
+         var receipt = read is null ? null : read with { Outcome = read.Outcome?.ToArray()! };
+         if (receipt is null) { return null; }
+         if (!ValidReceipt(receipt, target, request.OperationId) || authority is null
+--- /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs (before)
++++ /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs (preview)
+@@ -165,4 +165,78 @@
+         var restart = await fixture.Owner.LookupByIntentAsync(fixture.Target.TenantId, first.OperationId, first.LogicalIntentDigest, TestContext.Current.CancellationToken);
+         restart.Status.ShouldBe(winner.Status); restart.Receipt!.RequestDigest.ShouldBe(winner.Receipt!.RequestDigest); restart.Receipt.Outcome.ShouldBe(winner.Receipt.Outcome);
+     }
++    /// <summary>Oversized backend outcomes are denied before another full buffer allocation on every public original lookup path.</summary>
++    [Theory]
++    [InlineData("original")][InlineData("intent")][InlineData("request")]
++    public async Task OversizedReceiptOutcomeIsRejectedBeforeCopy(string path)
++    {
++        var fixture = new GuardedTransactionFixture(); var request = fixture.Request();
++        var committed = await fixture.Owner.CommitAsync(request, TestContext.Current.CancellationToken);
++        committed.Status.ShouldBe(GuardedStateCommitStatus.Committed);
++        byte[] oversizedBytes = new byte[16 * 1024 * 1024 + 1]; oversizedBytes[0] = 17; oversizedBytes[^1] = 23;
++        var oversized = committed.Receipt! with { Outcome = oversizedBytes };
++        fixture.ReceiptRead = _ => Task.FromResult<GuardedStateCommitReceipt?>(oversized);
++        fixture.Authority.ClearReceivedCalls(); var stored = fixture.Stored.ToDictionary(pair => pair.Key, pair => pair.Value.ToArray());
++        long allocatedBefore = GC.GetTotalAllocatedBytes(true);
++        var result = path == "request" ? await fixture.Owner.LookupAsync(request, TestContext.Current.CancellationToken)
++            : path == "intent" ? await fixture.Owner.LookupByIntentAsync(request.TenantId, request.OperationId, GuardedTransactionFixture.Hash("intent"u8.ToArray()), TestContext.Current.CancellationToken)
++            : await fixture.Owner.LookupOriginalAsync(request.TenantId, request.OperationId, GuardedTransactionFixture.Hash("scope"u8.ToArray()), TestContext.Current.CancellationToken);
++        long allocation = GC.GetTotalAllocatedBytes(true) - allocatedBefore;
++        result.Status.ShouldBe(GuardedStateCommitStatus.Unavailable); result.Receipt.ShouldBeNull();
++        allocation.ShouldBeLessThan(oversizedBytes.Length);
++        oversizedBytes[0].ShouldBe((byte)17); oversizedBytes[^1].ShouldBe((byte)23);
++        await fixture.Authority.DidNotReceiveWithAnyArgs().ValidateReceiptAsync(default!, default!, default);
++        fixture.TransactionCalls.ShouldBe(1); foreach (var pair in stored) { fixture.Stored[pair.Key].ShouldBe(pair.Value); }
++    }
++
++    /// <summary>Pure supplied request capture is bounded; terminated entries cannot authorize or change an existing joint original.</summary>
++    [Theory]
++    [InlineData("commit", "count", false)][InlineData("commit", "count", true)]
++    [InlineData("commit", "traversal", false)][InlineData("commit", "traversal", true)]
++    [InlineData("lookup", "count", false)][InlineData("lookup", "count", true)]
++    [InlineData("lookup", "traversal", false)][InlineData("lookup", "traversal", true)]
++    public async Task SuspendedRequestCaptureNeverContinuesJointTransaction(string operation, string access, bool expires)
++    {
++        var fixture = new GuardedTransactionFixture(); var request = fixture.Request();
++        (await fixture.Owner.CommitAsync(request, TestContext.Current.CancellationToken)).Status.ShouldBe(GuardedStateCommitStatus.Committed);
++        var stored = fixture.Stored.ToDictionary(pair => pair.Key, pair => pair.Value.ToArray());
++        byte[] guard = request.Guard.NextValue.ToArray(); byte[] source = request.Targets.Single().NextValue.ToArray();
++        var clock = new RetainedHistoryTimeProvider(fixture.Now); using var caller = new CancellationTokenSource();
++        using var release = new ManualResetEventSlim(); var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        void Block() { entered.TrySetResult(); release.Wait(); finished.TrySetResult(); }
++        var supplied = Substitute.For<IReadOnlyList<GuardedStateMutation>>();
++        supplied.Count.Returns(_ => { if (access == "count") { Block(); } return 1; });
++        supplied.GetEnumerator().Returns(_ => { if (access == "traversal") { Block(); } return request.Targets.GetEnumerator(); });
++        var input = request with { Targets = supplied }; var owner = new DaprGuardedStateTransaction(fixture.Client, clock, fixture.Authority);
++        fixture.Authority.ClearReceivedCalls(); fixture.Client.ClearReceivedCalls();
++        Task<GuardedStateCommitResult> pending = Task.Run(() => operation == "commit" ? owner.CommitAsync(input, caller.Token) : owner.LookupAsync(input, caller.Token), CancellationToken.None);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2));
++        try
++        {
++            if (expires) { clock.Advance(TimeSpan.FromSeconds(30)); (await pending.WaitAsync(TimeSpan.FromSeconds(2))).Status.ShouldBe(GuardedStateCommitStatus.Unavailable); }
++            else { caller.Cancel(); var error = await Should.ThrowAsync<OperationCanceledException>(() => pending.WaitAsync(TimeSpan.FromSeconds(2))); error.CancellationToken.ShouldBe(caller.Token); }
++        }
++        finally { release.Set(); }
++        await finished.Task.WaitAsync(TimeSpan.FromSeconds(2));
++        fixture.Authority.ReceivedCalls().ShouldBeEmpty(); fixture.Client.ReceivedCalls().ShouldBeEmpty(); fixture.TransactionCalls.ShouldBe(1);
++        foreach (var pair in stored) { fixture.Stored[pair.Key].ShouldBe(pair.Value); }
++        request.Guard.NextValue.ShouldBe(guard); request.Targets.Single().NextValue.ShouldBe(source);
++    }
++
++    /// <summary>Disabled direct original/request/guard read entries still honor the original caller token, with unchanged restrictive active defaults.</summary>
++    [Theory]
++    [InlineData("original")][InlineData("intent")][InlineData("request")][InlineData("guard")]
++    public async Task DisabledLookupEntriesCheckOriginalCancellation(string entry)
++    {
++        var fixture = new GuardedTransactionFixture(); var owner = new DaprGuardedStateTransaction(fixture.Client, TimeProvider.System);
++        var request = fixture.Request(); using var caller = new CancellationTokenSource(); caller.Cancel();
++        async Task<bool> Run(CancellationToken token) => entry == "guard" ? await owner.ReadGuardAsync(request.TenantId, token) is null
++            : (entry == "request" ? await owner.LookupAsync(request, token)
++                : entry == "intent" ? await owner.LookupByIntentAsync(request.TenantId, request.OperationId, GuardedTransactionFixture.Hash("intent"u8.ToArray()), token)
++                : await owner.LookupOriginalAsync(request.TenantId, request.OperationId, GuardedTransactionFixture.Hash("scope"u8.ToArray()), token)).Status == GuardedStateCommitStatus.Unavailable;
++        var error = await Should.ThrowAsync<OperationCanceledException>(() => Run(caller.Token)); error.CancellationToken.ShouldBe(caller.Token);
++        (await Run(CancellationToken.None)).ShouldBeTrue(); fixture.TransactionCalls.ShouldBe(0);
++    }
++
+ }
+--- /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs (before)
++++ /home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs (preview)
+@@ -16,6 +16,7 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
++            deadline.ThrowIfCancellationRequested();
+             if (authority is null) { return null; }
+             var cell = await deadline.ReadAsync(token => transaction.ReadGuardAsync(tenantId, token)).ConfigureAwait(false);
+             if (cell is null) { return null; }
+@@ -32,6 +33,7 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
++            deadline.ThrowIfCancellationRequested();
+             if (authority is null || payload is null || signingRequestId != DeletionBatchCapabilityIdentity.SigningRequestId(payload)
+                 || detachedJwsDigest is not { Length: 64 } || !detachedJwsDigest.All(char.IsAsciiHexDigit)) { return null; }
+             string operationId = "issue-" + Hash(new[] { signingRequestId, detachedJwsDigest });
+@@ -62,10 +64,12 @@
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), clock, cancellationToken, clock.GetTimestamp());
+         try
+         {
+-            if (authority is null || transition is null || !GovernanceScopeGuardReducer.IsClosedCommand(transition) || targets is null || targets.Count > 1000) { return null; }
++            deadline.ThrowIfCancellationRequested();
++            if (authority is null || transition is null || !GovernanceScopeGuardReducer.IsClosedCommand(transition) || targets is null) { return null; }
+             transition = await deadline.ReadAsync(_ => Task.FromResult(Capture(transition))).ConfigureAwait(false);
+             targets = await deadline.ReadAsync(_ =>
+             {
++                if (targets.Count > 1000) { throw new ArgumentException("Oversized joint write."); }
+                 long bytes = 0; var capturedTargets = new List<GuardedStateMutation>();
+                 foreach (var value in targets)
+                 {
+--- /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs (before)
++++ /home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs (preview)
+@@ -370,4 +370,50 @@
+         (await restarted.ExecuteAsync(first.Original, [first.Mutation], TestContext.Current.CancellationToken)).ShouldBe(first.Receipt);
+     }
+ 
++    /// <summary>The actual InstallEpoch entry bounds supplied target Count and traversal before any independent guard authority or joint effect.</summary>
++    [Theory]
++    [InlineData("count", false)][InlineData("count", true)][InlineData("traversal", false)][InlineData("traversal", true)]
++    public async Task SuspendedTargetsCannotAuthorizeOrMutateGuard(string access, bool expires)
++    {
++        var fixture = new GovernanceGuardFixture(); var command = fixture.Command(GovernanceGuardOperation.InstallEpoch);
++        var stored = fixture.Backend.Stored.ToDictionary(pair => pair.Key, pair => pair.Value.ToArray());
++        var clock = new RetainedHistoryTimeProvider(fixture.Backend.Now); using var caller = new CancellationTokenSource();
++        using var release = new ManualResetEventSlim(); var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        void Block() { entered.TrySetResult(); release.Wait(); finished.TrySetResult(); }
++        var supplied = Substitute.For<IReadOnlyList<GuardedStateMutation>>();
++        supplied.Count.Returns(_ => { if (access == "count") { Block(); } return 0; });
++        supplied.GetEnumerator().Returns(_ => { if (access == "traversal") { Block(); } return ((IEnumerable<GuardedStateMutation>)Array.Empty<GuardedStateMutation>()).GetEnumerator(); });
++        fixture.Authority.ClearReceivedCalls(); fixture.Backend.Authority.ClearReceivedCalls();
++        var owner = new GovernanceScopeGuardOwner(fixture.Backend.Owner, clock, fixture.Authority);
++        var pending = Task.Run(() => owner.ExecuteAsync(command, supplied, caller.Token), CancellationToken.None);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2));
++        try
++        {
++            if (expires) { clock.Advance(TimeSpan.FromSeconds(30)); (await pending.WaitAsync(TimeSpan.FromSeconds(2))).ShouldBeNull(); }
++            else { caller.Cancel(); var error = await Should.ThrowAsync<OperationCanceledException>(() => pending.WaitAsync(TimeSpan.FromSeconds(2))); error.CancellationToken.ShouldBe(caller.Token); }
++        }
++        finally { release.Set(); }
++        await finished.Task.WaitAsync(TimeSpan.FromSeconds(2));
++        fixture.Authority.ReceivedCalls().ShouldBeEmpty(); fixture.Backend.Authority.ReceivedCalls().ShouldBeEmpty(); fixture.Backend.TransactionCalls.ShouldBe(0);
++        foreach (var pair in stored) { fixture.Backend.Stored[pair.Key].ShouldBe(pair.Value); }
++    }
++
++    /// <summary>Every demonstrated disabled owner entry preserves original cancellation and remains null for an active caller.</summary>
++    [Theory]
++    [InlineData("read")][InlineData("execute")][InlineData("no-issue")]
++    public async Task DisabledOwnerEntriesCheckOriginalCancellation(string entry)
++    {
++        var fixture = new GovernanceGuardFixture(); var owner = new GovernanceScopeGuardOwner(fixture.Backend.Owner, TimeProvider.System);
++        var command = fixture.Command(GovernanceGuardOperation.InstallEpoch);
++        var payload = new DeletionBatchCapabilityV1("issuer", "audience", "tenant-a", "deletion-a", new string('A', 64), "AcceptedSet", 0,
++            new string('B', 64), new string('C', 64), "guard", 1, 1, 1, "key");
++        string requestId = DeletionBatchCapabilityIdentity.SigningRequestId(payload);
++        using var caller = new CancellationTokenSource(); caller.Cancel();
++        async Task<bool> Run(CancellationToken token) => entry == "read" ? await owner.ReadAsync("tenant-a", token) is null
++            : entry == "execute" ? await owner.ExecuteAsync(command, [], token) is null : await owner.ReadNoIssueAsync(payload, requestId, new string('D', 64), token) is null;
++        var error = await Should.ThrowAsync<OperationCanceledException>(() => Run(caller.Token)); error.CancellationToken.ShouldBe(caller.Token);
++        (await Run(CancellationToken.None)).ShouldBeTrue(); fixture.Backend.TransactionCalls.ShouldBe(0);
++    }
++
+ }

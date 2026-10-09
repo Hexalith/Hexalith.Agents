@@ -1,0 +1,34 @@
+{
+  "capturedUtc": "2026-10-09T02:15:59.032848+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "existed": true,
+      "sha256": "7dc1afb6d31ec0621e28a833534dbdf822aa53524eefd5245a821f865b2ece7d",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/history-owned-results/before/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs",
+      "existed": true,
+      "sha256": "e9d239c0467bf8bad586dd799a9b04f71092bb110d64b4e1ef73fd0fce71b09b",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/history-owned-results/before/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IIdentityHistoryCustody.cs",
+      "existed": true,
+      "sha256": "7b5f9494d3c060ba2e9a157ee349d8936830bc7903294ebe3598cb957ab07284",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/history-owned-results/before/eventstore/src/Hexalith.EventStore.Contracts/Security/IIdentityHistoryCustody.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "existed": true,
+      "sha256": "c46fe2fda55a39968c8296287494342cff5762d1fbebbefae8d7ae3c43d0894e",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/history-owned-results/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs"
+    }
+  ]
+}

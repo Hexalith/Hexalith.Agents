@@ -1,0 +1,93 @@
+{
+  "auditedUtc": "2026-10-09T00:51:53.477108+00:00",
+  "revision": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3",
+  "previousRevision": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2",
+  "orderedCapturesVerified": 97,
+  "exactPriorPrefixCount": 84,
+  "suppliedBeforeCopiesChecked": 404,
+  "currentHandoffPathsChecked": 37,
+  "engineeringArtifactsChecked": 115,
+  "commandsChecked": 39,
+  "historicalNonpassingCommandsRetained": 12,
+  "distinctPassingSelectedCases": 484,
+  "lanes": [
+    {
+      "lane": "reader",
+      "selectedPassed": 48,
+      "combinedXmlTotal": 48,
+      "classes": [
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests"
+      ]
+    },
+    {
+      "lane": "registration",
+      "selectedPassed": 7,
+      "combinedXmlTotal": 7,
+      "classes": [
+        "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests"
+      ]
+    },
+    {
+      "lane": "reconciliation",
+      "selectedPassed": 87,
+      "combinedXmlTotal": 87,
+      "classes": [
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests"
+      ]
+    },
+    {
+      "lane": "physical",
+      "selectedPassed": 45,
+      "combinedXmlTotal": 45,
+      "classes": [
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests"
+      ]
+    },
+    {
+      "lane": "canary",
+      "selectedPassed": 33,
+      "combinedXmlTotal": 33,
+      "classes": [
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests"
+      ]
+    },
+    {
+      "lane": "spool",
+      "selectedPassed": 38,
+      "combinedXmlTotal": 38,
+      "classes": [
+        "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests"
+      ]
+    },
+    {
+      "lane": "actual-coordinator",
+      "selectedPassed": 21,
+      "combinedXmlTotal": 50,
+      "classes": [
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests"
+      ]
+    },
+    {
+      "lane": "conversation",
+      "selectedPassed": 34,
+      "combinedXmlTotal": 34,
+      "classes": [
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests"
+      ]
+    },
+    {
+      "lane": "parties",
+      "selectedPassed": 171,
+      "combinedXmlTotal": 171,
+      "classes": [
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests"
+      ]
+    }
+  ],
+  "errors": [],
+  "scope": "Engineering integrity and selected focused evidence only. Root source review, full Local matrix, protected-state audit and runtime qualification require separate evidence."
+}

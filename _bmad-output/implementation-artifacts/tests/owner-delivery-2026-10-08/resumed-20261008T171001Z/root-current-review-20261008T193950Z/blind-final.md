@@ -1,0 +1,23 @@
+- Finding floor: `kB = 1,472,781 / 1,000 = 1,472.781`; `N = min(floor(sqrt(1,472.781) + 1), 10) = min(39, 10) = 10`.
+
+- `ReplicatedSecurityObservationSpool.cs:149` advances the independent exact-state anchor before saving the spool. A failed save leaves storage at revision N and authority at N+1; subsequent reads reject the stored state, preventing retry or drain. The other new actor owners use the same ordering. Add a durable pending-transition/reconciliation protocol and test failure before persistence followed by restart.
+
+- `RetainedHumanActorHistoryFold.cs:87` requires a readable predecessor for revocation. An establishment can expire before its later revocation expires, leaving an authenticated expired-prefix certificate followed by a readable revocation. This valid history throws because the predecessor is absent from `bindings`. Allow actor-free revocation continuity from the certified predecessor version and test this interval.
+
+- `TrustedEnvelopeReplayVerifier.cs:50` accepts any replay receipt whose retention ends after the current time. It never verifies the required retention duration against the accepted profile. A receipt retained for only seconds can therefore authorize a command despite the seven-day requirement. Validate the original retention basis and test shortened and extended receipts.
+
+- `SourcePublicationDispatcher.cs:17` resets its prefix to zero on every pass, while line 49 stops once the prefix reaches `maximumCount`. With 101 entries and a pass size of 100, every pass revisits the same first 100 entries; entry 101 never receives delivery. Preserve an authenticated resumable cursor, or count new delivery work separately from acknowledged-prefix verification.
+
+- `ConfiguredConversationDeletionReceiptVerifier.cs:26` checks worker authority before awaiting receiver lookup or target resolution, then returns `Available` without reconfirming it. Revocation during the final receiver await can still pass the admission stage’s last verification. Re-resolve and compare the worker authorization after the receiver operation; cover withdrawal during that await.
+
+- `DeletionConsumptionActor.cs:41`, `:45` and `:79` return `AlreadyDestroyedByBatch` without an aggregate `ReceiptId` or durable outcome for the requesting batch. `DeletionBatchExecutionCoordinator` requires a nonempty receipt, so this supported owner outcome becomes `ProtectionUnknown`; lookup after response loss also cannot recover it. Persist an exact result referencing the original destruction receipts and exercise it through the actual coordinator.
+
+- `DeletionBatchExecutionCoordinator.cs:61` builds replacement activation from the batch’s historical block-set revision. An unrelated revocation advances the protection owner’s block set, which makes `DeletionConsumptionActor.cs:179` reject activation. Every coordinator retry supplies the same stale revision, although the actor test demonstrates that an updated comparison can succeed. Add authenticated refresh and recovery for this case.
+
+- `EventStoreDeletionBatchGuardPort.cs:73` uses `SingleOrDefault` across all historical completion receipts for a deletion request. A post-seal content violation clears completion; completing its containment creates a second `CompletionSealed` receipt. Subsequent completion lookup then throws. Identify the current completion receipt by an explicit generation or retained receipt reference, and test repeated completion after containment.
+
+- `GovernanceScopeGuardReducer.cs:196` rejects every revocation for a key already listed as compromised. The protection owner accepts a later authenticated revocation revision for that key, so its new receipt can never be mirrored into the guard. Distinguish an already-blocked key from an already-recorded revocation event and support exact higher-revision receipts.
+
+- `DirectoryAtomicAppendClient.cs:32` rejects accepted ordinal zero, while `GovernanceScopeGuardReducer.AppendWrite` assigns zero when no deletion scope matches. Connecting these implementations would report an ordinary successfully committed pre-fence write as unavailable. Align the ordinal convention and add a test covering an accepted write outside all deletion scopes.
+
+- `SourceNamespaceSnapshotReader.cs:57` rejects a source whose current head exceeds the authenticated finite cut. The publication feed already handles this by extracting the exact committed prefix. A source append after cut capture can therefore deny catalogue reads even when the namespace authority continues to certify that cut. Read and validate the certified prefix, then reconfirm the cut; test a source that has advanced beyond it.

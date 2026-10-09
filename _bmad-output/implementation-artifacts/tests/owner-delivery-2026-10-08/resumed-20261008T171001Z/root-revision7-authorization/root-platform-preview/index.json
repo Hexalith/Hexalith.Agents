@@ -1,0 +1,50 @@
+{
+  "capturedUtc": "2026-10-09T09:23:39.477054+00:00",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-platform-preview/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "beforeSha256": "43ea2403240fa282a64e88bb76b451796ac27970a7968c1cee9633810a40ac48",
+      "previewSha256": "43ea2403240fa282a64e88bb76b451796ac27970a7968c1cee9633810a40ac48",
+      "deltaLines": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-platform-preview/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs",
+      "beforeSha256": "bc9a89171a657d1efc0832f517dbbddd10fcc01ada1e95184ab4958dc29fb19f",
+      "previewSha256": "84ccceb3ee3c727767a7bcfe3da62d90bbacc29a12fc8f4af37130f7e7c10e02",
+      "deltaLines": 26
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-platform-preview/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "beforeSha256": "bec766bdd47e3cf5ec7e811c4e46c8d4b2a1af739eb55ae2454d737017f4aa03",
+      "previewSha256": "f16b069b16888c6511a39b5ec91069830d384ffa0fd8712d45a66e2b84cbde2d",
+      "deltaLines": 10
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationDeadlineTests.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-platform-preview/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationDeadlineTests.cs",
+      "beforeSha256": "37cd67259bb7164cf5dddcfa0fadccebdb240d5b07b9af6998987a346db650a3",
+      "previewSha256": "f8421f3245cfe8c51ffcc7a6613b3ba2982d9540b2bf865aa36529f359771f27",
+      "deltaLines": 38
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-platform-preview/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "beforeSha256": "a35a52fed18a261b38ea2835bfca8e0cd241532d9df73308501781e6239a4ea5",
+      "previewSha256": "fa21501141b271d1bd58c7a2696afda1788c09d4a4bac419a2b8bb4e0d33d38b",
+      "deltaLines": 24
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-platform-preview/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "beforeSha256": "dbb6c9a3a9f9f4c25f6f50ace57b26191b3153b7d72ea06a176aad934ebad11c",
+      "previewSha256": "0e4cf5784e83eab2cf873648c8f4a296c69db54868cf8d86d765ba6cc3ea274a",
+      "deltaLines": 19
+    }
+  ],
+  "lines": 117,
+  "diffSha256": "159f86f2271391bc17579ce2a3b9d71d21d7587a573b5037cf207e1235a43f34",
+  "scope": "Preliminary settled Platform only; compare against final stable freeze"
+}

@@ -1,0 +1,41 @@
+{
+  "capturedUtc": "2026-10-09T01:04:32.200654+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DirectoryRepairOriginalIdentity.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceRepairState.cs",
+      "existed": true,
+      "sha256": "a8e44476b1b9288f0c03a6fa4fea68d807d175dcebaa7dfef08a51f0cfe427dc",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/repair-original-identity/before/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceRepairState.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardTransition.cs",
+      "existed": true,
+      "sha256": "7198f055b53c1c60f54772b6b535bb727ba5e8c7d831f5d458355b033dd0bb6a",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/repair-original-identity/before/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardTransition.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "existed": true,
+      "sha256": "49bbf777e28b47003b66b20e9f0c89a74a05cd22223da9f66fa3f6149afec641",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/repair-original-identity/before/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "existed": true,
+      "sha256": "bf12a4426eb924bcc318ba7d9e0354809d41967b434fcf2640e0a7465fc3751f",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/repair-original-identity/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs"
+    }
+  ]
+}

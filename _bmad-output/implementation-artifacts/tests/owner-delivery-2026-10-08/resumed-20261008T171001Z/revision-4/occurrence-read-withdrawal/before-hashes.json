@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-09T01:07:11.057466+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs",
+      "existed": true,
+      "sha256": "3a9422583f28e452b83f840a7f75ba0ffbb8d48bffb23b6c1964058d50cb9a91",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/occurrence-read-withdrawal/before/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs"
+    }
+  ]
+}

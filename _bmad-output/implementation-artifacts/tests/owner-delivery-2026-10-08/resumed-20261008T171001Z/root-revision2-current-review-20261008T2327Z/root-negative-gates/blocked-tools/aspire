@@ -1,0 +1,3 @@
+#!/bin/sh
+printf '%s\n' 'aspire' >> "$OWNER_GATE_CHILD_MARKER"
+exit 97

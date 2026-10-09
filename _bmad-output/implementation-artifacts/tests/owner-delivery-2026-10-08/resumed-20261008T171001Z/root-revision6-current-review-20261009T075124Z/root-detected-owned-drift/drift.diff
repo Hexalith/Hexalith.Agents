@@ -1,0 +1,49 @@
+--- frozen
++++ current
+@@ -49,7 +49,6 @@
+                 BadBinding == "tenant" ? new TenantId("other-tenant") : tenant,
+                 BadBinding == "principal" ? "wrong-principal" : principal,
+                 BadBinding == "party" ? F.Agent : ConversationDeletionDeliveryPumpTests.ServiceParty, "current-independent-authority", BadBinding != "organization");
+-        
+             }
+             finally { OperationFinished?.Invoke("authority"); }
+         }
+@@ -61,7 +60,6 @@
+             var state = await source.ReplayAsync();
+             if (SourceReads == BlockSourceCall) { SourceEntered.TrySetResult(); await SourcePending.Task; state = await source.ReplayAsync(); }
+             return state.DeletionSource;
+-        
+             }
+             finally { OperationFinished?.Invoke("source"); }
+         }
+@@ -74,13 +72,12 @@
+             if (PersistCommands) { source.Persist(ConversationAggregate.Handle(new RecordConversationDeletionDelivery(command,
+                 command.Metadata.IdempotencyKey!), await source.ReplayAsync())); }
+             return new(ConversationAgentsOutcome.Available);
+-        
+             }
+             finally { OperationFinished?.Invoke("record:" + command.Action); }
+         }
+         public async Task<string?> CurrentTargetAsync(TenantId tenant, CancellationToken token) {
+             try
+-            { token.ThrowIfCancellationRequested(); await (OperationHook?.Invoke("target") ?? Task.CompletedTask); ReceiverReads++; TargetCalls++; if (BlockTarget || BlockTargetCall == TargetCalls) { TargetEntered.TrySetResult(); return await TargetPending.Task; } return Target; 
++            { token.ThrowIfCancellationRequested(); await (OperationHook?.Invoke("target") ?? Task.CompletedTask); ReceiverReads++; TargetCalls++; if (BlockTarget || BlockTargetCall == TargetCalls) { TargetEntered.TrySetResult(); return await TargetPending.Task; } return Target;
+             }
+             finally { OperationFinished?.Invoke("target"); }
+         }
+@@ -93,7 +90,6 @@
+             if (UnknownLookup) { return new ConversationDeletionReceiverResult(ConversationAgentsOutcome.Unavailable); }
+             return Receipts.TryGetValue(target, out var receipt) ? new(ConversationAgentsOutcome.Available, receipt)
+                 : new ConversationDeletionReceiverResult(ConversationAgentsOutcome.Absent);
+-        
+             }
+             finally { OperationFinished?.Invoke("lookup"); }
+         }
+@@ -109,7 +105,6 @@
+                 signal.SourceRevision, 19, target, "synthetic-authenticated-receiver-receipt"); Receipts[target] = receipt;
+             if (LoseReceiverResponse) { LoseReceiverResponse = false; throw new HttpRequestException("Controlled lost receiver response."); }
+             return new ConversationDeletionReceiverResult(ConversationAgentsOutcome.Available, receipt);
+-        
+             }
+             finally { OperationFinished?.Invoke("submit"); }
+         }

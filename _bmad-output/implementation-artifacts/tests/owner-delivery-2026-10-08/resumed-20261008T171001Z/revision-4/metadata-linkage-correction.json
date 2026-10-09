@@ -1,0 +1,189 @@
+{
+  "capturedUtc": "2026-10-09T01:43:46.446677+00:00",
+  "scope": "Metadata-only correction after root stable-handoff audit; no source, captured before bytes, ordered list, existing execution logs/XML or frozen intent changed.",
+  "defect": "The selected later runner-payload log/XML lacked an exact command entry because the ledger was extracted before that executed test.",
+  "actualExecution": {
+    "timestamp": "2026-10-09T01:28:34.518Z",
+    "toolCallId": "call_0d3981c4e8764cb7852bdd9a2cf91915",
+    "workingDirectory": "/home/administrator/projects/hexalith/eventstore",
+    "shellCommand": "dotnet tests/Hexalith.EventStore.PayloadProtection.Tests/bin/Debug/net10.0/Hexalith.EventStore.PayloadProtection.Tests.dll -class '*InteractionOccurrenceKeyDerivationTests' -class '*InteractionOccurrenceProtectorTests' -result-xml /tmp/revision4-parties-runner-payload-tests.xml > /tmp/revision4-parties-runner-payload-tests.log 2>&1",
+    "argv": [
+      "dotnet",
+      "tests/Hexalith.EventStore.PayloadProtection.Tests/bin/Debug/net10.0/Hexalith.EventStore.PayloadProtection.Tests.dll",
+      "-class",
+      "*InteractionOccurrenceKeyDerivationTests",
+      "-class",
+      "*InteractionOccurrenceProtectorTests",
+      "-result-xml",
+      "/tmp/revision4-parties-runner-payload-tests.xml"
+    ],
+    "originalLog": "/tmp/revision4-parties-runner-payload-tests.log",
+    "archivedLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-payload-tests.log",
+    "archivedLogSha256": "02c269f9c61e6111d005a0f12609c3fb7377b96c4cce2855e225a2ee484338fa",
+    "logCompletedUtc": "2026-10-09T01:28:35.499511+00:00",
+    "originalXml": "/tmp/revision4-parties-runner-payload-tests.xml",
+    "archivedXml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-payload-tests.xml",
+    "archivedXmlSha256": "5333c442bfeb79c3320c73f401ca645a4a09aa73e2765d23b92f9ba7261f9c10",
+    "recordedResult": {
+      "total": 27,
+      "passed": 27,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "not-run": 0
+    },
+    "completionExitCode": 0,
+    "completionToolOutputTimestamp": "2026-10-09T01:28:35.703Z",
+    "completionToolChunkId": "467013",
+    "completionToolWallTimeSeconds": 0.781957766
+  },
+  "actualReturnedToolResult": {
+    "timestamp": "2026-10-09T01:28:35.703Z",
+    "chunkId": "467013",
+    "exitCode": 0,
+    "wallTimeSeconds": 0.781957766
+  },
+  "priorMetadata": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/commands.json",
+      "archive": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/metadata-linkage-correction/before/commands.json",
+      "sha256": "55563fd7c9139300f987c32d81789a48747800c2b31efe3bbf8ba2c0e48a3a11"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/README.md",
+      "archive": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/metadata-linkage-correction/before/README.md",
+      "sha256": "9c26390f6070f3ea240580bd52b9e300db072bca014a6fc268029859397789b2"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/engineering-handoff.json",
+      "archive": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/metadata-linkage-correction/before/engineering-handoff.json",
+      "sha256": "10a55ec93d64c2408553a0f00dce6f6068e62372237517efbea2a1565b582c2b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/artifact-hashes.json",
+      "archive": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/metadata-linkage-correction/before/artifact-hashes.json",
+      "sha256": "e1f311caff6ccfbb0825a93916c6e10a7d59c8395ecb5d00bb4a924b1df124af"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/handoff-verification.json",
+      "archive": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/metadata-linkage-correction/before/handoff-verification.json",
+      "sha256": "8557c9c5fe609a988875de8f84f88d1b4cb76e27965e317d042ebfe2cbf65156"
+    }
+  ],
+  "previousArtifactManifestSha256": "e1f311caff6ccfbb0825a93916c6e10a7d59c8395ecb5d00bb4a924b1df124af",
+  "selectedLaneCommandLinks": [
+    {
+      "lane": "namespace-reader",
+      "commandToolCallId": "call_40fd9138f87d480997887da3c233b9a2",
+      "timestamp": "2026-10-09T00:55:44.545Z",
+      "completionExitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-owned-capture/revision4-namespace-capture-tests.log",
+      "logSha256": "7712dc348c9a2c7295b2511c742ecd6d5ac20ddf5269ed1c8cfc8ce64af44ec9",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-owned-capture/revision4-namespace-capture-tests.xml",
+      "xmlSha256": "2400dd6519c2c0557c21eb39d2350b13eed8bc55f391c1bfdc1918524f118ddc"
+    },
+    {
+      "lane": "namespace-roster",
+      "commandToolCallId": "call_ce7f633b3feb4490aea7641ba13d8e8d",
+      "timestamp": "2026-10-09T00:58:22.846Z",
+      "completionExitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-roster-capture/revision4-namespace-roster-tests.log",
+      "logSha256": "8cdc3081e1738313cd8cad64b2c8e0454091be440a46870584a22ecfdfbe932e",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-roster-capture/revision4-namespace-roster-tests.xml",
+      "xmlSha256": "fc91e08e415ee0c213ce6c9a8ef2adbbfa9ec29366301d2d8a9f69e18b5d7bb0"
+    },
+    {
+      "lane": "finite-cut",
+      "commandToolCallId": "call_42fe9277a4bc4f4a90b1338f4aac9fcb",
+      "timestamp": "2026-10-09T01:03:34.075Z",
+      "completionExitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/revision4-finite-cut-tests-third.log",
+      "logSha256": "7a22f991027a446a0ca09186817071a77bb12f7864217a8bd0533495205dc132",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/revision4-finite-cut-tests-third.xml",
+      "xmlSha256": "2d89c1783059dff731050d77f309149465b81463b76af75d9313ffdbcbcadea9"
+    },
+    {
+      "lane": "feed-dispatch-compatibility",
+      "commandToolCallId": "call_b3edbc428b44416ab62598907e9e9714",
+      "timestamp": "2026-10-09T01:03:52.476Z",
+      "completionExitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/revision4-finite-cut-feed-dispatch-tests.log",
+      "logSha256": "f1b29bd6f79b3f1118fe4e5cf73049ce91a482496ba28e206ff1d126792f49ee",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/revision4-finite-cut-feed-dispatch-tests.xml",
+      "xmlSha256": "0f2491d1f415a51351cd74903cd170876217c19222d583441178aef3da7d1d43"
+    },
+    {
+      "lane": "repair-owner-original",
+      "commandToolCallId": "call_1acb9eca09594eae8cffc87d2f29816d",
+      "timestamp": "2026-10-09T01:06:00.123Z",
+      "completionExitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/repair-original-identity/revision4-repair-identity-tests.log",
+      "logSha256": "2ffa4638a7a8213aabc28b291d8f83e85beac211879fa5cc07e716f4ba440863",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/repair-original-identity/revision4-repair-identity-tests.xml",
+      "xmlSha256": "6e7b9e2bf15202c9edb0a209232f18c500013f1f35f7407bfab9aede2467015d"
+    },
+    {
+      "lane": "protection-target-order",
+      "commandToolCallId": "call_84868cea1e034c1483d76d854f738bec",
+      "timestamp": "2026-10-09T01:08:56.798Z",
+      "completionExitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/protection-target-order/revision4-target-order-tests-second.log",
+      "logSha256": "f19c4aa0ed759d77aab0dc455a56aea99d50680c8993b1777ddb92f5837c1b15",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/protection-target-order/revision4-target-order-tests-second.xml",
+      "xmlSha256": "bee282e0ffcd48f3277b63a7de946039f41f259211e7b6b04043b8eb433edede"
+    },
+    {
+      "lane": "platform-owner-final",
+      "commandToolCallId": "call_abc3f66c19e4403b9574b52ebe2e8c4d",
+      "timestamp": "2026-10-09T01:26:58.143Z",
+      "completionExitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/private-clock-registration/revision4-platform-owner-final-tests-second.log",
+      "logSha256": "246980fcd301e8738a256cf9dc043e93ebe69efac57d99109ef23db2b8011359",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/private-clock-registration/revision4-platform-owner-final-tests-second.xml",
+      "xmlSha256": "c0fe19219bcc007e77a3eadf4513fc01b46e00d8c1f357d67ee0b08b922f9759"
+    },
+    {
+      "lane": "runner-contracts",
+      "commandToolCallId": "call_b0bb1feddfa04dfc82bbe13fac5589a9",
+      "timestamp": "2026-10-09T01:25:26.381Z",
+      "completionExitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-contracts-tests.log",
+      "logSha256": "34276372bc285de116bc4bc9f6906d5fb66cf4e5ec4fe9835a8fe7762f8186a6",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-contracts-tests.xml",
+      "xmlSha256": "cd2367836e00cdd637c46312b96151bf34ee74b3a01bebcb683f42b51867cdb3"
+    },
+    {
+      "lane": "runner-client",
+      "commandToolCallId": "call_1e14cf835dda46b7bc1d755e5664d015",
+      "timestamp": "2026-10-09T01:26:36.013Z",
+      "completionExitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-client-tests.log",
+      "logSha256": "5f2a6864ee19ad1833b4f89373bb45a81b1a6cbe3e26e2a636d99a0137bdc88c",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-client-tests.xml",
+      "xmlSha256": "c514f5c513fcf60698e2e512ccb73fcc9ef93bb7d2a7722354f3fb5db91c86aa"
+    },
+    {
+      "lane": "runner-server",
+      "commandToolCallId": "call_6fee87eded0d4a72b7314fb04d55ed57",
+      "timestamp": "2026-10-09T01:27:56.855Z",
+      "completionExitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-server-tests.log",
+      "logSha256": "3ff2c30803e877666fb4cb9f68e9f54681e954baf244db592c4c58fa1aa6dc72",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-server-tests.xml",
+      "xmlSha256": "f113437a920bc86d0cd896f955ff2e16beffdf0eb1f759f8e7ce134233fdb760"
+    },
+    {
+      "lane": "runner-payload",
+      "commandToolCallId": "call_0d3981c4e8764cb7852bdd9a2cf91915",
+      "timestamp": "2026-10-09T01:28:34.518Z",
+      "completionExitCode": 0,
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-payload-tests.log",
+      "logSha256": "02c269f9c61e6111d005a0f12609c3fb7377b96c4cce2855e225a2ee484338fa",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-payload-tests.xml",
+      "xmlSha256": "5333c442bfeb79c3320c73f401ca645a4a09aa73e2765d23b92f9ba7261f9c10"
+    }
+  ],
+  "exactDotnetCommands": 64,
+  "unchangedCurrentSelectedDistinctPasses": 492,
+  "orderedCapturesUnchanged": 114
+}

@@ -1,0 +1,40 @@
+{
+  "capturedUtc": "2026-10-09T02:56:18.235023+00:00",
+  "reviewRevision": 5,
+  "reviewManifestSha256": "541337b7540a520fb8d26f2aa131abd2f79e7530fe5459b45b4d54600238f55a",
+  "requiredClassCount": 44,
+  "requiredClassSetEqualsPreviouslyMappedSet": true,
+  "runnerChecks": [
+    {
+      "repository": "parties",
+      "path": "eng/verify-ext-parties-1.ps1",
+      "currentSha256": "63e8d7974b267f8baa8a8d14ae1e50503836de5aee21a589240dc55e36277bb1",
+      "previousSha256": "63e8d7974b267f8baa8a8d14ae1e50503836de5aee21a589240dc55e36277bb1",
+      "unchanged": true
+    },
+    {
+      "repository": "platform",
+      "path": "eng/verify-ext-secrets-1.ps1",
+      "currentSha256": "84315bbe185135c469cf511e80e9f743034502bc4339b2bbccea8098e7f66159",
+      "previousSha256": "84315bbe185135c469cf511e80e9f743034502bc4339b2bbccea8098e7f66159",
+      "unchanged": true
+    },
+    {
+      "repository": "conversations",
+      "path": "eng/verify-ext-conv-ai-1.ps1",
+      "currentSha256": "47e94253d2e551bf9d2d23ce8ddcc844d63b4d7d34683f3f47347d62487242cd",
+      "previousSha256": "47e94253d2e551bf9d2d23ce8ddcc844d63b4d7d34683f3f47347d62487242cd",
+      "unchanged": true
+    }
+  ],
+  "all44ClassesMapped": true,
+  "hostScaffold": {
+    "path": "/home/administrator/projects/hexalith/platform/eng/verify-agents-host.sh",
+    "currentSha256": "dd65e6a86a28315b8d22298e9e654e1c27426de1640ebcb698d539b4f43b3fb2",
+    "scope": "Existing unmodified runner outside owned capture set; whole source before/after matrix snapshot will include it."
+  },
+  "mappingPlan": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/root-local-class-mapping-plan-r4.json",
+  "fullMatrixShapePlan": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/root-full-local-matrix-plan.json",
+  "executionStarted": false,
+  "limits": "Final frozen mapping only; actual complete root matrix, passing execution per class, command shape/log/XML and source drift audits remain mandatory."
+}

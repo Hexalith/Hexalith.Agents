@@ -1,0 +1,8 @@
+[
+  "dotnet",
+  "/tmp/hexalith-resume-catalogue-20261008/bin/Hexalith.Conversations.Server.Tests/debug/Hexalith.Conversations.Server.Tests.dll",
+  "-class",
+  "*EventStoreConversationTenantCatalogueTests",
+  "-result-xml",
+  "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/catalogue/streaming-catalogue-tests.xml"
+]

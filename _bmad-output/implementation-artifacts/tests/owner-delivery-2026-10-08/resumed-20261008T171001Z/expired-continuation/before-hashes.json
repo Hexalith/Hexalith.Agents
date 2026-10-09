@@ -1,0 +1,55 @@
+{
+  "capturedUtc": "2026-10-08T17:25:30.091460+00:00",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/ExpiredIdentityHistoryCertificate.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IExpiredIdentityHistoryCustody.cs",
+      "existed": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/RetainedIdentityHistoryStream.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/expired-continuation/before/eventstore/src/Hexalith.EventStore.Contracts/Streams/RetainedIdentityHistoryStream.cs",
+      "beforeSha256": "e7ef927feb922641c296f7701e03d9dbb99a3726521444933db678f750e5d3c9"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/RetainedIdentityHistoryValidator.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/expired-continuation/before/eventstore/src/Hexalith.EventStore.Contracts/Streams/RetainedIdentityHistoryValidator.cs",
+      "beforeSha256": "e12c03a8eb4d6518467ccb65c3109bb5cc81220dfd9e0c62fc0f0fcff8639def"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/expired-continuation/before/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "beforeSha256": "e04124330ea1cafc8fdf70d309a5db55e62cbb534a273a85cedd864253d6731a"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/ExpiredIdentityHistorySourceTests.cs",
+      "existed": false
+    },
+    {
+      "repository": "parties",
+      "relativePath": "src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/expired-continuation/before/parties/src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs",
+      "beforeSha256": "bfa7ff1402b3641ca91cbc31a2902ea5fa5f8fdf41eb4ad672f786a2256d205f"
+    },
+    {
+      "repository": "parties",
+      "relativePath": "tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/expired-continuation/before/parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+      "beforeSha256": "193c1bb99223f4e6ee7385dba6d94a6d4dc5fc91b4e41a48ddbd27015918864a"
+    }
+  ]
+}

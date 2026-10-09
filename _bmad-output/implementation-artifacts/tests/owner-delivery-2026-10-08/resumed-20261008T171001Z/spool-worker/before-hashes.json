@@ -1,0 +1,38 @@
+{
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GuardedTransactionFixture.cs",
+      "existed": true,
+      "sha256": "2ea01c1a505fff29a023fdf7cc015e120f05b13897178f5424d029004c7a8073"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs",
+      "existed": true,
+      "sha256": "9ef1e44d998a7b73ae2a10cd830a987ec67eab106e4fad22addfe776b413cdeb"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpoolWorker.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformPrivateCapabilityComposition.cs",
+      "existed": true,
+      "sha256": "33b5b0fe7b770a9d407086b3fecf3428d23102887f50488a5e511c6bbe9ce7e5"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolWorkerTests.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "eng/verify-ext-secrets-1.ps1",
+      "existed": true,
+      "sha256": "5e3ea22834b0913f88754a6b3c3812608592286b8e3218cb282cb7843b22b507"
+    }
+  ]
+}

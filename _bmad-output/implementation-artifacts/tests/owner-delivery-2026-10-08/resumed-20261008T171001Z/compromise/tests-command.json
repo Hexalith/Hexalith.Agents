@@ -1,0 +1,8 @@
+[
+  "dotnet",
+  "/tmp/hexalith-resume-compromise-20261008/bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll",
+  "-class",
+  "*DeletionCapabilityRevocationSubscriberTests",
+  "-result-xml",
+  "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/compromise/tests.xml"
+]

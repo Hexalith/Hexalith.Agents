@@ -1,0 +1,138 @@
+{
+  "capturedUtc": "2026-10-09T10:36:14.697237+00:00",
+  "historicalStrictAudit": "root-refreshed-matrix-shape-and-drift-audit.json",
+  "historicalFailureRetained": true,
+  "firstRefreshActualCommands": 14,
+  "firstRefreshNormalBuildLogs": 22,
+  "firstRefreshPassingXml": 21,
+  "firstRefreshPassingExecutions": 4907,
+  "firstRefreshRequiredClasses": 44,
+  "rows": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Subscriptions/EventStoreDomainEventProcessor.cs",
+      "beforeFirstRefresh": "8954753a2a563969f61a68e19c538317fdcbd948da69eff88f3fe272b24bbff0",
+      "afterFirstRefresh": "2ec7df4ecac7fa1009d3ee8ccb5c4ede97120cd222372833ec2a393a88674cf7",
+      "beforeFinalRefresh": "2ec7df4ecac7fa1009d3ee8ccb5c4ede97120cd222372833ec2a393a88674cf7",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/refresh-concurrent-drift/eventstore/src/Hexalith.EventStore.Client/Subscriptions/EventStoreDomainEventProcessor.cs",
+      "currentCopySha256": "2ec7df4ecac7fa1009d3ee8ccb5c4ede97120cd222372833ec2a393a88674cf7",
+      "ownedReviewPath": false,
+      "classification": "Unowned production subscription change completed before first refresh started; pre-snapshot versus execution drift remains visible, then exact current input covered again by final refresh",
+      "currentMtimeUtc": "2026-10-09T10:24:36.026929+00:00",
+      "firstRefreshStartedUtc": "2026-10-09T10:25:12.445943+00:00"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Aggregates/EventStoreAggregateTests.cs",
+      "beforeFirstRefresh": "7d3b76ada36b39d923efa4f2c911bf772d89688f4b43884c22e53e2e981b68cd",
+      "afterFirstRefresh": "cde27c9202a805512061c36dedf9c9602ed61385734a99d39a7b75ff4a5a8dc6",
+      "beforeFinalRefresh": "cde27c9202a805512061c36dedf9c9602ed61385734a99d39a7b75ff4a5a8dc6",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/refresh-concurrent-drift/eventstore/tests/Hexalith.EventStore.Client.Tests/Aggregates/EventStoreAggregateTests.cs",
+      "currentCopySha256": "cde27c9202a805512061c36dedf9c9602ed61385734a99d39a7b75ff4a5a8dc6",
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test project input changed or removed during first refresh; complete existing matrix refreshed again to retain all owning compatibility checks"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Events/DaprLogicalClaimCodecTests.cs",
+      "beforeFirstRefresh": "b192f8c7d761af77032864901789b3c0a76103d3fdeed1ad1038b47d0f4aabb8",
+      "afterFirstRefresh": "b192f8c7d761af77032864901789b3c0a76103d3fdeed1ad1038b47d0f4aabb8",
+      "beforeFinalRefresh": "8d36a77f44bbd7fc4688aa3c6c4f211f918bad3d19f7809bc55b3c30e7ae79ea",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/refresh-concurrent-drift/eventstore/tests/Hexalith.EventStore.Client.Tests/Events/DaprLogicalClaimCodecTests.cs",
+      "currentCopySha256": "8d36a77f44bbd7fc4688aa3c6c4f211f918bad3d19f7809bc55b3c30e7ae79ea",
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test project input changed or removed during first refresh; complete existing matrix refreshed again to retain all owning compatibility checks"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Registration/ServiceCollectionExtensionsTests.cs",
+      "beforeFirstRefresh": "e0778a5835f3dfe87e6b3d5f5030ed15dee0478355ebc79fcc6ef1da8733ae8f",
+      "afterFirstRefresh": "acbda58ae861cf9173a369f174312dc4c963d85bf598f330b69fb74aa29e4324",
+      "beforeFinalRefresh": "acbda58ae861cf9173a369f174312dc4c963d85bf598f330b69fb74aa29e4324",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/refresh-concurrent-drift/eventstore/tests/Hexalith.EventStore.Client.Tests/Registration/ServiceCollectionExtensionsTests.cs",
+      "currentCopySha256": "acbda58ae861cf9173a369f174312dc4c963d85bf598f330b69fb74aa29e4324",
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test project input changed or removed during first refresh; complete existing matrix refreshed again to retain all owning compatibility checks"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Subscriptions/EventStoreDomainEventProcessorTests.cs",
+      "beforeFirstRefresh": "69cb972c5fb1d65a8697fba88cd3e071696bffde1d826fac154cc0265dc382d1",
+      "afterFirstRefresh": "b381fa1832b5e2dfdbf437296a7a04fd70480862f36fdd1cafe8c529b80c00a7",
+      "beforeFinalRefresh": "b381fa1832b5e2dfdbf437296a7a04fd70480862f36fdd1cafe8c529b80c00a7",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/refresh-concurrent-drift/eventstore/tests/Hexalith.EventStore.Client.Tests/Subscriptions/EventStoreDomainEventProcessorTests.cs",
+      "currentCopySha256": "b381fa1832b5e2dfdbf437296a7a04fd70480862f36fdd1cafe8c529b80c00a7",
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test project input changed or removed during first refresh; complete existing matrix refreshed again to retain all owning compatibility checks"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/Events/EventEvolutionEvidenceTests.cs",
+      "beforeFirstRefresh": "2607d086aff786afd7d4940aa46b253807946f156b44e3013b7abc6b46c54aad",
+      "afterFirstRefresh": null,
+      "beforeFinalRefresh": null,
+      "currentCopy": null,
+      "currentCopySha256": null,
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test project input changed or removed during first refresh; complete existing matrix refreshed again to retain all owning compatibility checks"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/Events/EventEvolutionObligationAuditTests.cs",
+      "beforeFirstRefresh": "7f5e7d7c715be009affe38c40a89b1670dbe2e1e25cb10262457f5c9c4221485",
+      "afterFirstRefresh": null,
+      "beforeFinalRefresh": null,
+      "currentCopy": null,
+      "currentCopySha256": null,
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test project input changed or removed during first refresh; complete existing matrix refreshed again to retain all owning compatibility checks"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.DomainService.Tests/DomainProjectionCancellationTests.cs",
+      "beforeFirstRefresh": null,
+      "afterFirstRefresh": "4ae23c9a0fc9bc9b6393393421e147302dbd690aa1275ca817aebf08818618ca",
+      "beforeFinalRefresh": "203fbdd9c36c82f9cc3f4c59c3288c297826df8d9fde933bc7e3b395979154ca",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/refresh-concurrent-drift/eventstore/tests/Hexalith.EventStore.DomainService.Tests/DomainProjectionCancellationTests.cs",
+      "currentCopySha256": "203fbdd9c36c82f9cc3f4c59c3288c297826df8d9fde933bc7e3b395979154ca",
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test project input changed or removed during first refresh; complete existing matrix refreshed again to retain all owning compatibility checks"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPayloadVersionRoundTripTests.cs",
+      "beforeFirstRefresh": null,
+      "afterFirstRefresh": "5b4a2aa8992fb0c904dd2e8f48bcfe3291955a12d140faedd17003b5ceb5646a",
+      "beforeFinalRefresh": "5b4a2aa8992fb0c904dd2e8f48bcfe3291955a12d140faedd17003b5ceb5646a",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/refresh-concurrent-drift/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPayloadVersionRoundTripTests.cs",
+      "currentCopySha256": "5b4a2aa8992fb0c904dd2e8f48bcfe3291955a12d140faedd17003b5ceb5646a",
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test project input changed or removed during first refresh; complete existing matrix refreshed again to retain all owning compatibility checks"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/EventPersisterTests.cs",
+      "beforeFirstRefresh": "64003d06daa1b25da5c2a5caa131191f4a8853f5e2e11e4493fc2f865348bc44",
+      "afterFirstRefresh": "8dca3638778a63eabae3e7d5a4b6765474387bf84871ff6de26ebd421a5d8ec2",
+      "beforeFinalRefresh": "8dca3638778a63eabae3e7d5a4b6765474387bf84871ff6de26ebd421a5d8ec2",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/refresh-concurrent-drift/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/EventPersisterTests.cs",
+      "currentCopySha256": "8dca3638778a63eabae3e7d5a4b6765474387bf84871ff6de26ebd421a5d8ec2",
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test project input changed or removed during first refresh; complete existing matrix refreshed again to retain all owning compatibility checks"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/EventPublisherTests.cs",
+      "beforeFirstRefresh": "8895980d54025d7d349bae05f14d20a431c3729c5efdfd4ad5336eb5aa8e742e",
+      "afterFirstRefresh": "8895980d54025d7d349bae05f14d20a431c3729c5efdfd4ad5336eb5aa8e742e",
+      "beforeFinalRefresh": "906374334fee4787e056768ee69bedc23d9916183fecf3c59d5e0b7bd63aa1ba",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/refresh-concurrent-drift/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/EventPublisherTests.cs",
+      "currentCopySha256": "906374334fee4787e056768ee69bedc23d9916183fecf3c59d5e0b7bd63aa1ba",
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test project input changed or removed during first refresh; complete existing matrix refreshed again to retain all owning compatibility checks"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/EventStreamReaderTests.cs",
+      "beforeFirstRefresh": "7a0a1c8e15ab31c1e68c52b275aa0af0ae41e81273d8c1693e836064cfba70fe",
+      "afterFirstRefresh": "2f43709a17dde5f675dd82707629e24328e0d66806a141c4d1e4e136b11aa24f",
+      "beforeFinalRefresh": "2f43709a17dde5f675dd82707629e24328e0d66806a141c4d1e4e136b11aa24f",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/refresh-concurrent-drift/eventstore/tests/Hexalith.EventStore.Server.Tests/Events/EventStreamReaderTests.cs",
+      "currentCopySha256": "2f43709a17dde5f675dd82707629e24328e0d66806a141c4d1e4e136b11aa24f",
+      "ownedReviewPath": false,
+      "classification": "Unowned SDK test project input changed or removed during first refresh; complete existing matrix refreshed again to retain all owning compatibility checks"
+    }
+  ],
+  "ownedChanges": 0,
+  "action": "One final complete fourteen-command Local matrix with fresh artifacts and a fully completed immediate before snapshot; no source edits by root",
+  "errors": [],
+  "limits": "Source changes are concurrent unowned work and remain preserved; first refresh test/build successes are genuine but do not establish a globally stable graph."
+}

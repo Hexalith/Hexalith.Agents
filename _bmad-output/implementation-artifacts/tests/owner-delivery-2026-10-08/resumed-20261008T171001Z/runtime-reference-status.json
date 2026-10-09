@@ -1,0 +1,7 @@
+{
+  "recordedUtc": "2026-10-08T18:56:14.402104+00:00",
+  "question": "Where can I read the runtime configuration for the approved Conversations worker and independent decision signer? A configuration path or public identity references will let me check enrollment and trust; please do not send credentials.",
+  "userAnswer": "i dont know",
+  "status": "unestablished",
+  "meaning": "No actual worker enrollment/current machine binding, independent signer enrollment/profile/trust or current application actor/role authority was supplied by this answer. Existing service-Party, named approval-policy and engineering approvals remain accepted. Source engineering, review and local verification continue; runtime gates remain closed."
+}

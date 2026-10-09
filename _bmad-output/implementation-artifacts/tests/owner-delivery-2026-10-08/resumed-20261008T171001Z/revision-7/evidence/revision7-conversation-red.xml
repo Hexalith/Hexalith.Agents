@@ -1,0 +1,45 @@
+<assemblies schema-version="3" id="73d66b26-e99e-419e-8bec-ddaf96f4cfd2" computer="DESKTOP-VIOG240" user="administrator" start-rtf="2026-10-09T09:22:44.1160400+00:00" finish-rtf="2026-10-09T09:22:48.3636190+00:00" timestamp="10/09/2026 11:22:48"><assembly environment="64-bit (x64) .NET 10.0.12 [collection-per-class, parallel (collections, 14 threads)]" id="651cd11c-e9c8-46f9-9a7f-5795001e6a90" name="/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Server.Tests.dll" run-date="2026-10-09" run-time="09:22:44" start-rtf="2026-10-09T09:22:44.1160400+00:00" test-framework="xUnit.net v3 4.0.1+8ed8aa354c" target-framework=".NETCoreApp,Version=v10.0" errors="0" failed="2" finish-rtf="2026-10-09T09:22:48.3636190+00:00" not-run="0" passed="1" skipped="0" time="4.247" time-rtf="00:00:04.2470000" total="3"><collection name="Test collection for Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests (id: d87985d313b6b0f543778a692f960f2f3e6fe0b22fb741c678ec7e63aefacee8)" id="1f1888f0-3974-4aba-bfb7-b0bfbd62bbd9" failed="0" not-run="0" passed="1" skipped="0" time="0.159" time-rtf="00:00:00.1590000" total="1"><test id="2297b5bd-4b92-45f9-bdf8-49447e2d0ca5" name="Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests.DeletedOpenConversationIsExcludedFromCompleteActiveCount" result="Pass" time="0.159" time-rtf="00:00:00.1590000" start-rtf="2026-10-09T09:22:44.2035391+00:00" finish-rtf="2026-10-09T09:22:44.3726269+00:00" type="Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests" method="DeletedOpenConversationIsExcludedFromCompleteActiveCount" source-file="/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs" source-line="129" /></collection><collection name="Test collection for Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests (id: 218ee82c005bff42e8cdfceb5227fd900ca7521cfa26466db4eaf315074ee023)" id="1124af56-c7f2-46e2-8436-9bfe4c598357" failed="2" not-run="0" passed="0" skipped="0" time="4.142" time-rtf="00:00:04.1420000" total="2"><test id="20fca58e-1825-4dc6-bf04-5ad0b091255e" name="Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests.WorkerInvocationCannotOutliveCanceledCaller(delivery: False)" result="Fail" time="2.14" time-rtf="00:00:02.1400000" start-rtf="2026-10-09T09:22:44.2035473+00:00" finish-rtf="2026-10-09T09:22:46.3573701+00:00" type="Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests" method="WorkerInvocationCannotOutliveCanceledCaller" source-file="/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs" source-line="100"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests.WorkerInvocationCannotOutliveCanceledCaller(Boolean delivery) in /home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs:line 115
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="25b91296-958b-43d9-9881-1337a41662f6" name="Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests.WorkerInvocationCannotOutliveCanceledCaller(delivery: True)" result="Fail" time="2.002" time-rtf="00:00:02.0019999" start-rtf="2026-10-09T09:22:46.3577866+00:00" finish-rtf="2026-10-09T09:22:48.3610726+00:00" type="Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests" method="WorkerInvocationCannotOutliveCanceledCaller" source-file="/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs" source-line="100"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `pending.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests.WorkerInvocationCannotOutliveCanceledCaller(Boolean delivery) in /home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs:line 115
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test></collection></assembly></assemblies>

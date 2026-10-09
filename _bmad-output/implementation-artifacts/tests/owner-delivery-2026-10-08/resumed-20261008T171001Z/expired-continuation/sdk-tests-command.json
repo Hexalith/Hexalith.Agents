@@ -1,0 +1,10 @@
+[
+  "dotnet",
+  "/tmp/hexalith-resume-expired-sdk-20261008/bin/Hexalith.EventStore.Server.Tests/debug/Hexalith.EventStore.Server.Tests.dll",
+  "-class",
+  "*ExpiredIdentityHistorySourceTests",
+  "-class",
+  "*RetainedIdentityHistorySourceReaderTests",
+  "-result-xml",
+  "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/expired-continuation/sdk-tests.xml"
+]

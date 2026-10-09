@@ -1,0 +1,14 @@
+[
+  {
+    "location": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs:31-34",
+    "trigger_condition": "Guard-approved target aliases contain characters whose JSON escaping reverses their ordinal order.",
+    "guard_snippet": "Compare target.AgentInteractionId and target.TargetProtectionKeyAlias with StringComparer.Ordinal, matching GovernanceScopeGuardReducer.ValidBatch.",
+    "potential_consequence": "Valid manifests containing key+v1 before key-v1 cannot register or consume."
+  },
+  {
+    "location": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs:24-26",
+    "trigger_condition": "SigningAttemptOrdinal equals 9007199254740991 when a successor is created.",
+    "guard_snippet": "if (original.Payload.SigningAttemptOrdinal >= 9007199254740991L || proof.CurrentGuardRevision > 9007199254740991L) return null;",
+    "potential_consequence": "Successor exceeds the canonical I-JSON bound; signing throws instead of returning unavailable."
+  }
+]

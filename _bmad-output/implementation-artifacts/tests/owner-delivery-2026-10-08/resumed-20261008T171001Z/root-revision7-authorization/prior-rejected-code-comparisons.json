@@ -1,0 +1,54 @@
+{
+  "capturedUtc": "2026-10-09T09:06:51.717594+00:00",
+  "scope": "Prior-verdict comparison preparation only, not a new review or final carry determination",
+  "rows": [
+    {
+      "priorFinding": "B2",
+      "route": "reject-false",
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs",
+      "comparisonScope": "whole-source",
+      "priorReviewedNormalizedCodeSha256": "df5f2c4c76c660eedfee137edad4032c308f145624c194888b0d416208e60f51",
+      "currentNormalizedCodeSha256": "df5f2c4c76c660eedfee137edad4032c308f145624c194888b0d416208e60f51",
+      "unchangedAtPreparation": true,
+      "priorEvidence": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/current-review-triage.md",
+      "claimVerificationPerformed": false,
+      "requirement": "Only carry if a fresh reviewer files the same location/claim and final code remains unchanged; preserve verdict/route and skip claim verification then."
+    },
+    {
+      "priorFinding": "B7",
+      "route": "reject-low-complexity",
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs",
+      "comparisonScope": "whole-source",
+      "priorReviewedNormalizedCodeSha256": "124824a09bd14447b761fced120d07c6df5970a518ce3210750f63caaed00d4d",
+      "currentNormalizedCodeSha256": "124824a09bd14447b761fced120d07c6df5970a518ce3210750f63caaed00d4d",
+      "unchangedAtPreparation": true,
+      "priorEvidence": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/current-review-triage.md",
+      "claimVerificationPerformed": false,
+      "requirement": "Only carry if a fresh reviewer files the same location/claim and final code remains unchanged; preserve verdict/route and skip claim verification then."
+    },
+    {
+      "priorFinding": "B9",
+      "route": "reject-low-complexity",
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpoolWorker.cs",
+      "comparisonScope": "whole-source",
+      "priorReviewedNormalizedCodeSha256": "1e096873e10e1684ab3c9c5898154630dd158d06e4f24c5a9c5787b6b4f4b62c",
+      "currentNormalizedCodeSha256": "1e096873e10e1684ab3c9c5898154630dd158d06e4f24c5a9c5787b6b4f4b62c",
+      "unchangedAtPreparation": true,
+      "priorEvidence": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/current-review-triage.md",
+      "claimVerificationPerformed": false,
+      "requirement": "Only carry if a fresh reviewer files the same location/claim and final code remains unchanged; preserve verdict/route and skip claim verification then."
+    },
+    {
+      "priorFinding": "B10",
+      "route": "reject-low-complexity",
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "comparisonScope": "Copy method",
+      "priorReviewedNormalizedCodeSha256": "1ae9ab31866a7f6c1dc8d4215a10c76dde3d59ea2a7d7e1bf74b750e64261700",
+      "currentNormalizedCodeSha256": "1ae9ab31866a7f6c1dc8d4215a10c76dde3d59ea2a7d7e1bf74b750e64261700",
+      "unchangedAtPreparation": true,
+      "priorEvidence": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/current-review-triage.md",
+      "claimVerificationPerformed": false,
+      "requirement": "Only carry if a fresh reviewer files the same location/claim and final code remains unchanged; preserve verdict/route and skip claim verification then."
+    }
+  ]
+}

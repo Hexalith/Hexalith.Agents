@@ -1,0 +1,69 @@
+{
+  "capturedUtc": "2026-10-09T06:56:14.079053+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "existed": true,
+      "sha256": "77dfd9daa1e835897209986e68fefb1171d5d9b2f7a87800304dbdcf055050f3",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs",
+      "existed": true,
+      "sha256": "7799a8819a599ce579577afd53ad2a8dadaf2b557013d3aecb0c954953407159",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+      "existed": true,
+      "sha256": "51f7f58b91ac258a13cfe7a4ab65a1b3b8be0e14dcf5cf6e0d02f248d3b774c0",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs",
+      "existed": true,
+      "sha256": "60c8c6f71d54bed3a675ae731e8ce001d2612feea5a928473d6d804925f66ead",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PrivateActorStateIoLifetime.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ActorPendingFixture.cs",
+      "existed": true,
+      "sha256": "2b82bce3cceb91a2f1ee7e0b6bcf1f4fe1474c0b78b8879c3cbb8603745b106e",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/tests/Hexalith.Platform.Custody.Tests/ActorPendingFixture.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "existed": true,
+      "sha256": "1c1e1df7a28c31e831c976e6a1e43575ae03ba3d4162f35601c5c2b4cf9a45df",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "existed": true,
+      "sha256": "826cf04873741c7cc2d3125ad375e05b13de6c6082299d0f74a3f268f108e418",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "existed": true,
+      "sha256": "089708c2a9db5413ee867c9912bf709c120ea3f1362376c498b7f17b159a2760",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/actor-operation-state-lifetime/before/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs"
+    }
+  ]
+}

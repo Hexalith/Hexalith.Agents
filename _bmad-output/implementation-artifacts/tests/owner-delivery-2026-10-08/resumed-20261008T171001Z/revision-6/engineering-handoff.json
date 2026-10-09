@@ -1,0 +1,117 @@
+{
+  "capturedUtc": "2026-10-09T07:48:06.193853+00:00",
+  "status": "stable final source engineering handoff; packaged hash check passed; root full Local and next independent review pending",
+  "spec": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md",
+  "specSha256": "abf0d054eef53086596d2d3bfe848132d0615ae2b790eb41c1cecb915e487382",
+  "revision": 6,
+  "sourceEngineer": "owner_rederivation",
+  "orderedBaselines": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/ordered-baselines.json",
+  "orderedCaptureCount": 142,
+  "preservedExactPrefixCount": 125,
+  "freshUnits": 17,
+  "uniqueCapturedSourceTestPacketPaths": 51,
+  "changedSourceTestPacketPaths": 51,
+  "focusedDistinctPassedCases": 575,
+  "focusedLanes": [
+    {
+      "lane": "server-final",
+      "passed": 165,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "3.213",
+      "classes": {
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests": 48,
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests": 58,
+        "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests": 59
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-server-layout-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-server-layout-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-server-layout-tests.xml"
+    },
+    {
+      "lane": "platform-final",
+      "passed": 235,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "2.447",
+      "classes": {
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests": 40,
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests": 37,
+        "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests": 52,
+        "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests": 27,
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationAuthenticatorTests": 59,
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests": 1,
+        "Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests": 19
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-layout-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-layout-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-platform-layout-tests.xml"
+    },
+    {
+      "lane": "client-final",
+      "passed": 109,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "0.522",
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests": 48,
+        "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests": 29,
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests": 32
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-client-final-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-client-final-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-client-final-tests.xml"
+    },
+    {
+      "lane": "conversations-final",
+      "passed": 66,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "9.449",
+      "classes": {
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests": 9,
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests": 57
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-conversations-layout-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-conversations-layout-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/evidence/revision6-conversations-layout-tests.xml"
+    }
+  ],
+  "exactDotnetCommands": 71,
+  "selectedLaneCommandLinksVerified": 4,
+  "currentBuilds": "Four clean normal Debug/local-reference builds, zero warnings/errors; analyzer/XML defaults retained. Full root Local matrix never run by engineer.",
+  "findingStatus": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/finding-status.json",
+  "commands": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/commands.json",
+  "sourceHashes": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/current-owned-source.json",
+  "preservation": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/preservation.json",
+  "previousReviewedSourceComparison": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/final-reviewed-source-comparison.json",
+  "historicalAttempts": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/historical-attempts.json",
+  "ownerPackets": [
+    "ext-parties-1.md",
+    "ext-conv-ai-1.md",
+    "ext-secrets-1.md",
+    "ext-host-1.md"
+  ],
+  "priorPacketBytes": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/owner-packets/before/agents",
+  "verificationMap": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/required-class-audit.json",
+  "reviewFreezeOwner": "Root freezes cumulative manifest/diff with all142 captures, launches next three fresh independent reviewers and executes complete mandatory Local matrix.",
+  "remainingWork": [
+    "Root complete Local matrix and next independent three-layer review.",
+    "Current authorities/enrollment, qualified providers/backends/replicas/nonrollback anchors/isolation/all-copy destruction/restore/Live acceptance unestablished.",
+    "Story5.4 draft/backlog, parent in-progress, four dependencies Uncommitted; complete TargetVersionOrCommit and accepted full compatibility command TBD."
+  ],
+  "limits": [
+    "Finite budgets release callers; they do not forcibly terminate/reclaim blocked providers or qualify resource/backend isolation.",
+    "In-flight actor state I/O exclusion is process-local; exact independent journal remains mandatory for recovery.",
+    "Modeled qualified fixture authorities/backends/providers do not establish actual runtime composition."
+  ],
+  "preserved": "Frozen intent, protected story/sprint/register/policy, prior immutable packages and all concurrent external source. No source/artifact edits after stable final delivery."
+}

@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T00:00:27.561246+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs",
+      "existed": true,
+      "sha256": "0d8089dc00d3d8d3e4f5e8ea2f5dea3d13bc73ede2d10ceae3182600980ee51c",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/delivery-terminal-authority/before/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "existed": true,
+      "sha256": "859a008b00fa12f84f47e018e6bf272d92a27e2fd9342f8760f84d521e4e6721",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/delivery-terminal-authority/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs"
+    }
+  ]
+}

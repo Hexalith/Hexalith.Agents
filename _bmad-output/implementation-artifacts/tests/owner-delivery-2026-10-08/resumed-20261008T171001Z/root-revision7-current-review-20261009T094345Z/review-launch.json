@@ -1,0 +1,25 @@
+{
+  "launchedUtc": "2026-10-09T09:49:13.266918+00:00",
+  "allThreeLaunchedBeforeAnyResultsWereHandled": true,
+  "context": "none for each reviewer",
+  "modelCapability": "inherited current session, no override",
+  "reviewDiff": {
+    "capturedUtc": "2026-10-09T09:43:45.591364+00:00",
+    "manifest": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/review-input.json",
+    "manifestSha256": "c928e8b74d5973634408e117c98ce0b16afa70ef467ae9f2301847a366e130fa",
+    "diffFile": "/tmp/hexalith-owner-source-review-0xb9t7tj.diff",
+    "diffSha256": "d45de8e351d9260c7414d094abdbae288e4a072a04a220d0a54cb47248bf1877",
+    "diffBytes": 3697805,
+    "sections": 395,
+    "scope": "Cumulative earliest explicit before-capture to frozen current owned source, including new files; absolute source headers; CRLF normalized only for review readability. No staging or Git mutations."
+  },
+  "reviewers": [
+    "/root/owner_blind_review_r7",
+    "/root/owner_edge_review_r7",
+    "/root/owner_verification_review_r7"
+  ],
+  "claimsOnlyToEdgeAfterOwnTracing": true,
+  "rootDidNotReadReviewerInstructionFiles": true,
+  "parentStatus": "existing explicit full-parent in-progress override retained",
+  "required": "all three final replies before verdicts/grouping; no source mutation while review and matrix execute"
+}

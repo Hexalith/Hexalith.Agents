@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T09:38:11.247060+00:00",
+  "status": "pass; final stable source/evidence/package hash check",
+  "artifactManifest": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/artifact-hashes.json",
+  "artifactManifestSha256": "8c1161a6e70e2f4698af44c7737054dbf24225c40c6539b1c9e5caebc5067baf",
+  "packagedFilesChecked": 100,
+  "currentSourcePathsChecked": 21,
+  "orderedCapturesChecked": 148,
+  "preservedPrefix": 142,
+  "suppliedBeforeCopiesChecked": 559,
+  "freshSuppliedBeforeCopiesChecked": 22,
+  "previousRevisionArtifactsChecked": 289,
+  "classifiedConcurrentPathsPreserved": 6,
+  "selectedSuccessfulCommandLinksChecked": 4,
+  "exactDotnetCommandsChecked": 25,
+  "distinctPassingCases": 400,
+  "freshIndependentReview": "pending root",
+  "completeRootLocalMatrix": "pending root",
+  "sourceOrPacketEditsAfterFinalHandoff": "none authorized; engineering stops after delivery"
+}

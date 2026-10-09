@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-08T23:46:21.259101+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationWriterRegistration.cs",
+      "existed": true,
+      "sha256": "c34e3ebcad6750259f0bfbb4f430bb4a701e94ab80acf9e8057e334d1af36bb6",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/writer-registration/before/eventstore/src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationWriterRegistration.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs",
+      "existed": true,
+      "sha256": "8df902a339d9b4de99a392ea0cfe1fc0f08e2ccf8993d78f4294a2d5f91e4b7a",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/writer-registration/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs"
+    }
+  ]
+}

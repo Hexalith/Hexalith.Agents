@@ -1,0 +1,66 @@
+{
+  "capturedUtc": "2026-10-08T23:24:39.670034+00:00",
+  "requiredOwnedClasses": {
+    "Hexalith.Conversations.Server.Tests": [
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationDeliveryTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationProjectorTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests",
+      "Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests"
+    ],
+    "Hexalith.EventStore.Client.Tests": [
+      "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests",
+      "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests",
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests"
+    ],
+    "Hexalith.EventStore.Contracts.Tests": [
+      "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests"
+    ],
+    "Hexalith.EventStore.PayloadProtection.Tests": [
+      "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceKeyDerivationTests",
+      "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests"
+    ],
+    "Hexalith.EventStore.Server.Tests": [
+      "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests",
+      "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests",
+      "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests",
+      "Hexalith.EventStore.Server.Tests.Security.ExpiredIdentityHistorySourceTests",
+      "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests",
+      "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests",
+      "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests",
+      "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests"
+    ],
+    "Hexalith.Parties.Tests": [
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests"
+    ],
+    "Hexalith.Platform.Custody.Tests": [
+      "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests",
+      "Hexalith.Platform.Custody.Tests.DeletionBatchCapabilityCodecTests",
+      "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests",
+      "Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests",
+      "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests",
+      "Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests",
+      "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests",
+      "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests",
+      "Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests",
+      "Hexalith.Platform.Custody.Tests.PlatformAcceptedEnvelopeTimingTests",
+      "Hexalith.Platform.Custody.Tests.PlatformKeyInventoryActorTests",
+      "Hexalith.Platform.Custody.Tests.PlatformSecurityDenialRecorderTests",
+      "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationAuthenticatorTests",
+      "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests",
+      "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests",
+      "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolWorkerTests",
+      "Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests"
+    ]
+  },
+  "rootFullMatrix": "pending review triage",
+  "fullParent": "in-progress",
+  "runtimeReferences": "unestablished"
+}

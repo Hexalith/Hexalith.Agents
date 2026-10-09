@@ -1,0 +1,12 @@
+{
+  "capturedUtc": "2026-10-08T23:27:30.278850+00:00",
+  "sourceReviewPhase": "Three independent layers launched; await all final reports before classification",
+  "manifest": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/review-input.json",
+  "diff": "/tmp/hexalith-owner-source-review-802s8s4l.diff",
+  "ownedSourceDrift": [],
+  "focusedPasses": 390,
+  "negativeGateChecks": 11,
+  "fullLocalMatrix": "pending current-source review triage",
+  "fullParentStatus": "in-progress",
+  "runtimeConfiguration": "User does not know location; actual enrollment/current authority/qualification remain unestablished"
+}

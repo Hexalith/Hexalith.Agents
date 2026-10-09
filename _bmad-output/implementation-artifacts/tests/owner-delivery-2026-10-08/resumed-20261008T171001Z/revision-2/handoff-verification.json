@@ -1,0 +1,22 @@
+{
+  "verifiedUtc": "2026-10-08T23:22:00.656167+00:00",
+  "currentSourceHashesVerified": 64,
+  "orderedCapturesVerified": 84,
+  "exactPreservedPrefixVerified": 72,
+  "distinctPassingFocusedCases": 390,
+  "zeroFailedOrSkippedFocusedCases": true,
+  "completedSessionExitCodes": {
+    "ClientProgressBuild": 0,
+    "PlatformFinalBuild": 0,
+    "PlatformFinalTests": 0,
+    "ServerFinalBuild": 0,
+    "ServerFinalTests": 0,
+    "ConversationFinalBuild": 0,
+    "ConversationFinalTests": 0,
+    "ContractsFinalBuild": 0,
+    "ClientDownstreamBuild": 0,
+    "earlierMalformedScopeTest": 1,
+    "earlierNullableFixtureBuild": 1
+  },
+  "scope": "Current scoped source and artifact preservation checks; no claim of root matrix/review/production qualification."
+}

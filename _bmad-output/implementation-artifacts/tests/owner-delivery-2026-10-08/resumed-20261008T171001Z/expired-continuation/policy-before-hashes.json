@@ -1,0 +1,11 @@
+{
+  "files": [
+    {
+      "repository": "parties",
+      "relativePath": "src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/expired-continuation/before/parties/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs",
+      "beforeSha256": "73342fcff1a19186340549cc8740eb34b7f2f313e376065b8e370299ebbdec5f"
+    }
+  ]
+}

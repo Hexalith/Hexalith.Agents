@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T01:23:40.511969+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs",
+      "existed": true,
+      "sha256": "1c451dfd843ed5c08acf6482bda1b5e706dfa3f0ee03ff66c23aaa2327d8b3ba",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/signing-successor-bound/before/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "existed": true,
+      "sha256": "434ab52ef629a6793e001e91d2ca723c7aee154aa637e5b25e93556a41e84280",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/signing-successor-bound/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs"
+    }
+  ]
+}

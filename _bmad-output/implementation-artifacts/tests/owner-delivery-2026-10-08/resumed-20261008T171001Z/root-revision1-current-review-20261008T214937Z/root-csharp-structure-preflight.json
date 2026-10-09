@@ -1,0 +1,2703 @@
+{
+  "capturedUtc": "2026-10-08T21:53:49.122773+00:00",
+  "scope": "Static preflight for repository one-type-per-CSharp-file rule; column-zero declarations, normal analyzer builds remain required.",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs",
+      "topLevelDeclarations": [
+        "ConfiguredConversationDeletionReceiptVerifier"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionWorker.cs",
+      "topLevelDeclarations": [
+        "ConfiguredConversationDeletionWorker"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentAdmissionStage.cs",
+      "topLevelDeclarations": [
+        "ConversationAgentAdmissionStage"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentQueryService.cs",
+      "topLevelDeclarations": [
+        "ConversationAgentQueryService"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentServiceCollectionExtensions.cs",
+      "topLevelDeclarations": [
+        "ConversationAgentServiceCollectionExtensions"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentSourceReader.cs",
+      "topLevelDeclarations": [
+        "ConversationAgentSourceReader"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs",
+      "topLevelDeclarations": [
+        "ConversationDeletionDeliveryPump"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionPublicationDelivery.cs",
+      "topLevelDeclarations": [
+        "ConversationDeletionPublicationDelivery"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionPublicationProjector.cs",
+      "topLevelDeclarations": [
+        "ConversationDeletionPublicationProjector"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionReceiverResult.cs",
+      "topLevelDeclarations": [
+        "ConversationDeletionReceiverResult"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionWorkerRegistration.cs",
+      "topLevelDeclarations": [
+        "ConversationDeletionWorkerRegistration"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConversationTenantCatalogueRegistration.cs",
+      "topLevelDeclarations": [
+        "ConversationTenantCatalogueRegistration"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/EventStoreConversationTenantCatalogue.cs",
+      "topLevelDeclarations": [
+        "EventStoreConversationTenantCatalogue"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/IConversationDeletionReceiver.cs",
+      "topLevelDeclarations": [
+        "IConversationDeletionReceiver"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentLocalFixture.cs",
+      "topLevelDeclarations": [
+        "ConversationAgentLocalFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentSixSeamTests.cs",
+      "topLevelDeclarations": [
+        "ConversationAgentSixSeamTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionBackfillTests.cs",
+      "topLevelDeclarations": [
+        "ConversationDeletionBackfillTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "topLevelDeclarations": [
+        "ConversationDeletionDeliveryPumpFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "topLevelDeclarations": [
+        "ConversationDeletionDeliveryPumpTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionPublicationDeliveryTests.cs",
+      "topLevelDeclarations": [
+        "ConversationDeletionPublicationDeliveryTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionPublicationProjectorTests.cs",
+      "topLevelDeclarations": [
+        "ConversationDeletionPublicationProjectorTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs",
+      "topLevelDeclarations": [
+        "ConversationDeletionWorkerAdmissionTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerBoundaryHandler.cs",
+      "topLevelDeclarations": [
+        "ConversationDeletionWorkerBoundaryHandler"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationSourceCancellationFixture.cs",
+      "topLevelDeclarations": [
+        "ConversationSourceCancellationFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs",
+      "topLevelDeclarations": [
+        "EventStoreConversationTenantCatalogueTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeEventStreamReader.cs",
+      "topLevelDeclarations": [
+        "AuthoritativeEventStreamReader"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs",
+      "topLevelDeclarations": [
+        "AuthoritativeStreamReadDeadline"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs",
+      "topLevelDeclarations": [
+        "DirectoryAtomicAppendClient"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendOutcome.cs",
+      "topLevelDeclarations": [
+        "DirectoryAtomicAppendOutcome"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendRequest.cs",
+      "topLevelDeclarations": [
+        "DirectoryAtomicAppendRequest"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendState.cs",
+      "topLevelDeclarations": [
+        "DirectoryAtomicAppendState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/IAtomicDirectoryAppendOwner.cs",
+      "topLevelDeclarations": [
+        "IAtomicDirectoryAppendOwner"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/IDirectoryAtomicAppendAuthority.cs",
+      "topLevelDeclarations": [
+        "IDirectoryAtomicAppendAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/ISourcePublicationDelivery.cs",
+      "topLevelDeclarations": [
+        "ISourcePublicationDelivery"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/ISourcePublicationIndexStore.cs",
+      "topLevelDeclarations": [
+        "ISourcePublicationIndexStore"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/ISourcePublicationNamespaceSource.cs",
+      "topLevelDeclarations": [
+        "ISourcePublicationNamespaceSource"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/ISourcePublicationProjector.cs",
+      "topLevelDeclarations": [
+        "ISourcePublicationProjector"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/ISourcePublicationWriterRegistration.cs",
+      "topLevelDeclarations": [
+        "ISourcePublicationWriterRegistration"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/RetainedIdentityHistoryReader.cs",
+      "topLevelDeclarations": [
+        "RetainedIdentityHistoryReader"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourceNamespaceSnapshotReader.cs",
+      "topLevelDeclarations": [
+        "SourceNamespaceSnapshotReader"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationDeliveryStatus.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationDeliveryStatus"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationDispatchResult.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationDispatchResult"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationDispatcher.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationDispatcher"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationFeed"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/AnchoredStateTransition.cs",
+      "topLevelDeclarations": [
+        "AnchoredStateTransition"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/BoundedPendingStateStream.cs",
+      "topLevelDeclarations": [
+        "BoundedPendingStateStream"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionActivationComparison.cs",
+      "topLevelDeclarations": [
+        "DeletionActivationComparison"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBatchBlockRequest.cs",
+      "topLevelDeclarations": [
+        "DeletionBatchBlockRequest"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBatchCapabilityIdentity.cs",
+      "topLevelDeclarations": [
+        "DeletionBatchCapabilityIdentity"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBatchCapabilityV1.cs",
+      "topLevelDeclarations": [
+        "DeletionBatchCapabilityV1"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBatchConsumptionRequest.cs",
+      "topLevelDeclarations": [
+        "DeletionBatchConsumptionRequest"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionCapabilityRevocationEnvelope.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilityRevocationEnvelope"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionCapabilityRevocationReceipt.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilityRevocationReceipt"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionConsumptionBlockReason.cs",
+      "topLevelDeclarations": [
+        "DeletionConsumptionBlockReason"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionConsumptionOutcome.cs",
+      "topLevelDeclarations": [
+        "DeletionConsumptionOutcome"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionConsumptionStatus.cs",
+      "topLevelDeclarations": [
+        "DeletionConsumptionStatus"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionManifestProviderResult.cs",
+      "topLevelDeclarations": [
+        "DeletionManifestProviderResult"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionManifestProviderState.cs",
+      "topLevelDeclarations": [
+        "DeletionManifestProviderState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionReattestationActivation.cs",
+      "topLevelDeclarations": [
+        "DeletionReattestationActivation"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionTargetReceipt.cs",
+      "topLevelDeclarations": [
+        "DeletionTargetReceipt"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryBoundaryOutcome.cs",
+      "topLevelDeclarations": [
+        "DirectoryBoundaryOutcome"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryBoundaryOutcomeState.cs",
+      "topLevelDeclarations": [
+        "DirectoryBoundaryOutcomeState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryEpochActivation.cs",
+      "topLevelDeclarations": [
+        "DirectoryEpochActivation"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryEpochInstallation.cs",
+      "topLevelDeclarations": [
+        "DirectoryEpochInstallation"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryEpochLedger.cs",
+      "topLevelDeclarations": [
+        "DirectoryEpochLedger"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryRepairBoundary.cs",
+      "topLevelDeclarations": [
+        "DirectoryRepairBoundary"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryRepairCohortItem.cs",
+      "topLevelDeclarations": [
+        "DirectoryRepairCohortItem"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryRepairDrainReceipt.cs",
+      "topLevelDeclarations": [
+        "DirectoryRepairDrainReceipt"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryWriteKind.cs",
+      "topLevelDeclarations": [
+        "DirectoryWriteKind"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/ExpiredIdentityHistoryCertificate.cs",
+      "topLevelDeclarations": [
+        "ExpiredIdentityHistoryCertificate"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceAuthorization.cs",
+      "topLevelDeclarations": [
+        "GovernanceAuthorization"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceBatchCommand.cs",
+      "topLevelDeclarations": [
+        "GovernanceBatchCommand"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceBatchState.cs",
+      "topLevelDeclarations": [
+        "GovernanceBatchState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceContentBinding.cs",
+      "topLevelDeclarations": [
+        "GovernanceContentBinding"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceDeletionState.cs",
+      "topLevelDeclarations": [
+        "GovernanceDeletionState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs",
+      "topLevelDeclarations": [
+        "GovernanceGuardEvidence"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardOperation.cs",
+      "topLevelDeclarations": [
+        "GovernanceGuardOperation"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardReduction.cs",
+      "topLevelDeclarations": [
+        "GovernanceGuardReduction"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardTransition.cs",
+      "topLevelDeclarations": [
+        "GovernanceGuardTransition"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceHoldCommand.cs",
+      "topLevelDeclarations": [
+        "GovernanceHoldCommand"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceHoldState.cs",
+      "topLevelDeclarations": [
+        "GovernanceHoldState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceOrdinalCommand.cs",
+      "topLevelDeclarations": [
+        "GovernanceOrdinalCommand"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceOwnerCycle.cs",
+      "topLevelDeclarations": [
+        "GovernanceOwnerCycle"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceProtectionTarget.cs",
+      "topLevelDeclarations": [
+        "GovernanceProtectionTarget"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceProtocolReceipt.cs",
+      "topLevelDeclarations": [
+        "GovernanceProtocolReceipt"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceRepairState.cs",
+      "topLevelDeclarations": [
+        "GovernanceRepairState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceScopeV1.cs",
+      "topLevelDeclarations": [
+        "GovernanceScopeV1"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceSigningRecovery.cs",
+      "topLevelDeclarations": [
+        "GovernanceSigningRecovery"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceViolation.cs",
+      "topLevelDeclarations": [
+        "GovernanceViolation"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceWriteFacts.cs",
+      "topLevelDeclarations": [
+        "GovernanceWriteFacts"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GuardedStateCell.cs",
+      "topLevelDeclarations": [
+        "GuardedStateCell"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitReceipt.cs",
+      "topLevelDeclarations": [
+        "GuardedStateCommitReceipt"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitRequest.cs",
+      "topLevelDeclarations": [
+        "GuardedStateCommitRequest"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitResult.cs",
+      "topLevelDeclarations": [
+        "GuardedStateCommitResult"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitStatus.cs",
+      "topLevelDeclarations": [
+        "GuardedStateCommitStatus"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GuardedStateMutation.cs",
+      "topLevelDeclarations": [
+        "GuardedStateMutation"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GuardedStateTransactionTarget.cs",
+      "topLevelDeclarations": [
+        "GuardedStateTransactionTarget"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/IAnchoredStateTransitionAuthority.cs",
+      "topLevelDeclarations": [
+        "IAnchoredStateTransitionAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/IDeletionCapabilityCompromiseRegistrar.cs",
+      "topLevelDeclarations": [
+        "IDeletionCapabilityCompromiseRegistrar"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/IDeletionProtectionOwner.cs",
+      "topLevelDeclarations": [
+        "IDeletionProtectionOwner"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/IExpiredIdentityHistoryCustody.cs",
+      "topLevelDeclarations": [
+        "IExpiredIdentityHistoryCustody"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/IGovernanceScopeGuard.cs",
+      "topLevelDeclarations": [
+        "IGovernanceScopeGuard"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/IInteractionOccurrenceRegistry.cs",
+      "topLevelDeclarations": [
+        "IInteractionOccurrenceRegistry"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceIdentity.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceIdentity"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceRecord.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceRecord"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceRegistrySnapshot.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceRegistrySnapshot"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceRequest.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceRequest"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceReservationResult.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceReservationResult"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceReservationStatus.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceReservationStatus"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceSealedResult.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceSealedResult"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceWriterState.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceWriterState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/ProtectionTarget.cs",
+      "topLevelDeclarations": [
+        "ProtectionTarget"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/RecoverableAnchoredState.cs",
+      "topLevelDeclarations": [
+        "RecoverableAnchoredState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/TenantGovernanceGuardState.cs",
+      "topLevelDeclarations": [
+        "TenantGovernanceGuardState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/RetainedIdentityHistoryStream.cs",
+      "topLevelDeclarations": [
+        "RetainedIdentityHistoryStream"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/RetainedIdentityHistoryValidator.cs",
+      "topLevelDeclarations": [
+        "RetainedIdentityHistoryValidator"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourceNamespaceFold.cs",
+      "topLevelDeclarations": [
+        "SourceNamespaceFold"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourceNamespaceSnapshot.cs",
+      "topLevelDeclarations": [
+        "SourceNamespaceSnapshot"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationCheckpoint.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationCheckpoint"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationCut.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationCut"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationDescriptor.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationDescriptor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationHead.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationHead"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationIndexEntry.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationIndexEntry"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationIndexState.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationIndexState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationIndexWrite.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationIndexWrite"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationNamespaceAuthorization.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationNamespaceAuthorization"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationNamespaceState.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationNamespaceState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationPage.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationPage"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReadResult.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationReadResult"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationScope.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationScope"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/IInteractionOccurrenceKeyProvider.cs",
+      "topLevelDeclarations": [
+        "IInteractionOccurrenceKeyProvider"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/InteractionOccurrenceKeyDeriver.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceKeyDeriver"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/InteractionOccurrenceOwnedKey.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceOwnedKey"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.PayloadProtection/InteractionOccurrenceProtector.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceProtector"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Actors/AggregateActor.cs",
+      "topLevelDeclarations": [
+        "AggregateActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DaprDeletionCapabilityCompromiseRegistrar.cs",
+      "topLevelDeclarations": [
+        "DaprDeletionCapabilityCompromiseRegistrar"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DaprDeletionProtectionOwner.cs",
+      "topLevelDeclarations": [
+        "DaprDeletionProtectionOwner"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "topLevelDeclarations": [
+        "DaprGuardedStateTransaction"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DaprInteractionOccurrenceRegistry.cs",
+      "topLevelDeclarations": [
+        "DaprInteractionOccurrenceRegistry"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "topLevelDeclarations": [
+        "DeletionConsumptionActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionBatch.cs",
+      "topLevelDeclarations": [
+        "DeletionConsumptionBatch"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs",
+      "topLevelDeclarations": [
+        "DeletionConsumptionIdentity"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionLedger.cs",
+      "topLevelDeclarations": [
+        "DeletionConsumptionLedger"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionOperation.cs",
+      "topLevelDeclarations": [
+        "DeletionConsumptionOperation"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DirectoryMigrationBoundaryActor.cs",
+      "topLevelDeclarations": [
+        "DirectoryMigrationBoundaryActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "topLevelDeclarations": [
+        "GovernanceScopeGuardOwner"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "topLevelDeclarations": [
+        "GovernanceScopeGuardReducer"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IAtomicDeletionManifestProvider.cs",
+      "topLevelDeclarations": [
+        "IAtomicDeletionManifestProvider"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionActor.cs",
+      "topLevelDeclarations": [
+        "IDeletionConsumptionActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs",
+      "topLevelDeclarations": [
+        "IDeletionConsumptionAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDirectoryMigrationBoundaryActor.cs",
+      "topLevelDeclarations": [
+        "IDirectoryMigrationBoundaryActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDirectoryMigrationBoundaryAuthority.cs",
+      "topLevelDeclarations": [
+        "IDirectoryMigrationBoundaryAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IGovernanceGuardAuthority.cs",
+      "topLevelDeclarations": [
+        "IGovernanceGuardAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IGuardedStateTransactionAuthority.cs",
+      "topLevelDeclarations": [
+        "IGuardedStateTransactionAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IInteractionOccurrenceAuthority.cs",
+      "topLevelDeclarations": [
+        "IInteractionOccurrenceAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IInteractionOccurrenceRegistryActor.cs",
+      "topLevelDeclarations": [
+        "IInteractionOccurrenceRegistryActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceRegistryActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "topLevelDeclarations": [
+        "RetainedIdentityHistorySourceReader"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationIndexStore.cs",
+      "topLevelDeclarations": [
+        "DaprSourcePublicationIndexStore"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationNamespaceSource.cs",
+      "topLevelDeclarations": [
+        "DaprSourcePublicationNamespaceSource"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationWriterRegistration.cs",
+      "topLevelDeclarations": [
+        "DaprSourcePublicationWriterRegistration"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationIndexActor.cs",
+      "topLevelDeclarations": [
+        "ISourcePublicationIndexActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationNamespaceActor.cs",
+      "topLevelDeclarations": [
+        "ISourcePublicationNamespaceActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationNamespaceAuthority.cs",
+      "topLevelDeclarations": [
+        "ISourcePublicationNamespaceAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs",
+      "topLevelDeclarations": [
+        "ISourcePublicationOperationAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationIndexActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationNamespaceActor.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationNamespaceActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs",
+      "topLevelDeclarations": [
+        "AuthoritativeEventStreamReaderTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeReadTimeProvider.cs",
+      "topLevelDeclarations": [
+        "AuthoritativeReadTimeProvider"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs",
+      "topLevelDeclarations": [
+        "DaprSourcePublicationIndexStoreTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs",
+      "topLevelDeclarations": [
+        "DirectoryAtomicAppendTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedContent.cs",
+      "topLevelDeclarations": [
+        "RetainedHistorySuspendedContent"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedHandler.cs",
+      "topLevelDeclarations": [
+        "RetainedHistorySuspendedHandler"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedStream.cs",
+      "topLevelDeclarations": [
+        "RetainedHistorySuspendedStream"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistoryTimeProvider.cs",
+      "topLevelDeclarations": [
+        "RetainedHistoryTimeProvider"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedIdentityHistoryReaderTests.cs",
+      "topLevelDeclarations": [
+        "RetainedIdentityHistoryReaderTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs",
+      "topLevelDeclarations": [
+        "SourceNamespaceSnapshotReaderTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationDispatcherFixture.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationDispatcherFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationDispatcherTests.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationDispatcherTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationFeedTests.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationFeedTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs",
+      "topLevelDeclarations": [
+        "SourcePublicationNamespaceTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/Security/RecoverableAnchoredStateTests.cs",
+      "topLevelDeclarations": [
+        "RecoverableAnchoredStateTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceKeyDerivationTests.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceKeyDerivationTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorFixture.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceProtectorFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceProtectorTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceTestKeys.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceTestKeys"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs",
+      "topLevelDeclarations": [
+        "AggregateActorPublicationRegistrationTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Queries/DaprLogicalQueryFixture.cs",
+      "topLevelDeclarations": [
+        "DaprLogicalQueryFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": true
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+      "topLevelDeclarations": [
+        "DeletionConsumptionActorTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs",
+      "topLevelDeclarations": [
+        "DeletionConsumptionFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryFixture.cs",
+      "topLevelDeclarations": [
+        "DirectoryMigrationBoundaryFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryTests.cs",
+      "topLevelDeclarations": [
+        "DirectoryMigrationBoundaryTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/ExpiredIdentityHistorySourceTests.cs",
+      "topLevelDeclarations": [
+        "ExpiredIdentityHistorySourceTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/FalseCountGuardMutations.cs",
+      "topLevelDeclarations": [
+        "FalseCountGuardMutations"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs",
+      "topLevelDeclarations": [
+        "GovernanceGuardFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "topLevelDeclarations": [
+        "GovernanceScopeGuardTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs",
+      "topLevelDeclarations": [
+        "GuardedStateTransactionTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedTransactionFixture.cs",
+      "topLevelDeclarations": [
+        "GuardedTransactionFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+      "topLevelDeclarations": [
+        "InteractionOccurrenceRegistryActorTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedHistoryTimeProvider.cs",
+      "topLevelDeclarations": [
+        "RetainedHistoryTimeProvider"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "topLevelDeclarations": [
+        "RetainedIdentityHistorySourceReaderTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs",
+      "topLevelDeclarations": [
+        "PartyIdentityQueryService"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs",
+      "topLevelDeclarations": [
+        "RetainedHumanActorHistoryFold"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+      "topLevelDeclarations": [
+        "PartyIdentityQueryHandlerTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleAction.cs",
+      "topLevelDeclarations": [
+        "CustodyKeyLifecycleAction"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs",
+      "topLevelDeclarations": [
+        "CustodyKeyLifecycleActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleEntry.cs",
+      "topLevelDeclarations": [
+        "CustodyKeyLifecycleEntry"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleLedger.cs",
+      "topLevelDeclarations": [
+        "CustodyKeyLifecycleLedger"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleOutcome.cs",
+      "topLevelDeclarations": [
+        "CustodyKeyLifecycleOutcome"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleRequest.cs",
+      "topLevelDeclarations": [
+        "CustodyKeyLifecycleRequest"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleStatus.cs",
+      "topLevelDeclarations": [
+        "CustodyKeyLifecycleStatus"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyObjectIdentity.cs",
+      "topLevelDeclarations": [
+        "CustodyKeyObjectIdentity"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyRegistration.cs",
+      "topLevelDeclarations": [
+        "CustodyKeyRegistration"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyWrapCore.cs",
+      "topLevelDeclarations": [
+        "CustodyKeyWrapCore"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeadlineAnchoredStateAuthority.cs",
+      "topLevelDeclarations": [
+        "DeadlineAnchoredStateAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DecisionAuthorityApprover.cs",
+      "topLevelDeclarations": [
+        "DecisionAuthorityApprover"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DecisionAuthorityExpectedBasis.cs",
+      "topLevelDeclarations": [
+        "DecisionAuthorityExpectedBasis"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DecisionAuthorityManifest.cs",
+      "topLevelDeclarations": [
+        "DecisionAuthorityManifest"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DecisionAuthorityManifestCodec.cs",
+      "topLevelDeclarations": [
+        "DecisionAuthorityManifestCodec"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DecisionAuthorityPublishedProfile.cs",
+      "topLevelDeclarations": [
+        "DecisionAuthorityPublishedProfile"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionBatchCapabilityCodec.cs",
+      "topLevelDeclarations": [
+        "DeletionBatchCapabilityCodec"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "topLevelDeclarations": [
+        "DeletionBatchExecutionCoordinator"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionResult.cs",
+      "topLevelDeclarations": [
+        "DeletionBatchExecutionResult"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionBatchGuardSnapshot.cs",
+      "topLevelDeclarations": [
+        "DeletionBatchGuardSnapshot"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilityNoIssueProof.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilityNoIssueProof"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilityPublishedTrust.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilityPublishedTrust"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilityRevocationAuthorization.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilityRevocationAuthorization"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilityRevocationSubscriber.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilityRevocationSubscriber"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilityRevocationSubscription.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilityRevocationSubscription"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilitySigningActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningOutcome.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilitySigningOutcome"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningResult.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilitySigningResult"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningState.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilitySigningState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilitySigningSuccessor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilityTrustProfile.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilityTrustProfile"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DetachedEs256JwsCore.cs",
+      "topLevelDeclarations": [
+        "DetachedEs256JwsCore"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/EventStoreDeletionBatchGuardPort.cs",
+      "topLevelDeclarations": [
+        "EventStoreDeletionBatchGuardPort"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/EventStoreDeletionCapabilityGuardRevocationMirror.cs",
+      "topLevelDeclarations": [
+        "EventStoreDeletionCapabilityGuardRevocationMirror"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/EventStoreDeletionCapabilityNoIssueAuthority.cs",
+      "topLevelDeclarations": [
+        "EventStoreDeletionCapabilityNoIssueAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+      "topLevelDeclarations": [
+        "ExportKeyDeliveryActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryIdentity.cs",
+      "topLevelDeclarations": [
+        "ExportKeyDeliveryIdentity"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryOutcome.cs",
+      "topLevelDeclarations": [
+        "ExportKeyDeliveryOutcome"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryState.cs",
+      "topLevelDeclarations": [
+        "ExportKeyDeliveryState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyWrapContext.cs",
+      "topLevelDeclarations": [
+        "ExportKeyWrapContext"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyWrappingCore.cs",
+      "topLevelDeclarations": [
+        "ExportKeyWrappingCore"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportManifestSignatureContext.cs",
+      "topLevelDeclarations": [
+        "ExportManifestSignatureContext"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportManifestSignatureCore.cs",
+      "topLevelDeclarations": [
+        "ExportManifestSignatureCore"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Fr34CanaryAuthorization.cs",
+      "topLevelDeclarations": [
+        "Fr34CanaryAuthorization"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Fr34CanaryReference.cs",
+      "topLevelDeclarations": [
+        "Fr34CanaryReference"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Fr34PersistedCanary.cs",
+      "topLevelDeclarations": [
+        "Fr34PersistedCanary"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs",
+      "topLevelDeclarations": [
+        "Fr34ProtectionGate"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Fr34ProtectionReadinessCheck.cs",
+      "topLevelDeclarations": [
+        "Fr34ProtectionReadinessCheck"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Fr34ProtectionStartupGate.cs",
+      "topLevelDeclarations": [
+        "Fr34ProtectionStartupGate"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/Fr34ProtectionTarget.cs",
+      "topLevelDeclarations": [
+        "Fr34ProtectionTarget"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ICustodyKeyLifecycleActor.cs",
+      "topLevelDeclarations": [
+        "ICustodyKeyLifecycleActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ICustodyKeyLifecycleAuthority.cs",
+      "topLevelDeclarations": [
+        "ICustodyKeyLifecycleAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ICustodyKeyLifecycleProvider.cs",
+      "topLevelDeclarations": [
+        "ICustodyKeyLifecycleProvider"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionBatchGuardPort.cs",
+      "topLevelDeclarations": [
+        "IDeletionBatchGuardPort"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilityGuardRevocationMirror.cs",
+      "topLevelDeclarations": [
+        "IDeletionCapabilityGuardRevocationMirror"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilityNoIssueAuthority.cs",
+      "topLevelDeclarations": [
+        "IDeletionCapabilityNoIssueAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilityOriginalSigningReceiptAuthority.cs",
+      "topLevelDeclarations": [
+        "IDeletionCapabilityOriginalSigningReceiptAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilityRevocationAuthenticator.cs",
+      "topLevelDeclarations": [
+        "IDeletionCapabilityRevocationAuthenticator"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningActor.cs",
+      "topLevelDeclarations": [
+        "IDeletionCapabilitySigningActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningAuthority.cs",
+      "topLevelDeclarations": [
+        "IDeletionCapabilitySigningAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningProvider.cs",
+      "topLevelDeclarations": [
+        "IDeletionCapabilitySigningProvider"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningTrustProvider.cs",
+      "topLevelDeclarations": [
+        "IDeletionCapabilitySigningTrustProvider"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IExportKeyDeliveryActor.cs",
+      "topLevelDeclarations": [
+        "IExportKeyDeliveryActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IExportKeyDeliveryAuthority.cs",
+      "topLevelDeclarations": [
+        "IExportKeyDeliveryAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IExportKeyDirectDeliveryProvider.cs",
+      "topLevelDeclarations": [
+        "IExportKeyDirectDeliveryProvider"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IFr34CanaryAuthority.cs",
+      "topLevelDeclarations": [
+        "IFr34CanaryAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IFr34PersistedCanaryReader.cs",
+      "topLevelDeclarations": [
+        "IFr34PersistedCanaryReader"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IFr34ProtectionCanaryEngine.cs",
+      "topLevelDeclarations": [
+        "IFr34ProtectionCanaryEngine"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IIndependentDecisionAuthority.cs",
+      "topLevelDeclarations": [
+        "IIndependentDecisionAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPlatformKeyInventoryActor.cs",
+      "topLevelDeclarations": [
+        "IPlatformKeyInventoryActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPlatformKeyInventoryAuthority.cs",
+      "topLevelDeclarations": [
+        "IPlatformKeyInventoryAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IPrivateOwnerOperationGrantSource.cs",
+      "topLevelDeclarations": [
+        "IPrivateOwnerOperationGrantSource"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs",
+      "topLevelDeclarations": [
+        "IReplicatedSecuritySpoolAuthority"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ISecurityObservationRecorder.cs",
+      "topLevelDeclarations": [
+        "ISecurityObservationRecorder"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ITrustedEnvelopeReplayRegistrar.cs",
+      "topLevelDeclarations": [
+        "ITrustedEnvelopeReplayRegistrar"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs",
+      "topLevelDeclarations": [
+        "IndependentDecisionManifestVerifier"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/OwnedExportKey.cs",
+      "topLevelDeclarations": [
+        "OwnedExportKey"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformAcceptedEnvelopeTiming.cs",
+      "topLevelDeclarations": [
+        "PlatformAcceptedEnvelopeTiming"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryAction.cs",
+      "topLevelDeclarations": [
+        "PlatformKeyInventoryAction"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryActor.cs",
+      "topLevelDeclarations": [
+        "PlatformKeyInventoryActor"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryChange.cs",
+      "topLevelDeclarations": [
+        "PlatformKeyInventoryChange"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventoryEntry.cs",
+      "topLevelDeclarations": [
+        "PlatformKeyInventoryEntry"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventorySignal.cs",
+      "topLevelDeclarations": [
+        "PlatformKeyInventorySignal"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyInventorySnapshot.cs",
+      "topLevelDeclarations": [
+        "PlatformKeyInventorySnapshot"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyPurpose.cs",
+      "topLevelDeclarations": [
+        "PlatformKeyPurpose"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformKeyVersion.cs",
+      "topLevelDeclarations": [
+        "PlatformKeyVersion"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformPrivateCapabilityComposition.cs",
+      "topLevelDeclarations": [
+        "PlatformPrivateCapabilityComposition"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PlatformSecurityDenialRecorder.cs",
+      "topLevelDeclarations": [
+        "PlatformSecurityDenialRecorder"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+      "topLevelDeclarations": [
+        "PrivateOwnerOperationAuthenticator"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationCredential.cs",
+      "topLevelDeclarations": [
+        "PrivateOwnerOperationCredential"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs",
+      "topLevelDeclarations": [
+        "PrivateOwnerOperationDeadline"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationGrant.cs",
+      "topLevelDeclarations": [
+        "PrivateOwnerOperationGrant"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationScope.cs",
+      "topLevelDeclarations": [
+        "PrivateOwnerOperationScope"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "topLevelDeclarations": [
+        "ReplicatedSecurityObservationSpool"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpoolWorker.cs",
+      "topLevelDeclarations": [
+        "ReplicatedSecurityObservationSpoolWorker"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ReplicatedSecuritySpoolTarget.cs",
+      "topLevelDeclarations": [
+        "ReplicatedSecuritySpoolTarget"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityEventRecordReceipt.cs",
+      "topLevelDeclarations": [
+        "SecurityEventRecordReceipt"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityEventRecorderLookup.cs",
+      "topLevelDeclarations": [
+        "SecurityEventRecorderLookup"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityEventRecorderLookupState.cs",
+      "topLevelDeclarations": [
+        "SecurityEventRecorderLookupState"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityObservationIntent.cs",
+      "topLevelDeclarations": [
+        "SecurityObservationIntent"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityObservationOriginalLookup.cs",
+      "topLevelDeclarations": [
+        "SecurityObservationOriginalLookup"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityObservationOriginalLookupResult.cs",
+      "topLevelDeclarations": [
+        "SecurityObservationOriginalLookupResult"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecurityObservationRecord.cs",
+      "topLevelDeclarations": [
+        "SecurityObservationRecord"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/SecuritySpoolSnapshot.cs",
+      "topLevelDeclarations": [
+        "SecuritySpoolSnapshot"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeReplayIntent.cs",
+      "topLevelDeclarations": [
+        "TrustedEnvelopeReplayIntent"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeReplayReceipt.cs",
+      "topLevelDeclarations": [
+        "TrustedEnvelopeReplayReceipt"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeReplayVerifier.cs",
+      "topLevelDeclarations": [
+        "TrustedEnvelopeReplayVerifier"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/WrappedCustodyKey.cs",
+      "topLevelDeclarations": [
+        "WrappedCustodyKey"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/WrappedExportKey.cs",
+      "topLevelDeclarations": [
+        "WrappedExportKey"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ActorPendingFixture.cs",
+      "topLevelDeclarations": [
+        "ActorPendingFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/AnchoredFixtureJournal.cs",
+      "topLevelDeclarations": [
+        "AnchoredFixtureJournal"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleFixture.cs",
+      "topLevelDeclarations": [
+        "CustodyKeyLifecycleFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "topLevelDeclarations": [
+        "CustodyKeyLifecycleTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs",
+      "topLevelDeclarations": [
+        "DeletionBatchActualOwnerFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchCapabilityCodecTests.cs",
+      "topLevelDeclarations": [
+        "DeletionBatchCapabilityCodecTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "topLevelDeclarations": [
+        "DeletionBatchExecutionCoordinatorTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionFixture.cs",
+      "topLevelDeclarations": [
+        "DeletionBatchExecutionFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchTransactionFixture.cs",
+      "topLevelDeclarations": [
+        "DeletionBatchTransactionFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilityRevocationSubscriberTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "topLevelDeclarations": [
+        "DeletionCapabilitySigningActorTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportCustodyCryptographyTests.cs",
+      "topLevelDeclarations": [
+        "ExportCustodyCryptographyTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "topLevelDeclarations": [
+        "ExportKeyDeliveryActorTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs",
+      "topLevelDeclarations": [
+        "Fr34ProtectionGateTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs",
+      "topLevelDeclarations": [
+        "IndependentDecisionManifestVerifierTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PlatformAcceptedEnvelopeTimingTests.cs",
+      "topLevelDeclarations": [
+        "PlatformAcceptedEnvelopeTimingTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PlatformKeyInventoryActorTests.cs",
+      "topLevelDeclarations": [
+        "PlatformKeyInventoryActorTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PlatformSecurityDenialRecorderTests.cs",
+      "topLevelDeclarations": [
+        "PlatformSecurityDenialRecorderTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs",
+      "topLevelDeclarations": [
+        "PrivateOwnerOperationAuthenticatorTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+      "topLevelDeclarations": [
+        "ReplicatedSecurityObservationSpoolTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolWorkerTests.cs",
+      "topLevelDeclarations": [
+        "ReplicatedSecurityObservationSpoolWorkerTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs",
+      "topLevelDeclarations": [
+        "SecuritySpoolFixture"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs",
+      "topLevelDeclarations": [
+        "TrustedEnvelopeReplayVerifierTests"
+      ],
+      "matchesSingleType": true,
+      "externalOverlap": false
+    }
+  ],
+  "multipleTypes": []
+}

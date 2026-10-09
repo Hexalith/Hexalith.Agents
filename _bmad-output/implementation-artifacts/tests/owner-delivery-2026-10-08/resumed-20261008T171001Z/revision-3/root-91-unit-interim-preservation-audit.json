@@ -1,0 +1,45 @@
+{
+  "capturedUtc": "2026-10-09T00:01:35.008849+00:00",
+  "exactPreservedPriorPrefix": 84,
+  "currentOrderedUnits": 91,
+  "freshUnits": [
+    {
+      "capturePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/stream-owned-capture/before-hashes.json",
+      "captureSha256": "337a234d69875a8dd9073c0280ac94bfd384032b350bafd47b80124ff3e4f615",
+      "checkedBeforeRows": 2
+    },
+    {
+      "capturePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/writer-registration/before-hashes.json",
+      "captureSha256": "26a37db6a400a8fdf18349e86761dfbbd5a5a25fa089bf6a7586c429d8ab175a",
+      "checkedBeforeRows": 2
+    },
+    {
+      "capturePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/source-reconciliation/before-hashes.json",
+      "captureSha256": "23dd432c6c8fd5a657c6ef08a55146b587644bba69b897493c218f9c1b057a4f",
+      "checkedBeforeRows": 10
+    },
+    {
+      "capturePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/physical-vector/before-hashes.json",
+      "captureSha256": "81b2190e8053a3e65b4fdfd2d7fb5f82330c9ea5da6346e6aef57716057ea23e",
+      "checkedBeforeRows": 4
+    },
+    {
+      "capturePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/physical-actual-coordinator/before-hashes.json",
+      "captureSha256": "611a3bc1e24537716b03c93fba0be8988d87de8d317f0ac1a03924afcc449184",
+      "checkedBeforeRows": 1
+    },
+    {
+      "capturePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/delivery-terminal-authority/before-hashes.json",
+      "captureSha256": "b401c93abc7193f0f4557d3a078d767ad5119617386b44bb2fb0fdf0742a7899",
+      "checkedBeforeRows": 2
+    },
+    {
+      "capturePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/delivery-terminal-fixture/before-hashes.json",
+      "captureSha256": "8ac375a5ba8c5a61ea2d00a36328f1b9302f3308108aea028d4239fb43c0c96d",
+      "checkedBeforeRows": 1
+    }
+  ],
+  "suppliedBeforeCopiesVerified": true,
+  "newFileBasis": "Explicit absence with canonical SHA256 of empty bytes; no supplied before-copy claimed.",
+  "scope": "Interim fresh-unit preservation audit while source editing is active. Historical later hash-only prefix rows remain distinguished and are not claimed to have supplied matching copies. No stable final source or completed verification inferred."
+}

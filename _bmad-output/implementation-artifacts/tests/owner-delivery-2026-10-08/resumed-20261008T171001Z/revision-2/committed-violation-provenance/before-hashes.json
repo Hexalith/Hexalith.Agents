@@ -1,0 +1,48 @@
+{
+  "capturedUtc": "2026-10-08T22:30:13.545155+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceProtocolReceipt.cs",
+      "existed": true,
+      "sha256": "de721ff0556261aa8b885d8fe6abeb28dcb30e2396a363c94489521fd77a3a73",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/committed-violation-provenance/before/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceProtocolReceipt.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs",
+      "existed": true,
+      "sha256": "75698f06fb38b87a1a42402579ae63dbf4b3b2e3bc25d67bd37ec93748877d2e",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/committed-violation-provenance/before/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "existed": true,
+      "sha256": "6fc025e673c7e2ab73b88f7a29b45b821f33e6c26c393e6cdf8f36bc1be30976",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/committed-violation-provenance/before/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IGovernanceGuardAuthority.cs",
+      "existed": true,
+      "sha256": "1c1d510f7b1a29b5989edb029c247154c470ffeb3d16dba5d1e6c20db4f0ad10",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/committed-violation-provenance/before/eventstore/src/Hexalith.EventStore.Server/Security/IGovernanceGuardAuthority.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs",
+      "existed": true,
+      "sha256": "da73ecbf9e6eb19039cc4a940d15de2f659d386a90533b175f06e19e399e644f",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/committed-violation-provenance/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "existed": true,
+      "sha256": "7fd733607d960676b9ef618818b5547b4dfe5d0bf2ea0826fc58776ec3e8538e",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/committed-violation-provenance/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs"
+    }
+  ]
+}

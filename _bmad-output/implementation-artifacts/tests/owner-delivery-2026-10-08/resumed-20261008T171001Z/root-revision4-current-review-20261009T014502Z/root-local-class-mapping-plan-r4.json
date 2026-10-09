@@ -1,0 +1,397 @@
+{
+  "capturedUtc": "2026-10-09T02:20:38.972001+00:00",
+  "reviewRevision": 4,
+  "requiredClassCount": 44,
+  "allMapped": true,
+  "partiesLaneCount": 12,
+  "custodyConfiguredClassCount": 20,
+  "conversationsSuiteCount": 4,
+  "requiredClasses": [
+    {
+      "project": "Hexalith.Conversations.Server.Tests",
+      "class": "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests",
+      "plannedLocalMappings": [
+        "Conversations complete four suites"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Conversations.Server.Tests",
+      "class": "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests",
+      "plannedLocalMappings": [
+        "Conversations complete four suites"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Conversations.Server.Tests",
+      "class": "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests",
+      "plannedLocalMappings": [
+        "Conversations complete four suites"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Conversations.Server.Tests",
+      "class": "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationDeliveryTests",
+      "plannedLocalMappings": [
+        "Conversations complete four suites"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Conversations.Server.Tests",
+      "class": "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationProjectorTests",
+      "plannedLocalMappings": [
+        "Conversations complete four suites"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Conversations.Server.Tests",
+      "class": "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests",
+      "plannedLocalMappings": [
+        "Conversations complete four suites"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Conversations.Server.Tests",
+      "class": "Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests",
+      "plannedLocalMappings": [
+        "Conversations complete four suites"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Client.Tests",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Client.Tests",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Client.Tests",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Client.Tests",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Client.Tests",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Client.Tests",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Client.Tests",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Client.Tests",
+      "class": "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Contracts.Tests",
+      "class": "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.PayloadProtection.Tests",
+      "class": "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceKeyDerivationTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution (complete payload suite)"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.PayloadProtection.Tests",
+      "class": "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution (complete payload suite)"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Server.Tests",
+      "class": "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Server.Tests",
+      "class": "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Server.Tests",
+      "class": "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Server.Tests",
+      "class": "Hexalith.EventStore.Server.Tests.Security.ExpiredIdentityHistorySourceTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Server.Tests",
+      "class": "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Server.Tests",
+      "class": "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Server.Tests",
+      "class": "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.EventStore.Server.Tests",
+      "class": "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes",
+        "Dedicated SDK dynamic owned-class execution"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Parties.Tests",
+      "class": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+      "plannedLocalMappings": [
+        "Parties complete mapped Local lanes"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.DeletionBatchCapabilityCodecTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.PlatformAcceptedEnvelopeTimingTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.PlatformKeyInventoryActorTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.PlatformSecurityDenialRecorderTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationAuthenticatorTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolWorkerTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    },
+    {
+      "project": "Hexalith.Platform.Custody.Tests",
+      "class": "Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests",
+      "plannedLocalMappings": [
+        "Custody expanded Local"
+      ],
+      "mapped": true
+    }
+  ],
+  "source": "Frozen revision-4 source and runner mappings; provisional planning only. Recompute against final revision-5 freeze and require actual nonempty passing XML per class. No command execution or full verification inferred.",
+  "runnerCopies": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/source/parties/eng/verify-ext-parties-1.ps1",
+      "sha256": "63e8d7974b267f8baa8a8d14ae1e50503836de5aee21a589240dc55e36277bb1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/source/platform/eng/verify-ext-secrets-1.ps1",
+      "sha256": "84315bbe185135c469cf511e80e9f743034502bc4339b2bbccea8098e7f66159"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision4-current-review-20261009T014502Z/source/conversations/eng/verify-ext-conv-ai-1.ps1",
+      "sha256": "47e94253d2e551bf9d2d23ce8ddcc844d63b4d7d34683f3f47347d62487242cd"
+    }
+  ]
+}

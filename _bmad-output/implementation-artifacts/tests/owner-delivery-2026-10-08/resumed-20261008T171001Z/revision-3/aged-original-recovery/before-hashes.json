@@ -1,0 +1,48 @@
+{
+  "capturedUtc": "2026-10-09T00:04:30.759234+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "existed": true,
+      "sha256": "e260a1ae0a238d494eb12c5d82c89ed0dbb898efd1cbd3509f3cda8bb3464481",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/aged-original-recovery/before/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs",
+      "existed": true,
+      "sha256": "5c36d2a661112ed71e2196ad0f4fe28fbd1a66c09ae5fa6b1a15d11d61952998",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/aged-original-recovery/before/platform/src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ISecurityObservationRecorder.cs",
+      "existed": true,
+      "sha256": "add1f9311aa32f0ea1b6ccfbfece519dee9e7dbd6f3eda053e05ffa9e740005b",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/aged-original-recovery/before/platform/src/Hexalith.Platform.Custody/ISecurityObservationRecorder.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecurityObservationRecoveryGrant.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+      "existed": true,
+      "sha256": "a46c72e0346a34a0c55aa14f9fa2c76b58dc8ef45fd7e3e37bf2ba5329ecf435",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/aged-original-recovery/before/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs",
+      "existed": true,
+      "sha256": "f6571407f9af3e8e68a68c38e92f1ca07c9539f5dc3cc1cda6a6c6ac33831d92",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/aged-original-recovery/before/platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs"
+    }
+  ]
+}

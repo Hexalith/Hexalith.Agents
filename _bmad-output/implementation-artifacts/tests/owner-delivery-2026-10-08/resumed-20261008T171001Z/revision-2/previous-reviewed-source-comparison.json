@@ -1,0 +1,421 @@
+{
+  "scope": "Read-only preservation comparison against the 360-path previous root review freeze; does not attribute any external change to this engineer.",
+  "priorManifest": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision1-current-review-20261008T214937Z/review-input.json",
+  "priorPaths": 360,
+  "changedPaths": 59,
+  "changes": [
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/README.md",
+      "reviewedSha256": "0d1ffcf8a29a8f675850f36407b23f1ad4f6e7963f6b33027616f5e7158962c6",
+      "currentSha256": "1c728ff0734425b4761fc0bdf9f128fa7f87e6fff0d1e40b6cc5c104ec19d71c",
+      "capturedRevision2Path": false
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+      "reviewedSha256": "0e1a8f3e6e9713d0db46c7de22af1e5a9f575358e585ef085a6de1ff516d7319",
+      "currentSha256": "b7637d26b8417ad1ca602187c252ebfda81f7bead4a2815ab9771d41b07b9b35",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+      "reviewedSha256": "4d54170926908f9963184ec3f82bfee7e7d7f7c6e5a38bddb377bd9bd1bb806c",
+      "currentSha256": "fb001b147a30a7be313e6c2936cd7fc4299c2a1bd6db5377f57c5088a3e08d58",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+      "reviewedSha256": "3c6f49b388eb569ff576923cf641ee60ddb1e055d2f296d7e4d7cae3e2f99ca9",
+      "currentSha256": "d0e7876d937adac4853efddea51eed4d976210bd1665b9c3d3059bedc590e589",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+      "reviewedSha256": "26823f9f5546dc26412ff2d60987ed932bfb35bcc5ef33dd7c3d924c5ec19d18",
+      "currentSha256": "16f0c621cdf783ea4ee80ec2cb20c0d862aa05a83c424188407ad3b2903cca0b",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs",
+      "reviewedSha256": "0c20eed7d230ce4a993b2d8d20e03f5d05b4aae4b81013a1cccbfc0082f2cc2a",
+      "currentSha256": "0d8089dc00d3d8d3e4f5e8ea2f5dea3d13bc73ede2d10ceae3182600980ee51c",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionBackfillTests.cs",
+      "reviewedSha256": "c15744b630819c55f70b24048ef82fe52f28b50d51845e8c44b1fa419a9882e4",
+      "currentSha256": "8ec04b6225832d42a536ec738db90c0c4254d787c11de66b8eb85316f50d19ad",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "reviewedSha256": "01e45a47733e2a06ef6e9aec20677f070792c2deb203ff15da986f018c70fd74",
+      "currentSha256": "a2882bf8c7117d1845e61b4c0011069ac4304103fe50f1d20d0d0030e2fe3608",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "reviewedSha256": "165315485fbed313dab93f85da725265427112ba2679987a1aa332ed8672ddb1",
+      "currentSha256": "859a008b00fa12f84f47e018e6bf272d92a27e2fd9342f8760f84d521e4e6721",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/ISourcePublicationIndexStore.cs",
+      "reviewedSha256": "9bcd36f50745558096131067a4ffa335132e0ed2731c6bf8577a8a1ca76a2d6e",
+      "currentSha256": "19400d805e4ad5dd22c8d6dfc29edc3863515ace1182a4bcd059fc501e512395",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourcePublicationDispatcher.cs",
+      "reviewedSha256": "d0419abdc1304ae58c669de958af6919067552d22997ff1a3de8e7807aa10054",
+      "currentSha256": "ed38b3c1f4b255cc090975af8cf74858fcb9c1315e3923cd1fd6c0736ef7a3a4",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs",
+      "reviewedSha256": "aa51c69af91ccd1dd7cd2003560b41bd43011d2d5ddd8aaee85e1fe4b6b6e84a",
+      "currentSha256": "7cf16894bb633140fc5afb906c2f0230734ab0d936d2cf2b9927acc158c8d6de",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs",
+      "reviewedSha256": "75698f06fb38b87a1a42402579ae63dbf4b3b2e3bc25d67bd37ec93748877d2e",
+      "currentSha256": "073e54b575b9858a867d94e83bd6ef897792f090d7fb7f044d6265becb6f7ba1",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceProtocolReceipt.cs",
+      "reviewedSha256": "de721ff0556261aa8b885d8fe6abeb28dcb30e2396a363c94489521fd77a3a73",
+      "currentSha256": "bfa05295632bbe4f4e63cd91dcb518af65afcee1a91a7e38a525e7427027bfa6",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IAnchoredStateTransitionAuthority.cs",
+      "reviewedSha256": "0fe3718ed2ad8f9affb152f26a62aa2f3361cc198eca876c13e2b208bb35f447",
+      "currentSha256": "90f96f039d0288afefcbbc8a4394a063600771274eab8d9e911e42148d2ae8cd",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/RecoverableAnchoredState.cs",
+      "reviewedSha256": "28516d2fd6a50195a8a67d085690b64d7ed5c46eab9a15055685e4175325f70c",
+      "currentSha256": "2b154e23099515fe5f5ec2391069fb71a95484f1fb9003e8add7bd09a7c67715",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationIndexState.cs",
+      "reviewedSha256": "77b0a64230e178ce9a5a79b605d371282471227af30a1875c39f8dd9fc885d48",
+      "currentSha256": "f279b2e7839f6223af8f109e48c51e621fad3a835bee80192ef826fc749caba7",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprInteractionOccurrenceRegistry.cs",
+      "reviewedSha256": "6535772d4b6f52e32c2e25bd4ad54a5b642f4c4349727d05b385bf765d0713b3",
+      "currentSha256": "0b1d6b88a35bb520e7a470cbef7016962993f4f3be1970ba9404eea20d9e5556",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "reviewedSha256": "a26802fa56b9c73191c2c99ca0544ce8b4ee2d9dbe940e83b0aca61d5ced67ae",
+      "currentSha256": "4d3084827f4fd8fc0e38b702331d3257d07aad44e2f87467347d2b880e3a8d54",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DirectoryMigrationBoundaryActor.cs",
+      "reviewedSha256": "dc15dbc8480defb7eb0cf1470479f3ba65d43c668ed7347ea27223902060159b",
+      "currentSha256": "48bb9f98f60d3830c66e0abb50a7a4bfd7752b7348a075a313114cc7b4a20d35",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "reviewedSha256": "6fc025e673c7e2ab73b88f7a29b45b821f33e6c26c393e6cdf8f36bc1be30976",
+      "currentSha256": "49bbf777e28b47003b66b20e9f0c89a74a05cd22223da9f66fa3f6149afec641",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IGovernanceGuardAuthority.cs",
+      "reviewedSha256": "1c1d510f7b1a29b5989edb029c247154c470ffeb3d16dba5d1e6c20db4f0ad10",
+      "currentSha256": "284481a8ace1ef50023053a23a4cd9c0f9946e8a96e8b2db9d5fc9c6b0fdfe58",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs",
+      "reviewedSha256": "ae58dee44f07dcf8623c1f2d449c493b54cd106a4912a47054948f3d0c0bb0e6",
+      "currentSha256": "314cdc0626974336c20e424ac200ee5e965d5b663b53b7241e35ebd040e42d0b",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationIndexStore.cs",
+      "reviewedSha256": "09bebb085615ccfc82421fefe5bb94dec5ddc8bcb1dea13374712235b25aa816",
+      "currentSha256": "83c3872abf250ed1ef7f044cd73ce1657c708f35a3c541bd61c391076772bd4c",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/ISourcePublicationIndexActor.cs",
+      "reviewedSha256": "780842e57048de7c420a0f18d0d371819b4815074eee519ba27031bbcc2fd0fe",
+      "currentSha256": "8d986f4d5dafae6b699972ac04494e9b86383b50115c0985c7e368fdb089343a",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs",
+      "reviewedSha256": "73b8c4a4a1b2684bfd851199db3d1dd038d38064e15c70ec72fbb653c272a17e",
+      "currentSha256": "d9893dec1c0418d6a47c5fb205d01c6c477526023d5438cef3db16e25be59a8d",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs",
+      "reviewedSha256": "f6beb09f7adc8bac329605d617575831fb680e4c76707155b4d7e3807bae3251",
+      "currentSha256": "9a14bf85dbc915e82b5d3f57bfbe5246f05db9e1d4235d10d66b6124aa7c479d",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs",
+      "reviewedSha256": "6d7cd52d4c034dad7365534f2f718880a6b4fd14011616089b649229ebdcc41c",
+      "currentSha256": "bb882a6ddf168ad4f9ca80e4c8e951ec271344468ef14866cb9b462f7e74c080",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs",
+      "reviewedSha256": "4148e806b905f88e62ee0d1c674e13d34ca9757925e0716a162b61aa969e4372",
+      "currentSha256": "1e064f0171c318fe659ffbe858d9c0e17a0f1d2ebcc8a49be6b57fdd8fb57269",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationFeedTests.cs",
+      "reviewedSha256": "56d233592d305c51ad111e6283fc80b30faccd4f86cda865fbe58839f9e384ab",
+      "currentSha256": "fb38398331ac8a734b8fae751da2e15b595b7adcb09eef638d0014e125479f93",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Contracts.Tests/Security/RecoverableAnchoredStateTests.cs",
+      "reviewedSha256": "cbdd3f4cfb8f3818c4e87ad44f9b06fb43077924db54d40e7c37728820b7bf26",
+      "currentSha256": "f8744b071bb49405718594cc8e96b69f8ac1ddf89ddb0fdfb6b1242011d281f2",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+      "reviewedSha256": "e89874fafe1b709bd4daa421ed6975493fd2af0dedebea7a220885b39b1cb774",
+      "currentSha256": "77e59181072683571aeb9a088f19997832b32e34bbe4cd850db8c4eca5463943",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs",
+      "reviewedSha256": "5be20a82af9c6cdc710e162be4157f4f59271fbeab37e97ac9f03a04d7fcdc34",
+      "currentSha256": "9b20bc6b4d319680fd054db69942f3ae64998e450d07458e63991b7f16545bb4",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryFixture.cs",
+      "reviewedSha256": "8925768b108881db4dbd81ff0f88138781a2ea91bf33149038b98d0f882acc3a",
+      "currentSha256": "6ae89f012eb517fdb531272569533d46550c16402d6391e9bf96d90a84570299",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryTests.cs",
+      "reviewedSha256": "3c218efbe2f439fcb6ae69cb4bd0cde8b03344ea91f64c0c87aa4daea90efc7d",
+      "currentSha256": "0da9300a173d88172e832380a489e70a2789c3647180a02df82a73bf2ca852f9",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs",
+      "reviewedSha256": "da73ecbf9e6eb19039cc4a940d15de2f659d386a90533b175f06e19e399e644f",
+      "currentSha256": "30c8223455c052f94424ecee897d610d19c4d6038a718cc629cb7619bc96f1cd",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "reviewedSha256": "7fd733607d960676b9ef618818b5547b4dfe5d0bf2ea0826fc58776ec3e8538e",
+      "currentSha256": "bf12a4426eb924bcc318ba7d9e0354809d41967b434fcf2640e0a7465fc3751f",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs",
+      "reviewedSha256": "9b24ad363610d6949bc90400b9d29e6d71b19761914289be0212d2232c5f0961",
+      "currentSha256": "d5fd7193c22060bcb84341b82ce03714641dc04dd6ba5d71159ef22ac2b5c89a",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+      "reviewedSha256": "347b75a713ce18362f930611bff44efe34d74beaf06f5afda65487b0a720cee2",
+      "currentSha256": "852f4fa004ae1fe6191469c2ec7635505e6521eec893382d143566057b307fb9",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "eng/verify-ext-secrets-1.ps1",
+      "reviewedSha256": "be785e2c58b66b9ee8de7eb6d23f5e9b3cebe1c08507761b98f982d5c3715d77",
+      "currentSha256": "84315bbe185135c469cf511e80e9f743034502bc4339b2bbccea8098e7f66159",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs",
+      "reviewedSha256": "c26e5821d2f5c4baf14b380a71d416ea1945cfbca564b301afae260b37d7094d",
+      "currentSha256": "c3d532f61393f75dd23049054be8901c8adaf17232dc6c2cfedba231f619c8ef",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeadlineAnchoredStateAuthority.cs",
+      "reviewedSha256": "5e2aebbd732c555dca7778659d4d7baf620b4eb2dcbe2e7838fa2739419db47a",
+      "currentSha256": "72fc0d02f466b109fd95cc56069d0d99ce9eba89d8c0fc9da75e3c74487bbb4e",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "reviewedSha256": "413045f7aa5fd0a67c56990c01d447f42ed0f20c4686922c3a9efa1ef9c59a10",
+      "currentSha256": "2b0df2dc689d6bd512d8624bde7bbb7785bda07c785a91a19b2eb3d259b1a693",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+      "reviewedSha256": "64d8ec1a7f16fb240ddf7adbf3418a5f7a51d0096259d750d942c76e8ad8c74e",
+      "currentSha256": "989cd29f1578b2b2b41fdb0e195b1c909a18e79ad09611cf3eef122baaf71abf",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs",
+      "reviewedSha256": "cc6996527ca4c672a638690578aaac54b5e9a1ad0dac091e0e0c5b28bc358285",
+      "currentSha256": "652fc45fb4a5c1d33b357d8b64f1c260990dc2c120e153556f8b0c5a4d474ddd",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IFr34CanaryAuthority.cs",
+      "reviewedSha256": "2035405618aa9bbade3ee038999306d174807cde2ba83c7c5de8dae9f73d6056",
+      "currentSha256": "68dab5141d5d43abc5ad5754da0b505ff6fbeec3c91e5039926b509648e49302",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformKeyInventoryActor.cs",
+      "reviewedSha256": "485c59b70540079779a544a04833106ab72f2a7ae0b063cb7d529cc082dcc7c6",
+      "currentSha256": "46cda2f5c26dac2c1260776d68bbd8325b4aa9d8b0323a72b20ace4458f8af5d",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs",
+      "reviewedSha256": "048b694522065deecb52fedcef44d3f61b38040db46a74171e0967a4a457f3b7",
+      "currentSha256": "60c8c6f71d54bed3a675ae731e8ce001d2612feea5a928473d6d804925f66ead",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "reviewedSha256": "627e54a628859cff89ad806f49d30c6d06de22651f2ca273f6b121bdc5ab0a61",
+      "currentSha256": "e260a1ae0a238d494eb12c5d82c89ed0dbb898efd1cbd3509f3cda8bb3464481",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecuritySpoolSnapshot.cs",
+      "reviewedSha256": "f01a1f730bf4dccdfe726b3f3e7658001fa774475bb53356286879bd5ebdd9a5",
+      "currentSha256": "fe51162a1ad576105ee3d1e96aa022aafa9ccd0287fa24c58de9f444a6adc67d",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/AnchoredFixtureJournal.cs",
+      "reviewedSha256": "0179290f118bf5bed711bef21182a799aef8a9c120d6a4794df03d1e624845b7",
+      "currentSha256": "eeba6713f60467c995d734f9af0a6bb85f7850e930c4169088de886235f1f64d",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "reviewedSha256": "bf8248d063da6e9ab718d92c5f1a1ff11d071f738d7566657178b44a139829cf",
+      "currentSha256": "2ce576613ed7bd68963276a636ba862d1806cd39417ff7ac8c9024c32c3b0a64",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs",
+      "reviewedSha256": "993384321e77d2618e171aa62d138974ac43fac2070bc17df5f3e3206154dacf",
+      "currentSha256": "246bfb11cc666a18523bb71165af0340842139d213da05ce2aeac9d089497d37",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "reviewedSha256": "a99794c98e0fcba22c411e2ff7ea9118017deb4372c8730ec296280a60b6cae1",
+      "currentSha256": "2255da1ae25dd8434781814876279d2517960a28a6785ed37ea918d64f2d2d11",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "reviewedSha256": "d5b413d3933bf04d0399a030d301ecea949d12a1fa07a2f50819adbe5659d85f",
+      "currentSha256": "033d9e5545fc2fe3ef550735e72ceefcfa0888212189e502767cd7e8562cda08",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "reviewedSha256": "01bdd0ed2796d350e55077d754cc5dbb53cdbc3547ca1be1094b31fe13c4565a",
+      "currentSha256": "b3845999e32dde5e3b8d55ebd4f05629a8a90b370c0eeea8c67ae59ba857fa69",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs",
+      "reviewedSha256": "eb9f8bdaf1d3fc63bad23af785a2b879bfd610570a284f0576f511691798cf72",
+      "currentSha256": "66232da9a1cc3d2cde4fb275de2ffae9743275b2abb520c60d35e18f0e04a71c",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PlatformKeyInventoryActorTests.cs",
+      "reviewedSha256": "fa8da2c45956d8993c3c35f5790d5559d2004ec91aa3102b48df478d2d9f3b1e",
+      "currentSha256": "313c777b1597ed8953e1a18ef82d170b7b5d9678f1fa81f331a9c31fd7d4fd8e",
+      "capturedRevision2Path": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+      "reviewedSha256": "7bd728ddd3b21bae470ac7456d7ae272030e2e600f81d29d0de33effc41e95ef",
+      "currentSha256": "a46c72e0346a34a0c55aa14f9fa2c76b58dc8ef45fd7e3e37bf2ba5329ecf435",
+      "capturedRevision2Path": true
+    }
+  ]
+}

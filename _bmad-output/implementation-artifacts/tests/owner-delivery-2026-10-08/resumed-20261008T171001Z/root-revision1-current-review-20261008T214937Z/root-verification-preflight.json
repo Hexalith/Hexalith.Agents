@@ -1,0 +1,260 @@
+{
+  "capturedUtc": "2026-10-08T21:52:11.106738+00:00",
+  "scope": "Verification preflight only while all three independent layers are running. No review result handled; root execution pending.",
+  "requiredOwnedClasses": {
+    "Hexalith.Conversations.Server.Tests": [
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationDeliveryTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationProjectorTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests",
+      "Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests"
+    ],
+    "Hexalith.EventStore.Client.Tests": [
+      "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests",
+      "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests",
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests"
+    ],
+    "Hexalith.EventStore.Contracts.Tests": [
+      "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests"
+    ],
+    "Hexalith.EventStore.PayloadProtection.Tests": [
+      "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceKeyDerivationTests",
+      "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests"
+    ],
+    "Hexalith.EventStore.Server.Tests": [
+      "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests",
+      "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests",
+      "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests",
+      "Hexalith.EventStore.Server.Tests.Security.ExpiredIdentityHistorySourceTests",
+      "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests",
+      "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests",
+      "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests",
+      "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests"
+    ],
+    "Hexalith.Parties.Tests": [
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests"
+    ],
+    "Hexalith.Platform.Custody.Tests": [
+      "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests",
+      "Hexalith.Platform.Custody.Tests.DeletionBatchCapabilityCodecTests",
+      "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests",
+      "Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests",
+      "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests",
+      "Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests",
+      "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests",
+      "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests",
+      "Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests",
+      "Hexalith.Platform.Custody.Tests.PlatformAcceptedEnvelopeTimingTests",
+      "Hexalith.Platform.Custody.Tests.PlatformKeyInventoryActorTests",
+      "Hexalith.Platform.Custody.Tests.PlatformSecurityDenialRecorderTests",
+      "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationAuthenticatorTests",
+      "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests",
+      "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolWorkerTests",
+      "Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests"
+    ]
+  },
+  "focusedAudit": [
+    {
+      "kind": "build",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-contracts-build.log",
+      "sha256": "80fde4b84325d82441b026b0e020978568fb6f88a47e73267fbb667ccd15f168",
+      "clean": true
+    },
+    {
+      "kind": "build",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-client-build-fifth.log",
+      "sha256": "bbc411e0f861dcdc0c3cdbbb7566304981a35eaa380c34f022cb79f1b84538e8",
+      "clean": true
+    },
+    {
+      "kind": "build",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-server-build-fourth.log",
+      "sha256": "0cc10e12a8e4468518f11f2f8c52d30bc7586d7b6a8c62249041b5eea9be5254",
+      "clean": true
+    },
+    {
+      "kind": "build",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-build-seventh.log",
+      "sha256": "bc7dcb50deb51f18b80ef21fd9bc157783fd374dd70ba4c4a38e21923b8e03a6",
+      "clean": true
+    },
+    {
+      "kind": "build",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-build-fourth.log",
+      "sha256": "a0ff3357194b9265ad9ae545f0a162184a41647a3e5876eeedea17da3ca015ae",
+      "clean": true
+    },
+    {
+      "kind": "build",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-parties-build-final.log",
+      "sha256": "1d0ce88cbbef4aad987d16c52129d22a66e4dbcb719d6ebd900cb9feb8807c66",
+      "clean": true
+    },
+    {
+      "kind": "focused-test",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-helper-tests.log",
+      "sha256": "2cb4ab5c4a3de1db24d7f0d5a126173e68b8079c3f2c3ffdce97644253a951f0",
+      "totals": {
+        "total": 5,
+        "passed": 5,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "classes": [
+        "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests"
+      ]
+    },
+    {
+      "kind": "focused-test",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-client-tests.log",
+      "sha256": "5af33d012684f7e54aa82e4615da42d7493c49519f590cc697e551f2f398737b",
+      "totals": {
+        "total": 33,
+        "passed": 33,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "classes": [
+        "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests"
+      ]
+    },
+    {
+      "kind": "focused-test",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-index-tests.log",
+      "sha256": "52d4c03b38137d79177587359af93a00b77df9d220b7600a69d5ff606275ce77",
+      "totals": {
+        "total": 23,
+        "passed": 23,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "classes": [
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests"
+      ]
+    },
+    {
+      "kind": "focused-test",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-server-tests-second.log",
+      "sha256": "67de57c058d6412d5ff6cfa9fabc32f849ee5a3951800eb022134fae22360c2f",
+      "totals": {
+        "total": 205,
+        "passed": 205,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "classes": [
+        "Hexalith.EventStore.Server.Tests.Queries.DaprLogicalQueryTests",
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests",
+        "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests",
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests",
+        "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests"
+      ]
+    },
+    {
+      "kind": "focused-test",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-owner-tests-final.log",
+      "sha256": "650f34458817bb5432d1c284d846fbd27dba5ff6dddb1f77586c57e18cca89f6",
+      "totals": {
+        "total": 124,
+        "passed": 124,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "classes": [
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests",
+        "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests",
+        "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests",
+        "Hexalith.Platform.Custody.Tests.PlatformKeyInventoryActorTests",
+        "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests",
+        "Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests"
+      ]
+    },
+    {
+      "kind": "focused-test",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-coordinator-tests-fourth.log",
+      "sha256": "664dc68c67b5aa7599bd2c24ba717a0034314497f8d5e7079fd043d19c9a0dfc",
+      "totals": {
+        "total": 20,
+        "passed": 20,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "classes": [
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests"
+      ]
+    },
+    {
+      "kind": "focused-test",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-tests-first.log",
+      "sha256": "b821d91b28ed44c15c0375d8fb4984b8b2ee7d48f77497d1e0733b1d1380c27b",
+      "totals": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "classes": [
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests",
+        "Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests"
+      ]
+    },
+    {
+      "kind": "focused-test",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-worker-tests.log",
+      "sha256": "8ef3d449c45baa6fc1d4aad9a20cd0dea0bd9f02a176525e676765657e6ce629",
+      "totals": {
+        "total": 9,
+        "passed": 9,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "classes": [
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests"
+      ]
+    },
+    {
+      "kind": "focused-test",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-parties-tests-final.log",
+      "sha256": "7f80e6e612550bfc815218a455d5676bb9108b8c7700dd136246a1b184db3acd",
+      "totals": {
+        "total": 169,
+        "passed": 169,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "classes": [
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests"
+      ]
+    }
+  ],
+  "focusedTestTotal": 612,
+  "countingLimits": "Engineer focused evidence only; do not sum with overlapping root owner gates."
+}

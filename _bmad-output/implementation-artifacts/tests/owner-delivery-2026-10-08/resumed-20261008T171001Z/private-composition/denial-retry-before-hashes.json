@@ -1,0 +1,44 @@
+{
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformSecurityDenialRecorder.cs",
+      "existed": true,
+      "sha256": "975b8ec44e336bc2e67bdea709b796296d6bb8d18945f9e1aca227ab78a2b73e"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "existed": true,
+      "sha256": "8886108f42bedd7258612508eca567431e5325d0be64e138ab3e88681e73ca13"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs",
+      "existed": true,
+      "sha256": "97e713911d8fa1321e2f2b0f76d935589842f9fdaa9b6a311d79d460bbc5c873"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecurityObservationOriginalLookup.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecurityObservationOriginalLookupResult.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PlatformSecurityDenialRecorderTests.cs",
+      "existed": true,
+      "sha256": "ccb5a5da0815ae47a548128edaf45487a1ea771609d41ca0868f23f2fecfad92"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs",
+      "existed": true,
+      "sha256": "af4d20f17e5b918f12e3022dcb6208b29904cd55f14f4ff3dae39a11f1257c3c"
+    }
+  ]
+}

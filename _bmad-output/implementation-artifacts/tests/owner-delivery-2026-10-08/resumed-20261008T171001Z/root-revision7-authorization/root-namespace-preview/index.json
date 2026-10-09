@@ -1,0 +1,22 @@
+{
+  "capturedUtc": "2026-10-09T09:13:15.513270+00:00",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationNamespaceActor.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-namespace-preview/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationNamespaceActor.cs",
+      "beforeSha256": "4a26497102604c650ab4a78f39964c8f02ea4050d78cfee4edee0847ccffe6eb",
+      "previewSha256": "48cb63db45f69d0bde6f30b1e030ee0c6bf5fe8b5f40491985e3d46414e33756",
+      "deltaLines": 11
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs",
+      "copy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/root-namespace-preview/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs",
+      "beforeSha256": "a46b095533991dde206410576ccb67380af3a11116fabc34df0b8cac21aaf9ea",
+      "previewSha256": "1e81c71a0355329599edae0df7c215857a774646ea7bf9ebdb6179d7509ac13c",
+      "deltaLines": 52
+    }
+  ],
+  "lines": 63,
+  "diffSha256": "6e88e5cab1800037fc7210950c00fc8af8934546bdd035796564a441922b570f",
+  "scope": "Preliminary settled B3 only; compare against final stable freeze"
+}

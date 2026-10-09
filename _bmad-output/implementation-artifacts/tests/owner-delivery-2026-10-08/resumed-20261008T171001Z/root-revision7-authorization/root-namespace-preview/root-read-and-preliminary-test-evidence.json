@@ -1,0 +1,30 @@
+{
+  "capturedUtc": "2026-10-09T09:13:37.215404+00:00",
+  "rootReadFullPreviewDiff": true,
+  "previewLines": 63,
+  "previewSha256": "6e88e5cab1800037fc7210950c00fc8af8934546bdd035796564a441922b570f",
+  "pathsRead": 2,
+  "actualFocusedXml": [
+    {
+      "xml": "/tmp/revision7-namespace-green.xml",
+      "sha256": "01190702eeb1663b6c739b9f14eb26d59800e767bd643919bba0c4819ab9ab51",
+      "total": 24,
+      "passed": 24,
+      "failed": 0,
+      "classes": [
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests"
+      ]
+    },
+    {
+      "xml": "/tmp/revision7-namespace-red.xml",
+      "sha256": "b189c769493fb25a2b628ceb26cc855c719572e7b9ca8b93674269a52412526c",
+      "total": 3,
+      "passed": 1,
+      "failed": 2,
+      "classes": [
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests"
+      ]
+    }
+  ],
+  "scope": "Preliminary source/read and actual XML only; final hashes, exact command linkage, artifacts, cumulative review and full matrix remain required."
+}

@@ -1,0 +1,48 @@
+{
+  "capturedUtc": "2026-10-09T09:14:37.386590+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "existed": true,
+      "sha256": "43ea2403240fa282a64e88bb76b451796ac27970a7968c1cee9633810a40ac48",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/private-wait/before/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs",
+      "existed": true,
+      "sha256": "bc9a89171a657d1efc0832f517dbbddd10fcc01ada1e95184ab4958dc29fb19f",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/private-wait/before/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "existed": true,
+      "sha256": "bec766bdd47e3cf5ec7e811c4e46c8d4b2a1af739eb55ae2454d737017f4aa03",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/private-wait/before/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationDeadlineTests.cs",
+      "existed": true,
+      "sha256": "37cd67259bb7164cf5dddcfa0fadccebdb240d5b07b9af6998987a346db650a3",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/private-wait/before/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationDeadlineTests.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "existed": true,
+      "sha256": "a35a52fed18a261b38ea2835bfca8e0cd241532d9df73308501781e6239a4ea5",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/private-wait/before/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "existed": true,
+      "sha256": "dbb6c9a3a9f9f4c25f6f50ace57b26191b3153b7d72ea06a176aad934ebad11c",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/private-wait/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "capturedUtc": "2026-10-09T02:10:55.659234+00:00",
+  "rootOwnedFile": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-run-current-verification.py",
+  "beforeSha256": "3f4daaa53c7549d9fc8876f23a0598ff5cf4f0724d1a3225d1e252b2c5c3dc07",
+  "afterSha256": "75130548ecd82fbfac70330af2a7250741adf3bab53797027e414effe5db5305",
+  "syntax": "AST parse passed",
+  "change": "Retain exact version getter argv/cwd/start/finish/exit/stdout/stderr in the root command index; all matrix commands/filters/flags unchanged.",
+  "fullMatrix": "not yet run"
+}

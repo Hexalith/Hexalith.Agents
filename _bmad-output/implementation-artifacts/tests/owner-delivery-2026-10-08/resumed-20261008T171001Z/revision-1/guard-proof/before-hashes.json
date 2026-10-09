@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-08T21:01:51.145877+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs",
+      "existed": true,
+      "sha256": "4ad37120cca01dbcc8de7b3b0afe67b632a03efc4078467f7cc738038cd19bc0",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/guard-proof/before/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs",
+      "existed": true,
+      "sha256": "da73ecbf9e6eb19039cc4a940d15de2f659d386a90533b175f06e19e399e644f",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/guard-proof/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs"
+    }
+  ]
+}

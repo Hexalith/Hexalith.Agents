@@ -1,0 +1,94 @@
+{
+  "capturedUtc": "2026-10-08T18:53:21.667143+00:00",
+  "scope": "Root inspection observation while engineer continues; not a final frozen source audit.",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "observedSha256": "03a78cc7edb82ab0e065a50d754514b6a57bddca98b1e750c588776a979c78eb",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchExecutionResult.cs",
+      "observedSha256": "b5eb0b730d2166dae9886b910bcc0b57e88d47ed99621db432fd6f1429b76986",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionBatchGuardPort.cs",
+      "observedSha256": "6d1fe23528d9d8eb6ad40017ebe1cfbc48afdcdb25e95888c45bd99d4e3621e9",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchGuardSnapshot.cs",
+      "observedSha256": "11b83e8ab0e9276c050135a8c934257186979760ff0f8ee1c3f3f924d367ba2e",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/EventStoreDeletionBatchGuardPort.cs",
+      "observedSha256": "2acee782530112b1cffdb6eee2c94940e31afd673784a1b016ce85c73550237d",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/EventStoreDeletionCapabilityNoIssueAuthority.cs",
+      "observedSha256": "2946a58296d8cb04b15168c1a625f43dc0249a0664ea4c2c8b3da75108186869",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IGovernanceScopeGuard.cs",
+      "observedSha256": "3195677e82d00e3e9cca0adc0170d6f8b401989410c8dc17df6a20b94913f979",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceSigningRecovery.cs",
+      "observedSha256": "dd62673b55f8e0bdbff1e67e0f32cc3a1fb824c8b7144da90ebd5ea1227ebb01",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IDeletionProtectionOwner.cs",
+      "observedSha256": "0b3beb1375380729c6f88e852ad38316724d350408d842debbaa53210b02b6d9",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceProtocolReceipt.cs",
+      "observedSha256": "35d5a59501ecb705419f1e702e1ef15f3d3124e73fa5d4650e28bd7a94bdd688",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprDeletionProtectionOwner.cs",
+      "observedSha256": "b5b9af214084787ec1ba2e057988b262fe061a6e56bba999f5f6b8ee4f8572f5",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "observedSha256": "5fb08625c5b067e9c3a751fc24e0bbda5cb4fabe8ad3cc07559009c0198b9ad9",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "observedSha256": "d0d8eb32609f24982580942aab98a29256cdc67773767ae5e3540cff7ae8038a",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "observedSha256": "ac3aa043153658623a3805427e402d1c7dadb1dafa33c7005971f9753f78912d",
+      "reviewed": "Complete current source read; subsequent source changes require final-delta inspection."
+    }
+  ],
+  "findings": [
+    "Coordinator shared provider/wait cancellation signal can delay timeout under a blocking provider callback; sent to sole engineer for reuse of independent wait budget.",
+    "Final end-to-end coordinator tests must verify actual guard/signing/protection call chain and exact original outcome recovery."
+  ]
+}

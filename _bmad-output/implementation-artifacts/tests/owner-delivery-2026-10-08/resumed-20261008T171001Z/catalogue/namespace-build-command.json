@@ -1,0 +1,14 @@
+[
+  "dotnet",
+  "build",
+  "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Hexalith.EventStore.Client.Tests.csproj",
+  "-c",
+  "Debug",
+  "--artifacts-path",
+  "/tmp/hexalith-resume-namespace-20261008",
+  "-m:1",
+  "-p:NuGetAudit=false",
+  "-p:MinVerVersionOverride=1.0.0",
+  "-p:UseHexalithProjectReferences=true",
+  "-p:UseNuGetDeps=false"
+]

@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T02:29:17.270311+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Actors/AggregateActor.cs",
+      "existed": true,
+      "sha256": "ad77a3bb16c1e2b9527a0c2caec72ea7098f11df2ede9dc7f82089a2f10af951",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/aggregate-registration-fence/before/eventstore/src/Hexalith.EventStore.Server/Actors/AggregateActor.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs",
+      "existed": true,
+      "sha256": "f532aab464afc23b5cb373151f4ab6117b415f24edaaa2e29a9aa7d322a86d99",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/aggregate-registration-fence/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs"
+    }
+  ]
+}

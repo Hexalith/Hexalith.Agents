@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T02:32:28.920412+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "existed": true,
+      "sha256": "01c95082d4efde6106e62a5f73f32d65f695f4ea6d783fa251660c0af6c8a83a",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/retired-repair-epoch/before/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "existed": true,
+      "sha256": "3199d48f408a9c21d7e4944dca9de1329e0f3601e86bc1f79fa26b574b76eb1f",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/retired-repair-epoch/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs"
+    }
+  ]
+}

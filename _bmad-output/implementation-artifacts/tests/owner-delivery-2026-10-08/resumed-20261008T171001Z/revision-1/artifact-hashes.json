@@ -1,0 +1,1133 @@
+{
+  "capturedUtc": "2026-10-08T21:48:02.695793+00:00",
+  "scope": "Current final local build/execution artifacts and exact review input; no live qualification.",
+  "artifacts": {
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-contracts-build.log": {
+      "sha256": "80fde4b84325d82441b026b0e020978568fb6f88a47e73267fbb667ccd15f168",
+      "bytes": 1732
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-client-build-fifth.log": {
+      "sha256": "bbc411e0f861dcdc0c3cdbbb7566304981a35eaa380c34f022cb79f1b84538e8",
+      "bytes": 2063
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-server-build-fourth.log": {
+      "sha256": "0cc10e12a8e4468518f11f2f8c52d30bc7586d7b6a8c62249041b5eea9be5254",
+      "bytes": 3388
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-build-seventh.log": {
+      "sha256": "bc7dcb50deb51f18b80ef21fd9bc157783fd374dd70ba4c4a38e21923b8e03a6",
+      "bytes": 2116
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-build-fourth.log": {
+      "sha256": "a0ff3357194b9265ad9ae545f0a162184a41647a3e5876eeedea17da3ca015ae",
+      "bytes": 4990
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-parties-build-final.log": {
+      "sha256": "1d0ce88cbbef4aad987d16c52129d22a66e4dbcb719d6ebd900cb9feb8807c66",
+      "bytes": 7079
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-helper-tests.log": {
+      "sha256": "2cb4ab5c4a3de1db24d7f0d5a126173e68b8079c3f2c3ffdce97644253a951f0",
+      "bytes": 489
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-helper-tests.xml": {
+      "sha256": "0a314344d47f77d9d49fd2d7068b0d016ad454daf65c87e10dec5758fff586aa",
+      "bytes": 4835
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.DomainService.pdb": {
+      "sha256": "1811035d2eac8821b7947b55b4b97fd5c80f596fed98f67447b83c1c1dd38288",
+      "bytes": 153604,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.pdb": {
+      "sha256": "112a4be29ad475d64e90b608f7bd347cc6e1ed7ea697e8b01245b64974572f65",
+      "bytes": 267692,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.Commons.UniqueIds.pdb": {
+      "sha256": "f68b25d08b59d7acfae8e2ee847a3573757fa48bfba5c530fa8b73c74e757627",
+      "bytes": 15768,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.ServiceDefaults.dll": {
+      "sha256": "d82054e7ecfcb2bf4bfd0aa4f126bf1f47d1ff282a29baccd01e26caf9b66ccd",
+      "bytes": 108544,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.Tests.pdb": {
+      "sha256": "eaff0c83741107e15a58292d4c13667cd173c13f2c11b6c94d8158d184320e7e",
+      "bytes": 363580,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.ServiceDefaults.pdb": {
+      "sha256": "26293aee5309388e1f78c418c48e15851a5e1fb3a0ef10f90683329e5bc690c4",
+      "bytes": 49940,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.DomainService.dll": {
+      "sha256": "f3e5339e6a2c72cf71a9cb749e752d221b819fe36cc4cae178a941cbc349d4c8",
+      "bytes": 492544,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.pdb": {
+      "sha256": "d58c2e469c14c3a96bf7f257aba703f466b41e108210afea6ceff51bc707bf7e",
+      "bytes": 157768,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.Commons.UniqueIds.dll": {
+      "sha256": "6b057f44365595307e210dd2419b4f6eb89e5dd502ce5de8ea40e27c55ced5f0",
+      "bytes": 9728,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.Testing.pdb": {
+      "sha256": "29cab9a3433b6ce2e121245b973cee13509bb482ffeb4534e2499345743eaef4",
+      "bytes": 62100,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.Tests.dll": {
+      "sha256": "51687d958d4e5cab66870bf762ef7349c19b2192517e0a25c333d7a2566681fe",
+      "bytes": 1612800,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.dll": {
+      "sha256": "03e136c761767dfda4384c470dfcefa61f03e92679eacbb2308e0d936c04a8ff",
+      "bytes": 2554368,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.Testing.dll": {
+      "sha256": "7be90acaaafe398a7866c3fade2b952ebd25485cdf534139850aca831cd3c1ec",
+      "bytes": 120832,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.dll": {
+      "sha256": "3a1e98345ac5c79dd3ab18762d45a12526d0041553dfc7a5cc241ea42bc57e3c",
+      "bytes": 957952,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.dll": {
+      "sha256": "56a2f10104be7b40eca9b7189e1eb90bb412ae0cef943fbd388b982167fb2803",
+      "bytes": 585216,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.pdb": {
+      "sha256": "1451074d031af3a87564cc3576665636372d095ef5eb50cf1b41f573b6615070",
+      "bytes": 579036,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-client-tests.log": {
+      "sha256": "5af33d012684f7e54aa82e4615da42d7493c49519f590cc697e551f2f398737b",
+      "bytes": 475
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-client-tests.xml": {
+      "sha256": "cd4ed97dcb454d214961fed9e7cfc1f0751a350c0c8d35dc39181f565253947b",
+      "bytes": 23051
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.DomainService.pdb": {
+      "sha256": "1811035d2eac8821b7947b55b4b97fd5c80f596fed98f67447b83c1c1dd38288",
+      "bytes": 153604,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.pdb": {
+      "sha256": "358de81e4745192bcea2e26cf25df45f439eac4e66d716b3c2f3e526b7f5907c",
+      "bytes": 28576,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.pdb": {
+      "sha256": "112a4be29ad475d64e90b608f7bd347cc6e1ed7ea697e8b01245b64974572f65",
+      "bytes": 267692,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.Commons.UniqueIds.pdb": {
+      "sha256": "f68b25d08b59d7acfae8e2ee847a3573757fa48bfba5c530fa8b73c74e757627",
+      "bytes": 15768,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.ServiceDefaults.dll": {
+      "sha256": "d82054e7ecfcb2bf4bfd0aa4f126bf1f47d1ff282a29baccd01e26caf9b66ccd",
+      "bytes": 108544,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Gateway.pdb": {
+      "sha256": "091c90306f3ce4c1edadca1a72bd3ed83a4aecc8a5c2f98f1cf6300bbb7f09ce",
+      "bytes": 229300,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.ServiceDefaults.pdb": {
+      "sha256": "26293aee5309388e1f78c418c48e15851a5e1fb3a0ef10f90683329e5bc690c4",
+      "bytes": 49940,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.DomainService.dll": {
+      "sha256": "f3e5339e6a2c72cf71a9cb749e752d221b819fe36cc4cae178a941cbc349d4c8",
+      "bytes": 492544,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.pdb": {
+      "sha256": "d58c2e469c14c3a96bf7f257aba703f466b41e108210afea6ceff51bc707bf7e",
+      "bytes": 157768,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.Commons.UniqueIds.dll": {
+      "sha256": "6b057f44365595307e210dd2419b4f6eb89e5dd502ce5de8ea40e27c55ced5f0",
+      "bytes": 9728,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Admin.Abstractions.dll": {
+      "sha256": "4fb71ff8198f8bbb96e1da5fe447202f6e27951c57b7cc37429782fc5dee59ea",
+      "bytes": 239104,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Testing.pdb": {
+      "sha256": "29cab9a3433b6ce2e121245b973cee13509bb482ffeb4534e2499345743eaef4",
+      "bytes": 62100,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.dll": {
+      "sha256": "3ca6ac4b48c6adf8d53642e1807bfa218733b066a841ea0008f78ac8819017bd",
+      "bytes": 2554368,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Testing.dll": {
+      "sha256": "7be90acaaafe398a7866c3fade2b952ebd25485cdf534139850aca831cd3c1ec",
+      "bytes": 120832,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Admin.Abstractions.pdb": {
+      "sha256": "0162572e171da7fb9ed8b624a1ae5b76ca1349debed69d42579e2057be3a0725",
+      "bytes": 57780,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.Tests.dll": {
+      "sha256": "82ff03413b2c0080ea682c52d4c32f0d105090dabe775b7deee327d91c9cbaed",
+      "bytes": 1666048,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.dll": {
+      "sha256": "3a1e98345ac5c79dd3ab18762d45a12526d0041553dfc7a5cc241ea42bc57e3c",
+      "bytes": 957952,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Gateway.dll": {
+      "sha256": "05cf0dea67680703e7fe8fa41e6add0a29a6732dc5b620df4a05d35bcec75615",
+      "bytes": 831488,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.dll": {
+      "sha256": "56a2f10104be7b40eca9b7189e1eb90bb412ae0cef943fbd388b982167fb2803",
+      "bytes": 585216,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.Tests.pdb": {
+      "sha256": "5db60927bc901025247db85101dcdefef865f6462e1ebcb262add4f875af1c1d",
+      "bytes": 377020,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.dll": {
+      "sha256": "501c58bf5e458396f423738c517b18490f0fb9ddd54e89be43141a98dcfa3e98",
+      "bytes": 11776,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.pdb": {
+      "sha256": "bb36d6a66a0c7f1c7ef7f59490c0f66ba70dbd8558f6fe7ffb5ecf44fafe8526",
+      "bytes": 579080,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-index-tests.log": {
+      "sha256": "52d4c03b38137d79177587359af93a00b77df9d220b7600a69d5ff606275ce77",
+      "bytes": 475
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-index-tests.xml": {
+      "sha256": "9e90e44587da7dc714d8e2ee7e8c11d8b1d46a36b68184df8624a03e2aafbe9b",
+      "bytes": 16438
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-server-tests-second.log": {
+      "sha256": "67de57c058d6412d5ff6cfa9fabc32f849ee5a3951800eb022134fae22360c2f",
+      "bytes": 477
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-server-tests-second.xml": {
+      "sha256": "2096269f2d99424dc856743ac1958ce77c7f761ae4f95e6a0c8fcd3b05a840c4",
+      "bytes": 136008
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.DomainService.pdb": {
+      "sha256": "1811035d2eac8821b7947b55b4b97fd5c80f596fed98f67447b83c1c1dd38288",
+      "bytes": 153604,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.pdb": {
+      "sha256": "97b11a4ef4eb22886181826f94a055df941816e366f7128c9f3539c5ba31cfdf",
+      "bytes": 28576,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.pdb": {
+      "sha256": "b4ab1324f5b88cbc61b1e848f9459df8273b5bb54d1b39f59f3b63b388862840",
+      "bytes": 267704,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.UniqueIds.pdb": {
+      "sha256": "9e08f28f13bbbad3547ce3499840b8e23f3d39b143a429ddef384d1783ea8497",
+      "bytes": 15768,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.ServiceDefaults.dll": {
+      "sha256": "d82054e7ecfcb2bf4bfd0aa4f126bf1f47d1ff282a29baccd01e26caf9b66ccd",
+      "bytes": 108544,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests.dll": {
+      "sha256": "9b0da9b484be50ebbb1b4ca3f65e656d463e732149e595feed37d6f99cc1b8c6",
+      "bytes": 6663168,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Gateway.pdb": {
+      "sha256": "6174a284f0eb591fe11d42f2633fab0a84fefc1b3f872e61b0d554025790ceff",
+      "bytes": 229212,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.ServiceDefaults.pdb": {
+      "sha256": "26293aee5309388e1f78c418c48e15851a5e1fb3a0ef10f90683329e5bc690c4",
+      "bytes": 49940,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.DomainService.dll": {
+      "sha256": "f3e5339e6a2c72cf71a9cb749e752d221b819fe36cc4cae178a941cbc349d4c8",
+      "bytes": 492544,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.pdb": {
+      "sha256": "dec15d2a963169b06a73fcaee88d4bf1376f1d929b421e638042546c8cddeb22",
+      "bytes": 157768,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.UniqueIds.dll": {
+      "sha256": "d990be9908ce89cd0400ede65e8ee9cbc522ce738cf96345d5392bb4cdabaf6d",
+      "bytes": 9728,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Admin.Abstractions.dll": {
+      "sha256": "2bc61166961f60a7e16320451ef6be72f00b6cb3ad69d4a97298bae9b1e0b92f",
+      "bytes": 239104,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Testing.pdb": {
+      "sha256": "693e79c05f742e8fa2251a7b61e58fe639378be7fde8e06767352436b7fa8018",
+      "bytes": 62100,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Sample.Contracts.pdb": {
+      "sha256": "2c3c1eb7245d27755a12be551082e929decd526cc172d1e16dd45231bedb0204",
+      "bytes": 15396,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.dll": {
+      "sha256": "d0a74ff3b576f295512b38d705cc09ffd7eb3eced86b2795b4707aa899fbbfb3",
+      "bytes": 2554368,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Sample.pdb": {
+      "sha256": "b78d1d5c8aeb25637ccfdd4a78547931f0dabd03b0fed027a4b9a351d550fe1e",
+      "bytes": 32940,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Testing.dll": {
+      "sha256": "91041744b60d65ed63c93bc484b5b561e6e8f433a0e8fc7e06b57ebc23c1da7a",
+      "bytes": 120832,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.Tenants.Contracts.pdb": {
+      "sha256": "b74965b79eefbdae02b34d3ae772b976feca07229e768022436f0a6a016cd945",
+      "bytes": 30732,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Admin.Abstractions.pdb": {
+      "sha256": "acd486fd98aa6c447785d9c991ffbf7e93e81e4e53b2df27af3487aa1bab588d",
+      "bytes": 57780,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.dll": {
+      "sha256": "84ea96930176cce7dd24ca0281f89be56d31271d15385c3736b8dadc1e459f0b",
+      "bytes": 957952,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Gateway.dll": {
+      "sha256": "8ec956e76b374ec14401a734adc191f813ce2ca57a448ce846b85ef3c022fe83",
+      "bytes": 831488,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.dll": {
+      "sha256": "7d52bc19e0143fe030f6699ab484e54e1072804a244c09ccaeaf9eeb3dc3f884",
+      "bytes": 585216,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.Tenants.Contracts.dll": {
+      "sha256": "90bde482bb677fb6ff3ae0583c7d2ccb9182f221980824504547febc2b231855",
+      "bytes": 78336,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.dll": {
+      "sha256": "61fcf6b5c8a466e5eaf9d105ceda38b2826a1a51d424ec79240ae8bf75da4cf7",
+      "bytes": 11776,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Sample.dll": {
+      "sha256": "7174fe2911db1a745290f671aba908bb9232722baf3ee860b7c1460ddad35478",
+      "bytes": 23552,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.pdb": {
+      "sha256": "6c94b9f79e68c10e96e74c6284b17cdacefc4e277abc300ad55a1cda5d6daf71",
+      "bytes": 579312,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Sample.Contracts.dll": {
+      "sha256": "55120fc40f27ab216223e55b4c422778159c42b5f36ed579d04ab767528803b8",
+      "bytes": 11776,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests.pdb": {
+      "sha256": "841a96cbf22ed640e93838edd7155cbaa78ff1dfc7b221d49ffe25c2552a5a62",
+      "bytes": 1377476,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-owner-tests-final.log": {
+      "sha256": "650f34458817bb5432d1c284d846fbd27dba5ff6dddb1f77586c57e18cca89f6",
+      "bytes": 472
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-owner-tests-final.xml": {
+      "sha256": "fafb70b557f14eec058c5a1d6d207fe7aadad39a4f379db4f570ac14b26206f1",
+      "bytes": 80894
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.EventStore.DomainService.pdb": {
+      "sha256": "1811035d2eac8821b7947b55b4b97fd5c80f596fed98f67447b83c1c1dd38288",
+      "bytes": 153604,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.pdb": {
+      "sha256": "112a4be29ad475d64e90b608f7bd347cc6e1ed7ea697e8b01245b64974572f65",
+      "bytes": 267692,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Commons.UniqueIds.pdb": {
+      "sha256": "f68b25d08b59d7acfae8e2ee847a3573757fa48bfba5c530fa8b73c74e757627",
+      "bytes": 15768,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.EventStore.ServiceDefaults.dll": {
+      "sha256": "d82054e7ecfcb2bf4bfd0aa4f126bf1f47d1ff282a29baccd01e26caf9b66ccd",
+      "bytes": 108544,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.EventStore.ServiceDefaults.pdb": {
+      "sha256": "26293aee5309388e1f78c418c48e15851a5e1fb3a0ef10f90683329e5bc690c4",
+      "bytes": 49940,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.EventStore.DomainService.dll": {
+      "sha256": "f3e5339e6a2c72cf71a9cb749e752d221b819fe36cc4cae178a941cbc349d4c8",
+      "bytes": 492544,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.pdb": {
+      "sha256": "d58c2e469c14c3a96bf7f257aba703f466b41e108210afea6ceff51bc707bf7e",
+      "bytes": 157768,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Commons.UniqueIds.dll": {
+      "sha256": "6b057f44365595307e210dd2419b4f6eb89e5dd502ce5de8ea40e27c55ced5f0",
+      "bytes": 9728,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.pdb": {
+      "sha256": "1524508ae2c4071eb7bab296212db0c7e355f710735e49240f06af89fcb61215",
+      "bytes": 127420,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.pdb": {
+      "sha256": "8886f2b369272978d777957463683d50e985f6cc427ab832baa625493c4eb074",
+      "bytes": 119796,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.EventStore.Testing.pdb": {
+      "sha256": "29cab9a3433b6ce2e121245b973cee13509bb482ffeb4534e2499345743eaef4",
+      "bytes": 62100,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll": {
+      "sha256": "fbc6c2f2ad1739f3c59b726b5dad9cc43ab4a536f1bef221b9cb666a8c72d984",
+      "bytes": 484864,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.dll": {
+      "sha256": "3ca6ac4b48c6adf8d53642e1807bfa218733b066a841ea0008f78ac8819017bd",
+      "bytes": 2554368,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.EventStore.Testing.dll": {
+      "sha256": "7be90acaaafe398a7866c3fade2b952ebd25485cdf534139850aca831cd3c1ec",
+      "bytes": 120832,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.dll": {
+      "sha256": "3a1e98345ac5c79dd3ab18762d45a12526d0041553dfc7a5cc241ea42bc57e3c",
+      "bytes": 957952,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.dll": {
+      "sha256": "56a2f10104be7b40eca9b7189e1eb90bb412ae0cef943fbd388b982167fb2803",
+      "bytes": 585216,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.dll": {
+      "sha256": "0f35fd5de7810249276eff2f92917799401a0df27b1a73d07e6f42304866f0a6",
+      "bytes": 445952,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.pdb": {
+      "sha256": "bb36d6a66a0c7f1c7ef7f59490c0f66ba70dbd8558f6fe7ffb5ecf44fafe8526",
+      "bytes": 579080,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-coordinator-tests-fourth.log": {
+      "sha256": "664dc68c67b5aa7599bd2c24ba717a0034314497f8d5e7079fd043d19c9a0dfc",
+      "bytes": 470
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-coordinator-tests-fourth.xml": {
+      "sha256": "12e4c1a60579750f1766b81fc2e48baaef014a805febebdc226dca28b1e671b6",
+      "bytes": 14286
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-tests-first.log": {
+      "sha256": "b821d91b28ed44c15c0375d8fb4984b8b2ee7d48f77497d1e0733b1d1380c27b",
+      "bytes": 490
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-tests-first.xml": {
+      "sha256": "b6c44306fb1b635587e4221529a4f0a32344b449e177052b42196d1cf9ef55f5",
+      "bytes": 18377
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.Publication.dll": {
+      "sha256": "61b051b887daace61a5e0c90951fb08e2befae4996cf2a05888f74255ff52140",
+      "bytes": 15360,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.DomainService.pdb": {
+      "sha256": "1811035d2eac8821b7947b55b4b97fd5c80f596fed98f67447b83c1c1dd38288",
+      "bytes": 153604,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.pdb": {
+      "sha256": "e8715c9a70d2ba6c42e17ab342fc43629ca39572b9df057db25db8317d1cf48a",
+      "bytes": 267704,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.UniqueIds.pdb": {
+      "sha256": "9e08f28f13bbbad3547ce3499840b8e23f3d39b143a429ddef384d1783ea8497",
+      "bytes": 15768,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.ServiceDefaults.pdb": {
+      "sha256": "57689a437c0cffb40d915fd34e510b0c59c1e397b7676d7f1808d99e9cc95c60",
+      "bytes": 27348,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.ServiceDefaults.dll": {
+      "sha256": "d82054e7ecfcb2bf4bfd0aa4f126bf1f47d1ff282a29baccd01e26caf9b66ccd",
+      "bytes": 108544,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.Diagnostics.pdb": {
+      "sha256": "ed9dc0b3356a1cc0c907f1d74b62e15a773f72d03e62a13bbc9514b2ab546971",
+      "bytes": 14392,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.Http.pdb": {
+      "sha256": "49ac921451b12163ad0584ad4afb573b5147194dc2d26fc5a8a42406bdac85a1",
+      "bytes": 25032,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.ServiceDefaults.pdb": {
+      "sha256": "26293aee5309388e1f78c418c48e15851a5e1fb3a0ef10f90683329e5bc690c4",
+      "bytes": 49940,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Tenants.Client.pdb": {
+      "sha256": "aae2571e2bf92324cdd5cbbc400ad8916300bf441e1528740673ccc41dbb84e7",
+      "bytes": 26420,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.DomainService.dll": {
+      "sha256": "f3e5339e6a2c72cf71a9cb749e752d221b819fe36cc4cae178a941cbc349d4c8",
+      "bytes": 492544,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.pdb": {
+      "sha256": "dec15d2a963169b06a73fcaee88d4bf1376f1d929b421e638042546c8cddeb22",
+      "bytes": 157768,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Client.dll": {
+      "sha256": "84df37da75e7ccd950b09e678a5161a59b83c855d785c806974ca015dd3be5a8",
+      "bytes": 54784,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.UniqueIds.dll": {
+      "sha256": "d990be9908ce89cd0400ede65e8ee9cbc522ce738cf96345d5392bb4cdabaf6d",
+      "bytes": 9728,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.Http.dll": {
+      "sha256": "29aa9da198237f11a5be8bf14e2054095babc571be2e3efe96cfaafcb3822613",
+      "bytes": 22528,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.Serialization.pdb": {
+      "sha256": "3e869b7d78103dd09e74254b316417a90828e3fb9583a5d7b58042dc166e4e3c",
+      "bytes": 14316,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Testing.pdb": {
+      "sha256": "693e79c05f742e8fa2251a7b61e58fe639378be7fde8e06767352436b7fa8018",
+      "bytes": 62100,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Server.pdb": {
+      "sha256": "f368be12b770224536f3288442bc4bfc7bae73c6653b4d1f108a6c91f591918f",
+      "bytes": 152932,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Server.Tests.pdb": {
+      "sha256": "7b957ae0fe2d0f7bad018a6c014304e18aa6fff5c056cd341ea26e7719c38c37",
+      "bytes": 241924,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Testing.dll": {
+      "sha256": "e8b3d8b96e6debb2f3688b6a4b02ad00a7b6b199fd236ab848f6600c9735c278",
+      "bytes": 87040,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.TenantAccess.pdb": {
+      "sha256": "0222df174431556fc140f07f8bdabda00bdfcbfe24d705f74027f941313b7905",
+      "bytes": 21956,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.ServiceDefaults.dll": {
+      "sha256": "b52f332ed72aa9ae0679624c96eaf9a2e26b00d29bfcc4c67ca493994efdb6c1",
+      "bytes": 25088,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Client.pdb": {
+      "sha256": "a229bd61c1cdb0f542250e97aebb4ba3b5217f99b5b9f48977db276bf58d0042",
+      "bytes": 31624,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.dll": {
+      "sha256": "37401a80889991474d9b445bb47823c24bd7eaae0cda972fdddc3e18e73b98a1",
+      "bytes": 2554368,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.pdb": {
+      "sha256": "1f22846d174757def55f4c944ea8ac5dcc195ca1cc6b54da9a8d94c3056c3132",
+      "bytes": 61860,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.Publication.pdb": {
+      "sha256": "36537a7d64e906b903fa33dc865a2210bacdc2372cf82ea0d0d909b6f2460404",
+      "bytes": 14080,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.Serialization.dll": {
+      "sha256": "03af2555ed74fc3f1e33237006cec65ba9e0e8dea7470a97b5b3d1b95e425ab6",
+      "bytes": 13312,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Testing.pdb": {
+      "sha256": "62f99b8c1047c4c78f689c70c0acfb0a2883bce41cc183bdecef3de4f19d685a",
+      "bytes": 24884,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Testing.dll": {
+      "sha256": "91041744b60d65ed63c93bc484b5b561e6e8f433a0e8fc7e06b57ebc23c1da7a",
+      "bytes": 120832,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Tenants.Contracts.pdb": {
+      "sha256": "5de8f3849a38bf121f7fe28770f0139d81e648188cb17e2cb4f49e1c8108322f",
+      "bytes": 30736,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Contracts.pdb": {
+      "sha256": "689fd88d1b726eb024458d34edc5ddbad43a3071e333c473c3d7d9e291297d31",
+      "bytes": 802144,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.dll": {
+      "sha256": "9f2ccc78ef27dca3e2243275becd642588f93fac073830310cb37d37459cfbef",
+      "bytes": 957952,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.dll": {
+      "sha256": "7d52bc19e0143fe030f6699ab484e54e1072804a244c09ccaeaf9eeb3dc3f884",
+      "bytes": 585216,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Tenants.Contracts.dll": {
+      "sha256": "0c4a7a884ea1cccb03a5656964b585a0eec2f17b25adfa00c01f4443adac7418",
+      "bytes": 78336,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Server.dll": {
+      "sha256": "3a73847902082e466e8ecc3fd8173e6ed942b60132a3bffad5c7e71058a099a3",
+      "bytes": 518656,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Server.Tests.dll": {
+      "sha256": "80e6607dbfc126596deccbec15bb44eee588fb82029fc7ae9a4760d6c2b849df",
+      "bytes": 1150976,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Contracts.dll": {
+      "sha256": "793a6ae6babfa4f36a76ac1e5519e99fa26293c6da72f7c87e99cb5618be738b",
+      "bytes": 1879552,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.Diagnostics.dll": {
+      "sha256": "6383470b6982696202f49dd7a0ce004868887d0db29b158732211b5f354f96dd",
+      "bytes": 11776,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.pdb": {
+      "sha256": "7d3799587b604b046cc49c40770b54f2a970224aaec139076a246b1ca534157f",
+      "bytes": 579212,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.dll": {
+      "sha256": "ee75f38aa3c24a36a84bfbb59f2f2ffc048d3a36da7ba5f76fb2e66b5a79f0ac",
+      "bytes": 178176,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Tenants.Client.dll": {
+      "sha256": "f0dc6daa34e906f07d8fbea85f896295effedb0f1ef2937a100dca5960a1158f",
+      "bytes": 22016,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Commons.TenantAccess.dll": {
+      "sha256": "819bb96d224ccfc47e6860047743ea45023d6c9e7a21cbaa69f6d8c7e54cb33c",
+      "bytes": 52224,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-worker-tests.log": {
+      "sha256": "8ef3d449c45baa6fc1d4aad9a20cd0dea0bd9f02a176525e676765657e6ce629",
+      "bytes": 489
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-worker-tests.xml": {
+      "sha256": "89764cb4b7999aed061208f1734e05238e26cd9f7eef51202c0f4a72bee81d50",
+      "bytes": 7439
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-parties-tests-final.log": {
+      "sha256": "7f80e6e612550bfc815218a455d5676bb9108b8c7700dd136246a1b184db3acd",
+      "bytes": 426
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-parties-tests-final.xml": {
+      "sha256": "6e49d2a838f73ba970128e0f8e44e8a67ecb8798a520234e40496391eb06960e",
+      "bytes": 110605
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Memories.Contracts.pdb": {
+      "sha256": "efc10dd646e6185168936216ceb04d18a22ced1e900848bf338d2c578db0d0b9",
+      "bytes": 634408,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.DomainService.pdb": {
+      "sha256": "9053a559393573fc887c4deee1bdedfb7fc450bc0fd8fceeafc77969c9d48e1e",
+      "bytes": 153780,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.pdb": {
+      "sha256": "dbd6b3c90ed35c3b6d28e4a1efb84979056afabba7a2a36fc707258e3a9cb436",
+      "bytes": 28576,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Memories.Contracts.dll": {
+      "sha256": "6dc7a1cb5f8b7add39010428a2a6b27aa469499d0b0802ba434dbdf4b26b26b6",
+      "bytes": 1316864,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.pdb": {
+      "sha256": "e8715c9a70d2ba6c42e17ab342fc43629ca39572b9df057db25db8317d1cf48a",
+      "bytes": 267704,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Commons.UniqueIds.pdb": {
+      "sha256": "9e08f28f13bbbad3547ce3499840b8e23f3d39b143a429ddef384d1783ea8497",
+      "bytes": 15768,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Commons.ServiceDefaults.pdb": {
+      "sha256": "d552aaca08afc1ff553d671b16598a01e09580ce72d997551cb5e36547f23884",
+      "bytes": 27336,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.ServiceDefaults.dll": {
+      "sha256": "d82054e7ecfcb2bf4bfd0aa4f126bf1f47d1ff282a29baccd01e26caf9b66ccd",
+      "bytes": 108544,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Tests.pdb": {
+      "sha256": "8525d696997548386f2874f786adee9db59f49aa0bf43920198bad090ad5fcb2",
+      "bytes": 260352,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Projections.pdb": {
+      "sha256": "c8d3c6f29f90ba5f39ef4e573d9002193f53d6dc041a8bab26a606ebc57b2991",
+      "bytes": 48960,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.Gateway.pdb": {
+      "sha256": "76d0a8ddf5d913facd104ef329bec7ecec9166925296c2cad8ac64e777d02b6c",
+      "bytes": 229244,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Commons.Http.pdb": {
+      "sha256": "969780e5375928f5863da079ba3b08108e4630c696659fd2b18d93f09fa6e607",
+      "bytes": 25020,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.ServiceDefaults.pdb": {
+      "sha256": "26293aee5309388e1f78c418c48e15851a5e1fb3a0ef10f90683329e5bc690c4",
+      "bytes": 49940,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Tenants.Client.pdb": {
+      "sha256": "3c2393ac33fa09cf5cb677dbe7d1bfdfcffc4d4ee70c5aa69df628dd961b8592",
+      "bytes": 26408,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.DomainService.dll": {
+      "sha256": "d3266da07cd81e6646bc20d14be4744b850df10d798e6950e2f43140e3be8fec",
+      "bytes": 492544,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.pdb": {
+      "sha256": "dec15d2a963169b06a73fcaee88d4bf1376f1d929b421e638042546c8cddeb22",
+      "bytes": 157768,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Tenants.Testing.dll": {
+      "sha256": "b1568980499dee7f41a4522d53d519f0a6d97f923d04fb35a8fc6fc2fbcd09dc",
+      "bytes": 20992,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Commons.UniqueIds.dll": {
+      "sha256": "d990be9908ce89cd0400ede65e8ee9cbc522ce738cf96345d5392bb4cdabaf6d",
+      "bytes": 9728,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.Admin.Abstractions.dll": {
+      "sha256": "2bc61166961f60a7e16320451ef6be72f00b6cb3ad69d4a97298bae9b1e0b92f",
+      "bytes": 239104,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Commons.Http.dll": {
+      "sha256": "7d694129efd61fe65040646e49ec790fb9d905ea340ca403ea72feb45c42ddf4",
+      "bytes": 22528,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Tests.dll": {
+      "sha256": "cf8e6390643d6fd71409d6c09d7f922175982f8154dd1f3dd762d39be94dc710",
+      "bytes": 1252864,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.Testing.pdb": {
+      "sha256": "10f3df9025e6f0b864e49ddda1bad94e880dc940dc62a5ea6f350e972dcacecc",
+      "bytes": 62100,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.dll": {
+      "sha256": "b1d04f3e9f517f944f66ae35d04f9e37200106c12221cf02247d0cf3a01b045e",
+      "bytes": 404480,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Commons.dll": {
+      "sha256": "2a9434798b4403d553a7c80906884f9e0d0687cd8c99f59b342d52381dc3459a",
+      "bytes": 40960,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Commons.ServiceDefaults.dll": {
+      "sha256": "3b1844e13da70d6cda4b2f1806524cfbba8c557d0da09fc16c996a03878b8220",
+      "bytes": 25088,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.dll": {
+      "sha256": "eda5194fd016070f8974628f438dc1e12ce3de2746db128e5c93f244c67e95ed",
+      "bytes": 2554368,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Memories.Client.Rest.dll": {
+      "sha256": "e421db9e4219b675378cdf8cd0987aba5af664f4fb8a97a590527acb4ef78be8",
+      "bytes": 91648,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.Testing.dll": {
+      "sha256": "7124515ec80b28537f80823f59e68f8ab8b72a2a6dd5df4402f16baf25df31ff",
+      "bytes": 120832,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Tenants.Contracts.pdb": {
+      "sha256": "a3a5008bd3600e5505bdcc1db63552b5697321d65d5e61d6fde940aa94e276df",
+      "bytes": 30724,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Authentication.pdb": {
+      "sha256": "256e384f714d8b41fe468a872fe2017c54aae9b1d725773d048b4a1e0ae4c2a8",
+      "bytes": 24564,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.Admin.Abstractions.pdb": {
+      "sha256": "acd486fd98aa6c447785d9c991ffbf7e93e81e4e53b2df27af3487aa1bab588d",
+      "bytes": 57780,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Commons.pdb": {
+      "sha256": "0966966f327fbe07313e3d1b5fbb245adf4f26e89686ce5812ce4edca36f22bb",
+      "bytes": 31236,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.dll": {
+      "sha256": "9f2ccc78ef27dca3e2243275becd642588f93fac073830310cb37d37459cfbef",
+      "bytes": 957952,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Authentication.dll": {
+      "sha256": "7c4a75856f7fc8187372c81a02ca4277a074593b9cb712a89d65b827e0c1bb9c",
+      "bytes": 7680,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.Gateway.dll": {
+      "sha256": "ac25577c121a2859ede4b137de53bb12b96faf83a1626b0a3aacf44296bd47b5",
+      "bytes": 831488,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.dll": {
+      "sha256": "7d52bc19e0143fe030f6699ab484e54e1072804a244c09ccaeaf9eeb3dc3f884",
+      "bytes": 585216,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Tenants.Contracts.dll": {
+      "sha256": "6da1ae171eb4c6c2846888446a8ffa93960c5a59b22119559b247baf590481c2",
+      "bytes": 78336,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Projections.dll": {
+      "sha256": "4ed69fa3a141ca55157107cc6a18f5feb192b3dda6cba6386ab3de0b05ae57f3",
+      "bytes": 99840,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.pdb": {
+      "sha256": "91dd4e9771b109b7851fbfa7ef72ebea6b774e0773c70204f78f567ea7b1e13f",
+      "bytes": 136912,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Contracts.pdb": {
+      "sha256": "a4b768ebfa9b33ded38bcfb81829a8ea4e2dfa800c6951c0b17e6c076eecf49a",
+      "bytes": 71264,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Security.dll": {
+      "sha256": "2ad29db4d502e80362e81abfa33d482081c939b39ee71662e4dcb58d770f86da",
+      "bytes": 160768,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Memories.Client.Rest.pdb": {
+      "sha256": "7bdd06a7843abbbae72a1c70c306e8dae0e5b6b28af071c64edebc189e5394fd",
+      "bytes": 29456,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Tenants.Server.dll": {
+      "sha256": "314d42c84f06f1f4a35b2d1b6a9ea4976982c5486462cd8f895a4a26865474e2",
+      "bytes": 40448,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Contracts.dll": {
+      "sha256": "b076b3f7b89b6d7c4b0f8d459a4a2fc58bc7a0fb76406f5f7848becd9ae9d129",
+      "bytes": 267776,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.dll": {
+      "sha256": "a2ff7d7a3882b5ff40e2479dc5e6e0ea7da2ea339b6d5f1ae0aeef8929c682c6",
+      "bytes": 11776,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Testing.pdb": {
+      "sha256": "aa9d41e5bcd07df912bbb7329c9a15682dcff1138d71cbd71c33942405c3e3aa",
+      "bytes": 16412,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.pdb": {
+      "sha256": "63a7d18043d5a903f834a9795a5cdaf4369a73b1a7284a74f5b0aa30ae521cb8",
+      "bytes": 579336,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Testing.dll": {
+      "sha256": "a75350faac5e5ce663ae27b6d8873626ba9369e2476a717ba922904410e17ef0",
+      "bytes": 23040,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Security.pdb": {
+      "sha256": "f8ad902267703cfdd6da907758659e76932c88d16a5dd41f4f0d967b4c9d49ad",
+      "bytes": 62264,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Tenants.Server.pdb": {
+      "sha256": "cc00e03cae5dc6f4c12efe00e43a2f5cf2e3daa81d9e7ce13d4b00213515fc9b",
+      "bytes": 36148,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Tenants.Client.dll": {
+      "sha256": "f004f14c2eb6d718eeb066f470d8668932db889d06b2942acdf78bf2a4e46a80",
+      "bytes": 22016,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Tenants.Testing.pdb": {
+      "sha256": "809b0a6e147313ad53a179b7b99b453678f20ed0a8ce96ffc4566b9d2944308a",
+      "bytes": 32156,
+      "scope": "Current final Debug build artifact; executable result is separately retained in XML."
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-tests-third.xml": {
+      "sha256": "b48600a6d6e0d9cf3489da7bfe329a67805fc353f6b9e11f3ec0ccc7ce4015ab",
+      "bytes": 96730
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-tests-second.xml": {
+      "sha256": "62d89190bdb47e31f2cb1384634123dd12f7516ca61e259718759c5d9c2eb464",
+      "bytes": 87063
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-sdk-client-build-third.log": {
+      "sha256": "111c8ce09dd005034a28e85c623206282ed3011e0bc5bec73130412231b377cc",
+      "bytes": 2464
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-anchors-tests.log": {
+      "sha256": "f5573c6602489daf95d9feea56943618ff8bd4cc7022f388cd6f2fe20fc8bed6",
+      "bytes": 16206
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-server-build-third.log": {
+      "sha256": "c9a267b6731b1709153b8577051a7ce5fb74585e4e28ef78856ce9d3835f1da4",
+      "bytes": 3973
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-tests-third.log": {
+      "sha256": "126aafc5df47aaa566e344d8b60a3a3fd22b53e5ed689e1735ccd7fc257e5c45",
+      "bytes": 3165
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-sdk-build-first.log": {
+      "sha256": "2992a0769135e3b61e0d1f97fa0b982ac6f4d819191ef6a8b4f2a1091176d42f",
+      "bytes": 14635
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-tests-first.xml": {
+      "sha256": "7b1d13afc4efcf4951a86688a84e52bf6126e8f646bd7abaa911b475d13cce78",
+      "bytes": 99321
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-build-second.log": {
+      "sha256": "1c9703cb4693c8fa77daee8744e3ce883cd37ef5d17c38c6f460efbd4c748cde",
+      "bytes": 6036
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-tests-second.log": {
+      "sha256": "ac6879a70053dfe8d2ec79731ba3eae39538a97663e3290967b03457b365f47b",
+      "bytes": 472
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-tests-first.log": {
+      "sha256": "f2474e92b836f2ab6144fe09ca5115708a1b0da635275ec46e9d04a477217f22",
+      "bytes": 28364
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-anchors.xml": {
+      "sha256": "5c6d4cff207f84562512dbb503caecd1e701c266a3f140f34ea51ba704c4a5cc",
+      "bytes": 51950
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-parties-tests.log": {
+      "sha256": "beed3d031410b6dfe5c7b6867c36bea9d88bce7071a5543a2a534f9b105ad89a",
+      "bytes": 426
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-build.log": {
+      "sha256": "f0d20a290be56a712bf0a1eb9b609a44eb3c3ec5bfb8fc5b35ca79a2e8307688",
+      "bytes": 9531
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-build-third.log": {
+      "sha256": "6425bca30ba15506c5943420484cb807f55acfeced2806b156c4a0c90e769edf",
+      "bytes": 12126
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-sdk-build-second.log": {
+      "sha256": "941a71912a60edfef972a516a7bad6167d0285d325a993dbd39aee4778636a98",
+      "bytes": 2063
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-sdk-server-build-second.log": {
+      "sha256": "eb15cb3e582737e78cad7df0100c9ce311ae02223987e475f145f65cdb6cee34",
+      "bytes": 3388
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-build-first.log": {
+      "sha256": "2b21d3e300048045d01f4a9af40ccf39dbb93badb59c3c27a4602cc35f979c48",
+      "bytes": 2401
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-build-second.log": {
+      "sha256": "daf9848c0405e1cf193fdf83a61b718fae5559f0e13b06debd036d7a8fb5f288",
+      "bytes": 1713
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-build-third.log": {
+      "sha256": "679f44386a758b2c12a127e9288c6c0d5fa8f5487397a82647589fe03f141115",
+      "bytes": 7129
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-sdk-server-build.log": {
+      "sha256": "1ce4951ffbdcdd71ba1cf89b20c8444c351df387a3c2d01939c0bff109ed2d1d",
+      "bytes": 4015
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-build-fifth.log": {
+      "sha256": "9014adbb62541c51411e861b2b12c85f311d8eb1ab78d59211e0da47554658c2",
+      "bytes": 3882
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-parties-tests.xml": {
+      "sha256": "277de661c681b7e12fcdbfa48324fee23fd25a77765b7df83c268df1e7406082",
+      "bytes": 110641
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-build-fourth.log": {
+      "sha256": "efd1186d29d8ece76fca1c8ccd7836e7e09e0d05aa09d16a02612c5cb50e0374",
+      "bytes": 1713
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-parties-build.log": {
+      "sha256": "1ed3a9fb5a7ddfa64a1b0961f70981745f010ffd85fc532ebbc47f418d54f65a",
+      "bytes": 10049
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-build-sixth.log": {
+      "sha256": "632179c4cea1aeec8a34a6cee781fb6d4a4dde18bcefa614488237da988959b1",
+      "bytes": 2116
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-sdk-client-build-fourth.log": {
+      "sha256": "b22f22b8200dfd70a7092e6846423fcc2faa946b2fab2004b8119c10ee41ba5f",
+      "bytes": 2063
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/engineering-source-freeze-20261008T214802Z/review-input.json": {
+      "sha256": "9ad66ee27af3f66c21e228b80e3bbd8eab3ef816abd14f0dac433c3b35fe6e70",
+      "bytes": 454165
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/engineering-source-freeze-20261008T214802Z/owned-current.diff": {
+      "sha256": "272eedb926278cb8e8bd91fd85a8fff9d27cb3603ca16283a22cb8b54dad8569",
+      "bytes": 2298947
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/README.md": {
+      "sha256": "3371f20d8e6d38877a7acca9a8658588aa89af8a2ae0f6977c7f037ea2809553",
+      "bytes": 9416
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/commands.json": {
+      "sha256": "819db84ef8d26efc82a1af3e4d11376635932d09806964a1858bc9ab1830d782",
+      "bytes": 12839
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/engineering-handoff.json": {
+      "sha256": "821bcf2266c225b889174c35a0bea0b375a54f5676a5509ddef63f4298a398ec",
+      "bytes": 22074
+    },
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/ordered-baselines.json": {
+      "sha256": "7dbe0f8144ef7b8280b52ab81036a15bc8fa2c541a866e658b60248acb5ec6c8",
+      "bytes": 13005
+    }
+  },
+  "sourceHashes": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/engineering-source-freeze-20261008T214802Z/review-input.json",
+  "sourceFiles": 351,
+  "allReviewCopiesVerified": true,
+  "csharpCrlfChecked": 336,
+  "externalLfFormattingPreserved": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Queries/DaprLogicalQueryFixture.cs",
+  "ownedFiles": 360,
+  "changedCapturedFiles": 354,
+  "focusedTests": 612,
+  "uniqueFocusedTests": 612
+}

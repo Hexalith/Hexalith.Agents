@@ -1,0 +1,240 @@
+{
+  "capturedUtc": "2026-10-09T02:52:59.621879+00:00",
+  "protected": [
+    {
+      "path": "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md",
+      "sha256": "5b1de576274f93a464322c18ee977e8bc4d489c2b8569a64986de3c4fc5304b1",
+      "expected": "5b1de576274f93a464322c18ee977e8bc4d489c2b8569a64986de3c4fc5304b1"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/sprint-status.yaml",
+      "sha256": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+      "expected": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691"
+    },
+    {
+      "path": "_bmad-output/planning-artifacts/external-dependency-register.md",
+      "sha256": "184e16c05b57527abcdbd8588ae0c9fa10fe4c6093a53e66a509e9aa39fbcccb",
+      "expected": "184e16c05b57527abcdbd8588ae0c9fa10fe4c6093a53e66a509e9aa39fbcccb"
+    },
+    {
+      "path": "../parties/_bmad-output/planning-artifacts/actor-history-retention-policy-v1.md",
+      "sha256": "8f6780d252154803343432e2126e596209e432284cfddf1c7f5b9eb596aa2fe1",
+      "expected": "8f6780d252154803343432e2126e596209e432284cfddf1c7f5b9eb596aa2fe1"
+    }
+  ],
+  "parentSha256": "60eb78110670ee4c2bebe3874e8e0b0116141db6af17566cd3309ea3ae6634f3",
+  "frozenIntentSha256": "0cd11ddac96af9775593ea0aa24d969b235b32dfcc4a76a80e51d7eb9c82e2cb",
+  "csharpTypes": [
+    {
+      "path": "src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs",
+      "declaredTypes": [
+        "AuthoritativeStreamReadDeadline"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "src/Hexalith.EventStore.Contracts/Security/IIdentityHistoryCustody.cs",
+      "declaredTypes": [
+        "IIdentityHistoryCustody"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "src/Hexalith.EventStore.PayloadProtection/InteractionOccurrenceProtector.cs",
+      "declaredTypes": [
+        "InteractionOccurrenceProtector"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "src/Hexalith.EventStore.Server/Actors/AggregateActor.cs",
+      "declaredTypes": [
+        "AggregateActor",
+        "Log"
+      ],
+      "oneType": false,
+      "preExistingNestedTypePreserved": "Private generated logging class Log is present in both earliest and fresh revision-5 preserved before bytes; this delta adds one fence call and no type. No unrelated type migration was introduced.",
+      "newAdditionalTypes": []
+    },
+    {
+      "path": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "declaredTypes": [
+        "GovernanceScopeGuardReducer"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs",
+      "declaredTypes": [
+        "InteractionOccurrenceRegistryActor"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "declaredTypes": [
+        "RetainedIdentityHistorySourceReader"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs",
+      "declaredTypes": [
+        "InteractionOccurrenceProtectorTests"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs",
+      "declaredTypes": [
+        "AggregateActorPublicationRegistrationTests"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "declaredTypes": [
+        "GovernanceScopeGuardTests"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+      "declaredTypes": [
+        "InteractionOccurrenceRegistryActorTests"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "declaredTypes": [
+        "RetainedIdentityHistorySourceReaderTests"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "declaredTypes": [
+        "DeletionCapabilitySigningActor"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningState.cs",
+      "declaredTypes": [
+        "DeletionCapabilitySigningState"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+      "declaredTypes": [
+        "PrivateOwnerOperationAuthenticator"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "declaredTypes": [
+        "ReplicatedSecurityObservationSpool"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "declaredTypes": [
+        "DeletionCapabilitySigningActorTests"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "declaredTypes": [
+        "ExportKeyDeliveryActorTests"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs",
+      "declaredTypes": [
+        "PrivateOwnerOperationAuthenticatorTests"
+      ],
+      "oneType": true
+    },
+    {
+      "path": "tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+      "declaredTypes": [
+        "ReplicatedSecurityObservationSpoolTests"
+      ],
+      "oneType": true
+    }
+  ],
+  "requiredOwnedClasses": {
+    "Hexalith.Conversations.Server.Tests": [
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationAgentSixSeamTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationDeliveryTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionPublicationProjectorTests",
+      "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionWorkerAdmissionTests",
+      "Hexalith.Conversations.Server.Tests.Agents.EventStoreConversationTenantCatalogueTests"
+    ],
+    "Hexalith.EventStore.Client.Tests": [
+      "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests",
+      "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests",
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests",
+      "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests"
+    ],
+    "Hexalith.EventStore.Contracts.Tests": [
+      "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests"
+    ],
+    "Hexalith.EventStore.PayloadProtection.Tests": [
+      "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceKeyDerivationTests",
+      "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests"
+    ],
+    "Hexalith.EventStore.Server.Tests": [
+      "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests",
+      "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests",
+      "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests",
+      "Hexalith.EventStore.Server.Tests.Security.ExpiredIdentityHistorySourceTests",
+      "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests",
+      "Hexalith.EventStore.Server.Tests.Security.GuardedStateTransactionTests",
+      "Hexalith.EventStore.Server.Tests.Security.InteractionOccurrenceRegistryActorTests",
+      "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests"
+    ],
+    "Hexalith.Parties.Tests": [
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests"
+    ],
+    "Hexalith.Platform.Custody.Tests": [
+      "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests",
+      "Hexalith.Platform.Custody.Tests.DeletionBatchCapabilityCodecTests",
+      "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests",
+      "Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests",
+      "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests",
+      "Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests",
+      "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests",
+      "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests",
+      "Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests",
+      "Hexalith.Platform.Custody.Tests.PlatformAcceptedEnvelopeTimingTests",
+      "Hexalith.Platform.Custody.Tests.PlatformKeyInventoryActorTests",
+      "Hexalith.Platform.Custody.Tests.PlatformSecurityDenialRecorderTests",
+      "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationAuthenticatorTests",
+      "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests",
+      "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests",
+      "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolWorkerTests",
+      "Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests"
+    ]
+  },
+  "requiredClassCount": 44,
+  "allFourCurrentOwnerPacketsReadFully": true,
+  "rootCsharpRevisionDeltaFullyRead": {
+    "lines": 934,
+    "sha256": "aab14c587203469ce88360ef3f5e6558b1f1bc0f924d888e10b483dc2cf5bcbd"
+  },
+  "errors": [],
+  "typeScreenConclusion": "19 modified paths contain one type; AggregateActor retains its pre-existing nested logging type with no additional type. Every newly added type is in its own named file."
+}

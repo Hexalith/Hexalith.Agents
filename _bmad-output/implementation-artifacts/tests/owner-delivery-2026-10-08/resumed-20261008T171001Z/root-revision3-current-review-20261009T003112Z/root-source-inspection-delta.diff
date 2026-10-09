@@ -1,0 +1,1765 @@
+--- prior/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs
++++ current/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs
+@@ -35,6 +35,7 @@
+             var query = new ConversationDeletionSourceQuery(tenant, conversation, publication.SourceRevision, publication.PublicationId);
+             ConversationDeletionSourceResult source = await conversations.GetConversationDeletionSourceAsync(query, cancellationToken).WaitAsync(cancellationToken).ConfigureAwait(false);
+             cancellationToken.ThrowIfCancellationRequested();
++            if (!await StillAuthorizedAsync(admitted, conversation, cancellationToken).ConfigureAwait(false)) { return ConversationAgentsOutcome.Denied; }
+             if (source.Outcome == ConversationAgentsOutcome.Quarantined) { return source.Outcome; }
+             ConversationDeletionSignal? signal = source.Signal;
+             if (source.Outcome != ConversationAgentsOutcome.Available || signal is null) { return ConversationAgentsOutcome.Unavailable; }
+@@ -64,6 +65,7 @@
+                 if (source.Outcome != ConversationAgentsOutcome.Available || source.Signal != signal || source.LastAttemptId != attempt
+                     || source.TargetVersion != target || source.DeliveryRevision != command.ExpectedDeliveryRevision + 1)
+                 { return ConversationAgentsOutcome.Unavailable; }
++                if (!await StillAuthorizedAsync(admitted, conversation, cancellationToken).ConfigureAwait(false)) { return ConversationAgentsOutcome.Denied; }
+                 if (source.Acknowledgement is not null) { return Confirmed(source) ? ConversationAgentsOutcome.Available : ConversationAgentsOutcome.Quarantined; }
+             }
+             string currentAttempt = source.LastAttemptId!;
+@@ -160,6 +162,7 @@
+         token.ThrowIfCancellationRequested();
+         ConversationDeletionSourceResult persisted = await conversations.GetConversationDeletionSourceAsync(query, token).WaitAsync(token).ConfigureAwait(false);
+         token.ThrowIfCancellationRequested();
++        if (!await StillAuthorizedAsync(actor, source.Signal!.ConversationId, token).ConfigureAwait(false)) { return ConversationAgentsOutcome.Denied; }
+         return persisted.Outcome == ConversationAgentsOutcome.Available && persisted.Signal == source.Signal
+             && persisted.Acknowledgement == outcome.Acknowledgement && Confirmed(persisted)
+             ? ConversationAgentsOutcome.Available : ConversationAgentsOutcome.Unavailable;
+@@ -175,6 +178,7 @@
+         ConversationDeletionSourceResult persisted = await conversations.GetConversationDeletionSourceAsync(new(source.Signal.TenantId,
+             source.Signal.ConversationId, source.Signal.SourceRevision, source.Signal.ConversationDeletionSignalId), token).WaitAsync(token).ConfigureAwait(false);
+         token.ThrowIfCancellationRequested();
++        if (!await StillAuthorizedAsync(actor, source.Signal!.ConversationId, token).ConfigureAwait(false)) { return ConversationAgentsOutcome.Denied; }
+         return persisted.Outcome == ConversationAgentsOutcome.Quarantined && persisted.Signal == source.Signal
+             && !string.IsNullOrWhiteSpace(persisted.PoisonCode) && persisted.AcknowledgedSourceRevision == source.AcknowledgedSourceRevision
+             && persisted.Acknowledgement == source.Acknowledgement ? ConversationAgentsOutcome.Quarantined : ConversationAgentsOutcome.Unavailable;
+--- prior/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs
++++ current/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs
+@@ -28,6 +28,9 @@
+         internal TaskCompletionSource<string?> TargetPending = new(TaskCreationOptions.RunContinuationsAsynchronously);
+         internal string? BadBinding;
+         internal int Submissions, SourceReads, ReceiverReads;
++        internal int BlockSourceCall;
++        internal TaskCompletionSource SourceEntered = new(TaskCreationOptions.RunContinuationsAsynchronously);
++        internal TaskCompletionSource SourcePending = new(TaskCreationOptions.RunContinuationsAsynchronously);
+         internal List<RecordConversationDeletionDeliveryCommand> AttemptCommands = [];
+         internal Dictionary<string, ConversationDeletionAcknowledgement> Receipts = [];
+         internal TaskCompletionSource LookupEntered = new(TaskCreationOptions.RunContinuationsAsynchronously);
+@@ -46,7 +49,9 @@
+         public async Task<ConversationDeletionSourceResult> GetConversationDeletionSourceAsync(ConversationDeletionSourceQuery request, CancellationToken token)
+         {
+             token.ThrowIfCancellationRequested(); SourceReads++;
+-            var state = await source.ReplayAsync(); return state.DeletionSource;
++            var state = await source.ReplayAsync();
++            if (SourceReads == BlockSourceCall) { SourceEntered.TrySetResult(); await SourcePending.Task; state = await source.ReplayAsync(); }
++            return state.DeletionSource;
+         }
+         public async Task<ConversationAgentCommandResult> RecordConversationDeletionDeliveryAsync(RecordConversationDeletionDeliveryCommand command, CancellationToken token)
+         {
+--- prior/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs
++++ current/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs
+@@ -192,4 +192,36 @@
+         var original = (await f.Source.ReplayAsync()).DeletionSource; original.LastAttemptId.ShouldBe(f.AttemptCommands.Single().DeliveryAttemptId);
+         original.Acknowledgement.ShouldBeNull(); original.AcknowledgedSourceRevision.ShouldBe(0);
+     }
++
++    /// <summary>Withdrawal during the final actual serialized source read cannot release acknowledgement/quarantine success, while durable original receipts remain intact.</summary>
++    [Theory]
++    [InlineData("existing-ack")][InlineData("existing-quarantine")][InlineData("persisted-ack")][InlineData("persisted-quarantine")][InlineData("attempt-ack")]
++    public async Task TerminalSourceReadRequiresSameCurrentWorkerAuthority(string vector)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var f = await Approved();
++        if (vector.StartsWith("existing", StringComparison.Ordinal))
++        {
++            f.ChangedReceipt = vector == "existing-quarantine";
++            (await f.Pump().DeliverAsync(f.Entry, TestContext.Current.CancellationToken)).ShouldBe(f.ChangedReceipt ? ConversationAgentsOutcome.Quarantined : ConversationAgentsOutcome.Available);
++            f.BlockSourceCall = f.SourceReads + 1;
++        }
++        else { f.ChangedReceipt = vector == "persisted-quarantine"; f.BlockSourceCall = vector == "attempt-ack" ? 2 : 3; }
++        var pending = f.Pump().DeliverAsync(f.Entry, TestContext.Current.CancellationToken);
++        await f.SourceEntered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        // Exercise the attempt-read shortcut with an original acknowledgement already committed by another independently admitted worker.
++        if (vector == "attempt-ack")
++        {
++            f.BlockSourceCall = 0;
++            (await f.Pump().DeliverAsync(f.Entry, TestContext.Current.CancellationToken)).ShouldBe(ConversationAgentsOutcome.Available);
++        }
++        var retained = (await f.Source.ReplayAsync()).DeletionSource;
++        string before = System.Text.Json.JsonSerializer.Serialize(f.Source.PersistedEvents);
++        f.WithdrawAuthority = true; f.SourcePending.TrySetResult();
++        (await pending.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken)).ShouldBe(vector == "attempt-ack" ? ConversationAgentsOutcome.Unavailable : ConversationAgentsOutcome.Denied);
++        System.Text.Json.JsonSerializer.Serialize(f.Source.PersistedEvents).ShouldBe(before);
++        var after = (await f.Source.ReplayAsync()).DeletionSource;
++        after.Acknowledgement.ShouldBe(retained.Acknowledgement); after.LastAttemptId.ShouldBe(retained.LastAttemptId); after.PoisonCode.ShouldBe(retained.PoisonCode);
++        after.AcknowledgedSourceRevision.ShouldBe(retained.AcknowledgedSourceRevision);
++    }
+ }
+--- prior/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeEventStreamReader.cs
++++ current/eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeEventStreamReader.cs
+@@ -83,8 +83,15 @@
+                 var request = new StreamReadRequest(identity.TenantId, identity.Domain, identity.AggregateId,
+                     cursor, head, PageSize: PageSize);
+                 StreamReadPage supplied = await deadline.ReadAsync(token => gateway.ReadStreamAsync(request, token)).ConfigureAwait(false);
+-                StreamReadPage page = CapturePage(supplied, request.PageSize, deadline, ref bytes);
+-                long next = StreamReadPageValidator.ValidateAndGetNextSequence(request, page);
++                long priorBytes = bytes;
++                (StreamReadPage page, long capturedBytes, long next) = await deadline.ReadAsync(_ =>
++                {
++                    long ownedBytes = priorBytes;
++                    StreamReadPage ownedPage = CapturePage(supplied, request.PageSize, deadline, ref ownedBytes);
++                    long ownedNext = StreamReadPageValidator.ValidateAndGetNextSequence(request, ownedPage);
++                    return Task.FromResult((ownedPage, ownedBytes, ownedNext));
++                }).ConfigureAwait(false);
++                bytes = capturedBytes;
+                 if (page.Metadata.LatestSequence != head)
+                 {
+                     changed = true;
+@@ -129,15 +136,18 @@
+         var request = new StreamReadRequest(identity.TenantId, identity.Domain, identity.AggregateId,
+             ToSequence: 0, PageSize: 1);
+         StreamReadPage supplied = await deadline.ReadAsync(token => gateway.ReadStreamAsync(request, token)).ConfigureAwait(false);
+-        long bytes = 0;
+-        StreamReadPage page = CapturePage(supplied, request.PageSize, deadline, ref bytes);
+-        _ = StreamReadPageValidator.ValidateAndGetNextSequence(request, page);
+-        if (page.Events.Count != 0 || page.Metadata.IsTruncated)
+-        {
+-            throw new InvalidOperationException("Invalid head observation.");
+-        }
+-
+-        return page.Metadata.LatestSequence;
++        return await deadline.ReadAsync(_ =>
++        {
++            long bytes = 0;
++            StreamReadPage page = CapturePage(supplied, request.PageSize, deadline, ref bytes);
++            StreamReadPageValidator.ValidateAndGetNextSequence(request, page);
++            if (page.Events.Count != 0 || page.Metadata.IsTruncated)
++            {
++                throw new InvalidOperationException("Invalid head observation.");
++            }
++
++            return Task.FromResult(page.Metadata.LatestSequence);
++        }).ConfigureAwait(false);
+     }
+ 
+     private static StreamReadPage CapturePage(StreamReadPage supplied, int limit, AuthoritativeStreamReadDeadline deadline, ref long bytes)
+--- prior/eventstore/src/Hexalith.EventStore.Client/Streams/ISourcePublicationIndexStore.cs
++++ current/eventstore/src/Hexalith.EventStore.Client/Streams/ISourcePublicationIndexStore.cs
+@@ -5,6 +5,10 @@
+ /// <summary>Technical durable exact-index storage with one conditional revision owner.</summary>
+ public interface ISourcePublicationIndexStore
+ {
++    /// <summary>Reads independently authenticated original source reconciliation under the exact fresh complete cut; missing proof denies reuse.</summary>
++    Task<SourcePublicationReconciliationProgress?> ReadReconciliationProgressAsync(SourcePublicationCut cut, CancellationToken cancellationToken = default) => Task.FromResult<SourcePublicationReconciliationProgress?>(null);
++    /// <summary>Independently authenticates one original protected source prefix and conditionally retains exact bounded work; omission denies progress.</summary>
++    Task<SourcePublicationReconciliationProgress?> AdvanceReconciliationProgressAsync(SourcePublicationReconciliationAdvance advance, CancellationToken cancellationToken = default) => Task.FromResult<SourcePublicationReconciliationProgress?>(null);
+     /// <summary>Reads only a freshly independently authenticated retained consecutive acknowledgement prefix for the exact complete cut and current delivery binding. Omission cannot authorize resume.</summary>
+     Task<SourcePublicationDispatchProgress?> ReadDispatchProgressAsync(SourcePublicationCheckpoint cut, CancellationToken cancellationToken = default) => Task.FromResult<SourcePublicationDispatchProgress?>(null);
+     /// <summary>Independently verifies actual original acknowledgements and conditionally retains exact consecutive progress; caller status strings cannot authorize advancement. Omission denies durable progress.</summary>
+--- prior/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs
++++ current/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs
+@@ -55,72 +55,65 @@
+     {
+         for (int attempt = 0; attempt < 3; attempt++)
+         {
+-            SourcePublicationCut? initial = CaptureCut(await deadline.ReadAsync(token => namespaces.ReadAsync(scope, token)).ConfigureAwait(false), scope, deadline);
++            SourcePublicationCut? initial = await ReadCutAsync(scope, deadline).ConfigureAwait(false);
+             if (initial is null) { deadline.ThrowIfCancellationRequested(); return new(null, "publication-namespace-unavailable"); }
+-            SourcePublicationIndexState? prior = CaptureState(await deadline.ReadAsync(token => store.ReadAsync(scope, token)).ConfigureAwait(false), scope, deadline);
++            SourcePublicationIndexState? prior = await ReadStateAsync(scope, deadline).ConfigureAwait(false);
+             if (prior?.PoisonCode is not null) { deadline.ThrowIfCancellationRequested(); return new(null, prior.PoisonCode); }
+-            var projected = new List<SourcePublicationDescriptor>();
++            var retained = await deadline.ReadAsync(async token =>
++            {
++                var progress = await store.ReadReconciliationProgressAsync(initial, token).ConfigureAwait(false);
++                return progress is null ? null : SourcePublicationReconciliationProgress.Capture(progress);
++            }).ConfigureAwait(false);
++            if (retained is not null && (!retained.MatchesCut(initial) || prior?.ReconciliationProgress is null
++                || !SameProgress(retained, prior.ReconciliationProgress))) { return new(null, "publication-reconciliation-proof-unavailable"); }
++            if (retained is null && prior?.ReconciliationProgress?.MatchesCut(initial) == true)
++            { return new(null, "publication-reconciliation-proof-unavailable"); }
++            var projected = retained?.Publications.ToList() ?? [];
++            int verified = retained?.VerifiedSources ?? 0;
++            int worked = 0;
+             string? conflict = null;
++            int sourceIndex = 0;
+             foreach (SourcePublicationHead target in initial.Sources)
+             {
+                 deadline.ThrowIfCancellationRequested();
+                 SourcePublicationHead? previous = prior?.Sources.FirstOrDefault(h => h.Identity == target.Identity);
+                 if (previous is not null && previous.Head > target.Head) { conflict = "publication-source-regressed"; break; }
+-                // A registered but not-yet-created source contributes the empty committed prefix to this finite cut.
+-                if (target.Head == 0) { continue; }
+-                AuthoritativeStreamReadResult read = await deadline.ReadAsync(token => streams.ReadAsync(target.Identity, token)).ConfigureAwait(false);
+-                if (!read.IsAuthoritative || read.Stream is not { } source || source.Identity != target.Identity || source.Head < target.Head
+-                    || source.Events is null || source.Events.Count != source.Head || source.ObservedAt == default
+-                    || source.ObservedAt > timeProvider.GetUtcNow() || string.IsNullOrWhiteSpace(source.ObservationId))
+-                { deadline.ThrowIfCancellationRequested(); return new(null, "publication-source-hole"); }
+-                var prefix = new List<StreamReadEvent>();
+-                long payloadBytes = 0;
+-                foreach (StreamReadEvent item in source.Events)
++                if (sourceIndex++ < verified) { continue; }
++                var result = target.Head == 0 ? (Publications: (IReadOnlyList<SourcePublicationDescriptor>?)Array.Empty<SourcePublicationDescriptor>(), ObservationId: "empty-certified-cut", Head: 0L, Failure: (string?)null)
++                    : await ReadSourceAsync(target, deadline).ConfigureAwait(false);
++                if (result.Publications is null)
++                {
++                    if (result.Failure == "publication-source-incompatible") { conflict = result.Failure; break; }
++                    return new(null, result.Failure ?? "publication-source-hole");
++                }
++                foreach (SourcePublicationIndexEntry existing in prior?.Entries.Where(e => e.Publication.Identity == target.Identity) ?? [])
+                 {
+                     deadline.ThrowIfCancellationRequested();
+-                    if (prefix.Count == target.Head)
+-                    {
+-                        if (source.Head == target.Head) { return new(null, "publication-source-hole"); }
+-                        break;
+-                    }
+-                    if (item is null || item.Payload is null || item.Payload.Length > 16 * 1024 * 1024 - payloadBytes)
+-                    { return new(null, "publication-source-hole"); }
+-                    byte[] payload = item.Payload.ToArray();
+-                    payloadBytes += payload.Length;
+-                    var captured = item with { Payload = payload, ProtectionMetadata = CaptureProtection(item.ProtectionMetadata, deadline) };
+-                    if (captured.SequenceNumber != prefix.Count + 1 || string.IsNullOrWhiteSpace(captured.EventTypeName)
+-                        || string.IsNullOrWhiteSpace(captured.MessageId) || captured.MetadataVersion <= 0
+-                        || string.IsNullOrWhiteSpace(captured.SerializationFormat)) { return new(null, "publication-source-hole"); }
+-                    prefix.Add(captured);
+-                }
+-                if (prefix.Count != target.Head) { return new(null, "publication-source-hole"); }
+-                IReadOnlyList<SourcePublicationDescriptor> candidates;
+-                try { candidates = await deadline.ReadAsync(token => Task.FromResult(projector.Project(source with { Head = target.Head, Events = prefix.AsReadOnly() }, token))).ConfigureAwait(false); }
+-                catch (Exception exception) when (exception is InvalidOperationException or ArgumentException or System.Text.Json.JsonException)
+-                { conflict = "publication-source-incompatible"; break; }
+-                if (candidates is null || candidates.Count < 0 || candidates.Count > MaxEntries) { conflict = "publication-source-incompatible"; break; }
+-                var perSource = new List<SourcePublicationDescriptor>();
+-                foreach (SourcePublicationDescriptor candidate in candidates)
+-                {
+-                    deadline.ThrowIfCancellationRequested();
+-                    if (perSource.Count >= MaxEntries || !ValidDescriptor(candidate) || candidate.Identity != target.Identity
+-                        || candidate.SourceRevision > target.Head || prefix[(int)candidate.SourceRevision - 1].MessageId != candidate.SourceMessageId
+-                        || perSource.Any(p => p.SourceRevision == candidate.SourceRevision))
+-                    { conflict = "publication-source-incompatible"; break; }
+-                    perSource.Add(candidate);
++                    if (!result.Publications.Contains(existing.Publication)) { conflict = "publication-reference-conflict"; break; }
+                 }
+                 if (conflict is not null) { break; }
+-                foreach (SourcePublicationIndexEntry existing in prior?.Entries.Where(e => e.Publication.Identity == target.Identity) ?? [])
+-                {
+-                    deadline.ThrowIfCancellationRequested();
+-                    if (!perSource.Contains(existing.Publication)) { conflict = "publication-reference-conflict"; break; }
++                if (previous is not null && result.Publications.Any(p => p.SourceRevision <= previous.Head && !prior!.Entries.Any(e => e.Publication == p)))
++                { conflict = "publication-reference-conflict"; break; }
++                if (result.Publications.Any(candidate => projected.Any(existing => existing.PublicationId == candidate.PublicationId)))
++                { conflict = "publication-reference-conflict"; break; }
++                projected.AddRange(result.Publications);
++                if (projected.Count > MaxEntries) { return new(null, "publication-operational-bound"); }
++                var advanced = await deadline.ReadAsync(async token =>
++                {
++                    var proof = await store.AdvanceReconciliationProgressAsync(new(initial, sourceIndex - 1, target, result.ObservationId, result.Head, result.Publications), token).ConfigureAwait(false);
++                    return proof is null ? null : SourcePublicationReconciliationProgress.Capture(proof);
++                }).ConfigureAwait(false);
++                if (advanced is not null)
++                {
++                    if (!advanced.MatchesCut(initial) || advanced.VerifiedSources != verified + 1 || !advanced.Publications.SequenceEqual(projected))
++                    { return new(null, "publication-reconciliation-proof-unavailable"); }
++                    retained = advanced; verified = advanced.VerifiedSources;
++                    prior = await ReadStateAsync(scope, deadline).ConfigureAwait(false);
++                    if (prior?.ReconciliationProgress is null || !SameProgress(retained, prior.ReconciliationProgress))
++                    { return new(null, "publication-reconciliation-outcome-unknown"); }
++                    if (++worked >= 20 && verified < initial.Sources.Count) { return new(null, "publication-reconciliation-pending"); }
+                 }
+-                if (conflict is not null) { break; }
+-                if (previous is not null && perSource.Any(p => p.SourceRevision <= previous.Head
+-                    && !(prior!.Entries.Any(e => e.Publication == p))))
+-                { conflict = "publication-reference-conflict"; break; }
+-                projected.AddRange(perSource.OrderBy(p => p.SourceRevision));
+-                if (projected.Count > MaxEntries) { return new(null, "publication-operational-bound"); }
++                else if (retained is not null) { return new(null, "publication-reconciliation-unavailable"); }
+             }
+             if (prior?.Sources.Any(h => !initial.Sources.Any(target => target.Identity == h.Identity)) == true)
+             { conflict = "publication-source-disappeared"; }
+@@ -141,27 +134,29 @@
+                 }
+             }
+             // A changed namespace authority/cut cannot authenticate this reconciliation.
+-            SourcePublicationCut? final = CaptureCut(await deadline.ReadAsync(token => namespaces.ReadAsync(scope, token)).ConfigureAwait(false), scope, deadline);
++            SourcePublicationCut? final = await ReadCutAsync(scope, deadline).ConfigureAwait(false);
+             if (final is null || !SameCut(initial, final)) { return new(null, "publication-namespace-changed"); }
+             long revision = prior?.Revision ?? 0;
+             var updated = new SourcePublicationIndexState(scope, checked(revision + 1), initial.AuthorityRevision,
+                 conflict is not null && prior is not null ? prior.Sources : initial.Sources,
+-                conflict is not null ? prior?.Entries ?? Array.Empty<SourcePublicationIndexEntry>() : entries.AsReadOnly(), conflict) { DispatchProgress = prior?.DispatchProgress };
++                conflict is not null ? prior?.Entries ?? Array.Empty<SourcePublicationIndexEntry>() : entries.AsReadOnly(), conflict) { DispatchProgress = prior?.DispatchProgress, ReconciliationProgress = retained };
+             bool unchanged = prior is not null && prior.AuthorityRevision == updated.AuthorityRevision && prior.PoisonCode == updated.PoisonCode
+                 && prior.Sources.SequenceEqual(updated.Sources) && prior.Entries.SequenceEqual(updated.Entries);
+             if (unchanged) { updated = prior!; }
+             deadline.ThrowIfCancellationRequested();
+             if (!unchanged && !await deadline.ReadAsync(token => store.TryWriteAsync(scope, revision, updated, token)).ConfigureAwait(false)) { continue; }
+             // Read back exact persisted outcome; ambiguous/lost acknowledgement never fabricates a checkpoint.
+-            SourcePublicationIndexState? persisted = CaptureState(await deadline.ReadAsync(token => store.ReadAsync(scope, token)).ConfigureAwait(false), scope, deadline);
++            SourcePublicationIndexState? persisted = await ReadStateAsync(scope, deadline).ConfigureAwait(false);
+             if (persisted is null || persisted.Revision != updated.Revision || persisted.PoisonCode != updated.PoisonCode
+                 || persisted.AuthorityRevision != updated.AuthorityRevision || !persisted.Sources.SequenceEqual(updated.Sources)
+-                || !persisted.Entries.SequenceEqual(updated.Entries))
++                || !persisted.Entries.SequenceEqual(updated.Entries) || !SameProgress(persisted.ReconciliationProgress, updated.ReconciliationProgress))
+             { return new(null, "publication-index-outcome-unknown"); }
+             deadline.ThrowIfCancellationRequested();
+-            SourcePublicationCut? releaseCut = CaptureCut(await deadline.ReadAsync(token => namespaces.ReadAsync(scope, token)).ConfigureAwait(false), scope, deadline);
++            SourcePublicationCut? releaseCut = await ReadCutAsync(scope, deadline).ConfigureAwait(false);
+             if (releaseCut is null || !SameCut(initial, releaseCut)) { return new(null, "publication-namespace-changed"); }
+             if (persisted.PoisonCode is not null) { return new(null, persisted.PoisonCode); }
++            if (!await ConfirmReconciliationAsync(releaseCut, persisted, deadline).ConfigureAwait(false))
++            { return new(null, "publication-reconciliation-proof-unavailable"); }
+             if (afterOffset > persisted.Entries.Count) { return new(null, "publication-cursor-outside-cut"); }
+             var page = persisted.Entries.Where(e => e.Offset > afterOffset).Take(pageSize).ToArray();
+             long next = page.Length == 0 ? afterOffset : page[^1].Offset;
+@@ -178,18 +173,20 @@
+     internal async Task<SourcePublicationReadResult> ReadIndexedPageAsync(SourcePublicationCheckpoint cut, long afterOffset, CancellationToken token)
+     {
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), timeProvider, token, timeProvider.GetTimestamp());
+-        var initial = CaptureCut(await deadline.ReadAsync(ct => namespaces.ReadAsync(cut.Scope, ct)).ConfigureAwait(false), cut.Scope, deadline);
+-        var state = CaptureState(await deadline.ReadAsync(ct => store.ReadAsync(cut.Scope, ct)).ConfigureAwait(false), cut.Scope, deadline);
++        var initial = await ReadCutAsync(cut.Scope, deadline).ConfigureAwait(false);
++        var state = await ReadStateAsync(cut.Scope, deadline).ConfigureAwait(false);
+         if (initial is null || state is null || state.PoisonCode is not null || state.Revision < cut.IndexRevision || state.AuthorityRevision != cut.AuthorityRevision
+             || initial.AuthorityRevision != cut.AuthorityRevision || !state.Sources.SequenceEqual(cut.Sources) || !initial.Sources.SequenceEqual(cut.Sources)
++            || state.ReconciliationProgress is { } partial && (partial.VerifiedSources != partial.Sources.Count || !partial.MatchesCut(initial))
+             || state.Entries.Count != cut.LastOffset || afterOffset < 0 || afterOffset > state.Entries.Count) { return new(null, "publication-resume-cut-changed"); }
+         var entries = state.Entries.Where(e => e.Offset > afterOffset).Take(100).ToArray();
+-        var durable = CaptureState(await deadline.ReadAsync(ct => store.ReadAsync(cut.Scope, ct)).ConfigureAwait(false), cut.Scope, deadline);
+-        var final = CaptureCut(await deadline.ReadAsync(ct => namespaces.ReadAsync(cut.Scope, ct)).ConfigureAwait(false), cut.Scope, deadline);
++        var durable = await ReadStateAsync(cut.Scope, deadline).ConfigureAwait(false);
++        var final = await ReadCutAsync(cut.Scope, deadline).ConfigureAwait(false);
+         deadline.ThrowIfCancellationRequested();
+         if (durable is null || durable.Revision != state.Revision || durable.AuthorityRevision != state.AuthorityRevision || durable.PoisonCode != state.PoisonCode
+             || durable.DispatchProgress != state.DispatchProgress || !durable.Sources.SequenceEqual(state.Sources) || !durable.Entries.SequenceEqual(state.Entries)
+             || final is null || !SameCut(initial, final)) { return new(null, "publication-resume-cut-changed"); }
++        if (!await ConfirmReconciliationAsync(final, durable, deadline).ConfigureAwait(false)) { return new(null, "publication-reconciliation-proof-unavailable"); }
+         long next = entries.Length == 0 ? afterOffset : entries[^1].Offset;
+         var checkpoint = new SourcePublicationCheckpoint(cut.Scope, durable.Revision, durable.AuthorityRevision, durable.Sources, durable.Entries.Count);
+         return new(new(checkpoint, Array.AsReadOnly(entries), next, next < durable.Entries.Count), null);
+@@ -200,6 +197,67 @@
+     /// <summary>The owner independently authenticates actual source acknowledgements; receiver statuses are never durable-prefix proof.</summary>
+     internal Task<SourcePublicationDispatchProgress?> AdvanceDispatchProgressAsync(SourcePublicationDispatchAdvance advance, CancellationToken token)
+         => store.AdvanceDispatchProgressAsync(advance, token);
++
++    private async Task<bool> ConfirmReconciliationAsync(SourcePublicationCut cut, SourcePublicationIndexState state, AuthoritativeStreamReadDeadline deadline)
++    {
++        if (state.ReconciliationProgress is not { } original) { return true; }
++        var fresh = await deadline.ReadAsync(async token =>
++        {
++            var proof = await store.ReadReconciliationProgressAsync(cut, token).ConfigureAwait(false);
++            return proof is null ? null : SourcePublicationReconciliationProgress.Capture(proof);
++        }).ConfigureAwait(false);
++        deadline.ThrowIfCancellationRequested();
++        return fresh is not null && fresh.VerifiedSources == cut.Sources.Count && fresh.MatchesCut(cut) && SameProgress(fresh, original);
++    }
++    private Task<SourcePublicationCut?> ReadCutAsync(SourcePublicationScope scope, AuthoritativeStreamReadDeadline deadline)
++        => deadline.ReadAsync(async token => CaptureCut(await namespaces.ReadAsync(scope, token).ConfigureAwait(false), scope, deadline));
++    private Task<SourcePublicationIndexState?> ReadStateAsync(SourcePublicationScope scope, AuthoritativeStreamReadDeadline deadline)
++        => deadline.ReadAsync(async token => CaptureState(await store.ReadAsync(scope, token).ConfigureAwait(false), scope, deadline));
++    private async Task<(IReadOnlyList<SourcePublicationDescriptor>? Publications, string ObservationId, long Head, string? Failure)> ReadSourceAsync(
++        SourcePublicationHead target, AuthoritativeStreamReadDeadline deadline)
++    {
++        return await deadline.ReadAsync(async token =>
++        {
++            AuthoritativeStreamReadResult read = await streams.ReadAsync(target.Identity, token).ConfigureAwait(false);
++            if (!read.IsAuthoritative || read.Stream is not { } source || source.Identity != target.Identity || source.Head < target.Head || source.Head > MaxEntries
++                || source.Events is null || source.Events.Count != source.Head || source.ObservedAt == default || source.ObservedAt > timeProvider.GetUtcNow()
++                || string.IsNullOrWhiteSpace(source.ObservationId) || source.ObservationId.Length > 256)
++            { return ((IReadOnlyList<SourcePublicationDescriptor>?)null, "", 0L, "publication-source-hole"); }
++            var prefix = new List<StreamReadEvent>(); long bytes = 0;
++            foreach (var item in source.Events)
++            {
++                deadline.ThrowIfCancellationRequested();
++                if (prefix.Count == target.Head) { if (source.Head == target.Head) { return (null, "", 0L, "publication-source-hole"); } break; }
++                if (item is null || item.Payload is null || item.Payload.Length > 16 * 1024 * 1024 - bytes) { return (null, "", 0L, "publication-source-hole"); }
++                byte[] payload = item.Payload.ToArray(); bytes += payload.Length;
++                var captured = item with { Payload = payload, ProtectionMetadata = CaptureProtection(item.ProtectionMetadata, deadline) };
++                if (captured.SequenceNumber != prefix.Count + 1 || string.IsNullOrWhiteSpace(captured.EventTypeName) || string.IsNullOrWhiteSpace(captured.MessageId)
++                    || captured.MetadataVersion <= 0 || string.IsNullOrWhiteSpace(captured.SerializationFormat)) { return (null, "", 0L, "publication-source-hole"); }
++                prefix.Add(captured);
++            }
++            if (prefix.Count != target.Head) { return (null, "", 0L, "publication-source-hole"); }
++            IReadOnlyList<SourcePublicationDescriptor> candidates;
++            try { candidates = projector.Project(source with { Head = target.Head, Events = prefix.AsReadOnly() }, token); }
++            catch (Exception exception) when (exception is InvalidOperationException or ArgumentException or System.Text.Json.JsonException)
++            { return (null, "", 0L, "publication-source-incompatible"); }
++            if (candidates is null || candidates.Count is < 0 or > MaxEntries) { return (null, "", 0L, "publication-source-incompatible"); }
++            var owned = new List<SourcePublicationDescriptor>();
++            foreach (var candidate in candidates)
++            {
++                deadline.ThrowIfCancellationRequested();
++                if (owned.Count >= MaxEntries || !ValidDescriptor(candidate) || candidate.Identity != target.Identity || candidate.SourceRevision > target.Head
++                    || prefix[(int)candidate.SourceRevision - 1].MessageId != candidate.SourceMessageId || owned.Any(p => p.SourceRevision == candidate.SourceRevision))
++                { return (null, "", 0L, "publication-source-incompatible"); }
++                owned.Add(candidate);
++            }
++            deadline.ThrowIfCancellationRequested();
++            return ((IReadOnlyList<SourcePublicationDescriptor>?)Array.AsReadOnly(owned.OrderBy(p => p.SourceRevision).ToArray()), source.ObservationId, source.Head, (string?)null);
++        }).ConfigureAwait(false);
++    }
++    private static bool SameProgress(SourcePublicationReconciliationProgress? left, SourcePublicationReconciliationProgress? right)
++        => left is null ? right is null : right is not null && left.Scope == right.Scope && left.Version == right.Version
++            && left.SourceAuthorityRevision == right.SourceAuthorityRevision && left.VerifiedSources == right.VerifiedSources && left.ReceiptId == right.ReceiptId
++            && left.Sources.SequenceEqual(right.Sources) && left.Publications.SequenceEqual(right.Publications);
+ 
+     private SourcePublicationCut? CaptureCut(SourcePublicationCut? cut, SourcePublicationScope scope, AuthoritativeStreamReadDeadline deadline)
+     {
+@@ -291,6 +349,8 @@
+             entries.Add(entry);
+         }
+         deadline.ThrowIfCancellationRequested();
+-        return state with { Sources = heads.AsReadOnly(), Entries = entries.AsReadOnly() };
++        var reconciliation = state.ReconciliationProgress is { } proof ? SourcePublicationReconciliationProgress.Capture(proof) : null;
++        if (reconciliation is not null && reconciliation.Scope != scope) { throw new InvalidOperationException("Reconciliation scope mismatch."); }
++        return state with { Sources = heads.AsReadOnly(), Entries = entries.AsReadOnly(), ReconciliationProgress = reconciliation };
+     }
+ }
+--- prior/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationIndexState.cs
++++ current/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationIndexState.cs
+@@ -11,6 +11,8 @@
+ /// <param name="PoisonCode">A closed safe conflict category that prevents checkpoint release.</param>
+ public sealed record SourcePublicationIndexState(SourcePublicationScope Scope, long Revision, string AuthorityRevision, IReadOnlyList<SourcePublicationHead> Sources, IReadOnlyList<SourcePublicationIndexEntry> Entries, string? PoisonCode = null)
+ {
++    /// <summary>Independently retained exact source-prefix work; partial work cannot release a checkpoint.</summary>
++    public SourcePublicationReconciliationProgress? ReconciliationProgress { get; init; }
+     /// <summary>Independent durable acknowledgement-prefix proof; stale binding/cut remains retained but cannot authorize resume.</summary>
+     public SourcePublicationDispatchProgress? DispatchProgress { get; init; }
+ }
+--- prior/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationAdvance.cs
++++ current/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationAdvance.cs
+@@ -0,0 +1,9 @@
++namespace Hexalith.EventStore.Contracts.Streams;
++
++/// <summary>One exact verified source prefix proposed for independent retention; caller observations and descriptors grant no authority.</summary>
++/// <param name="Cut">Fresh independently complete source cut.</param><param name="ExpectedVerifiedSources">Consecutive retained source predecessor, or zero for a changed cut.</param>
++/// <param name="Source">The exact next source and certified prefix head.</param><param name="ObservationId">Original independently authenticated protected-source observation.</param>
++/// <param name="ObservedHead">Committed head observed by that source proof, possibly ahead of the cut prefix.</param>
++/// <param name="Publications">Exact closed projection of that certified prefix, including an empty projection.</param>
++public sealed record SourcePublicationReconciliationAdvance(SourcePublicationCut Cut, int ExpectedVerifiedSources, SourcePublicationHead Source,
++    string ObservationId, long ObservedHead, IReadOnlyList<SourcePublicationDescriptor> Publications);
+--- prior/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationProgress.cs
++++ current/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationProgress.cs
+@@ -0,0 +1,49 @@
++namespace Hexalith.EventStore.Contracts.Streams;
++
++/// <summary>Bounded independently authenticated original reconciliation work. Partial sources never certify a publication checkpoint.</summary>
++/// <param name="Scope">Exact installed namespace.</param><param name="Version">Conditional proof generation.</param><param name="SourceAuthorityRevision">Original complete-cut authority.</param>
++/// <param name="Sources">Exact entire complete cut, in canonical source order.</param><param name="VerifiedSources">Consecutive independently verified source prefixes.</param>
++/// <param name="Publications">Exact independently verified closed projections of those prefixes.</param><param name="ReceiptId">Independent immutable original proof; its text alone is insufficient.</param>
++public sealed record SourcePublicationReconciliationProgress(SourcePublicationScope Scope, long Version, string SourceAuthorityRevision,
++    IReadOnlyList<SourcePublicationHead> Sources, int VerifiedSources, IReadOnlyList<SourcePublicationDescriptor> Publications, string ReceiptId)
++{
++    /// <summary>Checks structural exact-cut identity only; independent fresh proof verification remains mandatory.</summary>
++    public bool MatchesCut(SourcePublicationCut cut)
++    {
++        ArgumentNullException.ThrowIfNull(cut);
++        return Scope == cut.Scope && SourceAuthorityRevision == cut.AuthorityRevision && Sources.SequenceEqual(cut.Sources);
++    }
++
++    /// <summary>Captures bounded owned proof carriers without claiming their authenticity or availability.</summary>
++    public static SourcePublicationReconciliationProgress Capture(SourcePublicationReconciliationProgress progress)
++    {
++        ArgumentNullException.ThrowIfNull(progress);
++        if (progress.Scope is null || progress.Version <= 0 || string.IsNullOrWhiteSpace(progress.SourceAuthorityRevision)
++            || progress.SourceAuthorityRevision.Length > 256 || string.IsNullOrWhiteSpace(progress.ReceiptId) || progress.ReceiptId.Length > 256
++            || progress.Sources is null || progress.Sources.Count is < 0 or > 1000 || progress.VerifiedSources <= 0
++            || progress.VerifiedSources > progress.Sources.Count || progress.Publications is null || progress.Publications.Count is < 0 or > 10000)
++        { throw new InvalidOperationException("Malformed source reconciliation proof."); }
++        var heads = new List<SourcePublicationHead>();
++        foreach (var head in progress.Sources)
++        {
++            if (heads.Count >= 1000 || head is null || head.Identity is null || head.Identity.TenantId != progress.Scope.Tenant
++                || head.Identity.Domain != progress.Scope.Domain || head.Head is < 0 or > 10000
++                || heads.Count > 0 && StringComparer.Ordinal.Compare(heads[^1].Identity.ActorId, head.Identity.ActorId) >= 0)
++            { throw new InvalidOperationException("Malformed reconciliation source vector."); }
++            heads.Add(head);
++        }
++        if (progress.VerifiedSources > heads.Count) { throw new InvalidOperationException("Malformed reconciliation prefix."); }
++        var publications = new List<SourcePublicationDescriptor>();
++        foreach (var item in progress.Publications)
++        {
++            if (publications.Count >= 10000 || item is null || item.Identity is null || item.SourceRevision is < 1 or > 10000
++                || string.IsNullOrWhiteSpace(item.PublicationId) || item.PublicationId.Length > 256 || string.IsNullOrWhiteSpace(item.SourceMessageId) || item.SourceMessageId.Length > 256
++                || item.StableFieldsDigest is not { Length: 64 } digest || !digest.All(c => c is >= '0' and <= '9' or >= 'A' and <= 'F')
++                || !heads.Take(progress.VerifiedSources).Any(h => h.Identity == item.Identity && h.Head >= item.SourceRevision)
++                || publications.Any(p => p.PublicationId == item.PublicationId || p.Identity == item.Identity && p.SourceRevision == item.SourceRevision))
++            { throw new InvalidOperationException("Malformed reconciliation publication proof."); }
++            publications.Add(item);
++        }
++        return progress with { Sources = heads.AsReadOnly(), Publications = publications.AsReadOnly() };
++    }
++}
+--- prior/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs
+@@ -246,29 +246,43 @@
+         if (provider is null) { return batch.Outcome; }
+         var operationClock = clock ?? TimeProvider.System;
+         using var deadline = new AuthoritativeStreamReadDeadline(TimeSpan.FromSeconds(30), operationClock, CancellationToken.None, operationClock.GetTimestamp());
+-        DeletionManifestProviderResult result;
++        DeletionManifestProviderResult? result;
+         try
+         {
+-            result = await deadline.ReadAsync(token => first ? provider.ConsumeAsync(batch.Current, batch.Outcome.ReceiptId!, token)
++            result = await ReadPhysicalAsync(first).ConfigureAwait(false);
++            if (!first && result?.State == DeletionManifestProviderState.NotStarted)
++            { result = await ReadPhysicalAsync(true).ConfigureAwait(false); }
++        }
++        catch (Exception) { return batch.Outcome; }
++        if (result?.State != DeletionManifestProviderState.Consumed) { return batch.Outcome; }
++        var receipts = result.TargetReceipts;
++        Task<DeletionManifestProviderResult?> ReadPhysicalAsync(bool consume) => deadline.ReadAsync(async token =>
++        {
++            var supplied = await (consume ? provider.ConsumeAsync(batch.Current, batch.Outcome.ReceiptId!, token)
+                 : provider.LookupAsync(batch.Current, batch.Outcome.ReceiptId!, token)).ConfigureAwait(false);
+-            if (!first && ExactProvider(batch, result) && result.State == DeletionManifestProviderState.NotStarted && result.TargetReceipts is { Count: 0 })
+-            { result = await deadline.ReadAsync(token => provider.ConsumeAsync(batch.Current, batch.Outcome.ReceiptId!, token)).ConfigureAwait(false); }
+-        }
+-        catch (Exception) { return batch.Outcome; }
+-        if (!ExactProvider(batch, result) || result.State != DeletionManifestProviderState.Consumed || result.TargetReceipts is null
+-            || result.TargetReceipts.Count != batch.Current.Targets.Count) { return batch.Outcome; }
+-        var receipts = new List<DeletionTargetReceipt>();
+-        foreach (var receipt in result.TargetReceipts)
+-        {
+-            if (receipts.Count >= batch.Current.Targets.Count || receipt is null || receipt.Target != batch.Current.Targets[receipts.Count]
+-                || receipt.OriginalBatchId != batch.Current.Capability.BatchId) { return batch.Outcome; }
+-            try { DeletionConsumptionIdentity.Text(receipt.ReceiptId); } catch (ArgumentException) { return batch.Outcome; }
+-            receipts.Add(receipt);
+-        }
+-        if (receipts.Count != batch.Current.Targets.Count) { return batch.Outcome; }
++            // Provider-owned Count/traversal is part of the same physical deadline. Abandoned capture touches local material only.
++            deadline.ThrowIfCancellationRequested();
++            if (!ExactProvider(batch, supplied) || supplied.TargetReceipts is null) { return null; }
++            int count = supplied.TargetReceipts.Count;
++            if (supplied.State == DeletionManifestProviderState.NotStarted)
++            { deadline.ThrowIfCancellationRequested(); return count == 0 ? supplied with { TargetReceipts = Array.Empty<DeletionTargetReceipt>() } : null; }
++            if (supplied.State != DeletionManifestProviderState.Consumed || count != batch.Current.Targets.Count) { return null; }
++            var owned = new List<DeletionTargetReceipt>(); var ids = new HashSet<string>(StringComparer.Ordinal);
++            foreach (var receipt in supplied.TargetReceipts)
++            {
++                deadline.ThrowIfCancellationRequested();
++                if (owned.Count >= batch.Current.Targets.Count || receipt is null || receipt.Target != batch.Current.Targets[owned.Count]
++                    || receipt.OriginalBatchId != batch.Current.Capability.BatchId) { return null; }
++                try { DeletionConsumptionIdentity.Text(receipt.ReceiptId); } catch (ArgumentException) { return null; }
++                if (!ids.Add(receipt.ReceiptId)) { return null; }
++                owned.Add(receipt);
++            }
++            deadline.ThrowIfCancellationRequested();
++            return owned.Count == batch.Current.Targets.Count ? supplied with { TargetReceipts = owned.AsReadOnly() } : null;
++        });
+         var next = state with { Revision = checked(state.Revision + 1) };
+         var consumed = batch with { Outcome = Result(next, batch.Current.Capability.BatchId, DeletionConsumptionStatus.Consumed)
+-            with { ReceiptId = batch.Outcome.ReceiptId, TargetReceipts = Array.AsReadOnly(receipts.ToArray()) } };
++            with { ReceiptId = batch.Outcome.ReceiptId, TargetReceipts = receipts } };
+         await SaveAsync(Replace(next, consumed)).ConfigureAwait(false); return consumed.Outcome;
+     }
+     private static bool ExactProvider(DeletionConsumptionBatch batch, DeletionManifestProviderResult? result) => result is not null
+@@ -306,6 +320,7 @@
+             var outcome = b.Outcome; DeletionConsumptionIdentity.Text(outcome.ReceiptId!);
+             if (outcome.OwnerRevision <= 0 || outcome.KeyBlockSetRevision < 0 || b.Current.Capability.AttestationOrdinal < b.Original.Capability.AttestationOrdinal
+                 || outcome.Status is DeletionConsumptionStatus.Consumed or DeletionConsumptionStatus.AlreadyDestroyedByBatch && (outcome.TargetReceipts.Count != b.Current.Targets.Count
++                    || outcome.TargetReceipts.Select(r => r.ReceiptId).Distinct(StringComparer.Ordinal).Count() != outcome.TargetReceipts.Count
+                     || outcome.TargetReceipts.Where((r, i) => r is null || r.Target != b.Current.Targets[i] || (outcome.Status == DeletionConsumptionStatus.Consumed ? r.OriginalBatchId != b.Current.Capability.BatchId
+                             : !batches.Any(original => original.Outcome.Status == DeletionConsumptionStatus.Consumed && original.Current.Capability.BatchId == r.OriginalBatchId
+                                 && original.Outcome.TargetReceipts.Contains(r)))
+@@ -383,7 +398,8 @@
+         if (existing is not null && !DeletionConsumptionIdentity.Same(existing.Current, request)) { return Result(state, request.Capability.BatchId, DeletionConsumptionStatus.Conflict); }
+         if (existing?.Outcome.Status == DeletionConsumptionStatus.AlreadyDestroyedByBatch) { return existing.Outcome; }
+         if (existing is null && state.Batches.Count >= 1000) { return Result(state, request.Capability.BatchId, DeletionConsumptionStatus.Unavailable); }
+-        if (originals.Count != request.Targets.Count || !originals.Select(r => r.Target).SequenceEqual(request.Targets))
++        if (originals.Count != request.Targets.Count || !originals.Select(r => r.Target).SequenceEqual(request.Targets)
++            || originals.Select(r => r.ReceiptId).Distinct(StringComparer.Ordinal).Count() != originals.Count)
+         { throw new InvalidOperationException("Incomplete exact original destruction coverage."); }
+         var next = state with { Revision = checked(state.Revision + 1) };
+         var result = Result(next, request.Capability.BatchId, DeletionConsumptionStatus.AlreadyDestroyedByBatch) with {
+--- prior/eventstore/src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationIndexStore.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationIndexStore.cs
+@@ -52,6 +52,20 @@
+         try { var result = await Proxy(advance.Cut.Scope).AdvanceDispatchProgressAsync(advance).WaitAsync(cancellationToken).ConfigureAwait(false); cancellationToken.ThrowIfCancellationRequested(); return result; }
+         catch (Exception) { cancellationToken.ThrowIfCancellationRequested(); throw; }
+     }
++    /// <inheritdoc/>
++    public async Task<SourcePublicationReconciliationProgress?> ReadReconciliationProgressAsync(SourcePublicationCut cut, CancellationToken cancellationToken = default)
++    {
++        ArgumentNullException.ThrowIfNull(cut); cancellationToken.ThrowIfCancellationRequested();
++        try { var result = await Proxy(cut.Scope).ReadReconciliationProgressAsync(cut).WaitAsync(cancellationToken).ConfigureAwait(false); cancellationToken.ThrowIfCancellationRequested(); return result; }
++        catch (Exception) { cancellationToken.ThrowIfCancellationRequested(); throw; }
++    }
++    /// <inheritdoc/>
++    public async Task<SourcePublicationReconciliationProgress?> AdvanceReconciliationProgressAsync(SourcePublicationReconciliationAdvance advance, CancellationToken cancellationToken = default)
++    {
++        ArgumentNullException.ThrowIfNull(advance); cancellationToken.ThrowIfCancellationRequested();
++        try { var result = await Proxy(advance.Cut.Scope).AdvanceReconciliationProgressAsync(advance).WaitAsync(cancellationToken).ConfigureAwait(false); cancellationToken.ThrowIfCancellationRequested(); return result; }
++        catch (Exception) { cancellationToken.ThrowIfCancellationRequested(); throw; }
++    }
+     private ISourcePublicationIndexActor Proxy(SourcePublicationScope scope)
+     {
+         ArgumentNullException.ThrowIfNull(scope);
+--- prior/eventstore/src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationWriterRegistration.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationWriterRegistration.cs
+@@ -41,13 +41,18 @@
+                 {
+                     var state = await deadline.ReadAsync(_ => actor.ReadAsync(scope)).ConfigureAwait(false);
+                     if (state is null) { throw new InvalidOperationException("Namespace is not installed."); }
+-                    state = SourcePublicationNamespaceActor.Capture(state);
++                    state = await deadline.ReadAsync(_ => Task.FromResult(SourcePublicationNamespaceActor.Capture(state))).ConfigureAwait(false);
+                     var authorized = await deadline.ReadAsync(token => _authority.AuthorizeAsync(state, token)).ConfigureAwait(false);
+                     if (state.Scope != scope || authorized is null || string.IsNullOrWhiteSpace(authorized.AuthorityRevision)
+                         || authorized.ValidUntil <= _clock.GetUtcNow()) { throw new InvalidOperationException("Namespace writer qualification unavailable."); }
+                     if (!await deadline.ReadAsync(_ => actor.RegisterAsync(scope, state.Revision, identity)).ConfigureAwait(false)) { continue; }
+                     var persisted = await deadline.ReadAsync(_ => actor.ReadAsync(scope)).ConfigureAwait(false);
+-                    if (persisted is not null && persisted.Scope == scope && persisted.AuthorityRevision == state.AuthorityRevision
++                    if (persisted is null) { throw new InvalidOperationException("Namespace registration outcome unknown."); }
++                    persisted = await deadline.ReadAsync(_ => Task.FromResult(SourcePublicationNamespaceActor.Capture(persisted))).ConfigureAwait(false);
++                    var finalAuthorization = await deadline.ReadAsync(token => _authority.AuthorizeAsync(persisted, token)).ConfigureAwait(false);
++                    deadline.ThrowIfCancellationRequested();
++                    if (finalAuthorization is not null && finalAuthorization.AuthorityRevision == authorized.AuthorityRevision
++                        && finalAuthorization.ValidUntil > _clock.GetUtcNow() && persisted.Scope == scope && persisted.AuthorityRevision == state.AuthorityRevision
+                         && persisted.LegacyCoverageReceipt == state.LegacyCoverageReceipt && persisted.WriterEnforcementReceipt == state.WriterEnforcementReceipt
+                         && persisted.Sources.Contains(identity)) { registered = true; break; }
+                     throw new InvalidOperationException("Namespace registration outcome unknown.");
+--- prior/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationIndexActor.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationIndexActor.cs
+@@ -6,6 +6,10 @@
+ /// <summary>Private technical actor transport. Host registration/ACL and namespace authority must be qualified before use.</summary>
+ public interface ISourcePublicationIndexActor : IActor
+ {
++    /// <summary>Reads independently authenticated original source reconciliation under the exact fresh complete cut; missing proof denies reuse.</summary>
++    Task<SourcePublicationReconciliationProgress?> ReadReconciliationProgressAsync(SourcePublicationCut cut);
++    /// <summary>Independently authenticates one original protected source prefix and conditionally retains exact bounded work; omission denies progress.</summary>
++    Task<SourcePublicationReconciliationProgress?> AdvanceReconciliationProgressAsync(SourcePublicationReconciliationAdvance advance);
+     /// <summary>Reads independent exact original acknowledgement-prefix proof under current source/cut/delivery authority.</summary>
+     Task<SourcePublicationDispatchProgress?> ReadDispatchProgressAsync(SourcePublicationCheckpoint cut);
+     /// <summary>Conditionally retains independently authenticated exact original acknowledgement progress in this same anchored owner.</summary>
+--- prior/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs
+@@ -12,6 +12,10 @@
+     Task<bool> VerifyDispatchProgressAsync(SourcePublicationCheckpoint cut, SourcePublicationDispatchProgress progress) => Task.FromResult(false);
+     /// <summary>Independently reads actual durable original source acknowledgements for the bounded advance, verifies predecessor proof and fresh complete cut/current delivery target and authority, then issues their exact conditional prefix proof. Missing, Unknown, Quarantined or changed authority denies; omission disables progress.</summary>
+     Task<SourcePublicationDispatchProgress?> AuthorizeDispatchAdvanceAsync(SourcePublicationDispatchAdvance advance, SourcePublicationIndexState current) => Task.FromResult<SourcePublicationDispatchProgress?>(null);
++    /// <summary>Independently authenticates the retained exact proof, every verified original protected source prefix/projection, and current complete namespace/cut authority. Stored strings/digests never grant reuse. Omission denies reconciliation resume.</summary>
++    Task<bool> VerifyReconciliationProgressAsync(SourcePublicationReconciliationProgress progress) => Task.FromResult(false);
++    /// <summary>Separately admits mutation and independently verifies the exact next original source observation/protected prefix/closed projection, predecessor proof and fresh complete cut/current installation. Issues an independently retained immutable conditional proof; caller facts alone are insufficient. Zero heads require exact complete-cut proof. Omission denies.</summary>
++    Task<SourcePublicationReconciliationProgress?> AuthorizeReconciliationAdvanceAsync(SourcePublicationReconciliationAdvance advance, SourcePublicationIndexState? current) => Task.FromResult<SourcePublicationReconciliationProgress?>(null);
+     /// <summary>Authenticates only the exact index read.</summary>
+     Task<bool> ReadIndexAsync(SourcePublicationScope scope);
+     /// <summary>Authenticates the exact conditional index request, including immutable publication vector and expected revision.</summary>
+--- prior/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs
+@@ -54,6 +54,9 @@
+             && retainedOriginal.TargetDigest == Digest(owned) && Digest(current) == Digest(owned))
+         { return await operations.WriteIndexAsync(request).ConfigureAwait(false); }
+         if ((current?.Revision ?? 0) != write.ExpectedRevision || current?.PoisonCode is not null) { return false; }
++        if (owned.ReconciliationProgress is { } reconciliation
++            && !await operations.VerifyReconciliationProgressAsync(reconciliation).ConfigureAwait(false)) { return false; }
++        if (current?.ReconciliationProgress is not null && owned.ReconciliationProgress is null && owned.PoisonCode is null) { return false; }
+         if (owned.DispatchProgress != current?.DispatchProgress && owned.DispatchProgress is { } progress
+             && (!MatchesProgress(owned, Checkpoint(owned), progress) || !await operations.VerifyDispatchProgressAsync(Checkpoint(owned), progress).ConfigureAwait(false))) { return false; }
+         if (current is not null && (owned.Entries.Count < current.Entries.Count || !current.Entries.SequenceEqual(owned.Entries.Take(current.Entries.Count))
+@@ -101,6 +104,53 @@
+         var next = state with { Revision = checked(state.Revision + 1), DispatchProgress = progress };
+         if (!await TryWriteAsync(new(state.Revision, next)).ConfigureAwait(false)) { return null; }
+         return await ReadDispatchProgressAsync(cut).ConfigureAwait(false);
++    }
++    /// <inheritdoc/>
++    public async Task<SourcePublicationReconciliationProgress?> ReadReconciliationProgressAsync(SourcePublicationCut cut)
++    {
++        cut = CaptureReconciliationCut(cut);
++        if (Host.Id.GetId() != cut.Scope.ActorId || operations is null || !await operations.ReadIndexAsync(cut.Scope).ConfigureAwait(false)) { return null; }
++        var state = await ReadStateAsync(cut.Scope).ConfigureAwait(false); var progress = state?.ReconciliationProgress;
++        if (state is null || state.PoisonCode is not null || progress is null || !progress.MatchesCut(cut)
++            || !await operations.VerifyReconciliationProgressAsync(progress).ConfigureAwait(false)) { return null; }
++        var final = await ReadStateAsync(cut.Scope).ConfigureAwait(false);
++        return final is not null && Digest(final) == Digest(state) && await operations.VerifyReconciliationProgressAsync(progress).ConfigureAwait(false)
++            && await operations.ReadIndexAsync(cut.Scope).ConfigureAwait(false) ? progress : null;
++    }
++    /// <inheritdoc/>
++    public async Task<SourcePublicationReconciliationProgress?> AdvanceReconciliationProgressAsync(SourcePublicationReconciliationAdvance advance)
++    {
++        ArgumentNullException.ThrowIfNull(advance); var cut = CaptureReconciliationCut(advance.Cut);
++        if (Host.Id.GetId() != cut.Scope.ActorId || operations is null || advance.ExpectedVerifiedSources < 0 || advance.ExpectedVerifiedSources >= cut.Sources.Count
++            || advance.Source != cut.Sources[advance.ExpectedVerifiedSources] || advance.ObservedHead < advance.Source.Head
++            || advance.ObservedHead > 10000 || string.IsNullOrWhiteSpace(advance.ObservationId) || advance.ObservationId.Length > 256
++            || !await operations.ReadIndexAsync(cut.Scope).ConfigureAwait(false)) { return null; }
++        // Read permission never recovers an unanchored original. Separate exact progress/mutation admission precedes TryWrite recovery.
++        var state = await ReadStateAsync(cut.Scope).ConfigureAwait(false);
++        if (state?.PoisonCode is not null) { return null; }
++        var original = state?.ReconciliationProgress;
++        bool reusable = original is not null && original.MatchesCut(cut) && await operations.VerifyReconciliationProgressAsync(original).ConfigureAwait(false);
++        int predecessor = reusable ? original!.VerifiedSources : 0;
++        if (predecessor != advance.ExpectedVerifiedSources) { return null; }
++        var expected = SourcePublicationReconciliationProgress.Capture(new(cut.Scope, checked((original?.Version ?? 0) + 1), cut.AuthorityRevision,
++            cut.Sources, predecessor + 1, (reusable ? original!.Publications : []).Concat(advance.Publications).ToArray(), "proposed"));
++        var ownedAdvance = advance with { Cut = cut, Publications = expected.Publications.Where(p => p.Identity == advance.Source.Identity).ToArray() };
++        var approved = await operations.AuthorizeReconciliationAdvanceAsync(ownedAdvance, state).ConfigureAwait(false);
++        if (approved is null) { return null; }
++        approved = SourcePublicationReconciliationProgress.Capture(approved);
++        if (approved.Version != expected.Version || approved.VerifiedSources != expected.VerifiedSources || !approved.MatchesCut(cut)
++            || !approved.Publications.SequenceEqual(expected.Publications) || !await operations.VerifyReconciliationProgressAsync(approved).ConfigureAwait(false)) { return null; }
++        var next = state is null ? new SourcePublicationIndexState(cut.Scope, 1, cut.AuthorityRevision, [], []) { ReconciliationProgress = approved }
++            : state with { Revision = checked(state.Revision + 1), ReconciliationProgress = approved };
++        if (!await TryWriteAsync(new(state?.Revision ?? 0, next)).ConfigureAwait(false)) { return null; }
++        return await ReadReconciliationProgressAsync(cut).ConfigureAwait(false);
++    }
++    private static SourcePublicationCut CaptureReconciliationCut(SourcePublicationCut cut)
++    {
++        ArgumentNullException.ThrowIfNull(cut);
++        if (!cut.IsComplete || cut.ObservedAt == default || cut.ValidUntil <= cut.ObservedAt) { throw new ArgumentException("Invalid reconciliation cut.", nameof(cut)); }
++        var captured = CaptureCheckpoint(new(cut.Scope, 1, cut.AuthorityRevision, cut.Sources, 0));
++        return cut with { Sources = Array.AsReadOnly(captured.Sources.OrderBy(h => h.Identity.ActorId, StringComparer.Ordinal).ToArray()) };
+     }
+     private static SourcePublicationCheckpoint Checkpoint(SourcePublicationIndexState state)
+         => new(state.Scope, state.Revision, state.AuthorityRevision, state.Sources, state.Entries.Count);
+@@ -181,7 +231,9 @@
+             entries.Add(entry);
+         }
+         if (state.DispatchProgress is { } progress && !ValidProgress(state with { Sources = heads.AsReadOnly(), Entries = entries.AsReadOnly() }, progress)) { throw new InvalidOperationException("Malformed original dispatch progress."); }
+-        return state with { Sources = heads.AsReadOnly(), Entries = entries.AsReadOnly() };
++        var reconciliation = state.ReconciliationProgress is { } retained ? SourcePublicationReconciliationProgress.Capture(retained) : null;
++        if (reconciliation is not null && reconciliation.Scope != scope) { throw new InvalidOperationException("Reconciliation scope mismatch."); }
++        return state with { Sources = heads.AsReadOnly(), Entries = entries.AsReadOnly(), ReconciliationProgress = reconciliation };
+     }
+     private static string Digest<T>(T state) => Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(state)));
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs
+@@ -444,6 +444,66 @@
+         result.Stream.ShouldBeNull();
+     }
+ 
++    /// <summary>Gateway return precedes blocked Count/MoveNext of page/head events or flags; owned capture must remain within the whole source deadline and never release late evidence.</summary>
++    [Theory]
++    [InlineData("head-count", false)][InlineData("head-count", true)]
++    [InlineData("head-events", false)][InlineData("head-events", true)]
++    [InlineData("page-count", false)][InlineData("page-count", true)]
++    [InlineData("page-events", false)][InlineData("page-events", true)]
++    [InlineData("flags-count", false)][InlineData("flags-count", true)]
++    [InlineData("flags-events", false)][InlineData("flags-events", true)]
++    public async Task SuspendedOwnedCollectionCannotRetainSourcePastCancellationOrDeadline(string vector, bool cancelCaller)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var gateway = Substitute.For<IEventStoreGatewayClient>(); var clock = new AuthoritativeReadTimeProvider();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var returned = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var released = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        using var release = new ManualResetEventSlim(); using var caller = new CancellationTokenSource();
++        void Suspend() { entered.TrySetResult(); release.Wait(); released.TrySetResult(); }
++        var events = Substitute.For<IReadOnlyList<StreamReadEvent>>();
++        bool head = vector.StartsWith("head-", StringComparison.Ordinal);
++        events.Count.Returns(_ => { if (vector.EndsWith("count", StringComparison.Ordinal)) { Suspend(); } return head ? 0 : 1; });
++        IEnumerable<StreamReadEvent> Events() { if (vector.EndsWith("events", StringComparison.Ordinal)) { Suspend(); } if (!head) { yield return Event(1); } }
++        events.GetEnumerator().Returns(_ => Events().GetEnumerator());
++        var flags = Substitute.For<IReadOnlyDictionary<string, string>>();
++        flags.Count.Returns(_ => { if (vector == "flags-count") { Suspend(); } return 1; });
++        IEnumerable<KeyValuePair<string, string>> Flags() { if (vector == "flags-events") { Suspend(); } yield return new("mode", "safe"); }
++        flags.GetEnumerator().Returns(_ => Flags().GetEnumerator());
++        int calls = 0;
++        gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            Interlocked.Increment(ref calls); var request = call.Arg<StreamReadRequest>();
++            if (request.ToSequence == 0 && !head) { return Page(request, 1, []); }
++            IReadOnlyList<StreamReadEvent> supplied = vector.StartsWith("flags-", StringComparison.Ordinal)
++                ? [Event(1) with { ProtectionMetadata = new(PayloadProtectionState.Unprotected, 1, null, null, null, flags) }] : events;
++            // Construct gateway metadata without consulting the adversarial collection, isolating post-return capture.
++            var page = new StreamReadPage(request.Tenant, request.Domain, request.AggregateId, supplied,
++                new(request.FromSequence, request.ToSequence, head ? null : 1, 1, head ? 0 : 1, false, null));
++            returned.TrySetResult(); return page;
++        });
++        var reader = new AuthoritativeEventStreamReader(gateway, clock, TimeSpan.FromSeconds(3));
++        var reading = Task.Run(() => reader.ReadAsync(new("tenant-a", "party", "party-1"), caller.Token), TestContext.Current.CancellationToken);
++        try
++        {
++            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); returned.Task.IsCompletedSuccessfully.ShouldBeTrue();
++            if (cancelCaller)
++            {
++                caller.Cancel();
++                (await Should.ThrowAsync<OperationCanceledException>(() => reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken))).CancellationToken.ShouldBe(caller.Token);
++            }
++            else
++            {
++                clock.Advance(TimeSpan.FromSeconds(3)); var result = await reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
++                result.Stream.ShouldBeNull(); result.FailureReason.ShouldBe("source-time-bound-exceeded");
++            }
++            int originalCalls = Volatile.Read(ref calls); release.Set();
++            await released.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            Volatile.Read(ref calls).ShouldBe(originalCalls); reading.IsCompleted.ShouldBeTrue();
++        }
++        finally { release.Set(); }
++    }
++
+     private static StreamReadEvent Event(long sequence) => new(sequence, "Created", "{}"u8.ToArray(), "json", 1, "message", null, null, DateTimeOffset.UnixEpoch, "actor");
+     private static StreamReadPage Page(StreamReadRequest request, long head, IReadOnlyList<StreamReadEvent> events)
+         => new(request.Tenant, request.Domain, request.AggregateId, events,
+--- prior/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs
+@@ -9,6 +9,7 @@
+ using Hexalith.EventStore.Contracts.Streams;
+ using Hexalith.EventStore.Contracts.Security;
+ using Hexalith.EventStore.Server.Streams;
++using Hexalith.EventStore.Client.Streams;
+ using Hexalith.EventStore.Testing.Fakes;
+ using NSubstitute;
+ using Shouldly;
+@@ -346,4 +347,219 @@
+         pending.TrySetResult(new(Scope, 1, 1, cut.AuthorityRevision, new string('A', 64), 1, new string('B', 64), "receiver", "authority", "late-original"));
+         waiting.IsCanceled.ShouldBeTrue();
+     }
++
++    private static SourcePublicationDescriptor ReconciliationPublication(SourcePublicationHead head)
++        => new("publication-" + head.Identity.AggregateId, head.Identity, 1, "message-" + head.Identity.AggregateId, new string('A', 64));
++    private static void QualifyReconciliation(ISourcePublicationOperationAuthority authority, Func<SourcePublicationCut> currentCut, TimeProvider clock, Func<bool>? proofCurrent = null)
++    {
++        var proofs = new Dictionary<string, string>(StringComparer.Ordinal); int issued = 0;
++        bool Current(SourcePublicationCut cut) => (proofCurrent is null || proofCurrent()) && cut.Scope == currentCut().Scope && cut.AuthorityRevision == currentCut().AuthorityRevision
++            && cut.Sources.SequenceEqual(currentCut().Sources) && cut.IsComplete && currentCut().IsComplete && cut.ValidUntil > clock.GetUtcNow()
++            && currentCut().ValidUntil > clock.GetUtcNow();
++        bool Verified(SourcePublicationCut cut, SourcePublicationReconciliationProgress progress) => Current(cut) && progress.MatchesCut(cut)
++            && proofs.TryGetValue(progress.ReceiptId, out var original) && original == JsonSerializer.Serialize(progress);
++        authority.VerifyReconciliationProgressAsync(Arg.Any<SourcePublicationReconciliationProgress>()).Returns(call =>
++            Verified(currentCut(), call.Arg<SourcePublicationReconciliationProgress>()));
++        authority.AuthorizeReconciliationAdvanceAsync(Arg.Any<SourcePublicationReconciliationAdvance>(), Arg.Any<SourcePublicationIndexState?>()).Returns(call =>
++        {
++            var proposal = call.Arg<SourcePublicationReconciliationAdvance>(); var state = call.Arg<SourcePublicationIndexState?>(); var original = state?.ReconciliationProgress;
++            bool reuse = original is not null && Verified(proposal.Cut, original);
++            int predecessor = reuse ? original!.VerifiedSources : 0;
++            if (!Current(proposal.Cut) || proposal.ExpectedVerifiedSources != predecessor || proposal.Source != proposal.Cut.Sources[predecessor]
++                || proposal.ObservedHead < proposal.Source.Head || proposal.ObservationId != "independent-" + proposal.Source.Identity.AggregateId
++                || !proposal.Publications.SequenceEqual(new[] { ReconciliationPublication(proposal.Source) })) { return (SourcePublicationReconciliationProgress?)null; }
++            var proof = new SourcePublicationReconciliationProgress(proposal.Cut.Scope, (original?.Version ?? 0) + 1, proposal.Cut.AuthorityRevision,
++                proposal.Cut.Sources, predecessor + 1, (reuse ? original!.Publications : []).Concat(proposal.Publications).ToArray(), "reconciliation-original-" + ++issued);
++            proofs.Add(proof.ReceiptId, JsonSerializer.Serialize(proof)); return proof;
++        });
++    }
++    private static AuthoritativeStreamReadResult ReconciliationSource(SourcePublicationHead head, TimeProvider clock)
++        => new(new(head.Identity, head.Head, clock.GetUtcNow(), [new(1, "Publication", [1], "json", 1, "message-" + head.Identity.AggregateId,
++            null, null, clock.GetUtcNow(), null)], "independent-" + head.Identity.AggregateId), null);
++
++    /// <summary>Forty source reconciliations taking one second each progress across an actual serialized index/dispatcher restart before any complete checkpoint is released.</summary>
++    [Fact]
++    public async Task SlowInitialSourceReconciliationProgressesAcrossActualOwnerRestart()
++    {
++        var clock = new AuthoritativeReadTimeProvider(); clock.Advance(DateTimeOffset.UtcNow - DateTimeOffset.UnixEpoch);
++        var heads = Enumerable.Range(0, 40).Select(n => new SourcePublicationHead(new(Scope.Tenant, Scope.Domain, "source-" + n.ToString("D2", System.Globalization.CultureInfo.InvariantCulture)), 1)).ToArray();
++        var cut = new SourcePublicationCut(Scope, "qualified-cut", clock.GetUtcNow(), clock.GetUtcNow().AddHours(1), heads, true);
++        var backend = new InMemoryStateManager(); var authority = Operations(); QualifyReconciliation(authority, () => cut, clock);
++        var namespaces = Substitute.For<ISourcePublicationNamespaceSource>(); namespaces.ReadAsync(Scope, Arg.Any<CancellationToken>()).Returns(_ => cut);
++        var streams = Substitute.For<IAuthoritativeEventStreamReader>(); var readIdentities = new List<string>();
++        streams.ReadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            var head = heads.Single(h => h.Identity == call.Arg<AggregateIdentity>()); readIdentities.Add(head.Identity.ActorId);
++            clock.Advance(TimeSpan.FromSeconds(1)); return ReconciliationSource(head, clock);
++        });
++        var projector = Substitute.For<ISourcePublicationProjector>();
++        projector.Project(Arg.Any<AuthoritativeEventStream>(), Arg.Any<CancellationToken>()).Returns(call => new[] { ReconciliationPublication(heads.Single(h => h.Identity == call.Arg<AuthoritativeEventStream>().Identity)) });
++        var acknowledged = new HashSet<string>(StringComparer.Ordinal); var delivered = new List<string>(); var delivery = Substitute.For<ISourcePublicationDelivery>();
++        delivery.LookupAcknowledgementAsync(Arg.Any<SourcePublicationIndexEntry>(), Arg.Any<CancellationToken>()).Returns(call =>
++            acknowledged.Contains(call.Arg<SourcePublicationIndexEntry>().Publication.PublicationId) ? SourcePublicationDeliveryStatus.Acknowledged : SourcePublicationDeliveryStatus.Pending);
++        delivery.DeliverAsync(Arg.Any<SourcePublicationIndexEntry>(), Arg.Any<CancellationToken>()).Returns(call =>
++        { var id = call.Arg<SourcePublicationIndexEntry>().Publication.PublicationId; delivered.Add(id); acknowledged.Add(id); return SourcePublicationDeliveryStatus.Acknowledged; });
++        var first = new SourcePublicationDispatcher(new(namespaces, streams, projector, Store(Actor(backend, authority)), clock), clock, delivery);
++        var partial = await first.DispatchAsync(Scope, 100, TestContext.Current.CancellationToken);
++        partial.IsComplete.ShouldBeFalse(); delivered.ShouldBeEmpty(); readIdentities.Count.ShouldBe(20);
++        var saved = backend.CommittedState.Single(); var partialState = saved.Value.ShouldBeOfType<SourcePublicationIndexState>();
++        partialState.Entries.ShouldBeEmpty(); partialState.Sources.ShouldBeEmpty(); partialState.ReconciliationProgress!.VerifiedSources.ShouldBe(20);
++        var restarted = new InMemoryStateManager(); await restarted.SetStateAsync(saved.Key, JsonSerializer.Deserialize<SourcePublicationIndexState>(JsonSerializer.Serialize(saved.Value))!); await restarted.SaveStateAsync();
++        var next = new SourcePublicationDispatcher(new(namespaces, streams, projector, Store(Actor(restarted, authority)), clock), clock, delivery);
++        var completed = await next.DispatchAsync(Scope, 100, TestContext.Current.CancellationToken);
++        completed.IsComplete.ShouldBeTrue(); delivered.Count.ShouldBe(40); delivered.Distinct(StringComparer.Ordinal).Count().ShouldBe(40);
++        readIdentities.Count.ShouldBe(40); readIdentities.Distinct(StringComparer.Ordinal).Count().ShouldBe(40);
++        delivered.ShouldContain("publication-source-39"); var final = restarted.CommittedState.Single().Value.ShouldBeOfType<SourcePublicationIndexState>();
++        final.Sources.ShouldBe(heads); final.Entries.Select(e => e.Offset).ShouldBe(Enumerable.Range(1, 40).Select(n => (long)n));
++        final.ReconciliationProgress!.VerifiedSources.ShouldBe(40);
++        (await next.DispatchAsync(Scope, 100, TestContext.Current.CancellationToken)).IsComplete.ShouldBeTrue();
++        delivered.Count.ShouldBe(40); readIdentities.Count.ShouldBe(40);
++    }
++
++    /// <summary>Exact retained partial originals deny changed namespace/cut authority, forged carriers, foreign addressing and stale restored bytes.</summary>
++    [Theory]
++    [InlineData("scope")][InlineData("installation")][InlineData("authority")][InlineData("cut")][InlineData("head")]
++    [InlineData("forged-receipt")][InlineData("forged-publication")][InlineData("stale")]
++    public async Task RetainedReconciliationCannotAuthenticateDifferentOrForgedCut(string vector)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var head = new SourcePublicationHead(new(Scope.Tenant, Scope.Domain, "source-00"), 1);
++        var nextHead = new SourcePublicationHead(new(Scope.Tenant, Scope.Domain, "source-01"), 1);
++        var cut = new SourcePublicationCut(Scope, "qualified-cut", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddHours(1), [head, nextHead], true);
++        var current = cut; var backend = new InMemoryStateManager(); var authority = Operations(); QualifyReconciliation(authority, () => current, TimeProvider.System);
++        var store = Store(Actor(backend, authority));
++        var first = await store.AdvanceReconciliationProgressAsync(new(cut, 0, head, "independent-source-00", 1, [ReconciliationPublication(head)]), TestContext.Current.CancellationToken);
++        first.ShouldNotBeNull(); var saved = backend.CommittedState.Single(); var before = JsonSerializer.Serialize(saved.Value);
++        if (vector is "scope" or "installation")
++        {
++            var foreign = vector == "scope" ? new SourcePublicationScope(Scope.Tenant, Scope.Domain, "foreign", Scope.InstallationId) : new SourcePublicationScope(Scope.Tenant, Scope.Domain, Scope.FeedName, "foreign");
++            (await Actor(backend, authority).ReadReconciliationProgressAsync(cut with { Scope = foreign })).ShouldBeNull();
++        }
++        else if (vector.StartsWith("forged", StringComparison.Ordinal))
++        {
++            var forged = vector == "forged-receipt" ? first with { ReceiptId = "unknown-proof" } : first with { Publications = [ReconciliationPublication(head) with { StableFieldsDigest = new string('B', 64) }] };
++            var state = saved.Value.ShouldBeOfType<SourcePublicationIndexState>();
++            (await store.TryWriteAsync(Scope, state.Revision, state with { Revision = state.Revision + 1, ReconciliationProgress = forged }, TestContext.Current.CancellationToken)).ShouldBeFalse();
++        }
++        else if (vector == "stale")
++        {
++            (await store.AdvanceReconciliationProgressAsync(new(cut, 1, nextHead, "independent-source-01", 1, [ReconciliationPublication(nextHead)]), TestContext.Current.CancellationToken)).ShouldNotBeNull();
++            var latest = backend.CommittedState.Single().Value;
++            await backend.SetStateAsync(saved.Key, JsonSerializer.Deserialize<SourcePublicationIndexState>(before)!); await backend.SaveStateAsync();
++            await Should.ThrowAsync<InvalidOperationException>(() => store.ReadReconciliationProgressAsync(cut, TestContext.Current.CancellationToken));
++            await backend.SetStateAsync(saved.Key, latest); await backend.SaveStateAsync();
++            (await store.ReadReconciliationProgressAsync(cut, TestContext.Current.CancellationToken))!.VerifiedSources.ShouldBe(2); return;
++        }
++        else
++        {
++            current = vector switch { "authority" => cut with { AuthorityRevision = "changed" }, "cut" => cut with { Sources = [head] }, _ => cut with { Sources = [head with { Head = 2 }, nextHead] } };
++            (await store.ReadReconciliationProgressAsync(cut, TestContext.Current.CancellationToken)).ShouldBeNull();
++            (await store.ReadReconciliationProgressAsync(current, TestContext.Current.CancellationToken)).ShouldBeNull();
++        }
++        JsonSerializer.Serialize(backend.CommittedState.Single().Value).ShouldBe(before);
++    }
++
++    /// <summary>Provider-owned namespace/index/source/projection/progress collections cannot retain a pass past cancellation/deadline or resume it into a late checkpoint.</summary>
++    [Theory]
++    [InlineData("cut-count", false)][InlineData("cut-count", true)]
++    [InlineData("state-count", false)][InlineData("state-count", true)]
++    [InlineData("source-events", false)][InlineData("source-events", true)]
++    [InlineData("candidate-count", false)][InlineData("candidate-count", true)]
++    [InlineData("progress-count", false)][InlineData("progress-count", true)]
++    public async Task SuspendedReconciliationSnapshotsReleaseCallerWithoutLateCheckpoint(string vector, bool cancelCaller)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var clock = new AuthoritativeReadTimeProvider(); clock.Advance(DateTimeOffset.UtcNow - DateTimeOffset.UnixEpoch);
++        var head = new SourcePublicationHead(new(Scope.Tenant, Scope.Domain, "source-00"), 1);
++        var cut = new SourcePublicationCut(Scope, "qualified-cut", clock.GetUtcNow(), clock.GetUtcNow().AddHours(1), [head], true);
++        var backend = new InMemoryStateManager(); var authority = Operations(); QualifyReconciliation(authority, () => cut, clock);
++        var actual = Store(Actor(backend, authority));
++        if (vector is "state-count" or "progress-count")
++        { (await actual.AdvanceReconciliationProgressAsync(new(cut, 0, head, "independent-source-00", 1, [ReconciliationPublication(head)]), TestContext.Current.CancellationToken)).ShouldNotBeNull(); }
++        string before = JsonSerializer.Serialize(backend.CommittedState);
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var released = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously); using var release = new ManualResetEventSlim();
++        void Suspend() { entered.TrySetResult(); release.Wait(); released.TrySetResult(); }
++        var namespaces = Substitute.For<ISourcePublicationNamespaceSource>();
++        var suppliedCut = cut with { Sources = vector == "cut-count" ? BlockingList(cut.Sources, Suspend, false) : cut.Sources };
++        namespaces.ReadAsync(Scope, Arg.Any<CancellationToken>()).Returns(suppliedCut);
++        var store = Substitute.For<ISourcePublicationIndexStore>();
++        store.ReadAsync(Scope, Arg.Any<CancellationToken>()).Returns(async call =>
++        {
++            var state = await actual.ReadAsync(Scope, call.Arg<CancellationToken>());
++            return state is not null && vector == "state-count" ? state with { Entries = BlockingList(state.Entries, Suspend, false) } : state;
++        });
++        store.ReadReconciliationProgressAsync(Arg.Any<SourcePublicationCut>(), Arg.Any<CancellationToken>()).Returns(async call =>
++        {
++            var proof = await actual.ReadReconciliationProgressAsync(call.Arg<SourcePublicationCut>(), call.Arg<CancellationToken>());
++            return proof is not null && vector == "progress-count" ? proof with { Sources = BlockingList(proof.Sources, Suspend, false) } : proof;
++        });
++        store.TryWriteAsync(Scope, Arg.Any<long>(), Arg.Any<SourcePublicationIndexState>(), Arg.Any<CancellationToken>()).Returns(call =>
++            actual.TryWriteAsync(Scope, call.Arg<long>(), call.Arg<SourcePublicationIndexState>(), call.Arg<CancellationToken>()));
++        store.AdvanceReconciliationProgressAsync(Arg.Any<SourcePublicationReconciliationAdvance>(), Arg.Any<CancellationToken>()).Returns(call =>
++            actual.AdvanceReconciliationProgressAsync(call.Arg<SourcePublicationReconciliationAdvance>(), call.Arg<CancellationToken>()));
++        var streams = Substitute.For<IAuthoritativeEventStreamReader>(); var source = ReconciliationSource(head, clock);
++        var suppliedSource = source with { Stream = source.Stream! with {
++            Events = vector == "source-events" ? BlockingList(source.Stream!.Events, Suspend, true) : source.Stream!.Events } };
++        streams.ReadAsync(head.Identity, Arg.Any<CancellationToken>()).Returns(suppliedSource);
++        var projector = Substitute.For<ISourcePublicationProjector>();
++        IReadOnlyList<SourcePublicationDescriptor> suppliedCandidates = vector == "candidate-count" ? BlockingList<SourcePublicationDescriptor>([ReconciliationPublication(head)], Suspend, false) : [ReconciliationPublication(head)];
++        projector.Project(Arg.Any<AuthoritativeEventStream>(), Arg.Any<CancellationToken>()).Returns(suppliedCandidates);
++        using var caller = new CancellationTokenSource(); var feed = new SourcePublicationFeed(namespaces, streams, projector, store, clock);
++        var pending = feed.ReadAsync(Scope, cancellationToken: caller.Token);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        try
++        {
++            if (cancelCaller) { caller.Cancel(); (await Should.ThrowAsync<OperationCanceledException>(() => pending.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken))).CancellationToken.ShouldBe(caller.Token); }
++            else { clock.Advance(TimeSpan.FromSeconds(30)); (await pending.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken)).FailureReason.ShouldBe("publication-time-bound-exceeded"); }
++            JsonSerializer.Serialize(backend.CommittedState).ShouldBe(before);
++        }
++        finally { release.Set(); }
++        await released.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        await store.DidNotReceive().TryWriteAsync(Arg.Any<SourcePublicationScope>(), Arg.Any<long>(), Arg.Any<SourcePublicationIndexState>(), Arg.Any<CancellationToken>());
++        await store.DidNotReceive().AdvanceReconciliationProgressAsync(Arg.Any<SourcePublicationReconciliationAdvance>(), Arg.Any<CancellationToken>());
++        JsonSerializer.Serialize(backend.CommittedState).ShouldBe(before);
++    }
++    private static IReadOnlyList<T> BlockingList<T>(IReadOnlyList<T> original, Action suspend, bool traversal)
++    {
++        var list = Substitute.For<IReadOnlyList<T>>();
++        list.Count.Returns(_ => { if (!traversal) { suspend(); } return original.Count; });
++        IEnumerable<T> Enumerate() { if (traversal) { suspend(); } foreach (var item in original) { yield return item; } }
++        list.GetEnumerator().Returns(_ => Enumerate().GetEnumerator()); return list;
++    }
++
++    /// <summary>Withdrawal during the final durable/cut await prevents both full and indexed-page checkpoint release under the existing independent retained-proof port.</summary>
++    [Theory]
++    [InlineData(false, "state")][InlineData(false, "cut")][InlineData(true, "state")][InlineData(true, "cut")]
++    public async Task FinalReconciliationReleaseReconfirmsIndependentSourceProof(bool indexedPage, string vector)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var head = new SourcePublicationHead(new(Scope.Tenant, Scope.Domain, "source-00"), 1);
++        var cut = new SourcePublicationCut(Scope, "qualified-cut", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddHours(1), [head], true);
++        bool current = true; var authority = Operations(); QualifyReconciliation(authority, () => cut, TimeProvider.System, () => current);
++        var backend = new InMemoryStateManager(); var actual = Store(Actor(backend, authority));
++        (await actual.AdvanceReconciliationProgressAsync(new(cut, 0, head, "independent-source-00", 1, [ReconciliationPublication(head)]), TestContext.Current.CancellationToken)).ShouldNotBeNull();
++        var initialNamespace = Substitute.For<ISourcePublicationNamespaceSource>(); initialNamespace.ReadAsync(Scope, Arg.Any<CancellationToken>()).Returns(cut);
++        var streams = Substitute.For<IAuthoritativeEventStreamReader>(); var projector = Substitute.For<ISourcePublicationProjector>();
++        var ready = (await new SourcePublicationFeed(initialNamespace, streams, projector, actual, TimeProvider.System).ReadAsync(Scope, cancellationToken: TestContext.Current.CancellationToken)).Page!.Checkpoint;
++        string before = JsonSerializer.Serialize(backend.CommittedState);
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously); var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var store = Substitute.For<ISourcePublicationIndexStore>(); int reads = 0;
++        store.ReadAsync(Scope, Arg.Any<CancellationToken>()).Returns(async call =>
++        {
++            var result = await actual.ReadAsync(Scope, call.Arg<CancellationToken>());
++            if (++reads == 2 && vector == "state") { entered.TrySetResult(); await release.Task; } return result;
++        });
++        store.ReadReconciliationProgressAsync(Arg.Any<SourcePublicationCut>(), Arg.Any<CancellationToken>()).Returns(call => actual.ReadReconciliationProgressAsync(call.Arg<SourcePublicationCut>(), call.Arg<CancellationToken>()));
++        var namespaces = Substitute.For<ISourcePublicationNamespaceSource>(); int cuts = 0;
++        namespaces.ReadAsync(Scope, Arg.Any<CancellationToken>()).Returns(async _ =>
++        { if (++cuts == (indexedPage ? 2 : 3) && vector == "cut") { entered.TrySetResult(); await release.Task; } return (SourcePublicationCut?)cut; });
++        var feed = new SourcePublicationFeed(namespaces, streams, projector, store, TimeProvider.System);
++        var pending = indexedPage ? feed.ReadIndexedPageAsync(ready, 0, TestContext.Current.CancellationToken)
++            : feed.ReadAsync(Scope, cancellationToken: TestContext.Current.CancellationToken);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); current = false; release.TrySetResult();
++        var result = await pending.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        result.Page.ShouldBeNull(); result.FailureReason.ShouldBe("publication-reconciliation-proof-unavailable");
++        JsonSerializer.Serialize(backend.CommittedState).ShouldBe(before); await streams.DidNotReceive().ReadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<CancellationToken>());
++    }
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs
+@@ -1,15 +1,20 @@
++using Dapr.Actors;
++using Dapr.Actors.Client;
+ using Dapr.Actors.Runtime;
+ using Hexalith.EventStore.Client.Streams;
+ using Hexalith.EventStore.Contracts.Identity;
+ using Hexalith.EventStore.Contracts.Results;
+ using Hexalith.EventStore.Contracts.Security;
++using Hexalith.EventStore.Contracts.Streams;
+ using Hexalith.EventStore.Server.Actors;
+ using Hexalith.EventStore.Server.Configuration;
+ using Hexalith.EventStore.Server.Events;
+ using Hexalith.EventStore.Server.Tests.TestUtilities;
++using Hexalith.EventStore.Server.Streams;
+ using Hexalith.EventStore.Testing.Fakes;
+ using Microsoft.Extensions.DependencyInjection;
+ using Microsoft.Extensions.Options;
++using Microsoft.Extensions.Time.Testing;
+ using NSubstitute;
+ using Shouldly;
+ using static Hexalith.EventStore.Server.Tests.Actors.AggregateActorTestHelper;
+@@ -46,4 +51,74 @@
+         if (refuse) { backend.CommittedState.Values.OfType<EventEnvelope>().ShouldBeEmpty(); result.Accepted.ShouldBeFalse(); }
+         else { backend.CommittedState.Values.OfType<EventEnvelope>().Count().ShouldBe(1); result.Accepted.ShouldBeTrue(); }
+     }
++
++    /// <summary>Actual registration cannot release an aggregate append after independently qualified coverage changes during its final transport awaits.</summary>
++    [Theory]
++    [InlineData("register", "withdraw")]
++    [InlineData("register", "expire")]
++    [InlineData("read", "withdraw")]
++    [InlineData("read", "expire")]
++    [InlineData("read", "current")]
++    public async Task FinalRegistrationRosterRequiresFreshIndependentQualification(string suspendedOperation, string change)
++    {
++        ArgumentNullException.ThrowIfNull(suspendedOperation); ArgumentNullException.ThrowIfNull(change);
++        var clock = new FakeTimeProvider(DateTimeOffset.Parse("2026-10-08T12:00:00Z", System.Globalization.CultureInfo.InvariantCulture));
++        var identity = new AggregateIdentity("test-tenant", "test-domain", "agg-001");
++        var scope = new SourcePublicationScope(identity.TenantId, identity.Domain, "deletion", "installation-1");
++        var namespaceBackend = new InMemoryStateManager(); var operations = Substitute.For<ISourcePublicationOperationAuthority>();
++        operations.ReadNamespaceAsync(scope).Returns(true);
++        operations.InstallNamespaceAsync(Arg.Any<SourcePublicationNamespaceState>()).Returns(true);
++        operations.RegisterSourceAsync(scope, 1, identity).Returns(true);
++        var namespaceActor = new SourcePublicationNamespaceActor(ActorHost.CreateForTest<SourcePublicationNamespaceActor>(
++            new ActorTestOptions { ActorId = new(scope.ActorId) }), operations);
++        ActorStateManagerTestHelper.SetStateManager(namespaceActor, namespaceBackend);
++        (await namespaceActor.InstallAsync(new(scope, 1, "installed", "coverage", "writers", []))).ShouldBeTrue();
++        bool qualified = true; var authorization = new SourcePublicationNamespaceAuthorization("qualified", clock.GetUtcNow().AddSeconds(10));
++        var authority = Substitute.For<ISourcePublicationNamespaceAuthority>(); var authorizedRosters = new List<SourcePublicationNamespaceState>();
++        authority.AuthorizeAsync(Arg.Any<SourcePublicationNamespaceState>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            authorizedRosters.Add(call.Arg<SourcePublicationNamespaceState>());
++            return qualified ? authorization : null;
++        });
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var transport = Substitute.For<ISourcePublicationNamespaceActor>(); int reads = 0;
++        transport.ReadAsync(scope).Returns(async _ =>
++        {
++            var state = await namespaceActor.ReadAsync(scope);
++            if (++reads == 2 && suspendedOperation == "read") { entered.TrySetResult(); await release.Task; }
++            return state;
++        });
++        transport.RegisterAsync(scope, 1, identity).Returns(async _ =>
++        {
++            bool result = await namespaceActor.RegisterAsync(scope, 1, identity);
++            if (suspendedOperation == "register") { entered.TrySetResult(); await release.Task; }
++            return result;
++        });
++        var proxies = Substitute.For<IActorProxyFactory>();
++        proxies.CreateActorProxy<ISourcePublicationNamespaceActor>(new ActorId(scope.ActorId), SourcePublicationNamespaceActor.ActorTypeName).Returns(transport);
++        var registration = new DaprSourcePublicationWriterRegistration([scope], proxies, authority, clock);
++        var backend = new InMemoryStateManager(); var context = CreateActor(stateManager: backend);
++        context.Invoker.InvokeAsync(Arg.Any<Hexalith.EventStore.Contracts.Commands.CommandEnvelope>(), Arg.Any<object?>(), Arg.Any<CancellationToken>())
++            .Returns(DomainResult.Success([new TestEvent()]));
++        using var services = new ServiceCollection().AddSingleton<ISourcePublicationWriterRegistration>(registration).BuildServiceProvider();
++        var actor = new AggregateActor(ActorHost.CreateForTest<AggregateActor>(new ActorTestOptions { ActorId = new(identity.ActorId) }),
++            context.Logger, context.Invoker, context.SnapshotManager, new NoOpEventPayloadProtectionService(), context.StatusStore,
++            context.EventPublisher, Options.Create(new EventDrainOptions()), Options.Create(new BackpressureOptions()), context.DeadLetterPublisher,
++            serviceProvider: services, commandAggregateTypeResolver: context.AggregateTypeResolver);
++        ActorStateManagerTestHelper.SetStateManager(actor, backend);
++        var pending = actor.ProcessCommandAsync(CreateTestEnvelope());
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        backend.CommittedState.Values.OfType<EventEnvelope>().ShouldBeEmpty();
++        if (change == "withdraw") { qualified = false; }
++        if (change == "expire") { clock.Advance(TimeSpan.FromSeconds(11)); }
++        release.TrySetResult();
++        var result = await pending.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        result.Accepted.ShouldBe(change == "current");
++        backend.CommittedState.Values.OfType<EventEnvelope>().Count().ShouldBe(change == "current" ? 1 : 0);
++        var retained = namespaceBackend.CommittedState.Single().Value.ShouldBeOfType<SourcePublicationNamespaceState>();
++        retained.Revision.ShouldBe(2); retained.Sources.ShouldBe(new[] { identity });
++        authorizedRosters.Count.ShouldBe(2); authorizedRosters[0].Sources.ShouldBeEmpty();
++        System.Text.Json.JsonSerializer.Serialize(authorizedRosters[1]).ShouldBe(System.Text.Json.JsonSerializer.Serialize(retained));
++    }
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs
+@@ -82,13 +82,14 @@
+     [InlineData("order")]
+     [InlineData("batch")]
+     [InlineData("reservation")]
++    [InlineData("duplicate-id")]
+     public async Task MalformedPhysicalVectorCannotBecomeConsumed(string vector)
+     {
+         var f = new DeletionConsumptionFixture(); f.AlterResult = result => vector switch {
+             "partial" => result with { TargetReceipts = result.TargetReceipts.Take(1).ToArray() },
+             "target" => result with { TargetReceipts = result.TargetReceipts.Select(r => r with { Target = r.Target with { TargetProtectionKeyAlias = "substitution" } }).ToArray() },
+             "order" => result with { TargetReceipts = result.TargetReceipts.Reverse().ToArray() },
+-            "batch" => result with { BatchId = "wrong" }, _ => result with { ReservationReceiptId = "wrong" }
++            "batch" => result with { BatchId = "wrong" }, "duplicate-id" => result with { TargetReceipts = result.TargetReceipts.Select(r => r with { ReceiptId = "same-receipt" }).ToArray() }, _ => result with { ReservationReceiptId = "wrong" }
+         };
+         var request = DeletionConsumptionFixture.Request(); await f.Actor.RegisterAsync(request);
+         (await f.Actor.ReserveAndConsumeAsync(request)).Status.ShouldBe(DeletionConsumptionStatus.ConsumptionReserved);
+@@ -369,4 +370,39 @@
+         await f.Provider.Received(1).ConsumeAsync(Arg.Any<DeletionBatchConsumptionRequest>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+         (await restarted.LookupAsync("tenant-a", "other-batch")).Status.ShouldBe(DeletionConsumptionStatus.Unconsumed);
+     }
++
++    /// <summary>A completed physical provider task cannot retain the actor through its receipt Count/traversal; the original reserve wins and later exact lookup never repeats consumption.</summary>
++    [Theory]
++    [InlineData(false, false, false)][InlineData(false, true, false)][InlineData(true, false, false)][InlineData(true, true, false)][InlineData(true, false, true)]
++    public async Task SuspendedPhysicalReceiptCaptureRetainsReservationAndAllowsTenantProgress(bool lookup, bool traversal, bool notStarted)
++    {
++        var f = new DeletionConsumptionFixture(); var request = DeletionConsumptionFixture.Request();
++        var clock = new RetainedHistoryTimeProvider(DateTimeOffset.UtcNow); var actor = DeletionConsumptionFixture.Create(f.Backend, f.Authority, f.Provider, clock);
++        await actor.RegisterAsync(request); if (lookup) { f.LoseResponse = true; (await actor.ReserveAndConsumeAsync(request)).Status.ShouldBe(DeletionConsumptionStatus.ConsumptionReserved); }
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously); var released = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        using var release = new ManualResetEventSlim();
++        void Suspend() { entered.TrySetResult(); release.Wait(); released.TrySetResult(); }
++        string? reservation = null; IReadOnlyList<DeletionTargetReceipt> exact = request.Targets.Select((target, index) => new DeletionTargetReceipt(target, request.Capability.BatchId, "retained-original-" + index)).ToArray();
++        var supplied = NSubstitute.Substitute.For<IReadOnlyList<DeletionTargetReceipt>>();
++        supplied.Count.Returns(_ => { if (!traversal) { Suspend(); } return notStarted ? 0 : exact.Count; });
++        IEnumerable<DeletionTargetReceipt> Enumerate() { Suspend(); foreach (var receipt in exact) { yield return receipt; } }
++        supplied.GetEnumerator().Returns(_ => Enumerate().GetEnumerator());
++        DeletionManifestProviderResult ProviderResult(string id) { reservation = id; return new("tenant-a", request.Capability.BatchId, id, notStarted ? DeletionManifestProviderState.NotStarted : DeletionManifestProviderState.Consumed, supplied); }
++        if (lookup) { f.Provider.LookupAsync(Arg.Any<DeletionBatchConsumptionRequest>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call => ProviderResult(call.Arg<string>())); }
++        else { f.Provider.ConsumeAsync(Arg.Any<DeletionBatchConsumptionRequest>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call => ProviderResult(call.Arg<string>())); }
++        var pending = lookup ? actor.LookupAsync("tenant-a", request.Capability.BatchId) : actor.ReserveAndConsumeAsync(request);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); clock.Advance(TimeSpan.FromSeconds(30));
++        var original = await pending.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); original.Status.ShouldBe(DeletionConsumptionStatus.ConsumptionReserved);
++        original.ReceiptId.ShouldBe(reservation);
++        (await actor.RegisterRevocationAsync(DeletionConsumptionFixture.Revocation("unrelated"))).ShouldNotBeNull();
++        var other = DeletionConsumptionFixture.Request("other", "healthy", targets: [new("tenant-a", "other", "other")]);
++        (await actor.RegisterAsync(other)).Status.ShouldBe(DeletionConsumptionStatus.Unconsumed);
++        string before = JsonSerializer.Serialize(f.Backend.CommittedState); release.Set(); await released.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        JsonSerializer.Serialize(f.Backend.CommittedState).ShouldBe(before);
++        f.Provider.LookupAsync(Arg.Any<DeletionBatchConsumptionRequest>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(new DeletionManifestProviderResult("tenant-a", request.Capability.BatchId, original.ReceiptId!, DeletionManifestProviderState.Consumed, exact));
++        var recovered = await DeletionConsumptionFixture.Create(f.Backend, f.Authority, f.Provider, clock).LookupAsync("tenant-a", request.Capability.BatchId);
++        recovered.Status.ShouldBe(DeletionConsumptionStatus.Consumed); recovered.ReceiptId.ShouldBe(original.ReceiptId); recovered.TargetReceipts.ShouldBe(exact);
++        await f.Provider.Received(1).ConsumeAsync(Arg.Any<DeletionBatchConsumptionRequest>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
++        (await actor.LookupAsync("tenant-a", "other")).Status.ShouldBe(DeletionConsumptionStatus.Unconsumed);
++    }
+ }
+--- prior/parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs
++++ current/parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs
+@@ -1156,6 +1156,47 @@
+         (await service.ResolveAtAsync(Envelope(new ResolveHumanActorBindingAt("tenant-a", "party-1", Start, Actor, 1)), TestContext.Current.CancellationToken)).Evidence.ShouldBeNull();
+     }
+ 
++    /// <summary>Two actor-free independently certified expired transitions preserve exact version continuity and return only the retained version-three source original.</summary>
++    [Theory]
++    [InlineData("rebound")][InlineData("revocation")]
++    public async Task MultipleExpiredTransitionsResolveOnlyRetainedVersionThreeThroughSerializedQuery(string expiredTransition)
++    {
++        ArgumentNullException.ThrowIfNull(expiredTransition);
++        const string intermediateActor = "01HX0000000000000000000002"; const string retainedActor = "01HX0000000000000000000003";
++        const string policy = "party-actor-retention-v1";
++        var secondAt = Start.AddDays(10); var successorAt = Start.AddDays(200); var now = Start.AddDays(376);
++        var original = Binding() with { ValidUntil = Start.AddDays(365), Custody = Binding().Custody with { PolicyId = policy, ExpiresAt = Start.AddDays(365) } };
++        var secondCustody = original.Custody with { ExpiresAt = secondAt.AddDays(365), LifecycleRevision = 2 };
++        IEventPayload second = expiredTransition == "rebound" ? new HumanActorBindingRebound(new(original with { ActorId = intermediateActor, BindingVersion = 2,
++            ValidFrom = secondAt, ValidUntil = secondAt.AddDays(365), Custody = secondCustody }, "second", "second-digest"), secondAt, 1)
++            : new HumanActorBindingRevoked("revoked", "revoked-digest", 1, secondAt, secondCustody);
++        var successor = original with { ActorId = retainedActor, BindingVersion = 3, ValidFrom = successorAt, ValidUntil = successorAt.AddDays(365),
++            Custody = original.Custody with { ExpiresAt = successorAt.AddDays(365), LifecycleRevision = 3 } };
++        var fixture = Service(Events()[0], new HumanActorBindingEstablished(new(original, "first", "first-digest"), Start, 0), second,
++            new HumanActorBindingRebound(new(successor, "third", "third-digest"), successorAt, 2));
++        fixture.Options.CurrentValue.Returns(new PartyIdentityOptions { PolicyId = policy, Retention = TimeSpan.FromDays(365), ExpiryTrigger = "binding-effective-at" });
++        var captured = (await fixture.HistoryReader.ReadAsync(new("tenant-a", "party", "party-1"), RetainedIdentityHistoryReadRequest.AttributionPurpose, TestContext.Current.CancellationToken)).Stream!;
++        var firstProof = new ExpiredIdentityHistoryCertificate(captured.Identity, captured.Purpose, policy, 2, typeof(HumanActorBindingEstablished).FullName!,
++            new string('A', 64), "original-first-destruction", 4, "current-lifecycle", now, now.AddMinutes(1));
++        var secondProof = firstProof with { SourceSequence = 3, EventTypeName = second.GetType().FullName!, SealedPayloadDigest = new string('B', 64), DestructionReceiptId = "original-second-destruction" };
++        var retained = captured with { ObservedAt = now, ValidUntil = now.AddMinutes(1), Events = [captured.Events.Single(item => item.SequenceNumber == 4)],
++            ExcludedSequences = [1], ExpiredEvents = [firstProof, secondProof] };
++        byte[] transport = JsonSerializer.SerializeToUtf8Bytes(retained, PartiesJsonOptions.Default);
++        System.Text.Encoding.UTF8.GetString(transport).ShouldNotContain(Actor); System.Text.Encoding.UTF8.GetString(transport).ShouldNotContain(intermediateActor);
++        fixture.HistoryReader.ReadAsync(Arg.Any<Hexalith.EventStore.Contracts.Identity.AggregateIdentity>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(
++            new RetainedIdentityHistoryReadResult(JsonSerializer.Deserialize<RetainedIdentityHistoryStream>(transport, PartiesJsonOptions.Default)!, null));
++        fixture.Authority.Admit(Arg.Any<QueryEnvelope>()).Returns(new PartyIdentityAdmissionResult(new(new("tenant-a", "party", "party-1", "Read", "c", "c", "d"), "reader", null,
++            retainedActor, 1, true, Start, Start.AddDays(600), 1), null));
++        TimeProvider clock = Substitute.For<TimeProvider>(); ConfigureSystemTimer(clock); clock.GetUtcNow().Returns(now);
++        var service = new PartyIdentityQueryService(fixture.Authority, clock, custody: fixture.Custody, historyReader: fixture.HistoryReader, identityOptions: fixture.Options);
++        var result = await service.ResolveAtAsync(Envelope(new ResolveHumanActorBindingAt("tenant-a", "party-1", successorAt, retainedActor, 3)), TestContext.Current.CancellationToken);
++        result.Outcome.ShouldBe(HumanActorBindingOutcome.Resolved); result.Evidence!.ShouldBe(successor); result.Evidence!.ActorId.ShouldBe(retainedActor);
++        result.Evidence.BindingVersion.ShouldBe(3); result.Evidence.ValidFrom.ShouldBe(successorAt); result.Evidence.ValidUntil.ShouldBe(successorAt.AddDays(365));
++        result.BindingSourcePosition.ShouldBe(4); result.SourcePosition.ShouldBe(4);
++        (await service.ResolveAtAsync(Envelope(new ResolveHumanActorBindingAt("tenant-a", "party-1", Start.AddDays(5), Actor, 1)), TestContext.Current.CancellationToken)).Evidence.ShouldBeNull();
++        (await service.ResolveAtAsync(Envelope(new ResolveHumanActorBindingAt("tenant-a", "party-1", Start.AddDays(20), intermediateActor, 2)), TestContext.Current.CancellationToken)).Evidence.ShouldBeNull();
++    }
++
+     /// <summary>One deadline cancels noncooperative source/custody and cannot admit a late success or fault.</summary>
+     [Theory]
+     [InlineData(false, false, false)]
+--- prior/platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs
++++ current/platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs
+@@ -45,13 +45,12 @@
+             var read = await budget.ReadAsync(() => storage.ReadAsync(reference, CancellationToken.None),
+                 static value => { if (value?.Bytes is { } bytes) { CryptographicOperations.ZeroMemory(bytes); } }).ConfigureAwait(false);
+             persisted = read?.Bytes;
+-            if (read?.Bytes is not { Length: > 0 and <= 16384 } || read.Reference != reference
+-                || read.Metadata is not { State: PayloadProtectionState.Protected, MetadataVersion: 1 }
+-                || !EventStorePayloadProtectionMetadataCarrier.TryValidate(read.Metadata, out _)
+-                || string.IsNullOrWhiteSpace(read.Metadata.Scheme) || string.IsNullOrWhiteSpace(read.Metadata.KeyAlias)) { return false; }
++            read = await budget.ReadAsync(() => Task.FromResult(CaptureObservation(read, reference, budget))).ConfigureAwait(false);
++            if (read is null) { return false; }
+             // The returned observation buffer is owned by this evaluation and cleared on every terminal path.
+             budget.Check();
+             if (persisted.AsSpan().IndexOf(plaintext) >= 0 || persisted.AsSpan().IndexOf(challenge) >= 0) { return false; }
++            if (!await ProveCarrierAsync(reference, canaryId, read!, initial!, budget).ConfigureAwait(false)) { return false; }
+             opened = await budget.ReadAsync(() => engine.UnsealAsync(reference, CancellationToken.None),
+                 static bytes => { if (bytes is not null) { CryptographicOperations.ZeroMemory(bytes); } }).ConfigureAwait(false);
+             if (opened is null || !CryptographicOperations.FixedTimeEquals(opened, plaintext)) { return false; }
+@@ -93,6 +92,49 @@
+     private bool ValidTarget() => target is not null && Text(target.EngineId) && Text(target.EngineVersion) && Text(target.CustodyTargetId) && Text(target.TenantId);
+     private bool OwnedReference(Fr34CanaryReference? value, string canaryId) => value is not null && value.Target == target
+         && value.CanaryId == canaryId && Text(value.RecordId) && Text(value.KeyReference);
++    private static Fr34PersistedCanary? CaptureObservation(Fr34PersistedCanary? supplied, Fr34CanaryReference reference, PrivateOwnerOperationDeadline budget)
++    {
++        budget.Check();
++        if (supplied?.Bytes is not { Length: > 0 and <= 16384 } || supplied.Reference != reference
++            || supplied.Metadata is not { State: PayloadProtectionState.Protected, MetadataVersion: 1 } metadata
++            || string.IsNullOrWhiteSpace(metadata.Scheme) || string.IsNullOrWhiteSpace(metadata.KeyAlias)
++            || metadata.Scheme.Length > EventStorePayloadProtectionMetadata.MaxSchemeLength || metadata.KeyAlias.Length > EventStorePayloadProtectionMetadata.MaxKeyAliasLength
++            || metadata.ContentHint?.Length > EventStorePayloadProtectionMetadata.MaxContentHintLength) { return null; }
++        IReadOnlyDictionary<string, string>? flags = null;
++        if (metadata.CompatibilityFlags is { } source)
++        {
++            if (source.Count is < 0 or > EventStorePayloadProtectionMetadata.MaxCompatibilityFlagCount) { return null; }
++            var owned = new Dictionary<string, string>(StringComparer.Ordinal);
++            foreach (var pair in source)
++            {
++                budget.Check();
++                if (owned.Count >= EventStorePayloadProtectionMetadata.MaxCompatibilityFlagCount || pair.Key is null || pair.Value is null
++                    || pair.Key.Length > EventStorePayloadProtectionMetadata.MaxCompatibilityFlagKeyLength || pair.Value.Length > EventStorePayloadProtectionMetadata.MaxCompatibilityFlagValueLength
++                    || !owned.TryAdd(pair.Key, pair.Value)) { return null; }
++            }
++            flags = new System.Collections.ObjectModel.ReadOnlyDictionary<string, string>(owned);
++        }
++        var captured = metadata with { CompatibilityFlags = flags };
++        if (!EventStorePayloadProtectionMetadataCarrier.TryValidate(captured, out _)) { return null; }
++        budget.Check(); return supplied with { Metadata = captured };
++    }
++    private async Task<bool> ProveCarrierAsync(Fr34CanaryReference reference, string canaryId, Fr34PersistedCanary observed,
++        Fr34CanaryAuthorization admitted, PrivateOwnerOperationDeadline budget)
++    {
++        if (!OwnedReference(reference, canaryId) || !Current(admitted)) { return false; }
++        var current = await budget.ReadAsync(() => authority.ObserveAsync(target, CancellationToken.None)).ConfigureAwait(false);
++        if (!SameAuthority(current, admitted)) { return false; }
++        // The independent proof operation owns its exact input copy until termination, even if this caller abandons it.
++        byte[] input = observed.Bytes.ToArray();
++        bool proved = await budget.ReadAsync(async () =>
++        {
++            try { return await authority.VerifyCarrierAsync(target, canaryId, reference, observed with { Bytes = input }, admitted, CancellationToken.None).ConfigureAwait(false); }
++            finally { CryptographicOperations.ZeroMemory(input); }
++        }, notStarted: () => CryptographicOperations.ZeroMemory(input)).ConfigureAwait(false);
++        if (!proved) { return false; }
++        var final = await budget.ReadAsync(() => authority.ObserveAsync(target, CancellationToken.None)).ConfigureAwait(false);
++        budget.Check(); return Current(admitted) && SameAuthority(final, admitted);
++    }
+     private async Task<bool> ProveOwnershipAsync(Fr34CanaryReference reference, string canaryId, Fr34CanaryAuthorization admitted, PrivateOwnerOperationDeadline budget)
+     {
+         if (!OwnedReference(reference, canaryId) || !Current(admitted)) { return false; }
+--- prior/platform/src/Hexalith.Platform.Custody/IFr34CanaryAuthority.cs
++++ current/platform/src/Hexalith.Platform.Custody/IFr34CanaryAuthority.cs
+@@ -8,6 +8,9 @@
+     /// <summary>Independently authenticates the original committed canary record and dedicated key against the expected target, fresh original ID and admitted current lifetime. Engine echoes or opaque references alone are insufficient. Omission denies every destruction, including late cleanup.</summary>
+     Task<bool> VerifyOwnershipAsync(Fr34ProtectionTarget expected, string originalCanaryId, Fr34CanaryReference reference, Fr34CanaryAuthorization admitted,
+         CancellationToken cancellationToken = default) => Task.FromResult(false);
++    /// <summary>Independently authenticates the exact observed committed bytes/metadata as the enrolled protection format of the exact engine/version/custody and original dedicated canary key/record under the unchanged admitted current lifetime. Protected labels, engine echoes and substring absence are insufficient. The observation input belongs to this operation until it completes; omission denies readiness.</summary>
++    Task<bool> VerifyCarrierAsync(Fr34ProtectionTarget expected, string originalCanaryId, Fr34CanaryReference reference, Fr34PersistedCanary observation,
++        Fr34CanaryAuthorization admitted, CancellationToken cancellationToken = default) => Task.FromResult(false);
+     /// <summary>Authenticates complete irreversible original canary DEK destruction at the enrolled custody owner.</summary>
+     Task<bool> ConfirmDestroyedAsync(Fr34CanaryReference reference, CancellationToken cancellationToken = default);
+ }
+--- prior/platform/src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs
++++ current/platform/src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs
+@@ -6,10 +6,16 @@
+ {
+     /// <summary>Resolves the actual qualified independent component/epoch; no default name, target or replica proof.</summary>
+     Task<ReplicatedSecuritySpoolTarget?> GetCurrentAsync(CancellationToken cancellationToken = default);
+-    /// <summary>Authenticates the dedicated current private caller and exact Observe/Lookup/Drain/Readiness method/intent; no human/Workflow/general dispatcher access.</summary>
++    /// <summary>Authenticates the dedicated current private caller and exact Observe/Lookup/Drain/Readiness/RecoverOriginal method/intent; no human/Workflow/general dispatcher access.</summary>
+     Task<bool> AuthorizeAsync(ReplicatedSecuritySpoolTarget target, string method, SecurityObservationIntent? intent, CancellationToken cancellationToken = default);
+     /// <summary>Authenticates exact private retained-server-receipt lookup without accepting caller-authored tenant routing; absent credentials deny.</summary>
+     Task<bool> AuthorizeOriginalLookupAsync(ReplicatedSecuritySpoolTarget target, SecurityObservationOriginalLookup lookup, CancellationToken cancellationToken = default) => Task.FromResult(false);
++    /// <summary>Independently admits only this exact retained aged original and authoritative NotRecorded/Recorded proof under a separately enrolled fresh restricted recovery credential. Bind original routing/first-seen/day/sequence/intent and exact installation; no generic human/Workflow permission or renewal. Missing permission defaults deny.</summary>
++    Task<SecurityObservationRecoveryGrant?> AuthorizeAgedOriginalRecoveryAsync(ReplicatedSecuritySpoolTarget target, SecurityObservationRecord original,
++        SecurityEventRecorderLookup proof, CancellationToken cancellationToken = default) => Task.FromResult<SecurityObservationRecoveryGrant?>(null);
++    /// <summary>Reconfirms independent original grant authenticity, unchanged current exact installation/recovery caller permission and authoritative current original recorder proof after every final await. Recorded reconciliation may follow an originally admitted NotRecorded proof; Unknown never authorizes an effect or acknowledgement. Omission denies.</summary>
++    Task<bool> VerifyAgedOriginalRecoveryAsync(SecurityObservationRecoveryGrant grant, SecurityEventRecorderLookup currentProof,
++        CancellationToken cancellationToken = default) => Task.FromResult(false);
+     /// <summary>Independently validates exact durable epoch/monotonic revision and captured state digest; missing/stale restored state cannot certify readiness.</summary>
+     Task<bool> ValidateStateAsync(ReplicatedSecuritySpoolTarget target, long revision, string exactStateDigest, CancellationToken cancellationToken = default);
+     /// <summary>Conditionally advances a durable independent antirollback anchor before component CAS; unknown/failed save closes availability until reconciliation.</summary>
+--- prior/platform/src/Hexalith.Platform.Custody/ISecurityObservationRecorder.cs
++++ current/platform/src/Hexalith.Platform.Custody/ISecurityObservationRecorder.cs
+@@ -6,6 +6,9 @@
+ {
+     /// <summary>Authenticates caller before exact authoritative source lookup; uncertain/gapped/outage evidence is Unknown.</summary>
+     Task<SecurityEventRecorderLookup> LookupAsync(SecurityObservationRecord record, CancellationToken cancellationToken = default);
++    /// <summary>Recovers only the independently retained exact original under a separately authenticated current restricted aged-recovery grant. Never renew its first-seen/day/sequence/intent/internal request or borrow generic append authority. Authoritative NotRecorded permits idempotent original source recording; Recorded permits reconciliation only. Missing qualified binding defaults unavailable.</summary>
++    Task RecoverOriginalAsync(SecurityObservationRecord original, SecurityObservationRecoveryGrant grant, CancellationToken cancellationToken = default)
++        => Task.FromException(new InvalidOperationException("Exact original recovery recorder is unavailable."));
+     /// <summary>Appends only the original observation idempotently; command acceptance does not acknowledge the spool.</summary>
+     Task AppendAsync(SecurityObservationRecord record, CancellationToken cancellationToken = default);
+ }
+--- prior/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs
++++ current/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs
+@@ -132,6 +132,68 @@
+         }
+         catch (Exception) { cancellationToken.ThrowIfCancellationRequested(); return acknowledged; }
+     }
++    /// <summary>Separately authorized recovery of one retained aged original. Automatic drain remains bounded by H; missing fresh independent permission or uncertain source proof denies every new effect.</summary>
++    public async Task<SecurityObservationRecord?> RecoverOriginalAsync(SecurityObservationIntent intent, CancellationToken cancellationToken = default)
++    {
++        var budget = new PrivateOwnerOperationDeadline(clock, cancellationToken);
++        try
++        {
++            ValidateIntent(intent); var target = await CurrentAsync("RecoverOriginal", intent, budget).ConfigureAwait(false);
++            if (target is null || recorder is null || authority is null) { return null; }
++            // Ordinary lookup cannot elevate an unanchored stage before separate exact-original mutation admission.
++            var (state, _) = await ReadAsync(target, budget).ConfigureAwait(false);
++            var retained = state?.Records.SingleOrDefault(record => record.Intent.ObservationId == intent.ObservationId);
++            if (retained?.Intent != intent || clock.GetUtcNow() < retained.ObservedAt + PlatformAcceptedEnvelopeTiming.RecoveryHorizon
++                || state!.Records.Any(record => record.Receipt is null && record.Sequence < retained.Sequence && SourceStream(record) == SourceStream(retained))) { return null; }
++            var original = retained with { Receipt = null };
++            var found = await budget.ReadAsync(() => recorder.LookupAsync(original, CancellationToken.None)).ConfigureAwait(false);
++            if (!OriginalProof(original, found)) { return null; }
++            var grant = await budget.ReadAsync(() => authority.AuthorizeAgedOriginalRecoveryAsync(target, original, found, CancellationToken.None)).ConfigureAwait(false);
++            if (!ValidRecoveryGrant(grant, target, original) || grant!.OriginalProof != found || !await StillGrantedAsync(found).ConfigureAwait(false)) { return null; }
++            // The original source may have recorded between admission and this lookup; never issue a second effect from stale absence.
++            found = await budget.ReadAsync(() => recorder.LookupAsync(original, CancellationToken.None)).ConfigureAwait(false);
++            if (!OriginalProof(original, found) || !await StillGrantedAsync(found).ConfigureAwait(false)) { return null; }
++            if (found.State == SecurityEventRecorderLookupState.NotRecorded)
++            {
++                try { await budget.ReadAsync(async () => { await recorder.RecoverOriginalAsync(original, grant, CancellationToken.None).ConfigureAwait(false); return true; }).ConfigureAwait(false); }
++                catch (Exception) { budget.Check(); }
++                found = await budget.ReadAsync(() => recorder.LookupAsync(original, CancellationToken.None)).ConfigureAwait(false);
++            }
++            if (found.State != SecurityEventRecorderLookupState.Recorded || !Exact(original, found.Receipt) || !await StillGrantedAsync(found).ConfigureAwait(false)) { return null; }
++            var (current, etag) = await ReadAsync(target, budget, true).ConfigureAwait(false);
++            var existing = current?.Records.SingleOrDefault(record => record.Intent.ObservationId == intent.ObservationId);
++            if (existing is null || existing with { Receipt = null } != original || existing.Receipt is not null && existing.Receipt != found.Receipt) { return null; }
++            if (existing.Receipt is null)
++            {
++                if (!await StillGrantedAsync(found).ConfigureAwait(false)) { return null; }
++                var next = current! with { Revision = checked(current.Revision + 1), Records = current.Records.Select(record => record.Sequence == original.Sequence ? record with { Receipt = found.Receipt } : record).ToArray() };
++                await TryWriteAsync(target, current, next, etag, budget).ConfigureAwait(false);
++            }
++            var (saved, _) = await ReadAsync(target, budget).ConfigureAwait(false);
++            var confirmed = saved?.Records.SingleOrDefault(record => record.Sequence == original.Sequence);
++            return confirmed is not null && confirmed with { Receipt = null } == original && confirmed.Receipt == found.Receipt
++                && await StillGrantedAsync(found).ConfigureAwait(false) ? confirmed : null;
++
++            async Task<bool> StillGrantedAsync(SecurityEventRecorderLookup proof)
++            {
++                if (!ValidRecoveryGrant(grant, target, original) || !OriginalProof(original, proof)) { return false; }
++                if (!await budget.ReadAsync(() => authority.VerifyAgedOriginalRecoveryAsync(grant!, proof, CancellationToken.None)).ConfigureAwait(false)
++                    || !await StillCurrentAsync(target, "RecoverOriginal", intent, budget).ConfigureAwait(false)) { return false; }
++                bool verified = await budget.ReadAsync(() => authority.VerifyAgedOriginalRecoveryAsync(grant!, proof, CancellationToken.None)).ConfigureAwait(false);
++                budget.Check(); return verified && ValidRecoveryGrant(grant, target, original);
++            }
++        }
++        catch (Exception) { cancellationToken.ThrowIfCancellationRequested(); return null; }
++    }
++    private bool ValidRecoveryGrant(SecurityObservationRecoveryGrant? grant, ReplicatedSecuritySpoolTarget target, SecurityObservationRecord original)
++        => grant is not null && grant.Target == target && grant.Original == original && grant.Original.Receipt is null
++            && OriginalProof(original, grant.OriginalProof) && !string.IsNullOrWhiteSpace(grant.RecoveryAuthorityRevision) && grant.RecoveryAuthorityRevision.Length <= 256
++            && grant.ObservedAt.Offset == TimeSpan.Zero && grant.ObservedAt != default && grant.ObservedAt <= clock.GetUtcNow()
++            && grant.ValidUntil.Offset == TimeSpan.Zero && grant.ValidUntil > clock.GetUtcNow() && grant.ValidUntil <= target.ValidUntil && ValidTarget(target);
++    private static bool OriginalProof(SecurityObservationRecord original, SecurityEventRecorderLookup? proof)
++        => proof is not null && (proof.State == SecurityEventRecorderLookupState.NotRecorded && proof.Receipt is null
++            || proof.State == SecurityEventRecorderLookupState.Recorded && Exact(original, proof.Receipt));
++
+     /// <summary>Readiness requires qualified current complete spool state with every original observation durably recorded; missing/stale/unknown state always blocks.</summary>
+     public async Task<bool> IsReadyAsync(CancellationToken cancellationToken = default)
+     {
+--- prior/platform/src/Hexalith.Platform.Custody/SecurityObservationRecoveryGrant.cs
++++ current/platform/src/Hexalith.Platform.Custody/SecurityObservationRecoveryGrant.cs
+@@ -0,0 +1,9 @@
++namespace Hexalith.Platform.Custody;
++
++/// <summary>Separately admitted exact-original aged recovery, without renewing the observation or extending automatic H. The shape alone grants no permission.</summary>
++/// <param name="Target">Exact current independently qualified installation/routing credential.</param><param name="Original">Independently retained immutable original first-seen/day/sequence/intent, with no acknowledgement.</param>
++/// <param name="OriginalProof">Independent authoritative original NotRecorded or exact Recorded proof at admission; Unknown cannot authorize recovery.</param>
++/// <param name="RecoveryAuthorityRevision">Independent current restricted recovery permission, distinct from automatic/human/Workflow credentials.</param>
++/// <param name="ObservedAt">Fresh independent permission observation.</param><param name="ValidUntil">Exclusive original recovery permission lifetime, never the observation's renewed time.</param>
++public sealed record SecurityObservationRecoveryGrant(ReplicatedSecuritySpoolTarget Target, SecurityObservationRecord Original,
++    SecurityEventRecorderLookup OriginalProof, string RecoveryAuthorityRevision, DateTimeOffset ObservedAt, DateTimeOffset ValidUntil);
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs
+@@ -26,6 +26,7 @@
+     internal int Reservations { get; private set; }
+     internal bool LoseSignatureResponse { get; set; }
+     internal bool LoseConsumptionResponse { get; set; }
++    internal bool DuplicatePhysicalReceiptIds { get; set; }
+     internal bool MakeFirstIssueStale { get; set; }
+     internal bool UnknownConsumptionLookup { get; set; }
+     internal TenantGovernanceGuardState State => JsonSerializer.Deserialize<TenantGovernanceGuardState>(JsonSerializer.Deserialize<GuardedStateCell>(Backend.Stored[Backend.Key(Backend.Target.GuardCellId)])!.Value)!;
+@@ -77,9 +78,9 @@
+             var result = new DeletionManifestProviderResult("tenant-a", request.Capability.BatchId, receipt, DeletionManifestProviderState.Consumed,
+                 request.Targets.Select(value => new DeletionTargetReceipt(value, request.Capability.BatchId, "irreversible-" + value.AgentInteractionId)).ToArray());
+             _destructions[receipt] = result;
+-            return LoseConsumptionResponse ? Task.FromException<DeletionManifestProviderResult>(new IOException("Controlled physical response loss.")) : Task.FromResult(result);
++            return LoseConsumptionResponse ? Task.FromException<DeletionManifestProviderResult>(new IOException("Controlled physical response loss.")) : Task.FromResult(Presented(result));
+         });
+-        provider.LookupAsync(Arg.Any<DeletionBatchConsumptionRequest>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call => _destructions[call.ArgAt<string>(1)]);
++        provider.LookupAsync(Arg.Any<DeletionBatchConsumptionRequest>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call => Presented(_destructions[call.ArgAt<string>(1)]));
+         ProtectionActor = new(ActorHost.CreateForTest<DeletionConsumptionActor>(new ActorTestOptions { ActorId = new(DeletionConsumptionActor.GetActorId("tenant-a")) }), protectionAuthority, provider);
+         InstallStateManager(ProtectionActor, ProtectionState);
+         var proxies = Substitute.For<IActorProxyFactory>(); proxies.CreateActorProxy<IDeletionConsumptionActor>(Arg.Any<Dapr.Actors.ActorId>(), DeletionConsumptionActor.ActorTypeName).Returns(call =>
+@@ -88,6 +89,8 @@
+         var protection = new DaprDeletionProtectionOwner("tenant-a", proxies, TimeProvider.System);
+         Coordinator = new(TimeProvider.System, new EventStoreDeletionBatchGuardPort(Guard), Signer, _ => protection);
+     }
++    private DeletionManifestProviderResult Presented(DeletionManifestProviderResult original)
++        => DuplicatePhysicalReceiptIds ? original with { TargetReceipts = original.TargetReceipts.Select(receipt => receipt with { ReceiptId = "duplicate-physical-id" }).ToArray() } : original;
+     internal IDeletionCapabilitySigningActor Signer(DeletionBatchCapabilityV1 payload)
+     {
+         string id = DeletionBatchCapabilityIdentity.SigningRequestId(payload);
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs
+@@ -292,4 +292,27 @@
+         (await f.Coordinator.ExecuteAsync(payload, cancellationToken: TestContext.Current.CancellationToken)).Guard.ShouldBe(recompleted);
+         f.State.Receipts.Count(r => r.Status == "CompletionSealed").ShouldBe(2); f.Reservations.ShouldBe(1);
+     }
++
++    /// <summary>Actual protection/coordinator refuses duplicate physical receipt identities and recovers the independently valid original vector without another destruction.</summary>
++    [Fact]
++    public async Task ActualDuplicatePhysicalReceiptIdsCannotCertifyCompletion()
++    {
++        using var fixture = new DeletionBatchActualOwnerFixture { DuplicatePhysicalReceiptIds = true };
++        var denied = await fixture.Coordinator.ExecuteAsync(fixture.Payload, cancellationToken: TestContext.Current.CancellationToken);
++        denied.Status.ShouldBe("ConsumptionReserved"); fixture.Reservations.ShouldBe(1); fixture.State.Deletions.Single().Completed.ShouldBeFalse();
++        using var reservedDocument = JsonDocument.Parse(JsonSerializer.Serialize(fixture.ProtectionState.CommittedState.Single().Value));
++        var reserved = reservedDocument.RootElement.GetProperty("Batches").EnumerateArray().Single().GetProperty("Outcome").Deserialize<DeletionConsumptionOutcome>()!;
++        reserved.Status.ShouldBe(DeletionConsumptionStatus.ConsumptionReserved); reserved.TargetReceipts.ShouldBeEmpty();
++        (await fixture.Coordinator.ExecuteAsync(fixture.Payload, cancellationToken: TestContext.Current.CancellationToken)).Status.ShouldBe("ConsumptionReserved");
++        fixture.Reservations.ShouldBe(1); fixture.DuplicatePhysicalReceiptIds = false;
++        var completed = await fixture.Coordinator.ExecuteAsync(fixture.Payload, cancellationToken: TestContext.Current.CancellationToken);
++        completed.Status.ShouldBe("CompletionSealed"); fixture.Reservations.ShouldBe(1); completed.Protection!.ReceiptId.ShouldBe(reserved.ReceiptId);
++        completed.Protection.TargetReceipts.Select(receipt => receipt.ReceiptId).Distinct(StringComparer.Ordinal).Count().ShouldBe(2);
++        fixture.State.Deletions.Single().Completed.ShouldBeTrue();
++        using var document = JsonDocument.Parse(JsonSerializer.Serialize(fixture.ProtectionState.CommittedState.Single().Value));
++        var retained = document.RootElement.GetProperty("Batches").EnumerateArray().Single();
++        retained.GetProperty("Original").Deserialize<DeletionBatchConsumptionRequest>()!.Capability.ShouldBe(fixture.Payload);
++        var outcome = retained.GetProperty("Outcome").Deserialize<DeletionConsumptionOutcome>()!;
++        outcome.Status.ShouldBe(DeletionConsumptionStatus.Consumed); outcome.ReceiptId.ShouldBe(reserved.ReceiptId); outcome.TargetReceipts.ShouldBe(completed.Protection.TargetReceipts);
++    }
+ }
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs
+@@ -13,6 +13,10 @@
+     [Theory]
+     [InlineData("valid", true)]
+     [InlineData("no-op", false)]
++    [InlineData("base64-wrapper", false)]
++    [InlineData("rejected-format", false)]
++    [InlineData("rejected-carrier-key", false)]
++    [InlineData("tampered-carrier", false)]
+     [InlineData("wrong-target", false)]
+     [InlineData("foreign-canary", false)]
+     [InlineData("foreign-key", false)]
+@@ -27,7 +31,7 @@
+     {
+         var fixture = Arrange(vector);
+         (await fixture.Gate.EvaluateAsync(TestContext.Current.CancellationToken)).ShouldBe(expected);
+-        if (vector == "no-op") { await fixture.Engine.DidNotReceiveWithAnyArgs().UnsealAsync(default!, TestContext.Current.CancellationToken); }
++        if (vector is "no-op" or "base64-wrapper" or "rejected-format" or "rejected-carrier-key" or "tampered-carrier") { await fixture.Engine.DidNotReceiveWithAnyArgs().UnsealAsync(default!, TestContext.Current.CancellationToken); }
+         if (vector is "wrong-target" or "foreign-canary" or "foreign-key") { await fixture.Engine.DidNotReceiveWithAnyArgs().DestroyAsync(default!, TestContext.Current.CancellationToken); }
+     }
+ 
+@@ -161,35 +165,106 @@
+         if (phase != "replay") { await f.Engine.DidNotReceiveWithAnyArgs().ReplayAsync(default!, TestContext.Current.CancellationToken); }
+     }
+ 
+-    private static (Fr34ProtectionGate Gate, IFr34ProtectionCanaryEngine Engine, IFr34CanaryAuthority Authority, IFr34PersistedCanaryReader Storage, Func<byte[]?> ReturnedBytes, Func<IReadOnlyList<byte[]>> ReturnedOwnedBuffers) Arrange(string vector)
++    /// <summary>A suspended independent carrier proof retains its owned bytes only until completion and cannot release readiness after cancellation.</summary>
++    [Fact]
++    public async Task CancelledCarrierProofPreservesAndClearsItsExactOwnedInput()
++    {
++        var f = Arrange("valid"); var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var pending = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously); byte[]? input = null;
++        f.Authority.VerifyCarrierAsync(Arg.Any<Fr34ProtectionTarget>(), Arg.Any<string>(), Arg.Any<Fr34CanaryReference>(), Arg.Any<Fr34PersistedCanary>(), Arg.Any<Fr34CanaryAuthorization>(), Arg.Any<CancellationToken>()).Returns(call =>
++        { input = call.Arg<Fr34PersistedCanary>().Bytes; entered.TrySetResult(); return pending.Task; });
++        using var caller = new CancellationTokenSource(); var operation = f.Gate.EvaluateAsync(caller.Token);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); caller.Cancel();
++        (await Should.ThrowAsync<OperationCanceledException>(() => operation.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken))).CancellationToken.ShouldBe(caller.Token);
++        input!.Any(value => value != 0).ShouldBeTrue(); pending.SetResult(true);
++        using var clearing = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken); clearing.CancelAfter(TimeSpan.FromSeconds(5));
++        while (input!.Any(value => value != 0)) { await Task.Delay(1, clearing.Token); }
++        await f.Engine.DidNotReceiveWithAnyArgs().UnsealAsync(default!, TestContext.Current.CancellationToken); operation.IsCanceled.ShouldBeTrue();
++    }
++
++    /// <summary>Actually suspended provider metadata Count/traversal releases cancellation/deadline and cannot reach independent proof or content admission after late completion.</summary>
++    [Theory]
++    [InlineData(false, false)][InlineData(false, true)][InlineData(true, false)][InlineData(true, true)]
++    public async Task SuspendedPersistedMetadataIsBoundedAndNeverReleasesReadiness(bool traversal, bool cancelCaller)
++    {
++        var clock = Substitute.For<TimeProvider>(); long ticks = 0; var callbacks = new List<Action>();
++        clock.GetUtcNow().Returns(new DateTimeOffset(2026, 10, 6, 12, 0, 0, TimeSpan.Zero));
++        clock.TimestampFrequency.Returns(TimeSpan.TicksPerSecond); clock.GetTimestamp().Returns(_ => ticks);
++        clock.CreateTimer(Arg.Any<TimerCallback>(), Arg.Any<object?>(), Arg.Any<TimeSpan>(), Arg.Any<TimeSpan>()).Returns(call =>
++        { callbacks.Add(() => call.Arg<TimerCallback>()(call.ArgAt<object?>(1))); return Substitute.For<ITimer>(); });
++        var f = Arrange("valid", clock); var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var completed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously); using var release = new ManualResetEventSlim();
++        void Suspend() { entered.TrySetResult(); release.Wait(); completed.TrySetResult(); }
++        var flags = Substitute.For<IReadOnlyDictionary<string, string>>();
++        flags.Count.Returns(_ => { if (!traversal) { Suspend(); } return 1; });
++        IEnumerable<KeyValuePair<string, string>> Enumerate() { Suspend(); yield return new("format", "enrolled-v1"); }
++        flags.GetEnumerator().Returns(_ => Enumerate().GetEnumerator());
++        byte[] returned = [1, 2, 3];
++        f.Storage.ReadAsync(Arg.Any<Fr34CanaryReference>(), Arg.Any<CancellationToken>()).Returns(call => new Fr34PersistedCanary(call.Arg<Fr34CanaryReference>(), returned,
++            new(PayloadProtectionState.Protected, 1, "actual-fixture", "key-v1", null, flags)));
++        using var caller = new CancellationTokenSource(); var pending = f.Gate.EvaluateAsync(caller.Token);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        try
++        {
++            if (cancelCaller) { caller.Cancel(); (await Should.ThrowAsync<OperationCanceledException>(() => pending.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken))).CancellationToken.ShouldBe(caller.Token); }
++            else { ticks = TimeSpan.FromSeconds(30).Ticks; foreach (var callback in callbacks.ToArray()) { callback(); } (await pending.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken)).ShouldBeFalse(); }
++            returned.All(value => value == 0).ShouldBeTrue();
++        }
++        finally { release.Set(); }
++        await completed.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        await f.Authority.DidNotReceiveWithAnyArgs().VerifyCarrierAsync(default!, default!, default!, default!, default!, TestContext.Current.CancellationToken);
++        await f.Engine.DidNotReceiveWithAnyArgs().UnsealAsync(default!, TestContext.Current.CancellationToken);
++    }
++
++    private static (Fr34ProtectionGate Gate, IFr34ProtectionCanaryEngine Engine, IFr34CanaryAuthority Authority, IFr34PersistedCanaryReader Storage, Func<byte[]?> ReturnedBytes, Func<IReadOnlyList<byte[]>> ReturnedOwnedBuffers) Arrange(string vector, TimeProvider? clockOverride = null)
+     {
+         var clock = new CustodyFixtureClock(); var target = new Fr34ProtectionTarget("engine", "immutable-v1", "custody-a", "canary-tenant");
++        TimeProvider operationClock = clockOverride ?? clock;
+         var engine = Substitute.For<IFr34ProtectionCanaryEngine>(); var storage = Substitute.For<IFr34PersistedCanaryReader>();
+         var authority = Substitute.For<IFr34CanaryAuthority>();
+-        var authorization = new Fr34CanaryAuthorization(target, "current-authority", clock.Now, clock.Now.AddMinutes(1));
++        var authorization = new Fr34CanaryAuthorization(target, "current-authority", operationClock.GetUtcNow(), operationClock.GetUtcNow().AddMinutes(1));
+         int observations = 0;
+         authority.ObserveAsync(target, Arg.Any<CancellationToken>()).Returns(_ =>
+             vector == "authority-change" && ++observations > 1 ? authorization with { AuthorityRevision = "changed-authority" } : authorization);
+-        byte[]? plaintext = null; byte[]? sealedBytes = null; byte[]? returnedBytes = null; var returnedOwnedBuffers = new List<byte[]>();
++        byte[]? plaintext = null; byte[]? verificationKey = null; string? originalCanary = null; byte[]? sealedBytes = null; byte[]? returnedBytes = null; var returnedOwnedBuffers = new List<byte[]>();
+         engine.SealAndPersistAsync(target, Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<CancellationToken>()).Returns(call =>
+         {
+-            plaintext = call.ArgAt<byte[]>(2).ToArray();
++            plaintext = call.ArgAt<byte[]>(2).ToArray(); originalCanary = call.ArgAt<string>(1);
+             byte[] key = RandomNumberGenerator.GetBytes(32), nonce = RandomNumberGenerator.GetBytes(12), tag = new byte[16], cipher = new byte[plaintext.Length];
+             using var aes = new AesGcm(key, 16); aes.Encrypt(nonce, plaintext, cipher, tag);
+-            sealedBytes = vector == "no-op" ? plaintext.ToArray() : nonce.Concat(cipher).Concat(tag).ToArray();
++            if (verificationKey is not null) { CryptographicOperations.ZeroMemory(verificationKey); }
++            verificationKey = key.ToArray();
++            sealedBytes = vector == "no-op" ? plaintext.ToArray() : vector == "base64-wrapper" ? System.Text.Encoding.UTF8.GetBytes(Convert.ToBase64String(plaintext)) : nonce.Concat(cipher).Concat(tag).ToArray();
++            if (vector == "tampered-carrier") { sealedBytes[^1] ^= 1; }
+             CryptographicOperations.ZeroMemory(key);
+             return new Fr34CanaryReference(vector == "wrong-target" ? target with { EngineVersion = "uncommitted-version" } : target,
+                 vector == "foreign-canary" ? "foreign-canary" : call.ArgAt<string>(1), "persisted-canary-" + call.ArgAt<string>(1), vector == "foreign-key" ? "foreign-key" : "dedicated-canary-dek");
+         });
+         storage.ReadAsync(Arg.Any<Fr34CanaryReference>(), Arg.Any<CancellationToken>()).Returns(call =>
+             new Fr34PersistedCanary(call.Arg<Fr34CanaryReference>(), returnedBytes = sealedBytes!.ToArray(), new(PayloadProtectionState.Protected, 1,
+-                vector == "malformed-metadata" ? "malformed\ncarrier" : "actual-fixture", "key-v1", null, null)));
++                vector == "malformed-metadata" ? "malformed\ncarrier" : vector == "rejected-format" ? "foreign-format" : "actual-fixture", vector == "rejected-carrier-key" ? "foreign-key-alias" : "key-v1", null, null)));
+         engine.UnsealAsync(Arg.Any<Fr34CanaryReference>(), Arg.Any<CancellationToken>()).Returns(_ =>
+         { var opened = vector == "wrong-unseal" ? new byte[plaintext!.Length] : plaintext!.ToArray(); returnedOwnedBuffers.Add(opened); return opened; });
+         engine.DestroyAsync(Arg.Any<Fr34CanaryReference>(), Arg.Any<CancellationToken>()).Returns(true);
+         authority.VerifyOwnershipAsync(target, Arg.Any<string>(), Arg.Any<Fr34CanaryReference>(), Arg.Any<Fr34CanaryAuthorization>(), Arg.Any<CancellationToken>()).Returns(call =>
+             call.Arg<Fr34CanaryReference>() is { } value && value.Target == target && value.CanaryId == call.Arg<string>()
+             && value.RecordId == "persisted-canary-" + value.CanaryId && value.KeyReference == "dedicated-canary-dek");
++        authority.VerifyCarrierAsync(target, Arg.Any<string>(), Arg.Any<Fr34CanaryReference>(), Arg.Any<Fr34PersistedCanary>(), Arg.Any<Fr34CanaryAuthorization>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            var reference = call.Arg<Fr34CanaryReference>(); var observed = call.Arg<Fr34PersistedCanary>(); var admitted = call.Arg<Fr34CanaryAuthorization>();
++            if (admitted != authorization || admitted.ValidUntil <= operationClock.GetUtcNow() || reference.Target != target || reference.CanaryId != originalCanary
++                || originalCanary != call.Arg<string>() || reference.KeyReference != "dedicated-canary-dek" || observed.Reference != reference
++                || observed.Metadata.Scheme != "actual-fixture" || observed.Metadata.KeyAlias != "key-v1" || observed.Bytes.Length < 28) { return false; }
++            var independentlyOpened = new byte[observed.Bytes.Length - 28];
++            try
++            {
++                using var enrolledAes = new AesGcm(verificationKey!, 16);
++                enrolledAes.Decrypt(observed.Bytes.AsSpan(0, 12), observed.Bytes.AsSpan(12, independentlyOpened.Length), observed.Bytes.AsSpan(observed.Bytes.Length - 16), independentlyOpened);
++                return CryptographicOperations.FixedTimeEquals(independentlyOpened, plaintext!);
++            }
++            catch (CryptographicException) { return false; }
++            finally { CryptographicOperations.ZeroMemory(independentlyOpened); }
++        });
+         authority.ConfirmDestroyedAsync(Arg.Any<Fr34CanaryReference>(), Arg.Any<CancellationToken>()).Returns(vector != "missing-destruction");
+         engine.ReplayAsync(Arg.Any<Fr34CanaryReference>(), Arg.Any<CancellationToken>()).Returns(_ =>
+         {
+@@ -198,6 +273,6 @@
+             { var bytes = plaintext!.ToArray(); returnedOwnedBuffers.Add(bytes); return PayloadUnprotectionOutcome.Readable(bytes, "json", EventStorePayloadProtectionMetadata.Unprotected()); }
+             return PayloadUnprotectionOutcome.Unreadable(vector == "wrong-erasure-kind" ? UnreadableProtectedDataReason.MissingKey : UnreadableProtectedDataReason.KeyInvalidatedOrDeleted);
+         });
+-        return (new(target, engine, storage, authority, clock), engine, authority, storage, () => returnedBytes, () => returnedOwnedBuffers);
++        return (new(target, engine, storage, authority, operationClock), engine, authority, storage, () => returnedBytes, () => returnedOwnedBuffers);
+     }
+ }
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs
+@@ -196,4 +196,89 @@
+         visited.ShouldBe(["a-unknown", "b-recorded", "a-unknown"]);
+         (await restarted.IsReadyAsync(TestContext.Current.CancellationToken)).ShouldBeFalse();
+     }
++
++    /// <summary>Automatic H remains fixed while separate exact-original recovery records an aged authoritative absence after restart/lost response, preserving original routing/day/first-seen/sequence.</summary>
++    [Theory]
++    [InlineData(false)][InlineData(true)]
++    public async Task AgedOriginalUsesOnlySeparateCurrentRecoveryAfterRestart(bool loseResponse)
++    {
++        var f = new SecuritySpoolFixture(); var intent = SecuritySpoolFixture.Intent(); var original = await f.Spool.ObserveAsync(intent, TestContext.Current.CancellationToken);
++        original.ShouldNotBeNull(); f.Clock.Now += PlatformAcceptedEnvelopeTiming.RecoveryHorizon;
++        (await f.Spool.DrainAsync(1, TestContext.Current.CancellationToken)).ShouldBe(0); f.PhysicalAppends.ShouldBe(0);
++        (await f.Spool.IsReadyAsync(TestContext.Current.CancellationToken)).ShouldBeFalse();
++        var restarted = new ReplicatedSecurityObservationSpool(f.Client, f.Clock, f.Authority, f.Recorder);
++        (await restarted.RecoverOriginalAsync(intent, TestContext.Current.CancellationToken)).ShouldBeNull(); f.RecoveryRequests.ShouldBe(0);
++        f.RecoveryPermission = true; f.LoseAppendAcknowledgement = loseResponse;
++        var recovered = await restarted.RecoverOriginalAsync(intent, TestContext.Current.CancellationToken);
++        recovered.ShouldNotBeNull(); (recovered with { Receipt = null }).ShouldBe(original); recovered.Receipt.ShouldBe(SecuritySpoolFixture.Receipt(original));
++        f.PhysicalAppends.ShouldBe(1); f.RecoveryRequests.ShouldBe(1);
++        await f.Recorder.DidNotReceive().AppendAsync(Arg.Any<SecurityObservationRecord>(), Arg.Any<CancellationToken>());
++        var saved = f.Read()!.Records.Single(); saved.ShouldBe(recovered); saved.ObservedAt.ShouldBe(original.ObservedAt); saved.UtcDay.ShouldBe(original.UtcDay); saved.Sequence.ShouldBe(original.Sequence);
++        (await restarted.IsReadyAsync(TestContext.Current.CancellationToken)).ShouldBeTrue();
++        (await new ReplicatedSecurityObservationSpool(f.Client, f.Clock, f.Authority, f.Recorder).RecoverOriginalAsync(intent, TestContext.Current.CancellationToken)).ShouldBe(recovered);
++        f.PhysicalAppends.ShouldBe(1); f.RecoveryRequests.ShouldBe(1);
++    }
++
++    /// <summary>Foreign/stale/malformed recovery carriers and unknown/changed source proof retain the exact aged original and cannot borrow automatic append authority.</summary>
++    [Theory]
++    [InlineData("missing")][InlineData("intent")][InlineData("routing")][InlineData("first-seen")][InlineData("day")][InlineData("sequence")]
++    [InlineData("installation")][InlineData("authority")][InlineData("expired")][InlineData("future")][InlineData("unknown")][InlineData("proof")]
++    public async Task AgedRecoveryRequiresExactIndependentOriginalAndFreshGrant(string vector)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var f = new SecuritySpoolFixture(); var intent = SecuritySpoolFixture.Intent(); var original = await f.Spool.ObserveAsync(intent, TestContext.Current.CancellationToken);
++        original.ShouldNotBeNull(); f.Clock.Now += PlatformAcceptedEnvelopeTiming.RecoveryHorizon; f.RecoveryPermission = vector != "missing";
++        f.AlterRecoveryGrant = grant => vector switch
++        {
++            "intent" => grant with { Original = grant.Original with { Intent = grant.Original.Intent with { ObservationId = "foreign" } } },
++            "routing" => grant with { Original = grant.Original with { Intent = grant.Original.Intent with { RoutingTenantId = "foreign" } } },
++            "first-seen" => grant with { Original = grant.Original with { ObservedAt = f.Clock.Now } },
++            "day" => grant with { Original = grant.Original with { UtcDay = "2026-10-07" } },
++            "sequence" => grant with { Original = grant.Original with { Sequence = 2 } },
++            "installation" => grant with { Target = grant.Target with { InstallationEpoch = "foreign" } },
++            "authority" => grant with { RecoveryAuthorityRevision = "foreign" },
++            "expired" => grant with { ValidUntil = f.Clock.Now },
++            "future" => grant with { ObservedAt = f.Clock.Now.AddMinutes(1) },
++            "proof" => grant with { OriginalProof = new(SecurityEventRecorderLookupState.Recorded, SecuritySpoolFixture.Receipt(original)) },
++            _ => grant,
++        };
++        if (vector == "unknown") { f.Recorder.LookupAsync(Arg.Any<SecurityObservationRecord>(), Arg.Any<CancellationToken>()).Returns(new SecurityEventRecorderLookup(SecurityEventRecorderLookupState.Unknown)); }
++        string before = System.Text.Json.JsonSerializer.Serialize(f.Read());
++        (await f.Spool.RecoverOriginalAsync(intent, TestContext.Current.CancellationToken)).ShouldBeNull();
++        f.PhysicalAppends.ShouldBe(0); f.RecoveryRequests.ShouldBe(0); System.Text.Json.JsonSerializer.Serialize(f.Read()).ShouldBe(before);
++        (await f.Spool.IsReadyAsync(TestContext.Current.CancellationToken)).ShouldBeFalse();
++    }
++
++    /// <summary>Fresh permission withdrawal during an actual source lookup denies a new effect; uncertain recovery acknowledgement retains pending and later exact Recorded proof reconciles without another append.</summary>
++    [Theory]
++    [InlineData("withdraw")][InlineData("unknown-after-recovery")][InlineData("lost-spool-save")]
++    public async Task AgedRecoveryWithdrawalOrUnknownOutcomePreservesOriginal(string vector)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var f = new SecuritySpoolFixture(); var intent = SecuritySpoolFixture.Intent(); var original = await f.Spool.ObserveAsync(intent, TestContext.Current.CancellationToken);
++        original.ShouldNotBeNull(); f.Clock.Now += PlatformAcceptedEnvelopeTiming.RecoveryHorizon; f.RecoveryPermission = true;
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously); var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        int lookups = 0;
++        if (vector == "withdraw")
++        {
++            f.Recorder.LookupAsync(Arg.Any<SecurityObservationRecord>(), Arg.Any<CancellationToken>()).Returns(async _ =>
++            { if (++lookups == 2) { entered.TrySetResult(); await release.Task; } return new SecurityEventRecorderLookup(SecurityEventRecorderLookupState.NotRecorded); });
++        }
++        if (vector == "unknown-after-recovery")
++        {
++            f.Recorder.LookupAsync(Arg.Any<SecurityObservationRecord>(), Arg.Any<CancellationToken>()).Returns(_ =>
++                ++lookups > 2 ? new SecurityEventRecorderLookup(SecurityEventRecorderLookupState.Unknown) : new(SecurityEventRecorderLookupState.NotRecorded));
++        }
++        if (vector == "lost-spool-save") { f.FailSave = true; f.FailSaveStage = 2; f.CommitBeforeSaveFault = true; }
++        var pending = f.Spool.RecoverOriginalAsync(intent, TestContext.Current.CancellationToken);
++        if (vector == "withdraw") { await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); f.RecoveryPermission = false; release.TrySetResult(); }
++        (await pending.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken)).ShouldBeNull();
++        if (vector == "withdraw") { f.PhysicalAppends.ShouldBe(0); f.RecoveryRequests.ShouldBe(0); f.Read()!.Records.Single().ShouldBe(original); return; }
++        f.PhysicalAppends.ShouldBe(1); f.RecoveryRequests.ShouldBe(1); f.FailSave = false;
++        if (vector == "unknown-after-recovery") { (await f.Spool.IsReadyAsync(TestContext.Current.CancellationToken)).ShouldBeFalse(); }
++        f.Recorder.LookupAsync(Arg.Any<SecurityObservationRecord>(), Arg.Any<CancellationToken>()).Returns(call => new SecurityEventRecorderLookup(SecurityEventRecorderLookupState.Recorded, f.Recorded[call.Arg<SecurityObservationRecord>().Intent.ObservationId]));
++        var recovered = await new ReplicatedSecurityObservationSpool(f.Client, f.Clock, f.Authority, f.Recorder).RecoverOriginalAsync(intent, TestContext.Current.CancellationToken);
++        recovered.ShouldNotBeNull(); (recovered with { Receipt = null }).ShouldBe(original); recovered.Receipt.ShouldBe(SecuritySpoolFixture.Receipt(original));
++        f.PhysicalAppends.ShouldBe(1); f.RecoveryRequests.ShouldBe(1); (await f.Spool.IsReadyAsync(TestContext.Current.CancellationToken)).ShouldBeTrue();
++    }
+ }
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs
+@@ -28,6 +28,9 @@
+     internal bool FailSave { get; set; }
+     internal bool LoseAppendAcknowledgement { get; set; }
+     internal bool AcceptWithoutPersistence { get; set; }
++    internal bool RecoveryPermission { get; set; }
++    internal Func<SecurityObservationRecoveryGrant, SecurityObservationRecoveryGrant>? AlterRecoveryGrant { get; set; }
++    internal int RecoveryRequests { get; private set; }
+     internal Dictionary<string, byte[]> Journal { get; } = [];
+     internal Dictionary<string, SecurityEventRecordReceipt> Recorded { get; } = [];
+     internal SecuritySpoolFixture()
+@@ -69,6 +72,33 @@
+             if (!AcceptWithoutPersistence) { Recorded[record.Intent.ObservationId] = Receipt(record); }
+             return LoseAppendAcknowledgement ? Task.FromException(new HttpRequestException("Controlled recorder response loss.")) : Task.CompletedTask;
+         });
++        var recoveryGrants = new HashSet<string>(StringComparer.Ordinal);
++        Authority.AuthorizeAgedOriginalRecoveryAsync(Target, Arg.Any<SecurityObservationRecord>(), Arg.Any<SecurityEventRecorderLookup>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            var original = call.Arg<SecurityObservationRecord>(); var proof = call.Arg<SecurityEventRecorderLookup>();
++            if (!RecoveryPermission || Read()?.Records.SingleOrDefault(record => record.Sequence == original.Sequence) is not { } retained
++                || retained with { Receipt = null } != original || !AuthenticProof(original, proof)) { return (SecurityObservationRecoveryGrant?)null; }
++            var grant = new SecurityObservationRecoveryGrant(Target, original, proof, "separately-installed-original-recovery", Clock.Now, Clock.Now.AddMinutes(5));
++            recoveryGrants.Add(JsonSerializer.Serialize(grant)); return AlterRecoveryGrant is null ? grant : AlterRecoveryGrant(grant);
++        });
++        Authority.VerifyAgedOriginalRecoveryAsync(Arg.Any<SecurityObservationRecoveryGrant>(), Arg.Any<SecurityEventRecorderLookup>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            var grant = call.Arg<SecurityObservationRecoveryGrant>();
++            return RecoveryPermission && grant.Target == Target && grant.ValidUntil > Clock.Now && recoveryGrants.Contains(JsonSerializer.Serialize(grant))
++                && AuthenticProof(grant.Original, call.Arg<SecurityEventRecorderLookup>());
++        });
++        Recorder.RecoverOriginalAsync(Arg.Any<SecurityObservationRecord>(), Arg.Any<SecurityObservationRecoveryGrant>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            RecoveryRequests++; var original = call.Arg<SecurityObservationRecord>(); var grant = call.Arg<SecurityObservationRecoveryGrant>();
++            if (!RecoveryPermission || grant.Original != original || !recoveryGrants.Contains(JsonSerializer.Serialize(grant)) || grant.ValidUntil <= Clock.Now)
++            { return Task.FromException(new InvalidOperationException("Independent original recovery denied.")); }
++            if (!Recorded.ContainsKey(original.Intent.ObservationId))
++            { PhysicalAppends++; if (!AcceptWithoutPersistence) { Recorded[original.Intent.ObservationId] = Receipt(original); } }
++            return LoseAppendAcknowledgement ? Task.FromException(new HttpRequestException("Controlled original recovery response loss.")) : Task.CompletedTask;
++        });
++        bool AuthenticProof(SecurityObservationRecord original, SecurityEventRecorderLookup proof) => proof.State == SecurityEventRecorderLookupState.NotRecorded
++            ? proof.Receipt is null && !Recorded.ContainsKey(original.Intent.ObservationId)
++            : proof.State == SecurityEventRecorderLookupState.Recorded && Recorded.TryGetValue(original.Intent.ObservationId, out var exact) && proof.Receipt == exact && exact == Receipt(original);
+         Spool = new(Client, Clock, Authority, Recorder);
+     }
+     internal void InstallJournal() => AnchoredFixtureJournal.Attach(Authority, Target.ComponentName + "|system/security-observations/" + Target.InstallationEpoch,

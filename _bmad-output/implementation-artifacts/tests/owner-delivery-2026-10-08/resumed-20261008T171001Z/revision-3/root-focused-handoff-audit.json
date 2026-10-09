@@ -1,0 +1,119 @@
+{
+  "auditedUtc": "2026-10-09T00:31:04.816140+00:00",
+  "sourceTestPacketHashesVerified": 37,
+  "orderedCapturesVerified": 97,
+  "exactRevision2Prefix": 84,
+  "freshBeforeCopiesVerified": 35,
+  "engineerArtifactHashesVerified": 115,
+  "commandsVerified": 39,
+  "historicalNonPassingCommandsRetained": 12,
+  "distinctPassingCurrentFocusedCases": 484,
+  "lanes": [
+    {
+      "lane": "reader",
+      "passed": 48,
+      "combinedXmlTotal": 48,
+      "classes": [
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests"
+      ],
+      "buildTimestamp": "2026-10-08T23:46:19.544Z",
+      "testTimestamp": "2026-10-08T23:46:41.036Z"
+    },
+    {
+      "lane": "registration",
+      "passed": 7,
+      "combinedXmlTotal": 7,
+      "classes": [
+        "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests"
+      ],
+      "buildTimestamp": "2026-10-08T23:48:36.271Z",
+      "testTimestamp": "2026-10-08T23:49:51.928Z"
+    },
+    {
+      "lane": "reconciliation",
+      "passed": 87,
+      "combinedXmlTotal": 87,
+      "classes": [
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests"
+      ],
+      "buildTimestamp": "2026-10-08T23:57:45.267Z",
+      "testTimestamp": "2026-10-08T23:58:01.418Z"
+    },
+    {
+      "lane": "physical",
+      "passed": 45,
+      "combinedXmlTotal": 45,
+      "classes": [
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests"
+      ],
+      "buildTimestamp": "2026-10-08T23:59:50.823Z",
+      "testTimestamp": "2026-10-09T00:00:25.188Z"
+    },
+    {
+      "lane": "canary",
+      "passed": 33,
+      "combinedXmlTotal": 33,
+      "classes": [
+        "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests"
+      ],
+      "buildTimestamp": "2026-10-09T00:09:06.803Z",
+      "testTimestamp": "2026-10-09T00:10:19.822Z"
+    },
+    {
+      "lane": "spool",
+      "passed": 38,
+      "combinedXmlTotal": 38,
+      "classes": [
+        "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests"
+      ],
+      "buildTimestamp": "2026-10-09T00:07:30.064Z",
+      "testTimestamp": "2026-10-09T00:08:00.018Z"
+    },
+    {
+      "lane": "actual-coordinator",
+      "passed": 21,
+      "combinedXmlTotal": 50,
+      "classes": [
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests"
+      ],
+      "buildTimestamp": "2026-10-09T00:03:16.742Z",
+      "testTimestamp": "2026-10-09T00:04:27.815Z"
+    },
+    {
+      "lane": "conversation",
+      "passed": 34,
+      "combinedXmlTotal": 34,
+      "classes": [
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests",
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests"
+      ],
+      "buildTimestamp": "2026-10-09T00:04:47.694Z",
+      "testTimestamp": "2026-10-09T00:05:58.829Z"
+    },
+    {
+      "lane": "parties",
+      "passed": 171,
+      "combinedXmlTotal": 171,
+      "classes": [
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests"
+      ],
+      "buildTimestamp": "2026-10-09T00:11:31.859Z",
+      "testTimestamp": "2026-10-09T00:14:21.983Z"
+    }
+  ],
+  "outsideFreshOwnershipSourceDrift": [],
+  "rootReadmeDeltaPreserved": [
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/README.md",
+      "reviewedSha256": "1c728ff0734425b4761fc0bdf9f128fa7f87e6fff0d1e40b6cc5c104ec19d71c",
+      "currentSha256": "fe9c79927304469a1602911a62a2377b6c1524a39c024ad2343f2e49f03ee4e3",
+      "withinRevision3CapturedPath": false
+    }
+  ],
+  "rootFullLocalVerification": "pending",
+  "independentReview": "pending",
+  "runtimeQualification": "unestablished"
+}

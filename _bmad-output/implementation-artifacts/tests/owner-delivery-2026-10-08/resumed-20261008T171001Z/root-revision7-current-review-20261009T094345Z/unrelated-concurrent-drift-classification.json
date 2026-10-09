@@ -1,0 +1,80 @@
+{
+  "capturedUtc": "2026-10-09T09:56:50.916694+00:00",
+  "historicalStrictAudit": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/root-full-matrix-shape-and-drift-audit.json",
+  "strictAuditFailureRetained": true,
+  "unrelatedConcurrentTestOnlyChanges": [
+    {
+      "path": "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/test/Hexalith.Builds.Module.Tests/CompositionPrerequisiteProbeTests.cs",
+      "before": "29f968b704db821a7704b6761464eb27694ac874fa81bb12e1dd1bc0aebb6bcb",
+      "after": "c531a7a73e7b8ca18c1e9557cb58b58b2a5e1ad362f1d11f0a9123134b95f6f7",
+      "owningProject": "Hexalith.Builds.Module.Tests",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/unrelated-concurrent-drift/platform/references/Hexalith.Builds/test/Hexalith.Builds.Module.Tests/CompositionPrerequisiteProbeTests.cs",
+      "consumedByOwnerMatrix": false,
+      "basis": "Separate test-only project; no corresponding project in any executed command/build log/XML, no references to its test project or these source files from selected owner source/tests/verification runners. The only workspace search hit for Tenants.UI.Tests is an XML comment in unexecuted EventStore.Admin.UI.Tests. Actual containing test csproj files read; default test source files stay in their own projects."
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/references/Hexalith.Builds/test/Hexalith.Builds.Tooling.IntegrationTests/Live/LiveGate.cs",
+      "before": "831f45635a9f85041f286854d193535f8874e7286af53d93dc958cb04cf62c89",
+      "after": "f052a7d6a625774f2246008911a858f068ab391d994f78a12c1276e3140c0df8",
+      "owningProject": "Hexalith.Builds.Tooling.IntegrationTests",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/unrelated-concurrent-drift/platform/references/Hexalith.Builds/test/Hexalith.Builds.Tooling.IntegrationTests/Live/LiveGate.cs",
+      "consumedByOwnerMatrix": false,
+      "basis": "Separate test-only project; no corresponding project in any executed command/build log/XML, no references to its test project or these source files from selected owner source/tests/verification runners. The only workspace search hit for Tenants.UI.Tests is an XML comment in unexecuted EventStore.Admin.UI.Tests. Actual containing test csproj files read; default test source files stay in their own projects."
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/tenants/tests/Hexalith.Tenants.UI.Tests/Components/TenantAuditPageTests.cs",
+      "before": "60ead2bcce5b1067632cb23c49e2be208a750de0dcf6f09b6a86d15f8195c6ca",
+      "after": "0ef7a739b725871de97e53ac610bc4f096da387c4cad80d2a7fe59ab25643557",
+      "owningProject": "Hexalith.Tenants.UI.Tests",
+      "currentCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/unrelated-concurrent-drift/tenants/tests/Hexalith.Tenants.UI.Tests/Components/TenantAuditPageTests.cs",
+      "consumedByOwnerMatrix": false,
+      "basis": "Separate test-only project; no corresponding project in any executed command/build log/XML, no references to its test project or these source files from selected owner source/tests/verification runners. The only workspace search hit for Tenants.UI.Tests is an XML comment in unexecuted EventStore.Admin.UI.Tests. Actual containing test csproj files read; default test source files stay in their own projects."
+    }
+  ],
+  "actualBuildAndInvocationLogsSearched": [
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/Hexalith.EventStore.Client.Tests/execution/root-invocation.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/Hexalith.EventStore.Client.Tests/root-invocation.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/Hexalith.EventStore.Contracts.Tests/execution/root-invocation.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/Hexalith.EventStore.Contracts.Tests/root-invocation.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/Hexalith.EventStore.PayloadProtection.Tests/execution/root-invocation.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/Hexalith.EventStore.PayloadProtection.Tests/root-invocation.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/Hexalith.EventStore.Server.Tests/execution/root-invocation.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/Hexalith.EventStore.Server.Tests/root-invocation.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/conversations/Hexalith.Conversations.Client.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/conversations/Hexalith.Conversations.Contracts.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/conversations/Hexalith.Conversations.Server.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/conversations/Hexalith.Conversations.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/conversations/root-invocation.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/custody/local-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/custody/root-invocation.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/eventstore-version.stdout.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/host-normal-diagnostics/root-invocation.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/host-scaffold/root-invocation.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/parties/Hexalith.EventStore.Client.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/parties/Hexalith.EventStore.Contracts.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/parties/Hexalith.EventStore.PayloadProtection.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/parties/Hexalith.EventStore.Server.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/parties/Hexalith.Parties.Client.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/parties/Hexalith.Parties.Contracts.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/parties/Hexalith.Parties.Security.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/parties/Hexalith.Parties.Server.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/parties/Hexalith.Parties.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/parties/Hexalith.Parties.UI.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/parties/Hexalith.Platform.Custody.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/parties/Hexalith.Platform.Identity.Tests-build.log",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision7-full-local-20261009t0948/parties/root-invocation.log"
+  ],
+  "projectMentions": {
+    "Hexalith.Builds.Module.Tests": [],
+    "Hexalith.Builds.Tooling.IntegrationTests": [],
+    "Hexalith.Tenants.UI.Tests": []
+  },
+  "refreshAffectedChecksRequired": false,
+  "allConsumedFrozenOwnerInputsStable": true,
+  "normalBuildLogs": 22,
+  "actualFullSuiteXmlFiles": 21,
+  "passingTestExecutions": 4907,
+  "requiredOwnedClassCount": 44,
+  "errors": [],
+  "limits": "Classifies exactly these three observed unowned files; no edited source attribution, rollback or acceptance of their unrelated tests. Global final stability remains checked separately."
+}

@@ -1,0 +1,14 @@
+{
+  "finding": "B10",
+  "status": "corrected",
+  "focusedClasses": [
+    "DaprSourcePublicationIndexStoreTests",
+    "SourcePublicationFeedTests",
+    "SourcePublicationDispatcherTests",
+    "SourcePublicationNamespaceTests"
+  ],
+  "passed": 87,
+  "failed": 0,
+  "historicalAttempts": "first run used last clean third-build DLL after failed fourth build; eight fixture/assertion failures, no current-source passing claim",
+  "fullRootVerification": "pending"
+}

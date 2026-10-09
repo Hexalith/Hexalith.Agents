@@ -1,0 +1,11 @@
+{
+  "auditedUtc": "2026-10-09T01:16:54.709646+00:00",
+  "xml": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/decision-owned-capture/revision4-decision-revocation-tests.xml",
+  "sha256": "b803c9138b0c117e6e9d475882e2be595ee3a6b16bd69c4340dbbdac0aff9174",
+  "actualPassedCases": 73,
+  "actualClasses": {
+    "Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests": 26,
+    "Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests": 47
+  },
+  "sourceClaims": "Current complete focused classes; production deadlines unchanged. Earlier 25/26 run is preserved separately; only the controlled test clock was corrected for that schedule. Final stable source/review/full Local audit remain pending."
+}

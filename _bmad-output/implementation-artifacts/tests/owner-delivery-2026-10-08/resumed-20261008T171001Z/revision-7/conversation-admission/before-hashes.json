@@ -1,0 +1,34 @@
+{
+  "capturedUtc": "2026-10-09T09:20:04.649370+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionWorker.cs",
+      "existed": true,
+      "sha256": "7a0d17cc90113b7d258e04096ca0a18446a8a4fe8475d99fe36a9c04f05b3d66",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/conversation-admission/before/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionWorker.cs"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs",
+      "existed": true,
+      "sha256": "bb274ec6798ab817aa1a30cb202a82c7bd0c7c20e44b53321a1c57444c2fd005",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/conversation-admission/before/conversations/src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs",
+      "existed": true,
+      "sha256": "6b87866a6b50f03c0a4919f3d7b960e8fa9f8e55b127a7c7c40e6a0e3aa0f744",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/conversation-admission/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs",
+      "existed": true,
+      "sha256": "a83fff83e51c5bb85ffed2cead0256e4fdf35875466ac15aa1199d3a89d8457c",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-7/conversation-admission/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs"
+    }
+  ]
+}

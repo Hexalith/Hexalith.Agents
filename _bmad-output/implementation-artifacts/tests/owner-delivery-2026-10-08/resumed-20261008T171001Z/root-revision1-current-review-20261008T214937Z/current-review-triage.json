@@ -1,0 +1,138 @@
+{
+  "capturedUtc": "2026-10-08T22:06:40.563014+00:00",
+  "allThreeFinalReportsReceivedBeforeTriage": true,
+  "reports": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision1-current-review-20261008T214937Z/blind-final.md",
+      "sha256": "561afeb9b01dcc32070790941049f8645f1b59710822ce7350ea5fd749ec485b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision1-current-review-20261008T214937Z/edge-final.json",
+      "sha256": "02f32eb9b8cf9dcd9ba316a536b9ca9000ec2f23f8f814d47b0a740177e3040f"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision1-current-review-20261008T214937Z/verification-final.md",
+      "sha256": "45ef24998657e896cea92cb540035d0e497cc7a98dc73631fbd1ae2d88328667"
+    }
+  ],
+  "findingCount": 16,
+  "floorArithmeticIsNotAFinding": true,
+  "priorCarry": "No same-location/same-claim unchanged prior row; revision-1 corrected the earlier claims, and these findings name distinct remaining outcomes.",
+  "findings": [
+    {
+      "id": "B1",
+      "verdict": "medium",
+      "route": "bad_spec",
+      "location": "eventstore/src/Hexalith.EventStore.Contracts/Security/RecoverableAnchoredState.cs:65",
+      "evidence": "A durable stage retained before failed independent journal recording remains unanchored; fresh reads return only the predecessor and every different CommitAsync conflicts. Exact original retries work, but restart/readiness cannot resolve the admitted staged original without resubmission; the recoverable owner needs independently authorized original-stage resolution, never blind read-side advancement."
+    },
+    {
+      "id": "B2",
+      "verdict": "high",
+      "route": "patch",
+      "location": "eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs:78",
+      "evidence": "RecordViolation accepts the caller Admission/Content string without checking the independently returned ViolationWriteFacts.Kind. The owner checks evidence scope/digests but performs no classification comparison; a supported admission fact can reach the Content containment branch. Reject either classification disagreement using the existing closed kind helpers."
+    },
+    {
+      "id": "B3",
+      "verdict": "high",
+      "route": "bad_spec",
+      "location": "eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs:81",
+      "evidence": "OriginalAcceptance is checked only for Accepted/ordinal/high-water/receipt presence, while a separately authenticated resource and matching-scope facts need no committed operation/resource/facts correlation with it. GovernanceProtocolReceipt currently supplies no complete committed acceptance correlation. Exact independently authenticated acceptance provenance must be retained and compared, without treating a genuine unrelated receipt as this resource proof."
+    },
+    {
+      "id": "B4",
+      "verdict": "high",
+      "route": "patch",
+      "location": "conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs:135",
+      "evidence": "StillAuthorizedAsync calls only worker.AuthorizeAsync for DeletionSource. AuthorizeDeliveryAsync is distinct and command admission may be withdrawn after the original attempt while read permission remains. The receiver SubmitAsync has no later command admission of its own; reconfirm exact current delivery authority at submission."
+    },
+    {
+      "id": "B5",
+      "verdict": "high",
+      "route": "bad_spec",
+      "location": "platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs:97",
+      "evidence": "Each DrainAsync selects the first pending maximumCount records and Unknown executes continue without scheduling progress. With bound one and tenant-A Unknown, every subsequent pass selects A and tenant-B never drains even with valid receiver evidence. Add bounded fair durable scheduling that retains Unknown and any required per-source order."
+    },
+    {
+      "id": "B6",
+      "verdict": "high",
+      "route": "bad_spec",
+      "location": "eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationDispatcher.cs:17",
+      "evidence": "Every pass re-verifies all earlier acknowledgements and invokes full feed reconciliation for each page under one fixed budget. A finite permitted acknowledged prefix can consume that budget repeatedly before later Pending originals, so retries/restart do not progress even though individual providers complete within their bounds. Add authenticated resumable verification rather than a process-only unchecked offset."
+    },
+    {
+      "id": "B7",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs:147",
+      "evidence": "A repeated read with an unchanged cut/vector/projected entries/poison always constructs revision+1 and calls TryWriteAsync. Ordinary polling creates avoidable journal transitions and CAS contention with discovery. A freshly independently reconfirmed identical logical index can be returned without another write, retaining final cut/current-state checks."
+    },
+    {
+      "id": "B8",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs:17",
+      "evidence": "After pending completes, failing Check invokes abandoned(result) inside the inner catch and the outer catch then schedules another successful-task cleanup. The same FR34 destructive cleanup therefore runs twice. Make abandonment callback single-use while preserving off-continuation cleanup and caller precedence."
+    },
+    {
+      "id": "B9",
+      "verdict": "high",
+      "route": "bad_spec",
+      "location": "platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs:80",
+      "evidence": "OwnedReference proves only engine-echoed target/canary and nonempty opaque references. A wrong key reference with the exact expected canary passes and normal finally or late cleanup invokes DestroyAsync before independent ownership proof; ConfirmDestroyedAsync is only after destruction. Add a default-unavailable independently authenticated original canary ownership proof before every destruction path."
+    },
+    {
+      "id": "B10",
+      "verdict": "low",
+      "route": "patch",
+      "location": "platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs:31",
+      "evidence": "Every ordinary evaluation creates an untracked seal input copy; accepted or invalid storage reads also leave returned Bytes uncleared while only a second clone is wiped. These are fresh random canary buffers, not user content, so harm is low; a direct ownership/cleanup correction is justified on this routine path. Preserve safe lifetime of outstanding provider input and clear owned buffers when their operation completes, including abandonment."
+    },
+    {
+      "id": "B11",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs:248",
+      "evidence": "RecoverAsync directly awaits physical Consume/Lookup after durably reserving the batch; outer adapter/coordinator deadlines do not release a non-reentrant actor turn. A noncompleting provider retains all same-tenant operations including later revocation. Bound provider invocation/await with an existing deadline helper and retain the already persisted ConsumptionReserved/unknown original for exact later lookup; no background state-manager writes."
+    },
+    {
+      "id": "B12",
+      "verdict": "false",
+      "route": "reject",
+      "location": "eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs:48",
+      "evidence": "The digest deliberately includes ContentIntentHmac. DirectoryAtomicAppendRequest declares that tenant-keyed HMAC covers the original exact command intent including bytes; IDirectoryAtomicAppendAuthority independently authenticates the original command/target and exact writer attribution at admission, outcome verification and final admission. Changing behavior/attribution metadata while keeping the original HMAC cannot pass that qualified contract. Only fixtures that always approve inconsistent intent demonstrate the proposed outcome; hashing raw arbitrary Extensions would also violate the safe keyed-content boundary."
+    },
+    {
+      "id": "E1",
+      "verdict": "high",
+      "route": "patch",
+      "location": "eventstore/src/Hexalith.EventStore.Server/Security/DaprInteractionOccurrenceRegistry.cs:36",
+      "evidence": "The proxy uses raw tenant ActorId, whereas InteractionOccurrenceRegistryActor.Check requires its canonical AggregateIdentity actor ID. No upstream wrapper corrects the ID. Use GetActorId and exercise an actor-ID-sensitive hosted-actor transport with persisted original outcomes."
+    },
+    {
+      "id": "E2",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs:98",
+      "evidence": "projector.Project runs synchronously on the feed continuation outside AuthoritativeStreamReadDeadline.ReadAsync; neither deadline expiry nor caller cancellation can complete until it returns. Route the existing closed projector through the helper that already bounds synchronous invocation, retaining captured-prefix and final checks. Test actually suspended projection and no late evidence release; execution reclamation remains unqualified."
+    },
+    {
+      "id": "V1",
+      "verdict": "medium",
+      "route": "patch",
+      "location": "eventstore/src/Hexalith.EventStore.Server/Security/DaprDeletionProtectionOwner.cs:36",
+      "evidence": "Preverified gap: current actual-owner fixture returns ProtectionActor for any proxy address, so replacing the canonical ID with raw tenant leaves tests green while actual actor Check refuses. Require ID-sensitive routing and executed register/consume/lookup persisted outcomes; keep independent backend/authority qualification distinction."
+    },
+    {
+      "id": "V2",
+      "verdict": "high",
+      "route": "patch",
+      "location": "conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs:74",
+      "evidence": "Other finding independently traced: StillAuthorizedAsync runs before the final CurrentTargetAsync await and SubmitAsync follows it without another check. Withdrawal during that suspended await still submits; only later acknowledgement denies. Recheck exact current worker/source and delivery authority after the final target lookup and before submission, with a controlled zero-submission assertion."
+    }
+  ],
+  "grouping": "Each survivor retained separately: shared locations or corrections do not establish a shared root cause. B4 wrong operation and V2 post-await timing are independently retained.",
+  "cascade": "B1/B3/B5/B6/B9 require non-frozen engineering revision 2. Remaining direct corrections and routing verification are mandatory in that revision; no patch/defer is processed before re-derivation. B12 rejected with contract refutation.",
+  "preservation": "In-place narrow re-derivation per explicit user preservation; no repository resets or blanket rollback."
+}

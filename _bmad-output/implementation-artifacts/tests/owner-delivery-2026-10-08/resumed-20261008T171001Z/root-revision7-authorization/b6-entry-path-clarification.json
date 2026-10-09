@@ -1,0 +1,22 @@
+{
+  "capturedUtc": "2026-10-09T09:04:47.363501+00:00",
+  "finding": "R6 B6: same direct absent-authority cancellation correction",
+  "sourceEvidence": [
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "method": "ReadNoIssueAsync",
+      "guard": "if (authority is null || payload is null ...) { return null; }",
+      "firstBudgetCheck": "only inside later deadline.ReadAsync",
+      "sourceBeforeSha256": "4003edce371090f2284663ff47af49366a10d0107353ffc49696d587e196f7e1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "method": "ReadGuardAsync",
+      "guard": "if (authority is null || !Text(tenantId)) { return null; }",
+      "firstBudgetCheck": "only inside later deadline.ReadAsync",
+      "sourceBeforeSha256": "c445b5653b6a2ad1363135ed39a2cc9b570bd61248f6eb133b157dcd59874319"
+    }
+  ],
+  "rootExecutionClaim": false,
+  "scope": "source-traced entry clarification within approved B6 correction, no new cycle"
+}

@@ -1,0 +1,937 @@
+{
+  "capturedUtc": "2026-10-08T23:26:32.270687+00:00",
+  "orderedCaptures": 84,
+  "preservedPrefix": 72,
+  "exactPrefixPassed": true,
+  "allSuppliedBeforeCopiesPassed": true,
+  "freshRevisionUnitsHaveEveryRequiredBeforeCopy": true,
+  "checkedBeforeCopies": 370,
+  "historicalHashOnlyRows": [
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/trust-before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "expectedSha256": "ebda946f634df34507f88561076a1bff9f40efc40fbce84ee474eaa80e6b21cc",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/trust-before-hashes.json",
+      "source": "platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "expectedSha256": "4f98f412cd2252b85e74eaa4e0923bedb6043da52d5cf15dad4061f5667117ce",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/paused-20261008T163407Z/supplemental-baseline-captures.json",
+      "source": "platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningOutcome.cs",
+      "expectedSha256": "d6314f8e5a1d05bc285f2a583d176e47f785f6e2bb6dbf26c32f70224c7d5e2a",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/paused-20261008T163407Z/supplemental-baseline-captures.json",
+      "source": "platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningActor.cs",
+      "expectedSha256": "c35d0ba97f8e691d5c9f498024b276cad440794cb648a9932a8f735dd262d1fb",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/paused-20261008T163407Z/supplemental-baseline-captures.json",
+      "source": "platform/src/Hexalith.Platform.Custody/DeletionBatchCapabilityCodec.cs",
+      "expectedSha256": "9b17d9489680c66e007fc67a54ffb398065f4ad6fd6a34563292e4c6661ff9b7",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/paused-20261008T163407Z/supplemental-baseline-captures.json",
+      "source": "platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "expectedSha256": "4f7414b90fa1b854ba5e27e6feba264fd4d35800e9c12e66fa062f8e4a35bf6d",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/paused-20261008T163407Z/supplemental-baseline-captures.json",
+      "source": "platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningAuthority.cs",
+      "expectedSha256": "d7ca5306b8ffddbfc46df98e0661127f9296ec5c70f641a7425d54a264394e48",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/paused-20261008T163407Z/supplemental-baseline-captures.json",
+      "source": "platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningProvider.cs",
+      "expectedSha256": "f060f93ede87af6c7cb185540286df6652763e95787d5fe760b99146886add2f",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/paused-20261008T163407Z/supplemental-baseline-captures.json",
+      "source": "platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "expectedSha256": "45c6ba5e9a4b3863a06e67e0830717330aeed7551bad4ab3d8cc58fb83f2448b",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/paused-20261008T163407Z/supplemental-baseline-captures.json",
+      "source": "platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchCapabilityCodecTests.cs",
+      "expectedSha256": "72d8160f73c01583fbeb8915fe30713669c3fa48129780719c727f8c82d43a00",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/guarded-transaction/guard-extension-before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitRequest.cs",
+      "expectedSha256": "4f1fed9d4eb3ad0ef9a60c0db9895e1a977aa00a44c1a94818f9c66b698e04b6",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/guarded-transaction/guard-extension-before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "expectedSha256": "1eef532ed2b513633185ded29ac399413e7aa9625eb97b6b14e5c1d67e3c7e16",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/guarded-transaction/guard-extension-before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Server/Security/IGuardedStateTransactionAuthority.cs",
+      "expectedSha256": "23c11d29e6568394bca59df82e610b00d1099de08595d9c2a5b1909d3cca2861",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/guarded-transaction/guard-extension-before-hashes.json",
+      "source": "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs",
+      "expectedSha256": "7b37e1b59b4b98a52c1ff3b1c638eb189e7126e1884d5bbf4b132708785cc397",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/guarded-transaction/guard-extension-before-hashes.json",
+      "source": "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedTransactionFixture.cs",
+      "expectedSha256": "f8637c0098ba1da6186d10ef3ffa5774e0b71c14fcb039546a1435d7e03380f8",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/capability-coordinator/before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceBatchCommand.cs",
+      "expectedSha256": "bdeeef7a26621046c5fa7eecdbebbda7e8b1a64c95c785c503881e33edf328f8",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/capability-coordinator/before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceBatchState.cs",
+      "expectedSha256": "05a8c9e965bb7b66e5578a06cf24033fa7a43f173c05f4398795b4cdc6a6b8dc",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/capability-coordinator/before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs",
+      "expectedSha256": "3daab2b9f27a4a7aa858e08694e25ffd2a19e610c6362bf0d04579ef61c6edb4",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/capability-coordinator/before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "expectedSha256": "4ef105522ce51cbb5d3ff853d2ac776f9b36deaea8c44a908d7446ebd7b3e362",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/capability-coordinator/before-hashes.json",
+      "source": "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs",
+      "expectedSha256": "7d82458a2d31ee8a3d7227306e75b34a7ddaa7021216ff6c2dc3304e5f588844",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/capability-coordinator/before-hashes.json",
+      "source": "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "expectedSha256": "ab0e67a19f4e1d67e11f901fe1d7c3bd0a39c39397e47b4c16d1248907e2492f",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/capability-coordinator/before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/DeletionBatchCapabilityCodec.cs",
+      "expectedSha256": "49a462929aa7594eef13caa588bd4893c5e25a32e946e7eb21ecb012db92cdd4",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/capability-coordinator/before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Server/Security/IGovernanceGuardAuthority.cs",
+      "expectedSha256": "409ebcb611fbf6c9b02a5b58e071d8c3fb0b60830feec22429c15ab7bbb0f27f",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/capability-coordinator/before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "expectedSha256": "af909afc2244f956cbee81018d1b5963e53babb0962971870bb0cd3d665dcc0c",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/capability-coordinator/before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "expectedSha256": "1ed1163308f3d1abc34da3cb374a78a9fc92ebe6983caf9d5424766774fb230f",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/capability-coordinator/before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceProtocolReceipt.cs",
+      "expectedSha256": "6520ef77718d050dd33fcec695343d470c14af170cdd18ca8844de653114777f",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/capability-coordinator/before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs",
+      "expectedSha256": "318924eb462a360ff09e4676cd158726505789d70fa3166089bf00e475e7e8a3",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/compromise/bridge-before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardTransition.cs",
+      "expectedSha256": "55f994dfcaa78f34ab401c623e07131ba8a383927aa0719e9fda649f1c870343",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/compromise/bridge-before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs",
+      "expectedSha256": "cd7d855afc745799372559954afab9d7fcee8e78081884699b987b3349282aee",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/compromise/bridge-before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Contracts/Security/TenantGovernanceGuardState.cs",
+      "expectedSha256": "5e956e534cc949958baae59655d3070db4ab5817333457f7c6933981ebc05bf4",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/compromise/bridge-before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "expectedSha256": "5fb08625c5b067e9c3a751fc24e0bbda5cb4fabe8ad3cc07559009c0198b9ad9",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/compromise/bridge-before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "expectedSha256": "4a729edbd2640be544eefe4a5d4f84d60be207c582e7a2d4a1fac92b002020a6",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/compromise/bridge-before-hashes.json",
+      "source": "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "expectedSha256": "2620ddc9bdac8ac49489fafbdd510f2fd2d8943ecf81194975eee619b50af0a7",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/compromise/bridge-before-hashes.json",
+      "source": "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs",
+      "expectedSha256": "36b3d48280807facc216b3aea8099b12d24a639d0a90cfdf076ecbc644cdaa4c",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/compromise/bridge-before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/IDeletionCapabilityGuardRevocationMirror.cs",
+      "expectedSha256": "e15e2ef84421d4a48a3b276c624e3a684cd2f5c0333d72029c596c3d074b6b67",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/compromise/bridge-before-hashes.json",
+      "source": "platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs",
+      "expectedSha256": "81e0d89ab14dff01a0218078c1386467b0864cc9244bacd1a2c4050f0ccf5a39",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/compromise/bridge-before-hashes.json",
+      "source": "platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "expectedSha256": "7ec0fa0021e9d962a9763e7d2cae139ffee94d101072460602ae1682f50b8b9c",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/signing-successor/recovery-before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningActor.cs",
+      "expectedSha256": "ec56495cacdeee697c451d4e7f8bdd946549961051179b02c35d263e988e428c",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/signing-successor/recovery-before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "expectedSha256": "d56269aee795a700c95793fdc0de2d40adf93c57dc630d653a97faff26beab79",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/signing-successor/recovery-before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs",
+      "expectedSha256": "0db060b3a449882d1d42c34c7cfe34b12693bccf294a578944d9fc14dbc5f596",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/signing-successor/recovery-before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "expectedSha256": "9bd7790d438651213fbf840afe2ae42351a43baf1c343fa135fb1f384f4a8ff4",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/signing-successor/recovery-before-hashes.json",
+      "source": "platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "expectedSha256": "e72625a0abecd2fb0e422feeef1b0151761fb65b329006b02e9a6498d62ebd8f",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/publication/before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs",
+      "expectedSha256": "6e7bf0563e5647b07b71ec74e965f7d8581988bee76d6b8d9b869bba4cde758b",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/publication/before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs",
+      "expectedSha256": "3dbe2b8370ef21a8844548edcbb7cb441b8eca547a8afbf79dc70e650b8bc103",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/publication/before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs",
+      "expectedSha256": "37888725f6ea89b6a3fe178cdc39f734bcfa936186ccfed651ed2cb8b84f8627",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/publication/before-hashes.json",
+      "source": "eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationFeedTests.cs",
+      "expectedSha256": "41505d0a6a74ff7962c8d43df3163bf8a6644b4d3dbd031391cb93110755e60d",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/publication/before-hashes.json",
+      "source": "eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs",
+      "expectedSha256": "7f16d301b110c795419814fd6417f28285ff1a1d3cf630bc01392f3af818531a",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/private-composition/denial-retry-before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/PlatformSecurityDenialRecorder.cs",
+      "expectedSha256": "975b8ec44e336bc2e67bdea709b796296d6bb8d18945f9e1aca227ab78a2b73e",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/private-composition/denial-retry-before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "expectedSha256": "8886108f42bedd7258612508eca567431e5325d0be64e138ab3e88681e73ca13",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/private-composition/denial-retry-before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs",
+      "expectedSha256": "97e713911d8fa1321e2f2b0f76d935589842f9fdaa9b6a311d79d460bbc5c873",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/private-composition/denial-retry-before-hashes.json",
+      "source": "platform/tests/Hexalith.Platform.Custody.Tests/PlatformSecurityDenialRecorderTests.cs",
+      "expectedSha256": "ccb5a5da0815ae47a548128edaf45487a1ea771609d41ca0868f23f2fecfad92",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/private-composition/denial-retry-before-hashes.json",
+      "source": "platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs",
+      "expectedSha256": "af4d20f17e5b918f12e3022dcb6208b29904cd55f14f4ff3dae39a11f1257c3c",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/fixture-corrections/before-hashes.json",
+      "source": "parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+      "expectedSha256": "8400be4c3d5be409c5140fffbe3d11152f3d7962c68e6976eb6daa1fec001fd1",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/fixture-corrections/before-hashes.json",
+      "source": "platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs",
+      "expectedSha256": "5f1595bb6b869bd81c78b1ad7feccef3755eba3141e0458c1ccac4ae3716220d",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/final-boundaries/before-hashes.json",
+      "source": "eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "expectedSha256": "877ab96834d33befbf0ae603f3bb67f62466f6f2023b7ca0b027e46faf2528c8",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/final-boundaries/before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/EventStoreDeletionCapabilityGuardRevocationMirror.cs",
+      "expectedSha256": "0813fc295b0ce65de281de897fc4ced054975476a9ae6edc093e9535ae32cc0c",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/final-boundaries/before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/PlatformSecurityDenialRecorder.cs",
+      "expectedSha256": "c6137ee94346acca2995774d1916a7a61d45ef2a343ec31e43fde3f21ec5f2b3",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/final-boundaries/before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "expectedSha256": "1d805edffac571b3993eb7881553bee321acbeab341f6a8625f3cf552d20efb0",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/final-boundaries/before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs",
+      "expectedSha256": "a64c5f19664bf91b538d66f93c0b20b852206fc49a0cdeff76e3653f74cc5988",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/final-before-hashes.json",
+      "source": "conversations/eng/verify-ext-conv-ai-1.ps1",
+      "expectedSha256": "1add3555ee055bff9aabf4fa6c9b19f5cd6fd1d27977073be1f1b0da18f6f37e",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/final-before-hashes.json",
+      "source": "parties/eng/verify-ext-parties-1.ps1",
+      "expectedSha256": "8cdd242ba34e01f5cb87940c5040738773165bb8b2958179b2cd506348d8ea5b",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/final-before-hashes.json",
+      "source": "platform/eng/verify-ext-secrets-1.ps1",
+      "expectedSha256": "69fa38e5a3b99e49808d6eb29daa5a11c10f7e058ef78953772cb2d609d21c25",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/private-composition/denial-contract-before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/SecurityObservationIntent.cs",
+      "expectedSha256": "10b85f66b6a1aa1726322b1c554ae2f1b41c69a7801616897525a371701248f2",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/private-composition/denial-contract-before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/SecurityObservationOriginalLookup.cs",
+      "expectedSha256": "4424eef7ddeef93e8d4860703a6bc5e95aef93881a988481b9583b5ddd0971f1",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/private-composition/denial-contract-before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "expectedSha256": "9cd49f0f4f7de8e47b35daad02d9730c6b17a9af43be5f17f9e89effb9de5308",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/private-composition/denial-contract-before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/PlatformSecurityDenialRecorder.cs",
+      "expectedSha256": "7b8a95a9ff83ffc7c887e3cd96fab2249390e1d953e61c3ddead047e2252eba9",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/spool-worker/before-hashes.json",
+      "source": "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedTransactionFixture.cs",
+      "expectedSha256": "2ea01c1a505fff29a023fdf7cc015e120f05b13897178f5424d029004c7a8073",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/spool-worker/before-hashes.json",
+      "source": "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs",
+      "expectedSha256": "9ef1e44d998a7b73ae2a10cd830a987ec67eab106e4fad22addfe776b413cdeb",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/spool-worker/before-hashes.json",
+      "source": "platform/src/Hexalith.Platform.Custody/PlatformPrivateCapabilityComposition.cs",
+      "expectedSha256": "33b5b0fe7b770a9d407086b3fecf3428d23102887f50488a5e511c6bbe9ce7e5",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    },
+    {
+      "capture": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/spool-worker/before-hashes.json",
+      "source": "platform/eng/verify-ext-secrets-1.ps1",
+      "expectedSha256": "5e3ea22834b0913f88754a6b3c3812608592286b8e3218cb282cb7843b22b507",
+      "scope": "Historical later hash-only row without explicit copy; same-folder earlier capture bytes must not be inferred as this later version. Earliest authoritative ownership baseline remains separately verified by current review manifest."
+    }
+  ],
+  "captures": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/owned-changes.json",
+      "sha256": "32e23aa9bc4672d56a4be7994b19a410d178d51093bf9c7490bb03715be91418",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 9,
+      "newFileAbsences": 10
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-corrections/owned-changes.json",
+      "sha256": "6ada1736de79886b1b2f7c1e2d9a30978297fed12e46c87312d632abc47aed5b",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 14,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/discovery-continuation/before-hashes.json",
+      "sha256": "bff4f9be92203edaeff8536011cbc42fc36c8caffd673a469e9a3c62dd529b8a",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 18
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/discovery-continuation/before-hashes-supplement.json",
+      "sha256": "d430f67ea7281c2adcfcbf3af16b269fe229a575207f23869aa176e4abd50544",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 3
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/discovery-continuation/worker-before-hashes.json",
+      "sha256": "6b8c8d9043efe14f4f4a2d177d70694954ebcb201e1e8823c9734000d31b6a27",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 1,
+      "newFileAbsences": 6
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/discovery-continuation/namespace-before-hashes.json",
+      "sha256": "f6ea5fd7347c9bde3f8b8e9e33114ca2c79f3da69c27eda943a587f6f4aefbe5",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 2,
+      "newFileAbsences": 9
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/discovery-continuation/namespace-actor-test-before.json",
+      "sha256": "7c57a7f0a977637b7486f999a38953993e6c8d7207395f65fc4670669772b962",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 1
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/discovery-continuation/admission-before-hashes.json",
+      "sha256": "bfa5404824c8456342096745cdbbde6f32a81e6e2da3dcdf4308b509ad3f36ac",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 2,
+      "newFileAbsences": 3
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/before-hashes.json",
+      "sha256": "8372ce6ac0dd913df9c1d90e532cd103c8d1e07691a588b7f248bbda4a410c41",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 3,
+      "newFileAbsences": 13
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/signing-before-hashes.json",
+      "sha256": "ee521e187a95b14540f5deefef307fea464996bf8ebe6cca532fb00fe9b8a690",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 8
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/trust-before-hashes.json",
+      "sha256": "0dd013c4346da47c340006b9509ff090cd5789e3b613908dba567f6c5e16667a",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 2
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/capability-move-before.json",
+      "sha256": "6596d2d799cd53233cc64bc965d1a0d36d9948605f050f4b84725287058357a1",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 1,
+      "newFileAbsences": 1
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/before-hashes.json",
+      "sha256": "c55e4dd1f5e72de4d9775b680ff82ab19aff28e203cdc878c6288325b8f28250",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 12
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/server-before-hashes.json",
+      "sha256": "e734a8cc02239108d18f3192828b516b0a5f49631fe206d8dc79165e4b029a43",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 8
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/tests-before-hashes.json",
+      "sha256": "c640f68b8e894fafd55a0217bbc226b39da91d1c41656d6d83bde4268a73bd12",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 2
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/accepted-timing-before.json",
+      "sha256": "6b34a8080f734d4f935e45d101b1d1e3c6f39eb3ad0f2d7b4e7df838c01de754",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 2
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/inventory-before-hashes.json",
+      "sha256": "c0cd486f7eacdcf937e1122d1f34ed7406f25b0cd06812f803941f08974daf09",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 11
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/occurrence-before-hashes.json",
+      "sha256": "0b5a910656a7daa2387468736d4466405d17e43e234c60e75a4fb34e0e7b5a92",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 12
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/occurrence-tests-before-hashes.json",
+      "sha256": "bf7834afeb7f66536f79da434792a87b2ef801bafba0ad1639b1edc858b6e924",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 3
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/occurrence-adapter-before.json",
+      "sha256": "b2659eaf130f1cf5b4f0ac49033e6ac5b2c922a2d555c99fd790b6511d27d048",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 7
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/rotation-recovery-before.json",
+      "sha256": "6a87696b98bfdbea611de3dc883563aff03e6eeb270a286f11dd70acbef34fdd",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 5,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/private-credential-before.json",
+      "sha256": "ea67c74a6ae9eb17b028d8fcd968363e1f052ca2308f8364445dd3184f58d040",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 6
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/discovery-continuation/private-operation-before.json",
+      "sha256": "6ce917f6f8467a42c464939bd8f6a161075c3fa8cb74d7e5d1b25fb5e4170af5",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 4,
+      "newFileAbsences": 1
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/revoked-recovery-before.json",
+      "sha256": "4ec8e5afda384baa1e881ba85cdefeb8ff54d23f72bf2f30684e177826ebe00d",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 3,
+      "newFileAbsences": 1
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/spool-before.json",
+      "sha256": "917bfabaac2c28f2c4b8a9c7ec62d0b4cefab894957e5d84eb1f7890d7cda232",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 1,
+      "newFileAbsences": 13
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/discovery-continuation/dispatcher-before.json",
+      "sha256": "5c8c8985cf228ecfc36506be15330375dd5f008ab4d8f54dbaf51e6f855acaee",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 8
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/epoch-repair-before.json",
+      "sha256": "be89e0c857d8b4d2fd563a059fbac8607f4171775f463009e2183afda9c52830",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 21
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/decision-verification-before.json",
+      "sha256": "ef8d875c0e198c70b24e66516af571232ab79382906d8b2a7f59c5454e595240",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 8
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/paused-20261008T163407Z/supplemental-baseline-captures.json",
+      "sha256": "e08dfae195d1d831b4428273cc780b7547da263224f873b55c63a90d20c7c9a2",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 30,
+      "newFileAbsences": 17
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/catalogue/before-hashes.json",
+      "sha256": "f132871cde8b9db4a3fdb6b4b9ab2e6099bc22ea581df9b5f7299ac5674797d1",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 1,
+      "newFileAbsences": 6
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/catalogue/streaming-before-hashes.json",
+      "sha256": "0af86055548b15f5ceefad9f570fe791e22bea43860e2c8322aa9f233e4369ac",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 2,
+      "newFileAbsences": 1
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/expired-continuation/before-hashes.json",
+      "sha256": "77a22a4f6fc1db472265371f91546ba97f3a67f62820383ebf84b455b7e1d8ec",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 5,
+      "newFileAbsences": 3
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/expired-continuation/source-clock-before-hashes.json",
+      "sha256": "314a66b3c6d94b9f3015c79fb40afc7f189ae61cf9534d0b5ae8f27947b19af9",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 1,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/expired-continuation/source-tests-before-hashes.json",
+      "sha256": "cec2be2a32338cdfb94278840b32d92fc68d343ffb26a0ebf6a5c869c0279cf4",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 1,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/expired-continuation/policy-before-hashes.json",
+      "sha256": "86a471113b90d4cea928559df04b6decd3e8ef177779b67257d9454631330810",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 1,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/compromise/before-hashes.json",
+      "sha256": "6f574d94d1797c1b8f8f8a260778d32bc7bf198ac5be3b6484d032e3459b0b2b",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 8
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/signing-successor/before-hashes.json",
+      "sha256": "37f7a89ad2a4371eef3015023533cfc9532084dcd428375f4a7494e3ab3c903a",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 5,
+      "newFileAbsences": 3
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/fr34/before-hashes.json",
+      "sha256": "99c755fb68b913f39109dd8f4df53ec686fdf22e1362371fbc275717eb9f4227",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 11
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/private-composition/before-hashes.json",
+      "sha256": "1f615398c938099618c784a8285a6d8c02172aae799ca183bd19fee1635b0c00",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 6
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/private-composition/recorder-before-hashes.json",
+      "sha256": "ea8a0e2fe4616376ef535e54363da9ed538ab99668a6d5e2b2b0dd0e4217b253",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 2
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/guarded-transaction/before-hashes.json",
+      "sha256": "6f962712af3fe1c62941bccaca0bb09bd7341a0c3b1c1354e5d23a46870fb888",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 10
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/guarded-transaction/fixture-before-hashes.json",
+      "sha256": "e7ed617b2a9d3476e49bf87699f6bda849dececbaa0830251f04abc59b147839",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 1
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/guarded-transaction/guard-extension-before-hashes.json",
+      "sha256": "c884c266555db2fe3a20cbc7d0ceb7bdb7634bb614ac82d6178da61bfa50e4cc",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/governance-guard/before-hashes.json",
+      "sha256": "15fe6f621789896098df32e7466cfc0135f99521d8443cbdd59ebe10f560b137",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 26
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/capability-coordinator/before-hashes.json",
+      "sha256": "03aee2860fd95ba44238c53f2a44ce96ba61a613ded1557590afadfcedb5ad23",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 15
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/before-hashes.json",
+      "sha256": "e554adc9c9db8c6659a298f005db2e411ee1309b7c8792947b3ae873e0a2112b",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 8,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/compromise/bridge-before-hashes.json",
+      "sha256": "fa4b463f58bb1a2cf3635f33a59ca59780e2b89e48ebc5398582dae07d977a13",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 1
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/signing-successor/recovery-before-hashes.json",
+      "sha256": "8c555ceb8edd8b75e93a1e7ce69ce4c7b841e04095ad0e2ff31b668137914059",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/publication/before-hashes.json",
+      "sha256": "9f2f9d7b1581ee081e93f8a9d3dd515fdf5bb10b192f43afd8b3758da605f213",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/private-composition/denial-retry-before-hashes.json",
+      "sha256": "278c3e7918e4036fb5caf15192b287a1852a290385a09025797d319472d14543",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 2
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/fixture-corrections/before-hashes.json",
+      "sha256": "695697209113c654549591c1875393bc79e6192d856693d5ced30171dabcab86",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/final-boundaries/before-hashes.json",
+      "sha256": "b413a93f8b74bde3e82a6eec95e854fade06b2fa31b7873f8fc78efffdbdc170",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/maps-runners/final-before-hashes.json",
+      "sha256": "b8d1cedb734ce07458206635e5a34f1bc0657dadf72d91d9599b19749dde7767",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 6,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/private-composition/denial-contract-before-hashes.json",
+      "sha256": "49430e58b4f6251e2fb2f6b8b4e0543768b1e2df50266b47be95a271c8fd7930",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/spool-worker/before-hashes.json",
+      "sha256": "5c8e506424a393375046f5d46f9d4915cbe37660182957c952ae2f70f27ba5bd",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 2
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/crlf/before-hashes.json",
+      "sha256": "37722d31acade6a32534f9e3e632177f7d6dc0a0fd38bcd893fdf083e95c9c38",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 121,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-anchors/before-hashes.json",
+      "sha256": "57271d6cbefd20cce55f189866d879f04c7204375c48f8aed550dacc2b165798",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 6,
+      "newFileAbsences": 5
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-anchor-supplement/before-hashes.json",
+      "sha256": "40c04b82580c37cfc67d398a816c6b50ab9d9ab94977e0cd1f9dc3c69bfc6c98",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 9,
+      "newFileAbsences": 1
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-protocols/before-hashes.json",
+      "sha256": "6f862ff8ef607abd56b272e93e4f4e1a03db847e988b6aaaee7c4b11e0eb6299",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 8,
+      "newFileAbsences": 2
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-protocol-supplement/before-hashes.json",
+      "sha256": "11b1c7ee5c2847c2985118fc83582cf76aeca881504eb73af1c5aa8832b9807b",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 3,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/anchor-bound/before-hashes.json",
+      "sha256": "f3746db5d580f3b4d4448aa099e7f6fb841deb621947ffe9180cdd6e031c795c",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 1
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/guard-proof/before-hashes.json",
+      "sha256": "073e05010996f482d288c03b6584b6197ebdaf95f7b71c168e556d3a46ae3a53",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 2,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/parties-continuity/before-hashes.json",
+      "sha256": "d665feaf9f294c6ea43c29b27f16da088bcbacb89ff22d1a863d5e832f0ce568",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 2,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/conversations-delivery/before-hashes.json",
+      "sha256": "1bfeafe5b032c76c9e8d7a477283634080728a7700259dbe1a8d9f19581e53d5",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 7,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/platform-anchors/before-hashes.json",
+      "sha256": "c49aff13202b113c7cfec64e3e8b256761c904d3892799c788ca0bcbce0fe45e",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 17,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/platform-anchor-fixtures/before-hashes.json",
+      "sha256": "26e9ea1459d03ccdb72e2802c15a5b67b5a9aaf61ad3f6ed1421f289530b2a19",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 2,
+      "newFileAbsences": 3
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/activation-completion/before-hashes.json",
+      "sha256": "786f1f08f315e4716d8c51332c95d3929c75e571382bd667681af9190b55d170",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 10,
+      "newFileAbsences": 1
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/spool-deadline/before-hashes.json",
+      "sha256": "d8b3a87068b8bde5e8ead6bc20a76a27832007f8e9dee9a485f0554c629f6f90",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 2,
+      "newFileAbsences": 1
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/conversations-backfill/before-hashes.json",
+      "sha256": "0513d324e7f0d0b1f10c181a8e65a4c399bd5920ee3c4dd302e47caa25f3b560",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 2,
+      "newFileAbsences": 1
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/external-query-build/before-hashes.json",
+      "sha256": "26ba7639f19fdd72bb797e11020fec55d65dd657f168e3ceb1226a3d550b34ad",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 1,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/packet-revision/before-hashes.json",
+      "sha256": "7128511bc289fc0fe235085bbfd9f145ee8340d170864613b7074efa22829cfb",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 4,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/engineering-evidence/before-hashes.json",
+      "sha256": "c91301fcc9af955b28ec1d104cd841cb8a7bf850791f14f82003e3f9c8614c75",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 0,
+      "newFileAbsences": 3
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/pending-original-resolution/before-hashes.json",
+      "sha256": "51ae3cba400e78ab2dc43ddb46b5404bf1f86ad206b428b614c37a69b3083b39",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 26,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/committed-violation-provenance/before-hashes.json",
+      "sha256": "6e3342ce388529a3cdd92c3f25ee6d91ec868405cbf789eee471d4c3428e3dc3",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 6,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/conversation-submission-authority/before-hashes.json",
+      "sha256": "d2cbbe28c50077427868f531b1135bf9e793b6cb839467dc83c86c8cd2820895",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 3,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/actor-provider-and-routing/before-hashes.json",
+      "sha256": "4332e364c9101f1a82fd793065739f45863dc46862d6d9641ae442c53b894d90",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 5,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/feed-idle-and-projection/before-hashes.json",
+      "sha256": "fe53d9899577394aef8d0829b6dc8155caa84a1016433183a53c70d29dbb9734",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 2,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/spool-fair-schedule/before-hashes.json",
+      "sha256": "a56cc37ecb61a76b08296bc875123e4346df153566ee0892501e4e327b7478c4",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 3,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/canary-ownership-cleanup/before-hashes.json",
+      "sha256": "2cf3a99ca4fc33c835dd89646a93bd9335a46c2a72cc41cf76c03ef05f6208a4",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 4,
+      "newFileAbsences": 2
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/deletion-routing-and-provenance-fixture/before-hashes.json",
+      "sha256": "65478026ff06abfb78451f3915485f289fd2fdc822327986db15d8c49447d5b2",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 2,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/publication-durable-progress/before-hashes.json",
+      "sha256": "f310544b8c2e1937b17160f4d949b670f2bc4d177b398774f77e0208f571d96b",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 12,
+      "newFileAbsences": 2
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/required-classes/before-hashes.json",
+      "sha256": "32597106802c79f4c6af1aeb9ab7a46454d16dfaa15dac38b61fcd8092c31382",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 1,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/owner-packets/before-hashes.json",
+      "sha256": "61f518a16f2b8aa52bda9cdfea5d3086fdcbca2530e21404f81a404537dc5a2e",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 4,
+      "newFileAbsences": 0
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/downstream-append-contract/before-hashes.json",
+      "sha256": "974921f98d6ad3f4e2c06bfc783be08b751a7eb3a3b09561dcb09b9599e49e53",
+      "suppliedOrExactMatchingBeforeCopiesPassed": 1,
+      "newFileAbsences": 0
+    }
+  ]
+}

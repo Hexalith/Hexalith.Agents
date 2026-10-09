@@ -1,0 +1,10 @@
+### Successful continuation through multiple expired transitions is unverified
+
+- **Changed surface:** parties/src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs:46 now accepts certified expired rebound/revocation transitions and advances binding versions without recovering their actor payloads.
+- **Impacted consumer or site:** Historical identity queries call this fold at parties/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs:202.
+- **Existing test evidence:** Regression gap. Symbol and query-reference searches across Parties, EventStore, Platform and Conversations identified the certificate-aware query tests in PartyIdentityQueryHandlerTests.cs. The successful cases at lines 1090 and 1141 each supply one expired establishment certificate; the latter keeps its revocation readable. The rebound certificate at line 1098 is an intentionally invalid first transition. The suffix cases at line 407 also expect denial. The HTTP client tests supply already-folded responses.
+- **Missing verification:** A successful historical query after an expired establishment and expired rebound or revocation, asserting the retained successor’s actor, binding version and original source position.
+- **Demonstration:** Restrict the expired-certificate branch to establishments. All checked certificate fixtures retain their expected outcomes, but a valid history containing expired versions 1 and 2 followed by retained version 3 becomes unavailable. For example, transitions on days 0, 10 and 200, queried on day 376 under the accepted 365-day policy, require precisely this continuation.
+- **Consequence:** Historical attribution to a retained successor can regress once multiple predecessor transitions expire without the checked verification failing.
+- **Disposition:** patch — add parameterized MultipleExpiredTransitionsPreserveRetainedSuccessor cases to PartyIdentityQueryHandlerTests, through ResolveAtAsync, covering expired rebound and revocation prefixes. The existing Local owner runner already selects this class.
+

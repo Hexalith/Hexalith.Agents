@@ -1,0 +1,27 @@
+{
+  "capturedUtc": "2026-10-09T01:14:36.821795+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs",
+      "existed": true,
+      "sha256": "c3d532f61393f75dd23049054be8901c8adaf17232dc6c2cfedba231f619c8ef",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/key-lifecycle-provider-bound/before/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleFixture.cs",
+      "existed": true,
+      "sha256": "bdaf2eac9e2316918b790c967745f9e90eb1d16ce9de9f5323b689b85fe1c578",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/key-lifecycle-provider-bound/before/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleFixture.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "existed": true,
+      "sha256": "2ce576613ed7bd68963276a636ba862d1806cd39417ff7ac8c9024c32c3b0a64",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/key-lifecycle-provider-bound/before/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs"
+    }
+  ]
+}

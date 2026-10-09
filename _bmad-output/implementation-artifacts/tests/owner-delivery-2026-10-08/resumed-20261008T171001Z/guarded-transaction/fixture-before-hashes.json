@@ -1,0 +1,9 @@
+{
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GuardedTransactionFixture.cs",
+      "existed": false
+    }
+  ]
+}

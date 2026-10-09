@@ -1,0 +1,9 @@
+### Active catalogue deletion exclusion has no consumer test
+
+- **Changed surface:** `conversations/src/Hexalith.Conversations.Server/Agents/EventStoreConversationTenantCatalogue.cs:36` derives `Active` from both `!state.IsDeleted` and `Lifecycle == Open`.
+- **Impacted consumer or site:** `ConversationAgentQueryService.CountAsync` counts these entries at `conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentQueryService.cs:123`.
+- **Existing test evidence:** `Regression gap`. Repository-wide searches for `EventStoreConversationTenantCatalogue`, `AddConversationTenantCatalogue`, `IConversationTenantCatalogue`, and the server namespace imports identified the concrete catalogue tests and fixture-based count tests. I read the complete `EventStoreConversationTenantCatalogueTests.cs`: its source helper at line 51 creates only creation/closed streams, and its count assertions at lines 74–83 verify open versus closed and creation-window filtering. `ConversationAgentSixSeamTests.cs:159` injects already-computed `Active` values, bypassing the new source mapping.
+- **Missing verification:** A persisted deletion approval must make an otherwise open Conversation inactive and exclude it from the complete active count.
+- **Demonstration:** Remove `!state.IsDeleted` from the adapter. None of the concrete catalogue tests I read would fail. Deletion approval sets the deletion signal without changing lifecycle (`ConversationState.Agents.cs:124`), so an approved deleted Conversation can remain `Open` and become counted.
+- **Consequence:** The active denominator includes logically deleted Conversations despite the accepted open/undeleted rule.
+- **Disposition:** `patch` — add `DeletedOpenConversationIsExcludedFromCompleteActiveCount` to `EventStoreConversationTenantCatalogueTests`, using a serialized creation-plus-deletion-approval source and asserting both `Active == false` and the query’s resulting count.

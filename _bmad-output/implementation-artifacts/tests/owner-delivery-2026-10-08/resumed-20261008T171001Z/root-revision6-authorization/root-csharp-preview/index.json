@@ -1,0 +1,345 @@
+{
+  "capturedUtc": "2026-10-09T07:37:17.459984+00:00",
+  "status": "preliminary root read after engineer declared code settled; final complete handoff and frozen manifest audit still required",
+  "orderedCaptureCount": 141,
+  "files": [
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/001-ConversationDeletionDeliveryPump.cs",
+      "beforeSha256": "ed4a5e0b4f1665b7c9da047edb3e53667290536782408f230b3f2839d2d8a515",
+      "currentSha256": "9586f42ab102e301106584cda45f90c773b71c8d94aa30c0e80d2741fe111aff",
+      "diffStartLine": 1,
+      "diffLines": 242
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/002-ConversationDeletionDeliveryPumpFixture.cs",
+      "beforeSha256": "ce08d99d4ef5e9d30a9a0a6938a38b15bd5a10a885972a3027de52cf8054f04e",
+      "currentSha256": "67fb5c853e3cb8c77fc42cb098152038abaa55fa76272b1791fa90c6d53d1e26",
+      "diffStartLine": 243,
+      "diffLines": 113
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/003-ConversationDeletionDeliveryPumpTests.cs",
+      "beforeSha256": "9928df2eedbaffa916558bae1f57977a9a6022df86c3c240bff24554358e150f",
+      "currentSha256": "964981415bf6e0dd049053bdbf5620415973b9fdca26e94953a1a58a9372e398",
+      "diffStartLine": 356,
+      "diffLines": 101
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/004-DirectoryAtomicAppendClient.cs",
+      "beforeSha256": "c8d23e79c4f0e825076d59d5b8970c9be3b5694323a5d365f9b8328ae340865d",
+      "currentSha256": "1caff9f18b93d2ea24beb9969d025928064fc0b0f8f098a52f81b068f40572a4",
+      "diffStartLine": 457,
+      "diffLines": 51
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendPayloadLifetime.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/005-DirectoryAtomicAppendPayloadLifetime.cs",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "currentSha256": "174713317974e8a7678901b6498d521363f141ba694409c48491dd9099bd9d30",
+      "diffStartLine": 508,
+      "diffLines": 49
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/IAtomicDirectoryAppendOwner.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/006-IAtomicDirectoryAppendOwner.cs",
+      "beforeSha256": "a907a2abaf372ecdfdd663409d44efd17ac86e4e7d5014eec98b215a6300ad1d",
+      "currentSha256": "d204a5bd5d602ff9a56081ed55662f9cf60bdde9e75a46ced3822a97a715b3fc",
+      "diffStartLine": 557,
+      "diffLines": 13
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Client/Streams/IDirectoryAtomicAppendAuthority.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/007-IDirectoryAtomicAppendAuthority.cs",
+      "beforeSha256": "1b9234facdcc0b6568e85cf4babc2a795d8c44bf06df755b4d5c6bbe0ef400ac",
+      "currentSha256": "8b56d979aade91fef036b68137dca73ea23a7a5a1d291808ca6ac93f166ca390",
+      "diffStartLine": 570,
+      "diffLines": 13
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionActivationComparison.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/008-DeletionActivationComparison.cs",
+      "beforeSha256": "2471ecdd503c69c2f51bdd16baa600d869ccaf462c33f7b89103daaad1a0e612",
+      "currentSha256": "75db400fd5b9e27d9966e39a1f3879497a6720acae8a18c92ac4f4749d2d46d6",
+      "diffStartLine": 583,
+      "diffLines": 12
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementReconciliation.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/009-DeletionBlockedReplacementReconciliation.cs",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "currentSha256": "3be85080b6e42b0e644d1f8892f2170f89f42ed7533ab5417281f439ddaaac20",
+      "diffStartLine": 595,
+      "diffLines": 18
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/010-GovernanceGuardEvidence.cs",
+      "beforeSha256": "073e54b575b9858a867d94e83bd6ef897792f090d7fb7f044d6265becb6f7ba1",
+      "currentSha256": "ed900ed989f90ec59b718bc81295791d7a0744d242e3b297cc9e0513f975b867",
+      "diffStartLine": 613,
+      "diffLines": 9
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/IDeletionProtectionOwner.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/011-IDeletionProtectionOwner.cs",
+      "beforeSha256": "e7f8c60dcaecf4af8efdc4a125b67dac924c0fc4caf3a251b138eab45d00ea99",
+      "currentSha256": "014b799b807f136a9d3d4c76a8fff7df292e82f4171c701bf11999fc3e718ae5",
+      "diffStartLine": 622,
+      "diffLines": 18
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DaprDeletionProtectionOwner.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/012-DaprDeletionProtectionOwner.cs",
+      "beforeSha256": "ffb6ee5513ec1270ad59209739a57e8185dba871b90183c9b6506f646dadca69",
+      "currentSha256": "4dcdf0f7d6380fb8fe033477f07c852ace2ec1e730399f9be27d522663a89dda",
+      "diffStartLine": 640,
+      "diffLines": 22
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/013-DeletionConsumptionActor.cs",
+      "beforeSha256": "d878ff09464b03a54aae246defd22fadac958e40553923da1c65c9bb9fa3c781",
+      "currentSha256": "832e3f5dc23f619918d2314128b2290981d3fca6e876fed607f03256712b59c0",
+      "diffStartLine": 662,
+      "diffLines": 157
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionBatch.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/014-DeletionConsumptionBatch.cs",
+      "beforeSha256": "0361ef5888f950f7b4324b7d8f15ed6a972b65ecb9893fc7476de7321e664b70",
+      "currentSha256": "3b24b5d10531b3b2d0377a27f80d2bf93d55a49badccb09b9a956f01f954e140",
+      "diffStartLine": 819,
+      "diffLines": 11
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/015-DeletionConsumptionIdentity.cs",
+      "beforeSha256": "a37329c57fba1ffb94d2e6190a3b0d74699949354eac99329fd0a52d8a281379",
+      "currentSha256": "3365118f17be29fecb253facd646283c4aea554afdb712c9290a971d78d0d35c",
+      "diffStartLine": 830,
+      "diffLines": 38
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionOperation.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/016-DeletionConsumptionOperation.cs",
+      "beforeSha256": "7548e244885a6a029677d23d2edb77e059bed5e478dd7211211baae9db7bee74",
+      "currentSha256": "2f4a3bfdab148efa5ce8638cda53a820d2130be6d8d8275c28a3e2128ae7b56c",
+      "diffStartLine": 868,
+      "diffLines": 14
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/017-GovernanceScopeGuardOwner.cs",
+      "beforeSha256": "90e901f9ed4b4be02254c0167d3f595e5dff629630b3ee4b990da81cbc372d24",
+      "currentSha256": "4003edce371090f2284663ff47af49366a10d0107353ffc49696d587e196f7e1",
+      "diffStartLine": 882,
+      "diffLines": 13
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/018-GovernanceScopeGuardReducer.cs",
+      "beforeSha256": "c524b886b3a13e301083e672a6c2d9b9c274005988cea45884abf56930649d66",
+      "currentSha256": "ba705bc03ff309d974224e07c3bd70611c85f7f6df1dd342832966ac428cb381",
+      "diffStartLine": 895,
+      "diffLines": 42
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionActor.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/019-IDeletionConsumptionActor.cs",
+      "beforeSha256": "21625b638723c59d08a22aa2b450386a687a35a5b3d96600808ee4af3ea6baca",
+      "currentSha256": "a8f9d1d6ca260d0a338bdbabe69226c95d72af0a752cb4ea95af60f347101dd0",
+      "diffStartLine": 937,
+      "diffLines": 13
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/020-IDeletionConsumptionAuthority.cs",
+      "beforeSha256": "5b4898497e8bd37916451f4ec11c1991d2e26462447d8876d8aa3661270e7186",
+      "currentSha256": "a73cddc06a701f53e154b2e18688d2c003af71671564052eb207739aae596117",
+      "diffStartLine": 950,
+      "diffLines": 10
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/021-RetainedIdentityHistorySourceReader.cs",
+      "beforeSha256": "ecd0c5a53fb79f9f012fd844ec94e30884e19f9ed39da956e1710a85dd9ca35f",
+      "currentSha256": "65bc21a4596b9c8b87b5d36762aacdb96150af5cb4df058431139d8a3e8ecd34",
+      "diffStartLine": 960,
+      "diffLines": 79
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/022-DirectoryAtomicAppendTests.cs",
+      "beforeSha256": "1e064f0171c318fe659ffbe858d9c0e17a0f1d2ebcc8a49be6b57fdd8fb57269",
+      "currentSha256": "f4d1a6a6353668749ee3d5ed7ed43312c5c9e4fc2926fb876e32a95f22566240",
+      "diffStartLine": 1039,
+      "diffLines": 126
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/023-RetainedIdentityHistorySourceReaderTests.cs",
+      "beforeSha256": "3c21619544596bd4027a0388d0f57b88594284ac4f759965d81837b8ee2ef9ca",
+      "currentSha256": "6fca87b490bc5e6e994452bdfdb537028ebb010437b818f85252440fb540b8b5",
+      "diffStartLine": 1165,
+      "diffLines": 54
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/024-CustodyKeyLifecycleActor.cs",
+      "beforeSha256": "7799a8819a599ce579577afd53ad2a8dadaf2b557013d3aecb0c954953407159",
+      "currentSha256": "76acb865e740c9259020cccae2c53a478298f7dc8a64ad29016097e72f1e8213",
+      "diffStartLine": 1219,
+      "diffLines": 221
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/025-DeletionBatchExecutionCoordinator.cs",
+      "beforeSha256": "2a4990877feb2471179adae2aeafa66438e4124d3cd28735b4fba26edb41c39a",
+      "currentSha256": "bec766bdd47e3cf5ec7e811c4e46c8d4b2a1af739eb55ae2454d737017f4aa03",
+      "diffStartLine": 1440,
+      "diffLines": 94
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/026-DeletionCapabilitySigningActor.cs",
+      "beforeSha256": "77dfd9daa1e835897209986e68fefb1171d5d9b2f7a87800304dbdcf055050f3",
+      "currentSha256": "e2697f6fa1d03df3ba390badc1c22f1ce56c51ff928c9d8c5fb57737c86af64f",
+      "diffStartLine": 1534,
+      "diffLines": 308
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/EventStoreDeletionBatchGuardPort.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/027-EventStoreDeletionBatchGuardPort.cs",
+      "beforeSha256": "0f3654a6df167ba3b773034d694cd941de2e3ab7f340da247936c9ea442f788b",
+      "currentSha256": "90b1bb1ed4450844fc5f11b48cca468209c70414955578ba918b2b27669b1b54",
+      "diffStartLine": 1842,
+      "diffLines": 16
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/028-ExportKeyDeliveryActor.cs",
+      "beforeSha256": "51f7f58b91ac258a13cfe7a4ab65a1b3b8be0e14dcf5cf6e0d02f248d3b774c0",
+      "currentSha256": "21a8569482d1e7808d876b8b38c14a16f76bdf827fa35442d7a7b12368c81e4b",
+      "diffStartLine": 1858,
+      "diffLines": 191
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/IDeletionBatchGuardPort.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/029-IDeletionBatchGuardPort.cs",
+      "beforeSha256": "9b8fd9f406b1f9feb0f4a41572fe1789ee36fd52f1d6959b1b29bd0a08fa6bf6",
+      "currentSha256": "a712c5b7c9af24a51e369e1912098baa7ff8dcc82d716f104de266e70c1c2405",
+      "diffStartLine": 2049,
+      "diffLines": 12
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateActorStateIoLifetime.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/030-PrivateActorStateIoLifetime.cs",
+      "beforeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "currentSha256": "c52054de973614974eb2e7342907a9fbb8dd55497b9d1a628638dab6a2817bd5",
+      "diffStartLine": 2061,
+      "diffLines": 28
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/031-PrivateOwnerOperationAuthenticator.cs",
+      "beforeSha256": "9e6aa75bec4788d42ef3b0a368b13b94d6ef253eadf907d26a20dd2b6387157b",
+      "currentSha256": "b748ded574d0a7c3fe37766ac8efd1ec0cbcd1632d66c645a0d6772bba7d1e6a",
+      "diffStartLine": 2089,
+      "diffLines": 87
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/032-PrivateOwnerOperationDeadline.cs",
+      "beforeSha256": "60c8c6f71d54bed3a675ae731e8ce001d2612feea5a928473d6d804925f66ead",
+      "currentSha256": "bc9a89171a657d1efc0832f517dbbddd10fcc01ada1e95184ab4958dc29fb19f",
+      "diffStartLine": 2176,
+      "diffLines": 23
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/TrustedEnvelopeReplayVerifier.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/033-TrustedEnvelopeReplayVerifier.cs",
+      "beforeSha256": "dcab969cc188516ba3d427a0e04607f5b63467faf7e49552123f053bc1004f15",
+      "currentSha256": "3140fd15a33db5bf8540a61e6b58d2ad03024eea184cf2deed2e495537e117d8",
+      "diffStartLine": 2199,
+      "diffLines": 22
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ActorPendingFixture.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/034-ActorPendingFixture.cs",
+      "beforeSha256": "2b82bce3cceb91a2f1ee7e0b6bcf1f4fe1474c0b78b8879c3cbb8603745b106e",
+      "currentSha256": "b30cb21d337ec6bdfbd85bc3b8b2b5978b2a7ed62daad11c9113aac1e8c44459",
+      "diffStartLine": 2221,
+      "diffLines": 22
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/AnchoredFixtureJournal.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/035-AnchoredFixtureJournal.cs",
+      "beforeSha256": "eeba6713f60467c995d734f9af0a6bb85f7850e930c4169088de886235f1f64d",
+      "currentSha256": "d272b73fd16db43c4037e41bd55234d7a935a74aaa3138afbbb1632edf31ec04",
+      "diffStartLine": 2243,
+      "diffLines": 33
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/036-CustodyKeyLifecycleTests.cs",
+      "beforeSha256": "089708c2a9db5413ee867c9912bf709c120ea3f1362376c498b7f17b159a2760",
+      "currentSha256": "a35a52fed18a261b38ea2835bfca8e0cd241532d9df73308501781e6239a4ea5",
+      "diffStartLine": 2276,
+      "diffLines": 52
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/037-DeletionBatchActualOwnerFixture.cs",
+      "beforeSha256": "b709d269b7e4d1ee39e4d870cb2873efad2c612a2aec1889df2ee22ce4e41e08",
+      "currentSha256": "f23c336ab178de638e4622ff02d4d261088335136fc577eed5587575a8946a2b",
+      "diffStartLine": 2328,
+      "diffLines": 87
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/038-DeletionBatchExecutionCoordinatorTests.cs",
+      "beforeSha256": "237a56ad46b084ce750d64d43e6b5091a7bf7e0ae818773ea5de7ad717469c04",
+      "currentSha256": "dbb6c9a3a9f9f4c25f6f50ace57b26191b3153b7d72ea06a176aad934ebad11c",
+      "diffStartLine": 2415,
+      "diffLines": 116
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/039-DeletionCapabilitySigningActorTests.cs",
+      "beforeSha256": "1c1e1df7a28c31e831c976e6a1e43575ae03ba3d4162f35601c5c2b4cf9a45df",
+      "currentSha256": "7fb17df9a8d809da384c1c2a22003ff1cadcd4914fca52eec447da1bf934eba2",
+      "diffStartLine": 2531,
+      "diffLines": 68
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/040-ExportKeyDeliveryActorTests.cs",
+      "beforeSha256": "826cf04873741c7cc2d3125ad375e05b13de6c6082299d0f74a3f268f108e418",
+      "currentSha256": "503df974108a36e294fdc4abd61aa2618dada12d479c4c70b192b0d34dfbbe0b",
+      "diffStartLine": 2599,
+      "diffLines": 56
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/041-PrivateOwnerOperationAuthenticatorTests.cs",
+      "beforeSha256": "d3b046a1bef33db23bd5966ce483bd6870ea5d7147184f31b260f4c9cd1c29ce",
+      "currentSha256": "3e13eebd423fd3ff95501ebaa1fa341a45eb1c977ea0d99c221bbbb64cc1a141",
+      "diffStartLine": 2655,
+      "diffLines": 79
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs",
+      "reviewCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-authorization/root-csharp-preview/042-TrustedEnvelopeReplayVerifierTests.cs",
+      "beforeSha256": "05e1543ee28d6de64ea20268bacd06ae1eeeb10130e28208c407b53a449c6b98",
+      "currentSha256": "ebe3d0126de623d40e7a33fb50a9803b25c623dd9570f93eabc4d5ef40e69f3b",
+      "diffStartLine": 2734,
+      "diffLines": 58
+    }
+  ],
+  "lines": 2791,
+  "diffSha256": "6a3a160ed928cf1c6323285229ed5738835b2bbae92f2055fc73a1f12f0293ad"
+}

@@ -1,0 +1,36 @@
+{
+  "reviewRevision": 5,
+  "reviewInputSha256": "541337b7540a520fb8d26f2aa131abd2f79e7530fe5459b45b4d54600238f55a",
+  "sourcePathsFrozen": 395,
+  "orderedCaptures": 125,
+  "status": "HALTED awaiting human review-limit decision",
+  "reviewers": [
+    "owner_blind_review_r5",
+    "owner_edge_review_r5",
+    "owner_verification_review_r5"
+  ],
+  "allThreeFreshLayersLaunchedBeforeAnyReportHandling": true,
+  "allThreeFinalReportsReceivedBeforeTriage": true,
+  "fullParentStatus": "accepted in-progress override retained",
+  "currentReviewLoopIteration": 6,
+  "engineeringFocusedEvidence": "426 distinct current passes, 38 executed command exits, 136 artifact hashes; independent root audit passed",
+  "rootFullLocalMatrix": {
+    "phase": "root-revision5-full-local-20261009t030010z",
+    "commandExitsZero": 13,
+    "passingExecutions": 4607,
+    "xmlFiles": 21,
+    "cleanNormalBuildLogs": 22,
+    "requiredOwnedClassesExecuted": 44,
+    "scope": "historical first matrix; later Server refresh failed"
+  },
+  "runtimeQualification": "unestablished; original Story5.4 draft/backlog and four Uncommitted dependencies preserved",
+  "matrixOrdering": "Moved first mandatory full Local run forward as independent work against stable immutable source; review results and actual test execution stay separate. No source edits or acceptance inferred.",
+  "updatedUtc": "2026-10-09T03:22:15.111933+00:00",
+  "archivedReports": [
+    "blind-final.md",
+    "edge-final.json",
+    "verification-final.md"
+  ],
+  "currentReviewFindings": 13,
+  "reviewDisposition": "13 rows; 5bad_spec/4patch/3carried-reject/1unverified-defer; no subsequent engineering"
+}

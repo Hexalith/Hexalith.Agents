@@ -1,0 +1,14 @@
+[
+  {
+    "location": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs:51-55",
+    "trigger_condition": "Trust becomes unavailable after the signing intent persists but before provider invocation.",
+    "guard_snippet": "if (await ResolveTrustAsync(payload) is null) return await SaveAsync(new(requestId, payload, DeletionCapabilitySigningState.Denied));",
+    "potential_consequence": "The unsigned request remains Unknown forever, blocking signing and successor recovery."
+  },
+  {
+    "location": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs:49-53",
+    "trigger_condition": "Two completed repairs reactivate an epoch already present in RepairHistory.",
+    "guard_snippet": "if (state.RepairHistory.Any(repair => repair.EpochId == command.EpochId)) return Denied();",
+    "potential_consequence": "Previously fenced epoch credentials pass the source writer epoch check again."
+  }
+]

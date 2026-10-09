@@ -1,0 +1,14 @@
+[
+  "dotnet",
+  "build",
+  "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Hexalith.EventStore.Server.Tests.csproj",
+  "-c",
+  "Debug",
+  "--artifacts-path",
+  "/tmp/hexalith-resume-expired-sdk-20261008",
+  "-m:1",
+  "-p:NuGetAudit=false",
+  "-p:MinVerVersionOverride=1.0.0",
+  "-p:UseHexalithProjectReferences=true",
+  "-p:UseNuGetDeps=false"
+]

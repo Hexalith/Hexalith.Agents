@@ -1,0 +1,361 @@
+{
+  "capturedUtc": "2026-10-08T21:48:02.485765+00:00",
+  "status": "Revision-1 source complete and stable for root full verification and the next independent review; complete owner/live acceptance remains incomplete.",
+  "spec": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md",
+  "orderedBaselineList": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/ordered-baselines.json",
+  "orderedBaselineCount": 72,
+  "original56EntriesExactlyPreserved": true,
+  "reviewInput": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/engineering-source-freeze-20261008T214802Z/review-input.json",
+  "reviewDiff": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/engineering-source-freeze-20261008T214802Z/owned-current.diff",
+  "exactCommands": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/commands.json",
+  "artifactHashes": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/artifact-hashes.json",
+  "focusedBuilds": [
+    {
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "project": "tests/Hexalith.EventStore.Contracts.Tests/Hexalith.EventStore.Contracts.Tests.csproj",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-contracts-build.log",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "project": "tests/Hexalith.EventStore.Client.Tests/Hexalith.EventStore.Client.Tests.csproj",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-client-build-fifth.log",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "project": "tests/Hexalith.EventStore.Server.Tests/Hexalith.EventStore.Server.Tests.csproj",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-server-build-fourth.log",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "project": "tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-build-seventh.log",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "cwd": "/home/administrator/projects/hexalith/conversations",
+      "project": "tests/Hexalith.Conversations.Server.Tests/Hexalith.Conversations.Server.Tests.csproj",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-build-fourth.log",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "cwd": "/home/administrator/projects/hexalith/parties",
+      "project": "tests/Hexalith.Parties.Tests/Hexalith.Parties.Tests.csproj",
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-parties-build-final.log",
+      "warnings": 0,
+      "errors": 0
+    }
+  ],
+  "focusedLanes": [
+    {
+      "assembly": "tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.Tests.dll",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "filters": [
+        "*RecoverableAnchoredStateTests"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-helper-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-helper-tests.xml",
+      "xmlSha256": "0a314344d47f77d9d49fd2d7068b0d016ad454daf65c87e10dec5758fff586aa",
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "assembly": "tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.Tests.dll",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "filters": [
+        "*SourcePublicationDispatcherTests",
+        "*SourceNamespaceSnapshotReaderTests",
+        "*DirectoryAtomicAppendTests"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-client-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-client-tests.xml",
+      "xmlSha256": "cd4ed97dcb454d214961fed9e7cfc1f0751a350c0c8d35dc39181f565253947b",
+      "total": 33,
+      "passed": 33,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "assembly": "tests/Hexalith.EventStore.Client.Tests/bin/Debug/net10.0/Hexalith.EventStore.Client.Tests.dll",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "filters": [
+        "*DaprSourcePublicationIndexStoreTests"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-index-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-index-tests.xml",
+      "xmlSha256": "9e90e44587da7dc714d8e2ee7e8c11d8b1d46a36b68184df8624a03e2aafbe9b",
+      "total": 23,
+      "passed": 23,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "assembly": "tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests.dll",
+      "cwd": "/home/administrator/projects/hexalith/eventstore",
+      "filters": [
+        "*DeletionConsumptionActorTests",
+        "*DirectoryMigrationBoundaryTests",
+        "*InteractionOccurrenceRegistryActorTests",
+        "*GovernanceScopeGuardTests",
+        "*DaprSourcePublicationIndexStoreTests",
+        "*DaprLogicalQueryTests"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-server-tests-second.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-eventstore-server-tests-second.xml",
+      "xmlSha256": "2096269f2d99424dc856743ac1958ce77c7f761ae4f95e6a0c8fcd3b05a840c4",
+      "total": 205,
+      "passed": 205,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "assembly": "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "filters": [
+        "*CustodyKeyLifecycleTests",
+        "*DeletionCapabilitySigningActorTests",
+        "*ExportKeyDeliveryActorTests",
+        "*PlatformKeyInventoryActorTests",
+        "*ReplicatedSecurityObservationSpoolTests",
+        "*TrustedEnvelopeReplayVerifierTests"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-owner-tests-final.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-owner-tests-final.xml",
+      "xmlSha256": "fafb70b557f14eec058c5a1d6d207fe7aadad39a4f379db4f570ac14b26206f1",
+      "total": 124,
+      "passed": 124,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "assembly": "tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll",
+      "cwd": "/home/administrator/projects/hexalith/platform",
+      "filters": [
+        "*DeletionBatchExecutionCoordinatorTests"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-coordinator-tests-fourth.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-platform-coordinator-tests-fourth.xml",
+      "xmlSha256": "12e4c1a60579750f1766b81fc2e48baaef014a805febebdc226dca28b1e671b6",
+      "total": 20,
+      "passed": 20,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "assembly": "tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Server.Tests.dll",
+      "cwd": "/home/administrator/projects/hexalith/conversations",
+      "filters": [
+        "*ConversationDeletionDeliveryPumpTests",
+        "*ConfiguredConversationDeletionWorkerAdmissionTests",
+        "*EventStoreConversationTenantCatalogueTests",
+        "*ConversationDeletionBackfillTests"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-tests-first.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-tests-first.xml",
+      "xmlSha256": "b6c44306fb1b635587e4221529a4f0a32344b449e177052b42196d1cf9ef55f5",
+      "total": 24,
+      "passed": 24,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "assembly": "tests/Hexalith.Conversations.Server.Tests/bin/Debug/net10.0/Hexalith.Conversations.Server.Tests.dll",
+      "cwd": "/home/administrator/projects/hexalith/conversations",
+      "filters": [
+        "*ConversationDeletionWorkerAdmissionTests"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-worker-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-conversations-worker-tests.xml",
+      "xmlSha256": "89764cb4b7999aed061208f1734e05238e26cd9f7eef51202c0f4a72bee81d50",
+      "total": 9,
+      "passed": 9,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "assembly": "tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Tests.dll",
+      "cwd": "/home/administrator/projects/hexalith/parties",
+      "filters": [
+        "*PartyIdentityQueryHandlerTests"
+      ],
+      "log": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-parties-tests-final.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/execution/revision1-parties-tests-final.xml",
+      "xmlSha256": "6e49d2a838f73ba970128e0f8e44e8a67ecb8798a520234e40496391eb06960e",
+      "total": 169,
+      "passed": 169,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    }
+  ],
+  "focusedTests": 612,
+  "uniqueFocusedTests": 612,
+  "corrections": [
+    {
+      "findings": [
+        "B1"
+      ],
+      "change": "All nine writers persist a bounded exact pending transition before independent journal advancement; fresh reads reconcile only an exact current authenticated anchor, retain stage ownership, and reconfirm fresh durable bytes and authority after final persistence.",
+      "verification": "Four stage/main failure and lost-ack restart vectors across the actual actors; publication unanchored/tampered candidate denial; spool concurrent stage ownership and same original retry preserving staged time/day/sequence after pre-anchor failure."
+    },
+    {
+      "findings": [
+        "B2",
+        "E2",
+        "E4"
+      ],
+      "change": "Retained revocation closes a certified expired predecessor version without materializing expired actor bytes; malformed or missing predecessor continuity remains denied.",
+      "verification": "Actual serialized PartyIdentityQueryHandler fold executes expired establishment, retained revocation/rebound, and malformed continuity."
+    },
+    {
+      "findings": [
+        "B3"
+      ],
+      "change": "Initial and terminal replay receipts require exact original first-seen plus accepted profile ReplayRetention, with UTC and overflow checks.",
+      "verification": "Shortened and extended structurally valid receipts are denied at initial and final checks."
+    },
+    {
+      "findings": [
+        "B4"
+      ],
+      "change": "Authenticated original acknowledgement lookup reconstructs a consecutive persisted prefix; only new pending deliveries consume the pass bound.",
+      "verification": "Actual serialized Conversations source lookup before/after durable acknowledgement and restart, unknown/quarantine/withdrawal denial, and 103 distinct actual sources dispatched 100 then completed after dispatcher restart."
+    },
+    {
+      "findings": [
+        "B5"
+      ],
+      "change": "Receipt verifier reconfirms exact current worker authority after final receiver lookup or target resolution.",
+      "verification": "Actually suspended final receiver awaits plus withdrawal deny acknowledgement/attempt admission and preserve source state."
+    },
+    {
+      "findings": [
+        "B6"
+      ],
+      "change": "AlreadyDestroyedByBatch persists an immutable requesting-batch outcome with its own aggregate receipt and original terminal target receipts.",
+      "verification": "Four staged/main failure and lost-ack restart cases plus actual coordinator exact recovery, without another physical destruction."
+    },
+    {
+      "findings": [
+        "B7"
+      ],
+      "change": "Bounded fresh independently authenticated activation comparison produces a comparison-bound stable operation identity and exact guard mirror.",
+      "verification": "Actual coordinator/protection owner exercises unrelated revocation, acknowledgement loss and restart; original block correlation and healthy replacement remain enforced."
+    },
+    {
+      "findings": [
+        "B8"
+      ],
+      "change": "Completion lookup selects the latest retained CompletionSealed receipt after post-seal containment and re-completion.",
+      "verification": "Actual guard state retains both completion receipts and repeated CompleteAsync returns the current receipt."
+    },
+    {
+      "findings": [
+        "B9",
+        "E3"
+      ],
+      "change": "Distinct higher same-key and authentic historical out-of-order revocation proofs remain retained; permanent key membership is unique and original batch block receipts never change.",
+      "verification": "Higher same-key and unordered different-key/retry delivery execute through the private subscriber, registrar, and actual guard mirror."
+    },
+    {
+      "findings": [
+        "B10"
+      ],
+      "change": "Actual append outcome verifier accepts ordinal zero with positive committed source revision and guard high-water; negative ordinal is denied.",
+      "verification": "DirectoryAtomicAppendTests exercises the actual append/client outcome path."
+    },
+    {
+      "findings": [
+        "B11"
+      ],
+      "change": "Reader extracts only the certified consecutive prefix when authenticated current source head advances, folds at the cut head, and reconfirms the complete cut.",
+      "verification": "SDK advanced-prefix and missing/gapped denial cases plus actual Conversations catalogue advanced-head certified-prefix case."
+    },
+    {
+      "findings": [
+        "E1"
+      ],
+      "change": "Compromise preserves original immutable dispatch; only independently authenticated exact original terminal outcomes can reconcile a reservation winner.",
+      "verification": "Actual guard/coordinator/protection source tests execute reservation-before-revocation and revocation-before-reservation schedules."
+    },
+    {
+      "findings": [
+        "V1"
+      ],
+      "change": "Authenticated NotPerformed pin removes only its own provisional reservation; NotPerformed unpin keeps its existing hold.",
+      "verification": "Lost-ack lookup, serialized restart and persisted destruction denial; separate confirmed pre-existing hold is retained after a distinct failed pin."
+    },
+    {
+      "findings": [
+        "V2"
+      ],
+      "change": "Rejected well-formed wrapping and physical outcome proofs preserve restrictive ledger/hold state.",
+      "verification": "Object ledger and anchor remain unchanged for rejected wrapping; rejected physical proof remains Unknown across restart and destruction is denied."
+    },
+    {
+      "findings": [
+        "R1",
+        "R2"
+      ],
+      "change": "Reconcile verifies freshly read durable target bytes and exact independent anchor/journal after its final persistence await; pending JSON production is stopped by a bounded stream.",
+      "verification": "Five direct helper tests include actually suspended final persistence with changed durable bytes/anchor/journal, valid recovery, and oversized production stopping before the full sequence or any journal call."
+    },
+    {
+      "findings": [
+        "Spool deadline"
+      ],
+      "change": "New independent journal verification and recording retain the original whole-operation deadline through a private deadline adapter.",
+      "verification": "Four actually suspended noncooperative journal tests cover cancellation and 30-second deadline for read/commit, with no processed-success claim."
+    }
+  ],
+  "externalOverlap": {
+    "path": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Queries/DaprLogicalQueryFixture.cs",
+    "ownedChange": "Only: internal Action? OriginHook = null;",
+    "reason": "Minimal necessary normal-build CS0649 correction authorized by root after fresh separate external-query-build capture.",
+    "preservedConcurrentChange": "services.AddSingleton(Substitute.For<Dapr.Client.DaprClient>()) and all other query work are external; captured-path deltas are not wholly attributed to this run.",
+    "verification": "Existing DaprLogicalQueryTests are included in the 205-test EventStore.Server focused pass."
+  },
+  "ownerPackets": [
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md"
+  ],
+  "earlierPacketArchive": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/historical-packets",
+  "engineeringSourceIncomplete": [],
+  "remaining": [
+    "Root fresh full Local matrix and next three independent review layers.",
+    "Actual independent current authority, worker/signer enrollment, profile and production provider references remain unestablished.",
+    "Qualified durable backend, replicas/isolation, nonrollback anchors, all-copy custody/destruction/restore and complete live owner qualification remain absent.",
+    "Full original Story 5.4 entry/execution gates and owner acceptance remain separately incomplete."
+  ],
+  "runtimeReferenceStatus": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/runtime-reference-status.json",
+  "preservation": "Frozen intent and baseline are unchanged by this engineer. Original story draft/backlog and external records Uncommitted remain preserved. No Git mutation, submodule change, deployment, external owner message or unavailable live consuming seam was performed.",
+  "historicalExecution": "All earlier failed and superseded revision1 logs/XML remain in execution/. Final passing selections are explicitly listed above; no earlier failure is waived or relabeled as a current pass."
+}

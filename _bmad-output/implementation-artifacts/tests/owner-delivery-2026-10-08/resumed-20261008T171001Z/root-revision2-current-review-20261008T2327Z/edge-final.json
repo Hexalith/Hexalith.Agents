@@ -1,0 +1,15 @@
+[
+  {
+    "location": "eventstore/src/Hexalith.EventStore.Client/Streams/AuthoritativeEventStreamReader.cs:85-86",
+    "trigger_condition": "A supplied event list or protection flag enumerator blocks synchronously.",
+    "guard_snippet": "StreamReadPage page = await deadline.ReadAsync(_ => Task.FromResult(CapturePage(supplied, request.PageSize, deadline, ref bytes)));",
+    "potential_consequence": "The read hangs despite its thirty-second deadline or caller cancellation."
+  },
+  {
+    "location": "platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpoolWorker.cs:10",
+    "trigger_condition": "Configured interval exceeds 4,294,967,294 milliseconds.",
+    "guard_snippet": "if (interval.TotalMilliseconds > 4294967294) { throw new ArgumentOutOfRangeException(nameof(interval)); }",
+    "potential_consequence": "Task.Delay faults after the first pass; pending observations stop draining."
+  }
+]
+

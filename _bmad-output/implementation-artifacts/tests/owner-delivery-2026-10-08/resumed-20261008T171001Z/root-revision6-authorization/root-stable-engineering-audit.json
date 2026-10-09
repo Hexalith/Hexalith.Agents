@@ -1,0 +1,60 @@
+{
+  "auditedUtc": "2026-10-09T07:50:43.721029+00:00",
+  "revision": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6",
+  "previousRevision": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5",
+  "orderedCapturesVerified": 142,
+  "exactPriorPrefixCount": 125,
+  "suppliedBeforeCopiesChecked": 537,
+  "currentHandoffPathsChecked": 51,
+  "engineeringArtifactsChecked": 289,
+  "commandsChecked": 71,
+  "historicalNonpassingCommandsRetained": 21,
+  "distinctPassingSelectedCases": 575,
+  "lanes": [
+    {
+      "lane": "server-final",
+      "selectedPassed": 165,
+      "combinedXmlTotal": 165,
+      "classes": {
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests": 48,
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests": 58,
+        "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests": 59
+      }
+    },
+    {
+      "lane": "platform-final",
+      "selectedPassed": 235,
+      "combinedXmlTotal": 235,
+      "classes": {
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests": 40,
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests": 37,
+        "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests": 52,
+        "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests": 27,
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationAuthenticatorTests": 59,
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests": 1,
+        "Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests": 19
+      }
+    },
+    {
+      "lane": "client-final",
+      "selectedPassed": 109,
+      "combinedXmlTotal": 109,
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests": 48,
+        "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests": 29,
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests": 32
+      }
+    },
+    {
+      "lane": "conversations-final",
+      "selectedPassed": 66,
+      "combinedXmlTotal": 66,
+      "classes": {
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionBackfillTests": 9,
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests": 57
+      }
+    }
+  ],
+  "errors": [],
+  "scope": "Engineering integrity and selected focused evidence only. Root source review, full Local matrix, protected-state audit and runtime qualification require separate evidence."
+}

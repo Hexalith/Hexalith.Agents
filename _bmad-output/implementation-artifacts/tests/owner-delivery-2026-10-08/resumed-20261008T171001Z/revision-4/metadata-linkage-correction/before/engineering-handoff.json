@@ -1,0 +1,215 @@
+{
+  "capturedUtc": "2026-10-09T01:34:29.737931+00:00",
+  "status": "stable source engineering handoff; final packaged hash confirmation is recorded in handoff-verification.json; root full Local and next review pending",
+  "spec": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md",
+  "revision": 4,
+  "sourceEngineer": "owner_rederivation",
+  "orderedBaselines": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/ordered-baselines.json",
+  "orderedCaptureCount": 114,
+  "preservedExactPrefixCount": 97,
+  "revision4FreshUnits": 17,
+  "revision4ExplicitUniqueSourceTestRunnerPacketPaths": 44,
+  "revision4ChangedSourceTestRunnerPacketPaths": 44,
+  "focusedDistinctPassedCases": 492,
+  "focusedLanes": [
+    {
+      "lane": "namespace-reader",
+      "passed": 35,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "0.282",
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests": 35
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-owned-capture/revision4-namespace-capture-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-owned-capture/revision4-namespace-capture-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-owned-capture/revision4-namespace-capture-tests.xml"
+    },
+    {
+      "lane": "namespace-roster",
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "0.275",
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests": 21
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-roster-capture/revision4-namespace-roster-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-roster-capture/revision4-namespace-roster-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/namespace-roster-capture/revision4-namespace-roster-tests.xml"
+    },
+    {
+      "lane": "finite-cut",
+      "passed": 65,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "2.046",
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests": 65
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/revision4-finite-cut-build-third.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/revision4-finite-cut-tests-third.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/revision4-finite-cut-tests-third.xml"
+    },
+    {
+      "lane": "feed-dispatch-compatibility",
+      "passed": 27,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "0.380",
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests": 11,
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests": 16
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/revision4-finite-cut-build-third.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/revision4-finite-cut-feed-dispatch-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finite-cut-continuation/revision4-finite-cut-feed-dispatch-tests.xml"
+    },
+    {
+      "lane": "repair-owner-original",
+      "passed": 69,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "2.382",
+      "classes": {
+        "Hexalith.EventStore.Server.Tests.Security.DirectoryMigrationBoundaryTests": 12,
+        "Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests": 57
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/repair-original-identity/revision4-repair-identity-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/repair-original-identity/revision4-repair-identity-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/repair-original-identity/revision4-repair-identity-tests.xml"
+    },
+    {
+      "lane": "protection-target-order",
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "0.724",
+      "classes": {
+        "Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests": 48
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/protection-target-order/revision4-target-order-build-second.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/protection-target-order/revision4-target-order-tests-second.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/protection-target-order/revision4-target-order-tests-second.xml"
+    },
+    {
+      "lane": "platform-owner-final",
+      "passed": 170,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "0.642",
+      "classes": {
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests": 35,
+        "Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests": 26,
+        "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests": 42,
+        "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests": 20,
+        "Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests": 47
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/private-clock-registration/revision4-platform-owner-final-build-second.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/private-clock-registration/revision4-platform-owner-final-tests-second.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/private-clock-registration/revision4-platform-owner-final-tests-second.xml"
+    },
+    {
+      "lane": "runner-contracts",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "0.197",
+      "classes": {
+        "Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests": 12
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-contracts-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-contracts-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-contracts-tests.xml"
+    },
+    {
+      "lane": "runner-client",
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "0.266",
+      "classes": {
+        "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests": 11
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-client-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-client-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-client-tests.xml"
+    },
+    {
+      "lane": "runner-server",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "0.277",
+      "classes": {
+        "Hexalith.EventStore.Server.Tests.Actors.AggregateActorPublicationRegistrationTests": 7
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-server-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-server-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-server-tests.xml"
+    },
+    {
+      "lane": "runner-payload",
+      "passed": 27,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "notRun": 0,
+      "seconds": "0.289",
+      "classes": {
+        "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceKeyDerivationTests": 16,
+        "Hexalith.EventStore.PayloadProtection.Tests.InteractionOccurrenceProtectorTests": 11
+      },
+      "buildLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-payload-build.log",
+      "testLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-payload-tests.log",
+      "xml": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/parties-runner-completeness/revision4-parties-runner-payload-tests.xml"
+    }
+  ],
+  "currentBuilds": "Every affected project has a clean normal Debug/local-reference build with zero warnings/errors; no analyzer/XML override. Engineer did not execute full root Local matrix.",
+  "findingStatus": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/finding-status.json",
+  "commands": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/commands.json",
+  "sourceHashes": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/current-owned-source.json",
+  "preservation": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/preservation.json",
+  "previousReviewedSourceComparison": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/previous-reviewed-source-comparison.json",
+  "historicalAttempts": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/historical-attempts.json",
+  "ownerPackets": [
+    "ext-parties-1.md",
+    "ext-conv-ai-1.md",
+    "ext-secrets-1.md",
+    "ext-host-1.md"
+  ],
+  "priorPacketBytes": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/owner-packets/before/agents",
+  "verificationMap": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-4/required-class-audit.json",
+  "reviewFreezeOwner": "Root creates cumulative current-source diff/manifest from the 114 ordered captures and launches three fresh independent reviewers.",
+  "remainingWork": [
+    "Root full Local matrix and next independent three-layer review.",
+    "Actual current authorities/enrollment, qualified providers/backends/replicas/nonrollback anchors/isolation/all-copy destruction/restore/Live acceptance unestablished.",
+    "Original Story 5.4 draft/backlog; parent in-progress; all four dependencies Uncommitted with complete target/accepted compatibility command TBD."
+  ],
+  "limits": [
+    "New finite-cut continuation port defaults deny; modeled backend/authority tests are not production binding proof.",
+    "Caller deadline bounds do not forcibly terminate/reclaim abandoned provider execution or establish deployment capacity.",
+    "Compatibility-only legacy recording methods alone cannot enable the mandatory inherited transition journal."
+  ],
+  "preserved": "Frozen intent, story/sprint/register/policy and external edits; root-owned README remains outside ownership. No source or packaged artifact edits after stable final handoff."
+}

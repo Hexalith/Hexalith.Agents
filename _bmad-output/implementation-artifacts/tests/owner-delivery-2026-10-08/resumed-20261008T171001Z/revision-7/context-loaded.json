@@ -1,0 +1,50 @@
+{
+  "scope": "Complete current spec including appended B6 clarification, all frontmatter context files and all three exact current reports/triage/preservation read before their dependent implementation.",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md",
+      "sha256": "5a2306cc05ef34fa820604be3490d5180d907b2e59e3d1e4a17c5676741188cd",
+      "lines": 849
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/specs/spec-story-5-4-dependency-unblock/owner-implementation-plan.md",
+      "sha256": "5bc1adf238049f5543aeb1b4e72cb6c27c2322f7870e0514626e309f0c84f88e",
+      "lines": 110
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/specs/spec-story-5-4-dependency-unblock/parties-identity-contract.md",
+      "sha256": "59699c8318d2ced61dd994fce5c20055fe87f48365415c65969b69b37790d0cd",
+      "lines": 100
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/external-dependency-register.md",
+      "sha256": "184e16c05b57527abcdbd8588ae0c9fa10fe4c6093a53e66a509e9aa39fbcccb",
+      "lines": 311
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/blind-final.md",
+      "sha256": "7eb1ef45d76b28660e0c9d896a0d91db0a62c2d9d55a7b737cdd3f1e36c1a6b6",
+      "lines": 21
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/edge-final.json",
+      "sha256": "9b9e24014f8d17fe309dc69a60d621546c6e2754cae3c35c897672bab7ad8825",
+      "lines": 28
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/verification-final.md",
+      "sha256": "d4b8a1e2cf3fc9ef97bc08b9f2d83d1da3e71b72076c916ca7ce888def68bc9f",
+      "lines": 9
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/current-review-triage.json",
+      "sha256": "34422a6389abc0853a2e1d70c974f03481162c6ea46895727a68e92f4f335ea1",
+      "lines": 312
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-authorization/concurrent-drift-classification.json",
+      "sha256": "f335871834f8fda9d03e1af61ce97edf6525e6499317615b08056475c0cc25b9",
+      "lines": 56
+    }
+  ]
+}

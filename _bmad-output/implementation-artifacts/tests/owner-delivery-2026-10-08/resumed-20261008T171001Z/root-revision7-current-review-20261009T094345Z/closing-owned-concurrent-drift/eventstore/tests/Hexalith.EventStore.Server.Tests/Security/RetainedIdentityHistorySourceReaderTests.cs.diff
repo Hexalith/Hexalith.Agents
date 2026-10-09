@@ -1,0 +1,31 @@
+--- /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/source/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs
++++ /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/closing-owned-concurrent-drift/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs
+@@ -357,8 +357,6 @@
+     [InlineData("metadata-version", true)]
+     [InlineData("event-contract", false)]
+     [InlineData("event-contract", true)]
+-    [InlineData("payload-version", false)]
+-    [InlineData("payload-version", true)]
+     public async Task UnsupportedStoredMetadata_DeniesBeforeCustody(string corruption, bool excludedProfile)
+     {
+         RetainedIdentityHistorySourceReader reader = Arrange();
+@@ -379,6 +377,19 @@
+         result.Stream.ShouldBeNull();
+         result.FailureReason.ShouldBe("history-source-metadata-unsupported");
+         await _custody.DidNotReceiveWithAnyArgs().UnprotectEventAsync(default!, default!, default!, default!, default);
++    }
++
++    [Fact]
++    public async Task MetadataV1PayloadVersionPassesHistoryMetadataAdmission() {
++        RetainedIdentityHistorySourceReader reader = Arrange();
++        EventEnvelope profile = Stored(1, "ErasedProfile", "sealed") with { PayloadVersion = 2 };
++        EventEnvelope history = Stored(2, typeof(HistoryCustodyProbeEvent).FullName!, "sealed-history") with { PayloadVersion = 2 };
++        _actor.ReadEventsRangeAsync(0, 2, 100).Returns([profile, history]);
++
++        RetainedIdentityHistoryReadResult result = await reader.ReadAsync(_principal, Request());
++
++        result.IsAuthoritative.ShouldBeTrue();
++        result.Stream!.Events.ShouldHaveSingleItem().SequenceNumber.ShouldBe(2);
+     }
+ 
+     /// <summary>Custody receives a copy so a mutating provider cannot overwrite sealed source bytes.</summary>

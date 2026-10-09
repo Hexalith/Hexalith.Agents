@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-08T21:31:21.091186+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Queries/DaprLogicalQueryFixture.cs",
+      "existed": true,
+      "sha256": "02d7c3017f30654037ab3801754af463b7c62adb9de3f777ed528ab5f8d8ab9a",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/external-query-build/before/eventstore/tests/Hexalith.EventStore.Server.Tests/Queries/DaprLogicalQueryFixture.cs"
+    }
+  ]
+}

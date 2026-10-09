@@ -1,0 +1,19 @@
+{
+  "auditedUtc": "2026-10-09T00:34:02.170368+00:00",
+  "currentFrozenFiles": 380,
+  "existingCSharpFiles": 344,
+  "suppliedBeforeCopiesChecked": 404,
+  "historicalLaterHashOnlyRows": 71,
+  "currentShaMatches": true,
+  "oneTopLevelTypePerCSharpFile": true,
+  "crlfExceptPreservedConcurrentQueryFixture": true,
+  "frozenParentPreserved": true,
+  "sourceDeltaReadCompletely": {
+    "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision3-current-review-20261009T003112Z/root-source-inspection-delta.diff",
+    "lines": 1765,
+    "sections": 31,
+    "sha256": "1287dec45d1af3bcb5cad2a7266212067c1ed4142e135043bd4659cc1d28b4a4"
+  },
+  "artifactDeltaInspection": "Structured hash/log/XML audit; no claim that all generated metadata lines were read as prose.",
+  "errors": []
+}

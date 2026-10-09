@@ -1,0 +1,10 @@
+{
+  "capturedUtc": "2026-10-08T23:22:22.448129+00:00",
+  "manifest": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/review-input.json",
+  "manifestSha256": "37e9a608fae5766fe6bf4c44580246950df46608bc8a5e352f1a4c6a16b1416d",
+  "diffFile": "/tmp/hexalith-owner-source-review-802s8s4l.diff",
+  "diffSha256": "233586353f9dcff25741f48f4deb2ce5b3e288ab363a0b4f56c24f32acdb84b0",
+  "diffBytes": 1752244,
+  "sections": 357,
+  "scope": "Cumulative earliest explicit before-capture to frozen current owned source, including new files; absolute source headers; CRLF normalized only for review readability. No staging or Git mutations."
+}

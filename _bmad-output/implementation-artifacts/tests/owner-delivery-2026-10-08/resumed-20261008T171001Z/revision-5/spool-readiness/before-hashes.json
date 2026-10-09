@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-09T02:19:55.990618+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "existed": true,
+      "sha256": "3e20782e7e7e69854778bc754b8768615f996cdbd44e78fc957b53de7fad98e3",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/spool-readiness/before/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+      "existed": true,
+      "sha256": "e43f262d8fbb717d4945a247e8245ca7d28cf5800d6e8e7b569e395336a3b254",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-5/spool-readiness/before/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs"
+    }
+  ]
+}

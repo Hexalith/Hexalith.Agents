@@ -1,0 +1,171 @@
+{
+  "capturedUtc": "2026-10-09T07:48:06.193853+00:00",
+  "newPublicTestClasses": [],
+  "editedPublicTestClassesRemainExisting": true,
+  "allEditedClassesActuallyExecutedInCorrectProject": true,
+  "paths": [
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "beforePublicClasses": [],
+      "currentPublicClasses": [],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "beforePublicClasses": [
+        "ConversationDeletionDeliveryPumpTests"
+      ],
+      "currentPublicClasses": [
+        "ConversationDeletionDeliveryPumpTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Conversations.Server.Tests.Agents.ConversationDeletionDeliveryPumpTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/PumpClock.cs",
+      "beforePublicClasses": [],
+      "currentPublicClasses": [],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/PumpTimer.cs",
+      "beforePublicClasses": [],
+      "currentPublicClasses": [],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs",
+      "beforePublicClasses": [
+        "DirectoryAtomicAppendTests"
+      ],
+      "currentPublicClasses": [
+        "DirectoryAtomicAppendTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "beforePublicClasses": [
+        "RetainedIdentityHistorySourceReaderTests"
+      ],
+      "currentPublicClasses": [
+        "RetainedIdentityHistorySourceReaderTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ActorPendingFixture.cs",
+      "beforePublicClasses": [],
+      "currentPublicClasses": [],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/AnchoredFixtureJournal.cs",
+      "beforePublicClasses": [],
+      "currentPublicClasses": [],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "beforePublicClasses": [
+        "CustodyKeyLifecycleTests"
+      ],
+      "currentPublicClasses": [
+        "CustodyKeyLifecycleTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs",
+      "beforePublicClasses": [],
+      "currentPublicClasses": [],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": []
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "beforePublicClasses": [
+        "DeletionBatchExecutionCoordinatorTests"
+      ],
+      "currentPublicClasses": [
+        "DeletionBatchExecutionCoordinatorTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "beforePublicClasses": [
+        "DeletionCapabilitySigningActorTests"
+      ],
+      "currentPublicClasses": [
+        "DeletionCapabilitySigningActorTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "beforePublicClasses": [
+        "ExportKeyDeliveryActorTests"
+      ],
+      "currentPublicClasses": [
+        "ExportKeyDeliveryActorTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs",
+      "beforePublicClasses": [
+        "PrivateOwnerOperationAuthenticatorTests"
+      ],
+      "currentPublicClasses": [
+        "PrivateOwnerOperationAuthenticatorTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationAuthenticatorTests"
+      ]
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs",
+      "beforePublicClasses": [
+        "TrustedEnvelopeReplayVerifierTests"
+      ],
+      "currentPublicClasses": [
+        "TrustedEnvelopeReplayVerifierTests"
+      ],
+      "newPublicTestClasses": [],
+      "currentFocusedClasses": [
+        "Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests"
+      ]
+    }
+  ],
+  "ownerRunnerSourceChanges": false,
+  "priorRequiredMappingsPreserved": true,
+  "prior44ClassExecutionRequirement": "preserved; root full Local map/execution audit pending, not claimed by engineering.",
+  "rootFullLocalExecution": "pending; root recomputes cumulative execution and maps after source freeze"
+}

@@ -1,0 +1,698 @@
+{
+  "scope": "Preliminary source inspection; engineer continues. Pre-existing Platform wrapper removal excluded from workflow attribution.",
+  "changed": [
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/README.md",
+      "lines": 59,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+      "lines": 41,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+      "lines": 50,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+      "lines": 43,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+      "lines": 45,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "eng/verify-ext-conv-ai-1.ps1",
+      "lines": 118,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationAgentServiceCollectionExtensions.cs",
+      "lines": 51,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationTenantCatalogueRegistration.cs",
+      "lines": 7,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/EventStoreConversationTenantCatalogue.cs",
+      "lines": 54,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs",
+      "lines": 115,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourceNamespaceSnapshotReader.cs",
+      "lines": 148,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionBatchCapabilityIdentity.cs",
+      "lines": 87,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/ExpiredIdentityHistoryCertificate.cs",
+      "lines": 22,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceAuthorization.cs",
+      "lines": 15,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceBatchCommand.cs",
+      "lines": 24,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceBatchState.cs",
+      "lines": 31,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceContentBinding.cs",
+      "lines": 9,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceDeletionState.cs",
+      "lines": 17,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs",
+      "lines": 40,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardOperation.cs",
+      "lines": 58,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardReduction.cs",
+      "lines": 8,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardTransition.cs",
+      "lines": 18,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceHoldCommand.cs",
+      "lines": 8,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceHoldState.cs",
+      "lines": 10,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceOrdinalCommand.cs",
+      "lines": 16,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceOwnerCycle.cs",
+      "lines": 8,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceProtectionTarget.cs",
+      "lines": 7,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceProtocolReceipt.cs",
+      "lines": 19,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceRepairState.cs",
+      "lines": 9,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceScopeV1.cs",
+      "lines": 8,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceSigningRecovery.cs",
+      "lines": 9,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceViolation.cs",
+      "lines": 18,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceWriteFacts.cs",
+      "lines": 15,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCell.cs",
+      "lines": 7,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitReceipt.cs",
+      "lines": 15,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitRequest.cs",
+      "lines": 17,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitResult.cs",
+      "lines": 5,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitStatus.cs",
+      "lines": 16,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateMutation.cs",
+      "lines": 6,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateTransactionTarget.cs",
+      "lines": 10,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IDeletionCapabilityCompromiseRegistrar.cs",
+      "lines": 14,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IDeletionProtectionOwner.cs",
+      "lines": 14,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IExpiredIdentityHistoryCustody.cs",
+      "lines": 14,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IGovernanceScopeGuard.cs",
+      "lines": 12,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/TenantGovernanceGuardState.cs",
+      "lines": 17,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/RetainedIdentityHistoryStream.cs",
+      "lines": 32,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/RetainedIdentityHistoryValidator.cs",
+      "lines": 82,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourceNamespaceFold.cs",
+      "lines": 6,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourceNamespaceSnapshot.cs",
+      "lines": 7,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprDeletionCapabilityCompromiseRegistrar.cs",
+      "lines": 32,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprDeletionProtectionOwner.cs",
+      "lines": 30,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "lines": 204,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs",
+      "lines": 59,
+      "newSinceSaved": false
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "lines": 170,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "lines": 385,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IGovernanceGuardAuthority.cs",
+      "lines": 17,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IGuardedStateTransactionAuthority.cs",
+      "lines": 24,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "lines": 252,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs",
+      "lines": 120,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/ExpiredIdentityHistorySourceTests.cs",
+      "lines": 75,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/FalseCountGuardMutations.cs",
+      "lines": 13,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs",
+      "lines": 109,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "lines": 233,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs",
+      "lines": 162,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GuardedTransactionFixture.cs",
+      "lines": 79,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/RetainedHistoryTimeProvider.cs",
+      "lines": 41,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "lines": 574,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "parties",
+      "relativePath": "eng/verify-ext-parties-1.ps1",
+      "lines": 115,
+      "newSinceSaved": false
+    },
+    {
+      "repository": "parties",
+      "relativePath": "src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs",
+      "lines": 309,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "parties",
+      "relativePath": "src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs",
+      "lines": 161,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "parties",
+      "relativePath": "tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+      "lines": 1706,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "eng/verify-ext-secrets-1.ps1",
+      "lines": 78,
+      "newSinceSaved": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchCapabilityCodec.cs",
+      "lines": 59,
+      "newSinceSaved": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "lines": 93,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchExecutionResult.cs",
+      "lines": 10,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchGuardSnapshot.cs",
+      "lines": 7,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityNoIssueProof.cs",
+      "lines": 11,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityRevocationAuthorization.cs",
+      "lines": 11,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityRevocationSubscriber.cs",
+      "lines": 97,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityRevocationSubscription.cs",
+      "lines": 7,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "lines": 195,
+      "newSinceSaved": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningOutcome.cs",
+      "lines": 18,
+      "newSinceSaved": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningState.cs",
+      "lines": 18,
+      "newSinceSaved": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs",
+      "lines": 31,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/EventStoreDeletionBatchGuardPort.cs",
+      "lines": 89,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/EventStoreDeletionCapabilityNoIssueAuthority.cs",
+      "lines": 16,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34CanaryAuthorization.cs",
+      "lines": 6,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34CanaryReference.cs",
+      "lines": 6,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34PersistedCanary.cs",
+      "lines": 7,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs",
+      "lines": 85,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionReadinessCheck.cs",
+      "lines": 13,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionStartupGate.cs",
+      "lines": 13,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionTarget.cs",
+      "lines": 6,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionBatchGuardPort.cs",
+      "lines": 18,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilityGuardRevocationMirror.cs",
+      "lines": 16,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilityNoIssueAuthority.cs",
+      "lines": 12,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilityRevocationAuthenticator.cs",
+      "lines": 13,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningActor.cs",
+      "lines": 15,
+      "newSinceSaved": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IFr34CanaryAuthority.cs",
+      "lines": 10,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IFr34PersistedCanaryReader.cs",
+      "lines": 8,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IFr34ProtectionCanaryEngine.cs",
+      "lines": 16,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ITrustedEnvelopeReplayRegistrar.cs",
+      "lines": 14,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformPrivateCapabilityComposition.cs",
+      "lines": 35,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformSecurityDenialRecorder.cs",
+      "lines": 57,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/TrustedEnvelopeReplayIntent.cs",
+      "lines": 8,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/TrustedEnvelopeReplayReceipt.cs",
+      "lines": 8,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/TrustedEnvelopeReplayVerifier.cs",
+      "lines": 54,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "lines": 91,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionFixture.cs",
+      "lines": 99,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchTransactionFixture.cs",
+      "lines": 79,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs",
+      "lines": 92,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "lines": 305,
+      "newSinceSaved": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs",
+      "lines": 123,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PlatformSecurityDenialRecorderTests.cs",
+      "lines": 52,
+      "newSinceSaved": true
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs",
+      "lines": 85,
+      "newSinceSaved": true
+    }
+  ],
+  "diffPath": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-preliminary-current-review-20261008T185500Z/saved-to-preliminary-readable.diff",
+  "sha256": "e53626f1978f34637922b5da83e239b7ddbdaf61cab192c0678a47c96dac2135",
+  "lines": 8161
+}

@@ -1,0 +1,185 @@
+<assemblies schema-version="3" id="26cbe245-e29e-4ab9-869b-5576537aa8d4" computer="DESKTOP-VIOG240" user="administrator" start-rtf="2026-10-09T01:11:24.1826374+00:00" finish-rtf="2026-10-09T01:11:56.4174841+00:00" timestamp="10/09/2026 03:11:56"><assembly environment="64-bit (x64) .NET 10.0.12 [collection-per-class, parallel (collections, 14 threads)]" id="44ca828f-0da5-4578-aa6f-b23d7df5077f" name="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests.dll" run-date="2026-10-09" run-time="01:11:24" start-rtf="2026-10-09T01:11:24.1826374+00:00" test-framework="xUnit.net v3 4.0.1+8ed8aa354c" target-framework=".NETCoreApp,Version=v10.0" errors="0" failed="16" finish-rtf="2026-10-09T01:11:56.4174841+00:00" not-run="0" passed="0" skipped="0" time="32.237" time-rtf="00:00:32.2370000" total="16"><collection name="Test collection for Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests (id: 333c06b4980e30ba809fbc528297037fc9d536eb98fc7e28fb38c779f6b1d333)" id="6327a2e3-8443-4078-9963-ff576e8efea4" failed="16" not-run="0" passed="0" skipped="0" time="32.115" time-rtf="00:00:32.1150000" total="16"><test id="6ce04431-1817-4565-b150-8e6243c7b7b5" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;block-initial\&quot;, traversal: False, cancelCaller: False)" result="Fail" time="2.074" time-rtf="00:00:02.0740000" start-rtf="2026-10-09T01:11:24.2550156+00:00" finish-rtf="2026-10-09T01:11:26.3472607+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 164
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="00c9c22c-2cce-47b4-85e0-5aeb5839c105" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;block-initial\&quot;, traversal: False, cancelCaller: True)" result="Fail" time="2.02" time-rtf="00:00:02.0200000" start-rtf="2026-10-09T01:11:26.3496725+00:00" finish-rtf="2026-10-09T01:11:28.3711402+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 162
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="27b30cf4-582e-423c-b918-330d796ac0fd" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;block-initial\&quot;, traversal: True, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:11:28.3712426+00:00" finish-rtf="2026-10-09T01:11:30.3736292+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 164
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="83193ee5-0c88-4726-9e8f-88bda50dab7e" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;block-initial\&quot;, traversal: True, cancelCaller: True)" result="Fail" time="2.002" time-rtf="00:00:02.0019999" start-rtf="2026-10-09T01:11:30.3738131+00:00" finish-rtf="2026-10-09T01:11:32.3766881+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 162
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="fb6c3105-26e8-4f83-878a-0b7d71d68172" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;block-lost-ack\&quot;, traversal: False, cancelCaller: False)" result="Fail" time="2.003" time-rtf="00:00:02.0030000" start-rtf="2026-10-09T01:11:32.3767932+00:00" finish-rtf="2026-10-09T01:11:34.3808450+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 164
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="6eef07cd-bac7-4736-a4b1-7be2b2d042b9" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;block-lost-ack\&quot;, traversal: False, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:11:34.3809399+00:00" finish-rtf="2026-10-09T01:11:36.3818029+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 162
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="233bb3f9-6d2f-4c8d-942d-9d41331f48f4" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;block-lost-ack\&quot;, traversal: True, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:11:36.3818977+00:00" finish-rtf="2026-10-09T01:11:38.3840847+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 164
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="ce91650c-c43c-4fb0-9a80-cd13361afbc1" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;block-lost-ack\&quot;, traversal: True, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:11:38.3841830+00:00" finish-rtf="2026-10-09T01:11:40.3859529+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 162
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="86b59d7e-bfa4-490b-bc51-1971390d3ddf" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;mirror-initial\&quot;, traversal: False, cancelCaller: False)" result="Fail" time="2.002" time-rtf="00:00:02.0019999" start-rtf="2026-10-09T01:11:40.3860475+00:00" finish-rtf="2026-10-09T01:11:42.3889792+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 164
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="4825e6dd-103b-426c-bd66-335f8bbf4854" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;mirror-initial\&quot;, traversal: False, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:11:42.3890767+00:00" finish-rtf="2026-10-09T01:11:44.3908841+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 162
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="e0bfb1b3-7add-4fa0-b5c2-352e782f653d" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;mirror-initial\&quot;, traversal: True, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:11:44.3909748+00:00" finish-rtf="2026-10-09T01:11:46.3928487+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 164
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="12d4f991-3138-4a48-b1ae-ae72d710ff2f" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;mirror-initial\&quot;, traversal: True, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:11:46.3929568+00:00" finish-rtf="2026-10-09T01:11:48.3948011+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 162
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="8b482439-8b82-4e34-b66c-a5dd8c30d9ef" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;mirror-lost-ack\&quot;, traversal: False, cancelCaller: False)" result="Fail" time="2.003" time-rtf="00:00:02.0030000" start-rtf="2026-10-09T01:11:48.3948786+00:00" finish-rtf="2026-10-09T01:11:50.3991494+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 164
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="69898887-8210-4193-adeb-3974f9b8061a" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;mirror-lost-ack\&quot;, traversal: False, cancelCaller: True)" result="Fail" time="2.002" time-rtf="00:00:02.0019999" start-rtf="2026-10-09T01:11:50.3992407+00:00" finish-rtf="2026-10-09T01:11:52.4018509+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 162
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="ebc9160c-a714-4d25-8b23-6ed6120b34d5" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;mirror-lost-ack\&quot;, traversal: True, cancelCaller: False)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:11:52.4019457+00:00" finish-rtf="2026-10-09T01:11:54.4038621+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="System.TimeoutException"><message>System.TimeoutException : The operation has timed out.</message><stack-trace>   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 164
+--- End of stack trace from previous location ---</stack-trace></failure></test><test id="ab894fc6-46b8-4db4-bc26-ba220f53afa5" name="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(vector: \&quot;mirror-lost-ack\&quot;, traversal: True, cancelCaller: True)" result="Fail" time="2.001" time-rtf="00:00:02.0010000" start-rtf="2026-10-09T01:11:54.4039486+00:00" finish-rtf="2026-10-09T01:11:56.4062179+00:00" type="Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests" method="SuspendedReceiptCaptureReleasesCallerWithoutLateMirror" source-file="/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs" source-line="99"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : Task `operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)`
+    should throw
+System.OperationCanceledException
+    but threw
+System.TimeoutException</message><stack-trace>   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task&amp; currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests.SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(String vector, Boolean traversal, Boolean cancelCaller) in /home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs:line 162
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test></collection></assembly></assemblies>

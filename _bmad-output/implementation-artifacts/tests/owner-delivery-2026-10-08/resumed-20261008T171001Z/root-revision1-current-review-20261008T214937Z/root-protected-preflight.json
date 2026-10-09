@@ -1,0 +1,41 @@
+{
+  "capturedUtc": "2026-10-08T21:52:33.820943+00:00",
+  "phase": "review-awaiting-all-reports",
+  "checks": [
+    {
+      "path": "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md",
+      "expected": "5b1de576274f93a464322c18ee977e8bc4d489c2b8569a64986de3c4fc5304b1",
+      "actual": "5b1de576274f93a464322c18ee977e8bc4d489c2b8569a64986de3c4fc5304b1",
+      "passed": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/sprint-status.yaml",
+      "expected": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+      "actual": "b72bc45b7a645d56a5981dbd1463f50a410ec39605c17be05222f6e6e2229691",
+      "passed": true
+    },
+    {
+      "path": "_bmad-output/planning-artifacts/external-dependency-register.md",
+      "expected": "184e16c05b57527abcdbd8588ae0c9fa10fe4c6093a53e66a509e9aa39fbcccb",
+      "actual": "184e16c05b57527abcdbd8588ae0c9fa10fe4c6093a53e66a509e9aa39fbcccb",
+      "passed": true
+    },
+    {
+      "path": "../parties/_bmad-output/planning-artifacts/actor-history-retention-policy-v1.md",
+      "expected": "8f6780d252154803343432e2126e596209e432284cfddf1c7f5b9eb596aa2fe1",
+      "actual": "8f6780d252154803343432e2126e596209e432284cfddf1c7f5b9eb596aa2fe1",
+      "passed": true
+    },
+    {
+      "scope": "frozen-parent",
+      "expected": "0cd11ddac96af9775593ea0aa24d969b235b32dfcc4a76a80e51d7eb9c82e2cb",
+      "actual": "0cd11ddac96af9775593ea0aa24d969b235b32dfcc4a76a80e51d7eb9c82e2cb",
+      "passed": true
+    },
+    {
+      "scope": "authorized-four-date-cells-only",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

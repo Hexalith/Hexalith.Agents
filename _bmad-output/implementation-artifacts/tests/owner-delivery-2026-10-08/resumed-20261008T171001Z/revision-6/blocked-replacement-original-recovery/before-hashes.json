@@ -1,0 +1,34 @@
+{
+  "capturedUtc": "2026-10-09T07:20:49.448588+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "existed": true,
+      "sha256": "290391112d1ea08bb7ca918e7fbacd357807411762566a39a57faaa97e6b91e0",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-original-recovery/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionOperation.cs",
+      "existed": true,
+      "sha256": "7548e244885a6a029677d23d2edb77e059bed5e478dd7211211baae9db7bee74",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-original-recovery/before/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionOperation.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "existed": true,
+      "sha256": "dde8bab33836b9d316a56518a9a8722afd8751cdcbcac8a52bb1d8976de1f3a7",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-original-recovery/before/platform/src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "existed": true,
+      "sha256": "f923561b4c9ad0fb740e0bcad024824460a92e010b6cddf5b2f8b50939c1ea04",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-6/blocked-replacement-original-recovery/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs"
+    }
+  ]
+}

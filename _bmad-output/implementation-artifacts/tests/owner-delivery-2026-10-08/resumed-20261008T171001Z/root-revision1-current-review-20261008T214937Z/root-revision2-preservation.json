@@ -1,0 +1,10 @@
+{
+  "capturedUtc": "2026-10-08T22:06:40.563014+00:00",
+  "oldSpecSha256": "66ed94f19f1de1ae47aac1d81d1c6714dafcb45f558e541ac5981369ff8de47a",
+  "newSpecSha256": "ea8070138ff776b62cf3b2ccc49422c966d01cd33a6864e12c1d8f1920780b5f",
+  "frozenBeforeSha256": "0cd11ddac96af9775593ea0aa24d969b235b32dfcc4a76a80e51d7eb9c82e2cb",
+  "frozenAfterSha256": "0cd11ddac96af9775593ea0aa24d969b235b32dfcc4a76a80e51d7eb9c82e2cb",
+  "iteration": 2,
+  "sourceResetPerformed": false,
+  "sourceMutationsByRoot": false
+}

@@ -1,0 +1,47 @@
+{
+  "capturedUtc": "2026-10-09T07:53:39.579611+00:00",
+  "frozenPaths": 402,
+  "captureCount": 142,
+  "exactEarlierInputHashPrefix": 125,
+  "previewReadSha256": "6a3a160ed928cf1c6323285229ed5738835b2bbae92f2055fc73a1f12f0293ad",
+  "postPreviewChanges": [
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "start": 1,
+      "lines": 29
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/PumpClock.cs",
+      "start": 30,
+      "lines": 20
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/PumpTimer.cs",
+      "start": 50,
+      "lines": 14
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementReconciliation.cs",
+      "start": 64,
+      "lines": 10
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/eventstore/src/Hexalith.EventStore.Contracts/Security/DeletionBlockedReplacementResult.cs",
+      "start": 74,
+      "lines": 8
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+      "start": 82,
+      "lines": 12
+    },
+    {
+      "sourcePath": "/home/administrator/projects/hexalith/platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationMachine.cs",
+      "start": 94,
+      "lines": 7
+    }
+  ],
+  "postPreviewLines": 100,
+  "errors": [],
+  "remainingRead": "All post-preview C# delta and four complete owner packets"
+}

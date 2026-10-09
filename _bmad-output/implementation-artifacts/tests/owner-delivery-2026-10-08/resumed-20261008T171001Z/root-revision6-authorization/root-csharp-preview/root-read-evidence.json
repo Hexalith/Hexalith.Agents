@@ -1,0 +1,23 @@
+{
+  "capturedUtc": "2026-10-09T07:43:35.104521+00:00",
+  "copiedCSharpDeltaReadFully": true,
+  "lines": 2791,
+  "paths": 42,
+  "diffSha256": "6a3a160ed928cf1c6323285229ed5738835b2bbae92f2055fc73a1f12f0293ad",
+  "readRanges": [
+    "1-639 with truncation gap reread125-456",
+    "640-1218 with truncation gap reread819-959",
+    "1219-1533",
+    "1534-1841",
+    "1842-2220",
+    "2221-2530",
+    "2531-2791"
+  ],
+  "requiredBeforeFinalAssessment": "Confirm preview code hashes against the complete stable final handoff and read every resulting declaration/layout delta plus every four updated owner packet; no final review or full matrix claimed.",
+  "newTypeLayoutCorrectionsForwardedToSoleEngineer": [
+    "DeletionBlockedReplacementResult",
+    "PumpClock",
+    "PumpTimer",
+    "Machine"
+  ]
+}

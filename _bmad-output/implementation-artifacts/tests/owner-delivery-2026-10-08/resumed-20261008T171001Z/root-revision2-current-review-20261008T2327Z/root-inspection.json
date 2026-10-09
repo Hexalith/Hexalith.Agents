@@ -1,0 +1,8 @@
+{
+  "capturedUtc": "2026-10-08T23:24:39.670034+00:00",
+  "delta": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/root-inspection-delta.diff",
+  "deltaSha256": "52528d26029d274506afd3662ca5f35c6712a8d2440a10c31df5e3b6e9c55275",
+  "readCompletely": "lines1-2616 across sequential reads",
+  "allFrozenSourceHashesCurrent": true,
+  "scope": "Entire previous reviewed source preserved; root read full revision2 delta plus engineer handoff/commands/packets and checked focused XML/protection/capture/artifact hashes. Source review still pending all3 reports."
+}

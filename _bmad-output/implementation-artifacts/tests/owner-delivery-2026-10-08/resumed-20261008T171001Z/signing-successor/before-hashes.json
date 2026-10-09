@@ -1,0 +1,54 @@
+{
+  "files": [
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityNoIssueProof.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilityNoIssueAuthority.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs",
+      "existed": false
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/signing-successor/before/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "beforeSha256": "b316984a4305ee494642c377ecc400d332c4bbb5da2360b58b7ce8560e0a2cc0"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningOutcome.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/signing-successor/before/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningOutcome.cs",
+      "beforeSha256": "3cbac0c218c64f224a824f3e5a4757640b7c0601fa05f4318b54497d1032d7f4"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningState.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/signing-successor/before/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningState.cs",
+      "beforeSha256": "7d1681d9d98b727eb3462168110e50abd2ed45cb702e4a4bc30e736bf24773f8"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningActor.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/signing-successor/before/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningActor.cs",
+      "beforeSha256": "ac16e59e82f55f5bc978fc30024e02210620a736a5cc8f2bbc7ac24c61c04c1a"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "existed": true,
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/signing-successor/before/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "beforeSha256": "d6e0f7065a18a774931837cd47ddfe2bfae24efdb11e7f2d5819387c7066c779"
+    }
+  ]
+}

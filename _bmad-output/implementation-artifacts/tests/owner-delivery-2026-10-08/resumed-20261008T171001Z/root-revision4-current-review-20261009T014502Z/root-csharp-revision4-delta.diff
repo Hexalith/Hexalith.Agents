@@ -1,0 +1,1935 @@
+--- prior/eventstore/src/Hexalith.EventStore.Client/Streams/SourceNamespaceSnapshotReader.cs
++++ current/eventstore/src/Hexalith.EventStore.Client/Streams/SourceNamespaceSnapshotReader.cs
+@@ -42,7 +42,8 @@
+                 cancellationToken, clock.GetTimestamp());
+             try
+             {
+-                var initial = CaptureCut(await deadline.ReadAsync(token => namespaces.ReadAsync(scope, token)).ConfigureAwait(false), scope, deadline);
++                var suppliedInitial = await deadline.ReadAsync(token => namespaces.ReadAsync(scope, token)).ConfigureAwait(false);
++                var initial = await deadline.ReadAsync(_ => Task.FromResult(CaptureCut(suppliedInitial, scope, deadline))).ConfigureAwait(false);
+                 if (initial is null) { return null; }
+                 var sources = new List<T>();
+                 long retainedBytes = 0;
+@@ -53,36 +54,19 @@
+                     // An uncreated registration has no source bytes to read; gateway NotFound is not a hole.
+                     if (head.Head == 0) { continue; }
+                     var read = await deadline.ReadAsync(token => streams.ReadAsync(head.Identity, token)).ConfigureAwait(false);
+-                    if (!read.IsAuthoritative || read.Stream is not { } source || source.Identity != head.Identity
+-                        || source.Head < head.Head || source.Events is null || source.Events.Count < head.Head || source.Head > 10000 || source.Events.Count > 10000
+-                        || source.ObservedAt == default || source.ObservedAt > clock.GetUtcNow()
+-                        || string.IsNullOrWhiteSpace(source.ObservationId)) { return null; }
+-                    var events = new List<StreamReadEvent>();
+-                    long payloadBytes = 0;
+-                    foreach (var item in source.Events)
+-                    {
+-                        deadline.ThrowIfCancellationRequested();
+-                        if (events.Count == head.Head) { break; }
+-                        if (item is null || item.SequenceNumber != events.Count + 1L
+-                            || item.Payload is null || item.Payload.Length > 16 * 1024 * 1024 - payloadBytes
+-                            || string.IsNullOrWhiteSpace(item.EventTypeName) || string.IsNullOrWhiteSpace(item.MessageId)
+-                            || item.MetadataVersion <= 0 || string.IsNullOrWhiteSpace(item.SerializationFormat)) { return null; }
+-                        var payload = item.Payload.ToArray();
+-                        payloadBytes += payload.Length;
+-                        if (retainSourceBytes)
+-                        {
+-                            retainedBytes += payload.Length;
+-                            if (retainedBytes > 16 * 1024 * 1024) { return null; }
+-                        }
+-                        events.Add(item with { Payload = payload, ProtectionMetadata = CaptureProtection(item.ProtectionMetadata, deadline) });
+-                    }
+-                    if (events.Count != head.Head) { return null; }
+-                    var value = await deadline.ReadAsync(token => Task.FromResult(fold(source with { Head = head.Head, Events = events.AsReadOnly() }, token))).ConfigureAwait(false);
++                    // Capture uses only a local byte counter; abandoned worker progress never changes this operation's retained state.
++                    long alreadyRetained = retainedBytes;
++                    var captured = await deadline.ReadAsync(_ => Task.FromResult(CaptureSource(read, head, deadline,
++                        retainSourceBytes ? 16 * 1024 * 1024 - alreadyRetained : 16 * 1024 * 1024))).ConfigureAwait(false);
++                    if (captured is null) { return null; }
++                    if (retainSourceBytes) { retainedBytes += captured.Value.PayloadBytes; }
++                    var value = await deadline.ReadAsync(token => Task.FromResult(fold(captured.Value.Source, token))).ConfigureAwait(false);
+                     deadline.ThrowIfCancellationRequested();
+                     if (value is null) { return null; }
+                     sources.Add(value);
+                 }
+-                var final = CaptureCut(await deadline.ReadAsync(token => namespaces.ReadAsync(scope, token)).ConfigureAwait(false), scope, deadline);
++                var suppliedFinal = await deadline.ReadAsync(token => namespaces.ReadAsync(scope, token)).ConfigureAwait(false);
++                var final = await deadline.ReadAsync(_ => Task.FromResult(CaptureCut(suppliedFinal, scope, deadline))).ConfigureAwait(false);
+                 deadline.ThrowIfCancellationRequested();
+                 return final is not null && final.AuthorityRevision == initial.AuthorityRevision
+                     && final.Sources.SequenceEqual(initial.Sources)
+@@ -93,6 +77,30 @@
+             { cancellationToken.ThrowIfCancellationRequested(); return null; }
+         }
+         catch (Exception) { cancellationToken.ThrowIfCancellationRequested(); throw; }
++    }
++
++    private (AuthoritativeEventStream Source, long PayloadBytes)? CaptureSource(AuthoritativeStreamReadResult read,
++        SourcePublicationHead head, AuthoritativeStreamReadDeadline deadline, long maximumBytes)
++    {
++        deadline.ThrowIfCancellationRequested();
++        if (!read.IsAuthoritative || read.Stream is not { } source || source.Identity != head.Identity
++            || source.Head < head.Head || source.Events is null || source.Events.Count < head.Head || source.Head > 10000 || source.Events.Count > 10000
++            || source.ObservedAt == default || source.ObservedAt > clock.GetUtcNow()
++            || string.IsNullOrWhiteSpace(source.ObservationId)) { return null; }
++        var events = new List<StreamReadEvent>(); long payloadBytes = 0;
++        foreach (var item in source.Events)
++        {
++            deadline.ThrowIfCancellationRequested();
++            if (events.Count == head.Head) { break; }
++            if (item is null || item.SequenceNumber != events.Count + 1L
++                || item.Payload is null || item.Payload.Length > maximumBytes - payloadBytes
++                || string.IsNullOrWhiteSpace(item.EventTypeName) || string.IsNullOrWhiteSpace(item.MessageId)
++                || item.MetadataVersion <= 0 || string.IsNullOrWhiteSpace(item.SerializationFormat)) { return null; }
++            var payload = item.Payload.ToArray(); payloadBytes += payload.Length;
++            events.Add(item with { Payload = payload, ProtectionMetadata = CaptureProtection(item.ProtectionMetadata, deadline) });
++        }
++        deadline.ThrowIfCancellationRequested();
++        return events.Count == head.Head ? (source with { Head = head.Head, Events = events.AsReadOnly() }, payloadBytes) : null;
+     }
+ 
+     private SourcePublicationCut? CaptureCut(SourcePublicationCut? cut, SourcePublicationScope scope, AuthoritativeStreamReadDeadline deadline)
+--- prior/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs
++++ current/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs
+@@ -64,8 +64,19 @@
+                 var progress = await store.ReadReconciliationProgressAsync(initial, token).ConfigureAwait(false);
+                 return progress is null ? null : SourcePublicationReconciliationProgress.Capture(progress);
+             }).ConfigureAwait(false);
+-            if (retained is not null && (!retained.MatchesCut(initial) || prior?.ReconciliationProgress is null
+-                || !SameProgress(retained, prior.ReconciliationProgress))) { return new(null, "publication-reconciliation-proof-unavailable"); }
++            SourcePublicationCut currentInitial = initial;
++            if (retained is not null && (prior?.ReconciliationProgress is null || !SameProgress(retained, prior.ReconciliationProgress))) { return new(null, "publication-reconciliation-proof-unavailable"); }
++            if (retained is not null && !retained.MatchesCut(initial))
++            {
++                if (!retained.CanContinueUnder(initial)) { return new(null, "publication-reconciliation-proof-unavailable"); }
++                if (retained.VerifiedSources < retained.Sources.Count)
++                {
++                    var original = await deadline.ReadAsync(_ => Task.FromResult(CaptureCut(retained.OriginalCut, scope, deadline))).ConfigureAwait(false);
++                    if (original is null) { return new(null, "publication-reconciliation-proof-unavailable"); }
++                    initial = original;
++                }
++                else { retained = null; } // Completed original work must not hide new publications from the next reconciliation.
++            }
+             if (retained is null && prior?.ReconciliationProgress?.MatchesCut(initial) == true)
+             { return new(null, "publication-reconciliation-proof-unavailable"); }
+             var projected = retained?.Publications.ToList() ?? [];
+@@ -100,7 +111,7 @@
+                 if (projected.Count > MaxEntries) { return new(null, "publication-operational-bound"); }
+                 var advanced = await deadline.ReadAsync(async token =>
+                 {
+-                    var proof = await store.AdvanceReconciliationProgressAsync(new(initial, sourceIndex - 1, target, result.ObservationId, result.Head, result.Publications), token).ConfigureAwait(false);
++                    var proof = await store.AdvanceReconciliationProgressAsync(new(initial, sourceIndex - 1, target, result.ObservationId, result.Head, result.Publications) { CurrentCut = currentInitial }, token).ConfigureAwait(false);
+                     return proof is null ? null : SourcePublicationReconciliationProgress.Capture(proof);
+                 }).ConfigureAwait(false);
+                 if (advanced is not null)
+@@ -133,9 +144,10 @@
+                     entries.Add(new(entries.Count + 1L, candidate));
+                 }
+             }
+-            // A changed namespace authority/cut cannot authenticate this reconciliation.
++            // Original finite-cut completion is separate from the freshly complete current inventory.
+             SourcePublicationCut? final = await ReadCutAsync(scope, deadline).ConfigureAwait(false);
+-            if (final is null || !SameCut(initial, final)) { return new(null, "publication-namespace-changed"); }
++            if (final is null || !SameCut(initial, final) && (retained is null || !await ConfirmReconciliationAsync(final, prior!, deadline).ConfigureAwait(false)))
++            { return new(null, "publication-namespace-changed"); }
+             long revision = prior?.Revision ?? 0;
+             var updated = new SourcePublicationIndexState(scope, checked(revision + 1), initial.AuthorityRevision,
+                 conflict is not null && prior is not null ? prior.Sources : initial.Sources,
+@@ -153,7 +165,7 @@
+             { return new(null, "publication-index-outcome-unknown"); }
+             deadline.ThrowIfCancellationRequested();
+             SourcePublicationCut? releaseCut = await ReadCutAsync(scope, deadline).ConfigureAwait(false);
+-            if (releaseCut is null || !SameCut(initial, releaseCut)) { return new(null, "publication-namespace-changed"); }
++            if (releaseCut is null || !SameCut(initial, releaseCut) && retained is null) { return new(null, "publication-namespace-changed"); }
+             if (persisted.PoisonCode is not null) { return new(null, persisted.PoisonCode); }
+             if (!await ConfirmReconciliationAsync(releaseCut, persisted, deadline).ConfigureAwait(false))
+             { return new(null, "publication-reconciliation-proof-unavailable"); }
+@@ -176,8 +188,9 @@
+         var initial = await ReadCutAsync(cut.Scope, deadline).ConfigureAwait(false);
+         var state = await ReadStateAsync(cut.Scope, deadline).ConfigureAwait(false);
+         if (initial is null || state is null || state.PoisonCode is not null || state.Revision < cut.IndexRevision || state.AuthorityRevision != cut.AuthorityRevision
+-            || initial.AuthorityRevision != cut.AuthorityRevision || !state.Sources.SequenceEqual(cut.Sources) || !initial.Sources.SequenceEqual(cut.Sources)
+-            || state.ReconciliationProgress is { } partial && (partial.VerifiedSources != partial.Sources.Count || !partial.MatchesCut(initial))
++            || initial.AuthorityRevision != cut.AuthorityRevision || !state.Sources.SequenceEqual(cut.Sources)
++            || !initial.Sources.SequenceEqual(cut.Sources) && (state.ReconciliationProgress is not { } continued || !continued.CanContinueUnder(initial))
++            || state.ReconciliationProgress is { } partial && partial.VerifiedSources != partial.Sources.Count
+             || state.Entries.Count != cut.LastOffset || afterOffset < 0 || afterOffset > state.Entries.Count) { return new(null, "publication-resume-cut-changed"); }
+         var entries = state.Entries.Where(e => e.Offset > afterOffset).Take(100).ToArray();
+         var durable = await ReadStateAsync(cut.Scope, deadline).ConfigureAwait(false);
+@@ -185,7 +198,8 @@
+         deadline.ThrowIfCancellationRequested();
+         if (durable is null || durable.Revision != state.Revision || durable.AuthorityRevision != state.AuthorityRevision || durable.PoisonCode != state.PoisonCode
+             || durable.DispatchProgress != state.DispatchProgress || !durable.Sources.SequenceEqual(state.Sources) || !durable.Entries.SequenceEqual(state.Entries)
+-            || final is null || !SameCut(initial, final)) { return new(null, "publication-resume-cut-changed"); }
++            || final is null || !SameCut(initial, final) && (durable.ReconciliationProgress is not { } preserved || !preserved.CanContinueUnder(final)))
++        { return new(null, "publication-resume-cut-changed"); }
+         if (!await ConfirmReconciliationAsync(final, durable, deadline).ConfigureAwait(false)) { return new(null, "publication-reconciliation-proof-unavailable"); }
+         long next = entries.Length == 0 ? afterOffset : entries[^1].Offset;
+         var checkpoint = new SourcePublicationCheckpoint(cut.Scope, durable.Revision, durable.AuthorityRevision, durable.Sources, durable.Entries.Count);
+@@ -207,7 +221,8 @@
+             return proof is null ? null : SourcePublicationReconciliationProgress.Capture(proof);
+         }).ConfigureAwait(false);
+         deadline.ThrowIfCancellationRequested();
+-        return fresh is not null && fresh.VerifiedSources == cut.Sources.Count && fresh.MatchesCut(cut) && SameProgress(fresh, original);
++        return fresh is not null && fresh.VerifiedSources == fresh.Sources.Count
++            && (fresh.MatchesCut(cut) || fresh.CanContinueUnder(cut)) && SameProgress(fresh, original);
+     }
+     private Task<SourcePublicationCut?> ReadCutAsync(SourcePublicationScope scope, AuthoritativeStreamReadDeadline deadline)
+         => deadline.ReadAsync(async token => CaptureCut(await namespaces.ReadAsync(scope, token).ConfigureAwait(false), scope, deadline));
+@@ -257,7 +272,11 @@
+     private static bool SameProgress(SourcePublicationReconciliationProgress? left, SourcePublicationReconciliationProgress? right)
+         => left is null ? right is null : right is not null && left.Scope == right.Scope && left.Version == right.Version
+             && left.SourceAuthorityRevision == right.SourceAuthorityRevision && left.VerifiedSources == right.VerifiedSources && left.ReceiptId == right.ReceiptId
+-            && left.Sources.SequenceEqual(right.Sources) && left.Publications.SequenceEqual(right.Publications);
++            && left.Sources.SequenceEqual(right.Sources) && left.Publications.SequenceEqual(right.Publications)
++            && SameOriginalCut(left.OriginalCut, right.OriginalCut);
++    private static bool SameOriginalCut(SourcePublicationCut? left, SourcePublicationCut? right)
++        => left is null ? right is null : right is not null && SameCut(left, right) && left.ObservedAt == right.ObservedAt
++            && left.ValidUntil == right.ValidUntil && left.IsComplete == right.IsComplete;
+ 
+     private SourcePublicationCut? CaptureCut(SourcePublicationCut? cut, SourcePublicationScope scope, AuthoritativeStreamReadDeadline deadline)
+     {
+--- prior/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryRepairOriginalIdentity.cs
++++ current/eventstore/src/Hexalith.EventStore.Contracts/Security/DirectoryRepairOriginalIdentity.cs
+@@ -0,0 +1,7 @@
++using Hexalith.EventStore.Contracts.Identity;
++
++namespace Hexalith.EventStore.Contracts.Security;
++
++/// <summary>Complete identity of one immutable original repair-cohort operation; the operation is scoped to its authoritative owner.</summary>
++/// <param name="Owner">Exact authoritative original owner.</param><param name="OperationId">Exact operation within that owner.</param>
++public sealed record DirectoryRepairOriginalIdentity(AggregateIdentity Owner, string OperationId);
+--- prior/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardTransition.cs
++++ current/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceGuardTransition.cs
+@@ -17,6 +17,8 @@
+ /// <param name="ReferenceId">Exact ReferenceId.</param>
+ public sealed record GovernanceGuardTransition(string TenantId, string OperationId, GovernanceGuardOperation Operation, long ExpectedGuardRevision, string EpochId, string DeletionRequestId, GovernanceScopeV1? Scope, GovernanceWriteFacts? Write, DirectoryRepairBoundary? Repair, GovernanceOrdinalCommand? Ordinal, GovernanceHoldCommand? Hold, GovernanceBatchCommand? Batch, string AuthorizationId, string ReferenceId)
+ {
++    /// <summary>Gets the complete original owner/operation identity only for bridge append or acknowledged drain. It grants no terminal-result or mutation authority.</summary>
++    public DirectoryRepairOriginalIdentity? BridgeOriginal { get; init; }
+     /// <summary>Complete original same-owner key block result; present only for the exact compromise mirror.</summary>
+     public DeletionCapabilityRevocationReceipt? RevocationReceipt { get; init; }
+ }
+--- prior/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceRepairState.cs
++++ current/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceRepairState.cs
+@@ -5,5 +5,9 @@
+ /// <param name="EpochId">Exact EpochId.</param>
+ /// <param name="CheckpointId">Exact CheckpointId.</param>
+ /// <param name="Cohort">Exact Cohort.</param>
+-/// <param name="DrainedOperationIds">Exact DrainedOperationIds.</param>
+-public sealed record GovernanceRepairState(string RepairId, string EpochId, string CheckpointId, IReadOnlyList<DirectoryRepairCohortItem> Cohort, IReadOnlyList<string> DrainedOperationIds);
++/// <param name="DrainedOperationIds">Legacy operation-only compatibility carrier; it cannot authorize complete-owner drains or successor activation.</param>
++public sealed record GovernanceRepairState(string RepairId, string EpochId, string CheckpointId, IReadOnlyList<DirectoryRepairCohortItem> Cohort, IReadOnlyList<string> DrainedOperationIds)
++{
++    /// <summary>Gets exact independently acknowledged complete original identities. Raw operation IDs grant no drain authority.</summary>
++    public IReadOnlyList<DirectoryRepairOriginalIdentity> DrainedOriginals { get; init; } = [];
++}
+--- prior/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationAdvance.cs
++++ current/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationAdvance.cs
+@@ -6,4 +6,8 @@
+ /// <param name="ObservedHead">Committed head observed by that source proof, possibly ahead of the cut prefix.</param>
+ /// <param name="Publications">Exact closed projection of that certified prefix, including an empty projection.</param>
+ public sealed record SourcePublicationReconciliationAdvance(SourcePublicationCut Cut, int ExpectedVerifiedSources, SourcePublicationHead Source,
+-    string ObservationId, long ObservedHead, IReadOnlyList<SourcePublicationDescriptor> Publications);
++    string ObservationId, long ObservedHead, IReadOnlyList<SourcePublicationDescriptor> Publications)
++{
++    /// <summary>Gets the freshly authenticated current complete cut when advancing the independently retained original finite cut. Omission requires exact current-cut identity.</summary>
++    public SourcePublicationCut? CurrentCut { get; init; }
++}
+--- prior/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationProgress.cs
++++ current/eventstore/src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationProgress.cs
+@@ -7,6 +7,19 @@
+ public sealed record SourcePublicationReconciliationProgress(SourcePublicationScope Scope, long Version, string SourceAuthorityRevision,
+     IReadOnlyList<SourcePublicationHead> Sources, int VerifiedSources, IReadOnlyList<SourcePublicationDescriptor> Publications, string ReceiptId)
+ {
++    /// <summary>Gets the independently retained original complete cut, including its unchanged observation and authority expiry. Missing legacy carriers cannot authorize changed-cut continuation.</summary>
++    public SourcePublicationCut? OriginalCut { get; init; }
++
++    /// <summary>Checks structural monotonic preservation only; it never authenticates a larger head or current permission.</summary>
++    public bool CanContinueUnder(SourcePublicationCut current)
++    {
++        ArgumentNullException.ThrowIfNull(current);
++        return OriginalCut is { IsComplete: true } original && MatchesCut(original) && current.IsComplete
++            && current.Scope == original.Scope && current.AuthorityRevision == original.AuthorityRevision
++            && current.Sources.Count == Sources.Count
++            && Sources.Zip(current.Sources).All(pair => pair.First.Identity == pair.Second.Identity && pair.First.Head <= pair.Second.Head);
++    }
++
+     /// <summary>Checks structural exact-cut identity only; independent fresh proof verification remains mandatory.</summary>
+     public bool MatchesCut(SourcePublicationCut cut)
+     {
+@@ -44,6 +57,23 @@
+             { throw new InvalidOperationException("Malformed reconciliation publication proof."); }
+             publications.Add(item);
+         }
+-        return progress with { Sources = heads.AsReadOnly(), Publications = publications.AsReadOnly() };
++        SourcePublicationCut? original = null;
++        if (progress.OriginalCut is { } supplied)
++        {
++            if (supplied.Scope != progress.Scope || !supplied.IsComplete || supplied.AuthorityRevision != progress.SourceAuthorityRevision
++                || supplied.ObservedAt == default || supplied.ValidUntil <= supplied.ObservedAt || supplied.Sources is null
++                || supplied.Sources.Count is < 0 or > 1000)
++            { throw new InvalidOperationException("Malformed original reconciliation cut."); }
++            var originalHeads = new List<SourcePublicationHead>();
++            foreach (var head in supplied.Sources)
++            {
++                if (originalHeads.Count >= heads.Count || head != heads[originalHeads.Count])
++                { throw new InvalidOperationException("Changed original reconciliation cut."); }
++                originalHeads.Add(head);
++            }
++            if (originalHeads.Count != heads.Count) { throw new InvalidOperationException("Incomplete original reconciliation cut."); }
++            original = supplied with { Sources = originalHeads.AsReadOnly() };
++        }
++        return progress with { Sources = heads.AsReadOnly(), Publications = publications.AsReadOnly(), OriginalCut = original };
+     }
+ }
+--- prior/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs
+@@ -28,14 +28,18 @@
+             || request.CommittedIssuedGuardRevision <= 0 || request.DispatchGuardRevision < request.CommittedIssuedGuardRevision
+             || request.DetachedJws is not { Length: > 0 and <= 16384 } || request.Targets is null || request.Targets.Count is < 1 or > 1000)
+         { throw new ArgumentException("Invalid protection request."); }
+-        var targets = new List<ProtectionTarget>(); string? previous = null;
++        var targets = new List<ProtectionTarget>(); ProtectionTarget? previous = null;
+         foreach (var target in request.Targets)
+         {
+             if (targets.Count >= 1000 || target is null || target.TenantId != c.TenantId) { throw new ArgumentException("Invalid protection target."); }
+             Text(target.TenantId); Text(target.AgentInteractionId); Text(target.TargetProtectionKeyAlias);
+-            string identity = JsonSerializer.Serialize(new[] { target.TenantId, target.AgentInteractionId, target.TargetProtectionKeyAlias });
+-            if (previous is not null && StringComparer.Ordinal.Compare(previous, identity) >= 0) { throw new ArgumentException("Unsorted or duplicate protection target."); }
+-            previous = identity; targets.Add(target);
++            if (previous is not null)
++            {
++                int interactionOrder = StringComparer.Ordinal.Compare(previous.AgentInteractionId, target.AgentInteractionId);
++                if (interactionOrder > 0 || interactionOrder == 0 && StringComparer.Ordinal.Compare(previous.TargetProtectionKeyAlias, target.TargetProtectionKeyAlias) >= 0)
++                { throw new ArgumentException("Unsorted or duplicate protection target."); }
++            }
++            previous = target; targets.Add(target);
+         }
+         var owned = Array.AsReadOnly(targets.ToArray());
+         if (c.ManifestDigest != TargetDigest(owned)) { throw new ArgumentException("Protection manifest mismatch."); }
+--- prior/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs
+@@ -40,13 +40,14 @@
+                 state = state with { Repair = new(command.OperationId, state.EpochId, repair.NamespaceCheckpoint, repair.Cohort.ToArray(), []) };
+                 break;
+             case GovernanceGuardOperation.RecordBridgeDrain:
+-                if (state.Repair is null || command.EpochId != state.EpochId || !state.Repair.Cohort.Any(value => value.OperationId == reference)
+-                    || state.Repair.DrainedOperationIds.Contains(reference, StringComparer.Ordinal)) { return Denied(); }
+-                state = state with { Repair = state.Repair with { DrainedOperationIds = state.Repair.DrainedOperationIds.Append(reference).ToArray() } };
++                if (state.Repair is null || command.EpochId != state.EpochId || command.BridgeOriginal is not { } drain
++                    || reference != drain.OperationId || !state.Repair.Cohort.Any(value => Original(value) == drain)
++                    || state.Repair.DrainedOriginals.Contains(drain)) { return Denied(); }
++                state = state with { Repair = state.Repair with { DrainedOriginals = state.Repair.DrainedOriginals.Append(drain).ToArray() } };
+                 break;
+             case GovernanceGuardOperation.ActivateSuccessor:
+                 if (state.Repair is null || !Text(command.EpochId) || command.EpochId == state.EpochId
+-                    || !state.Repair.Cohort.All(value => state.Repair.DrainedOperationIds.Contains(value.OperationId, StringComparer.Ordinal))
++                    || !state.Repair.Cohort.All(value => state.Repair.DrainedOriginals.Contains(Original(value)))
+                     || !Text(evidence.LegacyRevocationReceipt) || !Text(evidence.WriterEnforcementReceipt)) { return Denied(); }
+                 state = state with { EpochId = command.EpochId, LegacyRevocationReceipt = evidence.LegacyRevocationReceipt,
+                     WriterEnforcementReceipt = evidence.WriterEnforcementReceipt, RepairHistory = state.RepairHistory.Append(state.Repair).ToArray(), Repair = null };
+@@ -54,7 +55,9 @@
+             case GovernanceGuardOperation.AppendWrite:
+                 var facts = command.Write!;
+                 if (!ValidFacts(facts, state.TenantId) || facts.EpochId != state.EpochId || command.EpochId != state.EpochId || !Text(evidence.AppendResourceId) || !Hex(evidence.TargetMutationDigest)) { return Denied(); }
+-                if (state.Repair is not null && (state.Repair.DrainedOperationIds.Contains(reference, StringComparer.Ordinal) || !state.Repair.Cohort.Any(value => value.OperationId == reference && value.Kind == facts.Kind
++                if (state.Repair is null && command.BridgeOriginal is not null) { return Denied(); }
++                if (state.Repair is not null && (command.BridgeOriginal is not { } bridge || reference != bridge.OperationId
++                    || state.Repair.DrainedOriginals.Contains(bridge) || !state.Repair.Cohort.Any(value => Original(value) == bridge && value.Kind == facts.Kind
+                     && value.Owner.ToString() == facts.PermitOwnerId && value.PermitId == facts.PermitId && value.EffectCapabilityId == facts.EffectCapabilityId
+                     && value.OwnerRevision == facts.CapabilityOwnerRevision && value.SourceConversationId == facts.PermitSourceConversationId))) { return Denied(); }
+                 var matching = state.Deletions.Where(value => Matches(value.Scope, facts)).ToArray();
+@@ -355,9 +358,10 @@
+         or DirectoryWriteKind.LeaseCommit or DirectoryWriteKind.RateAuthorization or DirectoryWriteKind.OpenAuthorization or DirectoryWriteKind.BudgetAuthorization or DirectoryWriteKind.CapacityAuthorization;
+     private static bool Content(DirectoryWriteKind kind) => kind is DirectoryWriteKind.Create or DirectoryWriteKind.ContentAppend or DirectoryWriteKind.CreationOutbox;
+     private static bool ValidCohort(IReadOnlyList<DirectoryRepairCohortItem> cohort, string tenant) => cohort is not null && cohort.Count <= 1000
+-        && cohort.Select(value => value.OperationId).Distinct(StringComparer.Ordinal).Count() == cohort.Count
+-        && cohort.All(value => value.Owner.TenantId == tenant && Enum.IsDefined(value.Kind) && value.OwnerRevision > 0 && value.OriginalState is "Pending" or "Committed" or "Authorized"
+-            && new[] { value.OperationId, value.SourceConversationId, value.PermitId, value.EffectCapabilityId }.All(Text));
++        && cohort.All(value => value is not null && value.Owner is not null && value.Owner.TenantId == tenant && Enum.IsDefined(value.Kind) && value.OwnerRevision > 0 && value.OriginalState is "Pending" or "Committed" or "Authorized"
++            && new[] { value.OperationId, value.SourceConversationId, value.PermitId, value.EffectCapabilityId }.All(Text))
++        && cohort.Select(Original).Distinct().Count() == cohort.Count;
++    private static DirectoryRepairOriginalIdentity Original(DirectoryRepairCohortItem item) => new(item.Owner, item.OperationId);
+     private static bool ValidBatch(GovernanceBatchCommand batch, string tenant) => Text(batch.BatchId) && batch.Targets is { Count: > 0 and <= 1000 }
+         && batch.Targets.All(value => value.TenantId == tenant && Text(value.AgentInteractionId) && Text(value.TargetProtectionKeyAlias))
+         && batch.Targets.Distinct().Count() == batch.Targets.Count && Same(batch.Targets, batch.Targets.OrderBy(value => value.AgentInteractionId, StringComparer.Ordinal)
+@@ -397,6 +401,8 @@
+     private static bool Shape(GovernanceGuardTransition value)
+     {
+         if (!Text(value.TenantId) || !Text(value.OperationId) || value.ExpectedGuardRevision <= 0 || !Enum.IsDefined(value.Operation)) { return false; }
++        if (value.BridgeOriginal is { } original && (value.Operation is not (GovernanceGuardOperation.AppendWrite or GovernanceGuardOperation.RecordBridgeDrain)
++            || original.Owner is null || original.Owner.TenantId != value.TenantId || !Text(original.OperationId))) { return false; }
+         bool write = value.Operation == GovernanceGuardOperation.AppendWrite;
+         bool repair = value.Operation == GovernanceGuardOperation.InstallRepairFence;
+         bool ordinal = value.Operation is GovernanceGuardOperation.RecordViolation or GovernanceGuardOperation.RecordOwnerCycleEffective or GovernanceGuardOperation.AuthorizeContentBinding or GovernanceGuardOperation.CommitContentBinding;
+--- prior/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs
+@@ -12,7 +12,10 @@
+     Task<bool> AuthorizeOperationAsync(string tenantId, string identity, string operation, CancellationToken cancellationToken = default);
+     /// <summary>Authenticates the independently installed protection owner and exact tenant/revision/owned safe-state digest, including initial absence. Rollback or divergent restore denies all reads and effects.</summary>
+     Task<bool> ValidateStateAsync(string tenantId, long revision, string exactStateDigest, CancellationToken cancellationToken = default);
+-    /// <summary>Conditionally advances the independently durable installed-owner anchor before ledger persistence. A failed or unknown store save leaves availability closed until exact independent reconciliation; no anchor rollback is permitted.</summary>
++    /// <summary>Deprecated compatibility-only legacy anchor hook; current recoverable actors do not invoke it.
++    /// Qualified implementations must implement the mandatory inherited IAnchoredStateTransitionAuthority admitted-original admission/recovery
++    /// and conditional exact transition journal, including independent staging ownership, current permission and final durable-state/anchor confirmation.
++    /// Implementing this legacy hook alone never enables an actor; omitted inherited proof defaults deny.</summary>
+     Task<bool> RecordRevisionAsync(string tenantId, long expectedRevision, long nextRevision, string exactStateDigest, CancellationToken cancellationToken = default);
+     /// <summary>Authenticates exact signed payload/manifest, separate committed issue revision and successful guard dispatch.</summary>
+     Task<bool> VerifyDispatchAsync(DeletionBatchConsumptionRequest request, CancellationToken cancellationToken = default);
+--- prior/eventstore/src/Hexalith.EventStore.Server/Security/IDirectoryMigrationBoundaryAuthority.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Security/IDirectoryMigrationBoundaryAuthority.cs
+@@ -17,6 +17,9 @@
+     Task<bool> VerifyActivationAsync(DirectoryEpochActivation activation, CancellationToken cancellationToken = default);
+     /// <summary>Validates exact captured durable tenant/revision/state digest against the independently installed antirollback anchor.</summary>
+     Task<bool> ValidateStateAsync(string tenantId, long revision, string stateDigest, CancellationToken cancellationToken = default);
+-    /// <summary>Advances independent conditional exact-state anchor before persistence; unknown/precommit failure closes availability pending independent reconciliation.</summary>
++    /// <summary>Deprecated compatibility-only legacy anchor hook; current recoverable actors do not invoke it.
++    /// Qualified implementations must implement the mandatory inherited IAnchoredStateTransitionAuthority admitted-original admission/recovery
++    /// and conditional exact transition journal, including independent staging ownership, current permission and final durable-state/anchor confirmation.
++    /// Implementing this legacy hook alone never enables an actor; omitted inherited proof defaults deny.</summary>
+     Task<bool> RecordRevisionAsync(string tenantId, long expectedRevision, long nextRevision, string stateDigest, CancellationToken cancellationToken = default);
+ }
+--- prior/eventstore/src/Hexalith.EventStore.Server/Security/IInteractionOccurrenceAuthority.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Security/IInteractionOccurrenceAuthority.cs
+@@ -17,7 +17,9 @@
+     Task<bool> VerifySealedAsync(InteractionOccurrenceRecord reservation, InteractionOccurrenceSealedResult sealedResult, CancellationToken cancellationToken = default);
+     /// <summary>Authenticates exact durable source-write or authoritative never-written completion; unknown completion cannot activate or abort.</summary>
+     Task<bool> VerifyWriterAsync(InteractionOccurrenceRecord record, string proofId, bool persisted, CancellationToken cancellationToken = default);
+-    /// <summary>Conditionally advances the independently durable antirollback anchor BEFORE registry persistence. Failed/unknown anchor or store save permits no encryption.
+-    /// A precommit store failure leaves availability closed until independent reconciliation; it never rolls the anchor back or reuses a reference.</summary>
++    /// <summary>Deprecated compatibility-only legacy anchor hook; current recoverable actors do not invoke it.
++    /// Qualified implementations must implement the mandatory inherited IAnchoredStateTransitionAuthority admitted-original admission/recovery
++    /// and conditional exact transition journal, including independent staging ownership, current permission and final durable-state/anchor confirmation.
++    /// Implementing this legacy hook alone never enables an actor; omitted inherited proof defaults deny.</summary>
+     Task<bool> RecordRevisionAsync(string tenantId, string epochId, long expectedRevision, long nextRevision, string exactStateDigest, CancellationToken cancellationToken = default);
+ }
+--- prior/eventstore/src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationNamespaceSource.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationNamespaceSource.cs
+@@ -24,7 +24,7 @@
+                 var actor = proxies.CreateActorProxy<ISourcePublicationNamespaceActor>(new(scope.ActorId), SourcePublicationNamespaceActor.ActorTypeName);
+                 var installed = await deadline.ReadAsync(_ => actor.ReadAsync(scope)).ConfigureAwait(false);
+                 if (installed is null) { return null; }
+-                installed = SourcePublicationNamespaceActor.Capture(installed);
++                installed = await deadline.ReadAsync(_ => Task.FromResult(SourcePublicationNamespaceActor.Capture(installed))).ConfigureAwait(false);
+                 if (installed.Scope != scope) { return null; }
+                 var approved = await deadline.ReadAsync(token => authority.AuthorizeAsync(installed, token)).ConfigureAwait(false);
+                 if (!Current(approved)) { return null; }
+@@ -46,7 +46,7 @@
+                 }
+                 var final = await deadline.ReadAsync(_ => actor.ReadAsync(scope)).ConfigureAwait(false);
+                 if (final is null) { return null; }
+-                final = SourcePublicationNamespaceActor.Capture(final);
++                final = await deadline.ReadAsync(_ => Task.FromResult(SourcePublicationNamespaceActor.Capture(final))).ConfigureAwait(false);
+                 if (final.Scope != scope || final.Revision != installed.Revision || final.AuthorityRevision != installed.AuthorityRevision
+                     || final.LegacyCoverageReceipt != installed.LegacyCoverageReceipt || final.WriterEnforcementReceipt != installed.WriterEnforcementReceipt
+                     || !final.InitialSources!.SequenceEqual(installed.InitialSources!) || !final.Sources.SequenceEqual(installed.Sources)) { return null; }
+--- prior/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs
+@@ -14,6 +14,8 @@
+     Task<SourcePublicationDispatchProgress?> AuthorizeDispatchAdvanceAsync(SourcePublicationDispatchAdvance advance, SourcePublicationIndexState current) => Task.FromResult<SourcePublicationDispatchProgress?>(null);
+     /// <summary>Independently authenticates the retained exact proof, every verified original protected source prefix/projection, and current complete namespace/cut authority. Stored strings/digests never grant reuse. Omission denies reconciliation resume.</summary>
+     Task<bool> VerifyReconciliationProgressAsync(SourcePublicationReconciliationProgress progress) => Task.FromResult(false);
++    /// <summary>Independently authenticates the exact retained original complete installation/roster/cut and protected-prefix proof against this freshly complete current cut, proves monotonic preservation of every original source and projection, and checks current private/source/installation permission and both unchanged applicable expiries. Larger heads and stored strings alone grant nothing. Omission denies finite-cut continuation.</summary>
++    Task<bool> VerifyFiniteCutContinuationAsync(SourcePublicationReconciliationProgress original, SourcePublicationCut currentCut) => Task.FromResult(false);
+     /// <summary>Separately admits mutation and independently verifies the exact next original source observation/protected prefix/closed projection, predecessor proof and fresh complete cut/current installation. Issues an independently retained immutable conditional proof; caller facts alone are insufficient. Zero heads require exact complete-cut proof. Omission denies.</summary>
+     Task<SourcePublicationReconciliationProgress?> AuthorizeReconciliationAdvanceAsync(SourcePublicationReconciliationAdvance advance, SourcePublicationIndexState? current) => Task.FromResult<SourcePublicationReconciliationProgress?>(null);
+     /// <summary>Authenticates only the exact index read.</summary>
+@@ -22,7 +24,10 @@
+     Task<bool> WriteIndexAsync(SourcePublicationIndexWrite request);
+     /// <summary>Independently validates exact persisted index revision/state digest, including revision zero and the serialized null digest for initial absence. Missing nonrollback anchors deny.</summary>
+     Task<bool> ValidateIndexStateAsync(SourcePublicationScope scope, long revision, string stateDigest) => Task.FromResult(false);
+-    /// <summary>Conservatively advances the independent exact-state anchor before persistence; ambiguity denies old/divergent state until exact reconciliation.</summary>
++    /// <summary>Deprecated compatibility-only legacy anchor hook; current recoverable actors do not invoke it.
++    /// Qualified implementations must implement the mandatory inherited IAnchoredStateTransitionAuthority admitted-original admission/recovery
++    /// and conditional exact transition journal, including independent staging ownership, current permission and final durable-state/anchor confirmation.
++    /// Implementing this legacy hook alone never enables an actor; omitted inherited proof defaults deny.</summary>
+     Task<bool> RecordIndexRevisionAsync(SourcePublicationScope scope, long expectedRevision, long nextRevision, string stateDigest) => Task.FromResult(false);
+     /// <summary>Authenticates only the exact installed namespace read.</summary>
+     Task<bool> ReadNamespaceAsync(SourcePublicationScope scope);
+--- prior/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs
++++ current/eventstore/src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs
+@@ -111,17 +111,18 @@
+         cut = CaptureReconciliationCut(cut);
+         if (Host.Id.GetId() != cut.Scope.ActorId || operations is null || !await operations.ReadIndexAsync(cut.Scope).ConfigureAwait(false)) { return null; }
+         var state = await ReadStateAsync(cut.Scope).ConfigureAwait(false); var progress = state?.ReconciliationProgress;
+-        if (state is null || state.PoisonCode is not null || progress is null || !progress.MatchesCut(cut)
+-            || !await operations.VerifyReconciliationProgressAsync(progress).ConfigureAwait(false)) { return null; }
++        if (state is null || state.PoisonCode is not null || progress is null
++            || !await CurrentReconciliationAsync(progress, cut).ConfigureAwait(false)) { return null; }
+         var final = await ReadStateAsync(cut.Scope).ConfigureAwait(false);
+-        return final is not null && Digest(final) == Digest(state) && await operations.VerifyReconciliationProgressAsync(progress).ConfigureAwait(false)
++        return final is not null && Digest(final) == Digest(state) && await CurrentReconciliationAsync(progress, cut).ConfigureAwait(false)
+             && await operations.ReadIndexAsync(cut.Scope).ConfigureAwait(false) ? progress : null;
+     }
+     /// <inheritdoc/>
+     public async Task<SourcePublicationReconciliationProgress?> AdvanceReconciliationProgressAsync(SourcePublicationReconciliationAdvance advance)
+     {
+         ArgumentNullException.ThrowIfNull(advance); var cut = CaptureReconciliationCut(advance.Cut);
+-        if (Host.Id.GetId() != cut.Scope.ActorId || operations is null || advance.ExpectedVerifiedSources < 0 || advance.ExpectedVerifiedSources >= cut.Sources.Count
++        var currentCut = advance.CurrentCut is { } suppliedCurrent ? CaptureReconciliationCut(suppliedCurrent) : cut;
++        if (currentCut.Scope != cut.Scope || Host.Id.GetId() != cut.Scope.ActorId || operations is null || advance.ExpectedVerifiedSources < 0 || advance.ExpectedVerifiedSources >= cut.Sources.Count
+             || advance.Source != cut.Sources[advance.ExpectedVerifiedSources] || advance.ObservedHead < advance.Source.Head
+             || advance.ObservedHead > 10000 || string.IsNullOrWhiteSpace(advance.ObservationId) || advance.ObservationId.Length > 256
+             || !await operations.ReadIndexAsync(cut.Scope).ConfigureAwait(false)) { return null; }
+@@ -129,22 +130,33 @@
+         var state = await ReadStateAsync(cut.Scope).ConfigureAwait(false);
+         if (state?.PoisonCode is not null) { return null; }
+         var original = state?.ReconciliationProgress;
+-        bool reusable = original is not null && original.MatchesCut(cut) && await operations.VerifyReconciliationProgressAsync(original).ConfigureAwait(false);
++        bool reusable = original is not null && original.MatchesCut(cut) && await CurrentReconciliationAsync(original, currentCut).ConfigureAwait(false);
++        if (!SameReconciliationCut(cut, currentCut) && !reusable) { return null; }
+         int predecessor = reusable ? original!.VerifiedSources : 0;
+         if (predecessor != advance.ExpectedVerifiedSources) { return null; }
+         var expected = SourcePublicationReconciliationProgress.Capture(new(cut.Scope, checked((original?.Version ?? 0) + 1), cut.AuthorityRevision,
+-            cut.Sources, predecessor + 1, (reusable ? original!.Publications : []).Concat(advance.Publications).ToArray(), "proposed"));
+-        var ownedAdvance = advance with { Cut = cut, Publications = expected.Publications.Where(p => p.Identity == advance.Source.Identity).ToArray() };
++            cut.Sources, predecessor + 1, (reusable ? original!.Publications : []).Concat(advance.Publications).ToArray(), "proposed") { OriginalCut = reusable ? original!.OriginalCut ?? cut : cut });
++        var ownedAdvance = advance with { Cut = cut, CurrentCut = currentCut, Publications = expected.Publications.Where(p => p.Identity == advance.Source.Identity).ToArray() };
+         var approved = await operations.AuthorizeReconciliationAdvanceAsync(ownedAdvance, state).ConfigureAwait(false);
+         if (approved is null) { return null; }
+         approved = SourcePublicationReconciliationProgress.Capture(approved);
+         if (approved.Version != expected.Version || approved.VerifiedSources != expected.VerifiedSources || !approved.MatchesCut(cut)
+-            || !approved.Publications.SequenceEqual(expected.Publications) || !await operations.VerifyReconciliationProgressAsync(approved).ConfigureAwait(false)) { return null; }
++            || !approved.Publications.SequenceEqual(expected.Publications) || !SameOriginalCut(approved.OriginalCut, expected.OriginalCut)
++            || !await CurrentReconciliationAsync(approved, currentCut).ConfigureAwait(false)) { return null; }
+         var next = state is null ? new SourcePublicationIndexState(cut.Scope, 1, cut.AuthorityRevision, [], []) { ReconciliationProgress = approved }
+             : state with { Revision = checked(state.Revision + 1), ReconciliationProgress = approved };
+         if (!await TryWriteAsync(new(state?.Revision ?? 0, next)).ConfigureAwait(false)) { return null; }
+-        return await ReadReconciliationProgressAsync(cut).ConfigureAwait(false);
+-    }
++        return await ReadReconciliationProgressAsync(currentCut).ConfigureAwait(false);
++    }
++    private async Task<bool> CurrentReconciliationAsync(SourcePublicationReconciliationProgress progress, SourcePublicationCut current)
++        => operations is not null && await operations.VerifyReconciliationProgressAsync(progress).ConfigureAwait(false)
++            && (progress.MatchesCut(current) || progress.CanContinueUnder(current)
++                && await operations.VerifyFiniteCutContinuationAsync(progress, current).ConfigureAwait(false));
++    private static bool SameReconciliationCut(SourcePublicationCut first, SourcePublicationCut second)
++        => first.Scope == second.Scope && first.AuthorityRevision == second.AuthorityRevision && first.Sources.SequenceEqual(second.Sources);
++    private static bool SameOriginalCut(SourcePublicationCut? first, SourcePublicationCut? second)
++        => first is null ? second is null : second is not null && SameReconciliationCut(first, second)
++            && first.IsComplete == second.IsComplete && first.ObservedAt == second.ObservedAt && first.ValidUntil == second.ValidUntil;
+     private static SourcePublicationCut CaptureReconciliationCut(SourcePublicationCut cut)
+     {
+         ArgumentNullException.ThrowIfNull(cut);
+--- prior/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs
+@@ -350,50 +350,74 @@
+ 
+     private static SourcePublicationDescriptor ReconciliationPublication(SourcePublicationHead head)
+         => new("publication-" + head.Identity.AggregateId, head.Identity, 1, "message-" + head.Identity.AggregateId, new string('A', 64));
+-    private static void QualifyReconciliation(ISourcePublicationOperationAuthority authority, Func<SourcePublicationCut> currentCut, TimeProvider clock, Func<bool>? proofCurrent = null)
++    private static void QualifyReconciliation(ISourcePublicationOperationAuthority authority, Func<SourcePublicationCut> currentCut, TimeProvider clock, Func<bool>? proofCurrent = null, bool finiteContinuation = false)
+     {
+         var proofs = new Dictionary<string, string>(StringComparer.Ordinal); int issued = 0;
+         bool Current(SourcePublicationCut cut) => (proofCurrent is null || proofCurrent()) && cut.Scope == currentCut().Scope && cut.AuthorityRevision == currentCut().AuthorityRevision
+             && cut.Sources.SequenceEqual(currentCut().Sources) && cut.IsComplete && currentCut().IsComplete && cut.ValidUntil > clock.GetUtcNow()
+             && currentCut().ValidUntil > clock.GetUtcNow();
+-        bool Verified(SourcePublicationCut cut, SourcePublicationReconciliationProgress progress) => Current(cut) && progress.MatchesCut(cut)
++        bool Preserved(SourcePublicationCut cut) => finiteContinuation && (proofCurrent is null || proofCurrent()) && cut.IsComplete
++            && cut.Scope == currentCut().Scope && cut.AuthorityRevision == currentCut().AuthorityRevision && currentCut().IsComplete
++            && cut.ValidUntil > clock.GetUtcNow() && currentCut().ValidUntil > clock.GetUtcNow()
++            && cut.Sources.Count == currentCut().Sources.Count
++            && cut.Sources.Zip(currentCut().Sources).All(pair => pair.First.Identity == pair.Second.Identity && pair.First.Head <= pair.Second.Head);
++        bool Verified(SourcePublicationCut cut, SourcePublicationReconciliationProgress progress) => (Current(cut) || Preserved(cut)) && progress.MatchesCut(cut)
+             && proofs.TryGetValue(progress.ReceiptId, out var original) && original == JsonSerializer.Serialize(progress);
+         authority.VerifyReconciliationProgressAsync(Arg.Any<SourcePublicationReconciliationProgress>()).Returns(call =>
+-            Verified(currentCut(), call.Arg<SourcePublicationReconciliationProgress>()));
++        {
++            var progress = call.Arg<SourcePublicationReconciliationProgress>();
++            return Verified(finiteContinuation ? progress.OriginalCut ?? currentCut() : currentCut(), progress);
++        });
++        authority.VerifyFiniteCutContinuationAsync(Arg.Any<SourcePublicationReconciliationProgress>(), Arg.Any<SourcePublicationCut>()).Returns(call =>
++        {
++            var progress = call.Arg<SourcePublicationReconciliationProgress>(); var fresh = call.Arg<SourcePublicationCut>();
++            return progress.OriginalCut is { } original && Preserved(original) && Current(fresh) && progress.CanContinueUnder(fresh) && Verified(original, progress);
++        });
+         authority.AuthorizeReconciliationAdvanceAsync(Arg.Any<SourcePublicationReconciliationAdvance>(), Arg.Any<SourcePublicationIndexState?>()).Returns(call =>
+         {
+             var proposal = call.Arg<SourcePublicationReconciliationAdvance>(); var state = call.Arg<SourcePublicationIndexState?>(); var original = state?.ReconciliationProgress;
+             bool reuse = original is not null && Verified(proposal.Cut, original);
+             int predecessor = reuse ? original!.VerifiedSources : 0;
+-            if (!Current(proposal.Cut) || proposal.ExpectedVerifiedSources != predecessor || proposal.Source != proposal.Cut.Sources[predecessor]
++            if (!(Current(proposal.Cut) || Preserved(proposal.Cut) && proposal.CurrentCut is { } fresh && Current(fresh)) || proposal.ExpectedVerifiedSources != predecessor || proposal.Source != proposal.Cut.Sources[predecessor]
+                 || proposal.ObservedHead < proposal.Source.Head || proposal.ObservationId != "independent-" + proposal.Source.Identity.AggregateId
+-                || !proposal.Publications.SequenceEqual(new[] { ReconciliationPublication(proposal.Source) })) { return (SourcePublicationReconciliationProgress?)null; }
++                || !proposal.Publications.SequenceEqual(ReconciliationPublications(proposal.Source))) { return (SourcePublicationReconciliationProgress?)null; }
+             var proof = new SourcePublicationReconciliationProgress(proposal.Cut.Scope, (original?.Version ?? 0) + 1, proposal.Cut.AuthorityRevision,
+-                proposal.Cut.Sources, predecessor + 1, (reuse ? original!.Publications : []).Concat(proposal.Publications).ToArray(), "reconciliation-original-" + ++issued);
++                proposal.Cut.Sources, predecessor + 1, (reuse ? original!.Publications : []).Concat(proposal.Publications).ToArray(), "reconciliation-original-" + ++issued)
++                { OriginalCut = proposal.Cut };
+             proofs.Add(proof.ReceiptId, JsonSerializer.Serialize(proof)); return proof;
+         });
+     }
++    private static IReadOnlyList<SourcePublicationDescriptor> ReconciliationPublications(SourcePublicationHead head)
++        => head.Head == 1 ? [ReconciliationPublication(head)] : [ReconciliationPublication(head),
++            new("append-" + head.Identity.AggregateId, head.Identity, 2, "append-message-" + head.Identity.AggregateId, new string('B', 64))];
+     private static AuthoritativeStreamReadResult ReconciliationSource(SourcePublicationHead head, TimeProvider clock)
+-        => new(new(head.Identity, head.Head, clock.GetUtcNow(), [new(1, "Publication", [1], "json", 1, "message-" + head.Identity.AggregateId,
+-            null, null, clock.GetUtcNow(), null)], "independent-" + head.Identity.AggregateId), null);
++        => new(new(head.Identity, head.Head, clock.GetUtcNow(), ReconciliationPublications(head).Select(p => new StreamReadEvent(p.SourceRevision,
++            "Publication", [1], "json", 1, p.SourceMessageId, null, null, clock.GetUtcNow(), null)).ToArray(), "independent-" + head.Identity.AggregateId), null);
+ 
+     /// <summary>Forty source reconciliations taking one second each progress across an actual serialized index/dispatcher restart before any complete checkpoint is released.</summary>
+     [Fact]
+-    public async Task SlowInitialSourceReconciliationProgressesAcrossActualOwnerRestart()
++    public Task SlowInitialSourceReconciliationProgressesAcrossActualOwnerRestart() => ReconcileAcrossRestartAsync(false);
++
++    /// <summary>Authenticated monotonic appends between every resumed pass cannot strand the original forty-source cut; subsequent reconciliation delivers the append once.</summary>
++    [Fact]
++    public Task MonotonicAppendsCompleteOriginalCutAcrossActualOwnerRestart() => ReconcileAcrossRestartAsync(true);
++
++    private static async Task ReconcileAcrossRestartAsync(bool appendBetweenPasses)
+     {
+         var clock = new AuthoritativeReadTimeProvider(); clock.Advance(DateTimeOffset.UtcNow - DateTimeOffset.UnixEpoch);
+         var heads = Enumerable.Range(0, 40).Select(n => new SourcePublicationHead(new(Scope.Tenant, Scope.Domain, "source-" + n.ToString("D2", System.Globalization.CultureInfo.InvariantCulture)), 1)).ToArray();
+         var cut = new SourcePublicationCut(Scope, "qualified-cut", clock.GetUtcNow(), clock.GetUtcNow().AddHours(1), heads, true);
+-        var backend = new InMemoryStateManager(); var authority = Operations(); QualifyReconciliation(authority, () => cut, clock);
++        var backend = new InMemoryStateManager(); var authority = Operations(); QualifyReconciliation(authority, () => cut, clock, finiteContinuation: appendBetweenPasses);
+         var namespaces = Substitute.For<ISourcePublicationNamespaceSource>(); namespaces.ReadAsync(Scope, Arg.Any<CancellationToken>()).Returns(_ => cut);
+         var streams = Substitute.For<IAuthoritativeEventStreamReader>(); var readIdentities = new List<string>();
+         streams.ReadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<CancellationToken>()).Returns(call =>
+         {
+-            var head = heads.Single(h => h.Identity == call.Arg<AggregateIdentity>()); readIdentities.Add(head.Identity.ActorId);
++            var head = cut.Sources.Single(h => h.Identity == call.Arg<AggregateIdentity>()); readIdentities.Add(head.Identity.ActorId);
+             clock.Advance(TimeSpan.FromSeconds(1)); return ReconciliationSource(head, clock);
+         });
+         var projector = Substitute.For<ISourcePublicationProjector>();
+-        projector.Project(Arg.Any<AuthoritativeEventStream>(), Arg.Any<CancellationToken>()).Returns(call => new[] { ReconciliationPublication(heads.Single(h => h.Identity == call.Arg<AuthoritativeEventStream>().Identity)) });
++        projector.Project(Arg.Any<AuthoritativeEventStream>(), Arg.Any<CancellationToken>()).Returns(call =>
++            ReconciliationPublications(new(call.Arg<AuthoritativeEventStream>().Identity, call.Arg<AuthoritativeEventStream>().Head)));
+         var acknowledged = new HashSet<string>(StringComparer.Ordinal); var delivered = new List<string>(); var delivery = Substitute.For<ISourcePublicationDelivery>();
+         delivery.LookupAcknowledgementAsync(Arg.Any<SourcePublicationIndexEntry>(), Arg.Any<CancellationToken>()).Returns(call =>
+             acknowledged.Contains(call.Arg<SourcePublicationIndexEntry>().Publication.PublicationId) ? SourcePublicationDeliveryStatus.Acknowledged : SourcePublicationDeliveryStatus.Pending);
+@@ -405,6 +429,7 @@
+         var saved = backend.CommittedState.Single(); var partialState = saved.Value.ShouldBeOfType<SourcePublicationIndexState>();
+         partialState.Entries.ShouldBeEmpty(); partialState.Sources.ShouldBeEmpty(); partialState.ReconciliationProgress!.VerifiedSources.ShouldBe(20);
+         var restarted = new InMemoryStateManager(); await restarted.SetStateAsync(saved.Key, JsonSerializer.Deserialize<SourcePublicationIndexState>(JsonSerializer.Serialize(saved.Value))!); await restarted.SaveStateAsync();
++        if (appendBetweenPasses) { cut = cut with { Sources = heads.Select((h, i) => i == 0 ? h with { Head = 2 } : h).ToArray(), ObservedAt = clock.GetUtcNow() }; }
+         var next = new SourcePublicationDispatcher(new(namespaces, streams, projector, Store(Actor(restarted, authority)), clock), clock, delivery);
+         var completed = await next.DispatchAsync(Scope, 100, TestContext.Current.CancellationToken);
+         completed.IsComplete.ShouldBeTrue(); delivered.Count.ShouldBe(40); delivered.Distinct(StringComparer.Ordinal).Count().ShouldBe(40);
+@@ -412,8 +437,22 @@
+         delivered.ShouldContain("publication-source-39"); var final = restarted.CommittedState.Single().Value.ShouldBeOfType<SourcePublicationIndexState>();
+         final.Sources.ShouldBe(heads); final.Entries.Select(e => e.Offset).ShouldBe(Enumerable.Range(1, 40).Select(n => (long)n));
+         final.ReconciliationProgress!.VerifiedSources.ShouldBe(40);
++        if (appendBetweenPasses)
++        {
++            var originalCheckpoint = new SourcePublicationCheckpoint(Scope, final.Revision, final.AuthorityRevision, final.Sources, 40);
++            var originalPage = await new SourcePublicationFeed(namespaces, streams, projector, Store(Actor(restarted, authority)), clock)
++                .ReadIndexedPageAsync(originalCheckpoint, 0, TestContext.Current.CancellationToken);
++            originalPage.Page!.Checkpoint.Sources.ShouldBe(heads); originalPage.Page.Entries.Count.ShouldBe(40);
++            (await next.DispatchAsync(Scope, 100, TestContext.Current.CancellationToken)).IsComplete.ShouldBeFalse();
++            delivered.Count.ShouldBe(40);
++            (await next.DispatchAsync(Scope, 100, TestContext.Current.CancellationToken)).IsComplete.ShouldBeTrue();
++            delivered.Count.ShouldBe(41); delivered.Count(p => p == "append-source-00").ShouldBe(1);
++            final = restarted.CommittedState.Single().Value.ShouldBeOfType<SourcePublicationIndexState>();
++            final.Sources.ShouldBe(cut.Sources); final.Entries.Last().Offset.ShouldBe(41);
++            final.Entries.Last().Publication.PublicationId.ShouldBe("append-source-00");
++        }
+         (await next.DispatchAsync(Scope, 100, TestContext.Current.CancellationToken)).IsComplete.ShouldBeTrue();
+-        delivered.Count.ShouldBe(40); readIdentities.Count.ShouldBe(40);
++        delivered.Count.ShouldBe(appendBetweenPasses ? 41 : 40); readIdentities.Count.ShouldBe(appendBetweenPasses ? 80 : 40);
+     }
+ 
+     /// <summary>Exact retained partial originals deny changed namespace/cut authority, forged carriers, foreign addressing and stale restored bytes.</summary>
+@@ -562,4 +601,97 @@
+         result.Page.ShouldBeNull(); result.FailureReason.ShouldBe("publication-reconciliation-proof-unavailable");
+         JsonSerializer.Serialize(backend.CommittedState).ShouldBe(before); await streams.DidNotReceive().ReadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<CancellationToken>());
+     }
++
++    /// <summary>Independent finite-cut continuation denies foreign installation, missing/regressed originals, forgery, expiry, withdrawal and absent monotonic proof without changing retained durable bytes.</summary>
++    [Theory]
++    [InlineData("scope")][InlineData("installation")][InlineData("missing")][InlineData("regressed")]
++    [InlineData("forged-receipt")][InlineData("forged-publication")][InlineData("expired")][InlineData("withdrawn")][InlineData("unbound")]
++    public async Task FiniteCutContinuationDeniesUnprovenPreservation(string vector)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var clock = new AuthoritativeReadTimeProvider(); clock.Advance(DateTimeOffset.UtcNow - DateTimeOffset.UnixEpoch);
++        var first = new SourcePublicationHead(new(Scope.Tenant, Scope.Domain, "source-00"), 1);
++        var second = new SourcePublicationHead(new(Scope.Tenant, Scope.Domain, "source-01"), 1);
++        var original = new SourcePublicationCut(Scope, "qualified-cut", clock.GetUtcNow(), clock.GetUtcNow().AddMinutes(1), [first, second], true);
++        var current = original; bool proofCurrent = true; var authority = Operations();
++        QualifyReconciliation(authority, () => current, clock, () => proofCurrent, true);
++        var backend = new InMemoryStateManager(); var store = Store(Actor(backend, authority));
++        var retained = (await store.AdvanceReconciliationProgressAsync(new(original, 0, first, "independent-source-00", 1,
++            [ReconciliationPublication(first)]), TestContext.Current.CancellationToken))!;
++        retained.OriginalCut.ShouldNotBeNull();
++        var saved = backend.CommittedState.Single(); string before = JsonSerializer.Serialize(saved.Value);
++        current = original with { Sources = [first with { Head = 2 }, second], ObservedAt = clock.GetUtcNow() };
++        if (vector.StartsWith("forged", StringComparison.Ordinal))
++        {
++            var forged = vector == "forged-receipt" ? retained with { ReceiptId = "unknown-original" }
++                : retained with { Publications = [ReconciliationPublication(first) with { StableFieldsDigest = new string('B', 64) }] };
++            var state = saved.Value.ShouldBeOfType<SourcePublicationIndexState>();
++            (await store.TryWriteAsync(Scope, state.Revision, state with { Revision = state.Revision + 1, ReconciliationProgress = forged },
++                TestContext.Current.CancellationToken)).ShouldBeFalse();
++        }
++        else
++        {
++            if (vector is "scope" or "installation") { current = current with { Scope = new(Scope.Tenant, Scope.Domain,
++                vector == "scope" ? "foreign" : Scope.FeedName, vector == "installation" ? "foreign" : Scope.InstallationId) }; }
++            if (vector == "missing") { current = current with { Sources = [first with { Head = 2 }] }; }
++            if (vector == "regressed") { current = current with { Sources = [first with { Head = 2 }, second with { Head = 0 }] }; }
++            if (vector == "expired") { clock.Advance(TimeSpan.FromMinutes(1)); current = current with { ValidUntil = clock.GetUtcNow().AddHours(1) }; }
++            if (vector == "withdrawn") { proofCurrent = false; }
++            if (vector == "unbound") { authority.VerifyFiniteCutContinuationAsync(Arg.Any<SourcePublicationReconciliationProgress>(), Arg.Any<SourcePublicationCut>()).Returns(false); }
++            (await Actor(backend, authority).ReadReconciliationProgressAsync(current)).ShouldBeNull();
++        }
++        JsonSerializer.Serialize(backend.CommittedState.Single().Value).ShouldBe(before);
++        var restored = new InMemoryStateManager(); await restored.SetStateAsync(saved.Key, JsonSerializer.Deserialize<SourcePublicationIndexState>(before)!);
++        await restored.SaveStateAsync(); JsonSerializer.Serialize(restored.CommittedState.Single().Value).ShouldBe(before);
++        if (!vector.StartsWith("forged", StringComparison.Ordinal)) { (await Actor(restored, authority).ReadReconciliationProgressAsync(current)).ShouldBeNull(); }
++    }
++
++    /// <summary>Withdrawing only the independent finite-cut permission during a suspended final durable/cut read denies both original checkpoint and indexed-page release.</summary>
++    [Theory]
++    [InlineData(false, "state")][InlineData(false, "cut")][InlineData(true, "state")][InlineData(true, "cut")]
++    public async Task FinalFiniteCutReleaseReconfirmsCurrentContinuationPermission(bool indexedPage, string vector)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var first = new SourcePublicationHead(new(Scope.Tenant, Scope.Domain, "source-00"), 1);
++        var second = new SourcePublicationHead(new(Scope.Tenant, Scope.Domain, "source-01"), 1);
++        var original = new SourcePublicationCut(Scope, "qualified-cut", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddHours(1), [first, second], true);
++        var current = original; var authority = Operations(); QualifyReconciliation(authority, () => current, TimeProvider.System, finiteContinuation: true);
++        var backend = new InMemoryStateManager(); var actual = Store(Actor(backend, authority));
++        (await actual.AdvanceReconciliationProgressAsync(new(original, 0, first, "independent-source-00", 1,
++            [ReconciliationPublication(first)]), TestContext.Current.CancellationToken)).ShouldNotBeNull();
++        var namespaces = Substitute.For<ISourcePublicationNamespaceSource>(); namespaces.ReadAsync(Scope, Arg.Any<CancellationToken>()).Returns(_ => current);
++        var streams = Substitute.For<IAuthoritativeEventStreamReader>(); streams.ReadAsync(second.Identity, Arg.Any<CancellationToken>()).Returns(_ => ReconciliationSource(second, TimeProvider.System));
++        var projector = Substitute.For<ISourcePublicationProjector>(); projector.Project(Arg.Any<AuthoritativeEventStream>(), Arg.Any<CancellationToken>()).Returns([ReconciliationPublication(second)]);
++        SourcePublicationCheckpoint? ready = null;
++        if (indexedPage) { ready = (await new SourcePublicationFeed(namespaces, streams, projector, actual, TimeProvider.System)
++            .ReadAsync(Scope, cancellationToken: TestContext.Current.CancellationToken)).Page!.Checkpoint; }
++        current = original with { Sources = [first with { Head = 2 }, second] };
++        bool continuationCurrent = true;
++        authority.VerifyFiniteCutContinuationAsync(Arg.Any<SourcePublicationReconciliationProgress>(), Arg.Any<SourcePublicationCut>()).Returns(call =>
++        {
++            var progress = call.Arg<SourcePublicationReconciliationProgress>(); var cut = call.Arg<SourcePublicationCut>();
++            return continuationCurrent && progress.CanContinueUnder(cut) && cut.Sources.SequenceEqual(current.Sources);
++        });
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var store = Substitute.For<ISourcePublicationIndexStore>(); int reads = 0; int cuts = 0;
++        store.ReadAsync(Scope, Arg.Any<CancellationToken>()).Returns(async call =>
++        {
++            var result = await actual.ReadAsync(Scope, call.Arg<CancellationToken>());
++            if (++reads == (indexedPage ? 2 : 3) && vector == "state") { entered.TrySetResult(); await release.Task; } return result;
++        });
++        store.ReadReconciliationProgressAsync(Arg.Any<SourcePublicationCut>(), Arg.Any<CancellationToken>()).Returns(call => actual.ReadReconciliationProgressAsync(call.Arg<SourcePublicationCut>(), call.Arg<CancellationToken>()));
++        store.AdvanceReconciliationProgressAsync(Arg.Any<SourcePublicationReconciliationAdvance>(), Arg.Any<CancellationToken>()).Returns(call => actual.AdvanceReconciliationProgressAsync(call.Arg<SourcePublicationReconciliationAdvance>(), call.Arg<CancellationToken>()));
++        store.TryWriteAsync(Scope, Arg.Any<long>(), Arg.Any<SourcePublicationIndexState>(), Arg.Any<CancellationToken>()).Returns(call => actual.TryWriteAsync(Scope, call.Arg<long>(), call.Arg<SourcePublicationIndexState>(), call.Arg<CancellationToken>()));
++        namespaces.ReadAsync(Scope, Arg.Any<CancellationToken>()).Returns(async _ =>
++        { if (++cuts == (indexedPage ? 2 : 3) && vector == "cut") { entered.TrySetResult(); await release.Task; } return (SourcePublicationCut?)current; });
++        var feed = new SourcePublicationFeed(namespaces, streams, projector, store, TimeProvider.System);
++        var pending = indexedPage ? feed.ReadIndexedPageAsync(ready!, 0, TestContext.Current.CancellationToken)
++            : feed.ReadAsync(Scope, cancellationToken: TestContext.Current.CancellationToken);
++        await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        string before = JsonSerializer.Serialize(backend.CommittedState); continuationCurrent = false; release.TrySetResult();
++        var denied = await pending.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++        denied.Page.ShouldBeNull(); denied.FailureReason.ShouldBe("publication-reconciliation-proof-unavailable");
++        JsonSerializer.Serialize(backend.CommittedState).ShouldBe(before);
++    }
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs
+@@ -1,5 +1,6 @@
+ using Hexalith.EventStore.Client.Streams;
+ using Hexalith.EventStore.Contracts.Identity;
++using Hexalith.EventStore.Contracts.Security;
+ using Hexalith.EventStore.Contracts.Streams;
+ using NSubstitute;
+ using Shouldly;
+@@ -135,4 +136,85 @@
+         bytes[0] = 99; result.Sources.Single().Events.Single().Payload.ShouldBe(new byte[] { 1, 2, 3 });
+     }
+ 
++    /// <summary>Provider-returned cuts, prefix events and flags cannot hold completion beyond the same whole-operation cancellation/deadline, or release a late fold.</summary>
++    [Theory]
++    [InlineData("initial-cut-count", false)][InlineData("initial-cut-count", true)]
++    [InlineData("initial-cut-items", false)][InlineData("initial-cut-items", true)]
++    [InlineData("final-cut-count", false)][InlineData("final-cut-count", true)]
++    [InlineData("final-cut-items", false)][InlineData("final-cut-items", true)]
++    [InlineData("first-source-count", false)][InlineData("first-source-count", true)]
++    [InlineData("first-source-items", false)][InlineData("first-source-items", true)]
++    [InlineData("last-source-count", false)][InlineData("last-source-count", true)]
++    [InlineData("last-source-items", false)][InlineData("last-source-items", true)]
++    [InlineData("first-flags-count", false)][InlineData("first-flags-count", true)]
++    [InlineData("first-flags-items", false)][InlineData("first-flags-items", true)]
++    [InlineData("last-flags-count", false)][InlineData("last-flags-count", true)]
++    [InlineData("last-flags-items", false)][InlineData("last-flags-items", true)]
++    public async Task SuspendedCollectionsReleaseCallerWithoutLateNamespaceOrFold(string vector, bool cancelCaller)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var clock = new AuthoritativeReadTimeProvider(); var now = clock.GetUtcNow();
++        var second = new AggregateIdentity("tenant-a", "conversation", "source-b");
++        SourcePublicationHead[] heads = [new(Identity, 1), new(second, 1)];
++        var cut = new SourcePublicationCut(Scope, "authority", now, now.AddMinutes(1), heads, true);
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var released = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        using var release = new ManualResetEventSlim(); using var caller = new CancellationTokenSource();
++        void Suspend() { entered.TrySetResult(); release.Wait(); released.TrySetResult(); }
++        var suppliedHeads = Substitute.For<IReadOnlyList<SourcePublicationHead>>();
++        suppliedHeads.Count.Returns(_ => { if (vector.EndsWith("count", StringComparison.Ordinal)) { Suspend(); } return 2; });
++        IEnumerable<SourcePublicationHead> Heads() { if (vector.EndsWith("items", StringComparison.Ordinal)) { Suspend(); } foreach (var head in heads) { yield return head; } }
++        suppliedHeads.GetEnumerator().Returns(_ => Heads().GetEnumerator());
++        var namespaces = Substitute.For<ISourcePublicationNamespaceSource>(); int namespaceCalls = 0;
++        namespaces.ReadAsync(Scope, Arg.Any<CancellationToken>()).Returns(_ =>
++        {
++            int call = Interlocked.Increment(ref namespaceCalls);
++            return (vector.StartsWith("initial-cut-", StringComparison.Ordinal) && call == 1)
++                || (vector.StartsWith("final-cut-", StringComparison.Ordinal) && call == 2) ? cut with { Sources = suppliedHeads } : cut;
++        });
++        byte[] original = [1, 2, 3];
++        var flags = Substitute.For<IReadOnlyDictionary<string, string>>();
++        flags.Count.Returns(_ => { if (vector.EndsWith("count", StringComparison.Ordinal)) { Suspend(); } return 1; });
++        IEnumerable<KeyValuePair<string, string>> Flags() { if (vector.EndsWith("items", StringComparison.Ordinal)) { Suspend(); } yield return new("mode", "safe"); }
++        flags.GetEnumerator().Returns(_ => Flags().GetEnumerator());
++        StreamReadEvent item = new(1, "Created", original, "json", 1, "original", null, null, now, null);
++        var events = Substitute.For<IReadOnlyList<StreamReadEvent>>();
++        events.Count.Returns(_ => { if (vector.EndsWith("count", StringComparison.Ordinal)) { Suspend(); } return 1; });
++        IEnumerable<StreamReadEvent> Events() { if (vector.EndsWith("items", StringComparison.Ordinal)) { Suspend(); } yield return item; }
++        events.GetEnumerator().Returns(_ => Events().GetEnumerator());
++        var streams = Substitute.For<IAuthoritativeEventStreamReader>(); int streamCalls = 0; int folds = 0;
++        streams.ReadAsync(Arg.Any<AggregateIdentity>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            Interlocked.Increment(ref streamCalls); var identity = call.Arg<AggregateIdentity>();
++            bool selected = vector.StartsWith("first-", StringComparison.Ordinal) ? identity == Identity : identity == second;
++            IReadOnlyList<StreamReadEvent> supplied = selected && vector.Contains("-source-", StringComparison.Ordinal) ? events
++                : selected && vector.Contains("-flags-", StringComparison.Ordinal) ? [item with { ProtectionMetadata = new(PayloadProtectionState.Unprotected, 1, null, null, null, flags) }] : [item];
++            return new AuthoritativeStreamReadResult(new(identity, 1, now, supplied, "exact-original"), null);
++        });
++        var reader = new SourceNamespaceSnapshotReader(namespaces, streams, clock);
++        var reading = Task.Run(() => reader.ReadFoldedAsync<string>(Scope, (source, token) =>
++        { token.ThrowIfCancellationRequested(); Interlocked.Increment(ref folds); return source.Identity.ActorId; }, caller.Token), TestContext.Current.CancellationToken);
++        try
++        {
++            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            if (cancelCaller)
++            {
++                caller.Cancel();
++                (await Should.ThrowAsync<OperationCanceledException>(() => reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken))).CancellationToken.ShouldBe(caller.Token);
++            }
++            else
++            {
++                clock.Advance(TimeSpan.FromSeconds(30));
++                (await reading.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).ShouldBeNull();
++            }
++            int originalFolds = Volatile.Read(ref folds); int originalReads = Volatile.Read(ref streamCalls); int originalCuts = Volatile.Read(ref namespaceCalls);
++            release.Set(); await released.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            reading.IsCompleted.ShouldBeTrue(); Volatile.Read(ref folds).ShouldBe(originalFolds);
++            Volatile.Read(ref streamCalls).ShouldBe(originalReads); Volatile.Read(ref namespaceCalls).ShouldBe(originalCuts);
++            original.ShouldBe(new byte[] { 1, 2, 3 });
++        }
++        finally { release.Set(); }
++    }
++
++
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs
+@@ -161,4 +161,80 @@
+         (await new SourcePublicationNamespaceActor(host).ReadAsync(Scope)).ShouldBeNull();
+         var persisted = backend.CommittedState.Single().Value.ShouldBeOfType<SourcePublicationNamespaceState>(); persisted.Revision.ShouldBe(1); persisted.Sources.ShouldNotContain(Created);
+     }
++
++    /// <summary>Provider-owned initial and final roster capture cannot retain the caller beyond its original budget or release a late cut.</summary>
++    [Theory]
++    [InlineData("initial-count", true)]
++    [InlineData("initial-count", false)]
++    [InlineData("initial-items", true)]
++    [InlineData("initial-items", false)]
++    [InlineData("initial-installation-items", true)]
++    [InlineData("initial-installation-items", false)]
++    [InlineData("final-count", true)]
++    [InlineData("final-count", false)]
++    [InlineData("final-items", true)]
++    [InlineData("final-items", false)]
++    [InlineData("final-installation-items", true)]
++    [InlineData("final-installation-items", false)]
++    public async Task SuspendedRosterCaptureReleasesCallerWithoutLateCut(string vector, bool cancelCaller)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var backend = new InMemoryStateManager(); var actual = Actor(backend);
++        (await actual.InstallAsync(Installation())).ShouldBeTrue();
++        byte[] original = JsonSerializer.SerializeToUtf8Bytes(backend.CommittedState.Single().Value);
++        var clock = new AuthoritativeReadTimeProvider();
++        using var cancellation = new CancellationTokenSource();
++        using var release = new ManualResetEventSlim();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var detachedReturned = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var supplied = Substitute.For<IReadOnlyList<AggregateIdentity>>();
++        void Suspend()
++        {
++            entered.TrySetResult(); release.Wait(); detachedReturned.TrySetResult();
++        }
++        supplied.Count.Returns(_ => { if (vector.EndsWith("-count", StringComparison.Ordinal)) { Suspend(); } return 1; });
++        supplied.GetEnumerator().Returns(_ =>
++        {
++            if (vector.EndsWith("-items", StringComparison.Ordinal)) { Suspend(); }
++            return ((IEnumerable<AggregateIdentity>)new[] { Existing }).GetEnumerator();
++        });
++        var proxy = Substitute.For<ISourcePublicationNamespaceActor>(); int reads = 0;
++        proxy.ReadAsync(Scope).Returns(async _ =>
++        {
++            var owned = (await actual.ReadAsync(Scope))!; int ordinal = Interlocked.Increment(ref reads);
++            if (ordinal != (vector.StartsWith("initial", StringComparison.Ordinal) ? 1 : 2)) { return (SourcePublicationNamespaceState?)owned; }
++            return vector.Contains("installation", StringComparison.Ordinal)
++                ? owned with { InitialSources = supplied } : owned with { Sources = supplied };
++        });
++        var source = Substitute.For<IAggregateActor>(); source.GetStreamMetadataAsync().Returns(new AggregateStreamMetadata(true, 1));
++        var authority = Substitute.For<ISourcePublicationNamespaceAuthority>(); int authorizations = 0;
++        authority.AuthorizeAsync(Arg.Any<SourcePublicationNamespaceState>(), Arg.Any<CancellationToken>()).Returns(_ =>
++        {
++            Interlocked.Increment(ref authorizations);
++            return new SourcePublicationNamespaceAuthorization("current-qualified-installation", DateTimeOffset.UnixEpoch.AddHours(1));
++        });
++        var operation = Task.Run(() => new DaprSourcePublicationNamespaceSource(Proxies(proxy, source), authority, clock)
++            .ReadAsync(Scope, cancellation.Token), CancellationToken.None);
++        try
++        {
++            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            if (cancelCaller)
++            {
++                cancellation.Cancel();
++                var error = await Should.ThrowAsync<OperationCanceledException>(() => operation.WaitAsync(TimeSpan.FromSeconds(2)));
++                error.CancellationToken.ShouldBe(cancellation.Token);
++            }
++            else
++            {
++                clock.Advance(TimeSpan.FromSeconds(30));
++                (await operation.WaitAsync(TimeSpan.FromSeconds(2))).ShouldBeNull();
++            }
++            int finalAuthorizations = Volatile.Read(ref authorizations); int finalReads = Volatile.Read(ref reads);
++            release.Set(); await detachedReturned.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            Volatile.Read(ref authorizations).ShouldBe(finalAuthorizations); Volatile.Read(ref reads).ShouldBe(finalReads);
++            JsonSerializer.SerializeToUtf8Bytes(backend.CommittedState.Single().Value).ShouldBe(original);
++            backend.CommittedState.Single().Value.ShouldBeOfType<SourcePublicationNamespaceState>().Revision.ShouldBe(1);
++        }
++        finally { release.Set(); }
++    }
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs
+@@ -1,4 +1,5 @@
+ using System.Text;
++using System.Text.Json;
+ using Hexalith.EventStore.Contracts.Security;
+ using NSubstitute;
+ 
+@@ -90,4 +91,38 @@
+         using var watchdog = new CancellationTokenSource(TimeSpan.FromSeconds(5)); while (owned.Bytes.Any(value => value != 0)) { await Task.Delay(10, watchdog.Token); }
+         f.Record!.Sealed.ShouldBeNull(); await f.Registry.DidNotReceive().RetainSealedAsync(Arg.Any<InteractionOccurrenceIdentity>(), Arg.Any<InteractionOccurrenceSealedResult>(), Arg.Any<CancellationToken>());
+     }
++
++    /// <summary>Actual active event/snapshot decryption cannot release plaintext when final Read authority is withdrawn; pending, active and source evidence remain immutable.</summary>
++    [Theory]
++    [InlineData(false)][InlineData(true)]
++    public async Task ActiveReadWithdrawalAfterDecryptReleasesNoPayloadAndPreservesOriginal(bool snapshot)
++    {
++        var f = new InteractionOccurrenceProtectorFixture(); byte[] source = Payload();
++        var identity = snapshot ? f.Identity with { Kind = PayloadProtectionPayloadKind.Snapshot, PayloadTypeId = "hx-snapshot-v1:test" } : f.Identity;
++        var sealedResult = snapshot ? await f.Adapter.ProtectSnapshotAsync(source, identity, "digest-v1", 1,
++            InteractionOccurrenceProtectorFixture.Reference, TestContext.Current.CancellationToken) : await Write(f, source);
++        sealedResult.ShouldNotBeNull();
++        var pending = f.Record!; pending.WriterState.ShouldBe(InteractionOccurrenceWriterState.SealedPending);
++        byte[] pendingBytes = JsonSerializer.SerializeToUtf8Bytes(pending); byte[] cipher = sealedResult.PayloadBytes.ToArray();
++        (await f.Adapter.CompleteWriterAsync(identity, sealedResult.KeyReference, "exact-committed-source", true,
++            TestContext.Current.CancellationToken)).Record!.WriterState.ShouldBe(InteractionOccurrenceWriterState.Active);
++        byte[] activeBytes = JsonSerializer.SerializeToUtf8Bytes(f.Record); int finalChecks = 0;
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        using var release = new ManualResetEventSlim();
++        f.Keys.Current = () => { Interlocked.Increment(ref finalChecks); entered.TrySetResult(); release.Wait(); return f.Current; };
++        var reading = f.Adapter.UnprotectAsync(identity, TestContext.Current.CancellationToken);
++        try
++        {
++            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            f.Current = false; release.Set();
++            var denied = await reading.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            denied.IsReadable.ShouldBeFalse(); denied.PayloadBytes.ShouldBeNull(); Volatile.Read(ref finalChecks).ShouldBe(1);
++            JsonSerializer.SerializeToUtf8Bytes(pending).ShouldBe(pendingBytes);
++            JsonSerializer.SerializeToUtf8Bytes(f.Record).ShouldBe(activeBytes);
++            f.Record!.Sealed!.PayloadBytes.ShouldBe(cipher); sealedResult.PayloadBytes.ShouldBe(cipher); source.ShouldBe(Payload());
++            f.OwnedBuffers.All(buffer => buffer.All(value => value == 0)).ShouldBeTrue();
++            f.Keys.WriteRoots.ShouldBe(1); f.Keys.Leases.ShouldBe(1);
++        }
++        finally { release.Set(); }
++    }
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs
+@@ -405,4 +405,37 @@
+         await f.Provider.Received(1).ConsumeAsync(Arg.Any<DeletionBatchConsumptionRequest>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+         (await actor.LookupAsync("tenant-a", "other")).Status.ShouldBe(DeletionConsumptionStatus.Unconsumed);
+     }
++
++    /// <summary>Raw ordinal alias order agrees with the guard even when JSON escaping differs; reversed/duplicate vectors fail before admission/effect and the exact original survives consumption lookup/restart.</summary>
++    [Theory]
++    [InlineData("sorted")][InlineData("reversed")][InlineData("duplicate")]
++    public async Task CanonicalRawTargetOrderPreservesOriginalAcrossConsumeAndRestart(string vector)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var plus = new ProtectionTarget("tenant-a", "interaction-a", "key+v1");
++        var minus = plus with { TargetProtectionKeyAlias = "key-v1" };
++        IReadOnlyList<ProtectionTarget> targets = vector switch { "reversed" => [minus, plus], "duplicate" => [plus, plus], _ => [plus, minus] };
++        var f = new DeletionConsumptionFixture { LoseResponse = true }; var request = DeletionConsumptionFixture.Request(targets: targets);
++        if (vector != "sorted")
++        {
++            await Should.ThrowAsync<ArgumentException>(() => f.Actor.RegisterAsync(request));
++            await f.Authority.DidNotReceive().VerifyDispatchAsync(Arg.Any<DeletionBatchConsumptionRequest>(), Arg.Any<CancellationToken>());
++            await f.Authority.DidNotReceive().RecordTransitionAsync(Arg.Any<AnchoredStateTransition>(), Arg.Any<CancellationToken>());
++            f.Provider.ReceivedCalls().ShouldBeEmpty(); f.Backend.CommittedState.ShouldBeEmpty(); return;
++        }
++        (await f.Actor.RegisterAsync(request)).Status.ShouldBe(DeletionConsumptionStatus.Unconsumed);
++        var reserved = await f.Actor.ReserveAndConsumeAsync(request); reserved.Status.ShouldBe(DeletionConsumptionStatus.ConsumptionReserved);
++        var saved = f.Backend.CommittedState.Single(); var persisted = saved.Value.ShouldBeOfType<DeletionConsumptionLedger>();
++        DeletionConsumptionIdentity.Digest(persisted.Batches.Single().Original).ShouldBe(DeletionConsumptionIdentity.Digest(request));
++        var restored = new Hexalith.EventStore.Testing.Fakes.InMemoryStateManager();
++        await restored.SetStateAsync(saved.Key, JsonSerializer.Deserialize<DeletionConsumptionLedger>(JsonSerializer.Serialize(saved.Value))!); await restored.SaveStateAsync();
++        var restarted = DeletionConsumptionFixture.Create(restored, f.Authority, f.Provider);
++        var original = await restarted.LookupAsync("tenant-a", request.Capability.BatchId); original.Status.ShouldBe(DeletionConsumptionStatus.Consumed);
++        original.ReceiptId.ShouldBe(reserved.ReceiptId); original.TargetReceipts.Select(r => r.Target).ShouldBe(targets);
++        DeletionConsumptionIdentity.Digest(await restarted.ReserveAndConsumeAsync(request)).ShouldBe(DeletionConsumptionIdentity.Digest(original));
++        var final = restored.CommittedState.Single().Value.ShouldBeOfType<DeletionConsumptionLedger>().Batches.Single();
++        DeletionConsumptionIdentity.Digest(final.Original).ShouldBe(DeletionConsumptionIdentity.Digest(request));
++        DeletionConsumptionIdentity.Digest(final.Outcome).ShouldBe(DeletionConsumptionIdentity.Digest(original));
++        await f.Provider.Received(1).ConsumeAsync(Arg.Any<DeletionBatchConsumptionRequest>(), reserved.ReceiptId!, Arg.Any<CancellationToken>());
++    }
+ }
+--- prior/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs
++++ current/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs
+@@ -26,10 +26,10 @@
+         var mutation = new GuardedStateMutation("source-a", 0, GuardedTransactionFixture.Hash([]), "sealed-content"u8.ToArray());
+         (await fixture.Apply(fixture.Command(GovernanceGuardOperation.AppendWrite, write: fixture.Facts(kind)), [mutation])).Status.ShouldBe("Blocked");
+         fixture.Backend.Stored.ContainsKey(fixture.Backend.Key("source-a")).ShouldBeFalse();
+-        (await fixture.Apply(fixture.Command(GovernanceGuardOperation.AppendWrite, write: fixture.Facts(kind), reference: "original-work"), [mutation])).Status.ShouldBe("Accepted");
++        (await fixture.Apply(fixture.Command(GovernanceGuardOperation.AppendWrite, write: fixture.Facts(kind), reference: "original-work") with { BridgeOriginal = new(owner, cohort.OperationId) }, [mutation])).Status.ShouldBe("Accepted");
+         (await fixture.Apply(fixture.Command(GovernanceGuardOperation.ActivateSuccessor) with { EpochId = "epoch-b" })).Status.ShouldBe("Blocked");
+-        (await fixture.Apply(fixture.Command(GovernanceGuardOperation.RecordBridgeDrain, reference: "original-work"))).Status.ShouldBe("Committed");
+-        (await fixture.Apply(fixture.Command(GovernanceGuardOperation.AppendWrite, write: fixture.Facts(kind), reference: "original-work"), [mutation with { CellId = "after-drain" }])).Status.ShouldBe("Blocked");
++        (await fixture.Apply(fixture.Command(GovernanceGuardOperation.RecordBridgeDrain, reference: "original-work") with { BridgeOriginal = new(owner, cohort.OperationId) })).Status.ShouldBe("Committed");
++        (await fixture.Apply(fixture.Command(GovernanceGuardOperation.AppendWrite, write: fixture.Facts(kind), reference: "original-work") with { BridgeOriginal = new(owner, cohort.OperationId) }, [mutation with { CellId = "after-drain" }])).Status.ShouldBe("Blocked");
+         fixture.Backend.Stored.ContainsKey(fixture.Backend.Key("after-drain")).ShouldBeFalse();
+         (await fixture.Apply(fixture.Command(GovernanceGuardOperation.ActivateSuccessor) with { EpochId = "epoch-b" })).Status.ShouldBe("Committed");
+         fixture.State.Repair.ShouldBeNull(); fixture.State.RepairHistory.Single().Cohort.Single().ShouldBe(cohort);
+@@ -281,4 +281,43 @@
+         f.State.Receipts.Single(r => r.OperationId == accepted.OperationId).ShouldBe(accepted);
+     }
+ 
++
++    /// <summary>Two authoritative owners may share an operation ID; serialized guard state keeps their bridge/drain/activation and original lookup independent.</summary>
++    [Fact]
++    public async Task SameOperationAcrossOwnersRequiresBothExactOriginalDrains()
++    {
++        var f = new GovernanceGuardFixture();
++        var ownerA = new AggregateIdentity("tenant-a", "directory", "directory-a");
++        var ownerB = new AggregateIdentity("tenant-a", "directory", "directory-b");
++        var first = new DirectoryRepairCohortItem(ownerA, "same-original", DirectoryWriteKind.Permit, "conversation-a", "permit-a", "effect-a", 1, "Authorized");
++        var second = first with { Owner = ownerB };
++        var install = f.Command(GovernanceGuardOperation.InstallRepairFence);
++        install = install with { Repair = new("tenant-a", install.OperationId, "epoch-a", install.ExpectedGuardRevision, "post-fence-checkpoint", "repair-revocation", [first, second]) };
++        (await f.Apply(install)).Status.ShouldBe("Committed");
++        f.State.Repair!.Cohort.Count.ShouldBe(2);
++        var identityA = new DirectoryRepairOriginalIdentity(ownerA, first.OperationId);
++        var identityB = new DirectoryRepairOriginalIdentity(ownerB, second.OperationId);
++        var mutationA = new GuardedStateMutation("bridge-a", 0, GuardedTransactionFixture.Hash([]), "sealed-a"u8.ToArray());
++        var appendA = f.Command(GovernanceGuardOperation.AppendWrite, write: f.Facts(DirectoryWriteKind.Permit), reference: first.OperationId) with { BridgeOriginal = identityA };
++        var acceptedA = await f.Apply(appendA, [mutationA]); acceptedA.Status.ShouldBe("Accepted");
++        (await f.Apply(f.Command(GovernanceGuardOperation.RecordBridgeDrain, reference: first.OperationId) with { BridgeOriginal = identityA })).Status.ShouldBe("Committed");
++        f.State.Repair!.DrainedOriginals.ShouldBe(new[] { identityA });
++        (await f.Apply(f.Command(GovernanceGuardOperation.AppendWrite, write: f.Facts(DirectoryWriteKind.Permit), reference: first.OperationId) with { BridgeOriginal = identityA },
++            [mutationA with { CellId = "after-a-drain" }])).Status.ShouldBe("Blocked");
++        (await f.Apply(f.Command(GovernanceGuardOperation.ActivateSuccessor) with { EpochId = "epoch-b" })).Status.ShouldBe("Blocked");
++        var mutationB = mutationA with { CellId = "bridge-b", NextValue = "sealed-b"u8.ToArray() };
++        var factsB = f.Facts(DirectoryWriteKind.Permit) with { PermitOwnerId = ownerB.ToString() };
++        (await f.Apply(f.Command(GovernanceGuardOperation.AppendWrite, write: factsB, reference: second.OperationId) with { BridgeOriginal = identityB }, [mutationB])).Status.ShouldBe("Accepted");
++        (await f.Apply(f.Command(GovernanceGuardOperation.RecordBridgeDrain, reference: second.OperationId))).Status.ShouldBe("Blocked");
++        f.State.Repair!.DrainedOriginals.ShouldBe(new[] { identityA });
++        (await f.Apply(f.Command(GovernanceGuardOperation.RecordBridgeDrain, reference: second.OperationId) with { BridgeOriginal = identityB })).Status.ShouldBe("Committed");
++        (await f.Apply(f.Command(GovernanceGuardOperation.ActivateSuccessor) with { EpochId = "epoch-b" })).Status.ShouldBe("Committed");
++        f.State.Repair.ShouldBeNull(); var history = f.State.RepairHistory.Single();
++        history.Cohort.ShouldBe(new[] { first, second }); history.DrainedOriginals.ShouldBe(new[] { identityA, identityB });
++        f.State.EpochId.ShouldBe("epoch-b"); f.State.LegacyRevocationReceipt.ShouldBe("legacy-revoked");
++        f.Backend.Stored.ContainsKey(f.Backend.Key("after-a-drain")).ShouldBeFalse();
++        f.DenyEffects = true; var restarted = new GovernanceScopeGuardOwner(f.Backend.Owner, TimeProvider.System, f.Authority);
++        (await restarted.ExecuteAsync(appendA, [mutationA], TestContext.Current.CancellationToken)).ShouldBe(acceptedA);
++        f.State.RepairHistory.Single().DrainedOriginals.ShouldBe(new[] { identityA, identityB });
++    }
+ }
+--- prior/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs
++++ current/platform/src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs
+@@ -10,8 +10,12 @@
+ /// <summary>Actual same-tenant durable wrapped-object/hold/physical-outcome protocol. Raw key bytes never enter this actor.
+ /// Missing qualified physical fence/manifest/all-copy/restore backend/current private authority disables effects and lookup.
+ /// Production requires non-reentrant actor turns and an independently qualified durable state store.</summary>
+-public sealed class CustodyKeyLifecycleActor(ActorHost host, ICustodyKeyLifecycleAuthority? authority = null, ICustodyKeyLifecycleProvider? provider = null) : Actor(host), ICustodyKeyLifecycleActor
++/// <param name="host">Private same-tenant runtime actor.</param><param name="authority">Independent exact original lifecycle authority.</param>
++/// <param name="provider">Qualified physical lifecycle owner.</param><param name="clock">Optional whole physical-operation clock; omission retains the system thirty-second operational bound.</param>
++public sealed class CustodyKeyLifecycleActor(ActorHost host, ICustodyKeyLifecycleAuthority? authority = null, ICustodyKeyLifecycleProvider? provider = null,
++    TimeProvider? clock = null) : Actor(host), ICustodyKeyLifecycleActor
+ {
++    private readonly TimeProvider _clock = clock ?? TimeProvider.System;
+     private const string StateKey = "custody-key-lifecycle-candidate-v1";
+     /// <summary>Gets exact private actor type.</summary>
+     public const string ActorTypeName = "CustodyKeyLifecycleActor";
+@@ -38,17 +42,18 @@
+     /// <inheritdoc/>
+     public async Task<CustodyKeyLifecycleOutcome> ApplyAsync(CustodyKeyLifecycleRequest request)
+     {
++        var budget = new PrivateOwnerOperationDeadline(_clock, CancellationToken.None);
+         Validate(request); Check(request.Identity); string digest = Digest(request); var missing = Missing(request.Identity, request.OperationId, digest);
+         if (!await AdmitAsync(request.Identity, request.OperationId, "ApplyKeyLifecycle", digest).ConfigureAwait(false)) { return missing; }
+-        var result = await ApplyCoreAsync(request, digest).ConfigureAwait(false);
++        var result = await ApplyCoreAsync(request, digest, budget).ConfigureAwait(false);
+         return await AdmitAsync(request.Identity, request.OperationId, "ApplyKeyLifecycle", digest).ConfigureAwait(false) ? result : missing;
+     }
+-    private async Task<CustodyKeyLifecycleOutcome> ApplyCoreAsync(CustodyKeyLifecycleRequest request, string digest)
++    private async Task<CustodyKeyLifecycleOutcome> ApplyCoreAsync(CustodyKeyLifecycleRequest request, string digest, PrivateOwnerOperationDeadline budget)
+     {
+         var missing = Missing(request.Identity, request.OperationId, digest); var state = await ReadAsync(request.Identity.TenantId, true).ConfigureAwait(false);
+         var key = state?.Keys.SingleOrDefault(k => k.Registration.Identity == request.Identity); if (state is null || key is null) { return missing; }
+         var prior = key.Outcomes.SingleOrDefault(o => o.OperationId == request.OperationId);
+-        if (prior is not null) { return prior.RequestDigest == digest ? await ResolveAsync(state, key, request, prior).ConfigureAwait(false) : missing with { Status = CustodyKeyLifecycleStatus.Conflict }; }
++        if (prior is not null) { return prior.RequestDigest == digest ? await ResolveAsync(state, key, request, prior, budget).ConfigureAwait(false) : missing with { Status = CustodyKeyLifecycleStatus.Conflict }; }
+         if (provider is null || authority is null || key.Requests.Count >= 10000 || state.Keys.Sum(k => k.Requests.Count) >= 10000
+             || request.ExpectedRevision != state.Revision || key.Outcomes.Any(o => o.Status is CustodyKeyLifecycleStatus.Unknown or CustodyKeyLifecycleStatus.Destroyed)
+             || !await authority.AuthorizeEffectAsync(request).ConfigureAwait(false)) { return missing; }
+@@ -62,35 +67,47 @@
+         if (!await SaveAsync(state, next).ConfigureAwait(false)) { return missing; }
+         // Only the owning physical backend consumes current linearizable control at its irreversible instant.
+         // Missing/unknown result never permits a new physical call; retries use Lookup only.
+-        try { return await RetainAsync(next, reserved, request, pending, await provider.ExecuteAsync(key.Registration, request, digest).ConfigureAwait(false)).ConfigureAwait(false); }
++        try
++        {
++            // Only physical invocation/await runs away from the actor turn. A late task has no actor-state continuation.
++            var result = await budget.ReadAsync(() => provider.ExecuteAsync(key.Registration, request, digest)).ConfigureAwait(false);
++            return await RetainAsync(next, reserved, request, pending, result, budget).ConfigureAwait(false);
++        }
+         catch (Exception) { return pending; }
+     }
+     /// <inheritdoc/>
+     public async Task<CustodyKeyLifecycleOutcome> LookupAsync(CustodyKeyLifecycleRequest request)
+     {
++        var budget = new PrivateOwnerOperationDeadline(_clock, CancellationToken.None);
+         Validate(request); Check(request.Identity); string digest = Digest(request); var missing = Missing(request.Identity, request.OperationId, digest);
+         if (!await AdmitAsync(request.Identity, request.OperationId, "LookupKeyLifecycle", digest).ConfigureAwait(false)) { return missing; }
+         var state = await ReadAsync(request.Identity.TenantId).ConfigureAwait(false); var key = state?.Keys.SingleOrDefault(k => k.Registration.Identity == request.Identity);
+         var prior = key?.Outcomes.SingleOrDefault(o => o.OperationId == request.OperationId);
+-        var result = state is not null && key is not null && prior?.RequestDigest == digest ? await ResolveAsync(state, key, request, prior).ConfigureAwait(false) : missing;
++        var result = state is not null && key is not null && prior?.RequestDigest == digest ? await ResolveAsync(state, key, request, prior, budget).ConfigureAwait(false) : missing;
+         return await AdmitAsync(request.Identity, request.OperationId, "LookupKeyLifecycle", digest).ConfigureAwait(false) ? result : missing;
+     }
+-    private async Task<CustodyKeyLifecycleOutcome> ResolveAsync(CustodyKeyLifecycleLedger state, CustodyKeyLifecycleEntry key, CustodyKeyLifecycleRequest request, CustodyKeyLifecycleOutcome original)
++    private async Task<CustodyKeyLifecycleOutcome> ResolveAsync(CustodyKeyLifecycleLedger state, CustodyKeyLifecycleEntry key, CustodyKeyLifecycleRequest request, CustodyKeyLifecycleOutcome original, PrivateOwnerOperationDeadline budget)
+     {
+         if (original.Status != CustodyKeyLifecycleStatus.Unknown) { return original; }
+         if (provider is null || authority is null) { return original; }
+-        try { return await RetainAsync(state, key, request, original, await provider.LookupAsync(key.Registration, request, original.RequestDigest).ConfigureAwait(false)).ConfigureAwait(false); }
++        try
++        {
++            var result = await budget.ReadAsync(() => provider.LookupAsync(key.Registration, request, original.RequestDigest)).ConfigureAwait(false);
++            return await RetainAsync(state, key, request, original, result, budget).ConfigureAwait(false);
++        }
+         catch (Exception) { return original; }
+     }
+     private async Task<CustodyKeyLifecycleOutcome> RetainAsync(CustodyKeyLifecycleLedger state, CustodyKeyLifecycleEntry key, CustodyKeyLifecycleRequest request,
+-        CustodyKeyLifecycleOutcome pending, CustodyKeyLifecycleOutcome result)
+-    {
++        CustodyKeyLifecycleOutcome pending, CustodyKeyLifecycleOutcome result, PrivateOwnerOperationDeadline budget)
++    {
++        budget.Check();
+         var expected = request.Action switch { CustodyKeyLifecycleAction.Pin => CustodyKeyLifecycleStatus.Pinned, CustodyKeyLifecycleAction.Unpin => CustodyKeyLifecycleStatus.Unpinned, _ => CustodyKeyLifecycleStatus.Destroyed };
+         if (result is null || result.Identity != request.Identity || result.OperationId != request.OperationId || result.RequestDigest != pending.RequestDigest
+             || result.Status != expected && result.Status != CustodyKeyLifecycleStatus.NotPerformed || !ValidText(result.ReceiptId)
+             || result.Status == CustodyKeyLifecycleStatus.Destroyed && !ValidText(result.RestoreBarrierReceiptId)
+             || result.Status != CustodyKeyLifecycleStatus.Destroyed && result.RestoreBarrierReceiptId is not null || authority is null
+             || !await authority.VerifyOutcomeAsync(request, result).ConfigureAwait(false)) { return pending; }
++        budget.Check();
+         var pins = key.Pins;
+         if (request.Action == CustodyKeyLifecycleAction.Pin && result.Status == CustodyKeyLifecycleStatus.NotPerformed)
+         { pins = pins.Where(p => p.OperationId != request.OperationId).ToArray(); }
+--- prior/platform/src/Hexalith.Platform.Custody/DeletionCapabilityRevocationSubscriber.cs
++++ current/platform/src/Hexalith.Platform.Custody/DeletionCapabilityRevocationSubscriber.cs
+@@ -28,22 +28,22 @@
+             if (!Valid(envelope) || string.IsNullOrWhiteSpace(signedEvidence) || signedEvidence.Length > 16384) { return false; }
+             var authorization = await budget.ReadAsync(() => authenticator.VerifyAsync(envelope, signedEvidence, CancellationToken.None)).ConfigureAwait(false);
+             if (!Current(authorization, envelope)) { return false; }
+-            var block = Capture(await budget.ReadAsync(() => registrar.LookupAsync(envelope, CancellationToken.None)).ConfigureAwait(false), envelope, budget);
++            var block = await budget.ReadAsync(async () => Capture(await registrar.LookupAsync(envelope, CancellationToken.None).ConfigureAwait(false), envelope, budget)).ConfigureAwait(false);
+             if (block is null)
+             {
+                 // Register is idempotent at the same owner. A lost result is resolved only by exact lookup.
+                 try { await budget.ReadAsync(() => registrar.RegisterAsync(envelope, CancellationToken.None)).ConfigureAwait(false); }
+                 catch (Exception) { budget.Check(); }
+-                block = Capture(await budget.ReadAsync(() => registrar.LookupAsync(envelope, CancellationToken.None)).ConfigureAwait(false), envelope, budget);
++                block = await budget.ReadAsync(async () => Capture(await registrar.LookupAsync(envelope, CancellationToken.None).ConfigureAwait(false), envelope, budget)).ConfigureAwait(false);
+             }
+             if (block is null || !await StillCurrentAsync(authorization!, envelope, signedEvidence, budget).ConfigureAwait(false)) { return false; }
+-            var original = Capture(await budget.ReadAsync(() => mirror.LookupAsync(envelope, CancellationToken.None)).ConfigureAwait(false), envelope, budget);
++            var original = await budget.ReadAsync(async () => Capture(await mirror.LookupAsync(envelope, CancellationToken.None).ConfigureAwait(false), envelope, budget)).ConfigureAwait(false);
+             if (original is not null && !Same(original, block)) { return false; }
+             if (original is null)
+             {
+                 try { await budget.ReadAsync(() => mirror.RecordAsync(block, CancellationToken.None)).ConfigureAwait(false); }
+                 catch (Exception) { budget.Check(); }
+-                original = Capture(await budget.ReadAsync(() => mirror.LookupAsync(envelope, CancellationToken.None)).ConfigureAwait(false), envelope, budget);
++                original = await budget.ReadAsync(async () => Capture(await mirror.LookupAsync(envelope, CancellationToken.None).ConfigureAwait(false), envelope, budget)).ConfigureAwait(false);
+             }
+             budget.Check();
+             return original is not null && Same(original, block)
+--- prior/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs
++++ current/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs
+@@ -31,18 +31,19 @@
+     /// <inheritdoc/>
+     public async Task<DeletionCapabilitySigningOutcome> SignAsync(DeletionBatchCapabilityV1 payload)
+     {
++        var budget = new PrivateOwnerOperationDeadline(_clock, CancellationToken.None);
+         string id = Check(payload);
+         if (!(authority is not null && await authority.AuthorizeOperationAsync(payload, id, "SignDeletionCapability").ConfigureAwait(false))) { return new(id, payload, DeletionCapabilitySigningState.Unavailable); }
+-        var result = await SignAsyncCoreAsync(payload).ConfigureAwait(false);
++        var result = await SignAsyncCoreAsync(payload, budget).ConfigureAwait(false);
+         if (!(authority is not null && await authority.AuthorizeOperationAsync(payload, id, "SignDeletionCapability").ConfigureAwait(false))) { return new(id, payload, DeletionCapabilitySigningState.Unavailable); }
+         return result;
+     }
+-    private async Task<DeletionCapabilitySigningOutcome> SignAsyncCoreAsync(DeletionBatchCapabilityV1 payload)
++    private async Task<DeletionCapabilitySigningOutcome> SignAsyncCoreAsync(DeletionBatchCapabilityV1 payload, PrivateOwnerOperationDeadline budget)
+     {
+         string requestId = Check(payload);
+         if (authority is null || !await authority.AuthorizeOperationAsync(payload, requestId, "SignDeletionCapability").ConfigureAwait(false)) { return new(requestId, payload, DeletionCapabilitySigningState.Unavailable); }
+         var existing = await ReadAsync(payload, requestId, true).ConfigureAwait(false);
+-        if (existing is not null) { return await ResolveAsync(payload, requestId, existing).ConfigureAwait(false); }
++        if (existing is not null) { return await ResolveAsync(payload, requestId, existing, budget).ConfigureAwait(false); }
+         if (authority is null || provider is null || trustProvider is null) { return new(requestId, payload, DeletionCapabilitySigningState.Unavailable); }
+         if (!await authority.AuthorizeAsync(payload, requestId).ConfigureAwait(false))
+         { return await SaveAsync(new(requestId, payload, DeletionCapabilitySigningState.Denied)).ConfigureAwait(false); }
+@@ -51,25 +52,26 @@
+         if (!await authority.AuthorizeAsync(payload, requestId).ConfigureAwait(false))
+         { return await SaveAsync(new(requestId, payload, DeletionCapabilitySigningState.Denied)).ConfigureAwait(false); }
+         if (await ResolveTrustAsync(payload).ConfigureAwait(false) is null) { return new(requestId, payload, DeletionCapabilitySigningState.Unavailable); }
+-        try { return await RetainAsync(payload, requestId, await provider.SignAsync(payload, requestId).ConfigureAwait(false)).ConfigureAwait(false); }
++        try { return await RetainAsync(payload, requestId, await budget.ReadAsync(async () => CaptureProviderResult(await provider.SignAsync(payload, requestId).ConfigureAwait(false))).ConfigureAwait(false), budget).ConfigureAwait(false); }
+         catch (Exception) { return new(requestId, payload, DeletionCapabilitySigningState.Unknown); }
+     }
+     /// <inheritdoc/>
+     public async Task<DeletionCapabilitySigningOutcome> LookupAsync(DeletionBatchCapabilityV1 payload)
+     {
++        var budget = new PrivateOwnerOperationDeadline(_clock, CancellationToken.None);
+         string id = Check(payload);
+         if (!(authority is not null && await authority.AuthorizeOperationAsync(payload, id, "LookupDeletionCapability").ConfigureAwait(false))) { return new(id, payload, DeletionCapabilitySigningState.Unavailable); }
+-        var result = await LookupAsyncCoreAsync(payload).ConfigureAwait(false);
++        var result = await LookupAsyncCoreAsync(payload, budget).ConfigureAwait(false);
+         if (!(authority is not null && await authority.AuthorizeOperationAsync(payload, id, "LookupDeletionCapability").ConfigureAwait(false))) { return new(id, payload, DeletionCapabilitySigningState.Unavailable); }
+         return result;
+     }
+-    private async Task<DeletionCapabilitySigningOutcome> LookupAsyncCoreAsync(DeletionBatchCapabilityV1 payload)
++    private async Task<DeletionCapabilitySigningOutcome> LookupAsyncCoreAsync(DeletionBatchCapabilityV1 payload, PrivateOwnerOperationDeadline budget)
+     {
+         string requestId = Check(payload);
+         if (authority is null || !await authority.AuthorizeOperationAsync(payload, requestId, "LookupDeletionCapability").ConfigureAwait(false)) { return new(requestId, payload, DeletionCapabilitySigningState.Unavailable); }
+         var existing = await ReadAsync(payload, requestId).ConfigureAwait(false);
+         return existing is null ? new(requestId, payload, DeletionCapabilitySigningState.Unavailable)
+-            : await ResolveAsync(payload, requestId, existing).ConfigureAwait(false);
++            : await ResolveAsync(payload, requestId, existing, budget).ConfigureAwait(false);
+     }
+     private string Check(DeletionBatchCapabilityV1 payload)
+     {
+@@ -77,17 +79,18 @@
+         if (Host.Id.GetId() != GetActorId(payload)) { throw new ArgumentException("Deletion signing scope mismatch.", nameof(payload)); }
+         return request;
+     }
+-    private async Task<DeletionCapabilitySigningOutcome> ResolveAsync(DeletionBatchCapabilityV1 payload, string id, DeletionCapabilitySigningOutcome existing)
++    private async Task<DeletionCapabilitySigningOutcome> ResolveAsync(DeletionBatchCapabilityV1 payload, string id, DeletionCapabilitySigningOutcome existing, PrivateOwnerOperationDeadline budget)
+     {
+         if (existing.Payload != payload || existing.SigningRequestId != id) { return new(id, payload, DeletionCapabilitySigningState.Conflict); }
+         if (existing.State is DeletionCapabilitySigningState.Signed or DeletionCapabilitySigningState.Denied
+             or DeletionCapabilitySigningState.SignedAttestationObsoleteUnissued) { return existing; }
+         if (provider is null || trustProvider is null) { return new(id, payload, DeletionCapabilitySigningState.Unavailable); }
+-        try { return await RetainAsync(payload, id, await provider.LookupAsync(payload, id).ConfigureAwait(false), recoveringOriginal: true).ConfigureAwait(false); }
++        try { return await RetainAsync(payload, id, await budget.ReadAsync(async () => CaptureProviderResult(await provider.LookupAsync(payload, id).ConfigureAwait(false))).ConfigureAwait(false), budget, recoveringOriginal: true).ConfigureAwait(false); }
+         catch (Exception) { return new(id, payload, DeletionCapabilitySigningState.Unknown); }
+     }
+-    private async Task<DeletionCapabilitySigningOutcome> RetainAsync(DeletionBatchCapabilityV1 payload, string id, DeletionCapabilitySigningResult result, bool recoveringOriginal = false)
+-    {
++    private async Task<DeletionCapabilitySigningOutcome> RetainAsync(DeletionBatchCapabilityV1 payload, string id, DeletionCapabilitySigningResult result, PrivateOwnerOperationDeadline budget, bool recoveringOriginal = false)
++    {
++        budget.Check();
+         if (result.Outcome is not { } outcome || outcome.Payload != payload || outcome.SigningRequestId != id)
+         { return new(id, payload, DeletionCapabilitySigningState.Conflict); }
+         if (outcome.State != DeletionCapabilitySigningState.Signed) { return new(id, payload, DeletionCapabilitySigningState.Unknown); }
+@@ -108,13 +111,21 @@
+         if (trust.IsRevoked && (originalReceiptAuthority is null || string.IsNullOrWhiteSpace(result.OriginalIssuanceReceiptId)
+             || !await originalReceiptAuthority.VerifyOriginalIssuanceAsync(payload, id, result, trust).ConfigureAwait(false)))
+         { return new(id, payload, DeletionCapabilitySigningState.Unknown); }
++        budget.Check();
+         byte[] ownedAnchor = trust.SubjectPublicKeyInfo; using var key = ECDsa.Create();
+         key.ImportSubjectPublicKeyInfo(ownedAnchor, out int consumed);
+         var profile = new DeletionCapabilityTrustProfile(payload.Issuer, payload.Audience, payload.TenantId, payload.CapabilityKeyVersion,
+             trust.PublicAnchorId, trust.PublicAnchorVersion);
+         if (consumed != ownedAnchor.Length || !DeletionBatchCapabilityCodec.Verify(payload, profile, outcome.DetachedJws, key))
+         { return new(id, payload, DeletionCapabilitySigningState.Unknown); }
++        budget.Check();
+         return await SaveAsync(outcome).ConfigureAwait(false);
++    }
++    // The abandoned provider worker owns only detached public result bytes, never actor state or journal work.
++    private static DeletionCapabilitySigningResult CaptureProviderResult(DeletionCapabilitySigningResult result)
++    {
++        if (result.PublicAnchorSubjectPublicKeyInfo is { Length: > 512 }) { throw new FormatException("Signing result anchor exceeds carrier bound."); }
++        return result with { PublicAnchorSubjectPublicKeyInfo = result.PublicAnchorSubjectPublicKeyInfo?.ToArray() };
+     }
+     private async Task<DeletionCapabilityPublishedTrust?> ResolveTrustAsync(DeletionBatchCapabilityV1 payload, bool requireCurrent = true, bool allowRevokedHistory = false)
+     {
+@@ -197,6 +208,7 @@
+     /// <inheritdoc/>
+     public async Task<DeletionCapabilitySigningOutcome> ObsoleteUnissuedAsync(DeletionBatchCapabilityV1 payload)
+     {
++        var budget = new PrivateOwnerOperationDeadline(_clock, CancellationToken.None);
+         string id = Check(payload); var unavailable = new DeletionCapabilitySigningOutcome(id, payload, DeletionCapabilitySigningState.Unavailable);
+         if (authority is null || noIssueAuthority is null || !await authority.AuthorizeOperationAsync(payload, id, "ObsoleteUnissued").ConfigureAwait(false)) { return unavailable; }
+         var existing = await ReadAsync(payload, id, true).ConfigureAwait(false);
+@@ -204,7 +216,7 @@
+         if (existing.State == DeletionCapabilitySigningState.SignedAttestationObsoleteUnissued)
+         { return await authority.AuthorizeOperationAsync(payload, id, "ObsoleteUnissued").ConfigureAwait(false) ? existing : unavailable; }
+         // Unknown signer state is resolved only by original lookup; no signing retry occurs.
+-        existing = await ResolveAsync(payload, id, existing).ConfigureAwait(false);
++        existing = await ResolveAsync(payload, id, existing, budget).ConfigureAwait(false);
+         if (existing.State != DeletionCapabilitySigningState.Signed) { return unavailable; }
+         string digest = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(existing.DetachedJws!)));
+         var proof = await noIssueAuthority.ReadAsync(payload, id, digest).ConfigureAwait(false);
+--- prior/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs
++++ current/platform/src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs
+@@ -21,7 +21,7 @@
+         ArgumentNullException.ThrowIfNull(original);
+         if (original.State != DeletionCapabilitySigningState.SignedAttestationObsoleteUnissued || original.NoIssueProof is null || currentProof is not { } proof
+             || proof.ProofId != original.NoIssueProof.ProofId
+-            || !Valid(original, proof, evaluatedAt) || original.Payload.SigningAttemptOrdinal == long.MaxValue) { return null; }
++            || !Valid(original, proof, evaluatedAt) || original.Payload.SigningAttemptOrdinal >= 9007199254740991L) { return null; }
+         return original.Payload with { SigningAttemptOrdinal = original.Payload.SigningAttemptOrdinal + 1,
+             IntendedIssuedGuardRevision = proof.CurrentGuardRevision, CapabilityKeyVersion = proof.CurrentHealthyKeyVersion };
+     }
+--- prior/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs
++++ current/platform/src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs
+@@ -19,18 +19,19 @@
+     /// <inheritdoc/>
+     public async Task<ExportKeyDeliveryOutcome> DeliverAsync(ExportKeyDeliveryIdentity identity)
+     {
++        var budget = new PrivateOwnerOperationDeadline(clock, CancellationToken.None);
+         Check(identity);
+         if (!(authority is not null && await authority.AuthorizeOperationAsync(identity, "DeliverExportKey").ConfigureAwait(false))) { return new(identity, ExportKeyDeliveryState.Unavailable); }
+-        var result = await DeliverAsyncCoreAsync(identity).ConfigureAwait(false);
++        var result = await DeliverAsyncCoreAsync(identity, budget).ConfigureAwait(false);
+         if (!(authority is not null && await authority.AuthorizeOperationAsync(identity, "DeliverExportKey").ConfigureAwait(false))) { return new(identity, ExportKeyDeliveryState.Unavailable); }
+         return result;
+     }
+-    private async Task<ExportKeyDeliveryOutcome> DeliverAsyncCoreAsync(ExportKeyDeliveryIdentity identity)
++    private async Task<ExportKeyDeliveryOutcome> DeliverAsyncCoreAsync(ExportKeyDeliveryIdentity identity, PrivateOwnerOperationDeadline budget)
+     {
+         Check(identity);
+         if (authority is null || !await authority.AuthorizeOperationAsync(identity, "DeliverExportKey").ConfigureAwait(false)) { return new(identity, ExportKeyDeliveryState.Unavailable); }
+         ExportKeyDeliveryOutcome? existing = await ReadAsync(identity, true).ConfigureAwait(false);
+-        if (existing is not null) { return await ResolveAsync(identity, existing).ConfigureAwait(false); }
++        if (existing is not null) { return await ResolveAsync(identity, existing, budget).ConfigureAwait(false); }
+         if (provider is null || authority is null) { return new(identity, ExportKeyDeliveryState.Unavailable); }
+         if (clock.GetUtcNow() >= identity.ExclusiveExpiry) { return await SaveAsync(new(identity, ExportKeyDeliveryState.NotDelivered, Reason: "expired")).ConfigureAwait(false); }
+         if (!await authority.AuthorizeAsync(identity).ConfigureAwait(false))
+@@ -42,38 +43,40 @@
+         { return await SaveAsync(new(identity, ExportKeyDeliveryState.NotDelivered, Reason: "authority-or-expiry-changed")).ConfigureAwait(false); }
+         try
+         {
+-            ExportKeyDeliveryOutcome outcome = await provider.ReleaseAsync(identity).ConfigureAwait(false);
+-            return await RetainProviderOutcomeAsync(identity, outcome).ConfigureAwait(false);
++            ExportKeyDeliveryOutcome outcome = await budget.ReadAsync(() => provider.ReleaseAsync(identity)).ConfigureAwait(false);
++            return await RetainProviderOutcomeAsync(identity, outcome, budget).ConfigureAwait(false);
+         }
+         catch (Exception) { return new(identity, ExportKeyDeliveryState.Unknown); }
+     }
+     /// <inheritdoc/>
+     public async Task<ExportKeyDeliveryOutcome> LookupAsync(ExportKeyDeliveryIdentity identity)
+     {
++        var budget = new PrivateOwnerOperationDeadline(clock, CancellationToken.None);
+         Check(identity);
+         if (!(authority is not null && await authority.AuthorizeOperationAsync(identity, "LookupExportKey").ConfigureAwait(false))) { return new(identity, ExportKeyDeliveryState.Unavailable); }
+-        var result = await LookupAsyncCoreAsync(identity).ConfigureAwait(false);
++        var result = await LookupAsyncCoreAsync(identity, budget).ConfigureAwait(false);
+         if (!(authority is not null && await authority.AuthorizeOperationAsync(identity, "LookupExportKey").ConfigureAwait(false))) { return new(identity, ExportKeyDeliveryState.Unavailable); }
+         return result;
+     }
+-    private async Task<ExportKeyDeliveryOutcome> LookupAsyncCoreAsync(ExportKeyDeliveryIdentity identity)
++    private async Task<ExportKeyDeliveryOutcome> LookupAsyncCoreAsync(ExportKeyDeliveryIdentity identity, PrivateOwnerOperationDeadline budget)
+     {
+         Check(identity);
+         if (authority is null || !await authority.AuthorizeOperationAsync(identity, "LookupExportKey").ConfigureAwait(false)) { return new(identity, ExportKeyDeliveryState.Unavailable); }
+         var existing = await ReadAsync(identity).ConfigureAwait(false);
+         return existing is null ? new(identity, ExportKeyDeliveryState.Unavailable)
+-            : await ResolveAsync(identity, existing).ConfigureAwait(false);
++            : await ResolveAsync(identity, existing, budget).ConfigureAwait(false);
+     }
+-    private async Task<ExportKeyDeliveryOutcome> ResolveAsync(ExportKeyDeliveryIdentity expected, ExportKeyDeliveryOutcome existing)
++    private async Task<ExportKeyDeliveryOutcome> ResolveAsync(ExportKeyDeliveryIdentity expected, ExportKeyDeliveryOutcome existing, PrivateOwnerOperationDeadline budget)
+     {
+         if (existing.Identity != expected) { return new(expected, ExportKeyDeliveryState.Conflict); }
+         if (existing.State is ExportKeyDeliveryState.Delivered or ExportKeyDeliveryState.NotDelivered) { return existing; }
+         if (provider is null) { return new(expected, ExportKeyDeliveryState.Unavailable); }
+-        try { return await RetainProviderOutcomeAsync(expected, await provider.LookupAsync(expected).ConfigureAwait(false)).ConfigureAwait(false); }
++        try { return await RetainProviderOutcomeAsync(expected, await budget.ReadAsync(() => provider.LookupAsync(expected)).ConfigureAwait(false), budget).ConfigureAwait(false); }
+         catch (Exception) { return new(expected, ExportKeyDeliveryState.Unknown); }
+     }
+-    private async Task<ExportKeyDeliveryOutcome> RetainProviderOutcomeAsync(ExportKeyDeliveryIdentity expected, ExportKeyDeliveryOutcome outcome)
++    private async Task<ExportKeyDeliveryOutcome> RetainProviderOutcomeAsync(ExportKeyDeliveryIdentity expected, ExportKeyDeliveryOutcome outcome, PrivateOwnerOperationDeadline budget)
+     {
++        budget.Check();
+         if (outcome.Identity != expected) { return new(expected, ExportKeyDeliveryState.Conflict); }
+         if (outcome.State == ExportKeyDeliveryState.Delivered && outcome.ObservedAt is { } at && at != default
+             && at < expected.ExclusiveExpiry && at <= clock.GetUtcNow())
+--- prior/platform/src/Hexalith.Platform.Custody/ICustodyKeyLifecycleAuthority.cs
++++ current/platform/src/Hexalith.Platform.Custody/ICustodyKeyLifecycleAuthority.cs
+@@ -14,6 +14,9 @@
+     Task<bool> VerifyOutcomeAsync(CustodyKeyLifecycleRequest request, CustodyKeyLifecycleOutcome outcome, CancellationToken cancellationToken = default);
+     /// <summary>Validates exact captured durable tenant/revision/digest against independently installed antirollback state.</summary>
+     Task<bool> ValidateStateAsync(string tenantId, long revision, string exactStateDigest, CancellationToken cancellationToken = default);
+-    /// <summary>Advances independent conditional anchor before metadata save; precommit/unknown loss closes availability pending reconciliation.</summary>
++    /// <summary>Deprecated compatibility-only legacy anchor hook; current recoverable actors do not invoke it.
++    /// Qualified implementations must implement the mandatory inherited IAnchoredStateTransitionAuthority admitted-original admission/recovery
++    /// and conditional exact transition journal, including independent staging ownership, current permission and final durable-state/anchor confirmation.
++    /// Implementing this legacy hook alone never enables an actor; omitted inherited proof defaults deny.</summary>
+     Task<bool> RecordRevisionAsync(string tenantId, long expectedRevision, long nextRevision, string exactStateDigest, CancellationToken cancellationToken = default);
+ }
+--- prior/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningAuthority.cs
++++ current/platform/src/Hexalith.Platform.Custody/IDeletionCapabilitySigningAuthority.cs
+@@ -10,7 +10,10 @@
+     Task<bool> AuthorizeAsync(DeletionBatchCapabilityV1 payload, string signingRequestId, CancellationToken cancellationToken = default);
+     /// <summary>Authenticates the independently installed exact original operation owner and captured safe outcome digest, including initial absence. Restored missing, unknown or divergent terminal state denies lookup and effects; private caller credentials do not prove durable history.</summary>
+     Task<bool> ValidateStateAsync(DeletionBatchCapabilityV1 identity, string signingRequestId, string exactStateDigest, CancellationToken cancellationToken = default);
+-    /// <summary>Conditionally advances the independently durable original-operation anchor before state persistence, matching the exact expected prior digest. Only absence to reserved/negative and reserved to immutable terminal transitions are permitted. Failed or unknown persistence remains unavailable until independent reconciliation.</summary>
++    /// <summary>Deprecated compatibility-only legacy anchor hook; current recoverable actors do not invoke it.
++    /// Qualified implementations must implement the mandatory inherited IAnchoredStateTransitionAuthority admitted-original admission/recovery
++    /// and conditional exact transition journal, including independent staging ownership, current permission and final durable-state/anchor confirmation.
++    /// Implementing this legacy hook alone never enables an actor; omitted inherited proof defaults deny.</summary>
+     Task<bool> RecordStateAsync(DeletionBatchCapabilityV1 identity, string signingRequestId, string expectedStateDigest, string nextStateDigest, CancellationToken cancellationToken = default);
+ 
+ }
+--- prior/platform/src/Hexalith.Platform.Custody/IExportKeyDeliveryAuthority.cs
++++ current/platform/src/Hexalith.Platform.Custody/IExportKeyDeliveryAuthority.cs
+@@ -10,7 +10,10 @@
+     Task<bool> AuthorizeAsync(ExportKeyDeliveryIdentity identity, CancellationToken cancellationToken = default);
+     /// <summary>Authenticates the independently installed exact original operation owner and captured safe outcome digest, including initial absence. Restored missing, unknown or divergent terminal state denies lookup and effects; private caller credentials do not prove durable history.</summary>
+     Task<bool> ValidateStateAsync(ExportKeyDeliveryIdentity identity, string exactStateDigest, CancellationToken cancellationToken = default);
+-    /// <summary>Conditionally advances the independently durable original-operation anchor before state persistence, matching the exact expected prior digest. Only absence to reserved/negative and reserved to immutable terminal transitions are permitted. Failed or unknown persistence remains unavailable until independent reconciliation.</summary>
++    /// <summary>Deprecated compatibility-only legacy anchor hook; current recoverable actors do not invoke it.
++    /// Qualified implementations must implement the mandatory inherited IAnchoredStateTransitionAuthority admitted-original admission/recovery
++    /// and conditional exact transition journal, including independent staging ownership, current permission and final durable-state/anchor confirmation.
++    /// Implementing this legacy hook alone never enables an actor; omitted inherited proof defaults deny.</summary>
+     Task<bool> RecordStateAsync(ExportKeyDeliveryIdentity identity, string expectedStateDigest, string nextStateDigest, CancellationToken cancellationToken = default);
+ 
+ }
+--- prior/platform/src/Hexalith.Platform.Custody/IPlatformKeyInventoryAuthority.cs
++++ current/platform/src/Hexalith.Platform.Custody/IPlatformKeyInventoryAuthority.cs
+@@ -8,7 +8,10 @@
+     Task<bool> AuthorizeOperationAsync(PlatformKeyVersion scope, string operation, CancellationToken cancellationToken = default);
+     /// <summary>Authenticates the independently installed inventory owner for exact tenant/purpose/alias and captured revision/state digest, including initial absence. Caller credentials alone cannot authorize a restored state.</summary>
+     Task<bool> ValidateStateAsync(PlatformKeyVersion scope, long revision, string exactStateDigest, CancellationToken cancellationToken = default);
+-    /// <summary>Conditionally advances the independently durable inventory anchor before persistence. Unknown or precommit store failure remains unavailable until independent reconciliation, without reopening revoked versions.</summary>
++    /// <summary>Deprecated compatibility-only legacy anchor hook; current recoverable actors do not invoke it.
++    /// Qualified implementations must implement the mandatory inherited IAnchoredStateTransitionAuthority admitted-original admission/recovery
++    /// and conditional exact transition journal, including independent staging ownership, current permission and final durable-state/anchor confirmation.
++    /// Implementing this legacy hook alone never enables an actor; omitted inherited proof defaults deny.</summary>
+     Task<bool> RecordRevisionAsync(PlatformKeyVersion scope, long expectedRevision, long nextRevision, string exactStateDigest, CancellationToken cancellationToken = default);
+     /// <summary>Authenticates exact tenant/purpose/version/provider/authority and current complete change evidence.</summary>
+     Task<bool> AuthorizeAsync(PlatformKeyInventoryChange change, CancellationToken cancellationToken = default);
+--- prior/platform/src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs
++++ current/platform/src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs
+@@ -18,6 +18,9 @@
+         CancellationToken cancellationToken = default) => Task.FromResult(false);
+     /// <summary>Independently validates exact durable epoch/monotonic revision and captured state digest; missing/stale restored state cannot certify readiness.</summary>
+     Task<bool> ValidateStateAsync(ReplicatedSecuritySpoolTarget target, long revision, string exactStateDigest, CancellationToken cancellationToken = default);
+-    /// <summary>Conditionally advances a durable independent antirollback anchor before component CAS; unknown/failed save closes availability until reconciliation.</summary>
++    /// <summary>Deprecated compatibility-only legacy anchor hook; current recoverable actors do not invoke it.
++    /// Qualified implementations must implement the mandatory inherited IAnchoredStateTransitionAuthority admitted-original admission/recovery
++    /// and conditional exact transition journal, including independent staging ownership, current permission and final durable-state/anchor confirmation.
++    /// Implementing this legacy hook alone never enables an actor; omitted inherited proof defaults deny.</summary>
+     Task<bool> RecordRevisionAsync(ReplicatedSecuritySpoolTarget target, long expectedRevision, long nextRevision, string safeStateDigest, CancellationToken cancellationToken = default);
+ }
+--- prior/platform/src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs
++++ current/platform/src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs
+@@ -9,17 +9,22 @@
+         var budget = new PrivateOwnerOperationDeadline(clock, cancellationToken);
+         try
+         {
+-            budget.Check(); var owned = DecisionAuthorityManifestCodec.Capture(manifest); ArgumentNullException.ThrowIfNull(expected);
+-            var basis = expected with { AffectedEvaluations = DecisionAuthorityManifestCodec.Sorted(expected.AffectedEvaluations), RequiredRoles = DecisionAuthorityManifestCodec.Sorted(expected.RequiredRoles) };
++            budget.Check();
++            var owned = await budget.ReadAsync(() => Task.FromResult(DecisionAuthorityManifestCodec.Capture(manifest))).ConfigureAwait(false);
++            var basis = await budget.ReadAsync(() =>
++            {
++                ArgumentNullException.ThrowIfNull(expected);
++                return Task.FromResult(expected with { AffectedEvaluations = DecisionAuthorityManifestCodec.Sorted(expected.AffectedEvaluations), RequiredRoles = DecisionAuthorityManifestCodec.Sorted(expected.RequiredRoles) });
++            }).ConfigureAwait(false);
+             if (authority is null || detachedJws is not { Length: > 0 and <= 16384 } || !Matches(owned, basis)) { budget.Check(); return false; }
+-            var profile = Capture(await budget.ReadAsync(() => authority.ResolveAsync(basis, owned.SigningKeyVersion, CancellationToken.None)).ConfigureAwait(false));
++            var profile = await budget.ReadAsync(async () => Capture(await authority.ResolveAsync(basis, owned.SigningKeyVersion, CancellationToken.None).ConfigureAwait(false))).ConfigureAwait(false);
+             if (profile is null || !Current(profile, owned) || !await budget.ReadAsync(() => authority.VerifyExpectedBasisAsync(basis, Capture(profile)!, CancellationToken.None)).ConfigureAwait(false)) { budget.Check(); return false; }
+             if (owned.Approvers.Any(a => profile.ForbiddenApprovalActors.Contains(a.ActorId, StringComparer.Ordinal)) || !DecisionAuthorityManifestCodec.Verify(owned, profile, detachedJws)) { budget.Check(); return false; }
+             foreach (var approver in owned.Approvers)
+             {
+                 budget.Check(); if (!await budget.ReadAsync(() => authority.VerifyApproverAsync(basis, approver, owned.IssuedAt, CancellationToken.None)).ConfigureAwait(false)) { budget.Check(); return false; }
+             }
+-            var final = Capture(await budget.ReadAsync(() => authority.ResolveAsync(basis, owned.SigningKeyVersion, CancellationToken.None)).ConfigureAwait(false));
++            var final = await budget.ReadAsync(async () => Capture(await authority.ResolveAsync(basis, owned.SigningKeyVersion, CancellationToken.None).ConfigureAwait(false))).ConfigureAwait(false);
+             bool same = final is not null && final.ProfileRevision == profile.ProfileRevision && final.Issuer == profile.Issuer && final.Audience == profile.Audience
+                 && final.SigningKeyVersion == profile.SigningKeyVersion && final.PublicAnchorId == profile.PublicAnchorId && final.PublicAnchorVersion == profile.PublicAnchorVersion
+                 && final.SubjectPublicKeyInfo.AsSpan().SequenceEqual(profile.SubjectPublicKeyInfo) && final.ForbiddenApprovalActors.SequenceEqual(profile.ForbiddenApprovalActors)
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleFixture.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleFixture.cs
+@@ -55,9 +55,9 @@
+             ? JsonSerializer.Deserialize<CustodyKeyLifecycleOutcome>(bytes)! : new(request.Identity, request.OperationId, digest, CustodyKeyLifecycleStatus.Unknown));
+     }
+     internal CustodyKeyLifecycleLedger Persisted => (CustodyKeyLifecycleLedger)Backend.CommittedState.Single().Value;
+-    internal static CustodyKeyLifecycleActor Create(IActorStateManager backend, ICustodyKeyLifecycleAuthority? authority = null, ICustodyKeyLifecycleProvider? provider = null)
++    internal static CustodyKeyLifecycleActor Create(IActorStateManager backend, ICustodyKeyLifecycleAuthority? authority = null, ICustodyKeyLifecycleProvider? provider = null, TimeProvider? clock = null)
+     {
+-        var actor = new CustodyKeyLifecycleActor(ActorHost.CreateForTest<CustodyKeyLifecycleActor>(new ActorTestOptions { ActorId = new(CustodyKeyLifecycleActor.GetActorId("tenant-a")) }), authority, provider);
++        var actor = new CustodyKeyLifecycleActor(ActorHost.CreateForTest<CustodyKeyLifecycleActor>(new ActorTestOptions { ActorId = new(CustodyKeyLifecycleActor.GetActorId("tenant-a")) }), authority, provider, clock);
+         typeof(Actor).GetProperty("StateManager", BindingFlags.Public | BindingFlags.Instance)!.SetValue(actor, backend); return actor;
+     }
+     internal static CustodyKeyObjectIdentity Identity(PlatformKeyPurpose purpose = PlatformKeyPurpose.ExportEnvelopeKey) => new("tenant-a", "object-a", purpose, "explicit-alias-a", "original-key-v1", "phase-pinned-lifecycle-v1", "synthetic-store-v1", "candidate-contract-v1");
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs
+@@ -226,4 +226,63 @@
+         (await restarted.ApplyAsync(CustodyKeyLifecycleFixture.Request(CustodyKeyLifecycleAction.Destroy, 5, "blocked-after-negative-pin"))).Status.ShouldBe(CustodyKeyLifecycleStatus.BlockedByPin);
+         restored.CommittedState.Single().Value.ShouldBeOfType<CustodyKeyLifecycleLedger>().Keys.Single().Pins.Single().ShouldBe(original); f.Effects.ShouldBe(2);
+     }
++
++    /// <summary>Suspended physical invocation/task releases the modeled non-reentrant tenant turn at the original deadline; late results never persist and exact serialized lookup recovers one effect.</summary>
++    [Theory]
++    [InlineData(false, false)][InlineData(false, true)][InlineData(true, false)][InlineData(true, true)]
++    public async Task SuspendedPhysicalLifecycleReleasesTurnAndRecoversOnlyOriginal(bool lookup, bool invocation)
++    {
++        var (clock, advance) = PrivateOwnerDeadlineTestClock.Create(); var f = new CustodyKeyLifecycleFixture();
++        await f.Actor.RegisterWrappedAsync(CustodyKeyLifecycleFixture.Registration());
++        var request = CustodyKeyLifecycleFixture.Request(CustodyKeyLifecycleAction.Pin, 1, "bounded-original-pin");
++        if (lookup) { f.LoseResponse = true; (await f.Actor.ApplyAsync(request)).Status.ShouldBe(CustodyKeyLifecycleStatus.Unknown); }
++        var provider = Substitute.For<ICustodyKeyLifecycleProvider>();
++        using var release = new ManualResetEventSlim(); using var turn = new SemaphoreSlim(1);
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var returned = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var pending = new TaskCompletionSource<CustodyKeyLifecycleOutcome>(TaskCreationOptions.RunContinuationsAsynchronously);
++        CustodyKeyLifecycleOutcome? physical = null;
++        Task<CustodyKeyLifecycleOutcome> Suspend(CustodyKeyLifecycleOutcome result)
++        {
++            physical = result; entered.TrySetResult();
++            if (!invocation) { return pending.Task; }
++            release.Wait(); returned.TrySetResult(); return Task.FromResult(result);
++        }
++        provider.ExecuteAsync(Arg.Any<CustodyKeyRegistration>(), Arg.Any<CustodyKeyLifecycleRequest>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            f.LoseResponse = false;
++            return Suspend(f.ExecuteAsync(call.Arg<CustodyKeyRegistration>(), call.Arg<CustodyKeyLifecycleRequest>(), call.Arg<string>(), call.Arg<CancellationToken>()).GetAwaiter().GetResult());
++        });
++        provider.LookupAsync(Arg.Any<CustodyKeyRegistration>(), Arg.Any<CustodyKeyLifecycleRequest>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call =>
++            Suspend(f.LookupAsync(call.Arg<CustodyKeyRegistration>(), call.Arg<CustodyKeyLifecycleRequest>(), call.Arg<string>(), call.Arg<CancellationToken>()).GetAwaiter().GetResult()));
++        var actor = CustodyKeyLifecycleFixture.Create(f.Backend, f.Authority, provider, clock);
++        async Task<T> Turn<T>(Func<Task<T>> operation)
++        { await turn.WaitAsync(TestContext.Current.CancellationToken); try { return await operation(); } finally { turn.Release(); } }
++        var waiting = Task.Run(() => Turn(() => lookup ? actor.LookupAsync(request) : actor.ApplyAsync(request)), TestContext.Current.CancellationToken);
++        try
++        {
++            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            advance(TimeSpan.FromSeconds(30));
++            (await waiting.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).Status.ShouldBe(CustodyKeyLifecycleStatus.Unknown);
++            f.Persisted.Keys.Single().Pins.Single().ShouldBe(request); f.Effects.ShouldBe(1);
++            (await Turn(() => actor.ApplyAsync(CustodyKeyLifecycleFixture.Request(CustodyKeyLifecycleAction.Destroy, f.Persisted.Revision, "same-key-blocked")))
++                .WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).Status.ShouldBe(CustodyKeyLifecycleStatus.Unavailable);
++            var other = CustodyKeyLifecycleFixture.Registration(CustodyKeyLifecycleFixture.Identity() with { ObjectId = "other-key" })
++                with { OperationId = "other-wrap", ExpectedRevision = f.Persisted.Revision };
++            (await Turn(() => actor.RegisterWrappedAsync(other)).WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).Status.ShouldBe(CustodyKeyLifecycleStatus.Wrapped);
++            string before = JsonSerializer.Serialize(f.Persisted);
++            if (invocation) { release.Set(); await returned.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); }
++            else { pending.TrySetResult(physical!); }
++            JsonSerializer.Serialize(f.Persisted).ShouldBe(before); f.Persisted.Keys.First().Outcomes.Single().Status.ShouldBe(CustodyKeyLifecycleStatus.Unknown);
++            var saved = f.Backend.CommittedState.Single(); var restored = new InMemoryStateManager();
++            await restored.SetStateAsync(saved.Key, JsonSerializer.Deserialize<CustodyKeyLifecycleLedger>(before)!, TestContext.Current.CancellationToken);
++            await restored.SaveStateAsync(TestContext.Current.CancellationToken);
++            var restarted = CustodyKeyLifecycleFixture.Create(restored, f.Authority, f, clock);
++            var original = await restarted.LookupAsync(request); original.ShouldBe(physical); original.Status.ShouldBe(CustodyKeyLifecycleStatus.Pinned);
++            (await restarted.ApplyAsync(request)).ShouldBe(original); f.Effects.ShouldBe(1);
++            var final = restored.CommittedState.Single().Value.ShouldBeOfType<CustodyKeyLifecycleLedger>().Keys.Single(k => k.Registration.Identity == request.Identity);
++            final.Requests.Single().ShouldBe(request); final.Pins.Single().ShouldBe(request); final.Outcomes.Single().ShouldBe(original);
++        }
++        finally { release.Set(); pending.TrySetResult(physical!); }
++    }
+ }
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs
+@@ -94,4 +94,80 @@
+         services.GetService<DeletionCapabilityRevocationSubscriber>().ShouldBeNull();
+         services.GetService<IDeletionCapabilityGuardRevocationMirror>().ShouldBeNull();
+     }
++
++    /// <summary>Initial/lost-ack block and mirror receipt capture cannot retain a caller beyond cancellation/deadline or resume late mirroring/authority checks.</summary>
++    [Theory]
++    [InlineData("block-initial", false, false)]
++    [InlineData("block-initial", false, true)]
++    [InlineData("block-initial", true, false)]
++    [InlineData("block-initial", true, true)]
++    [InlineData("block-lost-ack", false, false)]
++    [InlineData("block-lost-ack", false, true)]
++    [InlineData("block-lost-ack", true, false)]
++    [InlineData("block-lost-ack", true, true)]
++    [InlineData("mirror-initial", false, false)]
++    [InlineData("mirror-initial", false, true)]
++    [InlineData("mirror-initial", true, false)]
++    [InlineData("mirror-initial", true, true)]
++    [InlineData("mirror-lost-ack", false, false)]
++    [InlineData("mirror-lost-ack", false, true)]
++    [InlineData("mirror-lost-ack", true, false)]
++    [InlineData("mirror-lost-ack", true, true)]
++    public async Task SuspendedReceiptCaptureReleasesCallerWithoutLateMirror(string vector, bool traversal, bool cancelCaller)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var (clock, advance) = PrivateOwnerDeadlineTestClock.Create(); var envelope = Envelope();
++        var auth = Substitute.For<IDeletionCapabilityRevocationAuthenticator>(); int authorizations = 0;
++        auth.VerifyAsync(envelope, "evidence", Arg.Any<CancellationToken>()).Returns(_ =>
++        {
++            Interlocked.Increment(ref authorizations);
++            return new DeletionCapabilityRevocationAuthorization(envelope, "authority", clock.GetUtcNow(), clock.GetUtcNow().AddMinutes(1));
++        });
++        using var release = new ManualResetEventSlim();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var returned = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        void Suspend() { entered.TrySetResult(); release.Wait(); returned.TrySetResult(); }
++        var supplied = Substitute.For<IReadOnlyList<string>>();
++        supplied.Count.Returns(_ => { if (!traversal) { Suspend(); } return 1; });
++        supplied.GetEnumerator().Returns(_ => { if (traversal) { Suspend(); } return ((IEnumerable<string>)new[] { "batch-a" }).GetEnumerator(); });
++        var exact = new DeletionCapabilityRevocationReceipt(envelope, 1, 1, "original-block", ["batch-a"]);
++        var adversarial = exact with { AffectedBatchIds = supplied };
++        var registrar = Substitute.For<IDeletionCapabilityCompromiseRegistrar>(); var mirror = Substitute.For<IDeletionCapabilityGuardRevocationMirror>();
++        int blockReads = 0; int mirrorReads = 0; int registrations = 0; int mirrors = 0;
++        registrar.LookupAsync(envelope, Arg.Any<CancellationToken>()).Returns(_ =>
++        {
++            int read = Interlocked.Increment(ref blockReads);
++            return vector == "block-initial" ? adversarial : vector == "block-lost-ack" ? read == 1 ? null : adversarial : exact;
++        });
++        registrar.RegisterAsync(envelope, Arg.Any<CancellationToken>()).Returns<DeletionCapabilityRevocationReceipt?>(_ =>
++        { Interlocked.Increment(ref registrations); throw new IOException("lost block acknowledgement"); });
++        mirror.LookupAsync(envelope, Arg.Any<CancellationToken>()).Returns(_ =>
++        {
++            int read = Interlocked.Increment(ref mirrorReads);
++            return vector == "mirror-initial" ? adversarial : vector == "mirror-lost-ack" ? read == 1 ? null : adversarial : exact;
++        });
++        mirror.RecordAsync(Arg.Any<DeletionCapabilityRevocationReceipt>(), Arg.Any<CancellationToken>()).Returns<bool>(call =>
++        {
++            var receipt = call.Arg<DeletionCapabilityRevocationReceipt>(); receipt.AffectedBatchIds.ShouldBe(new[] { "batch-a" });
++            Interlocked.Increment(ref mirrors); throw new IOException("lost mirror acknowledgement");
++        });
++        using var caller = new CancellationTokenSource();
++        var operation = Task.Run(() => new DeletionCapabilityRevocationSubscriber(new(envelope.Issuer, envelope.Audience, envelope.TenantId),
++            auth, registrar, mirror, clock).ReceiveAsync(envelope, "evidence", caller.Token), TestContext.Current.CancellationToken);
++        try
++        {
++            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            if (cancelCaller)
++            {
++                caller.Cancel(); (await Should.ThrowAsync<OperationCanceledException>(() => operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken))).CancellationToken.ShouldBe(caller.Token);
++            }
++            else { advance(TimeSpan.FromSeconds(30)); (await operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).ShouldBeFalse(); }
++            var counts = (authorizations, blockReads, mirrorReads, registrations, mirrors);
++            release.Set(); await returned.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            (authorizations, blockReads, mirrorReads, registrations, mirrors).ShouldBe(counts);
++            exact.AffectedBatchIds.ShouldBe(new[] { "batch-a" }); exact.ReceiptId.ShouldBe("original-block");
++            mirrors.ShouldBe(vector == "mirror-lost-ack" ? 1 : 0);
++        }
++        finally { release.Set(); }
++    }
+ }
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs
+@@ -323,6 +323,94 @@
+         await provider.Received(1).SignAsync(payload, id, Arg.Any<CancellationToken>());
+     }
+ 
++    /// <summary>Suspended sign/lookup releases the modeled turn without late persistence; serialized original lookup after compromise requires the independent historic receipt and never signs again.</summary>
++    [Theory]
++    [InlineData(false, false)][InlineData(false, true)][InlineData(true, false)][InlineData(true, true)]
++    public async Task SuspendedPhysicalSigningReleasesTurnWithoutLateArtifact(bool lookup, bool invocation)
++    {
++        var (clock, advance) = PrivateOwnerDeadlineTestClock.Create(); var payload = Payload(); string id = DeletionBatchCapabilityCodec.SigningRequestId(payload);
++        var backend = new InMemoryStateManager(); var authority = Authority();
++        using var key = ECDsa.Create(ECCurve.NamedCurves.nistP256); var original = Signed(payload, key) with { OriginalIssuanceReceiptId = "retained-original-issuance" };
++        var trust = Trust(payload, key); var current = await trust.ResolveAsync(payload.TenantId, "DeletionBatchCapabilitySigningKey", payload.CapabilityKeyVersion, TestContext.Current.CancellationToken);
++        var receipt = Substitute.For<IDeletionCapabilityOriginalSigningReceiptAuthority>();
++        receipt.VerifyOriginalIssuanceAsync(payload, id, Arg.Is<DeletionCapabilitySigningResult>(r => r.OriginalIssuanceReceiptId == original.OriginalIssuanceReceiptId),
++            Arg.Any<DeletionCapabilityPublishedTrust>(), Arg.Any<CancellationToken>()).Returns(true);
++        var provider = Substitute.For<IDeletionCapabilitySigningProvider>();
++        if (lookup)
++        {
++            provider.SignAsync(payload, id, Arg.Any<CancellationToken>()).Returns(Task.FromException<DeletionCapabilitySigningResult>(new HttpRequestException("Original signing acknowledgement lost.")));
++            (await Actor(payload, backend, authority, provider, trust, receipt, clock: clock).SignAsync(payload)).State.ShouldBe(DeletionCapabilitySigningState.Unknown);
++        }
++        using var release = new ManualResetEventSlim(); using var turn = new SemaphoreSlim(1);
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var returned = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var pending = new TaskCompletionSource<DeletionCapabilitySigningResult>(TaskCreationOptions.RunContinuationsAsynchronously);
++        Task<DeletionCapabilitySigningResult> Suspend()
++        {
++            entered.TrySetResult(); if (!invocation) { return pending.Task; }
++            release.Wait(); returned.TrySetResult(); return Task.FromResult(original);
++        }
++        if (lookup) { provider.LookupAsync(payload, id, Arg.Any<CancellationToken>()).Returns(_ => Suspend()); }
++        else { provider.SignAsync(payload, id, Arg.Any<CancellationToken>()).Returns(_ => Suspend()); }
++        var actor = Actor(payload, backend, authority, provider, trust, receipt, clock: clock);
++        async Task<T> Turn<T>(Func<Task<T>> operation)
++        { await turn.WaitAsync(TestContext.Current.CancellationToken); try { return await operation(); } finally { turn.Release(); } }
++        var waiting = Task.Run(() => Turn(() => lookup ? actor.LookupAsync(payload) : actor.SignAsync(payload)), TestContext.Current.CancellationToken);
++        try
++        {
++            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); advance(TimeSpan.FromSeconds(30));
++            (await waiting.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).State.ShouldBe(DeletionCapabilitySigningState.Unknown);
++            var saved = backend.CommittedState.Single(); string before = JsonSerializer.Serialize(saved.Value);
++            ((DeletionCapabilitySigningOutcome)saved.Value).Payload.ShouldBe(payload); ((DeletionCapabilitySigningOutcome)saved.Value).DetachedJws.ShouldBeNull();
++            authority.AuthorizeOperationAsync(payload, id, "SignDeletionCapability", Arg.Any<CancellationToken>()).Returns(false);
++            (await Turn(() => actor.SignAsync(payload)).WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).State.ShouldBe(DeletionCapabilitySigningState.Unavailable);
++            if (invocation) { release.Set(); await returned.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); }
++            else { pending.TrySetResult(original); }
++            JsonSerializer.Serialize(backend.CommittedState.Single().Value).ShouldBe(before);
++            var restored = new InMemoryStateManager();
++            await restored.SetStateAsync(saved.Key, JsonSerializer.Deserialize<DeletionCapabilitySigningOutcome>(before)!, TestContext.Current.CancellationToken);
++            await restored.SaveStateAsync(TestContext.Current.CancellationToken);
++            authority.AuthorizeAsync(payload, id, Arg.Any<CancellationToken>()).Returns(false);
++            trust.ResolveAsync(payload.TenantId, "DeletionBatchCapabilitySigningKey", payload.CapabilityKeyVersion, Arg.Any<CancellationToken>())
++                .Returns(current! with { IsCurrentNonRevoked = false, IsRevoked = true, TrustProfileRevision = 2 });
++            provider.LookupAsync(payload, id, Arg.Any<CancellationToken>()).Returns(original);
++            var restarted = Actor(payload, restored, authority, provider, trust, receipt, clock: clock);
++            (await restarted.LookupAsync(payload)).ShouldBe(original.Outcome); (await restarted.LookupAsync(payload)).ShouldBe(original.Outcome);
++            restored.CommittedState.Single().Value.ShouldBe(original.Outcome);
++            await provider.Received(1).SignAsync(payload, id, Arg.Any<CancellationToken>());
++            await receipt.Received(1).VerifyOriginalIssuanceAsync(payload, id, Arg.Any<DeletionCapabilitySigningResult>(), Arg.Any<DeletionCapabilityPublishedTrust>(), Arg.Any<CancellationToken>());
++        }
++        finally { release.Set(); pending.TrySetResult(original); }
++    }
++
++    /// <summary>The last I-JSON attempt remains canonical and signable; exhaustion produces no unrepresentable successor and leaves the original artifact/proof unchanged.</summary>
++    [Theory]
++    [InlineData(9007199254740990L)][InlineData(9007199254740991L)]
++    public void SuccessorStopsAtCanonicalAttemptLimit(long attempt)
++    {
++        var clock = new CustodyFixtureClock(); var payload = Payload() with { SigningAttemptOrdinal = attempt };
++        using var originalKey = ECDsa.Create(ECCurve.NamedCurves.nistP256); var signed = Signed(payload, originalKey).Outcome!;
++        string digest = Convert.ToHexString(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(signed.DetachedJws!)));
++        var proof = new DeletionCapabilityNoIssueProof(payload, signed.SigningRequestId, digest, "exact-original-no-issue", 9,
++            "independent-healthy-key", "current-independent-guard", clock.Now, clock.Now.AddMinutes(1));
++        var original = signed with { State = DeletionCapabilitySigningState.SignedAttestationObsoleteUnissued, NoIssueProof = proof };
++        string before = JsonSerializer.Serialize(original);
++        var successor = DeletionCapabilitySigningSuccessor.Create(original, proof, clock.Now);
++        if (attempt == 9007199254740991L) { successor.ShouldBeNull(); }
++        else
++        {
++            successor.ShouldBe(payload with { SigningAttemptOrdinal = 9007199254740991L, IntendedIssuedGuardRevision = 9, CapabilityKeyVersion = proof.CurrentHealthyKeyVersion });
++            DeletionBatchCapabilityCodec.CanonicalPayload(successor!).Length.ShouldBeGreaterThan(0);
++            using var currentKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
++            var profile = new DeletionCapabilityTrustProfile(successor!.Issuer, successor.Audience, successor.TenantId,
++                successor.CapabilityKeyVersion, "current-independent-anchor", "version-2");
++            string jws = DeletionBatchCapabilityCodec.Sign(successor, profile, currentKey);
++            DeletionBatchCapabilityCodec.Verify(successor, profile, jws, currentKey).ShouldBeTrue();
++            DeletionBatchCapabilityCodec.SigningRequestId(successor).ShouldNotBe(original.SigningRequestId);
++        }
++        JsonSerializer.Serialize(original).ShouldBe(before);
++    }
++
+     private static string Digest<T>(T value) => Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(value)));
+ 
+     /// <summary>Restart after the original proof lease expires retains that original artifact/proof and recovers only a fresh independent exact successor basis.</summary>
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs
+@@ -33,7 +33,7 @@
+ 
+     private static ExportKeyDeliveryIdentity Identity(CustodyFixtureClock clock) => new("tenant-a", "delivery-1", "export-1", 7,
+         "actor-1", "export-download", "principal-direct-channel", clock.Now.AddMinutes(1), "lifecycle-v1", "store-v1", 1);
+-    private static ExportKeyDeliveryActor Actor(ExportKeyDeliveryIdentity identity, IActorStateManager backend, CustodyFixtureClock clock,
++    private static ExportKeyDeliveryActor Actor(ExportKeyDeliveryIdentity identity, IActorStateManager backend, TimeProvider clock,
+         IExportKeyDeliveryAuthority? authority = null, IExportKeyDirectDeliveryProvider? provider = null)
+     {
+         var actor = new ExportKeyDeliveryActor(ActorHost.CreateForTest<ExportKeyDeliveryActor>(new ActorTestOptions { ActorId = new(identity.ActorId) }), clock, authority, provider);
+@@ -200,6 +200,59 @@
+         (await restarted.LookupAsync(identity)).ShouldBe(original); await provider.Received(1).ReleaseAsync(identity, Arg.Any<CancellationToken>());
+     }
+ 
++    /// <summary>Suspended direct release/lookup releases the modeled tenant turn; late completion cannot change Unknown and exact serialized lookup retains the original pre-expiry observation.</summary>
++    [Theory]
++    [InlineData(false, false)][InlineData(false, true)][InlineData(true, false)][InlineData(true, true)]
++    public async Task SuspendedPhysicalDeliveryReleasesTurnWithoutLateOutcome(bool lookup, bool invocation)
++    {
++        var (clock, advance) = PrivateOwnerDeadlineTestClock.Create();
++        var identity = Identity(new CustodyFixtureClock { Now = clock.GetUtcNow() }); var authority = Authority(); var backend = new InMemoryStateManager();
++        var original = new ExportKeyDeliveryOutcome(identity, ExportKeyDeliveryState.Delivered, clock.GetUtcNow());
++        var provider = Substitute.For<IExportKeyDirectDeliveryProvider>();
++        if (lookup)
++        {
++            provider.ReleaseAsync(identity, Arg.Any<CancellationToken>()).Returns(Task.FromException<ExportKeyDeliveryOutcome>(new HttpRequestException("Original direct release acknowledgement lost.")));
++            (await Actor(identity, backend, clock, authority, provider).DeliverAsync(identity)).State.ShouldBe(ExportKeyDeliveryState.Unknown);
++        }
++        using var release = new ManualResetEventSlim(); using var turn = new SemaphoreSlim(1);
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var returned = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var pending = new TaskCompletionSource<ExportKeyDeliveryOutcome>(TaskCreationOptions.RunContinuationsAsynchronously);
++        Task<ExportKeyDeliveryOutcome> Suspend()
++        {
++            entered.TrySetResult(); if (!invocation) { return pending.Task; }
++            release.Wait(); returned.TrySetResult(); return Task.FromResult(original);
++        }
++        if (lookup) { provider.LookupAsync(identity, Arg.Any<CancellationToken>()).Returns(_ => Suspend()); }
++        else { provider.ReleaseAsync(identity, Arg.Any<CancellationToken>()).Returns(_ => Suspend()); }
++        var actor = Actor(identity, backend, clock, authority, provider);
++        async Task<T> Turn<T>(Func<Task<T>> operation)
++        { await turn.WaitAsync(TestContext.Current.CancellationToken); try { return await operation(); } finally { turn.Release(); } }
++        var waiting = Task.Run(() => Turn(() => lookup ? actor.LookupAsync(identity) : actor.DeliverAsync(identity)), TestContext.Current.CancellationToken);
++        try
++        {
++            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); advance(TimeSpan.FromSeconds(30));
++            (await waiting.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).State.ShouldBe(ExportKeyDeliveryState.Unknown);
++            var saved = backend.CommittedState.Single(); string before = JsonSerializer.Serialize(saved.Value);
++            ((ExportKeyDeliveryOutcome)saved.Value).Identity.ShouldBe(identity); ((ExportKeyDeliveryOutcome)saved.Value).ObservedAt.ShouldBeNull();
++            (await Turn(() => actor.DeliverAsync(identity with { RequesterActorId = "another-requester" })).WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken))
++                .State.ShouldBe(ExportKeyDeliveryState.Conflict);
++            if (invocation) { release.Set(); await returned.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken); }
++            else { pending.TrySetResult(original); }
++            JsonSerializer.Serialize(backend.CommittedState.Single().Value).ShouldBe(before);
++            var restored = new InMemoryStateManager();
++            await restored.SetStateAsync(saved.Key, JsonSerializer.Deserialize<ExportKeyDeliveryOutcome>(before)!, TestContext.Current.CancellationToken);
++            await restored.SaveStateAsync(TestContext.Current.CancellationToken);
++            advance(TimeSpan.FromMinutes(2)); authority.AuthorizeAsync(identity, Arg.Any<CancellationToken>()).Returns(false);
++            provider.LookupAsync(identity, Arg.Any<CancellationToken>()).Returns(original);
++            var restarted = Actor(identity, restored, clock, authority, provider);
++            (await restarted.LookupAsync(identity)).ShouldBe(original); (await restarted.DeliverAsync(identity)).ShouldBe(original);
++            restored.CommittedState.Single().Value.ShouldBe(original); original.ObservedAt!.Value.ShouldBeLessThan(identity.ExclusiveExpiry);
++            await provider.Received(1).ReleaseAsync(identity, Arg.Any<CancellationToken>());
++        }
++        finally { release.Set(); pending.TrySetResult(original); }
++    }
++
+     private static string Digest<T>(T value) => Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(value)));
+ 
+ }
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs
+@@ -129,4 +129,84 @@
+         await authority.Received(1).VerifyAuthorityBoundaryAsync(Arg.Any<DecisionAuthorityExpectedBasis>(), Arg.Any<DecisionAuthorityManifest>(), Arg.Any<DecisionAuthorityPublishedProfile>(), Arg.Any<CancellationToken>());
+     }
+ 
++
++    /// <summary>Manifest/basis and first/final public-profile collection capture cannot retain cancellation/deadline or continue into late approval.</summary>
++    [Theory]
++    [InlineData("manifest-evaluations", false, false)]
++    [InlineData("manifest-evaluations", false, true)]
++    [InlineData("manifest-evaluations", true, false)]
++    [InlineData("manifest-evaluations", true, true)]
++    [InlineData("manifest-approvers", false, false)]
++    [InlineData("manifest-approvers", false, true)]
++    [InlineData("manifest-approvers", true, false)]
++    [InlineData("manifest-approvers", true, true)]
++    [InlineData("basis-evaluations", false, false)]
++    [InlineData("basis-evaluations", false, true)]
++    [InlineData("basis-evaluations", true, false)]
++    [InlineData("basis-evaluations", true, true)]
++    [InlineData("basis-roles", false, false)]
++    [InlineData("basis-roles", false, true)]
++    [InlineData("basis-roles", true, false)]
++    [InlineData("basis-roles", true, true)]
++    [InlineData("initial-profile", false, false)]
++    [InlineData("initial-profile", false, true)]
++    [InlineData("initial-profile", true, false)]
++    [InlineData("initial-profile", true, true)]
++    [InlineData("final-profile", false, false)]
++    [InlineData("final-profile", false, true)]
++    [InlineData("final-profile", true, false)]
++    [InlineData("final-profile", true, true)]
++    public async Task SuspendedDecisionCollectionsReleaseCallerWithoutLateApproval(string vector, bool traversal, bool cancelCaller)
++    {
++        ArgumentNullException.ThrowIfNull(vector);
++        var (clock, advance) = PrivateOwnerDeadlineTestClock.Create(); var sourceClock = new CustodyFixtureClock { Now = clock.GetUtcNow() };
++        using var issuer = ECDsa.Create(ECCurve.NamedCurves.nistP256);
++        var manifest = Manifest(sourceClock); var basis = Basis(manifest); var profile = Profile(sourceClock, issuer);
++        string signature = Signed(manifest, profile, issuer);
++        string originalManifest = System.Text.Json.JsonSerializer.Serialize(manifest);
++        string originalBasis = System.Text.Json.JsonSerializer.Serialize(basis);
++        string originalProfile = System.Text.Json.JsonSerializer.Serialize(profile);
++        using var release = new ManualResetEventSlim();
++        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        var returned = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
++        void Suspend() { entered.TrySetResult(); release.Wait(); returned.TrySetResult(); }
++        IReadOnlyList<T> Suspended<T>(IReadOnlyList<T> original)
++        {
++            var supplied = Substitute.For<IReadOnlyList<T>>();
++            supplied.Count.Returns(_ => { if (!traversal) { Suspend(); } return original.Count; });
++            supplied.GetEnumerator().Returns(_ => { if (traversal) { Suspend(); } return original.GetEnumerator(); }); return supplied;
++        }
++        var input = manifest; var expected = basis;
++        if (vector == "manifest-evaluations") { input = manifest with { AffectedEvaluations = Suspended(manifest.AffectedEvaluations) }; }
++        if (vector == "manifest-approvers") { input = manifest with { Approvers = Suspended(manifest.Approvers) }; }
++        if (vector == "basis-evaluations") { expected = basis with { AffectedEvaluations = Suspended(basis.AffectedEvaluations) }; }
++        if (vector == "basis-roles") { expected = basis with { RequiredRoles = Suspended(basis.RequiredRoles) }; }
++        var authority = Authority(profile); int reads = 0;
++        authority.ResolveAsync(Arg.Any<DecisionAuthorityExpectedBasis>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(_ =>
++        {
++            int read = Interlocked.Increment(ref reads);
++            return read == (vector == "initial-profile" ? 1 : vector == "final-profile" ? 2 : 0)
++                ? profile with { ForbiddenApprovalActors = Suspended(profile.ForbiddenApprovalActors) } : profile;
++        });
++        using var caller = new CancellationTokenSource();
++        var operation = Task.Run(() => new IndependentDecisionManifestVerifier(clock, authority).VerifyAsync(input, signature, expected, caller.Token), TestContext.Current.CancellationToken);
++        try
++        {
++            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            if (cancelCaller)
++            {
++                caller.Cancel(); var denied = await Should.ThrowAsync<OperationCanceledException>(() => operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken));
++                denied.CancellationToken.ShouldBe(caller.Token);
++            }
++            else { advance(TimeSpan.FromSeconds(30)); (await operation.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken)).ShouldBeFalse(); }
++            int calls = authority.ReceivedCalls().Count(); release.Set();
++            await returned.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
++            authority.ReceivedCalls().Count().ShouldBe(calls);
++            System.Text.Json.JsonSerializer.Serialize(manifest).ShouldBe(originalManifest);
++            System.Text.Json.JsonSerializer.Serialize(basis).ShouldBe(originalBasis);
++            System.Text.Json.JsonSerializer.Serialize(profile).ShouldBe(originalProfile);
++            await authority.DidNotReceive().VerifyAuthorityBoundaryAsync(Arg.Any<DecisionAuthorityExpectedBasis>(), Arg.Any<DecisionAuthorityManifest>(), Arg.Any<DecisionAuthorityPublishedProfile>(), Arg.Any<CancellationToken>());
++        }
++        finally { release.Set(); }
++    }
+ }
+--- prior/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerDeadlineTestClock.cs
++++ current/platform/tests/Hexalith.Platform.Custody.Tests/PrivateOwnerDeadlineTestClock.cs
+@@ -0,0 +1,37 @@
++using NSubstitute;
++
++namespace Hexalith.Platform.Custody.Tests;
++
++/// <summary>Controlled monotonic private-operation budget clock; timer callbacks fire only when the test advances its retained operational time.</summary>
++internal static class PrivateOwnerDeadlineTestClock
++{
++    /// <summary>Creates a scoped deterministic clock and its explicit elapsed-time/timer advancement.</summary>
++    internal static (TimeProvider Clock, Action<TimeSpan> Advance) Create()
++    {
++        var clock = Substitute.For<TimeProvider>(); long ticks = 0;
++        var callbacks = new System.Collections.Concurrent.ConcurrentDictionary<int, (long Due, Action Fire)>(); int timerId = 0;
++        var observations = new System.Collections.Concurrent.ConcurrentDictionary<int, long>();
++        clock.TimestampFrequency.Returns(TimeSpan.TicksPerSecond); clock.GetTimestamp().Returns(_ =>
++        {
++            long observed = Interlocked.Read(ref ticks); observations[Environment.CurrentManagedThreadId] = observed; return observed;
++        });
++        clock.GetUtcNow().Returns(_ => new DateTimeOffset(2026, 10, 9, 0, 0, 0, TimeSpan.Zero).AddTicks(Interlocked.Read(ref ticks)));
++        clock.CreateTimer(Arg.Any<TimerCallback>(), Arg.Any<object?>(), Arg.Any<TimeSpan>(), Arg.Any<TimeSpan>()).Returns(call =>
++        {
++            int id = Interlocked.Increment(ref timerId); var timer = Substitute.For<ITimer>();
++            // ReadAsync computes remaining time from the immediately preceding timestamp observation.
++            // A clock advance between that observation and registration must not restart its deadline.
++            long basis = observations.GetValueOrDefault(Environment.CurrentManagedThreadId, Interlocked.Read(ref ticks));
++            callbacks[id] = (basis + call.ArgAt<TimeSpan>(2).Ticks, () => call.Arg<TimerCallback>()(call.ArgAt<object?>(1)));
++            timer.When(t => t.Dispose()).Do(callInfo => callbacks.TryRemove(id, out _));
++            timer.DisposeAsync().Returns(callInfo => { callbacks.TryRemove(id, out _); return ValueTask.CompletedTask; });
++            if (callbacks[id].Due <= Interlocked.Read(ref ticks)) { callbacks[id].Fire(); }
++            return timer;
++        });
++        return (clock, elapsed =>
++        {
++            long current = Interlocked.Add(ref ticks, elapsed.Ticks);
++            foreach (var callback in callbacks.Values.ToArray()) { if (callback.Due <= current) { callback.Fire(); } }
++        });
++    }
++}

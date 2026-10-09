@@ -1,0 +1,175 @@
+{
+  "reviewersAllFinal": true,
+  "reviewIteration": 7,
+  "individualVerdicts": [
+    {
+      "id": "B1",
+      "layer": "blind",
+      "path": "../platform/src/Hexalith.Platform.Custody/DecisionAuthorityManifestCodec.cs:47",
+      "claim": "Candidate manifest Unicode bytes differ from RFC 8785 and can reject an independent compliant signature.",
+      "verdict": "maybe-false",
+      "route": "defer",
+      "unverifiedSeverity": "medium",
+      "evidence": "The codec uses UnsafeRelaxedJsonEscaping and says RFC-8785-style; RFC 8785 section 3.2.2.2 requires literal non-control Unicode. However, DecisionAuthorityManifest and its candidate profile explicitly supply no accepted public wire/profile, and the register's mandatory RFC 8785 profile applies to DeletionBatchCapabilityV1, a different codec. No accepted independent decision signer/profile or genuine incompatible manifest is installed. Establish the actual approved decision wire algorithm and verify its independently signed Unicode bytes before claiming operational interoperability harm.",
+      "correction": "Only an actually accepted exact decision wire/profile can settle whether this candidate encoding must change; do not silently impose the deletion-capability profile on decision approvals."
+    },
+    {
+      "id": "B2",
+      "layer": "blind",
+      "path": "../platform/src/Hexalith.Platform.Custody/EventStoreDeletionBatchGuardPort.cs:29",
+      "claim": "Snapshot original receipt recovery bypasses result-specific lookup permission and discloses unauthorized results.",
+      "verdict": "false",
+      "route": "reject-false",
+      "evidence": "IGovernanceScopeGuard.ReadAsync explicitly exposes the entire independently qualified content-free guard, including Receipts. GovernanceScopeGuardOwner reconfirms its exact state through DaprGuardedStateTransaction, whose AuthorizeReadAsync authorizes this installed cell read for the restricted coordinator. Thus the proposed reader already legitimately received these receipts before the adapter selects one; selection adds no disclosure or new effect. ReadLookupAsync/AuthorizeLookupAsync protect the separate operation lookup API. The shortcut's fact receipt does not grant a dispatch, reservation or mutation; those independently authorize their own owning transition. The filed additional disclosure is disproved by the existing authorized read surface."
+    },
+    {
+      "id": "B3",
+      "layer": "blind",
+      "path": "../eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs:82",
+      "claim": "The same original acceptance can allocate another violation successor under a changed ViolationId.",
+      "verdict": "medium",
+      "route": "bad_spec",
+      "evidence": "RecordViolation retains and checks only ViolationId for duplication, then validates the same original accepted operation/resource/facts/mutation and allocates deletion.Ordinal+1. Updating command.Ordinal to the current ordinal and supplying a new ViolationId/no-cut receipt does not change that original acceptance; no retained original-acceptance identity prevents another successor and obligation. GovernanceOrdinalCommand does not define an independently derived violation identity. Repeated observation of one genuine accepted write can therefore produce spurious recuts/owner obligations.",
+      "correction": "Specify and retain or deterministically derive exact per-request original acceptance/resource/kind identity, with stable retry under changed caller operation/violation IDs. Preserve truly distinct acceptances and all prior violation/owner-cycle history."
+    },
+    {
+      "id": "B4",
+      "layer": "blind",
+      "path": "../eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs:66",
+      "claim": "Maximum matching ordinal loses per-deletion attribution for overlapping scopes.",
+      "verdict": "medium",
+      "route": "bad_spec",
+      "evidence": "ValidScope permits both ExactInteraction and SourceDeletionExactConversation. CommitAdmissionFence permits distinct request IDs without an overlap exclusion. Matching ContentAppend remains accepted while both requests lack a content binding, including when their per-request ordinals differ. AppendWrite then stamps only Max matching.Ordinal, although the two request ledgers have different actual installed ordinals. The scalar receipt cannot recover the other request's original attribution. Later original-acceptance checks merely compare that same scalar; they do not reconstruct each request's linearization.",
+      "correction": "Define coherent per-request original ordinal attribution for legitimately overlapping installed scopes; preserve each ledger and original receipts. Do not add an invented Product ban on overlapping requests or fabricate one scope's ordinal from another."
+    },
+    {
+      "id": "B5",
+      "layer": "blind",
+      "path": "../eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs:291",
+      "claim": "Only physical recovery is bounded; admission, authority, journal and actor state I/O can retain the tenant actor indefinitely.",
+      "verdict": "medium",
+      "route": "bad_spec",
+      "evidence": "Register/Reserve/Block/Revocation/Activate/Lookup await AdmitAsync directly. ReadAsync directly awaits StateManager cache/read/pending and RecoverableAnchoredState authority/journal work; SaveAsync also remains on unbounded state/journal calls. The only thirty-second actor deadline is constructed inside RecoverAsync for provider invocation/receipt capture. A stalled AuthorizeOperationAsync or state/journal Task before that point occupies the same non-reentrant tenant actor, so later revocation/block entries cannot run even after the client adapter abandons its caller.",
+      "correction": "Use one whole-entry actor budget through admission, pure capture, state/journal and terminal release, retaining on-turn StateManager execution and exclusion until any unfinished state I/O actually ends. Recover immutable originals only; preserve reservation-winner completion and zero duplicate effects."
+    },
+    {
+      "id": "B6",
+      "layer": "blind",
+      "path": "../eventstore/src/Hexalith.EventStore.Contracts/Security/RecoverableAnchoredState.cs:59",
+      "claim": "CommitAsync retains caller/provider mutable transition bytes across validation and awaits.",
+      "verdict": "medium",
+      "route": "bad_spec",
+      "evidence": "Unlike ReconcileAsync's explicit detached owned array, CommitAsync validates transition once and sends the same TargetBytes array to read/admission/persist/confirmation/journal across awaits. A caller retaining this public array can mutate it after independent original admission; persistence then receives mutated staging bytes. Exact compares byte equality to the same mutated input without rehashing, and an exact independent journal may refuse recording, leaving an invalid primary pending stage that ReconcileAsync.Validate rejects. The authority's immutable proof cannot repair this helper's mutable staging input.",
+      "correction": "Establish detached exact helper ownership and read-only provider borrowing; isolate mutable external input and revalidate exact owned carrier/digest at staging/confirmation/journal boundaries. Preserve genuine current conditional original proofs, bounded bytes and no unanchored release."
+    },
+    {
+      "id": "B7",
+      "layer": "blind",
+      "path": "../platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs:47",
+      "claim": "Persisted canary bytes remain shared across the scan/proof and are cleared without reader ownership terms.",
+      "verdict": "medium",
+      "route": "bad_spec",
+      "evidence": "CaptureObservation detaches metadata but returns supplied with the same Bytes. EvaluateAsync scans that original array; ProveCarrierAsync awaits another authority read before copying it. The scan and exact proof can therefore consume different contents if a reader-held buffer changes, and finally clears the supplied buffer. IFr34PersistedCanaryReader and Fr34PersistedCanary contain no transfer/read-only lifetime rule. The current gate comment alone does not establish a safe provider ownership boundary or a single exact carrier snapshot.",
+      "correction": "Define safe persisted-reader ownership/borrowing, capture one bounded owned byte snapshot before scanning, and use that exact snapshot for proof and cleanup. Preserve independent persisted-format/key proof, safe provider lifetime and all existing canary destruction/late-cleanup constraints."
+    },
+    {
+      "id": "B8",
+      "layer": "blind",
+      "path": "../eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs:22",
+      "claim": "Concurrent cancellation and malformed capture can escape as the malformed-input exception.",
+      "verdict": "low",
+      "route": "reject-low-complexity",
+      "evidence": "Capture/digest run before the existing terminal catch, so cancellation arriving after the initial check but before a malformed-carrier exception is not rechecked on that exception. The concrete Dictionary has no supplied blocking callback; active malformed arguments intentionally throw outside the availability catch and the logged preservation constraint retains that behavior. This negligible concurrent-invalid-input boundary is unlikely in ordinary valid calls. Preserving that exception behavior while adding caller-first handling requires another catch/guard, beyond a direct correction; reject under the low-complexity rule. Do not introduce artificial collection callbacks."
+    },
+    {
+      "id": "B9",
+      "layer": "blind",
+      "path": "../platform/src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs:147",
+      "claim": "A provider request is queued before exhausted remaining time is checked.",
+      "verdict": "low",
+      "route": "patch",
+      "evidence": "AwaitAsync first checks caller cancellation, schedules Task.Run(operation), and only then samples remaining elapsed time and rejects a nonpositive duration. If synchronous intervening work or scheduling exhausts the existing budget, another grant/key/profile read can start despite immediate outer timeout. Final release still denies and late keys are disposed, so this is minor unnecessary provider work rather than unauthorized credentials.",
+      "correction": "Move the existing remaining-time sample/nonpositive check before scheduling the pure provider operation; retain original cancellation and safe cleanup for actually started work."
+    },
+    {
+      "id": "B10",
+      "layer": "blind",
+      "path": "../platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs:28",
+      "claim": "Acknowledged records permanently exhaust the one-installation admission/readiness bound.",
+      "verdict": "medium",
+      "route": "bad_spec",
+      "evidence": "ObserveAsync refuses new identities at 10000, DrainAsync changes only Receipt/scheduling fields, and no path retires or archives records. IsReadyAsync correctly refuses the full state even when every record is acknowledged. Key selects only the current InstallationEpoch; switching epochs has no integrated historical-original routing and cannot be assumed to preserve exact lookup or pending work. This is distinct from revision-4 B2's false-readiness bug: that direct correction required no rollover, and remains correct. The new verified issue is ordinary cumulative lifetime exhaustion, not false readiness at the existing bound.",
+      "correction": "Specify a bounded durable continuation/partition or archival protocol preserving every original receipt/routing/pending record and independently current authority. Keep the 10000 per-carrier bound and refuse unavailable capacity; do not purge, reset history, invent a retention policy or claim runtime capacity qualification."
+    },
+    {
+      "id": "B11",
+      "layer": "blind",
+      "path": "../eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs:43",
+      "claim": "Unresolved covering reservation recovery returns another batch's outcome to the requesting batch.",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "FindCoveredReservation accepts another original whose targets cover the requested targets. If RecoverAsync remains ConsumptionReserved, RegisterAsyncCoreAsync's false ternary branch returns that original outcome, including the covering BatchId/ReceiptId, after admission was checked for the requested batch. The coordinator's Exact requires payload.BatchId, so it rejects the mismatched response; only the Consumed branch correctly retains requesting-batch AlreadyDestroyed evidence.",
+      "correction": "Keep covering recovery internal and return a restrictive outcome naming the requesting tenant/batch until complete exact covered receipts can be retained; never fabricate a receipt or repeat physical consumption."
+    },
+    {
+      "id": "B12",
+      "layer": "blind",
+      "path": "../platform/src/Hexalith.Platform.Custody/TrustedEnvelopeReplayVerifier.cs:52",
+      "claim": "A retained first-seen timestamp can predate the envelope's permitted issuance window.",
+      "verdict": "maybe-false",
+      "route": "defer",
+      "unverifiedSeverity": "medium",
+      "evidence": "Exact checks original intent, UTC/order, source position and exact R retention but not a lower envelope issuance bound. However, the private registrar contract requires FirstSeenAt to be the original verifier evaluation time, and its intent digest binds the complete authenticated delivery bytes; the only registration path authenticates before passing evaluatedAt. No actual Agents-owned registrar/source or genuine authenticated impossible original was supplied. A fabricated timestamp returned by an always-accepting fixture does not establish the filed producer/consumer harm. Verify a genuine original source receipt and timing/clock schedule, then show premature replay-retention harm before prescribing an extra policy check.",
+      "correction": "Settle from actual authenticated original registration/lookup and delivery timing evidence, preserving legitimate unchanged original retries and accepted L/S/O/H/R."
+    },
+    {
+      "id": "E1",
+      "layer": "edge",
+      "path": "../eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationDispatcher.cs:64-70",
+      "claim": "Null progress admission wrongly permits dispatch completion.",
+      "verdict": "false",
+      "route": "reject-false",
+      "evidence": "SourcePublicationDispatchResult explicitly means the largest consecutively authenticated acknowledged offset in this pass, not a separately stored delivery ledger. ISourcePublicationDelivery requires each Acknowledged status to be an independently authenticated durable exact source acknowledgement. Every advanced entry is checked before advancing; an unavailable retained progress proof starts reconstruction at zero. Null advancement loses the optional retained optimization but grants no skipped acknowledgement or durable progress proof. Existing executed reconnect/103-original tests intentionally cover this safe reconstruction fallback. The proposed null guard would change that valid behavior rather than fix an unauthenticated checkpoint."
+    },
+    {
+      "id": "E2",
+      "layer": "edge",
+      "path": "../parties/src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs:34-53",
+      "claim": "Readable revocation can leave zero bindings and fail to reject a later expired suffix.",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "A certified expired establishment increments version without adding a binding. The explicitly supported readable revocation then closes that certified version and increments version, still with zero bindings. A later expired rebound/revocation therefore passes the existing bindings.Count==0 prefix check. RetainedIdentityHistoryValidator verifies complete disjoint positions but not global readable/expired ordering, so no upstream guard closes the stated branch. The fold accepts a forbidden suffix (and can continue to a later readable successor) rather than rejecting inconsistent history.",
+      "correction": "Track that any readable transition was consumed and reject subsequent expired transitions, preserving certified expired prefixes followed by readable revocation/successor and exact source positions/365-day policy."
+    },
+    {
+      "id": "V1",
+      "layer": "verification-gap",
+      "path": "../conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentServiceCollectionExtensions.cs:48",
+      "claim": "Opt-in catalogue registration is never exercised by active-count tests.",
+      "verdict": "medium",
+      "route": "patch",
+      "preverified": true,
+      "evidence": "Accepted as filed without re-verification: the reviewer searched AddConversationTenantCatalogue/registration/consumers; existing catalogue tests directly construct adapters/query services and SixSeamTests registers a fixture. Removing Replace leaves the default unavailable catalogue in an opted-in host, while those tests stay green. Add a composed scoped query-service assertion using the existing actual source/authority fixtures and both registration methods.",
+      "correction": "In the existing catalogue test class execute AddConversationAgentServices and AddConversationTenantCatalogue, resolve the scoped query service and assert complete active count over persisted source. Keep denied defaults and actual required class mapping."
+    },
+    {
+      "id": "R1",
+      "layer": "root",
+      "path": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-{parties,conv-ai,secrets,host}-1.md (revision7 evidence link)",
+      "claim": "All four revision7 evidence links point to a nonexistent directory with spaces.",
+      "verdict": "low",
+      "route": "patch",
+      "evidence": "Each current packet links revision7 evidence to resumed-20261008 T 171001 Z/revision-7/README.md. The sealed engineering evidence directory is resumed-20261008T171001Z/revision-7/README.md. Root read all four complete packets and checked current/frozen bytes, so the reproducibility link is directly broken.",
+      "correction": "Correct only the four revision7 evidence link targets to the existing exact directory; retain packet content/history and capture before bytes."
+    }
+  ],
+  "counts": {
+    "defer": 2,
+    "reject-false": 2,
+    "bad_spec": 6,
+    "reject-low-complexity": 1,
+    "patch": 5
+  },
+  "groupingNotYetPerformed": true,
+  "limits": "Root source review and actual full Local evidence do not establish runtime qualification, owner acceptance or original Story 5.4 readiness."
+}

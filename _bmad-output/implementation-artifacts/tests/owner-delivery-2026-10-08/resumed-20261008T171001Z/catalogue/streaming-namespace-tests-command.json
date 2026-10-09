@@ -1,0 +1,8 @@
+[
+  "dotnet",
+  "/tmp/hexalith-resume-namespace-20261008/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+  "-class",
+  "*SourceNamespaceSnapshotReaderTests",
+  "-result-xml",
+  "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/catalogue/streaming-namespace-tests.xml"
+]

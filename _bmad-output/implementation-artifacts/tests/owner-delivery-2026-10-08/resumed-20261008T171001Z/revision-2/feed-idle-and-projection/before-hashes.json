@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-08T22:38:43.011198+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs",
+      "existed": true,
+      "sha256": "aa51c69af91ccd1dd7cd2003560b41bd43011d2d5ddd8aaee85e1fe4b6b6e84a",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/feed-idle-and-projection/before/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationFeedTests.cs",
+      "existed": true,
+      "sha256": "56d233592d305c51ad111e6283fc80b30faccd4f86cda865fbe58839f9e384ab",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-2/feed-idle-and-projection/before/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationFeedTests.cs"
+    }
+  ]
+}

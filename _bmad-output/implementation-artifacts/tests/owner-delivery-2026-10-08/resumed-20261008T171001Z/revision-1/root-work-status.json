@@ -1,0 +1,14 @@
+{
+  "stage": "review engineering revision 1 in progress",
+  "iteration": 1,
+  "parentStatus": "in-progress",
+  "allThreeReviewReports": "received and archived",
+  "classifiedFindingItems": 17,
+  "currentReviewedManifest": "root-current-review-20261008T193950Z/review-input.json",
+  "newSourceVerification": "pending current re-derivation; historical focused runs do not establish new current source",
+  "rootFinalMatrix": "pending stable source handoff",
+  "runtimeConfiguration": "unestablished; user does not know location",
+  "originalStoryAndSprint": "draft/backlog preserved",
+  "dependencies": "all four Uncommitted; target/full accepted command TBD",
+  "acceptedInputs": "preserved; no repeat approval requested"
+}

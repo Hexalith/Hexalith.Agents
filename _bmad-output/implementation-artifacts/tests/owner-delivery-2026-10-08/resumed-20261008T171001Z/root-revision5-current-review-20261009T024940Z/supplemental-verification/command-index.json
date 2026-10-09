@@ -1,0 +1,49 @@
+[
+  {
+    "name": "Host normal Debug diagnostic build",
+    "cwd": "/home/administrator/projects/hexalith/platform",
+    "argv": [
+      "dotnet",
+      "build",
+      "./apphost.cs",
+      "-c",
+      "Debug",
+      "--artifacts-path",
+      "/tmp/hexalith-owner-r5-root-refresh-20261009t0318z/host",
+      "-p:TreatWarningsAsErrors=true",
+      "-p:AspireUseCliBundle=true",
+      "-p:NuGetAudit=false",
+      "-p:MinVerVersionOverride=1.0.0",
+      "-v",
+      "normal"
+    ],
+    "startedUtc": "2026-10-09T03:12:25.173071+00:00",
+    "finishedUtc": "2026-10-09T03:12:26.517393+00:00",
+    "exitCode": 0,
+    "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision5-current-review-20261009T024940Z/supplemental-verification/1.log"
+  },
+  {
+    "name": "Hexalith.EventStore.Server.Tests normal build",
+    "cwd": "/home/administrator/projects/hexalith/eventstore",
+    "argv": [
+      "dotnet",
+      "build",
+      "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Server.Tests/Hexalith.EventStore.Server.Tests.csproj",
+      "-c",
+      "Debug",
+      "--artifacts-path",
+      "/tmp/hexalith-owner-r5-root-refresh-20261009t0318z/eventstore",
+      "-m:1",
+      "-p:NuGetAudit=false",
+      "-p:MinVerVersionOverride=1.0.0",
+      "-p:UseHexalithProjectReferences=true",
+      "-p:UseNuGetDeps=false",
+      "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+      "-p:HexalithEventStoreVersion=3.117.1"
+    ],
+    "startedUtc": "2026-10-09T03:12:26.517886+00:00",
+    "finishedUtc": "2026-10-09T03:12:36.655282+00:00",
+    "exitCode": 1,
+    "invocationLog": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision5-current-review-20261009T024940Z/supplemental-verification/2.log"
+  }
+]

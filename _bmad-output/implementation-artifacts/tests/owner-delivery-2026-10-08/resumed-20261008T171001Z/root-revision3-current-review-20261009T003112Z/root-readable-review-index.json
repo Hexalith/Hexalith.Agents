@@ -1,0 +1,3054 @@
+{
+  "manifest": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision3-current-review-20261009T003112Z/review-input.json",
+  "manifestSha256": "fcae8f7d53efe29c430c7d5e12a78aedacc722d6e1ff398119119af07f939293",
+  "previousManifest": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision2-current-review-20261008T2327Z/review-input.json",
+  "normalization": "CRLF to LF only for readability; original frozen source and raw unified diff remain authoritative.",
+  "readableDiff": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision3-current-review-20261009T003112Z/owned-current-readable.diff",
+  "readableSha256": "58e5ad1e9283cb2de338409cfed45c4f8e6d6f86c22b906bb0e245e6453eeef7",
+  "readableLines": 30213,
+  "deltaDiff": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision3-current-review-20261009T003112Z/root-inspection-delta.diff",
+  "deltaSha256": "e927b5363dc1cc32a6dc8821296a7efb12be6d79416bf2b74016bafaef636bc0",
+  "deltaLines": 10308,
+  "files": [
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/README.md",
+      "currentSha256": "fe9c79927304469a1602911a62a2377b6c1524a39c024ad2343f2e49f03ee4e3",
+      "unifiedLines": 94,
+      "deltaLines": 10,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+      "currentSha256": "5be090deb0757a95bc7e59136e168a418f1b412bdbfe00aabcf728ebbe85f53c",
+      "unifiedLines": 80,
+      "deltaLines": 12,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+      "currentSha256": "99c269574b4af178552974914885190943f5a72de94b3246cb24935d144f0ee1",
+      "unifiedLines": 103,
+      "deltaLines": 21,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+      "currentSha256": "82805a262960b6867775a2a095cf0aca22bfccb73f234eb85ad7ecffc07d1e7c",
+      "unifiedLines": 92,
+      "deltaLines": 12,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+      "currentSha256": "387a122ea5e5e37a1c6c3c15c995dcaf75dd802daf8fde091aab81c5c4492952",
+      "unifiedLines": 90,
+      "deltaLines": 12,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/README.md",
+      "currentSha256": "cbb7675f0aa1d8ac020677faaac5f2e258ca018635329167c4046aeb3b75b46c",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/README.md",
+      "currentSha256": "3371f20d8e6d38877a7acca9a8658588aa89af8a2ae0f6977c7f037ea2809553",
+      "unifiedLines": 49,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/commands.json",
+      "currentSha256": "819db84ef8d26efc82a1af3e4d11376635932d09806964a1858bc9ab1830d782",
+      "unifiedLines": 263,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/engineering-handoff.json",
+      "currentSha256": "821bcf2266c225b889174c35a0bea0b375a54f5676a5509ddef63f4298a398ec",
+      "unifiedLines": 364,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/README.md",
+      "currentSha256": "0baf8cc063c4e7613a5204a85da70fef3b3a8c357017d7f63eb51ace9c4b9d7d",
+      "unifiedLines": 40,
+      "deltaLines": 40,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/artifact-hashes.json",
+      "currentSha256": "087d6c661734915094e3f9a458f1c1109f073a8318d23f292ac0b942d4ca0e31",
+      "unifiedLines": 699,
+      "deltaLines": 699,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/commands.json",
+      "currentSha256": "84cda178e1c118488319fc4ad933bdf9b1e64e64c7d039deb5a63d131229fdd6",
+      "unifiedLines": 1205,
+      "deltaLines": 1205,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/current-owned-source.json",
+      "currentSha256": "363e40a2284a912d16a6dc1818bdb6b29854de0f33addadbf435c9b949298f70",
+      "unifiedLines": 459,
+      "deltaLines": 459,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/engineering-handoff.json",
+      "currentSha256": "492616bef4f0015edec64bedebad4f95a71ab551cd23631a6f3fe75df84860f3",
+      "unifiedLines": 185,
+      "deltaLines": 185,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/final-focused-results.json",
+      "currentSha256": "25dbc4cb99b295ae52a22f763d318189a9a9d2b1d684a3f4cc5f844a8c3389d6",
+      "unifiedLines": 4506,
+      "deltaLines": 4506,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/finding-status.json",
+      "currentSha256": "e519f98721959d9dce2d627757cefdd8a2fb2006437634c0ee84aad61a5610a8",
+      "unifiedLines": 92,
+      "deltaLines": 92,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/handoff-verification.json",
+      "currentSha256": "30b796262db6b70d55dcce7073c4a198530650e1ec0d330c03f8dc8e758db767",
+      "unifiedLines": 22,
+      "deltaLines": 22,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/historical-attempts.json",
+      "currentSha256": "93c9c49dd673bb169113f29b85202371b46e2e4a93fae894a97e2b85e0a6f89e",
+      "unifiedLines": 272,
+      "deltaLines": 272,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/preservation.json",
+      "currentSha256": "c7a2bba01362d94bd73f0c4b092f498ff8ff592f9a04901422fe853648904b30",
+      "unifiedLines": 614,
+      "deltaLines": 614,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/previous-reviewed-source-comparison.json",
+      "currentSha256": "d888323bb6187713c3f28d3b654a8cf72d9b7c9f7e8b9e2f8b885399cabd43d2",
+      "unifiedLines": 256,
+      "deltaLines": 256,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "agents",
+      "relativePath": "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-3/required-class-audit.json",
+      "currentSha256": "b2ae25adb41a110fe42297d7e55a1e81f86d3134ca60465db18ebcfaf3a9fe0b",
+      "unifiedLines": 126,
+      "deltaLines": 126,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "eng/verify-ext-conv-ai-1.ps1",
+      "currentSha256": "47e94253d2e551bf9d2d23ce8ddcc844d63b4d7d34683f3f47347d62487242cd",
+      "unifiedLines": 37,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionReceiptVerifier.cs",
+      "currentSha256": "bb274ec6798ab817aa1a30cb202a82c7bd0c7c20e44b53321a1c57444c2fd005",
+      "unifiedLines": 63,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConfiguredConversationDeletionWorker.cs",
+      "currentSha256": "7a0d17cc90113b7d258e04096ca0a18446a8a4fe8475d99fe36a9c04f05b3d66",
+      "unifiedLines": 50,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationAgentAdmissionStage.cs",
+      "currentSha256": "4500355ee39dd03d354df5fbda41e36246e6857defd540e5e62182f86a8e47cc",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationAgentQueryService.cs",
+      "currentSha256": "699d7bc00e414536d8cf386c7b20986e5dae09592d80c16afcf4375268c2bdd6",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationAgentServiceCollectionExtensions.cs",
+      "currentSha256": "8091071e220ef0d94f286909d939511d6c3a40cab06489a19dbc66b72ce97ad8",
+      "unifiedLines": 26,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationAgentSourceReader.cs",
+      "currentSha256": "055b64e67ddd543ebc6baa5cd1228406888213880f28ab710c9e1ac7925dacfc",
+      "unifiedLines": 89,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionDeliveryPump.cs",
+      "currentSha256": "ed4a5e0b4f1665b7c9da047edb3e53667290536782408f230b3f2839d2d8a515",
+      "unifiedLines": 189,
+      "deltaLines": 34,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionPublicationDelivery.cs",
+      "currentSha256": "020fc1313383f91913cec062b43531cae802cce395e2143935ec380da324c303",
+      "unifiedLines": 24,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionPublicationProjector.cs",
+      "currentSha256": "e8b78d372fc1c9d90085ad2952b6c21fca4c09b216bc1cce6b51978c3cf93071",
+      "unifiedLines": 58,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionReceiverResult.cs",
+      "currentSha256": "f8b72b1efb79323dd7bc7d0ad9a16913052076b725da49f3ba32437de5f30a9f",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationDeletionWorkerRegistration.cs",
+      "currentSha256": "31314985406d0175d97e8665ce127e7352584a96e3816874249ee3d43ceab961",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/ConversationTenantCatalogueRegistration.cs",
+      "currentSha256": "e7022be4b13e7701d612f2c4ea2f727b70df7691a66322df4919a0f82a48ea3a",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/EventStoreConversationTenantCatalogue.cs",
+      "currentSha256": "109fe222c72d802cd8461f694f81ad6d654b529408e784447f76c5a5a486ff21",
+      "unifiedLines": 57,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Agents/IConversationDeletionReceiver.cs",
+      "currentSha256": "c4c88e7a9d4b63c1902cf6bbd5bc48eb6ada606731883aa172e6b147f0b0d125",
+      "unifiedLines": 20,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "src/Hexalith.Conversations.Server/Hexalith.Conversations.Server.csproj",
+      "currentSha256": "589a3d25a6b0f5c86eb27b5f3120724dc7f91677f306501faaa5a7cedef1cc4f",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentLocalFixture.cs",
+      "currentSha256": "897ea4c0deca292145beea8062b64409d915448f524d4c1851bd778c219b6344",
+      "unifiedLines": 97,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentSixSeamTests.cs",
+      "currentSha256": "2c6f10a7c0da024007ee032665a6cdf8d83dd34b19b05a240020bb786dba3e69",
+      "unifiedLines": 183,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionBackfillTests.cs",
+      "currentSha256": "8ec04b6225832d42a536ec738db90c0c4254d787c11de66b8eb85316f50d19ad",
+      "unifiedLines": 211,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpFixture.cs",
+      "currentSha256": "ce08d99d4ef5e9d30a9a0a6938a38b15bd5a10a885972a3027de52cf8054f04e",
+      "unifiedLines": 49,
+      "deltaLines": 23,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionDeliveryPumpTests.cs",
+      "currentSha256": "9928df2eedbaffa916558bae1f57977a9a6022df86c3c240bff24554358e150f",
+      "unifiedLines": 230,
+      "deltaLines": 39,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionPublicationDeliveryTests.cs",
+      "currentSha256": "cb5645515074681c0082b735460ac4d96d3b1d2bcb418e4b55b5680e3bb253f1",
+      "unifiedLines": 56,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionPublicationProjectorTests.cs",
+      "currentSha256": "098a6261be7486dd722116ffe73bc79fec7d9c73c72e597291d934e508255cab",
+      "unifiedLines": 74,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerAdmissionTests.cs",
+      "currentSha256": "6b87866a6b50f03c0a4919f3d7b960e8fa9f8e55b127a7c7c40e6a0e3aa0f744",
+      "unifiedLines": 102,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionWorkerBoundaryHandler.cs",
+      "currentSha256": "930f96745d1f26ed02cdc76531e62db03a802b6b433ba5cd4bbce8eaf3e47ec6",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationSourceCancellationFixture.cs",
+      "currentSha256": "e69cc79d55eba66088a0a932a886e8bef265b12a2fc810427aa215ddef863baf",
+      "unifiedLines": 36,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs",
+      "currentSha256": "a83fff83e51c5bb85ffed2cead0256e4fdf35875466ac15aa1199d3a89d8457c",
+      "unifiedLines": 131,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Hexalith.EventStore.Client.csproj",
+      "currentSha256": "b9f5657e342473b941d70b14114cb41d8a1a5d96b6b9b90bcad98ca13d3cb239",
+      "unifiedLines": 0,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/AuthoritativeEventStreamReader.cs",
+      "currentSha256": "94f2a831247b990d07d0d5a5a10017ec243fe8b8af54653f4f3e32edd6782474",
+      "unifiedLines": 311,
+      "deltaLines": 48,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs",
+      "currentSha256": "e9d239c0467bf8bad586dd799a9b04f71092bb110d64b4e1ef73fd0fce71b09b",
+      "unifiedLines": 113,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs",
+      "currentSha256": "c8d23e79c4f0e825076d59d5b8970c9be3b5694323a5d365f9b8328ae340865d",
+      "unifiedLines": 76,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendOutcome.cs",
+      "currentSha256": "7ff278ada09ff32aaf202e506420ca60eb31239679ac7c19c288c118c09a4b35",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendRequest.cs",
+      "currentSha256": "8673aef15753a2ae04dd7a55236e1b06e0a5a00a2f30e7363c6a0f8173631eec",
+      "unifiedLines": 22,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendState.cs",
+      "currentSha256": "f61aad6162b6333d7f8e1a11f66977d36e3ac07b7489c65abc52f5b7c2007217",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/IAtomicDirectoryAppendOwner.cs",
+      "currentSha256": "a907a2abaf372ecdfdd663409d44efd17ac86e4e7d5014eec98b215a6300ad1d",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/IDirectoryAtomicAppendAuthority.cs",
+      "currentSha256": "1b9234facdcc0b6568e85cf4babc2a795d8c44bf06df755b4d5c6bbe0ef400ac",
+      "unifiedLines": 13,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/ISourcePublicationDelivery.cs",
+      "currentSha256": "0b97ff16590b0d04cfa1cd1fb56b36849c77a38e4b2fc74b26f3d4da090cf943",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/ISourcePublicationIndexStore.cs",
+      "currentSha256": "785879546e03fa1fadf6d42d135445333eb9367497818ffb273614dd8d1d8f9a",
+      "unifiedLines": 24,
+      "deltaLines": 13,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/ISourcePublicationNamespaceSource.cs",
+      "currentSha256": "b6b942dea6e432bc737e87750ccb7e861a53982d5a240769b915988ad0771ab4",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/ISourcePublicationProjector.cs",
+      "currentSha256": "20ccc95fa1898f6ad5d259db6ba0c9cd8e0fa27e090d8fca6b8825504d098483",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/ISourcePublicationWriterRegistration.cs",
+      "currentSha256": "4fdef394cc0f6ba2d6e1539f1c3f34af7164f91f662c73591797f72583da05fd",
+      "unifiedLines": 13,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/RetainedIdentityHistoryReader.cs",
+      "currentSha256": "b3f66811fc4e604653812363b79b760f5c6d87b1fe8862d706b93edf91c551d9",
+      "unifiedLines": 191,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourceNamespaceSnapshotReader.cs",
+      "currentSha256": "25fed811d4fba9b8557312e97ad9fe401de8867ed5b779bee74676cd71ae2e99",
+      "unifiedLines": 152,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourcePublicationDeliveryStatus.cs",
+      "currentSha256": "10ac23056d2db3b85cc781148712809ea01ad62db30c248007c8ed49134f9c5b",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourcePublicationDispatchResult.cs",
+      "currentSha256": "84290eac6c96bbec3c23119296b486128bfe2c4ee8c9a24c7f0790b2cda5235e",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourcePublicationDispatcher.cs",
+      "currentSha256": "ed38b3c1f4b255cc090975af8cf74858fcb9c1315e3923cd1fd6c0736ef7a3a4",
+      "unifiedLines": 94,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourcePublicationFeed.cs",
+      "currentSha256": "54a5a45073dd8f8f6439213502de8a77f7f15e6fcd846b95ca4427dcaf2b5adb",
+      "unifiedLines": 359,
+      "deltaLines": 259,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/AnchoredStateTransition.cs",
+      "currentSha256": "083ee9fa48c4e0f5c298dfd3e5727000a07e8548b9641536d25417d04258ece8",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/BoundedPendingStateStream.cs",
+      "currentSha256": "1786b0400af3e2fde457bba1c364b2f1607e53cf4ae7d26a97bd2ae3c5cefe05",
+      "unifiedLines": 30,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionActivationComparison.cs",
+      "currentSha256": "2471ecdd503c69c2f51bdd16baa600d869ccaf462c33f7b89103daaad1a0e612",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionBatchBlockRequest.cs",
+      "currentSha256": "455de60d1a6bc4ccd2e6b0df561b683f02c04c98af480347ec41b15aabd76f8f",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionBatchCapabilityIdentity.cs",
+      "currentSha256": "939913627ea64033a74de93f6547ecb4210c7588bd02873fc83ace5d00bb21cd",
+      "unifiedLines": 90,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionBatchCapabilityV1.cs",
+      "currentSha256": "e5450edb8b23c3924113c664b64a2cc199b516a442d3ab4750f617623a673ada",
+      "unifiedLines": 23,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionBatchConsumptionRequest.cs",
+      "currentSha256": "c2f6bede58d075b9b1ea41eaa16cfe74ac7cbcdeb1a46fc7b1675c79ca3ff582",
+      "unifiedLines": 13,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionCapabilityRevocationEnvelope.cs",
+      "currentSha256": "cf11182343513efc6a178a6965e3a099f6c917bdf7dc9732403b395abae5d78c",
+      "unifiedLines": 16,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionCapabilityRevocationReceipt.cs",
+      "currentSha256": "d06ec66816127d19bd077f63a93b8c20f9595fddc84494b9e63531036070a525",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionConsumptionBlockReason.cs",
+      "currentSha256": "27e7e73cf16931b3c5606f42af25eacf282110536aa611831f90f902ec4d715c",
+      "unifiedLines": 13,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionConsumptionOutcome.cs",
+      "currentSha256": "2ba205b2546036b3225e3109f7ca0e23e714669094fe04966d38d762e2bfd7e8",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionConsumptionStatus.cs",
+      "currentSha256": "f23fb963e2d93ea91ceef4c785bf1138ee131087813028927bf8a95c1d6d4b82",
+      "unifiedLines": 25,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionManifestProviderResult.cs",
+      "currentSha256": "0cdba39718a037bdf5b9c06927f74207ee8011e4f03371b44398fd19249af6e1",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionManifestProviderState.cs",
+      "currentSha256": "e84071e42e6211ef6ee8160c56e3b382f4cd3af3d3ad7ff97b38e966ec0b0af0",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionReattestationActivation.cs",
+      "currentSha256": "d0ed87067c7e83b589da3185553ec0329566a70b4a9b018a368a81b968ff713a",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DeletionTargetReceipt.cs",
+      "currentSha256": "28354ab5c123445f06cb8019de393dda9e6c0ba32b05e98c25a1bb77421f15dd",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DirectoryBoundaryOutcome.cs",
+      "currentSha256": "131c192969f001271980d3576c4f0394ef562ae87ae834246ce52c3c8de8d5ae",
+      "unifiedLines": 9,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DirectoryBoundaryOutcomeState.cs",
+      "currentSha256": "4cbefab8de311adb78fb9bd970409b284e830707deabebe86abe652bf223dd82",
+      "unifiedLines": 23,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DirectoryEpochActivation.cs",
+      "currentSha256": "f6d68f30639ab648ed003d66b0391517ee8e61b0309abe653053730328ba5c78",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DirectoryEpochInstallation.cs",
+      "currentSha256": "7173f4958ec286bae77e62ed21008df10dd0830b458ef1b31a8d220b490c6000",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DirectoryEpochLedger.cs",
+      "currentSha256": "1e2fcd0fb764756d296022169bff110f20d8ec139438d2fdcc65e478b9ff2668",
+      "unifiedLines": 13,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DirectoryRepairBoundary.cs",
+      "currentSha256": "43c95658944823607f8e74f1186996ce2c5406401680d283cdd35e96958c2bf6",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DirectoryRepairCohortItem.cs",
+      "currentSha256": "02e5a1eb4accc74646c31f3e5e7d019e50199727fb0dd822f07fdda738f09f4d",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DirectoryRepairDrainReceipt.cs",
+      "currentSha256": "7ba54fc049ce5d079067a2ac1ca1336c9f61e4159f4cf094e524aae995429760",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/DirectoryWriteKind.cs",
+      "currentSha256": "3e7befceee34028a4330d482c05f584a394f4a2e9502858251d68a44bc0db6dd",
+      "unifiedLines": 33,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/ExpiredIdentityHistoryCertificate.cs",
+      "currentSha256": "db6d2af6de8a8100b147c95acb22e778d5974a1a21a21df6133495d11d114cf1",
+      "unifiedLines": 25,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceAuthorization.cs",
+      "currentSha256": "7dbd3679377262aa9a68aa335c719bde37e41b37a6d47b22754b1f3d012931d8",
+      "unifiedLines": 18,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceBatchCommand.cs",
+      "currentSha256": "f8740cc500b456d9c73c85b5d7e31acd9e7278ce2a2de7ba0752cdf3b0085c21",
+      "unifiedLines": 27,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceBatchState.cs",
+      "currentSha256": "578945edbbb6695af8d898f9c1fb09daa35f72fae7787eac35026eb486689c90",
+      "unifiedLines": 34,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceContentBinding.cs",
+      "currentSha256": "f063f9b35449d82f063d025c90cecca6056eb2b38e5a9aef931a5114001ef2f0",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceDeletionState.cs",
+      "currentSha256": "6f884ccc8d80289b43ee43d7c6d8305d5bc19e09bc6db75a3a4fcd3db8ee7c99",
+      "unifiedLines": 20,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardEvidence.cs",
+      "currentSha256": "073e54b575b9858a867d94e83bd6ef897792f090d7fb7f044d6265becb6f7ba1",
+      "unifiedLines": 60,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardOperation.cs",
+      "currentSha256": "211b34c43ec05ae0b5121d6cb2809c02315e06e7012a815fc2f350fe9ab309da",
+      "unifiedLines": 61,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardReduction.cs",
+      "currentSha256": "77bc13130e677c911471580fdcc8bacb9ed64f34a23f86c7fa6fe20fd4c6f8a8",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceGuardTransition.cs",
+      "currentSha256": "7198f055b53c1c60f54772b6b535bb727ba5e8c7d831f5d458355b033dd0bb6a",
+      "unifiedLines": 25,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceHoldCommand.cs",
+      "currentSha256": "5542c8498bf4e0dd009e1830ea96adf11e53b02165d8f4fe4e8f246d4e1f8968",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceHoldState.cs",
+      "currentSha256": "51e828f692526cd7a4483482825c6df392cacc0d3d2c11e110bcecd98501e394",
+      "unifiedLines": 13,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceOrdinalCommand.cs",
+      "currentSha256": "ef25fb3793685d9f6dc9f15433529f4780fa4ceeadbdfada58bf67e74109d87e",
+      "unifiedLines": 19,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceOwnerCycle.cs",
+      "currentSha256": "4801d504369e64b7fe03ce2bc9fdcc011763b3f80781b28635fcf950be50fcb1",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceProtectionTarget.cs",
+      "currentSha256": "957d688c0b50540a8c36f0f6a7ec3e51dee8c81d0ff919bd54c04ecf42bccbbc",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceProtocolReceipt.cs",
+      "currentSha256": "bfa05295632bbe4f4e63cd91dcb518af65afcee1a91a7e38a525e7427027bfa6",
+      "unifiedLines": 28,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceRepairState.cs",
+      "currentSha256": "a8e44476b1b9288f0c03a6fa4fea68d807d175dcebaa7dfef08a51f0cfe427dc",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceScopeV1.cs",
+      "currentSha256": "978a3b46b63109d23579bef3ebcca01ed39cc89a82ba4a2d49c3ce805d3adc51",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceSigningRecovery.cs",
+      "currentSha256": "a1f35c613a1ffeab536eb0c05ea4bfc133e9de2af2ffe7d936db4a0276b6bdbe",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceViolation.cs",
+      "currentSha256": "36730b794efd7f2a48f0379c3b417bc460773805bc9d2fd140d7720ea6cbc273",
+      "unifiedLines": 21,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GovernanceWriteFacts.cs",
+      "currentSha256": "b5b58a35ab02d032e3bdb71fc4729a1262b69e6f985f83c40856cd1e0e550c92",
+      "unifiedLines": 18,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCell.cs",
+      "currentSha256": "70903fb9bac5f173bc12ac83ec5c69fdaf21d916413aa9f704bdbf775fdd77df",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitReceipt.cs",
+      "currentSha256": "404db9c6e7aa24317db6fb82e760a0e534364803851972b856aa2a7a8579d81d",
+      "unifiedLines": 18,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitRequest.cs",
+      "currentSha256": "a516cfd5e389c6aedc8f63e8da7e8d75208e29fa16ea1ff7cce6aea8fe61178a",
+      "unifiedLines": 20,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitResult.cs",
+      "currentSha256": "b7f00373db99eb80b709ff535243c5b9f4d932841abfc7d74f1d93413cd2433b",
+      "unifiedLines": 8,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateCommitStatus.cs",
+      "currentSha256": "bb7520d107737e12ab1c0aea98bf3f6bbac21050a5750cbe9e16098738e7cea4",
+      "unifiedLines": 19,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateMutation.cs",
+      "currentSha256": "cb6d3f031adc62c76f0d578ba65758dc0f675a181ec5549cc3b698f6c8cd3b77",
+      "unifiedLines": 9,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/GuardedStateTransactionTarget.cs",
+      "currentSha256": "c535d2c74def8e6e68464149dfe9eeda3a418ad7fe1f41849a51b296d525098d",
+      "unifiedLines": 13,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IAnchoredStateTransitionAuthority.cs",
+      "currentSha256": "90f96f039d0288afefcbbc8a4394a063600771274eab8d9e911e42148d2ae8cd",
+      "unifiedLines": 22,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IDeletionCapabilityCompromiseRegistrar.cs",
+      "currentSha256": "ae5cc90c42fe82f2360473145ecc46388e6bfec1c0b07323e01a82f8f3ae865f",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IDeletionProtectionOwner.cs",
+      "currentSha256": "e7f8c60dcaecf4af8efdc4a125b67dac924c0fc4caf3a251b138eab45d00ea99",
+      "unifiedLines": 20,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IExpiredIdentityHistoryCustody.cs",
+      "currentSha256": "d205f7204f83952accc6f3b47ce7626ad2fbeee2f17d2631a1489d17ffee9008",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IGovernanceScopeGuard.cs",
+      "currentSha256": "1ac453ffbd279735cf6815de898b351918d05e474832bbdb7a9be8167098cdb0",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/IInteractionOccurrenceRegistry.cs",
+      "currentSha256": "1fdf866a41fe41221c23bafe35595035a9a2225444856926e91cb238b0d71f8a",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceIdentity.cs",
+      "currentSha256": "a4c48b630b5164cccfe38c3a00c5f812bf148fa20573fcd652b91bcdd028d880",
+      "unifiedLines": 20,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceRecord.cs",
+      "currentSha256": "d08163fe130c3591a0deee673de010b12d6e644591c17dc05dcfb4abf7b984da",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceRegistrySnapshot.cs",
+      "currentSha256": "0c61e74e9771d460ea54e1964616a43284e5df0f6452dbe1d43c2fdae222f548",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceRequest.cs",
+      "currentSha256": "2165372ad1395fee25be4f34c11025cd89c1cacc4cd613380c1d155f65506525",
+      "unifiedLines": 16,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceReservationResult.cs",
+      "currentSha256": "c76ca6e55b95bfb5642cb1dcce23cd5209760cb7c5606c2d5ab04995e362deed",
+      "unifiedLines": 13,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceReservationStatus.cs",
+      "currentSha256": "bc6a51ec3117f75bc4520d976e313ce9f3987dc745b9b8883b4c32a77537c4fb",
+      "unifiedLines": 19,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceSealedResult.cs",
+      "currentSha256": "73425a45647b53cb9b9c287e21ad8324fc5aab69975e390138dbc04cd17a6e33",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/InteractionOccurrenceWriterState.cs",
+      "currentSha256": "e01e9d89dd52768e88f42a2f003070d41df5359e0f740bd4316cca9e117eef43",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/ProtectionTarget.cs",
+      "currentSha256": "c5707cb93c32e048ab87dcaa4f83caedadbe900c74ae0f1ac313503e220af5d5",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/RecoverableAnchoredState.cs",
+      "currentSha256": "2b154e23099515fe5f5ec2391069fb71a95484f1fb9003e8add7bd09a7c67715",
+      "unifiedLines": 99,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Security/TenantGovernanceGuardState.cs",
+      "currentSha256": "9da9b8130b570137ebc8f790deef17c008fbe65f207527f21a56866ddb822b90",
+      "unifiedLines": 24,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/RetainedIdentityHistoryStream.cs",
+      "currentSha256": "d915de2acdd56885055a60d96085271780275fdcb63e953effb9cb05d3cd2359",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/RetainedIdentityHistoryValidator.cs",
+      "currentSha256": "68d3e17f08dffe034daa2fcc308cf10ed1657144469c8fa8166367fc3069cc11",
+      "unifiedLines": 36,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourceNamespaceFold.cs",
+      "currentSha256": "d8bcf33dd013ea17fc6c732cd5309875cc05b9e283288ffd108e708939d6c0db",
+      "unifiedLines": 9,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourceNamespaceSnapshot.cs",
+      "currentSha256": "6f690de84a3e6750ee7735279dd304660062df245797fc566ffdc7b23334bd65",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationCheckpoint.cs",
+      "currentSha256": "26c18c1ad9ac019b4f6c7c6367483478b5673423e1a6a4aa15993b62325bf1d9",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationCut.cs",
+      "currentSha256": "26462832dc57d69efc4b644416f42d0da3b6de8e65652e96b8fde34f05f4369d",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationDescriptor.cs",
+      "currentSha256": "0bed04a64bf306df0c9006cef026449a711d901782956b486f1e859a9d8e0f41",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationDispatchAdvance.cs",
+      "currentSha256": "f7b6593ee83c218766132326d29aca8f38f757bc2626d916b9c10158e5c4d8f6",
+      "unifiedLines": 9,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationDispatchProgress.cs",
+      "currentSha256": "886552190a65cd180335628cdb259a77aa796d168d55f70fbc07263de9f56b6c",
+      "unifiedLines": 13,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationHead.cs",
+      "currentSha256": "430ae1003f1ae0d6c608b25dbbb422ed68f493a1475a7aa2a949cbb139f57297",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationIndexEntry.cs",
+      "currentSha256": "344ab325c8b19cd6cd4184718a3d1edf1858291eab962d68ffbb6265c9db5ada",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationIndexState.cs",
+      "currentSha256": "22e103c388d177e84174ae2a0e5cc07a32a05d03ac11e722e3a9f0b3b0dde4d5",
+      "unifiedLines": 22,
+      "deltaLines": 11,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationIndexWrite.cs",
+      "currentSha256": "f8854bd9cf151bec00d3ec2fcbbfc180d5884d486e70fc8a9e9b376dce560d3c",
+      "unifiedLines": 9,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationNamespaceAuthorization.cs",
+      "currentSha256": "d3117685275bbd85e29d872aebffb8e6161dc902aa5f440ce4dd56fce5ba239f",
+      "unifiedLines": 9,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationNamespaceState.cs",
+      "currentSha256": "858b087fe95c5061891c5c23806355fea40a58de2453d7a56340bc1ed8a23b29",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationPage.cs",
+      "currentSha256": "00569d84ab827d97825b49c890bbdbf4f4a7ff8fd224fd24e54777a53dbe76e7",
+      "unifiedLines": 13,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReadResult.cs",
+      "currentSha256": "18ae66c74795cf7666a1767c5e52290589c6f4c5972372f667a00cf10949d8a4",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationAdvance.cs",
+      "currentSha256": "da6bd287f63753112d347e0fd8e7ecabaef14c6ea50d4dcf8c1a8b71e090c921",
+      "unifiedLines": 12,
+      "deltaLines": 12,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationReconciliationProgress.cs",
+      "currentSha256": "06176e49fb6e4eb9f8d63fe38cde18e83b9c2c76e3306529140999665c58ff7a",
+      "unifiedLines": 52,
+      "deltaLines": 52,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Contracts/Streams/SourcePublicationScope.cs",
+      "currentSha256": "161a223f0ef040aa4b39a637de6b65ae82da619d3acad189ddc93fcb742ff1fb",
+      "unifiedLines": 31,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.PayloadProtection/IInteractionOccurrenceKeyProvider.cs",
+      "currentSha256": "2570f79924720e36c487c9e3133f7727e0d555c94f4ece3fc25fea84cf725efa",
+      "unifiedLines": 19,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.PayloadProtection/InteractionOccurrenceKeyDeriver.cs",
+      "currentSha256": "9db5177503843bea8a1a9e91f903a3df617433ab105d56332934d84898a7e799",
+      "unifiedLines": 44,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.PayloadProtection/InteractionOccurrenceOwnedKey.cs",
+      "currentSha256": "a72632716ffc4d5c2e7db61c47b87af4af09b725dd768971633d5fbeaea612d3",
+      "unifiedLines": 24,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.PayloadProtection/InteractionOccurrenceProtector.cs",
+      "currentSha256": "4606d5a33182457a58096129aa42c142c7c0074385b571f11c8e6fe0db888837",
+      "unifiedLines": 210,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Actors/AggregateActor.cs",
+      "currentSha256": "ad77a3bb16c1e2b9527a0c2caec72ea7098f11df2ede9dc7f82089a2f10af951",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprDeletionCapabilityCompromiseRegistrar.cs",
+      "currentSha256": "51fd3ced9a37675ee5298f2dd3047ef0e20baca6144e112304dbf6abfa3495ec",
+      "unifiedLines": 35,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprDeletionProtectionOwner.cs",
+      "currentSha256": "ffb6ee5513ec1270ad59209739a57e8185dba871b90183c9b6506f646dadca69",
+      "unifiedLines": 42,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprGuardedStateTransaction.cs",
+      "currentSha256": "c445b5653b6a2ad1363135ed39a2cc9b570bd61248f6eb133b157dcd59874319",
+      "unifiedLines": 207,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DaprInteractionOccurrenceRegistry.cs",
+      "currentSha256": "0b1d6b88a35bb520e7a470cbef7016962993f4f3be1970ba9404eea20d9e5556",
+      "unifiedLines": 44,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs",
+      "currentSha256": "d878ff09464b03a54aae246defd22fadac958e40553923da1c65c9bb9fa3c781",
+      "unifiedLines": 441,
+      "deltaLines": 82,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionBatch.cs",
+      "currentSha256": "0361ef5888f950f7b4324b7d8f15ed6a972b65ecb9893fc7476de7321e664b70",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionIdentity.cs",
+      "currentSha256": "10a36414cfc2418ec84e1bd35794eda1f15860d4421cd846e5f19e7258520dcb",
+      "unifiedLines": 62,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionLedger.cs",
+      "currentSha256": "d2ba867b9af09f7d9515448d7d891c7477ca36b0f2f736b2636e4cb3da535fb8",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DeletionConsumptionOperation.cs",
+      "currentSha256": "7548e244885a6a029677d23d2edb77e059bed5e478dd7211211baae9db7bee74",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/DirectoryMigrationBoundaryActor.cs",
+      "currentSha256": "48bb9f98f60d3830c66e0abb50a7a4bfd7752b7348a075a313114cc7b4a20d35",
+      "unifiedLines": 198,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardOwner.cs",
+      "currentSha256": "90e901f9ed4b4be02254c0167d3f595e5dff629630b3ee4b990da81cbc372d24",
+      "unifiedLines": 187,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "currentSha256": "49bbf777e28b47003b66b20e9f0c89a74a05cd22223da9f66fa3f6149afec641",
+      "unifiedLines": 429,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IAtomicDeletionManifestProvider.cs",
+      "currentSha256": "3fdcfa4cb6899213a770020e022ae40ca6514fcb9d43dcc77eeb8c925dfeffdc",
+      "unifiedLines": 18,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IDeletionConsumptionActor.cs",
+      "currentSha256": "21625b638723c59d08a22aa2b450386a687a35a5b3d96600808ee4af3ea6baca",
+      "unifiedLines": 28,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IDeletionConsumptionAuthority.cs",
+      "currentSha256": "b0df83c433d8a4e09806a094fb4ec7228df49c5ffeb69028ed50e825622a7b3f",
+      "unifiedLines": 28,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IDirectoryMigrationBoundaryActor.cs",
+      "currentSha256": "d682701a81cd0bb259bce6e5275e1a6a9940cdf3a8344c743afe526c0a092ad1",
+      "unifiedLines": 24,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IDirectoryMigrationBoundaryAuthority.cs",
+      "currentSha256": "7d02062b2e275c05d1c48efa46e96f8a7380f907518925e283c4ae5eca13734d",
+      "unifiedLines": 25,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IGovernanceGuardAuthority.cs",
+      "currentSha256": "284481a8ace1ef50023053a23a4cd9c0f9946e8a96e8b2db9d5fc9c6b0fdfe58",
+      "unifiedLines": 20,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IGuardedStateTransactionAuthority.cs",
+      "currentSha256": "ceb21f29c3f6a6398845f4483b40fa749c398b7d71d409b5b2bbd4810c7cb30e",
+      "unifiedLines": 27,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IInteractionOccurrenceAuthority.cs",
+      "currentSha256": "e551a7d4dae8232019dfd45a924cb5d22600cddd7dc8876e75c2f838ec1b6190",
+      "unifiedLines": 26,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/IInteractionOccurrenceRegistryActor.cs",
+      "currentSha256": "b1213591d7185c49be2534ee7d370970e58130c22dcf77a920e9ae23e9e9b41d",
+      "unifiedLines": 20,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/InteractionOccurrenceRegistryActor.cs",
+      "currentSha256": "314cdc0626974336c20e424ac200ee5e965d5b663b53b7241e35ebd040e42d0b",
+      "unifiedLines": 201,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/RetainedIdentityHistorySourceReader.cs",
+      "currentSha256": "7dc1afb6d31ec0621e28a833534dbdf822aa53524eefd5245a821f865b2ece7d",
+      "unifiedLines": 196,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationIndexStore.cs",
+      "currentSha256": "ef5f64969bd61817f83ab5bf912209ee74362d5502d87d6a5be9f325ae1b80ce",
+      "unifiedLines": 77,
+      "deltaLines": 23,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationNamespaceSource.cs",
+      "currentSha256": "d70a36d582bbbbb06a0ad91bad82c2bd5e24debcf4951e49098f4e2f1548c30d",
+      "unifiedLines": 69,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/DaprSourcePublicationWriterRegistration.cs",
+      "currentSha256": "7b6b89246b96a8f2b2702b482c7239f9165bd28f35034262b35e63c8d99cbae9",
+      "unifiedLines": 69,
+      "deltaLines": 23,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/ISourcePublicationIndexActor.cs",
+      "currentSha256": "2f135b1e46fb4c61cff0e3df6c1a0d69b3a6c32ef9414e985d9b1ba612c940ec",
+      "unifiedLines": 24,
+      "deltaLines": 13,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/ISourcePublicationNamespaceActor.cs",
+      "currentSha256": "03f0858b9c11b31625d0efda642f4bccf9531f072844fe30aa1768be7421b591",
+      "unifiedLines": 19,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/ISourcePublicationNamespaceAuthority.cs",
+      "currentSha256": "6a961774321f239b8c4e4c92506964cbfaf3b310f83511023f7cfb5d8a76c685",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/ISourcePublicationOperationAuthority.cs",
+      "currentSha256": "19085793a61ad28ba6043986005d40e1d2e9ba7fa039a360bdebf3f4187d4a44",
+      "unifiedLines": 36,
+      "deltaLines": 13,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/SourcePublicationIndexActor.cs",
+      "currentSha256": "c689b0ad399483c78a9b0dc1054bf649a6a09ae10777ab396854251d9b78afec",
+      "unifiedLines": 242,
+      "deltaLines": 77,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Streams/SourcePublicationNamespaceActor.cs",
+      "currentSha256": "4a26497102604c650ab4a78f39964c8f02ea4050d78cfee4edee0847ccffe6eb",
+      "unifiedLines": 97,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeEventStreamReaderTests.cs",
+      "currentSha256": "c091ecf8e4e114daa94b71b77207b75524f5350eca37d985149b111819d21d69",
+      "unifiedLines": 445,
+      "deltaLines": 69,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/AuthoritativeReadTimeProvider.cs",
+      "currentSha256": "8284e92dbb1f715cc3c69894ab909f1ac9890873a4c32e78532ed46a9c6d238a",
+      "unifiedLines": 39,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/DaprSourcePublicationIndexStoreTests.cs",
+      "currentSha256": "2cb37a7f6d86e1f05a12aaa472fae4c686272f166ed01e6679ac262fcc0e4b1b",
+      "unifiedLines": 568,
+      "deltaLines": 230,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendClientTests.cs",
+      "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unifiedLines": 0,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendTests.cs",
+      "currentSha256": "1e064f0171c318fe659ffbe858d9c0e17a0f1d2ebcc8a49be6b57fdd8fb57269",
+      "unifiedLines": 95,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedContent.cs",
+      "currentSha256": "aafa35fbe6b318ff13eb36d61ddfce0ed04957e5f67e5633a0e59679952f08ec",
+      "unifiedLines": 41,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedHandler.cs",
+      "currentSha256": "b654040bdcce48cf8ee5aba6d53f5469595d6e19a47b2cfa36812a727df585fc",
+      "unifiedLines": 32,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistorySuspendedStream.cs",
+      "currentSha256": "8d97051922a2cba9fca553126718c26c7ea0c369782412e37260b00d9f86a78d",
+      "unifiedLines": 28,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/RetainedHistoryTimeProvider.cs",
+      "currentSha256": "8f8aac15e4c25e5fae91207205312a47c5b2eb070b97985b5e2be8a556637cdc",
+      "unifiedLines": 41,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/RetainedIdentityHistoryReaderTests.cs",
+      "currentSha256": "78fa161a2b75f16d7da07abd78c9eefda0285fe0ad452c499569984a90e0aac8",
+      "unifiedLines": 190,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs",
+      "currentSha256": "a3f1bf4f58d6d6d89f87ce1cfdbe2dc5792c3be3e858f145327b51607656b340",
+      "unifiedLines": 141,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationDispatcherFixture.cs",
+      "currentSha256": "37acdec4838d7e7713e9cf1f139d6877073b95c18c064e14e0d5273cbe338d2f",
+      "unifiedLines": 54,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationDispatcherTests.cs",
+      "currentSha256": "603d67c8f7e4f8c65aff7c555b7d2d0073d65360a00746e8fee529b589589385",
+      "unifiedLines": 106,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationFeedTests.cs",
+      "currentSha256": "fb38398331ac8a734b8fae751da2e15b595b7adcb09eef638d0014e125479f93",
+      "unifiedLines": 221,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationNamespaceTests.cs",
+      "currentSha256": "eec65734e55f5f2aeedf1567726b1504bd4440c4769fd2b5dff1da2c99a30126",
+      "unifiedLines": 167,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Contracts.Tests/Security/RecoverableAnchoredStateTests.cs",
+      "currentSha256": "f8744b071bb49405718594cc8e96b69f8ac1ddf89ddb0fdfb6b1242011d281f2",
+      "unifiedLines": 116,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.PayloadProtection.Tests/Hexalith.EventStore.PayloadProtection.Tests.csproj",
+      "currentSha256": "b6b7bb86ef8bfeb68e2df04f1a3f8590e0eeb6aeab82ea4aba895fc8f5bfd820",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceKeyDerivationTests.cs",
+      "currentSha256": "8e9c28465cf0e97b51146aefea0d4c60c63a2ef89624868e9e72a161f0c30422",
+      "unifiedLines": 86,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorFixture.cs",
+      "currentSha256": "522b64f242db242d7133bdd98ab5d625d94c3276cf03b46ac9ab08dcce3616a0",
+      "unifiedLines": 63,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceProtectorTests.cs",
+      "currentSha256": "3a9422583f28e452b83f840a7f75ba0ffbb8d48bffb23b6c1964058d50cb9a91",
+      "unifiedLines": 96,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.PayloadProtection.Tests/InteractionOccurrenceTestKeys.cs",
+      "currentSha256": "05ac2527f0578500ffa551e30ae9c5ba67ce126a198c9c07a7d666037dbddbd6",
+      "unifiedLines": 36,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Actors/AggregateActorPublicationRegistrationTests.cs",
+      "currentSha256": "f532aab464afc23b5cb373151f4ab6117b415f24edaaa2e29a9aa7d322a86d99",
+      "unifiedLines": 127,
+      "deltaLines": 98,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Queries/DaprLogicalQueryFixture.cs",
+      "currentSha256": "e12b024dfa8fa786437c35179d3e14b183eee30be928901cd11f904926073513",
+      "unifiedLines": 101,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+      "currentSha256": "8c72f82aa9a78e35deb98e7ecb33d705892cac18d49b27957ab2e1f50b513c5e",
+      "unifiedLines": 411,
+      "deltaLines": 58,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionFixture.cs",
+      "currentSha256": "9b20bc6b4d319680fd054db69942f3ae64998e450d07458e63991b7f16545bb4",
+      "unifiedLines": 107,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryActorTests.cs",
+      "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unifiedLines": 0,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryFixture.cs",
+      "currentSha256": "6ae89f012eb517fdb531272569533d46550c16402d6391e9bf96d90a84570299",
+      "unifiedLines": 90,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/DirectoryMigrationBoundaryTests.cs",
+      "currentSha256": "0da9300a173d88172e832380a489e70a2789c3647180a02df82a73bf2ca852f9",
+      "unifiedLines": 114,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/ExpiredIdentityHistorySourceTests.cs",
+      "currentSha256": "e8c754ed487008d35dcae5f852cb58f44c846c2a03f1803ebc7f9e7e8f51d452",
+      "unifiedLines": 78,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/FalseCountGuardMutations.cs",
+      "currentSha256": "10110347b4af7a28a714570b12636878d2fe8f1579dcee5467a9be927873b9d2",
+      "unifiedLines": 16,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceGuardFixture.cs",
+      "currentSha256": "30c8223455c052f94424ecee897d610d19c4d6038a718cc629cb7619bc96f1cd",
+      "unifiedLines": 121,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardProtocolTests.cs",
+      "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unifiedLines": 0,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs",
+      "currentSha256": "bf12a4426eb924bcc318ba7d9e0354809d41967b434fcf2640e0a7465fc3751f",
+      "unifiedLines": 287,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GuardedStateTransactionTests.cs",
+      "currentSha256": "f631865e05aa9d09ef592adaf2d595504455dd9add030ffc6308f289f118668e",
+      "unifiedLines": 171,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GuardedTransactionFixture.cs",
+      "currentSha256": "2f2d07739251e5eadcfdcdf3978ebbd6d3ad27fc6d0d111ebdb1a53e7295fb1e",
+      "unifiedLines": 84,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceFixture.cs",
+      "currentSha256": "d5fd7193c22060bcb84341b82ce03714641dc04dd6ba5d71159ef22ac2b5c89a",
+      "unifiedLines": 89,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/InteractionOccurrenceRegistryActorTests.cs",
+      "currentSha256": "852f4fa004ae1fe6191469c2ec7635505e6521eec893382d143566057b307fb9",
+      "unifiedLines": 186,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/RetainedHistoryTimeProvider.cs",
+      "currentSha256": "5fd985789013f2f07f455ecf851a74428ddebf39af12118b99aa3d1eb7a3f4a9",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/RetainedIdentityHistorySourceReaderTests.cs",
+      "currentSha256": "c46fe2fda55a39968c8296287494342cff5762d1fbebbefae8d7ae3c43d0894e",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Streams/SourcePublicationIndexActorTests.cs",
+      "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unifiedLines": 0,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "parties",
+      "relativePath": "eng/verify-ext-parties-1.ps1",
+      "currentSha256": "ad3a7b3e86638378c2d932263c82a9b91721b292a7576ce7a7b08c0fe91dea4a",
+      "unifiedLines": 30,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "parties",
+      "relativePath": "src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs",
+      "currentSha256": "bd261ec79cb88e862a0e0e6302ef6db58bab3c49d7e30df6655d2fbd0f9d6896",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "parties",
+      "relativePath": "src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs",
+      "currentSha256": "b34518af329b998d12b6dc699f593828015ab196c546b6ce0f91e547b11e988a",
+      "unifiedLines": 62,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "parties",
+      "relativePath": "tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+      "currentSha256": "9e924ea422f800761c46ed4bfaace8f0e5681e9d9a797b525b50c3b80c688209",
+      "unifiedLines": 204,
+      "deltaLines": 50,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "eng/verify-ext-secrets-1.ps1",
+      "currentSha256": "84315bbe185135c469cf511e80e9f743034502bc4339b2bbccea8098e7f66159",
+      "unifiedLines": 81,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/CustodyKeyLifecycleAction.cs",
+      "currentSha256": "5e2d290e77360a730a5231611b6a2b007f1979b2873400b37c1d7e3bbeabe990",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/CustodyKeyLifecycleActor.cs",
+      "currentSha256": "c3d532f61393f75dd23049054be8901c8adaf17232dc6c2cfedba231f619c8ef",
+      "unifiedLines": 198,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/CustodyKeyLifecycleEntry.cs",
+      "currentSha256": "b4a1747e9f6bb2f873daf48d71be94cefb5c96c7803abb26b241704362cf9b2d",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/CustodyKeyLifecycleLedger.cs",
+      "currentSha256": "41ab6e41a92ced28c4fec9a5f9fa4714a7707a93dd80a45bf908dff5c26cc6a6",
+      "unifiedLines": 8,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/CustodyKeyLifecycleOutcome.cs",
+      "currentSha256": "6ed70ca1cab0e692eb4811dbd904ab3a37442fe58d15ec36ed295545fbc551cd",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/CustodyKeyLifecycleRequest.cs",
+      "currentSha256": "156d71653710dc1f372684dc62fb61f4061075d7aa918322636ff9f31e950526",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/CustodyKeyLifecycleStatus.cs",
+      "currentSha256": "8aa1e00be1fb3669c2f00d1577b183418365f0cbbafc54768584fbaec8bc8464",
+      "unifiedLines": 27,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/CustodyKeyObjectIdentity.cs",
+      "currentSha256": "ce4d4cfeb95563dfbf003b13a44954cb983635e6a31849897af7034e5a13c999",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/CustodyKeyRegistration.cs",
+      "currentSha256": "093a0efcfefa2acd0728b2552027f06ac27163dd5a40b7ac02f6c12596dc19b2",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/CustodyKeyWrapCore.cs",
+      "currentSha256": "b52911fc6b5952b76c7c364e416259bf6f7053e156a0936c64d9bb7654fc175f",
+      "unifiedLines": 39,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeadlineAnchoredStateAuthority.cs",
+      "currentSha256": "72fc0d02f466b109fd95cc56069d0d99ce9eba89d8c0fc9da75e3c74487bbb4e",
+      "unifiedLines": 23,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DecisionAuthorityApprover.cs",
+      "currentSha256": "2875fb0dac8d031d7592e20be99eb378f7f680f1bda96524b36aa51fc2f87dda",
+      "unifiedLines": 9,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DecisionAuthorityExpectedBasis.cs",
+      "currentSha256": "3e17d6591ebc7fc6322fcafeb147f87616d3f75b0ffd9fa94b103c0f5844da87",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DecisionAuthorityManifest.cs",
+      "currentSha256": "508973e9668ca23892630c022d2b1af3b2d2edea645c111ffd38601683d78ed9",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DecisionAuthorityManifestCodec.cs",
+      "currentSha256": "7372ec250e4125feebcf51f712da427156289ac073778f7669132bf6a1c9e958",
+      "unifiedLines": 73,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DecisionAuthorityPublishedProfile.cs",
+      "currentSha256": "8f212285624da26b98f7d68db585d70142d8e25f62f69a2be7192d9c43e208ab",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchCapabilityCodec.cs",
+      "currentSha256": "a18fb4951dd1897c9383265d58334d140fe07c6219ba345f166ef0ae0f74cd5d",
+      "unifiedLines": 62,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchCapabilityV1.cs",
+      "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unifiedLines": 0,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchExecutionCoordinator.cs",
+      "currentSha256": "2a4990877feb2471179adae2aeafa66438e4124d3cd28735b4fba26edb41c39a",
+      "unifiedLines": 118,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchExecutionResult.cs",
+      "currentSha256": "618b7055e42923ec87db03df9bc92667ce681a86b0d0b1f21ddc1bf796d9b890",
+      "unifiedLines": 13,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionBatchGuardSnapshot.cs",
+      "currentSha256": "a22b78c80a680e020a1e90554a2726aa39f33fbf43c7810e0fcf66c74a945f1f",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityNoIssueProof.cs",
+      "currentSha256": "409656b998eded489c31b92cc724d9163f2f10b1b4cfdd3b6d57fb130818fc39",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityPublishedTrust.cs",
+      "currentSha256": "f2e28ec561e964466f2c606a658bbfc6977a350e3751e4e400e4f77a24ca43a6",
+      "unifiedLines": 20,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityRevocationAuthorization.cs",
+      "currentSha256": "576014506d860da31f7e8262ab1fe8435ebcac5f1ae3049103947a751f01c81a",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityRevocationSubscriber.cs",
+      "currentSha256": "cec6e8b392c17a829dc2455196ed11efe1f8fab2698649b7c9816691e43bbe70",
+      "unifiedLines": 100,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityRevocationSubscription.cs",
+      "currentSha256": "4a00a382d4c4976ba3d26d4eca692a37d3429c07843f1b386e78728463435654",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningActor.cs",
+      "currentSha256": "2b0df2dc689d6bd512d8624bde7bbb7785bda07c785a91a19b2eb3d259b1a693",
+      "unifiedLines": 239,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningOutcome.cs",
+      "currentSha256": "f99423fff1b127855ffbb5ba33e62de8e47b76521e5464e166873456beac3fa9",
+      "unifiedLines": 21,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningResult.cs",
+      "currentSha256": "a2905b11b5dee5c0b9d7087b29ae16a623a79e13ee58bdb1d5bedaa0b3153da1",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningState.cs",
+      "currentSha256": "aed51c0b22d59fc671db17ca36f24cfa8371b14dc4162b8b0882f217ead37b1b",
+      "unifiedLines": 21,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilitySigningSuccessor.cs",
+      "currentSha256": "1c451dfd843ed5c08acf6482bda1b5e706dfa3f0ee03ff66c23aaa2327d8b3ba",
+      "unifiedLines": 41,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DeletionCapabilityTrustProfile.cs",
+      "currentSha256": "cb4ab421cbf95f470615a7e62efedcb5505e1054786e2f2f57d4590a19c4b7c5",
+      "unifiedLines": 8,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/DetachedEs256JwsCore.cs",
+      "currentSha256": "67ca22b9262bee59cd7b71cd78ada37de1da51d0d6567e914934dddd8b2588f5",
+      "unifiedLines": 87,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/EventStoreDeletionBatchGuardPort.cs",
+      "currentSha256": "0f3654a6df167ba3b773034d694cd941de2e3ab7f340da247936c9ea442f788b",
+      "unifiedLines": 92,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/EventStoreDeletionCapabilityGuardRevocationMirror.cs",
+      "currentSha256": "bed1172722de14f2c6f62b1b14332df13b078fad439b967d649e28dff9f01da5",
+      "unifiedLines": 68,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/EventStoreDeletionCapabilityNoIssueAuthority.cs",
+      "currentSha256": "9d477bc63f37321c5667bfece52499ee8254b9d8b37d9f9267ebdbffae761911",
+      "unifiedLines": 19,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyDeliveryActor.cs",
+      "currentSha256": "989cd29f1578b2b2b41fdb0e195b1c909a18e79ad09611cf3eef122baaf71abf",
+      "unifiedLines": 149,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyDeliveryIdentity.cs",
+      "currentSha256": "680326d462e891e88a0a04f2b3136b727e7a3a3ca015b10611062552dc70d31f",
+      "unifiedLines": 46,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyDeliveryOutcome.cs",
+      "currentSha256": "0917df1b0406538b81ef323d07d5d0ab71b417baee52e2a3c37e3badbe747cb5",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyDeliveryState.cs",
+      "currentSha256": "e03850937db3730f8bdb236c70b1570616cf0fda940e3857e7ccb7df75f15b6e",
+      "unifiedLines": 19,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyWrapContext.cs",
+      "currentSha256": "c031461abae326899081b1e1af46e38e40ca1af11e0d806b4a728347b9771b49",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportKeyWrappingCore.cs",
+      "currentSha256": "d911042db4b32e28f3f81ed24d1f4e1dd70481276e06f14f02e152cdc248cbf6",
+      "unifiedLines": 70,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportManifestSignatureContext.cs",
+      "currentSha256": "6821454a856001c18495604b50abcaa80f86edc48e0bb55edc5f6ce140fd409d",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ExportManifestSignatureCore.cs",
+      "currentSha256": "c6adb0ed286bb397273358be71db49c09202cddb592ac4e24cf59f67277d3aaa",
+      "unifiedLines": 44,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34CanaryAuthorization.cs",
+      "currentSha256": "016495685afa367fa2a18d3d022da75361d3d50b9227b62c7c77f90dc323b4ef",
+      "unifiedLines": 9,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34CanaryReference.cs",
+      "currentSha256": "b394d18df6ab943a9c11cd5e9a3727068d4a493cf0a8990b0c3b4cc0c4f9a261",
+      "unifiedLines": 9,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34PersistedCanary.cs",
+      "currentSha256": "ab4ed8dc7b9766c87249996986caa95cf6a7346345a6c44452cef521aced0ae9",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs",
+      "currentSha256": "df2a8c62414decf25c90f015c39a00c333b224a001c5c6677dccc3829f389e2e",
+      "unifiedLines": 167,
+      "deltaLines": 69,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionReadinessCheck.cs",
+      "currentSha256": "8af942a46e594ac4edc332b4d0d6a1646a4202cb4435d91004724076b5eaf501",
+      "unifiedLines": 16,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionStartupGate.cs",
+      "currentSha256": "aa895522d174480ba4f74d67b7de18f5f0d06e52181adc866379f9ca7a63bacf",
+      "unifiedLines": 16,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Fr34ProtectionTarget.cs",
+      "currentSha256": "ff613d6e58c686b561cce5187b0bea66650df8aac131362c82b47474d005f35a",
+      "unifiedLines": 9,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj",
+      "currentSha256": "096b91b6ab0878078bde04b749e55e3468a29b42a086f8026008b42665626b0b",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ICustodyKeyLifecycleActor.cs",
+      "currentSha256": "c704bd2c5b22b95c6a655b640b9826e0e85d348c0fa51b15c7f82f083a4574db",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ICustodyKeyLifecycleAuthority.cs",
+      "currentSha256": "cc748f6d8a1957b18b8dfdbb05a01c50ace163898059e37054496b680ab5c0cd",
+      "unifiedLines": 22,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ICustodyKeyLifecycleProvider.cs",
+      "currentSha256": "4a7e151cce4aa0b0f931bcc4cce922f9e3df5029467d051a00d545c479da68f9",
+      "unifiedLines": 14,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionBatchGuardPort.cs",
+      "currentSha256": "9b8fd9f406b1f9feb0f4a41572fe1789ee36fd52f1d6959b1b29bd0a08fa6bf6",
+      "unifiedLines": 21,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilityGuardRevocationMirror.cs",
+      "currentSha256": "768a2d33f16cb090e948c8aef7e4aae7d4b902e51d4da99a397d23941f928e72",
+      "unifiedLines": 19,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilityNoIssueAuthority.cs",
+      "currentSha256": "bce4c9ccd98b740c6a4b3ba127380b0f330e4b4ecf20941f537e7ffbc4d92a3b",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilityOriginalSigningReceiptAuthority.cs",
+      "currentSha256": "db812aefebfea8f85ddcae2c4ee29f05c7b05c6be83c8f0868719e4d4a59be36",
+      "unifiedLines": 16,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilityRevocationAuthenticator.cs",
+      "currentSha256": "629f2d771bdbd1653060e7a8ce0b894ae2b75e8e4ba5a7c49cd1fca6c433c520",
+      "unifiedLines": 16,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningActor.cs",
+      "currentSha256": "27371e0d2b81167d96bd8c59bb5a7df08b8f784b1a379c64db305ac9dfe86463",
+      "unifiedLines": 20,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningAuthority.cs",
+      "currentSha256": "1d3aa7cdbc7c8be345e429784d117c380104d01c0a7bed8e668f684c741b5cc6",
+      "unifiedLines": 19,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningProvider.cs",
+      "currentSha256": "9b848b26668b5842cf969106f97451e7f8fceabcd92b8b4cc0933ec9f2b7ce30",
+      "unifiedLines": 16,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IDeletionCapabilitySigningTrustProvider.cs",
+      "currentSha256": "0db1af23249feaeadb035998049fc94828819b2f0a82771c1873004afa771ed8",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IExportKeyDeliveryActor.cs",
+      "currentSha256": "79039c630c9143c388150035f957cde043a8aa0463ece57b0444ac520000235c",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IExportKeyDeliveryAuthority.cs",
+      "currentSha256": "47fa20d5f7d5bf19b8ba97c90c7218576ff1efe3bc3a43666b5dd54c009a3938",
+      "unifiedLines": 19,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IExportKeyDirectDeliveryProvider.cs",
+      "currentSha256": "0b631ff42fcf9e645d6f410a5328caefb6d68a79e30f1a7fbd507bae3ddeee24",
+      "unifiedLines": 16,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IFr34CanaryAuthority.cs",
+      "currentSha256": "8ec2225aa5cf9dd599e49349b4440b85d7fe70efcd862dc13f44d5508f9538a4",
+      "unifiedLines": 19,
+      "deltaLines": 12,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IFr34PersistedCanaryReader.cs",
+      "currentSha256": "b595cb70e697d66a0f6ec15960b69544422f2afa770268f562d10e86e1e7324a",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IFr34ProtectionCanaryEngine.cs",
+      "currentSha256": "4ecd3992f1d4c1d9d0d53f51b5662310f21c5f2adcae65ae130cc2ff6438991d",
+      "unifiedLines": 19,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IIndependentDecisionAuthority.cs",
+      "currentSha256": "0fef5c1bcbb42a2dbdb923c3262ddd3b90e1c01985ec853f271040ab7b563e5b",
+      "unifiedLines": 18,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IPlatformKeyInventoryActor.cs",
+      "currentSha256": "0dbb5ddbcbaaf3cf3d0ce1aa937a2efdf23a488134a8352be1594a860adaa03f",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IPlatformKeyInventoryAuthority.cs",
+      "currentSha256": "f26783964f1b84780ad9fbca067393f95c4207573ff7985c579e70dfc086b674",
+      "unifiedLines": 18,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IPrivateOwnerOperationGrantSource.cs",
+      "currentSha256": "1aa450bf684e3c7838897833023c9cf17e80ca4bbd2dd870c3ea07f87348da14",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IReplicatedSecuritySpoolAuthority.cs",
+      "currentSha256": "badb5dd7289aa251e3c9a70c4cd63f4d6caf51b16b10de7a1e95da6e192c2c7d",
+      "unifiedLines": 26,
+      "deltaLines": 20,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ISecurityObservationRecorder.cs",
+      "currentSha256": "49f97e2895169731b39ce6cbeb7f9b1bfd2c1cdb7bc16afbd8c68abb691bc6ca",
+      "unifiedLines": 17,
+      "deltaLines": 12,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ITrustedEnvelopeReplayRegistrar.cs",
+      "currentSha256": "03e4f5f020be8a5ee503ecb6bafdea155b0fd0dcb0dd630f1be581ec3c5da74d",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/IndependentDecisionManifestVerifier.cs",
+      "currentSha256": "5fd53a1cd36e4508f00c289c8b3f8f6c2be106bf599d5ec7c98aff1c4e328532",
+      "unifiedLines": 56,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/OwnedExportKey.cs",
+      "currentSha256": "f71b697f704a049d078b06cb21a1d90c8085ff71db6d074c58f13850024ef7c3",
+      "unifiedLines": 36,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformAcceptedEnvelopeTiming.cs",
+      "currentSha256": "6174b0186506271094ca90a4b0285c8b5bfe73290e16e9a86f1a5907edb7cc96",
+      "unifiedLines": 26,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformKeyInventoryAction.cs",
+      "currentSha256": "52d9372504c4514765ce3ac8fe5f897f7c1f59f23224ef82eec38f4f0f0afec7",
+      "unifiedLines": 13,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformKeyInventoryActor.cs",
+      "currentSha256": "46cda2f5c26dac2c1260776d68bbd8325b4aa9d8b0323a72b20ace4458f8af5d",
+      "unifiedLines": 139,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformKeyInventoryChange.cs",
+      "currentSha256": "0d3ce3ad0641b79a1bdc590db198f1398689cc6bb235df6369964413be68a138",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformKeyInventoryEntry.cs",
+      "currentSha256": "777811790b32fa18d3de97d1789c83a21c95adb07938438f80748ba358527de2",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformKeyInventorySignal.cs",
+      "currentSha256": "1788b0822b3f00cd2a43b9e5122898b3da17eb3112ed4899ec80f35a66e86563",
+      "unifiedLines": 12,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformKeyInventorySnapshot.cs",
+      "currentSha256": "7b39865a93a13e8d994bdf6320ba7dabe1399e9d00a599eb58a3947cf741068a",
+      "unifiedLines": 13,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformKeyPurpose.cs",
+      "currentSha256": "abcf087ee4f5ec1b2821848fab9567dcc7a2a2690ccff29647339a8958d5a15d",
+      "unifiedLines": 31,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformKeyVersion.cs",
+      "currentSha256": "90067f867ac8dda8b94a61abbd79c88146fc765783fef80f5f9e17609b6a0971",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformPrivateCapabilityComposition.cs",
+      "currentSha256": "a1af23569a725dac8fb474dfc9e8199297d0065b7aec3564d77f30e93ef8387d",
+      "unifiedLines": 45,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PlatformSecurityDenialRecorder.cs",
+      "currentSha256": "814c5f057c60f9896d785c9120e6ce36d903b5bf7e4a48d06d7f159f4518e47a",
+      "unifiedLines": 74,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PrivateOwnerOperationAuthenticator.cs",
+      "currentSha256": "98a54c3f59d0d46544c3b260b07e6ec10a200a50f2d7c1f5a233817f286395d8",
+      "unifiedLines": 109,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PrivateOwnerOperationCredential.cs",
+      "currentSha256": "1d81c90aa66a819c686d1435dab49efae9e6d1f2691d5370c7ee54ff16ac1b5b",
+      "unifiedLines": 24,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PrivateOwnerOperationDeadline.cs",
+      "currentSha256": "60c8c6f71d54bed3a675ae731e8ce001d2612feea5a928473d6d804925f66ead",
+      "unifiedLines": 29,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PrivateOwnerOperationGrant.cs",
+      "currentSha256": "bb8ee04d48ddad2cc650918e28ee013cd44e326a06d446e19e43d250ab10494c",
+      "unifiedLines": 18,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/PrivateOwnerOperationScope.cs",
+      "currentSha256": "9759119564a9ab6ddde3bf82f90d69d276ca322e4cf56eb7ffafc0884c3820e4",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+      "currentSha256": "3e20782e7e7e69854778bc754b8768615f996cdbd44e78fc957b53de7fad98e3",
+      "unifiedLines": 304,
+      "deltaLines": 71,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpoolWorker.cs",
+      "currentSha256": "7f2a370e2cf0c65ca116fa77635c69463e8d2099e4032a656cb35f31fcc792a7",
+      "unifiedLines": 25,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/ReplicatedSecuritySpoolTarget.cs",
+      "currentSha256": "10f32fffdb169fac85db5de6a61c4558abb8b280587618ae7a4755ea724dd03d",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecurityEventRecordReceipt.cs",
+      "currentSha256": "eee27da2dd7a951dd87a144dfdedd40ef36deb3a4ba1196768c5b4f3b37e84f7",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecurityEventRecorderLookup.cs",
+      "currentSha256": "3e300f850aa3491787f68a70933c093bdee921b9f5851c2b0233b6e698b24b3f",
+      "unifiedLines": 9,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecurityEventRecorderLookupState.cs",
+      "currentSha256": "eed18ae93d65a4b57998b39d0887f9c707aac7d9ad48d57038f9651dee8dca89",
+      "unifiedLines": 15,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecurityObservationIntent.cs",
+      "currentSha256": "2fc25a8bc4afd374903860217d4a03c586d0f94c05cafdf8b15b3f0f6eb8f00b",
+      "unifiedLines": 19,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecurityObservationOriginalLookup.cs",
+      "currentSha256": "68e6abf233109deeaa602da14cabf95c3aaa28ecba7a2eff0862cc802178d620",
+      "unifiedLines": 9,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecurityObservationOriginalLookupResult.cs",
+      "currentSha256": "fcc95bd698a376e064a0eed7c84b951e9005d380eb0518ec74bacb7c117195af",
+      "unifiedLines": 8,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecurityObservationRecord.cs",
+      "currentSha256": "40361907671920295f32d28d86fc902110e58fca2cf6799df6d4fd9c94fc34f6",
+      "unifiedLines": 16,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecurityObservationRecoveryGrant.cs",
+      "currentSha256": "49e7e3a42c34a7813c5ece2d2870fa18f30d7966e71ec2dc7b0772213465a0b9",
+      "unifiedLines": 12,
+      "deltaLines": 12,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/SecuritySpoolSnapshot.cs",
+      "currentSha256": "fe51162a1ad576105ee3d1e96aa022aafa9ccd0287fa24c58de9f444a6adc67d",
+      "unifiedLines": 17,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/TrustedEnvelopeReplayIntent.cs",
+      "currentSha256": "c09fb8c868442c61e85cccb66b79c6af0d3048e43c5cb17894b03d05f0756658",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/TrustedEnvelopeReplayReceipt.cs",
+      "currentSha256": "c6c58f1b737fef92d51fe9dd36b617259eac932f0966e7313fd2d97050599687",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/TrustedEnvelopeReplayVerifier.cs",
+      "currentSha256": "dcab969cc188516ba3d427a0e04607f5b63467faf7e49552123f053bc1004f15",
+      "unifiedLines": 59,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/WrappedCustodyKey.cs",
+      "currentSha256": "bed0bf2bb09fcb71b55dd771041dd4da938630ee7c5318e0b492a49d78c5a236",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "src/Hexalith.Platform.Custody/WrappedExportKey.cs",
+      "currentSha256": "688d4b90872bcb1a69f862775a5e621512d6b964bb548ae384bfe530ba8058e4",
+      "unifiedLines": 11,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ActorPendingFixture.cs",
+      "currentSha256": "2b82bce3cceb91a2f1ee7e0b6bcf1f4fe1474c0b78b8879c3cbb8603745b106e",
+      "unifiedLines": 29,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/AnchoredFixtureJournal.cs",
+      "currentSha256": "eeba6713f60467c995d734f9af0a6bb85f7850e930c4169088de886235f1f64d",
+      "unifiedLines": 51,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/CompletionCancellationClock.cs",
+      "currentSha256": "0d64200fe6ecca3d8e355eff97a3a898873a7e4b677d4d310c011b8a9f878136",
+      "unifiedLines": 19,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleActorTests.cs",
+      "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unifiedLines": 0,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleFixture.cs",
+      "currentSha256": "bdaf2eac9e2316918b790c967745f9e90eb1d16ce9de9f5323b689b85fe1c578",
+      "unifiedLines": 74,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/CustodyKeyLifecycleTests.cs",
+      "currentSha256": "2ce576613ed7bd68963276a636ba862d1806cd39417ff7ac8c9024c32c3b0a64",
+      "unifiedLines": 232,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchActualOwnerFixture.cs",
+      "currentSha256": "b709d269b7e4d1ee39e4d870cb2873efad2c612a2aec1889df2ee22ce4e41e08",
+      "unifiedLines": 164,
+      "deltaLines": 31,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchCapabilityCodecTests.cs",
+      "currentSha256": "831f7c513c1426e67e48a8c7ec32a4ef3a38332f3205d90676ca27888c823912",
+      "unifiedLines": 120,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionCoordinatorTests.cs",
+      "currentSha256": "237a56ad46b084ce750d64d43e6b5091a7bf7e0ae818773ea5de7ad717469c04",
+      "unifiedLines": 321,
+      "deltaLines": 30,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchExecutionFixture.cs",
+      "currentSha256": "07f541da602fcc7818a26d1db38026b61a6caf9967de85b9c5f009a246d96699",
+      "unifiedLines": 102,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionBatchTransactionFixture.cs",
+      "currentSha256": "82bbf50ea87b47c338701d683e7563d630a6bcd3654d9911eb0f5578d9a625ff",
+      "unifiedLines": 82,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilityRevocationSubscriberTests.cs",
+      "currentSha256": "dfe513ca1831b917248927687b881181a4f2e820791f951f03787cc2c8430c23",
+      "unifiedLines": 100,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/DeletionCapabilitySigningActorTests.cs",
+      "currentSha256": "033d9e5545fc2fe3ef550735e72ceefcfa0888212189e502767cd7e8562cda08",
+      "unifiedLines": 355,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ExportCustodyCryptographyTests.cs",
+      "currentSha256": "bcbfd6f816039fd7bf2f9a0fff1b6b760ebe477b3561d03535b4eeb85413de2e",
+      "unifiedLines": 291,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ExportKeyDeliveryActorTests.cs",
+      "currentSha256": "b3845999e32dde5e3b8d55ebd4f05629a8a90b370c0eeea8c67ae59ba857fa69",
+      "unifiedLines": 208,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateFixture.cs",
+      "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unifiedLines": 0,
+      "deltaLines": 0,
+      "priorBasis": "original preserved baseline"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs",
+      "currentSha256": "93c936e47def7e07e618fef758c3e6424a87c6090302ee756d966475c7f1956b",
+      "unifiedLines": 281,
+      "deltaLines": 143,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+      "currentSha256": "69a132fd2959113ff51b0219755b3a8a924cddc74b22ad30bde259b73512c7f6",
+      "unifiedLines": 10,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/IndependentDecisionManifestVerifierTests.cs",
+      "currentSha256": "f4a8ce0f0f87d82ebe367235afdbbf2a70113ca9da4d79519dd453c6bf28a89f",
+      "unifiedLines": 135,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PlatformAcceptedEnvelopeTimingTests.cs",
+      "currentSha256": "ec7037ad3bf1d774e4698fcd620e27071b2b8e4991ff0233fe979667b049009c",
+      "unifiedLines": 31,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PlatformKeyInventoryActorTests.cs",
+      "currentSha256": "313c777b1597ed8953e1a18ef82d170b7b5d9678f1fa81f331a9c31fd7d4fd8e",
+      "unifiedLines": 152,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PlatformSecurityDenialRecorderTests.cs",
+      "currentSha256": "bc2a26da445ffaf7f27769ed8dd85990ac35dbbf19a4410c66dfd1d031cf86ff",
+      "unifiedLines": 96,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationAuthenticatorTests.cs",
+      "currentSha256": "439fe31155eb4cd3aa71fd6c1b20ecccb6c11574907ec94d49090bb02de91438",
+      "unifiedLines": 90,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/PrivateOwnerOperationDeadlineTests.cs",
+      "currentSha256": "37cd67259bb7164cf5dddcfa0fadccebdb240d5b07b9af6998987a346db650a3",
+      "unifiedLines": 34,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+      "currentSha256": "e43f262d8fbb717d4945a247e8245ca7d28cf5800d6e8e7b569e395336a3b254",
+      "unifiedLines": 287,
+      "deltaLines": 92,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolWorkerTests.cs",
+      "currentSha256": "a7de77ac56ab55d218fc878238544335a6500121916b2fac9e245513a2302676",
+      "unifiedLines": 73,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs",
+      "currentSha256": "e5b719ed90d8bdb4245a49be53cbe203c2b4a8955a3415f2dcf52e509813d813",
+      "unifiedLines": 114,
+      "deltaLines": 46,
+      "priorBasis": "previous frozen copy"
+    },
+    {
+      "repository": "platform",
+      "relativePath": "tests/Hexalith.Platform.Custody.Tests/TrustedEnvelopeReplayVerifierTests.cs",
+      "currentSha256": "05e1543ee28d6de64ea20268bacd06ae1eeeb10130e28208c407b53a449c6b98",
+      "unifiedLines": 108,
+      "deltaLines": 0,
+      "priorBasis": "previous frozen copy"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "capturedUtc": "2026-10-08T21:03:35.647293+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "parties",
+      "relativePath": "src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs",
+      "existed": true,
+      "sha256": "1f2f1a747042f6d74c3b1cbb40e382151838f38cb06c4e9b84c2cb6ff0051bba",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/parties-continuity/before/parties/src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs"
+    },
+    {
+      "repository": "parties",
+      "relativePath": "tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+      "existed": true,
+      "sha256": "46f782c7f8f6ee153eaa9dec86dae5178314943e289df34106ddaf14fe9f8d18",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/parties-continuity/before/parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "capturedUtc": "2026-10-08T20:58:59.382254+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourcePublicationDispatcher.cs",
+      "existed": true,
+      "sha256": "ec2742fa08af1bb30190f49cc4a7935ddf8d9134da34e19d4dc1d62f59a13710",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-protocols/before/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationDispatcher.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/ISourcePublicationDelivery.cs",
+      "existed": true,
+      "sha256": "8ccbe6c9492450664cadebdab51cead97631a10a4c5f3c6c0a69dea447051a98",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-protocols/before/eventstore/src/Hexalith.EventStore.Client/Streams/ISourcePublicationDelivery.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourcePublicationDeliveryStatus.cs",
+      "existed": true,
+      "sha256": "749e4bb2fa2c646afcd0258ae4de03c60a3cb82f2d4fb38b66edca1e30afabdc",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-protocols/before/eventstore/src/Hexalith.EventStore.Client/Streams/SourcePublicationDeliveryStatus.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/SourceNamespaceSnapshotReader.cs",
+      "existed": true,
+      "sha256": "7118e7d23d9150ffa120fe46dd1665702862e0f9a91d7149f5492e7e90ba9046",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-protocols/before/eventstore/src/Hexalith.EventStore.Client/Streams/SourceNamespaceSnapshotReader.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs",
+      "existed": true,
+      "sha256": "9549ebc5f33e4040859389c54d35b4d79a4ed2309a710b7388d307037e440ffa",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-protocols/before/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendClient.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationDispatcherTests.cs",
+      "existed": true,
+      "sha256": "b774b2c7519d75aa8f38b03af2a4bbcb1ac87421e581cb10bc37946352d09cc4",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-protocols/before/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourcePublicationDispatcherTests.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs",
+      "existed": true,
+      "sha256": "50f6907d0f2aa7949f6f98dc3f956672f0655102ce4733f8839b0748ad7f9587",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-protocols/before/eventstore/tests/Hexalith.EventStore.Client.Tests/Streams/SourceNamespaceSnapshotReaderTests.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Client.Tests/Streams/DirectoryAtomicAppendClientTests.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs",
+      "existed": true,
+      "sha256": "7d97ca5cdef963133429d8e09ad44295a88828aa5a51c8e42f8a9084415f31fe",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/eventstore-protocols/before/eventstore/src/Hexalith.EventStore.Server/Security/GovernanceScopeGuardReducer.cs"
+    },
+    {
+      "repository": "eventstore",
+      "relativePath": "tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardProtocolTests.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    }
+  ]
+}

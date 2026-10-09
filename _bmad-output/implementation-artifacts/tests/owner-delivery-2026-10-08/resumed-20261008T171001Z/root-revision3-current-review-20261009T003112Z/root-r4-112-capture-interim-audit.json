@@ -1,0 +1,8 @@
+{
+  "auditedUtc": "2026-10-09T01:28:43.434880+00:00",
+  "orderedCaptureCount": 112,
+  "exactPriorPrefixVerified": 97,
+  "freshCapturedRows": 43,
+  "freshSuppliedBeforeCopiesVerified": 41,
+  "scope": "Interim preservation only; packaging is still active and source is not yet frozen."
+}

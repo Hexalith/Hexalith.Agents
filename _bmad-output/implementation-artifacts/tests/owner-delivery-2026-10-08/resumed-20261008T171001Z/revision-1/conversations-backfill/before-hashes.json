@@ -1,0 +1,27 @@
+{
+  "capturedUtc": "2026-10-08T21:28:43.030029+00:00",
+  "scope": "Explicit before-edit owner preservation capture",
+  "files": [
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentLocalFixture.cs",
+      "existed": true,
+      "sha256": "84d030b4d4a9578ba9b466e1d8c5f009d4eee8b76285dbec0cf9b20e2d894c52",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/conversations-backfill/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/ConversationAgentLocalFixture.cs"
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/ConversationDeletionBackfillTests.cs",
+      "existed": false,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "beforeCopy": null
+    },
+    {
+      "repository": "conversations",
+      "relativePath": "tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs",
+      "existed": true,
+      "sha256": "97c3aa6f0fe037daa67d49ef4f97c748398e90a870a448b189ff675a54bbcf21",
+      "beforeCopy": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-1/conversations-backfill/before/conversations/tests/Hexalith.Conversations.Server.Tests/Agents/EventStoreConversationTenantCatalogueTests.cs"
+    }
+  ]
+}

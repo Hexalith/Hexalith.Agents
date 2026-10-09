@@ -1,0 +1,26 @@
+{
+  "capturedUtc": "2026-10-09T02:08:46.938274+00:00",
+  "parentBeforeSha256": "cfcce798ddf8a87b5e24aacea389a25302de941555acb87f2812b0c27d0dd735",
+  "parentAfterSha256": "1b938e51b4a80e4d3b930caca82a5944dc777ff75c3e3d32832a89faf3d2ea34",
+  "frozenSha256": "0cd11ddac96af9775593ea0aa24d969b235b32dfcc4a76a80e51d7eb9c82e2cb",
+  "reviewLoopIteration": 5,
+  "status": "in-progress",
+  "badSpecFindings": [
+    "B7",
+    "E1"
+  ],
+  "directPatches": [
+    "B1",
+    "B2",
+    "B3",
+    "B4",
+    "B5",
+    "B6",
+    "B8",
+    "E2",
+    "V1"
+  ],
+  "allThreeFinalsReceived": true,
+  "fullRootLocalMatrix": "still required, never yet run",
+  "rederivation": "only faulty fragments in place; user/concurrent edits and positive owner corrections preserved"
+}
