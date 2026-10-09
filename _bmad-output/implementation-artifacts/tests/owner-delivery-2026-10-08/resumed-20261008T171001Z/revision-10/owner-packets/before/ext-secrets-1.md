@@ -103,9 +103,3 @@ The shared spool admission now reserves worst-case serialized future receipts fo
 ## Root revision 9 review — 2026-10-09
 
 Root completed the [revision 9 review and full Local rerun](root-revision9-review-20261009/README.md). The broad custody lane passed 666/666, but the complete Local gate remains failed by two concurrently changed EventStore retained-history payload-version assertions, each seen in Parties and Server; 38 unowned source paths changed during the rerun. Independent review found a partly filled archive rollover race and a byte-capacity readiness error at the 16-page ceiling; the owner spec records all 20 verdicts and the required review-loop checkpoint. This packet remains source evidence only: the dependency is **Uncommitted**, with complete immutable target, accepted compatibility command, backend/runtime/Live qualification and owner acceptance still unestablished.
-
-## Engineering revision 10 source correction — 2026-10-09
-
-[Revision 10 focused evidence](resumed-20261008T171001Z/revision-10/README.md). The FR34 gate clears the reader-transferred array when its caller turn ends, including when pure metadata capture remains suspended; the original prompt-clear assertion is restored. All 34 focused FR34 cases pass. Shared EventStore actor post-method and failure hooks wait for unfinished StateManager I/O before Dapr saves or clears that manager; the actor class passes 57/57, including retained-stage deadline cases. This is focused source evidence, not a qualified production protection or key provider.
-
-The complete target and accepted compatibility command remain TBD; this dependency remains **Uncommitted**. Actual current signing/digest/rotation/revocation authorities, production keys/provider, independent canary and persisted observer, all-copy destruction/nonrollback restore, qualified backend and complete Live qualification remain unestablished.

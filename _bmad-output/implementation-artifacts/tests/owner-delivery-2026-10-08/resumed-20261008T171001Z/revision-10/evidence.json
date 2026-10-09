@@ -1,0 +1,296 @@
+{
+  "artifacts": {
+    "README.md": {
+      "bytes": 4163,
+      "sha256": "30c2a6ced0546a6877dd5b8b89e80b324903b61a380cf19b12ee072059582484"
+    },
+    "actor.log": {
+      "bytes": 475,
+      "sha256": "b96d3268d9335be9957dd51d30dbf5bb1ea717521a88517f91722ca235227650"
+    },
+    "actor.xml": {
+      "bytes": 39087,
+      "sha256": "3459a7ba85b64a2ea6dfd4b4665f5b3a7fa58fe2effb442ca32a1324b28451b8"
+    },
+    "build-eventstore-contracts.log": {
+      "bytes": 76,
+      "sha256": "ae23f92f422bef85a8c857142edcd4ce2a1bccfb9ba13381aea9aab19db1ee57"
+    },
+    "build-eventstore-server.log": {
+      "bytes": 76,
+      "sha256": "8344476b7d4ea26e33510a5dd2d11c552f5ca2fb49ab6ec2ebd972563ec3b250"
+    },
+    "build-parties.log": {
+      "bytes": 76,
+      "sha256": "d9862fdf77feccaf8725df404a05d750b6e56f3ed14f2e6f4dd6584487677be9"
+    },
+    "build-platform-custody.log": {
+      "bytes": 76,
+      "sha256": "6e551d8ad38aa771bb88ec277bcc1d661a1bc3b32af937b3e130de707ac4798a"
+    },
+    "commands.txt": {
+      "bytes": 6010,
+      "sha256": "2e8a4430110dc342038339fb23e8d686bb64a4463372cfad8d7c2079202f8a23"
+    },
+    "contracts.log": {
+      "bytes": 490,
+      "sha256": "272076565b1a1dd50de1f35eaf949b80a05ca3e96e1d6ce6ed7700c3d31d8642"
+    },
+    "contracts.xml": {
+      "bytes": 11083,
+      "sha256": "eb1f5039dee6cd8a17d3c4cda394b9a5c9bef8e4d51a69812ee4893e4cbb85a5"
+    },
+    "fr34.log": {
+      "bytes": 470,
+      "sha256": "ba98be9f5f8b69e30b8dea5a402650d202eecf344d068c5a40813711e8b321fd"
+    },
+    "fr34.xml": {
+      "bytes": 22324,
+      "sha256": "5b644d6c03a14208f05ea7dfc308d992b187a869e7c5621a163811db03090f1f"
+    },
+    "guard.log": {
+      "bytes": 475,
+      "sha256": "81494d33ec9e165a1103de6cf3e385c79282ba2161edebaf607e779637477292"
+    },
+    "guard.xml": {
+      "bytes": 47643,
+      "sha256": "42ab9305b9d67386574cd694705943028742ec3452924332cf679a4e6af4a033"
+    },
+    "history.log": {
+      "bytes": 475,
+      "sha256": "6574b3c2e9b1b0b8aaf68597e0007e696c2f3510fdcdf20c2584e5b2723205e7"
+    },
+    "history.xml": {
+      "bytes": 58189,
+      "sha256": "231b42e9fde41f8fe044d4a5151017beacfafdc9a73d2803d3eb0f703258a755"
+    },
+    "parties.log": {
+      "bytes": 424,
+      "sha256": "b5f48b64aaf732162a32e8b7087d2b3527a6e33eb116a7282b69403d210dfe55"
+    },
+    "parties.xml": {
+      "bytes": 4611,
+      "sha256": "c22bef0f8cfee1ab85037a3cff4947c3dcca1fbf561f26a87a945e78323e879f"
+    },
+    "spool.log": {
+      "bytes": 472,
+      "sha256": "bdcfcdfc4b5241564b2c3fdf0a7b44d92dba3a047c38e78c44a1d38756f904ab"
+    },
+    "spool.xml": {
+      "bytes": 36163,
+      "sha256": "73c14d612eef04edd72deda6b0746e4e8040d5fff6d963d5d92b8be577e0acaa"
+    }
+  },
+  "repositories": {
+    "agents": {
+      "diff_check_exit": 0,
+      "diff_check_output": "",
+      "head": "14112ad549d848cb9a76bb8e17900b08e558bd29",
+      "status": [
+        " M _bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md",
+        " M _bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md",
+        " M _bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md",
+        " M _bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md",
+        "?? _bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/"
+      ]
+    },
+    "eventstore": {
+      "diff_check_exit": 0,
+      "diff_check_output": "",
+      "head": "9ebccd38505ace6d1197dfc6e02701ecfff26327",
+      "status": [
+        " M tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs",
+        " M tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs"
+      ]
+    },
+    "parties": {
+      "diff_check_exit": 0,
+      "diff_check_output": "",
+      "head": "926faa207bab55eeeed4bc7d5d5a50b3e6af917f",
+      "status": [
+        " M tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs"
+      ]
+    },
+    "platform": {
+      "diff_check_exit": 0,
+      "diff_check_output": "",
+      "head": "4a41508c354acdccd7e18d6f71ad6f7650295714",
+      "status": [
+        "MM _bmad-output/implementation-artifacts/spec-1-3-resolve-one-active-root-source-mapping.md",
+        "M  _bmad-output/implementation-artifacts/sprint-status.yaml",
+        " m references/Hexalith.Builds",
+        " M src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs",
+        " M src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs",
+        " M tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs",
+        " M tests/Hexalith.Platform.Custody.Tests/PlatformSecurityDenialRecorderTests.cs",
+        " M tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+        " M tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs"
+      ]
+    }
+  },
+  "source": {
+    "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md": {
+      "bytes": 26887,
+      "revision9_snapshot_sha256": "5ab519a2162cd2836f72a3000ebd369150613b0f9b178681c102251c990d5618",
+      "sha256": "6e25fab7cefaacac2ddaecef44371a6cb05e949f34b726fb38d0f4ba16ba657b",
+      "snapshot": "source-after/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-conv-ai-1.md"
+    },
+    "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md": {
+      "bytes": 40359,
+      "revision9_snapshot_sha256": "45a34512cb8d1d2b75dc2044ffc820be64f159c18676376f34e8a8ecb2aeb805",
+      "sha256": "6750679ff38a75b4ae185c034c6e1d696732b85b58721ed21be7f7906680d568",
+      "snapshot": "source-after/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-host-1.md"
+    },
+    "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md": {
+      "bytes": 25536,
+      "revision9_snapshot_sha256": "50fc5063108fa76544c1a8c28accbd76d5195220ca5745388d464dab0a26292e",
+      "sha256": "4be52c92e165c91a7ff4de692b400aa6575c101d256bae18f2e34bf71ac59eb2",
+      "snapshot": "source-after/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-parties-1.md"
+    },
+    "agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md": {
+      "bytes": 33637,
+      "revision9_snapshot_sha256": "910bb84b760cd9031fa26a0f36c5df901f572963e8963210ac9c3e0082c67b37",
+      "sha256": "74b9ca4ffc095a4944836a7038b75d0162aec78c1efac3bdf779cd4d42299103",
+      "snapshot": "source-after/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/ext-secrets-1.md"
+    },
+    "eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendOutcome.cs": {
+      "bytes": 1160,
+      "sha256": "90d8fc2d75fd1ae69ae0fa0f73d5231b6b762d0fd97af109f77dbc94731684a8",
+      "snapshot": "source-after/eventstore/src/Hexalith.EventStore.Client/Streams/DirectoryAtomicAppendOutcome.cs"
+    },
+    "eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceProtocolReceipt.cs": {
+      "bytes": 2374,
+      "sha256": "3de042476d60f593cd58c9b64ef3f090474cef232f19bb4e19c38cf8dd2c527c",
+      "snapshot": "source-after/eventstore/src/Hexalith.EventStore.Contracts/Security/GovernanceProtocolReceipt.cs"
+    },
+    "eventstore/src/Hexalith.EventStore.Contracts/Security/RecoverableAnchoredState.cs": {
+      "bytes": 7619,
+      "sha256": "852aa050ab92d5089651a487ccb1f76ae1c31bb61daa4fca29fcdd29c220a01f",
+      "snapshot": "source-after/eventstore/src/Hexalith.EventStore.Contracts/Security/RecoverableAnchoredState.cs"
+    },
+    "eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs": {
+      "bytes": 59325,
+      "sha256": "7b0692a638d56d717abce8f0e76bb0d8f75cfef2dc225d68e95c77960fecba6c",
+      "snapshot": "source-after/eventstore/src/Hexalith.EventStore.Server/Security/DeletionConsumptionActor.cs"
+    },
+    "eventstore/src/Hexalith.EventStore.Server/Security/EntryOutcomeHolder.cs": {
+      "bytes": 405,
+      "sha256": "aad2175dbe903f9f1e7c922e8478ae6a6696e5949bb98fb768513ff52ca15dd7",
+      "snapshot": "source-after/eventstore/src/Hexalith.EventStore.Server/Security/EntryOutcomeHolder.cs"
+    },
+    "eventstore/tests/Hexalith.EventStore.Contracts.Tests/Security/RecoverableAnchoredStateTests.cs": {
+      "bytes": 10644,
+      "sha256": "e53bfe0d7a4d6c79a892429c6c668b1c1f205fead39f486e1bd57bbe1609fe77",
+      "snapshot": "source-after/eventstore/tests/Hexalith.EventStore.Contracts.Tests/Security/RecoverableAnchoredStateTests.cs"
+    },
+    "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs": {
+      "bytes": 59711,
+      "revision9_snapshot_sha256": "074510c0e88c17666a82b565e255a33146aeaf74ac11d42fefb980b68fbd5c29",
+      "sha256": "c04b89b5ddd4293f8ae4e83b8e25685ae6608baa06e85f1674d7beb971258d53",
+      "snapshot": "source-after/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs"
+    },
+    "eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs": {
+      "bytes": 52750,
+      "revision9_snapshot_sha256": "250a27232b7140d041f335bb350431d9640624279880f0d2696908f3d37c5f53",
+      "sha256": "19b70576ea3f43136c3f1134ab869a56723caf2be9c976ab1c07696a72aa282e",
+      "snapshot": "source-after/eventstore/tests/Hexalith.EventStore.Server.Tests/Security/GovernanceScopeGuardTests.cs"
+    },
+    "parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs": {
+      "bytes": 122915,
+      "sha256": "41c7007231614bc4ba056c54e9b00ceb2de49ef3225403006c3b3a33f65094ef",
+      "snapshot": "source-after/parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs"
+    },
+    "platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs": {
+      "bytes": 14294,
+      "sha256": "f60e616cda31f85913340b331e88101022fc8208517ad3fcdf349c2239d8d777",
+      "snapshot": "source-after/platform/src/Hexalith.Platform.Custody/Fr34ProtectionGate.cs"
+    },
+    "platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs": {
+      "bytes": 43507,
+      "revision9_snapshot_sha256": "dd21984dac5f2a083275a707e1f26be5f84aa71c6f3103a550e48b855d1ca90e",
+      "sha256": "b5c7f045ec67ae078ce37c550471ffde2aec19adc979ce877ddb1a077ace640f",
+      "snapshot": "source-after/platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs"
+    },
+    "platform/tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs": {
+      "bytes": 27363,
+      "sha256": "602c82e7b276aa9706e992e5f264eae37a626b7b74634824d894a48724957050",
+      "snapshot": "source-after/platform/tests/Hexalith.Platform.Custody.Tests/Fr34ProtectionGateTests.cs"
+    },
+    "platform/tests/Hexalith.Platform.Custody.Tests/PlatformSecurityDenialRecorderTests.cs": {
+      "bytes": 12178,
+      "revision9_snapshot_sha256": "d6f55c6e145aa1ea71dcd281764176d214f555f70e24372c7ec23a90f1198436",
+      "sha256": "a260a09e8e5a485af28b7a4bf0d0232142dca8e9c70a56b60cfc5e91d8352a7e",
+      "snapshot": "source-after/platform/tests/Hexalith.Platform.Custody.Tests/PlatformSecurityDenialRecorderTests.cs"
+    },
+    "platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs": {
+      "bytes": 59842,
+      "revision9_snapshot_sha256": "b9ffe1d771cdf54c444f3db99f6dc362d84406694e3dcc3166862891d7ed27a0",
+      "sha256": "44f21964462f96c87c23a5fd12b545fd2b720a76b59d95b784bdf61b7f316aa8",
+      "snapshot": "source-after/platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs"
+    },
+    "platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs": {
+      "bytes": 12246,
+      "revision9_snapshot_sha256": "50bd817389223105dec3b23a08f17767abadee87e87ce2996e530f88738ed3b3",
+      "sha256": "b8f804f3c5c564762ed85cfe97fc67c8160b74554d96f9fd6efe4af948fedd32",
+      "snapshot": "source-after/platform/tests/Hexalith.Platform.Custody.Tests/SecuritySpoolFixture.cs"
+    }
+  },
+  "tests": {
+    "actor": {
+      "executed": 57,
+      "results": {
+        "Fail": 0,
+        "Pass": 57,
+        "Skip": 0
+      }
+    },
+    "contracts": {
+      "executed": 14,
+      "results": {
+        "Fail": 0,
+        "Pass": 14,
+        "Skip": 0
+      }
+    },
+    "fr34": {
+      "executed": 34,
+      "results": {
+        "Fail": 0,
+        "Pass": 34,
+        "Skip": 0
+      }
+    },
+    "guard": {
+      "executed": 71,
+      "results": {
+        "Fail": 0,
+        "Pass": 71,
+        "Skip": 0
+      }
+    },
+    "history": {
+      "executed": 78,
+      "results": {
+        "Fail": 0,
+        "Pass": 78,
+        "Skip": 0
+      }
+    },
+    "parties": {
+      "executed": 5,
+      "results": {
+        "Fail": 0,
+        "Pass": 5,
+        "Skip": 0
+      }
+    },
+    "spool": {
+      "executed": 53,
+      "results": {
+        "Fail": 0,
+        "Pass": 53,
+        "Skip": 0
+      }
+    }
+  }
+}

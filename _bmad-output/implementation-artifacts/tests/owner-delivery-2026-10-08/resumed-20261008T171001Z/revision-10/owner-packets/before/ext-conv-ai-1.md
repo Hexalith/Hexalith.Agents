@@ -96,9 +96,3 @@ The shared spool admission now reserves worst-case serialized future receipts fo
 ## Root revision 9 review — 2026-10-09
 
 Root completed the [revision 9 review and full Local rerun](root-revision9-review-20261009/README.md). The broad custody lane passed 666/666, but the complete Local gate remains failed by two concurrently changed EventStore retained-history payload-version assertions, each seen in Parties and Server; 38 unowned source paths changed during the rerun. Independent review found a partly filled archive rollover race and a byte-capacity readiness error at the 16-page ceiling; the owner spec records all 20 verdicts and the required review-loop checkpoint. This packet remains source evidence only: the dependency is **Uncommitted**, with complete immutable target, accepted compatibility command, backend/runtime/Live qualification and owner acceptance still unestablished.
-
-## Engineering revision 10 source correction — 2026-10-09
-
-[Revision 10 focused evidence](resumed-20261008T171001Z/revision-10/README.md). No Conversations source, six-seam contract, delivery runner or service-Party enrollment changed in this revision. Shared EventStore ordinal documentation now identifies the exposed accepted ordinal as the maximum over matching requests and directs reporters to the authenticated per-request `AdmissionAttributionsJson` value. The shared spool's revised archive/readiness behavior is source-only and grants no Conversations receiver or worker authority. Existing modeled six-seam evidence remains the current local basis; no revision-10 Conversations delivery execution is claimed.
-
-This dependency remains **Uncommitted**, with complete target and accepted compatibility command TBD. Actual dedicated service-Party enrollment, current worker/approval/source authority, authenticated receiver and receipt integration, persisted delivery/restart proof and full Live qualification remain unestablished.

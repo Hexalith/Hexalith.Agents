@@ -102,9 +102,3 @@ The shared spool admission now reserves worst-case serialized future receipts fo
 ## Root revision 9 review — 2026-10-09
 
 Root completed the [revision 9 review and full Local rerun](root-revision9-review-20261009/README.md). The broad custody lane passed 666/666, but the complete Local gate remains failed by two concurrently changed EventStore retained-history payload-version assertions, each seen in Parties and Server; 38 unowned source paths changed during the rerun. Independent review found a partly filled archive rollover race and a byte-capacity readiness error at the 16-page ceiling; the owner spec records all 20 verdicts and the required review-loop checkpoint. This packet remains source evidence only: the dependency is **Uncommitted**, with complete immutable target, accepted compatibility command, backend/runtime/Live qualification and owner acceptance still unestablished.
-
-## Engineering revision 10 source correction — 2026-10-09
-
-[Revision 10 focused evidence](resumed-20261008T171001Z/revision-10/README.md). The `expired-after-readable` synthetic query vector now exercises the retained-history fold while admission is still valid. The five vectors pass. Shared EventStore guard state now refuses a zero admission-fence revision before original lookup, and actor retained-stage recover/verify use the entry deadline. The Parties policy, public contract and Local runner are unchanged. This is focused source evidence; the complete owner Local matrix and independent review have not been rerun for this revision.
-
-The complete target and accepted compatibility command remain TBD, and this dependency remains **Uncommitted**. Actual current actor/role authority, authenticated retained certificates, production custody and nonrollback restore, all-copy expiry/destruction, enrolled credentials and complete P-01–P-10 Live qualification remain unestablished. The original Story 5.4 remains draft/backlog.

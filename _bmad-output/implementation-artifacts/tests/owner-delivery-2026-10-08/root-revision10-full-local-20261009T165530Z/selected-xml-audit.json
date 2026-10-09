@@ -1,0 +1,222 @@
+{
+  "reports": [
+    {
+      "path": "parties/Hexalith.EventStore.Client.Tests-tests.xml",
+      "sha256": "cede04fb52e2f950f22effbf57c1552c78fe64e436854729ebcca63cceb25f75",
+      "total": 343,
+      "passed": 343,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "parties/Hexalith.EventStore.Contracts.Tests-tests.xml",
+      "sha256": "e529325a193161bb42e18588ac5bf9a3afac80c7c39af2084e1a89397560dc02",
+      "total": 37,
+      "passed": 37,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "parties/Hexalith.EventStore.PayloadProtection.Tests-tests.xml",
+      "sha256": "67b8aee013d9c17a38311ec4f819206ba5382c7e9d04ab4ba828ddc97ad2cd84",
+      "total": 33,
+      "passed": 33,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "parties/Hexalith.EventStore.Server.Tests-tests.xml",
+      "sha256": "1d7afd7db3859109740cf34ab45ff44034af8894e069660d7a6370895f343d18",
+      "total": 401,
+      "passed": 401,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "parties/Hexalith.Parties.Client.Tests-tests.xml",
+      "sha256": "56f4a55d0663d2bb408a6b4d4512985444ff4519ba45269c8da9cb1ab6b23a50",
+      "total": 98,
+      "passed": 98,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "parties/Hexalith.Parties.Contracts.Tests-tests.xml",
+      "sha256": "a4a6153342b9b57d9f55acfde89af2d4d2fc63719e209b5feb8259c4ce2cd2e5",
+      "total": 29,
+      "passed": 29,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "parties/Hexalith.Parties.Security.Tests-tests.xml",
+      "sha256": "ff0dbaf3e9c64b03547addf0520fa43367ab4f421a1677641d3a98900a810243",
+      "total": 30,
+      "passed": 30,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "parties/Hexalith.Parties.Server.Tests-tests.xml",
+      "sha256": "3b95074d22db0b6123423f60cc1af9271c4e8071f99987c10a2fb9f48a0f9d85",
+      "total": 94,
+      "passed": 94,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "parties/Hexalith.Parties.Tests-tests.xml",
+      "sha256": "579e8a1ac2d5d88ae0d6ff0bcb1cc58a87f1eb749bd408ae4cbf770436069816",
+      "total": 374,
+      "passed": 374,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "parties/Hexalith.Parties.UI.Tests-tests.xml",
+      "sha256": "ade6b0ef5796c3536d267bc043285fd771894be7ed8139c6137531efd7951ac9",
+      "total": 72,
+      "passed": 72,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "parties/Hexalith.Platform.Custody.Tests-tests.xml",
+      "sha256": "e969d9d17d20e4c6513822082da96b5ab5efc3a2ae182132bd09cfcec74529ef",
+      "total": 171,
+      "passed": 171,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "parties/Hexalith.Platform.Identity.Tests-tests.xml",
+      "sha256": "e326ff6a7541f5e0a6f45ac351520b6381a81f8818a0aba612aa834fbb256b85",
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "conversations/run-20261009T1658591176617Z/Hexalith.Conversations.Client.Tests.xml",
+      "sha256": "ee33de2b91e6a5d4e7a8bac59fbc3df4b1ce43768606c2e5a8d525fc24f9bcdf",
+      "total": 39,
+      "passed": 39,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "conversations/run-20261009T1658591176617Z/Hexalith.Conversations.Contracts.Tests.xml",
+      "sha256": "ccfec055c3e6ab794c508b32e85d204f1130a7f7605cf015c04e89fb5cd36030",
+      "total": 618,
+      "passed": 618,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "conversations/run-20261009T1658591176617Z/Hexalith.Conversations.Server.Tests.xml",
+      "sha256": "c66ebc02f5ca6bc5fe67efb4dcfa4777010618c2bf3a59fbed9e248a9eb6e9ba",
+      "total": 848,
+      "passed": 848,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "conversations/run-20261009T1658591176617Z/Hexalith.Conversations.Tests.xml",
+      "sha256": "220d5b48bde5b95e3ec0861e949ebe3bb03c52730244039141658367711eb6c0",
+      "total": 185,
+      "passed": 185,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "custody/local-tests.xml",
+      "sha256": "760ac46442a4b1ca67a37da417cd863d79d02c9135b43ba7baec4e8bdc8bb5f4",
+      "total": 671,
+      "passed": 671,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "Hexalith.EventStore.Contracts.Tests/tests.xml",
+      "sha256": "f5089817ea7d3077bb2b49525541c5d6993ee1d3cdc889f1bbb895613476fc96",
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "Hexalith.EventStore.Client.Tests/tests.xml",
+      "sha256": "82f7d51d63805a2134d83ac541fb0b5c07d90348e0416ba7270660a5c4505a46",
+      "total": 260,
+      "passed": 260,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "Hexalith.EventStore.Server.Tests/tests.xml",
+      "sha256": "5cdfca179acf58a237f81b8d6891d87d75f42f65ae831dd0bb401f8b96711994",
+      "total": 281,
+      "passed": 281,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    {
+      "path": "Hexalith.EventStore.PayloadProtection.Tests/tests.xml",
+      "sha256": "40fe8d30c61a838178faf6bde5916263a4709c26931efc5d59cfe6c2e6d6203f",
+      "total": 632,
+      "passed": 632,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    }
+  ],
+  "totals": {
+    "total": 5232,
+    "passed": 5232,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not-run": 0
+  }
+}

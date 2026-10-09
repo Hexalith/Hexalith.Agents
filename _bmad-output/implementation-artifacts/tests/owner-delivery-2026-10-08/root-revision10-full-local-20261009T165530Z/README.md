@@ -1,0 +1,9 @@
+# Story 5.4 owner prerequisite revision 10 full Local matrix
+
+All 14 commands in `summary.json` exited zero. `summary.json` records the exact argv, working directory, UTC start/end and log path for each command. `source-before.json` and `source-after.json` hash tracked source/test/tool files in the four owner repositories.
+
+The 21 selected owner XML reports contain 5,232 passing executions, 0 failures, 0 errors, 0 skips and 0 not-run cases. The supplemental Conversations six-seam report adds 37 passing executions. Executions overlap across owner lanes and are not a unique-test count. All 44 required classes from the prior command index executed and passed. The 22 normal build logs show zero warnings and errors. `selected-xml-audit.json` identifies the 21 reports and their SHA-256 values; `xml-audit.json` inventories all 99 captured XML files, including the supplemental report and 77 zero-test build artifacts. Parties, Conversations, Custody, EventStore and Host LocalScaffold completed with zero command failures.
+
+Two Git observations changed during the matrix: Conversations gained one unrelated untracked release-evidence JSON; EventStore advanced from `9ebccd38505ace6d1197dfc6e02701ecfff26327` to `a534cca381d995bdb682b4e37d94376ef729f400` as its two owner test changes were committed. The tracked source/test/tool file hashes in the captured before and after snapshots are identical. This supports tested-source byte freshness for the captured tracked graph, while it does not certify unrelated untracked or production runtime state.
+
+Production providers, enrollment, backend/replica/restore qualification, full Live lanes, accepted complete owner targets and compatibility commands remain outstanding. This Local result does not change the four Uncommitted dependency records or the draft status of original Story 5.4.

@@ -1,0 +1,33 @@
+# Exact executed commands. Each cd selects the repository root; redirection writes this packet.
+cd /home/administrator/projects/hexalith/eventstore
+dotnet build tests/Hexalith.EventStore.Server.Tests/Hexalith.EventStore.Server.Tests.csproj --configuration Debug --no-restore -m:1 -p:UseHexalithProjectReferences=true -p:NuGetAudit=false --verbosity quiet > /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/build-eventstore-server.log 2>&1
+
+cd /home/administrator/projects/hexalith/eventstore
+dotnet build tests/Hexalith.EventStore.Contracts.Tests/Hexalith.EventStore.Contracts.Tests.csproj --configuration Debug --no-restore -m:1 -p:UseHexalithProjectReferences=true -p:NuGetAudit=false --verbosity quiet > /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/build-eventstore-contracts.log 2>&1
+
+cd /home/administrator/projects/hexalith/platform
+dotnet build tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj --configuration Debug --no-restore -m:1 -p:UseHexalithProjectReferences=true -p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore -p:NuGetAudit=false --verbosity quiet > /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/build-platform-custody.log 2>&1
+
+cd /home/administrator/projects/hexalith/parties
+dotnet build tests/Hexalith.Parties.Tests/Hexalith.Parties.Tests.csproj --configuration Debug --no-restore -m:1 -p:UseHexalithProjectReferences=true -p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore -p:NuGetAudit=false --verbosity quiet > /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/build-parties.log 2>&1
+
+cd /home/administrator/projects/hexalith/platform
+tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests -class Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests -result-xml /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/spool.xml > /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/spool.log 2>&1
+
+cd /home/administrator/projects/hexalith/platform
+tests/Hexalith.Platform.Custody.Tests/bin/Debug/net10.0/Hexalith.Platform.Custody.Tests -class Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests -result-xml /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/fr34.xml > /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/fr34.log 2>&1
+
+cd /home/administrator/projects/hexalith/eventstore
+tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests -class Hexalith.EventStore.Server.Tests.Security.DeletionConsumptionActorTests -result-xml /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/actor.xml > /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/actor.log 2>&1
+
+cd /home/administrator/projects/hexalith/eventstore
+tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests -class Hexalith.EventStore.Server.Tests.Security.GovernanceScopeGuardTests -result-xml /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/guard.xml > /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/guard.log 2>&1
+
+cd /home/administrator/projects/hexalith/eventstore
+tests/Hexalith.EventStore.Contracts.Tests/bin/Debug/net10.0/Hexalith.EventStore.Contracts.Tests -class Hexalith.EventStore.Contracts.Tests.Security.RecoverableAnchoredStateTests -result-xml /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/contracts.xml > /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/contracts.log 2>&1
+
+cd /home/administrator/projects/hexalith/parties
+tests/Hexalith.Parties.Tests/bin/Debug/net10.0/Hexalith.Parties.Tests -method Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CertifiedExpiredEstablishmentRetainedRevocationAndReboundResolveThroughQuery -result-xml /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/parties.xml > /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/parties.log 2>&1
+
+cd /home/administrator/projects/hexalith/eventstore
+tests/Hexalith.EventStore.Server.Tests/bin/Debug/net10.0/Hexalith.EventStore.Server.Tests -class Hexalith.EventStore.Server.Tests.Security.RetainedIdentityHistorySourceReaderTests -result-xml /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/history.xml > /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/revision-10/history.log 2>&1
