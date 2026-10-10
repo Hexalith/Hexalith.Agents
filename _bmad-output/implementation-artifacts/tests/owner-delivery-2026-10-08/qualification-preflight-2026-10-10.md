@@ -21,6 +21,10 @@ registered targets, but unrelated tracked edits make all three checkouts dirty.
 An isolated exact checkout is needed for qualification without disturbing
 those edits.
 
+The register rows now retain the literal `Command:` marker required by the
+Parties readiness parser. This static compatibility correction did not run the
+readiness probe or any Live/Full command.
+
 ## Current runtime observation
 
 Using `/home/administrator/.kube/hexalith-production`, a metadata-only query of
