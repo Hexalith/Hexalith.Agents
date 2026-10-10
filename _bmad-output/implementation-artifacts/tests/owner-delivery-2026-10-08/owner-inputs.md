@@ -71,4 +71,4 @@ The proposed `agents-decision-issuer` label is not an enrolled account or public
 | Spool replica count | Pending |
 | Spool failure model | Pending |
 
-Human exact-Conversation scope and class/time-range scope remain separate **Open Product scope decisions**. Neither is approved by this runtime-input record. The four [owner packets](README.md) retain their requirement maps and qualification gates. Complete immutable targets and accepted full compatibility commands are still TBD; all four records remain Uncommitted and Story 5.4 remains draft/backlog.
+Human exact-Conversation scope and class/time-range scope remain separate **Open Product scope decisions**. Neither is approved by this runtime-input record. The four [owner packets](README.md) retain their requirement maps and qualification gates. The four records now have immutable targets and accepted full compatibility commands in the [dependency register](../../../planning-artifacts/external-dependency-register.md); all remain Committed, none is Available, and Story 5.4 remains draft/backlog.
