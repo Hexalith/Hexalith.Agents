@@ -622,3 +622,7 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-update-eventstore-to-3-119-0.md`
   summary: Verify the EventStore gateway test in Debug source-reference mode after the Conversations.Client analyzer blocker is resolved.
   evidence: The Debug server test project build stops on nine pre-existing CA1062 errors in `references/Hexalith.Conversations/src/Hexalith.Conversations.Client`, before the gateway test can run. A passing source-reference build and test run would settle whether the local EventStore checkout remains compatible.
+
+- source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
+  summary: Rehashing a revision-10 spool head or archive page may fail its stored digest after the reservation fields were added.
+  evidence: `ReservedArchiveDigest` and `ArchiveReservationCount` serialize under default options, so a snapshot written before those fields would get a new `StateDigest` and could fail anchor or archive-link checks. No retained pre-change head or page was shown, and divergent digests already fail closed. An actual retained revision-10 head or archive page would settle whether this is a medium compatibility break.

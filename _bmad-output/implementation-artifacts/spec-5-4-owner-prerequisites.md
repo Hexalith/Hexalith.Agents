@@ -7,7 +7,7 @@ route: 'dispatch'
 human_approval: 'accepted'
 approved_on: '2026-10-06'
 baseline_commit: 'b252fcfde51bd04317ce5843a0a42bfe4dce5170'
-review_loop_iteration: 10
+review_loop_iteration: 11
 context:
   - '_bmad-output/specs/spec-story-5-4-dependency-unblock/owner-implementation-plan.md'
   - '_bmad-output/specs/spec-story-5-4-dependency-unblock/parties-identity-contract.md'
@@ -75,6 +75,23 @@ context:
 ## Review Triage Log
 
 Resolved local findings: SDK retained-history authority/custody waits and HTTP send/body reads did not bound noncooperative providers; Conversations client did not promptly cancel outstanding transport/body reads; Parties lacked entry/post-await/terminal cancellation and could consult final authority after a cancelled false custody result; Platform scaffold verifier incorrectly reported full compatibility. Meaningful cancellation/late-disposal/gate cases now pass. Full Parties json-redacted replay compatibility, Conversations C4, production custody/retention/profile/authority and H1–H4 remain unresolved; no acceptance or availability was manufactured.
+
+### Revision 11 review — 2026-10-10
+
+| Id | Verdict | Route | Evidence |
+| --- | --- | --- | --- |
+| B1 | false | reject | `status: in-review` is this review pass. The parent returns to in-progress because this cycle does not finish it. The correction is spec bookkeeping, which this step does not take from a reviewer. |
+| B2 | false | reject | The Debug class commands and 89/89 plus 58/58 results are recorded. A new evidence directory would edit this spec's process record. |
+| B3 | false | reject | Both halves were in the review diff. EventStore commit `36a9950424c850327c8341ba73784d900e99decc` was not created by this cycle. The actor class passed 58/58. |
+| B4 | medium | patch | `ObserveAsync` returns null when reservation completion fails, before the exact head/archive lookup. A retained original is hidden until completion succeeds. |
+| B5 | medium | patch | Both crash tests recover only through `ObserveAsync`. Grouped with V1 and V2. |
+| B6 | low | reject | The repeated race overlaps completion after the page exists and stops at 16 pages. Both crash points and the existing page-16 refusal already run. A second pre-CAS harness is more than a direct correction. |
+| B7 | low | reject | The positive case brackets the existing false ceiling test: readiness holds on the last head whose worst-case projection fits, and one more record does not. Admitting a synthetic worst-case record is extra. |
+| B8 | false | reject | `OnActorMethodFailedInternalAsync` is the runtime failure entry. The test keeps the runtime `ClearCacheAsync` at zero until the unfinished clear faults, then observes one clear. That is the same direct-hook pattern as the existing post-method test. |
+| E1 | maybe-false | defer | New default fields change `StateDigest` of a revision-10 snapshot if one is rehashed. No retained pre-change head or archive page was shown, and a divergent digest already fails closed. Settle with an actual retained revision-10 head or page. Unverified medium if that state exists. |
+| V1 | medium | patch | Pre-verified: a sub-10,000 acknowledged reservation is not drained. Dropping the new `DrainAsync` completion leaves current tests green. |
+| V2 | medium | patch | Pre-verified: `IsReadyAsync` is never called on a reserved head. Dropping its completion block leaves current tests green while readiness stays true. |
+| V3 | medium | patch | Pre-verified: no lookup covers a reservation digest that does not match the carrier. Deleting the `Capture` comparison leaves current tests green. |
 
 ## Verification
 
@@ -1042,3 +1059,42 @@ The authorized revision-10 engineering pass addressed the 17 open review patch i
 Root then ran the [complete revision-10 Local matrix](tests/owner-delivery-2026-10-08/root-revision10-full-local-20261009T165530Z/README.md). All 14 selected commands exited zero. The 21 selected XML reports contain 5,232 passing executions, with no failures, errors, skips or not-run cases; a supplemental Conversations six-seam report contains 37 more passing executions. All 44 required classes executed and all 22 normal build logs show zero warnings or errors. Captured tracked source/test/tool file hashes were unchanged between matrix entry and exit. EventStore HEAD advanced while two already-tested owner test files were committed, and Conversations gained an unrelated untracked evidence JSON; both Git observations are preserved separately from the unchanged captured source bytes. The prior retained-history payload-version failures no longer reproduce in the current Local matrix.
 
 Independent revision-10 review, complete owner targets and accepted compatibility commands, current production authority and credentials, qualified custody/backend/replica/restore behavior, and full Live qualification remain outstanding. Keep this parent `in-progress`, the original Story 5.4 `draft`/backlog, and all four external dependencies `Uncommitted`.
+
+## Revision 10 scoped source audit — 2026-10-10
+
+The resumed implementation pass rechecked all 19 revision-10 captured source and packet paths against their recorded hashes and inspected the spool, FR34 caller-release cleanup, actor state-I/O exclusion, ordinal documentation and anchored-byte corrections. No new source defect was verified, and no source files were changed. This was a scoped audit of the existing [revision-10 Local evidence](tests/owner-delivery-2026-10-08/root-revision10-full-local-20261009T165530Z/README.md), not a fresh matrix run or the required full independent review; leave the 17 review patch checkboxes open. Production enrollment, backend/custody/restore qualification, accepted complete targets and commands, and Live evidence remain outstanding, with all four external records `Uncommitted`.
+
+## Revision 10 independent review findings — 2026-10-10
+
+An independent read-only reviewer verified all 17 revision-10 source corrections and the 19 captured source/packet hashes against their recorded evidence. It found three issues requiring triage before the review checkboxes can close:
+
+- **Medium, design correction:** `../platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs` persists a content-addressed archive page before checking whether its anchored head still owns that rollover. A stale writer leaves an unlinked physical page; the current race test already proves two physical pages at one page index. Repetition defeats the accepted limit of 16 immutable archive pages per installation, even while linked traversal remains bounded. A conditional durable head reservation before page creation, followed by exact page verification/finalization and interrupted-phase recovery, preserves that limit without changing the frozen intent. Recheck both crash points and repeated races.
+- **Medium, verification gap:** `../eventstore/tests/Hexalith.EventStore.Server.Tests/Security/DeletionConsumptionActorTests.cs` covers post-method save exclusion but does not exercise the new failed-method cleanup hook with unfinished state I/O. Add a stalled/faulted I/O case proving `ClearCacheAsync` waits for quiescence.
+- **Low, verification gap:** `../platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs` covers page-16 refusal but not positive readiness with space for the worst-case next observation. Add that positive boundary case.
+
+This is one independent review, not the complete three-layer workflow review. No source correction or new test was run. The approved revision-10 cycle has reached its review boundary at `review_loop_iteration: 10`; another engineering loop requires human escalation under the rendered bmad-build review step. Keep all statuses and dependency gates unchanged.
+
+## Revision 11 authorization — 2026-10-10
+
+The user authorized exactly one implementation-and-review cycle, revision 11, past the review-loop limit. Keep `review_loop_iteration: 10` until this cycle's review records its increment; do not reset it. This authorization does not cover a later cycle.
+
+Apply only the three 2026-10-10 independent-review findings above, and leave the other revision-10 corrections in place:
+
+- In `ReplicatedSecurityObservationSpool`, reserve the anchored head before creating an archive page, then verify and finalize that exact page and recover an interrupted phase. Recheck both crash points and a repeated race so one installation cannot grow past 16 immutable archive pages.
+- In `DeletionConsumptionActorTests`, add a stalled or faulted unfinished state-I/O case proving the failed-method cleanup hook waits for quiescence before `ClearCacheAsync`.
+- In `ReplicatedSecurityObservationSpoolTests`, add the positive page-ceiling case where readiness holds because there is room for the worst-case next observation and its receipt.
+
+Keep Story 5.4 draft/backlog, this parent in-progress, and EXT-PARTIES-1, EXT-CONV-AI-1, EXT-SECRETS-1, and EXT-HOST-1 Uncommitted. Do not invent a target, command, enrollment, or Live result. Do not commit, push, or invoke Live or Full.
+
+## Revision 11 engineering delivery — 2026-10-10
+
+The authorized revision-11 source slice is implemented and locally verified. `review_loop_iteration` stays 10 until this cycle's review records its increment. Independent three-layer review and the full Local matrix were not run. Story 5.4 stays draft/backlog, this parent stays in-progress, and EXT-PARTIES-1, EXT-CONV-AI-1, EXT-SECRETS-1, and EXT-HOST-1 stay Uncommitted. No target, command, enrollment, or Live result was invented. No commit, push, deploy, or Live/Full invocation was performed.
+
+- `ReplicatedSecurityObservationSpool` now reserves the anchored head, with `ReservedArchiveDigest` and `ArchiveReservationCount`, before creating an archive page. It then verifies that exact content-addressed page and finalizes the head. Observe, drain, and readiness recover an interrupted reservation. A stale writer that loses the head reservation does not create another page. Already-unlinked pages are not deleted.
+- Crash coverage: a failed page save after a durable reservation leaves zero carriers and restart writes exactly one; a failed finalize after the page exists leaves that one page and the reserved head, and restart finalizes it without a second page. A repeated race from page 15 with overlapping admissions ends at 16 physical pages and stays there.
+- `FinalPageReadinessHoldsWhenWorstCaseObservationFits` covers the positive page-16 boundary where the acknowledged head still has room for the worst-case next observation and its receipt.
+- `FailedMethodCleanupWaitsForFaultedStateIoBeforeClearCache` stalls actor state I/O, faults it after the turn deadline, and shows `OnActorMethodFailedInternalAsync` does not call the runtime `ClearCacheAsync` until that I/O settles.
+
+The positive page-ceiling fixture estimates a near-limit acknowledged head, then steps to the last count whose worst-case receipt projection still fits. Review patches then return an exact retained original when reservation completion fails, and add drain, readiness, and mismatched-digest cases. Debug builds of `Hexalith.Platform.Custody.Tests` and `Hexalith.EventStore.Server.Tests` reported zero warnings and zero errors. Built Debug assemblies, selected with `-class` and no `--filter`, passed the four custody classes at 89/89 before those patches and `DeletionConsumptionActorTests` at 58/58. After the patches, `ReplicatedSecurityObservationSpoolTests` passed 62/62. The actor test file is present in EventStore commit `36a9950424c850327c8341ba73784d900e99decc` together with unrelated versioned-actor test files; this cycle did not create that commit. Platform spool source remains uncommitted.
+
+Revision 11 review is complete. `review_loop_iteration` is 11. This authorization does not cover another cycle. The parent stays in-progress, Story 5.4 stays draft/backlog, and EXT-PARTIES-1, EXT-CONV-AI-1, EXT-SECRETS-1, and EXT-HOST-1 stay Uncommitted. One deferred note records that a retained revision-10 spool head or archive page would be needed before treating the new reservation fields as a digest-compatibility break.
