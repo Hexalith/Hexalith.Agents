@@ -4,6 +4,8 @@ Engineering revision 3 reached a stable 484-case focused handoff and all three i
 
 The four current full-scope packets are [Parties](ext-parties-1.md), [Conversations](ext-conv-ai-1.md), [custody](ext-secrets-1.md) and [host](ext-host-1.md). Every requirement row maps delivered source and Local proof to the exact remaining runtime input, gated consumer integration or live qualification. Full targets/accepted commands remain TBD and all four records remain Uncommitted. Original Story 5.4 remains draft/backlog; the prerequisite parent remains in-progress. No staging, commit, push, branch, submodule initialization/update, deployment, external owner message or unavailable consuming live seam was performed.
 
+The [four-owner runtime-input checklist](owner-inputs.md) records accepted decisions, outstanding configuration references and Open Product scope decisions. Pending entries are not enrollment or Live/Full qualification.
+
 [Accepted inputs](accepted-owner-inputs-20261008.json) preserve environment 192.168.1.30, Branch B, the 365-day binding-effective-at/exclusive-expiry policy, accepted creation-window denominator, dedicated Conversations service Party, trusted request timing L=300/S=30/O=600/H=86400/R=604800 seconds and Jérôme Piquot's named approval assignment. [Runtime reference status](resumed-20261008T171001Z/runtime-reference-status.json) records unestablished worker/signer configuration and current public identity references. These actual enrollment/profile/provider/authority facts remain missing; accepted choices are not reopened.
 
 ## Current source and evidence boundary
