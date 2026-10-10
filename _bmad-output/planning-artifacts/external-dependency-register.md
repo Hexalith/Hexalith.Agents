@@ -48,7 +48,7 @@ A runtime, test, or qualification path that would execute a seam whose record is
 
 ## Critical Dependency Records
 
-*Commit acceptance 2026-10-10: `EXT-PARTIES-1`, `EXT-CONV-AI-1`, `EXT-SECRETS-1`, and `EXT-HOST-1` are `Committed` at the immutable owner commits and pinned commands below. Earlier dated `TBD` and `Uncommitted` notes describe their historical state. The Live/Full commands have not been run; no record is `Available`, and Story 5.4 remains draft/backlog.*
+*Commit acceptance 2026-10-10: `EXT-PARTIES-1`, `EXT-CONV-AI-1`, `EXT-SECRETS-1`, and `EXT-HOST-1` are `Committed` at the immutable owner commits and pinned commands below. Earlier dated `TBD` and `Uncommitted` notes describe their historical state. The Live/Full commands have not been run; none of these four records is `Available`. Stories 5.1 and 5.2 are done, and Story 5.4 is approved and `ready-for-dev` under the entry gate above. Consuming live seams remain blocked until their records are `Available` with passing exact-target evidence.*
 
 *Run the four pinned commands from the Hexalith.Agents repository root against exact clean owner checkouts. The `Command:` marker is part of the Parties readiness parser contract.*
 
@@ -294,7 +294,7 @@ The record closes only when its named evidence is accepted and this table is ame
 
 ## 2026-09-27 Owner Coordination For Story 5.4
 
-The following requests are open with the owning repositories. They are requests for decisions and delivery evidence, **not** accepted commitments. The inspected local revisions are observations only; none supplies an accepted `TargetVersionOrCommit`, integration date, or exact live compatibility command. All four records remain `Uncommitted`, and no Story 5.4-only subset may advance a broader record to `Available`.
+At this date, the following requests were open with the owning repositories. They were requests for decisions and delivery evidence, **not** accepted commitments. The inspected local revisions were observations only; none then supplied an accepted `TargetVersionOrCommit`, integration date, or exact live compatibility command. All four records were `Uncommitted` at that time, and no Story 5.4-only subset could advance a broader record to `Available`. The 2026-10-10 commitment rows above supersede this historical status.
 
 | Record and owner request | Inspected evidence | Exact owner response still needed |
 | --- | --- | --- |
@@ -303,13 +303,13 @@ The following requests are open with the owning repositories. They are requests 
 | `EXT-SECRETS-1` — [Platform #1](https://github.com/Hexalith/Hexalith.Platform/issues/1) | The owning repository is still `TBD`. The Platform scaffold contains no accepted HMAC/replay profile or full custody command. | Platform Maintainer selects the owning repository and accepts the **full** secrets contract, including numeric trusted-envelope bounds, replay retention, security digest, rotation/revocation, and the later signing/custody extensions; supplies an immutable full target, integration date, and live command. |
 | `EXT-HOST-1` — [Platform #2](https://github.com/Hexalith/Hexalith.Platform/issues/2) | At historical `a66cdf346e521ad147f442b686f301f0f59c525c`, `./eng/verify-agents-host.sh` builds the scaffold and explicitly defers live Agents composition. The Platform working tree has pre-existing changes that are not an immutable target. | Platform Maintainer accepts the complete expanded host contract, including replicated security-audit spool, restricted replay/security credentials, recovery worker, full composition and v21/v23 protection/migration extensions; supplies an immutable full target, integration date, and exact live command. |
 
-## Current Blocking Summary
+## Historical Blocking Summary — 2026-09-27
 
-All twelve dependency records are `Uncommitted`; every current consumer remains blocked from `ready-for-dev` until the fields required for `Committed` are accepted. Story 5.1's satisfied historical entry gate is not a current consumer. `EXT-HOST-1`'s earlier target/date/command are historical only because the required artifact now includes the production `EXT-PROTECTION-1` binding and FR-34 attestation port. `RQ-1` additionally requires every dependency in its qualification profile to be `Available` with the exact compatibility command passing against the target used by the run.
+At this date all twelve dependency records were `Uncommitted`, so their then-current consumers were blocked from `ready-for-dev` pending the fields required for `Committed`. Story 5.1's satisfied historical entry gate was not reopened. `EXT-HOST-1`'s earlier target/date/command were historical because its required artifact had expanded to include the production `EXT-PROTECTION-1` binding and FR-34 attestation port. `RQ-1` additionally requires every dependency in its qualification profile to be `Available` with the exact compatibility command passing against the target used by the run. The 2026-10-10 acceptance above supersedes this summary for the four Story 5.4 records.
 
 
 ## 2026-10-07 Project Owner Commitment Instruction
 
 The user declared project ownership and requested the Story 5.4 commitments. [Recorded owner packet](../implementation-artifacts/story-5-4-owner-commitments-2026-10-07.md) names the project owner acting as Parties, Conversations and Platform Maintainer, preserves the complete contract scope and explicitly selects Hexalith.Platform for EXT-SECRETS-1. The preceding historical coordination requests remain evidence of earlier missing packets, not a requirement for another owner to respond on GitHub after this direct declaration.
 
-Target versions/full commits, integration dates and complete executable compatibility commands remain TBD. The four records therefore remain Uncommitted under the register's status semantics. The existing Live/Full script paths are proposed delivery entry points only; their current guards correctly refuse incomplete implementations. No availability, live qualification or consuming execution is inferred from owner authorization.
+As of 2026-10-07, target versions/full commits, integration dates and complete executable compatibility commands remained TBD. The four records were then Uncommitted under the register's status semantics. The existing Live/Full script paths were proposed delivery entry points only; their guards refused incomplete implementations. No availability, live qualification or consuming execution was inferred from owner authorization. The 2026-10-10 accepted commitment rows above supersede those historical field and status observations; they do not establish availability.

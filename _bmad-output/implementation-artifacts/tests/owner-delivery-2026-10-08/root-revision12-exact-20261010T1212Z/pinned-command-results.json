@@ -1,0 +1,37 @@
+{
+  "recordedUtc": "2026-10-10T12:14:12Z",
+  "workingDirectory": "/tmp/owner-rev12-exact-juvRpH/agents",
+  "checkoutMode": "clean detached worktrees; no root-declared submodules initialized",
+  "ownerCommits": {
+    "parties": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+    "conversations": "8469c5c6891d12b43d2082136b1ca7ddfac52c3b",
+    "platform": "f448db29493c1b30b0f18380188fe99b8b7606fe"
+  },
+  "ownerWorktreesCleanBeforeAndAfter": true,
+  "results": [
+    {
+      "key": "parties",
+      "command": "test \"$(git -C ../parties rev-parse HEAD)\" = \"56cb4401c4179d431385ad3d931fefa402e4fc5a\" && test -z \"$(git -C ../parties status --porcelain)\" && pwsh -NoProfile -File ../parties/eng/verify-ext-parties-1.ps1 -Mode Live -EventStoreRoot ../eventstore -PlatformRoot ../platform -EvidenceDirectory /tmp/ext-parties-1-live",
+      "exit": 1,
+      "output": "Write-Error: Missing live inputs: EXT_PARTIES_GATEWAY_URL, EXT_PARTIES_TENANT_A, EXT_PARTIES_TENANT_B, EXT_PARTIES_PROVISIONER_CREDENTIAL, EXT_PARTIES_IDENTITY_WRITER_CREDENTIAL, EXT_PARTIES_READER_CREDENTIAL, EXT_PARTIES_POLICY_ID, EXT_PARTIES_RETENTION, EXT_PARTIES_EXPIRY_TRIGGER, EXT_PARTIES_CUSTODY_TARGET, EXT_PARTIES_RESTORE_TARGET, EXT_PARTIES_FAILURE_INJECTION_TARGET\n"
+    },
+    {
+      "key": "conversations",
+      "command": "test \"$(git -C ../conversations rev-parse HEAD)\" = \"8469c5c6891d12b43d2082136b1ca7ddfac52c3b\" && test -z \"$(git -C ../conversations status --porcelain)\" && pwsh -NoProfile -File ../conversations/eng/verify-ext-conv-ai-1.ps1 -Mode Live -ArtifactsPath /tmp/ext-conv-ai-1-live",
+      "exit": 1,
+      "output": "Exception: /tmp/owner-rev12-exact-juvRpH/conversations/eng/verify-ext-conv-ai-1.ps1:46:5\nLine |\n  46 |      throw 'Live gate closed before any calls: candidate discovery/bac …\n     |      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n     | Live gate closed before any calls: candidate\n     | discovery/backfill/pump/catalogue source is not independently qualified\n     | or installed with current authority, worker enrollment and an\n     | authenticated exact receiver acknowledgement. Production SDK source\n     | attestation/compare-append and approval bindings remain unestablished.\n     | No caller manifest can override incomplete installation or\n     | qualification. Execution requires complete installed behavior and actual\n     | Available owner records, or an explicitly accepted all-owner\n     | qualification cohort.\n"
+    },
+    {
+      "key": "secrets",
+      "command": "test \"$(git -C ../platform rev-parse HEAD)\" = \"f448db29493c1b30b0f18380188fe99b8b7606fe\" && test -z \"$(git -C ../platform status --porcelain)\" && pwsh -NoProfile -File ../platform/eng/verify-ext-secrets-1.ps1 -Mode Live -EventStoreSourceRoot ../eventstore -ArtifactsDirectory /tmp/ext-secrets-1-live-artifacts -EvidenceDirectory /tmp/ext-secrets-1-live-evidence",
+      "exit": 1,
+      "output": "Exception: /tmp/owner-rev12-exact-juvRpH/platform/eng/verify-ext-secrets-1.ps1:13:5\nLine |\n  13 |      throw 'DependencyNotAvailable: EXT-SECRETS-1. Complete live S1-S4 …\n     |      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n     | DependencyNotAvailable: EXT-SECRETS-1. Complete live S1-S4/v23\n     | qualification requires production custody/profile, independent\n     | authority, accepted targets/commands and qualified persisted\n     | installation; implemented source protocols do not establish those inputs.\n"
+    },
+    {
+      "key": "host",
+      "command": "test \"$(git -C ../platform rev-parse HEAD)\" = \"f448db29493c1b30b0f18380188fe99b8b7606fe\" && test -z \"$(git -C ../platform status --porcelain)\" && bash ../platform/eng/verify-agents-host.sh --mode Full --artifacts-path /tmp/ext-host-1-full",
+      "exit": 1,
+      "output": "ERROR: DependencyNotAvailable: EXT-HOST-1. Complete H1-H4 composition, production providers, accepted targets/commands and persisted qualification are unavailable.\n"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "version": "3.119.0",
+  "commands": [
+    {
+      "number": 7,
+      "argv": [
+        "dotnet",
+        "build",
+        "/home/administrator/projects/hexalith/eventstore/tests/Hexalith.EventStore.Client.Tests/Hexalith.EventStore.Client.Tests.csproj",
+        "-c",
+        "Debug",
+        "--artifacts-path",
+        "/tmp/hexalith-owner-rev11-client-current-7l_9u83g",
+        "-m:1",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:UseNuGetDeps=false",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore",
+        "-p:HexalithEventStoreVersion=3.119.0"
+      ],
+      "startedUtc": "2026-10-10T11:57:19.147182+00:00",
+      "finishedUtc": "2026-10-10T11:57:28.383052+00:00",
+      "exitCode": 0
+    },
+    {
+      "number": 8,
+      "argv": [
+        "dotnet",
+        "/tmp/hexalith-owner-rev11-client-current-7l_9u83g/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.AuthoritativeEventStreamReaderTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.DaprSourcePublicationIndexStoreTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.DirectoryAtomicAppendTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.SourceNamespaceSnapshotReaderTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationDispatcherTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationFeedTests",
+        "-class",
+        "Hexalith.EventStore.Client.Tests.Streams.SourcePublicationNamespaceTests",
+        "-result-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision11-full-local-20261010T114725Z/corrected-eventstore-client-final/tests.xml"
+      ],
+      "startedUtc": "2026-10-10T11:57:28.383278+00:00",
+      "finishedUtc": "2026-10-10T11:57:31.261555+00:00",
+      "exitCode": 0
+    }
+  ]
+}

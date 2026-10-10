@@ -1,0 +1,24 @@
+{
+  "observedUtc": "2026-10-10T11:52:28.205267+00:00",
+  "scope": "working tree src/eng/apphost.cs versus accepted target; test and document differences are outside this list",
+  "owners": {
+    "parties": {
+      "target": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+      "workingSourceToolDiffPaths": []
+    },
+    "conversations": {
+      "target": "8469c5c6891d12b43d2082136b1ca7ddfac52c3b",
+      "workingSourceToolDiffPaths": []
+    },
+    "platform": {
+      "target": "f448db29493c1b30b0f18380188fe99b8b7606fe",
+      "workingSourceToolDiffPaths": [
+        "src/Hexalith.Platform.Identity/P1ReceiptHttpAdapter.cs",
+        "src/Hexalith.Platform.Identity/P1ReceiptHttpDeadline.cs",
+        "src/Hexalith.Platform.Identity/P1ReceiptHttpDeadlineMonitor.cs",
+        "src/Hexalith.Platform.Identity/P1ReceiptHttpHistory.cs",
+        "src/Hexalith.Platform.Identity/P1ReceiptHttpTrust.cs"
+      ]
+    }
+  }
+}

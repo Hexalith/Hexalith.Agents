@@ -1,0 +1,149 @@
+{
+  "DependencyAvailable": false,
+  "Total": 680,
+  "BuildArguments": [
+    "build",
+    "/home/administrator/projects/hexalith/platform/tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj",
+    "-c",
+    "Debug",
+    "--artifacts-path",
+    "/tmp/hexalith-owner-revision11-xjw9na1z/custody",
+    "-m:1",
+    "-p:NuGetAudit=false",
+    "-p:MinVerVersionOverride=1.0.0",
+    "-p:UseHexalithProjectReferences=true",
+    "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore"
+  ],
+  "Mode": "Local",
+  "Scope": "Configured S1/S2/S3/S4, lifecycle/inventory/delivery/signing/decision/private-credential/spool/FR34/replay/denial/compromise source simulations; no live qualification",
+  "XmlSha256": "05e80909f6c39e71227417ba92d645c1e9a93d6c82631a871ee29d4bcf444d96",
+  "RequiredClasses": [
+    {
+      "Passed": 42,
+      "Class": "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests"
+    },
+    {
+      "Passed": 68,
+      "Class": "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests"
+    },
+    {
+      "Passed": 16,
+      "Class": "Hexalith.Platform.Custody.Tests.DeletionBatchCapabilityCodecTests"
+    },
+    {
+      "Passed": 38,
+      "Class": "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests"
+    },
+    {
+      "Passed": 26,
+      "Class": "Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests"
+    },
+    {
+      "Passed": 52,
+      "Class": "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests"
+    },
+    {
+      "Passed": 49,
+      "Class": "Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests"
+    },
+    {
+      "Passed": 27,
+      "Class": "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests"
+    },
+    {
+      "Passed": 34,
+      "Class": "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests"
+    },
+    {
+      "Passed": 9,
+      "Class": "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests"
+    },
+    {
+      "Passed": 47,
+      "Class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests"
+    },
+    {
+      "Passed": 56,
+      "Class": "Hexalith.Platform.Custody.Tests.IdentityHistoryCustodyPolicyTests"
+    },
+    {
+      "Passed": 47,
+      "Class": "Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests"
+    },
+    {
+      "Passed": 2,
+      "Class": "Hexalith.Platform.Custody.Tests.PlatformAcceptedEnvelopeTimingTests"
+    },
+    {
+      "Passed": 13,
+      "Class": "Hexalith.Platform.Custody.Tests.PlatformKeyInventoryActorTests"
+    },
+    {
+      "Passed": 11,
+      "Class": "Hexalith.Platform.Custody.Tests.PlatformSecurityDenialRecorderTests"
+    },
+    {
+      "Passed": 59,
+      "Class": "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationAuthenticatorTests"
+    },
+    {
+      "Passed": 62,
+      "Class": "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests"
+    },
+    {
+      "Passed": 3,
+      "Class": "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolWorkerTests"
+    },
+    {
+      "Passed": 19,
+      "Class": "Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests"
+    }
+  ],
+  "TestArguments": [
+    "/tmp/hexalith-owner-revision11-xjw9na1z/custody/bin/Hexalith.Platform.Custody.Tests/debug/Hexalith.Platform.Custody.Tests.dll",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.CustodyKeyLifecycleTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.CustodyPrerequisiteTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.DeletionBatchCapabilityCodecTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.DeletionBatchExecutionCoordinatorTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.DeletionCapabilityRevocationSubscriberTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.DeletionCapabilitySigningActorTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.ExportCustodyCryptographyTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.ExportKeyDeliveryActorTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.Fr34ProtectionGateTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationDeadlineTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.IdentityHistoryCleanupTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.IdentityHistoryCustodyPolicyTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.IndependentDecisionManifestVerifierTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.PlatformAcceptedEnvelopeTimingTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.PlatformKeyInventoryActorTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.PlatformSecurityDenialRecorderTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.PrivateOwnerOperationAuthenticatorTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.ReplicatedSecurityObservationSpoolWorkerTests",
+    "-class",
+    "Hexalith.Platform.Custody.Tests.TrustedEnvelopeReplayVerifierTests",
+    "-result-xml",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/root-revision11-full-local-20261010T114725Z/custody/local-tests.xml"
+  ],
+  "Passed": 680,
+  "LiveReady": false
+}

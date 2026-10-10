@@ -2,10 +2,10 @@
 title: '5.4 Prove Trusted Principal Tenant Party And Approver Readiness'
 type: 'feature'
 created: '2026-09-27'
-status: 'draft'
+status: 'ready-for-dev'
 human_approval: 'accepted'
 approved_on: '2026-10-04'
-implementation_entry: 'blocked-external-commitments'
+implementation_entry: 'ready-for-dev'
 route: 'dispatch'
 review_loop_iteration: 0
 context:
@@ -70,6 +70,7 @@ context:
 
 ## Implementation Notes
 
+- 2026-10-10 entry reconciliation: The [authoritative register](../planning-artifacts/external-dependency-register.md) now accepts `EXT-PARTIES-1`, `EXT-CONV-AI-1`, `EXT-SECRETS-1`, and `EXT-HOST-1` as `Committed`, each with an immutable owner commit, integration date, and pinned executable compatibility command. Stories 5.1 and 5.2 are done and the 2026-10-04 full-story approval remains effective. The story and sprint status therefore advance to `ready-for-dev`. Earlier dated `Uncommitted`, `TBD`, and draft/backlog observations, including the delivery disposition in the frozen section, describe the state before this acceptance. The frozen intent, Branch B, full scope, tasks, and acceptance criteria are unchanged. None of the four records is `Available`; only each owner's pinned exact-target command may execute its Committed seam to establish availability. All consuming live runtime, test, and qualification paths remain blocked with `DependencyNotAvailable` until their relevant records are `Available` and exact-target commands have passed.
 - 2026-10-04: Recorded the user's "I accept" as specification approval. No owner target, integration date or executable command was supplied by that response, and no dependency gate was waived. Preserve the approved frozen intent and acceptance criteria; retain draft/backlog pending complete owner commitments. Resume from this approval when the register's entry gate is satisfied.
 - 2026-10-06: Rechecked owner issues, installed references and sibling source. Parties identity/history and Platform identity hosting are now committed in sibling repositories; full live contracts and owner packets remain missing. Preserve prior approval, frozen intent, acceptance criteria, full scope and Branch B; retain draft/backlog. No implementation or consumer seam execution occurred.
 - 2026-10-07: Recorded the user's project-owner declaration and instruction to make the four complete commitments. Updated owner accountability and selected Hexalith.Platform for secret custody. [Commitment packet](story-5-4-owner-commitments-2026-10-07.md) retains missing target/date/complete-command fields explicitly; no current partial commit, delivery date or live success was invented. Direct owner instruction supersedes the need for another owner to respond on GitHub, while complete record and execution gates remain unchanged.
@@ -98,7 +99,7 @@ context:
 
 ## Design Notes
 
-Full-story intent and scope are settled. Unresolved delivery fields are owner commitments the code cannot supply. No irreversible operation is planned before those inputs and the applicable execution gates are satisfied. Implementation footprint remains domain, Server, EventStore, UI and tests; shared infrastructure belongs to its technical owner. [Current recheck](story-5-4-entry-recheck-2026-10-07.md) distinguishes implementation gaps from historical local evidence. No repeat scope, Branch-B or retention approval is required.
+Full-story intent and scope are settled. The four delivery commitments are accepted in the register; live availability and exact-target compatibility evidence remain outstanding. No irreversible operation is planned before the applicable execution gates are satisfied. Implementation footprint remains domain, Server, EventStore, UI and tests; shared infrastructure belongs to its technical owner. [Historical recheck](story-5-4-entry-recheck-2026-10-07.md) distinguishes implementation gaps from local evidence at that date. No repeat scope, Branch-B or retention approval is required.
 
 ## Verification
 

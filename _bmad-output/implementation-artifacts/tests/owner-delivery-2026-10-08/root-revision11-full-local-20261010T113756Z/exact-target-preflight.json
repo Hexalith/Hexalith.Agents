@@ -1,0 +1,29 @@
+{
+  "observedUtc": "2026-10-10T11:46:19.392743+00:00",
+  "preflight": {
+    "parties": {
+      "acceptedTarget": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+      "head": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+      "headMatchesTarget": true,
+      "clean": false,
+      "statusLineCount": 5,
+      "pinnedCommandPreflightPasses": false
+    },
+    "conversations": {
+      "acceptedTarget": "8469c5c6891d12b43d2082136b1ca7ddfac52c3b",
+      "head": "353e9dbf47a1472b29fe3f43d485a8ae3a03b884",
+      "headMatchesTarget": false,
+      "clean": false,
+      "statusLineCount": 17,
+      "pinnedCommandPreflightPasses": false
+    },
+    "platform": {
+      "acceptedTarget": "f448db29493c1b30b0f18380188fe99b8b7606fe",
+      "head": "5649318966792064444f6f7cb8238fa6075e7302",
+      "headMatchesTarget": false,
+      "clean": false,
+      "statusLineCount": 2,
+      "pinnedCommandPreflightPasses": false
+    }
+  }
+}

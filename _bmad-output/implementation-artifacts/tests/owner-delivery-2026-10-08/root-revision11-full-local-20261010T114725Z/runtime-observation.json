@@ -1,0 +1,11 @@
+{
+  "observedUtc": "2026-10-10T11:45:32.468738+00:00",
+  "scope": "Kubernetes resource-name observation only; services outside Kubernetes and differently named resources are not excluded",
+  "kubeconfigReference": "/home/administrator/.kube/hexalith-production",
+  "workloadKinds": "deployments,statefulsets,pods,services",
+  "matchingOwnerNamedResources": [],
+  "openbaoHexalithKeys": {
+    "ready": 3,
+    "desired": 3
+  }
+}

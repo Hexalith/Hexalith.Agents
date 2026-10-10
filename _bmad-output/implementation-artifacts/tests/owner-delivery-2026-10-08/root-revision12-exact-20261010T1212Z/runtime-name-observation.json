@@ -1,0 +1,54 @@
+{
+  "observedUtc": "2026-10-10T12:24:00Z",
+  "kubeconfigReference": "/home/administrator/.kube/hexalith-production",
+  "componentQuery": "kubectl get components.dapr.io -A -o json (metadata namespace/name/spec type only)",
+  "components": [
+    [
+      "hexalith-memories",
+      "access-telemetry-config",
+      "configuration.redis"
+    ],
+    [
+      "hexalith-memories",
+      "access-telemetry-secrets",
+      "secretstores.hashicorp.vault"
+    ],
+    [
+      "hexalith-memories",
+      "access-telemetry-store",
+      "state.postgresql"
+    ],
+    [
+      "hexalith-memories",
+      "llm-openai",
+      "conversation.openai"
+    ],
+    [
+      "hexalith-memories",
+      "pubsub",
+      "pubsub.redis"
+    ],
+    [
+      "hexalith-memories",
+      "secretstore",
+      "secretstores.hashicorp.vault"
+    ],
+    [
+      "hexalith-memories",
+      "statestore",
+      "state.redis"
+    ]
+  ],
+  "workloadKinds": [
+    "Deployment",
+    "StatefulSet",
+    "DaemonSet",
+    "Job",
+    "CronJob",
+    "Pod",
+    "Service"
+  ],
+  "matchingWorkloadNames": [],
+  "matchingHexalithOwnerImages": [],
+  "limits": "Name/image-name observation only; differently named or non-Kubernetes services are not excluded. No Secret values or workload environment values were read."
+}
