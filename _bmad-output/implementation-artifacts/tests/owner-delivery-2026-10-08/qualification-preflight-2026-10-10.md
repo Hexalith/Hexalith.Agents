@@ -55,11 +55,19 @@ application credentials, protection engine, replicated spool and failure
 model. The overlapping-export Product disposition and two deletion-scope
 decisions remain open.
 
+Hexalith.Platform is the owner of the missing host composition. Its tracked
+`apphost.cs` and `aspire.config.json` identify the source composition root;
+the Platform README marks Agents DomainService/UI wiring as planned, and the
+current Agents-enabled AppHost path refuses startup. No separate tracked
+Agents deployment manifest or installed application binding was found in the
+Platform repository. Platform must supply and qualify that composition; the
+cluster infrastructure inventory is not a substitute for it.
+
 ## Qualification route
 
-1. Identify the actual deployment/composition manifest and application
-   configuration references for host `192.168.1.30`; record references and
-   public identifiers only.
+1. Hexalith.Platform must provide the actual deployed composition manifest
+   and application configuration references for host `192.168.1.30`; record
+   references and public identifiers only.
 2. Implement and install the missing owner bindings and complete persisted
    Live/Full verification paths. The current fail-closed entry points cannot
    pass at their registered immutable commits.

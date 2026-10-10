@@ -71,6 +71,8 @@ The proposed `agents-decision-issuer` label is not an enrolled account or public
 
 ## EXT-HOST-1 — runtime references still to supply
 
+Hexalith.Platform owns this composition. From the Agents repository root, its tracked source composition files are `../platform/apphost.cs` and `../platform/aspire.config.json`; the current Agents-enabled path refuses startup, and `../platform/eng/verify-agents-host.sh --mode Full` refuses before build. The Platform README still lists Agents DomainService/UI wiring as planned. These are source references, not an installed composition manifest for `192.168.1.30` or evidence of application bindings.
+
 | Input | Verified reference / exact missing reference | Evidence source |
 | --- | --- | --- |
 | Composition manifest for `192.168.1.30`: versions | Partial: node kubelet `v1.34.9`, Dapr control plane images `1.18.1`, OpenBao image `2.6.2`. Pending — exact Agents/Parties/Conversations/EventStore/Tenants and provider version/profile manifest path. | K2–K4; these are cluster component versions only. |
