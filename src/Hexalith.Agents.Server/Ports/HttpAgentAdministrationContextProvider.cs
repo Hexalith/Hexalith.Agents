@@ -1,57 +1,69 @@
-using System;
-using System.Linq;
 using System.Security.Claims;
-
 using Microsoft.AspNetCore.Http;
 
 namespace Hexalith.Agents.Server.Ports;
 
-/// <summary>
-/// Derives the trusted <see cref="AgentAdministrationContext"/> from the authenticated principal on the current
-/// HTTP request (Story 5.2 AC4). Nothing is read from the request body or query string, so a caller cannot name a
-/// tenant it does not belong to or assert administration authority it was not granted.
-/// </summary>
-/// <remarks>
-/// The resolution is fail-closed at every step: no HTTP context, an unauthenticated principal, a missing tenant
-/// claim, or a missing Agents-administrator role all yield <see cref="AgentAdministrationContext.Anonymous"/>,
-/// which the operations surface turns into a not-authorized result before any mutation or lookup-dependent
-/// disclosure.
-/// </remarks>
-public sealed class HttpAgentAdministrationContextProvider(
-    IHttpContextAccessor httpContextAccessor) : IAgentAdministrationContextProvider
+/// <summary>Authenticates scope/subject, then selects one principal using current Tenants and Parties evidence.</summary>
+public sealed class HttpAgentAdministrationContextProvider(IHttpContextAccessor httpContextAccessor,
+    ICurrentTenantAuthoritySource? tenantSource = null, ICurrentHumanActorSource? actorSource = null,
+    IAgentDependencyAvailability? availability = null, TimeProvider? clock = null) : IAgentAdministrationContextProvider
 {
-    /// <summary>The role granting Agent administration authority within the caller's tenant.</summary>
+    /// <summary>Gets the tenant administration operation role.</summary>
     public const string AgentsAdministratorRole = "Agents.Administrator";
-
-    /// <summary>The platform operator role used for reserved-system governance.</summary>
+    /// <summary>Gets the global administration operation role.</summary>
     public const string PlatformOperatorRole = "Agents.PlatformOperator";
-
-    /// <summary>The claim types carrying the caller's tenant scope, in resolution order.</summary>
-    private static readonly string[] _tenantClaimTypes = ["tenantId", "tenant_id", "tid", "tenant"];
-
-    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor
-        ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+    private readonly TimeProvider _clock = clock ?? TimeProvider.System;
 
     /// <inheritdoc />
     public AgentAdministrationContext GetContext()
     {
-        if (_httpContextAccessor.HttpContext?.User is not { Identity.IsAuthenticated: true } user)
+        ClaimsIdentity[] identities = httpContextAccessor.HttpContext?.User.Identities.Where(item => item.IsAuthenticated).ToArray() ?? [];
+        if (identities.Length != 1)
         {
             return AgentAdministrationContext.Anonymous;
         }
 
-        string tenantId = _tenantClaimTypes
-            .Select(user.FindFirstValue)
-            .FirstOrDefault(static value => !string.IsNullOrWhiteSpace(value)) ?? string.Empty;
+        string[] tenants = identities[0].Claims.Where(item => item.Type is "tenantId" or "tenant_id" or "tid" or "tenant")
+            .Select(item => item.Value).Distinct(StringComparer.Ordinal).ToArray();
+        string[] subjects = identities[0].Claims.Where(item => item.Type is "sub" or ClaimTypes.NameIdentifier)
+            .Select(item => item.Value).Distinct(StringComparer.Ordinal).ToArray();
+        return tenants.Length <= 1 && subjects.Length == 1 && !string.IsNullOrWhiteSpace(subjects[0])
+            ? new(tenants.SingleOrDefault() ?? string.Empty, subjects[0], false)
+            : AgentAdministrationContext.Anonymous;
+    }
 
-        string actorUserId = user.FindFirstValue("sub")
-            ?? user.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? string.Empty;
+    /// <inheritdoc />
+    public async ValueTask<AgentAdministrationContext> GetContextAsync(bool platform, CancellationToken cancellationToken)
+    {
+        AgentAdministrationContext identity = GetContext();
+        if (tenantSource is null || actorSource is null || availability is null
+            || availability.Check("EXT-HOST-1") is not null || availability.Check("EXT-PARTIES-1") is not null
+            || string.IsNullOrWhiteSpace(identity.ActorUserId) || string.IsNullOrWhiteSpace(identity.TenantId))
+        {
+            return identity;
+        }
 
-        return new AgentAdministrationContext(
-            tenantId,
-            actorUserId,
-            user.IsInRole(AgentsAdministratorRole),
-            user.IsInRole(PlatformOperatorRole));
+        try
+        {
+            CurrentHumanActorEvidence? actor = await actorSource.ReadAsync(identity.TenantId, identity.ActorUserId, cancellationToken).ConfigureAwait(false);
+            TenantAuthorityEvidence? roles = await tenantSource.ReadAsync(platform ? "system" : identity.TenantId, platform, cancellationToken).ConfigureAwait(false);
+            DateTimeOffset now = _clock.GetUtcNow();
+            cancellationToken.ThrowIfCancellationRequested();
+            if (actor is null || actor.TenantId != identity.TenantId || actor.Subject != identity.ActorUserId
+                || string.IsNullOrWhiteSpace(actor.ActorId) || string.IsNullOrWhiteSpace(actor.PartyId)
+                || actor.BindingVersion <= 0 || actor.SourcePosition <= 0 || actor.ObservedAt == default
+                || actor.ObservedAt > now || actor.ValidUntil <= now
+                || !ProjectedTenantAccessReader.Grants(roles, platform ? "system" : identity.TenantId, actor.ActorId,
+                    platform ? PlatformOperatorRole : AgentsAdministratorRole, null, platform, now))
+            {
+                return identity;
+            }
+
+            return new(platform ? "system" : identity.TenantId, actor.ActorId, !platform, platform);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            return identity;
+        }
     }
 }

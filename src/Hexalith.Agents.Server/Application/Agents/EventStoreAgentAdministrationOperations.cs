@@ -224,7 +224,7 @@ public sealed class EventStoreAgentAdministrationOperations(
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
 
-        AgentAdministrationContext context = _contextProvider.GetContext();
+        AgentAdministrationContext context = await _contextProvider.GetContextAsync(false, cancellationToken).ConfigureAwait(false);
         string? correlationId = options?.CorrelationId;
         if (!context.IsAuthorized)
         {
@@ -287,7 +287,7 @@ public sealed class EventStoreAgentAdministrationOperations(
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
 
-        AgentAdministrationContext context = _contextProvider.GetContext();
+        AgentAdministrationContext context = await _contextProvider.GetContextAsync(false, cancellationToken).ConfigureAwait(false);
         if (!context.IsAuthorized)
         {
             string? deniedCorrelation = options?.CorrelationId;
