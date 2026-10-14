@@ -14,4 +14,8 @@ namespace Hexalith.Agents.Server.Ports;
 /// </remarks>
 /// <param name="Status">The fail-closed dependency verdict (only <see cref="PartyLinkValidationStatus.Valid"/> permits a link).</param>
 /// <param name="PartyId">The validated/created stable Party id (a reference, not PII), or <see langword="null"/> when none.</param>
-public sealed record AgentPartyValidationResult(PartyLinkValidationStatus Status, string? PartyId);
+public sealed record AgentPartyValidationResult(PartyLinkValidationStatus Status, string? PartyId)
+{
+    /// <summary>Gets the unavailable external record.</summary>
+    public Hexalith.Agents.Contracts.Security.DependencyNotAvailable? Dependency { get; init; }
+}

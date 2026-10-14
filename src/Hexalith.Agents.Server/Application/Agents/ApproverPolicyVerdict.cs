@@ -43,8 +43,15 @@ internal static class ApproverPolicyVerdict
         bool anyDisabled = false;
         bool anyMissing = false;
 
-        foreach (ApproverSourceResolution source in result.Sources)
+        for (int index = 0; index < result.Sources.Count; index++)
         {
+            ApproverSourceResolution source = result.Sources[index];
+            if (source.Kind != policy.Sources[index].Kind
+                || source.Kind is ApproverPolicySourceKind.Caller or ApproverPolicySourceKind.Unknown)
+            {
+                return ApproverPolicyValidationStatus.Unavailable;
+            }
+
             switch (source.Outcome)
             {
                 case ApproverSourceOutcome.Unauthorized:
@@ -64,7 +71,9 @@ internal static class ApproverPolicyVerdict
                     anyMissing = true;
                     break;
                 case ApproverSourceOutcome.Resolved:
+                    break;
                 default:
+                    anyUnavailable = true;
                     break;
             }
         }

@@ -107,10 +107,9 @@
 @code {
     private const string HeadingId = "agents-approver-policy-heading";
 
-    // The four V1 approver-source kinds (AD-8). Unknown is the sentinel and is never offered as a configurable row.
+    // Retired Caller remains readable in historical contracts and is never offered for configuration.
     private static readonly ApproverPolicySourceKind[] _v1SourceKinds =
     [
-        ApproverPolicySourceKind.Caller,
         ApproverPolicySourceKind.PredefinedParty,
         ApproverPolicySourceKind.TenantRole,
         ApproverPolicySourceKind.ConversationOwner,

@@ -102,6 +102,12 @@ public sealed class AgentInteractionGateOrchestrator
         // (1) Read every dependency through its port — each fail-closed on throw/not-available (AD-12; FR-21). No
         // provider adapter call, no Conversations post, no proposal anywhere on this path (AC2).
         TenantAccessReadResult tenant = await ReadTenantAccessAsync(request, ct).ConfigureAwait(false);
+        if (tenant is not { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true })
+        {
+            // A denied caller must not address the claimed tenant's Party, Conversation, Agent or catalog,
+            // or construct a target-domain command. Security observation is a private ingress operation.
+            return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInteractionStatus.Denied);
+        }
         AgentPartyValidationResult callerParty = await ValidatePartyAsync(request.TenantId, request.CallerPartyId, ct).ConfigureAwait(false);
         ConversationAccessReadResult conversation = await ReadConversationAccessAsync(request, ct).ConfigureAwait(false);
         AgentInvocationReadiness readiness = await ReadReadinessAsync(request, ct).ConfigureAwait(false);

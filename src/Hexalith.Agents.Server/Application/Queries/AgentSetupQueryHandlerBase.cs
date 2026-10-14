@@ -114,11 +114,6 @@ public abstract class AgentSetupQueryHandlerBase(
 
     private async Task<bool> IsAgentsAdminAsync(QueryEnvelope query, CancellationToken cancellationToken)
     {
-        if (query.IsGlobalAdmin)
-        {
-            return true;
-        }
-
         TenantAccessReadResult access = await _tenantAccessReader
             .ReadAsync(query.TenantId, query.UserId, callerPartyId: string.Empty, cancellationToken)
             .ConfigureAwait(false);

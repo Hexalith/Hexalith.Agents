@@ -17,6 +17,8 @@ namespace Hexalith.Agents.Server.Ports;
 /// <param name="IsFresh">Whether the consulted Tenants projection is within its freshness threshold.</param>
 public sealed record TenantAccessReadResult(AgentInteractionGateOutcome Outcome, bool IsFresh)
 {
+    /// <summary>Gets the unavailable external record, without any claimed resource information.</summary>
+    public Hexalith.Agents.Contracts.Security.DependencyNotAvailable? Dependency { get; init; }
     /// <summary>Gets the fail-closed not-available result (the deferred default) — unavailable and not fresh.</summary>
     public static TenantAccessReadResult Unavailable { get; } = new(AgentInteractionGateOutcome.Unavailable, false);
 }

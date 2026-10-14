@@ -761,7 +761,8 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             return "Approver policy is required.";
         }
 
-        if (policy.DisclosureCategory == ApproverPolicyBasisDisclosure.Unknown)
+        if (policy.DisclosureCategory == ApproverPolicyBasisDisclosure.Unknown
+            || !Enum.IsDefined(policy.DisclosureCategory))
         {
             return "Approver policy disclosure category must be specified.";
         }
@@ -776,10 +777,11 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             switch (source.Kind)
             {
                 case ApproverPolicySourceKind.Caller:
+                    return "Caller is a retired approver source.";
                 case ApproverPolicySourceKind.ConversationOwner:
                     if (partyId is not null || tenantRole is not null)
                     {
-                        return "Caller and ConversationOwner approver sources must not carry a PartyId or TenantRole.";
+                        return "ConversationOwner approver sources must not carry a PartyId or TenantRole.";
                     }
 
                     break;

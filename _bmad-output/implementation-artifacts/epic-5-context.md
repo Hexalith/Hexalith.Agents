@@ -4,7 +4,7 @@
 
 ## Goal
 
-Deliver live tenant-scoped `hexa` setup with shared authoritative configuration, lifecycle, readiness, and callability. Preserve history; uncertainty blocks effects.
+Let administrators configure tenant-scoped `hexa` through live public operations and receive one authoritative explanation of lifecycle, setup validity, Provider state, readiness, and callability. Preserve history and block effects whenever current authority or dependency evidence is uncertain.
 
 ## Stories
 
@@ -22,13 +22,13 @@ Deliver live tenant-scoped `hexa` setup with shared authoritative configuration,
 ## Requirements & Constraints
 
 - Platform provisions one `hexa` per tenant, create-only under Agents Service Principal. Exact retries preserve identity; divergence conflicts. Tenant administrators configure/activate/disable/inspect; second-Agent creation, deletion and Party replacement are forbidden.
-- Selected Branch B preserves the Organization Party verified by immutable tenant-scoped ID. Complete launch-contract acceptance remains required; Uncommitted development supplies no launch evidence.
+- Selected Branch B preserves the Organization Party verified by immutable tenant-scoped ID. Development evidence cannot establish live availability or launch attainment.
 - Require current Party classification/liveness, position/time, stable non-PII human actor identity and versioned current/action-time binding. Missing/stale/ambiguous/overlapping/mismatched evidence blocks; non-human Parties cannot approve.
 - Approvers require current Source Conversation participation/read access and the configured policy basis; separation compares stable human actors across principal kinds.
 - Changes require expected revisions, deterministic duplicates and persisted projections. Active never proves callable; revocation blocks. Authorize before lookup/disclosure/mutation; cross-tenant responses reveal no existence or data.
 - Provider catalog belongs to `system`; tenant enablement, selection, and versioned data-handling acceptance remain separate. Configuration applies prospectively; migration preserves history. Expose secret references/configured state only.
 - Retired Caller/safety-override/prohibited-cost values remain deserializable but cannot mutate/authorize. Unknown values block.
-- Human-binding history retains the accepted 365 fixed days from binding-effective-at, exclusive expiry. Custody/destruction/restore/successor continuity still need qualification. Interaction-content retention instead starts at terminal state.
+- Human-binding history retains the accepted 365 fixed days from binding-effective-at, exclusive expiry; custody, destruction, restore, and successor continuity need qualification. Interaction-content retention starts at terminal state.
 
 ## Technical Decisions
 
@@ -47,12 +47,12 @@ Use FrontComposer/Fluent V5. Separate lifecycle, suspension, readiness, and call
 
 ## Cross-Story Dependencies
 
-5.1 provides the boundary; 5.2/5.3 independently provide Agent/catalog operations; 5.4 authority/security; 5.5 shared readiness; 5.6 composition; 5.7 prior-setup activation. 5.8 protects later content; 5.9/5.10 tighten foundations. No later-epic dependency.
+5.1 provides the boundary; 5.2/5.3 independently provide Agent/catalog operations; 5.4 authority/security; 5.5 shared readiness; 5.6 platform composition; 5.7 prior-setup activation. 5.8 follows integration and protects content-bearing Epics 6–8; 5.9/5.10 tighten cost and retired-policy foundations. No story depends on a later story.
 
 The register alone establishes commitments. Ready-for-dev requires complete accepted Committed/Available records without TBD fields. Only an owner's accepted exact-target compatibility command may execute a Committed seam to establish Available; consumers otherwise return DependencyNotAvailable(record). Available requires live Level 4; required Level 5 completes in qualification/RQ-1. Changed contracts invalidate acceptance; failed compatibility blocks use. Fixtures supply no live attainment. Historical host evidence preserves 5.1 completion only.
 
-Full 5.4 is specification-approved and `ready-for-dev`, consuming completed Stories 5.1 and 5.2. The register accepted EXT-CONV-AI-1, EXT-HOST-1, EXT-PARTIES-1 and EXT-SECRETS-1 as Committed on 2026-10-10 with immutable owner targets, integration date 2026-10-08 and pinned complete verification commands. None is Available; their Live/Full commands have not passed against the exact targets. Contract/package work may begin, while consuming live runtime, test and qualification paths remain blocked. Complete owner engineering remains in progress. Preserve full Conversations/custody/host/shared EventStore scope; partial qualification cannot advance a broader record.
+Full 5.4 is specification-approved and its entry gate is satisfied by completed Stories 5.1/5.2 and the four commitments accepted on 2026-10-10: EXT-CONV-AI-1, EXT-HOST-1, EXT-PARTIES-1, and EXT-SECRETS-1. Each names an immutable owner target, integration date 2026-10-08, and complete pinned compatibility command. None is Available; Live/Full qualification has not passed. Contract/package implementation may proceed; consuming runtime, test, and qualification paths stay blocked. Preserve complete Conversations, custody, host, and shared EventStore scope; a subset cannot advance a broader record.
 
-Accepted inputs: environment 192.168.1.30; open, undeleted Conversations created in [from,to), including zero calls, as denominator; a dedicated Conversations service Party requiring enrollment/current machine binding, distinct from hexa/humans. Jérôme Piquot approved Product/Governance/Security/Architecture authority assignments. Actual actor/role binding, independent signer/trust, worker enrollment and live qualification remain unestablished.
+Accepted operational inputs use environment 192.168.1.30, an open/undeleted Conversations denominator for [from,to) that includes zero-call Conversations, and a dedicated Conversations service Party with enrollment/current machine binding. Accepted authority assignments still require actual actor/role binding, independent signer/trust, worker enrollment, and live qualification.
 
 5.3 invokes no Provider seam; its accepted historical Branch B non-consumption ruling and open platform-catalog migration non-conformance remain distinct. Host/protection/topology gates and conditional recorder, Instruction-protection, and legacy-plaintext decisions remain; no local default resolves them.

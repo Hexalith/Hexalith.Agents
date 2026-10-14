@@ -40,12 +40,13 @@ public abstract class AgentInteractionAuditQueryHandlerBase(
         ArgumentNullException.ThrowIfNull(query);
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (string.IsNullOrWhiteSpace(query.UserId))
+        if (string.IsNullOrWhiteSpace(query.UserId) || string.IsNullOrWhiteSpace(query.TenantId)
+            || string.IsNullOrWhiteSpace(query.AggregateId))
         {
             return QueryResult.Failure("Forbidden");
         }
 
-        bool isAuthorized = query.IsGlobalAdmin || await HasTenantAccessAsync(query, cancellationToken).ConfigureAwait(false);
+        bool isAuthorized = await HasTenantAccessAsync(query, cancellationToken).ConfigureAwait(false);
         if (!isAuthorized)
         {
             return QueryResult.FromPayload(ToElement(CreateNotAuthorizedPayload(query.CorrelationId)));
