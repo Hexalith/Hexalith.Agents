@@ -390,10 +390,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             return AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion);
         }
 
-        // Replace deterministically sets the single active identity, so there is always at most one PartyId (AC3).
-        return AgentSetupDomainResult.Applied([
-            new AgentPartyIdentityReplaced(agentId, state.PartyId, command.PartyId, state.ConfigurationVersion + 1),
-        ], state.ConfigurationVersion + 1);
+        return Invalid(agentId, "Agent Party identity is immutable; replacement is retired.");
     }
 
     /// <summary>Handles selecting an enabled Provider/model from the governed catalog for the Agent (AC1, AC2, AC3; FR-5).</summary>

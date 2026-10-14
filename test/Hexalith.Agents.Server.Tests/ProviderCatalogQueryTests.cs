@@ -50,6 +50,7 @@ public sealed class ProviderCatalogQueryTests
     {
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(
             TenantId, UserId, IsAgentsAdmin: false, IsPlatformOperator: true));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
         _tenantAccess
             .ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
@@ -446,6 +447,7 @@ public sealed class ProviderCatalogQueryTests
         Seed();
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(
             TenantId, UserId, IsAgentsAdmin: false, IsPlatformOperator: false));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
 
         ProviderCatalogInspectionResult denied = await ExecuteAsync(
             GetHandler(), Query(GetProviderCatalogEntryQuery.QueryType,
@@ -466,6 +468,7 @@ public sealed class ProviderCatalogQueryTests
         {
             _contextProvider.GetContext().Returns(new AgentAdministrationContext(
                 TenantId, "another-operator", IsAgentsAdmin: false, IsPlatformOperator: true));
+            _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
         }
 
         QueryResult wire = await GetHandler().ExecuteAsync(Query(GetProviderCatalogEntryQuery.QueryType,

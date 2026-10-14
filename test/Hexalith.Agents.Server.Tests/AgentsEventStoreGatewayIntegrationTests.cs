@@ -56,8 +56,8 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     public void Gateway_registration_is_explicit_idempotent_and_owns_setup_and_governance_adapters()
     {
         ServiceCollection gatewayServices = new();
-        _ = gatewayServices.AddAgentsEventStore(AgentsAppId);
-        _ = gatewayServices.AddAgentsEventStore(AgentsAppId);
+        _ = gatewayServices.AddAgentsEventStore(AgentsAppId, new FixtureTrustedCommandProofReader());
+        _ = gatewayServices.AddAgentsEventStore(AgentsAppId, new FixtureTrustedCommandProofReader());
         using ServiceProvider gateway = gatewayServices.BuildServiceProvider();
 
         string[] commandTypes = gateway.GetServices<IIdempotencyIntentAdapter>()
@@ -116,7 +116,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         factory.CreateActorProxy<ICoordinatedCommandActor>(Arg.Any<ActorId>(), CoordinatedCommandActor.ActorTypeName)
             .Returns(coordinator);
         ServiceCollection services = new();
-        _ = services.AddAgentsEventStore(AgentsAppId);
+        _ = services.AddAgentsEventStore(AgentsAppId, new FixtureTrustedCommandProofReader());
         services.AddLogging();
         services.AddSingleton(factory);
         services.AddSingleton(Options.Create(new EventStoreActorOptions()));
@@ -144,7 +144,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     public void Governance_admission_intent_ignores_restamped_decision_time_but_rejects_semantic_change()
     {
         ServiceCollection services = new();
-        _ = services.AddAgentsEventStore(AgentsAppId);
+        _ = services.AddAgentsEventStore(AgentsAppId, new FixtureTrustedCommandProofReader());
         using ServiceProvider provider = services.BuildServiceProvider();
         IIdempotencyIntentAdapter adapter = provider.GetServices<IIdempotencyIntentAdapter>()
             .Single(item => item.CommandType == nameof(DecideProviderDataHandling));
@@ -172,7 +172,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     public void Enablement_admission_intent_ignores_server_derived_terms_but_rejects_semantic_change()
     {
         ServiceCollection services = new();
-        _ = services.AddAgentsEventStore(AgentsAppId);
+        _ = services.AddAgentsEventStore(AgentsAppId, new FixtureTrustedCommandProofReader());
         using ServiceProvider provider = services.BuildServiceProvider();
         IIdempotencyIntentAdapter adapter = provider.GetServices<IIdempotencyIntentAdapter>()
             .Single(item => item.CommandType == nameof(SetTenantProviderModelEnablement));
@@ -204,7 +204,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         string commandType)
     {
         ServiceCollection services = new();
-        _ = services.AddAgentsEventStore(AgentsAppId);
+        _ = services.AddAgentsEventStore(AgentsAppId, new FixtureTrustedCommandProofReader());
         using ServiceProvider provider = services.BuildServiceProvider();
         IIdempotencyIntentAdapter adapter = provider.GetServices<IIdempotencyIntentAdapter>()
             .Single(item => item.CommandType == commandType);
@@ -262,7 +262,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     public void Gateway_registration_rejects_a_conflicting_Dapr_app_id()
     {
         ServiceCollection services = new();
-        _ = services.AddAgentsEventStore(AgentsAppId);
+        _ = services.AddAgentsEventStore(AgentsAppId, new FixtureTrustedCommandProofReader());
 
         Should.Throw<InvalidOperationException>(() => services.AddAgentsEventStore("other-agents"));
         using ServiceProvider provider = services.BuildServiceProvider();
@@ -888,7 +888,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     private static IdempotencyIntentAdapterRegistry Registry()
     {
         ServiceCollection services = new();
-        _ = services.AddAgentsEventStore(AgentsAppId);
+        _ = services.AddAgentsEventStore(AgentsAppId, new FixtureTrustedCommandProofReader());
         using ServiceProvider provider = services.BuildServiceProvider();
         return new IdempotencyIntentAdapterRegistry(
             provider.GetServices<IIdempotencyIntentAdapter>().ToArray(),
@@ -898,7 +898,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     private static ITrustedCommandExtensionPolicy Policy()
     {
         ServiceCollection services = new();
-        _ = services.AddAgentsEventStore(AgentsAppId);
+        _ = services.AddAgentsEventStore(AgentsAppId, new FixtureTrustedCommandProofReader());
         using ServiceProvider provider = services.BuildServiceProvider();
         return provider.GetRequiredService<ITrustedCommandExtensionPolicy>();
     }
@@ -1092,7 +1092,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         builder.Services.AddSingleton<ExtensionMetadataSanitizer>();
         if (registerAgentsIntegration)
         {
-            _ = builder.Services.AddAgentsEventStore(AgentsAppId);
+            _ = builder.Services.AddAgentsEventStore(AgentsAppId, new FixtureTrustedCommandProofReader());
         }
 
         builder.Services.AddSingleton<IIdempotencyDigestKeyProvider>(_ => CreateDigestKeyProvider());

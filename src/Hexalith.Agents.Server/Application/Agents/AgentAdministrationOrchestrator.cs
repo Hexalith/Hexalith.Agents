@@ -139,7 +139,7 @@ public sealed class AgentAdministrationOrchestrator
         {
             foreach ((string key, string value) in clientSupplied)
             {
-                if (Array.IndexOf(_reservedExtensionKeys, key) < 0)
+                if (!Hexalith.Agents.Contracts.Security.AgentTrustedExtensionKeys.IsReserved(key) && Array.IndexOf(_reservedExtensionKeys, key) < 0)
                 {
                     extensions[key] = value;
                 }

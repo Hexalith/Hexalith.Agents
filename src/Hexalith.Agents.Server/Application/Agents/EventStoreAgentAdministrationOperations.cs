@@ -45,7 +45,8 @@ public sealed class EventStoreAgentAdministrationOperations(
     IReadModelStore readModelStore,
     IOptions<AgentSetupReadModelOptions> options,
     IAgentCommandIdentityFactory identityFactory,
-    IAgentCommandStatusReader statusReader) : IAgentAdministrationOperations
+    IAgentCommandStatusReader statusReader,
+    IApproverPolicyResolver? approverResolver = null) : IAgentAdministrationOperations
 {
     private readonly IAgentAdministrationContextProvider _contextProvider = contextProvider
         ?? throw new ArgumentNullException(nameof(contextProvider));
@@ -268,14 +269,10 @@ public sealed class EventStoreAgentAdministrationOperations(
                 correlationId);
         }
 
-        return AgentOperationResult<AgentSetupResult>.Succeeded(
-            AgentSetupViewFactory.Create(
-                entry.Value,
-                context.TenantId,
-                agentId,
-                expectedConfigurationVersion,
-                isAgentsAdmin: true),
-            correlationId: correlationId);
+        AgentSetupResult setup = await AgentSetupBasisEnricher.EnrichAsync(
+            AgentSetupViewFactory.Create(entry.Value, context.TenantId, agentId, expectedConfigurationVersion, isAgentsAdmin: true),
+            entry.Value, approverResolver, cancellationToken).ConfigureAwait(false);
+        return AgentOperationResult<AgentSetupResult>.Succeeded(setup, correlationId: correlationId);
     }
 
     private async ValueTask<AgentOperationResult<AgentCommandAcceptance>> WriteAsync(

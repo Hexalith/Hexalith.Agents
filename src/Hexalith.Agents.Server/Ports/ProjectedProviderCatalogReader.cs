@@ -49,7 +49,7 @@ public sealed class ProjectedProviderCatalogReader(
         ArgumentException.ThrowIfNullOrWhiteSpace(providerId);
         ArgumentException.ThrowIfNullOrWhiteSpace(modelId);
 
-        AgentAdministrationContext context = _contextProvider.GetContext();
+        AgentAdministrationContext context = await _contextProvider.GetContextAsync(false, ct).ConfigureAwait(false);
         if (!context.IsAuthorized)
         {
             return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.NotAuthorized, null);

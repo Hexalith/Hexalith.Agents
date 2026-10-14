@@ -296,17 +296,22 @@ public sealed class ProviderCatalogCoordinationIntegrationTests
 
     private static SubmitCommand Submit<T>(string messageId, string tenant, string domain, string aggregateId,
         T payload, string authorityKey)
-        => new(messageId, tenant, domain, aggregateId, typeof(T).Name,
+        => new(CanonicalMessageId(messageId), tenant, domain, aggregateId, typeof(T).Name,
             JsonSerializer.SerializeToUtf8Bytes(payload), "correlation", "operator",
             new Dictionary<string, string> { [authorityKey] = "true" });
 
     private static EventEnvelope Persisted<T>(string messageId, long sequence, string domain, string tenant,
         string aggregateId, T payload)
-        => new(messageId, aggregateId, "aggregate", tenant, domain, sequence, sequence, _now.AddSeconds(sequence),
-            "correlation", messageId, "operator", "test", typeof(T).Name, 1, "json",
+        => new(CanonicalMessageId(messageId), aggregateId, "aggregate", tenant, domain, sequence, sequence, _now.AddSeconds(sequence),
+            "01ARZ3NDEKTSV4RRFFQ69G5FAV", CanonicalMessageId(messageId), "operator", "test", typeof(T).Name, 1, "json",
             JsonSerializer.SerializeToUtf8Bytes(payload), null);
 
     private static ProjectionEventDto Projected<T>(string messageId, long sequence, T payload)
         => new(typeof(T).Name, JsonSerializer.SerializeToUtf8Bytes(payload), "json", sequence,
             _now.AddSeconds(sequence), "correlation", messageId);
+    private static string CanonicalMessageId(string value)
+        => NUlid.Ulid.TryParse(value, out _) ? value : _canonicalMessageIds.GetOrAdd(value, static _ => NUlid.Ulid.NewUlid().ToString());
+
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> _canonicalMessageIds = new(StringComparer.Ordinal);
+
 }

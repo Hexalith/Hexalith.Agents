@@ -496,7 +496,8 @@ public sealed class ProviderCatalogMigrationTests
             .ShouldNotBeNull();
         inventory.Entries.Add(Entry() with
         {
-            ProviderId = "z-provider", ModelId = "second",
+            ProviderId = "z-provider",
+            ModelId = "second",
             Pricing = Entry().Pricing! with { Currency = currency },
         });
         _store.Seed(StoreName, key, inventory);
@@ -516,7 +517,8 @@ public sealed class ProviderCatalogMigrationTests
             .ShouldNotBeNull();
         inventory.Entries.Add(Entry() with
         {
-            ProviderId = "z-provider", ModelId = "second",
+            ProviderId = "z-provider",
+            ModelId = "second",
             SafeCapabilityFlags = ProviderModelCapabilityFlags.Streaming | (ProviderModelCapabilityFlags)(1 << 8),
         });
         _store.Seed(StoreName, key, inventory);
@@ -532,6 +534,7 @@ public sealed class ProviderCatalogMigrationTests
     {
         SeedLegacy("tenant-a", Entry());
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Services.AddSingleton<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>(Substitute.For<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>());
         builder.WebHost.UseTestServer();
         builder.Services.AddSingleton(Service());
         builder.Services.AddSingleton(AgentsClient.Unavailable());
@@ -553,6 +556,7 @@ public sealed class ProviderCatalogMigrationTests
     {
         SeedLegacy("tenant-a", Entry());
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Services.AddSingleton<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>(Substitute.For<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>());
         builder.WebHost.UseTestServer();
         builder.Services.AddSingleton(Service(isPlatformOperator: false));
         builder.Services.AddSingleton(AgentsClient.Unavailable());
@@ -626,6 +630,7 @@ public sealed class ProviderCatalogMigrationTests
         IAgentAdministrationContextProvider context = Substitute.For<IAgentAdministrationContextProvider>();
         context.GetContext().Returns(new AgentAdministrationContext(
             "tenant-a", "operator", IsAgentsAdmin: false, IsPlatformOperator: isPlatformOperator));
+        context.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => context.GetContext());
         return new(new ProviderCatalogAdministrationOrchestrator(dispatcher), context,
             new AgentCommandIdentityFactory(), _store,
             Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = StoreName }), gateway: gateway);
@@ -746,7 +751,9 @@ public sealed class ProviderCatalogMigrationTests
         _store.Seed(StoreName, ProviderCatalogReadModelAddresses.Detail(tenantId),
             new ProviderCatalogReadModel
             {
-                CatalogId = tenantId, TenantId = tenantId, Entries = [entry],
+                CatalogId = tenantId,
+                TenantId = tenantId,
+                Entries = [entry],
                 LastSequenceNumber = 1,
                 StreamSequences = new Dictionary<string, long>(StringComparer.Ordinal) { [tenantId] = 1 },
             });

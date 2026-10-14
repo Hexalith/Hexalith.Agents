@@ -82,7 +82,7 @@ public sealed class EventStoreAgentCommandDispatcherTests
             .Map(new InvalidOperationException("stream agent-hexa@7 is corrupt"))
             .ShouldBe(AgentOperationErrorCode.Unavailable);
 
-    private EventStoreAgentCommandDispatcher Dispatcher() => new(_gateway);
+    private EventStoreAgentCommandDispatcher Dispatcher() => new(_gateway, new FixtureTrustedCommandAdmission());
 
     private void CaptureSubmit()
         => _gateway

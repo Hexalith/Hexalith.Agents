@@ -42,7 +42,7 @@ internal static class AgentTestData
     /// <summary>A valid sample Approver Policy (caller + a predefined Party + a tenant role) with operator-only disclosure.</summary>
     internal static AgentApproverPolicy SampleApproverPolicy { get; } = new(
         [
-            new ApproverPolicySource(ApproverPolicySourceKind.Caller, null, null),
+            new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, null, null),
             new ApproverPolicySource(ApproverPolicySourceKind.PredefinedParty, ApproverPartyId, null),
             new ApproverPolicySource(ApproverPolicySourceKind.TenantRole, null, ApproverTenantRole),
         ],

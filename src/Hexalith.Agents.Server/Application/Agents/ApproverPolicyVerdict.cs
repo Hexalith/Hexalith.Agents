@@ -47,6 +47,7 @@ internal static class ApproverPolicyVerdict
         {
             ApproverSourceResolution source = result.Sources[index];
             if (source.Kind != policy.Sources[index].Kind
+                || (source.Source is not null && source.Source != policy.Sources[index])
                 || source.Kind is ApproverPolicySourceKind.Caller or ApproverPolicySourceKind.Unknown)
             {
                 return ApproverPolicyValidationStatus.Unavailable;

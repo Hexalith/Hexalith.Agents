@@ -9,6 +9,7 @@ using Hexalith.Agents.Contracts.Agent.Queries;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.Serialization;
 using Hexalith.Agents.Server.Ports;
+using Hexalith.Agents.Server.Application.Agents;
 using Hexalith.Agents.Server.Projections;
 
 using Hexalith.EventStore.Client.Projections;
@@ -33,7 +34,8 @@ namespace Hexalith.Agents.Server.Application.Queries;
 public abstract class AgentSetupQueryHandlerBase(
     IReadModelStore readModelStore,
     IOptions<AgentSetupReadModelOptions> options,
-    ITenantAccessReader tenantAccessReader) : IDomainQueryHandler
+    ITenantAccessReader tenantAccessReader,
+    IApproverPolicyResolver? approverResolver = null) : IDomainQueryHandler
 {
     private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web)
     {
@@ -78,12 +80,11 @@ public abstract class AgentSetupQueryHandlerBase(
                 cancellationToken)
             .ConfigureAwait(false);
 
-        return QueryResult.FromPayload(ToElement(AgentSetupViewFactory.Create(
-            entry.Value,
-            query.TenantId,
-            query.AggregateId,
-            ReadExpectedConfigurationVersion(query.Payload),
-            isAgentsAdmin: true)));
+        AgentSetupResult setup = await AgentSetupBasisEnricher.EnrichAsync(
+            AgentSetupViewFactory.Create(entry.Value, query.TenantId, query.AggregateId,
+                ReadExpectedConfigurationVersion(query.Payload), isAgentsAdmin: true),
+            entry.Value, approverResolver, cancellationToken).ConfigureAwait(false);
+        return QueryResult.FromPayload(ToElement(setup));
     }
 
     /// <summary>Serializes the payload with contract enum names.</summary>
@@ -119,26 +120,4 @@ public abstract class AgentSetupQueryHandlerBase(
             .ConfigureAwait(false);
         return access is { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true };
     }
-}
-
-/// <summary>Serves the live <see cref="GetAgentStatusQuery"/> from the persisted setup read model.</summary>
-public sealed class GetAgentStatusQueryHandler(
-    IReadModelStore readModelStore,
-    IOptions<AgentSetupReadModelOptions> options,
-    ITenantAccessReader tenantAccessReader)
-    : AgentSetupQueryHandlerBase(readModelStore, options, tenantAccessReader)
-{
-    /// <inheritdoc />
-    public override string QueryType => GetAgentStatusQuery.QueryType;
-}
-
-/// <summary>Serves the live <see cref="GetAgentConfigurationQuery"/> from the persisted setup read model.</summary>
-public sealed class GetAgentConfigurationQueryHandler(
-    IReadModelStore readModelStore,
-    IOptions<AgentSetupReadModelOptions> options,
-    ITenantAccessReader tenantAccessReader)
-    : AgentSetupQueryHandlerBase(readModelStore, options, tenantAccessReader)
-{
-    /// <inheritdoc />
-    public override string QueryType => GetAgentConfigurationQuery.QueryType;
 }

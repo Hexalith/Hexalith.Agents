@@ -39,6 +39,8 @@ public sealed record AgentOperationResult(
             AgentOperationErrorCode.Conflict => AgentOperationStatus.Conflict,
             AgentOperationErrorCode.Stale => AgentOperationStatus.Stale,
             AgentOperationErrorCode.Unavailable => AgentOperationStatus.Unavailable,
+            AgentOperationErrorCode.DependencyNotAvailable => AgentOperationStatus.Unavailable,
+            AgentOperationErrorCode.SecurityAuditUnavailable => AgentOperationStatus.Unavailable,
             AgentOperationErrorCode.Rejected => AgentOperationStatus.Rejected,
             AgentOperationErrorCode.Blocked => AgentOperationStatus.Blocked,
             AgentOperationErrorCode.UnableToVerify => AgentOperationStatus.UnableToVerify,

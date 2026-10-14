@@ -45,6 +45,7 @@ public sealed class AgentsOperationEndpointsTests
     public void Operation_endpoints_register_stable_route_area()
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Services.AddSingleton<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>(Substitute.For<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>());
         builder.Services.AddSingleton(AgentsClient.Unavailable());
 
         WebApplication app = builder.Build();
@@ -74,6 +75,7 @@ public sealed class AgentsOperationEndpointsTests
     public void Story_5_2_administration_routes_name_their_target_agent_in_the_path()
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Services.AddSingleton<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>(Substitute.For<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>());
         builder.Services.AddSingleton(AgentsClient.Unavailable());
 
         WebApplication app = builder.Build();
@@ -178,6 +180,7 @@ public sealed class AgentsOperationEndpointsTests
             .Returns(new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(accepted));
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Services.AddSingleton<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>(Substitute.For<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>());
         builder.WebHost.UseTestServer();
         builder.Services.AddSingleton(AgentsClientWith(administration));
         await using WebApplication app = builder.Build();
@@ -387,6 +390,7 @@ public sealed class AgentsOperationEndpointsTests
     public void Setup_write_handlers_declare_both_optional_retry_headers_for_endpoint_metadata()
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Services.AddSingleton<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>(Substitute.For<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>());
         builder.Services.AddSingleton(AgentsClient.Unavailable());
         WebApplication app = builder.Build();
         app.MapAgentsOperationEndpoints();
@@ -781,6 +785,7 @@ public sealed class AgentsOperationEndpointsTests
     private static WebApplication BuildApp(IAgentsClient client)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Services.AddSingleton<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>(Substitute.For<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>());
         builder.Services.AddSingleton(client);
 
         WebApplication app = builder.Build();
@@ -792,6 +797,7 @@ public sealed class AgentsOperationEndpointsTests
     private static WebApplication BuildHttpApp(IAgentsClient client)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Services.AddSingleton<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>(Substitute.For<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>());
         builder.WebHost.UseTestServer();
         builder.Services.AddSingleton(client);
 

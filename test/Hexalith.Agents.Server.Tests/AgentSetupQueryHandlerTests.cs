@@ -45,6 +45,34 @@ public sealed class AgentSetupQueryHandlerTests
             .ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
 
+    /// <summary>Verifies that same kind substituted party cannot confirm the safe query basis.</summary>
+    [Fact]
+    public async Task SameKindSubstitutedPartyCannotConfirmTheSafeQueryBasis()
+    {
+        var configured = new ApproverPolicySource(ApproverPolicySourceKind.PredefinedParty, "configured-party", null);
+        var resolver = Substitute.For<IApproverPolicyResolver>();
+        resolver.ResolveAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<CancellationToken>()).Returns(
+            new ApproverPolicyResolutionResult([new ApproverSourceResolution(ApproverPolicySourceKind.PredefinedParty, ApproverSourceOutcome.Resolved)
+            {
+                Source = new(ApproverPolicySourceKind.PredefinedParty, "substituted-party", null),
+            }]));
+        _store.Seed(StoreName, AgentSetupReadModelAddresses.Detail(TenantId, AgentId), new AgentSetupReadModel
+        {
+            IsCreated = true,
+            AgentId = AgentId,
+            TenantId = TenantId,
+            DisplayName = "hexa",
+            ApproverPolicySources = [configured],
+            ApproverPolicyDisclosure = ApproverPolicyBasisDisclosure.OperatorOnly,
+            ResponseMode = AgentResponseMode.Confirmation,
+            ConfigurationVersion = 1,
+        });
+        var handler = new GetAgentStatusQueryHandler(_store,
+            Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }), _tenantAccess, resolver);
+        var result = await ExecuteAsync(handler, Query(GetAgentStatusQuery.QueryType));
+        result.Setup.ShouldNotBeNull().Agent.ApproverPolicyBasis.Single().Status.ShouldBe(ApproverPolicyValidationStatus.Unavailable);
+    }
+
     [Fact]
     public async Task Both_setup_queries_answer_with_the_same_authoritative_truth()
     {

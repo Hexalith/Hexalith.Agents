@@ -42,7 +42,7 @@ public sealed class ProviderCatalogMigrationService(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(legacyTenantIds);
-        AgentAdministrationContext actor = contextProvider.GetContext();
+        AgentAdministrationContext actor = await contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
         if (!actor.IsPlatformOperator || string.IsNullOrWhiteSpace(actor.ActorUserId))
         {
             return new("NotAuthorized", 0, 0);

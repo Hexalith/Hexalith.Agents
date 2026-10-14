@@ -23,6 +23,20 @@ namespace Hexalith.Agents.Tests;
 /// </summary>
 public sealed class AgentApproverPolicyTests
 {
+    /// <summary>Verifies that caller remains historically readable but cannot mutate configuration.</summary>
+    [Fact]
+    public void CallerRemainsHistoricallyReadableButCannotMutateConfiguration()
+    {
+        AgentState state = StateWith(ValidCreate());
+        var policy = new AgentApproverPolicy([new(ApproverPolicySourceKind.Caller, null, null)], ApproverPolicyBasisDisclosure.OperatorOnly);
+        var command = ConfigureCommand(policy);
+        DomainResult result = AgentAggregate.Handle(command, state, Envelope(command));
+        result.IsRejection.ShouldBeTrue();
+        ApplyAll(state, result);
+        state.ApproverPolicySources.ShouldBeNull();
+        state.Apply(new AgentApproverPolicyConfigured(AgentId, policy, 1, 2));
+        state.ApproverPolicySources.ShouldNotBeNull().Single().Kind.ShouldBe(ApproverPolicySourceKind.Caller);
+    }
     private static ConfigureAgentApproverPolicy ConfigureCommand(AgentApproverPolicy? policy = null)
         => new(policy ?? SampleApproverPolicy);
 
@@ -82,18 +96,18 @@ public sealed class AgentApproverPolicyTests
         // TenantRole carrying a PartyId it must not.
         new AgentApproverPolicy([new ApproverPolicySource(ApproverPolicySourceKind.TenantRole, ApproverPartyId, ApproverTenantRole)], ApproverPolicyBasisDisclosure.OperatorOnly),
         // Caller carrying a PartyId it must not.
-        new AgentApproverPolicy([new ApproverPolicySource(ApproverPolicySourceKind.Caller, ApproverPartyId, null)], ApproverPolicyBasisDisclosure.OperatorOnly),
+        new AgentApproverPolicy([new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, ApproverPartyId, null)], ApproverPolicyBasisDisclosure.OperatorOnly),
         // ConversationOwner carrying a TenantRole it must not.
         new AgentApproverPolicy([new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, null, ApproverTenantRole)], ApproverPolicyBasisDisclosure.OperatorOnly),
         // Unknown source kind.
         new AgentApproverPolicy([new ApproverPolicySource(ApproverPolicySourceKind.Unknown, null, null)], ApproverPolicyBasisDisclosure.OperatorOnly),
         // Unknown disclosure category.
-        new AgentApproverPolicy([new ApproverPolicySource(ApproverPolicySourceKind.Caller, null, null)], ApproverPolicyBasisDisclosure.Unknown),
+        new AgentApproverPolicy([new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, null, null)], ApproverPolicyBasisDisclosure.Unknown),
         // Duplicate source.
         new AgentApproverPolicy(
             [
-                new ApproverPolicySource(ApproverPolicySourceKind.Caller, null, null),
-                new ApproverPolicySource(ApproverPolicySourceKind.Caller, null, null),
+                new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, null, null),
+                new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, null, null),
             ],
             ApproverPolicyBasisDisclosure.OperatorOnly),
     ];
@@ -141,13 +155,13 @@ public sealed class AgentApproverPolicyTests
         AgentState state = StateWith(ValidCreate());
 
         var policy = new AgentApproverPolicy(
-            [new ApproverPolicySource(ApproverPolicySourceKind.Caller, "   ", null)],
+            [new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, "   ", null)],
             ApproverPolicyBasisDisclosure.OperatorOnly);
         DomainResult result = AgentAggregate.Handle(ConfigureCommand(policy), state, Envelope(ConfigureCommand(policy)));
 
         result.IsSuccess.ShouldBeTrue();
         ApproverPolicySource stored = result.Events[0].ShouldBeOfType<AgentApproverPolicyConfigured>().Policy.Sources[0];
-        stored.Kind.ShouldBe(ApproverPolicySourceKind.Caller);
+        stored.Kind.ShouldBe(ApproverPolicySourceKind.ConversationOwner);
         stored.PartyId.ShouldBeNull(); // the whitespace reference was normalized away
     }
 
@@ -179,8 +193,8 @@ public sealed class AgentApproverPolicyTests
 
         var policy = new AgentApproverPolicy(
             [
-                new ApproverPolicySource(ApproverPolicySourceKind.Caller, "   ", null),
-                new ApproverPolicySource(ApproverPolicySourceKind.Caller, null, null),
+                new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, "   ", null),
+                new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, null, null),
             ],
             ApproverPolicyBasisDisclosure.OperatorOnly);
         DomainResult result = AgentAggregate.Handle(ConfigureCommand(policy), state, Envelope(ConfigureCommand(policy)));

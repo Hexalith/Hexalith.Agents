@@ -1,6 +1,4 @@
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
+using Hexalith.Agents.Contracts.Security;
 
 namespace Hexalith.Agents.Contracts.TrustedEnvelopeReplay;
 
@@ -16,8 +14,6 @@ public static class TrustedEnvelopeReplayIdentity
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(issuer);
         ArgumentException.ThrowIfNullOrWhiteSpace(nonce);
-        string[] components = ["trusted-envelope-replay", issuer, nonce];
-        string framed = string.Join('\u001f', components.Select(component => Encoding.UTF8.GetByteCount(component).ToString(CultureInfo.InvariantCulture) + ":" + component));
-        return Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(framed)));
+        return AgentsSecurityIdentity.Derive("trusted-envelope-replay", issuer, nonce);
     }
 }

@@ -83,17 +83,18 @@
                        never an affirmative "Available", which would render an unknown dependency as ready (AD-12
                        fail-closed). Icon (question), colour (informative) and text all agree on "unknown" (AC5). *@
                     <ul>
-                        @foreach (ApproverPolicySourceKind kind in _v1SourceKinds)
+                        @foreach (ApproverPolicyBasisEntry basis in agent.ApproverPolicyBasis.Count > 0 ? agent.ApproverPolicyBasis : _v1SourceKinds.Select(kind => new ApproverPolicyBasisEntry(kind, ApproverPolicyValidationStatus.Unknown)))
                         {
+                            ApproverPolicySourceKind kind = basis.Kind;
                             <li class="agents-approver-policy__source-row" data-testid="@($"agents-approver-policy-source-{kind}")">
                                 <span class="agents-approver-policy__source-basis">@Localizer[$"Agents.ApproverPolicy.SourceKind.{kind}"]</span>
                                 <FluentBadge Appearance="BadgeAppearance.Tint"
-                                             Color="BadgeColor.Informative"
-                                             IconStart="@FcFluentIcons.QuestionCircle16()"
+                                             Color="@(basis.Status == ApproverPolicyValidationStatus.Valid ? BadgeColor.Success : basis.Status == ApproverPolicyValidationStatus.Unknown ? BadgeColor.Informative : BadgeColor.Severe)"
+                                             IconStart="@(basis.Status == ApproverPolicyValidationStatus.Valid ? FcFluentIcons.Checkmark16() : basis.Status == ApproverPolicyValidationStatus.Unknown ? FcFluentIcons.QuestionCircle16() : FcFluentIcons.Warning16())"
                                              role="status"
-                                             aria-label="@Localizer["Agents.ApproverPolicy.SourceAvailability.Unknown"]"
+                                             aria-label="@Localizer[$"Agents.ApproverPolicy.SourceAvailability.{Availability(basis.Status)}"]"
                                              data-testid="@($"agents-approver-policy-source-availability-{kind}")">
-                                    @Localizer["Agents.ApproverPolicy.SourceAvailability.Unknown"]
+                                    @Localizer[$"Agents.ApproverPolicy.SourceAvailability.{Availability(basis.Status)}"]
                                 </FluentBadge>
                             </li>
                         }
@@ -114,6 +115,10 @@
         ApproverPolicySourceKind.TenantRole,
         ApproverPolicySourceKind.ConversationOwner,
     ];
+
+    private static string Availability(ApproverPolicyValidationStatus status)
+        => status == ApproverPolicyValidationStatus.Valid ? "Available"
+            : status == ApproverPolicyValidationStatus.Unknown ? "Unknown" : "Blocked";
 
     private FcPageHeader? _header;
     private AgentInspectionResult? _result;

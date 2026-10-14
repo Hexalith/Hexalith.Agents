@@ -92,7 +92,7 @@ public sealed class ApproverPolicyVerdictTests
         var sources = new List<ApproverPolicySource>(sourceCount);
         for (int i = 0; i < sourceCount; i++)
         {
-            sources.Add(new ApproverPolicySource(ApproverPolicySourceKind.Caller, null, null));
+            sources.Add(new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, null, null));
         }
 
         return new AgentApproverPolicy(sources, ApproverPolicyBasisDisclosure.OperatorOnly);
@@ -103,7 +103,7 @@ public sealed class ApproverPolicyVerdictTests
         var sources = new List<ApproverSourceResolution>(outcomes.Length);
         foreach (ApproverSourceOutcome outcome in outcomes)
         {
-            sources.Add(new ApproverSourceResolution(ApproverPolicySourceKind.Caller, outcome));
+            sources.Add(new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, outcome));
         }
 
         return new ApproverPolicyResolutionResult(sources);

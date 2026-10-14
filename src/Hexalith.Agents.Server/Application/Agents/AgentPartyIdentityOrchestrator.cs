@@ -68,7 +68,7 @@ public sealed class AgentPartyIdentityOrchestrator
         ArgumentNullException.ThrowIfNull(request);
 
         // (1) Authorize — fail closed before any Parties call or dispatch (AD-12).
-        if (!request.IsAgentsAdmin)
+        if (!request.IsAgentsAdmin || request.Operation == AgentPartyLinkOperation.Replace)
         {
             return AgentPartyLinkOutcome.Denied();
         }
@@ -130,7 +130,7 @@ public sealed class AgentPartyIdentityOrchestrator
         {
             foreach ((string key, string value) in clientSupplied)
             {
-                if (Array.IndexOf(_reservedExtensionKeys, key) < 0)
+                if (!Hexalith.Agents.Contracts.Security.AgentTrustedExtensionKeys.IsReserved(key) && Array.IndexOf(_reservedExtensionKeys, key) < 0)
                 {
                     extensions[key] = value;
                 }

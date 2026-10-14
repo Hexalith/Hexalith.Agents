@@ -69,7 +69,7 @@ public sealed class EventStoreProviderCatalogOperations(
         bool hasSubmissionReceipt,
         CancellationToken cancellationToken)
     {
-        AgentAdministrationContext context = await ResolveContextAsync(cancellationToken).ConfigureAwait(false);
+        AgentAdministrationContext context = await _contextProvider.GetContextAsync(targetTenantId == ProviderCatalogIdentity.PlatformTenantId, cancellationToken).ConfigureAwait(false);
         if (string.Equals(targetTenantId, "current", StringComparison.Ordinal))
         {
             targetTenantId = context.TenantId;
@@ -148,7 +148,7 @@ public sealed class EventStoreProviderCatalogOperations(
         AgentOperationOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        AgentAdministrationContext context = await ResolveContextAsync(cancellationToken).ConfigureAwait(false);
+        AgentAdministrationContext context = await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
         if (!context.IsPlatformOperator || string.IsNullOrWhiteSpace(context.ActorUserId))
         {
             return AgentOperationResult<TenantProviderEnablementInspectionResult>.Succeeded(
@@ -231,7 +231,7 @@ public sealed class EventStoreProviderCatalogOperations(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(command);
-        AgentAdministrationContext context = await ResolveContextAsync(cancellationToken).ConfigureAwait(false);
+        AgentAdministrationContext context = await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
         if (!context.IsPlatformOperator || string.IsNullOrWhiteSpace(context.ActorUserId))
         {
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized);
@@ -305,7 +305,7 @@ public sealed class EventStoreProviderCatalogOperations(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(command);
-        AgentAdministrationContext context = await ResolveContextAsync(cancellationToken).ConfigureAwait(false);
+        AgentAdministrationContext context = await _contextProvider.GetContextAsync(false, cancellationToken).ConfigureAwait(false);
         if (!context.IsAuthorized)
         {
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized);
@@ -398,7 +398,7 @@ public sealed class EventStoreProviderCatalogOperations(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(command);
-        AgentAdministrationContext context = await ResolveContextAsync(cancellationToken).ConfigureAwait(false);
+        AgentAdministrationContext context = await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
         if (!context.IsPlatformOperator || string.IsNullOrWhiteSpace(context.ActorUserId))
         {
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized);
@@ -470,7 +470,7 @@ public sealed class EventStoreProviderCatalogOperations(
         CancellationToken cancellationToken,
         int? expectedCapabilityVersion = null)
     {
-        AgentAdministrationContext context = await ResolveContextAsync(cancellationToken).ConfigureAwait(false);
+        AgentAdministrationContext context = await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
         string? correlationId = options?.CorrelationId;
         if (!context.IsPlatformOperator)
         {
@@ -535,7 +535,7 @@ public sealed class EventStoreProviderCatalogOperations(
         Func<ProviderCatalogAdministrationRequest, CancellationToken, Task<AgentAdministrationOutcome>> dispatch,
         CancellationToken cancellationToken)
     {
-        AgentAdministrationContext context = await ResolveContextAsync(cancellationToken).ConfigureAwait(false);
+        AgentAdministrationContext context = await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
         string correlationId = options?.CorrelationId is { Length: > 0 } supplied
             ? supplied
             : _identityFactory.NewCorrelationId();
@@ -591,7 +591,7 @@ public sealed class EventStoreProviderCatalogOperations(
         AgentOperationOptions? options,
         CancellationToken ct)
     {
-        AgentAdministrationContext context = await ResolveContextAsync(cancellationToken).ConfigureAwait(false);
+        AgentAdministrationContext context = await _contextProvider.GetContextAsync(false, ct).ConfigureAwait(false);
         if (!context.IsAuthorized || string.Equals(context.TenantId, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal))
         {
             return AgentOperationResult<TenantProviderCatalogInspectionResult>.Succeeded(
@@ -650,7 +650,7 @@ public sealed class EventStoreProviderCatalogOperations(
         bool platformAuthority,
         CancellationToken ct)
     {
-        AgentAdministrationContext context = await ResolveContextAsync(cancellationToken).ConfigureAwait(false);
+        AgentAdministrationContext context = await _contextProvider.GetContextAsync(platformAuthority, ct).ConfigureAwait(false);
         string correlationId = options?.CorrelationId is { Length: > 0 } supplied
             ? supplied : _identityFactory.NewCorrelationId();
         if (string.IsNullOrWhiteSpace(context.ActorUserId)
@@ -754,10 +754,4 @@ public sealed class EventStoreProviderCatalogOperations(
             _ => null,
         };
     }
-    private async ValueTask<AgentAdministrationContext> ResolveContextAsync(CancellationToken cancellationToken)
-    {
-        AgentAdministrationContext tenant = await _contextProvider.GetContextAsync(false, cancellationToken).ConfigureAwait(false);
-        return tenant.IsAuthorized ? tenant : await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
-    }
-
 }

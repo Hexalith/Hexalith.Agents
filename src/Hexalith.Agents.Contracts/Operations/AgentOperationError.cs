@@ -9,6 +9,8 @@ public sealed record AgentOperationError(
     AgentOperationErrorCode Code,
     string Message)
 {
+    /// <summary>Gets the unavailable external record, without any claimed target identity.</summary>
+    public Hexalith.Agents.Contracts.Security.DependencyNotAvailable? Dependency { get; init; }
     /// <summary>Creates a safe error from the supplied code.</summary>
     /// <param name="code">The safe error class.</param>
     /// <returns>A safe error payload.</returns>
@@ -32,6 +34,8 @@ public sealed record AgentOperationError(
             AgentOperationErrorCode.Rejected => "The operation was rejected.",
             AgentOperationErrorCode.Blocked => "The operation is blocked.",
             AgentOperationErrorCode.UnableToVerify => "The operation outcome could not be verified.",
+            AgentOperationErrorCode.DependencyNotAvailable => "A required external dependency is not available.",
+            AgentOperationErrorCode.SecurityAuditUnavailable => "Durable security observation is unavailable.",
             _ => "The operation failed.",
         };
 }

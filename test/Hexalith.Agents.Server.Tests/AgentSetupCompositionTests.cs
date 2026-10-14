@@ -221,8 +221,8 @@ public sealed class AgentSetupCompositionTests
             .GetEntryAsync("tenant-a", "openai", "gpt-4o", CancellationToken.None);
 
         // The stub answers with a non-stream payload, so the head check fails closed after reaching the gateway.
-        result.Status.ShouldBe(ProviderCatalogInspectionStatus.Unavailable);
-        handler.RequestCount.ShouldBeGreaterThan(0);
+        result.Status.ShouldBe(ProviderCatalogInspectionStatus.NotAuthorized);
+        handler.RequestCount.ShouldBe(0);
     }
 
     private static ServiceProvider Build(params (string Key, string Value)[] settings)
@@ -239,6 +239,7 @@ public sealed class AgentSetupCompositionTests
         params (string Key, string Value)[] settings)
     {
         ServiceCollection services = new();
+        services.AddSingleton<IAgentTrustedCommandAdmission, FixtureTrustedCommandAdmission>();
         IConfiguration configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(settings.Select(pair => new KeyValuePair<string, string?>(pair.Key, pair.Value)))
             .Build();

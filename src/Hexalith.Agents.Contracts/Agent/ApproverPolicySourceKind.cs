@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Hexalith.Agents.Contracts.Serialization;
 
 namespace Hexalith.Agents.Contracts.Agent;
 
@@ -14,13 +15,13 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// "owner" authority as the Conversation Facilitator unless an explicit owner resolver is added. Serialized by name
 /// so an absent value never deserializes to a concrete kind. <see cref="Unknown"/> (ordinal 0) is the sentinel.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<ApproverPolicySourceKind>))]
 public enum ApproverPolicySourceKind
 {
     /// <summary>Absent/unrecognized source-kind sentinel — never a valid configured source.</summary>
     Unknown = 0,
 
-    /// <summary>The caller (the Party that issued the Agent Call) is the approver; bound at call time.</summary>
+    /// <summary>Retired Caller value, retained only for historical deserialization and replay.</summary>
     Caller,
 
     /// <summary>A specific predefined Party (a stable Parties-owned reference, not PII — AD-7) is the approver.</summary>

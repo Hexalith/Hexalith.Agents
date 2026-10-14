@@ -43,4 +43,10 @@ public enum AgentOperationErrorCode
 
     /// <summary>The operation completed without enough trusted evidence to verify its exact outcome.</summary>
     UnableToVerify = 9,
+
+    /// <summary>An accepted external record lacks Available exact-target compatibility evidence.</summary>
+    DependencyNotAvailable = 10,
+
+    /// <summary>Durable denial capture could not be confirmed; no target command may be constructed.</summary>
+    SecurityAuditUnavailable = 11,
 }

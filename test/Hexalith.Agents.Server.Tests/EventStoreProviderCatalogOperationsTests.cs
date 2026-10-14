@@ -44,6 +44,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
     public EventStoreProviderCatalogOperationsTests()
     {
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "admin-user", IsAgentsAdmin: true, IsPlatformOperator: true));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
         _ = _gateway
             .SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
             .Returns(call =>
@@ -374,6 +375,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
         visible.Revision.ShouldBe(2);
 
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "tenant-admin", IsAgentsAdmin: true));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
         int priorGets = _store.GetCount;
         TenantProviderEnablementInspectionResult denied = (await Operations()
             .GetTenantEnablementAsync(TenantId, "openai", "gpt-4o")).Value.ShouldNotBeNull();
@@ -574,9 +576,12 @@ public sealed class EventStoreProviderCatalogOperationsTests
         ProviderDataHandlingRecord submitted = change switch
         {
             "effective-at" => terms with { EffectiveAt = DateTimeOffset.UtcNow },
-            "declaration" => terms with { TighteningDeclaration = new ProviderDataHandlingTighteningDeclaration(
+            "declaration" => terms with
+            {
+                TighteningDeclaration = new ProviderDataHandlingTighteningDeclaration(
                 0, 1, new ProviderDataHandlingFieldDiff(40, 30, false, false, [], [], "old", "terms-v1"),
-                "operator", "PlatformOperator", DateTimeOffset.UtcNow) },
+                "operator", "PlatformOperator", DateTimeOffset.UtcNow)
+            },
             _ => terms with { ProcessingRegions = null! },
         };
         var decision = new DecideProviderDataHandling("openai", "gpt-4o", 1, true, "approved", 1, submitted, default);
@@ -647,6 +652,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
     public async Task Unauthorized_create_is_denied_before_migration_field_validation()
     {
         _contextProvider.GetContext().Returns(AgentAdministrationContext.Anonymous);
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
         CreateProviderModelEntry command = CreateCommand() with { MigratedFrom = "legacy:forged" };
 
         AgentOperationResult<ProviderCatalogCommandAcceptance> result = await Operations().CreateEntryAsync(command);
@@ -737,6 +743,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
     public async Task An_unauthorized_write_does_not_dispatch()
     {
         _contextProvider.GetContext().Returns(AgentAdministrationContext.Anonymous);
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
 
         AgentOperationResult<ProviderCatalogCommandAcceptance> result = await Operations().CreateEntryAsync(CreateCommand());
 
@@ -750,12 +757,12 @@ public sealed class EventStoreProviderCatalogOperationsTests
     {
         IAgentAdministrationOperations administration = new EventStoreAgentAdministrationOperations(
             _contextProvider,
-            new AgentAdministrationOrchestrator(new EventStoreAgentCommandDispatcher(_gateway)),
-            new AgentResponseModeOrchestrator(new EventStoreAgentCommandDispatcher(_gateway)),
+            new AgentAdministrationOrchestrator(new EventStoreAgentCommandDispatcher(_gateway, new FixtureTrustedCommandAdmission())),
+            new AgentResponseModeOrchestrator(new EventStoreAgentCommandDispatcher(_gateway, new FixtureTrustedCommandAdmission())),
             new AgentActivationProviderRevalidation(
                 Substitute.For<IProviderCatalogReader>(),
                 Substitute.For<IApproverPolicyResolver>(),
-                new EventStoreAgentCommandDispatcher(_gateway)),
+                new EventStoreAgentCommandDispatcher(_gateway, new FixtureTrustedCommandAdmission())),
             _store,
             Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }),
             new AgentCommandIdentityFactory(),
@@ -775,6 +782,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
     {
         SeedProjectedEntry(1);
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "tenant-admin", IsAgentsAdmin: true));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
         int priorGets = _store.GetCount;
 
         ProviderCatalogInspectionResult result = (read == "list"
@@ -796,6 +804,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
     {
         SeedProjectedEntry(1);
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "tenant-admin", IsAgentsAdmin: true));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
         IProviderCatalogOperations operations = Operations();
 
         AgentOperationResult<ProviderCatalogCommandAcceptance> result = write switch
@@ -818,6 +827,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
     public async Task Tenant_administrator_cannot_read_platform_or_other_tenant_command_outcomes(string targetTenantId)
     {
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "tenant-admin", IsAgentsAdmin: true));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
 
         AgentOperationResult<AgentSetupWriteStatus> result = await Operations()
             .GetCommandOutcomeAsync(targetTenantId, "msg-outcome");
@@ -832,6 +842,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
         SeedTenantDecisionView();
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "operator", IsAgentsAdmin: false,
             IsPlatformOperator: true));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
         ProviderDataHandlingRecord terms = SelectableEntry(1).DataHandling.ShouldNotBeNull();
 
         AgentOperationResult<ProviderCatalogCommandAcceptance> result = await Operations().DecideDataHandlingAsync(
@@ -984,7 +995,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
 
     private IProviderCatalogOperations Operations(IReadModelStore? store = null, TimeProvider? clock = null)
     {
-        var dispatcher = new EventStoreAgentCommandDispatcher(_gateway);
+        var dispatcher = new EventStoreAgentCommandDispatcher(_gateway, new FixtureTrustedCommandAdmission());
         return new EventStoreProviderCatalogOperations(
             _contextProvider,
             new ProviderCatalogAdministrationOrchestrator(dispatcher),

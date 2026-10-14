@@ -87,9 +87,9 @@ public sealed class AgentInteractionProposalApprovalOrchestratorTests
     [Fact]
     public async Task Unauthorized_approval_dispatches_approval_failed_without_reading_version_or_posting()
     {
-        _approverPolicyResolver.ResolveAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<CancellationToken>())
+        _approverPolicyResolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
             .Returns(new ApproverPolicyResolutionResult([
-                new ApproverSourceResolution(ApproverPolicySourceKind.Caller, ApproverSourceOutcome.Unauthorized),
+                new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Unauthorized),
             ]));
         _ = _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _dispatched = e), Arg.Any<CancellationToken>());
 
@@ -252,13 +252,13 @@ public sealed class AgentInteractionProposalApprovalOrchestratorTests
 
     private static AgentApproverPolicy Policy()
         => new(
-            [new ApproverPolicySource(ApproverPolicySourceKind.Caller, PartyId: null, TenantRole: null)],
+            [new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, PartyId: null, TenantRole: null)],
             ApproverPolicyBasisDisclosure.UserVisible);
 
     private void StubAuthorized()
-        => _approverPolicyResolver.ResolveAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<CancellationToken>())
+        => _approverPolicyResolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
             .Returns(new ApproverPolicyResolutionResult([
-                new ApproverSourceResolution(ApproverPolicySourceKind.Caller, ApproverSourceOutcome.Resolved),
+                new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Resolved),
             ]));
 
     private void StubVersionAvailable()

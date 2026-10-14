@@ -72,4 +72,8 @@ public record AgentStatusView(
     bool HasConfirmationContentSafetyOverride,
     IReadOnlyList<AgentActivationBlocker> ActivationBlockers,
     IReadOnlyList<AgentLaunchReadinessBlocker> LaunchReadinessBlockers,
-    bool ProductionLikeGenerationEnabled);
+    bool ProductionLikeGenerationEnabled)
+{
+    /// <summary>Gets freshly resolved safe policy basis; absent evidence is Unknown and never implies readiness.</summary>
+    public IReadOnlyList<ApproverPolicyBasisEntry> ApproverPolicyBasis { get; init; } = [];
+}

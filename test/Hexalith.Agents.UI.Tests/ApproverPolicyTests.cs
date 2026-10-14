@@ -25,6 +25,25 @@ public sealed class ApproverPolicyTests : AgentsTestContext
         => SetupGateway.GetConfigurationAsync(Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(AgentInspectionResult.Success(view)));
 
+    /// <summary>Verifies that current basis renders the exact api sources and fail closed statuses.</summary>
+    [Fact]
+    public void CurrentBasisRendersTheExactApiSourcesAndFailClosedStatuses()
+    {
+        GivenConfiguration(AgentUiTestData.Status(AgentLifecycleStatus.Active,
+            responseMode: AgentResponseMode.Confirmation, hasApproverPolicy: true) with
+        {
+            ApproverPolicyBasis = [new(ApproverPolicySourceKind.TenantRole, ApproverPolicyValidationStatus.Unavailable)],
+        });
+        var cut = RenderPage<ApproverPolicy>();
+        cut.WaitForAssertion(() =>
+        {
+            cut.Find("[data-testid='agents-approver-policy-source-availability-TenantRole']").TextContent
+                .ShouldContain("Agents.ApproverPolicy.SourceAvailability.Blocked");
+            cut.FindAll("[data-testid='agents-approver-policy-source-PredefinedParty']").ShouldBeEmpty();
+            cut.FindAll("[data-testid='agents-approver-policy-source-Caller']").ShouldBeEmpty();
+        });
+    }
+
     [Fact]
     public void Automatic_mode_renders_the_not_applicable_state_never_blocked()
     {
@@ -62,8 +81,9 @@ public sealed class ApproverPolicyTests : AgentsTestContext
         });
     }
 
+    /// <summary>Verifies that confirmation mode with a policy renders presence version disclosure and supported source kinds.</summary>
     [Fact]
-    public void Confirmation_mode_with_a_policy_renders_presence_version_disclosure_and_all_four_source_kinds()
+    public void ConfirmationModeWithPolicyRendersPresenceVersionDisclosureAndSupportedSourceKinds()
     {
         GivenConfiguration(AgentUiTestData.Status(
             AgentLifecycleStatus.Active,
@@ -83,7 +103,7 @@ public sealed class ApproverPolicyTests : AgentsTestContext
                 .ShouldContain("Agents.ApproverPolicy.Disclosure.UserVisible");
 
             // The exactly four V1 approver-source kinds (AD-8) each render a row; Unknown is never offered.
-            cut.Find("[data-testid='agents-approver-policy-source-Caller']");
+            cut.FindAll("[data-testid='agents-approver-policy-source-Caller']").ShouldBeEmpty();
             cut.Find("[data-testid='agents-approver-policy-source-PredefinedParty']");
             cut.Find("[data-testid='agents-approver-policy-source-TenantRole']");
             cut.Find("[data-testid='agents-approver-policy-source-ConversationOwner']");
@@ -92,7 +112,7 @@ public sealed class ApproverPolicyTests : AgentsTestContext
             // Per-source availability is indeterminate without the live read path, so each row renders the neutral
             // "not yet evaluated" state — never an affirmative "Available" that would show an unknown dependency as
             // ready (AD-12 fail-closed; AC5 icon+colour+text agree on "unknown").
-            cut.Find("[data-testid='agents-approver-policy-source-availability-Caller']").TextContent
+            cut.Find("[data-testid='agents-approver-policy-source-availability-PredefinedParty']").TextContent
                 .ShouldContain("Agents.ApproverPolicy.SourceAvailability.Unknown");
             cut.Markup.ShouldNotContain("Agents.ApproverPolicy.SourceAvailability.Available");
         });

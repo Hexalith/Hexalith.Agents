@@ -66,6 +66,7 @@ public sealed class ProjectedProviderCatalogReaderTests
 
         IAgentAdministrationContextProvider context = Substitute.For<IAgentAdministrationContextProvider>();
         context.GetContext().Returns(new AgentAdministrationContext(tenantId, "admin", IsAgentsAdmin: true));
+        context.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => context.GetContext());
         IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
         gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>())
             .Returns(call =>
@@ -105,6 +106,7 @@ public sealed class ProjectedProviderCatalogReaderTests
         store.Seed(storeName, TenantProviderEnablementReadModelAddresses.Detail(tenantId), projectedTenant);
         IAgentAdministrationContextProvider context = Substitute.For<IAgentAdministrationContextProvider>();
         context.GetContext().Returns(new AgentAdministrationContext(tenantId, "admin", IsAgentsAdmin: true));
+        context.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => context.GetContext());
         IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
         gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>())
             .Returns(call =>
@@ -167,6 +169,7 @@ public sealed class ProjectedProviderCatalogReaderTests
         store.Seed(storeName, TenantProviderEnablementReadModelAddresses.Detail(tenantId), tenant);
         IAgentAdministrationContextProvider context = Substitute.For<IAgentAdministrationContextProvider>();
         context.GetContext().Returns(new AgentAdministrationContext(tenantId, "admin", IsAgentsAdmin: true));
+        context.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => context.GetContext());
         IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
         gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>())
             .Returns(call =>
@@ -275,6 +278,7 @@ public sealed class ProjectedProviderCatalogReaderTests
         store.Seed(storeName, TenantProviderEnablementReadModelAddresses.Detail(tenantId), tenant);
         IAgentAdministrationContextProvider context = Substitute.For<IAgentAdministrationContextProvider>();
         context.GetContext().Returns(new AgentAdministrationContext(tenantId, "admin", IsAgentsAdmin: true));
+        context.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => context.GetContext());
         IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
         gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>())
             .Returns(call =>

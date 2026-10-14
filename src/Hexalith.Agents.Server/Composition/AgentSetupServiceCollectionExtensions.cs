@@ -40,6 +40,16 @@ internal static class AgentSetupServiceCollectionExtensions
         services.Configure<ProviderCatalogReadModelOptions>(configuration.GetSection(ProviderCatalogReadModelOptions.SectionName));
         services.TryAddSingleton<IAgentCommandIdentityFactory, AgentCommandIdentityFactory>();
         services.AddHttpContextAccessor();
+        services.TryAddSingleton<TimeProvider>(TimeProvider.System);
+        services.TryAddSingleton<IAgentDependencyAvailability, CommittedAgentDependencyAvailability>();
+        services.TryAddSingleton<ICurrentTenantAuthoritySource, UnavailableCurrentTenantAuthoritySource>();
+        services.TryAddSingleton<ICurrentHumanActorSource, UnavailableCurrentHumanActorSource>();
+        services.TryAddSingleton<ICurrentApproverEvidenceSource, UnavailableCurrentApproverEvidenceSource>();
+        services.TryAddSingleton<IAgentTrustedCommandAdmission, UnavailableAgentTrustedCommandAdmission>();
+        services.RemoveAll<ITenantAccessReader>();
+        services.AddSingleton<ITenantAccessReader, ProjectedTenantAccessReader>();
+        services.RemoveAll<IApproverPolicyResolver>();
+        services.AddSingleton<IApproverPolicyResolver, ProjectedApproverPolicyResolver>();
         services.TryAddSingleton<IAgentAdministrationContextProvider, HttpAgentAdministrationContextProvider>();
         services.TryAddSingleton(AgentsClient.Unavailable().ProviderCatalog);
 

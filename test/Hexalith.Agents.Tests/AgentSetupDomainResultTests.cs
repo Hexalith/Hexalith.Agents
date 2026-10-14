@@ -174,11 +174,7 @@ public sealed class AgentSetupDomainResultTests
             linkState.ConfigurationVersion + 1);
 
         AgentState replaceState = StateWithLinkedParty(create);
-        var replace = new ReplaceAgentPartyIdentity("party-002");
-        yield return (
-            nameof(ReplaceAgentPartyIdentity),
-            AgentAggregate.Handle(replace, replaceState, LinkEnvelope(replace)),
-            replaceState.ConfigurationVersion + 1);
+
 
         AgentState providerState = StateWith(create);
         var provider = new SelectAgentProviderModel(SelectedProviderId, SelectedModelId, SelectedCapabilityVersion);

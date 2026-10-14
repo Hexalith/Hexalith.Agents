@@ -421,7 +421,24 @@ public sealed class AgentOperationContractsTests
             (AgentOperationErrorCode.Unavailable, 6),
             (AgentOperationErrorCode.Rejected, 7),
             (AgentOperationErrorCode.Blocked, 8),
-            (AgentOperationErrorCode.UnableToVerify, 9));
+            (AgentOperationErrorCode.UnableToVerify, 9),
+            (AgentOperationErrorCode.DependencyNotAvailable, 10),
+            (AgentOperationErrorCode.SecurityAuditUnavailable, 11));
+        Pin(
+            (ApproverPolicyValidationStatus.Unknown, 0),
+            (ApproverPolicyValidationStatus.Valid, 1),
+            (ApproverPolicyValidationStatus.Incomplete, 2),
+            (ApproverPolicyValidationStatus.Missing, 3),
+            (ApproverPolicyValidationStatus.Disabled, 4),
+            (ApproverPolicyValidationStatus.Ambiguous, 5),
+            (ApproverPolicyValidationStatus.Unavailable, 6),
+            (ApproverPolicyValidationStatus.Unauthorized, 7));
+        Pin(
+            (ApproverPolicySourceKind.Unknown, 0),
+            (ApproverPolicySourceKind.Caller, 1),
+            (ApproverPolicySourceKind.PredefinedParty, 2),
+            (ApproverPolicySourceKind.TenantRole, 3),
+            (ApproverPolicySourceKind.ConversationOwner, 4));
         Pin(
             (AgentResponseMode.Unknown, 0),
             (AgentResponseMode.Automatic, 1),

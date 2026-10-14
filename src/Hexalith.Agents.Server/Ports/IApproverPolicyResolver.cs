@@ -27,4 +27,12 @@ public interface IApproverPolicyResolver
     /// <param name="ct">The cancellation token.</param>
     /// <returns>The safe per-source resolution result (no PII, no secrets).</returns>
     Task<ApproverPolicyResolutionResult> ResolveAsync(string tenantId, AgentApproverPolicy policy, CancellationToken ct);
+
+    /// <summary>Resolves current action authority; a legacy context-free resolver grants no runtime authority.</summary>
+    Task<ApproverPolicyResolutionResult> ResolveForActorAsync(string tenantId, AgentApproverPolicy policy, ApproverResolutionContext context, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(policy);
+        return Task.FromResult(new ApproverPolicyResolutionResult(policy.Sources.Select(item =>
+            new ApproverSourceResolution(item.Kind, ApproverSourceOutcome.Unavailable)).ToArray()));
+    }
 }

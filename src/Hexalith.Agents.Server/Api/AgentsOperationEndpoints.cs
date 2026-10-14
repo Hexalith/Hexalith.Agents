@@ -27,6 +27,7 @@ public static class AgentsOperationEndpoints
         ArgumentNullException.ThrowIfNull(endpoints);
 
         RouteGroupBuilder group = endpoints.MapGroup("/api/agents/operations");
+        group.AddEndpointFilter<AgentDependencyAvailabilityFilter>();
 
         MapProviderCatalog(group);
         MapAgentAdministration(group);

@@ -24,19 +24,24 @@ namespace Hexalith.Agents.Server.Ports;
 public sealed class EventStoreAgentCommandDispatcher : IAgentCommandDispatcher
 {
     private readonly IEventStoreGatewayClient _gateway;
+    private readonly IAgentTrustedCommandAdmission _admission;
 
     /// <summary>Initializes a new instance of the <see cref="EventStoreAgentCommandDispatcher"/> class.</summary>
     /// <param name="gateway">The EventStore command/query gateway client.</param>
-    public EventStoreAgentCommandDispatcher(IEventStoreGatewayClient gateway)
+    public EventStoreAgentCommandDispatcher(IEventStoreGatewayClient gateway, IAgentTrustedCommandAdmission? admission = null)
     {
         ArgumentNullException.ThrowIfNull(gateway);
         _gateway = gateway;
+        _admission = admission ?? new UnavailableAgentTrustedCommandAdmission(new CommittedAgentDependencyAvailability());
     }
 
     /// <inheritdoc />
     public async Task<SubmitCommandResponse> DispatchAsync(CommandEnvelope envelope, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(envelope);
+        // Register first-seen before constructing the gateway target command. The ordinary dispatcher never
+        // obtains the registrar or denial-worker credential from DI.
+        envelope = await _admission.AdmitAsync(envelope, ct).ConfigureAwait(false);
 
         using JsonDocument payload = JsonDocument.Parse(
             envelope.Payload.Length == 0 ? "{}"u8.ToArray() : envelope.Payload);

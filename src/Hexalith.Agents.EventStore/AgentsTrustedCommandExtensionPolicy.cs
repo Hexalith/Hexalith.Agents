@@ -11,7 +11,7 @@ using Hexalith.EventStore.Contracts.Commands;
 
 namespace Hexalith.Agents.EventStore;
 
-internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId) : ITrustedCommandExtensionPolicy
+internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId, IAgentsTrustedCommandProofReader? proofReader = null) : ITrustedCommandExtensionPolicy
 {
     private const string AgentDomain = "agent";
     private const string ProviderCatalogDomain = "provider-catalog";
@@ -65,7 +65,8 @@ internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId) : 
             || authenticatedIdentities[0].FindAll(DaprCallerAppIdClaim).Select(claim => claim.Value).Count(value =>
                 string.Equals(value, _agentsAppId, StringComparison.Ordinal)) != 1
             || principal.FindAll(DaprCallerAppIdClaim).Count() != 1
-            || !Claims(command.Domain, command.CommandType, key))
+            || !Claims(command.Domain, command.CommandType, key)
+            || proofReader?.HasAdmittedProof(principal, command, key, value) != true)
         {
             return false;
         }

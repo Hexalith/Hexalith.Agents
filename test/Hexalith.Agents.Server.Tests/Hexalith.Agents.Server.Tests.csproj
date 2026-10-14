@@ -15,4 +15,7 @@
     <Compile Remove="ConversationClientResponsePosterTests.cs" />
   </ItemGroup>
 
+  <PropertyGroup Condition="'$(HexalithPartiesFromSource)' == 'true'">
+    <DefineConstants>$(DefineConstants);HEXALITH_PARTIES_SOURCE</DefineConstants>
+  </PropertyGroup>
 </Project>

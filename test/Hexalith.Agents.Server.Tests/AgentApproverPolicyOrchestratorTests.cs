@@ -30,7 +30,7 @@ public sealed class AgentApproverPolicyOrchestratorTests
 
     private static readonly AgentApproverPolicy _policy = new(
         [
-            new ApproverPolicySource(ApproverPolicySourceKind.Caller, null, null),
+            new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, null, null),
             new ApproverPolicySource(ApproverPolicySourceKind.PredefinedParty, "party-approver", null),
         ],
         ApproverPolicyBasisDisclosure.OperatorOnly);

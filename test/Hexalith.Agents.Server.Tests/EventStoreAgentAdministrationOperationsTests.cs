@@ -51,6 +51,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     public EventStoreAgentAdministrationOperationsTests()
     {
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "admin-user", IsAgentsAdmin: true));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
         _ = _gateway
             .SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
             .Returns(call => AppliedReceipt(call.ArgAt<SubmitCommandRequest>(0), configurationVersion: 4));
@@ -382,6 +383,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         CaptureSubmit();
         SeedProjectedSetup(configurationVersion: 2, providerId: "openai", modelId: "gpt-4o", responseMode: AgentResponseMode.Automatic);
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "intruder", IsAgentsAdmin: false));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
 
         AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(
             AgentId,
@@ -400,6 +402,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     {
         CaptureSubmit();
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "intruder", IsAgentsAdmin: false));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
 
         AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(AgentId, new DisableAgent());
 
@@ -413,6 +416,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     public async Task Authorization_precedes_even_invalid_caller_metadata()
     {
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "intruder", IsAgentsAdmin: false));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
 
         AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(
             AgentId,
@@ -429,6 +433,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     {
         SeedProjectedSetup(configurationVersion: 2);
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "intruder", IsAgentsAdmin: false));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
 
         AgentSetupResult result = (await Operations().GetStatusAsync(AgentId)).Value.ShouldNotBeNull();
 
@@ -441,6 +446,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     {
         SeedProjectedSetup(configurationVersion: 2);
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "intruder", IsAgentsAdmin: false));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
 
         AgentOperationResult<AgentSetupResult> result = await Operations().GetStatusAsync(
             AgentId,
@@ -455,6 +461,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
     {
         SeedProjectedSetup(configurationVersion: 2);
         _contextProvider.GetContext().Returns(new AgentAdministrationContext("other-tenant", "their-admin", IsAgentsAdmin: true));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
 
         AgentSetupResult result = (await Operations().GetStatusAsync(AgentId)).Value.ShouldNotBeNull();
 
@@ -924,7 +931,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
 
     private IAgentAdministrationOperations Operations()
     {
-        var dispatcher = new EventStoreAgentCommandDispatcher(_gateway);
+        var dispatcher = new EventStoreAgentCommandDispatcher(_gateway, new FixtureTrustedCommandAdmission());
         return new EventStoreAgentAdministrationOperations(
             _contextProvider,
             new AgentAdministrationOrchestrator(dispatcher),
@@ -966,7 +973,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
                 ModelId = modelId,
                 ResponseMode = responseMode,
                 ApproverPolicySources = includeApproverPolicy
-                    ? [new ApproverPolicySource(ApproverPolicySourceKind.Caller, PartyId: null, TenantRole: null)]
+                    ? [new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, PartyId: null, TenantRole: null)]
                     : [],
                 ApproverPolicyDisclosure = includeApproverPolicy
                     ? ApproverPolicyBasisDisclosure.OperatorOnly

@@ -157,23 +157,18 @@ public sealed class AgentPartyIdentityTests
         state.PartyId.ShouldBe(LinkedPartyId); // the existing link is unchanged
     }
 
+    /// <summary>Verifies that replacement with valid evidence is rejected and keeps immutable identity.</summary>
     [Fact]
-    public void Replace_with_valid_verdict_swaps_to_the_new_identity_keeping_exactly_one()
+    public void ReplacementWithValidEvidenceIsRejectedAndKeepsImmutableIdentity()
     {
         AgentState state = StateWithLinkedParty(ValidCreate());
-        int versionBeforeReplace = state.ConfigurationVersion;
-
+        int originalVersion = state.ConfigurationVersion;
         var command = new ReplaceAgentPartyIdentity(OtherPartyId);
         DomainResult result = AgentAggregate.Handle(command, state, LinkEnvelope(command));
-
-        result.IsSuccess.ShouldBeTrue();
-        AgentPartyIdentityReplaced replaced = result.Events[0].ShouldBeOfType<AgentPartyIdentityReplaced>();
-        replaced.PreviousPartyId.ShouldBe(LinkedPartyId);
-        replaced.PartyId.ShouldBe(OtherPartyId);
-        replaced.ConfigurationVersion.ShouldBe(versionBeforeReplace + 1);
-
+        result.IsRejection.ShouldBeTrue();
         ApplyAll(state, result);
-        state.PartyId.ShouldBe(OtherPartyId); // exactly one active identity, now the replacement
+        state.PartyId.ShouldBe(LinkedPartyId);
+        state.ConfigurationVersion.ShouldBe(originalVersion);
     }
 
     [Fact]
@@ -187,20 +182,16 @@ public sealed class AgentPartyIdentityTests
         result.IsNoOp.ShouldBeTrue();
     }
 
+    /// <summary>Verifies that replacement cannot link an unprovisioned identity.</summary>
     [Fact]
-    public void Replace_on_an_unlinked_agent_links_with_a_null_previous_id()
+    public void ReplacementCannotLinkAnUnprovisionedIdentity()
     {
-        AgentState state = StateWith(ValidCreate()); // no prior identity
-
+        AgentState state = StateWith(ValidCreate());
         var command = new ReplaceAgentPartyIdentity(LinkedPartyId);
         DomainResult result = AgentAggregate.Handle(command, state, LinkEnvelope(command));
-
-        AgentPartyIdentityReplaced replaced = result.Events[0].ShouldBeOfType<AgentPartyIdentityReplaced>();
-        replaced.PreviousPartyId.ShouldBeNull();
-        replaced.PartyId.ShouldBe(LinkedPartyId);
-
+        result.IsRejection.ShouldBeTrue();
         ApplyAll(state, result);
-        state.PartyId.ShouldBe(LinkedPartyId);
+        state.PartyId.ShouldBeNull();
     }
 
     [Fact]
@@ -375,8 +366,8 @@ public sealed class AgentPartyIdentityTests
 
         // Replace keeps exactly one identity.
         var replace = new ReplaceAgentPartyIdentity(OtherPartyId);
-        (await ProcessAndApplyAsync(aggregate, state, replace, LinkEnvelope(replace))).IsSuccess.ShouldBeTrue();
-        state.PartyId.ShouldBe(OtherPartyId);
+        (await ProcessAndApplyAsync(aggregate, state, replace, LinkEnvelope(replace))).IsRejection.ShouldBeTrue();
+        state.PartyId.ShouldBe(LinkedPartyId);
         state.Lifecycle.ShouldBe(AgentLifecycleStatus.Active); // replacement does not change lifecycle
     }
 

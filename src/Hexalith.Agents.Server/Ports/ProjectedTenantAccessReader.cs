@@ -4,12 +4,12 @@ namespace Hexalith.Agents.Server.Ports;
 
 /// <summary>Authorizes only a contiguous fold that corresponds to the current authoritative source head.</summary>
 public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource source, IAgentDependencyAvailability availability,
-    TimeProvider clock) : ITenantAccessReader
+    TimeProvider clock, ICurrentHumanActorSource? actorSource = null) : ITenantAccessReader
 {
     /// <inheritdoc />
     public async Task<TenantAccessReadResult> ReadAsync(string tenantId, string actorUserId, string callerPartyId, CancellationToken ct)
     {
-        if (availability.Check("EXT-HOST-1") is { } blocker)
+        if ((availability.Check("EXT-HOST-1") ?? availability.Check("EXT-PARTIES-1")) is { } blocker)
         {
             return TenantAccessReadResult.Unavailable with { Dependency = blocker };
         }
@@ -21,11 +21,25 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
 
         try
         {
+            if (actorSource is null)
+            {
+                return TenantAccessReadResult.Unavailable;
+            }
+
+            CurrentHumanActorEvidence? actor = await actorSource.ReadAsync(tenantId, actorUserId, ct).ConfigureAwait(false);
+            bool administration = string.IsNullOrEmpty(callerPartyId);
+            ct.ThrowIfCancellationRequested();
+            if (!IsCurrentActor(actor, tenantId, actorUserId, callerPartyId, administration, clock.GetUtcNow()))
+            {
+                return new(AgentInteractionGateOutcome.Unauthorized, false);
+            }
+
             TenantAuthorityEvidence? evidence = await source.ReadAsync(tenantId, false, ct).ConfigureAwait(false);
             ct.ThrowIfCancellationRequested();
-            bool administration = string.IsNullOrEmpty(callerPartyId);
-            bool granted = Grants(evidence, tenantId, actorUserId, administration ? "Agents.Administrator" : "User",
-                administration ? null : callerPartyId, false, clock.GetUtcNow());
+            DateTimeOffset now = clock.GetUtcNow();
+            bool granted = IsCurrentActor(actor, tenantId, actorUserId, callerPartyId, administration, now)
+                && Grants(evidence, tenantId, actor.ActorId, administration ? "Agents.Administrator" : "User",
+                    administration ? null : callerPartyId, false, now);
             return new(granted ? AgentInteractionGateOutcome.Satisfied : AgentInteractionGateOutcome.Unauthorized, granted);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
@@ -34,12 +48,21 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
         }
     }
 
+    private static bool IsCurrentActor([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] CurrentHumanActorEvidence? actor, string tenantId, string subject,
+        string callerPartyId, bool administration, DateTimeOffset now)
+        => actor is not null && actor.TenantId == tenantId && actor.Subject == subject
+            && !string.IsNullOrWhiteSpace(actor.ActorId) && !string.IsNullOrWhiteSpace(actor.PartyId)
+            && actor.BindingVersion > 0 && actor.SourcePosition > 0 && actor.ObservedAt != default
+            && actor.ObservedAt <= now && actor.ValidUntil > now
+            && (administration || actor.PartyId == callerPartyId);
+
     /// <summary>Checks complete source scope, event sequence, current tenant state and exact actor/role binding.</summary>
     internal static bool Grants(TenantAuthorityEvidence? evidence, string tenantId, string actorId, string role,
         string? partyId, bool global, DateTimeOffset now)
     {
         if (evidence is null || evidence.TenantId != tenantId
-            || evidence.Domain != (global ? "global-administrators" : "tenant")
+            || evidence.Domain != (global ? "global-administrators" : "tenants")
+            || evidence.SourceTenantId != "system" || evidence.SourceAggregateId != (global ? "global-administrators" : tenantId)
             || evidence.SourceHead <= 0 || evidence.Events.Count != evidence.SourceHead
             || evidence.ObservedAt == default || evidence.ObservedAt > now || evidence.ValidUntil <= now
             || evidence.ObservedAt.Offset != TimeSpan.Zero || evidence.ValidUntil.Offset != TimeSpan.Zero)

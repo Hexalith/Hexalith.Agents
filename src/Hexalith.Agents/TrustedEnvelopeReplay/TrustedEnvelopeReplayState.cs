@@ -6,10 +6,11 @@ namespace Hexalith.Agents.TrustedEnvelopeReplay;
 public sealed class TrustedEnvelopeReplayState
 {
     /// <summary>Gets the first accepted registration.</summary>
-    public RegisterTrustedEnvelopeReplay? Registration { get; private set; }
+    [System.Text.Json.Serialization.JsonInclude]
+    public RegisterTrustedEnvelopeFirstSeen? Registration { get; private set; }
 
     /// <summary>Applies the original event; contradictory accepted history cannot silently overwrite it.</summary>
-    public void Apply(TrustedEnvelopeReplayRegistered item)
+    public void Apply(TrustedEnvelopeFirstSeen item)
     {
         ArgumentNullException.ThrowIfNull(item);
         if (Registration is not null && Registration != item.Registration)
@@ -21,5 +22,6 @@ public sealed class TrustedEnvelopeReplayState
     }
 
     /// <summary>Preserves original facts when a rejected command is replayed.</summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822", Justification = "EventStore requires instance Apply methods for replay discovery.")]
     public void Apply(TrustedEnvelopeReplayRejected item) => ArgumentNullException.ThrowIfNull(item);
 }

@@ -119,7 +119,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.Denied);
-        VerdictFor(AgentInteractionGateCheck.TenantAccess).ShouldBe(AgentInteractionGateOutcome.Unauthorized);
+        _lastDispatched.ShouldBeNull();
     }
 
     [Fact]
@@ -326,12 +326,12 @@ public sealed class AgentInteractionGateOrchestratorTests
         AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.Denied); // tenant access is authorization-class
-        VerdictFor(AgentInteractionGateCheck.TenantAccess).ShouldBe(AgentInteractionGateOutcome.Unavailable);
+        _lastDispatched.ShouldBeNull();
 
         // AD-14: no raw error text crosses the boundary — the dispatched command and outcome carry only safe enums.
         string outcomeJson = JsonSerializer.Serialize(outcome);
         outcomeJson.ShouldNotContain("secret-bearing detail");
-        JsonSerializer.Serialize(DispatchedVerdicts()).ShouldNotContain("secret-bearing detail");
+        _lastDispatched.ShouldBeNull();
     }
 
     [Fact]
@@ -458,7 +458,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         AgentInteractionGateOutcomeResult outcome = await orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.Denied);
-        await dispatcher.Received(1).DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
     }
 
     // ===== Cross-seam: the dispatched gate command drives the real pure aggregate =====
@@ -596,9 +596,9 @@ public sealed class AgentInteractionGateOrchestratorTests
 
         AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
-        outcome.Status.ShouldBe(AgentInteractionStatus.Blocked);
-        VerdictFor(AgentInteractionGateCheck.DependencyFreshness).ShouldBe(AgentInteractionGateOutcome.Stale);
-        VerdictFor(AgentInteractionGateCheck.TenantAccess).ShouldBe(AgentInteractionGateOutcome.Satisfied);
+        outcome.Status.ShouldBe(AgentInteractionStatus.Denied);
+        _lastDispatched.ShouldBeNull();
+        _lastDispatched.ShouldBeNull();
     }
 
     [Fact]

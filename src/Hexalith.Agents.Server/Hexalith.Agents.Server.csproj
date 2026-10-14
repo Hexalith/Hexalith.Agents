@@ -60,4 +60,7 @@
     <DefineConstants>$(DefineConstants);HEXALITH_CONVERSATIONS_SOURCE</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(HexalithPartiesFromSource)' == 'true'">
+    <DefineConstants>$(DefineConstants);HEXALITH_PARTIES_SOURCE</DefineConstants>
+  </PropertyGroup>
 </Project>

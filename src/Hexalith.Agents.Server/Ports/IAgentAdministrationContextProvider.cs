@@ -7,7 +7,19 @@ public interface IAgentAdministrationContextProvider
     /// <returns>The trusted caller context.</returns>
     AgentAdministrationContext GetContext();
 
-    /// <summary>Resolves current authority for one operation-specific principal.</summary>
+    /// <summary>Resolves current authority for one operation-specific principal. Legacy providers preserve identity
+    /// only; their role booleans cannot establish current authority.</summary>
+    /// <param name="platform">Whether the operation requires the Platform principal.</param>
+    /// <param name="cancellationToken">The operation cancellation token.</param>
+    /// <returns>Authenticated identity with both authority flags cleared unless a current-authority adapter overrides this method.</returns>
     ValueTask<AgentAdministrationContext> GetContextAsync(bool platform, CancellationToken cancellationToken)
-        => ValueTask.FromResult(GetContext());
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        AgentAdministrationContext identity = GetContext();
+        return ValueTask.FromResult(identity with
+        {
+            IsAgentsAdmin = false,
+            IsPlatformOperator = false,
+        });
+    }
 }

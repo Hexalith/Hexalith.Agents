@@ -94,19 +94,14 @@ public sealed class AgentPartyIdentityOrchestratorTests
         await _dispatcher.DidNotReceiveWithAnyArgs().DispatchAsync(default!, default);
     }
 
+    /// <summary>Verifies that replacement stops before any party lookup provision or dispatch.</summary>
     [Fact]
-    public async Task Replace_operation_dispatches_a_replace_command()
+    public async Task ReplacementStopsBeforeAnyPartyLookupProvisionOrDispatch()
     {
-        _directory.ValidateExistingPartyAsync(TenantId, "party-002", Arg.Any<CancellationToken>())
-            .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "party-002"));
-        CaptureDispatch();
-
-        await Orchestrator.ExecuteAsync(
-            Request(partyId: "party-002", operation: AgentPartyLinkOperation.Replace), CancellationToken.None);
-
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
-        dispatched.CommandType.ShouldBe(nameof(ReplaceAgentPartyIdentity));
-        JsonSerializer.Deserialize<ReplaceAgentPartyIdentity>(dispatched.Payload)!.PartyId.ShouldBe("party-002");
+        var result = await Orchestrator.ExecuteAsync(Request(partyId: "party-002", operation: AgentPartyLinkOperation.Replace), CancellationToken.None);
+        result.Dispatched.ShouldBeFalse();
+        _directory.ReceivedCalls().ShouldBeEmpty();
+        _dispatcher.ReceivedCalls().ShouldBeEmpty();
     }
 
     [Fact]

@@ -132,7 +132,7 @@ public sealed class AgentInteractionProposalEditOrchestratorTests
     [Fact]
     public async Task A_resolver_that_throws_fails_closed_to_a_no_dispatch_denial_without_leaking()
     {
-        _resolver.ResolveAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<CancellationToken>())
+        _resolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new InvalidOperationException("resolve blew up: secret-bearing detail"));
         CaptureDispatch();
 
@@ -223,7 +223,7 @@ public sealed class AgentInteractionProposalEditOrchestratorTests
     [Fact]
     public async Task A_genuine_cancellation_propagates_and_no_command_is_dispatched()
     {
-        _resolver.ResolveAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<CancellationToken>())
+        _resolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new OperationCanceledException());
         CaptureDispatch();
 
@@ -261,11 +261,11 @@ public sealed class AgentInteractionProposalEditOrchestratorTests
         => StubResolver(ApproverSourceOutcome.Resolved);
 
     private void StubResolver(ApproverSourceOutcome sourceOutcome)
-        => _resolver.ResolveAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<CancellationToken>())
-            .Returns(new ApproverPolicyResolutionResult([new ApproverSourceResolution(ApproverPolicySourceKind.Caller, sourceOutcome)]));
+        => _resolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
+            .Returns(new ApproverPolicyResolutionResult([new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, sourceOutcome)]));
 
     private static AgentApproverPolicy SingleSourcePolicy()
-        => new([new ApproverPolicySource(ApproverPolicySourceKind.Caller, null, null)], ApproverPolicyBasisDisclosure.OperatorOnly);
+        => new([new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, null, null)], ApproverPolicyBasisDisclosure.OperatorOnly);
 
     private static AgentInteractionProposalEditRequest Request(
         AgentApproverPolicy? policy = null,

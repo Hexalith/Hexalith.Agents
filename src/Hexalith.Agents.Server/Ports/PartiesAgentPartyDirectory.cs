@@ -1,46 +1,37 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 using Hexalith.Agents.Contracts.Agent;
-
-using Hexalith.Parties.Client;
 using Hexalith.Parties.Client.Abstractions;
-using Hexalith.Parties.Contracts.Commands;
+#if HEXALITH_PARTIES_SOURCE
 using Hexalith.Parties.Contracts.Models;
+using Hexalith.Parties.Contracts.Queries;
 using Hexalith.Parties.Contracts.ValueObjects;
+#endif
 
 namespace Hexalith.Agents.Server.Ports;
 
-/// <summary>
-/// <see cref="IAgentPartyDirectory"/> adapter over the public Parties client (AD-3, AD-7, AD-12). It maps observed
-/// Party state to a fail-closed <see cref="PartyLinkValidationStatus"/> and provisions a new Agent Party as an
-/// <c>Organization</c> with a deterministic id. It returns ONLY the verdict + the stable Party id — the Parties
-/// <c>PartyDetail</c> PII fields (<c>DisplayName</c>, <c>SortName</c>, <c>PersonDetails</c>, <c>ContactChannels</c>,
-/// …) never cross this boundary back into Agents (AC1; AD-14).
-/// </summary>
+/// <summary>Consumes explicit tenant/id identity evidence only after the complete Parties record is Available.</summary>
 public sealed class PartiesAgentPartyDirectory : IAgentPartyDirectory
 {
-    private readonly IPartiesQueryClient _queryClient;
-    private readonly IPartiesCommandClient _commandClient;
+    private readonly IAgentDependencyAvailability _availability;
+    private readonly TimeProvider _clock;
+#if HEXALITH_PARTIES_SOURCE
+    private readonly IPartiesIdentityClient? _identityClient;
 
-    /// <summary>Initializes a new instance of the <see cref="PartiesAgentPartyDirectory"/> class.</summary>
-    /// <param name="queryClient">The public Parties query client.</param>
-    /// <param name="commandClient">The public Parties command client.</param>
-    public PartiesAgentPartyDirectory(IPartiesQueryClient queryClient, IPartiesCommandClient commandClient)
+    /// <summary>Composes the accepted explicit-scope current identity client.</summary>
+    public PartiesAgentPartyDirectory(IPartiesIdentityClient identityClient, IAgentDependencyAvailability availability, TimeProvider clock)
     {
-        ArgumentNullException.ThrowIfNull(queryClient);
-        ArgumentNullException.ThrowIfNull(commandClient);
-        _queryClient = queryClient;
-        _commandClient = commandClient;
+        _identityClient = identityClient;
+        _availability = availability;
+        _clock = clock;
+    }
+#endif
+    /// <summary>Legacy construction remains closed; profile queries and general Party creation confer no identity authority.</summary>
+    public PartiesAgentPartyDirectory(IPartiesQueryClient? queryClient = null, IPartiesCommandClient? commandClient = null)
+    {
+        _availability = new CommittedAgentDependencyAvailability();
+        _clock = TimeProvider.System;
     }
 
-    /// <summary>
-    /// Derives the deterministic Party id for an Agent's provisioned Organization Party, so a retried provision is
-    /// idempotent and never creates duplicate Parties (AD-13).
-    /// </summary>
-    /// <param name="agentId">The Agent id.</param>
-    /// <returns>The deterministic Party id.</returns>
+    /// <summary>Preserves the historical deterministic identity; it never authorizes replacement/provisioning.</summary>
     public static string DeriveProvisionedPartyId(string agentId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
@@ -50,87 +41,60 @@ public sealed class PartiesAgentPartyDirectory : IAgentPartyDirectory
     /// <inheritdoc />
     public async Task<AgentPartyValidationResult> ValidateExistingPartyAsync(string tenantId, string partyId, CancellationToken ct)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(partyId);
+        if (_availability.Check("EXT-PARTIES-1") is { } blocker)
+        {
+            return new(PartyLinkValidationStatus.Unavailable, null) { Dependency = blocker };
+        }
 
-        // tenantId is part of the port contract for forward tenant scoping; per-call scoping is deferred with the
-        // live runtime binding (Story 1.2/1.3). Today tenant isolation is enforced ambiently by the Parties client
-        // (the "Parties:{ Tenant }" config / caller auth context), and a cross-tenant read surfaces as 401/403 →
-        // Unauthorized below — never as a silently fresh Valid (AD-12 fail closed; FR-19 tenant isolation).
-        try
+        if (string.IsNullOrWhiteSpace(tenantId) || string.IsNullOrWhiteSpace(partyId))
         {
-            PartyDetail party = await _queryClient.GetPartyAsync(partyId, ct).ConfigureAwait(false);
-            PartyLinkValidationStatus status = MapExistingVerdict(party);
-            return new AgentPartyValidationResult(
-                status,
-                status == PartyLinkValidationStatus.Valid ? party.Id : null);
+            return new(PartyLinkValidationStatus.Unauthorized, null);
         }
-        catch (PartiesClientException ex) when (ex.Status == 404)
+#if HEXALITH_PARTIES_SOURCE
+        if (_identityClient is not null)
         {
-            // No Party matched the supplied reference.
-            return new AgentPartyValidationResult(PartyLinkValidationStatus.Missing, null);
+            try
+            {
+                DateTimeOffset started = _clock.GetUtcNow();
+                PartyIdentityResult result = await _identityClient.ResolvePartyIdentityAsync(tenantId, new ResolvePartyIdentity(tenantId, partyId), ct).ConfigureAwait(false);
+                DateTimeOffset completed = _clock.GetUtcNow();
+                ct.ThrowIfCancellationRequested();
+                if (result.Outcome != PartyIdentityOutcome.Resolved || result.Evidence is not { } evidence)
+                {
+                    return new(result.Outcome == PartyIdentityOutcome.Ineligible ? PartyLinkValidationStatus.Disabled : PartyLinkValidationStatus.Unavailable, null);
+                }
+
+                if (evidence.TenantId != tenantId || evidence.PartyId != partyId || evidence.ContractVersion != 1
+                    || evidence.SourcePosition <= 0 || string.IsNullOrWhiteSpace(evidence.ObservationId)
+                    || completed < started || evidence.ObservedAt < started || evidence.ObservedAt > completed
+                    || evidence.ObservedAt.Offset != TimeSpan.Zero || evidence.Classification is not
+                        (PartyIdentityClassification.Human or PartyIdentityClassification.Organization or PartyIdentityClassification.Agent))
+                {
+                    return new(PartyLinkValidationStatus.Unavailable, null);
+                }
+
+                return evidence.IsActive && !evidence.IsRestricted && !evidence.IsErasingOrErased
+                    ? new(PartyLinkValidationStatus.Valid, partyId) : new(PartyLinkValidationStatus.Disabled, null);
+            }
+            catch (Exception exception) when (exception is not OperationCanceledException)
+            {
+                return new(PartyLinkValidationStatus.Unavailable, null);
+            }
         }
-        catch (PartiesClientException ex) when (ex.Status is 401 or 403)
-        {
-            // Wrong-tenant scope / caller not authorized to read the Party.
-            return new AgentPartyValidationResult(PartyLinkValidationStatus.Unauthorized, null);
-        }
-        catch (PartiesClientException)
-        {
-            // Any other gateway error is dependency uncertainty — fail closed (AD-12).
-            return new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            // Transport/unexpected adapter failure — fail closed (AD-12).
-            return new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null);
-        }
+#endif
+        await Task.CompletedTask.ConfigureAwait(false);
+        return new(PartyLinkValidationStatus.Unavailable, null);
     }
 
     /// <inheritdoc />
-    public async Task<AgentPartyValidationResult> ProvisionAgentPartyAsync(string tenantId, AgentPartyProvisioningRequest request, CancellationToken ct)
+    public Task<AgentPartyValidationResult> ProvisionAgentPartyAsync(string tenantId, AgentPartyProvisioningRequest request, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(request);
-        string partyId = DeriveProvisionedPartyId(request.AgentId);
-
-        var create = new CreateParty
+        // The legacy label/id request is not the owner's immutable versioned provisioning contract. It cannot
+        // mint a replacement identity. Platform provisioning must retain the original accepted Parties intent.
+        return Task.FromResult(new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null)
         {
-            PartyId = partyId,
-            Type = PartyType.Organization, // no AiAgent/Bot/System type — Organization avoids person PII
-            OrganizationDetails = new OrganizationDetails { LegalName = request.OrganizationLabel },
-        };
-
-        try
-        {
-            // The new Party detail (and any PII it carries) stays in Parties — only the deterministic id + verdict
-            // return to the Agents side (AC1; AD-7).
-            _ = await _commandClient.CreatePartyWithResultAsync(create, ct).ConfigureAwait(false);
-            return new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, partyId);
-        }
-        catch (PartiesClientException ex) when (ex.Status is 401 or 403)
-        {
-            return new AgentPartyValidationResult(PartyLinkValidationStatus.Unauthorized, null);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            return new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null);
-        }
-    }
-
-    // Maps a returned PartyDetail to a fail-closed verdict (Dev Notes › Parties State → Verdict Mapping). A
-    // deactivated/erased/restricted Party is Disabled; a non-Current projection is Unavailable (never trusted as
-    // fresh — AD-12); otherwise Valid.
-    private static PartyLinkValidationStatus MapExistingVerdict(PartyDetail party)
-    {
-        if (!party.IsActive || party.IsErased || party.IsRestricted)
-        {
-            return PartyLinkValidationStatus.Disabled;
-        }
-
-        if (party.Freshness is { Status: not ProjectionFreshnessStatus.Current })
-        {
-            return PartyLinkValidationStatus.Unavailable;
-        }
-
-        return PartyLinkValidationStatus.Valid;
+            Dependency = _availability.Check("EXT-PARTIES-1"),
+        });
     }
 }

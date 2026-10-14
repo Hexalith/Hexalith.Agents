@@ -32,7 +32,7 @@ public sealed class AgentActivationApproverRevalidationTests
 
     private static readonly AgentApproverPolicy _policy = new(
         [
-            new ApproverPolicySource(ApproverPolicySourceKind.Caller, null, null),
+            new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, null, null),
             new ApproverPolicySource(ApproverPolicySourceKind.PredefinedParty, "party-approver", null),
         ],
         ApproverPolicyBasisDisclosure.OperatorOnly);
@@ -97,7 +97,7 @@ public sealed class AgentActivationApproverRevalidationTests
     {
         ResolverReturns(new ApproverPolicyResolutionResult(
         [
-            new ApproverSourceResolution(ApproverPolicySourceKind.Caller, ApproverSourceOutcome.Resolved),
+            new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Resolved),
             new ApproverSourceResolution(ApproverPolicySourceKind.PredefinedParty, ApproverSourceOutcome.Disabled),
         ]));
         CaptureDispatch();
@@ -141,7 +141,7 @@ public sealed class AgentActivationApproverRevalidationTests
         // the client forges a Valid verdict to try to bypass it. The resolver returns one outcome per configured source.
         ResolverReturns(new ApproverPolicyResolutionResult(
         [
-            new ApproverSourceResolution(ApproverPolicySourceKind.Caller, ApproverSourceOutcome.Missing),
+            new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Missing),
             new ApproverSourceResolution(ApproverPolicySourceKind.PredefinedParty, ApproverSourceOutcome.Resolved),
         ]));
         CaptureDispatch();
@@ -250,7 +250,7 @@ public sealed class AgentActivationApproverRevalidationTests
     private static ApproverPolicyResolutionResult AllResolved()
         => new(
         [
-            new ApproverSourceResolution(ApproverPolicySourceKind.Caller, ApproverSourceOutcome.Resolved),
+            new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Resolved),
             new ApproverSourceResolution(ApproverPolicySourceKind.PredefinedParty, ApproverSourceOutcome.Resolved),
         ]);
 

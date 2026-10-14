@@ -171,7 +171,7 @@ public sealed class AgentInteractionProposalTerminalOrchestratorTests
     [Fact]
     public async Task Resolver_cancellation_propagates_without_dispatching_terminal_command()
     {
-        _approverPolicyResolver.ResolveAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<CancellationToken>())
+        _approverPolicyResolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new OperationCanceledException());
         CaptureDispatch();
 
@@ -244,19 +244,19 @@ public sealed class AgentInteractionProposalTerminalOrchestratorTests
 
     private static AgentApproverPolicy Policy()
         => new(
-            [new ApproverPolicySource(ApproverPolicySourceKind.Caller, PartyId: null, TenantRole: null)],
+            [new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, PartyId: null, TenantRole: null)],
             ApproverPolicyBasisDisclosure.UserVisible);
 
     private void StubAuthorized()
-        => _approverPolicyResolver.ResolveAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<CancellationToken>())
+        => _approverPolicyResolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
             .Returns(new ApproverPolicyResolutionResult([
-                new ApproverSourceResolution(ApproverPolicySourceKind.Caller, ApproverSourceOutcome.Resolved),
+                new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Resolved),
             ]));
 
     private void StubUnauthorized()
-        => _approverPolicyResolver.ResolveAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<CancellationToken>())
+        => _approverPolicyResolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
             .Returns(new ApproverPolicyResolutionResult([
-                new ApproverSourceResolution(ApproverPolicySourceKind.Caller, ApproverSourceOutcome.Unauthorized),
+                new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Unauthorized),
             ]));
 
     private void CaptureDispatch()

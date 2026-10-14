@@ -40,6 +40,7 @@ public sealed class ProviderCatalogAuthorizationTests
     public async Task CrossTenantSelectionIsDenied()
     {
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "admin-user", IsAgentsAdmin: true));
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
         ProjectedProviderCatalogReader reader = Reader();
 
         ProviderCatalogEntryReadResult result = await reader.GetEntryAsync(
@@ -60,6 +61,7 @@ public sealed class ProviderCatalogAuthorizationTests
     public async Task An_unauthorized_caller_learns_nothing_about_catalog_rows()
     {
         _contextProvider.GetContext().Returns(AgentAdministrationContext.Anonymous);
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
         EventStoreProviderCatalogOperations operations = Operations();
 
         ProviderCatalogInspectionResult result = (await operations.ListEntriesAsync(includeDisabled: true))
@@ -76,6 +78,7 @@ public sealed class ProviderCatalogAuthorizationTests
     public async Task An_unauthorized_reader_does_not_address_the_store()
     {
         _contextProvider.GetContext().Returns(AgentAdministrationContext.Anonymous);
+        _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
         int getsBefore = _store.GetCount;
 
         ProviderCatalogEntryReadResult result = await Reader().GetEntryAsync(

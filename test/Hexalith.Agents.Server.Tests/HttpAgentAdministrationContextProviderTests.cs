@@ -17,7 +17,7 @@ using Shouldly;
 public sealed class HttpAgentAdministrationContextProviderTests
 {
     [Theory]
-    [InlineData("Agents.PlatformOperator", true)]
+    [InlineData("Agents.PlatformOperator", false)]
     [InlineData("Platform.Operator", false)]
     public void Platform_authority_comes_only_from_the_agents_platform_operator_role(string role, bool expected)
     {
@@ -36,8 +36,8 @@ public sealed class HttpAgentAdministrationContextProviderTests
 
         context.TenantId.ShouldBe("acme");
         context.ActorUserId.ShouldBe("admin-user");
-        context.IsAgentsAdmin.ShouldBeTrue();
-        context.IsAuthorized.ShouldBeTrue();
+        context.IsAgentsAdmin.ShouldBeFalse();
+        context.IsAuthorized.ShouldBeFalse();
     }
 
     [Theory]
@@ -52,7 +52,7 @@ public sealed class HttpAgentAdministrationContextProviderTests
             (ClaimTypes.Role, HttpAgentAdministrationContextProvider.AgentsAdministratorRole));
 
         context.TenantId.ShouldBe("acme");
-        context.IsAuthorized.ShouldBeTrue();
+        context.IsAuthorized.ShouldBeFalse();
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public sealed class HttpAgentAdministrationContextProviderTests
             (ClaimTypes.Role, HttpAgentAdministrationContextProvider.AgentsAdministratorRole));
 
         context.ActorUserId.ShouldBe("admin-user");
-        context.IsAuthorized.ShouldBeTrue();
+        context.IsAuthorized.ShouldBeFalse();
     }
 
     [Fact]

@@ -18,7 +18,8 @@ public static class AgentsEventStoreServiceCollectionExtensions
     /// <param name="services">The gateway service collection.</param>
     /// <param name="agentsAppId">The exact allow-listed Dapr application id of the trusted Agents service.</param>
     /// <returns>The service collection for chaining.</returns>
-    public static IServiceCollection AddAgentsEventStore(this IServiceCollection services, string agentsAppId)
+    public static IServiceCollection AddAgentsEventStore(this IServiceCollection services, string agentsAppId,
+        IAgentsTrustedCommandProofReader? proofReader = null)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentException.ThrowIfNullOrWhiteSpace(agentsAppId);
@@ -50,7 +51,7 @@ public static class AgentsEventStoreServiceCollectionExtensions
         services.AddIdempotencyIntentAdapter<ProviderGovernanceIdempotencyIntentAdapter<SetTenantProviderModelEnablement>>();
         services.AddIdempotencyIntentAdapter<ProviderGovernanceIdempotencyIntentAdapter<DecideProviderDataHandling>>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ITrustedCommandExtensionPolicy>(
-            new AgentsTrustedCommandExtensionPolicy(agentsAppId)));
+            new AgentsTrustedCommandExtensionPolicy(agentsAppId, proofReader)));
         services.TryAddEnumerable(ServiceDescriptor.Singleton<Hexalith.EventStore.Server.Commands.ICoordinatedCommandPolicy,
             AgentsProviderCatalogCoordinationPolicy>());
         return services;

@@ -10,7 +10,7 @@ namespace Hexalith.Agents.TrustedEnvelopeReplay;
 public sealed class TrustedEnvelopeReplayAggregate : EventStoreAggregate<TrustedEnvelopeReplayState>
 {
     /// <summary>Registers once, reuses original times on exact replay, and rejects any changed authenticated fields.</summary>
-    public static DomainResult Handle(RegisterTrustedEnvelopeReplay command, TrustedEnvelopeReplayState? state, CommandEnvelope envelope)
+    public static DomainResult Handle(RegisterTrustedEnvelopeFirstSeen command, TrustedEnvelopeReplayState? state, CommandEnvelope envelope)
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
@@ -30,10 +30,10 @@ public sealed class TrustedEnvelopeReplayAggregate : EventStoreAggregate<Trusted
             bool exact = command.Issuer == original.Issuer && command.DeliveryNonce == original.DeliveryNonce
                 && command.TargetTenantId == original.TargetTenantId && command.LogicalCommandId == original.LogicalCommandId
                 && command.SigningKeyVersion == original.SigningKeyVersion && command.CanonicalAndTagDigest == original.CanonicalAndTagDigest;
-            return exact ? DomainResult.Success([]) : DomainResult.Rejection([new TrustedEnvelopeReplayRejected("ReplayConflict")]);
+            return exact ? DomainResult.NoOp() : DomainResult.Rejection([new TrustedEnvelopeReplayRejected("ReplayConflict")]);
         }
 
-        return DomainResult.Success([new TrustedEnvelopeReplayRegistered(command)]);
+        return DomainResult.Success([new TrustedEnvelopeFirstSeen(command)]);
     }
 
     private static bool IsDigest(string value) => value is { Length: 64 } && value.All(char.IsAsciiHexDigit);

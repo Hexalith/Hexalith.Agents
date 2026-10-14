@@ -120,7 +120,7 @@ public sealed class AgentInteractionProposalApprovalOrchestrator
         try
         {
             ApproverPolicyResolutionResult resolution = await _approverPolicyResolver
-                .ResolveAsync(request.TenantId, policy, ct)
+                .ResolveForActorAsync(request.TenantId, policy, new ApproverResolutionContext(request.ActorUserId, request.ApproverPartyId, request.SourceConversationId), ct)
                 .ConfigureAwait(false);
             return ApproverPolicyVerdict.Evaluate(policy, resolution);
         }
@@ -310,7 +310,7 @@ public sealed class AgentInteractionProposalApprovalOrchestrator
         var extensions = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach ((string key, string value) in clientSupplied)
         {
-            if (Array.IndexOf(_reservedExtensionKeys, key) < 0)
+            if (!Hexalith.Agents.Contracts.Security.AgentTrustedExtensionKeys.IsReserved(key) && Array.IndexOf(_reservedExtensionKeys, key) < 0)
             {
                 extensions[key] = value;
             }
