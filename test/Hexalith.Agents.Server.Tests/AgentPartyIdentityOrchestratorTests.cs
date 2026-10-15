@@ -47,7 +47,7 @@ public sealed class AgentPartyIdentityOrchestratorTests
         outcome.Dispatched.ShouldBeTrue();
         outcome.Verdict.ShouldBe(PartyLinkValidationStatus.Valid);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.CommandType.ShouldBe(nameof(LinkAgentPartyIdentity));
         dispatched.AggregateId.ShouldBe(AgentId);
         dispatched.Extensions.ShouldNotBeNull();
@@ -74,7 +74,7 @@ public sealed class AgentPartyIdentityOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(partyId: "party-001", clientExtensions: clientExtensions), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions["party:linkValidation"].ShouldBe("Missing"); // the trusted verdict wins, not the forged "Valid"
         dispatched.Extensions["actor:agentsAdmin"].ShouldBe("true");        // repopulated from the trusted decision
@@ -116,7 +116,7 @@ public sealed class AgentPartyIdentityOrchestratorTests
 
         await _directory.Received(1).ProvisionAgentPartyAsync(TenantId, Arg.Any<AgentPartyProvisioningRequest>(), Arg.Any<CancellationToken>());
         outcome.PartyId.ShouldBe("agent-hexa");
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         JsonSerializer.Deserialize<LinkAgentPartyIdentity>(dispatched.Payload)!.PartyId.ShouldBe("agent-hexa");
     }
 
@@ -131,7 +131,7 @@ public sealed class AgentPartyIdentityOrchestratorTests
 
         outcome.Verdict.ShouldBe(PartyLinkValidationStatus.Unavailable);
         outcome.Dispatched.ShouldBeTrue();
-        await _dispatcher.Received(1).DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
         LastDispatched().ShouldNotBeNull().Extensions!["party:linkValidation"].ShouldBe("Unavailable");
     }
 
@@ -147,7 +147,7 @@ public sealed class AgentPartyIdentityOrchestratorTests
         AgentPartyLinkOutcome outcome = await Orchestrator.ExecuteAsync(Request(partyId: "party-001"), CancellationToken.None);
 
         outcome.PartyId.ShouldBe("party-001");
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         JsonSerializer.Deserialize<LinkAgentPartyIdentity>(dispatched.Payload)!.PartyId.ShouldBe("party-001");
         dispatched.Extensions!["party:linkValidation"].ShouldBe("Missing");
     }
@@ -199,13 +199,13 @@ public sealed class AgentPartyIdentityOrchestratorTests
             organizationLabel,
             clientExtensions);
 
-    private CommandEnvelope? _lastDispatched;
+    private AgentCommandIntent? _lastDispatched;
 
-    private CommandEnvelope? CaptureDispatch()
+    private AgentCommandIntent? CaptureDispatch()
     {
-        _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
+        _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
         return _lastDispatched;
     }
 
-    private CommandEnvelope? LastDispatched() => _lastDispatched;
+    private AgentCommandIntent? LastDispatched() => _lastDispatched;
 }

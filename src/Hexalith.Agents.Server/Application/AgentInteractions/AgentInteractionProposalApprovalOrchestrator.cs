@@ -248,7 +248,7 @@ public sealed class AgentInteractionProposalApprovalOrchestrator
         CancellationToken ct)
     {
         var command = new ApproveProposedAgentReply(request.AgentInteractionId, result);
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             InteractionDomain,

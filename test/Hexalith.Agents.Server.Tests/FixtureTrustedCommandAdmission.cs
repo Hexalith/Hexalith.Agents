@@ -7,6 +7,6 @@ namespace Hexalith.Agents.Server.Tests;
 internal sealed class FixtureTrustedCommandAdmission : IAgentTrustedCommandAdmission
 {
     /// <inheritdoc />
-    public Task<CommandEnvelope> AdmitAsync(CommandEnvelope intent, CancellationToken cancellationToken)
+    public Task<AgentCommandIntent> AdmitAsync(AgentCommandIntent intent, CancellationToken cancellationToken)
         => Task.FromResult(intent);
 }

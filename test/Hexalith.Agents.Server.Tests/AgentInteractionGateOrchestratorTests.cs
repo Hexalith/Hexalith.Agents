@@ -52,7 +52,7 @@ public sealed class AgentInteractionGateOrchestratorTests
     private readonly IApproverPolicyResolver _approverPolicyResolver = Substitute.For<IApproverPolicyResolver>();
     private readonly IAgentCommandDispatcher _dispatcher = Substitute.For<IAgentCommandDispatcher>();
 
-    private CommandEnvelope? _lastDispatched;
+    private AgentCommandIntent? _lastDispatched;
 
     private AgentInteractionGateOrchestrator Orchestrator => new(
         _tenantAccessReader,
@@ -76,7 +76,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         outcome.AgentInteractionId.ShouldBe(AgentInteractionId);
         outcome.Status.ShouldBe(AgentInteractionStatus.Authorized);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.CommandType.ShouldBe(nameof(EvaluateAgentInteractionGate));
         dispatched.Domain.ShouldBe("agent-interaction");
         dispatched.AggregateId.ShouldBe(AgentInteractionId);
@@ -373,7 +373,7 @@ public sealed class AgentInteractionGateOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(clientExtensions: clientExtensions), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions.ShouldNotContainKey("actor:agentsAdmin");
         dispatched.Extensions.ShouldNotContainKey("provider:selectionValidation");
@@ -413,7 +413,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         // provider adapter, no IConversationClient.AppendMessageAsync, and no proposal creation on this path (AC2). The
         // conversation seam is a READ (IConversationAccessReader.ReadAsync), and exactly one gate command is dispatched.
         await _conversationAccessReader.Received(1).ReadAsync(TenantId, SourceConversationId, CallerPartyId, Arg.Any<CancellationToken>());
-        await _dispatcher.Received(1).DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
         LastDispatched().ShouldNotBeNull().CommandType.ShouldBe(nameof(EvaluateAgentInteractionGate));
     }
 
@@ -425,7 +425,7 @@ public sealed class AgentInteractionGateOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.TenantId.ShouldBe(TenantId);
         dispatched.MessageId.ShouldBe("msg-1");
         dispatched.CorrelationId.ShouldBe("corr-1");
@@ -458,7 +458,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         AgentInteractionGateOutcomeResult outcome = await orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.Denied);
-        await dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     // ===== Cross-seam: the dispatched gate command drives the real pure aggregate =====
@@ -473,13 +473,13 @@ public sealed class AgentInteractionGateOrchestratorTests
 
         AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         var command = JsonSerializer.Deserialize<EvaluateAgentInteractionGate>(dispatched.Payload)!;
 
         var state = new AgentInteractionState();
         state.Apply(new InteractionRequested(
             AgentInteractionId, AgentId, CallerPartyId, SourceConversationId, SampleSnapshot(), "prompt", "idem"));
-        DomainResult result = AgentInteractionAggregate.Handle(command, state, dispatched);
+        DomainResult result = AgentInteractionAggregate.Handle(command, state, dispatched.ToFixtureEnvelope());
 
         AgentInteractionGateFailed failed = result.Events[0].ShouldBeOfType<AgentInteractionGateFailed>();
         // The orchestrator's returned status and the aggregate's recorded decision agree (shared policy — no drift).
@@ -679,7 +679,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         await Should.ThrowAsync<OperationCanceledException>(
             async () => await Orchestrator.ExecuteAsync(Request(), CancellationToken.None));
 
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     // ===== Helpers =====
@@ -772,9 +772,9 @@ public sealed class AgentInteractionGateOrchestratorTests
             clientExtensions);
 
     private void CaptureDispatch()
-        => _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
+        => _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
 
-    private CommandEnvelope? LastDispatched() => _lastDispatched;
+    private AgentCommandIntent? LastDispatched() => _lastDispatched;
 
     private IReadOnlyList<AgentInvocationGateVerdict> DispatchedVerdicts()
         => JsonSerializer.Deserialize<EvaluateAgentInteractionGate>(LastDispatched()!.Payload)!.Verdicts;

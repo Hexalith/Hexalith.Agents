@@ -37,7 +37,7 @@ public sealed class AgentInteractionProposalApprovalOrchestratorTests
     private readonly IApproverPolicyResolver _approverPolicyResolver = Substitute.For<IApproverPolicyResolver>();
     private readonly IAgentCommandDispatcher _dispatcher = Substitute.For<IAgentCommandDispatcher>();
 
-    private CommandEnvelope? _dispatched;
+    private AgentCommandIntent? _dispatched;
     private ConversationAppendRequest? _append;
 
     private AgentInteractionProposalApprovalOrchestrator Orchestrator => new(
@@ -59,7 +59,7 @@ public sealed class AgentInteractionProposalApprovalOrchestratorTests
             .Returns(new ConversationMembershipResult(ConversationMembershipOutcome.Present));
         _poster.AppendAgentMessageAsync(Arg.Do<ConversationAppendRequest>(r => _append = r), Arg.Any<CancellationToken>())
             .Returns(new ConversationAppendResult(ConversationAppendOutcome.Posted));
-        _ = _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _dispatched = e), Arg.Any<CancellationToken>());
+        _ = _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _dispatched = e), Arg.Any<CancellationToken>());
 
         AgentInteractionProposalApprovalOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
@@ -91,7 +91,7 @@ public sealed class AgentInteractionProposalApprovalOrchestratorTests
             .Returns(new ApproverPolicyResolutionResult([
                 new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Unauthorized),
             ]));
-        _ = _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _dispatched = e), Arg.Any<CancellationToken>());
+        _ = _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _dispatched = e), Arg.Any<CancellationToken>());
 
         AgentInteractionProposalApprovalOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
@@ -110,7 +110,7 @@ public sealed class AgentInteractionProposalApprovalOrchestratorTests
 
         outcome.Status.ShouldBe(AgentInteractionStatus.Unknown);
         outcome.NotApprovableReason.ShouldBe(AgentProposedReplyNotApprovableReason.ProposalNotPending);
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -212,7 +212,7 @@ public sealed class AgentInteractionProposalApprovalOrchestratorTests
         await Should.ThrowAsync<OperationCanceledException>(
             async () => await Orchestrator.ExecuteAsync(Request(), CancellationToken.None));
 
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -278,5 +278,5 @@ public sealed class AgentInteractionProposalApprovalOrchestratorTests
             .Returns(new ConversationAppendResult(outcome));
 
     private void CaptureDispatch()
-        => _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _dispatched = e), Arg.Any<CancellationToken>());
+        => _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _dispatched = e), Arg.Any<CancellationToken>());
 }

@@ -52,7 +52,7 @@ public sealed class AgentContentSafetyPolicyOrchestratorTests
         outcome.Authorized.ShouldBeTrue();
         outcome.Dispatched.ShouldBeTrue();
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.CommandType.ShouldBe(nameof(ConfigureAgentContentSafetyPolicy));
         dispatched.AggregateId.ShouldBe(AgentId);
         dispatched.Extensions.ShouldNotBeNull();
@@ -81,7 +81,7 @@ public sealed class AgentContentSafetyPolicyOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(clientExtensions), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions["actor:agentsAdmin"].ShouldBe("true");
         dispatched.Extensions.ContainsKey("provider:selectionValidation").ShouldBeFalse();
@@ -114,10 +114,10 @@ public sealed class AgentContentSafetyPolicyOrchestratorTests
             _configuration,
             clientExtensions);
 
-    private CommandEnvelope? _lastDispatched;
+    private AgentCommandIntent? _lastDispatched;
 
     private void CaptureDispatch()
-        => _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
+        => _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
 
-    private CommandEnvelope? LastDispatched() => _lastDispatched;
+    private AgentCommandIntent? LastDispatched() => _lastDispatched;
 }

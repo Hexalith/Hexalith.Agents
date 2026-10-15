@@ -49,7 +49,7 @@ public sealed class AgentApproverPolicyOrchestratorTests
         outcome.Authorized.ShouldBeTrue();
         outcome.Dispatched.ShouldBeTrue();
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.CommandType.ShouldBe(nameof(ConfigureAgentApproverPolicy));
         dispatched.AggregateId.ShouldBe(AgentId);
         dispatched.Extensions.ShouldNotBeNull();
@@ -76,7 +76,7 @@ public sealed class AgentApproverPolicyOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(clientExtensions), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions["actor:agentsAdmin"].ShouldBe("true");
         dispatched.Extensions.ContainsKey("approver:policyValidation").ShouldBeFalse();
@@ -108,10 +108,10 @@ public sealed class AgentApproverPolicyOrchestratorTests
             _policy,
             clientExtensions);
 
-    private CommandEnvelope? _lastDispatched;
+    private AgentCommandIntent? _lastDispatched;
 
     private void CaptureDispatch()
-        => _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
+        => _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
 
-    private CommandEnvelope? LastDispatched() => _lastDispatched;
+    private AgentCommandIntent? LastDispatched() => _lastDispatched;
 }

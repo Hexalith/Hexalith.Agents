@@ -53,7 +53,7 @@ public sealed class AgentActivationApproverRevalidationTests
             Request(AgentResponseMode.Confirmation, _policy), CancellationToken.None);
 
         outcome.ApproverVerdict.ShouldBe(ApproverPolicyValidationStatus.Valid);
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions!["approver:policyValidation"].ShouldBe("Valid");
         await _resolver.Received(1).ResolveAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<CancellationToken>());
     }
@@ -85,7 +85,7 @@ public sealed class AgentActivationApproverRevalidationTests
 
         outcome.ProviderVerdict.ShouldBe(ProviderSelectionValidationStatus.Valid);
         outcome.ApproverVerdict.ShouldBe(ApproverPolicyValidationStatus.Valid);
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions!["provider:selectionValidation"].ShouldBe("Valid");
         dispatched.Extensions!["approver:policyValidation"].ShouldBe("Valid");
         await _reader.Received(1).GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>());
@@ -156,7 +156,7 @@ public sealed class AgentActivationApproverRevalidationTests
         await Revalidation.ExecuteAsync(
             Request(AgentResponseMode.Confirmation, _policy, clientExtensions), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions["approver:policyValidation"].ShouldBe("Missing"); // the trusted verdict wins, not the forged "Valid"
         dispatched.Extensions["actor:agentsAdmin"].ShouldBe("true");
@@ -206,7 +206,7 @@ public sealed class AgentActivationApproverRevalidationTests
         outcome.ApproverVerdict.ShouldBe(ApproverPolicyValidationStatus.Unavailable);
         await _reader.DidNotReceiveWithAnyArgs().GetEntryAsync(default!, default!, default!, default);
         await _resolver.DidNotReceiveWithAnyArgs().ResolveAsync(default!, default!, default);
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         Dictionary<string, string> extensions = dispatched.Extensions.ShouldNotBeNull();
         extensions[AgentProviderSelectionOrchestrator.ProviderSelectionValidationExtensionKey]
             .ShouldBe(nameof(ProviderSelectionValidationStatus.Unavailable));
@@ -273,12 +273,12 @@ public sealed class AgentActivationApproverRevalidationTests
             RecordedApproverPolicy: policy,
             ClientSuppliedExtensions: clientExtensions);
 
-    private CommandEnvelope? _lastDispatched;
+    private AgentCommandIntent? _lastDispatched;
 
     private void CaptureDispatch()
         => _dispatcher
-            .DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>())
+            .DispatchAsync(Arg.Do<AgentCommandIntent>(e => _lastDispatched = e), Arg.Any<CancellationToken>())
             .Returns(new SubmitCommandResponse("corr-1", null, "msg-activate"));
 
-    private CommandEnvelope? LastDispatched() => _lastDispatched;
+    private AgentCommandIntent? LastDispatched() => _lastDispatched;
 }

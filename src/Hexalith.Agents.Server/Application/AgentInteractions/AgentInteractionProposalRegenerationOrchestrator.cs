@@ -144,7 +144,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         // (5) Build the server-trusted regenerate command + envelope (AggregateId = interaction id, Domain = agent-interaction);
         // strip reserved client trust extensions (none repopulated on this path).
         var command = new RegenerateProposedAgentReply(request.AgentInteractionId, result);
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             InteractionDomain,

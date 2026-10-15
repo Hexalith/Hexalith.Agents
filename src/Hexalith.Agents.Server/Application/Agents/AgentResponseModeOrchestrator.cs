@@ -65,7 +65,7 @@ public sealed class AgentResponseModeOrchestrator
         }
 
         var command = new ConfigureAgentResponseMode(request.Mode);
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             AgentDomain,

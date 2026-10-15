@@ -139,7 +139,7 @@ public sealed class ProviderCatalogAdministrationOrchestrator
             _ => throw new InvalidOperationException("Unsupported provider catalog command."),
         };
 
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             ProviderCatalogIdentity.PlatformTenantId,
             ProviderCatalogAggregate.Domain,
@@ -196,7 +196,7 @@ public sealed class ProviderCatalogAdministrationOrchestrator
         Dictionary<string, string> extensions = BuildTrustedExtensions(request.ClientSuppliedExtensions);
         extensions.Remove(ProviderCatalogAggregate.ProviderAdminExtensionKey);
         extensions[authorityKey] = "true";
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             tenantId,
             TenantProviderEnablementAggregate.Domain,

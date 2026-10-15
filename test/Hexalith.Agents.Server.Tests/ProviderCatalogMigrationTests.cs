@@ -34,7 +34,7 @@ public sealed class ProviderCatalogMigrationTests
 {
     private const string StoreName = "statestore";
     private readonly FakeReadModelStore _store = new();
-    private readonly List<CommandEnvelope> _sent = [];
+    private readonly List<AgentCommandIntent> _sent = [];
     private readonly Dictionary<string, long> _legacyHeads = new(StringComparer.Ordinal);
     private readonly Dictionary<string, long> _targetHeads = new(StringComparer.Ordinal);
     private readonly HashSet<string> _rejectedMessages = new(StringComparer.Ordinal);
@@ -596,7 +596,7 @@ public sealed class ProviderCatalogMigrationTests
         gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(call =>
             {
-                CommandEnvelope? command = _sent.FirstOrDefault(item => item.MessageId == call.Arg<string>());
+                AgentCommandIntent? command = _sent.FirstOrDefault(item => item.MessageId == call.Arg<string>());
                 bool rejected = command is not null && _rejectedMessages.Contains(command.MessageId);
                 CommandStatus commandStatus = _forcedStatus ?? (rejected ? CommandStatus.Rejected : CommandStatus.Completed);
                 return command is null ? null : new CommandStatusQueryResponse(command.CorrelationId,
@@ -609,17 +609,17 @@ public sealed class ProviderCatalogMigrationTests
                 };
             });
         IAgentCommandDispatcher dispatcher = Substitute.For<IAgentCommandDispatcher>();
-        dispatcher.DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>())
+        dispatcher.DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>())
             .Returns(call =>
             {
-                CommandEnvelope envelope = call.Arg<CommandEnvelope>();
+                AgentCommandIntent envelope = call.Arg<AgentCommandIntent>();
                 _sent.Add(envelope);
                 if (_rejectNextCommand)
                 {
                     _rejectNextCommand = false;
                     _rejectedMessages.Add(envelope.MessageId);
                     // Another writer projects the same target while this exact command is rejected.
-                    Persist(envelope with { MessageId = "unrelated-writer" });
+                    Persist(envelope.WithFixtureMessageId("unrelated-writer"));
                 }
                 else
                 {
@@ -636,7 +636,7 @@ public sealed class ProviderCatalogMigrationTests
             Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = StoreName }), gateway: gateway);
     }
 
-    private void Persist(CommandEnvelope envelope)
+    private void Persist(AgentCommandIntent envelope)
     {
         if (envelope.CommandType == nameof(CreateProviderModelEntry))
         {

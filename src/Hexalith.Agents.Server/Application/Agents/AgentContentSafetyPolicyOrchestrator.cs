@@ -75,7 +75,7 @@ public sealed class AgentContentSafetyPolicyOrchestrator
         }
 
         var command = new ConfigureAgentContentSafetyPolicy(request.Configuration);
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             AgentDomain,

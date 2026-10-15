@@ -92,7 +92,7 @@ public sealed class EventStoreAgentCommandDispatcherTests
     private static EventStoreGatewayException Gateway(int statusCode)
         => new(statusCode, "gateway failure", detail: "stream agent-hexa@revision 7");
 
-    private static CommandEnvelope Envelope(byte[]? payload = null)
+    private static AgentCommandIntent Envelope(byte[]? payload = null)
         => new(
             "msg-1",
             "acme",

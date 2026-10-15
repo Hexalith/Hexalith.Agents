@@ -62,7 +62,7 @@ public sealed class AgentApproverPolicyOrchestrator
         }
 
         var command = new ConfigureAgentApproverPolicy(request.Policy);
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             AgentDomain,

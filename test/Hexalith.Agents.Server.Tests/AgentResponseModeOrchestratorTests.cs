@@ -42,7 +42,7 @@ public sealed class AgentResponseModeOrchestratorTests
         outcome.Authorized.ShouldBeTrue();
         outcome.Dispatched.ShouldBeTrue();
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.CommandType.ShouldBe(nameof(ConfigureAgentResponseMode));
         dispatched.AggregateId.ShouldBe(AgentId);
         dispatched.Extensions.ShouldNotBeNull();
@@ -70,7 +70,7 @@ public sealed class AgentResponseModeOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(AgentResponseMode.Automatic, clientExtensions), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions["actor:agentsAdmin"].ShouldBe("true");
         dispatched.Extensions.ContainsKey("approver:policyValidation").ShouldBeFalse();
@@ -104,12 +104,12 @@ public sealed class AgentResponseModeOrchestratorTests
             mode,
             clientExtensions);
 
-    private CommandEnvelope? _lastDispatched;
+    private AgentCommandIntent? _lastDispatched;
 
     private void CaptureDispatch()
         => _dispatcher
-            .DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>())
+            .DispatchAsync(Arg.Do<AgentCommandIntent>(e => _lastDispatched = e), Arg.Any<CancellationToken>())
             .Returns(new SubmitCommandResponse("corr-1", null, "msg-1"));
 
-    private CommandEnvelope? LastDispatched() => _lastDispatched;
+    private AgentCommandIntent? LastDispatched() => _lastDispatched;
 }

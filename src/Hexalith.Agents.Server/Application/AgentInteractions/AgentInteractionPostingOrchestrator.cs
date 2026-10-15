@@ -100,7 +100,7 @@ public sealed class AgentInteractionPostingOrchestrator
 
         // Build the envelope (AggregateId = interaction id, Domain = agent-interaction); strip reserved client trust
         // extensions (none repopulated on this path).
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             InteractionDomain,

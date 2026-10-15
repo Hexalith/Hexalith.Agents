@@ -75,7 +75,7 @@ public sealed class AgentSetupCompositionTests
 
         IAgentCommandDispatcher dispatcher = provider.GetRequiredService<IAgentCommandDispatcher>();
         _ = await dispatcher.DispatchAsync(
-            new CommandEnvelope(
+            new AgentCommandIntent(
                 "message-1",
                 "tenant-a",
                 "agent",
@@ -105,7 +105,7 @@ public sealed class AgentSetupCompositionTests
 
         IAgentCommandDispatcher dispatcher = provider.GetRequiredService<IAgentCommandDispatcher>();
         _ = await dispatcher.DispatchAsync(
-            new CommandEnvelope(
+            new AgentCommandIntent(
                 "message-1",
                 "tenant-a",
                 "agent",

@@ -96,10 +96,10 @@ public sealed class ProviderCatalogAuthorizationTests
     [Fact]
     public async Task Catalog_orchestration_strips_the_internal_activation_version_extension()
     {
-        CommandEnvelope? dispatched = null;
+        AgentCommandIntent? dispatched = null;
         IAgentCommandDispatcher dispatcher = Substitute.For<IAgentCommandDispatcher>();
         dispatcher.DispatchAsync(
-                Arg.Do<CommandEnvelope>(value => dispatched = value),
+                Arg.Do<AgentCommandIntent>(value => dispatched = value),
                 Arg.Any<CancellationToken>())
             .Returns(new Hexalith.EventStore.Contracts.Commands.SubmitCommandResponse("corr-1", null, "msg-1"));
         var orchestrator = new ProviderCatalogAdministrationOrchestrator(dispatcher);
@@ -121,7 +121,7 @@ public sealed class ProviderCatalogAuthorizationTests
             new DisableProviderModelEntry("openai", "gpt-4o"),
             CancellationToken.None);
 
-        CommandEnvelope sent = dispatched.ShouldNotBeNull();
+        AgentCommandIntent sent = dispatched.ShouldNotBeNull();
         sent.Extensions.ShouldNotBeNull()
             .ContainsKey(AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion)
             .ShouldBeFalse();

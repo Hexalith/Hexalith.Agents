@@ -26,10 +26,11 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
                 return TenantAccessReadResult.Unavailable;
             }
 
+            DateTimeOffset started = clock.GetUtcNow();
             CurrentHumanActorEvidence? actor = await actorSource.ReadAsync(tenantId, actorUserId, ct).ConfigureAwait(false);
             bool administration = string.IsNullOrEmpty(callerPartyId);
             ct.ThrowIfCancellationRequested();
-            if (!IsCurrentActor(actor, tenantId, actorUserId, callerPartyId, administration, clock.GetUtcNow()))
+            if (!IsCurrentActor(actor, tenantId, actorUserId, callerPartyId, administration, started, clock.GetUtcNow()))
             {
                 return new(AgentInteractionGateOutcome.Unauthorized, false);
             }
@@ -37,9 +38,9 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
             TenantAuthorityEvidence? evidence = await source.ReadAsync(tenantId, false, ct).ConfigureAwait(false);
             ct.ThrowIfCancellationRequested();
             DateTimeOffset now = clock.GetUtcNow();
-            bool granted = IsCurrentActor(actor, tenantId, actorUserId, callerPartyId, administration, now)
+            bool granted = IsCurrentActor(actor, tenantId, actorUserId, callerPartyId, administration, started, now)
                 && Grants(evidence, tenantId, actor.ActorId, administration ? "Agents.Administrator" : "User",
-                    administration ? null : callerPartyId, false, now);
+                    administration ? null : callerPartyId, false, now, started);
             return new(granted ? AgentInteractionGateOutcome.Satisfied : AgentInteractionGateOutcome.Unauthorized, granted);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
@@ -49,22 +50,19 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
     }
 
     private static bool IsCurrentActor([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] CurrentHumanActorEvidence? actor, string tenantId, string subject,
-        string callerPartyId, bool administration, DateTimeOffset now)
-        => actor is not null && actor.TenantId == tenantId && actor.Subject == subject
-            && !string.IsNullOrWhiteSpace(actor.ActorId) && !string.IsNullOrWhiteSpace(actor.PartyId)
-            && actor.BindingVersion > 0 && actor.SourcePosition > 0 && actor.ObservedAt != default
-            && actor.ObservedAt <= now && actor.ValidUntil > now
-            && (administration || actor.PartyId == callerPartyId);
+        string callerPartyId, bool administration, DateTimeOffset started, DateTimeOffset now)
+        => actor?.IsCurrentFor(tenantId, subject, administration ? null : callerPartyId, started, now) == true;
 
     /// <summary>Checks complete source scope, event sequence, current tenant state and exact actor/role binding.</summary>
     internal static bool Grants(TenantAuthorityEvidence? evidence, string tenantId, string actorId, string role,
-        string? partyId, bool global, DateTimeOffset now)
+        string? partyId, bool global, DateTimeOffset now, DateTimeOffset? notBefore = null)
     {
         if (evidence is null || evidence.TenantId != tenantId
             || evidence.Domain != (global ? "global-administrators" : "tenants")
             || evidence.SourceTenantId != "system" || evidence.SourceAggregateId != (global ? "global-administrators" : tenantId)
             || evidence.SourceHead <= 0 || evidence.Events.Count != evidence.SourceHead
             || evidence.ObservedAt == default || evidence.ObservedAt > now || evidence.ValidUntil <= now
+            || (notBefore is { } started && (now < started || evidence.ObservedAt < started))
             || evidence.ObservedAt.Offset != TimeSpan.Zero || evidence.ValidUntil.Offset != TimeSpan.Zero)
         {
             return false;

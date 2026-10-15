@@ -63,7 +63,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
     private readonly IApproverPolicyResolver _resolver = Substitute.For<IApproverPolicyResolver>();
     private readonly IAgentCommandDispatcher _dispatcher = Substitute.For<IAgentCommandDispatcher>();
 
-    private CommandEnvelope? _lastDispatched;
+    private AgentCommandIntent? _lastDispatched;
 
     private AgentInteractionProposalRegenerationOrchestrator Orchestrator => new(
         _contextReader,
@@ -88,7 +88,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
         outcome.NotRegeneratableReason.ShouldBe(AgentProposedReplyNotRegeneratableReason.Unknown);
         outcome.RegeneratedVersionId.ShouldBe(AgentProposalRegenerationIdentity.DeriveVersionId(AgentInteractionId, SourceConversationId, RegenerationAttemptId));
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.CommandType.ShouldBe(nameof(RegenerateProposedAgentReply));
         dispatched.Domain.ShouldBe("agent-interaction");
         dispatched.AggregateId.ShouldBe(AgentInteractionId);
@@ -141,7 +141,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
         outcome.RegeneratedVersionId.ShouldBeEmpty();
         await _generationProvider.DidNotReceive().GenerateAsync(Arg.Any<AgentGenerationProviderRequest>(), Arg.Any<CancellationToken>());
         await _contextReader.DidNotReceive().ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Theory]
@@ -156,7 +156,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
         AgentInteractionProposalRegenerationOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(proposalState: state), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.ProposalRegenerated);
-        await _dispatcher.Received(1).DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     // ===== Fail-closed authorization → no-dispatch, NO provider call (FR-16; AD-12) =====
@@ -182,7 +182,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
         outcome.Status.ShouldBe(AgentInteractionStatus.Unknown);
         outcome.RegeneratedVersionId.ShouldBeEmpty();
         await _generationProvider.DidNotReceive().GenerateAsync(Arg.Any<AgentGenerationProviderRequest>(), Arg.Any<CancellationToken>());
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -194,7 +194,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
             Request(policy: new AgentApproverPolicy([], ApproverPolicyBasisDisclosure.OperatorOnly)), CancellationToken.None);
 
         outcome.NotRegeneratableReason.ShouldBe(AgentProposedReplyNotRegeneratableReason.NotAuthorized);
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -208,7 +208,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
 
         outcome.NotRegeneratableReason.ShouldBe(AgentProposedReplyNotRegeneratableReason.NotAuthorized);
         JsonSerializer.Serialize(outcome).ShouldNotContain("secret-bearing detail");
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -228,7 +228,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
 
         // The first fail-closed seam on the path is the approver resolver → no-dispatch NotAuthorized denial (no provider call).
         outcome.NotRegeneratableReason.ShouldBe(AgentProposedReplyNotRegeneratableReason.NotAuthorized);
-        await dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     // ===== Provider + content-safety failure mapping (AC3) =====
@@ -446,8 +446,8 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
     public async Task A_retried_regeneration_reuses_the_same_deterministic_version_id()
     {
         StubHappy();
-        var dispatched = new List<CommandEnvelope>();
-        _ = _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(dispatched.Add), Arg.Any<CancellationToken>());
+        var dispatched = new List<AgentCommandIntent>();
+        _ = _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(dispatched.Add), Arg.Any<CancellationToken>());
 
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
@@ -477,7 +477,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(clientExtensions: clientExtensions), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions.ShouldNotContainKey("actor:agentsAdmin");
         dispatched.Extensions.ShouldNotContainKey("provider:selectionValidation");
@@ -494,7 +494,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.TenantId.ShouldBe(TenantId);
         dispatched.MessageId.ShouldBe("msg-1");
         dispatched.CorrelationId.ShouldBe("corr-1");
@@ -514,7 +514,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
         await Should.ThrowAsync<OperationCanceledException>(
             async () => await Orchestrator.ExecuteAsync(Request(), CancellationToken.None));
 
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     // ===== Cross-seam: the dispatched command drives the real aggregate to the same decision =====
@@ -527,11 +527,11 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
 
         AgentInteractionProposalRegenerationOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         var command = JsonSerializer.Deserialize<RegenerateProposedAgentReply>(dispatched.Payload)!;
 
         AgentInteractionState state = ProposalCreatedState();
-        DomainResult result = AgentInteractionAggregate.Handle(command, state, dispatched);
+        DomainResult result = AgentInteractionAggregate.Handle(command, state, dispatched.ToFixtureEnvelope());
 
         ProposedAgentReplyRegenerated regenerated = result.Events[0].ShouldBeOfType<ProposedAgentReplyRegenerated>();
         regenerated.RegeneratedVersion.GeneratedContent.ShouldBe(RegeneratedContentText);
@@ -631,9 +631,9 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
             clientExtensions);
 
     private void CaptureDispatch()
-        => _ = _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
+        => _ = _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
 
-    private CommandEnvelope? LastDispatched() => _lastDispatched;
+    private AgentCommandIntent? LastDispatched() => _lastDispatched;
 
     private AgentProposalRegenerationResult DispatchedResult()
         => JsonSerializer.Deserialize<RegenerateProposedAgentReply>(LastDispatched()!.Payload)!.Result;

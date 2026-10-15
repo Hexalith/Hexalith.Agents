@@ -501,7 +501,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         DomainResult domainResult = AgentAggregate.Handle(
             create,
             alreadyApplied ? CreatedState(create) : null,
-            AdminEnvelope(create));
+            AdminEnvelope(create).ToFixtureEnvelope());
 
         domainResult.ResultPayload.ShouldNotBeNull();
         using JsonDocument payload = JsonDocument.Parse(domainResult.ResultPayload);
@@ -889,7 +889,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         return state;
     }
 
-    private static CommandEnvelope AdminEnvelope<T>(T command)
+    private static AgentCommandIntent AdminEnvelope<T>(T command)
         where T : notnull
         => new(
             MessageId,

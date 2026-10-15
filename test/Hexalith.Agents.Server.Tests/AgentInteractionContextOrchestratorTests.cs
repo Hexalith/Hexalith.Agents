@@ -53,7 +53,7 @@ public sealed class AgentInteractionContextOrchestratorTests
     private readonly IProviderCatalogReader _providerCatalogReader = Substitute.For<IProviderCatalogReader>();
     private readonly IAgentCommandDispatcher _dispatcher = Substitute.For<IAgentCommandDispatcher>();
 
-    private CommandEnvelope? _lastDispatched;
+    private AgentCommandIntent? _lastDispatched;
 
     private AgentInteractionContextOrchestrator Orchestrator => new(
         _contextReader,
@@ -74,7 +74,7 @@ public sealed class AgentInteractionContextOrchestratorTests
         outcome.AgentInteractionId.ShouldBe(AgentInteractionId);
         outcome.Status.ShouldBe(AgentInteractionStatus.ContextReady);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.CommandType.ShouldBe(nameof(BuildAgentInteractionContext));
         dispatched.Domain.ShouldBe("agent-interaction");
         dispatched.AggregateId.ShouldBe(AgentInteractionId);
@@ -268,7 +268,7 @@ public sealed class AgentInteractionContextOrchestratorTests
         await Should.ThrowAsync<OperationCanceledException>(
             async () => await Orchestrator.ExecuteAsync(Request(), CancellationToken.None));
 
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     // ===== Trust model: client measurement discarded, reserved extensions stripped (AC3) =====
@@ -290,7 +290,7 @@ public sealed class AgentInteractionContextOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(clientExtensions: clientExtensions), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions.ShouldNotContainKey("actor:agentsAdmin");
         dispatched.Extensions.ShouldNotContainKey("provider:selectionValidation");
@@ -307,7 +307,7 @@ public sealed class AgentInteractionContextOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.TenantId.ShouldBe(TenantId);
         dispatched.MessageId.ShouldBe("msg-1");
         dispatched.CorrelationId.ShouldBe("corr-1");
@@ -329,7 +329,7 @@ public sealed class AgentInteractionContextOrchestratorTests
         // provider adapter, no IConversationClient.AppendMessageAsync, and no proposal creation on this path (AC3). The
         // conversation seam is a READ (IConversationContextReader.ReadAsync), and exactly one context command is dispatched.
         await _contextReader.Received(1).ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, Arg.Any<CancellationToken>());
-        await _dispatcher.Received(1).DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
         LastDispatched().ShouldNotBeNull().CommandType.ShouldBe(nameof(BuildAgentInteractionContext));
     }
 
@@ -360,14 +360,14 @@ public sealed class AgentInteractionContextOrchestratorTests
 
         AgentInteractionContextOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         var command = JsonSerializer.Deserialize<BuildAgentInteractionContext>(dispatched.Payload)!;
 
         var state = new AgentInteractionState();
         state.Apply(new InteractionRequested(
             AgentInteractionId, "hexa", CallerPartyId, SourceConversationId, SampleSnapshot(), "prompt", "idem"));
         state.Apply(new AgentInteractionAuthorized(AgentInteractionId));
-        DomainResult result = AgentInteractionAggregate.Handle(command, state, dispatched);
+        DomainResult result = AgentInteractionAggregate.Handle(command, state, dispatched.ToFixtureEnvelope());
 
         AgentInteractionContextBlocked blocked = result.Events[0].ShouldBeOfType<AgentInteractionContextBlocked>();
         blocked.Reason.ShouldBe(AgentInteractionContextBlockReason.ExceedsModelBudget);
@@ -381,8 +381,8 @@ public sealed class AgentInteractionContextOrchestratorTests
     public async Task All_deferred_defaults_fail_closed_to_context_blocked()
     {
         var dispatcher = Substitute.For<IAgentCommandDispatcher>();
-        CommandEnvelope? captured = null;
-        _ = dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => captured = e), Arg.Any<CancellationToken>());
+        AgentCommandIntent? captured = null;
+        _ = dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => captured = e), Arg.Any<CancellationToken>());
 
         var orchestrator = new AgentInteractionContextOrchestrator(
             new DeferredConversationContextReader(),
@@ -393,7 +393,7 @@ public sealed class AgentInteractionContextOrchestratorTests
         AgentInteractionContextOutcomeResult outcome = await orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
-        await dispatcher.Received(1).DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
         var command = JsonSerializer.Deserialize<BuildAgentInteractionContext>(captured!.Payload)!;
         command.Measurement.LoadOutcome.ShouldBe(AgentInteractionContextLoadOutcome.Unavailable);
     }
@@ -460,9 +460,9 @@ public sealed class AgentInteractionContextOrchestratorTests
             clientExtensions);
 
     private void CaptureDispatch()
-        => _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
+        => _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
 
-    private CommandEnvelope? LastDispatched() => _lastDispatched;
+    private AgentCommandIntent? LastDispatched() => _lastDispatched;
 
     private AgentInteractionContextMeasurement DispatchedMeasurement()
         => JsonSerializer.Deserialize<BuildAgentInteractionContext>(LastDispatched()!.Payload)!.Measurement;

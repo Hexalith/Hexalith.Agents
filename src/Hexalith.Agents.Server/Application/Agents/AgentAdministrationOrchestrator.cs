@@ -114,7 +114,7 @@ public sealed class AgentAdministrationOrchestrator
             return AgentAdministrationOutcome.Denied();
         }
 
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             _agentDomain,

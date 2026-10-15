@@ -131,7 +131,7 @@ public sealed class AgentInteractionProposalRejectionOrchestrator
     private async Task DispatchAsync(AgentInteractionProposalRejectionRequest request, AgentProposalRejectionResult result, CancellationToken ct)
     {
         var command = new RejectProposedAgentReply(request.AgentInteractionId, result);
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             InteractionDomain,

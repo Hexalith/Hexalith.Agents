@@ -15,7 +15,7 @@ using Hexalith.Agents.Server.Ports;                 // Deferred* ports, AgentGen
 
 using Hexalith.Agents.Server.Tests.Conformance;     // RequirementTraits
 
-using Hexalith.EventStore.Contracts.Commands;       // CommandEnvelope
+using Hexalith.EventStore.Contracts.Commands;       // AgentCommandIntent
 
 using Shouldly;
 
@@ -251,7 +251,7 @@ public sealed class RuntimeOwnershipConformanceTests
         result.Outcome.ShouldBe(AgentGenerationOutcome.ProviderUnavailable, "AD-18/AD-12/FR-21: the deferred generation provider must fail closed (Unavailable), never invoke a live model.");
 
         var dispatcher = new DeferredAgentCommandDispatcher();
-        CommandEnvelope envelope = new("msg-1", "acme", "agent", "hexa", "ActivateAgent", Array.Empty<byte>(), "corr-1", null, "admin-user", null);
+        AgentCommandIntent envelope = new("msg-1", "acme", "agent", "hexa", "ActivateAgent", Array.Empty<byte>(), "corr-1", null, "admin-user", null);
         await Should.ThrowAsync<NotSupportedException>(async () => await dispatcher.DispatchAsync(envelope, CancellationToken.None));
 
         typeof(RuntimeOwnershipConformanceTests).Assembly.GetType("Hexalith.Agents.Server.Tests.DeferredAgentCommandDispatcherTests")

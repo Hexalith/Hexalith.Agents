@@ -10,13 +10,13 @@ using Hexalith.EventStore.Contracts.Commands;
 namespace Hexalith.Agents.Server.Ports;
 
 /// <summary>
-/// Live <see cref="IAgentCommandDispatcher"/> binding (Story 5.2 AC1). It submits the fully-built, server-trusted
-/// <see cref="CommandEnvelope"/> through the EventStore gateway so an authorized administration command is durably
+/// Live <see cref="IAgentCommandDispatcher"/> binding. It admits an immutable <see cref="AgentCommandIntent"/> before
+/// constructing any EventStore target command, then submits it through the gateway so an authorized command is durably
 /// persisted as Agent events instead of hitting the fail-closed placeholder.
 /// </summary>
 /// <remarks>
-/// The dispatcher performs no authorization and populates no trusted extension: the orchestration that built the
-/// envelope already stripped every client-supplied reserved key and repopulated only the keys it can vouch for.
+/// Orchestrations strip client-reserved keys. Host admission verifies the operation, principal, scope and exact bytes,
+/// durably registers replay and captures classified denials before this dispatcher constructs a target command.
 /// Gateway failures surface as <see cref="EventStoreGatewayException"/> and are translated into safe public codes
 /// by <see cref="AgentCommandDispatchFailure"/> at the operations edge — this seam never invents a success and
 /// never lets infrastructure text reach a caller.
@@ -28,6 +28,7 @@ public sealed class EventStoreAgentCommandDispatcher : IAgentCommandDispatcher
 
     /// <summary>Initializes a new instance of the <see cref="EventStoreAgentCommandDispatcher"/> class.</summary>
     /// <param name="gateway">The EventStore command/query gateway client.</param>
+    /// <param name="admission">The private host admission closure, or the fail-closed default when absent.</param>
     public EventStoreAgentCommandDispatcher(IEventStoreGatewayClient gateway, IAgentTrustedCommandAdmission? admission = null)
     {
         ArgumentNullException.ThrowIfNull(gateway);
@@ -36,12 +37,17 @@ public sealed class EventStoreAgentCommandDispatcher : IAgentCommandDispatcher
     }
 
     /// <inheritdoc />
-    public async Task<SubmitCommandResponse> DispatchAsync(CommandEnvelope envelope, CancellationToken ct)
+    public async Task<SubmitCommandResponse> DispatchAsync(AgentCommandIntent intent, CancellationToken ct)
     {
-        ArgumentNullException.ThrowIfNull(envelope);
-        // Register first-seen before constructing the gateway target command. The ordinary dispatcher never
-        // obtains the registrar or denial-worker credential from DI.
-        envelope = await _admission.AdmitAsync(envelope, ct).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(intent);
+        // This await precedes even CommandEnvelope's eager target-identity validation. The ordinary dispatcher
+        // never obtains the registrar or denial-worker credential from DI.
+        AgentCommandIntent admitted = await _admission.AdmitAsync(intent, ct).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(admitted);
+        ct.ThrowIfCancellationRequested();
+        var envelope = new CommandEnvelope(
+            admitted.MessageId, admitted.TenantId, admitted.Domain, admitted.AggregateId, admitted.CommandType,
+            admitted.Payload, admitted.CorrelationId, admitted.CausationId, admitted.UserId, admitted.Extensions);
 
         using JsonDocument payload = JsonDocument.Parse(
             envelope.Payload.Length == 0 ? "{}"u8.ToArray() : envelope.Payload);

@@ -6,7 +6,7 @@ namespace Hexalith.Agents.Server.Ports;
 public sealed class UnavailableAgentTrustedCommandAdmission(IAgentDependencyAvailability availability) : IAgentTrustedCommandAdmission
 {
     /// <inheritdoc />
-    public Task<CommandEnvelope> AdmitAsync(CommandEnvelope intent, CancellationToken cancellationToken)
+    public Task<AgentCommandIntent> AdmitAsync(AgentCommandIntent intent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(intent);
         cancellationToken.ThrowIfCancellationRequested();
@@ -14,11 +14,11 @@ public sealed class UnavailableAgentTrustedCommandAdmission(IAgentDependencyAvai
         {
             if (availability.Check(record) is not null)
             {
-                return Task.FromException<CommandEnvelope>(new AgentDependencyNotAvailableException(record));
+                return Task.FromException<AgentCommandIntent>(new AgentDependencyNotAvailableException(record));
             }
         }
 
         // Availability of a record never invents a host adapter or credentials.
-        return Task.FromException<CommandEnvelope>(new AgentDependencyNotAvailableException("EXT-HOST-1"));
+        return Task.FromException<AgentCommandIntent>(new AgentDependencyNotAvailableException("EXT-HOST-1"));
     }
 }

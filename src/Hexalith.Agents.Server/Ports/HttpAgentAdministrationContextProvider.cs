@@ -45,16 +45,20 @@ public sealed class HttpAgentAdministrationContextProvider(IHttpContextAccessor 
 
         try
         {
+            DateTimeOffset started = _clock.GetUtcNow();
             CurrentHumanActorEvidence? actor = await actorSource.ReadAsync(identity.TenantId, identity.ActorUserId, cancellationToken).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            if (actor?.IsCurrentFor(identity.TenantId, identity.ActorUserId, null, started, _clock.GetUtcNow()) != true)
+            {
+                return identity;
+            }
+
             TenantAuthorityEvidence? roles = await tenantSource.ReadAsync(platform ? "system" : identity.TenantId, platform, cancellationToken).ConfigureAwait(false);
             DateTimeOffset now = _clock.GetUtcNow();
             cancellationToken.ThrowIfCancellationRequested();
-            if (actor is null || actor.TenantId != identity.TenantId || actor.Subject != identity.ActorUserId
-                || string.IsNullOrWhiteSpace(actor.ActorId) || string.IsNullOrWhiteSpace(actor.PartyId)
-                || actor.BindingVersion <= 0 || actor.SourcePosition <= 0 || actor.ObservedAt == default
-                || actor.ObservedAt > now || actor.ValidUntil <= now
+            if (!actor.IsCurrentFor(identity.TenantId, identity.ActorUserId, null, started, now)
                 || !ProjectedTenantAccessReader.Grants(roles, platform ? "system" : identity.TenantId, actor.ActorId,
-                    platform ? PlatformOperatorRole : AgentsAdministratorRole, null, platform, now))
+                    platform ? PlatformOperatorRole : AgentsAdministratorRole, null, platform, now, started))
             {
                 return identity;
             }

@@ -293,7 +293,7 @@ public sealed class ProjectedProviderCatalogReaderTests
         var reader = new ProjectedProviderCatalogReader(store,
             Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = storeName }), context, gateway);
         IAgentCommandDispatcher dispatcher = Substitute.For<IAgentCommandDispatcher>();
-        dispatcher.DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>())
+        dispatcher.DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>())
             .Returns(new SubmitCommandResponse("corr", null, "msg"));
 
         AgentProviderSelectionOutcome selection = await new AgentProviderSelectionOrchestrator(reader, dispatcher)

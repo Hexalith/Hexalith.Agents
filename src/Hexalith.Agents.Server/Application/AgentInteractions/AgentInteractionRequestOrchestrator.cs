@@ -18,7 +18,7 @@ namespace Hexalith.Agents.Server.Application.AgentInteractions;
 /// (Story 2.1; AC1, AC2, AC3, AC4; AD-3, AD-4, AD-13). It (1) derives the deterministic interaction id, (2) reads
 /// the trusted AD-4 Agent configuration snapshot through <see cref="IAgentConfigurationSnapshotReader"/>, (3)
 /// assembles the server-trusted <see cref="RequestAgentInteraction"/> command with that snapshot, (4) builds the
-/// <see cref="CommandEnvelope"/> keyed by the interaction id under the <c>agent-interaction</c> domain, (5)
+/// <see cref="AgentCommandIntent"/> keyed by the interaction id under the <c>agent-interaction</c> domain, (5)
 /// dispatches it through <see cref="IAgentCommandDispatcher"/>, and (6) returns a safe
 /// <see cref="AgentInteractionReference"/>. The impure id derivation and snapshot read happen here, outside the pure
 /// aggregate, and feed back through the command (the AD-3 round-trip).
@@ -102,7 +102,7 @@ public sealed class AgentInteractionRequestOrchestrator
 
         // (5) Build the envelope (AggregateId = deterministic interaction id, Domain = agent-interaction). Reserved
         // trust extensions are stripped; none are repopulated on this request path.
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             InteractionDomain,

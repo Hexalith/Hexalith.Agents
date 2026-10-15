@@ -51,7 +51,7 @@ public sealed class AgentInteractionProposalOrchestratorTests
     private readonly IProposalExpiryPolicyReader _expiryReader = Substitute.For<IProposalExpiryPolicyReader>();
     private readonly IAgentCommandDispatcher _dispatcher = Substitute.For<IAgentCommandDispatcher>();
 
-    private CommandEnvelope? _lastDispatched;
+    private AgentCommandIntent? _lastDispatched;
 
     private AgentInteractionProposalOrchestrator Orchestrator => new(
         _versionReader,
@@ -71,7 +71,7 @@ public sealed class AgentInteractionProposalOrchestratorTests
         outcome.AgentInteractionId.ShouldBe(AgentInteractionId);
         outcome.Status.ShouldBe(AgentInteractionStatus.ProposalCreated);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.CommandType.ShouldBe(nameof(CreateProposedAgentReply));
         dispatched.Domain.ShouldBe("agent-interaction");
         dispatched.AggregateId.ShouldBe(AgentInteractionId);
@@ -181,8 +181,8 @@ public sealed class AgentInteractionProposalOrchestratorTests
     public async Task All_deferred_defaults_fail_closed_to_proposal_creation_failed()
     {
         var dispatcher = Substitute.For<IAgentCommandDispatcher>();
-        CommandEnvelope? captured = null;
-        _ = dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => captured = e), Arg.Any<CancellationToken>());
+        AgentCommandIntent? captured = null;
+        _ = dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => captured = e), Arg.Any<CancellationToken>());
 
         var orchestrator = new AgentInteractionProposalOrchestrator(
             new DeferredAgentGeneratedVersionReader(),
@@ -192,7 +192,7 @@ public sealed class AgentInteractionProposalOrchestratorTests
         AgentInteractionProposalOutcomeResult outcome = await orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.ProposalCreationFailed);
-        await dispatcher.Received(1).DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
         var command = JsonSerializer.Deserialize<CreateProposedAgentReply>(captured!.Payload)!;
         // The deferred version reader returns not-available → GeneratedVersionUnavailable.
         command.Result.Outcome.ShouldBe(AgentProposalCreationOutcome.GeneratedVersionUnavailable);
@@ -204,8 +204,8 @@ public sealed class AgentInteractionProposalOrchestratorTests
     public async Task A_retried_creation_reuses_the_same_deterministic_proposal_id()
     {
         StubHappy();
-        var dispatched = new List<CommandEnvelope>();
-        _ = _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(dispatched.Add), Arg.Any<CancellationToken>());
+        var dispatched = new List<AgentCommandIntent>();
+        _ = _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(dispatched.Add), Arg.Any<CancellationToken>());
 
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
@@ -235,7 +235,7 @@ public sealed class AgentInteractionProposalOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(clientExtensions: clientExtensions), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions.ShouldNotContainKey("actor:agentsAdmin");
         dispatched.Extensions.ShouldNotContainKey("provider:selectionValidation");
@@ -252,7 +252,7 @@ public sealed class AgentInteractionProposalOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.TenantId.ShouldBe(TenantId);
         dispatched.MessageId.ShouldBe("msg-1");
         dispatched.CorrelationId.ShouldBe("corr-1");
@@ -273,7 +273,7 @@ public sealed class AgentInteractionProposalOrchestratorTests
             Request(responseMode: AgentResponseMode.Automatic), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.Generated); // unchanged — no proposal created
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
         await _versionReader.DidNotReceive().ReadSelectedVersionAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
@@ -287,7 +287,7 @@ public sealed class AgentInteractionProposalOrchestratorTests
 
         AgentInteractionProposalOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         var command = JsonSerializer.Deserialize<CreateProposedAgentReply>(dispatched.Payload)!;
 
         var state = new AgentInteractionState();
@@ -296,7 +296,7 @@ public sealed class AgentInteractionProposalOrchestratorTests
         state.Apply(new AgentInteractionAuthorized(AgentInteractionId));
         state.Apply(new AgentInteractionContextReady(AgentInteractionId, SampleContextEvidence()));
         state.Apply(new AgentOutputGenerated(AgentInteractionId, SampleVersion()));
-        DomainResult result = AgentInteractionAggregate.Handle(command, state, dispatched);
+        DomainResult result = AgentInteractionAggregate.Handle(command, state, dispatched.ToFixtureEnvelope());
 
         ProposedAgentReplyCreated created = result.Events[0].ShouldBeOfType<ProposedAgentReplyCreated>();
         created.Evidence.ProposedVersionId.ShouldBe(VersionId);
@@ -316,7 +316,7 @@ public sealed class AgentInteractionProposalOrchestratorTests
         await Should.ThrowAsync<OperationCanceledException>(
             async () => await Orchestrator.ExecuteAsync(Request(), CancellationToken.None));
 
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -332,7 +332,7 @@ public sealed class AgentInteractionProposalOrchestratorTests
         await Should.ThrowAsync<OperationCanceledException>(
             async () => await Orchestrator.ExecuteAsync(Request(), CancellationToken.None));
 
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     // ===== Helpers =====
@@ -406,9 +406,9 @@ public sealed class AgentInteractionProposalOrchestratorTests
             clientExtensions);
 
     private void CaptureDispatch()
-        => _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
+        => _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
 
-    private CommandEnvelope? LastDispatched() => _lastDispatched;
+    private AgentCommandIntent? LastDispatched() => _lastDispatched;
 
     private AgentProposalCreationResult DispatchedResult()
         => JsonSerializer.Deserialize<CreateProposedAgentReply>(LastDispatched()!.Payload)!.Result;

@@ -89,7 +89,7 @@ public sealed class AgentProviderSelectionOrchestrator
         var command = new SelectAgentProviderModel(request.ProviderId, request.ModelId, capabilityVersion);
 
         // (6) Build the envelope with server-populated trusted extensions (client reserved keys stripped).
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             AgentDomain,

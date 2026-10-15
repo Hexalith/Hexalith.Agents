@@ -23,7 +23,7 @@ public sealed class DeferredAgentCommandDispatcherTests
     public async Task Dispatch_throws_not_supported_until_the_live_binding_is_wired()
     {
         var dispatcher = new DeferredAgentCommandDispatcher();
-        CommandEnvelope envelope = new(
+        AgentCommandIntent envelope = new(
             "msg-1",
             "acme",
             "agent",

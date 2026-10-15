@@ -104,7 +104,7 @@ public sealed class AgentInteractionProposalEditOrchestrator
         // (4) Build the server-trusted edit command + envelope (AggregateId = interaction id, Domain = agent-interaction);
         // strip reserved client trust extensions (none repopulated on this path).
         var command = new EditProposedAgentReply(request.AgentInteractionId, result);
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             InteractionDomain,

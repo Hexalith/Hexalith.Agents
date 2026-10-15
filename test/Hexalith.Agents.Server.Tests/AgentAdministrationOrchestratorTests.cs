@@ -28,7 +28,7 @@ public sealed class AgentAdministrationOrchestratorTests
     private const string AgentId = "hexa";
 
     private readonly IAgentCommandDispatcher _dispatcher = Substitute.For<IAgentCommandDispatcher>();
-    private CommandEnvelope? _dispatched;
+    private AgentCommandIntent? _dispatched;
 
     private AgentAdministrationOrchestrator Orchestrator => new(_dispatcher);
 
@@ -46,7 +46,7 @@ public sealed class AgentAdministrationOrchestratorTests
         outcome.Dispatched.ShouldBeTrue();
         outcome.Receipt.ShouldNotBeNull().MessageId.ShouldBe("msg-1");
 
-        CommandEnvelope envelope = _dispatched.ShouldNotBeNull();
+        AgentCommandIntent envelope = _dispatched.ShouldNotBeNull();
         envelope.CommandType.ShouldBe(nameof(UpdateAgentConfiguration));
         envelope.Domain.ShouldBe("agent");
         envelope.AggregateId.ShouldBe(AgentId);
@@ -64,7 +64,7 @@ public sealed class AgentAdministrationOrchestratorTests
             new CreateAgent(TenantId, "hexa", null, "instructions long enough to be valid"),
             CancellationToken.None);
 
-        CommandEnvelope envelope = _dispatched.ShouldNotBeNull();
+        AgentCommandIntent envelope = _dispatched.ShouldNotBeNull();
         envelope.CommandType.ShouldBe(nameof(CreateAgent));
         JsonSerializer.Deserialize<CreateAgent>(envelope.Payload)!.TenantId.ShouldBe(TenantId);
     }
@@ -79,7 +79,7 @@ public sealed class AgentAdministrationOrchestratorTests
             new CreateAgent("victim-tenant", "hexa", null, "instructions long enough to be valid"),
             CancellationToken.None);
 
-        CommandEnvelope envelope = _dispatched.ShouldNotBeNull();
+        AgentCommandIntent envelope = _dispatched.ShouldNotBeNull();
 
         // The stored tenant scope comes from the authenticated caller, never from the body — so the envelope tenant
         // and the tenant the aggregate persists can never diverge (AC4).
@@ -156,6 +156,6 @@ public sealed class AgentAdministrationOrchestratorTests
 
     private void CaptureDispatch()
         => _dispatcher
-            .DispatchAsync(Arg.Do<CommandEnvelope>(envelope => _dispatched = envelope), Arg.Any<CancellationToken>())
+            .DispatchAsync(Arg.Do<AgentCommandIntent>(envelope => _dispatched = envelope), Arg.Any<CancellationToken>())
             .Returns(new SubmitCommandResponse("corr-1", null, "msg-1"));
 }

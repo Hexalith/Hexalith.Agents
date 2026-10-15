@@ -92,7 +92,7 @@ public sealed class AgentPartyIdentityOrchestrator
             : new LinkAgentPartyIdentity(partyId);
 
         // (4) Build the envelope with server-populated trusted extensions (client reserved keys stripped).
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             AgentDomain,

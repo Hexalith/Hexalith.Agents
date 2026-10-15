@@ -54,7 +54,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
         outcome.Verdict.ShouldBe(ProviderSelectionValidationStatus.Valid);
         outcome.CapabilityVersion.ShouldBe(7);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.CommandType.ShouldBe(nameof(SelectAgentProviderModel));
         dispatched.AggregateId.ShouldBe(AgentId);
         dispatched.Extensions.ShouldNotBeNull();
@@ -180,7 +180,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(clientExtensions: clientExtensions), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions["provider:selectionValidation"].ShouldBe("Disabled"); // the trusted verdict wins, not the forged "Valid"
         dispatched.Extensions["actor:agentsAdmin"].ShouldBe("true");                 // repopulated from the trusted decision
@@ -198,7 +198,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
 
         outcome.Verdict.ShouldBe(ProviderSelectionValidationStatus.Missing);
         outcome.Dispatched.ShouldBeTrue();
-        await _dispatcher.Received(1).DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
         LastDispatched().ShouldNotBeNull().Extensions!["provider:selectionValidation"].ShouldBe("Missing");
     }
 
@@ -238,7 +238,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
             ActivationRequest(ProviderId, ModelId), CancellationToken.None);
 
         outcome.ProviderVerdict.ShouldBe(ProviderSelectionValidationStatus.Valid);
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.CommandType.ShouldBe(nameof(ActivateAgent));
         dispatched.Extensions!["provider:selectionValidation"].ShouldBe("Valid");
         await _reader.Received(1).GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>());
@@ -304,7 +304,7 @@ public sealed class AgentProviderSelectionOrchestratorTests
 
         await revalidation.ExecuteAsync(request, CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions["provider:selectionValidation"].ShouldBe("Disabled"); // the trusted verdict wins, not the forged "Valid"
         dispatched.Extensions["actor:agentsAdmin"].ShouldBe("true");                 // repopulated from the trusted decision
@@ -373,15 +373,15 @@ public sealed class AgentProviderSelectionOrchestratorTests
             SelectedProviderId: selectedProviderId,
             SelectedModelId: selectedModelId);
 
-    private CommandEnvelope? _lastDispatched;
+    private AgentCommandIntent? _lastDispatched;
 
     private void CaptureDispatch()
         => _dispatcher
-            .DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>())
+            .DispatchAsync(Arg.Do<AgentCommandIntent>(e => _lastDispatched = e), Arg.Any<CancellationToken>())
             .Returns(call => new SubmitCommandResponse(
-                call.ArgAt<CommandEnvelope>(0).CorrelationId,
+                call.ArgAt<AgentCommandIntent>(0).CorrelationId,
                 null,
-                call.ArgAt<CommandEnvelope>(0).MessageId));
+                call.ArgAt<AgentCommandIntent>(0).MessageId));
 
-    private CommandEnvelope? LastDispatched() => _lastDispatched;
+    private AgentCommandIntent? LastDispatched() => _lastDispatched;
 }

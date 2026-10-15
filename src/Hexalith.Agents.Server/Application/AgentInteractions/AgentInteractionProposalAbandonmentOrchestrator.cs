@@ -115,7 +115,7 @@ public sealed class AgentInteractionProposalAbandonmentOrchestrator
     private async Task DispatchAsync(AgentInteractionProposalAbandonmentRequest request, AgentProposalAbandonmentResult result, CancellationToken ct)
     {
         var command = new AbandonProposedAgentReply(request.AgentInteractionId, result);
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             InteractionDomain,

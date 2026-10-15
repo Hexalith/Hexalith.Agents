@@ -136,7 +136,7 @@ public sealed class AgentInteractionProposalExpiryOrchestrator
     private async Task DispatchAsync(AgentInteractionProposalExpiryRequest request, AgentProposalExpiryResult result, CancellationToken ct)
     {
         var command = new ExpireProposedAgentReply(request.AgentInteractionId, result);
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             InteractionDomain,

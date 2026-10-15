@@ -49,7 +49,7 @@ public sealed class AgentInteractionPostingOrchestratorTests
     private readonly IConversationResponsePoster _poster = Substitute.For<IConversationResponsePoster>();
     private readonly IAgentCommandDispatcher _dispatcher = Substitute.For<IAgentCommandDispatcher>();
 
-    private CommandEnvelope? _lastDispatched;
+    private AgentCommandIntent? _lastDispatched;
     private ConversationAppendRequest? _lastAppend;
 
     private AgentInteractionPostingOrchestrator Orchestrator => new(
@@ -71,7 +71,7 @@ public sealed class AgentInteractionPostingOrchestratorTests
         outcome.AgentInteractionId.ShouldBe(AgentInteractionId);
         outcome.Status.ShouldBe(AgentInteractionStatus.Posted);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.CommandType.ShouldBe(nameof(PostAgentResponse));
         dispatched.Domain.ShouldBe("agent-interaction");
         dispatched.AggregateId.ShouldBe(AgentInteractionId);
@@ -230,8 +230,8 @@ public sealed class AgentInteractionPostingOrchestratorTests
     public async Task All_deferred_defaults_fail_closed_to_posting_failed()
     {
         var dispatcher = Substitute.For<IAgentCommandDispatcher>();
-        CommandEnvelope? captured = null;
-        _ = dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => captured = e), Arg.Any<CancellationToken>());
+        AgentCommandIntent? captured = null;
+        _ = dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => captured = e), Arg.Any<CancellationToken>());
 
         var orchestrator = new AgentInteractionPostingOrchestrator(
             new DeferredAgentPartyReader(),
@@ -242,7 +242,7 @@ public sealed class AgentInteractionPostingOrchestratorTests
         AgentInteractionPostingOutcomeResult outcome = await orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.PostingFailed);
-        await dispatcher.Received(1).DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
         var command = JsonSerializer.Deserialize<PostAgentResponse>(captured!.Payload)!;
         // The first deferred seam on the path is the Agent-Party read → PartyIdentityUnavailable.
         command.Result.Outcome.ShouldBe(AgentResponsePostingOutcome.PartyIdentityUnavailable);
@@ -285,7 +285,7 @@ public sealed class AgentInteractionPostingOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(clientExtensions: clientExtensions), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.Extensions.ShouldNotBeNull();
         dispatched.Extensions.ShouldNotContainKey("actor:agentsAdmin");
         dispatched.Extensions.ShouldNotContainKey("provider:selectionValidation");
@@ -302,7 +302,7 @@ public sealed class AgentInteractionPostingOrchestratorTests
 
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         dispatched.TenantId.ShouldBe(TenantId);
         dispatched.MessageId.ShouldBe("msg-1");
         dispatched.CorrelationId.ShouldBe("corr-1");
@@ -323,7 +323,7 @@ public sealed class AgentInteractionPostingOrchestratorTests
             Request(responseMode: AgentResponseMode.Confirmation), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.Generated); // unchanged — not posted
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
         await _partyReader.DidNotReceive().ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _poster.DidNotReceive().AppendAgentMessageAsync(Arg.Any<ConversationAppendRequest>(), Arg.Any<CancellationToken>());
     }
@@ -338,7 +338,7 @@ public sealed class AgentInteractionPostingOrchestratorTests
 
         AgentInteractionPostingOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
-        CommandEnvelope dispatched = LastDispatched().ShouldNotBeNull();
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         var command = JsonSerializer.Deserialize<PostAgentResponse>(dispatched.Payload)!;
 
         var state = new AgentInteractionState();
@@ -347,7 +347,7 @@ public sealed class AgentInteractionPostingOrchestratorTests
         state.Apply(new AgentInteractionAuthorized(AgentInteractionId));
         state.Apply(new AgentInteractionContextReady(AgentInteractionId, SampleContextEvidence()));
         state.Apply(new AgentOutputGenerated(AgentInteractionId, SampleVersion()));
-        DomainResult result = AgentInteractionAggregate.Handle(command, state, dispatched);
+        DomainResult result = AgentInteractionAggregate.Handle(command, state, dispatched.ToFixtureEnvelope());
 
         AgentResponsePosted posted = result.Events[0].ShouldBeOfType<AgentResponsePosted>();
         posted.Evidence.AgentPartyId.ShouldBe(AgentPartyId);
@@ -367,7 +367,7 @@ public sealed class AgentInteractionPostingOrchestratorTests
         await Should.ThrowAsync<OperationCanceledException>(
             async () => await Orchestrator.ExecuteAsync(Request(), CancellationToken.None));
 
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     // ===== Helpers =====
@@ -445,9 +445,9 @@ public sealed class AgentInteractionPostingOrchestratorTests
             clientExtensions);
 
     private void CaptureDispatch()
-        => _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
+        => _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
 
-    private CommandEnvelope? LastDispatched() => _lastDispatched;
+    private AgentCommandIntent? LastDispatched() => _lastDispatched;
 
     private ConversationAppendRequest? LastAppend() => _lastAppend;
 

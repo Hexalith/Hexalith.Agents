@@ -33,7 +33,7 @@ public sealed class AgentInteractionProposalTerminalOrchestratorTests
     private readonly IProposalExpiryPolicyReader _expiryReader = Substitute.For<IProposalExpiryPolicyReader>();
     private readonly IAgentCommandDispatcher _dispatcher = Substitute.For<IAgentCommandDispatcher>();
 
-    private CommandEnvelope? _dispatched;
+    private AgentCommandIntent? _dispatched;
 
     private AgentInteractionProposalRejectionOrchestrator RejectionOrchestrator => new(_approverPolicyResolver, _dispatcher);
 
@@ -57,7 +57,7 @@ public sealed class AgentInteractionProposalTerminalOrchestratorTests
         _dispatched.AggregateId.ShouldBe(InteractionId);
         command.Result.Outcome.ShouldBe(AgentProposalRejectionOutcome.Rejected);
         command.Result.RationaleCode.ShouldBe("OffTopic");
-        await _dispatcher.Received(1).DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public sealed class AgentInteractionProposalTerminalOrchestratorTests
 
         outcome.Status.ShouldBe(AgentInteractionStatus.Unknown);
         outcome.NotRejectableReason.ShouldBe(AgentProposedReplyNotRejectableReason.ProposalNotPending);
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public sealed class AgentInteractionProposalTerminalOrchestratorTests
 
         outcome.Status.ShouldBe(AgentInteractionStatus.Unknown);
         outcome.NotAbandonableReason.ShouldBe(AgentProposedReplyNotAbandonableReason.ProposalNotPending);
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public sealed class AgentInteractionProposalTerminalOrchestratorTests
         _dispatched.CommandType.ShouldBe(nameof(AbandonProposedAgentReply));
         command.Result.Outcome.ShouldBe(AgentProposalAbandonmentOutcome.Abandoned);
         command.Result.ActorPartyId.ShouldBe(ApproverPartyId);
-        await _dispatcher.Received(1).DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -165,7 +165,7 @@ public sealed class AgentInteractionProposalTerminalOrchestratorTests
 
         notReached.Outcome.ShouldBe(AgentProposalExpiryOutcome.ExpiryNotReached);
         noPolicy.Outcome.ShouldBe(AgentProposalExpiryOutcome.NoExpiryPolicy);
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -178,7 +178,7 @@ public sealed class AgentInteractionProposalTerminalOrchestratorTests
         await Should.ThrowAsync<OperationCanceledException>(
             async () => await RejectionOrchestrator.ExecuteAsync(RejectionRequest(), CancellationToken.None));
 
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -191,7 +191,7 @@ public sealed class AgentInteractionProposalTerminalOrchestratorTests
         await Should.ThrowAsync<OperationCanceledException>(
             async () => await ExpiryOrchestrator.ExecuteAsync(ExpiryRequest(expiresAt: null), CancellationToken.None));
 
-        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<CommandEnvelope>(), Arg.Any<CancellationToken>());
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     private static AgentInteractionProposalRejectionRequest RejectionRequest(
@@ -260,5 +260,5 @@ public sealed class AgentInteractionProposalTerminalOrchestratorTests
             ]));
 
     private void CaptureDispatch()
-        => _dispatcher.DispatchAsync(Arg.Do<CommandEnvelope>(e => _dispatched = e), Arg.Any<CancellationToken>());
+        => _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _dispatched = e), Arg.Any<CancellationToken>());
 }

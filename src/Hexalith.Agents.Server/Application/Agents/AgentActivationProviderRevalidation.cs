@@ -154,7 +154,7 @@ public sealed class AgentActivationProviderRevalidation
         CancellationToken ct)
     {
         var command = new ActivateAgent();
-        var envelope = new CommandEnvelope(
+        var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             AgentDomain,
