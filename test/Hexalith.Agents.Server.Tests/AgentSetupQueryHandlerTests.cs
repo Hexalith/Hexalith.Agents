@@ -45,6 +45,43 @@ public sealed class AgentSetupQueryHandlerTests
             .ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
 
+    /// <summary>Verifies that a misrouted model cannot disclose another scope or cause a foreign approver lookup.</summary>
+    [Theory]
+    [InlineData(true, "foreign-tenant", AgentId)]
+    [InlineData(false, "foreign-tenant", AgentId)]
+    [InlineData(true, TenantId, "foreign-agent")]
+    [InlineData(false, TenantId, "foreign-agent")]
+    [InlineData(true, "foreign-tenant", "foreign-agent")]
+    [InlineData(false, "foreign-tenant", "foreign-agent")]
+    public async Task MisroutedSetupIsUnavailableBeforeDisclosureOrApproverLookup(bool statusQuery, string modelTenant, string modelAgent)
+    {
+        var resolver = Substitute.For<IApproverPolicyResolver>();
+        _store.Seed(StoreName, AgentSetupReadModelAddresses.Detail(TenantId, AgentId), new AgentSetupReadModel
+        {
+            IsCreated = true,
+            AgentId = modelAgent,
+            TenantId = modelTenant,
+            DisplayName = "foreign-display-name",
+            Description = "foreign-description",
+            ApproverPolicySources = [new(ApproverPolicySourceKind.PredefinedParty, "foreign-party", null)],
+            ApproverPolicyDisclosure = ApproverPolicyBasisDisclosure.OperatorOnly,
+            ResponseMode = AgentResponseMode.Confirmation,
+            ConfigurationVersion = 99,
+        });
+        var options = Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName });
+        AgentSetupQueryHandlerBase handler = statusQuery
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, resolver)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, resolver);
+
+        AgentSetupResult result = await ExecuteAsync(handler,
+            Query(statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType));
+
+        result.Status.ShouldBe(AgentInspectionStatus.Unavailable);
+        result.Setup.ShouldBeNull();
+        JsonSerializer.Serialize(result, _json).ShouldNotContain("foreign-");
+        resolver.ReceivedCalls().ShouldBeEmpty();
+    }
+
     /// <summary>Verifies that same kind substituted party cannot confirm the safe query basis.</summary>
     [Fact]
     public async Task SameKindSubstitutedPartyCannotConfirmTheSafeQueryBasis()

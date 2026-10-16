@@ -32,6 +32,15 @@ public static class AgentSetupViewFactory
             return AgentSetupResult.NotAuthorized();
         }
 
+        // The addressed read-model key cannot establish the returned value's scope. Validate it before
+        // inspecting any metadata or resolving its approvers so a misrouted value never discloses another Agent.
+        if (model is not null
+            && (!string.Equals(model.TenantId, tenantId, StringComparison.Ordinal)
+                || !string.Equals(model.AgentId, agentId, StringComparison.Ordinal)))
+        {
+            return AgentSetupResult.Unavailable();
+        }
+
         AgentInspectionResult inspection = AgentInspection.GetStatus(
             AgentSetupProjectionFold.ToState(model, tenantId, agentId),
             isAgentsAdmin: true);

@@ -1,0 +1,295 @@
+{
+  "recordedAtUtc": "2026-10-16T07:24:51.607862+00:00",
+  "scope": "Local setup-query returned-model scope validation; full Story 5.4 remains in-progress",
+  "storyStatus": "in-progress",
+  "storyComplete": false,
+  "liveReadinessEstablished": false,
+  "changes": [
+    "Validate returned setup TenantId and AgentId in the shared view factory before inspecting state or resolving approvers.",
+    "Add six wrong-tenant/wrong-Agent regressions across both setup queries.",
+    "Require AgentSetupQueryHandlerTests in the strict Local verifier."
+  ],
+  "baselineLocalCommand": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Local -ArtifactsPath /tmp/agents-story54-resume-2026-10-16/local",
+  "baselineTotalPassed": 3687,
+  "redCommand": "dotnet test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll -method '*MisroutedSetupIsUnavailableBeforeDisclosureOrApproverLookup*' -result-xml /tmp/agents-story54-resume-2026-10-16/scope-red.xml",
+  "redExpectedExitCode": 1,
+  "redResults": {
+    "total": 6,
+    "passed": 0,
+    "failed": 6,
+    "errors": 0,
+    "skipped": 0,
+    "not-run": 0
+  },
+  "redArtifact": {
+    "path": "/tmp/agents-story54-resume-2026-10-16/scope-red.xml",
+    "sha256": "6d3910fce78f9fce57b0cf6f7e23cbc0d8706fdeca276334c4e6b0a273bcafe6"
+  },
+  "focusedCommand": "dotnet test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll -class Hexalith.Agents.Server.Tests.AgentSetupQueryHandlerTests -result-xml /tmp/agents-story54-resume-2026-10-16/scope-green.xml",
+  "focusedResults": {
+    "total": 17,
+    "passed": 17,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not-run": 0
+  },
+  "focusedArtifact": {
+    "path": "/tmp/agents-story54-resume-2026-10-16/scope-green.xml",
+    "sha256": "b3a6a17a61117f91969403ae18414ef01f0a85e3716483f86b1eca3a821e9d52"
+  },
+  "localCommand": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Local -ArtifactsPath /tmp/agents-story54-resume-2026-10-16/final-local",
+  "localExitCode": 0,
+  "owningProjects": [
+    {
+      "project": "Hexalith.Agents.Client.Tests",
+      "results": {
+        "total": 6,
+        "passed": 6,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "xml": {
+        "path": "/tmp/agents-story54-resume-2026-10-16/final-local/Hexalith.Agents.Client.Tests.xml",
+        "sha256": "c32a3c446f94121bfab9cdc8335b20f856b6eaea609f5fd11f19c9a1bd6e5c35"
+      },
+      "buildLog": {
+        "path": "/tmp/agents-story54-resume-2026-10-16/final-local/Hexalith.Agents.Client.Tests.build.log",
+        "sha256": "5cf928c4f2192cdfa89f7cc740fd8ee6320d42592daeeefe5879c1a280967464"
+      },
+      "zeroBuildWarnings": true
+    },
+    {
+      "project": "Hexalith.Agents.Contracts.Tests",
+      "results": {
+        "total": 731,
+        "passed": 731,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "xml": {
+        "path": "/tmp/agents-story54-resume-2026-10-16/final-local/Hexalith.Agents.Contracts.Tests.xml",
+        "sha256": "08b213848b9f445615b29000c0bd05077ab6ae772839a4ad563c90a17134abf3"
+      },
+      "buildLog": {
+        "path": "/tmp/agents-story54-resume-2026-10-16/final-local/Hexalith.Agents.Contracts.Tests.build.log",
+        "sha256": "6f20d740627de865cae9046a71ca61275c276ac9e85b2880f14ea63ae527902b"
+      },
+      "zeroBuildWarnings": true
+    },
+    {
+      "project": "Hexalith.Agents.Server.Tests",
+      "results": {
+        "total": 885,
+        "passed": 885,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "xml": {
+        "path": "/tmp/agents-story54-resume-2026-10-16/final-local/Hexalith.Agents.Server.Tests.xml",
+        "sha256": "8f4386a4d57a68a7412e661306836bf5ae6ea950b2abe252a71a03149738fe93"
+      },
+      "buildLog": {
+        "path": "/tmp/agents-story54-resume-2026-10-16/final-local/Hexalith.Agents.Server.Tests.build.log",
+        "sha256": "36bab1c0a8450de06edf856d2eb77449c19d6d275f065951826ac2ccffd48d5a"
+      },
+      "zeroBuildWarnings": true
+    },
+    {
+      "project": "Hexalith.Agents.Tests",
+      "results": {
+        "total": 913,
+        "passed": 913,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "xml": {
+        "path": "/tmp/agents-story54-resume-2026-10-16/final-local/Hexalith.Agents.Tests.xml",
+        "sha256": "8a254e58872da87a5952527f11363e61df13f50feb501a360f689cfb1c5c1a10"
+      },
+      "buildLog": {
+        "path": "/tmp/agents-story54-resume-2026-10-16/final-local/Hexalith.Agents.Tests.build.log",
+        "sha256": "3e30ada2ccb710171aa17719c101056cacad1653eac0f19e32641ea28c50f95f"
+      },
+      "zeroBuildWarnings": true
+    },
+    {
+      "project": "Hexalith.Agents.UI.Tests",
+      "results": {
+        "total": 1158,
+        "passed": 1158,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "xml": {
+        "path": "/tmp/agents-story54-resume-2026-10-16/final-local/Hexalith.Agents.UI.Tests.xml",
+        "sha256": "6666970df81d3cffb737d3750a9c76300c2c0e603e03f22519ac94114f34101b"
+      },
+      "buildLog": {
+        "path": "/tmp/agents-story54-resume-2026-10-16/final-local/Hexalith.Agents.UI.Tests.build.log",
+        "sha256": "11ebe255f3f0014a2556e1860b66bd9d5d0cebb6be7091151277ba54a97ce515"
+      },
+      "zeroBuildWarnings": true
+    }
+  ],
+  "totalPassed": 3693,
+  "localResult": {
+    "LiveReadinessEstablished": false,
+    "Blockers": [
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-PARTIES-1"
+      },
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-CONV-AI-1"
+      },
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-SECRETS-1"
+      },
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-HOST-1"
+      }
+    ],
+    "ExternalOwnerCalls": 0,
+    "LocalContractsVerified": true,
+    "StoryComplete": false,
+    "Mode": "Local"
+  },
+  "liveCommand": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Live -ArtifactsPath /tmp/agents-story54-resume-2026-10-16/final-live",
+  "liveExpectedExitCode": 1,
+  "liveArtifact": {
+    "path": "/tmp/agents-story54-resume-2026-10-16/final-live/result.json",
+    "sha256": "a3096cf7e887bade7aebe9b827fc2004d41893460dc3cac0da778d0a55462c1b"
+  },
+  "liveResult": {
+    "Blockers": [
+      {
+        "RecordId": "EXT-PARTIES-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-CONV-AI-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-SECRETS-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-HOST-1",
+        "Code": "DependencyNotAvailable"
+      }
+    ],
+    "ExternalCalls": 0,
+    "Mode": "Live",
+    "StoryComplete": false
+  },
+  "sourceBeforeManifest": {
+    "path": "/tmp/agents-story54-resume-2026-10-16/before-final-hashes.json",
+    "sha256": "436b69605177ab9b8bb6cabc30e34ffddae18ecb145d4bcc15484c295639302c"
+  },
+  "sourceAfterManifest": {
+    "path": "/tmp/agents-story54-resume-2026-10-16/after-final-hashes.json",
+    "sha256": "436b69605177ab9b8bb6cabc30e34ffddae18ecb145d4bcc15484c295639302c"
+  },
+  "sourceDriftCount": 0,
+  "verifiedFiles": [
+    {
+      "path": "src/Hexalith.Agents.Server/Projections/AgentSetupViewFactory.cs",
+      "sha256": "177eaca0c4053cab19a5fd96de2f08b80b34476c18cb4d5c2d6a59f7d36426da"
+    },
+    {
+      "path": "test/Hexalith.Agents.Server.Tests/AgentSetupQueryHandlerTests.cs",
+      "sha256": "e8aeb2a03768ebff27251fffa1ed87b8143ade247fb8cd0ea91442266543592f"
+    },
+    {
+      "path": "eng/verify-story-5.4.ps1",
+      "sha256": "019c0ab3aa6db3d1675c690abb77e17bc4375ead4bce832edf570219fa378b24"
+    },
+    {
+      "path": "_bmad-output/planning-artifacts/external-dependency-register.md",
+      "sha256": "6d443170159303bdd39da62b377cb29501ef2071b7d2c01a1f2f77191a984a45"
+    }
+  ],
+  "frozenIntentSha256": "a20faa6ebe5cdc5b92024d0e5bbb3644dd65e53964d2e5f8cdce4c153c1e3668",
+  "frozenIntentChanged": false,
+  "dependencies": [
+    {
+      "recordId": "EXT-PARTIES-1",
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+      "installedTarget": "493730941329d1bca3b4f6b2f6a67ffe305c2443",
+      "exactTargetMatches": false,
+      "ownerCommandExecuted": false,
+      "blocker": "DependencyNotAvailable"
+    },
+    {
+      "recordId": "EXT-CONV-AI-1",
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "8469c5c6891d12b43d2082136b1ca7ddfac52c3b",
+      "installedTarget": "58f158413df4e3d6b97190b2458e323eab6029c4",
+      "exactTargetMatches": false,
+      "ownerCommandExecuted": false,
+      "blocker": "DependencyNotAvailable"
+    },
+    {
+      "recordId": "EXT-SECRETS-1",
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "f448db29493c1b30b0f18380188fe99b8b7606fe",
+      "installedTarget": "c75e680f5460c411aa922696605f18039bd2a77d",
+      "exactTargetMatches": false,
+      "ownerCommandExecuted": false,
+      "blocker": "DependencyNotAvailable"
+    },
+    {
+      "recordId": "EXT-HOST-1",
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "f448db29493c1b30b0f18380188fe99b8b7606fe",
+      "installedTarget": "c75e680f5460c411aa922696605f18039bd2a77d",
+      "exactTargetMatches": false,
+      "ownerCommandExecuted": false,
+      "blocker": "DependencyNotAvailable"
+    }
+  ],
+  "externalOwnerCalls": 0,
+  "ownerSourceEdits": 0,
+  "dependencyStatusesChanged": false,
+  "incompleteAcceptanceMatrix": {
+    "currentAuthority": [
+      "Production current Tenants/Parties/Conversations source bindings",
+      "Immutable create-only Party provisioning",
+      "Live safe API/UI authority and revocation proof"
+    ],
+    "trustedDelivery": [
+      "Real AD-30 signature/principal/operation/scope admission",
+      "Private exact-target replay credentials and conditional EventStore persistence",
+      "Authenticated persisted replay/ACL/AD-29 end-state qualification"
+    ],
+    "denialRecovery": [
+      "Platform replicated durable denial spool and recovery-worker bindings",
+      "Persisted outage/restart/restore/lost-ack deduplication and acknowledgement proof"
+    ],
+    "tenantIsolation": [
+      "Complete deployed log/count/message/accessibility non-disclosure qualification"
+    ]
+  },
+  "limitations": [
+    "The isolation regression uses a substituted read-model store and approver resolver; no live owner seam or state-store durability is claimed.",
+    "Accepted owner targets differ from installed references; complete owner delivery and accepted exact-target qualification remain required.",
+    "The Agents repository contains no AppHost; Platform hosting remains unavailable and was not started."
+  ],
+  "whitespaceCheck": "git -c core.whitespace=cr-at-eol diff --check (pass; changed C# files use required CRLF)"
+}
