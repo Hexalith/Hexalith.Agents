@@ -557,7 +557,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
 
     private void StubResolver(ApproverSourceOutcome sourceOutcome)
         => _resolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
-            .Returns(new ApproverPolicyResolutionResult([new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, sourceOutcome)]));
+            .Returns(new ApproverPolicyResolutionResult([new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, sourceOutcome) { Source = new(ApproverPolicySourceKind.ConversationOwner, null, null) }]));
 
     private void StubLoadedConversation()
     {

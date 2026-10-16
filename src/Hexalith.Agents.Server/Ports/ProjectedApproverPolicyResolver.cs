@@ -13,7 +13,10 @@ public sealed class ProjectedApproverPolicyResolver(ICurrentApproverEvidenceSour
     /// <inheritdoc />
     public Task<ApproverPolicyResolutionResult> ResolveForActorAsync(string tenantId, AgentApproverPolicy policy,
         ApproverResolutionContext context, CancellationToken ct)
-        => ResolveCoreAsync(tenantId, policy, context, ct);
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        return ResolveCoreAsync(tenantId, policy, context, ct);
+    }
 
     private async Task<ApproverPolicyResolutionResult> ResolveCoreAsync(string tenantId, AgentApproverPolicy policy,
         ApproverResolutionContext? context, CancellationToken ct)
@@ -28,6 +31,19 @@ public sealed class ProjectedApproverPolicyResolver(ICurrentApproverEvidenceSour
             }
         }
 
+        ct.ThrowIfCancellationRequested();
+        if (string.IsNullOrWhiteSpace(tenantId) || (context is not null
+            && (string.IsNullOrWhiteSpace(context.ActorId) || string.IsNullOrWhiteSpace(context.PartyId)
+                || string.IsNullOrWhiteSpace(context.SourceConversationId))))
+        {
+            return new(policy.Sources.Select(item => new ApproverSourceResolution(item.Kind, ApproverSourceOutcome.Unauthorized)
+            {
+                Source = item,
+            }).ToArray());
+        }
+
+        DateTimeOffset evaluationStarted = clock.GetUtcNow();
+        DateTimeOffset lastObserved = evaluationStarted;
         foreach (ApproverPolicySource configured in policy.Sources)
         {
             ApproverSourceOutcome outcome = ApproverSourceOutcome.Unavailable;
@@ -35,27 +51,36 @@ public sealed class ProjectedApproverPolicyResolver(ICurrentApproverEvidenceSour
             IReadOnlyList<CurrentApproverEvidence> captured = [];
             if (configured.Kind is ApproverPolicySourceKind.Caller or ApproverPolicySourceKind.Unknown || !Enum.IsDefined(configured.Kind))
             {
-                results.Add(new(configured.Kind, outcome));
+                results.Add(new(configured.Kind, outcome) { Source = configured });
                 continue;
             }
 
             try
             {
                 DateTimeOffset started = clock.GetUtcNow();
-                IReadOnlyList<CurrentApproverEvidence> candidates = await source.ReadAsync(tenantId, configured, context?.SourceConversationId, ct).ConfigureAwait(false);
-                captured = candidates.ToArray();
+                if (started < lastObserved)
+                {
+                    return Unavailable(policy);
+                }
+
+                CurrentApproverEvidence[] candidates = (await source.ReadAsync(tenantId, configured, context?.SourceConversationId, ct).ConfigureAwait(false)).ToArray();
                 DateTimeOffset now = clock.GetUtcNow();
                 ct.ThrowIfCancellationRequested();
-                // Any malformed candidate blocks the source; filtering it out must not create false uniqueness.
-                bool valid = now >= started && candidates.All(item => item.Source == configured && item.Actor.TenantId == tenantId
-                    && !string.IsNullOrWhiteSpace(item.Actor.ActorId) && !string.IsNullOrWhiteSpace(item.Actor.PartyId)
-                    && item.Actor.BindingVersion > 0 && item.Actor.SourcePosition > 0 && item.Actor.ObservedAt >= started
-                    && item.Actor.ObservedAt <= now && item.Actor.ValidUntil > now
-                    && (configured.Kind != ApproverPolicySourceKind.PredefinedParty || configured.PartyId == item.Actor.PartyId));
-                bool coherent = candidates.GroupBy(item => item.Actor.PartyId, StringComparer.Ordinal)
-                    .All(group => group.Count() == 1);
-                if (valid && coherent && candidates.Count > 0)
+                if (now < started)
                 {
+                    return Unavailable(policy);
+                }
+
+                // Any malformed candidate blocks the source; filtering it out must not create false uniqueness.
+                bool valid = candidates.All(item => item?.Source == configured && item.Actor is { } actor
+                    && actor.IsCurrentFor(tenantId, actor.Subject, null, started, now)
+                    && (configured.Kind != ApproverPolicySourceKind.PredefinedParty || configured.PartyId == item.Actor.PartyId));
+                lastObserved = now;
+                bool coherent = valid && candidates.GroupBy(item => item.Actor.PartyId, StringComparer.Ordinal)
+                    .All(group => group.Count() == 1);
+                if (valid && coherent && candidates.Length > 0)
+                {
+                    captured = candidates;
                     if (context is null)
                     {
                         outcome = ApproverSourceOutcome.Resolved;
@@ -72,7 +97,7 @@ public sealed class ProjectedApproverPolicyResolver(ICurrentApproverEvidenceSour
                 }
                 else if (valid)
                 {
-                    outcome = candidates.Count == 0 ? ApproverSourceOutcome.Missing : ApproverSourceOutcome.Ambiguous;
+                    outcome = candidates.Length == 0 ? ApproverSourceOutcome.Missing : ApproverSourceOutcome.Ambiguous;
                 }
             }
             catch (Exception exception) when (exception is not OperationCanceledException)
@@ -83,11 +108,19 @@ public sealed class ProjectedApproverPolicyResolver(ICurrentApproverEvidenceSour
             results.Add(new(configured.Kind, outcome) { Source = configured, Evidence = accepted, Candidates = captured });
         }
 
+        CurrentApproverEvidence[] currentCandidates = results.SelectMany(item => item.Candidates).ToArray();
+        if (currentCandidates.Length == 0)
+        {
+            ct.ThrowIfCancellationRequested();
+            return new(results);
+        }
+
         // Recheck every accepted interval after the final source await; later revocation/expiry never falls back.
         bool confirmed = false;
         try
         {
-            confirmed = await source.ConfirmAsync(tenantId, results.SelectMany(item => item.Candidates).ToArray(), ct).ConfigureAwait(false);
+            ct.ThrowIfCancellationRequested();
+            confirmed = await source.ConfirmAsync(tenantId, currentCandidates, ct).ConfigureAwait(false);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
@@ -96,12 +129,18 @@ public sealed class ProjectedApproverPolicyResolver(ICurrentApproverEvidenceSour
 
         DateTimeOffset completed = clock.GetUtcNow();
         ct.ThrowIfCancellationRequested();
-        if (!confirmed || results.Any(item => item.Candidates.Any(candidate => candidate.Actor.ValidUntil <= completed
-            || candidate.Actor.ObservedAt > completed)))
+        if (!confirmed || completed < lastObserved || currentCandidates.Any(candidate =>
+            !candidate.Actor.IsCurrentFor(tenantId, candidate.Actor.Subject, null, evaluationStarted, completed)))
         {
-            return new(results.Select(item => item with { Outcome = ApproverSourceOutcome.Unavailable, Evidence = null }).ToArray());
+            return Unavailable(policy);
         }
 
         return new(results);
     }
+
+    private static ApproverPolicyResolutionResult Unavailable(AgentApproverPolicy policy)
+        => new(policy.Sources.Select(item => new ApproverSourceResolution(item.Kind, ApproverSourceOutcome.Unavailable)
+        {
+            Source = item,
+        }).ToArray());
 }

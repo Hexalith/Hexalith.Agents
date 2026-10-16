@@ -103,7 +103,7 @@ public sealed class ApproverPolicyVerdictTests
         var sources = new List<ApproverSourceResolution>(outcomes.Length);
         foreach (ApproverSourceOutcome outcome in outcomes)
         {
-            sources.Add(new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, outcome));
+            sources.Add(new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, outcome) { Source = new(ApproverPolicySourceKind.ConversationOwner, null, null) });
         }
 
         return new ApproverPolicyResolutionResult(sources);

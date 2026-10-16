@@ -262,7 +262,7 @@ public sealed class AgentInteractionProposalEditOrchestratorTests
 
     private void StubResolver(ApproverSourceOutcome sourceOutcome)
         => _resolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
-            .Returns(new ApproverPolicyResolutionResult([new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, sourceOutcome)]));
+            .Returns(new ApproverPolicyResolutionResult([new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, sourceOutcome) { Source = new(ApproverPolicySourceKind.ConversationOwner, null, null) }]));
 
     private static AgentApproverPolicy SingleSourcePolicy()
         => new([new ApproverPolicySource(ApproverPolicySourceKind.ConversationOwner, null, null)], ApproverPolicyBasisDisclosure.OperatorOnly);

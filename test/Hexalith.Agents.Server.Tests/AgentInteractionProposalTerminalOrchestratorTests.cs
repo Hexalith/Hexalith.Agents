@@ -250,13 +250,13 @@ public sealed class AgentInteractionProposalTerminalOrchestratorTests
     private void StubAuthorized()
         => _approverPolicyResolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
             .Returns(new ApproverPolicyResolutionResult([
-                new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Resolved),
+                new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Resolved) { Source = new(ApproverPolicySourceKind.ConversationOwner, null, null) },
             ]));
 
     private void StubUnauthorized()
         => _approverPolicyResolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
             .Returns(new ApproverPolicyResolutionResult([
-                new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Unauthorized),
+                new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Unauthorized) { Source = new(ApproverPolicySourceKind.ConversationOwner, null, null) },
             ]));
 
     private void CaptureDispatch()

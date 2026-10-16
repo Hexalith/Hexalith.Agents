@@ -97,7 +97,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         _readinessReader.ReadAsync(TenantId, AgentId, Arg.Any<CancellationToken>())
             .Returns(Readiness() with { ResponseMode = AgentResponseMode.Confirmation, ApproverPolicy = policy });
         _approverPolicyResolver.ResolveAsync(TenantId, policy, Arg.Any<CancellationToken>())
-            .Returns(new ApproverPolicyResolutionResult([new ApproverSourceResolution(ApproverPolicySourceKind.PredefinedParty, ApproverSourceOutcome.Resolved)]));
+            .Returns(new ApproverPolicyResolutionResult([new ApproverSourceResolution(ApproverPolicySourceKind.PredefinedParty, ApproverSourceOutcome.Resolved) { Source = new(ApproverPolicySourceKind.PredefinedParty, "party-approver", null) }]));
         CaptureDispatch();
 
         AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
@@ -258,7 +258,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         _readinessReader.ReadAsync(TenantId, AgentId, Arg.Any<CancellationToken>())
             .Returns(Readiness() with { ResponseMode = AgentResponseMode.Confirmation, ApproverPolicy = policy });
         _approverPolicyResolver.ResolveAsync(TenantId, policy, Arg.Any<CancellationToken>())
-            .Returns(new ApproverPolicyResolutionResult([new ApproverSourceResolution(ApproverPolicySourceKind.PredefinedParty, ApproverSourceOutcome.Ambiguous)]));
+            .Returns(new ApproverPolicyResolutionResult([new ApproverSourceResolution(ApproverPolicySourceKind.PredefinedParty, ApproverSourceOutcome.Ambiguous) { Source = new(ApproverPolicySourceKind.PredefinedParty, "party-approver", null) }]));
         CaptureDispatch();
 
         AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);

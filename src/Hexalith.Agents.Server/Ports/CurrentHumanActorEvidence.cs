@@ -10,7 +10,8 @@ public sealed record CurrentHumanActorEvidence(string TenantId, string Subject, 
 {
     /// <summary>Checks exact subject/scope/binding correspondence and fresh UTC evidence at the completion instant.</summary>
     internal bool IsCurrentFor(string tenantId, string subject, string? partyId, DateTimeOffset started, DateTimeOffset now)
-        => TenantId == tenantId && Subject == subject
+        => !string.IsNullOrWhiteSpace(tenantId) && !string.IsNullOrWhiteSpace(subject)
+            && TenantId == tenantId && Subject == subject
             && !string.IsNullOrWhiteSpace(ActorId) && !string.IsNullOrWhiteSpace(PartyId)
             && BindingVersion > 0 && SourcePosition > 0 && ObservedAt != default
             && now >= started && ObservedAt >= started && ObservedAt <= now && ValidUntil > now

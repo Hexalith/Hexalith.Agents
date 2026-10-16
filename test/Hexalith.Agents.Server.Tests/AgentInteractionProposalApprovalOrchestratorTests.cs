@@ -89,7 +89,7 @@ public sealed class AgentInteractionProposalApprovalOrchestratorTests
     {
         _approverPolicyResolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
             .Returns(new ApproverPolicyResolutionResult([
-                new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Unauthorized),
+                new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Unauthorized) { Source = new(ApproverPolicySourceKind.ConversationOwner, null, null) },
             ]));
         _ = _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _dispatched = e), Arg.Any<CancellationToken>());
 
@@ -258,7 +258,7 @@ public sealed class AgentInteractionProposalApprovalOrchestratorTests
     private void StubAuthorized()
         => _approverPolicyResolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), Arg.Any<CancellationToken>())
             .Returns(new ApproverPolicyResolutionResult([
-                new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Resolved),
+                new ApproverSourceResolution(ApproverPolicySourceKind.ConversationOwner, ApproverSourceOutcome.Resolved) { Source = new(ApproverPolicySourceKind.ConversationOwner, null, null) },
             ]));
 
     private void StubVersionAvailable()
