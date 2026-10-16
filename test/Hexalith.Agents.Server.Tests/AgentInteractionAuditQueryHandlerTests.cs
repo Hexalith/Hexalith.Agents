@@ -18,7 +18,7 @@ public sealed class AgentInteractionAuditQueryHandlerTests
     [Fact]
     public async Task Non_global_user_gets_not_authorized_without_state_access()
     {
-        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available(State()));
+        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", State()));
         var handler = new GetAgentInteractionStatusQueryHandler(reader, new DeferredTenantAccessReader());
 
         QueryResult result = await handler.ExecuteAsync(Envelope(GetAgentInteractionStatusQuery.QueryType, isGlobalAdmin: false), CancellationToken.None);
@@ -31,7 +31,7 @@ public sealed class AgentInteractionAuditQueryHandlerTests
     [Fact]
     public async Task Global_admin_gets_safe_status_from_tenant_scoped_state()
     {
-        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available(State()));
+        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", State()));
         var handler = new GetAgentInteractionStatusQueryHandler(reader, new StubTenantAccessReader(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true)));
 
         QueryResult result = await handler.ExecuteAsync(Envelope(GetAgentInteractionStatusQuery.QueryType), CancellationToken.None);
@@ -60,7 +60,7 @@ public sealed class AgentInteractionAuditQueryHandlerTests
     [Fact]
     public async Task Stale_state_returns_audit_delayed()
     {
-        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available(State(), isFresh: false));
+        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", State(), isFresh: false));
         var handler = new GetAgentAuditAvailabilityQueryHandler(reader, new StubTenantAccessReader(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true)));
 
         QueryResult result = await handler.ExecuteAsync(Envelope(GetAgentAuditAvailabilityQuery.QueryType), CancellationToken.None);
@@ -86,7 +86,7 @@ public sealed class AgentInteractionAuditQueryHandlerTests
                 10,
                 20),
         ];
-        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available(state));
+        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", state));
         var handler = new GetAgentGenerationEvidenceQueryHandler(reader, new StubTenantAccessReader(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true)));
 
         QueryResult result = await handler.ExecuteAsync(Envelope(GetAgentGenerationEvidenceQuery.QueryType), CancellationToken.None);
@@ -99,7 +99,7 @@ public sealed class AgentInteractionAuditQueryHandlerTests
     [Fact]
     public async Task Tenant_member_with_fresh_access_is_authorized_and_reads_scoped_state()
     {
-        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available(State()));
+        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", State()));
         var tenant = new StubTenantAccessReader(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
         var handler = new GetAgentInteractionStatusQueryHandler(reader, tenant);
 
@@ -112,7 +112,7 @@ public sealed class AgentInteractionAuditQueryHandlerTests
     [Fact]
     public async Task Tenant_member_with_stale_access_is_not_authorized_without_state_access()
     {
-        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available(State()));
+        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", State()));
         var tenant = new StubTenantAccessReader(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: false));
         var handler = new GetAgentInteractionStatusQueryHandler(reader, tenant);
 
@@ -125,7 +125,7 @@ public sealed class AgentInteractionAuditQueryHandlerTests
     [Fact]
     public async Task Every_audit_handler_fails_closed_to_not_authorized_without_state_access()
     {
-        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available(State()));
+        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", State()));
 
         foreach (AgentInteractionAuditQueryHandlerBase handler in AllHandlers(reader, new DeferredTenantAccessReader()))
         {
@@ -168,7 +168,9 @@ public sealed class AgentInteractionAuditQueryHandlerTests
     [Fact]
     public async Task State_reader_is_scoped_strictly_to_the_envelope_tenant_and_aggregate()
     {
-        var reader = new CapturingAuditStateReader(AgentInteractionAuditStateReadResult.Available(State()));
+        AgentInteractionState state = State();
+        state.AgentInteractionId = "interaction-9";
+        var reader = new CapturingAuditStateReader(AgentInteractionAuditStateReadResult.Available("tenant-9", "interaction-9", state));
         var handler = new GetAgentInteractionStatusQueryHandler(reader, new StubTenantAccessReader(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true)));
 
         await handler.ExecuteAsync(

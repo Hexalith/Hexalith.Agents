@@ -47,6 +47,7 @@ public abstract class AgentInteractionAuditQueryHandlerBase(
         }
 
         bool isAuthorized = await HasTenantAccessAsync(query, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
         if (!isAuthorized)
         {
             return QueryResult.FromPayload(ToElement(CreateNotAuthorizedPayload(query.CorrelationId)));
@@ -55,8 +56,13 @@ public abstract class AgentInteractionAuditQueryHandlerBase(
         AgentInteractionAuditStateReadResult read = await _reader
             .ReadAsync(query.TenantId, query.AggregateId, cancellationToken)
             .ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
 
-        if (!read.CanLoad)
+        // A scoped request does not prove the returned stream's scope. Verify authoritative provenance before
+        // inspecting state or rendering any ids, evidence, counts, or availability from a misrouted read.
+        if (!read.CanLoad || !string.Equals(read.SourceTenantId, query.TenantId, StringComparison.Ordinal)
+            || !string.Equals(read.SourceAggregateId, query.AggregateId, StringComparison.Ordinal)
+            || (read.State is { } state && !string.Equals(state.AgentInteractionId, query.AggregateId, StringComparison.Ordinal)))
         {
             return QueryResult.FromPayload(ToElement(CreateUnavailablePayload(query.CorrelationId)));
         }
