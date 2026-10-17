@@ -18,7 +18,7 @@ namespace Hexalith.Agents.Server.Application.AgentInteractions;
 
 /// <summary>
 /// Application orchestration for the invocation authorization + dependency-readiness gate (Story 2.2; AC1–AC4; AD-3,
-/// AD-12). It reads every gate dependency through its port (each fail-closed on throw/not-available), maps each to one
+/// AD-12). It authorizes current tenant, caller and Conversation access before protected reads, then maps readiness to
 /// safe <see cref="AgentInvocationGateVerdict"/> in <see cref="AgentInteractionGateCheck"/> evaluation order, assembles
 /// the server-trusted <see cref="EvaluateAgentInteractionGate"/> command, and dispatches it through
 /// <see cref="IAgentCommandDispatcher"/>. The impure dependency reads happen here, outside the pure aggregate, and feed
@@ -91,17 +91,19 @@ public sealed class AgentInteractionGateOrchestrator
         _dispatcher = dispatcher;
     }
 
-    /// <summary>Reads every dependency, assembles + dispatches the gate command, and returns the safe decided outcome (AC1–AC4).</summary>
+    /// <summary>Authorizes access before reading readiness, dispatching the gate command and returning its safe outcome.</summary>
     /// <param name="request">The gate orchestration request (snapshot-recorded ids + caller context).</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>The safe gate outcome (interaction id + decided status).</returns>
     public async Task<AgentInteractionGateOutcomeResult> ExecuteAsync(AgentInteractionGateRequest request, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(request);
+        ct.ThrowIfCancellationRequested();
 
-        // (1) Read every dependency through its port — each fail-closed on throw/not-available (AD-12; FR-21). No
-        // provider adapter call, no Conversations post, no proposal anywhere on this path (AC2).
+        // (1) Authorize each scope before protected downstream reads. No provider invocation, Conversations post,
+        // proposal or target command follows a denied or uncertain tenant/caller/Conversation read.
         TenantAccessReadResult tenant = await ReadTenantAccessAsync(request, ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
         if (tenant is not { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true })
         {
             // A denied caller must not address the claimed tenant's Party, Conversation, Agent or catalog,
@@ -109,11 +111,27 @@ public sealed class AgentInteractionGateOrchestrator
             return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInteractionStatus.Denied);
         }
         AgentPartyValidationResult callerParty = await ValidatePartyAsync(request.TenantId, request.CallerPartyId, ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
+        if (callerParty.Status != PartyLinkValidationStatus.Valid)
+        {
+            return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInteractionStatus.Denied);
+        }
+
         ConversationAccessReadResult conversation = await ReadConversationAccessAsync(request, ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
+        if (conversation is not { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true })
+        {
+            return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInteractionStatus.Denied);
+        }
+
         AgentInvocationReadiness readiness = await ReadReadinessAsync(request, ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
         AgentInteractionGateOutcome agentPartyIdentity = await ReadAgentPartyIdentityAsync(request.TenantId, readiness, ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
         AgentInteractionGateOutcome providerReadiness = await ReadProviderReadinessAsync(request, ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
         AgentInteractionGateOutcome responsePolicy = await ResolveResponsePolicyAsync(request.TenantId, readiness, ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
 
         // (2) Map each read to exactly one verdict, in AgentInteractionGateCheck enum (evaluation) order.
         var verdicts = new List<AgentInvocationGateVerdict>

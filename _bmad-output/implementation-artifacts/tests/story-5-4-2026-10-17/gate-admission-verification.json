@@ -1,0 +1,191 @@
+{
+  "story": "5.4",
+  "scope": "Local gate authorization and cancellation follow-through",
+  "storyComplete": false,
+  "changedFiles": [
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateOrchestratorTests.cs",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs",
+    "eng/verify-story-5.4.ps1"
+  ],
+  "canonicalRevisions": {
+    ".": "7ce1f733214b03035957cc30726a8d20067578c9",
+    "references/Hexalith.Parties": "90af3047b50046cb4f6f91e01f182f562110aab3",
+    "references/Hexalith.Tenants": "e667d5391dae306e631dec23acd191863e54130c",
+    "references/Hexalith.Conversations": "4e937361613c2dba72c46595226219017e6ba524",
+    "references/Hexalith.EventStore": "77d9af18a54d92506e310fe5a45021a395e66f60",
+    "references/Hexalith.Platform": "b4b6d4a1efcd2f13c6d03270f8e952f27ed8148b",
+    "../parties": "3e9651ede9ac9b8d955d756dad21d0b31ab85302",
+    "../conversations": "9cbc71b63be3fa1ce4d89d98ef1771c54c6603f5",
+    "../platform": "f81b864e17012bb75c60374f4efaab87c20d63e1"
+  },
+  "commands": {
+    "redBuild": "dotnet build test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj --configuration Debug -m:1 -p:NuGetAudit=false -p:MinVerVersionOverride=1.0.0 --nologo",
+    "redFocused": "dotnet test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll -class Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests -result-xml /tmp/agents-story54-gate-red.xml",
+    "greenFocused": "dotnet test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll -class Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests -class Hexalith.Agents.Server.Tests.AgentInteractionGateOrchestratorTests -result-xml /tmp/agents-story54-gate-green.xml",
+    "broad": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Local -ArtifactsPath /tmp/agents-story54-gate-final/local",
+    "uiRerun": "dotnet test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll -class Hexalith.Agents.UI.Tests.AgentConfigurationTests -result-xml /tmp/agents-story54-gate-final/ui-config-rerun.xml",
+    "liveRefusal": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Live -ArtifactsPath /tmp/agents-story54-gate-final/live"
+  },
+  "red": {
+    "total": 30,
+    "passed": 0,
+    "failed": 30,
+    "errors": 0,
+    "skipped": 0,
+    "not-run": 0
+  },
+  "greenFocused": {
+    "total": 66,
+    "passed": 66,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not-run": 0
+  },
+  "broad": {
+    "exitCode": 1,
+    "projects": {
+      "Hexalith.Agents.Client.Tests": {
+        "total": 6,
+        "passed": 6,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Contracts.Tests": {
+        "total": 731,
+        "passed": 731,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "total": 991,
+        "passed": 991,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "total": 913,
+        "passed": 913,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "total": 1158,
+        "passed": 1156,
+        "failed": 2,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    }
+  },
+  "uiFocused": {
+    "exitCode": 1,
+    "total": 54,
+    "passed": 52,
+    "failed": 2,
+    "errors": 0,
+    "skipped": 0,
+    "not-run": 0
+  },
+  "uiFailures": [
+    "Hexalith.Agents.UI.Tests.AgentConfigurationTests.Automatic_catch_up_preserves_drafts_through_the_immediate_and_later_projection_reads",
+    "Hexalith.Agents.UI.Tests.AgentConfigurationTests.Polling_exhaustion_preserves_pending_truth_and_stops_further_reads"
+  ],
+  "live": {
+    "ExternalCalls": 0,
+    "Mode": "Live",
+    "Blockers": [
+      {
+        "RecordId": "EXT-PARTIES-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-CONV-AI-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-SECRETS-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-HOST-1",
+        "Code": "DependencyNotAvailable"
+      }
+    ],
+    "StoryComplete": false
+  },
+  "beforeHashes": {
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs": "2b108cf82c85d5b171a4509acd4c9578701f59438d6684741a638ffca3ce834e",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateOrchestratorTests.cs": "5f197e78594f6e68e5748ef7ceab3473c931c27c29e87a582cbc24b51ad1cea9",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs": "16ee60b0cb7386c94ddbd00e166d7dad836a2426ad1686537f90a6f24c2c135e",
+    "eng/verify-story-5.4.ps1": "c45d7a585c9e994ef092b561aac0f452e9281d3aae4adba03ef1dcfe534933d7",
+    "_bmad-output/planning-artifacts/external-dependency-register.md": "6d443170159303bdd39da62b377cb29501ef2071b7d2c01a1f2f77191a984a45"
+  },
+  "afterHashes": {
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs": "2b108cf82c85d5b171a4509acd4c9578701f59438d6684741a638ffca3ce834e",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateOrchestratorTests.cs": "5f197e78594f6e68e5748ef7ceab3473c931c27c29e87a582cbc24b51ad1cea9",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs": "16ee60b0cb7386c94ddbd00e166d7dad836a2426ad1686537f90a6f24c2c135e",
+    "eng/verify-story-5.4.ps1": "c45d7a585c9e994ef092b561aac0f452e9281d3aae4adba03ef1dcfe534933d7",
+    "_bmad-output/planning-artifacts/external-dependency-register.md": "6d443170159303bdd39da62b377cb29501ef2071b7d2c01a1f2f77191a984a45"
+  },
+  "sourceDrift": [],
+  "artifactHashes": {
+    "/tmp/agents-story54-gate-red.xml": "5cb44fc1f8c29cffcd5056308254e13e95748d61d74dd1b5fc1b6c8a08dab6fd",
+    "/tmp/agents-story54-gate-red.log": "cccbef9555fe023a3ca843555e6878d63535b8922bfba7506e50e304a967e655",
+    "/tmp/agents-story54-gate-red-build.log": "c51d8d20a23b34d8279f17e604f07d1726de694e627dc24cc5d553b123e19ee4",
+    "/tmp/agents-story54-gate-green.xml": "7b01a14e6ac52c4e631d97bed77e8ebb4bf8bc3a12e6826f4a83bb7735b21cf8",
+    "/tmp/agents-story54-gate-green.log": "cc213d8aa1a87f6ded886c7e5dce47e90db8e9e3d9929f60877b0daf15cb6640",
+    "/tmp/agents-story54-gate-green-build.log": "5b430c0bf0f61252d8100f894339b3d12208536861e3bfa7dce449d582e00a97",
+    "/tmp/agents-story54-gate-final/local.log": "796195853e45af517ecbabecdfabbf6fbd05389e0ae7ca2fbe1968dc88efcf3c",
+    "/tmp/agents-story54-gate-final/live.log": "1fd77440e3c5fa74c8c272065396e93f0022531d6b31d5ed90103104e29de89a",
+    "/tmp/agents-story54-gate-final/live/result.json": "4a2d3991bdde98328a327edc7ca2f4f8a5a303718270e8dec0b68df82e6d178b",
+    "/tmp/agents-story54-gate-final/ui-config-rerun.xml": "ad634c761d91628291c250f314614afc74f47f4df0c3cb435ba923b3c396e433",
+    "/tmp/agents-story54-gate-final/ui-config-rerun.log": "11e9db5b666cd8c0cc745e67034f6a97371cbe815b74c1cde24b2cd2558780e7",
+    "/tmp/agents-story54-gate-final/local/Hexalith.Agents.Client.Tests.xml": "17cb5b5cadad2240c8178c3f49d540363c0fca6d45e63ec8a050b149bf21e955",
+    "/tmp/agents-story54-gate-final/local/Hexalith.Agents.Contracts.Tests.xml": "c3c5a1a43e119338afdaeb7ca7e5cb20ccd96baf9c3d8cd8e7740290610c2af4",
+    "/tmp/agents-story54-gate-final/local/Hexalith.Agents.Server.Tests.xml": "1630cb70c9669a53456b857d2057f96c67eaa6d97ca1362bdf13528daeffc20e",
+    "/tmp/agents-story54-gate-final/local/Hexalith.Agents.Tests.xml": "22dc843e2e226e8e834a9c5acb1a268563814c1fbf794f93f0773be3edd25087",
+    "/tmp/agents-story54-gate-final/local/Hexalith.Agents.UI.Tests.xml": "02382f92843a2e51c9716b3e34a8b900d05462d8994ccfbf2aa43f291b8870a5",
+    "/tmp/agents-story54-gate-final/local/Hexalith.Agents.Client.Tests.build.log": "7d8507f9818c7b3ce4899e0215ba9fed9506d64210311406fa7543e7c53f9f4d",
+    "/tmp/agents-story54-gate-final/local/Hexalith.Agents.Contracts.Tests.build.log": "0e37b1811734eb679d5581c422caacfae2e4f3c4a9071d183031834285a3266f",
+    "/tmp/agents-story54-gate-final/local/Hexalith.Agents.Server.Tests.build.log": "b7b94760cb43ff45701b66b9d489fff480d639b288d34711cd79c7dd72b41427",
+    "/tmp/agents-story54-gate-final/local/Hexalith.Agents.Tests.build.log": "ba893230b29f0d24146af8ecb3453bf8a27f620b5a6610146b4f8c720522f357",
+    "/tmp/agents-story54-gate-final/local/Hexalith.Agents.UI.Tests.build.log": "76a5ae2874fb49fc880c33f663a86e1c5b8703f888bcac4b4fbb552bdf8b9618"
+  },
+  "remainingAcceptance": [
+    "Installed production Tenants/Parties/Conversations current-source and immutable provisioning bindings",
+    "Real AD-30 canonical signature and scoped principal/operation verification",
+    "Private exact-target replay registrar credentials and persisted ACL proof",
+    "Replicated durable denial spool and worker with outage/lost-ack/restart/restore end-state evidence",
+    "All four owner records Available with accepted exact-target qualification",
+    "Complete deployed API/UI/log/count/accessibility tenant-isolation and full story matrix"
+  ],
+  "unrelatedBroadBlocker": "Two unchanged AgentConfigurationTests attempt to change disabled inputs while HasUnresolvedAttempt is true; focused rerun reproduces both. No UI source or test was modified.",
+  "whitespaceValidation": {
+    "command": "git -c core.whitespace=cr-at-eol diff --check",
+    "exitCode": 0,
+    "note": "C# files retain required CRLF; unconfigured git diff --check reports CR as trailing whitespace."
+  },
+  "parentVerification": {
+    "inputDrift": [],
+    "unchangedUiInputs": [
+      "src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor",
+      "test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs"
+    ],
+    "fullBaselineDiff": "/tmp/agents-story54-baseline-8n84rbbn.diff",
+    "fullBaselineDiffSha256": "ba6c86c64004dcb8b09cfade1cc3028a450eafea3608e28f35eeff34119d9210",
+    "currentPatch": "/tmp/agents-story54-current.diff",
+    "currentPatchSha256": "7f751bae34c919dc85c2adcdc75ef8fac41f2ab10c881d6fbac2f65a8bbb792e",
+    "disposition": "Implementation remains in-progress; complete live matrix and broad Local gate have not passed."
+  }
+}

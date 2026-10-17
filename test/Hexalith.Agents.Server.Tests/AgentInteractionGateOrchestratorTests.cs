@@ -133,7 +133,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.Denied);
-        VerdictFor(AgentInteractionGateCheck.CallerPartyState).ShouldBe(AgentInteractionGateOutcome.Missing);
+        _lastDispatched.ShouldBeNull();
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.Denied);
-        VerdictFor(AgentInteractionGateCheck.SourceConversationAccess).ShouldBe(AgentInteractionGateOutcome.Stale);
+        _lastDispatched.ShouldBeNull();
     }
 
     [Fact]
@@ -532,7 +532,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.Denied);
-        VerdictFor(AgentInteractionGateCheck.CallerPartyState).ShouldBe(AgentInteractionGateOutcome.Unauthorized);
+        _lastDispatched.ShouldBeNull();
     }
 
     [Fact]
@@ -602,7 +602,7 @@ public sealed class AgentInteractionGateOrchestratorTests
     }
 
     [Fact]
-    public async Task Stale_conversation_read_maps_dependency_freshness_to_stale_while_conversation_access_stays_satisfied()
+    public async Task Stale_conversation_access_stops_before_dispatch()
     {
         StubAllReady();
         _conversationAccessReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, Arg.Any<CancellationToken>())
@@ -611,9 +611,8 @@ public sealed class AgentInteractionGateOrchestratorTests
 
         AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
-        outcome.Status.ShouldBe(AgentInteractionStatus.Blocked);
-        VerdictFor(AgentInteractionGateCheck.DependencyFreshness).ShouldBe(AgentInteractionGateOutcome.Stale);
-        VerdictFor(AgentInteractionGateCheck.SourceConversationAccess).ShouldBe(AgentInteractionGateOutcome.Satisfied);
+        outcome.Status.ShouldBe(AgentInteractionStatus.Denied);
+        _lastDispatched.ShouldBeNull();
     }
 
     // ===== QA gap coverage: per-reader fail-closed catches (FR-21; AD-14) =====
@@ -629,8 +628,8 @@ public sealed class AgentInteractionGateOrchestratorTests
         AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.Denied); // Source Conversation access is authorization-class
-        VerdictFor(AgentInteractionGateCheck.SourceConversationAccess).ShouldBe(AgentInteractionGateOutcome.Unavailable);
-        JsonSerializer.Serialize(DispatchedVerdicts()).ShouldNotContain("transport blew up");
+        _lastDispatched.ShouldBeNull();
+        JsonSerializer.Serialize(outcome).ShouldNotContain("transport blew up");
     }
 
     [Fact]
