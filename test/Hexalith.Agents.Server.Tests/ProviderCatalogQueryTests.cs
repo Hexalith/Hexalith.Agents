@@ -509,6 +509,23 @@ public sealed class ProviderCatalogQueryTests
         System.Text.Encoding.UTF8.GetString(wire.PayloadBytes!).ShouldNotContain("cfg-openai-gpt4o");
     }
 
+    [Theory]
+    [InlineData(UserId, "stable-actor", true)]
+    [InlineData("another-subject", UserId, false)]
+    public async Task Platform_query_binds_the_token_subject_not_the_elevated_actor_id(string subject, string elevatedActor, bool allowed)
+    {
+        // The elevated context carries the Parties stable actor id; the query user is the token subject.
+        Seed();
+        _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, subject, IsAgentsAdmin: false));
+        _contextProvider.GetContextAsync(true, Arg.Any<CancellationToken>()).Returns(
+            new AgentAdministrationContext("system", elevatedActor, IsAgentsAdmin: false, IsPlatformOperator: true));
+
+        ProviderCatalogInspectionResult result = await ExecuteAsync(
+            GetHandler(), Query(GetProviderCatalogEntryQuery.QueryType, new GetProviderCatalogEntryQuery("openai", "gpt-4o")));
+
+        result.Status.ShouldBe(allowed ? ProviderCatalogInspectionStatus.Success : ProviderCatalogInspectionStatus.NotAuthorized);
+    }
+
     [Fact]
     public async Task Platform_detail_carries_the_entry_stream_projected_command_ids()
     {

@@ -198,11 +198,14 @@ public abstract class ProviderCatalogQueryHandlerBase(
         if (platformQuery)
         {
             // EventStore's GlobalAdministrator flag is infrastructure authority, not Agents.PlatformOperator.
-            // The latter must be independently proven by the authenticated host principal.
+            // The latter must be independently proven by the authenticated host principal. The query user is the
+            // token subject; the elevated context carries the Parties stable actor id, which may differ from it.
+            string subject = _contextProvider.GetContext().ActorUserId;
             AgentAdministrationContext actor = await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
             return query.IsGlobalAdmin && actor.IsPlatformOperator
                 && !string.IsNullOrWhiteSpace(actor.ActorUserId)
-                && string.Equals(actor.ActorUserId, query.UserId, StringComparison.Ordinal);
+                && !string.IsNullOrWhiteSpace(subject)
+                && string.Equals(subject, query.UserId, StringComparison.Ordinal);
         }
 
         TenantAccessReadResult access = await _tenantAccessReader
