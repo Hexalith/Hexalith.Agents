@@ -60,7 +60,10 @@ jobs:
           npm audit signatures
       - name: Enforce shared package authority
         shell: pwsh
-        run: ./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1 -RepositoryRoot . -CatalogPath ./references/Hexalith.Builds/Props/Directory.Packages.props
+        run: |
+          $exclusions = @(Get-Content -LiteralPath ./eng/package-authority-exclusions.txt |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) -and -not $_.TrimStart().StartsWith('#') }) -join ';'
+          ./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1 -RepositoryRoot . -CatalogPath ./references/Hexalith.Builds/Props/Directory.Packages.props -ExcludedPath $exclusions
       - name: Enforce EventStore package floor
         shell: pwsh
         run: ./eng/verify-story-5.2.ps1 -PackageFloorOnly

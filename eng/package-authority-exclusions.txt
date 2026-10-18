@@ -1,0 +1,7 @@
+# Historical evidence harnesses. They import absolute paths from other
+# machines and are outside the Agents consumer graph.
+_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/custody-continuation/focused-harness/CustodyFocused.csproj
+_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/focused-harness/OwnedCustody.csproj
+_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/host-continuation/focused-harness/OwnedTests.csproj
+_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/protection-continuation/focused-harness/ProtectionFocused.csproj
+_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/review-corrections/gateway-harness/Gateway.Protected.Focused.csproj

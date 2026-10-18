@@ -119,7 +119,10 @@ function New-UnrelatedPackageArchive {
 Push-Location $root
 try {
     Write-Host 'Gate: shared package authority'
-    pwsh -NoProfile -File $consumerAuthorityValidator -RepositoryRoot $root -CatalogPath $authoritativeCatalog
+    $exclusionFile = Join-Path $root 'eng/package-authority-exclusions.txt'
+    $exclusions = @(Get-Content -LiteralPath $exclusionFile |
+        Where-Object { -not [string]::IsNullOrWhiteSpace($_) -and -not $_.TrimStart().StartsWith('#') }) -join ';'
+    pwsh -NoProfile -File $consumerAuthorityValidator -RepositoryRoot $root -CatalogPath $authoritativeCatalog -ExcludedPath $exclusions
 
     Write-Host 'Gate: effective EventStore package floor'
     pwsh -NoProfile -File (Join-Path $root 'eng/verify-story-5.2.ps1') -PackageFloorOnly

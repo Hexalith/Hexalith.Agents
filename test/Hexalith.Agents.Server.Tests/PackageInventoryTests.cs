@@ -108,7 +108,8 @@ public sealed class PackageInventoryTests
         workflow.ShouldContain("test/Hexalith.Agents.Server.Tests");
         workflow.ShouldContain("test/Hexalith.Agents.UI.Tests");
         workflow.ShouldContain("name: Enforce shared package authority");
-        workflow.ShouldContain("./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1 -RepositoryRoot . -CatalogPath ./references/Hexalith.Builds/Props/Directory.Packages.props");
+        workflow.ShouldContain("./eng/package-authority-exclusions.txt");
+        workflow.ShouldContain("./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1 -RepositoryRoot . -CatalogPath ./references/Hexalith.Builds/Props/Directory.Packages.props -ExcludedPath $exclusions");
         workflow.ShouldContain("name: Enforce EventStore package floor");
         workflow.ShouldContain("./eng/verify-story-5.2.ps1 -PackageFloorOnly");
         workflow.ShouldContain("python3 -m unittest discover -s tests/tooling -p '*_test.py'");
