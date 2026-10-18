@@ -1,0 +1,442 @@
+{
+  "date": "2026-10-18",
+  "story": "5.4",
+  "disposition": "in-progress",
+  "fullStoryComplete": false,
+  "fullStoryReviewStarted": false,
+  "change": "Stop cancelled setup queries and direct administration reads before subsequent protected reads, safe-basis resolution and rendering; prevent pre-cancelled dispatch from entering host admission.",
+  "commands": {
+    "redBuild": "dotnet build test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj --configuration Debug -m:1 -p:NuGetAudit=false -p:MinVerVersionOverride=1.0.0 --nologo > /tmp/agents-story54-setup-cancellation-red-build.log 2>&1",
+    "red": "dotnet test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll -class Hexalith.Agents.Server.Tests.SetupReadCancellationAdmissionTests -class Hexalith.Agents.Server.Tests.Story54BoundaryTests -result-xml /tmp/agents-story54-setup-cancellation-2026-10-18/red.xml",
+    "greenBuild": "dotnet build test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj --configuration Debug -m:1 -p:NuGetAudit=false -p:MinVerVersionOverride=1.0.0 --nologo > /tmp/agents-story54-setup-cancellation-2026-10-18/green-build.log 2>&1",
+    "focusedGreen": "dotnet test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll -class Hexalith.Agents.Server.Tests.SetupReadCancellationAdmissionTests -class Hexalith.Agents.Server.Tests.Story54BoundaryTests -class Hexalith.Agents.Server.Tests.AgentSetupQueryHandlerTests -class Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests -result-xml /tmp/agents-story54-setup-cancellation-2026-10-18/green.xml",
+    "local": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Local -ArtifactsPath /tmp/agents-story54-setup-cancellation-2026-10-18/local",
+    "liveRefusal": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Live -ArtifactsPath /tmp/agents-story54-setup-cancellation-2026-10-18/live",
+    "whitespace": "git -c core.whitespace=cr-at-eol diff --check"
+  },
+  "red": {
+    "exitCode": 1,
+    "summary": {
+      "total": 38,
+      "passed": 9,
+      "failed": 29,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    "newCases": 32,
+    "newCasesFailingBeforeGuards": 29,
+    "limitation": "The red run was not bounded by the final full source manifests; it records the reproduced cancellation failures before the guards, while external reference updates were observed separately."
+  },
+  "focusedGreen": {
+    "exitCode": 0,
+    "summary": {
+      "total": 113,
+      "passed": 113,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    }
+  },
+  "local": {
+    "exitCode": 0,
+    "summary": {
+      "total": 3848,
+      "passed": 3848,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    "projects": {
+      "Hexalith.Agents.Client.Tests": {
+        "total": 6,
+        "passed": 6,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Contracts.Tests": {
+        "total": 731,
+        "passed": 731,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "total": 1040,
+        "passed": 1040,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "total": 913,
+        "passed": 913,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "total": 1158,
+        "passed": 1158,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "builds": {
+      "Hexalith.Agents.Tests": {
+        "warnings": 0,
+        "errors": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "warnings": 0,
+        "errors": 0
+      },
+      "Hexalith.Agents.Contracts.Tests": {
+        "warnings": 0,
+        "errors": 0
+      },
+      "Hexalith.Agents.Client.Tests": {
+        "warnings": 0,
+        "errors": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "warnings": 0,
+        "errors": 0
+      }
+    },
+    "result": {
+      "StoryComplete": false,
+      "LiveReadinessEstablished": false,
+      "LocalContractsVerified": true,
+      "ExternalOwnerCalls": 0,
+      "Mode": "Local",
+      "Blockers": [
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-PARTIES-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-CONV-AI-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-SECRETS-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-HOST-1"
+        }
+      ]
+    }
+  },
+  "liveRefusal": {
+    "exitCode": 1,
+    "result": {
+      "Mode": "Live",
+      "Blockers": [
+        {
+          "RecordId": "EXT-PARTIES-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-CONV-AI-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-SECRETS-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-HOST-1",
+          "Code": "DependencyNotAvailable"
+        }
+      ],
+      "ExternalCalls": 0,
+      "StoryComplete": false
+    },
+    "meaning": "Consuming execution-gate refusal only; no owner compatibility command or live acceptance was executed by this task."
+  },
+  "sourceSnapshot": {
+    "filesHashed": 30025,
+    "beforeManifest": "/tmp/agents-story54-setup-cancellation-2026-10-18/before.json",
+    "beforeManifestSha256": "b5d0589d82ce2bec237f5209fc7c431cae5262c1be0ee8b86b9534628c25a67f",
+    "afterManifest": "/tmp/agents-story54-setup-cancellation-2026-10-18/after.json",
+    "afterManifestSha256": "5a4d03c68ce86f3cd2089e4b85bf68cbb7cab080dd2ae2856c026b2e80b82225",
+    "changedFiles": [],
+    "changedFileCount": 0,
+    "coverage": "All files under root src/test/eng and installed root references, plus root build/config files and the authoritative dependency register; excludes generated bin/obj, git, node_modules, artifacts, and planning/skill directories.",
+    "changedCompilerAndVerifierHashes": {
+      "eng/verify-story-5.4.ps1": "5ebe7bdfb89cbc53396581e73d65ebf39dbdb4bf56643704028c26c576c2e2cc",
+      "src/Hexalith.Agents.Server/Application/Agents/AgentSetupBasisEnricher.cs": "acda7a11bd19e95fe5089b7ae01d016df9ab95ac6929ae5cc4040eb9c05a3157",
+      "src/Hexalith.Agents.Server/Application/Agents/EventStoreAgentAdministrationOperations.cs": "d05cb77ca91f81bd1ac5de67ae6dba0dcd0963e45ed5ea4846bdd70726618b61",
+      "src/Hexalith.Agents.Server/Application/Queries/AgentSetupQueryHandlerBase.cs": "30a22866072f61bc9b613e2619b9d0b7c7cfda1eadba468572f10eb800c1aa40",
+      "src/Hexalith.Agents.Server/Ports/EventStoreAgentCommandDispatcher.cs": "13900af7c5bdb7ea726d54f331d312e8f1de635a464775dba9975151560e22ca",
+      "test/Hexalith.Agents.Server.Tests/SetupReadCancellationAdmissionTests.cs": "14622e9fc6dca38e6a1d485d9711286461ed1259d20ea11731ed45f46d0427d1",
+      "test/Hexalith.Agents.Server.Tests/Story54BoundaryTests.cs": "e2d6fb8b98c053b01c9a595863cead49cdf6f62ba24b04c45ec4450c09529278"
+    }
+  },
+  "revisionsBefore": {
+    ".": "a65a8e45fb72c034612a53ebabd7d685fe59981b",
+    "references/Hexalith.AI.Tools": "3f194e17174994d308ec84af9ee2b5aa68674d0d",
+    "references/Hexalith.Commons": "9e874b1a3c6e7b6ff07b6f40b81d36e4e1403798",
+    "references/Hexalith.PolymorphicSerializations": "98de6e013840ece9f0fa7c68ab7dcdf2bba3b375",
+    "references/Hexalith.Conversations": "1d7bd9a3d914b93dd27fdd1fe962ce8bd2d50965",
+    "references/Hexalith.EventStore": "37bdc90a72b9f0ea547852e903334cc8cc541641",
+    "references/Hexalith.Memories": "fb39a0c59cc3befd3176dec5e3c790f94d0e5bd1",
+    "references/Hexalith.Tenants": "66ab4a5b3f8152535ede44670b50466d24ef588b",
+    "references/Hexalith.Parties": "d279b43548628c7e3d06113ab5c264a72bf5b69f",
+    "references/Hexalith.Builds": "2db121b978d296ee0886188c675186384c9c9bad",
+    "references/Hexalith.FrontComposer": "6ab8d2daac6d2ee8ef2f0ce8686cb446d0b6dd0b",
+    "references/Hexalith.McpCli": "55ed6e9cec45999d1f6bb67bcb513d203e9e2429",
+    "references/Hexalith.Platform": "0d4c6dd91a0e5762b13dddb722e130f42320c062"
+  },
+  "revisionsAfter": {
+    ".": "75aefea9d21b2b0d2f06dbe7fd42c5baa3cbd8b0",
+    "references/Hexalith.AI.Tools": "3f194e17174994d308ec84af9ee2b5aa68674d0d",
+    "references/Hexalith.Commons": "9e874b1a3c6e7b6ff07b6f40b81d36e4e1403798",
+    "references/Hexalith.PolymorphicSerializations": "98de6e013840ece9f0fa7c68ab7dcdf2bba3b375",
+    "references/Hexalith.Conversations": "1d7bd9a3d914b93dd27fdd1fe962ce8bd2d50965",
+    "references/Hexalith.EventStore": "37bdc90a72b9f0ea547852e903334cc8cc541641",
+    "references/Hexalith.Memories": "fb39a0c59cc3befd3176dec5e3c790f94d0e5bd1",
+    "references/Hexalith.Tenants": "66ab4a5b3f8152535ede44670b50466d24ef588b",
+    "references/Hexalith.Parties": "d279b43548628c7e3d06113ab5c264a72bf5b69f",
+    "references/Hexalith.Builds": "2db121b978d296ee0886188c675186384c9c9bad",
+    "references/Hexalith.FrontComposer": "6ab8d2daac6d2ee8ef2f0ce8686cb446d0b6dd0b",
+    "references/Hexalith.McpCli": "55ed6e9cec45999d1f6bb67bcb513d203e9e2429",
+    "references/Hexalith.Platform": "0d4c6dd91a0e5762b13dddb722e130f42320c062"
+  },
+  "externalWorkspaceChange": {
+    "initialRootHead": "a65a8e45fb72c034612a53ebabd7d685fe59981b",
+    "finalRootHead": "75aefea9d21b2b0d2f06dbe7fd42c5baa3cbd8b0",
+    "rootCommitAdvancedDuringVerification": true,
+    "rootCommitSubject": "build: sync local changes via /pushall",
+    "initialRootGitlinks": {
+      "references/Hexalith.AI.Tools": "3f194e17174994d308ec84af9ee2b5aa68674d0d",
+      "references/Hexalith.Commons": "9e874b1a3c6e7b6ff07b6f40b81d36e4e1403798",
+      "references/Hexalith.PolymorphicSerializations": "98de6e013840ece9f0fa7c68ab7dcdf2bba3b375",
+      "references/Hexalith.Conversations": "4e937361613c2dba72c46595226219017e6ba524",
+      "references/Hexalith.EventStore": "77d9af18a54d92506e310fe5a45021a395e66f60",
+      "references/Hexalith.Memories": "f6b60d5a2e9b81d84fddad789c7d9bed40d3a533",
+      "references/Hexalith.Tenants": "e667d5391dae306e631dec23acd191863e54130c",
+      "references/Hexalith.Parties": "90af3047b50046cb4f6f91e01f182f562110aab3",
+      "references/Hexalith.Builds": "4f53d9f37c5b86cfd43fbcc8fa5dd4df19b84c77",
+      "references/Hexalith.FrontComposer": "b102b85b148f21fb26d5742e120c344109df7084",
+      "references/Hexalith.McpCli": "b35b0975a234f1f97e2e35e9dad381d0a988f4af",
+      "references/Hexalith.Platform": "b4b6d4a1efcd2f13c6d03270f8e952f27ed8148b"
+    },
+    "externallyCommittedPaths": [
+      "eng/verify-story-5.4.ps1",
+      "references/Hexalith.Builds",
+      "references/Hexalith.Conversations",
+      "references/Hexalith.EventStore",
+      "references/Hexalith.FrontComposer",
+      "references/Hexalith.McpCli",
+      "references/Hexalith.Memories",
+      "references/Hexalith.Parties",
+      "references/Hexalith.Platform",
+      "references/Hexalith.Tenants",
+      "src/Hexalith.Agents.Server/Application/Agents/AgentSetupBasisEnricher.cs",
+      "src/Hexalith.Agents.Server/Application/Agents/EventStoreAgentAdministrationOperations.cs",
+      "src/Hexalith.Agents.Server/Application/Queries/AgentSetupQueryHandlerBase.cs",
+      "src/Hexalith.Agents.Server/Ports/EventStoreAgentCommandDispatcher.cs",
+      "test/Hexalith.Agents.Server.Tests/SetupReadCancellationAdmissionTests.cs",
+      "test/Hexalith.Agents.Server.Tests/Story54BoundaryTests.cs"
+    ],
+    "sourceDriftDuringFinalVerification": 0,
+    "explanation": "Another workspace actor advanced references before the final input snapshot, then committed those pointers and this task's in-flight source/test/verifier edits. This task performed no staging, commit, push, submodule initialization/update or owner source edit; all external work was preserved."
+  },
+  "dependencies": [
+    {
+      "recordId": "EXT-PARTIES-1",
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+      "installedReference": "references/Hexalith.Parties",
+      "installedTarget": "d279b43548628c7e3d06113ab5c264a72bf5b69f",
+      "installedMatchesAccepted": false,
+      "liveAvailable": false
+    },
+    {
+      "recordId": "EXT-CONV-AI-1",
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "87e8b4a6ec3224b20a560b0e83de857805925572",
+      "installedReference": "references/Hexalith.Conversations",
+      "installedTarget": "1d7bd9a3d914b93dd27fdd1fe962ce8bd2d50965",
+      "installedMatchesAccepted": false,
+      "liveAvailable": false
+    },
+    {
+      "recordId": "EXT-SECRETS-1",
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "abbec4093715c1db854433119b32d4e16df20d08",
+      "installedReference": "references/Hexalith.Platform",
+      "installedTarget": "0d4c6dd91a0e5762b13dddb722e130f42320c062",
+      "installedMatchesAccepted": false,
+      "liveAvailable": false
+    },
+    {
+      "recordId": "EXT-HOST-1",
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "abbec4093715c1db854433119b32d4e16df20d08",
+      "installedReference": "references/Hexalith.Platform",
+      "installedTarget": "0d4c6dd91a0e5762b13dddb722e130f42320c062",
+      "installedMatchesAccepted": false,
+      "liveAvailable": false
+    }
+  ],
+  "matrixAudit": [
+    {
+      "row": "Current authority",
+      "localEvidence": "Full existing authority suites plus 30 setup cancellation cases and both setup queries/direct read paths pass. Cancellation prevents later read-model/approver reads and result rendering, including dependency failure after cancellation.",
+      "livePersistedEvidenceAvailable": false,
+      "remaining": "Available exact installed owner targets, production current Tenants/Parties/Conversations source bindings and live API/UI current-authority/revocation proof."
+    },
+    {
+      "row": "Trusted delivery",
+      "localEvidence": "Eight trusted-boundary cases pass, including two dispatcher cancellation cases; full replay fold/snapshot and immutable-intent/admission ordering suites pass.",
+      "livePersistedEvidenceAvailable": false,
+      "remaining": "Real AD-30 signature/principal/operation/scope admission and host receipt binding; private exact-target replay credentials/ACL, persisted first-seen replay and AD-29 delivery proof."
+    },
+    {
+      "row": "Denial recovery",
+      "localEvidence": "Full SecurityEventLog pure fold and serialization suites pass; no replicated spool, worker, state store, or ACL seam is executed.",
+      "livePersistedEvidenceAvailable": false,
+      "remaining": "Platform replicated durable denial spool and restricted worker, persisted outage/restart/restore/lost-ack exactly-once recovery, spool-outage no-command proof."
+    },
+    {
+      "row": "Cross-tenant non-disclosure",
+      "localEvidence": "Full setup, audit isolation and interaction admission suites pass; cancelled setup paths expose no returned setup and make no later protected read.",
+      "livePersistedEvidenceAvailable": false,
+      "remaining": "Complete deployed tenant isolation across lookup/effect/count/message/log/accessibility outputs and persisted restricted-capability evidence."
+    }
+  ],
+  "preserved": {
+    "frozenIntent": true,
+    "approval": true,
+    "branch": "B",
+    "baselineCommitUnchanged": true,
+    "fullScopeAndAcceptanceCriteria": true,
+    "fullOwnerBoundTasksRemainUnchecked": true,
+    "dependencyStatusesAndTargetsUnchanged": true,
+    "frozenIntentSha256": "a20faa6ebe5cdc5b92024d0e5bbb3644dd65e53964d2e5f8cdce4c153c1e3668",
+    "executionTaskListSha256": "3ca3bcaabacc39b6a556ecbecffc9a0bc6bd69c6ada4d3a32b50753e7a6a84b1"
+  },
+  "artifactDirectory": "/tmp/agents-story54-setup-cancellation-2026-10-18",
+  "artifactHashes": {
+    "green-build.log": "dd24713b0fa64eab5751d275d7202a424631259434f7b67193e0c53b42fd4a27",
+    "green.log": "8c4df46d479c08843bdecf4b033b60326129273cdae729e493f26c53645555fa",
+    "green.xml": "7d92bc3c427388ea89fec4bf79135c444ed94c714bdd19954fc3316d62fd1c64",
+    "live/result.json": "2e29fd7f5d73b8f8ea0e7e0c7ae6b870d4b3dfbb9890050229208905b417dc29",
+    "live.log": "1fd77440e3c5fa74c8c272065396e93f0022531d6b31d5ed90103104e29de89a",
+    "local/Hexalith.Agents.Client.Tests.build.log": "4af3477ad1cb1872a014874ccebca6b21d25e02c722c00525879115a5e7951e0",
+    "local/Hexalith.Agents.Client.Tests.xml": "6f5366f76729d99ed6c9a1c88c125c74f7fe300bf809113199f42c716213289c",
+    "local/Hexalith.Agents.Contracts.Tests.build.log": "8f25e1baab10e751c53953a5064e6b79810fd9dfde5502116fe2409a3849e904",
+    "local/Hexalith.Agents.Contracts.Tests.xml": "3850ce223f0b24b3f03420fadc390fc624de4feeeb82e0e562363dffcdb4394e",
+    "local/Hexalith.Agents.Server.Tests.build.log": "8c551a44de9e56bead6892463889854d1b4bd7a65c5f177d7cda19fe13c15eaa",
+    "local/Hexalith.Agents.Server.Tests.xml": "c681d59c428617b00ec796590149b1d41ec383af9fc8a17b1ebb6f70a02fd746",
+    "local/Hexalith.Agents.Tests.build.log": "72869ca2a818461c872b2fb12bf0874d6961c5d03c649e447490135ac310b8ea",
+    "local/Hexalith.Agents.Tests.xml": "ef63fe9efc21bcf515ae78961e00e28b5e83bc77cdfa9a5b8ed95cef223dc462",
+    "local/Hexalith.Agents.UI.Tests.build.log": "1a5c663297ad565a26b40ff61aec9a7301c1c1cd8478b6d54e35e53466e405a2",
+    "local/Hexalith.Agents.UI.Tests.xml": "22433c2c106b59b6fa6a9e0a06d9835b7f5a0beb33aa6a2ef284f2e7e86e1b24",
+    "local/result.json": "707b939ad29aa5f22b097c5618ccfc3c743a74e3f8a77c6804d18357678183f1",
+    "local.log": "9791292c055011e6906d5c914fefcb3dcd0bab784bb75a3b869fb80a46773e39",
+    "red.log": "d3394e4bbc1f59a40145569d9b3abe91688a013f400d0e2f945400fbed3452cc",
+    "red.xml": "b042b86a3eb425666c1d448962e11cb65c00208b2120ba85ac98b808ae157a79",
+    "snapshot.py": "96f55101b8ac8cf3ff662cdf01b7e6755bc401e80b6f3e8b387d83ea304fcb3b",
+    "red-build.log": "72df7bf0ee967fb58e018b5252f8dbe6b17abaab231af819064a949af92ffc59"
+  },
+  "ownerCompatibilityCommandsExecuted": 0,
+  "externalConsumerCalls": 0,
+  "domainStatePersistenceClaimed": false,
+  "secretsOrCredentialsRecorded": false,
+  "primaryAgentInspection": {
+    "utc": "2026-10-18T09:06:49.619482+00:00",
+    "head": "75aefea9d21b2b0d2f06dbe7fd42c5baa3cbd8b0",
+    "inspectedChangeDiff": "/tmp/agents-story54-inspected-change-k670ufbb.diff",
+    "inspectedChangeDiffSha256": "d447a024a038866edcf5d81a1f7016493e51865ef734137692baa12685a97fd0",
+    "artifactHashesIndependentlyVerified": 21,
+    "currentSourceFilesIndependentlyVerified": 30025,
+    "requiredPassingSuites": {
+      "SetupReadCancellationAdmissionTests": {
+        "passedCases": 30,
+        "methods": [
+          "DirectCancellationStopsBeforeFurtherReadsOrRendering",
+          "DirectReadFailureCannotSwallowCancellation",
+          "QueryCancellationStopsBeforeFurtherReadsOrRendering"
+        ]
+      },
+      "Story54BoundaryTests": {
+        "passedCases": 8,
+        "methods": [
+          "AuthenticatedDaprCallerAndUnsignedFlagGrantNoTrustedExtension",
+          "CancellationStopsBeforeAdmissionOrTargetConstruction",
+          "CommittedPublicApiReturnsNamedDependencyWithoutCallingTheClientOrEchoingClaimedTarget",
+          "IntentBytesStayImmutableWhileAdmissionAwaitsAndDeliveryNonceRemainsSeparate",
+          "RejectedAdmissionPrecedesTargetCommandConstruction",
+          "TargetIdentityValidationRunsOnlyAfterAdmissionCompletes",
+          "UnavailableReplayAdmissionConstructsNoGatewayTargetRequest"
+        ]
+      },
+      "Story54CurrentEvidenceTests": {
+        "passedCases": 13,
+        "methods": [
+          "CommittedDependencyStopsBeforeAnyCurrentSourceLookup",
+          "EarlierConfigurationCandidateExpiringDuringALaterSourceReadIsUnavailable",
+          "LegacyCallerAndUnknownSourceOutcomesGrantNoAuthority",
+          "MultipleRoleMembersAllowOnlyTheExactCurrentHumanWithSourceAccess",
+          "QuerySubjectIsResolvedToTheCurrentStableActorBeforeRoleComparison",
+          "RevocationAndGlobalSourceSubstitutionFailClosed",
+          "TenantAuthorityRequiresContiguousEventsEqualToCurrentHead"
+        ]
+      },
+      "TrustedEnvelopeReplayTests": {
+        "passedCases": 6,
+        "methods": [
+          "ExactLaterReplayRetainsOriginalFirstSeenAndRetentionAfterSnapshot",
+          "ReplayIsIssuerWideAndCannotBeRegisteredInATargetTenant",
+          "ReusedNonceWithAnyChangedAuthenticatedFieldRejectsAndPreservesState"
+        ]
+      },
+      "SecurityEventLogTests": {
+        "passedCases": 4,
+        "methods": [
+          "ChangedObservationNeverOverwritesOriginal",
+          "LostAcknowledgementRetryAfterSnapshotProducesOneOriginalDailyEvent",
+          "RecordingIsRestrictedToOriginalAuthenticatedRouteAndDay"
+        ]
+      },
+      "AuditQueryIsolationTests": {
+        "passedCases": 76,
+        "methods": [
+          "CancellationDuringAuthorizationStopsBeforeStateAccess",
+          "CancellationDuringStateReadStopsBeforeRendering",
+          "DeniedTenantNeverReadsAnyAuditState",
+          "MisroutedStateReturnsOnlyTheUnavailablePayload",
+          "ScopedAbsenceStillUsesTheHandlerMissingStatePayload"
+        ]
+      },
+      "AgentInteractionGateAdmissionTests": {
+        "passedCases": 30,
+        "methods": [
+          "CallerDenialStopsBeforeProtectedReadsOrDispatch",
+          "CancellationBeforeAdmissionPerformsNoReadOrDispatch",
+          "CancellationDuringDependencyReadStopsBeforeFurtherWork",
+          "ConversationDenialStopsBeforeProtectedReadsOrDispatch"
+        ]
+      }
+    },
+    "matrixResult": "Incomplete: every matrix row still lacks authenticated persisted Live evidence.",
+    "fullStoryReviewCompleted": false,
+    "livePlaceholderStillPresent": true,
+    "reason": "All four dependencies remain Committed/unavailable; installed reference targets differ from the accepted targets. The approved spec prohibits external seam execution before Available. Full-story tasks and acceptance criteria remain unmet."
+  }
+}
