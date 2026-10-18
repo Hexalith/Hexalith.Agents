@@ -1,0 +1,13 @@
+{
+  "recordId": "EXT-CONV-AI-1",
+  "registerCommit": "24b771d481083d04971a820238be18a638d5d889",
+  "registerSha256": "5482b6f8e9a03cfcb3e5e7afbfeaba66c6c3268a5bab3cbcf79b7e66fa9f03e0",
+  "acceptedStatusAtRun": "Committed",
+  "targetVersionOrCommit": "87e8b4a6ec3224b20a560b0e83de857805925572",
+  "command": "test \"$(git -C ../conversations rev-parse HEAD)\" = \"87e8b4a6ec3224b20a560b0e83de857805925572\" && test -z \"$(git -C ../conversations status --porcelain)\" && pwsh -NoProfile -File ../conversations/eng/verify-ext-conv-ai-1.ps1 -Mode Live -LiveManifest /home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/live-manifest.json -ArtifactsPath /tmp/ext-conv-ai-1-live",
+  "workingDirectory": "/tmp/claude-1000/-home-administrator-projects-hexalith-agents/d78ed76a-a698-417f-82f0-81c40988763e/scratchpad/ws/agents",
+  "startedAtUtc": "2026-10-18T07:51:13.167689+00:00",
+  "finishedAtUtc": "2026-10-18T07:51:15.447570+00:00",
+  "exitCode": 1,
+  "passed": false
+}

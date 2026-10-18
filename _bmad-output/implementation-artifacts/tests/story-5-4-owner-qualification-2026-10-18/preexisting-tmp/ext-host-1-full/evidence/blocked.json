@@ -1,0 +1,1 @@
+{"blocked":true,"dependency":"EXT-HOST-1","dependencyAvailable":false,"effects":0,"gap":["partiesBinding","conversationsBinding","protectionEngine","protectionObserver"],"liveEffects":0,"productionEngineRegistered":false,"schema":"EXT-HOST-1.full-evidence.v1","suites":{"custodyExitCode":0,"custodyTests":129,"guardExitCode":0,"guardTests":71}}

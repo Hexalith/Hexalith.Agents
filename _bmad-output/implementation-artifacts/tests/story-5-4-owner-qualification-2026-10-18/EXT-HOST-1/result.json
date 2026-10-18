@@ -1,0 +1,13 @@
+{
+  "recordId": "EXT-HOST-1",
+  "registerCommit": "24b771d481083d04971a820238be18a638d5d889",
+  "registerSha256": "5482b6f8e9a03cfcb3e5e7afbfeaba66c6c3268a5bab3cbcf79b7e66fa9f03e0",
+  "acceptedStatusAtRun": "Committed",
+  "targetVersionOrCommit": "abbec4093715c1db854433119b32d4e16df20d08",
+  "command": "test \"$(git -C ../platform rev-parse HEAD)\" = \"abbec4093715c1db854433119b32d4e16df20d08\" && test -z \"$(git -C ../platform status --porcelain)\" && bash ../platform/eng/verify-agents-host.sh --mode Full --artifacts-path /tmp/ext-host-1-full",
+  "workingDirectory": "/tmp/claude-1000/-home-administrator-projects-hexalith-agents/d78ed76a-a698-417f-82f0-81c40988763e/scratchpad/ws/agents",
+  "startedAtUtc": "2026-10-18T07:51:23.571233+00:00",
+  "finishedAtUtc": "2026-10-18T07:53:36.460470+00:00",
+  "exitCode": 1,
+  "passed": false
+}

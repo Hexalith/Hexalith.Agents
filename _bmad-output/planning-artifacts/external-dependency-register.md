@@ -56,6 +56,15 @@ A runtime, test, or qualification path that would execute a seam whose record is
 
 *`EXT-PARTIES-1` is unchanged. No new integration date was accepted: `2026-10-08` is retained, was not met, and is literally required by the `EXT-SECRETS-1` verifier. The owner also accepted the [bounded owner-qualification cohort `OQ-5.4-1`](#oq-541--bounded-owner-qualification-cohort). All four records remain `Committed`; none is `Available`. The reconciliation records that the `EXT-HOST-1` and `EXT-PARTIES-1` commands have no pass path at their targets.*
 
+*Owner command run 2026-10-18: all four accepted commands ran once from a clean Agents clone at the acceptance commit against clean exact owner targets. Each exited 1:*
+
+- *`EXT-PARTIES-1`: missing Live inputs.*
+- *`EXT-CONV-AI-1`: `LIVE_MANIFEST_MISSING`.*
+- *`EXT-SECRETS-1`: `DependencyNotAvailable`, 67 inputs, zero effects.*
+- *`EXT-HOST-1`: `DependencyNotAvailable`; its custody and guard suites passed, but four bindings are absent.*
+
+*No record is `Available`. [Evidence](../implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/README.md).*
+
 ### EXT-CONV-AI-1 — Conversations AI Membership And Posting
 
 | Commitment field | Value |

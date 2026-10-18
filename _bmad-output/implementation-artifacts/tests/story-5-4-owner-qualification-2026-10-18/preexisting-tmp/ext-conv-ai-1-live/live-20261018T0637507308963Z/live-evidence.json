@@ -1,0 +1,15 @@
+{
+  "Mode": "Live",
+  "Result": "BLOCKED",
+  "EvidenceKind": "AuthenticatedPersistedRuntime",
+  "TargetCommit": null,
+  "ManifestPath": "",
+  "Gates": [
+    {
+      "Result": "BLOCKED",
+      "Code": "LIVE_MANIFEST_MISSING",
+      "Reason": "An exact installed runtime manifest is required before any Live call."
+    }
+  ],
+  "Lanes": []
+}

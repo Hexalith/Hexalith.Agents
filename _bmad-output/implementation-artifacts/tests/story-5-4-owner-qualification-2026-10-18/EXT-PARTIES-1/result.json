@@ -1,0 +1,13 @@
+{
+  "recordId": "EXT-PARTIES-1",
+  "registerCommit": "24b771d481083d04971a820238be18a638d5d889",
+  "registerSha256": "5482b6f8e9a03cfcb3e5e7afbfeaba66c6c3268a5bab3cbcf79b7e66fa9f03e0",
+  "acceptedStatusAtRun": "Committed",
+  "targetVersionOrCommit": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+  "command": "test \"$(git -C ../parties rev-parse HEAD)\" = \"56cb4401c4179d431385ad3d931fefa402e4fc5a\" && test -z \"$(git -C ../parties status --porcelain)\" && pwsh -NoProfile -File ../parties/eng/verify-ext-parties-1.ps1 -Mode Live -EventStoreRoot ../eventstore -PlatformRoot ../platform -EvidenceDirectory /tmp/ext-parties-1-live",
+  "workingDirectory": "/tmp/claude-1000/-home-administrator-projects-hexalith-agents/d78ed76a-a698-417f-82f0-81c40988763e/scratchpad/ws/agents",
+  "startedAtUtc": "2026-10-18T07:51:08.228442+00:00",
+  "finishedAtUtc": "2026-10-18T07:51:13.130172+00:00",
+  "exitCode": 1,
+  "passed": false
+}

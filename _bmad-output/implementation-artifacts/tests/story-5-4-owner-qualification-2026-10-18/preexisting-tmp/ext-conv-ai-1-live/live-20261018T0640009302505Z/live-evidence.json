@@ -1,0 +1,15 @@
+{
+  "Mode": "Live",
+  "Result": "BLOCKED",
+  "EvidenceKind": "AuthenticatedPersistedRuntime",
+  "TargetCommit": "476369f83d8fbdcecaa3b2b9ef33bc310d4131a6",
+  "ManifestPath": "/tmp/ext-conv-ai-1-dummy-manifest.json",
+  "Gates": [
+    {
+      "Result": "BLOCKED",
+      "Reason": "The exact source target has uncommitted changes.",
+      "Code": "TARGET_NOT_CLEAN"
+    }
+  ],
+  "Lanes": []
+}
