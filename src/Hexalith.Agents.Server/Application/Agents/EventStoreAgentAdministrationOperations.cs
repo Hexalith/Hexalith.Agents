@@ -224,8 +224,10 @@ public sealed class EventStoreAgentAdministrationOperations(
         CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
+        cancellationToken.ThrowIfCancellationRequested();
 
         AgentAdministrationContext context = await _contextProvider.GetContextAsync(false, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
         string? correlationId = options?.CorrelationId;
         if (!context.IsAuthorized)
         {
@@ -252,9 +254,11 @@ public sealed class EventStoreAgentAdministrationOperations(
                     AgentSetupReadModelAddresses.Detail(context.TenantId, agentId),
                     cancellationToken)
                 .ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return AgentOperationResult<AgentSetupResult>.Failed(
                 AgentCommandDispatchFailure.Map(exception),
                 correlationId);
@@ -272,6 +276,7 @@ public sealed class EventStoreAgentAdministrationOperations(
         AgentSetupResult setup = await AgentSetupBasisEnricher.EnrichAsync(
             AgentSetupViewFactory.Create(entry.Value, context.TenantId, agentId, expectedConfigurationVersion, isAgentsAdmin: true),
             entry.Value, approverResolver, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
         return AgentOperationResult<AgentSetupResult>.Succeeded(setup, correlationId: correlationId);
     }
 

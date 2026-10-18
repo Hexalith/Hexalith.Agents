@@ -11,6 +11,7 @@ internal static class AgentSetupBasisEnricher
     internal static async Task<AgentSetupResult> EnrichAsync(AgentSetupResult result, AgentSetupReadModel? model,
         IApproverPolicyResolver? resolver, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (result.Setup is not { } setup || model?.ApproverPolicySources is not { Count: > 0 } sources)
         {
             return result;
@@ -23,9 +24,11 @@ internal static class AgentSetupBasisEnricher
             {
                 resolved = await resolver.ResolveAsync(model.TenantId,
                     new AgentApproverPolicy(sources, model.ApproverPolicyDisclosure), cancellationToken).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
             }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 resolved = null;
             }
         }

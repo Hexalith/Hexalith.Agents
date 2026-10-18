@@ -79,11 +79,13 @@ public abstract class AgentSetupQueryHandlerBase(
                 AgentSetupReadModelAddresses.Detail(query.TenantId, query.AggregateId),
                 cancellationToken)
             .ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
 
         AgentSetupResult setup = await AgentSetupBasisEnricher.EnrichAsync(
             AgentSetupViewFactory.Create(entry.Value, query.TenantId, query.AggregateId,
                 ReadExpectedConfigurationVersion(query.Payload), isAgentsAdmin: true),
             entry.Value, approverResolver, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
         return QueryResult.FromPayload(ToElement(setup));
     }
 
@@ -118,6 +120,7 @@ public abstract class AgentSetupQueryHandlerBase(
         TenantAccessReadResult access = await _tenantAccessReader
             .ReadAsync(query.TenantId, query.UserId, callerPartyId: string.Empty, cancellationToken)
             .ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
         return access is { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true };
     }
 }

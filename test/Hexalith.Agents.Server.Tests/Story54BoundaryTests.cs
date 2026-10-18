@@ -20,6 +20,37 @@ namespace Hexalith.Agents.Server.Tests;
 /// <summary>Local transport refusal evidence; no live owner seam, credential or readiness qualification is exercised.</summary>
 public sealed class Story54BoundaryTests
 {
+    /// <summary>Verifies cancellation precedes admission effects and target construction even if admission ignores its token.</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task CancellationStopsBeforeAdmissionOrTargetConstruction(bool cancelDuringAdmission)
+    {
+        using var cancellation = new CancellationTokenSource();
+        var gateway = Substitute.For<IEventStoreGatewayClient>();
+        var admission = Substitute.For<IAgentTrustedCommandAdmission>();
+        var intent = new AgentCommandIntent("logical", "claimed:tenant-a", "agent", "claimed:hexa", "DisableAgent", [], "correlation", null, "actor", null);
+        admission.AdmitAsync(intent, Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            cancellation.Cancel();
+            return intent;
+        });
+        if (!cancelDuringAdmission)
+        {
+            cancellation.Cancel();
+        }
+
+        OperationCanceledException error = await Should.ThrowAsync<OperationCanceledException>(
+            () => new EventStoreAgentCommandDispatcher(gateway, admission).DispatchAsync(intent, cancellation.Token));
+
+        error.CancellationToken.ShouldBe(cancellation.Token);
+        gateway.ReceivedCalls().ShouldBeEmpty();
+        if (!cancelDuringAdmission)
+        {
+            admission.ReceivedCalls().ShouldBeEmpty();
+        }
+    }
+
     /// <summary>Verifies that unavailable replay admission constructs no gateway target request.</summary>
     [Fact]
     public async Task UnavailableReplayAdmissionConstructsNoGatewayTargetRequest()

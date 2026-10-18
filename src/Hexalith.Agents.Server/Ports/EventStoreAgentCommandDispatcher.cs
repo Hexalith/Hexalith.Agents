@@ -40,6 +40,7 @@ public sealed class EventStoreAgentCommandDispatcher : IAgentCommandDispatcher
     public async Task<SubmitCommandResponse> DispatchAsync(AgentCommandIntent intent, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(intent);
+        ct.ThrowIfCancellationRequested();
         // This await precedes even CommandEnvelope's eager target-identity validation. The ordinary dispatcher
         // never obtains the registrar or denial-worker credential from DI.
         AgentCommandIntent admitted = await _admission.AdmitAsync(intent, ct).ConfigureAwait(false);
