@@ -22,6 +22,7 @@ public sealed class ProjectedApproverPolicyResolver(ICurrentApproverEvidenceSour
         ApproverResolutionContext? context, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(policy);
+        ct.ThrowIfCancellationRequested();
         var results = new List<ApproverSourceResolution>();
         foreach (string record in new[] { "EXT-HOST-1", "EXT-PARTIES-1", "EXT-CONV-AI-1" })
         {
@@ -31,7 +32,6 @@ public sealed class ProjectedApproverPolicyResolver(ICurrentApproverEvidenceSour
             }
         }
 
-        ct.ThrowIfCancellationRequested();
         if (string.IsNullOrWhiteSpace(tenantId) || (context is not null
             && (string.IsNullOrWhiteSpace(context.ActorId) || string.IsNullOrWhiteSpace(context.PartyId)
                 || string.IsNullOrWhiteSpace(context.SourceConversationId))))
@@ -102,6 +102,7 @@ public sealed class ProjectedApproverPolicyResolver(ICurrentApproverEvidenceSour
             }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
+                ct.ThrowIfCancellationRequested();
                 accepted = null;
             }
 

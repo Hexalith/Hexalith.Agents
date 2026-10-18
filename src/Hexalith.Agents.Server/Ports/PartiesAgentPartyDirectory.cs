@@ -41,6 +41,7 @@ public sealed class PartiesAgentPartyDirectory : IAgentPartyDirectory
     /// <inheritdoc />
     public async Task<AgentPartyValidationResult> ValidateExistingPartyAsync(string tenantId, string partyId, CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
         if (_availability.Check("EXT-PARTIES-1") is { } blocker)
         {
             return new(PartyLinkValidationStatus.Unavailable, null) { Dependency = blocker };
@@ -78,6 +79,7 @@ public sealed class PartiesAgentPartyDirectory : IAgentPartyDirectory
             }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
+                ct.ThrowIfCancellationRequested();
                 return new(PartyLinkValidationStatus.Unavailable, null);
             }
         }
@@ -90,6 +92,7 @@ public sealed class PartiesAgentPartyDirectory : IAgentPartyDirectory
     public Task<AgentPartyValidationResult> ProvisionAgentPartyAsync(string tenantId, AgentPartyProvisioningRequest request, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(request);
+        ct.ThrowIfCancellationRequested();
         // The legacy label/id request is not the owner's immutable versioned provisioning contract. It cannot
         // mint a replacement identity. Platform provisioning must retain the original accepted Parties intent.
         return Task.FromResult(new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null)

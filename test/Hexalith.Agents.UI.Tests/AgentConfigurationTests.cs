@@ -630,7 +630,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             freshness: AgentSetupFreshness.Stale,
             truthState: AgentSetupTruthState.AuthoritativePending);
         AgentSetupView confirmed = AgentUiTestData.Setup(
-            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Confirmation) with
+            AgentUiTestData.Status(AgentLifecycleStatus.Active, responseMode: AgentResponseMode.Automatic) with
             {
                 DisplayName = "confirmed authoritative name",
                 Description = "confirmed authoritative description",
@@ -641,8 +641,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             Task.FromResult(AgentSetupResult.Success(initial)),
             Task.FromResult(AgentSetupResult.Success(pending)),
             Task.FromResult(AgentSetupResult.Success(confirmed)));
-        GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
-            AgentResponseMode.Confirmation,
+        GivenAcceptedWrite(gateway => gateway.ActivateAsync(
             Arg.Any<AgentOperationOptions>(),
             Arg.Any<CancellationToken>()));
 
@@ -652,7 +651,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         cut.Find("[data-testid='agents-config-description-input']").Change("submitted administrator description");
         await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
             AgentResponseMode.Confirmation));
-        Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
+        Task submission = cut.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
         cut.WaitForAssertion(() =>
         {
             SetupGateway.Received(1).GetSetupAsync(4, Arg.Any<CancellationToken>());
@@ -662,19 +661,23 @@ public sealed class AgentConfigurationTests : AgentsTestContext
                 .ShouldBe("submitted administrator description");
             cut.FindComponent<ResponseModeToggle>().Instance.Value.ShouldBe(AgentResponseMode.Confirmation);
         });
-        cut.Find("[data-testid='agents-config-display-name-input']").Change("edited during catch-up name");
-        cut.Find("[data-testid='agents-config-description-input']").Change("edited during catch-up description");
-        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
-            AgentResponseMode.Automatic));
+        // The retained attempt locks all mutable inputs. These unrelated drafts were entered before
+        // submission and must survive both reads without simulating edits a user cannot perform.
+        cut.Find("[data-testid='agents-config-display-name-input']").HasAttribute("disabled").ShouldBeTrue();
+        cut.Find("[data-testid='agents-config-description-input']").HasAttribute("disabled").ShouldBeTrue();
+        cut.FindComponent<ResponseModeToggle>().Instance.Disabled.ShouldBeTrue();
 
         Clock.Advance(TimeSpan.FromMilliseconds(250));
         await submission;
 
         cut.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value")
-            .ShouldBe("edited during catch-up name");
+            .ShouldBe("submitted administrator name");
         cut.Find("[data-testid='agents-config-description-input']").GetAttribute("value")
-            .ShouldBe("edited during catch-up description");
-        cut.FindComponent<ResponseModeToggle>().Instance.Value.ShouldBe(AgentResponseMode.Automatic);
+            .ShouldBe("submitted administrator description");
+        cut.FindComponent<ResponseModeToggle>().Instance.Value.ShouldBe(AgentResponseMode.Confirmation);
+        cut.Find("[data-testid='agents-config-display-name-input']").HasAttribute("disabled").ShouldBeFalse();
+        cut.Find("[data-testid='agents-config-description-input']").HasAttribute("disabled").ShouldBeFalse();
+        cut.FindComponent<ResponseModeToggle>().Instance.Disabled.ShouldBeFalse();
         cut.Find("[data-testid='agents-config-truth-stage']").TextContent
             .ShouldContain("Agents.Config.Truth.Stage.ProjectionConfirmed");
     }
@@ -699,7 +702,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             freshness: AgentSetupFreshness.Stale,
             truthState: AgentSetupTruthState.AuthoritativePending);
         AgentSetupView confirmed = AgentUiTestData.Setup(
-            AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Confirmation) with
+            AgentUiTestData.Status(AgentLifecycleStatus.Active, responseMode: AgentResponseMode.Automatic) with
             {
                 DisplayName = "confirmed name",
                 Description = "confirmed description",
@@ -710,16 +713,17 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             Task.FromResult(AgentSetupResult.Success(call.ArgAt<int?>(0) is null
                 ? initial
                 : confirmManualRefresh ? confirmed : pending)));
-        GivenAcceptedWrite(gateway => gateway.ConfigureResponseModeAsync(
-            AgentResponseMode.Confirmation,
+        GivenAcceptedWrite(gateway => gateway.ActivateAsync(
             Arg.Any<AgentOperationOptions>(),
             Arg.Any<CancellationToken>()));
 
         IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
         cut.WaitForAssertion(() => cut.Find("[data-testid='agents-response-mode-confirmation']"));
+        cut.Find("[data-testid='agents-config-display-name-input']").Change("unsaved administrator name");
+        cut.Find("[data-testid='agents-config-description-input']").Change("unsaved administrator description");
         await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
             AgentResponseMode.Confirmation));
-        Task submission = cut.Find("[data-testid='agents-config-response-mode-submit']").ClickAsync(new MouseEventArgs());
+        Task submission = cut.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
         cut.WaitForAssertion(() => SetupGateway.Received(1).GetSetupAsync(4, Arg.Any<CancellationToken>()));
 
         for (int tick = 0; tick < 31; tick++)
@@ -756,16 +760,19 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             Arg.Is<int?>(version => version.HasValue && version.Value != 4),
             Arg.Any<CancellationToken>());
 
-        cut.Find("[data-testid='agents-config-display-name-input']").Change("unsaved administrator name");
-        cut.Find("[data-testid='agents-config-description-input']").Change("unsaved administrator description");
-        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(
-            AgentResponseMode.Automatic));
+        // Timeout retains the exact attempt, so only its recovery controls are interactive.
+        cut.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value")
+            .ShouldBe("unsaved administrator name");
+        cut.Find("[data-testid='agents-config-description-input']").GetAttribute("value")
+            .ShouldBe("unsaved administrator description");
+        cut.Find("[data-testid='agents-config-display-name-input']").HasAttribute("disabled").ShouldBeTrue();
+        cut.Find("[data-testid='agents-config-description-input']").HasAttribute("disabled").ShouldBeTrue();
+        cut.FindComponent<ResponseModeToggle>().Instance.Disabled.ShouldBeTrue();
         confirmManualRefresh = true;
         await cut.Find("[data-testid='agents-config-write-refresh']").ClickAsync(new MouseEventArgs());
 
         ExpectedVersionReadCount(4).ShouldBe(readsImmediatelyBeforeTimeout + 1);
-        await SetupGateway.Received(1).ConfigureResponseModeAsync(
-            AgentResponseMode.Confirmation,
+        await SetupGateway.Received(1).ActivateAsync(
             Arg.Any<AgentOperationOptions>(),
             Arg.Any<CancellationToken>());
         cut.Find("[data-testid='agents-config-write-state']").TextContent
@@ -774,7 +781,10 @@ public sealed class AgentConfigurationTests : AgentsTestContext
             .ShouldBe("unsaved administrator name");
         cut.Find("[data-testid='agents-config-description-input']").GetAttribute("value")
             .ShouldBe("unsaved administrator description");
-        cut.FindComponent<ResponseModeToggle>().Instance.Value.ShouldBe(AgentResponseMode.Automatic);
+        cut.FindComponent<ResponseModeToggle>().Instance.Value.ShouldBe(AgentResponseMode.Confirmation);
+        cut.Find("[data-testid='agents-config-display-name-input']").HasAttribute("disabled").ShouldBeFalse();
+        cut.Find("[data-testid='agents-config-description-input']").HasAttribute("disabled").ShouldBeFalse();
+        cut.FindComponent<ResponseModeToggle>().Instance.Disabled.ShouldBeFalse();
         cut.Find("[data-testid='agents-config-truth-stage']").TextContent
             .ShouldContain("Agents.Config.Truth.Stage.ProjectionConfirmed");
     }

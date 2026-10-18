@@ -9,6 +9,7 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
     /// <inheritdoc />
     public async Task<TenantAccessReadResult> ReadAsync(string tenantId, string actorUserId, string callerPartyId, CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
         if ((availability.Check("EXT-HOST-1") ?? availability.Check("EXT-PARTIES-1")) is { } blocker)
         {
             return TenantAccessReadResult.Unavailable with { Dependency = blocker };
@@ -45,6 +46,7 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
+            ct.ThrowIfCancellationRequested();
             return TenantAccessReadResult.Unavailable;
         }
     }

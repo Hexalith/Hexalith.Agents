@@ -1,0 +1,200 @@
+{
+  "story": "5.4",
+  "scope": "Current-authority and Party cancellation admission; valid unresolved-attempt UI interactions",
+  "verifiedAtUtc": "2026-10-17T09:44:29.994957+00:00",
+  "storyStatus": "in-progress",
+  "storyComplete": false,
+  "liveReadinessEstablished": false,
+  "baselineCommitPreserved": "4e79df1f8b4e91c8f7ec73f935ed9212950b596b",
+  "frozenBlockSha256": "a20faa6ebe5cdc5b92024d0e5bbb3644dd65e53964d2e5f8cdce4c153c1e3668",
+  "changedCompilerAndVerifierFiles": {
+    "src/Hexalith.Agents.Server/Application/Agents/AgentPartyIdentityOrchestrator.cs": "49776dc637a3218041b72f7bf49238bda403cfad8a179cc1dd0a1bc4ad15b1b6",
+    "src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs": "77aea2c15e58a2bab5567055b7c567a1d997fcd26633803ca92ba6998ee76586",
+    "src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs": "74e1892605d04273a571c54222794fad2cc2b88fc2a873135135298b7eee0033",
+    "src/Hexalith.Agents.Server/Ports/ProjectedApproverPolicyResolver.cs": "2c52915a00fe0687d5f28266291953e11b977f72b5e555aa67f7b21e16739c52",
+    "src/Hexalith.Agents.Server/Ports/ProjectedTenantAccessReader.cs": "bfd06582d9c90a8f6f73df052424cb0a3e923ce86d45e5e28e973c74901b1044",
+    "test/Hexalith.Agents.Server.Tests/AuthorityCancellationAdmissionTests.cs": "0090ef9509a3f76b2117333224c236b69e45a6a35e49f9db9c735a66d404840b",
+    "test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs": "d10e4019a2a8340e65daf5d0310c94f2ea2946b45bae84ac6019d9ab8e5df51d",
+    "eng/verify-story-5.4.ps1": "105f2d84a47b8c254f49fe1623a164bd8bc4e1879358d84d534f5bd5a40bc9cb"
+  },
+  "canonicalRevisions": {
+    ".": "0db2c8b17cb86deefc827ea2d0fefcbc90719957",
+    "references/Hexalith.Parties": "90af3047b50046cb4f6f91e01f182f562110aab3",
+    "references/Hexalith.Tenants": "e667d5391dae306e631dec23acd191863e54130c",
+    "references/Hexalith.Conversations": "4e937361613c2dba72c46595226219017e6ba524",
+    "references/Hexalith.EventStore": "77d9af18a54d92506e310fe5a45021a395e66f60",
+    "references/Hexalith.Platform": "b4b6d4a1efcd2f13c6d03270f8e952f27ed8148b",
+    "../parties": "1138c507e6c61f6a1f8fa0fd72f7c2aa28c89b52",
+    "../conversations": "9cbc71b63be3fa1ce4d89d98ef1771c54c6603f5",
+    "../platform": "c31721650589222471746b08d902bf8d14e0ce5c"
+  },
+  "commands": {
+    "serverBuild": "dotnet build test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj --configuration Debug -m:1 -p:NuGetAudit=false -p:MinVerVersionOverride=1.0.0 --nologo",
+    "serverRed": "dotnet test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll -class Hexalith.Agents.Server.Tests.AuthorityCancellationAdmissionTests -result-xml /tmp/story54-authority-red.xml",
+    "serverGreen": "dotnet test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll -class Hexalith.Agents.Server.Tests.AuthorityCancellationAdmissionTests -class Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests -class Hexalith.Agents.Server.Tests.ApproverEvidenceAdmissionTests -class Hexalith.Agents.Server.Tests.PartiesAgentPartyDirectoryTests -class Hexalith.Agents.Server.Tests.AgentPartyIdentityOrchestratorTests -result-xml /tmp/story54-authority-green.xml",
+    "uiBuild": "dotnet build test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj --configuration Debug -m:1 -p:NuGetAudit=false -p:MinVerVersionOverride=1.0.0 --nologo",
+    "uiRed": "dotnet test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll -class Hexalith.Agents.UI.Tests.AgentConfigurationTests -result-xml /tmp/story54-ui-draft-red.xml",
+    "uiGreen": "dotnet test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll -class Hexalith.Agents.UI.Tests.AgentConfigurationTests -result-xml /tmp/story54-ui-draft-green.xml",
+    "local": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Local -ArtifactsPath /tmp/agents-story54-authority-cancellation-2026-10-17/final-local",
+    "liveRefusal": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Live -ArtifactsPath /tmp/agents-story54-authority-cancellation-2026-10-17/live",
+    "whitespace": "git -c core.whitespace=cr-at-eol diff --check"
+  },
+  "red": {
+    "total": 17,
+    "passed": 1,
+    "failed": 16,
+    "errors": 0,
+    "skipped": 0,
+    "not-run": 0
+  },
+  "redNote": "Sixteen new cases fail against unchanged production code. The existing post-success Party-client cancellation check already passes the seventeenth case.",
+  "greenFocused": {
+    "total": 88,
+    "passed": 88,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not-run": 0
+  },
+  "uiRed": {
+    "total": 54,
+    "passed": 52,
+    "failed": 2,
+    "errors": 0,
+    "skipped": 0,
+    "not-run": 0
+  },
+  "uiGreen": {
+    "total": 54,
+    "passed": 54,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not-run": 0
+  },
+  "uiCorrection": {
+    "classification": "Invalid test interactions with controls disabled by the accepted unresolved-attempt policy; product UI unchanged.",
+    "requirement": "spec-5-2-configure-hexa-through-live-eventstore-operations-2.md Tasks: retain the activation version with the existing ULID/payload attempt and disable mutable inputs while unresolved.",
+    "coveragePreserved": "Both tests enter unsaved name/description/response-mode drafts before activation. The confirmed authoritative values differ from all three drafts. Automatic and timeout/manual-refresh paths preserve the drafts, original expected version, timing/read counts, status transitions and recovery actions; controls stay disabled while unresolved and enable after confirmation."
+  },
+  "broad": {
+    "exitCode": 0,
+    "projects": {
+      "Hexalith.Agents.Client.Tests": {
+        "total": 6,
+        "passed": 6,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Contracts.Tests": {
+        "total": 731,
+        "passed": 731,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "total": 1008,
+        "passed": 1008,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "total": 913,
+        "passed": 913,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "total": 1158,
+        "passed": 1158,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "totalPassed": 3816,
+    "buildWarnings": 0,
+    "buildErrors": 0
+  },
+  "compilerAndRegisterDrift": {
+    "beforeFileCount": 32389,
+    "afterFileCount": 32389,
+    "changed": []
+  },
+  "liveRefusal": {
+    "exitCode": 1,
+    "Blockers": [
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-PARTIES-1"
+      },
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-CONV-AI-1"
+      },
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-SECRETS-1"
+      },
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-HOST-1"
+      }
+    ],
+    "StoryComplete": false,
+    "ExternalCalls": 0,
+    "Mode": "Live"
+  },
+  "acceptedTargets": {
+    "EXT-PARTIES-1": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+    "EXT-CONV-AI-1": "8469c5c6891d12b43d2082136b1ca7ddfac52c3b",
+    "EXT-SECRETS-1": "f448db29493c1b30b0f18380188fe99b8b7606fe",
+    "EXT-HOST-1": "f448db29493c1b30b0f18380188fe99b8b7606fe"
+  },
+  "dependencyDisposition": "All four remain Committed/unavailable; installed owner targets differ from accepted pins. No owner command, consuming live seam, deployment or owner message executed.",
+  "remainingAcceptance": [
+    "Production contiguous/current Tenants, Parties actor/identity and Conversations approver bindings with live safe API/UI basis.",
+    "Actual signed principal/operation/scope admission, private reserved-system replay registration and persisted AD-29 retry/replay proof.",
+    "Replicated durable denial spool and recovery worker with exact-target private credentials and persisted ACL, outage, restart and lost-ack evidence.",
+    "Complete deployed cross-tenant output/log/count/accessibility isolation and accepted exact-target live matrix qualification."
+  ],
+  "artifactSha256": {
+    "/tmp/story54-authority-red-build.log": "983757567cf1b88b2131a346f406ce1c574c5a8c4d463f538eb0cf57488db591",
+    "/tmp/story54-authority-red.xml": "8c1cdf7e4f67311a39ab8aadff6b4d5818d97e2625948044eb245b47dd7f8749",
+    "/tmp/story54-authority-red.log": "2d2b7b721e761fe0181d872bf083dedf6e0e82d6b9aa8747e9779ba8c05e1b17",
+    "/tmp/story54-authority-green-build.log": "3a64951b47cdf076397a25ee1ab6eba5b9a4a5017e35b14676994ea7cc776775",
+    "/tmp/story54-authority-green.xml": "eeb4cfb575bb24373723a8054b952cb30454479594a6829739314876ff787e73",
+    "/tmp/story54-authority-green.log": "f4f6e14c550bfcda7a99c7a9eaf3eb5022734ad50192394eed650d444e25bdeb",
+    "/tmp/story54-ui-draft-red.xml": "dae27da02f4309f333055072bc2e686db42bd0c7ea91d96c400d20ab9d5fe41a",
+    "/tmp/story54-ui-draft-red.log": "ce8d43b569d3d66d1bbdd6cd1bb26d091c39ca548e6b01669d78fb96bb393e2e",
+    "/tmp/story54-ui-draft-green-build.log": "4ea25341626dfe85d351d188bc0f8db404f0b5b8fbd5841ac95af6897cdab1c4",
+    "/tmp/story54-ui-draft-green.xml": "8404927f7796ec1ec6e6837cf77f8d71d46bbebd3b6fb98fa9f7d78cf2e029bc",
+    "/tmp/story54-ui-draft-green.log": "1d2f06b5305f11b65916c6765ddfe3c338d6bb4ae86d2531d85ace1f4a067274",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/final-local/Hexalith.Agents.Client.Tests.build.log": "e87e16efd51edb696cc587d6bba30fb76020a223bd3ec5b89e5d562cc84eb394",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/final-local/Hexalith.Agents.Client.Tests.xml": "768098dc6389cce76eaf87be9e4a6928d31f45af39ca77939e76ed182812cfa4",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/final-local/Hexalith.Agents.Contracts.Tests.build.log": "caea526195a621218420a69bba361a1dc90a5932b2f4e99977d46981002e8eae",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/final-local/Hexalith.Agents.Contracts.Tests.xml": "c8c3388d9ea7121dba710951c8e424ffe0a88d18cd3cf011c3aa7a916c0fd143",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/final-local/Hexalith.Agents.Server.Tests.build.log": "f8be5086acd1041cbf9dc45752820bbbe13050794352390d286d94035fb07ff7",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/final-local/Hexalith.Agents.Server.Tests.xml": "60fd2c50d99af98f50f303aa6d75a7dc7fa66b61a1490a6d951c29fc356c7fd5",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/final-local/Hexalith.Agents.Tests.build.log": "f31db47c3377dbaf557887d3b3cce371340c866fcbb28136f330dc79de718b40",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/final-local/Hexalith.Agents.Tests.xml": "f5c34de33c8a9a2a3098e899cb0683fd6e23a9f759aca2ab5defc2cfe835b70f",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/final-local/Hexalith.Agents.UI.Tests.build.log": "3dc29ceb0f539a6a290692d8d90819cd1fb0ccc20096b659bb408f0bb9d65481",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/final-local/Hexalith.Agents.UI.Tests.xml": "b6947e4922e55521cb54e07396ead9a8b5c0c0269863e2b8ad5636f4ff0ce7eb",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/final-local/result.json": "861ad6f60ea1d8a910161c32682b9ba1186a4f5aade65731f4ee9d2bd23c4224",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/live/result.json": "bd10bbfbfa4840ba7bce52d8a3807a51bcef2c78893bf62d45941078d46523b4",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/source-before.json": "e5dbfdd9f6f0325c79402f917c59e43edc6f31b3bfa88593ef1abc8e9bb7f873",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17/source-after.json": "e5dbfdd9f6f0325c79402f917c59e43edc6f31b3bfa88593ef1abc8e9bb7f873",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17-final-local.log": "958117a23f30f9a62994fdb27dfe50323003e950c81801bdf07a8a2059f4ffa0",
+    "/tmp/agents-story54-authority-cancellation-2026-10-17-live.log": "1fd77440e3c5fa74c8c272065396e93f0022531d6b31d5ed90103104e29de89a"
+  },
+  "approvedIntentReceiptSha256": "6fa07235f215cb79e7aa129853afdc8b460611090c734a1e355b671be788dfac"
+}

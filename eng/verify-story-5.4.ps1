@@ -57,7 +57,8 @@ foreach ($name in $projects) {
     }
     $requiredClasses = switch ($name) {
         'Hexalith.Agents.Tests' { @('TrustedEnvelopeReplayTests', 'SecurityEventLogTests') }
-        'Hexalith.Agents.Server.Tests' { @('Story54CurrentEvidenceTests', 'Story54BoundaryTests', 'ApproverEvidenceAdmissionTests', 'TenantAuthorityAdmissionOrderingTests', 'AgentSetupQueryHandlerTests', 'AuditQueryIsolationTests', 'AgentInteractionAuditQueryHandlerTests', 'AgentInteractionGateAdmissionTests') }
+        'Hexalith.Agents.Server.Tests' { @('Story54CurrentEvidenceTests', 'Story54BoundaryTests', 'ApproverEvidenceAdmissionTests', 'TenantAuthorityAdmissionOrderingTests', 'AuthorityCancellationAdmissionTests', 'AgentSetupQueryHandlerTests', 'AuditQueryIsolationTests', 'AgentInteractionAuditQueryHandlerTests', 'AgentInteractionGateAdmissionTests') }
+        'Hexalith.Agents.UI.Tests' { @('AgentConfigurationTests') }
         default { @() }
     }
     foreach ($class in $requiredClasses) {

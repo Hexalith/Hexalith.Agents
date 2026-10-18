@@ -35,6 +35,7 @@ public sealed class HttpAgentAdministrationContextProvider(IHttpContextAccessor 
     /// <inheritdoc />
     public async ValueTask<AgentAdministrationContext> GetContextAsync(bool platform, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         AgentAdministrationContext identity = GetContext();
         if (tenantSource is null || actorSource is null || availability is null
             || availability.Check("EXT-HOST-1") is not null || availability.Check("EXT-PARTIES-1") is not null
@@ -67,6 +68,7 @@ public sealed class HttpAgentAdministrationContextProvider(IHttpContextAccessor 
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return identity;
         }
     }

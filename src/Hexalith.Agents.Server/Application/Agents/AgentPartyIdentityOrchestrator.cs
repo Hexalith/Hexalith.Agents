@@ -66,6 +66,7 @@ public sealed class AgentPartyIdentityOrchestrator
     public async Task<AgentPartyLinkOutcome> ExecuteAsync(AgentPartyLinkRequest request, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(request);
+        ct.ThrowIfCancellationRequested();
 
         // (1) Authorize — fail closed before any Parties call or dispatch (AD-12).
         if (!request.IsAgentsAdmin || request.Operation == AgentPartyLinkOperation.Replace)
@@ -81,6 +82,7 @@ public sealed class AgentPartyIdentityOrchestrator
                 new AgentPartyProvisioningRequest(request.AgentId, request.OrganizationLabel ?? DefaultOrganizationLabel(request.AgentId)),
                 ct).ConfigureAwait(false)
             : await _directory.ValidateExistingPartyAsync(request.TenantId, RequireExistingPartyId(request), ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
 
         // The id carried on the command: the validated/provisioned id, else the requested id (so a non-Valid
         // verdict still produces an auditable, well-formed rejected command).
