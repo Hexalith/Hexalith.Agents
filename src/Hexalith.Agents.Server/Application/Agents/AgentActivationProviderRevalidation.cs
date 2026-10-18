@@ -75,6 +75,7 @@ public sealed class AgentActivationProviderRevalidation
     public async Task<AgentActivationRevalidationOutcome> ExecuteAsync(AgentActivationRevalidationRequest request, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(request);
+        ct.ThrowIfCancellationRequested();
 
         // Authorize — fail closed before any read or dispatch (AD-12).
         if (!request.IsAgentsAdmin)
@@ -97,6 +98,7 @@ public sealed class AgentActivationProviderRevalidation
             ProviderCatalogEntryReadResult read = await _catalogReader
                 .GetEntryAsync(request.TenantId, request.SelectedProviderId, request.SelectedModelId, ct)
                 .ConfigureAwait(false);
+            ct.ThrowIfCancellationRequested();
             providerVerdict = ProviderSelectionVerdict.Evaluate(read);
         }
 
@@ -110,6 +112,7 @@ public sealed class AgentActivationProviderRevalidation
             ApproverPolicyResolutionResult resolution = await _approverPolicyResolver
                 .ResolveAsync(request.TenantId, policy, ct)
                 .ConfigureAwait(false);
+            ct.ThrowIfCancellationRequested();
             approverVerdict = ApproverPolicyVerdict.Evaluate(policy, resolution);
         }
 
@@ -127,6 +130,7 @@ public sealed class AgentActivationProviderRevalidation
         CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(request);
+        ct.ThrowIfCancellationRequested();
 
         if (!request.IsAgentsAdmin)
         {
@@ -153,6 +157,7 @@ public sealed class AgentActivationProviderRevalidation
         ApproverPolicyValidationStatus approverVerdict,
         CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
         var command = new ActivateAgent();
         var envelope = new AgentCommandIntent(
             request.MessageId,
@@ -171,6 +176,7 @@ public sealed class AgentActivationProviderRevalidation
                 request.ExpectedConfigurationVersion));
 
         SubmitCommandResponse receipt = await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
 
         return AgentActivationRevalidationOutcome.FromDispatch(providerVerdict, approverVerdict, receipt);
     }

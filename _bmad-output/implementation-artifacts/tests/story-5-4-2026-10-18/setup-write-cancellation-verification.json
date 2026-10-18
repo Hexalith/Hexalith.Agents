@@ -1,0 +1,204 @@
+{
+  "story": "5.4",
+  "date": "2026-10-18",
+  "scope": "Setup-write and activation cancellation follow-through only",
+  "storyComplete": false,
+  "liveReadinessEstablished": false,
+  "changes": [
+    "Stop all five public setup writes before or after cancelled authority and before subsequent protected work.",
+    "Stop activation after cancelled setup, catalog and approver reads, including retained replay entry.",
+    "Do not translate cancelled dispatch or status failures into processed API results.",
+    "Require SetupWriteCancellationAdmissionTests in the strict Local verifier."
+  ],
+  "commands": {
+    "build": "dotnet build test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj --configuration Debug -m:1 -p:NuGetAudit=false -p:MinVerVersionOverride=1.0.0 --nologo",
+    "red": "dotnet test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll -class Hexalith.Agents.Server.Tests.SetupWriteCancellationAdmissionTests -result-xml /tmp/agents-story54-write-red.xml",
+    "green": "dotnet test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll -class Hexalith.Agents.Server.Tests.SetupWriteCancellationAdmissionTests -result-xml /tmp/agents-story54-write-green.xml",
+    "local": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Local -ArtifactsPath /tmp/agents-story54-write-2026-10-18/local",
+    "live": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Live -ArtifactsPath /tmp/agents-story54-write-2026-10-18/live"
+  },
+  "focused": {
+    "red": {
+      "total": 42,
+      "passed": 0,
+      "failed": 42,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0,
+      "xml": "/tmp/agents-story54-write-red.xml",
+      "log": "/tmp/agents-story54-write-red.log",
+      "buildLog": "/tmp/agents-story54-write-red-build.log"
+    },
+    "green": {
+      "total": 42,
+      "passed": 42,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0,
+      "xml": "/tmp/agents-story54-write-green.xml",
+      "log": "/tmp/agents-story54-write-green.log",
+      "buildLog": "/tmp/agents-story54-write-green-build.log"
+    }
+  },
+  "local": {
+    "exitCode": 0,
+    "projects": {
+      "Hexalith.Agents.Client.Tests": {
+        "total": 6,
+        "passed": 6,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Contracts.Tests": {
+        "total": 731,
+        "passed": 731,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "total": 1082,
+        "passed": 1082,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "total": 913,
+        "passed": 913,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "total": 1158,
+        "passed": 1158,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "totalPassed": 3890,
+    "warningFreeDebugBuilds": 5
+  },
+  "live": {
+    "exitCode": 1,
+    "Mode": "Live",
+    "Blockers": [
+      {
+        "RecordId": "EXT-PARTIES-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-CONV-AI-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-SECRETS-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-HOST-1",
+        "Code": "DependencyNotAvailable"
+      }
+    ],
+    "ExternalCalls": 0,
+    "StoryComplete": false
+  },
+  "canonicalRevisions": {
+    ".": "9c66474d407a6b4a3d4fb9d6b40b8cabf6eeaa33",
+    "references/Hexalith.Parties": "d279b43548628c7e3d06113ab5c264a72bf5b69f",
+    "references/Hexalith.Conversations": "2b3b9c3ff612df30a530c89aa27eb3d39529cc3f",
+    "references/Hexalith.Tenants": "66ab4a5b3f8152535ede44670b50466d24ef588b",
+    "references/Hexalith.Platform": "0d4c6dd91a0e5762b13dddb722e130f42320c062",
+    "references/Hexalith.EventStore": "37bdc90a72b9f0ea547852e903334cc8cc541641",
+    "references/Hexalith.Builds": "2db121b978d296ee0886188c675186384c9c9bad"
+  },
+  "acceptedTargets": {
+    "EXT-PARTIES-1": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+    "EXT-CONV-AI-1": "87e8b4a6ec3224b20a560b0e83de857805925572",
+    "EXT-SECRETS-1": "abbec4093715c1db854433119b32d4e16df20d08",
+    "EXT-HOST-1": "abbec4093715c1db854433119b32d4e16df20d08"
+  },
+  "inputHashAudit": {
+    "before": {
+      "src/Hexalith.Agents.Server/Application/Agents/EventStoreAgentAdministrationOperations.cs": "d31289e95806d073be80dd231437624d735541859e181e2d37fca5c0b7bbaa7d",
+      "src/Hexalith.Agents.Server/Application/Agents/AgentActivationProviderRevalidation.cs": "6610ed321748b3a29fc6db72efc6d7448a96e492c3ae21c074bbcdde0609e612",
+      "test/Hexalith.Agents.Server.Tests/SetupWriteCancellationAdmissionTests.cs": "67fddbc4d7b038448353d7d33d954dd7a899fdef9e2a36fa0402231896245e69",
+      "eng/verify-story-5.4.ps1": "76bcbba056d3087c9dd5a0aa136121d6d9908002f5a12a27f7466ce86fc76a9f",
+      "_bmad-output/planning-artifacts/external-dependency-register.md": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2"
+    },
+    "after": {
+      "src/Hexalith.Agents.Server/Application/Agents/EventStoreAgentAdministrationOperations.cs": "d31289e95806d073be80dd231437624d735541859e181e2d37fca5c0b7bbaa7d",
+      "src/Hexalith.Agents.Server/Application/Agents/AgentActivationProviderRevalidation.cs": "6610ed321748b3a29fc6db72efc6d7448a96e492c3ae21c074bbcdde0609e612",
+      "test/Hexalith.Agents.Server.Tests/SetupWriteCancellationAdmissionTests.cs": "67fddbc4d7b038448353d7d33d954dd7a899fdef9e2a36fa0402231896245e69",
+      "eng/verify-story-5.4.ps1": "76bcbba056d3087c9dd5a0aa136121d6d9908002f5a12a27f7466ce86fc76a9f",
+      "_bmad-output/planning-artifacts/external-dependency-register.md": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2"
+    },
+    "changedPaths": [],
+    "scope": "Four changed compiler/verifier files and authoritative dependency register; not a complete compiler-input manifest."
+  },
+  "artifactSha256": {
+    "/tmp/agents-story54-write-2026-10-18/live/result.json": "2e29fd7f5d73b8f8ea0e7e0c7ae6b870d4b3dfbb9890050229208905b417dc29",
+    "/tmp/agents-story54-write-2026-10-18/local/Hexalith.Agents.Client.Tests.build.log": "04307bc8ae4344d6bff52ad5f8d8bef427fccd26c3b7eb436004933629eb0fa1",
+    "/tmp/agents-story54-write-2026-10-18/local/Hexalith.Agents.Client.Tests.xml": "c74d4046814beb4df660fbeeaf14e62d8c8884f9e096cc6af7f175140d51403b",
+    "/tmp/agents-story54-write-2026-10-18/local/Hexalith.Agents.Contracts.Tests.build.log": "2331ddf8b0d407630be9523347a9562bcd6797dc607ce08b3f6e421c48b61c0a",
+    "/tmp/agents-story54-write-2026-10-18/local/Hexalith.Agents.Contracts.Tests.xml": "82d6075577f04f46750d4afe0dd6597e1f81b00f785987a56d12f998f432ddce",
+    "/tmp/agents-story54-write-2026-10-18/local/Hexalith.Agents.Server.Tests.build.log": "a52ee56e5527e1a775b2a44a5083e20e43c77e97a58460d1502d3341b45c6c54",
+    "/tmp/agents-story54-write-2026-10-18/local/Hexalith.Agents.Server.Tests.xml": "e55b8ac0353097314a983f3b7fa10b7e871bcad091e26d014e406d16c0061419",
+    "/tmp/agents-story54-write-2026-10-18/local/Hexalith.Agents.Tests.build.log": "ee48bd5f74455dbd41a2a28b443489c9e20149adc8c3686ea1e5c09d376958d5",
+    "/tmp/agents-story54-write-2026-10-18/local/Hexalith.Agents.Tests.xml": "99b37ea7dda208ee7e079595fafd79631a7bc5e1c727917784111744f9f60dd8",
+    "/tmp/agents-story54-write-2026-10-18/local/Hexalith.Agents.UI.Tests.build.log": "94315d9577dd2ff4d890525b37bf37dbd0ec4c898f1e957bcfe1c2b0b00f1c58",
+    "/tmp/agents-story54-write-2026-10-18/local/Hexalith.Agents.UI.Tests.xml": "527af35a12302c5ae493af9510ff682a407f45d9d8ef38649bce68bda3a1acd7",
+    "/tmp/agents-story54-write-2026-10-18/local/result.json": "c3a72edb05294357926303854622b40a8b5d667f4a9ce3f0f1a71497da195f38",
+    "/tmp/agents-story54-write-green-build.log": "c10a325a2702dfc03b3b3a8541c0c51b1d438048f7189c62db610e20a58fd066",
+    "/tmp/agents-story54-write-green.log": "3357e38bf3827c69d4934b21a3efcf61574d8fb5f154735511f0527d7969e901",
+    "/tmp/agents-story54-write-green.xml": "3308de680fcd561ccd08bcd643f4228fdba77be4ad3c9dd265655d1a9a62bde9",
+    "/tmp/agents-story54-write-inputs-after.json": "372c3567a7a6516b085a48be9585fe43c18f75d0e7fe632a8797d941c0ab70a3",
+    "/tmp/agents-story54-write-inputs-before.json": "372c3567a7a6516b085a48be9585fe43c18f75d0e7fe632a8797d941c0ab70a3",
+    "/tmp/agents-story54-write-live.log": "1fd77440e3c5fa74c8c272065396e93f0022531d6b31d5ed90103104e29de89a",
+    "/tmp/agents-story54-write-local.log": "341d6b74a0c11849374324d2e20d239bd25db6268f8ab7b1007e661d95ac7177",
+    "/tmp/agents-story54-write-red-build.log": "cdc52587e90c5461baec889f4c3e8b085438baf0d0b9318410ab7987096cab15",
+    "/tmp/agents-story54-write-red.log": "87bbfdc302a645b361a6337c9cddcf0688e23c3d2119b6ac2a203bd2cb5751cd",
+    "/tmp/agents-story54-write-red.xml": "9eaf01cb4d4c2fe51e427fe70f82f1be96f6ca9ba1b75bb5d09f57d064281e76"
+  },
+  "acceptanceMatrix": [
+    {
+      "row": "Current authority",
+      "localEvidence": "Fresh-authority ordering plus setup-write/activation cancellation regressions; API/UI local suites pass.",
+      "remaining": "Installed production current Tenants/Parties/Conversations bindings, immutable provisioning and exact-target live API/UI authority evidence."
+    },
+    {
+      "row": "Trusted delivery",
+      "localEvidence": "Existing pure replay folds and fail-closed host admission boundaries remain covered. Cancelled activation cannot construct or dispatch a later intent.",
+      "remaining": "Actual AD-30 signature/principal/operation/scope verification, private exact-target replay credentials/ACL, persisted AD-29 idempotency evidence."
+    },
+    {
+      "row": "Denial recovery",
+      "localEvidence": "Existing pure security-log folds remain covered; no durability or outage claim.",
+      "remaining": "Platform replicated durable denial spool/worker and persisted outage, restart, restore and lost-ack end-state evidence."
+    },
+    {
+      "row": "Tenant isolation",
+      "localEvidence": "Existing setup/audit/gate isolation tests and no downstream reads after cancelled authority.",
+      "remaining": "Complete deployed log/count/message/accessibility isolation and exact-target persisted ACL qualification."
+    }
+  ],
+  "preserved": [
+    "Frozen intent and acceptance criteria",
+    "Branch B",
+    "Dependency statuses and availability gates",
+    "Unchecked full-story execution tasks",
+    "in-progress story disposition"
+  ],
+  "ownerSeamsExecuted": 0,
+  "gitMutations": 0,
+  "ownerSourcesEdited": false
+}

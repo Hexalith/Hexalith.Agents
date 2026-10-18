@@ -288,8 +288,10 @@ public sealed class EventStoreAgentAdministrationOperations(
         bool requiresExpectedConfigurationVersion = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
+        cancellationToken.ThrowIfCancellationRequested();
 
         AgentAdministrationContext context = await _contextProvider.GetContextAsync(false, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
         if (!context.IsAuthorized)
         {
             string? deniedCorrelation = options?.CorrelationId;
@@ -337,9 +339,11 @@ public sealed class EventStoreAgentAdministrationOperations(
                         context.IsAgentsAdmin),
                     cancellationToken)
                 .ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return AgentOperationResult<AgentCommandAcceptance>.Failed(
                 AgentCommandDispatchFailure.Map(exception),
                 correlationId);
@@ -389,6 +393,7 @@ public sealed class EventStoreAgentAdministrationOperations(
                 }
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             if (wasRejected is true)
             {
                 return AgentOperationResult<AgentCommandAcceptance>.Failed(
@@ -428,6 +433,7 @@ public sealed class EventStoreAgentAdministrationOperations(
                 AgentSetupReadModelAddresses.Detail(request.TenantId, request.AgentId),
                 cancellationToken)
             .ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
 
         AgentSetupReadModel? model = entry.Value;
         if (model is null
