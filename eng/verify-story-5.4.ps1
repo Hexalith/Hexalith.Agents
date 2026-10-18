@@ -56,9 +56,9 @@ foreach ($name in $projects) {
             [int] $run.GetAttribute('not-run') -ne 0) { throw "IncompleteTestRun: $name" }
     }
     $requiredClasses = switch ($name) {
-        'Hexalith.Agents.Tests' { @('TrustedEnvelopeReplayTests', 'SecurityEventLogTests') }
+        'Hexalith.Agents.Tests' { @('TrustedEnvelopeReplayTests', 'SecurityEventLogTests', 'AgentApproverPolicyTests') }
         'Hexalith.Agents.Server.Tests' { @('Story54CurrentEvidenceTests', 'Story54BoundaryTests', 'ApproverEvidenceAdmissionTests', 'TenantAuthorityAdmissionOrderingTests', 'AuthorityCancellationAdmissionTests', 'AgentSetupQueryHandlerTests', 'SetupReadCancellationAdmissionTests', 'SetupWriteCancellationAdmissionTests', 'AuditQueryIsolationTests', 'AgentInteractionAuditQueryHandlerTests', 'AgentInteractionGateAdmissionTests') }
-        'Hexalith.Agents.UI.Tests' { @('AgentConfigurationTests') }
+        'Hexalith.Agents.UI.Tests' { @('AgentConfigurationTests', 'ApproverPolicyTests') }
         default { @() }
     }
     foreach ($class in $requiredClasses) {

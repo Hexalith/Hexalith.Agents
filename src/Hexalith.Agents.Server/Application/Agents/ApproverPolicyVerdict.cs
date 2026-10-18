@@ -99,4 +99,86 @@ internal static class ApproverPolicyVerdict
             ? ApproverPolicyValidationStatus.Missing
             : ApproverPolicyValidationStatus.Valid;
     }
+
+    /// <summary>
+    /// Computes the action-time verdict for one acting human (AD-8). The eligible approvers are the union of the
+    /// configured sources, so the actor needs an exact match in one source; a source that simply does not contain
+    /// the actor is not a denial while another source resolves them. Any unavailable, unknown, substituted or
+    /// ambiguous source still fails the action closed, because it could change who is eligible.
+    /// </summary>
+    /// <param name="policy">The configured Approver Policy.</param>
+    /// <param name="result">The actor-scoped safe per-source resolution result.</param>
+    /// <returns>The deterministic action verdict.</returns>
+    internal static ApproverPolicyValidationStatus EvaluateAction(AgentApproverPolicy policy, ApproverPolicyResolutionResult result)
+    {
+        if (policy.Sources.Count == 0)
+        {
+            return ApproverPolicyValidationStatus.Incomplete;
+        }
+
+        if (result.Sources.Count != policy.Sources.Count)
+        {
+            return ApproverPolicyValidationStatus.Unavailable;
+        }
+
+        bool anyUnavailable = false;
+        bool anyAmbiguous = false;
+        bool anyResolved = false;
+        bool anyUnauthorized = false;
+        bool anyDisabled = false;
+        for (int index = 0; index < result.Sources.Count; index++)
+        {
+            ApproverSourceResolution source = result.Sources[index];
+            if (source.Kind != policy.Sources[index].Kind
+                || source.Source != policy.Sources[index]
+                || source.Kind is ApproverPolicySourceKind.Caller or ApproverPolicySourceKind.Unknown
+                || !Enum.IsDefined(source.Kind))
+            {
+                return ApproverPolicyValidationStatus.Unavailable;
+            }
+
+            switch (source.Outcome)
+            {
+                case ApproverSourceOutcome.Resolved:
+                    anyResolved = true;
+                    break;
+                case ApproverSourceOutcome.Unauthorized:
+                    anyUnauthorized = true;
+                    break;
+                case ApproverSourceOutcome.Ambiguous:
+                    anyAmbiguous = true;
+                    break;
+                case ApproverSourceOutcome.Disabled:
+                    anyDisabled = true;
+                    break;
+                case ApproverSourceOutcome.Missing:
+                    break;
+                default:
+                    anyUnavailable = true;
+                    break;
+            }
+        }
+
+        if (anyUnavailable)
+        {
+            return ApproverPolicyValidationStatus.Unavailable;
+        }
+
+        if (anyAmbiguous)
+        {
+            return ApproverPolicyValidationStatus.Ambiguous;
+        }
+
+        if (anyResolved)
+        {
+            return ApproverPolicyValidationStatus.Valid;
+        }
+
+        if (anyUnauthorized)
+        {
+            return ApproverPolicyValidationStatus.Unauthorized;
+        }
+
+        return anyDisabled ? ApproverPolicyValidationStatus.Disabled : ApproverPolicyValidationStatus.Missing;
+    }
 }

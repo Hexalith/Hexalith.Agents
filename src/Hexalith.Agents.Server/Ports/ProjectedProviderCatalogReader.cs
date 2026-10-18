@@ -86,6 +86,12 @@ public sealed class ProjectedProviderCatalogReader(
         // A tenant never enabled for any model has no enablement stream or read model; a missing stream at
         // sequence zero is current empty truth, while an existing unprojected stream stays unavailable.
         TenantProviderEnablementReadModel projectedTenant = tenant.Value ?? new TenantProviderEnablementReadModel();
+        if (!projectedTenant.IsScopedTo(tenantId))
+        {
+            // A misrouted model can never supply another tenant's enablement to a trusted verdict.
+            return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null);
+        }
+
         if (!await ProviderCatalogReadFreshness.HasHeadAsync(_gateway, tenantId, TenantProviderEnablementAggregate.Domain,
             tenantId, projectedTenant.LastSequenceNumber, ct).ConfigureAwait(false))
         {

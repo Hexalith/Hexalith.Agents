@@ -95,16 +95,15 @@ public sealed class EventStoreProviderCatalogOperations(
         {
             CommandStatusQueryResponse? status = await _gateway.GetCommandStatusAsync(messageId, cancellationToken)
                 .ConfigureAwait(false);
-            if (status is null)
+
+            // A status from another tenant or message is answered exactly like an absent one, so the lookup
+            // cannot reveal that the identifier exists elsewhere.
+            if (status is null
+                || !string.Equals(status.TenantId, targetTenantId, StringComparison.Ordinal)
+                || !string.Equals(status.MessageId, messageId, StringComparison.Ordinal))
             {
                 return AgentOperationResult<AgentSetupWriteStatus>.Succeeded(hasSubmissionReceipt
                     ? AgentSetupWriteStatus.Submitted : AgentSetupWriteStatus.UnableToVerify);
-            }
-
-            if (!string.Equals(status.TenantId, targetTenantId, StringComparison.Ordinal)
-                || !string.Equals(status.MessageId, messageId, StringComparison.Ordinal))
-            {
-                return AgentOperationResult<AgentSetupWriteStatus>.Failed(AgentOperationErrorCode.NotAuthorized);
             }
 
             AgentSetupWriteStatus outcome = status.IsRejected
@@ -169,6 +168,12 @@ public sealed class EventStoreProviderCatalogOperations(
             ReadModelEntry<TenantProviderEnablementReadModel> read = await _readModelStore
                 .GetAsync<TenantProviderEnablementReadModel>(_options.Value.StateStoreName,
                     TenantProviderEnablementReadModelAddresses.Detail(tenantId), cancellationToken).ConfigureAwait(false);
+            if (read.Value?.IsScopedTo(tenantId) == false)
+            {
+                return AgentOperationResult<TenantProviderEnablementInspectionResult>.Succeeded(
+                    new(ProviderCatalogInspectionStatus.Unavailable, null, null), correlationId: options?.CorrelationId);
+            }
+
             ProviderCatalogReadModel? platform = await ReadPlatformModelAsync(cancellationToken).ConfigureAwait(false);
             TenantProviderEntryState? entry = null;
             bool found = read.Value?.State.Entries.TryGetValue(
@@ -606,6 +611,12 @@ public sealed class EventStoreProviderCatalogOperations(
             ReadModelEntry<TenantProviderEnablementReadModel> tenant = await _readModelStore.GetAsync<TenantProviderEnablementReadModel>(
                 _options.Value.StateStoreName,
                 TenantProviderEnablementReadModelAddresses.Detail(context.TenantId), ct).ConfigureAwait(false);
+            if (tenant.Value?.IsScopedTo(context.TenantId) == false)
+            {
+                return AgentOperationResult<TenantProviderCatalogInspectionResult>.Succeeded(
+                    new(ProviderCatalogInspectionStatus.Unavailable, []), correlationId: options?.CorrelationId);
+            }
+
             if (!await ProviderCatalogReadFreshness.IsTenantCurrentAsync(_gateway,
                 context.TenantId, platform.Value, tenant.Value,
                 providerId, modelId, ct).ConfigureAwait(false))

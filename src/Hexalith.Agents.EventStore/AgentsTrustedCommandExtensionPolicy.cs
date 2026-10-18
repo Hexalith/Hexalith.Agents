@@ -17,6 +17,7 @@ internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId, IA
     private const string ProviderCatalogDomain = "provider-catalog";
     private const string TenantProviderEnablementDomain = "tenant-provider-enablement";
     private const string DaprCallerAppIdClaim = "dapr_caller_app_id";
+    private const string HostTrustMetadataPrefix = "trust:";
 
     private static readonly HashSet<string> _setupCommandTypes =
     [
@@ -32,7 +33,8 @@ internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId, IA
     internal string AgentsAppId => _agentsAppId;
 
     public bool Claims(string domain, string commandType, string key)
-        => (string.Equals(domain, ProviderCatalogDomain, StringComparison.Ordinal)
+        => (IsHostTrustMetadata(key) && IsGovernedCommand(domain, commandType))
+            || (string.Equals(domain, ProviderCatalogDomain, StringComparison.Ordinal)
             && commandType is (nameof(CreateProviderModelEntry) or nameof(UpdateProviderModelEntry)
                 or nameof(EnableProviderModelEntry) or nameof(DisableProviderModelEntry))
             && string.Equals(key, "actor:agentsProviderAdmin", StringComparison.Ordinal))
@@ -71,6 +73,12 @@ internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId, IA
             return false;
         }
 
+        if (IsHostTrustMetadata(key))
+        {
+            // Host admission adds the delivery nonce and other signed delivery facts; they never assert authority.
+            return !string.IsNullOrWhiteSpace(value);
+        }
+
         if (string.Equals(key, AgentSetupTrustedExtensions.AgentAdministrator, StringComparison.Ordinal)
             || string.Equals(key, "actor:agentsProviderAdmin", StringComparison.Ordinal)
             || string.Equals(key, "actor:platformOperator", StringComparison.Ordinal)
@@ -99,6 +107,17 @@ internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId, IA
             && version > 0
             && string.Equals(version.ToString(CultureInfo.InvariantCulture), value, StringComparison.Ordinal);
     }
+
+    private static bool IsHostTrustMetadata(string key)
+        => key.Length > HostTrustMetadataPrefix.Length && key.StartsWith(HostTrustMetadataPrefix, StringComparison.Ordinal);
+
+    private static bool IsGovernedCommand(string domain, string commandType)
+        => (string.Equals(domain, ProviderCatalogDomain, StringComparison.Ordinal)
+                && commandType is nameof(CreateProviderModelEntry) or nameof(UpdateProviderModelEntry)
+                    or nameof(EnableProviderModelEntry) or nameof(DisableProviderModelEntry))
+            || (string.Equals(domain, TenantProviderEnablementDomain, StringComparison.Ordinal)
+                && commandType is nameof(SetTenantProviderModelEnablement) or nameof(DecideProviderDataHandling))
+            || (string.Equals(domain, AgentDomain, StringComparison.Ordinal) && _setupCommandTypes.Contains(commandType));
 
     private static bool IsCanonicalEnum<T>(string value)
         where T : struct, Enum

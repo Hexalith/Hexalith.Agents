@@ -542,6 +542,57 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     }
 
     [Fact]
+    public async Task Host_trust_metadata_reaches_execution_and_a_new_delivery_nonce_replays_the_same_logical_command()
+    {
+        var executedCommands = new List<SubmitCommand>();
+        await using WebApplication domain = BuildDomainApp(executedCommands.Add);
+        await domain.StartAsync().ConfigureAwait(true);
+        using HttpClient domainClient = domain.GetTestClient();
+        var ledger = new InMemoryAdmissionLedger(domainClient);
+        await using WebApplication gateway = BuildGatewayApp(
+            Principal(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId),
+            ledger,
+            registerAgentsIntegration: true);
+        await gateway.StartAsync().ConfigureAwait(true);
+        using HttpClient client = gateway.GetTestClient();
+
+        using HttpResponseMessage first = await client
+            .PostAsJsonAsync("/api/v1/commands", Delivery("trust:deliveryNonce", "delivery-1"))
+            .ConfigureAwait(true);
+        first.StatusCode.ShouldBe(System.Net.HttpStatusCode.Accepted);
+        SubmitCommandResponse firstReceipt = (await first.Content
+            .ReadFromJsonAsync<SubmitCommandResponse>()
+            .ConfigureAwait(true)).ShouldNotBeNull();
+
+        using HttpResponseMessage redelivery = await client
+            .PostAsJsonAsync("/api/v1/commands", Delivery("trust:deliveryNonce", "delivery-2"))
+            .ConfigureAwait(true);
+        redelivery.StatusCode.ShouldBe(System.Net.HttpStatusCode.Accepted);
+        (await redelivery.Content.ReadFromJsonAsync<SubmitCommandResponse>().ConfigureAwait(true))
+            .ShouldNotBeNull().MessageId.ShouldBe(firstReceipt.MessageId);
+
+        using HttpResponseMessage caseVariant = await client
+            .PostAsJsonAsync("/api/v1/commands", Delivery("TRUST:deliveryNonce", "delivery-3"))
+            .ConfigureAwait(true);
+        caseVariant.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
+
+        executedCommands.Count.ShouldBe(1);
+        executedCommands[0].Extensions?["trust:deliveryNonce"].ShouldBe("delivery-1");
+        ledger.ExecutionCount.ShouldBe(1);
+
+        static SubmitCommandRequest Delivery(string key, string nonce)
+        {
+            SubmitCommandRequest request = ActivationRequest(
+                JsonSerializer.SerializeToElement(new { value = 1 }),
+                "7",
+                nameof(ProviderSelectionValidationStatus.Valid),
+                nameof(ApproverPolicyValidationStatus.Valid));
+            request.Extensions.ShouldNotBeNull()[key] = nonce;
+            return request;
+        }
+    }
+
+    [Fact]
     public async Task Equivalent_setup_spelling_replays_on_the_gateway_and_a_semantic_change_does_not_append_again()
     {
         var executedCommands = new List<SubmitCommand>();
@@ -766,6 +817,14 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ProviderSelectionValidation, "valid", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), AgentSetupTrustedExtensions.ActivationExpectedConfigurationVersion, "07", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), "agent:unknown", "true", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), "trust:deliveryNonce", "delivery-1", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "tenant-provider-enablement", nameof(SetTenantProviderModelEnablement), "trust:deliveryNonce", "delivery-1", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(ActivateAgent), "trust:deliveryNonce", " ", false)]
+    [InlineData("Bearer", AgentsAppId, "agent", nameof(ActivateAgent), "trust:deliveryNonce", "delivery-1", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, "other-app", "agent", nameof(DisableAgent), "trust:deliveryNonce", "delivery-1", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", "OtherCommand", "trust:deliveryNonce", "delivery-1", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(DisableAgent), "TRUST:deliveryNonce", "delivery-1", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(DisableAgent), "trust:", "delivery-1", false)]
     public void Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(
         string authenticationType,
         string appId,
@@ -806,6 +865,13 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     [InlineData("other-domain", nameof(ActivateAgent), AgentSetupTrustedExtensions.AgentAdministrator, false)]
     [InlineData("agent", "OtherCommand", AgentSetupTrustedExtensions.AgentAdministrator, false)]
     [InlineData("agent", nameof(ActivateAgent), "agent:unknown", false)]
+    [InlineData("agent", nameof(ActivateAgent), "trust:deliveryNonce", true)]
+    [InlineData("provider-catalog", nameof(CreateProviderModelEntry), "trust:deliveryNonce", true)]
+    [InlineData("tenant-provider-enablement", nameof(DecideProviderDataHandling), "trust:signingKeyVersion", true)]
+    [InlineData("other-domain", nameof(ActivateAgent), "trust:deliveryNonce", false)]
+    [InlineData("agent", "OtherCommand", "trust:deliveryNonce", false)]
+    [InlineData("agent", nameof(DisableAgent), "TRUST:deliveryNonce", false)]
+    [InlineData("agent", nameof(DisableAgent), "trust:", false)]
     public void Reserved_extension_policy_claims_only_its_exact_keys(
         string domain,
         string commandType,

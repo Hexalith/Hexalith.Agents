@@ -136,6 +136,76 @@ public sealed class Story54BoundaryTests
         intent.ToString().ShouldBe("AgentCommandIntent");
     }
 
+    /// <summary>Verifies that admission cannot substitute a nonce, scope, actor, byte or assertion before target construction.</summary>
+    [Theory]
+    [InlineData("delivery-nonce-as-message-id")]
+    [InlineData("tenant")]
+    [InlineData("domain")]
+    [InlineData("aggregate")]
+    [InlineData("command-type")]
+    [InlineData("correlation")]
+    [InlineData("causation")]
+    [InlineData("user")]
+    [InlineData("payload")]
+    [InlineData("removed-extension")]
+    [InlineData("changed-extension")]
+    [InlineData("added-public-extension")]
+    [InlineData("added-authority-extension")]
+    [InlineData("added-case-variant-trust")]
+    [InlineData("added-empty-trust-key")]
+    [InlineData("added-null-trust-value")]
+    [InlineData("added-blank-trust-value")]
+    public async Task AdmissionThatChangesTheIntentConstructsNoTargetCommand(string change)
+    {
+        var gateway = Substitute.For<IEventStoreGatewayClient>();
+        var admission = Substitute.For<IAgentTrustedCommandAdmission>();
+        var intent = new AgentCommandIntent("logical", "tenant-a", "agent", "hexa", "DisableAgent", "{\"value\":1}"u8.ToArray(),
+            "correlation", "causation", "actor", new Dictionary<string, string>
+            {
+                [AgentSetupTrustedExtensions.AgentAdministrator] = "true",
+                ["caller-metadata"] = "original",
+            });
+        admission.AdmitAsync(intent, Arg.Any<CancellationToken>()).Returns(ChangedAdmission(intent, change));
+
+        var error = await Should.ThrowAsync<AgentDependencyNotAvailableException>(
+            () => new EventStoreAgentCommandDispatcher(gateway, admission).DispatchAsync(intent, CancellationToken.None));
+
+        error.RecordId.ShouldBe("EXT-HOST-1");
+        error.Message.ShouldBe("DependencyNotAvailable");
+        gateway.ReceivedCalls().ShouldBeEmpty();
+    }
+
+    /// <summary>Verifies that added host trust metadata keeps the logical identity as the idempotency key.</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task AdmissionThatOnlyAddsHostTrustMetadataKeepsTheLogicalIdentity(bool originalHasMetadata)
+    {
+        var gateway = Substitute.For<IEventStoreGatewayClient>();
+        var admission = Substitute.For<IAgentTrustedCommandAdmission>();
+        Dictionary<string, string>? metadata = originalHasMetadata
+            ? new Dictionary<string, string> { ["caller-metadata"] = "original" }
+            : null;
+        var intent = new AgentCommandIntent("logical", "tenant-a", "agent", "hexa", "DisableAgent", [], "correlation", "causation", "actor", metadata);
+        Dictionary<string, string> admittedMetadata = intent.Extensions ?? new Dictionary<string, string>(StringComparer.Ordinal);
+        admittedMetadata["trust:deliveryNonce"] = "delivery-1";
+        admittedMetadata["trust:signingKeyVersion"] = "key-1";
+        admission.AdmitAsync(intent, Arg.Any<CancellationToken>()).Returns(new AgentCommandIntent(intent.MessageId, intent.TenantId,
+            intent.Domain, intent.AggregateId, intent.CommandType, intent.Payload, intent.CorrelationId, intent.CausationId, intent.UserId,
+            admittedMetadata));
+        SubmitCommandRequest? submitted = null;
+        gateway.SubmitCommandAsync(Arg.Do<SubmitCommandRequest>(value => submitted = value), Arg.Any<CancellationToken>())
+            .Returns(new SubmitCommandResponse("correlation", null, "logical"));
+
+        _ = await new EventStoreAgentCommandDispatcher(gateway, admission).DispatchAsync(intent, CancellationToken.None);
+
+        SubmitCommandRequest request = submitted.ShouldNotBeNull();
+        request.MessageId.ShouldBe("logical");
+        request.IdempotencyKey.ShouldBe("logical");
+        request.Extensions.ShouldNotBeNull()["trust:deliveryNonce"].ShouldBe("delivery-1");
+        request.Extensions.ContainsKey("caller-metadata").ShouldBe(originalHasMetadata);
+    }
+
     /// <summary>Verifies that authenticated dapr caller and unsigned flag grant no trusted extension.</summary>
     [Fact]
     public void AuthenticatedDaprCallerAndUnsignedFlagGrantNoTrustedExtension()
@@ -147,6 +217,7 @@ public sealed class Story54BoundaryTests
         var principal = new ClaimsPrincipal(new ClaimsIdentity([new Claim("dapr_caller_app_id", "agents")], DaprInternalAuthenticationOptions.SchemeName));
         var request = new SubmitCommandRequest("message", "tenant-a", "agent", "hexa", "DisableAgent", JsonSerializer.SerializeToElement(new { }), "correlation");
         policy.Accepts(principal, request, AgentSetupTrustedExtensions.AgentAdministrator, "true").ShouldBeFalse();
+        policy.Accepts(principal, request, "trust:deliveryNonce", "delivery-1").ShouldBeFalse();
     }
 
     /// <summary>Verifies that committed public api returns named dependency without calling the client or echoing claimed target.</summary>
@@ -168,5 +239,50 @@ public sealed class Story54BoundaryTests
         json.ShouldContain("EXT-HOST-1");
         json.ShouldNotContain("foreign-agent");
         client.ReceivedCalls().ShouldBeEmpty();
+    }
+
+    private static AgentCommandIntent ChangedAdmission(AgentCommandIntent intent, string change)
+    {
+        Dictionary<string, string> metadata = intent.Extensions.ShouldNotBeNull();
+        metadata["trust:deliveryNonce"] = "delivery-1";
+        switch (change)
+        {
+            case "removed-extension":
+                metadata.Remove("caller-metadata");
+                break;
+            case "changed-extension":
+                metadata[AgentSetupTrustedExtensions.AgentAdministrator] = "false";
+                break;
+            case "added-public-extension":
+                metadata["caller-extra"] = "added";
+                break;
+            case "added-authority-extension":
+                metadata[AgentSetupTrustedExtensions.ApproverPolicyValidation] = "Valid";
+                break;
+            case "added-case-variant-trust":
+                metadata["TRUST:deliveryNonce"] = "delivery-2";
+                break;
+            case "added-empty-trust-key":
+                metadata["trust:"] = "delivery-2";
+                break;
+            case "added-null-trust-value":
+                metadata["trust:signingKeyVersion"] = null!;
+                break;
+            case "added-blank-trust-value":
+                metadata["trust:signingKeyVersion"] = " ";
+                break;
+        }
+
+        return new AgentCommandIntent(
+            change == "delivery-nonce-as-message-id" ? "delivery-1" : intent.MessageId,
+            change == "tenant" ? "tenant-b" : intent.TenantId,
+            change == "domain" ? "provider-catalog" : intent.Domain,
+            change == "aggregate" ? "other-agent" : intent.AggregateId,
+            change == "command-type" ? "ActivateAgent" : intent.CommandType,
+            change == "payload" ? "{\"value\":2}"u8.ToArray() : intent.Payload,
+            change == "correlation" ? "other-correlation" : intent.CorrelationId,
+            change == "causation" ? null : intent.CausationId,
+            change == "user" ? "other-actor" : intent.UserId,
+            metadata);
     }
 }

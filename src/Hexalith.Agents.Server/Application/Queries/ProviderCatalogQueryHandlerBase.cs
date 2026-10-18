@@ -97,6 +97,12 @@ public abstract class ProviderCatalogQueryHandlerBase(
             return QueryResult.FromPayload(ToElement(ProviderCatalogInspectionResult.Unavailable()));
         }
 
+        if (tenant?.IsScopedTo(query.TenantId) == false)
+        {
+            // The requested key never establishes the returned model's tenant; a misrouted model renders nothing.
+            return QueryResult.FromPayload(ToElement(ProviderCatalogInspectionResult.Unavailable()));
+        }
+
         (string? providerId, string? modelId) = GetRequestedEntry(query);
         bool current = platformQuery
             ? await ProviderCatalogReadFreshness.IsPlatformCurrentAsync(_gateway, entry.Value,

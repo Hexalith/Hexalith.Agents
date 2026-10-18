@@ -22,6 +22,32 @@ public sealed class TrustedEnvelopeReplayTests
         restored.Registration.ShouldBe(command);
     }
 
+    /// <summary>Verifies that a later exact delivery never compares or revalidates verifier-local time.</summary>
+    [Theory]
+    [InlineData("default")]
+    [InlineData("non-utc")]
+    [InlineData("changed-retention")]
+    public void ExactLaterReplayIgnoresVerifierLocalTimeAndKeepsOriginalFacts(string time)
+    {
+        var command = Original();
+        var state = new TrustedEnvelopeReplayState();
+        state.Apply(new TrustedEnvelopeFirstSeen(command));
+        var later = time switch
+        {
+            "default" => command with { FirstSeenAt = default, RetainUntil = default },
+            "non-utc" => command with
+            {
+                FirstSeenAt = command.FirstSeenAt.ToOffset(TimeSpan.FromHours(2)),
+                RetainUntil = command.RetainUntil.ToOffset(TimeSpan.FromHours(2)),
+            },
+            _ => command with { RetainUntil = command.RetainUntil.AddSeconds(1) },
+        };
+
+        TrustedEnvelopeReplayAggregate.Handle(later, state, Envelope(command)).IsNoOp.ShouldBeTrue();
+        TrustedEnvelopeReplayAggregate.Handle(later, null, Envelope(command)).IsRejection.ShouldBeTrue();
+        state.Registration.ShouldBe(command);
+    }
+
     /// <summary>Verifies that reused nonce with any changed authenticated field rejects and preserves state.</summary>
     [Theory]
     [InlineData("tenant-b", "logical-a", "key-a", "b")]

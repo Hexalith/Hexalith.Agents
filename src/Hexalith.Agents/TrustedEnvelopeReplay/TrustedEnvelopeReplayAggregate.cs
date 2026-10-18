@@ -18,19 +18,25 @@ public sealed class TrustedEnvelopeReplayAggregate : EventStoreAggregate<Trusted
             || string.IsNullOrWhiteSpace(command.Issuer) || string.IsNullOrWhiteSpace(command.DeliveryNonce)
             || envelope.AggregateId != TrustedEnvelopeReplayIdentity.Create(command.Issuer, command.DeliveryNonce)
             || string.IsNullOrWhiteSpace(command.TargetTenantId) || string.IsNullOrWhiteSpace(command.LogicalCommandId)
-            || string.IsNullOrWhiteSpace(command.SigningKeyVersion) || !IsDigest(command.CanonicalAndTagDigest)
-            || command.FirstSeenAt == default || command.FirstSeenAt.Offset != TimeSpan.Zero || command.RetainUntil.Offset != TimeSpan.Zero
-            || command.RetainUntil - command.FirstSeenAt != TimeSpan.FromSeconds(604800))
+            || string.IsNullOrWhiteSpace(command.SigningKeyVersion) || !IsDigest(command.CanonicalAndTagDigest))
         {
             return DomainResult.Rejection([new TrustedEnvelopeReplayRejected("InvalidRegistration")]);
         }
 
         if (state?.Registration is { } original)
         {
+            // A later delivery compares only immutable authenticated fields and reuses the stored first-seen times;
+            // verifier-local time is never recomputed or compared.
             bool exact = command.Issuer == original.Issuer && command.DeliveryNonce == original.DeliveryNonce
                 && command.TargetTenantId == original.TargetTenantId && command.LogicalCommandId == original.LogicalCommandId
                 && command.SigningKeyVersion == original.SigningKeyVersion && command.CanonicalAndTagDigest == original.CanonicalAndTagDigest;
             return exact ? DomainResult.NoOp() : DomainResult.Rejection([new TrustedEnvelopeReplayRejected("ReplayConflict")]);
+        }
+
+        if (command.FirstSeenAt == default || command.FirstSeenAt.Offset != TimeSpan.Zero || command.RetainUntil.Offset != TimeSpan.Zero
+            || command.RetainUntil - command.FirstSeenAt != TimeSpan.FromSeconds(604800))
+        {
+            return DomainResult.Rejection([new TrustedEnvelopeReplayRejected("InvalidRegistration")]);
         }
 
         return DomainResult.Success([new TrustedEnvelopeFirstSeen(command)]);

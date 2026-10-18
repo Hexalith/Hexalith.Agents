@@ -2,6 +2,7 @@ using System.Text.Json;
 using Hexalith.Agents.Contracts.SecurityEventLog;
 using Hexalith.Agents.SecurityEventLog;
 using Hexalith.EventStore.Contracts.Commands;
+using Hexalith.EventStore.Contracts.Results;
 using Shouldly;
 
 namespace Hexalith.Agents.Tests;
@@ -44,8 +45,27 @@ public sealed class SecurityEventLogTests
         SecurityEventLogAggregate.Handle(command, null, envelope).IsRejection.ShouldBeTrue();
     }
 
+    /// <summary>Verifies that only a derived observation digest can identify a recorded observation.</summary>
+    [Theory]
+    [InlineData("observation", false)]
+    [InlineData("claimed:tenant-a/hexa", false)]
+    [InlineData("security-observation-claimed:tenant-a", false)]
+    [InlineData("security-observation-BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB", false)]
+    [InlineData("security-observation-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", false)]
+    [InlineData("security-observation-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", false)]
+    [InlineData("SECURITY-OBSERVATION-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", false)]
+    [InlineData("security-observation-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", true)]
+    [InlineData("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef", true)]
+    public void OnlyADerivedObservationDigestIdentifiesARecordedObservation(string observationId, bool accepted)
+    {
+        var command = Original() with { SecurityObservationId = observationId };
+        DomainResult result = SecurityEventLogAggregate.Handle(command, null, Envelope(command));
+        result.IsSuccess.ShouldBe(accepted);
+        result.IsRejection.ShouldBe(!accepted);
+    }
+
     private static RecordSecurityEvent Original()
-        => new("observation", "tenant-a", "2026-10-14", new(2026, 10, 14, 10, 0, 0, TimeSpan.Zero),
+        => new("security-observation-" + new string('b', 64), "tenant-a", "2026-10-14", new(2026, 10, 14, 10, 0, 0, TimeSpan.Zero),
             "scope-mismatch", new string('a', 64), "retained-key");
     private static CommandEnvelope Envelope(RecordSecurityEvent command)
         => new("receipt", command.RoutingTenantId, SecurityEventLogIdentity.Domain,

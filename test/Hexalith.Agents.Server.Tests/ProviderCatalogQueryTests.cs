@@ -90,6 +90,33 @@ public sealed class ProviderCatalogQueryTests
     }
 
     [Fact]
+    public async Task A_misrouted_tenant_enablement_model_renders_only_the_content_free_unavailable_result()
+    {
+        Seed();
+        var foreign = new TenantProviderEnablementReadModel { LastSequenceNumber = 1 };
+        foreign.State.Apply(new TenantProviderModelEnablementSet("other-tenant", "openai", "gpt-4o", true, 1, UserId, null));
+        foreign.ProjectedCommandMessageIds.Add("foreign-command");
+        _store.Seed(StoreName, TenantProviderEnablementReadModelAddresses.Detail(TenantId), foreign);
+
+        foreach (QueryResult wire in new[]
+        {
+            await ListHandler().ExecuteAsync(Query(ListProviderCatalogEntriesQuery.QueryType,
+                new ListProviderCatalogEntriesQuery(false), tenantId: TenantId, global: false), CancellationToken.None),
+            await GetHandler().ExecuteAsync(Query(GetProviderCatalogEntryQuery.QueryType,
+                new GetProviderCatalogEntryQuery("openai", "gpt-4o"), tenantId: TenantId, global: false), CancellationToken.None),
+        })
+        {
+            byte[] payload = wire.PayloadBytes.ShouldNotBeNull();
+            JsonSerializer.Deserialize<ProviderCatalogInspectionResult>(payload, _json).ShouldNotBeNull()
+                .Status.ShouldBe(ProviderCatalogInspectionStatus.Unavailable);
+            string text = System.Text.Encoding.UTF8.GetString(payload);
+            text.ShouldNotContain("other-tenant");
+            text.ShouldNotContain("foreign-command");
+            text.ShouldNotContain("gpt-4o");
+        }
+    }
+
+    [Fact]
     public async Task Authorized_tenant_list_and_get_expose_only_enabled_entries_without_platform_configuration()
     {
         Seed();

@@ -126,7 +126,7 @@ public sealed class AgentInteractionGateOrchestratorTests
     public async Task Caller_party_missing_maps_to_denied()
     {
         StubAllReady();
-        _partyDirectory.ValidateExistingPartyAsync(TenantId, CallerPartyId, Arg.Any<CancellationToken>())
+        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CancellationToken>())
             .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Missing, null));
         CaptureDispatch();
 
@@ -525,7 +525,7 @@ public sealed class AgentInteractionGateOrchestratorTests
     {
         // The caller's Party verdict is authorization-class; an Unauthorized outcome decides Denied (AC3).
         StubAllReady();
-        _partyDirectory.ValidateExistingPartyAsync(TenantId, CallerPartyId, Arg.Any<CancellationToken>())
+        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CancellationToken>())
             .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Unauthorized, null));
         CaptureDispatch();
 
@@ -705,7 +705,9 @@ public sealed class AgentInteractionGateOrchestratorTests
             .Returns(new ConversationAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
         _readinessReader.ReadAsync(TenantId, AgentId, Arg.Any<CancellationToken>())
             .Returns(Readiness());
-        _partyDirectory.ValidateExistingPartyAsync(TenantId, Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CancellationToken>())
+            .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, CallerPartyId));
+        _partyDirectory.ValidateExistingPartyAsync(TenantId, AgentPartyId, Arg.Any<CancellationToken>())
             .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, AgentPartyId));
         _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())
             .Returns(new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success, Entry(selectable: true)));

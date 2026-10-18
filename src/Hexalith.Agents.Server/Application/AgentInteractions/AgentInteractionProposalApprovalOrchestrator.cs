@@ -122,7 +122,7 @@ public sealed class AgentInteractionProposalApprovalOrchestrator
             ApproverPolicyResolutionResult resolution = await _approverPolicyResolver
                 .ResolveForActorAsync(request.TenantId, policy, new ApproverResolutionContext(request.ActorUserId, request.ApproverPartyId, request.SourceConversationId), ct)
                 .ConfigureAwait(false);
-            return ApproverPolicyVerdict.Evaluate(policy, resolution);
+            return ApproverPolicyVerdict.EvaluateAction(policy, resolution);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

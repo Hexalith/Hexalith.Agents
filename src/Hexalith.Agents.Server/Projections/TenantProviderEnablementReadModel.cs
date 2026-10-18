@@ -21,4 +21,15 @@ public sealed class TenantProviderEnablementReadModel : IReadModelFreshness
 
     /// <inheritdoc />
     public string? ProjectionVersion { get; set; }
+
+    /// <summary>
+    /// Checks that this persisted model belongs to the requested tenant. The requested key never establishes the
+    /// returned value's scope; only a model that has not yet recorded any tenant fact may omit its tenant.
+    /// </summary>
+    /// <param name="tenantId">The tenant whose enablement was requested.</param>
+    /// <returns><see langword="true"/> when the model can be rendered or used for that tenant.</returns>
+    public bool IsScopedTo(string tenantId)
+        => string.Equals(State.TenantId, tenantId, StringComparison.Ordinal)
+            || (string.IsNullOrEmpty(State.TenantId) && State.Entries.Count == 0 && State.Revision == 0
+                && ProjectedCommandMessageIds.Count == 0);
 }

@@ -95,6 +95,30 @@ public sealed class ProjectedProviderCatalogReaderTests
     }
 
     [Fact]
+    public async Task A_misrouted_tenant_enablement_model_supplies_no_verdict_and_reads_no_stream()
+    {
+        const string tenantId = "tenant-a";
+        const string storeName = "statestore";
+        var store = new FakeReadModelStore();
+        var foreign = new TenantProviderEnablementReadModel { LastSequenceNumber = 1 };
+        foreign.State.Apply(new TenantProviderModelEnablementSet("tenant-b", "openai", "gpt-x", true, 1, "operator", null));
+        store.Seed(storeName, TenantProviderEnablementReadModelAddresses.Detail(tenantId), foreign);
+        IAgentAdministrationContextProvider context = Substitute.For<IAgentAdministrationContextProvider>();
+        context.GetContext().Returns(new AgentAdministrationContext(tenantId, "admin", IsAgentsAdmin: true));
+        context.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => context.GetContext());
+        IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
+        var reader = new ProjectedProviderCatalogReader(store,
+            Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = storeName }), context, gateway);
+
+        ProviderCatalogEntryReadResult result = await reader.GetEntryAsync(tenantId, "openai", "gpt-x",
+            CancellationToken.None);
+
+        result.Status.ShouldBe(ProviderCatalogInspectionStatus.Unavailable);
+        result.Entry.ShouldBeNull();
+        gateway.ReceivedCalls().ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task Unprojected_tenant_enablement_remains_unavailable_before_hidden_key_check()
     {
         const string tenantId = "tenant-a";
@@ -315,7 +339,9 @@ public sealed class ProjectedProviderCatalogReaderTests
             .Returns(new AgentInvocationReadiness(true, AgentLifecycleStatus.Active, true, "agent-party",
                 AgentResponseMode.Automatic, true, providerId, modelId, null, true, true));
         IAgentPartyDirectory parties = Substitute.For<IAgentPartyDirectory>();
-        parties.ValidateExistingPartyAsync(tenantId, Arg.Any<string>(), Arg.Any<CancellationToken>())
+        parties.ValidateCallerPartyAsync(tenantId, "caller-party", Arg.Any<CancellationToken>())
+            .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "caller-party"));
+        parties.ValidateExistingPartyAsync(tenantId, "agent-party", Arg.Any<CancellationToken>())
             .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "agent-party"));
         AgentInteractionGateOutcomeResult interaction = await new AgentInteractionGateOrchestrator(
             tenantAccess, conversationAccess, readiness, parties, reader,

@@ -75,7 +75,9 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
         long position = 0;
         foreach (TenantAuthorityEvent item in evidence.Events)
         {
-            if (item.Sequence != ++position || item.Role is not ("TenantActive" or "User" or "Agents.Administrator" or "Agents.PlatformOperator"))
+            // Every FR-33 role is valid source history; only an unknown role makes the fold uncertain.
+            if (item.Sequence != ++position || item.Role is not ("TenantActive" or "User" or "Agents.Administrator"
+                or "Agents.PlatformOperator" or "Agents.Approver" or "Agents.AuditOperator" or "Agents.Operator"))
             {
                 return false;
             }
@@ -84,9 +86,11 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
             {
                 active = item.Granted;
             }
-            else if (item.ActorId == actorId && item.Role == role && item.PartyId == partyId)
+            else if (item.ActorId == actorId && item.Role == role)
             {
-                granted = item.Granted;
+                // The actor's latest assignment decides; a revocation or a re-grant bound to another Party never
+                // leaves an earlier binding granted.
+                granted = item.Granted && item.PartyId == partyId;
             }
         }
 

@@ -110,7 +110,7 @@ public sealed class AgentInteractionGateOrchestrator
             // or construct a target-domain command. Security observation is a private ingress operation.
             return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInteractionStatus.Denied);
         }
-        AgentPartyValidationResult callerParty = await ValidatePartyAsync(request.TenantId, request.CallerPartyId, ct).ConfigureAwait(false);
+        AgentPartyValidationResult callerParty = await ValidatePartyAsync(request.TenantId, request.CallerPartyId, caller: true, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
         if (callerParty.Status != PartyLinkValidationStatus.Valid)
         {
@@ -209,11 +209,14 @@ public sealed class AgentInteractionGateOrchestrator
         }
     }
 
-    private async Task<AgentPartyValidationResult> ValidatePartyAsync(string tenantId, string partyId, CancellationToken ct)
+    // The caller must be a Human Party; the Agent's linked Party must be its Organization/Agent identity.
+    private async Task<AgentPartyValidationResult> ValidatePartyAsync(string tenantId, string partyId, bool caller, CancellationToken ct)
     {
         try
         {
-            return await _partyDirectory.ValidateExistingPartyAsync(tenantId, partyId, ct).ConfigureAwait(false);
+            return caller
+                ? await _partyDirectory.ValidateCallerPartyAsync(tenantId, partyId, ct).ConfigureAwait(false)
+                : await _partyDirectory.ValidateExistingPartyAsync(tenantId, partyId, ct).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -235,7 +238,7 @@ public sealed class AgentInteractionGateOrchestrator
             return AgentInteractionGateOutcome.Missing;
         }
 
-        AgentPartyValidationResult agentParty = await ValidatePartyAsync(tenantId, readiness.PartyId, ct).ConfigureAwait(false);
+        AgentPartyValidationResult agentParty = await ValidatePartyAsync(tenantId, readiness.PartyId, caller: false, ct).ConfigureAwait(false);
         return MapPartyVerdict(agentParty.Status);
     }
 

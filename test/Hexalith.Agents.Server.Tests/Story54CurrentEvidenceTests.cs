@@ -1,8 +1,10 @@
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.Security;
+using Hexalith.Agents.Server.Application.Agents;
 using Hexalith.Agents.Server.Ports;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Shouldly;
 
 namespace Hexalith.Agents.Server.Tests;
@@ -36,6 +38,53 @@ public sealed class Story54CurrentEvidenceTests
         ProjectedTenantAccessReader.Grants(evidence with { Domain = "tenants" }, "system", "actor-a", "Agents.PlatformOperator", null, true, clock.Now).ShouldBeFalse();
     }
 
+    /// <summary>Verifies that the actor's latest role assignment decides whichever Party it names.</summary>
+    [Theory]
+    [InlineData("party-a", true, "party-a", true)]
+    [InlineData(null, false, "party-a", false)]
+    [InlineData("party-b", false, "party-a", false)]
+    [InlineData("party-b", true, "party-a", false)]
+    [InlineData("party-b", true, "party-b", true)]
+    public void LatestActorRoleAssignmentDecidesWhicheverPartyItNames(string? laterParty, bool laterGranted, string requestedParty, bool allowed)
+    {
+        var clock = new Story54TimeProvider();
+        var evidence = new TenantAuthorityEvidence("tenant-a", "tenants", 3, clock.Now, clock.Now.AddSeconds(5),
+            [new(1, string.Empty, null, "TenantActive", true), new(2, "actor-a", "party-a", "User", true),
+                new(3, "actor-a", laterParty, "User", laterGranted)],
+            SourceAggregateId: "tenant-a");
+        ProjectedTenantAccessReader.Grants(evidence, "tenant-a", "actor-a", "User", requestedParty, false, clock.Now).ShouldBe(allowed);
+    }
+
+    /// <summary>Verifies that a Party-bound administrator revocation still revokes the Party-free administrator.</summary>
+    [Fact]
+    public void PartyBoundAdministratorRevocationRevokesThePartyFreeAssignment()
+    {
+        var clock = new Story54TimeProvider();
+        var evidence = new TenantAuthorityEvidence("tenant-a", "tenants", 3, clock.Now, clock.Now.AddSeconds(5),
+            [new(1, string.Empty, null, "TenantActive", true), new(2, "actor-a", null, "Agents.Administrator", true),
+                new(3, "actor-a", "party-a", "Agents.Administrator", false)],
+            SourceAggregateId: "tenant-a");
+        ProjectedTenantAccessReader.Grants(evidence, "tenant-a", "actor-a", "Agents.Administrator", null, false, clock.Now).ShouldBeFalse();
+    }
+
+    /// <summary>Verifies that other FR-33 role history keeps the fold current while unknown roles block it.</summary>
+    [Theory]
+    [InlineData("Agents.Approver", true)]
+    [InlineData("Agents.AuditOperator", true)]
+    [InlineData("Agents.Operator", true)]
+    [InlineData("Agents.Unknown", false)]
+    [InlineData("agents.approver", false)]
+    [InlineData("", false)]
+    public void OtherFr33RoleHistoryKeepsTheFoldCurrentWhileUnknownRolesBlock(string otherRole, bool allowed)
+    {
+        var clock = new Story54TimeProvider();
+        var evidence = new TenantAuthorityEvidence("tenant-a", "tenants", 3, clock.Now, clock.Now.AddSeconds(5),
+            [new(1, string.Empty, null, "TenantActive", true), new(2, "actor-a", null, "Agents.Administrator", true),
+                new(3, "actor-b", "party-b", otherRole, true)],
+            SourceAggregateId: "tenant-a");
+        ProjectedTenantAccessReader.Grants(evidence, "tenant-a", "actor-a", "Agents.Administrator", null, false, clock.Now).ShouldBe(allowed);
+    }
+
     /// <summary>Verifies that committed dependency stops before any current source lookup.</summary>
     [Fact]
     public async Task CommittedDependencyStopsBeforeAnyCurrentSourceLookup()
@@ -67,6 +116,42 @@ public sealed class Story54CurrentEvidenceTests
         var result = await resolver.ResolveForActorAsync("tenant-a", policy, new(actor, party, "conversation-a"), CancellationToken.None);
         result.Sources.Single().Outcome.ShouldBe(allowed ? ApproverSourceOutcome.Resolved : ApproverSourceOutcome.Unauthorized);
         (await resolver.ResolveAsync("tenant-a", policy, CancellationToken.None)).Sources.Single().Outcome.ShouldBe(ApproverSourceOutcome.Resolved);
+    }
+
+    /// <summary>Verifies that an action is authorized by the union of approver sources and still fails closed on uncertainty.</summary>
+    [Theory]
+    [InlineData("actor-a", "party-a", false, ApproverPolicyValidationStatus.Valid)]
+    [InlineData("actor-b", "party-b", false, ApproverPolicyValidationStatus.Valid)]
+    [InlineData("actor-c", "party-c", false, ApproverPolicyValidationStatus.Unauthorized)]
+    [InlineData("actor-a", "party-b", false, ApproverPolicyValidationStatus.Unauthorized)]
+    [InlineData("actor-a", "party-a", true, ApproverPolicyValidationStatus.Unavailable)]
+    public async Task ActionIsAuthorizedByTheUnionOfApproverSourcesAndFailsClosedOnUncertainty(
+        string actor, string party, bool secondUnavailable, ApproverPolicyValidationStatus expected)
+    {
+        var clock = new Story54TimeProvider();
+        var first = new ApproverPolicySource(ApproverPolicySourceKind.PredefinedParty, "party-a", null);
+        var second = new ApproverPolicySource(ApproverPolicySourceKind.PredefinedParty, "party-b", null);
+        var source = Substitute.For<ICurrentApproverEvidenceSource>();
+        source.ReadAsync("tenant-a", first, "conversation-a", Arg.Any<CancellationToken>())
+            .Returns(new[] { Candidate(first, "actor-a", "party-a", true, clock) });
+        if (secondUnavailable)
+        {
+            source.ReadAsync("tenant-a", second, "conversation-a", Arg.Any<CancellationToken>())
+                .ThrowsAsync(new InvalidOperationException("source-unavailable"));
+        }
+        else
+        {
+            source.ReadAsync("tenant-a", second, "conversation-a", Arg.Any<CancellationToken>())
+                .Returns(new[] { Candidate(second, "actor-b", "party-b", true, clock) });
+        }
+
+        source.ConfirmAsync("tenant-a", Arg.Any<IReadOnlyList<CurrentApproverEvidence>>(), Arg.Any<CancellationToken>()).Returns(true);
+        var resolver = new ProjectedApproverPolicyResolver(source, Substitute.For<IAgentDependencyAvailability>(), clock);
+        var policy = new AgentApproverPolicy([first, second], ApproverPolicyBasisDisclosure.OperatorOnly);
+
+        var result = await resolver.ResolveForActorAsync("tenant-a", policy, new(actor, party, "conversation-a"), CancellationToken.None);
+
+        ApproverPolicyVerdict.EvaluateAction(policy, result).ShouldBe(expected);
     }
 
     /// <summary>Verifies that earlier configuration candidate expiring during alater source read is unavailable.</summary>

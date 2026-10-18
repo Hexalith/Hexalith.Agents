@@ -15,7 +15,7 @@ public sealed class SecurityEventLogAggregate : EventStoreAggregate<SecurityEven
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
-        if (string.IsNullOrWhiteSpace(command.SecurityObservationId) || string.IsNullOrWhiteSpace(command.RoutingTenantId)
+        if (!IsObservationId(command.SecurityObservationId) || string.IsNullOrWhiteSpace(command.RoutingTenantId)
             || string.IsNullOrWhiteSpace(command.DigestKeyVersion) || command.ObservedAt == default
             || command.ObservedAt.Offset != TimeSpan.Zero
             || command.UtcDay != command.ObservedAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
@@ -33,5 +33,18 @@ public sealed class SecurityEventLogAggregate : EventStoreAggregate<SecurityEven
         }
 
         return DomainResult.Success([new SecurityEventRecorded(command)]);
+    }
+
+    /// <summary>Accepts only a derived lowercase SHA-256 identity, optionally with the spool's purpose prefix, so no raw or claimed text is stored.</summary>
+    private static bool IsObservationId(string? value)
+    {
+        const string prefix = "security-observation-";
+        if (value is null)
+        {
+            return false;
+        }
+
+        string digest = value.StartsWith(prefix, StringComparison.Ordinal) ? value[prefix.Length..] : value;
+        return digest.Length == 64 && digest.All(char.IsAsciiHexDigitLower);
     }
 }

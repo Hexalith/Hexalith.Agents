@@ -39,7 +39,16 @@ public sealed class PartiesAgentPartyDirectory : IAgentPartyDirectory
     }
 
     /// <inheritdoc />
-    public async Task<AgentPartyValidationResult> ValidateExistingPartyAsync(string tenantId, string partyId, CancellationToken ct)
+    public Task<AgentPartyValidationResult> ValidateExistingPartyAsync(string tenantId, string partyId, CancellationToken ct)
+        => ValidateAsync(tenantId, partyId, human: false, ct);
+
+    /// <inheritdoc />
+    public Task<AgentPartyValidationResult> ValidateCallerPartyAsync(string tenantId, string partyId, CancellationToken ct)
+        => ValidateAsync(tenantId, partyId, human: true, ct);
+
+    // An Agent identity is Organization (Branch B, verified by id) or Agent; a caller is Human. A well-formed Party of
+    // the other kind is Unauthorized for that purpose, so a person cannot speak as hexa nor hexa act as a caller.
+    private async Task<AgentPartyValidationResult> ValidateAsync(string tenantId, string partyId, bool human, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         if (_availability.Check("EXT-PARTIES-1") is { } blocker)
@@ -72,6 +81,11 @@ public sealed class PartiesAgentPartyDirectory : IAgentPartyDirectory
                         (PartyIdentityClassification.Human or PartyIdentityClassification.Organization or PartyIdentityClassification.Agent))
                 {
                     return new(PartyLinkValidationStatus.Unavailable, null);
+                }
+
+                if ((evidence.Classification == PartyIdentityClassification.Human) != human)
+                {
+                    return new(PartyLinkValidationStatus.Unauthorized, null);
                 }
 
                 return evidence.IsActive && !evidence.IsRestricted && !evidence.IsErasingOrErased

@@ -355,8 +355,16 @@ public sealed class EventStoreProviderCatalogOperationsTests
         result.Value.ShouldNotBeNull().TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
         AgentOperationResult<AgentSetupWriteStatus> otherTenant = await Operations()
             .GetCommandOutcomeAsync("another-tenant", result.Value.MessageId);
-        otherTenant.IsSuccess.ShouldBeFalse();
-        otherTenant.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.NotAuthorized);
+
+        // Story 5.4 AC4: a foreign status is indistinguishable from an absent one and discloses nothing.
+        otherTenant.IsSuccess.ShouldBeTrue();
+        otherTenant.Value.ShouldBe(AgentSetupWriteStatus.UnableToVerify);
+        _gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns((CommandStatusQueryResponse?)null);
+        AgentOperationResult<AgentSetupWriteStatus> absent = await Operations()
+            .GetCommandOutcomeAsync("another-tenant", "absent-message");
+        absent.IsSuccess.ShouldBe(otherTenant.IsSuccess);
+        absent.Value.ShouldBe(otherTenant.Value);
     }
 
     [Fact]
@@ -1021,6 +1029,36 @@ public sealed class EventStoreProviderCatalogOperationsTests
                 ProjectedAt = new DateTimeOffset(2026, 6, 24, 12, 0, 0, TimeSpan.Zero),
                 ProjectionVersion = capabilityVersion.ToString(System.Globalization.CultureInfo.InvariantCulture),
             });
+
+    [Fact]
+    public async Task A_misrouted_tenant_enablement_model_renders_nothing_on_tenant_or_platform_reads()
+    {
+        SeedProjectedEntry(1);
+        var foreign = new TenantProviderEnablementReadModel { LastSequenceNumber = 1 };
+        foreign.State.Apply(new TenantProviderModelEnablementSet("other-tenant", "openai", "gpt-4o", true, 1,
+            "operator", null));
+        foreign.ProjectedCommandMessageIds.Add("foreign-command");
+        _store.Seed(StoreName, TenantProviderEnablementReadModelAddresses.Detail(TenantId), foreign);
+
+        TenantProviderCatalogInspectionResult list = (await Operations().ListTenantEntriesAsync(includeDisabled: true))
+            .Value.ShouldNotBeNull();
+        TenantProviderCatalogInspectionResult detail = (await Operations().GetTenantEntryAsync("openai", "gpt-4o"))
+            .Value.ShouldNotBeNull();
+        TenantProviderEnablementInspectionResult platform = (await Operations()
+            .GetTenantEnablementAsync(TenantId, "openai", "gpt-4o")).Value.ShouldNotBeNull();
+
+        list.Status.ShouldBe(ProviderCatalogInspectionStatus.Unavailable);
+        list.Entries.ShouldBeEmpty();
+        list.ProjectedCommandMessageIds.ShouldBeNull();
+        detail.Status.ShouldBe(ProviderCatalogInspectionStatus.Unavailable);
+        detail.Entries.ShouldBeEmpty();
+        platform.Status.ShouldBe(ProviderCatalogInspectionStatus.Unavailable);
+        platform.Enabled.ShouldBeNull();
+        platform.Revision.ShouldBeNull();
+        platform.ProjectedCommandMessageIds.ShouldBeNull();
+        await _gateway.DidNotReceive().ReadStreamAsync(Arg.Is<StreamReadRequest>(request =>
+            request.Domain == TenantProviderEnablementAggregate.Domain), Arg.Any<CancellationToken>());
+    }
 
     private void SeedTenantDecisionView()
     {

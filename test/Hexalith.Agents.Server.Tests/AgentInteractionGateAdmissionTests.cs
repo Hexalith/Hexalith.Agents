@@ -34,7 +34,7 @@ public sealed class AgentInteractionGateAdmissionTests
     public async Task CallerDenialStopsBeforeProtectedReadsOrDispatch(PartyLinkValidationStatus status)
     {
         Configure();
-        _parties.ValidateExistingPartyAsync("tenant-a", "caller", Arg.Any<CancellationToken>())
+        _parties.ValidateCallerPartyAsync("tenant-a", "caller", Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
                 _reads.Add("Caller");
@@ -131,11 +131,15 @@ public sealed class AgentInteractionGateAdmissionTests
             Complete("Tenant");
             return new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true);
         });
+        _parties.ValidateCallerPartyAsync("tenant-a", "caller", Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            Complete("Caller");
+            return new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "caller");
+        });
         _parties.ValidateExistingPartyAsync("tenant-a", Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call =>
         {
-            string partyId = call.ArgAt<string>(1);
-            Complete(partyId == "caller" ? "Caller" : "AgentParty");
-            return new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, partyId);
+            Complete("AgentParty");
+            return new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, call.ArgAt<string>(1));
         });
         _conversations.ReadAsync("tenant-a", "conversation", "caller", Arg.Any<CancellationToken>()).Returns(_ =>
         {

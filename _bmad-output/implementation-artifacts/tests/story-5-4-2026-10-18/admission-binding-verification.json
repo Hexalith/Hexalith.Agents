@@ -1,0 +1,214 @@
+{
+  "story": "5.4",
+  "recordedAtUtc": "2026-10-18T17:39:35.020758+00:00",
+  "disposition": "in-progress; complete story acceptance remains unmet",
+  "scope": "Local trusted-delivery, current-authority, approver and isolation follow-through from three read-only audits. No owner source, dependency reference, frozen intent, approval, task checkbox or dependency status changed.",
+  "canonicalRevisions": {
+    "Agents": "c44415f64733ae31ae863c95c58576e772cf1388",
+    "references/Hexalith.AI.Tools": "3f194e17174994d308ec84af9ee2b5aa68674d0d",
+    "references/Hexalith.Builds": "1dfc39e3a3e6ab1c8ce95138490b39d76e7feb2c",
+    "references/Hexalith.Commons": "5c23c818f639c5bb3175f964c5549440bd5b876d",
+    "references/Hexalith.Conversations": "24aa14aa736660051868b0bd8b1b345b08b2a8a8",
+    "references/Hexalith.EventStore": "2490f4f409e015155c046afa55b37997b04a271d",
+    "references/Hexalith.FrontComposer": "50f4acbc56192b2ad42b912aa6a83edf3bf2c264",
+    "references/Hexalith.McpCli": "1064ec090d016bf229646398e87b138245ac3be9",
+    "references/Hexalith.Memories": "4f6b3b1265d15d208761e6419e5c825d3f39fea3",
+    "references/Hexalith.Parties": "749b26d303e448bddafb1e56402bfe676bc92d7f",
+    "references/Hexalith.Platform": "cf20db9e8a4697b0e9fb82d388751d355088e942",
+    "references/Hexalith.PolymorphicSerializations": "221ac4592ba908ae7661ba1fa9e2d1fcc23baee0",
+    "references/Hexalith.Tenants": "1532aef62d4532562a5837447463297e64358333"
+  },
+  "changes": [
+    "EventStoreAgentCommandDispatcher binds the admitted intent to the exact submitted intent: logical MessageId, target, operation, actor, correlation/causation, bytes and original metadata must be unchanged; only non-blank trust:* entries may be added; otherwise DependencyNotAvailable(EXT-HOST-1) before any target command.",
+    "AgentsTrustedCommandExtensionPolicy claims trust:* host metadata for the commands it governs and accepts it only with the existing Dapr identity, admitted proof and a non-blank value; the delivery nonce stays outside AD-29 idempotency.",
+    "TrustedEnvelopeReplayAggregate validates first-seen times only on first registration; an exact later delivery is a no-op regardless of verifier-local time.",
+    "SecurityEventLogAggregate accepts only a derived lowercase SHA-256 SecurityObservationId (optionally security-observation- prefixed).",
+    "ProjectedTenantAccessReader: the actor latest (actor, role) assignment decides, so a revocation or re-grant naming another Party revokes; Agents.Approver/AuditOperator/Operator history is valid while unknown roles still block.",
+    "ApproverPolicyVerdict.EvaluateAction: edit, regeneration, approval, rejection and abandonment authorize the acting human against the union of sources; unavailable/unknown/substituted/ambiguous sources still fail closed.",
+    "EventStoreProviderCatalogOperations command-outcome lookup answers a foreign-tenant/message status exactly like an absent one.",
+    "TenantProviderEnablementReadModel.IsScopedTo: reader, tenant list/detail, platform tenant inspection and catalog queries return content-free Unavailable for a misrouted tenant enablement model before freshness reads or rendering.",
+    "eng/verify-story-5.4.ps1 additionally requires AgentApproverPolicyTests and UI ApproverPolicyTests to execute and pass."
+  ],
+  "redEvidence": {
+    "harness": "HEAD sources restored for every changed src file (ApproverPolicyVerdict.EvaluateAction shimmed to the pre-change Evaluate), then the updated test assemblies were built and the affected classes run; guarded sources were restored afterwards.",
+    "dispatcherOnly": {
+      "resultXmlSha256": "e0e5eb1469102bf387a4ec8f14948b907708d24392463a9e32e6ba6c95db4dd6",
+      "failures": {
+        "Story54BoundaryTests.AdmissionThatChangesTheIntentConstructsNoTargetCommand": "16/16 failed"
+      }
+    },
+    "domain": {
+      "resultXmlSha256": "5058af30348c7e9a17e41caa4197ef916810618e395b102815f38d9f502c2b64",
+      "failures": {
+        "SecurityEventLogTests.OnlyADerivedObservationDigestIdentifiesARecordedObservation": "7/9 failed",
+        "TrustedEnvelopeReplayTests.ExactLaterReplayIgnoresVerifierLocalTimeAndKeepsOriginalFacts": "3/3 failed"
+      }
+    },
+    "server": {
+      "resultXmlSha256": "99d83d2956bef0454c559a8659d1a0b147d766ad2b9f41f163b3969e8e164b31",
+      "failures": {
+        "AgentsEventStoreGatewayIntegrationTests.Host_trust_metadata_reaches_execution_and_a_new_delivery_nonce_replays_the_same_logical_command": "1/1 failed",
+        "AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value": "2/43 failed",
+        "AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_claims_only_its_exact_keys": "3/28 failed",
+        "EventStoreProviderCatalogOperationsTests.A_misrouted_tenant_enablement_model_renders_nothing_on_tenant_or_platform_reads": "1/1 failed",
+        "EventStoreProviderCatalogOperationsTests.Completed_tenant_no_op_and_cross_tenant_status_are_scoped_to_the_command_target": "1/1 failed",
+        "ProjectedProviderCatalogReaderTests.A_misrouted_tenant_enablement_model_supplies_no_verdict_and_reads_no_stream": "1/1 failed",
+        "ProviderCatalogQueryTests.A_misrouted_tenant_enablement_model_renders_only_the_content_free_unavailable_result": "1/1 failed",
+        "Story54BoundaryTests.AdmissionThatChangesTheIntentConstructsNoTargetCommand": "16/16 failed",
+        "Story54CurrentEvidenceTests.ActionIsAuthorizedByTheUnionOfApproverSourcesAndFailsClosedOnUncertainty": "2/5 failed",
+        "Story54CurrentEvidenceTests.LatestActorRoleAssignmentDecidesWhicheverPartyItNames": "3/5 failed",
+        "Story54CurrentEvidenceTests.OtherFr33RoleHistoryKeepsTheFoldCurrentWhileUnknownRolesBlock": "3/6 failed",
+        "Story54CurrentEvidenceTests.PartyBoundAdministratorRevocationRevokesThePartyFreeAssignment": "1/1 failed"
+      }
+    },
+    "note": "Every new case expected to change behavior failed before the change; cases that already held (accepted ids, pass-through admissions) passed in both runs. The later added-blank-trust-value dispatcher case was added after the red run and was verified green only. Red XML lived in the session scratchpad; only hashes are retained."
+  },
+  "commands": {
+    "local": {
+      "command": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Local -ArtifactsPath /tmp/agents-story54-admission-binding-2026-10-18/local",
+      "exitCode": 0,
+      "logSha256": "7d8bb641bf8f1edee99080832e280b48e6bca67d749b31fa84885087f3980c28",
+      "resultJsonSha256": "0f02d1cec380a598e9d45c435b275267dd5c18f67e8f755c72c4d6e8543ad7e1"
+    },
+    "live": {
+      "command": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Live -ArtifactsPath /tmp/agents-story54-admission-binding-2026-10-18/live",
+      "exitCode": 1,
+      "expected": "DependencyNotAvailable for all four records; zero external calls",
+      "logSha256": "f26f697d2ccdb8b2806a54003a409d8410ae90e2d3895ae0d3d6cc2baa0523f7",
+      "resultJsonSha256": "85662dd1141eccdcf00cd1a20a00e2981b5ee0fa72831ce614f785ef8bdc59af"
+    }
+  },
+  "localTotalPassed": 3957,
+  "projects": [
+    {
+      "project": "Hexalith.Agents.Contracts.Tests",
+      "total": 731,
+      "passed": 731,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0,
+      "debugBuildWarnings": 0,
+      "resultXmlSha256": "87ab5563c203239418b9a3dcf6ab2ada511f35b8ee61ede5b2e4bb64d1127d45"
+    },
+    {
+      "project": "Hexalith.Agents.Client.Tests",
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0,
+      "debugBuildWarnings": 0,
+      "resultXmlSha256": "457160a65717fd6448e3915b3d17a44b7e17b85af7dcb0985a90577d54f4a0df"
+    },
+    {
+      "project": "Hexalith.Agents.Tests",
+      "total": 925,
+      "passed": 925,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0,
+      "debugBuildWarnings": 0,
+      "resultXmlSha256": "cfc133bef51bf6be27ad074953a144958ad7ade57b35cc64f463129bebd862bd"
+    },
+    {
+      "project": "Hexalith.Agents.Server.Tests",
+      "total": 1137,
+      "passed": 1137,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0,
+      "debugBuildWarnings": 0,
+      "resultXmlSha256": "3cddd02061e400d1f3bc857c7d6ed97143bd4b821da2dc8d9da38f587c149cec"
+    },
+    {
+      "project": "Hexalith.Agents.UI.Tests",
+      "total": 1158,
+      "passed": 1158,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0,
+      "debugBuildWarnings": 0,
+      "resultXmlSha256": "5375f0a01e462fc59efc5aefd00c4c04e75f47414823c3d1a631baf7f1194f21"
+    }
+  ],
+  "changedFileSha256": {
+    "eng/verify-story-5.4.ps1": "e72367259985f49eae4cb8becb2f49a35666222c2c4fce735c7b6927f26cf176",
+    "src/Hexalith.Agents.EventStore/AgentsTrustedCommandExtensionPolicy.cs": "c748d48d32fb5b7166a90b1b2d0ae6355d4719c65b6130aeecfa64e75fa12639",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionProposalAbandonmentOrchestrator.cs": "2cfc4047528be0d9d5ba78f26b895e58e3f7aa3193955a86c3c7525afac066b6",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionProposalApprovalOrchestrator.cs": "1b740a364a023e72675b5b6325a956c07e296f9b630daf30f5049da1fe2f82f0",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionProposalEditOrchestrator.cs": "921b782fe126d8d3413cc9a31df7407b14335a0718e6f40c5ab8b7820aca5f90",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionProposalRegenerationOrchestrator.cs": "8d29befd5d1461c127572195d8d9dc74362ba2ff373ceed4f31afe0e70ab6842",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionProposalRejectionOrchestrator.cs": "ca3aa66d249ce17270c5214b84b875d32569a52e6a734f42428467b0da071764",
+    "src/Hexalith.Agents.Server/Application/Agents/ApproverPolicyVerdict.cs": "906cf098880d366532a853484d7b8c6231ca8054bfa2ff6c25a5d496d83ec4e8",
+    "src/Hexalith.Agents.Server/Application/Agents/EventStoreProviderCatalogOperations.cs": "850301134cec447d8bb10905162ff7a4f3574552febca4b7e6c1f0fbad6774cd",
+    "src/Hexalith.Agents.Server/Application/Queries/ProviderCatalogQueryHandlerBase.cs": "618a4509acf6031529cd86ce46832e3f6e4c4368d107d4bc8d4eeec42145e219",
+    "src/Hexalith.Agents.Server/Ports/EventStoreAgentCommandDispatcher.cs": "0d817eac82990655a1997e5832d28928845cfe3f45d9970d077ffc8203fef674",
+    "src/Hexalith.Agents.Server/Ports/IAgentTrustedCommandAdmission.cs": "e403e9b7f88b388e30b0f55e28673f6b5c0a2c305b93f1fb9c86e053f411bf4a",
+    "src/Hexalith.Agents.Server/Ports/ProjectedProviderCatalogReader.cs": "96ea71ba251c1db2329e8b0b28b0afded27b01404ddae34c1a8dbe280a9666f6",
+    "src/Hexalith.Agents.Server/Ports/ProjectedTenantAccessReader.cs": "f2e658020eaa31865d73e1dfaa8c86dc1953595c001f1df33b3f42bc19f5dacd",
+    "src/Hexalith.Agents.Server/Projections/TenantProviderEnablementReadModel.cs": "845e4ae674cfac68452a3954f0d193504cb1a3d677e51b23964ff4de4ca12660",
+    "src/Hexalith.Agents/SecurityEventLog/SecurityEventLogAggregate.cs": "0a2e6a03b8a7cbdf95682583b40c4c7987c314fe9ff64b466fe21585295afa5b",
+    "src/Hexalith.Agents/TrustedEnvelopeReplay/TrustedEnvelopeReplayAggregate.cs": "5bfe5301c24b05b968ec53502a5393ea6f22742ada6ca6a18a130f514e7aa3f8",
+    "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs": "8bdad79bf9243a54485dbcdbb4003b90fcb1e5010529d01603bd1f9a89b86c5b",
+    "test/Hexalith.Agents.Server.Tests/EventStoreProviderCatalogOperationsTests.cs": "064ab855be035026a78ed67ea82f2ae242bcffe9a00781303fd323a9ebf305ad",
+    "test/Hexalith.Agents.Server.Tests/ProjectedProviderCatalogReaderTests.cs": "200a46337b39d223865432991e40099a83fbeed8d56c4e94c88335915a1ad8ae",
+    "test/Hexalith.Agents.Server.Tests/ProviderCatalogQueryTests.cs": "a2a2d3df7ae49ad3157d55ded0e80ebd51b731dd1e1d9d90136e92acc737bc3f",
+    "test/Hexalith.Agents.Server.Tests/Story54BoundaryTests.cs": "6bf5a7313f586aa71f8fb7e3990c91961ce197f2468940d3c8e01c4f4c6e4133",
+    "test/Hexalith.Agents.Server.Tests/Story54CurrentEvidenceTests.cs": "1891fa45adc7ee97ed5e35958ae4026d5f525d089bd6aeb008508b8599078001",
+    "test/Hexalith.Agents.Tests/SecurityEventLogTests.cs": "ea25c1de86f0a884f2073145fd79bb2b5d4a8ce72226503e8e333e301cf949e9",
+    "test/Hexalith.Agents.Tests/TrustedEnvelopeReplayTests.cs": "4e78b1cb7c1065d0b28407ed18951f3ece1074af47714a82885dd962cd6c3a4c"
+  },
+  "dependencyGates": {
+    "EXT-PARTIES-1": {
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+      "installedReference": "749b26d303e448bddafb1e56402bfe676bc92d7f",
+      "executionPermitted": false
+    },
+    "EXT-CONV-AI-1": {
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "87e8b4a6ec3224b20a560b0e83de857805925572",
+      "installedReference": "24aa14aa736660051868b0bd8b1b345b08b2a8a8",
+      "executionPermitted": false
+    },
+    "EXT-SECRETS-1": {
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "abbec4093715c1db854433119b32d4e16df20d08",
+      "installedReference": "cf20db9e8a4697b0e9fb82d388751d355088e942",
+      "executionPermitted": false
+    },
+    "EXT-HOST-1": {
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "abbec4093715c1db854433119b32d4e16df20d08",
+      "installedReference": "cf20db9e8a4697b0e9fb82d388751d355088e942",
+      "executionPermitted": false
+    }
+  },
+  "remainingLocalFindingsNotChanged": [
+    "IAgentPartyDirectory validates Agent identity and human callers with one classification rule (Human/Organization/Agent); splitting it by expected role needs a port contract change across link and gate callers.",
+    "Approve/reject/abandon (and regeneration state checks) and Agent Call request ingress perform no tenant-access read before proposal-state disclosure or a NotAuthorized dispatch into the claimed tenant; fixing it conflicts with existing Story 3.6 expectations and needs a design decision against AC4.",
+    "One stable actor listed under two Parties across or within approver sources is not yet treated as ambiguous.",
+    "Platform catalog queries compare the resolved stable actor id with the token subject (fails closed, functional only).",
+    "Replay/security aggregates persist rejection events into private streams; the Platform ACL must admit them or the registrar must avoid rejections (design decision with EXT-HOST-1).",
+    "Party-link, provider-selection, approver, content-safety and launch-readiness Agent commands remain unclaimed by the EventStore policy (Story 5.2 scope limit; fails closed)."
+  ],
+  "matrixAudit": [
+    {
+      "row": "Current authority",
+      "unmet": "Installed current Tenants/Parties/Conversations production source bindings, complete immutable Agent Party provisioning and live API/UI authority proof."
+    },
+    {
+      "row": "Trusted delivery",
+      "unmet": "Real AD-30 signature/principal/operation/scope admission composed by Platform; private replay credentials/ACL; persisted AD-29 delivery and live isolation proof."
+    },
+    {
+      "row": "Denial recovery",
+      "unmet": "Replicated durable spool, worker, outage/lost-ack recovery and persisted end-state evidence."
+    }
+  ]
+}

@@ -25,6 +25,8 @@ public sealed class PartiesAgentPartyDirectoryTests
         AgentPartyValidationResult read = await directory.ValidateExistingPartyAsync("tenant-a", "party-a", CancellationToken.None);
         read.Status.ShouldBe(PartyLinkValidationStatus.Unavailable);
         read.Dependency.ShouldBe(new DependencyNotAvailable("EXT-PARTIES-1"));
+        (await directory.ValidateCallerPartyAsync("tenant-a", "party-a", CancellationToken.None)).Status
+            .ShouldBe(PartyLinkValidationStatus.Unavailable);
         AgentPartyValidationResult provision = await directory.ProvisionAgentPartyAsync("tenant-a", new("hexa", "label"), CancellationToken.None);
         provision.Status.ShouldBe(PartyLinkValidationStatus.Unavailable);
         queries.ReceivedCalls().ShouldBeEmpty();
@@ -53,6 +55,30 @@ public sealed class PartiesAgentPartyDirectoryTests
         await client.Received(1).ResolvePartyIdentityAsync("tenant-a", new ResolvePartyIdentity("tenant-a", "party-a"), Arg.Any<CancellationToken>());
     }
 
+    /// <summary>Verifies that the Agent identity is an Organization or Agent Party and the caller is a Human Party.</summary>
+    [Theory]
+    [InlineData(PartyIdentityClassification.Organization, false, PartyLinkValidationStatus.Valid)]
+    [InlineData(PartyIdentityClassification.Agent, false, PartyLinkValidationStatus.Valid)]
+    [InlineData(PartyIdentityClassification.Human, false, PartyLinkValidationStatus.Unauthorized)]
+    [InlineData(PartyIdentityClassification.Human, true, PartyLinkValidationStatus.Valid)]
+    [InlineData(PartyIdentityClassification.Organization, true, PartyLinkValidationStatus.Unauthorized)]
+    [InlineData(PartyIdentityClassification.Agent, true, PartyLinkValidationStatus.Unauthorized)]
+    public async Task ClassificationMustMatchThePurpose(PartyIdentityClassification classification, bool caller, PartyLinkValidationStatus expected)
+    {
+        var client = Substitute.For<IPartiesIdentityClient>();
+        var clock = new Story54TimeProvider();
+        var evidence = new PartyIdentityEvidence(1, "tenant-a", "party-a", classification,
+            true, false, false, 1, clock.GetUtcNow(), "observation", null);
+        client.ResolvePartyIdentityAsync("tenant-a", Arg.Any<ResolvePartyIdentity>(), Arg.Any<CancellationToken>())
+            .Returns(new PartyIdentityResult(PartyIdentityOutcome.Resolved, evidence));
+        var directory = new PartiesAgentPartyDirectory(client, Substitute.For<IAgentDependencyAvailability>(), clock);
+        AgentPartyValidationResult result = caller
+            ? await directory.ValidateCallerPartyAsync("tenant-a", "party-a", CancellationToken.None)
+            : await directory.ValidateExistingPartyAsync("tenant-a", "party-a", CancellationToken.None);
+        result.Status.ShouldBe(expected);
+        result.PartyId.ShouldBe(expected == PartyLinkValidationStatus.Valid ? "party-a" : null);
+    }
+
     /// <summary>Verifies that a committed record blocks before the identity client.</summary>
     [Fact]
     public async Task ACommittedRecordBlocksBeforeTheIdentityClient()
@@ -60,6 +86,8 @@ public sealed class PartiesAgentPartyDirectoryTests
         var client = Substitute.For<IPartiesIdentityClient>();
         var directory = new PartiesAgentPartyDirectory(client, new CommittedAgentDependencyAvailability(), new Story54TimeProvider());
         (await directory.ValidateExistingPartyAsync("tenant-a", "party-a", CancellationToken.None)).Dependency
+            .ShouldBe(new DependencyNotAvailable("EXT-PARTIES-1"));
+        (await directory.ValidateCallerPartyAsync("tenant-a", "party-a", CancellationToken.None)).Dependency
             .ShouldBe(new DependencyNotAvailable("EXT-PARTIES-1"));
         client.ReceivedCalls().ShouldBeEmpty();
     }
