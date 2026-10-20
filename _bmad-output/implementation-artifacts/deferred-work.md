@@ -626,3 +626,11 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
   summary: Rehashing a revision-10 spool head or archive page may fail its stored digest after the reservation fields were added.
   evidence: `ReservedArchiveDigest` and `ArchiveReservationCount` serialize under default options, so a snapshot written before those fields would get a new `StateDigest` and could fail anchor or archive-link checks. No retained pre-change head or page was shown, and divergent digests already fail closed. An actual retained revision-10 head or archive page would settle whether this is a medium compatibility break.
+
+- source_spec: none
+  summary: Story 6.1 goal B — legacy InteractionDirectoryMigration Workflow (EventStore migration-epoch write fence, directory-repair fence, old-epoch bridge, two-scan DirectoryReady, legacy-plaintext negative fixture).
+  evidence: Split from Story 6.1 on 2026-10-19 by user choice; it is independently shippable and depends on EXT-HOST-1 EventStore namespace ports that do not exist yet, while the interaction core (goal A) stays fail-closed on DirectoryReady until it lands.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-6-1-start-and-recover-an-automatic-interaction.md`
+  summary: Story 6.1 User proposal action-intent outbox on `ConversationAgentState` (protected User approve/edit intents, ProposalMutation reservation, API-crash recovery, Closing races) with UserProposalActionIntentOutboxRecoveryTests and UserActionIntentImmediatelyBeforeAndAfterCommitClosingAndApiCrashTests.
+  evidence: Split at the 2026-10-20 spec-size gate (spec ~3,400 tokens) by user choice; it serves Confirmation-mode human actions consumed by Epic 7 (Stories 7.1-7.4), not the automatic path.
