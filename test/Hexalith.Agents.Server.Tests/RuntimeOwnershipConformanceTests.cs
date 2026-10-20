@@ -20,13 +20,9 @@ using Hexalith.EventStore.Contracts.Commands;       // AgentCommandIntent
 using Shouldly;
 
 /// <summary>
-/// Story 4.5 — cross-assembly runtime-ownership & SDK-purity conformance (AC2). Closes the AD-18/AD-19 purity gap left by
-/// the per-assembly Contracts guards: the EventStore <b>domain</b> surface and the public contracts must expose no
-/// framework/provider/workflow SDK type and reference no such assembly; the SDK-free <c>src/</c> projects must declare no
-/// provider/runtime/workflow package; and V1 must have <b>exactly one durable owner</b> at the fail-closed seam — there is
-/// no live workflow/background worker, the deferred generation/dispatch ports fail closed, and the live runtime owner
-/// (Agent Framework workflow/session restore, Dapr Workflow ownership, MCP/A2A/tool schemas) is deferred per
-/// <c>ARCHITECTURE-SPINE.md#Deferred</c>, verified here at the seam (no live owner, no SDK leak) rather than fabricated.
+/// Story 6.1 — cross-assembly runtime ownership and SDK purity. The Server has one opt-in Dapr Workflow owner;
+/// the public contracts and EventStore domain stay SDK-free. The default host registers no workflow runtime while
+/// OD-DAPR-SECURITY-1 is Open. Local replay proves Level 2 only; live Dapr and production-like recovery remain blocked.
 /// Every failure message cites AD-18/AD-19/AD-13.
 /// </summary>
 [Trait(RequirementTraits.Architecture, "AD-18")]
@@ -52,7 +48,7 @@ public sealed class RuntimeOwnershipConformanceTests
     /// <summary>Provider / runtime / workflow SDK package + assembly prefixes (same families, name space).</summary>
     private static readonly string[] _forbiddenSdkPackagePrefixes = _forbiddenSdkNamespacePrefixes;
 
-    /// <summary>The SDK-free source projects (public contracts + EventStore domain + admin UI). SDK packages may live only in Server/.AppHost/.Aspire when a live owner is bound (deferred).</summary>
+    /// <summary>The SDK-free source projects. Only Server may reference the shared Dapr.Workflow package.</summary>
     private static readonly string[] _sdkFreeProjects =
     [
         "Hexalith.Agents",            // EventStore domain
@@ -165,7 +161,7 @@ public sealed class RuntimeOwnershipConformanceTests
     [Trait(RequirementTraits.Gate, RequirementTraits.Gates.SdkPurity)]
     public void No_central_package_or_module_project_pins_a_provider_or_runtime_sdk()
     {
-        // The live runtime owner is deferred, so the module pins ZERO provider/runtime/workflow SDK versions (CPM means a
+        // The runtime version comes from the shared catalog; Agents declares no local runtime SDK versions (CPM means a
         // project cannot reference a package the central manifest does not pin — this is the strongest single guard).
         XDocument packages = XDocument.Load(ModuleLayout.RootFile("Directory.Packages.props"));
         foreach (string version in packages.Descendants()
@@ -183,7 +179,8 @@ public sealed class RuntimeOwnershipConformanceTests
             foreach (string package in PackageReferenceNames(projectFile))
             {
                 bool leaks = _forbiddenSdkPackagePrefixes.Any(prefix => package.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
-                leaks.ShouldBeFalse($"AD-18: '{Path.GetFileName(projectFile)}' references provider/runtime/workflow SDK '{package}' — no module project may bind one while the live owner is deferred.");
+                bool allowedWorkflow = package == "Dapr.Workflow" && Path.GetFileName(projectFile) == "Hexalith.Agents.Server.csproj";
+                (leaks && !allowedWorkflow).ShouldBeFalse($"AD-18: '{Path.GetFileName(projectFile)}' declares an unapproved runtime SDK '{package}'.");
             }
         }
     }
@@ -194,10 +191,13 @@ public sealed class RuntimeOwnershipConformanceTests
     [Trait(RequirementTraits.Gate, RequirementTraits.Gates.RuntimeOwnership)]
     public void Exactly_one_durable_owner_no_live_workflow_or_background_worker()
     {
-        // (a) The Workflows extension point holds no compiled durable owner.
+        // (a) Exactly one compiled owner exists, with no runtime registration in the default host.
         string serverRoot = Path.Combine(ModuleLayout.SourceRoot, "Hexalith.Agents.Server");
-        Directory.GetFiles(Path.Combine(serverRoot, "Application", "Workflows"), "*.cs", SearchOption.AllDirectories)
-            .ShouldBeEmpty("AD-18: Server/Application/Workflows must hold no compiled durable-owner type (the live workflow owner is deferred).");
+        Type[] owners = typeof(DeferredAgentCommandDispatcher).Assembly.GetTypes().Where(type =>
+            type.BaseType is { IsGenericType: true } parent && parent.GetGenericTypeDefinition() == typeof(Dapr.Workflow.Workflow<,>)).ToArray();
+        owners.Select(type => type.Name).ShouldBe(["AutomaticInteractionWorkflow"]);
+        File.ReadAllText(Path.Combine(serverRoot, "Composition", "AgentDomainHostComposition.cs"))
+            .Contains("AddAgentsInteractionWorkflow(", StringComparison.Ordinal).ShouldBeFalse("OD-DAPR-SECURITY-1: the default host must not register the runtime.");
 
         // Story 5.2 landed the live Agent setup projection, so Projections is no longer empty. What AD-18 still
         // forbids there is a second mutation owner: everything in the folder must be a platform projection handler
@@ -224,7 +224,10 @@ public sealed class RuntimeOwnershipConformanceTests
 
                 for (Type? baseType = type.BaseType; baseType is not null; baseType = baseType.BaseType)
                 {
-                    IsForbiddenSdkNamespace(baseType.Namespace)
+                    bool allowedWorkflowBase = assembly == typeof(DeferredAgentCommandDispatcher).Assembly
+                        && ((type.Name == "AutomaticInteractionWorkflow" && baseType.IsGenericType && baseType.GetGenericTypeDefinition() == typeof(Dapr.Workflow.Workflow<,>))
+                            || (type.Name == "ExecuteAutomaticInteractionStepActivity" && baseType.IsGenericType && baseType.GetGenericTypeDefinition() == typeof(Dapr.Workflow.WorkflowActivity<,>)));
+                    (IsForbiddenSdkNamespace(baseType.Namespace) && !allowedWorkflowBase)
                         .ShouldBeFalse($"AD-18: '{type.FullName}' derives from SDK type '{baseType.FullName}' — no framework/workflow durable owner may exist in V1.");
                 }
 
@@ -297,8 +300,8 @@ public sealed class RuntimeOwnershipConformanceTests
         string serverRoot = Path.Combine(ModuleLayout.SourceRoot, "Hexalith.Agents.Server");
 
         // The seam: no live owner is bound (deferred), so there is no session-restore / MCP / A2A / tool-schema surface yet.
-        Directory.GetFiles(Path.Combine(serverRoot, "Application", "Workflows"), "*.cs", SearchOption.AllDirectories)
-            .ShouldBeEmpty("AD-19#Deferred: live runtime owner (workflow/session restore) is deferred — verified at the fail-closed seam.");
+        File.Exists(Path.Combine(serverRoot, "Application", "Workflows", "AutomaticInteractionWorkflow.cs"))
+            .ShouldBeTrue("Story 6.1 supplies the sole opt-in Dapr owner; live qualification remains blocked.");
         Directory.Exists(Path.Combine(serverRoot, "Application", "Tools"))
             .ShouldBeTrue("AD-19#Deferred: the Tools extension point exists but is empty — MCP/A2A/tool-schema contracts are deferred.");
         Directory.GetFiles(Path.Combine(serverRoot, "Application", "Tools"), "*.cs", SearchOption.AllDirectories)

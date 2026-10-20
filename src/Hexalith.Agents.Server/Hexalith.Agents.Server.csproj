@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <PackageReference Include="NUlid" />
+    <PackageReference Include="Dapr.Workflow" />
   </ItemGroup>
 
   <!-- Story 1.4: the Party validation/provisioning adapter consumes only the PUBLIC Hexalith.Parties client +

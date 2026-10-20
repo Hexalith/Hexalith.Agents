@@ -27,7 +27,7 @@ public sealed class TraceabilityManifestTests
     /// The unresolved-governance ids that MUST be explicit launch blockers, not hidden assumptions (Story 4.5 Dev Notes /
     /// AC4 report §5): bounded-context values (OQ-10), content-bearing audit (OQ-8), Content Safety categories (OQ-9),
     /// launch metric thresholds (OQ-11), latency SLOs (OQ-5), cost-control thresholds (OQ-6), the Conversations
-    /// AddParticipant membership seam (AD-6/AD-7), the deferred live runtime owner (AD-18), and MCP/A2A/tool schemas (AD-19).
+    /// AddParticipant membership seam (AD-6/AD-7), the opt-in Dapr owner with live security/topology qualification still blocked (AD-18), and MCP/A2A/tool schemas (AD-19).
     /// </summary>
     private static readonly string[] _unresolvedGovernanceIds =
     [

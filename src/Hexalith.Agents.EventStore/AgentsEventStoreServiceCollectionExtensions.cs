@@ -1,3 +1,5 @@
+using Hexalith.Agents.Contracts.ConversationAgentState.Commands;
+using Hexalith.Agents.Contracts.AgentInteraction.Commands;
 using Hexalith.EventStore.Authorization;
 using Hexalith.EventStore.DomainService;
 using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
@@ -50,6 +52,15 @@ public static class AgentsEventStoreServiceCollectionExtensions
         services.AddIdempotencyIntentAdapter<ProviderGovernanceIdempotencyIntentAdapter<DisableProviderModelEntry>>();
         services.AddIdempotencyIntentAdapter<ProviderGovernanceIdempotencyIntentAdapter<SetTenantProviderModelEnablement>>();
         services.AddIdempotencyIntentAdapter<ProviderGovernanceIdempotencyIntentAdapter<DecideProviderDataHandling>>();
+        services.AddIdempotencyIntentAdapter<AutomaticInteractionIdempotencyIntentAdapter<RegisterInteractionPermit>>();
+        services.AddIdempotencyIntentAdapter<AutomaticInteractionIdempotencyIntentAdapter<AcknowledgeInteractionCreation>>();
+        services.AddIdempotencyIntentAdapter<AutomaticInteractionIdempotencyIntentAdapter<AcquireConversationEffectLease>>();
+        services.AddIdempotencyIntentAdapter<AutomaticInteractionIdempotencyIntentAdapter<CommitConversationEffect>>();
+        services.AddIdempotencyIntentAdapter<AutomaticInteractionIdempotencyIntentAdapter<SettleConversationEffectLease>>();
+        services.AddIdempotencyIntentAdapter<AutomaticInteractionIdempotencyIntentAdapter<CancelConversationEffectLease>>();
+        services.AddIdempotencyIntentAdapter<AutomaticInteractionIdempotencyIntentAdapter<EnterConversationDeletionClosing>>();
+        services.AddIdempotencyIntentAdapter<AutomaticInteractionIdempotencyIntentAdapter<CreatePermittedAgentInteraction>>();
+        services.AddIdempotencyIntentAdapter<AutomaticInteractionIdempotencyIntentAdapter<RecordAutomaticInteractionStep>>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ITrustedCommandExtensionPolicy>(
             new AgentsTrustedCommandExtensionPolicy(agentsAppId, proofReader)));
         services.TryAddEnumerable(ServiceDescriptor.Singleton<Hexalith.EventStore.Server.Commands.ICoordinatedCommandPolicy,

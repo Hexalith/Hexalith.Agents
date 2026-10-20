@@ -1,3 +1,6 @@
+using Hexalith.Agents.Contracts.ConversationAgentState.Commands;
+using Hexalith.Agents.Contracts.AgentInteraction.Commands;
+using Hexalith.Agents.Contracts.Security;
 using System.Globalization;
 using System.Security.Claims;
 
@@ -28,12 +31,19 @@ internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId, IA
         nameof(DisableAgent),
     ];
 
+    private static bool IsInteractionCommand(string domain, string commandType)
+        => domain == ConversationAgentStateIdentity.Domain && commandType is nameof(RegisterInteractionPermit) or nameof(AcknowledgeInteractionCreation)
+            or nameof(AcquireConversationEffectLease) or nameof(CommitConversationEffect) or nameof(SettleConversationEffectLease) or nameof(CancelConversationEffectLease) or nameof(EnterConversationDeletionClosing)
+            || domain == "agent-interaction" && commandType is nameof(CreatePermittedAgentInteraction) or nameof(RecordAutomaticInteractionStep);
+
     private readonly string _agentsAppId = agentsAppId;
 
     internal string AgentsAppId => _agentsAppId;
 
     public bool Claims(string domain, string commandType, string key)
-        => (IsHostTrustMetadata(key) && IsGovernedCommand(domain, commandType))
+        => (IsInteractionCommand(domain, commandType) && (commandType == nameof(EnterConversationDeletionClosing)
+                ? key == ConversationAgentStateIdentity.DeletionAuthority : key == ConversationAgentStateIdentity.WorkflowAuthority))
+            || (IsHostTrustMetadata(key) && IsGovernedCommand(domain, commandType))
             || (string.Equals(domain, ProviderCatalogDomain, StringComparison.Ordinal)
             && commandType is (nameof(CreateProviderModelEntry) or nameof(UpdateProviderModelEntry)
                 or nameof(EnableProviderModelEntry) or nameof(DisableProviderModelEntry))
@@ -79,6 +89,8 @@ internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId, IA
             return !string.IsNullOrWhiteSpace(value);
         }
 
+        if (key is ConversationAgentStateIdentity.WorkflowAuthority or ConversationAgentStateIdentity.DeletionAuthority) { return value == "true"; }
+
         if (string.Equals(key, AgentSetupTrustedExtensions.AgentAdministrator, StringComparison.Ordinal)
             || string.Equals(key, "actor:agentsProviderAdmin", StringComparison.Ordinal)
             || string.Equals(key, "actor:platformOperator", StringComparison.Ordinal)
@@ -112,7 +124,7 @@ internal sealed class AgentsTrustedCommandExtensionPolicy(string agentsAppId, IA
         => key.Length > HostTrustMetadataPrefix.Length && key.StartsWith(HostTrustMetadataPrefix, StringComparison.Ordinal);
 
     private static bool IsGovernedCommand(string domain, string commandType)
-        => (string.Equals(domain, ProviderCatalogDomain, StringComparison.Ordinal)
+        => IsInteractionCommand(domain, commandType) || (string.Equals(domain, ProviderCatalogDomain, StringComparison.Ordinal)
                 && commandType is nameof(CreateProviderModelEntry) or nameof(UpdateProviderModelEntry)
                     or nameof(EnableProviderModelEntry) or nameof(DisableProviderModelEntry))
             || (string.Equals(domain, TenantProviderEnablementDomain, StringComparison.Ordinal)

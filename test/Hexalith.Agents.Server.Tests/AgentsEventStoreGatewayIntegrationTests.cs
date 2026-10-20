@@ -12,6 +12,11 @@ using Dapr.Actors.Client;
 using Hexalith.Agents.Client;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
+using Hexalith.Agents.Contracts.AgentInteraction;
+using Hexalith.Agents.Contracts.AgentInteraction.Commands;
+using Hexalith.Agents.Contracts.ConversationAgentState.Commands;
+using Hexalith.Agents.Contracts.Security;
+using System.Text.Json.Nodes;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 using Hexalith.Agents.EventStore;
@@ -66,15 +71,24 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             .ToArray();
         commandTypes.ShouldBe(
         [
+            "AcknowledgeInteractionCreation",
+            "AcquireConversationEffectLease",
             nameof(ActivateAgent),
+            "CancelConversationEffectLease",
+            "CommitConversationEffect",
             nameof(ConfigureAgentResponseMode),
             nameof(CreateAgent),
+            "CreatePermittedAgentInteraction",
             nameof(CreateProviderModelEntry),
             nameof(DecideProviderDataHandling),
             nameof(DisableAgent),
             nameof(DisableProviderModelEntry),
             nameof(EnableProviderModelEntry),
+            "EnterConversationDeletionClosing",
+            "RecordAutomaticInteractionStep",
+            "RegisterInteractionPermit",
             nameof(SetTenantProviderModelEnablement),
+            "SettleConversationEffectLease",
             nameof(UpdateAgentConfiguration),
             nameof(UpdateProviderModelEntry),
         ]);
@@ -825,6 +839,17 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", "OtherCommand", "trust:deliveryNonce", "delivery-1", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(DisableAgent), "TRUST:deliveryNonce", "delivery-1", false)]
     [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent", nameof(DisableAgent), "trust:", "delivery-1", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "conversation-agent-state", nameof(RegisterInteractionPermit), ConversationAgentStateIdentity.WorkflowAuthority, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "conversation-agent-state", nameof(AcknowledgeInteractionCreation), ConversationAgentStateIdentity.WorkflowAuthority, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "conversation-agent-state", nameof(AcquireConversationEffectLease), ConversationAgentStateIdentity.WorkflowAuthority, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "conversation-agent-state", nameof(CommitConversationEffect), ConversationAgentStateIdentity.WorkflowAuthority, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "conversation-agent-state", nameof(SettleConversationEffectLease), ConversationAgentStateIdentity.WorkflowAuthority, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "conversation-agent-state", nameof(CancelConversationEffectLease), ConversationAgentStateIdentity.WorkflowAuthority, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "conversation-agent-state", nameof(EnterConversationDeletionClosing), ConversationAgentStateIdentity.DeletionAuthority, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent-interaction", nameof(CreatePermittedAgentInteraction), ConversationAgentStateIdentity.WorkflowAuthority, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent-interaction", nameof(RecordAutomaticInteractionStep), ConversationAgentStateIdentity.WorkflowAuthority, "true", true)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "conversation-agent-state", nameof(EnterConversationDeletionClosing), ConversationAgentStateIdentity.WorkflowAuthority, "true", false)]
+    [InlineData(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId, "agent-interaction", nameof(RecordAutomaticInteractionStep), ConversationAgentStateIdentity.DeletionAuthority, "true", false)]
     public void Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(
         string authenticationType,
         string appId,
@@ -872,6 +897,17 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     [InlineData("agent", "OtherCommand", "trust:deliveryNonce", false)]
     [InlineData("agent", nameof(DisableAgent), "TRUST:deliveryNonce", false)]
     [InlineData("agent", nameof(DisableAgent), "trust:", false)]
+    [InlineData("conversation-agent-state", nameof(RegisterInteractionPermit), ConversationAgentStateIdentity.WorkflowAuthority, true)]
+    [InlineData("conversation-agent-state", nameof(AcknowledgeInteractionCreation), ConversationAgentStateIdentity.WorkflowAuthority, true)]
+    [InlineData("conversation-agent-state", nameof(AcquireConversationEffectLease), ConversationAgentStateIdentity.WorkflowAuthority, true)]
+    [InlineData("conversation-agent-state", nameof(CommitConversationEffect), ConversationAgentStateIdentity.WorkflowAuthority, true)]
+    [InlineData("conversation-agent-state", nameof(SettleConversationEffectLease), ConversationAgentStateIdentity.WorkflowAuthority, true)]
+    [InlineData("conversation-agent-state", nameof(CancelConversationEffectLease), ConversationAgentStateIdentity.WorkflowAuthority, true)]
+    [InlineData("conversation-agent-state", nameof(EnterConversationDeletionClosing), ConversationAgentStateIdentity.DeletionAuthority, true)]
+    [InlineData("agent-interaction", nameof(CreatePermittedAgentInteraction), ConversationAgentStateIdentity.WorkflowAuthority, true)]
+    [InlineData("agent-interaction", nameof(RecordAutomaticInteractionStep), ConversationAgentStateIdentity.WorkflowAuthority, true)]
+    [InlineData("conversation-agent-state", nameof(EnterConversationDeletionClosing), ConversationAgentStateIdentity.WorkflowAuthority, false)]
+    [InlineData("agent-interaction", nameof(RecordAutomaticInteractionStep), ConversationAgentStateIdentity.DeletionAuthority, false)]
     public void Reserved_extension_policy_claims_only_its_exact_keys(
         string domain,
         string commandType,
@@ -949,6 +985,89 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
                 AgentSetupTrustedExtensions.AgentAdministrator,
                 "true").ShouldBeFalse();
         }
+    }
+
+    [Fact]
+    public async Task RegisteredAutomaticAdaptersIgnoreRevisionRestampsAndRetainBusinessProtectedAndAuthorityIntent()
+    {
+        var fixture = new AutomaticInteractionReplayFixture(); await fixture.StartAsync();
+        var p = fixture.Directory!.Permits[fixture.InteractionId].Permit;
+        var lease = fixture.Directory.Leases.Values.Single();
+        var fact = new AutomaticInteractionFact(AutomaticInteractionStep.ProviderInvocationAuthorized, new string('b', 64), AutomaticInteractionOutcome.Authorized, 11,
+            lease.LeaseId, lease.CommitRevision, OutputAuthority: new(1, new string('c', 64), AgentInteractionStatus.GenerationFailed, "reason", "metric", "disposition", 1, new string('d', 64)));
+        object[] commands =
+        [
+            new RegisterInteractionPermit(p, 10), new AcknowledgeInteractionCreation(p.AgentInteractionId, p.PermitId, p.CreationOutboxId, 1, 10),
+            new AcquireConversationEffectLease(lease, 10), new CommitConversationEffect(lease.LeaseId, p.AgentInteractionId, p.AgentInteractionId, 10),
+            new SettleConversationEffectLease(lease.LeaseId, p.AgentInteractionId, p.AgentInteractionId, lease.CommitRevision, 11, 10),
+            new CancelConversationEffectLease(lease.LeaseId, p.AgentInteractionId, p.AgentInteractionId, 10),
+            new EnterConversationDeletionClosing(p.TenantId, p.ConversationId, new string('e', 64), 10),
+            new CreatePermittedAgentInteraction(p, 1, 0), new RecordAutomaticInteractionStep(p.TenantId, p.AgentInteractionId, fact, 10),
+        ];
+        var registry = Registry();
+        foreach (object command in commands)
+        {
+            string domain = command is CreatePermittedAgentInteraction or RecordAutomaticInteractionStep ? "agent-interaction" : ConversationAgentStateIdentity.Domain;
+            string authority = command is EnterConversationDeletionClosing ? ConversationAgentStateIdentity.DeletionAuthority : ConversationAgentStateIdentity.WorkflowAuthority;
+            var payload = JsonSerializer.SerializeToNode(command, command.GetType())!.AsObject();
+            var submission = new SubmitCommand("message", p.TenantId, domain, domain == "agent-interaction" ? p.AgentInteractionId : ConversationAgentStateIdentity.Directory(p.TenantId, p.ConversationId),
+                command.GetType().Name, JsonSerializer.SerializeToUtf8Bytes(payload), "correlation", "workflow", new() { [authority] = "true" });
+            byte[] original = registry.Resolve(submission).CanonicalIntent;
+            var restamp = payload.DeepClone().AsObject(); restamp["ExpectedRevision"] = 100;
+            if (restamp["Fact"] is JsonObject f) { f["Revision"] = 101; }
+            registry.Resolve(submission with { Payload = JsonSerializer.SerializeToUtf8Bytes(restamp) }).CanonicalIntent.ShouldBe(original);
+            var changed = payload.DeepClone().AsObject();
+            if (changed["Permit"] is JsonObject permit) { permit["RequestDigest"] = new string('f', 64); }
+            else if (changed["Lease"] is JsonObject acquired) { acquired["OperationIdentity"] = new string('f', 64); }
+            else if (changed["Fact"] is JsonObject recorded) { recorded["OperationId"] = new string('f', 64); }
+            else if (changed.ContainsKey("DeletionRequestId")) { changed["DeletionRequestId"] = new string('f', 64); }
+            else { changed["AgentInteractionId"] = "different-interaction"; }
+            registry.Resolve(submission with { Payload = JsonSerializer.SerializeToUtf8Bytes(changed) }).CanonicalIntent.ShouldNotBe(original);
+            registry.Resolve(submission with { Extensions = new() { [authority] = "false" } }).CanonicalIntent.ShouldNotBe(original);
+            if (payload["Permit"] is JsonObject)
+            {
+                var protectedChange = payload.DeepClone().AsObject();
+                protectedChange["Permit"]!["Request"]!["Value"] = JsonSerializer.SerializeToNode(new { FixtureSealed = "changed-ciphertext" });
+                registry.Resolve(submission with { Payload = JsonSerializer.SerializeToUtf8Bytes(protectedChange) }).CanonicalIntent.ShouldNotBe(original);
+            }
+            if (payload["Fact"] is JsonObject)
+            {
+                var authorityChange = payload.DeepClone().AsObject(); authorityChange["Fact"]!["OutputAuthority"]!["FailureStatus"] = nameof(AgentInteractionStatus.SafetyFailed);
+                registry.Resolve(submission with { Payload = JsonSerializer.SerializeToUtf8Bytes(authorityChange) }).CanonicalIntent.ShouldNotBe(original);
+            }
+        }
+    }
+
+    [Theory]
+    [InlineData("conversation-agent-state", nameof(RegisterInteractionPermit), ConversationAgentStateIdentity.WorkflowAuthority)]
+    [InlineData("conversation-agent-state", nameof(AcknowledgeInteractionCreation), ConversationAgentStateIdentity.WorkflowAuthority)]
+    [InlineData("conversation-agent-state", nameof(AcquireConversationEffectLease), ConversationAgentStateIdentity.WorkflowAuthority)]
+    [InlineData("conversation-agent-state", nameof(CommitConversationEffect), ConversationAgentStateIdentity.WorkflowAuthority)]
+    [InlineData("conversation-agent-state", nameof(SettleConversationEffectLease), ConversationAgentStateIdentity.WorkflowAuthority)]
+    [InlineData("conversation-agent-state", nameof(CancelConversationEffectLease), ConversationAgentStateIdentity.WorkflowAuthority)]
+    [InlineData("conversation-agent-state", nameof(EnterConversationDeletionClosing), ConversationAgentStateIdentity.DeletionAuthority)]
+    [InlineData("agent-interaction", nameof(CreatePermittedAgentInteraction), ConversationAgentStateIdentity.WorkflowAuthority)]
+    [InlineData("agent-interaction", nameof(RecordAutomaticInteractionStep), ConversationAgentStateIdentity.WorkflowAuthority)]
+    public void AutomaticAuthorityRequiresExactAdmittedPrincipalCommandKeyAndValue(string domain, string commandType, string key)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        var proof = Substitute.For<IAgentsTrustedCommandProofReader>(); var services = new ServiceCollection();
+        services.AddAgentsEventStore(AgentsAppId, proof); using var provider = services.BuildServiceProvider();
+        var policy = provider.GetRequiredService<ITrustedCommandExtensionPolicy>();
+        var principal = Principal(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId); var request = Request(domain, commandType);
+        policy.Accepts(principal, request, key, "true").ShouldBeFalse();
+        proof.HasAdmittedProof(Arg.Is<ClaimsPrincipal>(p => ReferenceEquals(p, principal)), Arg.Is<SubmitCommandRequest>(r => ReferenceEquals(r, request)), key, "true").Returns(true);
+        policy.Accepts(principal, request, key, "true").ShouldBeTrue();
+        policy.Accepts(principal, request with { AggregateId = "another-owner" }, key, "true").ShouldBeFalse();
+        policy.Accepts(principal, request, key, "True").ShouldBeFalse();
+        policy.Accepts(principal, request, key, "false").ShouldBeFalse();
+        policy.Accepts(principal, request, key == ConversationAgentStateIdentity.WorkflowAuthority ? ConversationAgentStateIdentity.DeletionAuthority : ConversationAgentStateIdentity.WorkflowAuthority, "true").ShouldBeFalse();
+        policy.Accepts(Principal("Bearer", AgentsAppId), request, key, "true").ShouldBeFalse();
+        policy.Accepts(Principal(DaprInternalAuthenticationOptions.SchemeName, "other-app"), request, key, "true").ShouldBeFalse();
+        var claims = policy.GetType().GetMethod("Claims", BindingFlags.Instance | BindingFlags.Public)!.Invoke(policy, [domain, commandType, key]); claims.ShouldBe(true);
+        policy.GetType().GetMethod("Claims", BindingFlags.Instance | BindingFlags.Public)!.Invoke(policy, ["other-domain", commandType, key]).ShouldBe(false);
+        policy.GetType().GetMethod("Claims", BindingFlags.Instance | BindingFlags.Public)!.Invoke(policy, [domain, commandType, key.ToUpperInvariant()]).ShouldBe(false);
+        policy.GetType().GetMethod("Claims", BindingFlags.Instance | BindingFlags.Public)!.Invoke(policy, [domain, "OtherCommand", key]).ShouldBe(false);
     }
 
     private static IdempotencyIntentAdapterRegistry Registry()

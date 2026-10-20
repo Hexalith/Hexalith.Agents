@@ -203,6 +203,17 @@ internal static class AgentDomainHostComposition
         // belongs to its own story.
         builder.Services.AddAgentSetupServices(builder.Configuration);
 
+        builder.Services.TryAddSingleton<IAgentDependencyAvailability, CommittedAgentDependencyAvailability>();
+        builder.Services.TryAddSingleton<IAutomaticInteractionIntakeGate, DeferredAutomaticInteractionIntakeGate>();
+        builder.Services.TryAddSingleton<IInteractionDirectoryReadiness, DeferredInteractionDirectoryReadiness>();
+        builder.Services.TryAddSingleton<IConversationAgentStateReader, DeferredConversationAgentStateReader>();
+        builder.Services.TryAddSingleton<IAgentInteractionStateReader, DeferredAgentInteractionStateReader>();
+        builder.Services.TryAddSingleton<IInteractionWorkflowScheduler, DeferredInteractionWorkflowScheduler>();
+        builder.Services.TryAddSingleton<IAutomaticInteractionStepEffects, DeferredAutomaticInteractionStepEffects>();
+        builder.Services.AddScoped<AutomaticInteractionIntakeOrchestrator>();
+        builder.Services.AddScoped<InteractionOutboxRecoveryOrchestrator>();
+        builder.Services.AddScoped<AutomaticInteractionStepOrchestrator>();
+
         builder.Services.TryAddSingleton<IAgentsClient>(_ => AgentsClient.Unavailable());
     }
 }

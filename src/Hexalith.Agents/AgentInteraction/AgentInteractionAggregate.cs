@@ -37,7 +37,7 @@ namespace Hexalith.Agents.AgentInteraction;
 /// </para>
 /// </remarks>
 [EventStoreDomain("agent-interaction")]
-public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionState>
+public partial class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionState>
 {
     /// <summary>Handles creation (or idempotent re-creation) of the Agent Call request record (AC1, AC2, AC4).</summary>
     /// <param name="command">The request command (server-populated Agent id + AD-4 snapshot; caller prompt/references).</param>
@@ -48,6 +48,7 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
+        if (state?.PermittedCreation is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
         string interactionId = envelope.AggregateId;
 
         // Pure structural validation: required caller/source/prompt fields + a usable server-assembled snapshot
@@ -100,6 +101,7 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
+        if (state?.PermittedCreation is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
         string interactionId = envelope.AggregateId;
 
         // State precondition: the gate can only evaluate an interaction whose request was recorded. A gate command on a
@@ -145,6 +147,7 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
+        if (state?.PermittedCreation is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
         string interactionId = envelope.AggregateId;
 
         // State precondition: context can only be built on a recorded interaction. A context command on a never-requested
@@ -193,6 +196,7 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
+        if (state?.PermittedCreation is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
         string interactionId = envelope.AggregateId;
 
         // State precondition: output can only be generated on a recorded interaction. A generate command on a
@@ -243,6 +247,7 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
+        if (state?.PermittedCreation is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
         string interactionId = envelope.AggregateId;
 
         // State precondition: output can only be posted on a recorded interaction. A post command on a never-requested
@@ -304,6 +309,7 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
+        if (state?.PermittedCreation is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
         string interactionId = envelope.AggregateId;
 
         // State precondition: a proposal can only be created on a recorded interaction. A create command on a never-requested
@@ -365,6 +371,7 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
+        if (state?.PermittedCreation is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
         string interactionId = envelope.AggregateId;
 
         // State precondition: a proposal can only be edited on a recorded interaction. An edit command on a never-requested
@@ -430,6 +437,7 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
+        if (state?.PermittedCreation is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
         string interactionId = envelope.AggregateId;
 
         // State precondition: a proposal can only be regenerated on a recorded interaction. A regenerate command on a
@@ -483,6 +491,7 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
+        if (state?.PermittedCreation is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
         string interactionId = envelope.AggregateId;
 
         if (state is { IsRequested: true } requested)
@@ -552,6 +561,7 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
+        if (state?.PermittedCreation is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
         string interactionId = envelope.AggregateId;
 
         // State precondition: a proposal can only be rejected on a recorded interaction. A reject command on a never-requested
@@ -603,6 +613,7 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
+        if (state?.PermittedCreation is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
         string interactionId = envelope.AggregateId;
 
         // State precondition: a proposal can only be abandoned on a recorded interaction (AD-12).
@@ -651,6 +662,7 @@ public class AgentInteractionAggregate : EventStoreAggregate<AgentInteractionSta
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(envelope);
+        if (state?.PermittedCreation is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
         string interactionId = envelope.AggregateId;
 
         // State precondition: a proposal can only expire on a recorded interaction (AD-12).

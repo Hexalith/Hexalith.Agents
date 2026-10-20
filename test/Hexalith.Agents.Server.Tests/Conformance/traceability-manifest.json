@@ -60,7 +60,7 @@
     { "id": "AD-15", "title": "Public surface and UI parity", "story": "4-5", "verificationPath": "test/Hexalith.Agents.UI.Tests/UiFloorCoverageTests.cs", "blocker": false },
     { "id": "AD-16", "title": "Module-local operational topology", "story": "1-1", "verificationPath": "test/Hexalith.Agents.Server.Tests/StructuralSeedConformanceTests.cs", "blocker": false },
     { "id": "AD-17", "title": "Contract and test gates", "story": "4-5", "verificationPath": "test/Hexalith.Agents.Tests/Conformance/GovernanceConformanceTests.cs", "blocker": false },
-    { "id": "AD-18", "title": "Hybrid runtime ownership (live owner deferred, seam verified)", "story": "4-5", "verificationPath": "test/Hexalith.Agents.Server.Tests/RuntimeOwnershipConformanceTests.cs", "blocker": true },
+    { "id": "AD-18", "title": "Single opt-in Dapr owner; Level 2 replay only; live security/topology qualification blocked", "story": "6-1", "verificationPath": "test/Hexalith.Agents.Server.Tests/RuntimeOwnershipConformanceTests.cs", "blocker": true },
     { "id": "AD-19", "title": "Tool and protocol boundaries (MCP/A2A/tool schemas deferred, seam verified)", "story": "4-5", "verificationPath": "test/Hexalith.Agents.Server.Tests/RuntimeOwnershipConformanceTests.cs", "blocker": true }
   ],
   "uxdr": [

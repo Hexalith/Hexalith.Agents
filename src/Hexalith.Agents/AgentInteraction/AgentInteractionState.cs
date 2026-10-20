@@ -19,7 +19,7 @@ namespace Hexalith.Agents.AgentInteraction;
 /// Conversation-derived content (AD-14) — held here as the durable source of truth but never surfaced on the status
 /// view, the status reference, rejections, logs, or audit summaries, mirroring the Agent <c>Instructions</c> field.
 /// </remarks>
-public sealed class AgentInteractionState
+public sealed partial class AgentInteractionState
 {
     /// <summary>Gets or sets a value indicating whether the Agent Call request has been recorded.</summary>
     public bool IsRequested { get; set; }
