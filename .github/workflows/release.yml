@@ -113,7 +113,7 @@ jobs:
       id-token: write
       issues: write
       pull-requests: write
-    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-release.yml@1dfc39e3a3e6ab1c8ce95138490b39d76e7feb2c
+    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-release.yml@359fee24aeca4d9eabed4b425d4cfa2520b2adda
     with:
       solution: Hexalith.Agents.slnx
       test-platform: microsoft-testing-platform
@@ -123,7 +123,7 @@ jobs:
       governed-release: false
       publish-containers: false
       container-projects: ''
-      builds-execution-sha: 1dfc39e3a3e6ab1c8ce95138490b39d76e7feb2c
+      builds-execution-sha: 359fee24aeca4d9eabed4b425d4cfa2520b2adda
       source-branch: main
       source-ci-workflow: ci.yml
       package-manifest: eng/release-packages.json
