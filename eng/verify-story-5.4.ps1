@@ -35,10 +35,22 @@ $projects = @(
     'Hexalith.Agents.Contracts.Tests', 'Hexalith.Agents.Client.Tests', 'Hexalith.Agents.Tests',
     'Hexalith.Agents.Server.Tests', 'Hexalith.Agents.UI.Tests'
 )
+# Parties' source build takes its mapping from its caller. Supply global properties so restore and every
+# transitive project use the existing root-declared sources, without initializing Parties' nested references.
+$sourceProperties = @(
+    '-p:UseHexalithProjectReferences=true', '-p:UseNuGetDeps=false',
+    "-p:HexalithBuildsRoot=$(Join-Path $root 'references/Hexalith.Builds')",
+    "-p:HexalithEventStoreRoot=$(Join-Path $root 'references/Hexalith.EventStore')",
+    '-p:HexalithEventStoreFromSource=true',
+    "-p:HexalithCommonsRoot=$(Join-Path $root 'references/Hexalith.Commons')",
+    '-p:HexalithCommonsFromSource=true', '-p:HexalithCommonsHttpFromSource=true',
+    "-p:HexalithMcpCliRoot=$(Join-Path $root 'references/Hexalith.McpCli')",
+    '-p:HexalithMcpCliFromSource=true'
+)
 foreach ($name in $projects) {
     $project = Join-Path $root "test/$name/$name.csproj"
     $buildLog = Join-Path $ArtifactsPath "$name.build.log"
-    & dotnet build $project --configuration Debug -m:1 -p:NuGetAudit=false -p:MinVerVersionOverride=1.0.0 --nologo 2>&1 | Tee-Object -FilePath $buildLog
+    & dotnet build $project --configuration Debug -m:1 -p:NuGetAudit=false -p:MinVerVersionOverride=1.0.0 @sourceProperties --nologo 2>&1 | Tee-Object -FilePath $buildLog
     if ($LASTEXITCODE -ne 0) { throw "BuildFailed: $name" }
     if ((Get-Content $buildLog -Raw) -notmatch '(?m)^\s*0 Warning\(s\)\s*$') { throw "WarningGateFailed: $name" }
     $assembly = Join-Path $root "test/$name/bin/Debug/net10.0/$name.dll"
