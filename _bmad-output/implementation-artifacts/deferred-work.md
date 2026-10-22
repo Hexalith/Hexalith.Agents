@@ -333,6 +333,8 @@ status: open
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reject GitHub releases marked prerelease when verifying a stable semantic-version tag.
   evidence: The inherited release verifier checks tag, draft status, source SHA, and assets but never checks the GitHub `prerelease` flag, so a release marked prerelease can satisfy the stable-publication gate.
+  status: done 2026-10-22
+  resolution: `spec-five-deferred-release-verification-items.md` requires explicit prerelease=false for stable versions, including versions with build metadata; direct and subprocess regression fixtures cover invalid flags and preserve prerelease-version support.
 
 ## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2.md (2026-09-20)
 
@@ -364,6 +366,8 @@ Group A contracts re-review (fourth pass). Incomplete `Unknown = 0` tolerance mi
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reject non-positive and non-finite NuGet publication verifier timeouts with a bounded diagnostic.
   evidence: The inherited CLI passes an explicit invalid timeout to URL opening without validation, so negative, NaN, or infinite values can crash or wait unpredictably instead of failing through `VerificationError`.
+  status: done 2026-10-22
+  resolution: `spec-five-deferred-release-verification-items.md` validates positive finite timeouts before probing; direct and bounded subprocess tests cover zero, negative, NaN and infinite inputs for both modes and assert zero HTTP requests.
 
 ## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2.md (2026-09-21)
 
@@ -383,10 +387,14 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Add a negative regression test proving release source verification rejects non-main dispatch refs.
   evidence: The inherited source-proof suite passes `refs/heads/main` in every case, so deleting the explicit main-ref guard leaves all current tests green and can admit a branch ref that points at the current main commit.
+  status: done 2026-10-22
+  resolution: `spec-five-deferred-release-verification-items.md` adds branch, tag and pull-ref regressions with the exact main SHA and green main CI; a real CLI fixture also rejects a non-main dispatch.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Exercise the release source-proof CLI entry point through fixture-backed subprocess tests.
   evidence: Current tests invoke `verify_source_proof` directly; deleting the production CLI call leaves the suite green while the command exits successfully without checking main identity or CI evidence.
+  status: done 2026-10-22
+  resolution: `spec-five-deferred-release-verification-items.md` runs the production CLI against temporary JSON fixtures for exact green main, non-main dispatch, stale source, failed CI and empty CI, asserting exit codes and diagnostics.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Align the completed Agents CI/CD specification with the immutable shared-workflow revision now used by ordinary CI.
@@ -395,6 +403,8 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Exercise the GitHub Release and NuGet publication verifier CLI entry points through fixture-backed subprocess tests.
   evidence: The inherited tooling tests call helper functions directly, so deleting either production `main` verifier call leaves its suite green while the CLI can exit successfully without performing the release check.
+  status: done 2026-10-22
+  resolution: `spec-five-deferred-release-verification-items.md` exercises real bounded subprocesses using GitHub JSON and loopback NuGet fixtures, covering success, wrong source/assets, prereleases, complete inventory checks, collisions, partial publication and malformed responses.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Make high and critical NuGet vulnerability findings fail an ordinary CI build.
@@ -634,3 +644,7 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `_bmad-output/implementation-artifacts/spec-6-1-start-and-recover-an-automatic-interaction.md`
   summary: Story 6.1 User proposal action-intent outbox on `ConversationAgentState` (protected User approve/edit intents, ProposalMutation reservation, API-crash recovery, Closing races) with UserProposalActionIntentOutboxRecoveryTests and UserActionIntentImmediatelyBeforeAndAfterCommitClosingAndApiCrashTests.
   evidence: Split at the 2026-10-20 spec-size gate (spec ~3,400 tokens) by user choice; it serves Confirmation-mode human actions consumed by Epic 7 (Stories 7.1-7.4), not the automatic path.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-release-verification-items.md`
+  summary: Add subprocess coverage for the existing live gh API branch of release-source verification.
+  evidence: The source CLI regression tests use the existing JSON fixture flags and exercise the production proof call; both release callers use the unchanged live gh branch. A controlled gh executable on PATH could additionally prove endpoint construction, subprocess-failure diagnostics and malformed API-response handling without real GitHub requests. This pre-existing transport coverage gap is separate from the five selected deferrals; no incorrect live behavior was demonstrated.

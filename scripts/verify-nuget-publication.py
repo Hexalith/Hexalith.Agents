@@ -7,6 +7,7 @@ import argparse
 import gzip
 import io
 import json
+import math
 import re
 import sys
 import time
@@ -99,7 +100,10 @@ def registration_url(base_url: str, package_id: str, version: str) -> str:
 
 def _open_url(url: str, timeout: float):
     request = Request(url, headers={"Accept": "application/json", "User-Agent": "Hexalith.Agents-release-verifier/1"})
-    return urlopen(request, timeout=timeout)
+    try:
+        return urlopen(request, timeout=timeout)
+    except OverflowError as error:
+        raise VerificationError("timeout exceeds the transport's supported range") from error
 
 
 def decode_json_response(body: bytes, package_id: str, version: str) -> object:
@@ -216,6 +220,8 @@ def verify_publication(
         raise VerificationError("attempts must be at least 1")
     if delay_seconds < 0:
         raise VerificationError("delay seconds must not be negative")
+    if not math.isfinite(timeout) or timeout <= 0:
+        raise VerificationError("timeout must be a positive finite number of seconds")
 
     if expect == "absent":
         results = [

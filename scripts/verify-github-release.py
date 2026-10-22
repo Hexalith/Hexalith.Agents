@@ -61,6 +61,10 @@ def verify_github_release(
         raise ReleaseVerificationError(f"GitHub Release tag must be {expected_tag}")
     if release.get("draft") is not False:
         raise ReleaseVerificationError(f"GitHub Release {expected_tag} is missing or still a draft")
+    if "-" not in version.split("+", 1)[0] and release.get("prerelease") is not False:
+        raise ReleaseVerificationError(
+            f"GitHub Release {expected_tag} must explicitly have prerelease=false for a stable version"
+        )
 
     assets = release.get("assets")
     if not isinstance(assets, list) or any(not isinstance(asset, dict) for asset in assets):
