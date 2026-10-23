@@ -65,10 +65,16 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Decide whether a Facilitator-set Conversation block is clearable only by the same Party or by any current Facilitator.
   evidence: PRD and AD-7 require the setting authority evaluated at clear time without identifying whether authority is principal identity or current role membership (BH-13, EC-2).
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-governance-planning-items.md` — AD-7 and EXPERIENCE require the setting Party still to hold the Facilitator role, or the current Tenant Agent Administrator. Any-current-Facilitator authority applies only to the system-set ExternallyRemoved branch. This closes the planning question; the Conversations seam and A-9 remain qualification dependencies.
+  evidence_record: [Governance reconciliation](deferred-governance-reconciliation-2026-10-23.md#facilitator-block-clearing-authority)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Define the compliance-inspection second-party fallback when no unique eligible current Tenant Agent Administrator exists or that principal is the Inspector.
   evidence: The current documents do not settle this edge; Product/Architecture clarification is required to determine whether fail-closed stalling is intended (EC-7, unverified medium).
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-governance-planning-items.md` — FR-24 and AD-22/AD-30 already refuse missing/ambiguous authority and Inspector-self approval. EXPERIENCE now distinguishes those refusals from the established Administrator-in-subject Platform/second-Inspector branch, and AD-22/Story 8.8 use the governing PRD subject-set condition consistently. Uncertainty grants no automatic alternate; a broader fallback would require a new Product/Governance decision. No runtime inspection grant or qualification is added.
+  evidence_record: [Governance reconciliation](deferred-governance-reconciliation-2026-10-23.md#inspection-without-an-established-eligible-administrator)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Adjudicate the concurrent v7 Architecture findings and the already-triggered .NET `10.0.3xx` advisory escalation.
@@ -77,10 +83,16 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Resolve the blocked/unavailable-call metric's reason-dimensional numerator against its pair-only denominator.
   evidence: The governing PRD formula can exceed 100% when one Party/Conversation pair has multiple reasons, potentially causing an unnecessary trigger review; changing it requires Product authority (EC-10).
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-governance-planning-items.md` — Current FR-28 and AD-12 use distinct calling Parties in both numerator and denominator, deduplicating repeated calls/reasons/Conversations within each rolling seven-day aggregate share. Reason breakdowns do not sum into that share; existing exclusions, convening floor, samples and thresholds remain binding. This closes the formula definition, not metrics implementation.
+  evidence_record: [Governance reconciliation](deferred-governance-reconciliation-2026-10-23.md#blocked-and-unavailable-shares)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Specify atomicity or compensation for partial legal-hold DEK unpin failure.
   evidence: Story 8.1 requires restrictive failure but does not say how already-unpinned DEKs are re-pinned, leaving held content potentially erasable after a partial failure (EC-11).
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-governance-planning-items.md` — Current Story 8.1 and AD-2/AD-22 define staged release: the guard remains restrictive through every exact unpin/fence receipt, overlapping deletion waits for mirrored guard release, and phase-pinned exact lookup/retry preserves the release decision after partial failure. Physical expiry/destruction also require linearizable authorization. This supplies the existing serialization alternative to atomic unpin or re-pin compensation; actual custodian/provider qualification and open lifecycle/cancellation decisions remain required.
+  evidence_record: [Governance reconciliation](deferred-governance-reconciliation-2026-10-23.md#restrictive-partial-hold-release)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Reconcile the UX retry-posting failure transition with the PRD removal/block transition.
@@ -92,6 +104,9 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Add the governed Platform Operator and second-Compliance-Inspector branches to the UX compliance-inspection approval path.
   evidence: EXPERIENCE exposes Tenant Agent Administrator approval/post-hoc review without the alternative approver eligibility required when the Administrator is in the subject set (EC-14).
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-governance-planning-items.md` — EXPERIENCE groups both alternatives with the current-Administrator branch, authority/self-approval refusal and viewer-scoped discovery/approval/review on the existing audit list/detail. Its contract handoff and Story 8.8 assign the required public verdict/review fields and deferred-until-available behavior. Narrow-scope post-hoc limits, prior Platform approval for wide cases, anti-collusion and A-19/A-23 remain in force; no new role or grant is introduced.
+  evidence_record: [Governance reconciliation](deferred-governance-reconciliation-2026-10-23.md#alternate-inspection-approvers-in-ux)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Reconcile UX retry-posting locking with the closed AD-12 operation-family contract.

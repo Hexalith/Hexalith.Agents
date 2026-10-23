@@ -3352,12 +3352,17 @@ So that sensitive content can be examined without granting ambient Conversation 
 **Given** a request for unposted content or context metadata
 **When** disclosure is evaluated
 **Then** it requires either the Party durably recorded as Eligible Approver for that proposal or `AuditInspection(TenantId, InspectionId)` scoped to a named Conversation or case with a nonblank justification
-**And** the compliance path computes the subject set from callers, editors, Approvers, decision actors, Facilitators in scope, and the Tenant Agent Administrator whose configuration was in force; the second party must be outside that set and not the Inspector, using the current Tenant Agent Administrator when eligible and otherwise the Platform Operator or a second Compliance Inspector.
+**And** the compliance path computes the subject set from callers, editors, Approvers, decision actors, Facilitators in scope, and the Tenant Agent Administrator whose configuration was in force; the second party must be outside that set and not the Inspector, using the established current Tenant Agent Administrator when outside that set and distinct from the Inspector; only when that current Administrator is in the computed subject set does the Platform Operator or a second Compliance Inspector replace that branch. Missing or ambiguous current authority, or Inspector-self identity alone, does not select an alternate approver; unresolved authority and same-human approval fail closed under FR-24 and AD-22/AD-30.
 
 **Given** a second party is eligible for an inspection
 **When** pre-approval or post-hoc review is recorded
 **Then** two Compliance Inspectors cannot approve each other within 30 days, any scope wider than one Conversation requires Platform Operator approval, and post-hoc review is allowed only for a single proposal or single Conversation and must finish within 7 days
 **And** the Party-bearing Inspector and Party-bearing tenant reviewer resolve current human/liveness and historical actor binding through `EXT-PARTIES-1`; an `Administrator` reviewer proves current tenant role plus durable actor/role evidence, and a `Platform` reviewer proves current or historically recorded Hexalith.Tenants global-administrator authority without inventing a tenant Party. Separation compares stable `AuthenticatedHumanActorId`; missing, stale, ambiguous, overlapping, non-human where a Party is required, unavailable, same-actor, or incompatible evidence blocks approval/disclosure, while a missed post-hoc deadline remains recorded and visible.
+
+**Given** an authorized requester or second-party reviewer opens the tenant-scoped audit inspection list or detail
+**When** Story 8.8 returns the public inspection read contract
+**Then** it supplies support-safe request/scope/review state, expected revision, review deadline and evaluation time, and server-computed prior-approval/post-hoc eligibility, selected role basis or typed refusal/unavailable reason
+**And** an Inspector reviewer receives only requests they are entitled to oversee, with no protected content or unrelated case inventory. The existing audit evidence list/detail provides discovery and the AuditInspection-family approval/review confirmation; every command rechecks current authority, subject membership, stable-human separation, review mode and anti-collusion before appending. A post-hoc review recorded after its seven-day deadline remains permitted for an eligible reviewer: it resolves the current unreviewed signal while retaining the missed-window finding in immutable history and grants no new content read. Missing contracts render deferred, never an empty list or a locally inferred grant.
 
 **Given** an AuditInspection is accepted
 **When** content reads and review transitions occur
