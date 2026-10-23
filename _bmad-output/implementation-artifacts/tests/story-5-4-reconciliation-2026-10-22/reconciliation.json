@@ -1,0 +1,741 @@
+{
+  "schemaVersion": 1,
+  "kind": "BlockedOwnerDeliveryReconciliation",
+  "observedAtUtc": "2026-10-22T15:29:15.816723+00:00",
+  "result": "BLOCKED_BEFORE_REPLACEMENT_ACCEPTANCE",
+  "availableRecords": [],
+  "submittedReplacementCommitments": [],
+  "authority": {
+    "register": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/external-dependency-register.md",
+    "sha256": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2",
+    "agentsHead": "dd1639439c6822337a747e254fcd626151b27000",
+    "priorReconciliation": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-dependency-reconciliation-2026-10-18.md",
+    "priorReconciliationSha256": "7ea22dad7792770f8377cef64ab6f3c7b610ad06e776b71dd3b9aa12739ca5ae"
+  },
+  "acceptedRecordsUnchanged": {
+    "EXT-PARTIES-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Parties Maintainer",
+      "Repository": "`Hexalith.Parties`",
+      "RequiredArtifact": "Selected V1 branch: **Branch B**. **Branch A:** a public AI Party type and an authorization contract permitting only the Agents Service Principal to create `hexa`'s deterministic provisioned Party under that type. **Branch B:** Parties Maintainer and Product formally accept the existing Organization-typed provisioned Party as the V1 launch contract, verified everywhere by its immutable deterministic id and never by type. Both branches require create-only AD-2 provisioning, idempotent exact retries, typed conflict for divergent identity/type requests, mandatory tenant scope, no tenant-role creation or replacement, and no Party PII in public results. The record must name the selected branch; absence of that decision is `Uncommitted`. Independently of the selected identity branch, Parties exposes a tenant-scoped authoritative resolution by `PartyId` returning stable Party classification (`Human`, `Organization`, or `AI`), active/liveness state, evidence position and observed instant, plus typed missing, ambiguous, stale, denied, and unavailable outcomes. For every human Party, the same seam also returns one stable non-PII `AuthenticatedHumanActorId`, `HumanActorBindingVersion`, validity interval, and queryable binding history sufficient to reproduce the identity in force at an action; it returns typed missing, ambiguous, stale, and overlapping-history outcomes. AD-8 uses both classification and binding at predefined-approver configuration and every runtime approver resolution; non-human Parties can never be Approvers, and a human command carrying a Party must bind to the same authenticated actor id.",
+      "TargetVersionOrCommit": "`56cb4401c4179d431385ad3d931fefa402e4fc5a`",
+      "TargetIntegrationDate": "`2026-10-08`",
+      "CompatibilityContractAndVerificationCommand": "Contract: for the selected branch, create and resolve exactly one deterministic tenant-scoped provisioned Party for `hexa` under the Agents Service Principal; verify immutable identity by id on every path and additionally verify AI type only for Branch A; reject tenant-role creation, cross-tenant access, divergent replay, and replacement; return typed safe outcomes without Party PII; resolve approver candidates to fresh authoritative human-type and active/liveness evidence; resolve each human Party to its stable `AuthenticatedHumanActorId` and binding version; reproduce the binding in force for a historical instant; and reject missing, stale, ambiguous, overlapping, or actor-mismatched bindings with typed fail-closed outcomes. Command: `test \"$(git -C ../parties rev-parse HEAD)\" = \"56cb4401c4179d431385ad3d931fefa402e4fc5a\" && test -z \"$(git -C ../parties status --porcelain)\" && pwsh -NoProfile -File ../parties/eng/verify-ext-parties-1.ps1 -Mode Live -EventStoreRoot ../eventstore -PlatformRoot ../platform -EvidenceDirectory /tmp/ext-parties-1-live`.",
+      "RequiredEvidenceLevel": "Levels 4 and 5",
+      "AcceptedStatus": "`Committed`",
+      "ConsumingStories": "`RQ-1`; Stories 5.2, 5.4, 5.5, 6.1, 6.6, 7.1\u20137.5, 8.1\u20138.4, and 8.8 directly or conditionally consume identity or human Party/liveness/binding evidence. Story 6.1 directly verifies the caller and provisioned Agent Party and executes FR-8 membership step 10; Story 5.5's consumption remains conditional on the Product-selected recorder scope; Story 8.4 consumes the Release-Operator review branch. Branch-B-compatible identity-by-id portions may be developed where applicable, but no consumer may cite that work or any human actor-binding seam as launch evidence while this record is `Uncommitted`"
+    },
+    "EXT-CONV-AI-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Conversations Maintainer",
+      "Repository": "`Hexalith.Conversations`",
+      "RequiredArtifact": "Six core V1 seams. (1) Membership: public `IConversationClient.AddParticipantAsync` and `POST /api/v1/conversations/{conversationId}/participants`, limited for Agents to stable AI Party identity, `ParticipantType.AiAgent`, and `ParticipantRole.Member`; exact retries are idempotent no-ops, conflicting type/role is a typed conflict, and cross-tenant or general participant management is denied; plus a participant-state read for the AI participant and a participant removal limited to the AI participant for the PRD FR-2 removal block. Before accepting membership, Conversations verifies the immutable provisioned Party by id and additionally verifies AI type only when `EXT-PARTIES-1` commits Branch A; Branch B accepts its approved Organization type by id; the record owner supplies the final member and typed failure names (A-21). (2) Posting: append a Conversation Message as the `AiAgent` participant with an Agents-supplied deterministic `MessageId` and idempotency key, persisted verbatim or rejected (a differing returned id is a typed incompatibility that blocks posting), and message metadata carrying the Agent Call trace reference and provenance flags (AI-generated; human-edited and by which Party), so restart or replay cannot duplicate a post; plus an existence read by `MessageId` returning the message, typed absence, typed `ConversationDeleted`, typed `PrincipalRemovedFromConversation`, or unavailable, so Agents can check before retry or abandonment after a lost acknowledgement and record `LateConfirmed` rather than contradict an already-posted message. (3) Facilitator resolution: `ParticipantRole.Facilitator` on the participant read model. (4) The Eligible Conversation denominator is supplied either as an active-Conversation count per tenant/window or as a Conversations-side tenant event feed from which Agents computes the same count, never from Agent Calls (A-4). (5) Tenant-scoped reads under the Agents Service Principal of complete Conversation content, the Participant roster with roles, and Conversation existence/accessibility; they return typed `ConversationDeleted` and `PrincipalRemovedFromConversation` distinctly from transient denial or error, and content contains the messages a Participant would currently see, including current edit/delete state (A-15). (6) A Conversations-owned durable outbox or ordered tenant/source feed entry created atomically with the approved Conversation-deletion decision. It carries one immutable `ConversationDeletionSignalId` bound one-to-one to that logical approval, `TenantId`, `ConversationId`, stable source stream/revision, approval reference, source-contract version, and an independent delivery-attempt id. Reconnect/backfill is ordered from a durable checkpoint; the source retains and retries the same logical entry through Agents outage, typed refusal, target-version rollover, and lost acknowledgement until authenticated `DeletionSignalAccepted(SignalId, SourceRevision, ProtectedDeletionRevision)` advances the checkpoint. Retransmission never mints a new signal id/source revision; changed fields at the same id are a quarantined compatibility conflict that is not skipped or acknowledged, blocks seam readiness, and exposes only safe poison metadata. Source-revision and Agents acknowledgement lookup resolve both sides of lost delivery. The authenticated source identity and exact target are verified before Agents dispatch; the signal triggers PRD FR-30 deletion of derived Agent content and never grants a human Agents role, local cancellation authority, or scope beyond that source Conversation. Final member and typed failure names are owned by this record (PRD \u00a78.1 assumptions A-1 through A-4, A-15, A-16, A-21).",
+      "TargetVersionOrCommit": "`87e8b4a6ec3224b20a560b0e83de857805925572`",
+      "TargetIntegrationDate": "`2026-10-08`",
+      "CompatibilityContractAndVerificationCommand": "Contract: typed idempotent membership with participant-state read, AI-participant removal, and Hexalith.Parties identity-by-id verification plus AI-type verification only under committed Branch A; idempotent posting with trace/provenance metadata and a typed `MessageId` existence read covering message, absence, deletion, principal removal, and unavailable; Facilitator role exposure; active-Conversation count or equivalent Conversations-side tenant event feed; tenant-scoped current content/roster/existence/accessibility reads that distinguish deletion/removal from transient denial/error; and atomic durable approved-deletion outbox/feed delivery with stable logical signal/source revision, ordered checkpoint/backfill, retry until authenticated Agents acknowledgement, target-version rollover, conflict quarantine/no-skip, acknowledgement/source lookup, local-cancellation denial, and focused cross-tenant denial. During owner qualification the receiver role is filled per accepted cohort `OQ-5.4-1` item 1. Command: `test \"$(git -C ../conversations rev-parse HEAD)\" = \"87e8b4a6ec3224b20a560b0e83de857805925572\" && test -z \"$(git -C ../conversations status --porcelain)\" && pwsh -NoProfile -File ../conversations/eng/verify-ext-conv-ai-1.ps1 -Mode Live -LiveManifest /home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/live-manifest.json -ArtifactsPath /tmp/ext-conv-ai-1-live`",
+      "RequiredEvidenceLevel": "Levels 4 and 5",
+      "AcceptedStatus": "`Committed`",
+      "ConsumingStories": "5.4, 6.1, 6.2, 6.3, 6.6, 6.8, 7.1\u20137.5, 7.7, 8.3, 8.5, 8.8; `RQ-1`"
+    },
+    "EXT-SECRETS-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Platform Maintainer",
+      "Repository": "`Hexalith.Platform`",
+      "RequiredArtifact": "Versioned secret custody for Provider credentials, per-tenant KEKs and DigestKeys, tenant migration-epoch/directory-effect capability signing keys with exact revocation state, the reserved-system security-observation digest key, per-export envelope keys, manifest-signing keys/public trust anchors, trusted-envelope HMAC keys, and decision-authority verification anchors/trust profile. Decision-approval signing keys remain outside Agents and platform-host custody under the independently governed issuer named by that profile; the profile binds issuer, stable actor/authority-role sources for Product, Governance, Security, Architecture, and named maintainers, key-use purpose, freshness/expiry/revocation, and forbids the Release Operator recorder or platform key custodian from requesting or minting approval evidence. The trusted-envelope profile fixes issuer/audience, numeric maximum tag lifetime, clock skew, rotation overlap, command retry/recovery horizon, and `ReplayRecordRetention` no shorter than the greater of tag lifetime plus skew plus overlap and that recovery horizon, consumed by the Agents-owned reserved-`system` `TrustedEnvelopeReplay(Issuer, DeliveryNonce)` aggregate whose record binds the authenticated target tenant; it also fixes active/revoked key state, emergency revocation, retained digest-key versions, decision-manifest verification, wrap/unwrap/pin/unpin/destroy operations with irreversible receipts, safe rotation/invalidation signals, and a principal-bound `DeliverExportKey(DeliveryId, ExportId, CommitAcknowledgementRevision, RequesterActorId, Purpose, Audience, ExclusiveExpiry, LifecycleVersion, StoreTarget, ContractVersion)` operation whose key bytes are delivered directly to that authenticated principal. Delivery is idempotent by the complete identity and exposes authenticated exact outcome lookup as `Delivered(ObservedAt)`, `NotDelivered(Reason)`, or `Unknown/Unavailable`; the custodian rejects cross-tenant, changed-identity, expired, or revoked authority before release. Only opaque references, versions, public anchors, policy bounds, and configured/not-configured state cross Agents boundaries.",
+      "TargetVersionOrCommit": "`abbec4093715c1db854433119b32d4e16df20d08`",
+      "TargetIntegrationDate": "`2026-10-08`",
+      "CompatibilityContractAndVerificationCommand": "Contract: platform-hosted versioned resolution and custody; AES-256-GCM export-key wrapping; RFC 7515/7518 ES256 manifest signing and offline public-anchor verification; HMAC-SHA-256 trusted-envelope issuance/constant-time verification over AD-30 canonical bytes; target-tenant migration epoch/directory-effect capability issuance and legacy-epoch revocation accepted by the EventStore append guard; system-keyed HMAC of untrusted security-observation fields; independently issued signed decision-governance/authority manifests binding exact contract/version, effective predecessor or root policy, nonempty required approvers, affected evaluations, stable actor/role evidence, freshness, and revocation, with tests proving neither recorder nor custodian can sign/request approval; immutable `LogicalCommandId`, issuer-wide unique per-delivery `DeliveryNonce`, byte-identical replay routed only to domain idempotency, changed-field or cross-tenant nonce reuse rejected in the reserved-system replay namespace, bounded expiry/skew/overlap with retained replay records across the complete bound, emergency-revocation redispatch under a new key and nonce, rotation-triggered safety-verdict invalidation, denied access, destruction receipts, and principal-bound export-key delivery with deterministic identity, idempotent direct release, exact outcome lookup, exclusive-expiry/current-authority rejection before release, immutable Delivered outcome after release, and lost-ack recovery; tests cross expiry and actor revocation immediately before/after release, lookup outage, duplicate retry, cross-tenant substitution, changed purpose/audience/version, and stale/disconnected/restored migration writers while proving secret values do not enter events, projections, responses, logs, traces, or evidence. The live test also proves the non-public replay registrar credential can conditionally append only the exact replay stream/event and is unavailable to public, Workflow, and target-handler paths. Command: `test \"$(git -C ../platform rev-parse HEAD)\" = \"abbec4093715c1db854433119b32d4e16df20d08\" && test -z \"$(git -C ../platform status --porcelain)\" && env EXT_SECRETS_1_RUNTIME_CONFIGURATION=/home/administrator/hexalith-secrets-evidence/ext-secrets-1/acceptance-abbec40-20261018/detached-packet/runtime-reference.json EXT_SECRETS_1_ACCEPTANCE_PACKET=/home/administrator/hexalith-secrets-evidence/ext-secrets-1/acceptance-abbec40-20261018/detached-packet/replacement-acceptance-packet.json pwsh -NoProfile -File ../platform/eng/verify-ext-secrets-1.ps1 -Mode Live -EventStoreSourceRoot ../eventstore -ArtifactsDirectory /tmp/ext-secrets-1-live-20261018-abbec40-artifacts -EvidenceDirectory /tmp/ext-secrets-1-live-20261018-abbec40-evidence`",
+      "RuntimeQualificationBinding": "`{\"configurationSha256\":\"ca019f1325d973919a46b046fcb21be39a4b318800cd59e9378904c365228344\",\"enrollmentAnchorSha256\":null,\"executorAnchorSha256\":null,\"observerAnchorSha256\":null,\"planSha256\":\"16dd493ff0414fea13be95f137d372e54088881550665aa3239a5814a9e862ed\"}`",
+      "RequiredEvidenceLevel": "Levels 4 and 5",
+      "AcceptedStatus": "`Committed`",
+      "ConsumingStories": "5.4, 5.5, 5.6, 5.8, 6.1, 6.3, 6.4, 7.3, 8.1, 8.2, 8.3, 8.4; `RQ-1`"
+    },
+    "EXT-HOST-1": {
+      "Owner": "Project owner (user declaration 2026-10-07), acting as Platform Maintainer",
+      "Repository": "`Hexalith.Platform`",
+      "RequiredArtifact": "Platform-owned host composition for the Agents DomainService and UI with EventStore, Conversations, Parties, Tenants, Provider and safety adapters, Dapr Workflow, secrets, health, identity, telemetry, and a replicated durable content-free `security-audit-spool`. The spool accepts a deterministic `SecurityObservationId` before a classified Agents denial returns, retains pending records across EventStore/replay outages, exposes exact-id outcome lookup/acknowledgement, and grants its drain worker an ACL restricted to the computed `SecurityEventLog(RoutingTenantId, UtcDay)` stream and event; if the spool itself is unavailable, ingress constructs no Agents command and platform health blocks tenant-access/audit readiness. The host additionally binds the production `EXT-PROTECTION-1` engine and exposes the FR-34 attestation port used at startup and every readiness evaluation. The port lets Agents seal a canary, prove persisted bytes contain no plaintext, unseal it, destroy its DEK, replay `Erased`, and obtain engine identity/version for comparison with the committed protection target; the host fails closed against both the no-op default and a self-reporting wrapper around it. For Story 6.1 it also composes the target-limited directory-migration Workflow and EventStore namespace ports. Installing a tenant migration epoch revokes the legacy direct-write credential/epoch, and every later interaction/failure create or content append requires the current epoch plus an exact directory permit or committed-effect capability. Every `ConversationAgentState` permit, creation/workflow-start/User-action-intent outbox, lease acquire/commit, and interaction-owned rate/open/Budget/capacity phase-authorization append is likewise conditional on the current directory capability at EventStore. Repair first atomically installs a directory-repair fence that revokes all those new-directory/effect-authorization operations and returns an authenticated checkpoint; only the post-fence finite permit/outbox/lease/phase-authorization cohort may enter the old-epoch bridge, whose exact pending/committed/authorized work drains before successor activation revokes the old epoch, repair fence, and bridge. For Story 8.3 the same port evaluates canonical `GovernanceScopeV1` and its predicate digest from authoritative tenant stream identity, immutable first-event/directory-permit `SourceConversationId`, and permit/action/lease/phase-authorization owner facts\u2014never caller classification. Before either deletion origin builds a candidate, it conditionally installs a persistent ordinal scope admission fence that rejects later matching permit, User-action-intent, lease-acquire/commit, and rate/open/Budget/capacity phase-authorization appends; after the finite same-ordinal owner cycles become Effective it conditionally installs and verifies the separate content write fence that rejects later matching interaction/failure creates or content appends. The admission violation ledger is one append-only request ledger partitioned by fence ordinal: prior violations remain visible, while only the current installed ordinal can attest `ZeroAcceptedViolationsSinceInstall`. A pre-cut violation uses an explicit no-global-cut/candidate/token receipt; a later violation invalidates only exact present artifacts. Both assign one successor ordinal and require separately keyed owner cycles carrying all prior obligations. The content guard is stable by request/predicate and continuously installed: after one or more recuts, a successor-binding authorize/effect/result operation starts from the latest installed binding and appends the new ordinal/global-cut/token only after proving a complete gap-free ordered chain of intervening invalidated/tokenless ordinal receipts and the current zero proof; an overtaken authorization returns terminal obsolete without a guard append. The port also owns the tenant `GovernanceScopeGuard`: every authorized legal-hold request conditionally registers its canonical scope there before fence preparation and remains until an exact fully acknowledged release removes it. Hold registration and `CommitDeletionDestructionStartBarrierEffect` serialize on that owner. The `ProtectionFence` barrier authorization persists the exact observed `GovernanceScopeGuard` revision/compare token. Conditional append at that revision makes the seal operation serialize with admission writes and hold registration/release; an intervening mutation returns authenticated stale and must be mirrored before revision-bound reauthorization. The seal operation verifies both ledgers/current content binding/migration receipts, rejects any overlapping contender that won after authorization unless it consumes the exact effective deletion-allowed hold disposition, commits immutable `DestructionSealed`, and returns one deterministic non-expiring, revocable, single-use `DestroyDekManifest` capability bound to the sorted accepted key-target manifest; it has no `ExpiresAt` or renewal branch, and its capability-key version remains verifiable through outage, migration, restore, and the full retention of the batch identity and terminal outcome, including exact retry/lookup after consumption or revocation. No direct clean read, stale no-hold authorization, or unrelated append is authority. Each fence/guard/barrier exposes authenticated installation, exact-outcome lookup, verification/high-water, and complete append-only evidence; every admission ordinal/violation gap chain, owner cycle, content binding, hold contender/release, barrier/containment compare authorization and stale result, destruction seal, and batch identity/capability-key/guard-issued state plus referenced protection-owner blocked, reserved, re-attested, consumed, or revoked outcome survives migration successors. The protection engine consumes each manifest batch atomically as all targets or none, returns an ordered per-target irreversible receipt vector, and exposes exact batch lookup; each first previously uncovered complete protection target from an authoritative post-seal content violation is ProtectionFence-serialized into one monotonic ordinal and immutable singleton target manifest, while later same-target resources receive coverage links only, then follows `AuthorizeDeletionContainmentBatch`, guard-revision-conditional `CommitDeletionContainmentBatchEffect`, exact lookup, and `RecordDeletionContainmentBatchIssued` or `RecordDeletionContainmentBatchIssuanceStale` before its distinct batch may be consumed; exact duplicates reuse the ordinal/result and concurrent distinct targets receive distinct ordinals. An accepted admission after sealing invokes `BlockDeletionBatchConsumption` to race `ReserveAndConsumeDeletionBatch` at the protection owner, records `DeletionIntegrityCompromised`, blocks new batches, and can never be treated as resource-only content containment or successful completion. Missing, malformed, unknown-version, cross-tenant, or unverifiable scope membership rejects a write and prevents a clean verification result. The artifact replaces module-owned AppHost, Aspire, and ServiceDefaults ownership.",
+      "TargetVersionOrCommit": "`abbec4093715c1db854433119b32d4e16df20d08`",
+      "TargetIntegrationDate": "`2026-10-08`",
+      "CompatibilityContractAndVerificationCommand": "Contract: clean-checkout composition through the platform host without module-owned hosting infrastructure, including the durable security-audit spool, production protection-engine binding, and complete FR-34 attestation. The target-limited migration contract enforces the current epoch on interaction, directory, and effect-authorization writes; provides atomic directory-repair-fence install/checkpoint/lookup; freezes only the post-boundary cohort including protected User-action intents and rate/open/Budget/capacity authorizations; restricts the bridge to manifest-listed pending, committed, or already-authorized work; preserves every deletion fence ordinal/violation gap chain, owner-cycle receipt, continuous content binding, guard compare authorization/stale result, destruction seal, and batch capability/state; and atomically revokes old epoch/repair fence/bridge at successor activation. The deletion contract implements canonical exact-interaction and source-deletion exact-Conversation predicates; ordinal admission-fence authorize/effect/result; explicit pre-cut and post-cut violation containment with one successor ordinal; immutable separately keyed owner cycles and current zero proof; one continuously installed predicate content guard whose successor binding uses the latest installed binding plus a gap-free invalidation chain and returns terminal obsolete when overtaken; tenant-scope-guard revision/compare-token hold registration/release serialized with the destruction seal and authenticated stale reauthorization; an exact effective armed-contention disposition only when required; guard-owned atomic start-barrier authorize/effect/result; deterministic non-expiring, revocable, all-or-none manifest-batch destruction with per-target vectors, exact lookup and revocation race; guard-owned singleton containment-batch authorize/effect/result with ordinal allocation and lost-issuance lookup; migration preservation; post-start integrity blocking; and content containment with distinct batches. Tests race every directory/phase-authorization append and target write around migration-repair, admission-fence, and destruction-barrier boundaries; cover violations before the first cut and after content-fence installation; prove one successor ordinal, carried obligations, immutable Effective, repeated recut gap chains/obsolete binding outcomes, continuous content binding, and current zero; race hold registration/release before/at/after guard-revision-bound barrier authorization/seal while Open precedence stalls both and stale compare results require reauthorization; prove the guard commit\u2014not a prior read\u2014is first irreversible authority; and prove an exact multi-key manifest batch is consumed once, all targets or none, with non-expiring restore, lost-result lookup, revocation, explicit singleton containment issuance/lookup, and prior violations preserved. Human-origin exact-Conversation tests remain blocked pending `OD-HUMAN-EXACT-CONVERSATION-SCOPE-1`; `ClassUtcRange` tests remain blocked pending `OD-GOVERNANCE-CLASS-RANGE-SCOPE-1`. Command: `test \"$(git -C ../platform rev-parse HEAD)\" = \"abbec4093715c1db854433119b32d4e16df20d08\" && test -z \"$(git -C ../platform status --porcelain)\" && bash ../platform/eng/verify-agents-host.sh --mode Full --artifacts-path /tmp/ext-host-1-full`",
+      "RequiredEvidenceLevel": "Levels 4 and 5",
+      "AcceptedStatus": "`Committed`",
+      "ConsumingStories": "5.4, 5.6, 6.1, 8.1, 8.3; `RQ-1`"
+    },
+    "EXT-PROTECTION-1": {
+      "Owner": "EventStore Maintainer",
+      "Repository": "`Hexalith.EventStore`",
+      "RequiredArtifact": "A production payload-protection engine behind the existing EventStore hooks, applied field-level to a `ProtectedContent` envelope so every other event field stays plaintext and a destroyed-key field unprotects as the typed value `Erased` without breaking replay: one data-encryption key per `AgentInteraction`, plus an explicit provider-neutral `TargetProtectionKeyAlias` that lets a target-limited creation-outbox `ProtectedContent` field owned by `ConversationAgentState` select that exact interaction DEK without deriving it from the directory aggregate identity, wrapped by a per-tenant key-encryption key custodied through `EXT-SECRETS-1`. The custodian exposes `WrapDek`, `UnwrapDek`, `PinDek`, `UnpinDek`, per-key `DestroyDek`, and an atomic `DestroyDekManifest(BatchId, ManifestDigest, SortedTenantInteractionAliasTargets, GuardCapability)` operation. The batch identity and signed capability are deterministic and target-bound. The capability is non-expiring and revocable, carries its signing-key version, and that version remains verifiable for the full retention of the batch identity and terminal outcome, including exact retry/lookup after consumption or revocation; there is no expiry or renewal path and restore reuses the same identity. Consumption is single-use and all-or-none, returns an ordered irreversible per-target receipt vector, exact retry/lookup returns that vector, a changed target/digest conflicts, and `BlockDeletionBatchConsumption` races `ReserveAndConsumeDeletionBatch` at the same protection owner so exactly one wins. Each first previously uncovered complete protection target `(TenantId, AgentInteractionId, TargetProtectionKeyAlias)` uses one guard-issued batch for its ProtectionFence-assigned monotonic containment ordinal and immutable singleton target manifest; later violation resources for that same target receive coverage links only, no ProtectionFence event alone is a guard capability, and distinct uncovered targets receive distinct ordinals/batches. Hold pinning rejects both per-key and manifest destruction; sealed envelopes remain sealed on broker/read models, `PayloadUnprotectionOutcome` is unreadable after erasure, and snapshot/replay caches inherit the DEK (AD-22, AD-27). The shipped no-op default is not acceptable for content-bearing workflows (AD-14).",
+      "TargetVersionOrCommit": "`TBD`",
+      "TargetIntegrationDate": "`TBD`",
+      "CompatibilityContractAndVerificationCommand": "Contract: an owner-supplied executable command must prove at minimum (1) seal with plaintext-absence proof, (2) unseal with payload equality, (3) irreversible erase with typed `Erased` replay, (4) hold pin rejecting erase until authorized unpin, and (5) engine identity/version reporting equal to the exact committed target, with per-tenant isolation and restore-cannot-revive behavior. It must seal the directory creation-outbox field through the target alias and exercise a multi-interaction `DestroyDekManifest`: deterministic single-use batch identity, exact sorted target binding, all targets destroyed or none, ordered per-key receipts, byte-identical retry and lost-result lookup, changed-manifest conflict, duplicate-consumption denial with exact prior result, hold-pin rejection, and a protection-owner `BlockDeletionBatchConsumption`-versus-`ReserveAndConsumeDeletionBatch` race with exactly one winner, plus capability non-expiry across delayed dispatch/restore and signing-key verification until terminal batch state. A containment batch is accepted only with the exact guard-issued capability for its ProtectionFence-assigned singleton ordinal/manifest; response loss uses exact issuance and protection lookup, exact duplicates reuse it, concurrent distinct targets remain distinct, and containment ordinals cannot reuse the accepted-set batch. Replay must yield typed `Erased` from both source outbox and target events. Negative fixtures cover cross-tenant alias substitution, changed payload/manifest, partial-provider failure, snapshot/cache replay, backup, restore, and stale or revoked guard capability. Command: `TBD`.",
+      "RequiredEvidenceLevel": "Levels 4 and 5",
+      "AcceptedStatus": "`Uncommitted`",
+      "ConsumingStories": "5.6, 5.8, 6.1\u20136.4, 6.8, 7.1\u20137.4, 7.7, 8.1\u20138.3, 8.8; `RQ-1`"
+    }
+  },
+  "canonicalSourceObservations": [
+    {
+      "repository": "Agents",
+      "path": "/home/administrator/projects/hexalith/agents",
+      "requestedRevision": "HEAD",
+      "canonicalCommit": "dd1639439c6822337a747e254fcd626151b27000",
+      "originMain": "dd1639439c6822337a747e254fcd626151b27000",
+      "reachableFromLocallyRecordedOriginMain": true,
+      "workingTreeDirty": true
+    },
+    {
+      "repository": "Platform",
+      "path": "/home/administrator/projects/hexalith/platform",
+      "requestedRevision": "HEAD",
+      "canonicalCommit": "3beff28eede537eb36e84cdb93900af2556202d7",
+      "originMain": "3beff28eede537eb36e84cdb93900af2556202d7",
+      "reachableFromLocallyRecordedOriginMain": true,
+      "workingTreeDirty": true
+    },
+    {
+      "repository": "Parties",
+      "path": "/home/administrator/projects/hexalith/parties",
+      "requestedRevision": "HEAD",
+      "canonicalCommit": "9a46682ad170ba70e395aa00012f86f09ef6b315",
+      "originMain": "9a46682ad170ba70e395aa00012f86f09ef6b315",
+      "reachableFromLocallyRecordedOriginMain": true,
+      "workingTreeDirty": true
+    },
+    {
+      "repository": "Conversations",
+      "path": "/home/administrator/projects/hexalith/conversations",
+      "requestedRevision": "HEAD",
+      "canonicalCommit": "60f18214d7a4565d28096628af95d867ddd5e874",
+      "originMain": "60f18214d7a4565d28096628af95d867ddd5e874",
+      "reachableFromLocallyRecordedOriginMain": true,
+      "workingTreeDirty": true
+    },
+    {
+      "repository": "EventStore",
+      "path": "/home/administrator/projects/hexalith/eventstore",
+      "requestedRevision": "HEAD",
+      "canonicalCommit": "995117f9b899a2994e99257091b0ea35cfbe5090",
+      "originMain": "995117f9b899a2994e99257091b0ea35cfbe5090",
+      "reachableFromLocallyRecordedOriginMain": true,
+      "workingTreeDirty": true
+    }
+  ],
+  "sourceCandidates": {
+    "sharedPlatform": {
+      "requestedRevision": "3b4151df682448557d58a09027a05c5b41b6ce31",
+      "canonicalCommit": "3b4151df682448557d58a09027a05c5b41b6ce31",
+      "originMain": "3beff28eede537eb36e84cdb93900af2556202d7",
+      "reachableFromLocallyRecordedOriginMain": true
+    },
+    "partiesHandoff": {
+      "requestedRevision": "ee4a4b8736131c0e7ce480b6dc419dcc0c266c3b",
+      "canonicalCommit": "ee4a4b8736131c0e7ce480b6dc419dcc0c266c3b",
+      "originMain": "9a46682ad170ba70e395aa00012f86f09ef6b315",
+      "reachableFromLocallyRecordedOriginMain": true
+    },
+    "conversationsReviewedSource": {
+      "requestedRevision": "60f18214d7a4565d28096628af95d867ddd5e874",
+      "canonicalCommit": "60f18214d7a4565d28096628af95d867ddd5e874",
+      "originMain": "60f18214d7a4565d28096628af95d867ddd5e874",
+      "reachableFromLocallyRecordedOriginMain": true
+    }
+  },
+  "candidateReviews": {
+    "EXT-HOST-1": {
+      "disposition": "INCOMPLETE_NOT_SUBMITTED",
+      "sourceCandidate": "3b4151df682448557d58a09027a05c5b41b6ce31",
+      "exactCandidateCommandDataOnly": "test \"$(git -C ../platform rev-parse HEAD)\" = \"3b4151df682448557d58a09027a05c5b41b6ce31\" && test -z \"$(git -C ../platform status --porcelain)\" && bash ../platform/eng/verify-agents-host.sh --mode Full --artifacts-path /tmp/ext-host-1-full --profile /tmp/ext-story-54-shared-3b4151d/host/agents-deployment-profile.json",
+      "profileSha256": "f93680dfb9ae76f963005f0058622672c567612532591555e501dd3d13db7083",
+      "planSha256": "8d9716c0348f40fc9caab75aa3ebc1d8df9718aa7f6a4234c2a91be0de225679",
+      "missingInstalledReferences": [
+        "currentTenant",
+        "globalAdministrator",
+        "humanIdentity",
+        "approverEvidence",
+        "replay",
+        "recorder",
+        "worker",
+        "spoolBackend",
+        "failureModel",
+        "protectionEngine",
+        "protectionObserver",
+        "partiesBinding",
+        "conversationsBinding",
+        "replicaCount"
+      ],
+      "historicalIntegrationDate": "2026-10-08",
+      "newIntegrationDateProposed": false,
+      "fullComponentPassEstablishesAvailability": false
+    },
+    "EXT-SECRETS-1": {
+      "disposition": "INCOMPLETE_NOT_SUBMITTED",
+      "sourceCandidate": "3b4151df682448557d58a09027a05c5b41b6ce31",
+      "exactCandidateCommandDataOnly": "test \"$(git -C ../platform rev-parse HEAD)\" = \"3b4151df682448557d58a09027a05c5b41b6ce31\" && test -z \"$(git -C ../platform status --porcelain)\" && env EXT_SECRETS_1_RUNTIME_CONFIGURATION=/tmp/ext-story-54-shared-3b4151d/secrets/runtime-reference.json EXT_SECRETS_1_ACCEPTANCE_PACKET=/tmp/ext-story-54-shared-3b4151d/secrets/replacement-acceptance-packet.json pwsh -NoProfile -File ../platform/eng/verify-ext-secrets-1.ps1 -Mode Live -EventStoreSourceRoot ../eventstore -ArtifactsDirectory /tmp/ext-secrets-artifacts -EvidenceDirectory /tmp/ext-secrets-evidence",
+      "runtimeQualificationBinding": {
+        "configurationSha256": "b1a99a90583489424fcc236541d15ccf7bd0abe8ca8c8e33b9dccc966d01b8c8",
+        "enrollmentAnchorSha256": null,
+        "executorAnchorSha256": null,
+        "observerAnchorSha256": null,
+        "planSha256": "16dd493ff0414fea13be95f137d372e54088881550665aa3239a5814a9e862ed"
+      },
+      "nullAnchorMapSha256NotInstalledTrust": "53f138498b53f560ce6957f054d6feb7d27cdee2190c23bbf4331a3fcb89e160",
+      "missingInputIdentifiers": [
+        "CurrentProfileValidity",
+        "DistinctEnrolledTenants",
+        "IndependentCurrentInventoryAuthority",
+        "IndependentDecisionSignerAndActorRoleAuthority",
+        "IndependentInstalledQualificationAuthorities",
+        "IndependentPersistedStateObserver",
+        "IndependentRoleAppChannelAndAuthenticatedCallerScopes",
+        "InstalledOwnerQualificationExecutor",
+        "IsolatedTargetEnrollmentAuthority",
+        "MountedQualificationCallerCredential",
+        "MountedQualificationDaprCredential",
+        "OQ-5.4-1.AcceptedPinnedHostProfile",
+        "OQ-5.4-1.CommittedProtectionOwner",
+        "OQ-5.4-1.JointLivePhaseRunner",
+        "OQ-5.4-1.SharedPlatformTarget",
+        "OwnerAcceptedTargetRuntimeQualificationBindingAndExactCommand",
+        "PrivateAuthenticatedCompromiseSubscriberBinding",
+        "PrivateExactReplayRegistrarBinding",
+        "QualifiedAllCopyLifecycleAdapter",
+        "QualifiedNonrollbackRestoreAdapter",
+        "qualification.daprApiCredentialReference",
+        "qualification.enrollment.appChannelCredentialReference",
+        "qualification.enrollment.appId",
+        "qualification.enrollment.callerAuthenticatorReference",
+        "qualification.enrollment.callerScopeAuthorityReference",
+        "qualification.enrollment.identity",
+        "qualification.enrollment.installedP256PublicAnchor",
+        "qualification.enrollment.publicAnchorFile",
+        "qualification.enrollment.version",
+        "qualification.enrollmentCredentialReference",
+        "qualification.executor.appChannelCredentialReference",
+        "qualification.executor.appId",
+        "qualification.executor.callerAuthenticatorReference",
+        "qualification.executor.callerScopeAuthorityReference",
+        "qualification.executor.identity",
+        "qualification.executor.installedP256PublicAnchor",
+        "qualification.executor.publicAnchorFile",
+        "qualification.executor.version",
+        "qualification.isolatedTargetId",
+        "qualification.observer.appChannelCredentialReference",
+        "qualification.observer.appId",
+        "qualification.observer.callerAuthenticatorReference",
+        "qualification.observer.callerScopeAuthorityReference",
+        "qualification.observer.identity",
+        "qualification.observer.installedP256PublicAnchor",
+        "qualification.observer.publicAnchorFile",
+        "qualification.observer.version",
+        "runtime.acceptedReplacementCommit",
+        "runtime.actorRoleAuthorityReference",
+        "runtime.allCopyInventoryReference",
+        "runtime.allCopyLifecycleAuthorityReference",
+        "runtime.audience",
+        "runtime.authenticatedRequesterTransport",
+        "runtime.callTimeout",
+        "runtime.capabilitySignerCredentialReference",
+        "runtime.capabilitySignerReference",
+        "runtime.compromiseGuardMirrorReference",
+        "runtime.compromisePublisherReference",
+        "runtime.compromiseSubscriberCredentialReference",
+        "runtime.compromiseSubscriptionReference",
+        "runtime.currentInventoryAuthorityReference",
+        "runtime.currentRevocationReference",
+        "runtime.hmacCredentialReference",
+        "runtime.independentSignerAccount",
+        "runtime.independentSignerCredentialReference",
+        "runtime.issuer",
+        "runtime.migrationAuthorityReference",
+        "runtime.nonrollbackJournalReference",
+        "runtime.profileNotBefore",
+        "runtime.profileReference",
+        "runtime.profileValidUntil",
+        "runtime.profileVersion",
+        "runtime.protectionOwnerReference",
+        "runtime.providerBinding",
+        "runtime.publicAnchorRetentionReference",
+        "runtime.publicTrustReference",
+        "runtime.replayExactScope",
+        "runtime.replayRegistrarCredentialReference",
+        "runtime.replayRegistrarReference",
+        "runtime.restoreTarget",
+        "runtime.tenantA",
+        "runtime.tenantB",
+        "runtime.tenantInventoryReference"
+      ],
+      "missingInputCount": 83,
+      "cohortBlockingInputs": [
+        "OQ-5.4-1.CommittedProtectionOwner",
+        "OQ-5.4-1.SharedPlatformTarget",
+        "OQ-5.4-1.AcceptedPinnedHostProfile",
+        "OQ-5.4-1.JointLivePhaseRunner"
+      ],
+      "newIntegrationDateProposed": false
+    },
+    "EXT-CONV-AI-1": {
+      "disposition": "NotSubmitted",
+      "sourceObservation": "60f18214d7a4565d28096628af95d867ddd5e874",
+      "reviewedSnapshotFilesMatchingCommittedSource": 31,
+      "packetCompleteRuntimeTarget": null,
+      "exactReplacementCommand": null,
+      "runtimeQualificationBinding": {
+        "schemaVersion": 1,
+        "cohortId": "OQ-5.4-1",
+        "manifestSha256": null,
+        "files": {
+          "configuration": {
+            "path": null,
+            "sha256": null
+          },
+          "plan": {
+            "path": null,
+            "sha256": null
+          },
+          "hostProfile": {
+            "path": null,
+            "sha256": null
+          },
+          "hostVerifierEvidence": {
+            "path": null,
+            "sha256": null
+          },
+          "sourceAnchor": {
+            "path": null,
+            "sha256": null
+          },
+          "partyAnchor": {
+            "path": null,
+            "sha256": null
+          },
+          "approvalAnchor": {
+            "path": null,
+            "sha256": null
+          },
+          "workerAnchor": {
+            "path": null,
+            "sha256": null
+          },
+          "receiverAnchor": {
+            "path": null,
+            "sha256": null
+          },
+          "lookupAnchor": {
+            "path": null,
+            "sha256": null
+          },
+          "observerAnchor": {
+            "path": null,
+            "sha256": null
+          },
+          "controlAnchor": {
+            "path": null,
+            "sha256": null
+          }
+        }
+      },
+      "installedBindings": {
+        "liveManifest": null,
+        "servicePartyEnrollment": null,
+        "workerMachineBinding": null,
+        "approvalIssuer": null,
+        "commandSourceAuthority": null,
+        "sourcePublicationAuthority": null,
+        "hostDeliveryTransport": null,
+        "conformanceReceiver": null,
+        "independentLookup": null,
+        "retainedOwnerAttemptJournal": null
+      },
+      "blockerCodes": [
+        "APPROVAL_ISSUER_MISSING",
+        "COMMAND_SOURCE_ATTESTATION_UNAVAILABLE",
+        "HOST_DELIVERY_TRANSPORT_MISSING",
+        "HOST_LIVE_PASS_PATH_NOT_QUALIFIED",
+        "LIVE_MANIFEST_MISSING",
+        "OWNER_TARGET_NOT_ACCEPTED",
+        "PARTY_ENROLLMENT_MISSING",
+        "PROTECTION_NOT_COMMITTED",
+        "PUBLICATION_AUTHORITY_UNAVAILABLE",
+        "RECEIVER_NOT_INSTALLED",
+        "WORKER_BINDING_MISSING"
+      ],
+      "packetHistoricalIntegrationDate": "2026-10-08",
+      "newIntegrationDateProposed": false
+    },
+    "EXT-PARTIES-1": {
+      "disposition": "INCOMPLETE_NOT_SUBMITTED",
+      "sourceHandoff": "ee4a4b8736131c0e7ce480b6dc419dcc0c266c3b",
+      "exactCandidateCommandDataOnly": "test \"$(git -C ../parties rev-parse HEAD)\" = \"ee4a4b8736131c0e7ce480b6dc419dcc0c266c3b\" && test -z \"$(git -C ../parties status --porcelain)\" && test \"$(git -C ../eventstore rev-parse HEAD)\" = \"ab8fa115c486875be3a22860a273d5d68a26c749\" && test -z \"$(git -C ../eventstore status --porcelain)\" && test \"$(git -C ../platform rev-parse HEAD)\" = \"2ac8e73c09fe631c5620723b54784d2e28e8941f\" && test -z \"$(git -C ../platform status --porcelain)\" && pwsh -NoProfile -File ../parties/eng/verify-ext-parties-1.ps1 -Mode Live -EventStoreRoot ../eventstore -PlatformRoot ../platform -EvidenceDirectory /tmp/ext-parties-1-live",
+      "liveVerifierUnconditionalExit": 1,
+      "fullPersistedLanesImplemented": false,
+      "newIntegrationDateProposed": false,
+      "symbolicUnregisteredDependency": "PLAT-ACTOR-HISTORY-1"
+    },
+    "EXT-PROTECTION-1": {
+      "disposition": "INCOMPLETE_DO_NOT_ACCEPT_AS_COMMITTED",
+      "sourceObservation": "995117f9b899a2994e99257091b0ea35cfbe5090",
+      "completeDeliveryTarget": null,
+      "proposedIntegrationDate": "2026-11-02",
+      "integrationDateAccepted": false,
+      "exactCandidateCommandDataOnly": "python3 ../eventstore/tools/verify-ext-protection-1.py --mode Live --profile /home/administrator/hexalith-protection-evidence/ext-protection-1/accepted-profile.json --evidence-root /home/administrator/hexalith-protection-evidence/ext-protection-1/attempts",
+      "missingProfile": "/home/administrator/hexalith-protection-evidence/ext-protection-1/accepted-profile.json",
+      "profileExists": false,
+      "planSha256": "c1e7759a2687c122dd182aa48f1828e531166c0157a04b2ae0eba35e9ac4d10c",
+      "remainingGaps": [
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "negativeRestoreEvidence": {
+        "path": "/home/administrator/hexalith-protection-evidence/ext-protection-1/option-a-feasibility-20261018T113800Z-1dbe62f55af0434684a9602a3824bfe9/raft-probe-attempt-6.result.json",
+        "sha256": "6efa381bc70b3de57a24142e5e679f53781c7f89d5ab6740fb7664966f30888e",
+        "result": "ObservedRevival",
+        "g1Qualified": false
+      },
+      "architecture": "Adopted Dapr-only custody-lifecycle-v1 semantic binding; physical component/provider remains unqualified"
+    }
+  },
+  "execution": {
+    "ownerCommandsRun": 0,
+    "ownerCohortAttemptsReserved": 0,
+    "ownerCohortPhasesRun": 0,
+    "consumingAgentsPathsRun": 0,
+    "targetInstallations": 0,
+    "registerMutations": 0,
+    "journalMutations": 0,
+    "story54BuildResumed": false
+  },
+  "oq541": {
+    "unchanged": true,
+    "attemptBound": "One attempt per accepted target set; retain all attempts and recovery journals",
+    "phaseOrder": [
+      "0 protection owner command",
+      "1 secrets without host references",
+      "2 host using phase-1 credentials; every Agents consumer refuses DependencyNotAvailable",
+      "3 mutual secrets S3/S4/v23 and host H3/H4/v21/v23"
+    ],
+    "platformAvailability": "Both records only after entire run passes",
+    "receiver": "Separately installed/authenticated ContractConformance receiver; no Agents package/runtime; Level 4 only"
+  },
+  "sourceFileInventory": [
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/README.md",
+      "sha256": "7f1696e577b0cf370ace4de3f8ea2a571ef6a451102b0d4419761d6c3454a348",
+      "bytes": 3104
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/evidence-inventory.json",
+      "sha256": "044d6bc5d7c2af2486140236d37422d871b8de90691e226bd59b93454011372b",
+      "bytes": 26358
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/final-accepted-command-refusal.json",
+      "sha256": "fd9794d9321e4cdfd2c908fa5451a07352d10c80015210c6f8d19e52fbd12ef7",
+      "bytes": 740
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/final-readiness.json",
+      "sha256": "22ca22085b6bb687940c2bd954f9945b6d53fffaf6fdd4e9facec124591d9ec1",
+      "bytes": 935
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/final-source-observations.json",
+      "sha256": "e537a06edbc40c483f27a7d72f06256da28538e949d74af0f260e2ab2c0e72c1",
+      "bytes": 3830
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/final-verification.json",
+      "sha256": "41e017befe97ea52c9777cefb0300845eb6ca210665773247c083d44977b7386",
+      "bytes": 2480
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/replacement-acceptance-packet.blocked.json",
+      "sha256": "579b59180e13df164757204113bae20f3c15a07d0867432631b5a1cb2ad023df",
+      "bytes": 20693
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/review-summary.json",
+      "sha256": "2b79b032cfb580a247f48c60e525d07f81d5ff4174f5e0bfd971683946dd4f2e",
+      "bytes": 956
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/reviewed-receiver-publish.json",
+      "sha256": "2703df04dc36501aa30c2ce3215d83a9e2ee9766ad96f11f78572c5782e591af",
+      "bytes": 11140
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/reviewed-source-inventory.json",
+      "sha256": "e8a06faad669ff58b01b883d60d87baddec5c2e5f094d3fc11e48789870e12d1",
+      "bytes": 6588
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/reviewed-working-tree.diff",
+      "sha256": "c98da10ba0a9f270838910284cb6e717535ec49774c16aea7c369ca91e49f36a",
+      "bytes": 181643
+    },
+    {
+      "path": "/home/administrator/hexalith-protection-evidence/ext-protection-1/option-a-feasibility-20261018T113800Z-1dbe62f55af0434684a9602a3824bfe9/raft-probe-attempt-6.result.json",
+      "sha256": "6efa381bc70b3de57a24142e5e679f53781c7f89d5ab6740fb7664966f30888e",
+      "bytes": 23244
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/completion-20261019/acceptance/replacement-acceptance-packet.json",
+      "sha256": "d8c09616e2b801e86ca4b38e20d4e6a9ac6227b76c4341337e720f0d49138f6d",
+      "bytes": 2145
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/continuation-20261020/acceptance/replacement-acceptance-packet.json",
+      "sha256": "ff0a0a8a2c450b03e6feeecd83ab3a986b970b86f8d35d256540ff86db412246",
+      "bytes": 2151
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/continuation-20261020/acceptance-preview/replacement-acceptance-packet.json",
+      "sha256": "cc44901bc6fc8f46ad86664ba4b6da75989d25e3796da903f879b913f74b33fe",
+      "bytes": 2171
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/f1-20261020/acceptance/replacement-acceptance-packet.json",
+      "sha256": "de48993ad279088a3cd1e87bf80ac54ae60f596e5c0e2216a2a25b12394f38c3",
+      "bytes": 2124
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-dependency-reconciliation-2026-10-18.md",
+      "sha256": "7ea22dad7792770f8377cef64ab6f3c7b610ad06e776b71dd3b9aa12739ca5ae",
+      "bytes": 15327
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/external-dependency-register.md",
+      "sha256": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2",
+      "bytes": 74710
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/docs/implementation/ext-protection-1-owner-acceptance.md",
+      "sha256": "3ab9651ee326378f2c33df734f748717d11655f7c0bb1ad493a7d5e2ac4b824d",
+      "bytes": 82636
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/_bmad-output/implementation-artifacts/spec-5-4-ext-conv-ai-1-owner-qualification.md",
+      "sha256": "549aba1d58ff4e58d39ece11ca65b4aac6a25d09c93170635cf055f4796e4b4e",
+      "bytes": 14360
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/docs/implementation/ext-conv-ai-1-deletion-conformance-receiver.md",
+      "sha256": "b19f449f7aeb59da5916e83076a77938fe5ea2dabdf02b170d6a87b9cb3fa98e",
+      "bytes": 9295
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/docs/implementation/ext-conv-ai-1-runtime-qualification.md",
+      "sha256": "0087665ac0d04817ebd5005287f41cb760c390505f788fcf5a9ef96aa12f3130",
+      "bytes": 12164
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/_bmad-output/implementation-artifacts/spec-5-4-ext-protection-1-owner-delivery.md",
+      "sha256": "6ca41bc09b8de5d613db59ce5aa35e6630b3bbfe90dbcd2a431c2c03ae1bc259",
+      "bytes": 19076
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/_bmad-output/implementation-artifacts/spec-ext-protection-1-oq-5-4-1.md",
+      "sha256": "150d2f7aac3e2ee12d0e5e4ca22f03d1fe43c156554a07bb20f0ff3897478f11",
+      "bytes": 12025
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/docs/implementation/ext-protection-1-owner-acceptance.md",
+      "sha256": "658a8bf28027ef322fe73c0d21862fba2ae2a4a38e9fc563c006bf5772054421",
+      "bytes": 85279
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/docs/implementation/ext-protection-1-verifier-protocol.md",
+      "sha256": "2614ab0a79d6b7064f68902aa21202a13f8f2dccb136d604b6faaa649a76e559",
+      "bytes": 23922
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/eventstore/tools/ext-protection-1/plan.json",
+      "sha256": "c1e7759a2687c122dd182aa48f1828e531166c0157a04b2ae0eba35e9ac4d10c",
+      "bytes": 11271
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/tests/ext-parties-1-runtime-2026-10-18/README.md",
+      "sha256": "d299af695cdd9600eb680a463645256aa22cd4c4c9225e4cc66d137190a43db2",
+      "bytes": 5085
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-1.ps1",
+      "sha256": "63e8d7974b267f8baa8a8d14ae1e50503836de5aee21a589240dc55e36277bb1",
+      "bytes": 11553
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/actor-history-lifecycle-2026-10-07.md",
+      "sha256": "78cf9ffe55eeea1eef02d861af2f6cac282f3c513207aa9064fe8dd4ad6bdd74",
+      "bytes": 3506
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/README.md",
+      "sha256": "d9130b9171fec5f6ea71f49a6e65b9a8f9507bd01e498d910d9a82d297edd5e1",
+      "bytes": 14192
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/SHA256SUMS",
+      "sha256": "218c5aa1baed00a7e2666f4f27cdde442b77b00c05240d78d7d38ff5580df9cf",
+      "bytes": 937
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/command-bindings.json",
+      "sha256": "657723d4692a99e57ec6cd3c2df9ad5a032c4db4e354716858125550e1312c69",
+      "bytes": 11860
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/decision-packet.json",
+      "sha256": "dfe23b4aa297a8aadc0edecf44f21e62811e98e935715eaf510f445bfe6eab2c",
+      "bytes": 69161
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/github-metadata.json",
+      "sha256": "9ecfa2b854bae2bdd2c71e9568859fdca41e2b13290253f5c613054c74506f7d",
+      "bytes": 80389
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/installation-plan.md",
+      "sha256": "d4b71da0b8c0db0c2d6b1528ba410cd36ea070b125b54d2e40c828ad474697f5",
+      "bytes": 16873
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/local-evidence-audit.json",
+      "sha256": "f26b8d7302552f8ebf6db9b3d0f4ad70e2a0ac99c8fe09b92e18c5d788fea118",
+      "bytes": 25543
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/native-metadata.json",
+      "sha256": "9cc814eb5f5bbbaa4d70162422ba63f2cda26508dd69b876761bf4fbb46e7fbe",
+      "bytes": 102451
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/preservation.json",
+      "sha256": "ca1258e08eccabd22e6a1a00ee3cf158f5c6964fee22737f06d942dc3f59e7c4",
+      "bytes": 19866
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/qualification-plan.md",
+      "sha256": "2ec91e0c2d45f510e27312f985ca71f9967630c50e67b873af34ae286d1dc221",
+      "bytes": 13074
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/sources.json",
+      "sha256": "d7aef552a181df28b29adcf6c311596f99ab35652cbb0b7bda134825b220ba21",
+      "bytes": 16362
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/validation.json",
+      "sha256": "b597ad50f1018cb5f42f6f47253a94b089a40e92e7bcb8a5d857b86b474aa348",
+      "bytes": 15221
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-secrets-1-dek-provider-decision-2026-10-18.md",
+      "sha256": "0536906b5d68f76b2e194fbe646c56e6132dd9a1f6bfd3fbbeb525abb2301b50",
+      "bytes": 18736
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-secrets-1-erasure-authority-2026-10-20/OWNER-APPROVAL.md",
+      "sha256": "e7a5387aff07074090f529c341484c5ffdf6f1989cf001b04d0e1920e484e692",
+      "bytes": 3540
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-secrets-1-erasure-authority-decision-2026-10-20.md",
+      "sha256": "c87423bf1af0757a6fb4be60b634d5a7d527458a8576573b92bfbdf6e51ca044",
+      "bytes": 33090
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-secrets-1-option-a-feasibility-2026-10-18/README.md",
+      "sha256": "f90632721ccd0d1e4e2fd988baa016cb55a1b0fdccc9dd806803aa55f6d22a1c",
+      "bytes": 1627
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-secrets-1-option-a-feasibility-2026-10-18/native-result.json",
+      "sha256": "6efa381bc70b3de57a24142e5e679f53781c7f89d5ab6740fb7664966f30888e",
+      "bytes": 23244
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-story-5-4-shared-prerequisites-2026-10-22.md",
+      "sha256": "a1c98e62743e32786c3209835e495a4d15fbbe538478dbf679eaae3030fe88ee",
+      "bytes": 3302
+    },
+    {
+      "path": "/tmp/ext-story-54-shared-3b4151d/host/agents-deployment-profile.json",
+      "sha256": "f93680dfb9ae76f963005f0058622672c567612532591555e501dd3d13db7083",
+      "bytes": 545
+    },
+    {
+      "path": "/tmp/ext-story-54-shared-3b4151d/host/exact-command.sh",
+      "sha256": "8583ec95f9e07557a986c5c475c106f734ed26998001f19df42b529ab0aa6539",
+      "bytes": 318
+    },
+    {
+      "path": "/tmp/ext-story-54-shared-3b4151d/host/replacement-acceptance-packet.json",
+      "sha256": "ab0dd589f27ac8841ea9b1a441b452909bae15efce9175edfc0bb63a22e10b8a",
+      "bytes": 1638
+    },
+    {
+      "path": "/tmp/ext-story-54-shared-3b4151d/secrets/blocked-inputs.json",
+      "sha256": "3fbf3190f23f9cef9c53a3b9d256c04ff8ff3d05a23f754603a7ca8142567e39",
+      "bytes": 3432
+    },
+    {
+      "path": "/tmp/ext-story-54-shared-3b4151d/secrets/exact-command.sh",
+      "sha256": "b20f28cb08092ec9463652d46f746ed7b131ae8e52990ec8509d1e285fee60a1",
+      "bytes": 560
+    },
+    {
+      "path": "/tmp/ext-story-54-shared-3b4151d/secrets/replacement-acceptance-packet.json",
+      "sha256": "4e6e30f608a86906f15bb4ca46e7a8b4e64cac0518146ecee09616afc3459ed1",
+      "bytes": 1936
+    },
+    {
+      "path": "/tmp/ext-story-54-shared-3b4151d/secrets/runtime-qualification-binding.json",
+      "sha256": "993d095a411989574b98da3dc79f8c9ab32e6b01d3b4216e028827a1d54323b8",
+      "bytes": 256
+    },
+    {
+      "path": "/tmp/ext-story-54-shared-3b4151d/secrets/runtime-reference.json",
+      "sha256": "b1a99a90583489424fcc236541d15ccf7bd0abe8ca8c8e33b9dccc966d01b8c8",
+      "bytes": 2257
+    },
+    {
+      "path": "/tmp/ext-story-54-shared-60472462/host/replacement-acceptance-packet.json",
+      "sha256": "89ab2813fb0eb122f62f03d21fed71b79d66f654a7bf0e40c0c590b876fe7faf",
+      "bytes": 1639
+    },
+    {
+      "path": "/tmp/ext-story-54-shared-60472462/secrets/replacement-acceptance-packet.json",
+      "sha256": "824a9a53ede3bd426cad953be2de3d8f4490f7511515dc2682d40feae2b4266f",
+      "bytes": 1611
+    },
+    {
+      "path": "/tmp/ext-story-54-shared-c0edad76/host/replacement-acceptance-packet.json",
+      "sha256": "f58ce9ea7c89ef9e126af4441511e83388184a523aa93cfae9070af9b693fd72",
+      "bytes": 1639
+    },
+    {
+      "path": "/tmp/ext-story-54-shared-c0edad76/secrets/replacement-acceptance-packet.json",
+      "sha256": "e79d67b309c340df5440ac2d8ff1b7f0acb31c5e43607239d3b2a145ee1fdd43",
+      "bytes": 1938
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/story-5-4-reconciliation-2026-10-22/identity-owner-packets.md",
+      "sha256": "82e2fdda2ad0a232aa6ca93db24ceb54144c62418811fa91615e8581efbb9561",
+      "bytes": 15675,
+      "kind": "investigationReport"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/story-5-4-reconciliation-2026-10-22/platform-owner-packets.md",
+      "sha256": "14073f96563d0071f64372462dc3e7b6f2b67d9d3e6c422bd3dcb9ac0759d0e1",
+      "bytes": 20446,
+      "kind": "investigationReport"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/story-5-4-reconciliation-2026-10-22/protection-owner-packets.md",
+      "sha256": "28806c20d0a6c95832e6aa24d4ae4d6e6b8e990f361453af05b0a030f23cdaac",
+      "bytes": 15169,
+      "kind": "investigationReport"
+    }
+  ]
+}

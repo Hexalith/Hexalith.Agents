@@ -1,0 +1,406 @@
+{
+  "schemaVersion": 1,
+  "scope": "STATIC_RECONCILIATION_ONLY",
+  "checkedAtUtc": "2026-10-22T15:29:16.099481+00:00",
+  "result": "PASS",
+  "ownerQualificationResult": "NOT_RUN_BLOCKED",
+  "checks": [
+    {
+      "check": "unchanged-authority",
+      "path": "_bmad-output/planning-artifacts/external-dependency-register.md",
+      "passed": true,
+      "sha256": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2"
+    },
+    {
+      "check": "unchanged-authority",
+      "path": "_bmad-output/implementation-artifacts/story-5-4-dependency-reconciliation-2026-10-18.md",
+      "passed": true,
+      "sha256": "7ea22dad7792770f8377cef64ab6f3c7b610ad06e776b71dd3b9aa12739ca5ae"
+    },
+    {
+      "check": "historical-committed-owner-evidence-unchanged",
+      "passed": true,
+      "filesChecked": 32
+    },
+    {
+      "check": "shared-platform-target",
+      "passed": true
+    },
+    {
+      "check": "host-raw-profile-hash-matches-owner-binding",
+      "passed": true
+    },
+    {
+      "check": "secrets-raw-config-hash-matches-owner-binding",
+      "passed": true
+    },
+    {
+      "check": "secrets-independent-anchors-are-absent",
+      "passed": true
+    },
+    {
+      "check": "exact-blocker-counts",
+      "passed": true
+    },
+    {
+      "check": "conversations-explicitly-incomplete",
+      "passed": true
+    },
+    {
+      "check": "protection-profile-missing",
+      "passed": true
+    },
+    {
+      "check": "negative-native-evidence-hash",
+      "passed": true
+    },
+    {
+      "check": "candidate-ancestry",
+      "passed": true
+    },
+    {
+      "check": "no-availability-claim",
+      "passed": true
+    },
+    {
+      "check": "local-ignored-historical-logs-unchanged-since-initial-inventory",
+      "passed": true,
+      "filesChecked": 12
+    },
+    {
+      "check": "indexed-evidence-no-drift",
+      "passed": true,
+      "filesChecked": 63,
+      "drift": []
+    },
+    {
+      "check": "full-nine-field-accepted-record-snapshots-retained",
+      "passed": true
+    }
+  ],
+  "historicalOwnerEvidence": [
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-CONV-AI-1/result.json",
+      "sha256": "d4513098c016feb0b8b6f7356a8dc8b30de3fa48df108f45ec611c23406da934",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-CONV-AI-1/stderr.log",
+      "sha256": "c3740b170a21560bdba813d94b4781ae1ff4809dcbeafd570fbf296bd0dc271b",
+      "trackedInAgentsHead": false,
+      "unchangedSinceInitialStaticInventory": true,
+      "baseline": "Local ignored log; hash observed, no committed comparison available"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-CONV-AI-1/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "trackedInAgentsHead": false,
+      "unchangedSinceInitialStaticInventory": true,
+      "baseline": "Local ignored log; hash observed, no committed comparison available"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-CONV-AI-1/tmp-output/live-20261018T0751147138716Z/live-evidence.json",
+      "sha256": "b2841336c0ec6eb1c75f28b218205b296b848cc820d1f09db10cdb416a7c8b77",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-HOST-1/result.json",
+      "sha256": "f8e1152e624c72a23ee511448d7d85fcca676086d305773ca9a43560c4db7f76",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-HOST-1/stderr.log",
+      "sha256": "2f3f42ffd93cd7e6927bd86aa5ee4698fa1bac3d177b4a82bcdbb349e0b91d41",
+      "trackedInAgentsHead": false,
+      "unchangedSinceInitialStaticInventory": true,
+      "baseline": "Local ignored log; hash observed, no committed comparison available"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-HOST-1/stdout.log",
+      "sha256": "50818282c9dbedaa22ef94c2b71de68c7e4ff83fdecfcd984f774605b76acfc7",
+      "trackedInAgentsHead": false,
+      "unchangedSinceInitialStaticInventory": true,
+      "baseline": "Local ignored log; hash observed, no committed comparison available"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-HOST-1/tmp-output/ext-host-1-full/custody/custody.log",
+      "sha256": "1e02ac7ba1354252d97481393f62be9b32fe0697632065fda08cd4fb38126daa",
+      "trackedInAgentsHead": false,
+      "unchangedSinceInitialStaticInventory": true,
+      "baseline": "Local ignored log; hash observed, no committed comparison available"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-HOST-1/tmp-output/ext-host-1-full/evidence/acl.json",
+      "sha256": "b27ea90866de3a3f6e4540de9adb2fba5ec8e951e409e706d69a44c4c821221e",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-HOST-1/tmp-output/ext-host-1-full/evidence/blocked.json",
+      "sha256": "b6c1cee1bbd7540eefb2868fff4c982e769b864a44da8261106328f724f77c41",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-HOST-1/tmp-output/ext-host-1-full/evidence/isolation.json",
+      "sha256": "22726e666856eedaa2a6664b62a05adf175b606fb4dc14b175ef5bbf13499487",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-HOST-1/tmp-output/ext-host-1-full/evidence/outage.json",
+      "sha256": "8f42024341abbcd732ea0355c7ab8b15114cae3c61e1a7cd1385e5241060c1d0",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-HOST-1/tmp-output/ext-host-1-full/evidence/restart.json",
+      "sha256": "325f466133d490ac2bba549bff3db84be38de64a0b5a3581c1fdf74e39555814",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-HOST-1/tmp-output/ext-host-1-full/evidence/restore.json",
+      "sha256": "ff63645ab3e2f118766c2e47adbf0ec34246e7a10d848126e058160847177cd9",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-HOST-1/tmp-output/ext-host-1-full/guard/guard.log",
+      "sha256": "22d83ec2dce913782d7cfb39fb7cfe35d73c80f42d6c70915a2d7a05a078776e",
+      "trackedInAgentsHead": false,
+      "unchangedSinceInitialStaticInventory": true,
+      "baseline": "Local ignored log; hash observed, no committed comparison available"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-PARTIES-1/result.json",
+      "sha256": "0f71f048b492a2c24a5f5cd77c01d0779df411a00df73b73fc3715bcee4047ea",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-PARTIES-1/stderr.log",
+      "sha256": "a2d1f103bee5f08a738259f7ef5ef9d6387d478306d9bc913d4bbb2abc987911",
+      "trackedInAgentsHead": false,
+      "unchangedSinceInitialStaticInventory": true,
+      "baseline": "Local ignored log; hash observed, no committed comparison available"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-PARTIES-1/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "trackedInAgentsHead": false,
+      "unchangedSinceInitialStaticInventory": true,
+      "baseline": "Local ignored log; hash observed, no committed comparison available"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-PARTIES-1/tmp-output/live-gate.txt",
+      "sha256": "b60753bd1e52b607eb2f91bdc4cb3bbd67b760c8a87814215fb91ceb2cd9bdfd",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-SECRETS-1/detached-packet/blocked-inputs.json",
+      "sha256": "be3f72c000fa38a74f13e7c6abb2b71d1ba4d07957ccba62ff0e6a718adc1c24",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-SECRETS-1/detached-packet/exact-command.sh",
+      "sha256": "a70b8dfcbd8362e7fb0d45a2a6d47000d76f8d0f5fda5d3b3c2439e989e54866",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-SECRETS-1/detached-packet/prepare-report.json",
+      "sha256": "6d007a81f053e3cb0d1f2fdc1dda808d90aa8dcaa4924ee60e66973172f9d2c8",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-SECRETS-1/detached-packet/replacement-acceptance-packet.json",
+      "sha256": "20f55297ec867be44fa624e6be5fb55acb3d9bd8828ddf6889db8b95f3d2290f",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-SECRETS-1/detached-packet/runtime-qualification-binding.json",
+      "sha256": "41509f24ffe0545c54399dfa5332e9fc5499a09c9d4be6516cf3ae8efef9eb0b",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-SECRETS-1/detached-packet/runtime-reference.json",
+      "sha256": "ca019f1325d973919a46b046fcb21be39a4b318800cd59e9378904c365228344",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-SECRETS-1/result.json",
+      "sha256": "2d06de5781c4fbc5b01f4c1eb2c1839c401b87cd37f049413d19b364d6766568",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-SECRETS-1/stderr.log",
+      "sha256": "d2d60415954f8a5a5dcaa0e70b6c0ecd7ab2a2a287abfa976f68786fee21af09",
+      "trackedInAgentsHead": false,
+      "unchangedSinceInitialStaticInventory": true,
+      "baseline": "Local ignored log; hash observed, no committed comparison available"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-SECRETS-1/stdout.log",
+      "sha256": "15c64873d6d972e4ee82e3b54a9c961e0a00bff1918fa20bd12470517843e243",
+      "trackedInAgentsHead": false,
+      "unchangedSinceInitialStaticInventory": true,
+      "baseline": "Local ignored log; hash observed, no committed comparison available"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-SECRETS-1/tmp-output/ext-secrets-1-live-20261018-abbec40-evidence/attempt-a325083b-e455-426a-b119-d096625c0575/live-evidence.json",
+      "sha256": "8bcb5bec059fd2965532aa867cf11fe0c4270d3983b39955c80834395e4226d9",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/EXT-SECRETS-1/tmp-output/ext-secrets-1-live-20261018-abbec40-evidence/attempt-a325083b-e455-426a-b119-d096625c0575/live-plan.json",
+      "sha256": "7888fbaa1c1c7f6880997b27b860f28fa61c8a11064dc2c562517e03e7288aaf",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/README.md",
+      "sha256": "66ee48fec6845282857e7a1645c8bbe073740aaab834cf7a8466c6c645d3a89b",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/layout-heads.txt",
+      "sha256": "d83b28abf6292a3beae5711f03b23f595f387a36d1ff1863abfac75f2e99751f",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/preexisting-tmp/ext-conv-ai-1-live/live-20261018T0637507308963Z/live-evidence.json",
+      "sha256": "fe94b77ac0dc15ba7f5cbb670b62257c2072b19fa178d023dfd569625508eb1a",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/preexisting-tmp/ext-conv-ai-1-live/live-20261018T0640009302505Z/live-evidence.json",
+      "sha256": "8b68aa6886e73a8edc3a5ada396ce52f50d5fd7623bc189600e7eab66ac33b32",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/preexisting-tmp/ext-host-1-full/custody/custody.log",
+      "sha256": "a29fec07d34a0c6ffb18817bca914939c0595757351815fe1a6d3f3824055481",
+      "trackedInAgentsHead": false,
+      "unchangedSinceInitialStaticInventory": true,
+      "baseline": "Local ignored log; hash observed, no committed comparison available"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/preexisting-tmp/ext-host-1-full/evidence/acl.json",
+      "sha256": "a21f48add8b823bc368b4b438de6128838e8ffa1446c9e308730c304d6c1a82a",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/preexisting-tmp/ext-host-1-full/evidence/blocked.json",
+      "sha256": "b6c1cee1bbd7540eefb2868fff4c982e769b864a44da8261106328f724f77c41",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/preexisting-tmp/ext-host-1-full/evidence/isolation.json",
+      "sha256": "981e7736ff732d3fb928dd2a8a19b9c1d418fc8b463bd636a9a16aa696bcb3bb",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/preexisting-tmp/ext-host-1-full/evidence/outage.json",
+      "sha256": "4d1a0a81f76437d34fbce5e83ee6e76d136ad37bbdc7e7ceb54b12dc56bbbcf1",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/preexisting-tmp/ext-host-1-full/evidence/restart.json",
+      "sha256": "abee3af706b63ef0ea850a39ca86a1dbeac6a367fc1e10d8c786332fd5db4974",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/preexisting-tmp/ext-host-1-full/evidence/restore.json",
+      "sha256": "c82c52315f662ed18a839026dbdff3fe98991fa9ad6eb236fbe5fc150add7815",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/preexisting-tmp/ext-host-1-full/guard/guard.log",
+      "sha256": "30193caab2bb8dbb0c362be0a435cf259961980f935aa147b2473a810a983d19",
+      "trackedInAgentsHead": false,
+      "unchangedSinceInitialStaticInventory": true,
+      "baseline": "Local ignored log; hash observed, no committed comparison available"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/preexisting-tmp/ext-parties-1-live/live-gate.txt",
+      "sha256": "b60753bd1e52b607eb2f91bdc4cb3bbd67b760c8a87814215fb91ceb2cd9bdfd",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/preexisting-tmp-sha256.txt",
+      "sha256": "b0898c0611b9eeba9a202b1f9f82d23bdd5e0288207082137e9d9d466f8cecb1",
+      "unchangedFromAgentsHead": true,
+      "trackedInAgentsHead": true,
+      "unchangedSinceInitialStaticInventory": true
+    }
+  ],
+  "reconciliationSha256": "bdbb598cc062a90e85cf890ef8d6cca7f703b59a8e3a8abdc54017ef012b878a",
+  "execution": {
+    "ownerCommandsRun": 0,
+    "ownerCohortAttemptsReserved": 0,
+    "ownerCohortPhasesRun": 0,
+    "consumingAgentsPathsRun": 0,
+    "targetInstallations": 0,
+    "registerMutations": 0,
+    "journalMutations": 0,
+    "story54BuildResumed": false
+  },
+  "initialVerificationReceipt": "verification-initial.json",
+  "initialVerificationCorrection": "The first static check compared 12 local ignored .log files to nonexistent Git blobs. All 32 committed evidence files matched HEAD. The final receipt distinguishes committed-byte comparison from local log hash observations and retains the original failed receipt. No qualification ran.",
+  "historicalCommittedFileCount": 32,
+  "historicalLocalIgnoredLogCount": 12
+}
