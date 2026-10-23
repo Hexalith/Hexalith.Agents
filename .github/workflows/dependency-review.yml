@@ -16,4 +16,4 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    uses: Hexalith/Hexalith.Builds/.github/workflows/dependency-review.yml@main
+    uses: Hexalith/Hexalith.Builds/.github/workflows/dependency-review.yml@359fee24aeca4d9eabed4b425d4cfa2520b2adda

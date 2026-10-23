@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -147,6 +148,102 @@ class ReleaseSourceProofTests(unittest.TestCase):
                 with self.subTest(fixture=filename, fault=fault):
                     result = self.run_cli(main_ref(), runs(run()), fixture_overrides={filename: contents})
                     self.assert_cli_failure(result, f"could not read {label} JSON")
+
+    def run_live_cli(
+        self, replies: list[tuple[int, str, str]], *, install_gh: bool = True
+    ) -> tuple[subprocess.CompletedProcess[str], list[list[str]]]:
+        """Exercise real gh subprocess invocation using a controlled executable on PATH."""
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)
+            (path / "replies.json").write_text(json.dumps(replies), encoding="utf-8")
+            if install_gh:
+                gh = path / "gh"
+                gh.write_text(
+                    f"#!{sys.executable}\n"
+                    "import json, sys\n"
+                    "from pathlib import Path\n"
+                    "root = Path(__file__).parent\n"
+                    "log = root / 'calls.jsonl'\n"
+                    "index = len(log.read_text().splitlines()) if log.exists() else 0\n"
+                    "with log.open('a') as stream:\n"
+                    "    stream.write(json.dumps(sys.argv[1:]) + '\\n')\n"
+                    "code, output, diagnostic = json.loads((root / 'replies.json').read_text())[index]\n"
+                    "sys.stdout.write(output)\n"
+                    "sys.stderr.write(diagnostic)\n"
+                    "sys.exit(code)\n",
+                    encoding="utf-8",
+                )
+                gh.chmod(0o755)
+            environment = os.environ.copy()
+            # An absolute shebang lets this PATH exclude the installed gh entirely.
+            environment["PATH"] = directory
+            result = subprocess.run(
+                [
+                    sys.executable, str(SCRIPT),
+                    "--repository", "Hexalith/Hexalith.Agents",
+                    "--workflow", "ci.yml",
+                    "--dispatch-ref", "refs/heads/main",
+                    "--dispatch-sha", SHA,
+                ],
+                env=environment,
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            calls = path / "calls.jsonl"
+            return result, [json.loads(line) for line in calls.read_text().splitlines()] if calls.exists() else []
+
+    def test_live_cli_uses_exact_main_and_filtered_ci_endpoints(self) -> None:
+        result, calls = self.run_live_cli([
+            (0, json.dumps(main_ref()), ""), (0, json.dumps(runs(run())), ""),
+        ])
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(result.stdout, f"Verified exact successful main push CI for {SHA}.\n")
+        self.assertEqual(result.stderr, "")
+        self.assertEqual(calls, [
+            ["api", "repos/Hexalith/Hexalith.Agents/git/ref/heads/main"],
+            ["api", "repos/Hexalith/Hexalith.Agents/actions/workflows/ci.yml/runs"
+             f"?branch=main&event=push&status=completed&head_sha={SHA}&per_page=100"],
+        ])
+
+    def test_live_cli_rejects_stale_and_failed_ci_responses(self) -> None:
+        for main_response, ci_response, diagnostic in (
+            (main_ref(OTHER_SHA), runs(run()), "stale"),
+            (main_ref(), runs(run("failure")), "no successful push CI run"),
+        ):
+            with self.subTest(diagnostic=diagnostic):
+                result, calls = self.run_live_cli([
+                    (0, json.dumps(main_response), ""), (0, json.dumps(ci_response), ""),
+                ])
+                self.assert_cli_failure(result, diagnostic)
+                self.assertEqual(len(calls), 2)
+
+    def test_live_cli_reports_gh_failures_at_either_endpoint(self) -> None:
+        for failure_index in (0, 1):
+            for stderr in ("permission denied\n", ""):
+                with self.subTest(endpoint=failure_index, stderr=stderr):
+                    replies = [(0, json.dumps(main_ref()), "")] * failure_index
+                    replies.append((23, "", stderr))
+                    result, calls = self.run_live_cli(replies)
+                    diagnostic = "permission denied" if stderr else "exit code 23"
+                    self.assert_cli_failure(result, f"GitHub API source proof failed: {diagnostic}")
+                    self.assertEqual(len(calls), failure_index + 1)
+
+    def test_live_cli_reports_malformed_gh_json_at_either_endpoint(self) -> None:
+        for failure_index in (0, 1):
+            with self.subTest(endpoint=failure_index):
+                replies = [(0, json.dumps(main_ref()), "")] * failure_index
+                replies.append((0, "not-json", ""))
+                result, calls = self.run_live_cli(replies)
+                self.assert_cli_failure(result, "GitHub API source proof returned malformed JSON")
+                self.assertEqual(len(calls), failure_index + 1)
+
+    def test_live_cli_reports_missing_gh(self) -> None:
+        result, calls = self.run_live_cli([], install_gh=False)
+
+        self.assert_cli_failure(result, "the gh CLI is required for live source proof")
+        self.assertEqual(calls, [])
 
 
 if __name__ == "__main__":

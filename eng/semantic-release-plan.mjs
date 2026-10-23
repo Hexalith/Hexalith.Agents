@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Compute the semantic-release decision without invoking verify, prepare, or publish plugins.
 import { execFile } from 'node:child_process';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
@@ -15,6 +15,20 @@ delete plannerEnvironment.GITHUB_TOKEN;
 
 let temporaryDirectory;
 try {
+  const configuration = JSON.parse(await readFile(join(process.cwd(), '.releaserc.json'), 'utf8'));
+  // Keep analysis options in sync with publication while excluding plugins with write hooks.
+  const analysisPlugins = [
+    '@semantic-release/commit-analyzer',
+    '@semantic-release/release-notes-generator',
+  ];
+  const plugins = configuration.plugins.filter((plugin) =>
+    analysisPlugins.includes(Array.isArray(plugin) ? plugin[0] : plugin));
+  for (const name of analysisPlugins) {
+    if (!plugins.some((plugin) => (Array.isArray(plugin) ? plugin[0] : plugin) === name)) {
+      throw new Error(`Release configuration must declare ${name} for planning.`);
+    }
+  }
+
   temporaryDirectory = await mkdtemp(join(tmpdir(), 'agents-semantic-release-plan-'));
   const mirrorPath = join(temporaryDirectory, 'repository.git');
   const { stdout: isShallow } = await run('git', ['rev-parse', '--is-shallow-repository'], {
@@ -28,27 +42,43 @@ try {
     cwd: process.cwd(),
     env: plannerEnvironment,
   });
+  const { stdout: branch } = await run('git', ['branch', '--show-current'], {
+    cwd: process.cwd(),
+    env: plannerEnvironment,
+  });
+  const dispatchBranch = plannerEnvironment.GITHUB_REF?.startsWith('refs/heads/')
+    ? plannerEnvironment.GITHUB_REF.slice('refs/heads/'.length)
+    : 'main';
+  const sourceBranch = branch.trim() || dispatchBranch;
   await run('git', ['clone', '--mirror', '--no-local', '--quiet', process.cwd(), mirrorPath], {
     env: plannerEnvironment,
   });
-  await run('git', ['--git-dir', mirrorPath, 'update-ref', 'refs/heads/main', head.trim()], {
+  await run('git', ['--git-dir', mirrorPath, 'update-ref', `refs/heads/${sourceBranch}`, head.trim()], {
     env: plannerEnvironment,
   });
-  await run('git', ['--git-dir', mirrorPath, 'symbolic-ref', 'HEAD', 'refs/heads/main'], {
+  await run('git', ['--git-dir', mirrorPath, 'symbolic-ref', 'HEAD', `refs/heads/${sourceBranch}`], {
     env: plannerEnvironment,
   });
 
   const result = await semanticRelease(
     {
-      branches: ['main'],
-      tagFormat: 'v${version}',
+      branches: configuration.branches,
+      tagFormat: configuration.tagFormat,
       repositoryUrl: pathToFileURL(mirrorPath).href,
       dryRun: true,
       ci: false,
-      plugins: [
-        '@semantic-release/commit-analyzer',
-        '@semantic-release/release-notes-generator',
-      ],
+      plugins,
+      // semantic-release also reloads top-level hooks and shareable configs.
+      extends: [],
+      analyzeCommits: undefined,
+      generateNotes: undefined,
+      verifyConditions: [],
+      verifyRelease: [],
+      prepare: [],
+      publish: [],
+      addChannel: [],
+      success: [],
+      fail: [],
     },
     {
       cwd: process.cwd(),

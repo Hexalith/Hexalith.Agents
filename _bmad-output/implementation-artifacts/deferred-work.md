@@ -321,6 +321,8 @@ status: open
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Pin inherited reusable security workflows to reviewed immutable revisions.
   evidence: CodeQL, commitlint, and dependency-review workflows consume mutable `@main` refs, so upstream branch movement can change repository gates without a local review.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-ci-release-followups.md` pins all three callers to the already reviewed CI/release and Builds gitlink revision `359fee24aeca4d9eabed4b425d4cfa2520b2adda`; workflow lint and source inspection verify the callers. The 2026-09-22 pinning row below records the same item.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Make multi-package NuGet publication recoverable after a partial push.
@@ -329,6 +331,8 @@ status: open
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Restrict CodeQL concurrency cancellation so merged and scheduled revisions retain completed scans.
   evidence: The inherited CodeQL workflow cancels any run sharing the branch ref, including main pushes and scheduled scans, so a later run can erase the only completed evidence for an earlier merged SHA.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-ci-release-followups.md` limits cancellation and shared-ref grouping to pull requests; main and scheduled runs use their unique run ID so neither active nor pending scans displace another revision.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reject GitHub releases marked prerelease when verifying a stable semantic-version tag.
@@ -399,6 +403,8 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Align the completed Agents CI/CD specification with the immutable shared-workflow revision now used by ordinary CI.
   evidence: The completed CI/CD artifact still says ordinary CI tracks `domain-ci.yml@main`, while `.github/workflows/ci.yml` now pins the reusable workflow to a reviewed full commit SHA.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-ci-release-followups.md` adds an explicit current-state supersession of the historical frozen ordinary-CI instruction and corrects the CI/release implementation notes to the full revision actually used by the workflows.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Exercise the GitHub Release and NuGet publication verifier CLI entry points through fixture-backed subprocess tests.
@@ -431,6 +437,8 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Pin the CodeQL, commitlint, and dependency-review callers to an exact reviewed revision.
   evidence: The three security workflows consume `Hexalith.Builds` reusable workflows from mutable `@main` refs while the same change pins the CI and release callers to an exact revision, and the CodeQL caller grants security-events write to an unpinned workflow, so upstream movement can alter this repository's gates with no local review. Carried from earlier review rounds.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-ci-release-followups.md` resolves this carried duplicate with the same three immutable security-workflow pins as the earlier row; it is one deferred work item.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Decide whether high and critical NuGet audit diagnostics should fail the build.
@@ -439,6 +447,8 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Make the release planner read `.releaserc.json` instead of restating branches and tag format.
   evidence: The planner hardcodes its own branch list and tag format; a probe run in a scratch repository carrying a different tag format confirmed the rc file is fully overridden, so editing either file alone makes the planner reserve a version the real run never produces and the release aborts at the reserved-version check after packing. The actionable residue is a tooling test asserting the two sources agree. Carried from an earlier review round.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-ci-release-followups.md` derives branches, tag format, and analysis-plugin options from `.releaserc.json`, excludes publication plugins, and exercises custom branches, tags and analyzer rules through the real isolated planner.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Document the Conventional Commits, semantic-release, Node tooling, and test-runner changes for contributors.
@@ -648,3 +658,5 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-release-verification-items.md`
   summary: Add subprocess coverage for the existing live gh API branch of release-source verification.
   evidence: The source CLI regression tests use the existing JSON fixture flags and exercise the production proof call; both release callers use the unchanged live gh branch. A controlled gh executable on PATH could additionally prove endpoint construction, subprocess-failure diagnostics and malformed API-response handling without real GitHub requests. This pre-existing transport coverage gap is separate from the five selected deferrals; no incorrect live behavior was demonstrated.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-ci-release-followups.md` exercises the production live branch with a controlled gh executable on PATH, asserting exact API arguments, successful proof, stale/failed CI, failures and malformed JSON at either endpoint, and a missing CLI without making GitHub requests.

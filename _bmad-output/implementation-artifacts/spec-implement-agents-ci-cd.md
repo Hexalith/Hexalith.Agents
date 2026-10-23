@@ -11,6 +11,13 @@ context:
   - 'references/Hexalith.Builds/.github/workflows/ci-cd-standards.md'
 ---
 
+Current implementation (2026-10-23): ordinary CI, release, CodeQL, commitlint,
+and dependency-review all use the reviewed Hexalith.Builds revision
+`359fee24aeca4d9eabed4b425d4cfa2520b2adda`. The ordinary-CI `@main` instruction
+in the historical frozen intent below has been superseded by the repository's
+immutable CI pin. Release passes that same revision as `builds-execution-sha`.
+The original approved intent remains recorded verbatim for traceability.
+
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
 
 ## Intent
@@ -64,7 +71,7 @@ context:
 
 ## Implementation Notes
 
-- Publication is pinned to the root-reviewed Hexalith.Builds gitlink commit `cb91511794c8898b738d85dc6c751f82b832cbc9`; ordinary CI uses `domain-ci.yml@main`.
+- Publication and ordinary CI are pinned to the root-reviewed Hexalith.Builds gitlink commit `359fee24aeca4d9eabed4b425d4cfa2520b2adda`; ordinary CI uses `domain-ci.yml@359fee24aeca4d9eabed4b425d4cfa2520b2adda`.
 - The NuGet verifier follows compressed registration leaves to their NuGet catalog entry and treats only an exact HTTP 404 as proof of absence.
 - No workflow was dispatched and no package, tag, release, environment, secret, or repository variable was changed.
 
@@ -72,6 +79,7 @@ context:
 
 - 2026-09-18: Implemented the CI, security, release, package-publication, audit, and regression-test surface.
 - 2026-09-18: Applied review fixes for frozen/no-op gating, write-boundary source proof, release metadata verification, transient registry handling, timeout bounds, CodeQL coverage, and Dependabot commit compatibility.
+- 2026-10-23: Reconciled current CI/release implementation notes and security callers with the root-reviewed immutable Builds revision; preserved the historical frozen intent and explicitly documented its superseded ordinary-CI instruction.
 
 ## Review Triage Log
 
