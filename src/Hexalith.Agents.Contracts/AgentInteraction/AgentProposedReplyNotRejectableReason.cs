@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -17,7 +19,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// orchestrator's fail-closed denial when rejection-time authorization does not resolve to an authorized Approver (FR-7;
 /// AD-12). Mirrors <see cref="AgentProposedReplyNotEditableReason"/>.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentProposedReplyNotRejectableReason>))]
 public enum AgentProposedReplyNotRejectableReason
 {
     /// <summary>Not-a-reason sentinel — an absent/unrecognized classification never resolves to a concrete one.</summary>

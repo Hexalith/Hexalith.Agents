@@ -1,9 +1,11 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>Content-free failure classification; output safety status comes only from the pinned Product authority.</summary>
-[JsonConverter(typeof(JsonStringEnumConverter<AutomaticInteractionFailureKind>))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AutomaticInteractionFailureKind>))]
 public enum AutomaticInteractionFailureKind
 {
     /// <summary>Unknown failure classification.</summary>

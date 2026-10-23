@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -16,7 +18,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// fail-closed no-dispatch denial when edit-time authorization does not resolve to an authorized Approver (FR-15; AD-12).
 /// Mirrors <see cref="AgentProposedReplyNotCreatableReason"/>.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentProposedReplyNotEditableReason>))]
 public enum AgentProposedReplyNotEditableReason
 {
     /// <summary>Not-a-reason sentinel — an absent/unrecognized classification never resolves to a concrete one.</summary>

@@ -1,0 +1,617 @@
+{
+  "Hexalith.Agents.Contracts.Agent.AgentActivationBlocker": {
+    "Unknown": 0,
+    "MissingDisplayName": 1,
+    "MissingInstructions": 2,
+    "InvalidInstructions": 3,
+    "MissingPartyIdentity": 4,
+    "MissingProviderSelection": 5,
+    "ProviderUnavailable": 6,
+    "MissingResponseMode": 7,
+    "MissingApproverPolicy": 8,
+    "ApproverPolicyUnresolvable": 9,
+    "MissingContentSafetyPolicy": 10
+  },
+  "Hexalith.Agents.Contracts.Agent.AgentLaunchReadinessBlocker": {
+    "Unknown": 0,
+    "MissingContentSafetyPolicy": 1,
+    "MissingContextPolicy": 2,
+    "MissingLaunchMetrics": 3,
+    "IncompleteLaunchMetricDefinition": 4,
+    "MissingAutomaticLatencyTarget": 5,
+    "MissingConfirmationLatencyTarget": 6,
+    "MissingCostControlPosture": 7,
+    "UnresolvedAuditGovernance": 8
+  },
+  "Hexalith.Agents.Contracts.Agent.AgentLifecycleStatus": {
+    "Unknown": 0,
+    "Draft": 1,
+    "Active": 2,
+    "Disabled": 3
+  },
+  "Hexalith.Agents.Contracts.Agent.AgentResponseMode": {
+    "Unknown": 0,
+    "Automatic": 1,
+    "Confirmation": 2
+  },
+  "Hexalith.Agents.Contracts.Agent.AgentSetupFreshness": {
+    "Unknown": 0,
+    "Current": 1,
+    "Stale": 2
+  },
+  "Hexalith.Agents.Contracts.Agent.AgentSetupTruthState": {
+    "Unknown": 0,
+    "Submitted": 1,
+    "AuthoritativePending": 2,
+    "ProjectionConfirmed": 3
+  },
+  "Hexalith.Agents.Contracts.Agent.AgentSetupWriteEffect": {
+    "Unknown": 0,
+    "Applied": 1,
+    "AlreadyApplied": 2
+  },
+  "Hexalith.Agents.Contracts.Agent.ApproverPolicyBasisDisclosure": {
+    "Unknown": 0,
+    "UserVisible": 1,
+    "OperatorOnly": 2,
+    "Redacted": 3,
+    "Omitted": 4
+  },
+  "Hexalith.Agents.Contracts.Agent.ApproverPolicySourceKind": {
+    "Unknown": 0,
+    "Caller": 1,
+    "PredefinedParty": 2,
+    "TenantRole": 3,
+    "ConversationOwner": 4
+  },
+  "Hexalith.Agents.Contracts.Agent.ApproverPolicyValidationStatus": {
+    "Unknown": 0,
+    "Valid": 1,
+    "Incomplete": 2,
+    "Missing": 3,
+    "Disabled": 4,
+    "Ambiguous": 5,
+    "Unavailable": 6,
+    "Unauthorized": 7
+  },
+  "Hexalith.Agents.Contracts.Agent.ContentSafetyAuditTreatment": {
+    "Unknown": 0,
+    "MetadataOnly": 1,
+    "RedactedExcerpt": 2
+  },
+  "Hexalith.Agents.Contracts.Agent.ContentSafetyFailureHandling": {
+    "Unknown": 0,
+    "BlockAndAudit": 1,
+    "BlockWithAuditableOverride": 2
+  },
+  "Hexalith.Agents.Contracts.Agent.CostControlPosture": {
+    "Unknown": 0,
+    "Quotas": 1,
+    "Budgets": 2,
+    "ProviderModelLimits": 3,
+    "ReportingOnlyMonitoring": 4,
+    "AcceptedLaunchRisk": 5
+  },
+  "Hexalith.Agents.Contracts.Agent.LaunchMetricClassification": {
+    "Unknown": 0,
+    "Primary": 1,
+    "Secondary": 2,
+    "Counter": 3
+  },
+  "Hexalith.Agents.Contracts.Agent.PartyLinkValidationStatus": {
+    "Unknown": 0,
+    "Valid": 1,
+    "Missing": 2,
+    "Disabled": 3,
+    "Ambiguous": 4,
+    "Unavailable": 5,
+    "Unauthorized": 6
+  },
+  "Hexalith.Agents.Contracts.Agent.ProviderSelectionValidationStatus": {
+    "Unknown": 0,
+    "Valid": 1,
+    "Disabled": 2,
+    "Missing": 3,
+    "NotConfigured": 4,
+    "NotTextGenerationCapable": 5,
+    "MissingCapabilityMetadata": 6,
+    "Unpriced": 7,
+    "Regressed": 8,
+    "Unauthorized": 9,
+    "Unavailable": 10
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentCallRequestStatus": {
+    "Unknown": 0,
+    "Accepted": 1,
+    "NotAuthorized": 2,
+    "Rejected": 3
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentGenerationKind": {
+    "Unknown": 0,
+    "Generated": 1,
+    "Edited": 2,
+    "Regenerated": 3
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentGenerationOutcome": {
+    "Unknown": 0,
+    "Succeeded": 1,
+    "ProviderTimeout": 2,
+    "ProviderDisabled": 3,
+    "ProviderUnavailable": 4,
+    "AdapterFailure": 5,
+    "InvalidContext": 6,
+    "GenerationError": 7,
+    "ContentSafetyBlocked": 8,
+    "PolicyFailure": 9
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentInteractionContextBlockReason": {
+    "Unknown": 0,
+    "ContextUnavailable": 1,
+    "ContextNotFresh": 2,
+    "ExceedsModelBudget": 3,
+    "ModelBudgetUnavailable": 4
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentInteractionContextInspectionStatus": {
+    "Unknown": 0,
+    "Success": 1,
+    "NotAuthorized": 2,
+    "NotFound": 3
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentInteractionContextLoadOutcome": {
+    "Unknown": 0,
+    "Loaded": 1,
+    "Unauthorized": 2,
+    "Stale": 3,
+    "Unavailable": 4
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentInteractionContextMode": {
+    "Unknown": 0,
+    "Full": 1,
+    "Bounded": 2
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentInteractionContextNotBuildableReason": {
+    "Unknown": 0,
+    "InteractionNotRequested": 1,
+    "InteractionNotAuthorized": 2
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentInteractionGateCheck": {
+    "Unknown": 0,
+    "TenantAccess": 1,
+    "CallerPartyState": 2,
+    "SourceConversationAccess": 3,
+    "AgentLifecycle": 4,
+    "AgentPartyIdentity": 5,
+    "ProviderModelReadiness": 6,
+    "ResponsePolicy": 7,
+    "ContentSafetyPolicy": 8,
+    "DependencyFreshness": 9,
+    "LaunchReadiness": 10
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentInteractionGateNotEvaluableReason": {
+    "Unknown": 0,
+    "InteractionNotRequested": 1,
+    "NoVerdictsProvided": 2
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentInteractionGateOutcome": {
+    "Unknown": 0,
+    "Satisfied": 1,
+    "Missing": 2,
+    "Stale": 3,
+    "Ambiguous": 4,
+    "Disabled": 5,
+    "Unavailable": 6,
+    "Unauthorized": 7
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentInteractionInspectionStatus": {
+    "Unknown": 0,
+    "Success": 1,
+    "NotAuthorized": 2,
+    "NotFound": 3
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentInteractionRequestValidationStatus": {
+    "Unknown": 0,
+    "MissingCaller": 1,
+    "MissingSourceConversation": 2,
+    "MissingPrompt": 3,
+    "MissingAgentSnapshot": 4
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentInteractionStatus": {
+    "Unknown": 0,
+    "Requested": 1,
+    "Authorized": 2,
+    "Denied": 3,
+    "Blocked": 4,
+    "ContextReady": 5,
+    "ContextBlocked": 6,
+    "Generated": 7,
+    "GenerationFailed": 8,
+    "SafetyFailed": 9,
+    "Posted": 10,
+    "PostingFailed": 11,
+    "ProposalCreated": 12,
+    "ProposalCreationFailed": 13,
+    "ProposalEdited": 14,
+    "ProposalEditFailed": 15,
+    "ProposalRegenerated": 16,
+    "ProposalRegenerationFailed": 17,
+    "ProposalApproved": 18,
+    "ProposalPostingPending": 19,
+    "ProposalPosted": 20,
+    "ProposalPostingFailed": 21,
+    "ProposalApprovalFailed": 22,
+    "ProposalRejected": 23,
+    "ProposalAbandoned": 24,
+    "ProposalExpired": 25,
+    "ProposalRejectionFailed": 26,
+    "ProposalAbandonmentFailed": 27
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentOutputGenerationFailureReason": {
+    "Unknown": 0,
+    "ProviderTimeout": 1,
+    "ProviderDisabled": 2,
+    "ProviderUnavailable": 3,
+    "AdapterFailure": 4,
+    "InvalidContext": 5,
+    "GenerationError": 6,
+    "ContentSafetyBlocked": 7,
+    "PolicyFailure": 8
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentOutputNotGeneratableReason": {
+    "Unknown": 0,
+    "InteractionNotRequested": 1,
+    "ContextNotReady": 2
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposalAbandonmentOutcome": {
+    "Unknown": 0,
+    "Abandoned": 1,
+    "AlreadyTerminal": 2,
+    "NotAuthorized": 3,
+    "PolicyFailure": 4,
+    "ProposalNotPending": 5
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposalApprovalFailureReason": {
+    "Unknown": 0,
+    "NotAuthorized": 1,
+    "PolicyFailure": 2,
+    "SelectedVersionMissing": 3,
+    "SelectedVersionInvalid": 4,
+    "PartyIdentityUnavailable": 5,
+    "MembershipUnavailable": 6,
+    "MembershipRejected": 7,
+    "ConversationUnavailable": 8,
+    "PostRejected": 9,
+    "AdapterFailure": 10
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposalApprovalOutcome": {
+    "Unknown": 0,
+    "Approved": 1,
+    "Posted": 2,
+    "IdempotentPostingPending": 3,
+    "IdempotentPosted": 4,
+    "NotAuthorized": 5,
+    "PolicyFailure": 6,
+    "SelectedVersionMissing": 7,
+    "SelectedVersionInvalid": 8,
+    "PartyIdentityUnavailable": 9,
+    "MembershipUnavailable": 10,
+    "MembershipRejected": 11,
+    "ConversationUnavailable": 12,
+    "PostRejected": 13,
+    "AdapterFailure": 14
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposalCreationFailureReason": {
+    "Unknown": 0,
+    "GeneratedVersionUnavailable": 1,
+    "AdapterFailure": 2
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposalCreationOutcome": {
+    "Unknown": 0,
+    "Created": 1,
+    "GeneratedVersionUnavailable": 2,
+    "AdapterFailure": 3
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposalEditFailureReason": {
+    "Unknown": 0,
+    "NotAuthorized": 1,
+    "AdapterFailure": 2
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposalEditOutcome": {
+    "Unknown": 0,
+    "Edited": 1,
+    "AdapterFailure": 2
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposalExpiryOutcome": {
+    "Unknown": 0,
+    "Expired": 1,
+    "AlreadyTerminal": 2,
+    "NoExpiryPolicy": 3,
+    "ExpiryNotReached": 4,
+    "ProposalNotPending": 5
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposalRegenerationFailureReason": {
+    "Unknown": 0,
+    "NotAuthorized": 1,
+    "ProviderTimeout": 2,
+    "ProviderDisabled": 3,
+    "ProviderUnavailable": 4,
+    "AdapterFailure": 5,
+    "InvalidContext": 6,
+    "ContentSafetyBlocked": 7,
+    "PolicyFailure": 8
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposalRegenerationOutcome": {
+    "Unknown": 0,
+    "Regenerated": 1,
+    "ProviderTimeout": 2,
+    "ProviderDisabled": 3,
+    "ProviderUnavailable": 4,
+    "AdapterFailure": 5,
+    "InvalidContext": 6,
+    "ContentSafetyBlocked": 7,
+    "PolicyFailure": 8
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposalRejectionOutcome": {
+    "Unknown": 0,
+    "Rejected": 1,
+    "AlreadyTerminal": 2,
+    "NotAuthorized": 3,
+    "PolicyFailure": 4,
+    "ProposalNotPending": 5
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposedReplyNotAbandonableReason": {
+    "Unknown": 0,
+    "InteractionNotProposed": 1,
+    "ProposalNotPending": 2,
+    "NotAuthorized": 3
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposedReplyNotApprovableReason": {
+    "Unknown": 0,
+    "InteractionNotProposed": 1,
+    "ProposalNotPending": 2,
+    "DifferentVersionAlreadyApproved": 3
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposedReplyNotCreatableReason": {
+    "Unknown": 0,
+    "InteractionNotRequested": 1,
+    "NotConfirmationResponseMode": 2,
+    "OutputNotGenerated": 3
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposedReplyNotEditableReason": {
+    "Unknown": 0,
+    "InteractionNotProposed": 1,
+    "ProposalNotPending": 2,
+    "NotAuthorized": 3
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposedReplyNotExpirableReason": {
+    "Unknown": 0,
+    "InteractionNotProposed": 1,
+    "ProposalNotPending": 2,
+    "NoExpiryPolicy": 3,
+    "ExpiryNotReached": 4
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposedReplyNotRegeneratableReason": {
+    "Unknown": 0,
+    "InteractionNotProposed": 1,
+    "ProposalNotPending": 2,
+    "NotAuthorized": 3
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentProposedReplyNotRejectableReason": {
+    "Unknown": 0,
+    "InteractionNotProposed": 1,
+    "ProposalNotPending": 2,
+    "NotAuthorized": 3
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentResponseNotPostableReason": {
+    "Unknown": 0,
+    "InteractionNotRequested": 1,
+    "OutputNotGenerated": 2,
+    "NotAutomaticResponseMode": 3
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentResponsePostingFailureReason": {
+    "Unknown": 0,
+    "PartyIdentityUnavailable": 1,
+    "MembershipUnavailable": 2,
+    "MembershipRejected": 3,
+    "ConversationUnavailable": 4,
+    "PostRejected": 5,
+    "AdapterFailure": 6
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AgentResponsePostingOutcome": {
+    "Unknown": 0,
+    "Posted": 1,
+    "PartyIdentityUnavailable": 2,
+    "MembershipUnavailable": 3,
+    "MembershipRejected": 4,
+    "ConversationUnavailable": 5,
+    "PostRejected": 6,
+    "AdapterFailure": 7
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AutomaticInteractionFailureKind": {
+    "Unknown": 0,
+    "ProviderUnavailable": 1,
+    "ProviderError": 2,
+    "ProviderTimeout": 3,
+    "OutputSafetyDenied": 4,
+    "OutputSafetyUnavailable": 5
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AutomaticInteractionOutcome": {
+    "Unknown": 0,
+    "Authorized": 1,
+    "Allowed": 2,
+    "Blocked": 3,
+    "DependencyNotAvailable": 4,
+    "NotInvoked": 5,
+    "InvocationSettlement": 6,
+    "CancelNoInvocation": 7,
+    "Posted": 8,
+    "Discarded": 9,
+    "Failed": 10,
+    "Suppressed": 11
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AutomaticInteractionRejectionReason": {
+    "Unknown": 0,
+    "InvalidTarget": 1,
+    "InvalidPermit": 2,
+    "LegacyStream": 3,
+    "DivergentDuplicate": 4,
+    "StaleRevision": 5,
+    "InvalidPhase": 6,
+    "LeaseCommitRequired": 7,
+    "ProtectedContentRequired": 8,
+    "InvalidAuthority": 9,
+    "Terminal": 10
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.AutomaticInteractionStep": {
+    "Unknown": 0,
+    "WorkflowStartCheckpoint": 1,
+    "RateAdmissionAuthorized": 2,
+    "OpenInteractionLeaseAuthorized": 3,
+    "RateAdmissionRecorded": 4,
+    "OpenInteractionLeaseRecorded": 5,
+    "ApproverResolutionRecorded": 6,
+    "ContextReadRecorded": 7,
+    "BudgetReservationAuthorized": 8,
+    "BudgetReservationRecorded": 9,
+    "PromptSafetyRecorded": 10,
+    "ConversationMembershipRecorded": 11,
+    "AgentCallAccepted": 12,
+    "CapacityAdmissionAuthorized": 13,
+    "CapacityAdmissionRecorded": 14,
+    "ProviderInvocationAuthorized": 15,
+    "ProviderInvocationNotAuthorized": 16,
+    "BudgetDispositionDecided": 17,
+    "PreProviderCapacityDispositionDecided": 18,
+    "GenerationFailed": 19,
+    "GeneratedVersionRecorded": 20,
+    "ConversationPostingRecorded": 21,
+    "StartSuppressedByDeletion": 22,
+    "InteractionPreAcceptanceFailed": 23,
+    "ConversationPostingSuppressedByDeletion": 24
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.PendingProposalsInspectionStatus": {
+    "Unknown": 0,
+    "Success": 1,
+    "NotAuthorized": 2,
+    "Unavailable": 3,
+    "Stale": 4
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.ProposalDetailInspectionStatus": {
+    "Unknown": 0,
+    "Success": 1,
+    "NotAuthorized": 2,
+    "Unavailable": 3,
+    "Stale": 4,
+    "NotFound": 5
+  },
+  "Hexalith.Agents.Contracts.AgentInteraction.ProposedAgentReplyState": {
+    "Unknown": 0,
+    "Pending": 1,
+    "Edited": 2,
+    "Regenerated": 3,
+    "Approved": 4,
+    "PostingPending": 5,
+    "Posted": 6,
+    "PostingFailed": 7,
+    "Rejected": 8,
+    "Abandoned": 9,
+    "Expired": 10
+  },
+  "Hexalith.Agents.Contracts.Operations.AgentCallOperationStatus": {
+    "Unknown": 0,
+    "Requested": 1,
+    "Authorized": 2,
+    "Denied": 3,
+    "ContextLoading": 4,
+    "ContextBlocked": 5,
+    "Generating": 6,
+    "GenerationFailed": 7,
+    "Generated": 8
+  },
+  "Hexalith.Agents.Contracts.Operations.AgentOperationErrorCode": {
+    "Unknown": 0,
+    "NotAuthorized": 1,
+    "ValidationFailed": 2,
+    "NotFound": 3,
+    "Conflict": 4,
+    "Stale": 5,
+    "Unavailable": 6,
+    "Rejected": 7,
+    "Blocked": 8,
+    "UnableToVerify": 9,
+    "DependencyNotAvailable": 10,
+    "SecurityAuditUnavailable": 11
+  },
+  "Hexalith.Agents.Contracts.Operations.AgentOperationStatus": {
+    "Unknown": 0,
+    "Succeeded": 1,
+    "Pending": 2,
+    "Checking": 3,
+    "Degraded": 4,
+    "NotAuthorized": 5,
+    "ValidationFailed": 6,
+    "NotFound": 7,
+    "Conflict": 8,
+    "Stale": 9,
+    "Unavailable": 10,
+    "Rejected": 11,
+    "Blocked": 12,
+    "UnableToVerify": 13
+  },
+  "Hexalith.Agents.Contracts.Operations.AgentReadinessStatus": {
+    "Unknown": 0,
+    "Callable": 1,
+    "Checking": 2,
+    "InvalidConfiguration": 3,
+    "MissingPartyIdentity": 4,
+    "ProviderUnavailable": 5,
+    "Disabled": 6
+  },
+  "Hexalith.Agents.Contracts.Operations.AuditAvailabilityStatus": {
+    "Unknown": 0,
+    "AuditPending": 1,
+    "AuditAvailable": 2,
+    "AuditDelayed": 3,
+    "AuditUnavailable": 4
+  },
+  "Hexalith.Agents.Contracts.Operations.OperationalStatusInspectionStatus": {
+    "Unknown": 0,
+    "Success": 1,
+    "NotAuthorized": 2,
+    "Unavailable": 3,
+    "Stale": 4
+  },
+  "Hexalith.Agents.Contracts.Operations.ProposalOperationStatus": {
+    "Unknown": 0,
+    "Generated": 1,
+    "Edited": 2,
+    "Regenerated": 3,
+    "PendingApproval": 4,
+    "Approved": 5,
+    "Rejected": 6,
+    "Abandoned": 7,
+    "Expired": 8,
+    "PostingPending": 9,
+    "Posted": 10,
+    "PostingFailed": 11
+  },
+  "Hexalith.Agents.Contracts.Operations.ProviderModelReadinessStatus": {
+    "Unknown": 0,
+    "Enabled": 1,
+    "Disabled": 2,
+    "Degraded": 3,
+    "Failed": 4,
+    "NotConfigured": 5
+  },
+  "Hexalith.Agents.Contracts.ProviderCatalog.ProviderConfigurationState": {
+    "Unknown": 0,
+    "NotConfigured": 1,
+    "Configured": 2
+  },
+  "Hexalith.Agents.Contracts.ProviderCatalog.ProviderModelStatus": {
+    "Unknown": 0,
+    "Enabled": 1,
+    "Disabled": 2,
+    "Degraded": 3,
+    "Failed": 4
+  }
+}

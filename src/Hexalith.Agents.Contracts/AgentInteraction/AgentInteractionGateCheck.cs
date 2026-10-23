@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -16,7 +18,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// claims, tokens, Party personal data, provider payloads, or content (AD-14). Serialized by name so an absent value
 /// never deserializes to a concrete check. <see cref="Unknown"/> (ordinal 0) is the unrecognized sentinel.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentInteractionGateCheck>))]
 public enum AgentInteractionGateCheck
 {
     /// <summary>Absent/unrecognized check sentinel.</summary>

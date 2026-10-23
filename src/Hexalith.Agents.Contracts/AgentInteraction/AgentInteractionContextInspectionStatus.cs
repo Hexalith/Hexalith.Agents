@@ -1,3 +1,7 @@
+using System.Text.Json.Serialization;
+
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -6,6 +10,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// never reveals whether the interaction exists in another tenant or leaks unrelated records (AC1; AD-12). Mirrors
 /// <see cref="AgentInteractionGateInspectionStatus"/>.
 /// </summary>
+[JsonConverter(typeof(UnknownFallbackNumericEnumConverter<AgentInteractionContextInspectionStatus>))]
 public enum AgentInteractionContextInspectionStatus
 {
     /// <summary>Not-yet-known sentinel — an absent/unrecognized status never resolves to a concrete outcome.</summary>

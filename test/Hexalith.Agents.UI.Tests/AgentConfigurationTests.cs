@@ -17,6 +17,7 @@ using Hexalith.Agents.UI.Services.Gateways;
 using Hexalith.FrontComposer.Shell.Components.Layout;
 
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.FluentUI.AspNetCore.Components;
 
 using NSubstitute;
 
@@ -48,6 +49,44 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         cut.WaitForAssertion(() =>
             cut.Find("#fc-main-content").GetAttribute("data-fc-page-layout").ShouldBe("constrained"));
         cut.Find("[data-testid='agents-config']");
+    }
+
+    [Fact]
+    public void ConfigurationGroupsTitledSectionsAndKeepsActionsVisible()
+    {
+        GivenConfiguration(AgentUiTestData.Status(AgentLifecycleStatus.Draft));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+
+        cut.WaitForAssertion(() => cut.FindComponents<FluentAccordionItem>().Count.ShouldBe(10));
+        cut.FindComponents<FluentAccordion>().Count.ShouldBe(1);
+        foreach (IRenderedComponent<FluentAccordionItem> item in cut.FindComponents<FluentAccordionItem>())
+        {
+            item.Instance.Expanded.ShouldBeTrue();
+            item.Instance.Header.ShouldStartWith("Agents.Config.Section.");
+        }
+        IElement accordion = cut.Find("[data-testid='agents-config-sections']");
+        accordion.QuerySelector("[data-testid='agents-config-submit']").ShouldNotBeNull();
+        accordion.QuerySelector("[data-testid='agents-config-activate']").ShouldBeNull();
+        accordion.QuerySelector("[data-testid='agents-config-write-live-region']").ShouldBeNull();
+        cut.Find("[data-testid='agents-config-activate']");
+        cut.Find("[data-testid='agents-config-disable']");
+    }
+
+    [Fact]
+    public async Task CollapsedConfigurationSectionStaysCollapsedAfterAFieldEdit()
+    {
+        GivenConfiguration(AgentUiTestData.Status(AgentLifecycleStatus.Draft));
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.WaitForAssertion(() => cut.FindComponents<FluentAccordionItem>().Count.ShouldBe(10));
+        IRenderedComponent<FluentAccordionItem> identity = cut.FindComponents<FluentAccordionItem>()[0];
+
+        await cut.InvokeAsync(() => identity.Instance.SetExpandedAsync(false));
+        identity.Instance.Expanded.ShouldBeFalse();
+        cut.Find("[data-testid='agents-config-display-name-input']").Change("changed draft");
+
+        identity.Instance.Expanded.ShouldBeFalse();
+        cut.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value").ShouldBe("changed draft");
     }
 
     [Fact]

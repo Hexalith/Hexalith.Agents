@@ -35,6 +35,8 @@ public sealed class EventStoreProviderCatalogOperationsTests
 {
     private const string TenantId = "acme";
     private const string StoreName = "statestore";
+    private const string MessageId = "01ARZ3NDEKTSV4RRFFQ69G5FAV";
+    private const string CorrelationId = "01ARZ3NDEKTSV4RRFFQ69G5FAW";
 
     private readonly FakeReadModelStore _store = new();
     private readonly IEventStoreGatewayClient _gateway = Substitute.For<IEventStoreGatewayClient>();
@@ -76,6 +78,153 @@ public sealed class EventStoreProviderCatalogOperationsTests
                 return new StreamReadPage(request.Tenant, request.Domain, request.AggregateId, [],
                     new StreamReadMetadata(request.FromSequence, null, null, latest, 0, false, null));
             });
+    }
+
+    [Fact]
+    public async Task CanonicalCallerIdentitiesSurviveAnExactProviderWriteRetry()
+    {
+        IProviderCatalogOperations operations = Operations();
+        var options = new AgentOperationOptions(CorrelationId, MessageId);
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> first = await operations.CreateEntryAsync(CreateCommand(), options);
+        AgentOperationResult<ProviderCatalogCommandAcceptance> retry = await operations.CreateEntryAsync(CreateCommand(), options);
+
+        first.Value.ShouldNotBeNull().MessageId.ShouldBe(MessageId);
+        retry.Value.ShouldNotBeNull().ShouldBe(first.Value);
+        _submitted.Count.ShouldBe(2);
+        foreach (SubmitCommandRequest request in _submitted)
+        {
+            request.MessageId.ShouldBe(MessageId);
+            request.IdempotencyKey.ShouldBe(MessageId);
+            request.CorrelationId.ShouldBe(CorrelationId);
+        }
+    }
+
+    public static TheoryData<string, bool, string> InvalidProviderWriteIdentities()
+    {
+        TheoryData<string, bool, string> data = [];
+        foreach (string write in new[] { "create", "update", "enable", "disable", "enablement", "decision" })
+        {
+            foreach (bool correlation in new[] { false, true })
+            {
+                foreach (string invalid in new[] { "", "malformed", " ", "01arz3ndektsv4rrffq69g5fav",
+                    "81ARZ3NDEKTSV4RRFFQ69G5FAV", "e1192d81-7cc3-4006-af00-f264f58e9961" })
+                {
+                    data.Add(write, correlation, invalid);
+                }
+            }
+        }
+        return data;
+    }
+
+    [Theory]
+    [MemberData(nameof(InvalidProviderWriteIdentities))]
+    public async Task InvalidProviderWriteIdentityCannotDispatchOrReadStatus(string write, bool correlation, string invalid)
+    {
+        SeedTenantDecisionView();
+        var options = new AgentOperationOptions(correlation ? invalid : CorrelationId, correlation ? MessageId : invalid);
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> result = await WriteProviderAsync(write, options);
+
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.ValidationFailed);
+        result.CorrelationId.ShouldBe(correlation ? null : CorrelationId);
+        _submitted.ShouldBeEmpty();
+        await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task InvalidTenantWriteIdentityPrecedesDependencyReads(bool correlation)
+    {
+        var store = Substitute.For<IReadModelStore>();
+        store.GetAsync<ProviderCatalogReadModel>(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns<Task<ReadModelEntry<ProviderCatalogReadModel>>>(_ => throw new InvalidOperationException("Store unavailable"));
+        var options = new AgentOperationOptions(correlation ? "" : CorrelationId, correlation ? MessageId : "");
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> result = await Operations(store).SetTenantEnablementAsync(
+            new SetTenantProviderModelEnablement(TenantId, "openai", "gpt-4o", true, 0, null), options);
+
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.ValidationFailed);
+        await store.DidNotReceiveWithAnyArgs().GetAsync<ProviderCatalogReadModel>(default!, default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().ReadStreamAsync(default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
+    }
+
+    [Theory]
+    [InlineData("create")]
+    [InlineData("enablement")]
+    [InlineData("decision")]
+    public async Task UnauthorizedProviderWriteDoesNotEchoInvalidIdentity(string write)
+    {
+        _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "user", IsAgentsAdmin: false));
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> result = await WriteProviderAsync(write,
+            new AgentOperationOptions("unsafe-correlation", "unsafe-message"));
+
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.NotAuthorized);
+        result.CorrelationId.ShouldBeNull();
+        await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task InvalidGeneratedProviderIdentityCannotReachDispatch(bool invalidCorrelation)
+    {
+        IAgentCommandIdentityFactory factory = Substitute.For<IAgentCommandIdentityFactory>();
+        factory.NewCorrelationId().Returns(invalidCorrelation ? "invalid" : CorrelationId);
+        factory.NewMessageId().Returns(invalidCorrelation ? MessageId : "invalid");
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> result = await Operations(identityFactory: factory)
+            .CreateEntryAsync(CreateCommand());
+
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.ValidationFailed);
+        await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+    }
+
+    [Theory]
+    [InlineData("create", true)]
+    [InlineData("create", false)]
+    [InlineData("enablement", true)]
+    [InlineData("enablement", false)]
+    public async Task MismatchedProviderReceiptCannotConfirmOrQueryAnotherCommand(string write, bool correlation)
+    {
+        SeedTenantDecisionView();
+        _gateway.SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                SubmitCommandRequest request = call.Arg<SubmitCommandRequest>();
+                return new SubmitCommandResponse(correlation ? MessageId : request.CorrelationId!, null,
+                    correlation ? request.MessageId : CorrelationId);
+            });
+
+        AgentOperationResult<ProviderCatalogCommandAcceptance> result = await WriteProviderAsync(write,
+            new AgentOperationOptions(CorrelationId, MessageId));
+
+        result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.UnableToVerify);
+        result.Value.ShouldBeNull();
+        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+    }
+
+    private ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>> WriteProviderAsync(string write, AgentOperationOptions options)
+    {
+        IProviderCatalogOperations operations = Operations();
+        return write switch
+        {
+            "create" => operations.CreateEntryAsync(CreateCommand(), options),
+            "update" => operations.UpdateEntryAsync(UpdateCommand(), options),
+            "enable" => operations.EnableEntryAsync(new EnableProviderModelEntry("openai", "gpt-4o"), options),
+            "disable" => operations.DisableEntryAsync(new DisableProviderModelEntry("openai", "gpt-4o"), options),
+            "enablement" => operations.SetTenantEnablementAsync(new SetTenantProviderModelEnablement(TenantId, "openai", "gpt-4o", true, 0,
+                SelectableEntry(1).DataHandling), options),
+            "decision" => operations.DecideDataHandlingAsync(new DecideProviderDataHandling("openai", "gpt-4o", 1, true, "approved", 1,
+                SelectableEntry(1).DataHandling.ShouldNotBeNull(), default), options),
+            _ => throw new ArgumentException("Unknown test write.", nameof(write)),
+        };
     }
 
     [Fact]
@@ -616,12 +765,12 @@ public sealed class EventStoreProviderCatalogOperationsTests
         var decision = new DecideProviderDataHandling("openai", "gpt-4o", 1, true, "approved", 1, original, default);
 
         AgentOperationResult<ProviderCatalogCommandAcceptance> result = await Operations().DecideDataHandlingAsync(
-            decision, new AgentOperationOptions("corr-retry", "msg-original"));
+            decision, new AgentOperationOptions(CorrelationId, MessageId));
 
         result.IsSuccess.ShouldBeTrue();
         SubmitCommandRequest sent = _submitted.ShouldHaveSingleItem();
-        sent.MessageId.ShouldBe("msg-original");
-        sent.IdempotencyKey.ShouldBe("msg-original");
+        sent.MessageId.ShouldBe(MessageId);
+        sent.IdempotencyKey.ShouldBe(MessageId);
         JsonSerializer.Deserialize<DecideProviderDataHandling>(sent.Payload.GetRawText()).ShouldNotBeNull()
             .ConfirmedTerms.DataHandlingVersion.ShouldBe(1);
     }
@@ -1001,7 +1150,8 @@ public sealed class EventStoreProviderCatalogOperationsTests
         pending.Entries.ShouldBeEmpty();
     }
 
-    private IProviderCatalogOperations Operations(IReadModelStore? store = null, TimeProvider? clock = null)
+    private IProviderCatalogOperations Operations(IReadModelStore? store = null, TimeProvider? clock = null,
+        IAgentCommandIdentityFactory? identityFactory = null)
     {
         var dispatcher = new EventStoreAgentCommandDispatcher(_gateway, new FixtureTrustedCommandAdmission());
         return new EventStoreProviderCatalogOperations(
@@ -1009,7 +1159,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
             new ProviderCatalogAdministrationOrchestrator(dispatcher),
             store ?? _store,
             Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = StoreName }),
-            new AgentCommandIdentityFactory(), clock, _gateway);
+            identityFactory ?? new AgentCommandIdentityFactory(), clock, _gateway);
     }
 
     private void SeedProjectedEntry(int capabilityVersion)

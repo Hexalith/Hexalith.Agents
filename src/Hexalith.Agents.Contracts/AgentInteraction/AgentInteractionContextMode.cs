@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -13,7 +15,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// an absent value never resolves to a concrete mode; <see cref="Unknown"/> (ordinal 0) is the sentinel (used for a
 /// context-blocked record, which has no usable mode).
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentInteractionContextMode>))]
 public enum AgentInteractionContextMode
 {
     /// <summary>Not-a-mode sentinel — an absent/unrecognized mode never resolves to a concrete one (e.g. on a blocked record).</summary>

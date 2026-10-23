@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -14,7 +16,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// cost-control choice is itself an accepted downstream governance blocker (OQ-6); this enum records which posture
 /// kind was chosen, not the provider-specific numbers.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<CostControlPosture>))]
 public enum CostControlPosture
 {
     /// <summary>Absent/unrecognized posture sentinel — fails readiness recording.</summary>

@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -14,7 +16,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// fail-safe sentinel. Unlike rejection/abandonment, there is no approver verdict and no fail-closed "expiry-failed" terminal
 /// status — a non-<see cref="Expired"/> outcome simply leaves the proposal pending (AD-3: the aggregate never reads the clock).
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentProposalExpiryOutcome>))]
 public enum AgentProposalExpiryOutcome
 {
     /// <summary>Not-an-outcome sentinel — no transition (fail closed to no-expiry).</summary>

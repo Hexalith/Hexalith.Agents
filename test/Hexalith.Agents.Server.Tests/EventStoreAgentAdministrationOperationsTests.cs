@@ -19,6 +19,7 @@ using Hexalith.Agents.Server.Projections;
 
 using Hexalith.EventStore.Client.Gateway;
 using Hexalith.EventStore.Contracts.Commands;
+using Hexalith.EventStore.Contracts.Projections;
 using Hexalith.EventStore.Contracts.Results;
 
 using Microsoft.Extensions.Options;
@@ -148,6 +149,56 @@ public sealed class EventStoreAgentAdministrationOperationsTests
         second.Value.TargetConfigurationVersion.ShouldBe(first.Value.TargetConfigurationVersion);
         firstSubmit.IdempotencyKey.ShouldBe(MessageId);
         _lastSubmit.ShouldNotBeNull().IdempotencyKey.ShouldBe(MessageId);
+    }
+
+    [Fact]
+    public async Task LifecycleReceiptRequiresItsOwnNewConfigurationVersionBeforeConfirmation()
+    {
+        CreateAgent create = new(TenantId, "Hexa Assistant", "Tenant governed assistant", RealInstructions);
+        AgentState state = CreatedState(create);
+        var command = new DisableAgent();
+        DomainResult domain = AgentAggregate.Handle(command, state, AdminEnvelope(command).ToFixtureEnvelope());
+        AgentDisabled disabled = domain.Events.Single().ShouldBeOfType<AgentDisabled>();
+        disabled.ConfigurationVersion.ShouldBe(state.ConfigurationVersion + 1);
+        using JsonDocument payload = JsonDocument.Parse(domain.ResultPayload.ShouldNotBeNull());
+        _gateway.SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(call => new SubmitCommandResponse(call.Arg<SubmitCommandRequest>().CorrelationId!,
+                payload.RootElement.Clone(), call.Arg<SubmitCommandRequest>().MessageId));
+        var projection = new AgentSetupProjectionHandler(_store, _store,
+            Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }));
+        AgentCreated created = new(AgentId, TenantId, create.DisplayName!, create.Description, create.Instructions!, 1, 1);
+        var createdEvent = new ProjectionEventDto(nameof(AgentCreated), JsonSerializer.SerializeToUtf8Bytes(created),
+            "json", 1, DateTimeOffset.UtcNow, CorrelationId, MessageId);
+        var seed = await projection.ProjectAsync(new ProjectionRequest(TenantId, "agent", AgentId, [createdEvent]),
+            "created", CancellationToken.None);
+        seed.Status.ShouldBe(ProjectionDispatchStatus.Completed);
+
+        AgentCommandAcceptance acceptance = (await Operations().DisableAsync(AgentId, command,
+            new AgentOperationOptions(CorrelationId, MessageId))).Value.ShouldNotBeNull();
+
+        acceptance.MessageId.ShouldBe(MessageId);
+        acceptance.CorrelationId.ShouldBe(CorrelationId);
+        acceptance.Effect.ShouldBe(AgentSetupWriteEffect.Applied);
+        acceptance.TargetConfigurationVersion.ShouldBe(disabled.ConfigurationVersion);
+        AgentSetupView before = (await Operations().GetConfigurationAsync(AgentId,
+            expectedConfigurationVersion: acceptance.TargetConfigurationVersion)).Value.ShouldNotBeNull().Setup.ShouldNotBeNull();
+        before.TruthState.ShouldBe(AgentSetupTruthState.AuthoritativePending);
+        before.ConfigurationVersion.ShouldBe(state.ConfigurationVersion);
+
+        var disabledEvent = new ProjectionEventDto(nameof(AgentDisabled), JsonSerializer.SerializeToUtf8Bytes(disabled),
+            "json", 2, DateTimeOffset.UtcNow, CorrelationId, MessageId);
+        var projected = await projection.ProjectAsync(new ProjectionRequest(TenantId, "agent", AgentId, [disabledEvent]),
+            "disabled", CancellationToken.None);
+        projected.Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        AgentSetupReadModel persisted = _store.Snapshot<AgentSetupReadModel>(StoreName,
+            AgentSetupReadModelAddresses.Detail(TenantId, AgentId)).ShouldNotBeNull();
+        persisted.Lifecycle.ShouldBe(AgentLifecycleStatus.Disabled);
+        persisted.ConfigurationVersion.ShouldBe(disabled.ConfigurationVersion);
+        AgentSetupView after = (await Operations().GetConfigurationAsync(AgentId,
+            expectedConfigurationVersion: acceptance.TargetConfigurationVersion)).Value.ShouldNotBeNull().Setup.ShouldNotBeNull();
+        after.TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
+        after.ConfigurationVersion.ShouldBe(disabled.ConfigurationVersion);
+        after.Agent.Lifecycle.ShouldBe(AgentLifecycleStatus.Disabled);
     }
 
     [Fact]

@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -13,7 +15,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// fail-safe sentinel (mapped to <see cref="AdapterFailure"/> by the pure policy). The reasons are deliberately coarse
 /// and content-free. Mirrors <see cref="AgentProposalCreationFailureReason"/>.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentProposalEditFailureReason>))]
 public enum AgentProposalEditFailureReason
 {
     /// <summary>Not-a-reason sentinel — an absent/unrecognized classification never resolves to a concrete one.</summary>

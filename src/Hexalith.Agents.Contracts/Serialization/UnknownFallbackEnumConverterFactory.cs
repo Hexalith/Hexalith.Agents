@@ -38,7 +38,8 @@ public sealed class UnknownFallbackEnumConverterFactory : JsonConverterFactory
 
         Type? declared = typeToConvert.GetCustomAttribute<JsonConverterAttribute>(inherit: false)?.ConverterType;
         return declared is { IsGenericType: true }
-            && declared.GetGenericTypeDefinition() == typeof(UnknownFallbackEnumConverter<>)
+            && (declared.GetGenericTypeDefinition() == typeof(UnknownFallbackEnumConverter<>)
+                || declared.GetGenericTypeDefinition() == typeof(UnknownFallbackNumericEnumConverter<>))
                 ? declared
                 : null;
     }

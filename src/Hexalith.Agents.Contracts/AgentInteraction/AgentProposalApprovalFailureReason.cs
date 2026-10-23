@@ -1,11 +1,13 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
 /// Safe reason for an approval failure or an approved-version posting failure.
 /// </summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentProposalApprovalFailureReason>))]
 public enum AgentProposalApprovalFailureReason
 {
     /// <summary>Not-a-reason sentinel.</summary>

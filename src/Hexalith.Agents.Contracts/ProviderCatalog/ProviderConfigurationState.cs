@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.ProviderCatalog;
 
 /// <summary>
@@ -7,7 +9,7 @@ namespace Hexalith.Agents.Contracts.ProviderCatalog;
 /// reference has been associated with the entry — <em>without</em> exposing any secret value. Serialized by
 /// name so an absent value never deserializes to <see cref="Configured"/>.
 /// </summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<ProviderConfigurationState>))]
 public enum ProviderConfigurationState
 {
     /// <summary>Absent/unrecognized sentinel — treated as not configured.</summary>

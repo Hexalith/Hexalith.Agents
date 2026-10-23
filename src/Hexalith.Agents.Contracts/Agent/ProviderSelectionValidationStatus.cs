@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -16,7 +18,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// so an absent value never deserializes to a concrete verdict. <see cref="Unknown"/> (ordinal 0) is the fail-safe
 /// sentinel: an absent/unparseable verdict is treated as "validation did not happen" and the selection is rejected.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<ProviderSelectionValidationStatus>))]
 public enum ProviderSelectionValidationStatus
 {
     /// <summary>Absent/unrecognized verdict sentinel — treated as "validation did not happen" and fails closed.</summary>

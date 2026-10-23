@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -19,7 +21,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// appends its kinds additively). The full AD-5 proposal lifecycle — including the <c>Rejected</c>/<c>Abandoned</c>/<c>Expired</c>
 /// terminal states — is now owned and present; any further states stay additive.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<ProposedAgentReplyState>))]
 public enum ProposedAgentReplyState
 {
     /// <summary>Not-a-state sentinel — an absent/unrecognized state never resolves to a concrete one.</summary>

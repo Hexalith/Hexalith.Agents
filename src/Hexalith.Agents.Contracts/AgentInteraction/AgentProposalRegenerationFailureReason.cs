@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -16,7 +18,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// for the fail-closed approver path (mirroring <see cref="AgentProposalEditFailureReason.NotAuthorized"/>). The reasons are
 /// deliberately coarse and content-free — they carry no provider SDK detail.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentProposalRegenerationFailureReason>))]
 public enum AgentProposalRegenerationFailureReason
 {
     /// <summary>Not-a-reason sentinel — an absent/unrecognized classification never resolves to a concrete one.</summary>

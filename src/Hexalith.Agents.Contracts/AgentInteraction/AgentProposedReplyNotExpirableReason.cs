@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -16,7 +18,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// no-transition outcomes (no expiry configured, or the elapsed time has not reached <c>ExpiresAt</c>) — neither dispatches a
 /// terminal transition (AD-3: expiry "now" is supplied to the orchestrator, never read by the aggregate).
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentProposedReplyNotExpirableReason>))]
 public enum AgentProposedReplyNotExpirableReason
 {
     /// <summary>Not-a-reason sentinel — an absent/unrecognized classification never resolves to a concrete one.</summary>

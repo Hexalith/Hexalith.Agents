@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -12,7 +14,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// (ordinal 0) is the not-yet-classified sentinel — a recorded metric must carry a concrete classification, so
 /// <see cref="Unknown"/> is rejected at recording time and can never satisfy the readiness gate.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<LaunchMetricClassification>))]
 public enum LaunchMetricClassification
 {
     /// <summary>Absent/unrecognized classification sentinel — fails readiness recording.</summary>

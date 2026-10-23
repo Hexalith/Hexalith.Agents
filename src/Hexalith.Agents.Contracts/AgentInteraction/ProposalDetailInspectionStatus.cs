@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -13,7 +15,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// missing/other-tenant interaction returns <see cref="NotFound"/> with no detail (no fingerprinting that the record
 /// exists elsewhere).
 /// </summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<ProposalDetailInspectionStatus>))]
 public enum ProposalDetailInspectionStatus
 {
     /// <summary>Not-yet-known sentinel — an absent/unrecognized status never resolves to a concrete outcome.</summary>

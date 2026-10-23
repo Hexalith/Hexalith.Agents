@@ -1,9 +1,11 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>Closed automatic-interaction vocabulary; zero never grants authority.</summary>
-[JsonConverter(typeof(JsonStringEnumConverter<AutomaticInteractionRejectionReason>))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AutomaticInteractionRejectionReason>))]
 public enum AutomaticInteractionRejectionReason
 {
     /// <summary>Unknown classification.</summary>

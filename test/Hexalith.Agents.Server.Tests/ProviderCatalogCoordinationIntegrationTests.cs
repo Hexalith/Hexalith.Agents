@@ -40,6 +40,33 @@ public sealed class ProviderCatalogCoordinationIntegrationTests
     private static readonly DateTimeOffset _now = new(2026, 9, 23, 0, 0, 0, TimeSpan.Zero);
 
     [Fact]
+    public void FutureSourceConfigurationStateRetainsUnchangedGovernanceTerms()
+    {
+        var policy = new AgentsProviderCatalogCoordinationPolicy();
+        var terms = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1, _now);
+        CommandEnvelope decision = Submit("future-state", "tenant-a", TenantProviderEnablementAggregate.Domain,
+            "tenant-a", new DecideProviderDataHandling("provider", "model", 1, true, "approved", 1, terms, _now),
+            TenantProviderEnablementAggregate.TenantAdministratorExtensionKey).ToCommandEnvelope();
+        ProjectionEventDto created = Projected("created", 1, Created(terms));
+        ProjectionEventDto updated = Projected("updated", 2, Updated(terms));
+        foreach (ProjectionEventDto source in new[] { created, updated })
+        {
+            string json = System.Text.Encoding.UTF8.GetString(source.Payload)
+                .Replace("\"Configured\"", "\"FutureConfigurationState\"", StringComparison.Ordinal);
+            json.ShouldContain("FutureConfigurationState");
+            ProjectionEventDto future = source with { Payload = System.Text.Encoding.UTF8.GetBytes(json) };
+            ProjectionEventDto[] history = source.SequenceNumber == 1 ? [future] : [created, future];
+
+            policy.Validate(decision, history).ShouldBeTrue();
+            var stale = new DecideProviderDataHandling("provider", "model", 1, true, "approved", 1,
+                terms with { TermsReferenceId = "other-terms" }, _now);
+            CommandEnvelope wrongTerms = Submit("wrong-terms", "tenant-a", TenantProviderEnablementAggregate.Domain,
+                "tenant-a", stale, TenantProviderEnablementAggregate.TenantAdministratorExtensionKey).ToCommandEnvelope();
+            policy.Validate(wrongTerms, history).ShouldBeFalse();
+        }
+    }
+
+    [Fact]
     public async Task Fenced_tenant_decision_reaches_real_terms_coordinator_and_rejects_stale_source()
     {
         var policy = new AgentsProviderCatalogCoordinationPolicy();

@@ -1,11 +1,13 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
 /// Safe structural reason an approve-proposed-reply command could not be evaluated.
 /// </summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentProposedReplyNotApprovableReason>))]
 public enum AgentProposedReplyNotApprovableReason
 {
     /// <summary>Not-a-reason sentinel.</summary>

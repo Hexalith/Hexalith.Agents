@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -13,7 +15,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// fail-safe sentinel (treated as a creation failure). The values mirror <see cref="AgentProposalCreationFailureReason"/>
 /// (plus <see cref="Created"/>) so the policy mapping is total. Mirrors <see cref="AgentResponsePostingOutcome"/>.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentProposalCreationOutcome>))]
 public enum AgentProposalCreationOutcome
 {
     /// <summary>Not-an-outcome sentinel — treated as a creation failure (fail closed).</summary>

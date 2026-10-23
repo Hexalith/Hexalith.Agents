@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -9,7 +11,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// none so a failed request never reveals interaction identity (AD-12, AD-14). Mirrors the
 /// <see cref="Agent.AgentInspectionStatus"/> shape.
 /// </summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentCallRequestStatus>))]
 public enum AgentCallRequestStatus
 {
     /// <summary>Not-yet-known sentinel — an absent/unrecognized status never resolves to a concrete outcome.</summary>

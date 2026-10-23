@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -12,7 +14,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// Serialized by name so an absent value never resolves to a concrete kind; <see cref="Unknown"/> (ordinal 0) is the
 /// fail-safe sentinel. Ordinals are append-only — never reorder/renumber (asserted by the contract tests).
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentGenerationKind>))]
 public enum AgentGenerationKind
 {
     /// <summary>Not-a-kind sentinel — an absent/unrecognized kind never resolves to a concrete one.</summary>

@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="ContractEnumOrdinals.json" />
     <ProjectReference Include="..\..\src\Hexalith.Agents.Contracts\Hexalith.Agents.Contracts.csproj" />
   </ItemGroup>
 

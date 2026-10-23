@@ -242,6 +242,11 @@ public sealed class EventStoreProviderCatalogOperations(
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized);
         }
 
+        if (ValidateSuppliedWriteIdentities(options) is { } invalidIdentity)
+        {
+            return invalidIdentity;
+        }
+
         if (command.MigratedFrom is not null)
         {
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.Blocked);
@@ -314,6 +319,11 @@ public sealed class EventStoreProviderCatalogOperations(
         if (!context.IsAuthorized)
         {
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized);
+        }
+
+        if (ValidateSuppliedWriteIdentities(options) is { } invalidIdentity)
+        {
+            return invalidIdentity;
         }
 
         if (command.ConfirmedTerms is not { DataHandlingVersion: >= 1 } submitted
@@ -541,18 +551,24 @@ public sealed class EventStoreProviderCatalogOperations(
         CancellationToken cancellationToken)
     {
         AgentAdministrationContext context = await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
-        string correlationId = options?.CorrelationId is { Length: > 0 } supplied
-            ? supplied
-            : _identityFactory.NewCorrelationId();
-
         if (!context.IsPlatformOperator || string.IsNullOrWhiteSpace(context.ActorUserId))
         {
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(
                 AgentOperationErrorCode.NotAuthorized,
-                correlationId);
+                IsCanonicalUlid(options?.CorrelationId) ? options!.CorrelationId : null);
         }
 
-        string messageId = options?.IdempotencyKey is { Length: > 0 } key ? key : _identityFactory.NewMessageId();
+        string correlationId = options?.CorrelationId ?? _identityFactory.NewCorrelationId();
+        if (!IsCanonicalUlid(correlationId))
+        {
+            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.ValidationFailed);
+        }
+
+        string messageId = options?.IdempotencyKey ?? _identityFactory.NewMessageId();
+        if (!IsCanonicalUlid(messageId))
+        {
+            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.ValidationFailed, correlationId);
+        }
 
         AgentAdministrationOutcome outcome;
         try
@@ -662,17 +678,26 @@ public sealed class EventStoreProviderCatalogOperations(
         CancellationToken ct)
     {
         AgentAdministrationContext context = await _contextProvider.GetContextAsync(platformAuthority, ct).ConfigureAwait(false);
-        string correlationId = options?.CorrelationId is { Length: > 0 } supplied
-            ? supplied : _identityFactory.NewCorrelationId();
         if (string.IsNullOrWhiteSpace(context.ActorUserId)
             || (platformAuthority ? !context.IsPlatformOperator : !context.IsAuthorized || targetTenantId != context.TenantId)
             || string.IsNullOrWhiteSpace(targetTenantId)
             || string.Equals(targetTenantId, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal))
         {
-            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized, correlationId);
+            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized,
+                IsCanonicalUlid(options?.CorrelationId) ? options!.CorrelationId : null);
         }
 
-        string messageId = options?.IdempotencyKey is { Length: > 0 } key ? key : _identityFactory.NewMessageId();
+        string correlationId = options?.CorrelationId ?? _identityFactory.NewCorrelationId();
+        if (!IsCanonicalUlid(correlationId))
+        {
+            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.ValidationFailed);
+        }
+
+        string messageId = options?.IdempotencyKey ?? _identityFactory.NewMessageId();
+        if (!IsCanonicalUlid(messageId))
+        {
+            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.ValidationFailed, correlationId);
+        }
         try
         {
             AgentAdministrationOutcome outcome = await dispatch(new ProviderCatalogAdministrationRequest(
@@ -744,6 +769,19 @@ public sealed class EventStoreProviderCatalogOperations(
                 correlationId: correlationId),
         };
     }
+
+    private static AgentOperationResult<ProviderCatalogCommandAcceptance>? ValidateSuppliedWriteIdentities(AgentOperationOptions? options)
+        => options is not null
+            && (options.CorrelationId is not null && !IsCanonicalUlid(options.CorrelationId)
+                || options.IdempotencyKey is not null && !IsCanonicalUlid(options.IdempotencyKey))
+                ? AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.ValidationFailed,
+                    IsCanonicalUlid(options.CorrelationId) ? options.CorrelationId : null)
+                : null;
+
+    private static bool IsCanonicalUlid(string? value)
+        => !string.IsNullOrWhiteSpace(value)
+            && NUlid.Ulid.TryParse(value, out NUlid.Ulid parsed)
+            && string.Equals(parsed.ToString(), value, StringComparison.Ordinal);
 
     private static AgentSetupWriteStatus? ReceiptEffect(SubmitCommandResponse receipt)
     {

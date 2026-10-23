@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -8,7 +10,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// the interaction exists in another tenant or leaks unrelated records (AD-12, AD-14). Mirrors
 /// <see cref="Agent.AgentInspectionStatus"/> and <see cref="AgentInteractionContextInspectionStatus"/>.
 /// </summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentInteractionInspectionStatus>))]
 public enum AgentInteractionInspectionStatus
 {
     /// <summary>Not-yet-known sentinel — an absent/unrecognized status never resolves to a concrete outcome.</summary>

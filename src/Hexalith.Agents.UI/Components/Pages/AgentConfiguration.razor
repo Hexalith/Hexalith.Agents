@@ -92,155 +92,148 @@
             AgentSetupView setup = _result.Setup;
             AgentStatusView agent = setup.Agent;
 
-            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Identity"]">
-                <h2>@Localizer["Agents.Config.Section.Identity"]</h2>
-                <dl>
-                    <dt>@Localizer["Agents.Config.DisplayName.Label"]</dt>
-                    <dd data-testid="agents-config-display-name">@(string.IsNullOrEmpty(agent.DisplayName) ? Localizer["Agents.Common.None"] : agent.DisplayName)</dd>
-                    <dt>@Localizer["Agents.Config.Description.Label"]</dt>
-                    <dd data-testid="agents-config-description">@(string.IsNullOrEmpty(agent.Description) ? Localizer["Agents.Common.None"] : agent.Description)</dd>
-                </dl>
-            </section>
+            <FluentAccordion HeadingLevel="2" data-testid="agents-config-sections">
+                <FluentAccordionItem Header="@Localizer["Agents.Config.Section.Identity"]" @bind-Expanded="_expandedSections[0]">
+                    <dl>
+                        <dt>@Localizer["Agents.Config.DisplayName.Label"]</dt>
+                        <dd data-testid="agents-config-display-name">@(string.IsNullOrEmpty(agent.DisplayName) ? Localizer["Agents.Common.None"] : agent.DisplayName)</dd>
+                        <dt>@Localizer["Agents.Config.Description.Label"]</dt>
+                        <dd data-testid="agents-config-description">@(string.IsNullOrEmpty(agent.Description) ? Localizer["Agents.Common.None"] : agent.Description)</dd>
+                    </dl>
+                </FluentAccordionItem>
 
-            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Instructions"]">
-                <h2>@Localizer["Agents.Config.Section.Instructions"]</h2>
-                <ul>
-                    <li data-testid="agents-config-instructions-presence">@(agent.HasInstructions ? Localizer["Agents.Config.Instructions.Present"] : Localizer["Agents.Config.Instructions.Absent"])</li>
-                    @if (agent.HasInstructions)
+                <FluentAccordionItem Header="@Localizer["Agents.Config.Section.Instructions"]" @bind-Expanded="_expandedSections[1]">
+                    <ul>
+                        <li data-testid="agents-config-instructions-presence">@(agent.HasInstructions ? Localizer["Agents.Config.Instructions.Present"] : Localizer["Agents.Config.Instructions.Absent"])</li>
+                        @if (agent.HasInstructions)
+                        {
+                            <li data-testid="agents-config-instructions-validity">@(agent.InstructionsValid ? Localizer["Agents.Config.Instructions.Valid"] : Localizer["Agents.Config.Instructions.Invalid"])</li>
+                            <li data-testid="agents-config-instructions-version">@Localizer["Agents.Config.Instructions.Version", agent.InstructionsVersion]</li>
+                        }
+                    </ul>
+                </FluentAccordionItem>
+
+                <FluentAccordionItem Header="@Localizer["Agents.Config.Section.Edit"]" @bind-Expanded="_expandedSections[2]">
+                    @* The only write surface for identity and instructions. The instructions field always starts empty
+                       and is cleared while a submit is owned by the retained attempt; terminal failure or abandonment
+                       restores that exact draft. The current instruction text is never read back into the page, so a
+                       save reports presence/validity/version and nothing else (AD-14). *@
+                    <FluentTextInput @bind-Value="_displayNameDraft"
+                                     Disabled="@(_busy || HasUnresolvedAttempt)"
+                                     Label="@Localizer["Agents.Config.DisplayName.Label"]"
+                                     AriaLabel="@Localizer["Agents.Config.DisplayName.Label"]"
+                                     data-testid="agents-config-display-name-input" />
+                    <FluentTextInput @bind-Value="_descriptionDraft"
+                                     Disabled="@(_busy || HasUnresolvedAttempt)"
+                                     Label="@Localizer["Agents.Config.Description.Label"]"
+                                     AriaLabel="@Localizer["Agents.Config.Description.Label"]"
+                                     data-testid="agents-config-description-input" />
+                    <FluentTextArea @bind-Value="_instructionsDraft"
+                                    Disabled="@(_busy || HasUnresolvedAttempt)"
+                                    Label="@Localizer["Agents.Config.Instructions.Label"]"
+                                    AriaLabel="@Localizer["Agents.Config.Instructions.Label"]"
+                                    Required="true"
+                                    data-testid="agents-config-instructions-input" />
+                    <p class="agents-config__note" data-testid="agents-config-instructions-write-note">
+                        @Localizer["Agents.Config.Instructions.ReplaceNote"]
+                    </p>
+                    <FluentButton Appearance="ButtonAppearance.Primary"
+                                  Disabled="@(_busy || HasUnresolvedAttempt || string.IsNullOrWhiteSpace(_instructionsDraft))"
+                                  OnClick="SubmitConfigurationAsync"
+                                  data-testid="agents-config-submit">
+                        @Localizer["Agents.Config.Edit.Submit"]
+                    </FluentButton>
+                </FluentAccordionItem>
+
+                <FluentAccordionItem Header="@Localizer["Agents.Config.Section.Provider"]" @bind-Expanded="_expandedSections[3]">
+                    <p data-testid="agents-config-provider">
+                        @if (agent.HasProviderSelection && agent.SelectedProviderId is { } providerId && agent.SelectedModelId is { } modelId)
+                        {
+                            <code>@Localizer["Agents.Config.Provider.Selected", providerId, modelId]</code>
+                        }
+                        else
+                        {
+                            @Localizer["Agents.Config.Provider.None"]
+                        }
+                    </p>
+                </FluentAccordionItem>
+
+                <FluentAccordionItem Header="@Localizer["Agents.Config.Section.Truth"]" @bind-Expanded="_expandedSections[4]">
+                    <dl>
+                        <dt>@Localizer["Agents.Config.Truth.Stage.Label"]</dt>
+                        <dd data-testid="agents-config-truth-stage">@Localizer[$"Agents.Config.Truth.Stage.{setup.TruthState}"]</dd>
+                        <dt>@Localizer["Agents.Config.Truth.ConfigurationVersion.Label"]</dt>
+                        <dd data-testid="agents-config-configuration-version">@setup.ConfigurationVersion</dd>
+                        <dt>@Localizer["Agents.Config.Truth.ProjectionVersion.Label"]</dt>
+                        <dd data-testid="agents-config-projection-version">@(setup.ProjectionVersion ?? Localizer["Agents.Common.None"].Value)</dd>
+                        <dt>@Localizer["Agents.Config.Truth.Freshness.Label"]</dt>
+                        <dd data-testid="agents-config-freshness">@Localizer[$"Agents.Config.Truth.Freshness.{setup.Freshness}"]</dd>
+                    </dl>
+                </FluentAccordionItem>
+
+                <FluentAccordionItem Header="@Localizer["Agents.Config.Section.ResponseMode"]" @bind-Expanded="_expandedSections[5]">
+                    <ResponseModeToggle Value="@_responseMode" ValueChanged="OnResponseModeChanged" Name="agents-config-response-mode" Disabled="@(_busy || HasUnresolvedAttempt)" />
+                    <p class="agents-config__note">@Localizer["Agents.Config.ResponseMode.FutureOnlyNote"]</p>
+                    <FluentButton Appearance="ButtonAppearance.Primary"
+                                  Disabled="@(_busy || HasUnresolvedAttempt || _responseMode == agent.ResponseMode)"
+                                  OnClick="SubmitResponseModeAsync"
+                                  data-testid="agents-config-response-mode-submit">
+                        @Localizer["Agents.Config.ResponseMode.Submit"]
+                    </FluentButton>
+                </FluentAccordionItem>
+
+                <FluentAccordionItem Header="@Localizer["Agents.Config.Section.ApproverPolicy"]" @bind-Expanded="_expandedSections[6]">
+                    <p data-testid="agents-config-approver-presence">@(agent.HasApproverPolicy ? Localizer["Agents.ApproverPolicy.Present"] : Localizer["Agents.ApproverPolicy.Absent"])</p>
+                    @if (agent.HasApproverPolicy)
                     {
-                        <li data-testid="agents-config-instructions-validity">@(agent.InstructionsValid ? Localizer["Agents.Config.Instructions.Valid"] : Localizer["Agents.Config.Instructions.Invalid"])</li>
-                        <li data-testid="agents-config-instructions-version">@Localizer["Agents.Config.Instructions.Version", agent.InstructionsVersion]</li>
+                        <p>@Localizer["Agents.ApproverPolicy.Version", agent.ApproverPolicyVersion]</p>
+                        <p>@Localizer["Agents.ApproverPolicy.Disclosure.Label"]: @Localizer[$"Agents.ApproverPolicy.Disclosure.{agent.ApproverPolicyDisclosure}"]</p>
                     }
-                </ul>
-            </section>
+                    <FluentAnchorButton Href="/agents/approver-policy" Appearance="ButtonAppearance.Subtle" data-testid="agents-config-approver-link">
+                        @Localizer["Agents.Config.ApproverPolicy.Link"]
+                    </FluentAnchorButton>
+                </FluentAccordionItem>
 
-            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Edit"]">
-                @* The only write surface for identity and instructions. The instructions field always starts empty
-                   and is cleared while a submit is owned by the retained attempt; terminal failure or abandonment
-                   restores that exact draft. The current instruction text is never read back into the page, so a
-                   save reports presence/validity/version and nothing else (AD-14). *@
-                <h2>@Localizer["Agents.Config.Section.Edit"]</h2>
-                <FluentTextInput @bind-Value="_displayNameDraft"
-                                 Disabled="@(_busy || HasUnresolvedAttempt)"
-                                 Label="@Localizer["Agents.Config.DisplayName.Label"]"
-                                 AriaLabel="@Localizer["Agents.Config.DisplayName.Label"]"
-                                 data-testid="agents-config-display-name-input" />
-                <FluentTextInput @bind-Value="_descriptionDraft"
-                                 Disabled="@(_busy || HasUnresolvedAttempt)"
-                                 Label="@Localizer["Agents.Config.Description.Label"]"
-                                 AriaLabel="@Localizer["Agents.Config.Description.Label"]"
-                                 data-testid="agents-config-description-input" />
-                <FluentTextArea @bind-Value="_instructionsDraft"
-                                Disabled="@(_busy || HasUnresolvedAttempt)"
-                                Label="@Localizer["Agents.Config.Instructions.Label"]"
-                                AriaLabel="@Localizer["Agents.Config.Instructions.Label"]"
-                                Required="true"
-                                data-testid="agents-config-instructions-input" />
-                <p class="agents-config__note" data-testid="agents-config-instructions-write-note">
-                    @Localizer["Agents.Config.Instructions.ReplaceNote"]
-                </p>
-                <FluentButton Appearance="ButtonAppearance.Primary"
-                              Disabled="@(_busy || HasUnresolvedAttempt || string.IsNullOrWhiteSpace(_instructionsDraft))"
-                              OnClick="SubmitConfigurationAsync"
-                              data-testid="agents-config-submit">
-                    @Localizer["Agents.Config.Edit.Submit"]
-                </FluentButton>
-            </section>
+                <FluentAccordionItem Header="@Localizer["Agents.Config.Section.Lifecycle"]" @bind-Expanded="_expandedSections[7]">
+                    <AgentReadinessBadge State="@AgentReadiness.MapState(agent)" />
+                    <p data-testid="agents-config-lifecycle">@Localizer[$"Agents.Lifecycle.{agent.Lifecycle}"]</p>
+                </FluentAccordionItem>
 
-            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Provider"]">
-                <h2>@Localizer["Agents.Config.Section.Provider"]</h2>
-                <p data-testid="agents-config-provider">
-                    @if (agent.HasProviderSelection && agent.SelectedProviderId is { } providerId && agent.SelectedModelId is { } modelId)
+                <FluentAccordionItem Header="@Localizer["Agents.Config.Section.Blockers"]" @bind-Expanded="_expandedSections[8]">
+                    @if (agent.ActivationBlockers.Count == 0)
                     {
-                        <code>@Localizer["Agents.Config.Provider.Selected", providerId, modelId]</code>
+                        <p data-testid="agents-config-blockers-none">@Localizer["Agents.Overview.Blockers.None"]</p>
                     }
                     else
                     {
-                        @Localizer["Agents.Config.Provider.None"]
+                        <ul data-testid="agents-config-blockers">
+                            @foreach (AgentActivationBlocker blocker in agent.ActivationBlockers)
+                            {
+                                <li data-testid="@($"agents-config-blocker-{blocker}")">@Localizer[AgentReadiness.BlockerKeyFor(blocker)]</li>
+                            }
+                        </ul>
                     }
-                </p>
-            </section>
+                </FluentAccordionItem>
 
-            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Truth"]">
-                <h2>@Localizer["Agents.Config.Section.Truth"]</h2>
-                <dl>
-                    <dt>@Localizer["Agents.Config.Truth.Stage.Label"]</dt>
-                    <dd data-testid="agents-config-truth-stage">@Localizer[$"Agents.Config.Truth.Stage.{setup.TruthState}"]</dd>
-                    <dt>@Localizer["Agents.Config.Truth.ConfigurationVersion.Label"]</dt>
-                    <dd data-testid="agents-config-configuration-version">@setup.ConfigurationVersion</dd>
-                    <dt>@Localizer["Agents.Config.Truth.ProjectionVersion.Label"]</dt>
-                    <dd data-testid="agents-config-projection-version">@(setup.ProjectionVersion ?? Localizer["Agents.Common.None"].Value)</dd>
-                    <dt>@Localizer["Agents.Config.Truth.Freshness.Label"]</dt>
-                    <dd data-testid="agents-config-freshness">@Localizer[$"Agents.Config.Truth.Freshness.{setup.Freshness}"]</dd>
-                </dl>
-            </section>
-
-            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.ResponseMode"]">
-                <h2>@Localizer["Agents.Config.Section.ResponseMode"]</h2>
-                <ResponseModeToggle Value="@_responseMode" ValueChanged="OnResponseModeChanged" Name="agents-config-response-mode" Disabled="@(_busy || HasUnresolvedAttempt)" />
-                <p class="agents-config__note">@Localizer["Agents.Config.ResponseMode.FutureOnlyNote"]</p>
-                <FluentButton Appearance="ButtonAppearance.Primary"
-                              Disabled="@(_busy || HasUnresolvedAttempt || _responseMode == agent.ResponseMode)"
-                              OnClick="SubmitResponseModeAsync"
-                              data-testid="agents-config-response-mode-submit">
-                    @Localizer["Agents.Config.ResponseMode.Submit"]
-                </FluentButton>
-            </section>
-
-            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.ApproverPolicy"]">
-                <h2>@Localizer["Agents.Config.Section.ApproverPolicy"]</h2>
-                <p data-testid="agents-config-approver-presence">@(agent.HasApproverPolicy ? Localizer["Agents.ApproverPolicy.Present"] : Localizer["Agents.ApproverPolicy.Absent"])</p>
-                @if (agent.HasApproverPolicy)
-                {
-                    <p>@Localizer["Agents.ApproverPolicy.Version", agent.ApproverPolicyVersion]</p>
-                    <p>@Localizer["Agents.ApproverPolicy.Disclosure.Label"]: @Localizer[$"Agents.ApproverPolicy.Disclosure.{agent.ApproverPolicyDisclosure}"]</p>
-                }
-                <FluentAnchorButton Href="/agents/approver-policy" Appearance="ButtonAppearance.Subtle" data-testid="agents-config-approver-link">
-                    @Localizer["Agents.Config.ApproverPolicy.Link"]
-                </FluentAnchorButton>
-            </section>
-
-            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Lifecycle"]">
-                <h2>@Localizer["Agents.Config.Section.Lifecycle"]</h2>
-                <AgentReadinessBadge State="@AgentReadiness.MapState(agent)" />
-                <p data-testid="agents-config-lifecycle">@Localizer[$"Agents.Lifecycle.{agent.Lifecycle}"]</p>
-            </section>
-
-            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.Blockers"]">
-                <h2>@Localizer["Agents.Config.Section.Blockers"]</h2>
-                @if (agent.ActivationBlockers.Count == 0)
-                {
-                    <p data-testid="agents-config-blockers-none">@Localizer["Agents.Overview.Blockers.None"]</p>
-                }
-                else
-                {
-                    <ul data-testid="agents-config-blockers">
-                        @foreach (AgentActivationBlocker blocker in agent.ActivationBlockers)
+                <FluentAccordionItem Header="@Localizer["Agents.Config.Section.ContentSafety"]" @bind-Expanded="_expandedSections[9]">
+                    <ul>
+                        <li data-testid="agents-config-content-safety-presence">@(agent.HasContentSafetyPolicy ? Localizer["Agents.Config.ContentSafety.Present"] : Localizer["Agents.Config.ContentSafety.Absent"])</li>
+                        @if (agent.HasContentSafetyPolicy)
                         {
-                            <li data-testid="@($"agents-config-blocker-{blocker}")">@Localizer[AgentReadiness.BlockerKeyFor(blocker)]</li>
+                            <li data-testid="agents-config-content-safety-version">@Localizer["Agents.Config.ContentSafety.Version", agent.ContentSafetyPolicyVersion]</li>
+                        }
+                        @if (agent.HasAutomaticContentSafetyOverride)
+                        {
+                            <li>@Localizer["Agents.Config.ContentSafety.AutomaticOverride"]</li>
+                        }
+                        @if (agent.HasConfirmationContentSafetyOverride)
+                        {
+                            <li>@Localizer["Agents.Config.ContentSafety.ConfirmationOverride"]</li>
                         }
                     </ul>
-                }
-            </section>
+                </FluentAccordionItem>
 
-            <section class="agents-config__section" aria-label="@Localizer["Agents.Config.Section.ContentSafety"]">
-                <h2>@Localizer["Agents.Config.Section.ContentSafety"]</h2>
-                <ul>
-                    <li data-testid="agents-config-content-safety-presence">@(agent.HasContentSafetyPolicy ? Localizer["Agents.Config.ContentSafety.Present"] : Localizer["Agents.Config.ContentSafety.Absent"])</li>
-                    @if (agent.HasContentSafetyPolicy)
-                    {
-                        <li data-testid="agents-config-content-safety-version">@Localizer["Agents.Config.ContentSafety.Version", agent.ContentSafetyPolicyVersion]</li>
-                    }
-                    @if (agent.HasAutomaticContentSafetyOverride)
-                    {
-                        <li>@Localizer["Agents.Config.ContentSafety.AutomaticOverride"]</li>
-                    }
-                    @if (agent.HasConfirmationContentSafetyOverride)
-                    {
-                        <li>@Localizer["Agents.Config.ContentSafety.ConfirmationOverride"]</li>
-                    }
-                </ul>
-            </section>
+            </FluentAccordion>
 
             <section class="agents-config__activation" aria-label="@Localizer["Agents.Config.Activation.Label"]">
                 @* Activation is a distinct action shown after validity is visible. Activating sets a lifecycle
@@ -270,6 +263,7 @@
     private static readonly TimeSpan ProjectionPollingInterval = TimeSpan.FromMilliseconds(250);
     private static readonly TimeSpan ProjectionPollingTimeout = TimeSpan.FromSeconds(8);
 
+    private readonly bool[] _expandedSections = Enumerable.Repeat(true, 10).ToArray();
     private readonly CancellationTokenSource _lifetimeCancellation = new();
     private FcPageHeader? _header;
     private AgentSetupResult? _result;

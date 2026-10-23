@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -14,7 +16,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// <see cref="Unknown"/> (ordinal 0) is the "not-yet-known" sentinel: an absent/unrecognized status must never
 /// deserialize to a concrete state. Serialized by name so a missing value never resolves to <see cref="Requested"/>.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentInteractionStatus>))]
 public enum AgentInteractionStatus
 {
     /// <summary>Not-yet-known sentinel — an absent/unrecognized status never resolves to a concrete state.</summary>

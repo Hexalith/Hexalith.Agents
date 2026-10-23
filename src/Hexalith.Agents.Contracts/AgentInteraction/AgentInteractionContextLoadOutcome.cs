@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -16,7 +18,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// exists in another tenant (AC1). Serialized by name so an absent value never resolves to a concrete outcome;
 /// <see cref="Unknown"/> (ordinal 0) is the fail-safe sentinel (treated as a degraded read that fails closed).
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentInteractionContextLoadOutcome>))]
 public enum AgentInteractionContextLoadOutcome
 {
     /// <summary>Absent/unrecognized outcome sentinel — treated as a degraded read and fails closed.</summary>

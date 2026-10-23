@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -13,7 +15,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// fail-safe sentinel (treated as an edit failure). The values mirror <see cref="AgentProposalEditFailureReason"/> (plus
 /// <see cref="Edited"/>) so the policy mapping is total. Mirrors <see cref="AgentProposalCreationOutcome"/>.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentProposalEditOutcome>))]
 public enum AgentProposalEditOutcome
 {
     /// <summary>Not-an-outcome sentinel — treated as an edit failure (fail closed).</summary>

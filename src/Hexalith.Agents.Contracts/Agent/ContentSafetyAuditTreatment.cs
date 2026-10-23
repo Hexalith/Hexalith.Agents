@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -13,7 +15,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// (ordinal 0) is the fail-safe sentinel — it <b>cannot be configured</b>: a defined policy must specify how a safety
 /// failure is audited.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<ContentSafetyAuditTreatment>))]
 public enum ContentSafetyAuditTreatment
 {
     /// <summary>Absent/unrecognized fail-safe sentinel — cannot be configured (a defined policy must choose a treatment).</summary>

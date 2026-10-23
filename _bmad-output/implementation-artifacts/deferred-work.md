@@ -31,7 +31,8 @@ location: src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor:310
 source_spec: `spec-setup-projection-polling.md`
 severity: medium
 reason: This limitation predates the polling bundle: activation and disable do not increment ConfigurationVersion, while configuration writes expose only an expected version rather than the accepted command identity. A same-version lifecycle read can therefore confirm the pre-write lifecycle, and a concurrent configuration write can satisfy current+1. Correcting either case requires changing the API/projection correlation contract that this bundle explicitly leaves untouched.
-status: open
+status: done 2026-10-23
+resolution: `spec-five-deferred-contract-and-setup-items.md` verifies the existing canonical command receipt, domain-derived effect/target version and incrementing lifecycle versions. The new lifecycle regression carries an actual disable DomainResult through receipt validation and AgentSetupProjectionHandler, observes the old projection as pending, then asserts persisted Disabled/version state and a confirmed public view. Full local source verification passes; production topology qualification remains separately governed.
 
 ### DW-5: The intent may require retaining AuthoritativePending alongside every typed terminal read failure rather than rendering the existing fail-closed terminal surface.
 origin: spec-deferred 333d98453824
@@ -168,7 +169,8 @@ origin: code review round 2, 2026-09-14
 location: src/Hexalith.Agents.Contracts
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: Story 5.2 covers its setup payload and operation terms; the remaining AgentInteraction and ProviderCatalog payload families still require a coordinated prospective-compatibility migration. AgentInspectionStatus remains deliberately excluded because zero means Success.
-status: open
+status: done 2026-10-23
+resolution: `spec-five-deferred-contract-and-setup-items.md` migrates 44 interaction and two provider Unknown-zero enums without changing names or ordinals. Future scalar names/numbers degrade to Unknown, configured enum naming policies and known dictionary keys round-trip, and unknown dictionary keys fail closed rather than merge facts. The one previously numeric status retains its default numeric writer and explicit string-options encoding. Flags and Success-zero enums keep their prior behavior. The full 1,970-case Contracts suite passes.
 
 ### DW-14: Complete the provider-catalog write path to the Story 5.2 acceptance contract.
 
@@ -176,7 +178,8 @@ origin: code review round 4, 2026-09-15
 location: src/Hexalith.Agents.Server/Application/Agents/EventStoreProviderCatalogOperations.cs
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: The provider path still discards the receipt, lacks effect/version evidence and canonical identity validation, and belongs to Story 5.3.
-status: open
+status: done 2026-10-23
+resolution: `spec-five-deferred-contract-and-setup-items.md` completes canonical caller/generated identity validation across all six provider write families, rejecting empty/lowercase/overflowing/GUID/whitespace IDs before dispatch. Tenant writes validate supplied IDs before dependency reads; authorization remains first. Exact retries retain their pair and payload, mismatched receipts cannot confirm or query another command, and existing receipt/effect/outcome/projection and retained-UI regressions all pass in the 1,491-case Server and 1,171-case UI suites. This is local source evidence, not external host qualification.
 
 ### DW-15: Propagate the per-class zero-test guard to the Story 5.3 verifier.
 
@@ -210,7 +213,8 @@ origin: code review round 4, 2026-09-15
 location: src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: The pre-existing ten-section page does not meet the loaded UX accordion convention; this story adds no titled section.
-status: open
+status: done 2026-10-23
+resolution: `spec-five-deferred-contract-and-setup-items.md` groups all ten titled configuration sections in one FluentAccordion using actual Fluent UI v5 Header parameters and level-two headings. Sections start expanded and retain user collapse across parent renders; editing controls remain available, with activation actions and the write live region outside. Structure, collapse/edit and all existing configuration regressions pass within the 1,171-case full UI suite.
 
 ### DW-19: Establish whether the command-status seam is reachable through a production EventStore gateway.
 
@@ -268,7 +272,8 @@ origin: code review, 2026-09-19
 location: test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: Eight sibling `Hexalith.Agents.Contracts.Agent` enums (`ContentSafetyFailureHandling`, `ContentSafetyAuditTreatment`, `ApproverPolicySourceKind`, `ApproverPolicyValidationStatus`, `CostControlPosture`, `LaunchMetricClassification`, `PartyLinkValidationStatus`, `ProviderSelectionValidationStatus`) still declare the throwing `JsonStringEnumConverter` and escape `DiscoverPublicUnknownSentinelEnums` only because nothing on `AgentSetupView`/`AgentStatusView` references them. The Operations side is enumerated by namespace rather than traversed, so an `Unknown = 0` enum reaching the wire through an Operations record — `ContentSafetyAuditTreatment` on `AgentAuditGovernanceReadiness` today — is invisible to the guard despite its comment claiming either graph is "covered without editing this file". DW-13 is worded by namespace and does not name these. Widen the ledger wording, and replace `_deferredEnumNamespaces` with an explicit deferred-type list so a new Agent-namespace enum cannot fall through both nets.
-status: open
+status: done 2026-10-23
+resolution: `spec-five-deferred-contract-and-setup-items.md` migrates the six remaining Agent enums and covers all 70 public Unknown-zero enums, including nested Operations payloads and externally visible nested types. Namespace exclusions are replaced by three exact closed-directory protocol deferrals; five non-Unknown-zero exceptions are explicit. An embedded pre-migration member/ordinal snapshot prevents renumbering. Direct nested audit payload, configured serializer factory, numeric/name compatibility and future-value regressions pass in the full 1,970-case Contracts suite.
 
 ### DW-24: Settle the tenant-scoped authorization contract for the gateway command-status read.
 

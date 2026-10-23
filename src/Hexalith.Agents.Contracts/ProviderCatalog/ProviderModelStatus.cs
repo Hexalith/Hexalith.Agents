@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.ProviderCatalog;
 
 /// <summary>
@@ -13,7 +15,7 @@ namespace Hexalith.Agents.Contracts.ProviderCatalog;
 /// <see cref="Degraded"/> and <see cref="Failed"/> are reserved for the later runtime-health stories and are
 /// part of the stable surface so the future Provider catalog grid does not need a contract change.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<ProviderModelStatus>))]
 public enum ProviderModelStatus
 {
     /// <summary>Absent/unrecognized status sentinel — never selectable for active use.</summary>

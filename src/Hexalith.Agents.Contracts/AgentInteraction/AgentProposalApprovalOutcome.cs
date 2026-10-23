@@ -1,11 +1,13 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
 /// Server-assembled outcome of approving and posting one selected Proposed Agent Reply version.
 /// </summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentProposalApprovalOutcome>))]
 public enum AgentProposalApprovalOutcome
 {
     /// <summary>Not-an-outcome sentinel; fails closed.</summary>

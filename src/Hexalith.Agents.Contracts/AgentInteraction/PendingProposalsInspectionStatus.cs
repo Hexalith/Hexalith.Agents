@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -11,7 +13,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// <see cref="Unavailable"/>/<see cref="Stale"/> that back the UI <c>Error</c>/<c>Stale</c> surfaces (read models expose
 /// freshness/degraded/blocked states — architecture Consistency Conventions; AD-12).
 /// </summary>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<PendingProposalsInspectionStatus>))]
 public enum PendingProposalsInspectionStatus
 {
     /// <summary>Not-yet-known sentinel — an absent/unrecognized status never resolves to a concrete outcome.</summary>

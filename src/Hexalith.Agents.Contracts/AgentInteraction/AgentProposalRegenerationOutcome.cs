@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -16,7 +18,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// provider, while authorization fail-closed rides the result's verdict (mirroring the Story 3.3 edit path). Mirrors
 /// <see cref="AgentProposalEditOutcome"/> in role.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentProposalRegenerationOutcome>))]
 public enum AgentProposalRegenerationOutcome
 {
     /// <summary>Not-an-outcome sentinel — treated as a regeneration failure (fail closed).</summary>

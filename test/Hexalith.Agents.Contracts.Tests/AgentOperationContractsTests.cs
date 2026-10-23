@@ -89,18 +89,13 @@ public sealed class AgentOperationContractsTests
         }
     }
 
-    // Derived, never hand-maintained: every Unknown = 0 enum reachable from this story's own public read/write
-    // payloads and from the public operation envelope.
-    // An enum added to either graph later is covered without editing this file, which is the point — a hand-listed
-    // subset is exactly how the setup-view enums were missed. They share one sentinel, one by-name encoding, and
-    // one tolerant reader, so every property below iterates this set.
-    // AgentInspectionStatus is excluded by the Unknown = 0 rule itself: its zero is Success, so degrading an
-    // unrecognized value there would fail open. The AgentInteraction and ProviderCatalog enums are a separate,
-    // deferred migration and are excluded by namespace.
-    private static readonly string[] _deferredEnumNamespaces =
+    // Discover every public Unknown-zero enum, including nested operation payloads. The directory's closed
+    // protocol remains a separate migration; listing exact types prevents new siblings escaping this guard.
+    private static readonly Type[] _deferredEnumTypes =
     [
-        "Hexalith.Agents.Contracts.AgentInteraction",
-        "Hexalith.Agents.Contracts.ProviderCatalog",
+        typeof(Contracts.ConversationAgentState.ConversationDirectoryRejectionReason),
+        typeof(Contracts.ConversationAgentState.ConversationEffectLeaseStatus),
+        typeof(Contracts.ConversationAgentState.ConversationEffectKind),
     ];
 
     private static readonly Type[] _setupContractEnumTypes = DiscoverEnumTypes(
@@ -161,30 +156,88 @@ public sealed class AgentOperationContractsTests
 
     private static Type[] DiscoverPublicUnknownSentinelEnums()
     {
-        Assembly contracts = typeof(AgentOperationResult).Assembly;
-        SortedDictionary<string, Type> found = [];
+        return typeof(AgentOperationResult).Assembly.GetTypes()
+            .Where(type => type.IsVisible && type.IsEnum && Enum.GetName(type, 0) == "Unknown"
+                && !_deferredEnumTypes.Contains(type))
+            .OrderBy(type => type.FullName, StringComparer.Ordinal)
+            .ToArray();
+    }
 
-        // The story's own read payload is walked transitively; the public operation status terms are taken as
-        // declared, so an unrelated story's view type does not silently widen this story's guard.
-        foreach (Type enumType in _setupContractEnumTypes
-            .Where(type => Enum.GetName(type, 0) == "Unknown"
-                && !_deferredEnumNamespaces.Contains(type.Namespace)))
-        {
-            found[enumType.FullName!] = enumType;
-        }
+    [Fact]
+    public void MigratedEnumOrdinalsMatchThePreMigrationWireSnapshot()
+    {
+        using Stream stream = typeof(AgentOperationContractsTests).Assembly
+            .GetManifestResourceStream("Hexalith.Agents.Contracts.Tests.ContractEnumOrdinals.json").ShouldNotBeNull();
+        Dictionary<string, Dictionary<string, int>> snapshot = JsonSerializer
+            .Deserialize<Dictionary<string, Dictionary<string, int>>>(stream).ShouldNotBeNull();
 
-        foreach (Type root in contracts.GetTypes()
-            .Where(type => type.IsPublic
-                && type.IsEnum
-                && type.Namespace == typeof(AgentOperationResult).Namespace))
+        foreach ((string typeName, Dictionary<string, int> members) in snapshot)
         {
-            if (Enum.GetName(root, 0) == "Unknown")
+            Type enumType = typeof(AgentOperationResult).Assembly.GetType(typeName).ShouldNotBeNull();
+            foreach ((string name, int ordinal) in members)
             {
-                found[root.FullName!] = root;
+                Enum.GetName(enumType, ordinal).ShouldBe(name, $"{typeName}.{name} must keep ordinal {ordinal}.");
             }
         }
+    }
 
-        return [.. found.Values];
+    [Fact]
+    public void EveryPublicEnumHasAnUnknownSentinelOrAnExplicitCompatibilityException()
+    {
+        Type[] exceptions =
+        [
+            typeof(AgentInspectionStatus),
+            typeof(AgentSetupWriteStatus),
+            typeof(Contracts.AgentInteraction.AgentInteractionGateInspectionStatus),
+            typeof(Contracts.ProviderCatalog.ProviderCatalogInspectionStatus),
+            typeof(Contracts.ProviderCatalog.ProviderModelCapabilityFlags),
+        ];
+        Type[] withoutUnknown = typeof(AgentOperationResult).Assembly.GetTypes()
+            .Where(type => type.IsVisible && type.IsEnum && Enum.GetName(type, 0) != "Unknown")
+            .ToArray();
+
+        withoutUnknown.OrderBy(type => type.FullName, StringComparer.Ordinal)
+            .ShouldBe(exceptions.OrderBy(type => type.FullName, StringComparer.Ordinal));
+        foreach (Type deferred in _deferredEnumTypes)
+        {
+            Enum.GetName(deferred, 0).ShouldBe("Unknown");
+        }
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void FutureNestedAuditTreatmentDoesNotDiscardTheOperationPayload(bool web)
+    {
+        JsonSerializerOptions options = ShapeOptions(web);
+        options.Converters.Add(new UnknownFallbackEnumConverterFactory());
+        options.Converters.Add(new JsonStringEnumConverter());
+        string json = JsonSerializer.Serialize(AgentAuditGovernanceReadiness.MetadataOnlyBlocked, options)
+            .Replace("\"MetadataOnly\"", "\"FutureTreatment\"", StringComparison.Ordinal);
+
+        AgentAuditGovernanceReadiness result = JsonSerializer.Deserialize<AgentAuditGovernanceReadiness>(json, options)
+            .ShouldNotBeNull();
+
+        result.ActiveTreatment.ShouldBe(ContentSafetyAuditTreatment.Unknown);
+        result.BlockedTreatment.ShouldBe(ContentSafetyAuditTreatment.RedactedExcerpt);
+        result.Blockers.ShouldBe(AgentAuditGovernanceReadiness.MetadataOnlyBlocked.Blockers);
+    }
+
+    [Fact]
+    public void NestedOperationPayloadEnumsAreIncludedInCompatibilityCoverage()
+    {
+        Type[] roots = typeof(AgentOperationResult).Assembly.GetTypes()
+            .Where(type => type.IsVisible && type.Namespace == typeof(AgentOperationResult).Namespace)
+            .ToArray();
+        Type[] reachable = DiscoverEnumTypes(roots)
+            .Where(type => Enum.GetName(type, 0) == "Unknown" && !_deferredEnumTypes.Contains(type))
+            .ToArray();
+
+        reachable.ShouldContain(typeof(ContentSafetyAuditTreatment));
+        foreach (Type enumType in reachable)
+        {
+            _publicOperationEnumTypes.ShouldContain(enumType);
+        }
     }
 
     [Fact]
@@ -273,7 +326,85 @@ public sealed class AgentOperationContractsTests
 
         object nonZero = Enum.GetValues(enumType).Cast<object>().First(value => Convert.ToInt32(value) != 0);
         string json = JsonSerializer.Serialize(nonZero, enumType);
-        json.ShouldBe($"\"{nonZero}\"", $"{enumType.Name} must serialize by enum name.");
+        string expected = enumType == typeof(Contracts.AgentInteraction.AgentInteractionContextInspectionStatus)
+            ? Convert.ToInt32(nonZero).ToString(CultureInfo.InvariantCulture)
+            : $"\"{nonZero}\"";
+        json.ShouldBe(expected, $"{enumType.Name} must preserve its known wire encoding.");
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void LegacyNumericStatusKeepsExplicitStringOptionsEncoding(bool generic)
+    {
+        JsonSerializerOptions options = new()
+        {
+            Converters = { new UnknownFallbackEnumConverterFactory() },
+        };
+        options.Converters.Add(generic
+            ? new JsonStringEnumConverter<Contracts.AgentInteraction.AgentInteractionContextInspectionStatus>()
+            : new JsonStringEnumConverter());
+
+        JsonSerializer.Serialize(Contracts.AgentInteraction.AgentInteractionContextInspectionStatus.Success, options)
+            .ShouldBe("\"Success\"");
+        JsonSerializer.Deserialize<Contracts.AgentInteraction.AgentInteractionContextInspectionStatus>("\"FutureStatus\"", options)
+            .ShouldBe(Contracts.AgentInteraction.AgentInteractionContextInspectionStatus.Unknown);
+    }
+
+    [Theory]
+    [MemberData(nameof(PublicOperationEnumTypes))]
+    public void ExplicitEnumNamingPolicyPreservesKnownValuesAndDictionaryKeys(Type enumType)
+    {
+        ArgumentNullException.ThrowIfNull(enumType);
+        JsonSerializerOptions baseline = new()
+        {
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) },
+            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+        };
+        JsonSerializerOptions tolerant = new()
+        {
+            Converters = { new UnknownFallbackEnumConverterFactory(), new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) },
+            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+        };
+        Type dictionaryType = typeof(Dictionary<,>).MakeGenericType(enumType, typeof(string));
+        var dictionary = (System.Collections.IDictionary)Activator.CreateInstance(dictionaryType)!;
+        foreach (object declared in Enum.GetValues(enumType))
+        {
+            string json = JsonSerializer.Serialize(declared, enumType, baseline);
+            JsonSerializer.Serialize(declared, enumType, tolerant).ShouldBe(json);
+            JsonSerializer.Deserialize(json, enumType, tolerant).ShouldBe(declared);
+            dictionary.Add(declared, declared.ToString());
+        }
+        string keys = JsonSerializer.Serialize(dictionary, dictionaryType, baseline);
+        JsonSerializer.Serialize(dictionary, dictionaryType, tolerant).ShouldBe(keys);
+        var roundTrip = (System.Collections.IDictionary)JsonSerializer.Deserialize(keys, dictionaryType, tolerant).ShouldNotBeNull();
+        foreach (object key in dictionary.Keys)
+        {
+            roundTrip[key].ShouldBe(dictionary[key]);
+        }
+        Convert.ToInt32(JsonSerializer.Deserialize("\"future_value\"", enumType, tolerant)).ShouldBe(0);
+    }
+
+    [Theory]
+    [MemberData(nameof(PublicOperationEnumTypes))]
+    public void EnumDictionaryKeysRoundTripAllDeclaredMembersWithoutLosingFacts(Type enumType)
+    {
+        ArgumentNullException.ThrowIfNull(enumType);
+        Type dictionaryType = typeof(Dictionary<,>).MakeGenericType(enumType, typeof(string));
+        var original = (System.Collections.IDictionary)Activator.CreateInstance(dictionaryType)!;
+        foreach (object value in Enum.GetValues(enumType))
+        {
+            original.Add(value, value.ToString());
+        }
+        string json = JsonSerializer.Serialize(original, dictionaryType);
+        var result = (System.Collections.IDictionary)JsonSerializer.Deserialize(json, dictionaryType).ShouldNotBeNull();
+
+        result.Count.ShouldBe(original.Count);
+        foreach (object key in original.Keys)
+        {
+            result[key].ShouldBe(original[key]);
+        }
+        Should.Throw<JsonException>(() => JsonSerializer.Deserialize("{\"FutureKey\":\"fact\"}", dictionaryType));
     }
 
     [Theory]
@@ -326,13 +457,10 @@ public sealed class AgentOperationContractsTests
                 .Where(value => Convert.ToInt32(value) != 0)
                 .Select(value => value.ToString()!)
                 .ToArray();
-            if (nonZeroNames.Length < 2)
+            if (nonZeroNames.Length >= 2)
             {
-                throw new InvalidOperationException(
-                    $"Compatibility enum '{enumType.FullName}' must declare at least two non-zero members for the comma-list guard.");
+                data.Add(enumType, $"\"{nonZeroNames[0]}, {nonZeroNames[1]}\"");
             }
-
-            data.Add(enumType, $"\"{nonZeroNames[0]}, {nonZeroNames[1]}\"");
         }
 
         return data;
@@ -558,7 +686,8 @@ public sealed class AgentOperationContractsTests
             (OperationalStatusInspectionStatus.Unavailable, 3),
             (OperationalStatusInspectionStatus.Stale, 4));
 
-        foreach (Type enumType in _setupContractEnumTypes.Concat(_publicOperationEnumTypes).Distinct())
+        foreach (Type enumType in _setupContractEnumTypes.Concat(_publicOperationEnumTypes
+            .Where(type => type.Namespace == typeof(AgentOperationResult).Namespace)).Distinct())
         {
             pinnedEnumTypes.ShouldContain(enumType, $"{enumType.Name} is part of the setup or operation contract.");
         }

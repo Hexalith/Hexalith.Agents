@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 using Hexalith.Agents.Contracts.ProviderCatalog.Events;
+using Hexalith.Agents.Contracts.Serialization;
 using Hexalith.EventStore.Contracts.Commands;
 using Hexalith.EventStore.Contracts.Identity;
 using Hexalith.EventStore.Contracts.Projections;
@@ -17,7 +18,7 @@ public sealed class AgentsProviderCatalogCoordinationPolicy : ICoordinatedComman
 {
     private static readonly JsonSerializerOptions _json = new(JsonSerializerDefaults.Web)
     {
-        Converters = { new JsonStringEnumConverter() },
+        Converters = { new UnknownFallbackEnumConverterFactory(), new JsonStringEnumConverter() },
     };
 
     /// <inheritdoc />

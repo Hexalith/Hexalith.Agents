@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Hexalith.Agents.Contracts.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -12,7 +14,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// Serialized by name so an absent value never resolves to a concrete outcome; <see cref="Unknown"/> (ordinal 0) is the
 /// fail-safe sentinel (treated as an abandonment failure). Mirrors <see cref="AgentProposalRejectionOutcome"/>.
 /// </remarks>
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(UnknownFallbackEnumConverter<AgentProposalAbandonmentOutcome>))]
 public enum AgentProposalAbandonmentOutcome
 {
     /// <summary>Not-an-outcome sentinel — treated as an abandonment failure (fail closed).</summary>
