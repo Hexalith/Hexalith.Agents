@@ -44,14 +44,23 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Reconcile AD-30 with the Hexalith.Tenants authority for non-tenant-scoped Platform Operator role freshness.
   evidence: Tenants documents `global-administrators` as separate from tenant-scoped `tenants`, while the Spine names the `system` tenant projection; the wrong source can reject or mis-authorize Platform commands (BH-8, EC-1).
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-planning-reconciliation-items.md` — AD-30 explicitly requires fresh non-tenant-scoped global-administrators evidence for Platform and distinguishes the tenant-scoped tenants source. ActorTenantId=system is not a role-source selector; live authority qualification is unchanged.
+  evidence_record: [Planning reconciliation](deferred-planning-reconciliation-2026-10-23.md#platform-operator-authority)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Define a viable, versioned `DigestKey` rotation and concurrency policy for retained and legally held content.
   evidence: AD-22/ARCH-A-12 makes ordinary incident-response rotation unavailable while protected content exists and calls rotation lock-bearing although the closed AD-12/readiness family inventory omits it (BH-9, BH-10, EC-3, EC-6).
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-planning-reconciliation-items.md` — AD-22/AD-29 specify future-version rotation, retained originating key versions, recorded DigestKeyVersion comparisons across retries and exclusion from browser locks. This closes the policy-definition gap only; ARCH-A-12 still requires Security confirmation or a superseding procedure before RQ-1.
+  evidence_record: [Planning reconciliation](deferred-planning-reconciliation-2026-10-23.md#versioned-digestkey-rotation-and-concurrency)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Define how overlapping Agent-disabled and tenant-kill-switch pauses contribute to `PausedDuration`.
   evidence: Both causes can overlap, but AD-5/AD-12 do not say whether elapsed overlap is unioned or summed, so implementations can compute different retry deadlines (BH-11, EC-5).
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-planning-reconciliation-items.md` — PRD FR-18, AD-12 and EXPERIENCE agree on the union of pause intervals, counting overlap once and resuming only after both causes clear. Awaiting-proposal expiry continues independently; no runtime timer qualification is claimed.
+  evidence_record: [Planning reconciliation](deferred-planning-reconciliation-2026-10-23.md#overlapping-agent-and-tenant-pauses)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Decide whether a Facilitator-set Conversation block is clearable only by the same Party or by any current Facilitator.
@@ -76,6 +85,9 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Reconcile the UX retry-posting failure transition with the PRD removal/block transition.
   evidence: EXPERIENCE says every pre-post validation failure returns to `PostingFailed`, while the PRD requires `Abandoned(RemovedInConversations)` after the message-absence guard confirms a removal or block (EC-13).
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-planning-reconciliation-items.md` — PRD FR-18 and AD-5/AD-7 already distinguish Abandoned(RemovedInConversations) from other pre-post PostingFailed outcomes. EXPERIENCE now also preserves their no-post lookup exception and typed deleted/removed abandonment-only semantics; present and unavailable lookup safeguards remain intact.
+  evidence_record: [Planning reconciliation](deferred-planning-reconciliation-2026-10-23.md#retry-removalblock-transitions-and-existence-lookup)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Add the governed Platform Operator and second-Compliance-Inspector branches to the UX compliance-inspection approval path.
@@ -84,6 +96,9 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Reconcile UX retry-posting locking with the closed AD-12 operation-family contract.
   evidence: EXPERIENCE treats `ConversationPosting` as one of ten high-risk advisory-lock families, while the Spine and epics exclude it from the closed lock-bearing family set (EC-15).
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-planning-reconciliation-items.md` — AD-5/AD-12 and EXPERIENCE classify public administrative retry as lock-bearing ProposalResolution followed by workflow-only ConversationPosting. The latter owns no browser advisory lock; the closed set remains ten families.
+  evidence_record: [Planning reconciliation](deferred-planning-reconciliation-2026-10-23.md#administrative-retry-and-browser-locking)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations.md`
   summary: Implement immutable create-only `ProvisionHexa` and retire every Agent Party link/replace mutation path.
