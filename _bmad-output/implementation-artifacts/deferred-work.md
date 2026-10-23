@@ -419,6 +419,8 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reject traversing NuGet archive paths before stripping an optional current-directory prefix.
   evidence: The inherited package validator applies `lstrip("./")` before its traversal check, allowing a normalized `../../lib/...` path to become `lib/...` and potentially satisfy the exact DLL inventory.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-package-tooling-items.md` rejects traversal segments, absolute paths and Windows drive paths before normalization, preserves leading dots, and exercises malicious DLL and other asset paths through synthetic archive fixtures.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Derive semantic-release planning and publication from one release configuration.
@@ -427,6 +429,8 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Enforce the centrally declared package license, provenance URLs, and readme in package validation.
   evidence: The inherited package validator requires only a nonempty license and does not compare the expected MIT expression, repository/project URLs, or readme, so a project override can pass the release gate with inconsistent metadata.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-package-tooling-items.md` reads the central build metadata policy and requires its expression license, project/repository URLs, repository type and one nonempty packaged README; fixture regressions reject missing, duplicated or conflicting metadata.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Re-prove that the dispatched source is still current immediately before the first irreversible NuGet push.
@@ -453,6 +457,8 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Document the Conventional Commits, semantic-release, Node tooling, and test-runner changes for contributors.
   evidence: The change enforces Conventional Commits on pull-request titles and pushes to main, adds a Node toolchain and semantic-release, gates publication behind a repository variable, and switches the test runner, while the readme and agent instructions mention none of it and no contributing guide exists. Part of the fix edits agent-context files.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-package-tooling-items.md` adds a README-linked contributor guide with locked Node setup, commitlint validation, semantic-release planning/manual publication/freeze policy, Debug/source and Release/package modes, and Microsoft.Testing.Platform project-level commands.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reconcile the `references/Hexalith.EventStore` gitlink with the released package version the floor gate requires.
@@ -485,6 +491,8 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Publish only archives declared in the release package manifest.
   evidence: The inherited pack script preserves unrelated archives in `nupkgs`, while `publish-release-packages.sh` pushes the whole `nupkgs/*.nupkg` glob; a stray archive can bypass the manifest preflight.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-package-tooling-items.md` preflights the entire exact manifest/version set and pushes each validated path explicitly. Controlled publisher subprocesses prove stray and old-version archives are preserved and excluded, and missing/corrupt packages or failed proofs prevent every push.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reject a direct trusted CreateAgent command whose payload tenant differs from the EventStore envelope tenant.
@@ -526,6 +534,8 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
   summary: Define the coupled update path for Dependabot proposals that advance the Builds gitlink.
   evidence: A gitlink-only proposal fails the literal Builds SHA assertions in CI and PackageInventoryTests until workflow and test pins move together; preserve the consistency gate and supply automation or explicit maintainer instructions in the separate dependency-maintenance work.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-package-tooling-items.md` documents a single parent commit/PR updating the reviewed Builds gitlink, five reusable workflow refs, CI checkout assertion, release execution SHA and PackageInventoryTests expectations, followed by existing authority, tooling and source/package gates.
 
 - source_spec: `spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
   summary: Add executable fixture coverage for the focused Story 5.2 verifier's success, skip, unrun, and zero-discovery outcomes.

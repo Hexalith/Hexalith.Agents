@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import posixpath
+import re
 import sys
 import zipfile
 from dataclasses import dataclass
@@ -15,6 +16,13 @@ from xml.etree import ElementTree
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "eng" / "release-packages.json"
+NUMERIC_IDENTIFIER = r"(?:0|[1-9][0-9]*)"
+PRERELEASE_IDENTIFIER = rf"(?:{NUMERIC_IDENTIFIER}|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)"
+VERSION_PATTERN = re.compile(
+    rf"{NUMERIC_IDENTIFIER}\.{NUMERIC_IDENTIFIER}\.{NUMERIC_IDENTIFIER}"
+    rf"(?:-{PRERELEASE_IDENTIFIER}(?:\.{PRERELEASE_IDENTIFIER})*)?"
+    r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?"
+)
 
 EXPECTED_DEPENDENCIES = {
     "Hexalith.Agents.Contracts": frozenset(
@@ -176,19 +184,76 @@ def expected_package_ids() -> frozenset[str]:
     return frozenset(package["id"] for package in data["packages"])
 
 
+def normalize_archive_path(name: str) -> str:
+    """Reject traversal and rooted paths before normalizing harmless prefixes."""
+    slashed = name.replace("\\", "/")
+    segments = slashed.split("/")
+    if slashed.startswith("/") or any(re.match(r"^[A-Za-z]:", segment) for segment in segments) or ".." in segments:
+        raise ValueError(f"unsafe archive path: {name}")
+    return posixpath.normpath(slashed)
+
+
+def package_metadata_policy() -> dict[str, str]:
+    """Read expected release metadata from the central build properties."""
+    props = ElementTree.parse(ROOT / "Directory.Build.props").getroot()
+    policy: dict[str, str] = {}
+    for name in ("PackageLicenseExpression", "PackageProjectUrl", "RepositoryUrl", "RepositoryType", "PackageReadmeFile"):
+        values = {(element.text or "").strip() for element in props.iter(name)}
+        if len(values) != 1 or not next(iter(values)):
+            raise ValueError(f"central package policy must declare exactly one nonempty {name}")
+        policy[name] = next(iter(values))
+    return policy
+
+
 def read_metadata(package_path: Path) -> PackageMetadata:
     """Read package identity, dependency ids, and archive names."""
     with zipfile.ZipFile(package_path) as archive:
         names = tuple(archive.namelist())
+        normalized_names = tuple(normalize_archive_path(name) for name in names)
+        seen_names: set[str] = set()
+        for name in normalized_names:
+            if name.casefold() in seen_names:
+                raise ValueError(f"{package_path.name}: duplicate normalized archive path: {name}")
+            seen_names.add(name.casefold())
+        corrupt_member = archive.testzip()
+        if corrupt_member is not None:
+            raise ValueError(f"{package_path.name}: corrupt archive member: {corrupt_member}")
         nuspecs = [name for name in names if name.endswith(".nuspec")]
         if len(nuspecs) != 1:
             raise ValueError(f"{package_path.name}: expected one nuspec, found {len(nuspecs)}")
         root = ElementTree.fromstring(archive.read(nuspecs[0]))
         namespace = {"n": root.tag.split("}")[0].strip("{")} if root.tag.startswith("{") else {}
+        containers = root.findall("n:metadata", namespace) if namespace else root.findall("metadata")
+        if root.tag.rsplit("}", 1)[-1] != "package" or len(containers) != 1:
+            raise ValueError(f"{package_path.name}: expected package root with exactly one metadata container")
+
+        def element(name: str) -> ElementTree.Element:
+            elements = root.findall(f"n:metadata/n:{name}", namespace) if namespace else root.findall(f"metadata/{name}")
+            if len(elements) != 1:
+                raise ValueError(f"{package_path.name}: expected exactly one {name} metadata element")
+            return elements[0]
 
         def text(name: str) -> str:
-            element = root.find(f".//n:metadata/n:{name}", namespace) if namespace else root.find(f".//metadata/{name}")
-            return element.text.strip() if element is not None and element.text else ""
+            return (element(name).text or "").strip()
+
+        policy = package_metadata_policy()
+        if text("license") != policy["PackageLicenseExpression"] or element("license").get("type") != "expression":
+            raise ValueError(f"{package_path.name}: license must be the central expression {policy['PackageLicenseExpression']}")
+        if text("projectUrl") != policy["PackageProjectUrl"]:
+            raise ValueError(f"{package_path.name}: projectUrl must match central PackageProjectUrl")
+        repository = element("repository")
+        if repository.get("url") != policy["RepositoryUrl"] or repository.get("type") != policy["RepositoryType"]:
+            raise ValueError(f"{package_path.name}: repository URL and type must match central policy")
+        readme = policy["PackageReadmeFile"]
+        if text("readme") != readme:
+            raise ValueError(f"{package_path.name}: readme must match central PackageReadmeFile {readme}")
+        readme_entries = [name for name, normalized in zip(names, normalized_names, strict=True) if normalized == readme]
+        if (
+            len(readme_entries) != 1
+            or archive.getinfo(readme_entries[0]).is_dir()
+            or not archive.read(readme_entries[0]).strip()
+        ):
+            raise ValueError(f"{package_path.name}: expected one nonempty packaged readme {readme}")
 
         dependencies = root.findall(".//n:dependency", namespace) if namespace else root.findall(".//dependency")
         dependency_entries = tuple(
@@ -221,8 +286,8 @@ def read_metadata(package_path: Path) -> PackageMetadata:
             raise ValueError(f"{package_path.name}: dependencies have no version/range: {missing_versions}")
         package_id = text("id")
         version = text("version")
-        if not package_id or not version or not text("license"):
-            raise ValueError(f"{package_path.name}: id, version, and license metadata are required")
+        if not package_id or not version:
+            raise ValueError(f"{package_path.name}: id and version metadata are required")
         return PackageMetadata(package_id, version, dependency_entries, names)
 
 
@@ -264,15 +329,16 @@ def validate_package(metadata: PackageMetadata, path: Path, produced_version: st
 
     normalized_names: list[str] = []
     for name in metadata.archive_names:
-        normalized = posixpath.normpath(name.replace("\\", "/")).lstrip("./")
-        if normalized == ".." or normalized.startswith("../") or name.startswith(("/", "\\")):
-            raise ValueError(f"{path.name}: unsafe archive path: {name}")
-        normalized_names.append(normalized)
+        normalized_names.append(normalize_archive_path(name))
 
     expected_dlls = {f"lib/net10.0/{metadata.package_id}.dll".casefold()}
     if metadata.package_id == "Hexalith.Agents.UI":
         expected_dlls.add("lib/net10.0/fr/hexalith.agents.ui.resources.dll")
-    actual_dlls = {name.casefold() for name in normalized_names if name.casefold().endswith(".dll")}
+    actual_dlls = {
+        name.casefold()
+        for name, raw_name in zip(normalized_names, metadata.archive_names, strict=True)
+        if name.casefold().endswith(".dll") and not raw_name.endswith(("/", "\\"))
+    }
     if actual_dlls != expected_dlls:
         raise ValueError(
             f"{path.name}: package DLL inventory mismatch; "
@@ -320,10 +386,32 @@ def validate_directory(package_directory: Path) -> tuple[list[PackageMetadata], 
     return metadata, common_version
 
 
+def publication_paths(package_directory: Path, version: str) -> list[Path]:
+    """Preflight the complete manifest/version set, ignoring unrelated archives."""
+    if not VERSION_PATTERN.fullmatch(version):
+        raise ValueError(f"invalid publication version: {version!r}")
+    paths: list[Path] = []
+    for package_id in sorted(expected_package_ids()):
+        path = package_directory / f"{package_id}.{version}.nupkg"
+        if path.is_symlink() or not path.is_file():
+            raise ValueError(f"missing regular publication archive: {path.name}")
+        metadata = read_metadata(path)
+        if metadata.package_id != package_id or metadata.version != version:
+            raise ValueError(f"{path.name}: archive identity does not match manifest/version")
+        validate_package(metadata, path, version)
+        paths.append(path)
+    return paths
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("package_directory", type=Path)
+    parser.add_argument("--publication-version", help="print only validated manifest archive paths for this version")
     args = parser.parse_args()
+    if args.publication_version is not None:
+        for path in publication_paths(args.package_directory.resolve(), args.publication_version):
+            print(path)
+        return 0
     metadata, version = validate_directory(args.package_directory.resolve())
     print(f"Validated {len(metadata)} Hexalith.Agents packages at {version}.")
     return 0

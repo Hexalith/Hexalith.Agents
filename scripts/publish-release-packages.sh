@@ -13,13 +13,18 @@ version="$1"
 : "${HEXALITH_RELEASE_SOURCE_CI_WORKFLOW:?HEXALITH_RELEASE_SOURCE_CI_WORKFLOW is required}"
 : "${NUGET_API_KEY:?NUGET_API_KEY is required}"
 
+package_paths="$(python3 scripts/validate-nuget-packages.py ./nupkgs --publication-version "$version")"
+mapfile -t packages <<< "$package_paths"
+
 python3 scripts/verify-nuget-publication.py eng/release-packages.json "$version" --expect absent
 python3 scripts/verify-release-source.py \
   --repository "$GITHUB_REPOSITORY" \
   --workflow "$HEXALITH_RELEASE_SOURCE_CI_WORKFLOW" \
   --dispatch-ref "refs/heads/${HEXALITH_RELEASE_SOURCE_BRANCH}" \
   --dispatch-sha "$GITHUB_SHA"
-dotnet nuget push "./nupkgs/*.nupkg" \
-  --source https://api.nuget.org/v3/index.json \
-  --api-key "$NUGET_API_KEY"
+for package in "${packages[@]}"; do
+  dotnet nuget push "$package" \
+    --source https://api.nuget.org/v3/index.json \
+    --api-key "$NUGET_API_KEY"
+done
 python3 scripts/verify-nuget-publication.py eng/release-packages.json "$version" --expect present
