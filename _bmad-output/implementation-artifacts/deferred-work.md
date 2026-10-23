@@ -609,6 +609,8 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Client completion expiry (B03) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: HttpPartiesIdentityClient.Matches validates recorded interval/custody shape but has no current-clock comparison. A delayed historical response can pass after custody expiry. This is existing client behavior, separate from the new cleanup operation.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-identity-verification-items.md` verifies the pinned client's existing completion-clock checks through the maintained root command. All nine delayed-reply cases pass, including valid current/closed historical controls and historical custody expiry at completion; rejected replies return 503. This establishes local behavior, not production qualification.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Version-one rollout compatibility (B04) remains an earlier Story 5.4 prerequisite before owner qualification.
@@ -649,6 +651,8 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Current read lower time bound (E02) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: After custody, the current method checks upper expiry but not completedAt >= binding.ValidFrom or source.ObservedAt <= completedAt. An earlier-issued still-valid grant plus clock rollback can release future current evidence. This pre-existing current-read boundary remains a launch blocker.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-identity-verification-items.md` verifies the pinned query service's existing final source/binding lower bounds through the actual current-read method. The maintained root command runs source-rollback and binding-rollback custody-suspension cases with an otherwise valid authority, requiring Unavailable and no evidence, alongside the successful current-human control.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Readiness nested binding scope (E04) remains an earlier Story 5.4 prerequisite before owner qualification.
@@ -659,14 +663,20 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Current authority regression coverage (V01) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: Accept the pre-verified gap: authority-change tests call ResolveAtAsync, while current policy/cancellation tests do not observe removal of SameAuthority in ResolveAsync. Add current source/custody authority-change cases in the owning query verification slice.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-identity-verification-items.md` makes current-source and current-custody authority-withdrawal cases mandatory and adds root-owned non-null source/actor-revision/authority-revision changes plus unchanged controls. A private mutation removing current SameAuthority fails all six changed-authority cases while both controls pass; owner source stays untouched. Missing required scenarios or incomplete/failed/skipped/unrun results cannot produce a success receipt.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Current completion-expiry coverage (V02) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: Accept the pre-verified gap: the clock-crossing test exercises historical resolution; client invalid replies do not execute the current service. Add current binding-closure and custody-expiry crossing cases with otherwise valid authority.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-identity-verification-items.md` runs the existing current-query binding-interval and custody-expiry crossing rows through the maintained root command, asserting Unavailable with absent evidence at the exclusive completion boundary while authority remains valid. All four current completion-time rows and the successful control pass against actual owner sources.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Readiness exact-target receipt coverage (V03) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: Accept the pre-verified gap: existing counting-server smoke cases fail before receipt validation. A synthetic Available register with a mismatched receipt needs a no-HTTP regression test before this earlier readiness gate can be relied upon.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-identity-verification-items.md` extends the maintained production-script subprocess suite to 14 exact-target receipt cases: matching positive controls and independent record/target/command/outcome/evidence-level/prerequisite mismatches through both history verifier and wrapper. Every mismatch reaches its receipt diagnostic with zero HTTP and no success receipt; the root identity command requires all 14 exact named cases. Synthetic Available fixtures do not alter dependency acceptance.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-identity-completion-and-readiness-fixes.md`
   summary: Owner retained-history privacy and schema-drift qualification must account for unexpected profile fields.

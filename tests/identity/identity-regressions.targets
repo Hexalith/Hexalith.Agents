@@ -1,0 +1,8 @@
+<Project>
+  <Target Name="IncludeAgentsIdentityRegressions" BeforeTargets="CoreCompile"
+          Condition="'$(MSBuildProjectName)' == 'Hexalith.Parties.Tests'">
+    <ItemGroup>
+      <Compile Include="$(MSBuildThisFileDirectory)CurrentIdentityAuthorityTests.cs" />
+    </ItemGroup>
+  </Target>
+</Project>

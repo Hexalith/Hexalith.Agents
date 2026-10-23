@@ -49,6 +49,22 @@ They verify expiry, retained transitions, receive limits, scope and caller-relat
 paths. They establish synthetic verifier behavior; dependency acceptance and
 production qualification still require their existing owner evidence.
 
+To build the pinned Parties identity projects and run their focused current-read,
+client completion-time, authority-change and exact-target receipt regressions:
+
+```bash
+python3 scripts/verify-parties-identity.py --artifacts /tmp/agents-parties-identity
+```
+
+The command uses Debug project references to root-declared dependencies, with the
+existing package fallback for optional Memories. It records build logs, fresh xUnit
+results and a success-only `identity-verification.json` with source revisions,
+dirty state and execution timestamps. Root-owned non-null authority-change tests
+are compiled into the owner test assembly only for this command. Relative artifact
+paths resolve from the caller's directory; concurrent runs need separate artifact
+directories. This is local regression evidence; it does not change the dependency
+register or establish live readiness.
+
 The CI package lane restores and builds Release with
 `-p:UseHexalithProjectReferences=false`. Release and packing require package
 references. All external package versions come from

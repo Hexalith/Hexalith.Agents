@@ -31,7 +31,7 @@ def quote_ps(value):
 
 
 @unittest.skipUnless(PWSH, "Requires PowerShell")
-class PartiesReadinessVerifierTests(unittest.TestCase):
+class ReadinessProbeFixture(unittest.TestCase):
     """Fixtures exercise script behavior only, never dependency acceptance or Live qualification."""
 
     def setUp(self):
@@ -128,6 +128,9 @@ class PartiesReadinessVerifierTests(unittest.TestCase):
         ))
         self.assertEqual(requests[2]["payload"]["queryType"],
                          "Hexalith.Parties.Contracts.Queries.ResolvePartyIdentity")
+
+class PartiesReadinessVerifierTests(ReadinessProbeFixture):
+    """Verify retained history, bounds, scope and path behavior."""
 
     def test_matching_revoked_binding_passes_as_readiness_only(self):
         self.assert_success()
@@ -324,6 +327,35 @@ sys.exit(19)
         self.assertIn("Synthetic path probe", (evidence / "Hexalith.EventStore.Contracts.Tests-build.log").read_text())
         self.assertFalse((evidence / "local-evidence.json").exists())
         self.assertFalse(self.success_path.exists())
+
+
+class ExactTargetReceiptTests(ReadinessProbeFixture):
+    """Both production entry points require the complete exact-target proof before HTTP."""
+
+    def test_matching_receipt_passes(self):
+        self.assert_success()
+
+    def test_matching_receipt_passes_through_wrapper(self):
+        self.assert_success(wrapper=True)
+
+
+def receipt_case(field, value, wrapper):
+    def test(self):
+        self.receipt[field] = value
+        self.assert_refusal("exact-target compatibility/prerequisite proof does not match", 0,
+                            wrapper=wrapper)
+    return test
+
+
+for _field, _value in (
+    ("recordId", "EXT-OTHER-1"), ("targetVersionOrCommit", "b" * 40),
+    ("compatibilityCommand", COMMAND + " changed"), ("outcome", "Fail"),
+    ("evidenceLevel", 3), ("prerequisitesAvailable", False),
+):
+    for _wrapper in (False, True):
+        setattr(ExactTargetReceiptTests,
+                f"test_mismatched_{_field}_prevents_http" + ("_wrapper" if _wrapper else ""),
+                receipt_case(_field, _value, _wrapper))
 
 
 def scope_case(source_binding, field, case_only=False):
