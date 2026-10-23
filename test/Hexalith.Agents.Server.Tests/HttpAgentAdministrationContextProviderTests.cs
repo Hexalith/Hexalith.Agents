@@ -7,6 +7,8 @@ using Hexalith.Agents.Server.Ports;
 
 using Microsoft.AspNetCore.Http;
 
+using NSubstitute;
+
 using Shouldly;
 
 /// <summary>
@@ -134,6 +136,189 @@ public sealed class HttpAgentAdministrationContextProviderTests
     [Fact]
     public void No_http_context_at_all_yields_the_anonymous_context()
         => Provider(httpContext: null).GetContext().ShouldBe(AgentAdministrationContext.Anonymous);
+
+    /// <summary>Verifies current authority cannot combine two authenticated identities, even when their claims agree.</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task MultipleAuthenticatedIdentitiesAreAnonymousBeforeAuthorityReads(bool identicalClaims)
+    {
+        ClaimsIdentity first = new(
+            [new Claim("tenantId", "acme"), new Claim("sub", "admin-user")], "first-auth");
+        ClaimsIdentity second = new(
+            [new Claim("tenantId", identicalClaims ? "acme" : "another-tenant"),
+                new Claim("sub", identicalClaims ? "admin-user" : "another-user"),
+                new Claim(ClaimTypes.Role, HttpAgentAdministrationContextProvider.AgentsAdministratorRole)], "second-auth");
+
+        await AssertAnonymousBeforeAuthorityReadsAsync(new ClaimsPrincipal([first, second]));
+    }
+
+    /// <summary>Verifies conflicting aliases or repeated claim types deny identity before either authority source is read.</summary>
+    [Theory]
+    [InlineData("tenantId")]
+    [InlineData("tenant_id")]
+    [InlineData("tid")]
+    [InlineData("tenant")]
+    [InlineData("sub")]
+    [InlineData(ClaimTypes.NameIdentifier)]
+    public async Task ConflictingIdentityClaimsAreAnonymousBeforeAuthorityReads(string conflictingClaimType)
+    {
+        ClaimsIdentity identity = new(
+            [new Claim("tenantId", "acme"), new Claim("sub", "admin-user"),
+                new Claim(conflictingClaimType, "conflicting-value")], "test-auth");
+
+        await AssertAnonymousBeforeAuthorityReadsAsync(new ClaimsPrincipal(identity));
+    }
+
+    /// <summary>Verifies consistent claim aliases preserve one authenticated identity without granting claim-based roles.</summary>
+    [Fact]
+    public void AgreeingIdentityAliasesPreserveTheAuthenticatedScopeAndSubject()
+    {
+        AgentAdministrationContext context = Resolve(
+            ("tenantId", "acme"), ("tenant_id", "acme"), ("tid", "acme"), ("tenant", "acme"),
+            ("sub", "admin-user"), (ClaimTypes.NameIdentifier, "admin-user"),
+            (ClaimTypes.Role, HttpAgentAdministrationContextProvider.AgentsAdministratorRole),
+            (ClaimTypes.Role, HttpAgentAdministrationContextProvider.PlatformOperatorRole));
+
+        context.TenantId.ShouldBe("acme");
+        context.ActorUserId.ShouldBe("admin-user");
+        context.IsAgentsAdmin.ShouldBeFalse();
+        context.IsPlatformOperator.ShouldBeFalse();
+    }
+
+    /// <summary>Verifies unverified secondary claims cannot override the scope or subject of the one authenticated identity.</summary>
+    [Fact]
+    public void UnauthenticatedIdentityCannotOverrideTheAuthenticatedScopeOrSubject()
+    {
+        ClaimsIdentity unverified = new(
+            [new Claim("tenantId", "another-tenant"), new Claim("sub", "another-user"),
+                new Claim(ClaimTypes.Role, HttpAgentAdministrationContextProvider.AgentsAdministratorRole)]);
+        ClaimsIdentity authenticated = new(
+            [new Claim("tenantId", "acme"), new Claim("sub", "member-user")], "test-auth");
+        DefaultHttpContext httpContext = new() { User = new ClaimsPrincipal([unverified, authenticated]) };
+
+        AgentAdministrationContext context = Provider(httpContext).GetContext();
+
+        context.TenantId.ShouldBe("acme");
+        context.ActorUserId.ShouldBe("member-user");
+        context.IsAgentsAdmin.ShouldBeFalse();
+        context.IsPlatformOperator.ShouldBeFalse();
+    }
+
+    /// <summary>Verifies claim roles cannot replace a fresh current-authority denial for either administration principal.</summary>
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task ClaimRolesCannotOverrideCurrentAuthorityDenial(bool unverifiedSecondary, bool platform)
+    {
+        var clock = new Story54TimeProvider();
+        ClaimsIdentity authenticated = new(
+            [new Claim("tenantId", "tenant-a"), new Claim("tenant_id", "tenant-a"),
+                new Claim("tid", "tenant-a"), new Claim("tenant", "tenant-a"),
+                new Claim("sub", "authenticated-subject"), new Claim(ClaimTypes.NameIdentifier, "authenticated-subject")],
+            "test-auth");
+        Claim[] roleClaims =
+        [
+            new Claim(ClaimTypes.Role, HttpAgentAdministrationContextProvider.AgentsAdministratorRole),
+            new Claim(ClaimTypes.Role, HttpAgentAdministrationContextProvider.PlatformOperatorRole),
+        ];
+        ClaimsPrincipal principal;
+        if (unverifiedSecondary)
+        {
+            ClaimsIdentity unverified = new(
+                [new Claim("tenantId", "another-tenant"), new Claim("sub", "another-subject"), .. roleClaims]);
+            principal = new ClaimsPrincipal([unverified, authenticated]);
+        }
+        else
+        {
+            authenticated.AddClaims(roleClaims);
+            principal = new ClaimsPrincipal(authenticated);
+        }
+
+        var actors = Substitute.For<ICurrentHumanActorSource>();
+        actors.ReadAsync("tenant-a", "authenticated-subject", CancellationToken.None)
+            .Returns(new CurrentHumanActorEvidence("tenant-a", "authenticated-subject", "actor-a", "party-a", 1, 1,
+                clock.Now, clock.Now.AddSeconds(5)));
+        var tenants = Substitute.For<ICurrentTenantAuthoritySource>();
+        string authorityTenant = platform ? "system" : "tenant-a";
+        TenantAuthorityEvidence denial = platform
+            ? new("system", "global-administrators", 1, clock.Now, clock.Now.AddSeconds(5),
+                [new(1, "actor-a", null, HttpAgentAdministrationContextProvider.PlatformOperatorRole, false)],
+                SourceAggregateId: "global-administrators")
+            : new("tenant-a", "tenants", 2, clock.Now, clock.Now.AddSeconds(5),
+                [new(1, string.Empty, null, "TenantActive", true),
+                    new(2, "actor-a", null, HttpAgentAdministrationContextProvider.AgentsAdministratorRole, false)],
+                SourceAggregateId: "tenant-a");
+        tenants.ReadAsync(authorityTenant, platform, CancellationToken.None).Returns(denial);
+        var provider = new HttpAgentAdministrationContextProvider(
+            new HttpContextAccessor { HttpContext = new DefaultHttpContext { User = principal } },
+            tenants, actors, Substitute.For<IAgentDependencyAvailability>(), clock);
+
+        AgentAdministrationContext context = await provider.GetContextAsync(platform, CancellationToken.None);
+
+        context.TenantId.ShouldBe("tenant-a");
+        context.ActorUserId.ShouldBe("authenticated-subject");
+        context.IsAgentsAdmin.ShouldBeFalse();
+        context.IsPlatformOperator.ShouldBeFalse();
+        context.IsAuthorized.ShouldBeFalse();
+        await actors.Received(1).ReadAsync("tenant-a", "authenticated-subject", CancellationToken.None);
+        await tenants.Received(1).ReadAsync(authorityTenant, platform, CancellationToken.None);
+        actors.ReceivedCalls().Count().ShouldBe(1);
+        tenants.ReceivedCalls().Count().ShouldBe(1);
+    }
+
+    /// <summary>Verifies unverified secondary claims cannot complete an authenticated identity's missing scope or subject.</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task UnauthenticatedIdentityCannotSupplyMissingAuthenticatedClaims(bool missingTenant)
+    {
+        ClaimsIdentity authenticated = new(
+            [new Claim(missingTenant ? "sub" : "tenantId", missingTenant ? "member-user" : "acme")], "test-auth");
+        ClaimsIdentity unverified = new(
+            [new Claim("tenantId", "acme"), new Claim("sub", "admin-user"),
+                new Claim(ClaimTypes.Role, HttpAgentAdministrationContextProvider.AgentsAdministratorRole)]);
+        var actors = Substitute.For<ICurrentHumanActorSource>();
+        var tenants = Substitute.For<ICurrentTenantAuthoritySource>();
+        var provider = new HttpAgentAdministrationContextProvider(
+            new HttpContextAccessor
+            {
+                HttpContext = new DefaultHttpContext { User = new ClaimsPrincipal([authenticated, unverified]) },
+            }, tenants, actors, Substitute.For<IAgentDependencyAvailability>());
+
+        foreach (bool platform in new[] { false, true })
+        {
+            AgentAdministrationContext context = await provider.GetContextAsync(platform, CancellationToken.None);
+
+            context.TenantId.ShouldBeEmpty();
+            context.ActorUserId.ShouldBe(missingTenant ? "member-user" : string.Empty);
+            context.IsAgentsAdmin.ShouldBeFalse();
+            context.IsPlatformOperator.ShouldBeFalse();
+        }
+
+        actors.ReceivedCalls().ShouldBeEmpty();
+        tenants.ReceivedCalls().ShouldBeEmpty();
+    }
+
+    private static async Task AssertAnonymousBeforeAuthorityReadsAsync(ClaimsPrincipal principal)
+    {
+        var actors = Substitute.For<ICurrentHumanActorSource>();
+        var tenants = Substitute.For<ICurrentTenantAuthoritySource>();
+        var provider = new HttpAgentAdministrationContextProvider(
+            new HttpContextAccessor { HttpContext = new DefaultHttpContext { User = principal } },
+            tenants, actors, Substitute.For<IAgentDependencyAvailability>());
+
+        provider.GetContext().ShouldBe(AgentAdministrationContext.Anonymous);
+        foreach (bool platform in new[] { false, true })
+        {
+            (await provider.GetContextAsync(platform, CancellationToken.None)).ShouldBe(AgentAdministrationContext.Anonymous);
+        }
+
+        actors.ReceivedCalls().ShouldBeEmpty();
+        tenants.ReceivedCalls().ShouldBeEmpty();
+    }
 
     private static AgentAdministrationContext Resolve(params (string Type, string Value)[] claims)
     {

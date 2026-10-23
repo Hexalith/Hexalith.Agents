@@ -309,10 +309,14 @@ status: open
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Fail closed when a setup query reads a projection whose embedded tenant or Agent identity does not match its address.
   evidence: `AgentSetupQueryHandlerBase` passes the stored model directly to `AgentSetupViewFactory`, whose state reconstruction uses the embedded identifiers and metadata; unlike the operations path, no identity guard prevents a mis-keyed projection from disclosing another scope.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-setup-boundary-items.md` verifies the existing `AgentSetupViewFactory` identity guard through both query entry points, including foreign, blank and case-mismatched tenant/Agent values; unavailable results carry no setup data and never invoke the approver resolver. Existing matching/missing controls and all 1,306 Server Debug/source tests pass.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Render an unavailable setup state when the initial configuration-page read throws.
   evidence: `AgentConfiguration.OnInitializedAsync` catches disposal cancellation only, so a transport or deserialization exception from `LoadAsync` breaks initialization instead of using the page's existing unavailable state.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-setup-boundary-items.md` renders the existing typed unavailable surface for synchronous/asynchronous initial transport, JSON and unrelated cancellation failures, without exception details or mutation controls. Disposal cancellation and late results preserve page state. All 1,169 UI Debug/source tests pass.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Define a fail-closed projection policy for malformed payloads of known Agent event types.
@@ -358,10 +362,14 @@ Group A contracts re-review (fourth pass). Incomplete `Unknown = 0` tolerance mi
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Convert setup-query read-model-store failures into the typed unavailable result.
   evidence: `AgentSetupQueryHandlerBase.ExecuteAsync` lets a non-cancellation `IReadModelStore.GetAsync` failure escape, while the sibling provider query handler already catches the same infrastructure failure and returns its structured unavailable result; this behavior predates the current story patch.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-setup-boundary-items.md` translates non-cancellation store faults after authorization into `AgentSetupResult.Unavailable`, leaving approver enrichment outside the catch and rechecking caller cancellation before returning. Both query types have synchronous/asynchronous fault, denial-before-store and cancellation-race regressions; all 1,306 Server Debug/source tests pass.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reject non-HTTP EventStore base-address schemes during Agents host composition.
   evidence: `AgentSetupServiceCollectionExtensions` accepts any absolute URI even though the configured HTTP client cannot send non-HTTP schemes, so an invalid pre-existing configuration can resolve the live setup services and then fail every request at runtime.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-setup-boundary-items.md` requires HTTP or HTTPS before registering live gateway services. Five unsupported absolute schemes with a valid Dapr AppId preserve the deferred dispatcher/client/readers and omit live operations/gateway registration; HTTP and HTTPS positive controls pass with all 1,306 Server Debug/source tests.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Verify the integrity and package identity of GitHub Release assets instead of accepting filenames alone.
@@ -383,6 +391,8 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Bind Agent administration scope, actor, and role claims to one unambiguous authenticated identity.
   evidence: `HttpAgentAdministrationContextProvider` resolves claims and roles across the whole principal, so a primary authenticated identity can borrow authority or a conflicting tenant from another identity; this provider and behavior predate the current Story 5.2 patch.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-setup-boundary-items.md` verifies the existing single-authenticated-identity provider and current-evidence authority path. Regressions reject multiple authenticated identities and conflicting aliases before authority reads, ignore unauthenticated secondary claims, reject borrowed missing fields and preserve agreeing aliases without granting claim-based roles; all 1,306 Server Debug/source tests pass.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Define how confirmed setup writes reconcile editable drafts with a newer concurrent projection.

@@ -66,7 +66,9 @@ internal static class AgentSetupServiceCollectionExtensions
 
         string? baseUrl = configuration[$"{EventStoreSectionName}:BaseUrl"];
         string? appId = configuration[$"{EventStoreSectionName}:AppId"];
-        if (string.IsNullOrWhiteSpace(baseUrl) || !Uri.TryCreate(baseUrl, UriKind.Absolute, out Uri? baseAddress))
+        if (string.IsNullOrWhiteSpace(baseUrl)
+            || !Uri.TryCreate(baseUrl, UriKind.Absolute, out Uri? baseAddress)
+            || (baseAddress.Scheme != Uri.UriSchemeHttp && baseAddress.Scheme != Uri.UriSchemeHttps))
         {
             // No gateway: keep DeferredAgentCommandDispatcher and the Unavailable client. A host that cannot reach
             // EventStore must report unavailable rather than accept an administration command it cannot persist.

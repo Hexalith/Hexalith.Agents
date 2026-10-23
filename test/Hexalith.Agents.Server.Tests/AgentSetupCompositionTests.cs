@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 
 using Hexalith.Agents.Client;
+using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.ProviderCatalog;
 using Hexalith.Agents.Server.Application.Agents;
@@ -37,11 +38,14 @@ using Shouldly;
 /// </summary>
 public sealed class AgentSetupCompositionTests
 {
-    [Fact]
-    public void A_configured_gateway_resolves_the_live_dispatcher_and_administration_operations()
+    /// <summary>Verifies either supported HTTP scheme resolves the complete live administration path.</summary>
+    [Theory]
+    [InlineData("http://eventstore.example")]
+    [InlineData("https://eventstore.example")]
+    public void ConfiguredHttpGatewayResolvesLiveAdministrationOperations(string baseUrl)
     {
         using ServiceProvider provider = Build(
-            ("Agents:EventStore:BaseUrl", "https://eventstore.example"),
+            ("Agents:EventStore:BaseUrl", baseUrl),
             ("Agents:EventStore:AppId", "eventstore"));
         using IServiceScope scope = provider.CreateScope();
 
@@ -148,6 +152,36 @@ public sealed class AgentSetupCompositionTests
 
         scope.ServiceProvider.GetRequiredService<IAgentCommandDispatcher>()
             .ShouldBeOfType<DeferredAgentCommandDispatcher>();
+    }
+
+    /// <summary>Verifies an absolute unsupported URI cannot partially bind live services despite a valid Dapr target.</summary>
+    [Theory]
+    [InlineData("file:///tmp/eventstore")]
+    [InlineData("ftp://eventstore.example")]
+    [InlineData("ws://eventstore.example")]
+    [InlineData("mailto:eventstore@example.com")]
+    [InlineData("urn:hexalith:eventstore")]
+    public async Task UnsupportedGatewaySchemesLeaveTheCompleteAdministrationPathDeferred(string baseUrl)
+    {
+        using ServiceProvider provider = Build(
+            ("Agents:EventStore:BaseUrl", baseUrl),
+            ("Agents:EventStore:AppId", "eventstore"));
+        using IServiceScope scope = provider.CreateScope();
+
+        scope.ServiceProvider.GetRequiredService<IAgentCommandDispatcher>()
+            .ShouldBeOfType<DeferredAgentCommandDispatcher>();
+        scope.ServiceProvider.GetService<IAgentAdministrationOperations>().ShouldBeNull();
+        scope.ServiceProvider.GetService<IEventStoreGatewayClient>().ShouldBeNull();
+        scope.ServiceProvider.GetRequiredService<IAgentsClient>().AgentAdministration
+            .ShouldNotBeOfType<EventStoreAgentAdministrationOperations>();
+        scope.ServiceProvider.GetRequiredService<IAgentsClient>().ProviderCatalog
+            .ShouldNotBeOfType<EventStoreProviderCatalogOperations>();
+        scope.ServiceProvider.GetRequiredService<IProviderCatalogReader>()
+            .ShouldNotBeOfType<ProjectedProviderCatalogReader>();
+        IProviderCatalogOperations directOperations = scope.ServiceProvider.GetRequiredService<IProviderCatalogOperations>();
+        directOperations.GetType().ShouldBe(scope.ServiceProvider.GetRequiredService<IAgentsClient>().ProviderCatalog.GetType());
+        AgentOperationResult<ProviderCatalogInspectionResult> result = await directOperations.GetEntryAsync("provider", "model");
+        result.Status.ShouldBe(AgentOperationStatus.Unavailable);
     }
 
     [Fact]

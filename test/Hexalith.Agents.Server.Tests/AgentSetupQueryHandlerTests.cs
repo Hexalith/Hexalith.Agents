@@ -1,6 +1,7 @@
 namespace Hexalith.Agents.Server.Tests;
 
 using System;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -13,6 +14,7 @@ using Hexalith.Agents.Server.Application.Queries;
 using Hexalith.Agents.Server.Ports;
 using Hexalith.Agents.Server.Projections;
 
+using Hexalith.EventStore.Client.Projections;
 using Hexalith.EventStore.Contracts.Queries;
 
 using Microsoft.Extensions.Options;
@@ -53,6 +55,14 @@ public sealed class AgentSetupQueryHandlerTests
     [InlineData(false, TenantId, "foreign-agent")]
     [InlineData(true, "foreign-tenant", "foreign-agent")]
     [InlineData(false, "foreign-tenant", "foreign-agent")]
+    [InlineData(true, "", AgentId)]
+    [InlineData(false, "", AgentId)]
+    [InlineData(true, TenantId, "")]
+    [InlineData(false, TenantId, "")]
+    [InlineData(true, "Acme", AgentId)]
+    [InlineData(false, "Acme", AgentId)]
+    [InlineData(true, TenantId, "HEXA")]
+    [InlineData(false, TenantId, "HEXA")]
     public async Task MisroutedSetupIsUnavailableBeforeDisclosureOrApproverLookup(bool statusQuery, string modelTenant, string modelAgent)
     {
         var resolver = Substitute.For<IApproverPolicyResolver>();
@@ -73,12 +83,13 @@ public sealed class AgentSetupQueryHandlerTests
             ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, resolver)
             : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, resolver);
 
-        AgentSetupResult result = await ExecuteAsync(handler,
-            Query(statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType));
+        QueryResult response = await handler.ExecuteAsync(
+            Query(statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType), CancellationToken.None);
+        AgentSetupResult result = ReadSetupResult(response);
 
         result.Status.ShouldBe(AgentInspectionStatus.Unavailable);
         result.Setup.ShouldBeNull();
-        JsonSerializer.Serialize(result, _json).ShouldNotContain("foreign-");
+        Encoding.UTF8.GetString(response.PayloadBytes.ShouldNotBeNull()).ShouldNotContain("foreign-");
         resolver.ReceivedCalls().ShouldBeEmpty();
     }
 
@@ -255,6 +266,60 @@ public sealed class AgentSetupQueryHandlerTests
         denied.Setup.ShouldBeNull();
     }
 
+    /// <summary>Both query entry points translate backing-store faults without disclosing details or resolving approvers.</summary>
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    public async Task StoreFailureReturnsUnavailable(bool statusQuery, bool synchronousFailure)
+    {
+        var store = Substitute.For<IReadModelStore>();
+        var resolver = Substitute.For<IApproverPolicyResolver>();
+        store.GetAsync<AgentSetupReadModel>(StoreName, AgentSetupReadModelAddresses.Detail(TenantId, AgentId),
+            Arg.Any<CancellationToken>()).Returns<Task<ReadModelEntry<AgentSetupReadModel>>>(_ =>
+            synchronousFailure
+                ? throw new InvalidOperationException("private-store-details")
+                : Task.FromException<ReadModelEntry<AgentSetupReadModel>>(new InvalidOperationException("private-store-details")));
+        var options = Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName });
+        AgentSetupQueryHandlerBase handler = statusQuery
+            ? new GetAgentStatusQueryHandler(store, options, _tenantAccess, resolver)
+            : new GetAgentConfigurationQueryHandler(store, options, _tenantAccess, resolver);
+
+        QueryResult response = await handler.ExecuteAsync(
+            Query(statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType), CancellationToken.None);
+        AgentSetupResult result = ReadSetupResult(response);
+
+        result.ShouldBe(AgentSetupResult.Unavailable());
+        Encoding.UTF8.GetString(response.PayloadBytes.ShouldNotBeNull()).ShouldNotContain("private-store-details");
+        resolver.ReceivedCalls().ShouldBeEmpty();
+        await store.Received(1).GetAsync<AgentSetupReadModel>(StoreName,
+            AgentSetupReadModelAddresses.Detail(TenantId, AgentId), Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>Authorization denial still prevents any attempt to access a failing store.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task DeniedQueryNeverTouchesFailingStore(bool statusQuery)
+    {
+        var store = Substitute.For<IReadModelStore>();
+        store.GetAsync<AgentSetupReadModel>(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns<Task<ReadModelEntry<AgentSetupReadModel>>>(_ => throw new InvalidOperationException("private-store-details"));
+        _tenantAccess.ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(TenantAccessReadResult.Unavailable);
+        var options = Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName });
+        AgentSetupQueryHandlerBase handler = statusQuery
+            ? new GetAgentStatusQueryHandler(store, options, _tenantAccess)
+            : new GetAgentConfigurationQueryHandler(store, options, _tenantAccess);
+
+        AgentSetupResult result = await ExecuteAsync(handler,
+            Query(statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType));
+
+        result.ShouldBe(AgentSetupResult.NotAuthorized());
+        store.ReceivedCalls().ShouldBeEmpty();
+    }
+
     private GetAgentStatusQueryHandler StatusHandler()
         => new(_store, Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }), _tenantAccess);
 
@@ -262,8 +327,10 @@ public sealed class AgentSetupQueryHandlerTests
         => new(_store, Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }), _tenantAccess);
 
     private static async Task<AgentSetupResult> ExecuteAsync(AgentSetupQueryHandlerBase handler, QueryEnvelope query)
+        => ReadSetupResult(await handler.ExecuteAsync(query, CancellationToken.None));
+
+    private static AgentSetupResult ReadSetupResult(QueryResult result)
     {
-        QueryResult result = await handler.ExecuteAsync(query, CancellationToken.None);
         result.Success.ShouldBeTrue();
         return JsonSerializer.Deserialize<AgentSetupResult>(result.PayloadBytes.ShouldNotBeNull(), _json).ShouldNotBeNull();
     }

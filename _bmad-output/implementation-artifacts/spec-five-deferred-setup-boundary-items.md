@@ -1,0 +1,45 @@
+---
+title: 'Complete five deferred setup-boundary safeguards'
+type: 'bugfix'
+created: '2026-10-23'
+status: 'done'
+route: 'oneshot'
+review_loop_iteration: 0
+context: []
+---
+
+<frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
+
+## Intent
+
+**Problem:** The deferred-work ledger still carries five setup-boundary gaps: ambiguous authenticated identity claims, mis-keyed projection disclosure, escaping read-store failures, initial configuration-page read exceptions, and unsupported EventStore URL schemes. Claim isolation and projection scope validation already exist but need explicit regression evidence and ledger reconciliation; the other three gaps remain reproducible in source.
+
+**Approach:** Complete those five ledger items as one bounded setup-read reliability change. Preserve one-identity authority and projection-scope guards, add focused denial/disclosure regressions, translate non-cancellation setup-store failures into the existing typed Unavailable result, render the existing unavailable surface after initial page-read failures, and leave non-HTTP(S) gateway configurations deferred. Preserve cancellation, authorization-before-read, successful HTTP(S) composition, existing public contracts and post-write polling. Review and verify, close exactly these five rows, commit and push main as requested.
+
+</frozen-after-approval>
+
+## Implementation Notes
+
+- Route facts: no unresolved user-visible choices; no migrations, deployment, publication, or data mutation. Small local guards and regression additions reuse existing outcomes without introducing public API. Main push is explicitly authorized. No sprint story key; no root AppHost exists (hosting belongs to Platform).
+- Code map: `src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs` already rejects multiple authenticated identities and conflicting aliases, ignores unauthenticated claims and obtains authority from current evidence. Extend `test/Hexalith.Agents.Server.Tests/HttpAgentAdministrationContextProviderTests.cs` without rewriting that production path.
+- `src/Hexalith.Agents.Server/Projections/AgentSetupViewFactory.cs` already rejects mismatched tenant/Agent before enrichment. Existing `AgentSetupQueryHandlerTests.MisroutedSetupIsUnavailableBeforeDisclosureOrApproverLookup` covers foreign identities; extend invalid identity cases and retain matching/missing controls.
+- `src/Hexalith.Agents.Server/Application/Queries/AgentSetupQueryHandlerBase.cs` awaits `IReadModelStore.GetAsync` without translation. Catch only non-cancellation read failures after authorization, recheck caller cancellation before returning Unavailable, and keep approver enrichment outside the store catch. Cover both query types, synchronous/asynchronous faults, denial before access and cancellation races in query/cancellation tests.
+- `src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor` catches only disposal cancellation on initial load. Reuse `AgentSetupResult.Unavailable()` for other initial failures while suppressing all post-disposal updates. Add bUnit tests to `test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs` for synchronous/asynchronous failure, unrelated cancellation and disposal during the initial read; exception details and mutation controls must not render.
+- `src/Hexalith.Agents.Server/Composition/AgentSetupServiceCollectionExtensions.cs` accepts any absolute URI. Require HTTP(S) before live service registration; extend `AgentSetupCompositionTests` with unsupported schemes plus valid AppId, assert fully deferred services/client, and preserve both HTTP and HTTPS positive controls.
+- Verification: individual Debug/source test-project builds and runs for Server and UI; focused direct assembly filters if broad builds are blocked, then serialized Release/package fallback per repository validation ladder. Record exact blockers separately; do not weaken analyzers or build gates. Finish with whitespace checks and independent blind review. Follow repository commitlint and fetch/divergence checks before main push.
+- Baseline: clean `main` at `f4fd5f9b1dfce1c1aef1592f8e861fb5be810e37`. The unmodified Server Debug/source suite passed 1,262 tests with no skips; both affected test projects build without warnings or errors. New query tests reproduced six failures before the store catch (four store-fault cases and two cancellation races); new initial-page tests reproduced all six failure cases before the UI catch.
+- Implemented the three missing guards and added regression evidence for the two already implemented safeguards. Gateway tests include five unsupported absolute schemes and HTTP/HTTPS live controls; identity tests cover conflicting/agreeing aliases, multiple authenticated identities and unauthenticated secondary claims, with no authority reads for ambiguous identities. Projection tests additionally reject blank or case-mismatched identities before disclosure/enrichment. Initial-page tests cover synchronous/asynchronous transport, JSON and unrelated cancellation failures, plus disposal with a late success/failure.
+- `dotnet build test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj --configuration Debug --no-restore -m:1` passed without warnings/errors. `dotnet test --project test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj --configuration Debug --no-build --no-restore` passed all 1,296 tests, with zero skips. UI verification and independent blind review follow.
+- `dotnet build test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj --configuration Debug --no-restore -m:1` passed without warnings/errors. `dotnet test --project test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj --configuration Debug --no-build --no-restore` passed all 1,166 tests, with zero skips. Exactly five selected ledger rows now record their implementation or already-resolved evidence. No validation blockers.
+- Independent blind review returned six specific coverage gaps. Added provider-originated cancellation with an uncancelled caller, cancellation while a genuinely pending store read later faults, delayed UI failures after the loading render, original response-byte disclosure assertions, current actor/role-revocation checks despite claim roles, and direct unavailable catalog-operation resolution. All corrections remain within the selected five safeguards; no production changes beyond the three original guards were needed.
+- R1 fixture correction: the first post-review run exposed an overly strict exception-instance assertion in the new test. The async assertion helper may materialize `TaskCanceledException`; the final regression asserts the observable contract (cancelled execution, propagated cancellation, unchanged caller token and no approver calls), rather than exception reference identity. The UI suite passed all 1,169 tests after the review additions.
+- Final validation after all six review corrections: the same individual Debug/source build commands passed with zero warnings/errors, and the full Server and UI test commands passed 1,306 and 1,169 tests respectively (2,475 total), with zero skips. Whitespace checks passed with `git -c core.whitespace=cr-at-eol diff --check`, respecting existing CRLF files. Commitlint passed for the conventional commit message. Exactly five ledger rows are closed, no review findings were deferred, and no submodule contents or pointers changed. The final pre-commit fetch showed no divergence from origin/main.
+
+## Review Triage Log
+
+- R1 — medium / patch: The new catch filter could regress to catch provider cancellation while existing tests only cancelled the caller. Add synchronous/asynchronous store-originated cancellation for both query types, asserting the original exception escapes with the caller still uncancelled.
+- R2 — low / patch: The store-fault race fixture used an already-faulted task, leaving suspension untested. Add a pending read that faults after caller cancellation and verify cancellation wins without approver access.
+- R3 — medium / patch: Faulted-task UI fixtures did not prove a loading-to-unavailable render transition. Add pending transport, JSON and unrelated cancellation failures completed after the loading state is visible.
+- R4 — low / patch: Deserializing/reserializing discarded any unknown leaked response fields before assertions. Assert directly on original query response bytes for store errors and misrouted projections, then separately check typed results.
+- R5 — medium / patch: Synchronous identity extraction did not prove claim roles stay ignored after valid current actor evidence. Add tenant/platform cases with explicitly revoked current roles, agreeing aliases or unauthenticated secondary role claims, verifying exact actor and authority-source calls.
+- R6 — low / patch: Client-property assertions did not cover separately resolved catalog operations. Resolve the direct service for unsupported schemes, require the unavailable implementation type and verify an entry read returns Unavailable.

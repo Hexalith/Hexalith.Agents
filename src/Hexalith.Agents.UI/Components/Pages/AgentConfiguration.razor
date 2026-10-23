@@ -299,6 +299,13 @@
         {
             // Component disposal owns this cancellation. No post-navigation state or render is produced.
         }
+        catch (Exception)
+        {
+            if (!_disposed)
+            {
+                _result = AgentSetupResult.Unavailable();
+            }
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

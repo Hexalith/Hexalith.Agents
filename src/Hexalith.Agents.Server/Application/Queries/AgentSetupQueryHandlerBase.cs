@@ -28,8 +28,8 @@ namespace Hexalith.Agents.Server.Application.Queries;
 /// <remarks>
 /// Authorization runs before the read model is even addressed, and a denied caller gets the same shaped
 /// not-authorized result whether or not the Agent exists — so a probe cannot distinguish "no permission" from "no
-/// such Agent", and cannot learn another tenant's Agent exists (AC4). The read-model key is tenant-scoped, so
-/// cross-tenant disclosure is structurally impossible even if authorization were mis-wired.
+/// such Agent", and cannot learn another tenant's Agent exists (AC4). The tenant-scoped read-model key and the
+/// view factory's embedded-identity validation prevent a misrouted projection from disclosing another scope.
 /// </remarks>
 public abstract class AgentSetupQueryHandlerBase(
     IReadModelStore readModelStore,
@@ -73,12 +73,22 @@ public abstract class AgentSetupQueryHandlerBase(
             return QueryResult.FromPayload(ToElement(AgentSetupResult.NotAuthorized()));
         }
 
-        ReadModelEntry<AgentSetupReadModel> entry = await _readModelStore
-            .GetAsync<AgentSetupReadModel>(
-                _options.Value.StateStoreName,
-                AgentSetupReadModelAddresses.Detail(query.TenantId, query.AggregateId),
-                cancellationToken)
-            .ConfigureAwait(false);
+        ReadModelEntry<AgentSetupReadModel> entry;
+        try
+        {
+            entry = await _readModelStore
+                .GetAsync<AgentSetupReadModel>(
+                    _options.Value.StateStoreName,
+                    AgentSetupReadModelAddresses.Detail(query.TenantId, query.AggregateId),
+                    cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return QueryResult.FromPayload(ToElement(AgentSetupResult.Unavailable()));
+        }
+
         cancellationToken.ThrowIfCancellationRequested();
 
         AgentSetupResult setup = await AgentSetupBasisEnricher.EnrichAsync(

@@ -95,6 +95,87 @@ public sealed class SetupReadCancellationAdmissionTests
         }
     }
 
+    /// <summary>A provider cancellation remains cancellation even when the caller has not cancelled.</summary>
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    public async Task StoreCancellationIsNeverTranslatedIntoUnavailable(bool statusQuery, bool synchronousFailure)
+    {
+        using var cancellation = new CancellationTokenSource();
+        Configure("none", cancellation);
+        var error = new OperationCanceledException("provider-cancelled");
+        _store.GetAsync<AgentSetupReadModel>(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns<Task<ReadModelEntry<AgentSetupReadModel>>>(_ => synchronousFailure
+                ? throw error
+                : Task.FromException<ReadModelEntry<AgentSetupReadModel>>(error));
+        var options = Options.Create(new AgentSetupReadModelOptions());
+        AgentSetupQueryHandlerBase handler = statusQuery
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers);
+        var query = new QueryEnvelope(TenantId, AgentSetupReadModelAddresses.Domain, AgentId,
+            statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType, [], "correlation", "subject");
+
+        Task<QueryResult> execution = handler.ExecuteAsync(query, cancellation.Token);
+        await Should.ThrowAsync<OperationCanceledException>(() => execution);
+
+        execution.IsCanceled.ShouldBeTrue();
+        cancellation.IsCancellationRequested.ShouldBeFalse();
+        _approvers.ReceivedCalls().ShouldBeEmpty();
+    }
+
+    /// <summary>Cancellation while awaiting a store read wins over its later infrastructure fault.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task CancellationDuringPendingReadWinsOverLaterStoreFault(bool statusQuery)
+    {
+        using var cancellation = new CancellationTokenSource();
+        Configure("none", cancellation);
+        TaskCompletionSource<ReadModelEntry<AgentSetupReadModel>> pendingRead = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        _store.GetAsync<AgentSetupReadModel>(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(pendingRead.Task);
+        var options = Options.Create(new AgentSetupReadModelOptions());
+        AgentSetupQueryHandlerBase handler = statusQuery
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers);
+        var query = new QueryEnvelope(TenantId, AgentSetupReadModelAddresses.Domain, AgentId,
+            statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType, [], "correlation", "subject");
+
+        Task<QueryResult> execution = handler.ExecuteAsync(query, cancellation.Token);
+        execution.IsCompleted.ShouldBeFalse();
+        cancellation.Cancel();
+        pendingRead.SetException(new InvalidOperationException("late-store-details"));
+
+        OperationCanceledException error = await Should.ThrowAsync<OperationCanceledException>(() => execution);
+
+        error.CancellationToken.ShouldBe(cancellation.Token);
+        _approvers.ReceivedCalls().ShouldBeEmpty();
+    }
+
+    /// <summary>Read failure translation must not turn cancellation into a returned API result.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task QueryReadFailureCannotSwallowCancellation(bool statusQuery)
+    {
+        using var cancellation = new CancellationTokenSource();
+        Configure("store-failure", cancellation);
+        var options = Options.Create(new AgentSetupReadModelOptions());
+        AgentSetupQueryHandlerBase handler = statusQuery
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers);
+        var query = new QueryEnvelope(TenantId, AgentSetupReadModelAddresses.Domain, AgentId,
+            statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType, [], "correlation", "subject");
+
+        OperationCanceledException error = await Should.ThrowAsync<OperationCanceledException>(
+            () => handler.ExecuteAsync(query, cancellation.Token));
+
+        error.CancellationToken.ShouldBe(cancellation.Token);
+        _approvers.ReceivedCalls().ShouldBeEmpty();
+    }
+
     /// <summary>Read failure translation must not turn cancellation into a returned API result.</summary>
     [Theory]
     [InlineData(true)]

@@ -1291,6 +1291,110 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         });
     }
 
+    /// <summary>Initial gateway failures use the existing safe unavailable surface rather than breaking rendering.</summary>
+    [Theory]
+    [InlineData(true, "transport")]
+    [InlineData(false, "transport")]
+    [InlineData(true, "json")]
+    [InlineData(false, "json")]
+    [InlineData(true, "cancellation")]
+    [InlineData(false, "cancellation")]
+    public void InitialReadFailureRendersUnavailable(bool synchronousFailure, string failure)
+    {
+        Exception error = failure switch
+        {
+            "json" => new System.Text.Json.JsonException("private-initial-read-details"),
+            "cancellation" => new OperationCanceledException("private-initial-read-details"),
+            _ => new System.Net.Http.HttpRequestException("private-initial-read-details"),
+        };
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>())
+            .Returns<Task<AgentSetupResult>>(_ => synchronousFailure
+                ? throw error
+                : Task.FromException<AgentSetupResult>(error));
+
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.Find("[data-testid='agents-config-state']").TextContent.ShouldContain("Agents.Surface.Unavailable.Title");
+            cut.Markup.ShouldNotContain("Agents.Surface.PermissionDenied.Title");
+            cut.Markup.ShouldNotContain("private-initial-read-details");
+            cut.FindAll("[data-testid='agents-config-submit']").ShouldBeEmpty();
+            cut.FindAll("[data-testid='agents-config-activate']").ShouldBeEmpty();
+            cut.FindAll("[data-testid='agents-config-disable']").ShouldBeEmpty();
+        });
+    }
+
+    /// <summary>A failure after the loading render still completes initialization with a safe unavailable render.</summary>
+    [Theory]
+    [InlineData("transport")]
+    [InlineData("json")]
+    [InlineData("cancellation")]
+    public void DelayedInitialReadFailureReplacesLoadingWithUnavailable(string failure)
+    {
+        TaskCompletionSource<AgentSetupResult> pendingRead = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(pendingRead.Task);
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.Find("[data-testid='agents-config-state']").TextContent.ShouldContain("Agents.Surface.Loading.Title");
+        pendingRead.Task.IsCompleted.ShouldBeFalse();
+
+        pendingRead.SetException(failure switch
+        {
+            "json" => new System.Text.Json.JsonException("private-delayed-read-details"),
+            "cancellation" => new OperationCanceledException("private-delayed-read-details"),
+            _ => new System.Net.Http.HttpRequestException("private-delayed-read-details"),
+        });
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.Find("[data-testid='agents-config-state']").TextContent.ShouldContain("Agents.Surface.Unavailable.Title");
+            cut.Markup.ShouldNotContain("Agents.Surface.Loading.Title");
+            cut.Markup.ShouldNotContain("private-delayed-read-details");
+            cut.FindAll("[data-testid='agents-config-submit']").ShouldBeEmpty();
+            cut.FindAll("[data-testid='agents-config-activate']").ShouldBeEmpty();
+        });
+    }
+
+    /// <summary>Disposal cancels even a noncooperative initial read and prevents later results from changing the page.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task DisposalDuringInitialReadPreventsLateStateUpdates(bool lateFailure)
+    {
+        TaskCompletionSource<AgentSetupResult> stalledRead = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        CancellationToken readToken = default;
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(call =>
+        {
+            readToken = call.ArgAt<CancellationToken>(1);
+            return stalledRead.Task;
+        });
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        string markupAtDisposal = cut.Markup;
+        int rendersAtDisposal = cut.RenderCount;
+
+        cut.Instance.Dispose();
+
+        readToken.IsCancellationRequested.ShouldBeTrue();
+        // Leave the instance mounted so the final lifecycle render exposes any accidental state update.
+        cut.WaitForAssertion(() => cut.RenderCount.ShouldBeGreaterThan(rendersAtDisposal));
+        stalledRead.Task.IsCompleted.ShouldBeFalse();
+        if (lateFailure)
+        {
+            stalledRead.SetException(new InvalidOperationException("private-late-read-details"));
+        }
+        else
+        {
+            stalledRead.SetResult(AgentSetupResult.Success(AgentUiTestData.Setup(
+                AgentUiTestData.Status(AgentLifecycleStatus.Active))));
+        }
+
+        await cut.InvokeAsync(() => Task.CompletedTask);
+        cut.Render();
+        cut.Markup.ShouldBe(markupAtDisposal);
+        cut.Markup.ShouldNotContain("private-late-read-details");
+        await SetupGateway.Received(1).GetSetupAsync(null, Arg.Any<CancellationToken>());
+    }
+
     [Fact]
     public void An_unavailable_setup_read_renders_the_unavailable_surface_not_a_denial()
     {
