@@ -625,18 +625,26 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Readiness exact immutable expiry (B08, E05, V04) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: The readiness script parses retention but checks only a future returned expiry, not ValidFrom + retention or its interval bound. This pre-existing ReadinessOnly verifier can accept a wrong duration; it cannot qualify production. Same missing immutable-expiry comparison as B08. The source opening custody expiry is not compared with returned expiry. The verification reviewer independently confirms B08/E05: a 366-day returned deadline can pass a declared 365-day policy because only future expiry and opening actor/version/scope are checked.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-readiness-verifier-items.md` verifies the existing pinned Parties correction through maintained production-script subprocess tests: exact 365-day positive controls, a 366-day opening, returned custody expiry changes including one 100 ns tick, revocation-effective retention and unsupported policy. Refusals assert their diagnostic, request stage and absent success receipt. A temporary mutation removing the original-expiry comparison is detected. This closes the verifier defect, not owner qualification.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Readiness transition proof (B09) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: The verifier compares the opening actor/version/scope but does not reconstruct later revoke/rebind boundaries. An incorrectly open returned interval can pass. This is an earlier readiness verifier defect, not a cleanup/provider qualification result.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-readiness-verifier-items.md` exercises the pinned independent transition fold with valid revoked/rebound controls, separate returned intervals ignoring revoke/rebind, a changed later revocation, an independently changed returned opening time, a wrong predecessor and a shortened opening without a closing transition. A temporary mutation removing the closing-interval comparison is detected. Tests establish synthetic verifier behavior only.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Readiness streaming bound (B10) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: Invoke-WebRequest buffers the response before the UTF-8 byte-count check. The 32 MiB receive bound does not prevent oversized allocation; streaming enforcement is an earlier verifier prerequisite.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-readiness-verifier-items.md` verifies the pinned bounded HttpClient receive path at exactly 32 MiB and one byte above it for declared/chunked responses, also observing early disconnect before a full 40 MiB stream is sent. Otherwise wire-bounded responses separately exceed the 16 MiB decoded limit through one large event or two cumulatively oversized valid events. Overflow cases fail at the expected diagnostic with no receipt; raising the wire limit in a temporary copy is detected. Redirect refusal is also covered.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Relative evidence paths (B11, E03) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: The wrapper creates a caller-relative EvidenceDirectory then changes directory before resolving build/test outputs. Legal relative arguments can redirect or fail output. Normalize evidence and optional Memories paths before lane execution in the owning verifier slice. Same legal relative-path failure as B11, verified at Push-Location and the build/test Join-Path calls.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-readiness-verifier-items.md` runs the pinned wrapper from a foreign process directory and after PowerShell Set-Location. Controlled dotnet handles the current preliminary version query, then stops the first build; assertions verify absolute caller-relative evidence, artifact, Memories and EventStore paths and no later lane or success receipt. A LiveReadiness positive control uses relative register/evidence paths. Removing evidence normalization in a temporary copy is detected; no real owner build is claimed.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Current read lower time bound (E02) remains an earlier Story 5.4 prerequisite before owner qualification.
@@ -645,6 +653,8 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Readiness nested binding scope (E04) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: The readiness response guard checks outer tenant/Party and actor/version but not the nested evidence tenant/Party. Comparing opening source scope to the expected scope does not compare the returned nested scope; another tenant can pass the verifier.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-readiness-verifier-items.md` verifies both source-opening and returned nested tenant/Party against the pinned verifier, with independent foreign and case-only scope mutations and otherwise matching actor/version/outer scope. Each fails at its expected request stage without a receipt; removing the returned scope comparison in a temporary copy is detected. Current dependency acceptance records remain unchanged.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Current authority regression coverage (V01) remains an earlier Story 5.4 prerequisite before owner qualification.

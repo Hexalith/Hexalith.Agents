@@ -37,6 +37,18 @@ run, build the project and invoke its test assembly with single-dash `-class`
 or `-method` selectors. Do not use solution-level `dotnet test` or assume the
 legacy VSTest `--filter` syntax applies.
 
+The tooling suite also runs the pinned Parties readiness verifiers against
+temporary loopback fixtures. To run only those regressions:
+
+```bash
+python3 -m unittest discover -s tests/tooling -p 'parties_readiness_verifier_test.py'
+```
+
+These checks require PowerShell 7 and use the root-declared Parties submodule.
+They verify expiry, retained transitions, receive limits, scope and caller-relative
+paths. They establish synthetic verifier behavior; dependency acceptance and
+production qualification still require their existing owner evidence.
+
 The CI package lane restores and builds Release with
 `-p:UseHexalithProjectReferences=false`. Release and packing require package
 references. All external package versions come from
