@@ -24,7 +24,7 @@ public static class AgentSetupProjectionFold
     /// <summary>Reason reported when a delivery skips aggregate sequence numbers.</summary>
     public const string DeliverySequenceGapReason = "delivery-sequence-gap";
 
-    /// <summary>Reason reported when a delivery carries an event this domain cannot resolve.</summary>
+    /// <summary>Reason reported when a delivery carries an event type or payload this domain cannot resolve.</summary>
     public const string UnresolvedEventReason = "unresolved-event-type";
 
     // Instruction text is never persisted (AD-14), so replay feeds the pure policy a length-only stand-in that
@@ -49,8 +49,8 @@ public static class AgentSetupProjectionFold
 
     /// <summary>
     /// Returns the reason a delivery must be retried rather than folded, or <see langword="null"/> when the slice is
-    /// safe to apply. A gap or an unknown event type is a transport/deployment fault: folding past it would bake a
-    /// wrong end state into the read model, so the delivery fails and is retried instead.
+    /// safe to apply. A gap, unknown event type, or corrupt payload is a transport/deployment fault: folding past
+    /// it would bake a wrong end state into the read model, so the delivery fails and is retried instead.
     /// </summary>
     /// <param name="events">The delivered event slice.</param>
     /// <param name="checkpoint">The highest sequence number already folded (0 when none).</param>
@@ -78,7 +78,8 @@ public static class AgentSetupProjectionFold
             }
         }
 
-        return Array.Exists(pending, item => AgentEventTypeResolver.Resolve(item.EventTypeName) is null)
+        return Array.Exists(pending, item => AgentEventTypeResolver.Resolve(item.EventTypeName) is not { } eventType
+            || Deserialize(item.Payload, eventType) is null)
             ? UnresolvedEventReason
             : null;
     }
@@ -107,11 +108,13 @@ public static class AgentSetupProjectionFold
                 break;
             }
 
-            if (Deserialize(@event.Payload, eventType) is { } payload)
+            if (Deserialize(@event.Payload, eventType) is not { } payload)
             {
-                Apply(state, payload);
+                // Never advance beyond a known event whose state change could not be reconstructed.
+                break;
             }
 
+            Apply(state, payload);
             lastSequence = Math.Max(lastSequence, @event.SequenceNumber);
             DateTimeOffset timestamp = @event.Timestamp.ToUniversalTime();
             projectedAt = projectedAt is { } known && known >= timestamp ? known : timestamp;
@@ -219,8 +222,7 @@ public static class AgentSetupProjectionFold
         }
         catch (JsonException)
         {
-            // A corrupt payload can never be repaired by a retry, so the checkpoint still advances past it and
-            // state is left untouched rather than wedging every later delivery for this Agent.
+            // Delivery validation rejects the entire slice so no partial state or checkpoint is persisted.
             return null;
         }
     }

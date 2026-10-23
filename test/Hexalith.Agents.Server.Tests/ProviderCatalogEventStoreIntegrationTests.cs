@@ -1,6 +1,7 @@
 namespace Hexalith.Agents.Server.Tests;
 
 using System.Text.Json;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -177,6 +178,96 @@ public sealed class ProviderCatalogEventStoreIntegrationTests
         result.Status.ShouldBe(ProjectionDispatchStatus.Retryable);
         Persisted().LastSequenceNumber.ShouldBe(first.LastSequenceNumber);
         Persisted().Entries.ShouldHaveSingleItem().DisplayLabel.ShouldBe("OpenAI GPT-4o");
+    }
+
+    [Theory]
+    [InlineData("{", false)]
+    [InlineData("", false)]
+    [InlineData("null", false)]
+    [InlineData("[]", false)]
+    [InlineData("{", true)]
+    [InlineData("", true)]
+    [InlineData("null", true)]
+    [InlineData("[]", true)]
+    public async Task CorruptPendingPayloadRejectsTheWholeCatalogBatchAndCorrectedRedeliveryCompletes(string payload, bool existing)
+    {
+        ProjectionEventDto created = Created() with { MessageId = "create-command" };
+        if (existing)
+        {
+            await ProjectAsync(created);
+        }
+
+        string before = JsonSerializer.Serialize(_store.Snapshot<ProviderCatalogReadModel>(StoreName, Key));
+        int batchesBefore = _store.BatchCount;
+        string entryId = ProviderCatalogIdentity.EntryId("openai", "gpt-4o");
+        ProjectionEventDto[] corrected = [created, Updated(2) with { MessageId = "update-command" },
+            Event(nameof(ProviderModelEntryDisabled), 3, new ProviderModelEntryDisabled(entryId, "openai", "gpt-4o")) with { MessageId = "disable-command" },
+            Event(nameof(ProviderModelEntryEnabled), 4, new ProviderModelEntryEnabled(entryId, "openai", "gpt-4o")) with { MessageId = "enable-command" }];
+        ProjectionEventDto[] corrupt = [.. corrected];
+        corrupt[2] = corrupt[2] with { Payload = Encoding.UTF8.GetBytes(payload) };
+
+        DomainProjectionHandlerResult result = await ProjectAsync(corrupt);
+
+        result.Status.ShouldBe(ProjectionDispatchStatus.Retryable);
+        result.ReasonCode.ShouldBe(ProviderCatalogProjectionFold.UnresolvedEventReason);
+        _store.BatchCount.ShouldBe(batchesBefore);
+        JsonSerializer.Serialize(_store.Snapshot<ProviderCatalogReadModel>(StoreName, Key)).ShouldBe(before);
+
+        DomainProjectionHandlerResult retry = await ProjectAsync(corrected);
+
+        retry.Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        ProviderCatalogReadModel persisted = Persisted();
+        persisted.LastSequenceNumber.ShouldBe(4);
+        persisted.StreamSequences[entryId].ShouldBe(4);
+        persisted.StreamCommandMessageIds[entryId].ShouldBe(["create-command", "update-command", "disable-command", "enable-command"]);
+        persisted.Entries.ShouldHaveSingleItem().Status.ShouldBe(ProviderModelStatus.Enabled);
+        persisted.Entries[0].CapabilityVersion.ShouldBe(2);
+        JsonSerializer.Serialize(persisted).ShouldBe(JsonSerializer.Serialize(
+            ProviderCatalogProjectionFold.Fold(Request(corrected), current: null)));
+    }
+
+    [Theory]
+    [InlineData("{")]
+    [InlineData("")]
+    [InlineData("null")]
+    [InlineData("[]")]
+    public async Task CorruptCatalogRebuildIsRejectedWithoutChangingPersistedCatalog(string payload)
+    {
+        await ProjectAsync(Created() with { MessageId = "create-command" });
+        string before = JsonSerializer.Serialize(Persisted());
+        int batchesBefore = _store.BatchCount;
+        int readsBefore = _store.GetCount;
+
+        InvalidOperationException error = await Should.ThrowAsync<InvalidOperationException>(() => Handler().PrepareRebuildAsync(
+            Request(Created(), Updated(2) with { Payload = Encoding.UTF8.GetBytes(payload) }),
+            "corrupt-rebuild",
+            CancellationToken.None));
+
+        error.Message.ShouldBe(ProviderCatalogProjectionFold.UnresolvedEventReason);
+        _store.GetCount.ShouldBe(readsBefore);
+        _store.BatchCount.ShouldBe(batchesBefore);
+        JsonSerializer.Serialize(Persisted()).ShouldBe(before);
+    }
+
+    [Theory]
+    [InlineData("{")]
+    [InlineData("")]
+    [InlineData("null")]
+    [InlineData("[]")]
+    public async Task CorruptCoveredCatalogDuplicateDoesNotBlockNewValidEvents(string payload)
+    {
+        await ProjectAsync(Created() with { MessageId = "create-command" });
+
+        DomainProjectionHandlerResult result = await ProjectAsync(
+            Created() with { Payload = Encoding.UTF8.GetBytes(payload), MessageId = "ignored-command" },
+            Updated(2) with { MessageId = "update-command" });
+
+        result.Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        ProviderCatalogReadModel persisted = Persisted();
+        persisted.LastSequenceNumber.ShouldBe(2);
+        persisted.StreamCommandMessageIds[ProviderCatalogIdentity.EntryId("openai", "gpt-4o")]
+            .ShouldBe(["create-command", "update-command"]);
+        persisted.Entries.ShouldHaveSingleItem().CapabilityVersion.ShouldBe(2);
     }
 
     [Fact]

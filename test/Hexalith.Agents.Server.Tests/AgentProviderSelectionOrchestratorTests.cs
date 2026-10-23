@@ -103,6 +103,42 @@ public sealed class AgentProviderSelectionOrchestratorTests
             .ShouldBe(ProviderSelectionValidationStatus.Unpriced);
 
     [Theory]
+    [InlineData("ZZZ")]
+    [InlineData("XTS")]
+    public async Task NonCurrencyPricingMapsToUnpricedAndDispatchesTrustedRejectionEvidence(string currency)
+    {
+        ProviderCatalogEntryView entry = ValidEntry(capabilityVersion: 7);
+        ReaderReturns(SuccessRead(entry with
+        {
+            Pricing = entry.Pricing.ShouldNotBeNull() with { Currency = currency },
+        }));
+        CaptureDispatch();
+
+        AgentProviderSelectionOutcome outcome = await Orchestrator.ExecuteAsync(
+            Request(clientExtensions: new Dictionary<string, string>
+            {
+                ["provider:selectionValidation"] = "Valid",
+            }),
+            CancellationToken.None);
+
+        outcome.Authorized.ShouldBeTrue();
+        outcome.Dispatched.ShouldBeTrue();
+        outcome.Verdict.ShouldBe(ProviderSelectionValidationStatus.Unpriced);
+        outcome.CapabilityVersion.ShouldBe(7);
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
+        dispatched.CommandType.ShouldBe(nameof(SelectAgentProviderModel));
+        dispatched.Extensions.ShouldNotBeNull();
+        dispatched.Extensions["provider:selectionValidation"].ShouldBe("Unpriced");
+        dispatched.Extensions["actor:agentsAdmin"].ShouldBe("true");
+        SelectAgentProviderModel command = JsonSerializer.Deserialize<SelectAgentProviderModel>(dispatched.Payload).ShouldNotBeNull();
+        command.ProviderId.ShouldBe(ProviderId);
+        command.ModelId.ShouldBe(ModelId);
+        command.ProviderCapabilityVersion.ShouldBe(7);
+        await _reader.Received(1).GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>());
+        await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
     [InlineData(true)]
     [InlineData(false)]
     public async Task Zero_unit_price_maps_to_unpriced(bool zeroInput)

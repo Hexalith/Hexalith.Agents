@@ -183,7 +183,8 @@ origin: code review round 4, 2026-09-15
 location: eng/verify-story-5.3.ps1
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: That script's pre-existing filter can match nothing and still exit successfully.
-status: open
+status: done 2026-10-23
+resolution: `spec-five-deferred-projection-verification-items.md` replaces combined VSTest filters with independent native xUnit class/method selections. Every focused, composition and full-project run requires a nonzero test summary and rejects failures, skips and not-run tests; controlled subprocess fixtures exercise missing selections and runner failures.
 
 ### DW-16: Map operation failure bodies to appropriate HTTP statuses.
 
@@ -321,6 +322,8 @@ status: open
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Define a fail-closed projection policy for malformed payloads of known Agent event types.
   evidence: `AgentSetupProjectionFold.Deserialize` returns null for corrupt JSON while `Fold` still advances the persisted sequence checkpoint, permanently presenting incomplete state as current; this behavior predates the current exact-correlation patch.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-projection-verification-items.md` validates deserialization of every pending known event before the handler writes any batch, returning the existing retryable reason for malformed syntax, empty bytes, JSON null or incompatible JSON. Direct folding stops before the invalid event; persisted-state regressions cover whole-batch rejection, rebuild rejection, corrected redelivery and checkpoint-covered duplicates.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Pin inherited reusable security workflows to reviewed immutable revisions.
@@ -497,6 +500,8 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Fail provider catalog projection deliveries closed when a known event payload is corrupt.
   evidence: `ProviderCatalogProjectionFold.Fold` stops on a malformed payload but `ProviderCatalogProjectionHandler` can write the partial model and acknowledge the delivery, leaving later events unapplied; this projection policy predates the current setup-correlation patch.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-projection-verification-items.md` verifies the already implemented provider preflight guard, which rejects the entire delivery before folding or writing and rejects corrupt rebuilds before store access. Added absent/existing-store mixed-batch, corrected-redelivery, covered-duplicate and rebuild regressions assert complete persisted snapshots, sequence and command-identity windows.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Publish only archives declared in the release package manifest.
@@ -558,6 +563,8 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 ## Deferred from: code review of spec-5-3-govern-provider-models-and-pricing-through-live-operations-2.md (2026-09-24, contracts and domain chunk)
 
 - Pricing-version and initial-capability-version validation in `ProviderCatalogAggregate.ValidatePricing`/`Handle(CreateProviderModelEntry)` has no rejection test (mismatched positive version on update/create, non-migrated `InitialCapabilityVersion != 1`). The UI always sends `PricingVersion: 0`, so no current caller reaches it; add theory rows when this area is next touched.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-projection-verification-items.md` adds explicit create/update pricing-version and non-migrated initial-capability rejection cases, full input-state immutability before/after rejection replay, and valid automatic/explicit-version controls while preserving historical migration coverage.
 - `ProviderCatalogAggregate` and `TenantProviderEnablementAggregate` trust payload `EffectiveAt`/`DecidedAt`; only `EventStoreProviderCatalogOperations` stamps server time. Unverified (medium if true): settle by confirming whether the external EventStore gateway host (DW-21) exposes generic command submission for `provider-catalog`/`tenant-provider-enablement`, which would let an operator backdate or future-date grace or a tenant administrator falsify decision time.
 
 ## Deferred from: code review of spec-5-3-govern-provider-models-and-pricing-through-live-operations-2.md (2026-09-26, group 2 slice 1)
@@ -568,6 +575,8 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 
 - Platform-scope provider-catalog queries through EventStore `/query` now require `HttpAgentAdministrationContextProvider` to prove `Agents.PlatformOperator` and a matching `ActorUserId` from the ambient `HttpContext` (`ProviderCatalogQueryHandlerBase.IsProviderAdminAsync`). No `AddAuthentication`/JWT setup exists in `src/`, so in this repository's host the context is `Anonymous`. Unverified (high if true): every platform catalog query would return `NotAuthorized` in production. Settle under DW-21 by confirming the deployed domain-service host authenticates the bearer token EventStore forwards on the Dapr-invoked `/query` call.
 - `ProviderSelectionVerdict.HasValidPricing` switched to the ISO 4217 list without a selection-orchestrator test for a non-ISO currency (`ZZZ`, `XTS`) mapping to `Unpriced`. Aggregate and migration validate currency at write time, so only pre-validation data is exposed; add theory rows when the verdict is next touched.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-projection-verification-items.md` adds otherwise-valid positive-priced `ZZZ`/`XTS` orchestrator cases that return Unpriced, overwrite forged Valid client evidence, and dispatch the exact trusted rejection verdict and capability version. The existing valid ISO selection control remains intact.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Packaged SDK transport is missing (B01) remains an earlier Story 5.4 prerequisite before owner qualification.
@@ -680,3 +689,7 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
   evidence: The source CLI regression tests use the existing JSON fixture flags and exercise the production proof call; both release callers use the unchanged live gh branch. A controlled gh executable on PATH could additionally prove endpoint construction, subprocess-failure diagnostics and malformed API-response handling without real GitHub requests. This pre-existing transport coverage gap is separate from the five selected deferrals; no incorrect live behavior was demonstrated.
   status: done 2026-10-23
   resolution: `spec-five-deferred-ci-release-followups.md` exercises the production live branch with a controlled gh executable on PATH, asserting exact API arguments, successful proof, stale/failed CI, failures and malformed JSON at either endpoint, and a missing CLI without making GitHub requests.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-projection-verification-items.md`
+  summary: Define structural event-payload validation for successfully deserialized Agent projection events while preserving supported legacy defaults.
+  evidence: Existing `AgentState.Apply(AgentResponseModeConfigured)` accepts default mode/configuration-version values from `{}`, while `Apply(AgentApproverPolicyConfigured)` dereferences a null Policy and lifecycle Apply rejects negative configuration versions. These paths predate the syntax/null/shape delivery correction; deserialization alone cannot enforce their semantic invariants. Agree the required-member/legacy compatibility policy and validate before folding; application failures already occur before any read-model batch is written.

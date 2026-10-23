@@ -114,6 +114,66 @@ public sealed class ProviderCatalogAggregateTests
         created.MigratedFrom.ShouldBe("legacy:tenant-a");
     }
 
+    [Theory]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(int.MaxValue)]
+    public void CreateRejectsMismatchedExplicitPricingVersionWithoutChangingState(int pricingVersion)
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        string before = JsonSerializer.Serialize(state);
+        CreateProviderModelEntry command = ValidCreate(modelId: "new-model", pricing: ValidPricing(pricingVersion));
+
+        DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.ShouldHaveSingleItem().ShouldBeOfType<InvalidProviderModelPricingRejection>();
+        JsonSerializer.Serialize(state).ShouldBe(before);
+        ApplyAll(state, result);
+        JsonSerializer.Serialize(state).ShouldBe(before);
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(0)]
+    [InlineData(2)]
+    [InlineData(int.MaxValue)]
+    public void NonMigratedCreateRejectsInitialCapabilityVersionsOtherThanOneWithoutChangingState(int capabilityVersion)
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        string before = JsonSerializer.Serialize(state);
+        CreateProviderModelEntry command = ValidCreate(modelId: "new-model") with
+        {
+            InitialCapabilityVersion = capabilityVersion,
+        };
+
+        DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.ShouldHaveSingleItem().ShouldBeOfType<InvalidProviderModelMetadataRejection>();
+        JsonSerializer.Serialize(state).ShouldBe(before);
+        ApplyAll(state, result);
+        JsonSerializer.Serialize(state).ShouldBe(before);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public void NonMigratedCreateAcceptsAutomaticOrExplicitInitialPricingVersion(int pricingVersion)
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        string before = JsonSerializer.Serialize(state);
+        CreateProviderModelEntry command = ValidCreate(modelId: "new-model", pricing: ValidPricing(pricingVersion));
+
+        DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
+
+        result.IsSuccess.ShouldBeTrue();
+        ProviderModelEntryCreated created = result.Events.ShouldHaveSingleItem().ShouldBeOfType<ProviderModelEntryCreated>();
+        created.Pricing.PricingVersion.ShouldBe(1);
+        created.CapabilityVersion.ShouldBe(1);
+        JsonSerializer.Serialize(state).ShouldBe(before);
+    }
+
     [Fact]
     public void Unknown_three_letter_currency_rejects_as_non_iso()
     {
@@ -654,6 +714,66 @@ public sealed class ProviderCatalogAggregateTests
         updated.DisplayLabel.ShouldBe("OpenAI GPT-4o (renamed)");
         updated.ContextWindowTokenLimit.ShouldBe(200_000);
         updated.MaxOutputTokenLimit.ShouldBe(32_000);
+    }
+
+    [Theory]
+    [InlineData("unchanged", 2)]
+    [InlineData("unchanged", 3)]
+    [InlineData("input", 1)]
+    [InlineData("input", 3)]
+    [InlineData("output", 1)]
+    [InlineData("output", 3)]
+    [InlineData("currency", 1)]
+    [InlineData("currency", 3)]
+    public void UpdateRejectsMismatchedExplicitPricingVersionWithoutChangingState(string changedField, int pricingVersion)
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        string before = JsonSerializer.Serialize(state);
+        ProviderModelPricing pricing = ValidPricing(pricingVersion) with
+        {
+            InputTokenUnitPrice = changedField == "input" ? 0.003m : 0.002m,
+            OutputTokenUnitPrice = changedField == "output" ? 0.009m : 0.008m,
+            Currency = changedField == "currency" ? "EUR" : "USD",
+        };
+        UpdateProviderModelEntry command = ValidUpdate(displayLabel: "Renamed", pricing: pricing);
+
+        DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.ShouldHaveSingleItem().ShouldBeOfType<InvalidProviderModelPricingRejection>();
+        JsonSerializer.Serialize(state).ShouldBe(before);
+        ApplyAll(state, result);
+        JsonSerializer.Serialize(state).ShouldBe(before);
+    }
+
+    [Theory]
+    [InlineData("unchanged", 0, 1)]
+    [InlineData("unchanged", 1, 1)]
+    [InlineData("input", 0, 2)]
+    [InlineData("input", 2, 2)]
+    [InlineData("output", 0, 2)]
+    [InlineData("output", 2, 2)]
+    [InlineData("currency", 0, 2)]
+    [InlineData("currency", 2, 2)]
+    public void UpdateAcceptsAutomaticOrCorrectExplicitPricingVersion(string changedField, int pricingVersion, int expectedVersion)
+    {
+        ProviderCatalogState state = StateWith(ValidCreate());
+        string before = JsonSerializer.Serialize(state);
+        ProviderModelPricing pricing = ValidPricing(pricingVersion) with
+        {
+            InputTokenUnitPrice = changedField == "input" ? 0.003m : 0.002m,
+            OutputTokenUnitPrice = changedField == "output" ? 0.009m : 0.008m,
+            Currency = changedField == "currency" ? "EUR" : "USD",
+        };
+        UpdateProviderModelEntry command = ValidUpdate(displayLabel: "Renamed", pricing: pricing);
+
+        DomainResult result = ProviderCatalogAggregate.Handle(command, state, Envelope(command));
+
+        result.IsSuccess.ShouldBeTrue();
+        ProviderModelEntryMetadataUpdated updated = result.Events.ShouldHaveSingleItem().ShouldBeOfType<ProviderModelEntryMetadataUpdated>();
+        updated.Pricing.ShouldBe(pricing with { PricingVersion = expectedVersion });
+        updated.DisplayLabel.ShouldBe("Renamed");
+        JsonSerializer.Serialize(state).ShouldBe(before);
     }
 
     [Fact]

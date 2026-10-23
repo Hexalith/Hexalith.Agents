@@ -35,17 +35,17 @@ $testProjects = @(
 $focusedSuites = @(
     @{
         Project = 'test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj'
-        Filter  = 'FullyQualifiedName~ProviderCatalogAggregate|FullyQualifiedName~ProviderCatalogStateReplay|FullyQualifiedName~ProviderCatalogVersionRegression|FullyQualifiedName~ProviderSecretLeak|FullyQualifiedName~TenantProviderEnablementAggregate|FullyQualifiedName~DataHandlingGraceDeadline'
+        Classes = @('*ProviderCatalogAggregateTests', '*ProviderCatalogStateReplayTests', '*ProviderCatalogVersionRegressionTests', '*ProviderSecretLeakTests', '*TenantProviderEnablementAggregateTests', '*DataHandlingGraceDeadlineTests')
         Gate    = 'AC1 aggregate replay, pricing, version regression, and poison-secret sweep'
     },
     @{
         Project = 'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj'
-        Filter  = 'FullyQualifiedName~EventStoreProviderCatalogOperations|FullyQualifiedName~ProviderCatalogEventStoreIntegration|FullyQualifiedName~ProviderCatalogCoordinationIntegration|FullyQualifiedName~ProviderCatalogQuery|FullyQualifiedName~ProviderCatalogAuthorization|FullyQualifiedName~TenantProviderCatalogIntegration|FullyQualifiedName~ProviderCatalogMigration|FullyQualifiedName~ProjectedProviderCatalogReader|FullyQualifiedName~HttpAgentAdministrationContextProvider'
+        Classes = @('*EventStoreProviderCatalogOperationsTests', '*ProviderCatalogEventStoreIntegrationTests', '*ProviderCatalogCoordinationIntegrationTests', '*ProviderCatalogQueryTests', '*ProviderCatalogAuthorizationTests', '*TenantProviderCatalogIntegrationTests', '*ProviderCatalogMigrationTests', '*ProjectedProviderCatalogReaderTests', '*HttpAgentAdministrationContextProviderTests')
         Gate    = 'AC1-AC4 live EventStore command-query-projection and cross-tenant selection denial'
     },
     @{
         Project = 'test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj'
-        Filter  = 'FullyQualifiedName~ProviderCatalogTests|FullyQualifiedName~ProviderCatalogUiTests|FullyQualifiedName~ProviderCatalogGovernanceUiTests'
+        Classes = @('*ProviderCatalogTests', '*ProviderCatalogUiTests', '*ProviderCatalogGovernanceUiTests')
         Gate    = 'AC2 FrontComposer catalog truth flow without callability inference'
     }
 )
@@ -53,12 +53,12 @@ $focusedSuites = @(
 $compositionSuites = @(
     @{
         Project = 'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj'
-        Filter  = 'FullyQualifiedName~ProviderCatalogComposition|FullyQualifiedName~AgentSetupComposition'
+        Classes = @('*ProviderCatalogCompositionTests', '*AgentSetupCompositionTests')
         Gate    = 'the server container resolves the live catalog operations and projected reader'
     },
     @{
         Project = 'test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj'
-        Filter  = 'FullyQualifiedName~AgentsUiComposition'
+        Classes = @('*AgentsUiCompositionTests')
         Gate    = 'the FrontComposer container resolves the live catalog gateway from AddAgentsUiSetup'
     }
 )
@@ -113,7 +113,8 @@ function Invoke-TestGate {
     param(
         [Parameter(Mandatory = $true)] [string] $Name,
         [Parameter(Mandatory = $true)] [string] $Project,
-        [string] $Filter
+        [string[]] $Classes = @(),
+        [string[]] $Methods = @()
     )
 
     $assembly = [IO.Path]::GetFileNameWithoutExtension($Project)
@@ -122,15 +123,83 @@ function Invoke-TestGate {
         throw "Gate '$Name' requires built test assembly '$path'."
     }
 
+    $selections = @(
+        foreach ($class in $Classes) { @{ Option = '-class'; Value = $class } }
+        foreach ($method in $Methods) { @{ Option = '-method'; Value = $method } }
+    )
+    if ($selections.Count -eq 0) {
+        $selections = @(@{ Option = ''; Value = 'all tests' })
+    }
+
     Write-Host "Gate: $Name"
-    if ([string]::IsNullOrWhiteSpace($Filter)) {
-        & dotnet $path
-    }
-    else {
-        & dotnet $path '-filterVSTest' $Filter
-    }
-    if ($LASTEXITCODE -ne 0) {
-        throw "Gate '$Name' failed with exit code $LASTEXITCODE."
+    foreach ($selection in $selections) {
+        $arguments = @($path, '-failSkips')
+        if ($selection.Option) {
+            $arguments += @($selection.Option, $selection.Value)
+        }
+
+        $nativeErrorPreference = $PSNativeCommandUseErrorActionPreference
+        try {
+            # Stream progress immediately while retaining this invocation's summary evidence.
+            $PSNativeCommandUseErrorActionPreference = $false
+            $output = @()
+            & dotnet @arguments 2>&1 | Tee-Object -Variable output | ForEach-Object { Write-Host $_ }
+            $exitCode = $LASTEXITCODE
+        }
+        finally {
+            $PSNativeCommandUseErrorActionPreference = $nativeErrorPreference
+        }
+
+        if ($exitCode -ne 0) {
+            throw "Gate '$Name' failed for '$($selection.Value)' with exit code $exitCode."
+        }
+
+        $headers = @()
+        for ($index = 0; $index -lt @($output).Count; $index++) {
+            if (([string] $output[$index]).Trim() -ceq '=== TEST EXECUTION SUMMARY ===') {
+                $headers += $index
+            }
+        }
+        if ($headers.Count -eq 0) {
+            throw "Gate '$Name' produced no test summary for '$($selection.Value)'."
+        }
+        if ($headers.Count -ne 1) {
+            throw "Gate '$Name' produced ambiguous test summary sections for '$($selection.Value)'."
+        }
+
+        # Only the expected assembly's row within the runner summary is authoritative.
+        $rowPrefix = '^\s*' + [regex]::Escape($assembly) + '\s+Total:'
+        $rows = @()
+        for ($index = $headers[0] + 1; $index -lt @($output).Count; $index++) {
+            if ([string] $output[$index] -cmatch $rowPrefix) {
+                $rows += [string] $output[$index]
+            }
+        }
+        if ($rows.Count -eq 0) {
+            throw "Gate '$Name' produced no test summary for assembly '$assembly' and '$($selection.Value)'."
+        }
+        if ($rows.Count -ne 1) {
+            throw "Gate '$Name' produced ambiguous test summary rows for '$($selection.Value)'."
+        }
+
+        # xUnit emits only Total: 0 when a native selector matches no tests.
+        $rowPattern = $rowPrefix + '\s*(?<Total>\d+)(?:,\s*Errors:\s*(?<Errors>\d+),\s*Failed:\s*(?<Failed>\d+),\s*Skipped:\s*(?<Skipped>\d+),\s*Not Run:\s*(?<NotRun>\d+))?(?:,\s*Time:\s*[^\r\n]+)?\s*$'
+        $summary = [regex]::Match($rows[0], $rowPattern)
+        if (-not $summary.Success) {
+            throw "Gate '$Name' produced an invalid test summary row for '$($selection.Value)'."
+        }
+        if ([int] $summary.Groups['Total'].Value -le 0) {
+            throw "Gate '$Name' executed 0 tests; selection matched nothing: $($selection.Value)."
+        }
+        if (-not $summary.Groups['Errors'].Success) {
+            throw "Gate '$Name' produced an incomplete test summary row for '$($selection.Value)'."
+        }
+        if ([int] $summary.Groups['Errors'].Value -gt 0 -or [int] $summary.Groups['Failed'].Value -gt 0) {
+            throw "Gate '$Name' reported errors or failures for '$($selection.Value)'."
+        }
+        if ([int] $summary.Groups['Skipped'].Value -gt 0 -or [int] $summary.Groups['NotRun'].Value -gt 0) {
+            throw "Gate '$Name' skipped or did not run tests for '$($selection.Value)'."
+        }
     }
 }
 
@@ -163,13 +232,14 @@ try {
 
     Invoke-TestGate -Name 'story-5.3 focused — EventStore coordinated stream guard and terminal conflict status' `
         -Project $eventStoreCoordinatorProject `
-        -Filter 'FullyQualifiedName~CoordinatedCommandActorTests|FullyQualifiedName~Fenced_stale_source_after_a_target_reconciliation_miss|FullyQualifiedName~Handle_CoordinatedSourceConflict|FullyQualifiedName~CommandStatusControllerTests'
+        -Classes @('*CoordinatedCommandActorTests', '*CommandStatusControllerTests') `
+        -Methods @('*Fenced_stale_source_after_a_target_reconciliation_miss*', '*Handle_CoordinatedSourceConflict*')
     Invoke-TestGate -Name 'story-5.3 focused — EventStore gateway owning tenant status' `
         -Project $eventStoreClientProject `
-        -Filter 'FullyQualifiedName~GetCommandStatusAsync_UsesConfiguredPathAndDeserializesRejectedStatus|FullyQualifiedName~GetCommandStatusAsync_PreservesCompletedZeroEventCount'
+        -Methods @('*GetCommandStatusAsync_UsesConfiguredPathAndDeserializesRejectedStatus', '*GetCommandStatusAsync_PreservesCompletedZeroEventCount')
 
     foreach ($suite in $focusedSuites) {
-        Invoke-TestGate -Name "story-5.3 focused — $($suite.Gate)" -Project $suite.Project -Filter $suite.Filter
+        Invoke-TestGate -Name "story-5.3 focused — $($suite.Gate)" -Project $suite.Project -Classes $suite.Classes
     }
 
     foreach ($testProject in $testProjects) {
@@ -177,7 +247,7 @@ try {
     }
 
     foreach ($suite in $compositionSuites) {
-        Invoke-TestGate -Name "story-5.3 composition — $($suite.Gate)" -Project $suite.Project -Filter $suite.Filter
+        Invoke-TestGate -Name "story-5.3 composition — $($suite.Gate)" -Project $suite.Project -Classes $suite.Classes
     }
 
     Write-Host 'Gate: in-scope catalog seams are still present in source'

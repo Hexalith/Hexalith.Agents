@@ -1,6 +1,7 @@
 namespace Hexalith.Agents.Server.Tests;
 
 using System;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -144,6 +145,105 @@ public sealed class AgentSetupProjectionTests
         result.Status.ShouldBe(ProjectionDispatchStatus.Retryable);
         result.ReasonCode.ShouldBe(AgentSetupProjectionFold.UnresolvedEventReason);
         _store.Snapshot<AgentSetupReadModel>(StoreName, Key).ShouldBeNull();
+    }
+
+    [Theory]
+    [InlineData("{", false)]
+    [InlineData("", false)]
+    [InlineData("null", false)]
+    [InlineData("[]", false)]
+    [InlineData("{", true)]
+    [InlineData("", true)]
+    [InlineData("null", true)]
+    [InlineData("[]", true)]
+    public async Task CorruptPendingPayloadRejectsTheWholeBatchAndCorrectedRedeliveryCompletes(string payload, bool existing)
+    {
+        if (existing)
+        {
+            await ProjectAsync(Created());
+        }
+
+        string before = JsonSerializer.Serialize(_store.Snapshot<AgentSetupReadModel>(StoreName, Key));
+        int batchesBefore = _store.BatchCount;
+        ProjectionEventDto[] corrected = [Created(), ResponseMode(2, AgentResponseMode.Confirmation), Disabled(3), Activated(4, 4)];
+        ProjectionEventDto[] corrupt = [.. corrected];
+        corrupt[2] = corrupt[2] with { Payload = Encoding.UTF8.GetBytes(payload) };
+
+        DomainProjectionHandlerResult result = await ProjectAsync(corrupt);
+
+        result.Status.ShouldBe(ProjectionDispatchStatus.Retryable);
+        result.ReasonCode.ShouldBe(AgentSetupProjectionFold.UnresolvedEventReason);
+        _store.BatchCount.ShouldBe(batchesBefore);
+        JsonSerializer.Serialize(_store.Snapshot<AgentSetupReadModel>(StoreName, Key)).ShouldBe(before);
+
+        DomainProjectionHandlerResult retry = await ProjectAsync(corrected);
+
+        retry.Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        Persisted().LastSequenceNumber.ShouldBe(4);
+        Persisted().ConfigurationVersion.ShouldBe(4);
+        Persisted().Lifecycle.ShouldBe(AgentLifecycleStatus.Active);
+        Persisted().ResponseMode.ShouldBe(AgentResponseMode.Confirmation);
+        JsonSerializer.Serialize(Persisted()).ShouldBe(JsonSerializer.Serialize(
+            AgentSetupProjectionFold.Fold(Request(corrected), current: null)));
+    }
+
+    [Theory]
+    [InlineData("{")]
+    [InlineData("")]
+    [InlineData("null")]
+    [InlineData("[]")]
+    public async Task CorruptRebuildIsRejectedWithoutChangingPersistedSetup(string payload)
+    {
+        await ProjectAsync(Created());
+        string before = JsonSerializer.Serialize(Persisted());
+        int batchesBefore = _store.BatchCount;
+
+        InvalidOperationException error = await Should.ThrowAsync<InvalidOperationException>(() => Handler().PrepareRebuildAsync(
+            Request(Created(), Disabled(2) with { Payload = Encoding.UTF8.GetBytes(payload) }, Activated(3, 3)),
+            "corrupt-rebuild",
+            CancellationToken.None));
+
+        error.Message.ShouldBe(AgentSetupProjectionFold.UnresolvedEventReason);
+        _store.BatchCount.ShouldBe(batchesBefore);
+        JsonSerializer.Serialize(Persisted()).ShouldBe(before);
+    }
+
+    [Theory]
+    [InlineData("{")]
+    [InlineData("")]
+    [InlineData("null")]
+    [InlineData("[]")]
+    public async Task CorruptCoveredDuplicateDoesNotBlockNewValidEvents(string payload)
+    {
+        await ProjectAsync(Created());
+
+        DomainProjectionHandlerResult result = await ProjectAsync(
+            Created() with { Payload = Encoding.UTF8.GetBytes(payload) },
+            ResponseMode(2, AgentResponseMode.Confirmation));
+
+        result.Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        Persisted().LastSequenceNumber.ShouldBe(2);
+        Persisted().DisplayName.ShouldBe("hexa");
+        Persisted().ResponseMode.ShouldBe(AgentResponseMode.Confirmation);
+    }
+
+    [Theory]
+    [InlineData("{")]
+    [InlineData("")]
+    [InlineData("null")]
+    [InlineData("[]")]
+    public void DirectFoldStopsBeforeCorruptPayloadAndLaterEvents(string payload)
+    {
+        AgentSetupReadModel folded = AgentSetupProjectionFold.Fold(
+            Request(Created(), ResponseMode(2, AgentResponseMode.Confirmation),
+                Disabled(3) with { Payload = Encoding.UTF8.GetBytes(payload) }, Activated(4, 4)),
+            current: null);
+
+        folded.LastSequenceNumber.ShouldBe(2);
+        folded.ProjectionVersion.ShouldBe("2");
+        folded.ProjectedAt.ShouldBe(Timestamp(2));
+        folded.ConfigurationVersion.ShouldBe(2);
+        folded.ResponseMode.ShouldBe(AgentResponseMode.Confirmation);
     }
 
     [Fact]
