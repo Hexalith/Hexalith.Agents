@@ -70,5 +70,8 @@ jobs:
       - name: Enforce source and package test floors without skips
         shell: pwsh
         run: ./eng/verify-story.ps1 -Story 5.1
+      - name: Enforce Story 5.2 focused and regression evidence
+        shell: pwsh
+        run: ./eng/verify-story-5.2.ps1 -SkipBuild
       - name: Run tooling contract tests
         run: python3 -m unittest discover -s tests/tooling -p '*_test.py'

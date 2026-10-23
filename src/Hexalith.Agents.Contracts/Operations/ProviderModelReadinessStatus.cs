@@ -12,17 +12,17 @@ public enum ProviderModelReadinessStatus
     Unknown = 0,
 
     /// <summary>The provider/model is enabled.</summary>
-    Enabled,
+    Enabled = 1,
 
     /// <summary>The provider/model is disabled.</summary>
-    Disabled,
+    Disabled = 2,
 
     /// <summary>The provider/model is degraded and must not be rendered as healthy success.</summary>
-    Degraded,
+    Degraded = 3,
 
     /// <summary>The provider/model has failed.</summary>
-    Failed,
+    Failed = 4,
 
     /// <summary>The provider/model has no usable configuration.</summary>
-    NotConfigured,
+    NotConfigured = 5,
 }

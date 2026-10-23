@@ -381,7 +381,7 @@ public sealed class AgentOperationContractsTests
     }
 
     [Fact]
-    public void ShippedSetupEnumsKeepTheirPinnedOrdinals()
+    public void ShippedSetupAndOperationEnumsKeepTheirPinnedOrdinals()
     {
         HashSet<Type> pinnedEnumTypes = [];
 
@@ -502,9 +502,65 @@ public sealed class AgentOperationContractsTests
             (AgentLaunchReadinessBlocker.MissingCostControlPosture, 7),
             (AgentLaunchReadinessBlocker.UnresolvedAuditGovernance, 8));
 
-        foreach (Type enumType in _setupContractEnumTypes)
+        Pin(
+            (AgentReadinessStatus.Unknown, 0),
+            (AgentReadinessStatus.Callable, 1),
+            (AgentReadinessStatus.Checking, 2),
+            (AgentReadinessStatus.InvalidConfiguration, 3),
+            (AgentReadinessStatus.MissingPartyIdentity, 4),
+            (AgentReadinessStatus.ProviderUnavailable, 5),
+            (AgentReadinessStatus.Disabled, 6));
+
+        Pin(
+            (AgentCallOperationStatus.Unknown, 0),
+            (AgentCallOperationStatus.Requested, 1),
+            (AgentCallOperationStatus.Authorized, 2),
+            (AgentCallOperationStatus.Denied, 3),
+            (AgentCallOperationStatus.ContextLoading, 4),
+            (AgentCallOperationStatus.ContextBlocked, 5),
+            (AgentCallOperationStatus.Generating, 6),
+            (AgentCallOperationStatus.GenerationFailed, 7),
+            (AgentCallOperationStatus.Generated, 8));
+
+        Pin(
+            (AuditAvailabilityStatus.Unknown, 0),
+            (AuditAvailabilityStatus.AuditPending, 1),
+            (AuditAvailabilityStatus.AuditAvailable, 2),
+            (AuditAvailabilityStatus.AuditDelayed, 3),
+            (AuditAvailabilityStatus.AuditUnavailable, 4));
+
+        Pin(
+            (ProposalOperationStatus.Unknown, 0),
+            (ProposalOperationStatus.Generated, 1),
+            (ProposalOperationStatus.Edited, 2),
+            (ProposalOperationStatus.Regenerated, 3),
+            (ProposalOperationStatus.PendingApproval, 4),
+            (ProposalOperationStatus.Approved, 5),
+            (ProposalOperationStatus.Rejected, 6),
+            (ProposalOperationStatus.Abandoned, 7),
+            (ProposalOperationStatus.Expired, 8),
+            (ProposalOperationStatus.PostingPending, 9),
+            (ProposalOperationStatus.Posted, 10),
+            (ProposalOperationStatus.PostingFailed, 11));
+
+        Pin(
+            (ProviderModelReadinessStatus.Unknown, 0),
+            (ProviderModelReadinessStatus.Enabled, 1),
+            (ProviderModelReadinessStatus.Disabled, 2),
+            (ProviderModelReadinessStatus.Degraded, 3),
+            (ProviderModelReadinessStatus.Failed, 4),
+            (ProviderModelReadinessStatus.NotConfigured, 5));
+
+        Pin(
+            (OperationalStatusInspectionStatus.Unknown, 0),
+            (OperationalStatusInspectionStatus.Success, 1),
+            (OperationalStatusInspectionStatus.NotAuthorized, 2),
+            (OperationalStatusInspectionStatus.Unavailable, 3),
+            (OperationalStatusInspectionStatus.Stale, 4));
+
+        foreach (Type enumType in _setupContractEnumTypes.Concat(_publicOperationEnumTypes).Distinct())
         {
-            pinnedEnumTypes.ShouldContain(enumType, $"{enumType.Name} is part of the setup contract graph.");
+            pinnedEnumTypes.ShouldContain(enumType, $"{enumType.Name} is part of the setup or operation contract.");
         }
     }
 

@@ -250,7 +250,8 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md`
   summary: Make GlobalJsonShouldPinTheSdk assert the `test.runner` selection.
   evidence: The omission is pre-existing; `global.json` was unchanged by that story and already selects `Microsoft.Testing.Platform`, but the contract test does not pin it.
-  status: open
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-build-verification-items.md` The existing global.json contract now requires Microsoft.Testing.Platform alongside SDK fields; all 1,345 Server Debug/source tests pass.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-implement-agents-ci-cd.md`
   summary: Determine whether another credential holder can race the NuGet absence proof for the six Agents package IDs and whether an atomic reservation mechanism exists.
@@ -428,6 +429,8 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Make high and critical NuGet vulnerability findings fail an ordinary CI build.
   evidence: The inherited build policy exempts `NU1901` through `NU1904` from warnings-as-errors, so a newly disclosed high or critical vulnerability in an existing dependency does not fail the warning-as-error lane.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-build-verification-items.md` NU1903/NU1904 are no longer exempt from warnings-as-errors; low/moderate exemptions remain. The existing build guard enforces this policy, the CI/CD artifact records the supersession, and ordinary audit-enabled Release/package restore/build pass without warnings or errors.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reject traversing NuGet archive paths before stripping an optional current-directory prefix.
@@ -524,6 +527,8 @@ Server orchestration chunk review. Carried onto existing ledger rows; no new DW 
 Aggregate and contracts chunk review. One new item; the rest are carried onto existing ledger rows.
 
 - New: six operation enums (`AgentReadinessStatus`, `AgentCallOperationStatus`, `AuditAvailabilityStatus`, `ProposalOperationStatus`, `ProviderModelReadinessStatus`, `OperationalStatusInspectionStatus`) read numeric tokens through `UnknownFallbackEnumConverter`, but their members after `Unknown = 0` still have implicit ordinals and are not covered by `ShippedSetupEnumsKeepTheirPinnedOrdinals`. Inserting a member would silently change what a numeric peer's value means. The fix is to pin the current ordinals explicitly, without renumbering, and add them to the pin test. Pre-existing; spec -3 pinned setup enums only.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-build-verification-items.md` All six operation enums now explicitly assign every existing ordinal without renumbering. The shipped enum pin test verifies all members and exact numeric values; all 731 Contracts Debug/source tests pass with numeric fallback coverage intact.
 - `AgentSetupWriteStatus.Submitted = 0` has no fallback converter. Carried; owned by DW-11.
 - `AgentInspectionStatus.Success = 0` is deliberately excluded from the fallback. Carried; owned by DW-13.
 - A stale activation's `AgentActivationConfigurationVersionMismatchRejection` surfaces as retryable `UnableToVerify`, not `Stale` or `Conflict`. Carried; owned by DW-7, DW-12, and DW-25.
@@ -545,6 +550,8 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
   summary: Exercise the Story 5.2 focused class-presence gates in CI and reject skipped or undiscovered tests in its regression lane.
   evidence: The resumed review confirms CI invokes only PackageFloorOnly plus Story 5.1 broad floors, while verify-story-5.2.ps1 regression calls still omit skip rejection and minimum counts; these inherited gaps precede the normalization follow-up.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-build-verification-items.md` CI runs the complete Story 5.2 verifier with SkipBuild after the source/package floors. Each native focused/composition class requires an unambiguous nonzero successful expected-assembly summary; full-project regressions also enforce the existing Debug test floors. All calls reject errors, failures, skips and not-run tests. The full standalone source gate passes 20 named selections and 4,261 owning-project tests.
 
 - source_spec: `spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
   summary: Define the coupled update path for Dependabot proposals that advance the Builds gitlink.
@@ -555,6 +562,8 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
   summary: Add executable fixture coverage for the focused Story 5.2 verifier's success, skip, unrun, and zero-discovery outcomes.
   evidence: The verification-gap reviewer found only PackageFloorOnly execution and source-text checks; reverting Invoke-TestClasses to its earlier total-only behavior would leave those checks green. This inherited CI/tooling change predates the normalization follow-up.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-build-verification-items.md` Production-script subprocess fixtures exercise every class/full-project invocation, successful and missing selections, every full-project below-floor path, full-regression zero/failure/skip/not-run paths, default source restore/build ordering, absent/foreign/duplicate/incomplete/malformed summaries, native diagnostics, missing assemblies, package-floor-only behavior and live progress; matched/unmatched real xUnit selectors additionally verify runner compatibility.
 
 ## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-3.md (2026-09-23, re-review)
 

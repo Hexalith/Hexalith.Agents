@@ -112,6 +112,11 @@ public sealed class PackageInventoryTests
         workflow.ShouldContain("./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1 -RepositoryRoot . -CatalogPath ./references/Hexalith.Builds/Props/Directory.Packages.props -ExcludedPath $exclusions");
         workflow.ShouldContain("name: Enforce EventStore package floor");
         workflow.ShouldContain("./eng/verify-story-5.2.ps1 -PackageFloorOnly");
+        workflow.ShouldContain("./eng/verify-story-5.2.ps1 -SkipBuild");
+        Regex.IsMatch(
+            workflow,
+            @"(?m)^      - name: Enforce source and package test floors without skips\r?\n        shell: pwsh\r?\n        run: \./eng/verify-story\.ps1 -Story 5\.1\r?\n      - name: Enforce Story 5\.2 focused and regression evidence\r?\n        shell: pwsh\r?\n        run: \./eng/verify-story-5\.2\.ps1 -SkipBuild\r?\n(?=      - name:)")
+            .ShouldBeTrue("CI must run the blocking Story 5.2 gate immediately after the source/package builds.");
         workflow.ShouldContain("python3 -m unittest discover -s tests/tooling -p '*_test.py'");
         workflow.ShouldContain("git -c submodule.recurse=false submodule update --init");
         workflow.ShouldContain("timeout-minutes: 90");

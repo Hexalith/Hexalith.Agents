@@ -12,26 +12,26 @@ public enum AgentCallOperationStatus
     Unknown = 0,
 
     /// <summary>The call was requested.</summary>
-    Requested,
+    Requested = 1,
 
     /// <summary>The call was authorized.</summary>
-    Authorized,
+    Authorized = 2,
 
     /// <summary>The call was denied.</summary>
-    Denied,
+    Denied = 3,
 
     /// <summary>Conversation context is loading and is not success.</summary>
-    ContextLoading,
+    ContextLoading = 4,
 
     /// <summary>Conversation context was blocked.</summary>
-    ContextBlocked,
+    ContextBlocked = 5,
 
     /// <summary>Output generation is in progress and is not success.</summary>
-    Generating,
+    Generating = 6,
 
     /// <summary>Output generation failed.</summary>
-    GenerationFailed,
+    GenerationFailed = 7,
 
     /// <summary>Output was generated.</summary>
-    Generated,
+    Generated = 8,
 }

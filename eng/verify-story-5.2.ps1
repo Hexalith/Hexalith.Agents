@@ -39,11 +39,11 @@ $PSNativeCommandUseErrorActionPreference = $true
 $root = Split-Path -Parent $PSScriptRoot
 $solution = Join-Path $root 'Hexalith.Agents.slnx'
 $testProjects = @(
-    'test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj',
-    'test/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj',
-    'test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj',
-    'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj',
-    'test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj'
+    @{ Path = 'test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj'; MinimumExpectedTests = 529 },
+    @{ Path = 'test/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj'; MinimumExpectedTests = 6 },
+    @{ Path = 'test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj'; MinimumExpectedTests = 787 },
+    @{ Path = 'test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj'; MinimumExpectedTests = 573 },
+    @{ Path = 'test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj'; MinimumExpectedTests = 1073 }
 )
 
 function Assert-EventStorePackageFloor {
@@ -260,66 +260,98 @@ function Invoke-Gate {
     }
 }
 
-function Invoke-TestClasses {
+function Invoke-TestGate {
     param(
         [Parameter(Mandatory = $true)] [string] $Name,
         [Parameter(Mandatory = $true)] [string] $Assembly,
-        [Parameter(Mandatory = $true)] [string[]] $Classes
+        [string[]] $Classes = @(),
+        [ValidateRange(1, [int]::MaxValue)] [int] $MinimumExpectedTests = 1
     )
 
-    Write-Host "Gate: $Name"
-    $assemblyPath = if ([IO.Path]::IsPathRooted($Assembly)) {
-        $Assembly
-    }
-    else {
-        Join-Path $root $Assembly
-    }
-    if (-not (Test-Path -LiteralPath $assemblyPath -PathType Leaf)) {
-        throw "Gate '$Name' requires the built test assembly '$Assembly'. Run without -SkipBuild or build it first."
+    $assemblyName = [IO.Path]::GetFileNameWithoutExtension($Assembly)
+    $path = if ([IO.Path]::IsPathRooted($Assembly)) { $Assembly } else { Join-Path $root $Assembly }
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+        throw "Gate '$Name' requires built test assembly '$path'. Run without -SkipBuild or build it first."
     }
 
-    foreach ($class in $Classes) {
-        $arguments = @($assemblyPath, '-class', $class, '-failSkips')
+    $selections = @(
+        foreach ($class in $Classes) { @{ Option = '-class'; Value = $class } }
+    )
+    if ($selections.Count -eq 0) {
+        $selections = @(@{ Option = ''; Value = 'all tests' })
+    }
+
+    Write-Host "Gate: $Name"
+    foreach ($selection in $selections) {
+        $arguments = @($path, '-failSkips')
+        if ($selection.Option) {
+            $arguments += @($selection.Option, $selection.Value)
+        }
+
         $nativeErrorPreference = $PSNativeCommandUseErrorActionPreference
         try {
-            # Capture both successful and failing output so a failed focused class always remains diagnosable.
+            # Stream progress immediately while retaining this invocation's summary evidence.
             $PSNativeCommandUseErrorActionPreference = $false
-            $output = & dotnet @arguments 2>&1
+            $output = @()
+            & dotnet @arguments 2>&1 | Tee-Object -Variable output | ForEach-Object { Write-Host $_ }
             $exitCode = $LASTEXITCODE
         }
         finally {
             $PSNativeCommandUseErrorActionPreference = $nativeErrorPreference
         }
 
-        if ($null -ne $output) {
-            $output | ForEach-Object { Write-Host $_ }
-        }
-
         if ($exitCode -ne 0) {
-            throw "Gate '$Name' failed for class '$class' with exit code $exitCode."
+            throw "Gate '$Name' failed for '$($selection.Value)' with exit code $exitCode."
         }
 
-        $executed = 0
-        $sawSummary = $false
-        foreach ($line in $output) {
-            foreach ($match in [regex]::Matches([string] $line, 'Total:\s*(\d+),\s*Errors:\s*\d+,\s*Failed:\s*\d+,\s*Skipped:\s*(\d+),\s*Not Run:\s*(\d+)')) {
-                $sawSummary = $true
-                $skipped = [int] $match.Groups[2].Value
-                $notRun = [int] $match.Groups[3].Value
-                if ($skipped -gt 0 -or $notRun -gt 0) {
-                    throw "Gate '$Name' skipped or did not run tests in class '$class'."
-                }
-
-                $executed += [int] $match.Groups[1].Value
+        $headers = @()
+        for ($index = 0; $index -lt @($output).Count; $index++) {
+            if (([string] $output[$index]).Trim() -ceq '=== TEST EXECUTION SUMMARY ===') {
+                $headers += $index
             }
         }
-
-        if (-not $sawSummary) {
-            throw "Gate '$Name' produced no test summary for class '$class', so the focused selection cannot be trusted."
+        if ($headers.Count -eq 0) {
+            throw "Gate '$Name' produced no test summary for '$($selection.Value)'."
+        }
+        if ($headers.Count -ne 1) {
+            throw "Gate '$Name' produced ambiguous test summary sections for '$($selection.Value)'."
         }
 
-        if ($executed -le 0) {
-            throw "Gate '$Name' executed 0 tests; the -class selection matched nothing: $class."
+        # Only the expected assembly's row within the runner summary is authoritative.
+        $rowPrefix = '^\s*' + [regex]::Escape($assemblyName) + '\s+Total:'
+        $rows = @()
+        for ($index = $headers[0] + 1; $index -lt @($output).Count; $index++) {
+            if ([string] $output[$index] -cmatch $rowPrefix) {
+                $rows += [string] $output[$index]
+            }
+        }
+        if ($rows.Count -eq 0) {
+            throw "Gate '$Name' produced no test summary for assembly '$assemblyName' and '$($selection.Value)'."
+        }
+        if ($rows.Count -ne 1) {
+            throw "Gate '$Name' produced ambiguous test summary rows for '$($selection.Value)'."
+        }
+
+        # xUnit emits only Total: 0 when a native selector matches no tests.
+        $rowPattern = $rowPrefix + '\s*(?<Total>\d+)(?:,\s*Errors:\s*(?<Errors>\d+),\s*Failed:\s*(?<Failed>\d+),\s*Skipped:\s*(?<Skipped>\d+),\s*Not Run:\s*(?<NotRun>\d+))?(?:,\s*Time:\s*[^\r\n]+)?\s*$'
+        $summary = [regex]::Match($rows[0], $rowPattern)
+        if (-not $summary.Success) {
+            throw "Gate '$Name' produced an invalid test summary row for '$($selection.Value)'."
+        }
+        if ([int] $summary.Groups['Total'].Value -le 0) {
+            throw "Gate '$Name' executed 0 tests; selection matched nothing: $($selection.Value)."
+        }
+        if ([int] $summary.Groups['Total'].Value -lt $MinimumExpectedTests) {
+            throw "Gate '$Name' executed $($summary.Groups['Total'].Value) tests; expected at least $MinimumExpectedTests for '$($selection.Value)'."
+        }
+        if (-not $summary.Groups['Errors'].Success) {
+            throw "Gate '$Name' produced an incomplete test summary row for '$($selection.Value)'."
+        }
+        if ([int] $summary.Groups['Errors'].Value -gt 0 -or [int] $summary.Groups['Failed'].Value -gt 0) {
+            throw "Gate '$Name' reported errors or failures for '$($selection.Value)'."
+        }
+        if ([int] $summary.Groups['Skipped'].Value -gt 0 -or [int] $summary.Groups['NotRun'].Value -gt 0) {
+            throw "Gate '$Name' skipped or did not run tests for '$($selection.Value)'."
         }
     }
 }
@@ -349,20 +381,20 @@ try {
     }
 
     foreach ($suite in $focusedSuites) {
-        Invoke-TestClasses `
+        Invoke-TestGate `
             -Name "story-5.2 focused — $($suite.Gate)" `
             -Assembly $suite.Assembly `
             -Classes $suite.Classes
     }
 
     foreach ($testProject in $testProjects) {
-        Invoke-Gate -Name "regression — $testProject" -Arguments @(
-            'test', $testProject, '-c', 'Debug', '--no-build', '-p:UseHexalithProjectReferences=true'
-        )
+        $assembly = [IO.Path]::GetFileNameWithoutExtension($testProject.Path)
+        $path = [IO.Path]::Combine([IO.Path]::GetDirectoryName($testProject.Path), 'bin', 'Debug', 'net10.0', "$assembly.dll")
+        Invoke-TestGate -Name "regression — $($testProject.Path)" -Assembly $path -MinimumExpectedTests $testProject.MinimumExpectedTests
     }
 
     foreach ($suite in $compositionSuites) {
-        Invoke-TestClasses `
+        Invoke-TestGate `
             -Name "story-5.2 composition — $($suite.Gate)" `
             -Assembly $suite.Assembly `
             -Classes $suite.Classes

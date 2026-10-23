@@ -18,6 +18,11 @@ in the historical frozen intent below has been superseded by the repository's
 immutable CI pin. Release passes that same revision as `builds-execution-sha`.
 The original approved intent remains recorded verbatim for traceability.
 
+Current audit policy (2026-10-23): high/critical NuGet findings (`NU1903` and
+`NU1904`) now fail ordinary audit-enabled CI through warnings-as-errors. Only
+low/moderate findings (`NU1901`/`NU1902`) retain warning exemptions; the earlier
+all-severity exemption notes below describe the original implementation.
+
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
 
 ## Intent

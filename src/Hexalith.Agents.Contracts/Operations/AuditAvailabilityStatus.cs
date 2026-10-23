@@ -12,14 +12,14 @@ public enum AuditAvailabilityStatus
     Unknown = 0,
 
     /// <summary>Audit evidence is pending and is not success.</summary>
-    AuditPending,
+    AuditPending = 1,
 
     /// <summary>Audit evidence is available.</summary>
-    AuditAvailable,
+    AuditAvailable = 2,
 
     /// <summary>Audit evidence is delayed and must not be rendered as available.</summary>
-    AuditDelayed,
+    AuditDelayed = 3,
 
     /// <summary>Audit evidence is unavailable.</summary>
-    AuditUnavailable,
+    AuditUnavailable = 4,
 }

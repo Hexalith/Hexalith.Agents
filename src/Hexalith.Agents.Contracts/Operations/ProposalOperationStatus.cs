@@ -12,35 +12,35 @@ public enum ProposalOperationStatus
     Unknown = 0,
 
     /// <summary>A proposal version was generated.</summary>
-    Generated,
+    Generated = 1,
 
     /// <summary>The proposal was edited.</summary>
-    Edited,
+    Edited = 2,
 
     /// <summary>The proposal was regenerated.</summary>
-    Regenerated,
+    Regenerated = 3,
 
     /// <summary>The proposal is pending approval and is not success.</summary>
-    PendingApproval,
+    PendingApproval = 4,
 
     /// <summary>The proposal was approved but not necessarily posted.</summary>
-    Approved,
+    Approved = 5,
 
     /// <summary>The proposal was rejected.</summary>
-    Rejected,
+    Rejected = 6,
 
     /// <summary>The proposal was abandoned.</summary>
-    Abandoned,
+    Abandoned = 7,
 
     /// <summary>The proposal expired.</summary>
-    Expired,
+    Expired = 8,
 
     /// <summary>Posting is pending and is not success.</summary>
-    PostingPending,
+    PostingPending = 9,
 
     /// <summary>The approved version was posted.</summary>
-    Posted,
+    Posted = 10,
 
     /// <summary>Posting failed.</summary>
-    PostingFailed,
+    PostingFailed = 11,
 }

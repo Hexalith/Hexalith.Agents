@@ -12,20 +12,20 @@ public enum AgentReadinessStatus
     Unknown = 0,
 
     /// <summary>The Agent is callable.</summary>
-    Callable,
+    Callable = 1,
 
     /// <summary>Readiness is being checked and is not success.</summary>
-    Checking,
+    Checking = 2,
 
     /// <summary>The Agent has invalid configuration.</summary>
-    InvalidConfiguration,
+    InvalidConfiguration = 3,
 
     /// <summary>The Agent is missing a Party identity.</summary>
-    MissingPartyIdentity,
+    MissingPartyIdentity = 4,
 
     /// <summary>The selected provider/model is unavailable.</summary>
-    ProviderUnavailable,
+    ProviderUnavailable = 5,
 
     /// <summary>The Agent is disabled.</summary>
-    Disabled,
+    Disabled = 6,
 }

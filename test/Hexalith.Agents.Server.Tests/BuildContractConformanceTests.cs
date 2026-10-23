@@ -32,8 +32,34 @@ public sealed class BuildContractConformanceTests
         string warningsNotAsErrors = PropertyValue(props, "WarningsNotAsErrors")!;
         warningsNotAsErrors.ShouldContain("NU1901");
         warningsNotAsErrors.ShouldContain("NU1902");
-        warningsNotAsErrors.ShouldContain("NU1903");
-        warningsNotAsErrors.ShouldContain("NU1904");
+        warningsNotAsErrors.ShouldNotContain("NU1903");
+        warningsNotAsErrors.ShouldNotContain("NU1904");
+    }
+
+    [Fact]
+    public void OrdinaryReleaseShouldEvaluateTheHighAndCriticalAuditPolicy()
+    {
+        using JsonDocument evaluation = EvaluateMsBuild(
+            ModuleLayout.SourceProjectFile("Hexalith.Agents.Contracts"),
+            "-getProperty:NuGetAudit,NuGetAuditMode,TreatWarningsAsErrors,WarningsNotAsErrors,NoWarn",
+            "-p:Configuration=Release",
+            "-p:UseHexalithProjectReferences=false",
+            "/nr:false");
+
+        JsonElement properties = evaluation.RootElement.GetProperty("Properties");
+        properties.GetProperty("NuGetAudit").GetString().ShouldBe("true");
+        properties.GetProperty("NuGetAuditMode").GetString().ShouldBe("all");
+        properties.GetProperty("TreatWarningsAsErrors").GetString().ShouldBe("true");
+        string[] exemptions = (properties.GetProperty("WarningsNotAsErrors").GetString() ?? string.Empty)
+            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        exemptions.ShouldContain("NU1901");
+        exemptions.ShouldContain("NU1902");
+        exemptions.ShouldNotContain("NU1903");
+        exemptions.ShouldNotContain("NU1904");
+        string[] suppressed = (properties.GetProperty("NoWarn").GetString() ?? string.Empty)
+            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        suppressed.ShouldNotContain("NU1903");
+        suppressed.ShouldNotContain("NU1904");
     }
 
     [Fact]
@@ -274,6 +300,8 @@ public sealed class BuildContractConformanceTests
 
         sdk.GetProperty("version").GetString().ShouldNotBeNullOrWhiteSpace();
         sdk.GetProperty("rollForward").GetString().ShouldNotBeNullOrWhiteSpace();
+        global.RootElement.GetProperty("test").GetProperty("runner").GetString()
+            .ShouldBe("Microsoft.Testing.Platform");
     }
 
     private static string? PropertyValue(XDocument document, string localName)

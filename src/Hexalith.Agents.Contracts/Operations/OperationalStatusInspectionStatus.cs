@@ -17,14 +17,14 @@ public enum OperationalStatusInspectionStatus
     Unknown = 0,
 
     /// <summary>The inspection succeeded; the safe summary is present.</summary>
-    Success,
+    Success = 1,
 
     /// <summary>The caller is not authorized; no summary is returned (AD-12).</summary>
-    NotAuthorized,
+    NotAuthorized = 2,
 
     /// <summary>The read faulted or a dependency/projection is unreachable; no summary is returned (the UI <c>Unavailable</c> surface).</summary>
-    Unavailable,
+    Unavailable = 3,
 
     /// <summary>The projection reports stale/degraded data; the summary may be carried behind a stale/degraded notice (never rendered as fresh).</summary>
-    Stale,
+    Stale = 4,
 }
