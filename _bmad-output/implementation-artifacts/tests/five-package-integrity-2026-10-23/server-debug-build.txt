@@ -1,0 +1,54 @@
+  Determining projects to restore...
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.Conversations/src/Hexalith.Conversations.Contracts/Hexalith.Conversations.Contracts.csproj (in 126 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.Commons/src/libraries/Hexalith.Commons.Http/Hexalith.Commons.Http.csproj (in 111 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.Parties/src/Hexalith.Parties.Contracts/Hexalith.Parties.Contracts.csproj (in 287 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.Admin.Abstractions/Hexalith.EventStore.Admin.Abstractions.csproj (in 285 ms).
+  Restored /home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Contracts/Hexalith.Agents.Contracts.csproj (in 104 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.Commons/src/libraries/Hexalith.Commons.UniqueIds/Hexalith.Commons.UniqueIds.csproj (in 281 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.Contracts/Hexalith.EventStore.Contracts.csproj (in 284 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.Conversations/src/Hexalith.Conversations.Client/Hexalith.Conversations.Client.csproj (in 289 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.Parties/src/Hexalith.Parties.Client/Hexalith.Parties.Client.csproj (in 288 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.ServiceDefaults/Hexalith.EventStore.ServiceDefaults.csproj (in 303 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.Client/Hexalith.EventStore.Client.csproj (in 137 ms).
+  Restored /home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Client/Hexalith.Agents.Client.csproj (in 10 ms).
+  Restored /home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Hexalith.Agents.Server.csproj (in 316 ms).
+  Restored /home/administrator/projects/hexalith/agents/src/Hexalith.Agents/Hexalith.Agents.csproj (in 324 ms).
+  Restored /home/administrator/projects/hexalith/agents/src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj (in 322 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.DomainService/Hexalith.EventStore.DomainService.csproj (in 23 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.Commons/src/libraries/Hexalith.Commons.Serialization/Hexalith.Commons.Serialization.csproj (in 14 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.Server/Hexalith.EventStore.Server.csproj (in 319 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.Gateway/Hexalith.EventStore.Gateway.csproj (in 321 ms).
+  Restored /home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj (in 165 ms).
+  Hexalith.Commons.UniqueIds -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Commons.UniqueIds/debug/Hexalith.Commons.UniqueIds.dll
+  Successfully created package '/tmp/agents-five-integrity-20261023/root-build/package/debug/Hexalith.Commons.UniqueIds.1.0.0.nupkg'.
+  Successfully created package '/tmp/agents-five-integrity-20261023/root-build/package/debug/Hexalith.Commons.UniqueIds.1.0.0.snupkg'.
+  Hexalith.EventStore.Contracts -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.EventStore.Contracts/debug/Hexalith.EventStore.Contracts.dll
+  Hexalith.Agents.Contracts -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Agents.Contracts/debug/Hexalith.Agents.Contracts.dll
+  Hexalith.EventStore.Client -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.EventStore.Client/debug/Hexalith.EventStore.Client.dll
+  Hexalith.EventStore.ServiceDefaults -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.EventStore.ServiceDefaults/debug/Hexalith.EventStore.ServiceDefaults.dll
+  Hexalith.EventStore.DomainService -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.EventStore.DomainService/debug/Hexalith.EventStore.DomainService.dll
+  Hexalith.EventStore.Admin.Abstractions -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.EventStore.Admin.Abstractions/debug/Hexalith.EventStore.Admin.Abstractions.dll
+  Hexalith.EventStore.Server -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.EventStore.Server/debug/Hexalith.EventStore.Server.dll
+  Hexalith.EventStore.Gateway -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.EventStore.Gateway/debug/Hexalith.EventStore.Gateway.dll
+  Hexalith.Agents.EventStore -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Agents.EventStore/debug/Hexalith.Agents.EventStore.dll
+  Hexalith.Agents.Client -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Agents.Client/debug/Hexalith.Agents.Client.dll
+  Hexalith.Agents -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Agents/debug/Hexalith.Agents.dll
+  Hexalith.Parties.Contracts -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Parties.Contracts/debug/Hexalith.Parties.Contracts.dll
+  Hexalith.Parties.Client -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Parties.Client/debug/Hexalith.Parties.Client.dll
+  Hexalith.Commons.Serialization -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Commons.Serialization/debug/Hexalith.Commons.Serialization.dll
+  The package Hexalith.Commons.Serialization.1.0.0 is missing a readme. Go to https://aka.ms/nuget/authoring-best-practices/readme to learn why package readmes are important.
+  Successfully created package '/tmp/agents-five-integrity-20261023/root-build/package/debug/Hexalith.Commons.Serialization.1.0.0.nupkg'.
+  Successfully created package '/tmp/agents-five-integrity-20261023/root-build/package/debug/Hexalith.Commons.Serialization.1.0.0.snupkg'.
+  Hexalith.Conversations.Contracts -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Conversations.Contracts/debug/Hexalith.Conversations.Contracts.dll
+  Hexalith.Commons.Http -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Commons.Http/debug/Hexalith.Commons.Http.dll
+  Successfully created package '/tmp/agents-five-integrity-20261023/root-build/package/debug/Hexalith.Commons.Http.1.0.0.nupkg'.
+  Successfully created package '/tmp/agents-five-integrity-20261023/root-build/package/debug/Hexalith.Commons.Http.1.0.0.snupkg'.
+  Hexalith.Conversations.Client -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Conversations.Client/debug/Hexalith.Conversations.Client.dll
+  Hexalith.Agents.Server -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Agents.Server/debug/Hexalith.Agents.Server.dll
+  Hexalith.Agents.Server.Tests -> /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Agents.Server.Tests/debug/Hexalith.Agents.Server.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:18.09

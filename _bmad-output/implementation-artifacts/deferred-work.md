@@ -136,7 +136,8 @@ location: references/Hexalith.EventStore
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 severity: medium
 reason: Exact retry requires the same identity and payload; inspect EventStore's idempotency record handling to prove a changed payload cannot replay the first result.
-status: open
+status: done 2026-10-23
+resolution: `spec-five-deferred-package-integrity-items.md` verifies first-intent binding at pinned EventStore `5ce5f1d84b88c808cc8a526b9decf149de977e55`: four exact actor cases prove first reservation retains IntentDigest, equivalent retry reuses the original execution identity/fence, and a different intent conflicts before replay or state mutation. All 141 root Debug/source gateway cases pass, including equivalent payload spellings replaying the original result while a changed mode conflicts with one domain execution. The checked-in gateway-verification.json records commands, source revisions and XML hashes. This is local unit/in-process evidence; external Dapr persistence remains outside this proof.
 
 ### DW-10: Canonicalize correlation identifiers echoed by setup read paths.
 
@@ -243,7 +244,8 @@ location: scripts/validate-nuget-packages.py:197
 source_spec: `_bmad-output/implementation-artifacts/spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md`
 severity: medium
 reason: This may be a false positive because the review did not establish that current EventStore dependencies expose affected assets. The package validator currently discards nuspec dependency asset metadata; a mutated-package restore and `project.assets.json` comparison would settle whether omitting generated exclusions creates a consumer leak.
-status: open
+status: done 2026-10-23
+resolution: `spec-five-deferred-package-integrity-items.md` retains nuspec include/exclude metadata and rejects dependencies that effectively include ordinary Build assets. A maintained isolated local-feed restore regression compares project.assets.json and evaluated build properties: generated Build,Analyzers exclusions block the build-only leaf, while omitted or Analyzers-only exclusions import it; Compile,Runtime inclusion blocks it. Synthetic archive regressions cover omitted, weakened, case-varied and restricted metadata. Analyzer items and buildTransitive assets have distinct NuGet semantics; this closes the demonstrated ordinary-build omission gap without claiming those categories are suppressed.
 
 ## Deferred from: code review of spec-5-1-adopt-hexalith-builds-as-the-sole-package-version-authority.md (2026-09-18)
 
@@ -379,6 +381,8 @@ Group A contracts re-review (fourth pass). Incomplete `Unknown = 0` tolerance mi
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Verify the integrity and package identity of GitHub Release assets instead of accepting filenames alone.
   evidence: The inherited release verifier accepts empty, truncated, or substituted assets carrying the six expected names; NuGet publication checks protect the feed but do not validate the separate GitHub download artifacts.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-package-integrity-items.md` requires all downloaded manifest archives, validates package identity and boundaries with bounded ZIP reads, then matches API size and SHA-256 before success. The release workflow downloads the exact tag assets and invokes this gate. Actual CLI fixtures reject corrupt/substituted/wrong-identity assets, missing or extra files, bad size and missing/malformed/mismatched digests.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reject non-positive and non-finite NuGet publication verifier timeouts with a bounded diagnostic.
@@ -546,6 +550,8 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Compare published NuGet package bytes with the release archives during publication verification.
   evidence: The inherited `verify-nuget-publication.py` accepts a matching registration-leaf ID and version without downloading or hashing the package, so the publication gate cannot establish that NuGet serves the same archive as the release artifacts.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-package-integrity-items.md` makes presence CLI require locally validated expected archives, download each exact flat-container package within the existing bounded retry budget, and compare every ordinary ZIP member by SHA-256. Only the root repository-signature member may differ, as NuGet.org changes it during signing. Publisher and release verification pass their respective original/verified GitHub archives. CLI fixtures prove successful comparison, signing allowance, substitution/corruption rejection, missing-package retry exhaustion, transient recovery and zero-network preflight failure.
 
 ## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-3.md (2026-09-23)
 
@@ -711,6 +717,8 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-update-eventstore-to-3-119-0.md`
   summary: Verify the EventStore gateway test in Debug source-reference mode after the Conversations.Client analyzer blocker is resolved.
   evidence: The Debug server test project build stops on nine pre-existing CA1062 errors in `references/Hexalith.Conversations/src/Hexalith.Conversations.Client`, before the gateway test can run. A passing source-reference build and test run would settle whether the local EventStore checkout remains compatible.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-package-integrity-items.md` performs a fresh isolated Debug build with all six dependency FromSource properties true and zero warnings/errors; all 141 exact AgentsEventStoreGatewayIntegrationTests cases pass with zero failures/skips/not-run/errors. The old Conversations analyzer blocker does not reproduce. CONTRIBUTING documents the focused fresh-artifact command; gateway-verification.json retains canonical source revisions, commands and XML hashes. This establishes current pinned source compatibility, not live topology qualification.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
   summary: Rehashing a revision-10 spool head or archive page may fail its stored digest after the reservation fields were added.
@@ -733,3 +741,7 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-projection-verification-items.md`
   summary: Define structural event-payload validation for successfully deserialized Agent projection events while preserving supported legacy defaults.
   evidence: Existing `AgentState.Apply(AgentResponseModeConfigured)` accepts default mode/configuration-version values from `{}`, while `Apply(AgentApproverPolicyConfigured)` dereferences a null Policy and lifecycle Apply rejects negative configuration versions. These paths predate the syntax/null/shape delivery correction; deserialization alone cannot enforce their semantic invariants. Agree the required-member/legacy compatibility policy and validate before folding; application failures already occur before any read-model batch is written.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-package-integrity-items.md`
+  summary: Qualify the actual consumer analyzer and buildTransitive inventory separately from ordinary dependency Build exclusions.
+  evidence: The DW-22 offline restore proof demonstrates that nuspec Build,Analyzers exclusions block ordinary build imports but do not suppress transitive analyzer items; buildTransitive has separate semantics. No unexpected analyzer in an actual Agents consumer was demonstrated. Unverified medium: an unexpected executable asset would require a consumer graph/asset inventory and owner-approved policy, rather than treating nuspec exclusion flags as proof of suppression. The demonstrated ordinary-build omission gap is fixed and covered.

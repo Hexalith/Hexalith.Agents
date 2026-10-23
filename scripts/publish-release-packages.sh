@@ -27,4 +27,4 @@ for package in "${packages[@]}"; do
     --source https://api.nuget.org/v3/index.json \
     --api-key "$NUGET_API_KEY"
 done
-python3 scripts/verify-nuget-publication.py eng/release-packages.json "$version" --expect present
+python3 scripts/verify-nuget-publication.py eng/release-packages.json "$version" --expect present --package-directory ./nupkgs

@@ -1,0 +1,47 @@
+  Determining projects to restore...
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.McpCli/src/Hexalith.McpCli.Abstractions/Hexalith.McpCli.Abstractions.csproj (in 89 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.Commons/src/libraries/Hexalith.Commons.UniqueIds/Hexalith.Commons.UniqueIds.csproj (in 230 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.Admin.Abstractions/Hexalith.EventStore.Admin.Abstractions.csproj (in 229 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.McpCli/src/Hexalith.McpCli.Analyzers/Hexalith.McpCli.Analyzers.csproj (in 100 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.Contracts/Hexalith.EventStore.Contracts.csproj (in 229 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/samples/Hexalith.EventStore.Sample.Contracts/Hexalith.EventStore.Sample.Contracts.csproj (in 229 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.Tenants/src/Hexalith.Tenants.Contracts/Hexalith.Tenants.Contracts.csproj (in 234 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.Client/Hexalith.EventStore.Client.csproj (in 233 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.ServiceDefaults/Hexalith.EventStore.ServiceDefaults.csproj (in 240 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.DomainService/Hexalith.EventStore.DomainService.csproj (in 240 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.Server/Hexalith.EventStore.Server.csproj (in 241 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/samples/Hexalith.EventStore.Sample/Hexalith.EventStore.Sample.csproj (in 9 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.Testing/Hexalith.EventStore.Testing.csproj (in 241 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.Gateway/Hexalith.EventStore.Gateway.csproj (in 243 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore/Hexalith.EventStore.csproj (in 243 ms).
+  Restored /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/tests/Hexalith.EventStore.Server.Tests/Hexalith.EventStore.Server.Tests.csproj (in 249 ms).
+  Hexalith.Commons.UniqueIds -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.Commons.UniqueIds/debug/Hexalith.Commons.UniqueIds.dll
+  Successfully created package '/tmp/agents-five-integrity-20261023/owner-build/package/debug/Hexalith.Commons.UniqueIds.1.0.0.nupkg'.
+  Successfully created package '/tmp/agents-five-integrity-20261023/owner-build/package/debug/Hexalith.Commons.UniqueIds.1.0.0.snupkg'.
+  Hexalith.EventStore.Contracts -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore.Contracts/debug/Hexalith.EventStore.Contracts.dll
+  Hexalith.EventStore.Client -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore.Client/debug/Hexalith.EventStore.Client.dll
+  Hexalith.EventStore.ServiceDefaults -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore.ServiceDefaults/debug/Hexalith.EventStore.ServiceDefaults.dll
+  Hexalith.EventStore.DomainService -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore.DomainService/debug/Hexalith.EventStore.DomainService.dll
+  Hexalith.EventStore.Sample.Contracts -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore.Sample.Contracts/debug/Hexalith.EventStore.Sample.Contracts.dll
+  Hexalith.EventStore.Sample -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore.Sample/debug/Hexalith.EventStore.Sample.dll
+  Hexalith.Commons.UniqueIds -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.Commons.UniqueIds/debug/Hexalith.Commons.UniqueIds.dll
+  Successfully created package '/tmp/agents-five-integrity-20261023/owner-build/package/debug/Hexalith.Commons.UniqueIds.3.126.0.nupkg'.
+  Successfully created package '/tmp/agents-five-integrity-20261023/owner-build/package/debug/Hexalith.Commons.UniqueIds.3.126.0.snupkg'.
+  Hexalith.EventStore.Contracts -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore.Contracts/debug/Hexalith.EventStore.Contracts.dll
+  Hexalith.McpCli.Analyzers -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.McpCli.Analyzers/debug/Hexalith.McpCli.Analyzers.dll
+  Hexalith.McpCli.Abstractions -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.McpCli.Abstractions/debug/Hexalith.McpCli.Abstractions.dll
+  Hexalith.Tenants.Contracts -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.Tenants.Contracts/debug/Hexalith.Tenants.Contracts.dll
+  Hexalith.EventStore.Admin.Abstractions -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore.Admin.Abstractions/debug/Hexalith.EventStore.Admin.Abstractions.dll
+  Hexalith.EventStore.Server -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore.Server/debug/Hexalith.EventStore.Server.dll
+  Hexalith.EventStore.Gateway -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore.Gateway/debug/Hexalith.EventStore.Gateway.dll
+  Hexalith.EventStore -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore/debug/Hexalith.EventStore.dll
+  Hexalith.EventStore.Testing -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore.Testing/debug/Hexalith.EventStore.Testing.dll
+  Hexalith.McpCli.Analyzers -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.McpCli.Analyzers/debug/Hexalith.McpCli.Analyzers.dll
+  Hexalith.McpCli.Abstractions -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.McpCli.Abstractions/debug/Hexalith.McpCli.Abstractions.dll
+  Hexalith.EventStore.Server.Tests -> /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore.Server.Tests/debug/Hexalith.EventStore.Server.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:16.59

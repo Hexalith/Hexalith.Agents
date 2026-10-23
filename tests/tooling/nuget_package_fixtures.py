@@ -55,7 +55,8 @@ def write_package(
     group = ElementTree.SubElement(dependencies, "group", {"targetFramework": "net10.0"})
     for dependency_id in sorted(VALIDATOR.EXPECTED_DEPENDENCIES[package_id]):
         dependency_version = version if dependency_id in VALIDATOR.EXPECTED_DEPENDENCIES else "1.0.0"
-        ElementTree.SubElement(group, "dependency", {"id": dependency_id, "version": dependency_version})
+        ElementTree.SubElement(group, "dependency", {"id": dependency_id, "version": dependency_version,
+                                                    "exclude": "Build,Analyzers"})
     if mutate:
         mutate(metadata)
     if namespaced:

@@ -6,12 +6,18 @@ from __future__ import annotations
 import argparse
 import json
 import posixpath
+import stat
 import re
 import sys
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 from xml.etree import ElementTree
+
+
+MAX_ARCHIVE_BYTES = 64 * 1024 * 1024
+MAX_CONTENT_BYTES = 256 * 1024 * 1024
+MAX_MEMBERS = 10_000
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -166,6 +172,8 @@ class PackageDependency:
 
     package_id: str
     version: str
+    include_assets: str | None = None
+    exclude_assets: str | None = None
 
 
 @dataclass(frozen=True)
@@ -259,7 +267,8 @@ def read_metadata(package_path: Path) -> PackageMetadata:
         dependency_entries = tuple(
             sorted(
                 (
-                    PackageDependency(item.attrib["id"].strip(), item.attrib.get("version", "").strip())
+                    PackageDependency(item.attrib["id"].strip(), item.attrib.get("version", "").strip(),
+                                      item.get("include"), item.get("exclude"))
                     for item in dependencies
                     if item.attrib.get("id", "").strip()
                 ),
@@ -291,6 +300,25 @@ def read_metadata(package_path: Path) -> PackageMetadata:
         return PackageMetadata(package_id, version, dependency_entries, names)
 
 
+def validate_archive_limits(
+    path: Path, *, max_archive_bytes: int = MAX_ARCHIVE_BYTES,
+    max_content_bytes: int = MAX_CONTENT_BYTES, max_members: int = MAX_MEMBERS,
+) -> None:
+    """Reject unsupported or oversized archives before decompressing any member."""
+    if path.is_symlink() or not path.is_file() or not 0 < path.stat().st_size <= max_archive_bytes:
+        raise ValueError(f"{path.name}: missing, empty or oversized regular package archive")
+    with zipfile.ZipFile(path) as archive:
+        entries = archive.infolist()
+        if len(entries) > max_members or sum(entry.file_size for entry in entries) > max_content_bytes:
+            raise ValueError(f"{path.name}: expanded package exceeds content limits")
+        for entry in entries:
+            mode = stat.S_IFMT(entry.external_attr >> 16)
+            if mode not in {0, stat.S_IFREG, stat.S_IFDIR} or entry.flag_bits & 1:
+                raise ValueError(f"{path.name}: unsupported package member {entry.filename}")
+            if (entry.is_dir() and (entry.file_size != 0 or mode == stat.S_IFREG)) or (mode == stat.S_IFDIR and not entry.is_dir()):
+                raise ValueError(f"{path.name}: malformed directory member {entry.filename}")
+
+
 def validate_package(metadata: PackageMetadata, path: Path, produced_version: str) -> None:
     """Validate one package's dependency and asset boundary."""
     expected = EXPECTED_DEPENDENCIES.get(metadata.package_id)
@@ -301,6 +329,16 @@ def validate_package(metadata: PackageMetadata, path: Path, produced_version: st
         missing = sorted(expected - dependency_ids)
         unexpected = sorted(dependency_ids - expected)
         raise ValueError(f"{path.name}: dependency mismatch; missing={missing}; unexpected={unexpected}")
+
+    for dependency in metadata.dependencies:
+        included = {asset.strip().casefold() for asset in (dependency.include_assets or "all").split(",")}
+        excluded = {asset.strip().casefold() for asset in (dependency.exclude_assets or "").split(",")}
+        known_assets = {"", "all", "none", "compile", "runtime", "build", "buildtransitive",
+                        "buildmultitargeting", "analyzers", "native", "contentfiles"}
+        if (included | excluded) - known_assets:
+            raise ValueError(f"{path.name}: unrecognized dependency asset metadata: {dependency.package_id}")
+        if included & {"all", "build"} and not excluded & {"all", "build"}:
+            raise ValueError(f"{path.name}: dependency permits ordinary build assets: {dependency.package_id}")
 
     forbidden = sorted(
         dependency.package_id
@@ -369,6 +407,8 @@ def validate_package(metadata: PackageMetadata, path: Path, produced_version: st
 def validate_directory(package_directory: Path) -> tuple[list[PackageMetadata], str]:
     """Validate the full exact inventory and return metadata plus common version."""
     packages = sorted(path for path in package_directory.glob("*.nupkg") if not path.name.endswith(".snupkg"))
+    for package in packages:
+        validate_archive_limits(package)
     metadata = [read_metadata(package) for package in packages]
     actual_ids = frozenset(item.package_id for item in metadata)
     expected_ids = expected_package_ids()
@@ -395,6 +435,7 @@ def publication_paths(package_directory: Path, version: str) -> list[Path]:
         path = package_directory / f"{package_id}.{version}.nupkg"
         if path.is_symlink() or not path.is_file():
             raise ValueError(f"missing regular publication archive: {path.name}")
+        validate_archive_limits(path)
         metadata = read_metadata(path)
         if metadata.package_id != package_id or metadata.version != version:
             raise ValueError(f"{path.name}: archive identity does not match manifest/version")

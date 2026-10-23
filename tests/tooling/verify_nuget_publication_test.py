@@ -17,8 +17,11 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 
+from nuget_package_fixtures import write_inventory, write_package
+
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
 SCRIPT = ROOT / "scripts" / "verify-nuget-publication.py"
 SPEC = importlib.util.spec_from_file_location("verify_nuget_publication", SCRIPT)
 assert SPEC is not None and SPEC.loader is not None
@@ -96,6 +99,11 @@ def registration_server(responses: dict[str, tuple[int, object]], *, delayed_pat
 class VerifyNuGetPublicationTests(unittest.TestCase):
     """Cover collision, indexing, malformed-response, and inventory behavior."""
 
+    def test_presence_proof_requires_archives_before_any_network_request(self) -> None:
+        with self.assertRaisesRegex(VERIFIER.VerificationError, "package-directory is required"):
+            VERIFIER.verify_publication(("Hexalith.Agents",), "1.2.3", expect="present",
+                attempts=1, delay_seconds=0, opener=lambda *_args: self.fail("network reached"))
+
     def test_manifest_rejects_case_insensitive_duplicate_identities(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             manifest = Path(directory) / "release-packages.json"
@@ -147,7 +155,7 @@ class VerifyNuGetPublicationTests(unittest.TestCase):
         def opener(url: str, _timeout: float):
             raise missing(url)
 
-        VERIFIER.verify_publication(
+        VERIFIER._verify_inventory(
             ("Hexalith.Agents",),
             "1.2.3",
             expect="absent",
@@ -162,7 +170,7 @@ class VerifyNuGetPublicationTests(unittest.TestCase):
                 with self.subTest(expect=expect, timeout=timeout), self.assertRaisesRegex(
                     VERIFIER.VerificationError, "timeout must be a positive finite number"
                 ):
-                    VERIFIER.verify_publication(
+                    VERIFIER._verify_inventory(
                         ("Hexalith.Agents",),
                         "1.2.3",
                         expect=expect,
@@ -182,7 +190,7 @@ class VerifyNuGetPublicationTests(unittest.TestCase):
                     received.append(request_timeout)
                     return FakeResponse(leaf("Hexalith.Agents", "1.2.3"))
 
-                VERIFIER.verify_publication(
+                VERIFIER._verify_inventory(
                     ("Hexalith.Agents",),
                     "1.2.3",
                     expect="present",
@@ -197,7 +205,7 @@ class VerifyNuGetPublicationTests(unittest.TestCase):
         def opener(_url: str, _timeout: float):
             return FakeResponse(leaf("Hexalith.Agents", "1.2.3"))
 
-        VERIFIER.verify_publication(
+        VERIFIER._verify_inventory(
             ("Hexalith.Agents",),
             "1.2.3",
             expect="present",
@@ -229,7 +237,7 @@ class VerifyNuGetPublicationTests(unittest.TestCase):
             return FakeResponse(b"not-json")
 
         with self.assertRaisesRegex(VERIFIER.VerificationError, "malformed JSON"):
-            VERIFIER.verify_publication(
+            VERIFIER._verify_inventory(
                 ("Hexalith.Agents",),
                 "1.2.3",
                 expect="present",
@@ -249,7 +257,7 @@ class VerifyNuGetPublicationTests(unittest.TestCase):
                 raise missing(url)
             return FakeResponse(leaf(package_id, "1.2.3"))
 
-        VERIFIER.verify_publication(
+        VERIFIER._verify_inventory(
             ("Hexalith.Agents", "Hexalith.Agents.Client"),
             "1.2.3",
             expect="present",
@@ -280,7 +288,7 @@ class VerifyNuGetPublicationTests(unittest.TestCase):
                         raise transient_failure(url)
                     return FakeResponse(leaf("Hexalith.Agents", "1.2.3"))
 
-                VERIFIER.verify_publication(
+                VERIFIER._verify_inventory(
                     ("Hexalith.Agents",),
                     "1.2.3",
                     expect="present",
@@ -302,7 +310,7 @@ class VerifyNuGetPublicationTests(unittest.TestCase):
             raise http_error(url, 503)
 
         with self.assertRaisesRegex(VERIFIER.VerificationError, "HTTP 503"):
-            VERIFIER.verify_publication(
+            VERIFIER._verify_inventory(
                 ("Hexalith.Agents",),
                 "1.2.3",
                 expect="absent",
@@ -322,7 +330,7 @@ class VerifyNuGetPublicationTests(unittest.TestCase):
             raise missing(url)
 
         with self.assertRaisesRegex(VERIFIER.VerificationError, "retry exhaustion.*Hexalith.Agents"):
-            VERIFIER.verify_publication(
+            VERIFIER._verify_inventory(
                 ("Hexalith.Agents",),
                 "1.2.3",
                 expect="present",
@@ -340,7 +348,7 @@ class VerifyNuGetPublicationTests(unittest.TestCase):
             raise missing(url)
 
         with self.assertRaisesRegex(VERIFIER.VerificationError, "publication collision.*Agents.Client"):
-            VERIFIER.verify_publication(
+            VERIFIER._verify_inventory(
                 ("Hexalith.Agents", "Hexalith.Agents.Client"),
                 "1.2.3",
                 expect="absent",
@@ -368,30 +376,65 @@ class NuGetPublicationCliTests(unittest.TestCase):
         timeout: str = "1",
         attempts: int = 1,
         delayed_path: str | None = None,
+        package_fault: str = "",
     ) -> tuple[subprocess.CompletedProcess[str], list[str]]:
         """Run an isolated subprocess with a manifest and bounded loopback transport."""
-        with tempfile.TemporaryDirectory() as directory, registration_server(
-            responses, delayed_path=delayed_path
-        ) as (base_url, requests):
-            manifest_path = Path(directory) / "release-packages.json"
-            manifest_path.write_text(json.dumps(self.manifest), encoding="utf-8")
-            result = subprocess.run(
-                [
-                    sys.executable, str(SCRIPT), str(manifest_path), "1.2.3",
-                    "--expect", expect, "--attempts", str(attempts), "--delay-seconds", "0",
-                    f"--timeout={timeout}", "--base-url", base_url,
-                ],
-                cwd=directory,
-                env={**os.environ, "NO_PROXY": "127.0.0.1", "no_proxy": "127.0.0.1"},
-                capture_output=True,
-                text=True,
-                timeout=10,
-            )
-        return result, requests
+        with tempfile.TemporaryDirectory() as directory:
+            packages = Path(directory) / "packages"
+            packages.mkdir()
+            paths = write_inventory(packages)
+            responses = dict(responses)
+            for path in paths:
+                name = path.name.casefold()
+                package_id = name.removesuffix(".1.2.3.nupkg")
+                responses[f"/{package_id}/1.2.3/{name}"] = (200, path.read_bytes())
+            target = paths[0]
+            download_path = f"/{target.name.casefold().removesuffix('.1.2.3.nupkg')}/1.2.3/{target.name.casefold()}"
+            if package_fault == "missing local":
+                target.unlink()
+            elif package_fault == "missing remote":
+                del responses[download_path]
+            elif package_fault == "transient":
+                delayed_path = download_path
+            elif package_fault == "substitution":
+                replacement = write_package(packages, target.name.removesuffix(".1.2.3.nupkg"), readme=b"substituted")
+                responses[download_path] = (200, replacement.read_bytes())
+                # Retain the original local expectation.
+                write_package(packages, target.name.removesuffix(".1.2.3.nupkg"))
+            elif package_fault == "corrupt":
+                responses[download_path] = (200, b"bad archive")
+            elif package_fault == "signed":
+                import zipfile
+                with zipfile.ZipFile(target, "a") as archive:
+                    archive.writestr(".signature.p7s", b"repository signature fixture")
+                responses[download_path] = (200, target.read_bytes())
+                write_package(packages, target.name.removesuffix(".1.2.3.nupkg"))
+            with registration_server(responses, delayed_path=delayed_path) as (base_url, requests):
+                return self.invoke_cli(directory, packages, base_url, requests,
+                    expect=expect, timeout=timeout, attempts=attempts)
+
+    def invoke_cli(self, directory, packages, base_url, requests, *, expect, timeout, attempts):
+        manifest_path = Path(directory) / "release-packages.json"
+        manifest_path.write_text(json.dumps(self.manifest), encoding="utf-8")
+        result = subprocess.run(
+            [
+                sys.executable, str(SCRIPT), str(manifest_path), "1.2.3",
+                "--expect", expect, "--attempts", str(attempts), "--delay-seconds", "0",
+                f"--timeout={timeout}", "--base-url", base_url,
+                "--package-directory", str(packages), "--package-base-url", base_url,
+            ],
+            cwd=directory,
+            env={**os.environ, "NO_PROXY": "127.0.0.1", "no_proxy": "127.0.0.1"},
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        return result, list(requests)
 
     def assert_cli_failure(self, result: subprocess.CompletedProcess[str], diagnostic: str) -> None:
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-        self.assertIn(f"verify-nuget-publication: {diagnostic}", result.stderr)
+        self.assertIn("verify-nuget-publication: ", result.stderr)
+        self.assertIn(diagnostic, result.stderr)
         self.assertNotIn("Verified", result.stdout)
         self.assertNotIn("Traceback", result.stderr)
 
@@ -406,7 +449,8 @@ class NuGetPublicationCliTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertIn(f"Verified {len(self.paths)} package versions are {expect} on NuGet.", result.stdout)
                 self.assertEqual(result.stderr, "")
-                self.assertEqual(requests, list(self.paths))
+                self.assertEqual([path for path in requests if path.endswith('.json')], list(self.paths))
+                self.assertEqual(sum(path.endswith('.nupkg') for path in requests), len(self.paths) if expect == 'present' else 0)
 
     def test_cli_rejects_a_collision_anywhere_in_the_inventory(self) -> None:
         path, package_id = list(self.paths.items())[-1]
@@ -422,7 +466,8 @@ class NuGetPublicationCliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn(f"Verified {len(self.paths)} package versions are present on NuGet.", result.stdout)
         self.assertIn("NuGet indexing incomplete after attempt 1/2", result.stderr)
-        self.assertEqual(requests, [*self.paths, delayed_path])
+        self.assertEqual([path for path in requests if path.endswith('.json')], [*self.paths, delayed_path])
+        self.assertEqual(sum(path.endswith('.nupkg') for path in requests), len(self.paths))
 
     def test_cli_rejects_partial_publication_after_bounded_attempts(self) -> None:
         responses = {path: (200, leaf(package_id, "1.2.3")) for path, package_id in self.paths.items()}
@@ -431,7 +476,33 @@ class NuGetPublicationCliTests(unittest.TestCase):
         result, requests = self.run_cli(responses)
         self.assert_cli_failure(result, "NuGet presence retry exhaustion after 1 attempts;")
         self.assertIn(missing_package, result.stderr)
-        self.assertEqual(requests, list(self.paths))
+        self.assertEqual([path for path in requests if path.endswith('.json')], list(self.paths))
+
+    def test_cli_compares_payloads_and_allows_repository_signing(self) -> None:
+        responses = {path: (200, leaf(package_id, "1.2.3")) for path, package_id in self.paths.items()}
+        result, requests = self.run_cli(responses, package_fault="signed")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(sum(path.endswith('.nupkg') for path in requests), len(self.paths))
+        for fault, diagnostic in (("substitution", "published package content mismatch"),
+                                  ("corrupt", "not a zip file")):
+            with self.subTest(fault=fault):
+                result, requests = self.run_cli(responses, package_fault=fault)
+                self.assert_cli_failure(result, diagnostic if fault == 'substitution' else '')
+                self.assertEqual(len(requests), 2)
+
+    def test_cli_preflights_every_archive_before_requests(self) -> None:
+        result, requests = self.run_cli({}, package_fault="missing local")
+        self.assert_cli_failure(result, "")
+        self.assertIn("missing, empty or oversized", result.stderr)
+        self.assertEqual(requests, [])
+
+    def test_cli_retries_only_pending_downloads(self) -> None:
+        responses = {path: (200, leaf(package_id, "1.2.3")) for path, package_id in self.paths.items()}
+        result, requests = self.run_cli(responses, package_fault="transient", attempts=2)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(len(requests), 2 * len(self.paths) + 2)
+        result, requests = self.run_cli(responses, package_fault="missing remote", attempts=2)
+        self.assert_cli_failure(result, "NuGet presence retry exhaustion")
 
     def test_cli_rejects_malformed_and_mismatched_registration_leaves(self) -> None:
         path = next(iter(self.paths))

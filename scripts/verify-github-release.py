@@ -4,10 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
 from pathlib import Path
+
+from release_package_integrity import MAX_ARCHIVE_BYTES, package_contents
 
 
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
@@ -53,6 +56,10 @@ def verify_github_release(
     package_ids = [row.get("id") if isinstance(row, dict) else None for row in packages]
     if any(not isinstance(package_id, str) or not package_id for package_id in package_ids):
         raise ReleaseVerificationError("release manifest contains a malformed package identity")
+    if any(not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", package_id) for package_id in package_ids):
+        raise ReleaseVerificationError("release manifest contains an unsafe package identity")
+    if len({package_id.casefold() for package_id in package_ids}) != len(package_ids):
+        raise ReleaseVerificationError("release manifest repeats a package identity")
 
     if not isinstance(release, dict):
         raise ReleaseVerificationError("GitHub Release response must be an object")
@@ -90,17 +97,62 @@ def main() -> int:
     parser.add_argument("version")
     parser.add_argument("expected_sha")
     parser.add_argument("resolved_tag_sha")
+    parser.add_argument("--asset-directory", type=Path)
+    parser.add_argument("--metadata-only", action="store_true", help="preflight API metadata before downloading")
     args = parser.parse_args()
 
+    manifest = read_json(args.manifest.resolve(), "release manifest")
+    release = read_json(args.release.resolve(), "GitHub Release")
     verify_github_release(
-        read_json(args.manifest.resolve(), "release manifest"),
-        read_json(args.release.resolve(), "GitHub Release"),
+        manifest,
+        release,
         args.version,
         args.expected_sha,
         args.resolved_tag_sha,
     )
+    verify_asset_metadata(release)
+    if args.metadata_only:
+        print(f"Verified GitHub Release metadata for v{args.version}; archive contents are not yet verified.")
+        return 0
+    if args.asset_directory is None:
+        raise ReleaseVerificationError("--asset-directory is required to verify archive contents")
+    verify_asset_archives(manifest, release, args.asset_directory.resolve(), args.version)
     print(f"Verified GitHub Release v{args.version} at {args.expected_sha}.")
     return 0
+
+
+def verify_asset_metadata(release: dict) -> None:
+    """Reject oversized or unverifiable API assets before any download."""
+    for asset in release["assets"]:
+        size = asset.get("size")
+        digest = asset.get("digest")
+        if type(size) is not int or not 0 < size <= MAX_ARCHIVE_BYTES:
+            raise ReleaseVerificationError(f"{asset['name']}: asset size is missing or exceeds limits")
+        if not isinstance(digest, str) or not re.fullmatch(r"sha256:[0-9a-f]{64}", digest):
+            raise ReleaseVerificationError(f"{asset['name']}: missing or malformed asset SHA-256 digest")
+
+
+def verify_asset_archives(manifest: dict, release: dict, directory: Path, version: str) -> None:
+    """Require each download's API digest, length, package identity and boundaries."""
+    expected = {f"{row['id']}.{version}.nupkg": row["id"] for row in manifest["packages"]}
+    verify_asset_metadata(release)
+    try:
+        actual = {path.name for path in directory.iterdir()}
+        if actual != set(expected):
+            raise ValueError("downloaded asset inventory does not match release manifest")
+        for asset in release["assets"]:
+            path = directory / asset["name"]
+            package_contents(path, expected[path.name], version)
+            size = asset.get("size")
+            digest = asset.get("digest")
+            if type(size) is not int or size <= 0 or size != path.stat().st_size:
+                raise ValueError(f"{path.name}: asset size mismatch")
+            if not isinstance(digest, str) or not re.fullmatch(r"sha256:[0-9a-f]{64}", digest):
+                raise ValueError(f"{path.name}: missing or malformed asset SHA-256 digest")
+            if "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+                raise ValueError(f"{path.name}: asset SHA-256 mismatch")
+    except (OSError, ValueError) as error:
+        raise ReleaseVerificationError(str(error)) from error
 
 
 if __name__ == "__main__":

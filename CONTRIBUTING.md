@@ -113,9 +113,43 @@ declared in `eng/release-packages.json`. It validates archives and an isolated
 consumer, proves package versions absent, and rechecks the exact green main
 source before the first push. Publication sends only validated manifest/version
 archives; unrelated files are preserved. It then verifies NuGet presence and the
-GitHub Release's source and six asset names. Existing versions fail the release;
+GitHub Release's source and six downloaded archives. Each GitHub asset must match
+its API SHA-256 digest, byte length and package identity. NuGet presence requires
+downloading every exact package and comparing all ordinary archive members with
+the release artifacts. Both gates validate package boundaries and enforce archive
+and expanded-content limits. Existing versions fail the release;
 `--skip-duplicate` is not used. A partial push requires maintainer investigation
 because automatic reconciliation is not implemented.
+
+The NuGet comparison permits only changes to the root `.signature.p7s` member:
+[NuGet.org repository signing](https://devblogs.microsoft.com/dotnet/introducing-repository-signatures/)
+adds or countersigns that entry while preserving other package contents. This is
+content comparison, not cryptographic signature verification. Run the presence
+CLI with `--package-directory <original-archives>`; the GitHub CLI verifier requires
+`--asset-directory <downloaded-assets>`. The release workflow supplies both.
+It preflights release metadata before downloading, caps downloaded files at 64 MiB,
+then runs full archive verification. Metadata-only success explicitly states that
+contents have not yet been verified.
+
+Dependency validation retains nuspec include/exclude metadata and rejects ordinary
+dependency build assets. The offline restore regression shows that removing the
+generated `exclude="Build,Analyzers"` imports an ordinary build target. This check
+does not establish suppression of transitive analyzer or `buildTransitive` assets;
+the fixture explicitly checks the analyzer limitation against the installed SDK.
+
+For the focused EventStore gateway source-reference regression, use fresh artifacts
+to avoid stale package/source assets in shared `obj` directories:
+
+```bash
+dotnet build test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Debug --artifacts-path /tmp/agents-gateway -p:UseHexalithProjectReferences=true -m:1
+dotnet /tmp/agents-gateway/bin/Hexalith.Agents.Server.Tests/debug/Hexalith.Agents.Server.Tests.dll -class Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests -result-xml /tmp/agents-gateway.xml
+```
+
+Inspect the fresh XML for nonzero passing tests and zero failures, skips, not-run
+tests and errors. The gateway suite includes equivalent-intent replay and changed
+payload conflict; the owner admission actor regressions additionally check that
+the first stored intent is retained. These are local regressions and do not
+establish production Dapr persistence or dependency acceptance.
 
 ## Updating the Builds dependency
 

@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "kind": "local-deferred-verification-evidence",
+  "sources": {
+    "agents": "eb095b288b8630d473d0f8c1ccd045cf045aa006",
+    "eventStore": "5ce5f1d84b88c808cc8a526b9decf149de977e55",
+    "conversations": "ef3947078cb5ccf3d2b81ca684490e565e8cd04f"
+  },
+  "workingDirectory": "/home/administrator/projects/hexalith/agents",
+  "commands": [
+    "dotnet build test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj --configuration Debug --no-restore -p:UseHexalithProjectReferences=true -m:1",
+    "dotnet build test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj --configuration Debug --artifacts-path /tmp/agents-five-integrity-20261023/root-build -p:UseHexalithProjectReferences=true -m:1",
+    "dotnet /tmp/agents-five-integrity-20261023/root-build/bin/Hexalith.Agents.Server.Tests/debug/Hexalith.Agents.Server.Tests.dll -class Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests -result-xml /tmp/agents-five-integrity-20261023/agents-gateway.xml",
+    "dotnet msbuild references/Hexalith.EventStore/src/Hexalith.EventStore.Contracts/Hexalith.EventStore.Contracts.csproj -nologo -getProperty:HexalithEventStoreVersion",
+    "dotnet build references/Hexalith.EventStore/tests/Hexalith.EventStore.Server.Tests/Hexalith.EventStore.Server.Tests.csproj --configuration Debug --artifacts-path /tmp/agents-five-integrity-20261023/owner-build -p:UseHexalithProjectReferences=true -p:MinVerVersionOverride=1.0.0 -p:HexalithEventStoreVersion=3.126.0 -m:1",
+    "dotnet /tmp/agents-five-integrity-20261023/owner-build/bin/Hexalith.EventStore.Server.Tests/debug/Hexalith.EventStore.Server.Tests.dll -method Hexalith.EventStore.Server.Tests.Actors.IdempotencyAdmissionActorTests.Protector_PartitionsByTenantAndKeyButComparesCanonicalIntent -method Hexalith.EventStore.Server.Tests.Actors.IdempotencyAdmissionActorTests.AdmitAsync_NewKey_AtomicallyReservesAndIssuesFirstFence -method Hexalith.EventStore.Server.Tests.Actors.IdempotencyAdmissionActorTests.AdmitAsync_EquivalentRetry_ReusesFirstWriterExecutionIdentityAndFence -method Hexalith.EventStore.Server.Tests.Actors.IdempotencyAdmissionActorTests.AdmitAsync_LiveDifferentIntent_ReturnsConflictWithoutMutation -result-xml /tmp/agents-five-integrity-20261023/eventstore-first-intent.xml"
+  ],
+  "initialCommandResult": {
+    "exitCode": 1,
+    "reason": "Stale mixed default obj assets caused duplicate Commons assembly CS1704/MSB3243; recovered with fresh restore in isolated artifacts path, without weakening build gates."
+  },
+  "passingBuilds": {
+    "server-debug-build-fresh.log": {
+      "warnings": 0,
+      "errors": 0
+    },
+    "eventstore-debug-build.log": {
+      "warnings": 0,
+      "errors": 0
+    }
+  },
+  "results": {
+    "agents-gateway.xml": {
+      "total": 141,
+      "passed": 141,
+      "failed": 0,
+      "skipped": 0,
+      "notRun": 0,
+      "errors": 0,
+      "sha256": "829f3e201a34b29c27c8078062d732bc8e12f15505707f09066bc78b83972545"
+    },
+    "eventstore-first-intent.xml": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "notRun": 0,
+      "errors": 0,
+      "sha256": "811b3d4f44ea34bc8d621a61ba597d47fe8e5decf24ece90d42e17af5ad9cb0b"
+    }
+  },
+  "rootSourceProperties": {
+    "UseHexalithProjectReferences": "true",
+    "HexalithEventStoreFromSource": "true",
+    "HexalithConversationsFromSource": "true",
+    "HexalithPartiesFromSource": "true",
+    "HexalithTenantsFromSource": "true",
+    "HexalithFrontComposerFromSource": "true",
+    "HexalithCommonsFromSource": "true",
+    "HexalithEventStoreRoot": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+    "HexalithConversationsRoot": "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations",
+    "HexalithPartiesRoot": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties",
+    "HexalithTenantsRoot": "/home/administrator/projects/hexalith/agents/references/Hexalith.Tenants",
+    "HexalithFrontComposerRoot": "/home/administrator/projects/hexalith/agents/references/Hexalith.FrontComposer",
+    "HexalithCommonsRoot": "/home/administrator/projects/hexalith/agents/references/Hexalith.Commons"
+  },
+  "stateAssertions": [
+    {
+      "file": "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs",
+      "line": 610,
+      "assertion": "Automatic setup submitted once; case-insensitive string and legacy numeric equivalent retries return the original MessageId and exact ResultPayload; Confirmation under same key returns HTTP409; domain execution count and ledger execution count remain1. Gateway HTTP/registry/coordinator paths are real, admission actor state is a test fixture."
+    },
+    {
+      "file": "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs",
+      "line": 730,
+      "assertion": "Three invalid declared-command payload/domain cases each return HTTP400 nonretryable with correct_request, and neither ledger execution nor domain execution happens."
+    },
+    {
+      "file": "references/Hexalith.EventStore/tests/Hexalith.EventStore.Server.Tests/Actors/IdempotencyAdmissionActorTests.cs",
+      "line": 1009,
+      "assertion": "Same tenant/key and different canonical target retain ActorId but produce different IntentDigest; equivalent intent preserves digest; other tenant changes ActorId."
+    },
+    {
+      "file": "references/Hexalith.EventStore/tests/Hexalith.EventStore.Server.Tests/Actors/IdempotencyAdmissionActorTests.cs",
+      "line": 1030,
+      "assertion": "Real actor new-key path SetStateAsync receives Reserved record containing exact first request IntentDigest and fence1; SaveStateAsync executes once. This is mocked state-manager boundary evidence, not real external Dapr persistence."
+    },
+    {
+      "file": "references/Hexalith.EventStore/tests/Hexalith.EventStore.Server.Tests/Actors/IdempotencyAdmissionActorTests.cs",
+      "line": 1054,
+      "assertion": "Actor loaded from Pending stored record returns Pending with the original execution MessageId/CorrelationId and fence, ignoring retry execution identity; no SetStateAsync occurs."
+    },
+    {
+      "file": "references/Hexalith.EventStore/tests/Hexalith.EventStore.Server.Tests/Actors/IdempotencyAdmissionActorTests.cs",
+      "line": 1129,
+      "assertion": "Actor loaded from terminal stored intent-a with replay result receives intent-b and returns Conflict without any SetStateAsync; it cannot return the original terminal replay result as a successful replay."
+    },
+    {
+      "file": "references/Hexalith.EventStore/src/Hexalith.EventStore.Server/Actors/IdempotencyAdmissionActor.cs",
+      "line": 206,
+      "assertion": "Source stores request.IntentDigest in first Reserved record through PersistAsync; line284 compares stored record.IntentDigest against later request before replay."
+    }
+  ],
+  "limitations": [
+    "Local unit/in-process HTTP evidence only; no production-like topology or external persisted Dapr state proof.",
+    "Owner source, submodule pointers and nested initialization were not changed.",
+    "No NuGet or GitHub release publication was performed."
+  ],
+  "retainedArtifacts": {
+    "agents-gateway.xml": {
+      "source": "agents-gateway.xml",
+      "sha256": "829f3e201a34b29c27c8078062d732bc8e12f15505707f09066bc78b83972545"
+    },
+    "eventstore-first-intent.xml": {
+      "source": "eventstore-first-intent.xml",
+      "sha256": "811b3d4f44ea34bc8d621a61ba597d47fe8e5decf24ece90d42e17af5ad9cb0b"
+    },
+    "server-debug-build.txt": {
+      "source": "server-debug-build-fresh.log",
+      "sha256": "d7ffbe576b66e33fb6ebd943a8dd5d2072c71f43b4d46341fc6901109e90c783"
+    },
+    "eventstore-debug-build.txt": {
+      "source": "eventstore-debug-build.log",
+      "sha256": "14c85cd6c397679b1470e6e6032ccaf4bf641b82143b264c44c58f6bef177d5a"
+    }
+  }
+}

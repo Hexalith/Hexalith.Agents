@@ -168,12 +168,18 @@ jobs:
           git fetch --force origin "refs/tags/${tag}:refs/tags/${tag}"
           release_sha="$(git rev-list -n 1 "$tag")"
           python3 scripts/verify-github-release.py \
+            eng/release-packages.json github-release.json "$VERSION" "$DISPATCH_SHA" "$release_sha" --metadata-only
+          # Bash uses 1024-byte blocks: cap each downloaded file at 64 MiB.
+          ulimit -f 65536
+          gh release download "$tag" --repo "$REPOSITORY" --pattern '*.nupkg' --dir release-assets
+          python3 scripts/verify-github-release.py \
             eng/release-packages.json \
             github-release.json \
             "$VERSION" \
             "$DISPATCH_SHA" \
-            "$release_sha"
+            "$release_sha" \
+            --asset-directory release-assets
       - name: Verify all six versions reached NuGet
         env:
           VERSION: ${{ needs.plan-release.outputs.version }}
-        run: python3 scripts/verify-nuget-publication.py eng/release-packages.json "$VERSION" --expect present
+        run: python3 scripts/verify-nuget-publication.py eng/release-packages.json "$VERSION" --expect present --package-directory release-assets

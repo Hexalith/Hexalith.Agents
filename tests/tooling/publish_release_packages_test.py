@@ -35,6 +35,9 @@ class PublishReleasePackagesTests(unittest.TestCase):
                 paths[-1].write_bytes(b"bad archive")
             elif fault == "corrupt assembly":
                 corrupt_archive_member(paths[-1], f"lib/net10.0/{PACKAGE_IDS[-1]}.dll")
+            elif fault == "oversized":
+                with paths[-1].open("r+b") as archive:
+                    archive.truncate(65 * 1024 * 1024)
             commands = fixture / "commands"
             commands.mkdir()
             log = fixture / "commands.jsonl"
@@ -99,7 +102,7 @@ elif stage == "ci-runs":
         self.assertIn("a" * 40, source_args)
 
     def test_complete_local_preflight_precedes_network_and_pushes(self) -> None:
-        for fault in ("missing", "invalid", "corrupt assembly"):
+        for fault in ("missing", "invalid", "corrupt assembly", "oversized"):
             with self.subTest(fault=fault):
                 result, calls = self.run_publisher(fault=fault)
                 self.assertNotEqual(result.returncode, 0)

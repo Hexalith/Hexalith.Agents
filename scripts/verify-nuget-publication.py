@@ -5,12 +5,14 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import http.client
 import io
 import json
 import math
 import re
 import sys
 import time
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
@@ -18,8 +20,11 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
 
+from release_package_integrity import MAX_ARCHIVE_BYTES, expected_archives, package_contents
+
 
 DEFAULT_REGISTRATION_BASE = "https://api.nuget.org/v3/registration5-gz-semver2"
+DEFAULT_PACKAGE_BASE = "https://api.nuget.org/v3-flatcontainer"
 PACKAGE_ID_PATTERN = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,98}[A-Za-z0-9])?$")
 VERSION_PATTERN = re.compile(
     r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
@@ -199,7 +204,7 @@ def probe_package(
     return ProbeResult(package_id, version, True)
 
 
-def verify_publication(
+def _verify_inventory(
     package_ids: tuple[str, ...],
     version: str,
     *,
@@ -210,6 +215,8 @@ def verify_publication(
     timeout: float = 15.0,
     opener: Callable[[str, float], object] = _open_url,
     sleeper: Callable[[float], None] = time.sleep,
+    package_directory: Path | None = None,
+    package_base_url: str = DEFAULT_PACKAGE_BASE,
 ) -> None:
     """Verify the complete inventory with bounded retries for NuGet indexing."""
     if not VERSION_PATTERN.fullmatch(version):
@@ -222,6 +229,14 @@ def verify_publication(
         raise VerificationError("delay seconds must not be negative")
     if not math.isfinite(timeout) or timeout <= 0:
         raise VerificationError("timeout must be a positive finite number of seconds")
+    if not math.isfinite(delay_seconds):
+        raise VerificationError("delay seconds must be finite")
+    expected = None
+    if package_directory is not None:
+        try:
+            expected = expected_archives(package_directory, package_ids, version)
+        except ValueError as error:
+            raise VerificationError(str(error)) from error
 
     if expect == "absent":
         results = [
@@ -257,6 +272,11 @@ def verify_publication(
                     timeout=timeout,
                     opener=opener,
                 )
+                if result.present and expected is not None:
+                    verify_package_download(
+                        package_id, version, expected[package_id],
+                        base_url=package_base_url, timeout=timeout, opener=opener,
+                    )
             except TransientProbeError as error:
                 print(f"{package_id} {version}: transient failure: {error}", file=sys.stderr)
                 next_pending.append(package_id)
@@ -284,6 +304,50 @@ def verify_publication(
     )
 
 
+def verify_publication(
+    package_ids: tuple[str, ...], version: str, *, expect: str,
+    package_directory: Path | None = None, **options,
+) -> None:
+    """Require expected archives for every publication presence proof."""
+    if expect == "present" and package_directory is None:
+        raise VerificationError("--package-directory is required when verifying presence")
+    _verify_inventory(package_ids, version, expect=expect,
+        package_directory=package_directory, **options)
+
+
+def verify_package_download(
+    package_id: str, version: str, expected: dict[str, str], *,
+    base_url: str, timeout: float, opener: Callable[[str, float], object],
+) -> None:
+    """Compare all package payload members, allowing repository signing alone."""
+    normalized_id = quote(package_id.casefold(), safe="")
+    normalized_version = quote(version.split("+", 1)[0].casefold(), safe="")
+    url = f"{base_url.rstrip('/')}/{normalized_id}/{normalized_version}/{normalized_id}.{normalized_version}.nupkg"
+    try:
+        with opener(url, timeout) as response:
+            if response.getcode() != 200:
+                raise VerificationError(f"unexpected package HTTP {response.getcode()} for {package_id} {version}")
+            body = response.read(MAX_ARCHIVE_BYTES + 1)
+    except HTTPError as error:
+        status = error.code
+        error.close()
+        failure = TransientProbeError if status in {404, 429} or 500 <= status <= 599 else VerificationError
+        raise failure(f"package download HTTP {status} for {package_id} {version}") from error
+    except (URLError, OSError, http.client.HTTPException) as error:
+        raise TransientProbeError(f"package download failed for {package_id} {version}: {error}") from error
+    if len(body) > MAX_ARCHIVE_BYTES:
+        raise VerificationError(f"{package_id} {version}: package download exceeds size limit")
+    try:
+        with tempfile.TemporaryDirectory(prefix="agents-nuget-content-") as directory:
+            path = Path(directory) / f"{package_id}.{version}.nupkg"
+            path.write_bytes(body)
+            actual = package_contents(path, package_id, version)
+        if actual != expected:
+            raise ValueError(f"{package_id} {version}: published package content mismatch")
+    except (ValueError, OSError) as error:
+        raise VerificationError(str(error)) from error
+
+
 def main() -> int:
     """Run the command-line verifier."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -294,9 +358,13 @@ def main() -> int:
     parser.add_argument("--delay-seconds", type=float, default=10.0)
     parser.add_argument("--timeout", type=float, default=15.0)
     parser.add_argument("--base-url", default=DEFAULT_REGISTRATION_BASE)
+    parser.add_argument("--package-directory", type=Path)
+    parser.add_argument("--package-base-url", default=DEFAULT_PACKAGE_BASE)
     args = parser.parse_args()
 
     package_ids = load_package_ids(args.manifest.resolve())
+    if args.expect == "present" and args.package_directory is None:
+        raise VerificationError("--package-directory is required when verifying presence")
     verify_publication(
         package_ids,
         args.version,
@@ -305,6 +373,8 @@ def main() -> int:
         delay_seconds=args.delay_seconds,
         base_url=args.base_url,
         timeout=args.timeout,
+        package_directory=args.package_directory.resolve() if args.package_directory is not None else None,
+        package_base_url=args.package_base_url,
     )
     print(f"Verified {len(package_ids)} package versions are {args.expect} on NuGet.")
     return 0

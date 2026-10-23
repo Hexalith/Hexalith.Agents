@@ -19,6 +19,35 @@ class NuGetPackageValidationTests(unittest.TestCase):
         metadata = VALIDATOR.read_metadata(path)
         VALIDATOR.validate_package(metadata, path, VERSION)
 
+    def test_dependency_metadata_cannot_enable_ordinary_build_assets(self) -> None:
+        for attrs, allowed in (({}, False), ({"exclude": ""}, False), ({"exclude": "None"}, False),
+                               ({"exclude": "Analyzers"}, False), ({"exclude": "Build"}, True),
+                               ({"exclude": "build,analyzers"}, True), ({"exclude": "All"}, True),
+                               ({"include": "Compile,Runtime"}, True), ({"include": "None"}, True)):
+            with self.subTest(attrs=attrs), tempfile.TemporaryDirectory() as directory:
+                def mutate(metadata):
+                    dependency = metadata.find("dependencies/group/dependency")
+                    dependency.attrib.pop("exclude", None)
+                    dependency.attrib.update(attrs)
+                path = write_package(Path(directory), mutate=mutate)
+                metadata = VALIDATOR.read_metadata(path)
+                self.assertEqual(metadata.dependencies[0].include_assets, attrs.get("include"))
+                self.assertEqual(metadata.dependencies[0].exclude_assets, attrs.get("exclude"))
+                if allowed:
+                    VALIDATOR.validate_package(metadata, path, VERSION)
+                else:
+                    with self.assertRaisesRegex(ValueError, "permits ordinary build assets"):
+                        VALIDATOR.validate_package(metadata, path, VERSION)
+
+    def test_rejects_unrecognized_dependency_asset_flags(self) -> None:
+        for attribute in ("include", "exclude"):
+            for value in ("Compile;Build", "buid", "All,Unexpected"):
+                with self.subTest(attribute=attribute, value=value), tempfile.TemporaryDirectory() as directory:
+                    def mutate(metadata):
+                        metadata.find("dependencies/group/dependency").set(attribute, value)
+                    with self.assertRaisesRegex(ValueError, "unrecognized dependency asset metadata"):
+                        self.validate(write_package(Path(directory), mutate=mutate))
+
     def test_valid_metadata_and_harmless_current_directory_prefixes(self) -> None:
         for namespaced in (False, True):
             for prefix in ("", "./", "././"):

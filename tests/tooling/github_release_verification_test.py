@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import importlib.util
+import copy
+import hashlib
 import json
 import subprocess
 import sys
@@ -10,8 +12,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from nuget_package_fixtures import write_package
+
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
 SCRIPT = ROOT / "scripts" / "verify-github-release.py"
 SPEC = importlib.util.spec_from_file_location("verify_github_release", SCRIPT)
 assert SPEC is not None and SPEC.loader is not None
@@ -120,18 +125,57 @@ class GitHubReleaseVerificationTests(unittest.TestCase):
         *,
         version: str = VERSION,
         fixture_overrides: dict[str, str | None] | None = None,
+        asset_fault: str = "",
+        metadata_only: bool = False,
     ) -> subprocess.CompletedProcess[str]:
         """Run the production CLI against temporary release API fixtures."""
         with tempfile.TemporaryDirectory() as directory:
             manifest = Path(directory) / "manifest.json"
             release_path = Path(directory) / "release.json"
+            assets = Path(directory) / "assets"
+            assets.mkdir()
+            payload = copy.deepcopy(payload)
+            for row in MANIFEST["packages"]:
+                path = write_package(assets, row["id"], version=version)
+                for asset in payload.get("assets", []) if isinstance(payload, dict) else []:
+                    if asset.get("name") == path.name:
+                        asset.update(size=path.stat().st_size, digest="sha256:" + hashlib.sha256(path.read_bytes()).hexdigest())
+            path = assets / f"{MANIFEST['packages'][0]['id']}.{version}.nupkg"
+            if asset_fault == "corrupt":
+                path.write_bytes(b"not a package")
+            elif asset_fault == "substitution":
+                write_package(assets, MANIFEST["packages"][0]["id"], version=version, readme=b"replaced content")
+            elif asset_fault == "wrong identity":
+                wrong = write_package(assets, "Hexalith.Agents.Client", version=version)
+                path.write_bytes(wrong.read_bytes())
+                wrong.unlink()
+                for asset in payload["assets"]:
+                    if asset["name"] == path.name:
+                        asset.update(size=path.stat().st_size, digest="sha256:" + hashlib.sha256(path.read_bytes()).hexdigest())
+            elif asset_fault == "missing":
+                path.unlink()
+            elif asset_fault == "extra":
+                (assets / "unexpected.txt").write_text("extra")
+            elif asset_fault:
+                asset = payload["assets"][0]
+                if asset_fault == "size":
+                    asset["size"] += 1
+                elif asset_fault == "digest":
+                    asset["digest"] = "sha256:" + "0" * 64
+                elif asset_fault == "missing digest":
+                    del asset["digest"]
+                elif asset_fault == "malformed digest":
+                    asset["digest"] = "md5:123"
+                elif asset_fault == "oversized":
+                    asset["size"] = 65 * 1024 * 1024
             fixtures = {"manifest.json": json.dumps(MANIFEST), "release.json": json.dumps(payload)}
             fixtures.update(fixture_overrides or {})
             for filename, contents in fixtures.items():
                 if contents is not None:
                     (Path(directory) / filename).write_text(contents, encoding="utf-8")
             return subprocess.run(
-                [sys.executable, str(SCRIPT), str(manifest), str(release_path), version, SHA, resolved_tag_sha],
+                [sys.executable, str(SCRIPT), str(manifest), str(release_path), version, SHA, resolved_tag_sha,
+                 *( ["--metadata-only"] if metadata_only else ["--asset-directory", str(assets)] )],
                 capture_output=True,
                 text=True,
                 timeout=10,
@@ -150,6 +194,24 @@ class GitHubReleaseVerificationTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(result.stdout, f"Verified GitHub Release v{VERSION} at {SHA}.\n")
         self.assertEqual(result.stderr, "")
+
+    def test_cli_rejects_corrupt_substituted_and_misidentified_downloads(self) -> None:
+        for fault, diagnostic in (
+            ("corrupt", "not a zip file"), ("substitution", "mismatch"),
+            ("wrong identity", "package identity"), ("missing", "inventory"), ("extra", "inventory"),
+            ("size", "size mismatch"), ("digest", "SHA-256 mismatch"),
+            ("missing digest", "missing or malformed"), ("malformed digest", "missing or malformed"),
+        ):
+            with self.subTest(fault=fault):
+                self.assert_cli_failure(self.run_cli(release(), asset_fault=fault), diagnostic)
+
+    def test_metadata_preflight_rejects_oversized_assets_before_the_download_phase(self) -> None:
+        result = self.run_cli(release(), metadata_only=True, asset_fault="oversized")
+        self.assert_cli_failure(result, "asset size is missing or exceeds limits")
+        result = self.run_cli(release(), metadata_only=True, asset_fault="missing")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("archive contents are not yet verified", result.stdout)
+        self.assertNotIn("Verified GitHub Release v", result.stdout)
 
     def test_cli_accepts_stable_build_metadata_and_prerelease_versions(self) -> None:
         for version, prerelease in (("1.2.3+build-label", False), ("1.2.3-rc.1", True)):
