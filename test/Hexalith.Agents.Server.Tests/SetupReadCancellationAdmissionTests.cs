@@ -50,8 +50,8 @@ public sealed class SetupReadCancellationAdmissionTests
         Configure(boundary, cancellation);
         var options = Options.Create(new AgentSetupReadModelOptions());
         AgentSetupQueryHandlerBase handler = statusQuery
-            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers)
-            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers);
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers, _context)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers, _context);
         var query = new QueryEnvelope(TenantId, AgentSetupReadModelAddresses.Domain, AgentId,
             statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType, [], "correlation", "subject");
 
@@ -64,6 +64,110 @@ public sealed class SetupReadCancellationAdmissionTests
         {
             _tenantAccess.ReceivedCalls().ShouldBeEmpty();
         }
+    }
+
+    /// <summary>Cancellation during authenticated identity extraction stops before authority lookup.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task QueryIdentityCancellationStopsBeforeAuthorityLookup(bool statusQuery)
+    {
+        using var cancellation = new CancellationTokenSource();
+        Configure("none", cancellation);
+        _context.GetContext().Returns(_ =>
+        {
+            cancellation.Cancel();
+            return new AgentAdministrationContext(TenantId, "subject", false);
+        });
+        var options = Options.Create(new AgentSetupReadModelOptions());
+        AgentSetupQueryHandlerBase handler = statusQuery
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers, _context)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers, _context);
+        var query = new QueryEnvelope(TenantId, AgentSetupReadModelAddresses.Domain, AgentId,
+            handler.QueryType, [], "correlation", "subject");
+
+        OperationCanceledException error = await Should.ThrowAsync<OperationCanceledException>(
+            () => handler.ExecuteAsync(query, cancellation.Token));
+
+        error.CancellationToken.ShouldBe(cancellation.Token);
+        await _context.DidNotReceive().GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        _tenantAccess.ReceivedCalls().ShouldBeEmpty();
+        _store.ReceivedCalls().ShouldBeEmpty();
+        _approvers.ReceivedCalls().ShouldBeEmpty();
+    }
+
+    /// <summary>Current-authority provider cancellation propagates even if the caller remains active.</summary>
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    public async Task CurrentAuthorityProviderCancellationIsNeverTranslatedIntoDenial(bool statusQuery, bool synchronousFailure)
+    {
+        using var cancellation = new CancellationTokenSource();
+        Configure("none", cancellation);
+        var error = new OperationCanceledException("provider-cancelled");
+        _context.GetContextAsync(false, Arg.Any<CancellationToken>())
+            .Returns<ValueTask<AgentAdministrationContext>>(_ => synchronousFailure
+                ? throw error
+                : new ValueTask<AgentAdministrationContext>(Task.FromException<AgentAdministrationContext>(error)));
+        var options = Options.Create(new AgentSetupReadModelOptions());
+        AgentSetupQueryHandlerBase handler = statusQuery
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers, _context)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers, _context);
+        var query = new QueryEnvelope(TenantId, AgentSetupReadModelAddresses.Domain, AgentId,
+            handler.QueryType, [], "correlation", "subject");
+
+        Task<QueryResult> execution = handler.ExecuteAsync(query, cancellation.Token);
+        await Should.ThrowAsync<OperationCanceledException>(() => execution);
+
+        execution.IsCanceled.ShouldBeTrue();
+        cancellation.IsCancellationRequested.ShouldBeFalse();
+        _tenantAccess.ReceivedCalls().ShouldBeEmpty();
+        _store.ReceivedCalls().ShouldBeEmpty();
+        _approvers.ReceivedCalls().ShouldBeEmpty();
+    }
+
+    /// <summary>Cancellation while awaiting authority wins over late grants, denials and infrastructure faults.</summary>
+    [Theory]
+    [InlineData(true, "grant")]
+    [InlineData(false, "grant")]
+    [InlineData(true, "deny")]
+    [InlineData(false, "deny")]
+    [InlineData(true, "failure")]
+    [InlineData(false, "failure")]
+    public async Task CancellationDuringPendingAuthorityStopsBeforeProtectedReads(bool statusQuery, string completion)
+    {
+        using var cancellation = new CancellationTokenSource();
+        Configure("none", cancellation);
+        TaskCompletionSource<AgentAdministrationContext> pending = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        _context.GetContextAsync(false, Arg.Any<CancellationToken>())
+            .Returns(_ => new ValueTask<AgentAdministrationContext>(pending.Task));
+        var options = Options.Create(new AgentSetupReadModelOptions());
+        AgentSetupQueryHandlerBase handler = statusQuery
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers, _context)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers, _context);
+        var query = new QueryEnvelope(TenantId, AgentSetupReadModelAddresses.Domain, AgentId,
+            handler.QueryType, [], "correlation", "subject");
+
+        Task<QueryResult> execution = handler.ExecuteAsync(query, cancellation.Token);
+        execution.IsCompleted.ShouldBeFalse();
+        cancellation.Cancel();
+        if (completion == "failure")
+        {
+            pending.SetException(new InvalidOperationException("late-authority-details"));
+        }
+        else
+        {
+            pending.SetResult(new AgentAdministrationContext(TenantId, "stable-actor", completion == "grant"));
+        }
+
+        OperationCanceledException error = await Should.ThrowAsync<OperationCanceledException>(() => execution);
+
+        error.CancellationToken.ShouldBe(cancellation.Token);
+        _tenantAccess.ReceivedCalls().ShouldBeEmpty();
+        _store.ReceivedCalls().ShouldBeEmpty();
+        _approvers.ReceivedCalls().ShouldBeEmpty();
     }
 
     /// <summary>Cancelled direct setup reads stop before protected downstream reads or rendering.</summary>
@@ -112,8 +216,8 @@ public sealed class SetupReadCancellationAdmissionTests
                 : Task.FromException<ReadModelEntry<AgentSetupReadModel>>(error));
         var options = Options.Create(new AgentSetupReadModelOptions());
         AgentSetupQueryHandlerBase handler = statusQuery
-            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers)
-            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers);
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers, _context)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers, _context);
         var query = new QueryEnvelope(TenantId, AgentSetupReadModelAddresses.Domain, AgentId,
             statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType, [], "correlation", "subject");
 
@@ -138,8 +242,8 @@ public sealed class SetupReadCancellationAdmissionTests
             .Returns(pendingRead.Task);
         var options = Options.Create(new AgentSetupReadModelOptions());
         AgentSetupQueryHandlerBase handler = statusQuery
-            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers)
-            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers);
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers, _context)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers, _context);
         var query = new QueryEnvelope(TenantId, AgentSetupReadModelAddresses.Domain, AgentId,
             statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType, [], "correlation", "subject");
 
@@ -164,8 +268,8 @@ public sealed class SetupReadCancellationAdmissionTests
         Configure("store-failure", cancellation);
         var options = Options.Create(new AgentSetupReadModelOptions());
         AgentSetupQueryHandlerBase handler = statusQuery
-            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers)
-            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers);
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, _approvers, _context)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, _approvers, _context);
         var query = new QueryEnvelope(TenantId, AgentSetupReadModelAddresses.Domain, AgentId,
             statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType, [], "correlation", "subject");
 
@@ -216,6 +320,7 @@ public sealed class SetupReadCancellationAdmissionTests
                 return new TenantAccessReadResult(boundary == "denied-authority"
                     ? AgentInteractionGateOutcome.Unauthorized : AgentInteractionGateOutcome.Satisfied, true);
             });
+        _context.GetContext().Returns(new AgentAdministrationContext(TenantId, "subject", false));
         _context.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ =>
         {
             if (boundary is "authority" or "denied-authority")

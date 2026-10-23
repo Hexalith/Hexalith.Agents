@@ -298,7 +298,8 @@ origin: code review, 2026-09-19
 location: eng/verify-story.ps1
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: The pin sits in `eng/verify-story.ps1` (4 sites), `eng/verify-story-5.2.ps1` (2) and `eng/verify-story-5.3.ps1` (1), so it is a repo-wide convention that predates and outlives Story 5.2; round 4 already adjudicated the 5.2 half as "keep and record the advisory". The advisory it was scoped to, `GHSA-pgww-w46g-26qg`, is now remediated in the shared Builds catalog (`AngleSharp 1.8.2` with that fix pinned by comment), so the suppression no longer hides a known blocker — it only hides future ones, against `hexalith-llm-instructions.md`'s rule that the pin is a triage-ladder fallback. Decide repo-wide whether to drop it from all three verifiers.
-status: open
+status: done 2026-10-23
+resolution: `spec-five-deferred-admission-and-verification-items.md` removes routine audit suppression from all five verification scripts. Default source/package builds audit every dependency; production-script fixtures propagate NU1903 failures without running later gates. Explicit diagnostics-only negative probes in test fixtures remain separately scoped.
 
 ### DW-28: Settle the durable replay authorization contract for reserved command extensions.
 
@@ -451,6 +452,8 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Re-prove that the dispatched source is still current immediately before the first irreversible NuGet push.
   evidence: The release workflow proves current green main before planning and packing, but has no local publication-boundary recheck, so main can advance before the first package write despite the completed CI/CD requirement to stop stale source before publication.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-admission-and-verification-items.md` verifies the existing production publisher recheck with the actual source-proof CLI and controlled gh endpoints after complete local preflight and NuGet absence. Exact green main proceeds; main advancement, failed CI and either API failure prevent every package push.
 
 ## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2.md (2026-09-22)
 
@@ -491,14 +494,18 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
   summary: Stop a create command from storing a payload tenant that disagrees with the envelope tenant.
   evidence: `CreateAgent.TenantId` is stored by `AgentAggregate` from the payload, while idempotency scopes the canonical target by the envelope tenant. This slice hashes the declared payload and does not choose the event tenant; the approved spec forbids changing Party identity. The split predates this change.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-admission-and-verification-items.md` rejects ordinal payload/envelope tenant mismatches before creation or duplicate no-op using the existing invalid-configuration rejection. Absent/existing-state, case/whitespace, immutable-state and authorization-precedence regressions pass; valid create/replay controls remain intact.
 
 ## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-3.md (2026-09-22)
 
-- A create payload tenant can disagree with the envelope tenant. `AgentAggregate.Handle(CreateAgent)` stores `command.TenantId`, while setup idempotency scopes the canonical target by the envelope tenant. Pre-existing; this spec forbids changing Party identity. Same split as the bullet above.
+- A create payload tenant can disagree with the envelope tenant. `AgentAggregate.Handle(CreateAgent)` stores `command.TenantId`, while setup idempotency scopes the canonical target by the envelope tenant. Pre-existing; this spec forbids changing Party identity. Same split as the bullet above. Resolved by `spec-five-deferred-admission-and-verification-items.md` with the existing create-tenant item above; this carried pointer is not an additional work item.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Require Agents administrator authority before disclosing live setup queries.
   evidence: `AgentSetupQueryHandlerBase.IsAgentsAdminAsync` treats fresh tenant access as administrator authority, so an ordinary tenant member can receive administrator setup details through a direct EventStore query; this authorization path predates the current review pass.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-admission-and-verification-items.md` binds the query to the authenticated subject and exact tenant, requires current independent administrator evidence plus fresh tenant access, and denies before store/enrichment otherwise. Source and pinned EventStore 3.126.0 package forwarding use only the SDK-verified human principal, preserving the transport identity. Direct, DI, cancellation and real-dispatch regressions cover both query handlers.
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Fail provider catalog projection deliveries closed when a known event payload is corrupt.
@@ -515,6 +522,8 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reject a direct trusted CreateAgent command whose payload tenant differs from the EventStore envelope tenant.
   evidence: `AgentAggregate.Handle(CreateAgent)` stores `command.TenantId` without comparing it to `envelope.TenantId`; the supplied orchestrator rewrites the tenant but a direct or misconfigured trusted caller can bypass that caller-side guard. This repeats the previously recorded domain-invariant risk for this review finding.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-admission-and-verification-items.md` resolves this carried duplicate with the same aggregate tenant invariant and regression coverage as the earlier create row; it is one deferred item.
 
 ## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2.md (2026-09-23)
 
@@ -542,7 +551,7 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 
 - CI runs only `verify-story-5.2.ps1 -PackageFloorOnly` and the Story 5.1 floor, so a missing Story 5.2 focused class can leave CI green while broad test counts remain above their minima. Pre-existing; carried under the existing CI and release evidence row.
 - The Story 5.2 verifier's project-level regression calls have neither `--fail-skips on` nor minimum test counts, unlike its focused class calls. Skipped or undiscovered regression tests can leave the local verifier green. Pre-existing; carried under the existing CI and release evidence row.
-- `AgentAggregate.Handle(CreateAgent)` stores `CreateAgent.TenantId` while the setup adapter scopes canonical intent by the envelope tenant. A trusted direct caller can submit a mismatched pair. Pre-existing; the approved slice does not change Party identity, and this is already recorded above.
+- `AgentAggregate.Handle(CreateAgent)` stores `CreateAgent.TenantId` while the setup adapter scopes canonical intent by the envelope tenant. A trusted direct caller can submit a mismatched pair. Pre-existing; the approved slice does not change Party identity, and this is already recorded above. Resolved by `spec-five-deferred-admission-and-verification-items.md` with the existing create-tenant item above; this carried pointer is not an additional work item.
 - The domain host still falls back to `DeferredAgentCommandStatusReader`, so a domain-rejected setup write lacks a live terminal status and remains unverifiable. Pre-existing; carried under DW-7, DW-12, DW-19, DW-24, and DW-25.
 - `AgentInspectionStatus.Success = 0` makes a missing status field deserialize as success status with a null setup payload. Pre-existing; this type is deliberately excluded from the Unknown-zero migration and is tracked under the existing enum-compatibility work.
 - Six public operation enums still have implicit nonzero ordinals despite numeric legacy reads. A future insertion can reinterpret a shipped numeric value. Pre-existing; the setup-only pin test does not cover them, and the same finding is recorded in the aggregate-and-contracts chunk above.
@@ -568,6 +577,8 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 ## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-3.md (2026-09-23, re-review)
 
 - `AgentDomainHostComposition.Configure` carries about 180 lines of story-by-story comments moved verbatim from `Program.cs`, and several of them say live command dispatch "stays deferred behind DeferredAgentCommandDispatcher" (for example line 72). That contradicts the Story 5.2 `Agents:EventStore:BaseUrl` block in the same method. Pre-existing; trim or correct them when that composition is next edited.
+  status: done 2026-10-23
+  resolution: `spec-five-deferred-admission-and-verification-items.md` replaces historical story narratives with current composition conditions: projected tenant/approver adapters with unavailable authority sources, HTTP(S) BaseUrl plus AppId for live dispatch, and gated automatic-interaction ports. Executable registrations and ordering match baseline exactly.
 
 ## Deferred from: code review of spec-5-3-govern-provider-models-and-pricing-through-live-operations-2.md (2026-09-24, contracts and domain chunk)
 

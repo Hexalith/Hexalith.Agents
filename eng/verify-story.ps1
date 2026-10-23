@@ -128,7 +128,7 @@ try {
     pwsh -NoProfile -File (Join-Path $root 'eng/verify-story-5.2.ps1') -PackageFloorOnly
 
     Write-Host 'Gate: source-build'
-    dotnet restore $solution -p:Configuration=Debug -p:UseHexalithProjectReferences=true -p:NuGetAudit=false /m:1 /nr:false
+    dotnet restore $solution -p:Configuration=Debug -p:UseHexalithProjectReferences=true /m:1 /nr:false
     dotnet build $solution -c Debug --no-restore -warnaserror -p:UseHexalithProjectReferences=true /m:1 /nr:false
 
     foreach ($testProject in $testProjects) {
@@ -137,7 +137,7 @@ try {
     }
 
     Write-Host 'Gate: package-build'
-    dotnet restore $solution -p:Configuration=Release -p:UseHexalithProjectReferences=false -p:NuGetAudit=false /m:1 /nr:false
+    dotnet restore $solution -p:Configuration=Release -p:UseHexalithProjectReferences=false /m:1 /nr:false
     dotnet build $solution -c Release --no-restore -warnaserror -p:UseHexalithProjectReferences=false /m:1 /nr:false
 
     foreach ($testProject in $testProjects) {
@@ -149,7 +149,7 @@ try {
     Assert-NativeFailure -Name 'release-source-mode' -Arguments @(
         'build', 'src/Hexalith.Agents.Contracts/Hexalith.Agents.Contracts.csproj',
         '-c', 'Release', '-p:UseHexalithProjectReferences=true', '-p:UseNuGetDeps=false',
-        '-p:NuGetAudit=false', '/m:1', '/nr:false'
+        '/m:1', '/nr:false'
     ) -ExpectedDiagnostic 'Release builds must use package references for external Hexalith libraries.'
     Assert-NativeFailure -Name 'pack-source-mode' -Arguments @(
         'pack', 'src/Hexalith.Agents.Contracts/Hexalith.Agents.Contracts.csproj',
@@ -160,7 +160,7 @@ try {
     Assert-NativeFailure -Name 'missing-source-root' -Arguments @(
         'build', 'src/Hexalith.Agents.Contracts/Hexalith.Agents.Contracts.csproj',
         '-c', 'Debug', '-p:UseHexalithProjectReferences=true', '-p:UseNuGetDeps=false',
-        "-p:HexalithEventStoreRoot=$missingEventStoreRoot", '-p:NuGetAudit=false', '/m:1', '/nr:false'
+        "-p:HexalithEventStoreRoot=$missingEventStoreRoot", '/m:1', '/nr:false'
     ) -ExpectedDiagnostic "Source dependency 'references/Hexalith.EventStore' is missing."
 
     Write-Host 'Gate: exact-package-inventory'

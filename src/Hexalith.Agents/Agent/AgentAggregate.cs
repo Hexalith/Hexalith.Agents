@@ -121,6 +121,11 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             return Invalid(agentId, "TenantId is required.");
         }
 
+        if (!string.Equals(tenantId, envelope.TenantId, StringComparison.Ordinal))
+        {
+            return Invalid(agentId, "TenantId must match the command envelope tenant.");
+        }
+
         string displayName = NormalizeRequiredText(command.DisplayName);
         string? description = NormalizeOptionalText(command.Description);
         string instructions = NormalizeRequiredText(command.Instructions);

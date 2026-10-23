@@ -17,7 +17,11 @@ public sealed class HttpAgentAdministrationContextProvider(IHttpContextAccessor 
     /// <inheritdoc />
     public AgentAdministrationContext GetContext()
     {
-        ClaimsIdentity[] identities = httpContextAccessor.HttpContext?.User.Identities.Where(item => item.IsAuthenticated).ToArray() ?? [];
+        HttpContext? http = httpContextAccessor.HttpContext;
+        ClaimsPrincipal? principal = http?.User;
+        // EventStore verifies the originating query caller separately from the authenticated transport workload.
+        principal = Hexalith.EventStore.DomainService.VerifiedQueryCaller.Get(http)?.Principal ?? principal;
+        ClaimsIdentity[] identities = principal?.Identities.Where(item => item.IsAuthenticated).ToArray() ?? [];
         if (identities.Length != 1)
         {
             return AgentAdministrationContext.Anonymous;

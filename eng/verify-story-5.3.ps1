@@ -208,25 +208,25 @@ try {
     if (-not $SkipBuild) {
         Invoke-Gate -Name 'restore' -Arguments @(
             'restore', $solution, '-p:Configuration=Debug', '-p:UseHexalithProjectReferences=true',
-            '-p:NuGetAudit=false', '/m:1', '/nr:false'
+            '/m:1', '/nr:false'
         )
         Invoke-Gate -Name 'source-build' -Arguments @(
             'build', $solution, '-c', 'Debug', '--no-restore', '-warnaserror',
             '-p:UseHexalithProjectReferences=true', '/m:1', '/nr:false'
         )
         Invoke-Gate -Name 'EventStore coordinator restore' -Arguments @(
-            'restore', $eventStoreCoordinatorProject, '-p:NuGetAudit=false', '/m:1', '/nr:false'
+            'restore', $eventStoreCoordinatorProject, '/m:1', '/nr:false'
         )
         Invoke-Gate -Name 'EventStore coordinator build' -Arguments @(
             'build', $eventStoreCoordinatorProject, '-c', 'Debug', '--no-restore', '-warnaserror',
-            '-p:NuGetAudit=false', '/m:1', '/nr:false'
+            '/m:1', '/nr:false'
         )
         Invoke-Gate -Name 'EventStore client restore' -Arguments @(
-            'restore', $eventStoreClientProject, '-p:NuGetAudit=false', '/m:1', '/nr:false'
+            'restore', $eventStoreClientProject, '/m:1', '/nr:false'
         )
         Invoke-Gate -Name 'EventStore client build' -Arguments @(
             'build', $eventStoreClientProject, '-c', 'Debug', '--no-restore', '-warnaserror',
-            '-p:NuGetAudit=false', '/m:1', '/nr:false'
+            '/m:1', '/nr:false'
         )
     }
 

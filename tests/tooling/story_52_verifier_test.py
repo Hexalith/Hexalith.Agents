@@ -219,6 +219,8 @@ class Story52VerifierTests(unittest.TestCase):
         self.assertEqual(len(calls), 28)
         for call in calls[1:3]:
             self.assertIn("-p:UseHexalithProjectReferences=true", call)
+        for call in calls[:3]:
+            self.assertNotIn("-p:NuGetAudit=false", call)
         self.assertIn("-p:Configuration=Debug", calls[1])
         self.assertEqual(calls[2][calls[2].index("-c") + 1], "Debug")
         self.assertIn("-warnaserror", calls[2])

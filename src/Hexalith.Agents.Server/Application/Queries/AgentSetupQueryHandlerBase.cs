@@ -35,7 +35,8 @@ public abstract class AgentSetupQueryHandlerBase(
     IReadModelStore readModelStore,
     IOptions<AgentSetupReadModelOptions> options,
     ITenantAccessReader tenantAccessReader,
-    IApproverPolicyResolver? approverResolver = null) : IDomainQueryHandler
+    IApproverPolicyResolver? approverResolver = null,
+    IAgentAdministrationContextProvider? contextProvider = null) : IDomainQueryHandler
 {
     private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web)
     {
@@ -127,6 +128,37 @@ public abstract class AgentSetupQueryHandlerBase(
 
     private async Task<bool> IsAgentsAdminAsync(QueryEnvelope query, CancellationToken cancellationToken)
     {
+        if (contextProvider is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            // Query UserId is the authenticated token subject; current authority may resolve it to a different
+            // stable Parties actor. Bind the subject and both tenant scopes before disclosing setup details.
+            AgentAdministrationContext identity = contextProvider.GetContext();
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!string.Equals(identity.ActorUserId, query.UserId, StringComparison.Ordinal)
+                || !string.Equals(identity.TenantId, query.TenantId, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            AgentAdministrationContext actor = await contextProvider
+                .GetContextAsync(false, cancellationToken).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!actor.IsAuthorized || !string.Equals(actor.TenantId, query.TenantId, StringComparison.Ordinal))
+            {
+                return false;
+            }
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return false;
+        }
+
         TenantAccessReadResult access = await _tenantAccessReader
             .ReadAsync(query.TenantId, query.UserId, callerPartyId: string.Empty, cancellationToken)
             .ConfigureAwait(false);

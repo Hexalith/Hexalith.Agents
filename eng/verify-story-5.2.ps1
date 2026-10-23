@@ -57,7 +57,7 @@ function Assert-EventStorePackageFloor {
     $arguments = @(
         'msbuild', $projectPath, '-nologo',
         '-getItem:PackageVersion', '-p:Configuration=Release',
-        '-p:UseHexalithProjectReferences=false', '-p:NuGetAudit=false', '/nr:false'
+        '-p:UseHexalithProjectReferences=false', '/nr:false'
     )
     $nativeErrorPreference = $PSNativeCommandUseErrorActionPreference
     $standardErrorPath = [IO.Path]::GetTempFileName()
@@ -372,7 +372,7 @@ try {
     if (-not $SkipBuild) {
         Invoke-Gate -Name 'restore' -Arguments @(
             'restore', $solution, '-p:Configuration=Debug', '-p:UseHexalithProjectReferences=true',
-            '-p:NuGetAudit=false', '/m:1', '/nr:false'
+            '/m:1', '/nr:false'
         )
         Invoke-Gate -Name 'source-build' -Arguments @(
             'build', $solution, '-c', 'Debug', '--no-restore', '-warnaserror',

@@ -11,8 +11,9 @@ public sealed class GetAgentStatusQueryHandler(
     IReadModelStore readModelStore,
     IOptions<AgentSetupReadModelOptions> options,
     ITenantAccessReader tenantAccessReader,
-    IApproverPolicyResolver? approverResolver = null)
-    : AgentSetupQueryHandlerBase(readModelStore, options, tenantAccessReader, approverResolver)
+    IApproverPolicyResolver? approverResolver = null,
+    IAgentAdministrationContextProvider? contextProvider = null)
+    : AgentSetupQueryHandlerBase(readModelStore, options, tenantAccessReader, approverResolver, contextProvider)
 {
     /// <inheritdoc />
     public override string QueryType => GetAgentStatusQuery.QueryType;

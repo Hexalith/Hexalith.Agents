@@ -80,6 +80,43 @@ public sealed class AgentAggregateTests
         _ = result.Events[0].ShouldBeOfType<InvalidAgentConfigurationRejection>();
     }
 
+    /// <summary>Rejects foreign or noncanonical payload scope before creation or idempotent replay.</summary>
+    [Theory]
+    [InlineData("foreign-tenant", false)]
+    [InlineData("foreign-tenant", true)]
+    [InlineData("Acme", false)]
+    [InlineData("Acme", true)]
+    [InlineData(" acme ", false)]
+    [InlineData(" acme ", true)]
+    public void CreateRejectsPayloadTenantOutsideEnvelopeScope(string payloadTenant, bool existing)
+    {
+        CreateAgent command = ValidCreate(tenantId: payloadTenant);
+        AgentState? state = existing ? StateWith(command) : null;
+        string snapshot = System.Text.Json.JsonSerializer.Serialize(state);
+
+        DomainResult result = AgentAggregate.Handle(command, state, Envelope(command));
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.Count.ShouldBe(1);
+        InvalidAgentConfigurationRejection rejection = result.Events[0].ShouldBeOfType<InvalidAgentConfigurationRejection>();
+        rejection.Reason.ShouldBe("TenantId must match the command envelope tenant.");
+        rejection.Reason.ShouldNotContain(payloadTenant);
+        System.Text.Json.JsonSerializer.Serialize(state).ShouldBe(snapshot);
+    }
+
+    /// <summary>Authorization remains the first gate for an invalid payload scope.</summary>
+    [Fact]
+    public void CreateWithoutAuthorityDoesNotDiscloseTenantValidation()
+    {
+        CreateAgent command = ValidCreate(tenantId: "foreign-tenant");
+
+        DomainResult result = AgentAggregate.Handle(command, null, Envelope(command, isAgentsAdmin: false));
+
+        result.IsRejection.ShouldBeTrue();
+        result.Events.Count.ShouldBe(1);
+        _ = result.Events[0].ShouldBeOfType<AgentAdministrationDeniedRejection>();
+    }
+
     [Fact]
     public void Create_with_over_long_instructions_produces_invalid_configuration_without_echoing_value()
     {

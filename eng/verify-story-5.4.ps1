@@ -50,7 +50,7 @@ $sourceProperties = @(
 foreach ($name in $projects) {
     $project = Join-Path $root "test/$name/$name.csproj"
     $buildLog = Join-Path $ArtifactsPath "$name.build.log"
-    & dotnet build $project --configuration Debug -m:1 -p:NuGetAudit=false -p:MinVerVersionOverride=1.0.0 @sourceProperties --nologo 2>&1 | Tee-Object -FilePath $buildLog
+    & dotnet build $project --configuration Debug -m:1 -p:MinVerVersionOverride=1.0.0 @sourceProperties --nologo 2>&1 | Tee-Object -FilePath $buildLog
     if ($LASTEXITCODE -ne 0) { throw "BuildFailed: $name" }
     if ((Get-Content $buildLog -Raw) -notmatch '(?m)^\s*0 Warning\(s\)\s*$') { throw "WarningGateFailed: $name" }
     $assembly = Join-Path $root "test/$name/bin/Debug/net10.0/$name.dll"

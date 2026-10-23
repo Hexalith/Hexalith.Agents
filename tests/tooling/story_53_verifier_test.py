@@ -47,6 +47,11 @@ if args and Path(args[0]).name == "pwsh.dll":
     os.execv(os.environ["STORY_53_REAL_DOTNET"], [os.environ["STORY_53_REAL_DOTNET"], *args])
 with open(os.environ["STORY_53_CALL_LOG"], "a", encoding="utf-8") as log:
     log.write(json.dumps(args) + "\n")
+if args and args[0] in ("restore", "build"):
+    if os.environ["STORY_53_SCENARIO"] == "audit-failure" and os.environ["STORY_53_TARGET"] == f"{args[0]}::{args[1]}":
+        print("error NU1903: controlled high-severity advisory", file=sys.stderr)
+        sys.exit(23)
+    sys.exit(0)
 if not args or not args[0].endswith(".dll"):
     print("Unexpected build or restore invocation", file=sys.stderr)
     sys.exit(90)
@@ -134,10 +139,10 @@ class Story53VerifierTests(unittest.TestCase):
         )
 
     def run_verifier(
-        self, scenario: str = "success", target: str = "*ProviderCatalogStateReplayTests"
+        self, scenario: str = "success", target: str = "*ProviderCatalogStateReplayTests", *, skip_build: bool = True
     ) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            [PWSH, "-NoProfile", "-NonInteractive", "-File", str(self.script), "-SkipBuild"],
+            [PWSH, "-NoProfile", "-NonInteractive", "-File", str(self.script), *(["-SkipBuild"] if skip_build else [])],
             env=self.environment_for(scenario, target),
             text=True,
             capture_output=True,
@@ -147,6 +152,34 @@ class Story53VerifierTests(unittest.TestCase):
 
     def calls(self) -> list[list[str]]:
         return [json.loads(line) for line in self.log.read_text(encoding="utf-8").splitlines()] if self.log.exists() else []
+
+    def test_default_builds_keep_nuget_auditing_enabled(self) -> None:
+        result = self.run_verifier(skip_build=False)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        calls = self.calls()
+        self.assertEqual([call[0] for call in calls[:6]], ["restore", "build"] * 3)
+        for call in calls[:6]:
+            self.assertNotIn("-p:NuGetAudit=false", call)
+        self.assertIn("-p:Configuration=Debug", calls[0])
+        self.assertIn("-p:UseHexalithProjectReferences=true", calls[0])
+        self.assertTrue(calls[6][0].endswith(".dll"))
+
+    def test_audit_failure_in_any_restore_or_build_stops_before_tests(self) -> None:
+        targets = [self.root / "Hexalith.Agents.slnx", *[
+            Path(project) / (Path(project).name + ".csproj") for project in PROJECTS[:2]
+        ]]
+        for index, path in enumerate(targets):
+            for offset, operation in enumerate(("restore", "build")):
+                with self.subTest(project=str(path), operation=operation):
+                    self.log.unlink(missing_ok=True)
+                    result = self.run_verifier("audit-failure", f"{operation}::{path}", skip_build=False)
+
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("NU1903", result.stdout + result.stderr)
+                    calls = self.calls()
+                    self.assertEqual(len(calls), index * 2 + offset + 1)
+                    self.assertTrue(all(call[0] in ("restore", "build") for call in calls))
 
     def test_all_selections_and_full_project_gates_run_with_skip_rejection(self) -> None:
         result = self.run_verifier()

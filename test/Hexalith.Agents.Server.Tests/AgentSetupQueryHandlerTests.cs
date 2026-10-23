@@ -17,6 +17,7 @@ using Hexalith.Agents.Server.Projections;
 using Hexalith.EventStore.Client.Projections;
 using Hexalith.EventStore.Contracts.Queries;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 using NSubstitute;
@@ -41,11 +42,160 @@ public sealed class AgentSetupQueryHandlerTests
 
     private readonly FakeReadModelStore _store = new();
     private readonly ITenantAccessReader _tenantAccess = Substitute.For<ITenantAccessReader>();
+    private readonly IAgentAdministrationContextProvider _context = Substitute.For<IAgentAdministrationContextProvider>();
 
     public AgentSetupQueryHandlerTests()
-        => _tenantAccess
-            .ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+    {
+        _tenantAccess.ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
+        _context.GetContext().Returns(new AgentAdministrationContext(TenantId, UserId, false));
+        _context.GetContextAsync(false, Arg.Any<CancellationToken>())
+            .Returns(new AgentAdministrationContext(TenantId, "stable-actor", true));
+    }
+
+    /// <summary>Gets administrator evidence failures that must deny both setup query entry points.</summary>
+    public static TheoryData<bool, string> AdministratorDenialCases
+    {
+        get
+        {
+            var cases = new TheoryData<bool, string>();
+            foreach (bool status in new[] { true, false })
+            {
+                foreach (string evidence in new[]
+                {
+                    "member", "global-admin", "wrong-subject", "subject-case", "missing-subject",
+                    "wrong-identity-tenant", "identity-tenant-case", "missing-identity-tenant",
+                    "wrong-authority-tenant", "authority-tenant-case", "missing-authority-tenant",
+                    "missing-actor", "missing-provider", "legacy-provider",
+                })
+                {
+                    cases.Add(status, evidence);
+                }
+            }
+
+            return cases;
+        }
+    }
+
+    /// <summary>Membership, infrastructure elevation and mismatched identities never grant setup disclosure.</summary>
+    [Theory]
+    [MemberData(nameof(AdministratorDenialCases))]
+    public async Task CurrentScopedAdministratorEvidenceIsRequiredBeforeAnyRead(bool statusQuery, string evidence)
+    {
+        Seed(configurationVersion: 3, lastSequence: 5);
+        var resolver = Substitute.For<IApproverPolicyResolver>();
+        AgentAdministrationContext identity = new(TenantId, UserId, false);
+        AgentAdministrationContext actor = new(TenantId, "stable-actor", true);
+        switch (evidence)
+        {
+            case "member": actor = actor with { IsAgentsAdmin = false }; break;
+            case "global-admin": actor = actor with { IsAgentsAdmin = false, IsPlatformOperator = true }; break;
+            case "wrong-subject": identity = identity with { ActorUserId = "other-subject" }; break;
+            case "subject-case": identity = identity with { ActorUserId = "Admin-user" }; break;
+            case "missing-subject": identity = identity with { ActorUserId = "" }; break;
+            case "wrong-identity-tenant": identity = identity with { TenantId = "foreign-tenant" }; break;
+            case "identity-tenant-case": identity = identity with { TenantId = "Acme" }; break;
+            case "missing-identity-tenant": identity = identity with { TenantId = "" }; break;
+            case "wrong-authority-tenant": actor = actor with { TenantId = "foreign-tenant" }; break;
+            case "authority-tenant-case": actor = actor with { TenantId = "Acme" }; break;
+            case "missing-authority-tenant": actor = actor with { TenantId = "" }; break;
+            case "missing-actor": actor = actor with { ActorUserId = " " }; break;
+        }
+
+        _context.GetContext().Returns(identity);
+        _context.GetContextAsync(false, Arg.Any<CancellationToken>()).Returns(actor);
+        IAgentAdministrationContextProvider? provider = evidence switch
+        {
+            "missing-provider" => null,
+            "legacy-provider" => new LegacyRoleClaimAdministrationContextProvider(),
+            _ => _context,
+        };
+        var options = Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName });
+        AgentSetupQueryHandlerBase handler = statusQuery
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, resolver, provider)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, resolver, provider);
+        QueryEnvelope query = Query(handler.QueryType) with { IsGlobalAdmin = evidence == "global-admin" };
+        if (evidence == "legacy-provider")
+        {
+            query = query with { TenantId = "tenant-a", UserId = "authenticated-subject" };
+        }
+
+        QueryResult response = await handler.ExecuteAsync(query, CancellationToken.None);
+
+        ReadSetupResult(response).ShouldBe(AgentSetupResult.NotAuthorized());
+        _store.GetCount.ShouldBe(0);
+        resolver.ReceivedCalls().ShouldBeEmpty();
+        _tenantAccess.ReceivedCalls().ShouldBeEmpty();
+        Encoding.UTF8.GetString(response.PayloadBytes.ShouldNotBeNull()).ShouldNotContain("hexa");
+    }
+
+    /// <summary>Current authority can resolve an authenticated subject to a different stable actor identity.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task CurrentScopedAdministratorWithDistinctStableActorCanRead(bool statusQuery)
+    {
+        Seed(configurationVersion: 3, lastSequence: 5);
+        var services = new ServiceCollection();
+        services.AddSingleton<IReadModelStore>(_store);
+        services.AddSingleton<IOptions<AgentSetupReadModelOptions>>(
+            Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }));
+        services.AddSingleton(_tenantAccess);
+        services.AddSingleton(_context);
+        services.AddTransient<GetAgentStatusQueryHandler>();
+        services.AddTransient<GetAgentConfigurationQueryHandler>();
+        using ServiceProvider provider = services.BuildServiceProvider();
+        AgentSetupQueryHandlerBase handler = statusQuery
+            ? provider.GetRequiredService<GetAgentStatusQueryHandler>()
+            : provider.GetRequiredService<GetAgentConfigurationQueryHandler>();
+        using var cancellation = new CancellationTokenSource();
+
+        QueryResult response = await handler.ExecuteAsync(Query(handler.QueryType), cancellation.Token);
+
+        ReadSetupResult(response).Setup.ShouldNotBeNull().ConfigurationVersion.ShouldBe(3);
+        _store.GetCount.ShouldBe(1);
+        await _context.Received(1).GetContextAsync(false, cancellation.Token);
+        await _tenantAccess.Received(1).ReadAsync(TenantId, UserId, string.Empty, cancellation.Token);
+    }
+
+    /// <summary>Failure to obtain current authority denies disclosure without returning infrastructure details.</summary>
+    [Theory]
+    [InlineData(true, "identity")]
+    [InlineData(false, "identity")]
+    [InlineData(true, "current-sync")]
+    [InlineData(false, "current-sync")]
+    [InlineData(true, "current-async")]
+    [InlineData(false, "current-async")]
+    public async Task AuthorityReadFailureDeniesBeforeStoreAndEnrichment(bool statusQuery, string boundary)
+    {
+        Seed(configurationVersion: 3, lastSequence: 5);
+        var resolver = Substitute.For<IApproverPolicyResolver>();
+        var error = new InvalidOperationException("private-authority-details");
+        if (boundary == "identity")
+        {
+            _context.GetContext().Returns<AgentAdministrationContext>(_ => throw error);
+        }
+        else
+        {
+            _context.GetContextAsync(false, Arg.Any<CancellationToken>())
+                .Returns<ValueTask<AgentAdministrationContext>>(_ => boundary == "current-sync"
+                    ? throw error
+                    : new ValueTask<AgentAdministrationContext>(Task.FromException<AgentAdministrationContext>(error)));
+        }
+
+        var options = Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName });
+        AgentSetupQueryHandlerBase handler = statusQuery
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, resolver, _context)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, resolver, _context);
+
+        QueryResult response = await handler.ExecuteAsync(Query(handler.QueryType), CancellationToken.None);
+
+        ReadSetupResult(response).ShouldBe(AgentSetupResult.NotAuthorized());
+        _store.GetCount.ShouldBe(0);
+        resolver.ReceivedCalls().ShouldBeEmpty();
+        _tenantAccess.ReceivedCalls().ShouldBeEmpty();
+        Encoding.UTF8.GetString(response.PayloadBytes.ShouldNotBeNull()).ShouldNotContain("private-authority-details");
+    }
 
     /// <summary>Verifies that a misrouted model cannot disclose another scope or cause a foreign approver lookup.</summary>
     [Theory]
@@ -80,8 +230,8 @@ public sealed class AgentSetupQueryHandlerTests
         });
         var options = Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName });
         AgentSetupQueryHandlerBase handler = statusQuery
-            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, resolver)
-            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, resolver);
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, resolver, _context)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, resolver, _context);
 
         QueryResult response = await handler.ExecuteAsync(
             Query(statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType), CancellationToken.None);
@@ -116,7 +266,7 @@ public sealed class AgentSetupQueryHandlerTests
             ConfigurationVersion = 1,
         });
         var handler = new GetAgentStatusQueryHandler(_store,
-            Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }), _tenantAccess, resolver);
+            Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }), _tenantAccess, resolver, _context);
         var result = await ExecuteAsync(handler, Query(GetAgentStatusQuery.QueryType));
         result.Setup.ShouldNotBeNull().Agent.ApproverPolicyBasis.Single().Status.ShouldBe(ApproverPolicyValidationStatus.Unavailable);
     }
@@ -222,14 +372,14 @@ public sealed class AgentSetupQueryHandlerTests
     {
         Seed(configurationVersion: 3, lastSequence: 5);
 
-        // Authorization is satisfied for the caller's own tenant; the read is simply keyed elsewhere, so the
-        // answer is shaped exactly like a never-created Agent — no existence, versions, or blockers leak.
+        // The authenticated administrator's tenant must match the requested scope before any read occurs.
         AgentSetupResult result = await ExecuteAsync(
             StatusHandler(),
             Query(GetAgentStatusQuery.QueryType, tenantId: "other-tenant"));
 
-        result.Status.ShouldBe(AgentInspectionStatus.AgentNotFound);
+        result.Status.ShouldBe(AgentInspectionStatus.NotAuthorized);
         result.Setup.ShouldBeNull();
+        _store.GetCount.ShouldBe(0);
         JsonSerializer.Serialize(result, _json).ShouldNotContain(TenantId);
     }
 
@@ -283,8 +433,8 @@ public sealed class AgentSetupQueryHandlerTests
                 : Task.FromException<ReadModelEntry<AgentSetupReadModel>>(new InvalidOperationException("private-store-details")));
         var options = Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName });
         AgentSetupQueryHandlerBase handler = statusQuery
-            ? new GetAgentStatusQueryHandler(store, options, _tenantAccess, resolver)
-            : new GetAgentConfigurationQueryHandler(store, options, _tenantAccess, resolver);
+            ? new GetAgentStatusQueryHandler(store, options, _tenantAccess, resolver, _context)
+            : new GetAgentConfigurationQueryHandler(store, options, _tenantAccess, resolver, _context);
 
         QueryResult response = await handler.ExecuteAsync(
             Query(statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType), CancellationToken.None);
@@ -310,8 +460,8 @@ public sealed class AgentSetupQueryHandlerTests
             .Returns(TenantAccessReadResult.Unavailable);
         var options = Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName });
         AgentSetupQueryHandlerBase handler = statusQuery
-            ? new GetAgentStatusQueryHandler(store, options, _tenantAccess)
-            : new GetAgentConfigurationQueryHandler(store, options, _tenantAccess);
+            ? new GetAgentStatusQueryHandler(store, options, _tenantAccess, contextProvider: _context)
+            : new GetAgentConfigurationQueryHandler(store, options, _tenantAccess, contextProvider: _context);
 
         AgentSetupResult result = await ExecuteAsync(handler,
             Query(statusQuery ? GetAgentStatusQuery.QueryType : GetAgentConfigurationQuery.QueryType));
@@ -321,10 +471,10 @@ public sealed class AgentSetupQueryHandlerTests
     }
 
     private GetAgentStatusQueryHandler StatusHandler()
-        => new(_store, Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }), _tenantAccess);
+        => new(_store, Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }), _tenantAccess, contextProvider: _context);
 
     private GetAgentConfigurationQueryHandler ConfigurationHandler()
-        => new(_store, Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }), _tenantAccess);
+        => new(_store, Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }), _tenantAccess, contextProvider: _context);
 
     private static async Task<AgentSetupResult> ExecuteAsync(AgentSetupQueryHandlerBase handler, QueryEnvelope query)
         => ReadSetupResult(await handler.ExecuteAsync(query, CancellationToken.None));

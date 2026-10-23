@@ -54,7 +54,7 @@ foreach ($lane in $lanes) {
     foreach ($name in $projects) {
         $project = Join-Path $root "test/$name/$name.csproj"
         $buildLog = Join-Path $lanePath "$name.build.log"
-        & dotnet build $project --configuration $configuration -m:1 "-p:UseHexalithProjectReferences=$source" -p:NuGetAudit=false -p:MinVerVersionOverride=1.0.0 --nologo 2>&1 |
+        & dotnet build $project --configuration $configuration -m:1 "-p:UseHexalithProjectReferences=$source" -p:MinVerVersionOverride=1.0.0 --nologo 2>&1 |
             Tee-Object -FilePath $buildLog
         if ($LASTEXITCODE -ne 0) { throw "BuildFailed: $lane/$name ($buildLog)" }
         if ((Get-Content $buildLog -Raw) -notmatch '(?m)^\s*0 Warning\(s\)\s*$') { throw "WarningGateFailed: $lane/$name" }
