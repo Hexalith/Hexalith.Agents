@@ -124,13 +124,12 @@ class SemanticReleasePlanTests(unittest.TestCase):
         self.assertEqual(self.plan(repository), {"release_required": True, "version": "1.0.1"})
         self.assertEqual(self.run_git(repository, "for-each-ref", "--format=%(refname) %(objectname)"), before)
 
-    def test_top_level_publication_hooks_and_extends_are_excluded(self) -> None:
+    def test_top_level_publication_hooks_are_excluded(self) -> None:
         repository = self.create_repository("fix: repair boundary")
         configuration_path = repository / ".releaserc.json"
         configuration = json.loads(configuration_path.read_text(encoding="utf-8"))
-        configuration["extends"] = ["missing-publication-config-must-not-load"]
         for hook in (
-            "verifyConditions", "analyzeCommits", "verifyRelease", "generateNotes",
+            "verifyConditions", "verifyRelease",
             "prepare", "publish", "addChannel", "success", "fail",
         ):
             configuration[hook] = [["@semantic-release/exec", {f"{hook}Cmd": "exit 94"}]]
@@ -149,6 +148,46 @@ class SemanticReleasePlanTests(unittest.TestCase):
         configuration_path.write_text(json.dumps(configuration), encoding="utf-8")
 
         self.assertEqual(self.plan(repository), {"release_required": True, "version": "1.0.1"})
+
+    def test_unsupported_analysis_overrides_fail_without_a_plan(self) -> None:
+        for key, value in (
+            ("analyzeCommits", {"releaseRules": [{"type": "docs", "release": "minor"}]}),
+            ("generateNotes", {"preset": "angular"}),
+            ("extends", ["missing-publication-config-must-not-load"]),
+        ):
+            with self.subTest(key=key):
+                repository = self.create_repository("docs: clarify boundary")
+                configuration_path = repository / ".releaserc.json"
+                configuration = json.loads(configuration_path.read_text(encoding="utf-8"))
+                configuration[key] = value
+                configuration_path.write_text(json.dumps(configuration), encoding="utf-8")
+                before = self.run_git(repository, "for-each-ref", "--format=%(refname) %(objectname)")
+
+                with self.assertRaises(subprocess.CalledProcessError) as raised:
+                    self.plan(repository)
+
+                self.assertEqual(raised.exception.stdout, "")
+                self.assertIn(f"Release planning does not support top-level {key}", raised.exception.stderr)
+                self.assertEqual(self.run_git(repository, "for-each-ref", "--format=%(refname) %(objectname)"), before)
+
+    def test_unreviewed_plugins_and_exec_analysis_fail_without_a_plan(self) -> None:
+        for plugin, diagnostic in (
+            ("unreviewed-analysis-plugin", "does not support plugin unreviewed-analysis-plugin"),
+            (["@semantic-release/exec", {"analyzeCommitsCmd": "echo minor"}], "does not support exec analysis hooks"),
+            (["@semantic-release/exec", {"generateNotesCmd": "echo notes"}], "does not support exec analysis hooks"),
+        ):
+            with self.subTest(plugin=plugin):
+                repository = self.create_repository("docs: clarify boundary")
+                configuration_path = repository / ".releaserc.json"
+                configuration = json.loads(configuration_path.read_text(encoding="utf-8"))
+                configuration["plugins"].append(plugin)
+                configuration_path.write_text(json.dumps(configuration), encoding="utf-8")
+
+                with self.assertRaises(subprocess.CalledProcessError) as raised:
+                    self.plan(repository)
+
+                self.assertEqual(raised.exception.stdout, "")
+                self.assertIn(diagnostic, raised.exception.stderr)
 
 
 if __name__ == "__main__":

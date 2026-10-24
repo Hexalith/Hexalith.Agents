@@ -1,0 +1,2097 @@
+{
+  "recordedAt": "2026-10-24T02:02:43.983061+00:00",
+  "agentsBaseline": "e8294427aedeb1d9a917a4a8eaa4222d430b49e3",
+  "scope": "Local verification and closure of five ledger entries; no hosted CI, deployment, publication, dependency acceptance or production qualification.",
+  "ownerRevisions": {
+    "Builds": "359fee24aeca4d9eabed4b425d4cfa2520b2adda",
+    "EventStore": "5ce5f1d84b88c808cc8a526b9decf149de977e55",
+    "Parties": "4fc1124eb995a40553cb23b042d4a3c1add3dfb2"
+  },
+  "commands": [
+    "python3 scripts/verify-parties-identity.py --artifacts /tmp/agents-five-evidence-20261024/identity-final",
+    "python3 -m unittest discover -s tests/tooling -p \"*_test.py\"",
+    "dotnet build test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Debug --artifacts-path artifacts/five-deferred-evidence-20261024/server -p:UseHexalithProjectReferences=true -m:1",
+    "dotnet artifacts/five-deferred-evidence-20261024/server/bin/Hexalith.Agents.Server.Tests/debug/Hexalith.Agents.Server.Tests.dll -class Hexalith.Agents.Server.Tests.PackageInventoryTests -class Hexalith.Agents.Server.Tests.BuildContractConformanceTests -result-xml /tmp/agents-five-evidence-20261024/server-conformance.xml",
+    "dnx dotnet-inspect -y -- member RetainedIdentityHistoryReader --package Hexalith.EventStore.Client@3.126.0",
+    "dnx dotnet-inspect -y -- member IRetainedIdentityHistoryReader --package Hexalith.EventStore.Client@3.126.0 -m ReadAsync",
+    "dotnet run --project /tmp/agents-five-evidence-20261024/transport-probe/TransportProbe.csproj -c Debug",
+    "actionlint -no-color",
+    "node --check eng/semantic-release-plan.mjs",
+    "git -c core.whitespace=cr-at-eol diff --check",
+    "python3 -m unittest discover -s tests/tooling -p 'parties_identity_verification_test.py'",
+    "python3 -m unittest discover -s tests/tooling -p 'semantic_release_plan_test.py'",
+    "dnx dotnet-inspect -y -- --version",
+    "dotnet --version",
+    "python3 /tmp/agents-five-evidence-20261024/reproduce-package-probe.py"
+  ],
+  "identity": {
+    "runId": "4a1808e9514b4d2a8ba13e37ee3071e5",
+    "startedAt": "2026-10-24T01:56:25.913022+00:00",
+    "sources": {
+      "agents": {
+        "commit": "e8294427aedeb1d9a917a4a8eaa4222d430b49e3",
+        "dirty": true,
+        "status": [
+          " M CONTRIBUTING.md",
+          " M _bmad-output/implementation-artifacts/deferred-work.md",
+          " M _bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md",
+          " M eng/semantic-release-plan.mjs",
+          " M scripts/verify-parties-identity.py",
+          " M tests/tooling/parties_identity_verification_test.py",
+          " M tests/tooling/semantic_release_plan_test.py",
+          "?? _bmad-output/implementation-artifacts/deferred-evidence-reconciliation-2026-10-24.md",
+          "?? _bmad-output/implementation-artifacts/deferred-evidence-verification-2026-10-24.json",
+          "?? _bmad-output/implementation-artifacts/spec-five-deferred-evidence-reconciliation-items.md"
+        ]
+      },
+      "parties": {
+        "commit": "4fc1124eb995a40553cb23b042d4a3c1add3dfb2",
+        "dirty": false,
+        "status": []
+      }
+    },
+    "localBehaviorVerified": true,
+    "liveReadinessEstablished": false,
+    "eventStoreVersion": "3.126.0",
+    "ownerCases": {
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentCompletionTimeChangesDuringCustody_DenyEvidence": 4,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentAuthorityChangesDuringAwait_DenyEvidence": 2,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentHuman_RequiresCompleteSourceAndCurrentExactActor": 1,
+      "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity": 8,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence": 8,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SynchronousProviderInvocationIsBounded": 4,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget": 2,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence": 2,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider": 8,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SetupTimeConsumesOperationBudget": 4,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves": 2,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence": 2,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken": 4,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict": 2,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion": 12,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken": 4,
+      "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime": 9
+    },
+    "receiptSuite": "parties_readiness_verifier_test.ExactTargetReceiptTests",
+    "completedAt": "2026-10-24T02:02:15.759671+00:00"
+  },
+  "serverConformance": {
+    "total": "26",
+    "passed": "26",
+    "failed": "0",
+    "errors": "0",
+    "skipped": "0",
+    "not-run": "0"
+  },
+  "tooling": {
+    "initialFullSuite": {
+      "total": 213,
+      "result": "passed",
+      "seconds": 923.158,
+      "output": "................................................................................................................................................................................................................NuGet indexing incomplete after attempt 1/3; retrying pending inventory: Hexalith.Agents.Client\n...Hexalith.Agents 1.2.3: transient failure: NuGet returned unexpected HTTP 429 for Hexalith.Agents 1.2.3\nNuGet indexing incomplete after attempt 1/2; retrying pending inventory: Hexalith.Agents\nHexalith.Agents 1.2.3: transient failure: NuGet returned unexpected HTTP 503 for Hexalith.Agents 1.2.3\nNuGet indexing incomplete after attempt 1/2; retrying pending inventory: Hexalith.Agents\nHexalith.Agents 1.2.3: transient failure: NuGet request failed for Hexalith.Agents 1.2.3: temporary transport failure\nNuGet indexing incomplete after attempt 1/2; retrying pending inventory: Hexalith.Agents\n.NuGet indexing incomplete after attempt 1/3; retrying pending inventory: Hexalith.Agents\nNuGet indexing incomplete after attempt 2/3; retrying pending inventory: Hexalith.Agents\n.\n----------------------------------------------------------------------\nRan 213 tests in 923.158s\n\nOK\nHexalith.Agents 1.2.3: absent\nHexalith.Agents.Client 1.2.3: present\nHexalith.Agents 1.2.3: present\nHexalith.Agents 1.2.3: absent\nHexalith.Agents 1.2.3: present\nHexalith.Agents.Client 1.2.3: absent\nHexalith.Agents.Client 1.2.3: present\nHexalith.Agents 1.2.3: present\nHexalith.Agents 1.2.3: present\nHexalith.Agents 1.2.3: present\nHexalith.Agents 1.2.3: present\nHexalith.Agents 1.2.3: present\nHexalith.Agents 1.2.3: absent\nHexalith.Agents 1.2.3: absent\nHexalith.Agents 1.2.3: absent\n"
+    },
+    "postReviewIdentityHarness": {
+      "total": 31,
+      "result": "passed",
+      "seconds": 93.386,
+      "output": "...............................\n----------------------------------------------------------------------\nRan 31 tests in 93.386s\n\nOK\n"
+    },
+    "postReviewPlanner": {
+      "total": 10,
+      "result": "passed",
+      "seconds": 19.717,
+      "output": "..........\n----------------------------------------------------------------------\nRan 10 tests in 19.717s\n\nOK\n"
+    },
+    "phaseNote": "Full discovery began before review corrections. The final focused suites rerun every changed tooling test module after those corrections."
+  },
+  "packageProbe": {
+    "project": "<Project Sdk=\"Microsoft.NET.Sdk\">\n  <PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><TreatWarningsAsErrors>true</TreatWarningsAsErrors><NuGetAudit>true</NuGetAudit><NuGetAuditMode>all</NuGetAuditMode></PropertyGroup>\n  <ItemGroup><PackageReference Include=\"Hexalith.EventStore.Client\" Version=\"3.126.0\" /></ItemGroup>\n</Project>\n",
+    "source": "using System;\nusing System.Threading;\nusing System.Threading.Tasks;\nusing Hexalith.EventStore.Client.Streams;\nusing Hexalith.EventStore.Contracts.Streams;\nusing Hexalith.EventStore.Contracts.Identity;\n\nConsole.WriteLine(typeof(RetainedIdentityHistoryReader).AssemblyQualifiedName);\nConsole.WriteLine(typeof(IRetainedIdentityHistoryReader).IsAssignableFrom(typeof(RetainedIdentityHistoryReader)));\nFunc<IRetainedIdentityHistoryReader, AggregateIdentity, string, CancellationToken, Task<RetainedIdentityHistoryReadResult>> read = (reader, identity, purpose, cancellation) => reader.ReadAsync(identity, purpose, cancellation);\nConsole.WriteLine(read.Method.ReturnType);\n",
+    "output": "Hexalith.EventStore.Client.Streams.RetainedIdentityHistoryReader, Hexalith.EventStore.Client, Version=3.126.0.0, Culture=neutral, PublicKeyToken=null\nTrue\nSystem.Threading.Tasks.Task`1[Hexalith.EventStore.Contracts.Streams.RetainedIdentityHistoryReadResult]\n",
+    "packageLibraries": {
+      "ByteAether.Ulid/1.4.2": {
+        "type": "package",
+        "sha512": "LCOjm7QFSdM2X779Db2K+i3pPei4f8PJEcY1wGehkdgYNmpQaP5uF7U8aZMMBWeYe+zV2Ues9j/nFpW4Pw10wQ=="
+      },
+      "Dapr.Client/1.18.10": {
+        "type": "package",
+        "sha512": "PZ/KP37LtLXv5oIIjpOpPSZaEB0mvJzT24oIoMwI/Nm0d3DpO3QdhmgkDPUWTkxkSQ7qunsEZ5ltlKv/axeXOg=="
+      },
+      "Dapr.Common/1.18.10": {
+        "type": "package",
+        "sha512": "JsbUiR+V9DKZAMHhsnQREXLZJuY7Zee6hMY+PM/88jaufPVPXICUM3TQZCD2yJDFyYPXwu9iibGug6ea5SgfIw=="
+      },
+      "Dapr.Protos/1.18.10": {
+        "type": "package",
+        "sha512": "g0ZOJeTc7EosqBQIOynQOgg95icJrkYhccVRcWv1Naurx1xt+bRJp39wLkVRhtyCf/2ZIRgkEybCF+muJjFhwA=="
+      },
+      "Google.Api.CommonProtos/2.17.0": {
+        "type": "package",
+        "sha512": "elfQPknFr495hm7vdy6ZlgyQh6yzZq9TU7sS35L/Fj/fqjM/mUGau9gVJLhvQEtUlPjtR80hpn/m9HvBMyCXIw=="
+      },
+      "Google.Protobuf/3.35.0": {
+        "type": "package",
+        "sha512": "OrUZCUzBXqdSmsQSWp/EPeINjOBcMU+PrZEJegw0aLgOGFHZ9ZI37X/SFrIxo8C9ghKynaKpPr3BVPc4EujWYg=="
+      },
+      "Grpc.Core.Api/2.80.0": {
+        "type": "package",
+        "sha512": "i/8s+MOrYa6n7BmZ5bilcbHk+EMJDQHm2MKLhwGAT+urQqlZ6cpjvSivYvuULjebuX+UKieLYZbLRCmVQxFRkw=="
+      },
+      "Grpc.Net.Client/2.80.0": {
+        "type": "package",
+        "sha512": "I1Aa24nTRMHqx0pmQfvthFsOpejquDjiJV6092KBqjw6EEr3wA9CMXlrdkoEgHartOiJrpKyZiQRl7n0NVlfBg=="
+      },
+      "Grpc.Net.Common/2.80.0": {
+        "type": "package",
+        "sha512": "E2ERsx+9IXlry4yjBl8btx0XMIKzymGNSvX5jmBS/uSwYyYDoKIDcIREyLqFLvd8vcJdcoRlycpvn9YRXutFpQ=="
+      },
+      "Grpc.Reflection/2.80.0": {
+        "type": "package",
+        "sha512": "SNGFuUR4OiJM9QUdkpP6gbFVrRKSe2xhL7lvXMP38gcgwPJBFC0wVUcYMue656YhPRIGEjeCa4iXjDQ+VQU2jQ=="
+      },
+      "Hexalith.Commons.UniqueIds/2.30.3": {
+        "type": "package",
+        "sha512": "e0tQgVfkT4CkozW/fO1Nl0i4m9dmfk4/Er6WJXjOduSftvHW2bo3ppIQQ/ncYwpC+2hUlqezwWMeFpjZzd+1Tw=="
+      },
+      "Hexalith.EventStore.Client/3.126.0": {
+        "type": "package",
+        "sha512": "2K2YhHVrGpiCWe+hdlNncKZ0takPymxpdM2LwMccvBQiVkoLjUgxoSViy2vypEszrefbYEvWs/pre/3DQWB4KA=="
+      },
+      "Hexalith.EventStore.Contracts/3.126.0": {
+        "type": "package",
+        "sha512": "axp+KcCtwvIfyxNX/6E3f7StaYx8O9fg9c0DLgGtl4semgTiaBajkRES6aeUrDaSik9JWpa8GtnsSgZrd8l8oA=="
+      },
+      "Microsoft.AspNetCore.DataProtection.Abstractions/10.0.13": {
+        "type": "package",
+        "sha512": "ZeGcJpE6GpYVL2/4Lk0zkkTxf8a5hvTT91ApVf4BZA21GFQ4HY6gOpgPD1+4ED/43errbY8RwKyQynlT1kI33Q=="
+      },
+      "Microsoft.Extensions.Configuration/10.0.13": {
+        "type": "package",
+        "sha512": "inhujYI/nikhmLxYI6ZEcaCgZ28ipJsKMPPxxr2XWf3vM0Q2P+E9R3hDHABZOLBxzD3gjpgcbSH/+hd2+gvI2A=="
+      },
+      "Microsoft.Extensions.Configuration.Abstractions/10.0.13": {
+        "type": "package",
+        "sha512": "DY4C2qzTt2lOIY3VoscBH/TCwTolI5DKOfgJLuI+k1QUvRNT5vTMS58AOerNiihdVRStO0wEpLeRWA8jytzHBQ=="
+      },
+      "Microsoft.Extensions.Configuration.Binder/10.0.13": {
+        "type": "package",
+        "sha512": "yJJl/b0+W+GEWbu+7viw6C3h2BoNkB69Vlz7s/4e+hm4mYbJqfhdcDSi9sCXJw47blsBaiQd3UDPgDtop92+ug=="
+      },
+      "Microsoft.Extensions.DependencyInjection/10.0.13": {
+        "type": "package",
+        "sha512": "4tnWU9vrU/A8NwYe9Z6wvieZ0EBb/uM82LAT+edNhdepOBWREZ7M7mzb941EIDPJaeOFdbVrDd5+7s9e89U6bQ=="
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions/10.0.13": {
+        "type": "package",
+        "sha512": "G2GrGWNAPZBsii2F6AU8n+JT2tC1/I0Ml/e9ZyNCgPjf3hZqronP7o0X91aAynCmVeae8KkSIUNXXeXCNRmdVQ=="
+      },
+      "Microsoft.Extensions.Diagnostics/10.0.13": {
+        "type": "package",
+        "sha512": "J9ODOrffj1mK3Et69elNsLGRguesPxvThTdVpFmQX7fLNPhIOgqHQfLdGnTBEwNAV3yf8yiyVlpDZNw2qN87Nw=="
+      },
+      "Microsoft.Extensions.Diagnostics.Abstractions/10.0.13": {
+        "type": "package",
+        "sha512": "oZzqZze8ed1fLS20HtIrkPxQXGRG/koq09srIw2ptnDHm9RHfwB++d35hosB/cXc55TH7Pshv85O0txongjCIg=="
+      },
+      "Microsoft.Extensions.FileProviders.Abstractions/10.0.13": {
+        "type": "package",
+        "sha512": "BZDwtN3uoWRghDi5lRRZPDjMMCg2Ds7J6YEYjqka/TLjqnzquEpXyvchrIMeoubwT1ns23ow6PPeAoBHJO81Rw=="
+      },
+      "Microsoft.Extensions.Hosting.Abstractions/10.0.13": {
+        "type": "package",
+        "sha512": "zIrbe9vkIFXxW3mOApIOWXw+xMwX7Cgsptr3ZSlglJt4hW2qp4fB/JU1NHgAevteBNH4PicvU9DsFPHxlnnloA=="
+      },
+      "Microsoft.Extensions.Http/10.0.13": {
+        "type": "package",
+        "sha512": "2SuPNVERI5WMYOYMnc6l6OZcI1bN6DEwQcKokDPcf5FiukN7seLvhBTJgqf/Kb4mqQlwPE9idUdt0TaETCre7w=="
+      },
+      "Microsoft.Extensions.Logging/10.0.13": {
+        "type": "package",
+        "sha512": "fqbiPy4nUp4H2XHKAVQXKN2y3T2h4cFIx1DAAgE6iY9OHkN/OA1cKFi+geJKRWGuX6pS5SFbsjIPWHJqrxE0eg=="
+      },
+      "Microsoft.Extensions.Logging.Abstractions/10.0.13": {
+        "type": "package",
+        "sha512": "aSZEhEig4fvNiw2zs8Z6NyDlniKtq6YjcF3DyHuqTEHcZ2VKA/6itMPZ+dW+yWABWExlDcQwwdbqX1Rcb7W8WQ=="
+      },
+      "Microsoft.Extensions.Options/10.0.13": {
+        "type": "package",
+        "sha512": "tmMJgdrE4uhf1JcNs9CV9moAHW+hmDuvgMiPpnQxarKaUxqI2eN33sYK5S4l9Uw+rG9PJvlm4qPxMhvolTDTaQ=="
+      },
+      "Microsoft.Extensions.Options.ConfigurationExtensions/10.0.13": {
+        "type": "package",
+        "sha512": "xVO5HhATc09WXuS/RaDmx8ZeWS0mTpT1L0tkEDMSBHtAnNpNsDr0ge0wIO2jinCWWqpq5dL1tRTzpYNVlvyqLw=="
+      },
+      "Microsoft.Extensions.Primitives/10.0.13": {
+        "type": "package",
+        "sha512": "ZjTwxzhiw2TMEzIbUDkMF0dfDB2I4NQgIfKD0ELu9/5Mk+SRGdKZcD0/lvBrRCAPo6KN2r0BW86MRancoyJkoA=="
+      }
+    },
+    "concreteApiInspection": "# Hexalith.EventStore.Client.Streams.RetainedIdentityHistoryReader\n\nVerifies a purpose-scoped source certificate received over an authenticated owner transport.\n\nPackage: Hexalith.EventStore.Client | Version: 3.126.0 | TFM: net10.0 | Library: lib/net10.0/Hexalith.EventStore.Client.dll | Source: NuGet\n\n## Constructors\n\n| Name |\n| ---- |\n| .ctor |\n\n## Interfaces\n\n| Interface |\n| --------- |\n| Hexalith.EventStore.Client.Streams.IRetainedIdentityHistoryReader |\n\n## Method Groups\n\n| Name | Return Type |\n| ---- | ----------- |\n| ReadAsync | System.Threading.Tasks.Task&lt;Hexalith.EventStore.Contracts.Streams.RetainedIdentityHistoryReadResult&gt; |\n\nTips:\nmember RetainedIdentityHistoryReader --package Hexalith.EventStore.Client .ctor:1   # view member detail (source, IL)\ntype RetainedIdentityHistoryReader --package Hexalith.EventStore.Client --tree      # view type tree\nmember -m RetainedIdentityHistoryReader..ctor --package Hexalith.EventStore.Client  # dotted member syntax\n",
+    "interfaceApiInspection": "# Hexalith.EventStore.Client.Streams.IRetainedIdentityHistoryReader\n\nReads purpose-retained history independently of an erased profile's decryption key.\n\nPackage: Hexalith.EventStore.Client | Version: 3.126.0 | TFM: net10.0 | Library: lib/net10.0/Hexalith.EventStore.Client.dll | Source: NuGet\n\n## Methods\n\n| Name | Digest | Signature | Description |\n| ---- | ------ | --------- | ----------- |\n| ReadAsync | `439fba64d2` | `public abstract System.Threading.Tasks.Task<Hexalith.EventStore.Contracts.Streams.RetainedIdentityHistoryReadResult> ReadAsync(Hexalith.EventStore.Contracts.Identity.AggregateIdentity identity, string purpose, System.Threading.CancellationToken cancellationToken = default)` | Reads and validates the exact authenticated retained-history partition. |\n\nTips:\nmember IRetainedIdentityHistoryReader --package Hexalith.EventStore.Client ReadAsync:1   # view member detail (source, IL)\ntype IRetainedIdentityHistoryReader --package Hexalith.EventStore.Client --tree          # view type tree\nmember -m IRetainedIdentityHistoryReader.ReadAsync --package Hexalith.EventStore.Client  # dotted member syntax\n",
+    "reconstructionOutput": "10.0.402\nHexalith.EventStore.Client.Streams.RetainedIdentityHistoryReader, Hexalith.EventStore.Client, Version=3.126.0.0, Culture=neutral, PublicKeyToken=null\nTrue\nSystem.Threading.Tasks.Task`1[Hexalith.EventStore.Contracts.Streams.RetainedIdentityHistoryReadResult]\nPackage-only retained-history API verified: 3.126.0\n",
+    "reconstructionCommandSource": "import json, shutil, subprocess, tempfile, xml.etree.ElementTree as ET\nfrom pathlib import Path\nroot = Path.cwd()\nprobe = json.loads((root / '_bmad-output/implementation-artifacts/deferred-evidence-verification-2026-10-24.json').read_text())['packageProbe']\nversion = subprocess.check_output(['dotnet', 'msbuild', 'src/Hexalith.Agents.Contracts/Hexalith.Agents.Contracts.csproj', '-nologo', '-getProperty:HexalithEventStoreVersion', '-p:Configuration=Release', '-p:UseHexalithProjectReferences=false'], text=True, timeout=60).strip()\nproject = ET.fromstring(probe['project'])\nproject.find('.//PackageReference').set('Version', version)\nwith tempfile.TemporaryDirectory(prefix='agents-retained-package-') as directory:\n    target = Path(directory)\n    shutil.copyfile(root / 'global.json', target / 'global.json')\n    ET.ElementTree(project).write(target / 'TransportProbe.csproj')\n    (target / 'Program.cs').write_text(probe['source'])\n    subprocess.run(['dotnet', '--version'], cwd=target, check=True, timeout=30)\n    subprocess.run(['dotnet', 'run', '--project', 'TransportProbe.csproj', '-c', 'Debug'], cwd=target, check=True, timeout=180)\n    libraries = json.loads((target / 'obj/project.assets.json').read_text())['libraries']\n    assert f'Hexalith.EventStore.Client/{version}' in libraries\n    assert all(library['type'] == 'package' for library in libraries.values())\n    print(f'Package-only retained-history API verified: {version}')\n"
+  },
+  "verifiedFileSha256": {
+    "Directory.Build.props": "9d6019c3a9329606defad88f00e4c381bdf692afc705f54f83f73b5b8d934ccb",
+    "eng/semantic-release-plan.mjs": "5db7be32d59fcf3f8be467dcb9cab14ef318e2e7e6db320f55fe76fb717cd898",
+    ".releaserc.json": "9ec24f4702c82dfcd8c42ade0f8476a657569c2ef5f173046d4a6c6fc824155f",
+    ".github/workflows/ci.yml": "5ccfdfaa9c02e4a26b5d4063b4162b0aa006b60489bc216f379aed0dfbf5e2e2",
+    ".github/workflows/release.yml": "a73e07328a2bc23131fba3e9048010cee2e2a2ed592c2d0b26af9263358941f2",
+    ".github/dependabot.yml": "7c45352be9c46358b1232a8ccc03606d68d0747abfe81322716320375462dcc6",
+    "scripts/verify-parties-identity.py": "5a1982829969c61d64df29f2a7cf4a5f8affc4bfe835d19f88435bd514d7e1d9",
+    "tests/tooling/parties_identity_verification_test.py": "35d5dd459a506eaf331639029efe8d6d2e261b3a5a626626b125b9523357a59a",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs": "88aca1d2fe18260b7ed4393c30e348fcd75c7c03fa699b37af656e6abacdaa38",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Queries/PartyIdentityQueryDeadline.cs": "ce91ab42c8ef445a6955975582ca16f27826522d5c09085c238bcb66de3e809b",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Authorization/PartyIdentityOptions.cs": "13d53019d103f379159aa91371930d1504e8f95cdb8ca2941d88ec5b32e46689",
+    "references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs": "5fbc575fce0f6a28f09b176067460d5662e903dec16af5a47f40de876efbeb1a",
+    "tests/tooling/semantic_release_plan_test.py": "091c9825a2339edbd4bbf025d7544e3872806044736270b715367ddc46cd6895"
+  },
+  "resultSha256": {
+    "server-build.log": "92b09635a30f27d04d86bb9e940ccc01ba0214db40ca88208ff6dea9d7e2f4ae",
+    "server-conformance.log": "fcb800b2b08bb8d3183fe73a266af6fe5cf568bdc974f45e2e7e042aee11cdef",
+    "server-conformance.xml": "f6e53c70e236c745f5a46d1b973a609fa89cbf4ae5ada5da31a03cea47e0e5ea",
+    "tooling-tests.log": "36483ee155db1a86c8d725a9da21871ed449702e3f607c788ce4e4271b18322f",
+    "identity-harness-final-tests.log": "f85477d6789d4b17c2dd70d3d33917eacb0dbd88ff76fc849081a3259411c920",
+    "planner-final-tests.log": "a15fb65888ea920da38d0cb7596e3d62d1ce903e0e16dc6882dcd31f4f27b4a9",
+    "packaged-reader-api.log": "52f9ba5a3b840a2aeb096014d1ac75557c2db8f9735a356ce2c198b07425a2bc",
+    "packaged-interface-api.log": "192b70876fbc1bfa5633127aa51e8f1a858a5fa31629106752f4c02cb7c78a29",
+    "transport-probe.log": "5211a287e23db9af80ae7854ed95938908d8d965df8f41b6be6dba31bea4b0c9",
+    "reproduced-package-probe.log": "749245e7744c911c691761ae4c2a030374bb6284362130c42379d0f487e60ef6",
+    "dotnet-inspect-version.log": "0fbfdd54d1eaaff6290aa2bc3479ec450622a9fad6208941ce7fce810f959c5b",
+    "identity-final/BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion.xml": "b13358805478103e9554f9d69c4d612f0c010d8d647d57a6e4ad88506e9c83c0",
+    "identity-final/CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken.xml": "716770670a4c844428809420edd95a7481f59ef64cb4a78fe055aad4d0cfce52",
+    "identity-final/CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken.xml": "d2bb2e222d36b1494093c5d081f06c1f70a35d9f974725b432dc887efc68b4e3",
+    "identity-final/CurrentAuthorityChangeDuringReadMustNotReleaseIdentity.xml": "d77c49d242092bdbee2ae69ef0ce84441bebc6b8ad7c543a09d61d1f18f71419",
+    "identity-final/CurrentAuthorityChangesDuringAwait_DenyEvidence.xml": "12c9b11bd9ef178bc9797e3b2989d21e84fa918eafa138557d51e7f6c0dd4926",
+    "identity-final/CurrentCompletionTimeChangesDuringCustody_DenyEvidence.xml": "f7ffa47056dadb1589449d19da512be749107786e0836a38cd9b845f3ce7a60a",
+    "identity-final/CurrentHuman_RequiresCompleteSourceAndCurrentExactActor.xml": "8a60693dae72efdc33658786235b44e36f25c80e19a8ea70e1409c208eb54f0a",
+    "identity-final/DelayedReply_ValidatesCompletionTime.xml": "9b2a9e9e4dcf5e77eaca2e13097242c30543e0d8680833df4c2afc03e1c5d049",
+    "identity-final/InvalidQueryTimeout_DeniesBeforeAnyProvider.xml": "5b768e73097a6b70d243dd6b865d0fb3648d389f9a7aaf16f1174a65eaabbfaa",
+    "identity-final/ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict.xml": "6956dd9c6cb343c50d6047ec46550e4030b5d734a706d71d230f0ee88b4534d6",
+    "identity-final/ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves.xml": "ad5c753e57bd8e5648094a3990c3479ceab49d975588370aca0698af4fc066b1",
+    "identity-final/WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence.xml": "b5b891771504370d8a32f0dc97d9baa8f3fd7db15a5756ebd56b396782acca02",
+    "identity-final/WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence.xml": "aefbafb799fb4288a4defc9628bf09a026c7a4e79f7591b6fed7c4a8b1c3d5ca",
+    "identity-final/WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence.xml": "9827ac3a6959cc462672ec09264d7cde91e1ad3fd99a252138cf3801121159d0",
+    "identity-final/WholeQueryDeadline_SetupTimeConsumesOperationBudget.xml": "143909c1df65535c63bb29b115796aec779d8c458bf2cbed1eae01774680d956",
+    "identity-final/WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget.xml": "a3a5b0559855679530d8b500b2290a39b1866bcbb15810a225b9ca693501ebd9",
+    "identity-final/WholeQueryDeadline_SynchronousProviderInvocationIsBounded.xml": "f62bb3f8e2020b821efc50e1e264e0cc1b8a4bb4fea4e917121b053254aaec63",
+    "identity-final/BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion.log": "7d05388abf88160ed65eb2174c305763b507ad0ef74b0483480b38724c914f3d",
+    "identity-final/CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken.log": "ee99760646563154db0eee9620f08833f22811253a386590d65c4fba7717e9fb",
+    "identity-final/CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken.log": "55684beb55eb8bac6c38437baafb0f1f3972b784206a120246578d39ab7a28a7",
+    "identity-final/CurrentAuthorityChangeDuringReadMustNotReleaseIdentity.log": "e9cf8a2a5546b43430b26182fc8997555a64b69cd3c937e0fc34c03117d005d4",
+    "identity-final/CurrentAuthorityChangesDuringAwait_DenyEvidence.log": "4a4b4602086e10a4c84935558b431f2c93e098563db0c1b479de5efe314b21f3",
+    "identity-final/CurrentCompletionTimeChangesDuringCustody_DenyEvidence.log": "544a39fb4fd338c6bee752b4ca6fa83de86e1abf5bb4658187acd9016abe058e",
+    "identity-final/CurrentHuman_RequiresCompleteSourceAndCurrentExactActor.log": "bd2ec0f903a8a616073841b6fdd1be77c935487fb8990d3860a404d750bd140b",
+    "identity-final/DelayedReply_ValidatesCompletionTime.log": "11e9fe9b2fb7861b61291488e01bc77f196fd1f404d520c625a8c0501f584019",
+    "identity-final/Hexalith.Parties.Client.Tests.build.log": "04e0a5a8c74a0ff702e05e5a48812ca3b73bee71e99c7bf4ae020539e704ab96",
+    "identity-final/Hexalith.Parties.Tests.build.log": "b65fae7c572ccfcb0658e2cb96fe17e74606133886cde2e887767898baea98e9",
+    "identity-final/InvalidQueryTimeout_DeniesBeforeAnyProvider.log": "25b10255c09e4ea01cec78e19c3ec7affa1d78e0121cdb7ff026cbffe892e2c6",
+    "identity-final/ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict.log": "170cb3b4fde3cc794ea8a92f62d655407a2aa82ff1fefdb70fa2c693fecb1019",
+    "identity-final/ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves.log": "40c8ea05849fc504f37df2d9cfe84e26dd7bad8af6130ff21bfd06c7a8f05753",
+    "identity-final/WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence.log": "839408b9a373bcfa0b2d7506790f2abbb8af90c2aab1774dfa4b2ce1d152b2de",
+    "identity-final/WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence.log": "d4b7b68f61e0bf8e80772286c627b15a3d4b31d0966caf90c148ed2a07ea675f",
+    "identity-final/WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence.log": "2a2016c2b9fe9349e9d2797adb1ed2b9247e941a800198fa13ca1b3ca6caf12d",
+    "identity-final/WholeQueryDeadline_SetupTimeConsumesOperationBudget.log": "5a971d95755403adc55c2ae2d6fe0865dd14a2ebf45ddcf92de1139dc4d15608",
+    "identity-final/WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget.log": "527fc0339718b1801e5192747619c08c8ee69a69058adf8878726ccbdba78483",
+    "identity-final/WholeQueryDeadline_SynchronousProviderInvocationIsBounded.log": "e6db62ddc402619b14338cfe524c83bddadd89808967127ef0c07f6799e32414",
+    "identity-final/agents-revision.log": "503002a4eaf2e01474b70c603dd1a49350a5110a0324e5fe002da5a096a065a5",
+    "identity-final/agents-status.log": "53cef816eb52786e9992c9df55d3639e5492e2b55b5488882123cbc2f9b6e1f6",
+    "identity-final/eventstore-version.log": "21ad7848ad3fc8fa4ccb22ca1f8c158a5b98fe93054ce62674fa772855a7203a",
+    "identity-final/exact-target-receipts.log": "473f52533135107010a7f07b5016dce9913d0ea340098608c437827bc0bbd9ec",
+    "identity-final/parties-revision.log": "7cdd7a95589db0a2a89cba149a5e75791c23b187ae7a36e8d13087b38dc9f1cb",
+    "identity-final/parties-status.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "identity-final/identity-verification.json": "1d6abda7729278d30f98df9aa91b1dda4317b2dad3ef0c57f1e88ba95df3a336"
+  },
+  "nativeReports": {
+    "identity": {
+      "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "8372b4dc-67e8-4993-a556-a72ccf5ac916",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:48",
+          "start-rtf": "2026-10-24T01:58:48.0714056+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:49.2072009+00:00",
+          "not-run": "0",
+          "passed": "12",
+          "skipped": "0",
+          "time": "1.114",
+          "time-rtf": "00:00:01.1140000",
+          "total": "12"
+        },
+        "tests": [
+          {
+            "id": "2f97ccd3-ea47-4cf7-9c87-7f12ec9393c0",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: False, trigger: \\\"timer\\\")",
+            "result": "Pass",
+            "time": "0.232",
+            "time-rtf": "00:00:00.2320000",
+            "start-rtf": "2026-10-24T01:58:48.5059347+00:00",
+            "finish-rtf": "2026-10-24T01:58:48.7447373+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1666"
+          },
+          {
+            "id": "728bcc57-2454-49be-a64c-2f9dd61e7926",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: False, trigger: \\\"timer\\\")",
+            "result": "Pass",
+            "time": "0.036",
+            "time-rtf": "00:00:00.0360000",
+            "start-rtf": "2026-10-24T01:58:48.7482929+00:00",
+            "finish-rtf": "2026-10-24T01:58:48.7860648+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1666"
+          },
+          {
+            "id": "e7cbdbb8-b9a0-4606-8d4c-344843fd21d2",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: True, trigger: \\\"timer\\\")",
+            "result": "Pass",
+            "time": "0.111",
+            "time-rtf": "00:00:00.1110000",
+            "start-rtf": "2026-10-24T01:58:48.7864623+00:00",
+            "finish-rtf": "2026-10-24T01:58:48.8979643+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1666"
+          },
+          {
+            "id": "c0385e21-1881-492c-ad1f-17e889ebc6a3",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: True, trigger: \\\"timer\\\")",
+            "result": "Pass",
+            "time": "0.074",
+            "time-rtf": "00:00:00.0740000",
+            "start-rtf": "2026-10-24T01:58:48.8980378+00:00",
+            "finish-rtf": "2026-10-24T01:58:48.9730161+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1666"
+          },
+          {
+            "id": "f56336bf-c0b0-4315-841e-735f9e118d51",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: False, trigger: \\\"elapsed\\\")",
+            "result": "Pass",
+            "time": "0.005",
+            "time-rtf": "00:00:00.0050000",
+            "start-rtf": "2026-10-24T01:58:48.9730884+00:00",
+            "finish-rtf": "2026-10-24T01:58:48.9784436+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1666"
+          },
+          {
+            "id": "e949a239-1551-4f4a-84ad-801b37c89c8c",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: False, trigger: \\\"elapsed\\\")",
+            "result": "Pass",
+            "time": "0.001",
+            "time-rtf": "00:00:00.0010000",
+            "start-rtf": "2026-10-24T01:58:49.0138564+00:00",
+            "finish-rtf": "2026-10-24T01:58:49.0152038+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1666"
+          },
+          {
+            "id": "1303720a-95d3-4474-85f7-096a11dd5ae1",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: True, trigger: \\\"elapsed\\\")",
+            "result": "Pass",
+            "time": "0.003",
+            "time-rtf": "00:00:00.0030000",
+            "start-rtf": "2026-10-24T01:58:49.0152497+00:00",
+            "finish-rtf": "2026-10-24T01:58:49.0185489+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1666"
+          },
+          {
+            "id": "c54df04e-afbc-4517-8de7-2f816fc1cc5c",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: True, trigger: \\\"elapsed\\\")",
+            "result": "Pass",
+            "time": "0.005",
+            "time-rtf": "00:00:00.0050000",
+            "start-rtf": "2026-10-24T01:58:49.0186116+00:00",
+            "finish-rtf": "2026-10-24T01:58:49.0241133+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1666"
+          },
+          {
+            "id": "e1e51189-8d9d-4433-9571-3e2d908de389",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: False, trigger: \\\"caller\\\")",
+            "result": "Pass",
+            "time": "0.04",
+            "time-rtf": "00:00:00.0400000",
+            "start-rtf": "2026-10-24T01:58:49.0241734+00:00",
+            "finish-rtf": "2026-10-24T01:58:49.0648636+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1666"
+          },
+          {
+            "id": "25195a7c-6e2b-41d9-b9c2-b688f0394123",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: False, trigger: \\\"caller\\\")",
+            "result": "Pass",
+            "time": "0.037",
+            "time-rtf": "00:00:00.0370000",
+            "start-rtf": "2026-10-24T01:58:49.0649393+00:00",
+            "finish-rtf": "2026-10-24T01:58:49.1028214+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1666"
+          },
+          {
+            "id": "e78bf5cf-7274-4d3b-b189-e20954ea9d0d",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: True, trigger: \\\"caller\\\")",
+            "result": "Pass",
+            "time": "0.001",
+            "time-rtf": "00:00:00.0010000",
+            "start-rtf": "2026-10-24T01:58:49.1028796+00:00",
+            "finish-rtf": "2026-10-24T01:58:49.1044142+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1666"
+          },
+          {
+            "id": "00673083-67dd-4a21-99c1-f2109c2669bf",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: True, trigger: \\\"caller\\\")",
+            "result": "Pass",
+            "time": "0.001",
+            "time-rtf": "00:00:00.0010000",
+            "start-rtf": "2026-10-24T01:58:49.1044831+00:00",
+            "finish-rtf": "2026-10-24T01:58:49.1057755+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1666"
+          }
+        ]
+      },
+      "CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "7a9bdafa-ccbc-474b-a65e-d75e73246ef7",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:49",
+          "start-rtf": "2026-10-24T01:58:49.9512309+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:50.4510491+00:00",
+          "not-run": "0",
+          "passed": "4",
+          "skipped": "0",
+          "time": "0.500",
+          "time-rtf": "00:00:00.5000000",
+          "total": "4"
+        },
+        "tests": [
+          {
+            "id": "230019bd-2573-4057-b05f-dc963f6888bf",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken(historical: False, trigger: \\\"deadline\\\")",
+            "result": "Pass",
+            "time": "0.268",
+            "time-rtf": "00:00:00.2680000",
+            "start-rtf": "2026-10-24T01:58:50.0910932+00:00",
+            "finish-rtf": "2026-10-24T01:58:50.3802405+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1819"
+          },
+          {
+            "id": "46c1797d-43f4-4199-9e37-94b4d081aad5",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken(historical: True, trigger: \\\"deadline\\\")",
+            "result": "Pass",
+            "time": "0.03",
+            "time-rtf": "00:00:00.0300000",
+            "start-rtf": "2026-10-24T01:58:50.3875487+00:00",
+            "finish-rtf": "2026-10-24T01:58:50.4187558+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1819"
+          },
+          {
+            "id": "72af18a8-15ce-45a7-9048-1755280be79f",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken(historical: False, trigger: \\\"fault\\\")",
+            "result": "Pass",
+            "time": "0.002",
+            "time-rtf": "00:00:00.0020000",
+            "start-rtf": "2026-10-24T01:58:50.4188191+00:00",
+            "finish-rtf": "2026-10-24T01:58:50.4214566+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1819"
+          },
+          {
+            "id": "466b2c04-9487-484f-80d6-2cdbdc023327",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken(historical: True, trigger: \\\"fault\\\")",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:50.4214809+00:00",
+            "finish-rtf": "2026-10-24T01:58:50.4223432+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1819"
+          }
+        ]
+      },
+      "CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "8154877c-a6b3-4f90-b743-bae8acd1ae54",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:44",
+          "start-rtf": "2026-10-24T01:58:44.7425517+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:45.4265813+00:00",
+          "not-run": "0",
+          "passed": "4",
+          "skipped": "0",
+          "time": "0.686",
+          "time-rtf": "00:00:00.6860000",
+          "total": "4"
+        },
+        "tests": [
+          {
+            "id": "fd2de38a-72c4-4210-b17d-121e8ce50877",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken(historical: False, expire: False)",
+            "result": "Pass",
+            "time": "0.381",
+            "time-rtf": "00:00:00.3810000",
+            "start-rtf": "2026-10-24T01:58:44.9677527+00:00",
+            "finish-rtf": "2026-10-24T01:58:45.3636649+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1641"
+          },
+          {
+            "id": "e757d5f8-6090-4eb7-9f68-f3304cb88953",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken(historical: True, expire: False)",
+            "result": "Pass",
+            "time": "0.041",
+            "time-rtf": "00:00:00.0410000",
+            "start-rtf": "2026-10-24T01:58:45.3669423+00:00",
+            "finish-rtf": "2026-10-24T01:58:45.4095040+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1641"
+          },
+          {
+            "id": "f4b13b42-5f8d-4340-a7cc-8c9266906903",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken(historical: False, expire: True)",
+            "result": "Pass",
+            "time": "0.003",
+            "time-rtf": "00:00:00.0030000",
+            "start-rtf": "2026-10-24T01:58:45.4101381+00:00",
+            "finish-rtf": "2026-10-24T01:58:45.4138618+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1641"
+          },
+          {
+            "id": "861907cc-3c94-43a0-980c-c715583c9706",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken(historical: True, expire: True)",
+            "result": "Pass",
+            "time": "0.001",
+            "time-rtf": "00:00:00.0010000",
+            "start-rtf": "2026-10-24T01:58:45.4139930+00:00",
+            "finish-rtf": "2026-10-24T01:58:45.4152076+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1641"
+          }
+        ]
+      },
+      "CurrentAuthorityChangeDuringReadMustNotReleaseIdentity.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "3ede12fc-f3b1-49e3-a6b1-dff4de214c91",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:29",
+          "start-rtf": "2026-10-24T01:58:29.9257638+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:30.5098762+00:00",
+          "not-run": "0",
+          "passed": "8",
+          "skipped": "0",
+          "time": "0.586",
+          "time-rtf": "00:00:00.5860000",
+          "total": "8"
+        },
+        "tests": [
+          {
+            "id": "e1698e03-bada-49cb-957f-4678102240ac",
+            "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: False, change: \\\"source\\\")",
+            "result": "Pass",
+            "time": "0.272",
+            "time-rtf": "00:00:00.2720000",
+            "start-rtf": "2026-10-24T01:58:30.1774325+00:00",
+            "finish-rtf": "2026-10-24T01:58:30.4727166+00:00",
+            "type": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests",
+            "method": "CurrentAuthorityChangeDuringReadMustNotReleaseIdentity",
+            "source-file": "/home/administrator/projects/hexalith/agents/tests/identity/CurrentIdentityAuthorityTests.cs",
+            "source-line": "30"
+          },
+          {
+            "id": "61a4d775-571d-4451-839d-a1b7e98400c1",
+            "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: True, change: \\\"source\\\")",
+            "result": "Pass",
+            "time": "0.007",
+            "time-rtf": "00:00:00.0070000",
+            "start-rtf": "2026-10-24T01:58:30.4836688+00:00",
+            "finish-rtf": "2026-10-24T01:58:30.4911353+00:00",
+            "type": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests",
+            "method": "CurrentAuthorityChangeDuringReadMustNotReleaseIdentity",
+            "source-file": "/home/administrator/projects/hexalith/agents/tests/identity/CurrentIdentityAuthorityTests.cs",
+            "source-line": "30"
+          },
+          {
+            "id": "b550e11f-0b6f-4bf6-89d8-346ac0269c65",
+            "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: False, change: \\\"actor-revision\\\")",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:30.4911932+00:00",
+            "finish-rtf": "2026-10-24T01:58:30.4919057+00:00",
+            "type": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests",
+            "method": "CurrentAuthorityChangeDuringReadMustNotReleaseIdentity",
+            "source-file": "/home/administrator/projects/hexalith/agents/tests/identity/CurrentIdentityAuthorityTests.cs",
+            "source-line": "30"
+          },
+          {
+            "id": "cb69597f-cdb1-435a-90df-654a5b4096aa",
+            "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: True, change: \\\"actor-revision\\\")",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:30.4919271+00:00",
+            "finish-rtf": "2026-10-24T01:58:30.4925337+00:00",
+            "type": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests",
+            "method": "CurrentAuthorityChangeDuringReadMustNotReleaseIdentity",
+            "source-file": "/home/administrator/projects/hexalith/agents/tests/identity/CurrentIdentityAuthorityTests.cs",
+            "source-line": "30"
+          },
+          {
+            "id": "c892da60-1027-472f-93d7-e0fe546b5402",
+            "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: False, change: \\\"authority-revision\\\")",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:30.4925529+00:00",
+            "finish-rtf": "2026-10-24T01:58:30.4929109+00:00",
+            "type": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests",
+            "method": "CurrentAuthorityChangeDuringReadMustNotReleaseIdentity",
+            "source-file": "/home/administrator/projects/hexalith/agents/tests/identity/CurrentIdentityAuthorityTests.cs",
+            "source-line": "30"
+          },
+          {
+            "id": "62882111-031d-4e7f-8796-abd24653dd76",
+            "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: True, change: \\\"authority-revision\\\")",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:30.4929289+00:00",
+            "finish-rtf": "2026-10-24T01:58:30.4931900+00:00",
+            "type": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests",
+            "method": "CurrentAuthorityChangeDuringReadMustNotReleaseIdentity",
+            "source-file": "/home/administrator/projects/hexalith/agents/tests/identity/CurrentIdentityAuthorityTests.cs",
+            "source-line": "30"
+          },
+          {
+            "id": "d2ad30db-1e4c-45ef-9c49-596e5af2f41c",
+            "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: False, change: \\\"unchanged\\\")",
+            "result": "Pass",
+            "time": "0.001",
+            "time-rtf": "00:00:00.0010000",
+            "start-rtf": "2026-10-24T01:58:30.4931984+00:00",
+            "finish-rtf": "2026-10-24T01:58:30.4951919+00:00",
+            "type": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests",
+            "method": "CurrentAuthorityChangeDuringReadMustNotReleaseIdentity",
+            "source-file": "/home/administrator/projects/hexalith/agents/tests/identity/CurrentIdentityAuthorityTests.cs",
+            "source-line": "30"
+          },
+          {
+            "id": "5d568319-78b8-439b-95e9-4e734b853a40",
+            "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: True, change: \\\"unchanged\\\")",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:30.4952128+00:00",
+            "finish-rtf": "2026-10-24T01:58:30.4955620+00:00",
+            "type": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests",
+            "method": "CurrentAuthorityChangeDuringReadMustNotReleaseIdentity",
+            "source-file": "/home/administrator/projects/hexalith/agents/tests/identity/CurrentIdentityAuthorityTests.cs",
+            "source-line": "30"
+          }
+        ]
+      },
+      "CurrentAuthorityChangesDuringAwait_DenyEvidence.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "240febe3-870e-437d-b6a0-f3a2112f5d37",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:26",
+          "start-rtf": "2026-10-24T01:58:26.5783366+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:27.6120979+00:00",
+          "not-run": "0",
+          "passed": "2",
+          "skipped": "0",
+          "time": "1.034",
+          "time-rtf": "00:00:01.0340000",
+          "total": "2"
+        },
+        "tests": [
+          {
+            "id": "fd20577e-6855-4ffb-8223-bae5ff912295",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentAuthorityChangesDuringAwait_DenyEvidence(inCustody: False)",
+            "result": "Pass",
+            "time": "0.634",
+            "time-rtf": "00:00:00.6340000",
+            "start-rtf": "2026-10-24T01:58:26.9206119+00:00",
+            "finish-rtf": "2026-10-24T01:58:27.5736552+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CurrentAuthorityChangesDuringAwait_DenyEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "326"
+          },
+          {
+            "id": "56004b4d-191f-4ef0-94d9-99e62298a754",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentAuthorityChangesDuringAwait_DenyEvidence(inCustody: True)",
+            "result": "Pass",
+            "time": "0.003",
+            "time-rtf": "00:00:00.0030000",
+            "start-rtf": "2026-10-24T01:58:27.5760501+00:00",
+            "finish-rtf": "2026-10-24T01:58:27.5796460+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CurrentAuthorityChangesDuringAwait_DenyEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "326"
+          }
+        ]
+      },
+      "CurrentCompletionTimeChangesDuringCustody_DenyEvidence.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "004dce2c-2f11-46cf-9621-cf10281e293b",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:25",
+          "start-rtf": "2026-10-24T01:58:25.0834549+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:25.9847521+00:00",
+          "not-run": "0",
+          "passed": "4",
+          "skipped": "0",
+          "time": "0.904",
+          "time-rtf": "00:00:00.9040000",
+          "total": "4"
+        },
+        "tests": [
+          {
+            "id": "248bf5b8-200d-4504-a9a9-6625aa9c94b8",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentCompletionTimeChangesDuringCustody_DenyEvidence(change: \\\"interval-expiry\\\")",
+            "result": "Pass",
+            "time": "0.434",
+            "time-rtf": "00:00:00.4340000",
+            "start-rtf": "2026-10-24T01:58:25.4500868+00:00",
+            "finish-rtf": "2026-10-24T01:58:25.9167352+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CurrentCompletionTimeChangesDuringCustody_DenyEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "279"
+          },
+          {
+            "id": "93d6d9dc-bf31-480a-ad3c-e0e6f2663ee8",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentCompletionTimeChangesDuringCustody_DenyEvidence(change: \\\"custody-expiry\\\")",
+            "result": "Pass",
+            "time": "0.017",
+            "time-rtf": "00:00:00.0170000",
+            "start-rtf": "2026-10-24T01:58:25.9363348+00:00",
+            "finish-rtf": "2026-10-24T01:58:25.9540051+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CurrentCompletionTimeChangesDuringCustody_DenyEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "279"
+          },
+          {
+            "id": "fe961849-d982-4b03-987d-5bf75c0bce20",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentCompletionTimeChangesDuringCustody_DenyEvidence(change: \\\"source-rollback\\\")",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:25.9546738+00:00",
+            "finish-rtf": "2026-10-24T01:58:25.9554859+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CurrentCompletionTimeChangesDuringCustody_DenyEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "279"
+          },
+          {
+            "id": "7768885d-0f31-4761-886e-32f9197216f6",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentCompletionTimeChangesDuringCustody_DenyEvidence(change: \\\"binding-rollback\\\")",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:25.9555071+00:00",
+            "finish-rtf": "2026-10-24T01:58:25.9558866+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CurrentCompletionTimeChangesDuringCustody_DenyEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "279"
+          }
+        ]
+      },
+      "CurrentHuman_RequiresCompleteSourceAndCurrentExactActor.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "7bb4dcfc-8fef-4ec1-bf04-80b8554e8b84",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:28",
+          "start-rtf": "2026-10-24T01:58:28.5153165+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:29.2727002+00:00",
+          "not-run": "0",
+          "passed": "1",
+          "skipped": "0",
+          "time": "0.756",
+          "time-rtf": "00:00:00.7560000",
+          "total": "1"
+        },
+        "tests": [
+          {
+            "id": "4332bc9f-1447-4186-a204-a11d2739a185",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentHuman_RequiresCompleteSourceAndCurrentExactActor",
+            "result": "Pass",
+            "time": "0.468",
+            "time-rtf": "00:00:00.4680000",
+            "start-rtf": "2026-10-24T01:58:28.7573641+00:00",
+            "finish-rtf": "2026-10-24T01:58:29.2447860+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "CurrentHuman_RequiresCompleteSourceAndCurrentExactActor",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "688"
+          }
+        ]
+      },
+      "DelayedReply_ValidatesCompletionTime.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "1d6c0722-5aed-4652-8d0f-0763c9d7f9ea",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Client.Tests/debug/Hexalith.Parties.Client.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:59:57",
+          "start-rtf": "2026-10-24T01:59:57.2507886+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:59:58.1261081+00:00",
+          "not-run": "0",
+          "passed": "9",
+          "skipped": "0",
+          "time": "0.876",
+          "time-rtf": "00:00:00.8760000",
+          "total": "9"
+        },
+        "tests": [
+          {
+            "id": "007c5370-9614-4f3b-837e-01d84688171e",
+            "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"current-valid\\\")",
+            "result": "Pass",
+            "time": "0.338",
+            "time-rtf": "00:00:00.3380000",
+            "start-rtf": "2026-10-24T01:59:57.5233116+00:00",
+            "finish-rtf": "2026-10-24T01:59:57.8964668+00:00",
+            "type": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+            "method": "DelayedReply_ValidatesCompletionTime",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs",
+            "source-line": "288"
+          },
+          {
+            "id": "1ec89351-8b61-41ac-a42c-6fec26c77a13",
+            "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"current-interval-expiry\\\")",
+            "result": "Pass",
+            "time": "0.084",
+            "time-rtf": "00:00:00.0840000",
+            "start-rtf": "2026-10-24T01:59:57.9122263+00:00",
+            "finish-rtf": "2026-10-24T01:59:57.9972677+00:00",
+            "type": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+            "method": "DelayedReply_ValidatesCompletionTime",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs",
+            "source-line": "288"
+          },
+          {
+            "id": "0b7689b4-33b0-44b6-bfa2-eed4a7c79a0d",
+            "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"current-custody-expiry\\\")",
+            "result": "Pass",
+            "time": "0.005",
+            "time-rtf": "00:00:00.0050000",
+            "start-rtf": "2026-10-24T01:59:58.0118630+00:00",
+            "finish-rtf": "2026-10-24T01:59:58.0177365+00:00",
+            "type": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+            "method": "DelayedReply_ValidatesCompletionTime",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs",
+            "source-line": "288"
+          },
+          {
+            "id": "0ec7ddea-f16d-4849-9e76-af6a2a9f93ff",
+            "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"current-source-rollback\\\")",
+            "result": "Pass",
+            "time": "0.008",
+            "time-rtf": "00:00:00.0080000",
+            "start-rtf": "2026-10-24T01:59:58.0179398+00:00",
+            "finish-rtf": "2026-10-24T01:59:58.0267670+00:00",
+            "type": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+            "method": "DelayedReply_ValidatesCompletionTime",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs",
+            "source-line": "288"
+          },
+          {
+            "id": "d87013b8-2730-48ca-8af2-ff9db2175879",
+            "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"current-binding-rollback\\\")",
+            "result": "Pass",
+            "time": "0.014",
+            "time-rtf": "00:00:00.0140000",
+            "start-rtf": "2026-10-24T01:59:58.0268231+00:00",
+            "finish-rtf": "2026-10-24T01:59:58.0413125+00:00",
+            "type": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+            "method": "DelayedReply_ValidatesCompletionTime",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs",
+            "source-line": "288"
+          },
+          {
+            "id": "b9f0e741-3fee-4f0a-b3a9-25b228535351",
+            "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"current-future-observation\\\")",
+            "result": "Pass",
+            "time": "0.006",
+            "time-rtf": "00:00:00.0060000",
+            "start-rtf": "2026-10-24T01:59:58.0413738+00:00",
+            "finish-rtf": "2026-10-24T01:59:58.0478364+00:00",
+            "type": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+            "method": "DelayedReply_ValidatesCompletionTime",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs",
+            "source-line": "288"
+          },
+          {
+            "id": "478a4fa7-2b6f-48df-a475-97a860634964",
+            "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"historical-closed-valid\\\")",
+            "result": "Pass",
+            "time": "0.037",
+            "time-rtf": "00:00:00.0370000",
+            "start-rtf": "2026-10-24T01:59:58.0478823+00:00",
+            "finish-rtf": "2026-10-24T01:59:58.0852436+00:00",
+            "type": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+            "method": "DelayedReply_ValidatesCompletionTime",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs",
+            "source-line": "288"
+          },
+          {
+            "id": "33bb9bfd-80d8-4fc0-8055-ecf7dd10f702",
+            "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"historical-custody-expiry\\\")",
+            "result": "Pass",
+            "time": "0.001",
+            "time-rtf": "00:00:00.0010000",
+            "start-rtf": "2026-10-24T01:59:58.0853035+00:00",
+            "finish-rtf": "2026-10-24T01:59:58.0864262+00:00",
+            "type": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+            "method": "DelayedReply_ValidatesCompletionTime",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs",
+            "source-line": "288"
+          },
+          {
+            "id": "fa129e04-3f85-4af7-9481-d3e7cf24f9f2",
+            "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"historical-future-action\\\")",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:59:58.0864490+00:00",
+            "finish-rtf": "2026-10-24T01:59:58.0869758+00:00",
+            "type": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests",
+            "method": "DelayedReply_ValidatesCompletionTime",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Client.Tests/HttpPartiesIdentityClientTests.cs",
+            "source-line": "288"
+          }
+        ]
+      },
+      "InvalidQueryTimeout_DeniesBeforeAnyProvider.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "fd12bc94-ca67-484f-b903-ec29097bd15a",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:37",
+          "start-rtf": "2026-10-24T01:58:37.4814386+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:38.6386071+00:00",
+          "not-run": "0",
+          "passed": "8",
+          "skipped": "0",
+          "time": "1.158",
+          "time-rtf": "00:00:01.1580000",
+          "total": "8"
+        },
+        "tests": [
+          {
+            "id": "ffc9411a-5e9a-41e1-9661-88c502033df6",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: False, ticks: 0)",
+            "result": "Pass",
+            "time": "0.651",
+            "time-rtf": "00:00:00.6510000",
+            "start-rtf": "2026-10-24T01:58:37.8347957+00:00",
+            "finish-rtf": "2026-10-24T01:58:38.5340876+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "InvalidQueryTimeout_DeniesBeforeAnyProvider",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1618"
+          },
+          {
+            "id": "8064b8e4-db69-4820-9cb3-a2fa42bbd501",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: True, ticks: 0)",
+            "result": "Pass",
+            "time": "0.089",
+            "time-rtf": "00:00:00.0890000",
+            "start-rtf": "2026-10-24T01:58:38.5363598+00:00",
+            "finish-rtf": "2026-10-24T01:58:38.6257024+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "InvalidQueryTimeout_DeniesBeforeAnyProvider",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1618"
+          },
+          {
+            "id": "2adfe583-e2dd-4c42-99f5-718872177302",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: False, ticks: -1)",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:38.6261263+00:00",
+            "finish-rtf": "2026-10-24T01:58:38.6268633+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "InvalidQueryTimeout_DeniesBeforeAnyProvider",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1618"
+          },
+          {
+            "id": "79c0b0dd-5429-4e40-a98a-f51f8baf2526",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: True, ticks: -1)",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:38.6269628+00:00",
+            "finish-rtf": "2026-10-24T01:58:38.6275339+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "InvalidQueryTimeout_DeniesBeforeAnyProvider",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1618"
+          },
+          {
+            "id": "822681aa-4668-4fa7-812d-fb8a324c28f5",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: False, ticks: 300000001)",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:38.6276546+00:00",
+            "finish-rtf": "2026-10-24T01:58:38.6279473+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "InvalidQueryTimeout_DeniesBeforeAnyProvider",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1618"
+          },
+          {
+            "id": "d8111e40-e2a3-4ece-9ad0-2b714a86f4df",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: True, ticks: 300000001)",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:38.6280138+00:00",
+            "finish-rtf": "2026-10-24T01:58:38.6283528+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "InvalidQueryTimeout_DeniesBeforeAnyProvider",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1618"
+          },
+          {
+            "id": "86e047cb-c34f-45d8-9d39-884059babb5d",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: False, ticks: 9223372036854775807)",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:38.6284221+00:00",
+            "finish-rtf": "2026-10-24T01:58:38.6286405+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "InvalidQueryTimeout_DeniesBeforeAnyProvider",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1618"
+          },
+          {
+            "id": "ff8751db-1487-4a3b-807a-9c80798affa5",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: True, ticks: 9223372036854775807)",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:38.6286904+00:00",
+            "finish-rtf": "2026-10-24T01:58:38.6288996+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "InvalidQueryTimeout_DeniesBeforeAnyProvider",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1618"
+          }
+        ]
+      },
+      "ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "f7dbc443-f0ed-4028-b18d-7b5b02c374fd",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:46",
+          "start-rtf": "2026-10-24T01:58:46.2413093+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:46.7267233+00:00",
+          "not-run": "0",
+          "passed": "2",
+          "skipped": "0",
+          "time": "0.486",
+          "time-rtf": "00:00:00.4860000",
+          "total": "2"
+        },
+        "tests": [
+          {
+            "id": "31afe6b4-904c-49c0-9b79-8c6476d364f8",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict(historical: False)",
+            "result": "Pass",
+            "time": "0.264",
+            "time-rtf": "00:00:00.2640000",
+            "start-rtf": "2026-10-24T01:58:46.3658585+00:00",
+            "finish-rtf": "2026-10-24T01:58:46.6380614+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1921"
+          },
+          {
+            "id": "b7db6b80-91bd-485d-826e-c569a0f35525",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict(historical: True)",
+            "result": "Pass",
+            "time": "0.061",
+            "time-rtf": "00:00:00.0610000",
+            "start-rtf": "2026-10-24T01:58:46.6452163+00:00",
+            "finish-rtf": "2026-10-24T01:58:46.7075531+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1921"
+          }
+        ]
+      },
+      "ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "2e7dc5cb-824d-472a-a248-8099cc2da02c",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:41",
+          "start-rtf": "2026-10-24T01:58:41.6366976+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:42.7173633+00:00",
+          "not-run": "0",
+          "passed": "2",
+          "skipped": "0",
+          "time": "1.081",
+          "time-rtf": "00:00:01.0810000",
+          "total": "2"
+        },
+        "tests": [
+          {
+            "id": "6a2c27b7-2906-429d-9bc7-b9d6ac0e74d6",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves(historical: False)",
+            "result": "Pass",
+            "time": "0.745",
+            "time-rtf": "00:00:00.7450000",
+            "start-rtf": "2026-10-24T01:58:41.8618798+00:00",
+            "finish-rtf": "2026-10-24T01:58:42.6210361+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1868"
+          },
+          {
+            "id": "92d3c57e-3c5a-4a3b-9b82-8c92bf52ee89",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves(historical: True)",
+            "result": "Pass",
+            "time": "0.055",
+            "time-rtf": "00:00:00.0550000",
+            "start-rtf": "2026-10-24T01:58:42.6340165+00:00",
+            "finish-rtf": "2026-10-24T01:58:42.6892198+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1868"
+          }
+        ]
+      },
+      "WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "45d017c2-d77c-4112-a898-b5c1770dd0e9",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:35",
+          "start-rtf": "2026-10-24T01:58:35.5217219+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:36.1306252+00:00",
+          "not-run": "0",
+          "passed": "2",
+          "skipped": "0",
+          "time": "0.611",
+          "time-rtf": "00:00:00.6110000",
+          "total": "2"
+        },
+        "tests": [
+          {
+            "id": "5c6a9f2b-de9e-47e4-a510-92b1f65b1f47",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence(historical: False)",
+            "result": "Pass",
+            "time": "0.308",
+            "time-rtf": "00:00:00.3080000",
+            "start-rtf": "2026-10-24T01:58:35.6899377+00:00",
+            "finish-rtf": "2026-10-24T01:58:36.0086652+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1603"
+          },
+          {
+            "id": "04d6aa14-0940-416c-8108-c1a392e104b6",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence(historical: True)",
+            "result": "Pass",
+            "time": "0.053",
+            "time-rtf": "00:00:00.0530000",
+            "start-rtf": "2026-10-24T01:58:36.0228269+00:00",
+            "finish-rtf": "2026-10-24T01:58:36.0768938+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1603"
+          }
+        ]
+      },
+      "WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "74238557-8ad1-4bdc-bc9b-94b9d627390e",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:43",
+          "start-rtf": "2026-10-24T01:58:43.3833145+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:43.9813190+00:00",
+          "not-run": "0",
+          "passed": "2",
+          "skipped": "0",
+          "time": "0.598",
+          "time-rtf": "00:00:00.5980000",
+          "total": "2"
+        },
+        "tests": [
+          {
+            "id": "e966b41d-c3f4-4a80-bcff-8d18795cbff5",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence(historical: False)",
+            "result": "Pass",
+            "time": "0.313",
+            "time-rtf": "00:00:00.3130000",
+            "start-rtf": "2026-10-24T01:58:43.5100097+00:00",
+            "finish-rtf": "2026-10-24T01:58:43.8483532+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1900"
+          },
+          {
+            "id": "c8a3f463-d5b6-4f95-a7a9-65269b08e9e5",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence(historical: True)",
+            "result": "Pass",
+            "time": "0.06",
+            "time-rtf": "00:00:00.0600000",
+            "start-rtf": "2026-10-24T01:58:43.8573613+00:00",
+            "finish-rtf": "2026-10-24T01:58:43.9182868+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1900"
+          }
+        ]
+      },
+      "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "3d78d4bc-6b6e-473b-b108-56372cbdc311",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:31",
+          "start-rtf": "2026-10-24T01:58:31.3543354+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:32.0622768+00:00",
+          "not-run": "0",
+          "passed": "8",
+          "skipped": "0",
+          "time": "0.709",
+          "time-rtf": "00:00:00.7090000",
+          "total": "8"
+        },
+        "tests": [
+          {
+            "id": "ea8bedb4-988d-4c8b-8ecf-a51626001aae",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: False, inCustody: False, lateFault: False)",
+            "result": "Pass",
+            "time": "0.407",
+            "time-rtf": "00:00:00.4069999",
+            "start-rtf": "2026-10-24T01:58:31.5135503+00:00",
+            "finish-rtf": "2026-10-24T01:58:31.9673146+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1428"
+          },
+          {
+            "id": "6e5ce156-135b-4da2-aa84-bee80089632f",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: True, inCustody: False, lateFault: False)",
+            "result": "Pass",
+            "time": "0.032",
+            "time-rtf": "00:00:00.0320000",
+            "start-rtf": "2026-10-24T01:58:31.9689114+00:00",
+            "finish-rtf": "2026-10-24T01:58:32.0012397+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1428"
+          },
+          {
+            "id": "ab17fd3c-9fd8-4da1-bb3d-3b6cc9cc0259",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: False, inCustody: True, lateFault: False)",
+            "result": "Pass",
+            "time": "0.012",
+            "time-rtf": "00:00:00.0120000",
+            "start-rtf": "2026-10-24T01:58:32.0014900+00:00",
+            "finish-rtf": "2026-10-24T01:58:32.0139747+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1428"
+          },
+          {
+            "id": "19f06140-a735-44e4-85da-e1a771113a8b",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: True, inCustody: True, lateFault: False)",
+            "result": "Pass",
+            "time": "0.01",
+            "time-rtf": "00:00:00.0100000",
+            "start-rtf": "2026-10-24T01:58:32.0140734+00:00",
+            "finish-rtf": "2026-10-24T01:58:32.0308093+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1428"
+          },
+          {
+            "id": "d909b7db-156d-49cd-8155-04f59057a34b",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: False, inCustody: False, lateFault: True)",
+            "result": "Pass",
+            "time": "0.001",
+            "time-rtf": "00:00:00.0010000",
+            "start-rtf": "2026-10-24T01:58:32.0311772+00:00",
+            "finish-rtf": "2026-10-24T01:58:32.0325397+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1428"
+          },
+          {
+            "id": "20db021c-426d-4b77-93e1-1f31e4a80200",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: True, inCustody: False, lateFault: True)",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:32.0325671+00:00",
+            "finish-rtf": "2026-10-24T01:58:32.0330905+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1428"
+          },
+          {
+            "id": "715e7932-1180-4e35-83dd-1e1fe16a3fdc",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: False, inCustody: True, lateFault: True)",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:32.0331137+00:00",
+            "finish-rtf": "2026-10-24T01:58:32.0339970+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1428"
+          },
+          {
+            "id": "763e9825-ee28-4e83-9445-970a6124b03f",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: True, inCustody: True, lateFault: True)",
+            "result": "Pass",
+            "time": "0.003",
+            "time-rtf": "00:00:00.0030000",
+            "start-rtf": "2026-10-24T01:58:32.0340186+00:00",
+            "finish-rtf": "2026-10-24T01:58:32.0379403+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1428"
+          }
+        ]
+      },
+      "WholeQueryDeadline_SetupTimeConsumesOperationBudget.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "051b8ac0-9726-4471-ad27-10ea1113d3c4",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:39",
+          "start-rtf": "2026-10-24T01:58:39.5175764+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:40.8921907+00:00",
+          "not-run": "0",
+          "passed": "4",
+          "skipped": "0",
+          "time": "1.385",
+          "time-rtf": "00:00:01.3850000",
+          "total": "4"
+        },
+        "tests": [
+          {
+            "id": "43aae23e-9b48-449c-a0e7-bb46bf805b98",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SetupTimeConsumesOperationBudget(historical: False, exhausted: False)",
+            "result": "Pass",
+            "time": "0.692",
+            "time-rtf": "00:00:00.6919999",
+            "start-rtf": "2026-10-24T01:58:39.9373982+00:00",
+            "finish-rtf": "2026-10-24T01:58:40.6603962+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_SetupTimeConsumesOperationBudget",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1772"
+          },
+          {
+            "id": "fbe3d8bc-d3e9-4c93-acb1-3b8e86499036",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SetupTimeConsumesOperationBudget(historical: True, exhausted: False)",
+            "result": "Pass",
+            "time": "0.152",
+            "time-rtf": "00:00:00.1520000",
+            "start-rtf": "2026-10-24T01:58:40.6807345+00:00",
+            "finish-rtf": "2026-10-24T01:58:40.8332410+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_SetupTimeConsumesOperationBudget",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1772"
+          },
+          {
+            "id": "19c88cf0-0ca8-4106-8533-bb9148a2e847",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SetupTimeConsumesOperationBudget(historical: False, exhausted: True)",
+            "result": "Pass",
+            "time": "0.013",
+            "time-rtf": "00:00:00.0130000",
+            "start-rtf": "2026-10-24T01:58:40.8333041+00:00",
+            "finish-rtf": "2026-10-24T01:58:40.8469969+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_SetupTimeConsumesOperationBudget",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1772"
+          },
+          {
+            "id": "3e353dfa-9abc-4378-9874-ea8e41f2f710",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SetupTimeConsumesOperationBudget(historical: True, exhausted: True)",
+            "result": "Pass",
+            "time": "0",
+            "time-rtf": "00:00:00.0000000",
+            "start-rtf": "2026-10-24T01:58:40.8470636+00:00",
+            "finish-rtf": "2026-10-24T01:58:40.8479663+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_SetupTimeConsumesOperationBudget",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1772"
+          }
+        ]
+      },
+      "WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "1f31906e-f956-4b46-8c3e-364d4c30863e",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:34",
+          "start-rtf": "2026-10-24T01:58:34.3839255+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:34.9538989+00:00",
+          "not-run": "0",
+          "passed": "2",
+          "skipped": "0",
+          "time": "0.571",
+          "time-rtf": "00:00:00.5709999",
+          "total": "2"
+        },
+        "tests": [
+          {
+            "id": "be58c374-ecc2-461b-a5e9-b16e5d20e73e",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget(historical: False)",
+            "result": "Pass",
+            "time": "0.265",
+            "time-rtf": "00:00:00.2650000",
+            "start-rtf": "2026-10-24T01:58:34.6163976+00:00",
+            "finish-rtf": "2026-10-24T01:58:34.8950091+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1552"
+          },
+          {
+            "id": "3c405044-dd5e-4deb-ae90-5231aa750ceb",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget(historical: True)",
+            "result": "Pass",
+            "time": "0.041",
+            "time-rtf": "00:00:00.0410000",
+            "start-rtf": "2026-10-24T01:58:34.9012698+00:00",
+            "finish-rtf": "2026-10-24T01:58:34.9425523+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1552"
+          }
+        ]
+      },
+      "WholeQueryDeadline_SynchronousProviderInvocationIsBounded.xml": {
+        "summary": {
+          "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+          "id": "ccc361ce-711a-416f-b33e-06e08db2e9e7",
+          "name": "/tmp/agents-five-evidence-20261024/identity-final/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+          "run-date": "2026-10-24",
+          "run-time": "01:58:32",
+          "start-rtf": "2026-10-24T01:58:32.7803754+00:00",
+          "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+          "target-framework": ".NETCoreApp,Version=v10.0",
+          "errors": "0",
+          "failed": "0",
+          "finish-rtf": "2026-10-24T01:58:33.6420419+00:00",
+          "not-run": "0",
+          "passed": "4",
+          "skipped": "0",
+          "time": "0.862",
+          "time-rtf": "00:00:00.8620000",
+          "total": "4"
+        },
+        "tests": [
+          {
+            "id": "80800aab-4858-4a37-b405-30763e61fe58",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SynchronousProviderInvocationIsBounded(historical: False, inCustody: False)",
+            "result": "Pass",
+            "time": "0.398",
+            "time-rtf": "00:00:00.3980000",
+            "start-rtf": "2026-10-24T01:58:33.0629577+00:00",
+            "finish-rtf": "2026-10-24T01:58:33.4924753+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_SynchronousProviderInvocationIsBounded",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1496"
+          },
+          {
+            "id": "7a92db0a-2893-4c6e-ad2a-ea84a04d2b36",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SynchronousProviderInvocationIsBounded(historical: True, inCustody: False)",
+            "result": "Pass",
+            "time": "0.038",
+            "time-rtf": "00:00:00.0380000",
+            "start-rtf": "2026-10-24T01:58:33.5022479+00:00",
+            "finish-rtf": "2026-10-24T01:58:33.5482070+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_SynchronousProviderInvocationIsBounded",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1496"
+          },
+          {
+            "id": "c476c6fa-ff93-48d1-8bb8-bb46e4b2fee1",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SynchronousProviderInvocationIsBounded(historical: False, inCustody: True)",
+            "result": "Pass",
+            "time": "0.049",
+            "time-rtf": "00:00:00.0490000",
+            "start-rtf": "2026-10-24T01:58:33.5485713+00:00",
+            "finish-rtf": "2026-10-24T01:58:33.5982699+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_SynchronousProviderInvocationIsBounded",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1496"
+          },
+          {
+            "id": "22daa832-834d-4a18-81f6-441db61e8350",
+            "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SynchronousProviderInvocationIsBounded(historical: True, inCustody: True)",
+            "result": "Pass",
+            "time": "0.015",
+            "time-rtf": "00:00:00.0150000",
+            "start-rtf": "2026-10-24T01:58:33.5983207+00:00",
+            "finish-rtf": "2026-10-24T01:58:33.6140397+00:00",
+            "type": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests",
+            "method": "WholeQueryDeadline_SynchronousProviderInvocationIsBounded",
+            "source-file": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs",
+            "source-line": "1496"
+          }
+        ]
+      }
+    },
+    "serverConformance": {
+      "summary": {
+        "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+        "id": "cc2a0ba3-5ebe-41fa-823a-f563ee6deaac",
+        "name": "/home/administrator/projects/hexalith/agents/artifacts/five-deferred-evidence-20261024/server/bin/Hexalith.Agents.Server.Tests/debug/Hexalith.Agents.Server.Tests.dll",
+        "run-date": "2026-10-24",
+        "run-time": "01:58:26",
+        "start-rtf": "2026-10-24T01:58:26.0750508+00:00",
+        "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+        "target-framework": ".NETCoreApp,Version=v10.0",
+        "errors": "0",
+        "failed": "0",
+        "finish-rtf": "2026-10-24T01:59:19.3309310+00:00",
+        "not-run": "0",
+        "passed": "26",
+        "skipped": "0",
+        "time": "53.255",
+        "time-rtf": "00:00:53.2550000",
+        "total": "26"
+      },
+      "tests": [
+        {
+          "id": "289c19bd-0ea3-4ebf-a98a-7450d32aa83f",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.WrapperShouldLoadTheSharedCatalogFromANestedParentReferencesLayout",
+          "result": "Pass",
+          "time": "0.884",
+          "time-rtf": "00:00:00.8840000",
+          "start-rtf": "2026-10-24T01:58:26.3302042+00:00",
+          "finish-rtf": "2026-10-24T01:58:27.2287757+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "WrapperShouldLoadTheSharedCatalogFromANestedParentReferencesLayout",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "215"
+        },
+        {
+          "id": "150fd7ec-30d7-4b20-a853-deee48b7de04",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.RootPackagesPropsShouldBeAnImportOnlySharedCatalogWrapper",
+          "result": "Pass",
+          "time": "0.015",
+          "time-rtf": "00:00:00.0150000",
+          "start-rtf": "2026-10-24T01:58:27.2291882+00:00",
+          "finish-rtf": "2026-10-24T01:58:27.2448508+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "RootPackagesPropsShouldBeAnImportOnlySharedCatalogWrapper",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "65"
+        },
+        {
+          "id": "70ece4cd-ea77-4bde-bfe9-18db677a2b1f",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.AgentsUiShouldScopeItsPrereleaseDependencyWarningSuppressionToThePackableProject",
+          "result": "Pass",
+          "time": "0.042",
+          "time-rtf": "00:00:00.0420000",
+          "start-rtf": "2026-10-24T01:58:27.2451221+00:00",
+          "finish-rtf": "2026-10-24T01:58:27.2879819+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "AgentsUiShouldScopeItsPrereleaseDependencyWarningSuppressionToThePackableProject",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "108"
+        },
+        {
+          "id": "b4237924-6f80-4b97-9579-08a9a3b8f479",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.DebugRestoreShouldUsePackageModeInGitHubActionsAndSourceModeLocally(githubActions: \\\"true\\\", expectedProjectReferences: \\\"false\\\", expectedNuGetDependencies: \\\"true\\\")",
+          "result": "Pass",
+          "time": "1.257",
+          "time-rtf": "00:00:01.2569999",
+          "start-rtf": "2026-10-24T01:58:27.2931452+00:00",
+          "finish-rtf": "2026-10-24T01:58:28.5507504+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "DebugRestoreShouldUsePackageModeInGitHubActionsAndSourceModeLocally",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "140"
+        },
+        {
+          "id": "bc5231e1-04bf-49a0-a9bb-d2d201f297c3",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.DebugRestoreShouldUsePackageModeInGitHubActionsAndSourceModeLocally(githubActions: \\\"false\\\", expectedProjectReferences: \\\"true\\\", expectedNuGetDependencies: \\\"false\\\")",
+          "result": "Pass",
+          "time": "1.161",
+          "time-rtf": "00:00:01.1610000",
+          "start-rtf": "2026-10-24T01:58:28.5620610+00:00",
+          "finish-rtf": "2026-10-24T01:58:29.7237200+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "DebugRestoreShouldUsePackageModeInGitHubActionsAndSourceModeLocally",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "140"
+        },
+        {
+          "id": "f3aa8009-fc71-46a6-ac9f-2cf62b3c5856",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.RootCheckoutShouldLoadTheSharedEventStoreVersion",
+          "result": "Pass",
+          "time": "0.882",
+          "time-rtf": "00:00:00.8820000",
+          "start-rtf": "2026-10-24T01:58:29.7244900+00:00",
+          "finish-rtf": "2026-10-24T01:58:30.6067561+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "RootCheckoutShouldLoadTheSharedEventStoreVersion",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "119"
+        },
+        {
+          "id": "9e23c498-c624-4ebd-9436-e18f0fc5141a",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.WrapperShouldLoadTheSharedCatalogFromASiblingCheckout",
+          "result": "Pass",
+          "time": "0.528",
+          "time-rtf": "00:00:00.5280000",
+          "start-rtf": "2026-10-24T01:58:30.6073791+00:00",
+          "finish-rtf": "2026-10-24T01:58:31.1358485+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "WrapperShouldLoadTheSharedCatalogFromASiblingCheckout",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "207"
+        },
+        {
+          "id": "4ca4ebb2-70fe-41b6-be4d-96b1a4352f2e",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.RootBuildPropsShouldEnforceLanguageAndBuildContract",
+          "result": "Pass",
+          "time": "0",
+          "time-rtf": "00:00:00.0000000",
+          "start-rtf": "2026-10-24T01:58:31.1363095+00:00",
+          "finish-rtf": "2026-10-24T01:58:31.1368828+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "RootBuildPropsShouldEnforceLanguageAndBuildContract",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "20"
+        },
+        {
+          "id": "af389043-23aa-4751-9e0d-06da4acf5d69",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.GlobalJsonShouldPinTheSdk",
+          "result": "Pass",
+          "time": "0",
+          "time-rtf": "00:00:00.0000000",
+          "start-rtf": "2026-10-24T01:58:31.1370907+00:00",
+          "finish-rtf": "2026-10-24T01:58:31.1375086+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "GlobalJsonShouldPinTheSdk",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "294"
+        },
+        {
+          "id": "4b612513-37a3-4499-991d-ff9c0749aeef",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.RootBuildPropsShouldRequireTheLoadedSharedCatalogMarker",
+          "result": "Pass",
+          "time": "0.002",
+          "time-rtf": "00:00:00.0020000",
+          "start-rtf": "2026-10-24T01:58:31.1376698+00:00",
+          "finish-rtf": "2026-10-24T01:58:31.1398913+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "RootBuildPropsShouldRequireTheLoadedSharedCatalogMarker",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "88"
+        },
+        {
+          "id": "601e301b-3a25-446b-b03a-73f959ccfc5d",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.EventStorePackageFloorShouldFailClosedForInvalidPackageVersionRows(packageVersion: \\\"3.104.0\\\", expectedDiagnostic: \\\"requires Hexalith.EventStore 3.106.0 or later\\\")",
+          "result": "Pass",
+          "time": "9.343",
+          "time-rtf": "00:00:09.3430000",
+          "start-rtf": "2026-10-24T01:58:31.1424302+00:00",
+          "finish-rtf": "2026-10-24T01:58:40.4866795+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "EventStorePackageFloorShouldFailClosedForInvalidPackageVersionRows",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "162"
+        },
+        {
+          "id": "4a15789a-e3f1-4d48-9d79-8d97f41907ef",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.EventStorePackageFloorShouldFailClosedForInvalidPackageVersionRows(packageVersion: \\\"3.106.0-alpha\\\", expectedDiagnostic: \\\"requires Hexalith.EventStore 3.106.0 or later\\\")",
+          "result": "Pass",
+          "time": "9.444",
+          "time-rtf": "00:00:09.4440000",
+          "start-rtf": "2026-10-24T01:58:40.4868541+00:00",
+          "finish-rtf": "2026-10-24T01:58:49.9297134+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "EventStorePackageFloorShouldFailClosedForInvalidPackageVersionRows",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "162"
+        },
+        {
+          "id": "ae4febbe-547e-4774-b320-2d4a7ede5355",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.EventStorePackageFloorShouldFailClosedForInvalidPackageVersionRows(packageVersion: \\\"not-a-version\\\", expectedDiagnostic: \\\"is not a valid SemVer 2 version\\\")",
+          "result": "Pass",
+          "time": "9.225",
+          "time-rtf": "00:00:09.2250000",
+          "start-rtf": "2026-10-24T01:58:49.9297847+00:00",
+          "finish-rtf": "2026-10-24T01:58:59.1553540+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "EventStorePackageFloorShouldFailClosedForInvalidPackageVersionRows",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "162"
+        },
+        {
+          "id": "3bce7238-dac5-4882-9d38-30eac66de5e1",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.EventStorePackageFloorShouldFailClosedForInvalidPackageVersionRows(packageVersion: null, expectedDiagnostic: \\\"No effective package-mode Hexalith.EventStore Pack\\\"\u00b7\u00b7\u00b7)",
+          "result": "Pass",
+          "time": "12.225",
+          "time-rtf": "00:00:12.2250000",
+          "start-rtf": "2026-10-24T01:58:59.1554248+00:00",
+          "finish-rtf": "2026-10-24T01:59:11.3814571+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "EventStorePackageFloorShouldFailClosedForInvalidPackageVersionRows",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "162"
+        },
+        {
+          "id": "634947f6-f30b-448f-a2ca-4ff4effe5902",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.MissingSharedCatalogShouldFailWithRootOnlyInitializationGuidance",
+          "result": "Pass",
+          "time": "1.113",
+          "time-rtf": "00:00:01.1130000",
+          "start-rtf": "2026-10-24T01:59:11.3818712+00:00",
+          "finish-rtf": "2026-10-24T01:59:12.4954206+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "MissingSharedCatalogShouldFailWithRootOnlyInitializationGuidance",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "221"
+        },
+        {
+          "id": "61533f07-da03-4267-8abf-c812500cf788",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.WrapperShouldLoadTheSharedCatalogFromAParentReferencesLayout",
+          "result": "Pass",
+          "time": "0.773",
+          "time-rtf": "00:00:00.7730000",
+          "start-rtf": "2026-10-24T01:59:12.4959285+00:00",
+          "finish-rtf": "2026-10-24T01:59:13.2700252+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "WrapperShouldLoadTheSharedCatalogFromAParentReferencesLayout",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "211"
+        },
+        {
+          "id": "9019a36a-d414-43db-aa03-92786526e5ec",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.OrdinaryReleaseShouldEvaluateTheHighAndCriticalAuditPolicy",
+          "result": "Pass",
+          "time": "1.698",
+          "time-rtf": "00:00:01.6980000",
+          "start-rtf": "2026-10-24T01:59:13.2704526+00:00",
+          "finish-rtf": "2026-10-24T01:59:14.9682743+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "OrdinaryReleaseShouldEvaluateTheHighAndCriticalAuditPolicy",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "39"
+        },
+        {
+          "id": "14f2e7ac-1e3f-4c1c-bf27-1f24a9aca587",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.PackageTargetsShouldFailWhenSharedCatalogIsMissing(target: \\\"Pack\\\")",
+          "result": "Pass",
+          "time": "2.316",
+          "time-rtf": "00:00:02.3160000",
+          "start-rtf": "2026-10-24T01:59:14.9688075+00:00",
+          "finish-rtf": "2026-10-24T01:59:17.2852160+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "PackageTargetsShouldFailWhenSharedCatalogIsMissing",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "245"
+        },
+        {
+          "id": "2cc86df7-312e-4303-b5ad-b68758f5df64",
+          "name": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.PackageTargetsShouldFailWhenSharedCatalogIsMissing(target: \\\"Publish\\\")",
+          "result": "Pass",
+          "time": "2.03",
+          "time-rtf": "00:00:02.0299999",
+          "start-rtf": "2026-10-24T01:59:17.2852870+00:00",
+          "finish-rtf": "2026-10-24T01:59:19.3163602+00:00",
+          "type": "Hexalith.Agents.Server.Tests.BuildContractConformanceTests",
+          "method": "PackageTargetsShouldFailWhenSharedCatalogIsMissing",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/BuildContractConformanceTests.cs",
+          "source-line": "245"
+        },
+        {
+          "id": "91efd68b-2ecf-4df4-98b4-1ea1e9c4fe9c",
+          "name": "Hexalith.Agents.Server.Tests.PackageInventoryTests.ReleaseAutomationShouldPackInspectAndBuildAnIsolatedConsumer",
+          "result": "Pass",
+          "time": "0.043",
+          "time-rtf": "00:00:00.0429999",
+          "start-rtf": "2026-10-24T01:58:26.3242248+00:00",
+          "finish-rtf": "2026-10-24T01:58:26.3959304+00:00",
+          "type": "Hexalith.Agents.Server.Tests.PackageInventoryTests",
+          "method": "ReleaseAutomationShouldPackInspectAndBuildAnIsolatedConsumer",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs",
+          "source-line": "65"
+        },
+        {
+          "id": "a23de21a-0a06-4ea0-8832-70215f7d6da1",
+          "name": "Hexalith.Agents.Server.Tests.PackageInventoryTests.PackageToolingShouldValidateIdentityAndProtectCallerOwnedOutput",
+          "result": "Pass",
+          "time": "0.009",
+          "time-rtf": "00:00:00.0090000",
+          "start-rtf": "2026-10-24T01:58:26.4195357+00:00",
+          "finish-rtf": "2026-10-24T01:58:26.4294849+00:00",
+          "type": "Hexalith.Agents.Server.Tests.PackageInventoryTests",
+          "method": "PackageToolingShouldValidateIdentityAndProtectCallerOwnedOutput",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs",
+          "source-line": "234"
+        },
+        {
+          "id": "f1117c0c-d440-46cc-800c-1280b130ba0f",
+          "name": "Hexalith.Agents.Server.Tests.PackageInventoryTests.FrozenReleaseShouldRemainGreenAndSkipPublicationAssertions",
+          "result": "Pass",
+          "time": "0",
+          "time-rtf": "00:00:00.0000000",
+          "start-rtf": "2026-10-24T01:58:26.4296517+00:00",
+          "finish-rtf": "2026-10-24T01:58:26.4298084+00:00",
+          "type": "Hexalith.Agents.Server.Tests.PackageInventoryTests",
+          "method": "FrozenReleaseShouldRemainGreenAndSkipPublicationAssertions",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs",
+          "source-line": "204"
+        },
+        {
+          "id": "b09216b3-fbd0-45c9-9b57-677cea0cf133",
+          "name": "Hexalith.Agents.Server.Tests.PackageInventoryTests.DependencyAutomationAndCodeQlShouldCoverTheReleaseToolchain",
+          "result": "Pass",
+          "time": "0",
+          "time-rtf": "00:00:00.0000000",
+          "start-rtf": "2026-10-24T01:58:26.4298805+00:00",
+          "finish-rtf": "2026-10-24T01:58:26.4300159+00:00",
+          "type": "Hexalith.Agents.Server.Tests.PackageInventoryTests",
+          "method": "DependencyAutomationAndCodeQlShouldCoverTheReleaseToolchain",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs",
+          "source-line": "219"
+        },
+        {
+          "id": "727b3c86-4775-4cca-b32e-4cc4793b20cf",
+          "name": "Hexalith.Agents.Server.Tests.PackageInventoryTests.ReleaseShouldBeManualProtectedPinnedAndCollisionFailing(lineEnding: \\\"\\\\n\\\")",
+          "result": "Pass",
+          "time": "0.003",
+          "time-rtf": "00:00:00.0030000",
+          "start-rtf": "2026-10-24T01:58:26.4618855+00:00",
+          "finish-rtf": "2026-10-24T01:58:26.4649778+00:00",
+          "type": "Hexalith.Agents.Server.Tests.PackageInventoryTests",
+          "method": "ReleaseShouldBeManualProtectedPinnedAndCollisionFailing",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs",
+          "source-line": "147"
+        },
+        {
+          "id": "168f06c5-c151-4b5d-8156-1bbcc951e6ef",
+          "name": "Hexalith.Agents.Server.Tests.PackageInventoryTests.ReleaseShouldBeManualProtectedPinnedAndCollisionFailing(lineEnding: \\\"\\\\r\\\\n\\\")",
+          "result": "Pass",
+          "time": "0.001",
+          "time-rtf": "00:00:00.0010000",
+          "start-rtf": "2026-10-24T01:58:26.4770450+00:00",
+          "finish-rtf": "2026-10-24T01:58:26.4787033+00:00",
+          "type": "Hexalith.Agents.Server.Tests.PackageInventoryTests",
+          "method": "ReleaseShouldBeManualProtectedPinnedAndCollisionFailing",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs",
+          "source-line": "147"
+        },
+        {
+          "id": "44390a0a-1f4c-46a6-865a-e6b03f88a6e9",
+          "name": "Hexalith.Agents.Server.Tests.PackageInventoryTests.ReleaseManifestShouldDeclareTheExactPublicPackageSet",
+          "result": "Pass",
+          "time": "0.092",
+          "time-rtf": "00:00:00.0920000",
+          "start-rtf": "2026-10-24T01:58:26.4789924+00:00",
+          "finish-rtf": "2026-10-24T01:58:26.5711028+00:00",
+          "type": "Hexalith.Agents.Server.Tests.PackageInventoryTests",
+          "method": "ReleaseManifestShouldDeclareTheExactPublicPackageSet",
+          "source-file": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs",
+          "source-line": "25"
+        }
+      ]
+    }
+  },
+  "nativeReceiptResults": "test_matching_receipt_passes (parties_readiness_verifier_test.ExactTargetReceiptTests.test_matching_receipt_passes) ... ok\ntest_matching_receipt_passes_through_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_matching_receipt_passes_through_wrapper) ... ok\ntest_mismatched_compatibilityCommand_prevents_http (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_compatibilityCommand_prevents_http) ... ok\ntest_mismatched_compatibilityCommand_prevents_http_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_compatibilityCommand_prevents_http_wrapper) ... ok\ntest_mismatched_evidenceLevel_prevents_http (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_evidenceLevel_prevents_http) ... ok\ntest_mismatched_evidenceLevel_prevents_http_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_evidenceLevel_prevents_http_wrapper) ... ok\ntest_mismatched_outcome_prevents_http (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_outcome_prevents_http) ... ok\ntest_mismatched_outcome_prevents_http_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_outcome_prevents_http_wrapper) ... ok\ntest_mismatched_prerequisitesAvailable_prevents_http (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_prerequisitesAvailable_prevents_http) ... ok\ntest_mismatched_prerequisitesAvailable_prevents_http_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_prerequisitesAvailable_prevents_http_wrapper) ... ok\ntest_mismatched_recordId_prevents_http (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_recordId_prevents_http) ... ok\ntest_mismatched_recordId_prevents_http_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_recordId_prevents_http_wrapper) ... ok\ntest_mismatched_targetVersionOrCommit_prevents_http (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_targetVersionOrCommit_prevents_http) ... ok\ntest_mismatched_targetVersionOrCommit_prevents_http_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_targetVersionOrCommit_prevents_http_wrapper) ... ok\n\n----------------------------------------------------------------------\nRan 14 tests in 137.069s\n\nOK\n",
+  "toolVersions": {
+    "dotnetInspect": "0.26.0+d236a7a",
+    "rootDotnetSdk": "10.0.402",
+    "outsideRootProbeDotnetSdk": "10.0.402",
+    "node": "v26.4.0",
+    "python": "Python 3.14.4"
+  },
+  "initialVerifiedFileSha256": {
+    "Directory.Build.props": "9d6019c3a9329606defad88f00e4c381bdf692afc705f54f83f73b5b8d934ccb",
+    "eng/semantic-release-plan.mjs": "19c736a63d51693de4a671646a3f7e70be2f2f1acd007bb9d4496ff1a64a71cc",
+    ".releaserc.json": "9ec24f4702c82dfcd8c42ade0f8476a657569c2ef5f173046d4a6c6fc824155f",
+    ".github/workflows/ci.yml": "5ccfdfaa9c02e4a26b5d4063b4162b0aa006b60489bc216f379aed0dfbf5e2e2",
+    ".github/workflows/release.yml": "a73e07328a2bc23131fba3e9048010cee2e2a2ed592c2d0b26af9263358941f2",
+    ".github/dependabot.yml": "7c45352be9c46358b1232a8ccc03606d68d0747abfe81322716320375462dcc6",
+    "scripts/verify-parties-identity.py": "98f61794a9a50b051ff8570818973b3dd22f98c81c83fca04b45d6256e2f6233",
+    "tests/tooling/parties_identity_verification_test.py": "38dc9fdff871bd1eb10a078d300fcd57280f5ed0dcdbf228a05f2a76275cfea2",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs": "88aca1d2fe18260b7ed4393c30e348fcd75c7c03fa699b37af656e6abacdaa38",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Queries/PartyIdentityQueryDeadline.cs": "ce91ab42c8ef445a6955975582ca16f27826522d5c09085c238bcb66de3e809b",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Authorization/PartyIdentityOptions.cs": "13d53019d103f379159aa91371930d1504e8f95cdb8ca2941d88ec5b32e46689",
+    "references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs": "5fbc575fce0f6a28f09b176067460d5662e903dec16af5a47f40de876efbeb1a"
+  }
+}

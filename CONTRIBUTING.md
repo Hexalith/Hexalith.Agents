@@ -50,7 +50,8 @@ paths. They establish synthetic verifier behavior; dependency acceptance and
 production qualification still require their existing owner evidence.
 
 To build the pinned Parties identity projects and run their focused current-read,
-client completion-time, authority-change and exact-target receipt regressions:
+client completion-time, authority-change, query-deadline and exact-target receipt
+regressions:
 
 ```bash
 python3 scripts/verify-parties-identity.py --artifacts /tmp/agents-parties-identity
@@ -60,7 +61,12 @@ The command uses Debug project references to root-declared dependencies, with th
 existing package fallback for optional Memories. It records build logs, fresh xUnit
 results and a success-only `identity-verification.json` with source revisions,
 dirty state and execution timestamps. Root-owned non-null authority-change tests
-are compiled into the owner test assembly only for this command. Relative artifact
+are compiled into the owner test assembly only for this command. The deadline
+selections exercise current and historical queries, noncooperative source/custody
+providers, the shared operation budget, cancellation races and a successful read
+immediately before expiry. These checks establish bounded verdict waits; shared
+worker admission and resource reclamation still require owner qualification.
+Relative artifact
 paths resolve from the caller's directory; concurrent runs need separate artifact
 directories. This is local regression evidence; it does not change the dependency
 register or establish live readiness.
@@ -97,7 +103,11 @@ Semantic-release uses `.releaserc.json` and commit history to calculate releases
 `fix` normally selects a patch, `feat` a minor, and a breaking change a major.
 Other types alone normally do not trigger publication. The planner reads that
 same configuration. `node eng/semantic-release-plan.mjs` computes the decision
-using an isolated local mirror without publishing.
+using an isolated local mirror without publishing. Put analysis options in the
+configured commit-analyzer and release-notes-generator plugin tuples. The planner
+rejects top-level `analyzeCommits`, `generateNotes` and `extends` settings to avoid
+silently planning a different release from publication. Additional plugins and
+exec analysis hooks also require planner support before they can be used.
 
 ## Release policy
 

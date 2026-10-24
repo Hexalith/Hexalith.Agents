@@ -1651,3 +1651,15 @@ These paths entered the baseline diff through other Story 5.1, CI/release, follo
 - `tests/tooling/semantic_release_plan_test.py`
 - `tests/tooling/story_review_readiness/__init__.py`
 - `tests/tooling/verify_nuget_publication_test.py`
+
+
+## Current audit policy reconciliation (2026-10-24)
+
+The historical advisory exceptions in this completed specification do not describe
+current verification policy. `spec-five-deferred-build-verification-items.md`
+already established all-dependency NuGet auditing with warnings as errors and only
+NU1901/NU1902 exemptions; NU1903/NU1904 fail ordinary CI. The later admission and
+verification batch removed routine NuGetAudit=false arguments. This supersedes the
+old single-advisory wording without changing frozen historical intent or granting
+a new exception. Fresh effective-property and controlled verifier evidence is
+recorded in [the deferred evidence reconciliation](deferred-evidence-reconciliation-2026-10-24.md#high-and-critical-nuget-audit-diagnostics).

@@ -14,6 +14,20 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "scripts/verify-parties-identity.py"
+DEADLINE_METHODS = (
+    "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+    "CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken",
+    "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence",
+    "WholeQueryDeadline_SynchronousProviderInvocationIsBounded",
+    "WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget",
+    "WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence",
+    "InvalidQueryTimeout_DeniesBeforeAnyProvider",
+    "WholeQueryDeadline_SetupTimeConsumesOperationBudget",
+    "ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves",
+    "WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence",
+    "CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken",
+    "ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict",
+)
 
 DOTNET = r'''
 import json, os, pathlib, sys, xml.etree.ElementTree as ET
@@ -41,10 +55,24 @@ if args[0] == "build":
 assembly = pathlib.Path(args[0])
 selection = args[args.index("-method") + 1]
 test_type, method = selection.rsplit(".", 1)
+if os.environ.get("IDENTITY_TARGET_METHOD") not in (None, method):
+    scenario = "success"
 count = {"CurrentCompletionTimeChangesDuringCustody_DenyEvidence": 4,
          "CurrentAuthorityChangesDuringAwait_DenyEvidence": 2,
          "CurrentHuman_RequiresCompleteSourceAndCurrentExactActor": 1,
          "CurrentAuthorityChangeDuringReadMustNotReleaseIdentity": 8,
+         "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence": 8,
+         "WholeQueryDeadline_SynchronousProviderInvocationIsBounded": 4,
+         "WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget": 2,
+         "WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence": 2,
+         "InvalidQueryTimeout_DeniesBeforeAnyProvider": 8,
+         "WholeQueryDeadline_SetupTimeConsumesOperationBudget": 4,
+         "ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves": 2,
+         "WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence": 2,
+         "CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken": 4,
+         "ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict": 2,
+         "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion": 12,
+         "CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken": 4,
          "DelayedReply_ValidatesCompletionTime": 9}[method]
 path = pathlib.Path(args[args.index("-result-xml") + 1])
 if scenario == "runner-failure":
@@ -77,6 +105,84 @@ labels = {
     "CurrentAuthorityChangeDuringReadMustNotReleaseIdentity": [
         '(inCustody: ' + suspended + ', change: "' + change + '")' for suspended in ("False", "True")
         for change in ("source", "actor-revision", "authority-revision", "unchanged")],
+    "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence": (
+        '(historical: False, inCustody: False, lateFault: False)',
+        '(historical: False, inCustody: False, lateFault: True)',
+        '(historical: False, inCustody: True, lateFault: False)',
+        '(historical: False, inCustody: True, lateFault: True)',
+        '(historical: True, inCustody: False, lateFault: False)',
+        '(historical: True, inCustody: False, lateFault: True)',
+        '(historical: True, inCustody: True, lateFault: False)',
+        '(historical: True, inCustody: True, lateFault: True)',
+    ),
+    "WholeQueryDeadline_SynchronousProviderInvocationIsBounded": (
+        '(historical: False, inCustody: False)',
+        '(historical: False, inCustody: True)',
+        '(historical: True, inCustody: False)',
+        '(historical: True, inCustody: True)',
+    ),
+    "WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget": (
+        '(historical: False)',
+        '(historical: True)',
+    ),
+    "WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence": (
+        '(historical: False)',
+        '(historical: True)',
+    ),
+    "InvalidQueryTimeout_DeniesBeforeAnyProvider": (
+        '(historical: False, ticks: 0)',
+        '(historical: False, ticks: -1)',
+        '(historical: False, ticks: 300000001)',
+        '(historical: False, ticks: 9223372036854775807)',
+        '(historical: True, ticks: 0)',
+        '(historical: True, ticks: -1)',
+        '(historical: True, ticks: 300000001)',
+        '(historical: True, ticks: 9223372036854775807)',
+    ),
+    "WholeQueryDeadline_SetupTimeConsumesOperationBudget": (
+        '(historical: False, exhausted: False)',
+        '(historical: False, exhausted: True)',
+        '(historical: True, exhausted: False)',
+        '(historical: True, exhausted: True)',
+    ),
+    "ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves": (
+        '(historical: False)',
+        '(historical: True)',
+    ),
+    "WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence": (
+        '(historical: False)',
+        '(historical: True)',
+    ),
+    "CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken": (
+        '(historical: False, expire: False)',
+        '(historical: False, expire: True)',
+        '(historical: True, expire: False)',
+        '(historical: True, expire: True)',
+    ),
+    "ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict": (
+        '(historical: False)',
+        '(historical: True)',
+    ),
+    "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion": (
+        '(historical: False, inCustody: False, trigger: "timer")',
+        '(historical: False, inCustody: False, trigger: "elapsed")',
+        '(historical: False, inCustody: False, trigger: "caller")',
+        '(historical: False, inCustody: True, trigger: "timer")',
+        '(historical: False, inCustody: True, trigger: "elapsed")',
+        '(historical: False, inCustody: True, trigger: "caller")',
+        '(historical: True, inCustody: False, trigger: "timer")',
+        '(historical: True, inCustody: False, trigger: "elapsed")',
+        '(historical: True, inCustody: False, trigger: "caller")',
+        '(historical: True, inCustody: True, trigger: "timer")',
+        '(historical: True, inCustody: True, trigger: "elapsed")',
+        '(historical: True, inCustody: True, trigger: "caller")',
+    ),
+    "CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken": (
+        '(historical: False, trigger: "deadline")',
+        '(historical: False, trigger: "fault")',
+        '(historical: True, trigger: "deadline")',
+        '(historical: True, trigger: "fault")',
+    ),
     "DelayedReply_ValidatesCompletionTime": ['(scenario: "' + value + '")' for value in (
         "current-valid", "current-interval-expiry", "current-custody-expiry", "current-source-rollback",
         "current-binding-rollback", "current-future-observation", "historical-closed-valid",
@@ -183,7 +289,15 @@ else:
         self.assertEqual(receipt["sources"]["parties"], dict(commit="b" * 40, dirty=False, status=[]))
         self.assertEqual(len(receipt["runId"]), 32)
         self.assertLessEqual(receipt["startedAt"], receipt["completedAt"])
-        self.assertEqual(sorted(receipt["ownerCases"].values()), [1, 2, 4, 8, 9])
+        self.assertEqual(sorted(receipt["ownerCases"].values()), [1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 8, 8, 8, 9, 12])
+        self.assertEqual(set(receipt["ownerCases"]), {
+            "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests." + method
+            for method in ("CurrentCompletionTimeChangesDuringCustody_DenyEvidence",
+                           "CurrentAuthorityChangesDuringAwait_DenyEvidence",
+                           "CurrentHuman_RequiresCompleteSourceAndCurrentExactActor",
+                           *DEADLINE_METHODS)
+        } | {"Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity",
+             "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime"})
         builds = [call for call in calls if call.get("args", [None])[0] == "build"]
         self.assertEqual([Path(call["args"][1]).stem for call in builds],
                          ["Hexalith.Parties.Tests", "Hexalith.Parties.Client.Tests"])
@@ -202,7 +316,22 @@ else:
             for module in ("Builds", "EventStore", "Commons", "Tenants", "McpCli", "FrontComposer"):
                 self.assertIn(f"-p:Hexalith{module}Root={self.root / 'references' / ('Hexalith.' + module)}", args)
         self.assertEqual(calls[-1], {"stage": "receipt"})
-        self.assertEqual(len(calls), 13)
+        self.assertEqual(len(calls), 25)
+
+    def test_each_deadline_selection_requires_complete_named_results(self):
+        for method in DEADLINE_METHODS:
+            for scenario in ("missing-case", "unrelated-cases", "skipped"):
+                with self.subTest(method=method, scenario=scenario):
+                    self.calls.unlink(missing_ok=True)
+                    self.environment["IDENTITY_TARGET_METHOD"] = method
+                    result, calls = self.invoke(scenario)
+                    self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                    self.assertIn("invalid results for Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests." + method,
+                                  result.stderr)
+                    self.assertFalse(self.receipt.exists())
+                    self.assertEqual(calls[-1]["args"][2],
+                                     "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests." + method)
+                    self.assertFalse(any(call.get("stage") == "receipt" for call in calls))
 
     def test_localized_caller_gets_deterministic_build_language(self):
         self.environment["DOTNET_CLI_UI_LANGUAGE"] = "fr-FR"

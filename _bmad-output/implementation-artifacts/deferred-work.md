@@ -481,6 +481,9 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Derive semantic-release planning and publication from one release configuration.
   evidence: The inherited planner hardcodes branches, tag format, and plugins separately from `.releaserc.json`, so a later release-rule change can produce a different reserved version and block publication.
+  status: done 2026-10-24
+  resolution: `spec-five-deferred-evidence-reconciliation-items.md` — Reconciles the older open reference to the already implemented shared-config planner. The planner reads branches, tag format and analysis options from .releaserc.json and now refuses unsupported analysis overrides, unreviewed plugins and exec analysis hooks before generating a divergent plan; ten executable scratch-repository tests verify decisions, refusals and hook isolation. This closes the duplicate reference without claiming another planner implementation.
+  evidence_record: [Evidence reconciliation](deferred-evidence-reconciliation-2026-10-24.md#shared-release-configuration)
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Enforce the centrally declared package license, provenance URLs, and readme in package validation.
@@ -505,6 +508,9 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Decide whether high and critical NuGet audit diagnostics should fail the build.
   evidence: `Directory.Build.props` enables NuGet auditing across all dependencies and in the same property group appends NU1901 through NU1904 to `WarningsNotAsErrors`, so warnings-as-errors lanes report advisories and pass; a build-contract test pins that combination, and the story text scopes the audit exception to one inherited advisory, so closing it also requires renegotiating that text. Carried from an earlier review round.
+  status: done 2026-10-24
+  resolution: `spec-five-deferred-evidence-reconciliation-items.md` — The existing adopted policy exempts only NU1901/NU1902, audits every dependency and fails NU1903/NU1904. Fresh effective Release-property tests and controlled verifier failures confirm it. The completed Story 5.2 specification now carries an explicit current-policy supersession outside frozen historical intent; no new exception or risk acceptance is granted.
+  evidence_record: [Evidence reconciliation](deferred-evidence-reconciliation-2026-10-24.md#high-and-critical-nuget-audit-diagnostics)
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Make the release planner read `.releaserc.json` instead of restating branches and tag format.
@@ -529,6 +535,9 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
   summary: Make CI and release evidence honest for Story 5.2 floors, pins, skips, package layout, Dependabot, and unpublished dispatches.
   evidence: Split from the live-setup correctness spec because token count was 2491. The deferred slice is test floors and skip rejection in agents-policy, aligning the domain-ci and domain-release pin with the Builds gitlink, verifier skip and source-mode gaps, checkout credentials, npm signature audit, package-count and test-project drift, Dependabot gitlinks, and the unpublished-release signal. That last signal is still undecided: fail the workflow when publication is disabled, or stay green and write a job summary that publication did not run.
+  status: done 2026-10-24
+  resolution: `spec-five-deferred-evidence-reconciliation-items.md` — Reconciles every sub-item with the existing workflows, exact Builds gitlink/ref alignment, source/package floors, focused native-result guards, credential/signature rules, five test projects, six-package manifest, Dependabot and documented green frozen-publication summary. Fresh 26-case conformance and production-script tooling checks pass. Local automation evidence does not claim a hosted run or package publication.
+  evidence_record: [Evidence reconciliation](deferred-evidence-reconciliation-2026-10-24.md#story-52-ci-and-release-evidence)
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
   summary: Stop a create command from storing a payload tenant that disagrees with the envelope tenant.
@@ -642,6 +651,9 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Packaged SDK transport is missing (B01) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: The pinned Client 3.113.0 has no retained-history reader while source mode supplies it. Contracts already contains the older custody seam, so the claim is narrowed to missing retained-stream/reader APIs; packaged release verification remains an earlier prerequisite.
+  status: done 2026-10-24
+  resolution: `spec-five-deferred-evidence-reconciliation-items.md` — The actual catalog selects Client 3.126.0, which exports RetainedIdentityHistoryReader, IRetainedIdentityHistoryReader and the typed ReadAsync API. dotnet-inspect and a fresh isolated package-only compilation/runtime type probe confirm availability with no source references. This closes the missing-packaged-API defect; authenticated reads, full owner qualification and source/package revision equality remain separate requirements.
+  evidence_record: [Evidence reconciliation](deferred-evidence-reconciliation-2026-10-24.md#packaged-retained-history-api-b01)
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Successor continuity after predecessor expiry (B02) remains an earlier Story 5.4 prerequisite before owner qualification.
@@ -664,6 +676,9 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Party query deadline (B06) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: Current and retained-history custody waits use WaitAsync(cancellationToken) without an operation deadline. An ignoring provider with CancellationToken.None can stall indefinitely. This earlier query boundary needs its own bounded operation contract.
+  status: done 2026-10-24
+  resolution: `spec-five-deferred-evidence-reconciliation-items.md` — The pinned Parties service already supplies one bounded current/history query budget. The maintained root identity command now requires 54 exact deadline rows, alongside 24 earlier owner cases and 14 receipt cases. Thirty-six controlled negative executions reject missing, substituted or skipped deadline results before a success receipt. Fresh actual owner runs pass; authority responsiveness, worker reclamation, standalone transport and production qualification retain their separate gates.
+  evidence_record: [Evidence reconciliation](deferred-evidence-reconciliation-2026-10-24.md#party-query-deadline-b06)
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Readiness exact immutable expiry (B08, E05, V04) remains an earlier Story 5.4 prerequisite before owner qualification.

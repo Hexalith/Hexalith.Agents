@@ -16,11 +16,28 @@ delete plannerEnvironment.GITHUB_TOKEN;
 let temporaryDirectory;
 try {
   const configuration = JSON.parse(await readFile(join(process.cwd(), '.releaserc.json'), 'utf8'));
+  const unsupportedAnalysis = ['extends', 'analyzeCommits', 'generateNotes']
+    .filter((key) => Object.hasOwn(configuration, key));
+  if (unsupportedAnalysis.length !== 0) {
+    throw new Error(`Release planning does not support top-level ${unsupportedAnalysis.join(', ')}; `
+      + 'inline shared configuration and put analysis options in the declared analysis plugin tuples.');
+  }
   // Keep analysis options in sync with publication while excluding plugins with write hooks.
   const analysisPlugins = [
     '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',
   ];
+  const publicationPlugins = ['@semantic-release/exec', '@semantic-release/github'];
+  for (const plugin of configuration.plugins) {
+    const [name, options] = Array.isArray(plugin) ? plugin : [plugin, {}];
+    if (!analysisPlugins.includes(name) && !publicationPlugins.includes(name)) {
+      throw new Error(`Release planning does not support plugin ${name}; its analysis must be reviewed.`);
+    }
+    if (name === '@semantic-release/exec' && options
+        && (Object.hasOwn(options, 'analyzeCommitsCmd') || Object.hasOwn(options, 'generateNotesCmd'))) {
+      throw new Error('Release planning does not support exec analysis hooks; use the declared analysis plugins.');
+    }
+  }
   const plugins = configuration.plugins.filter((plugin) =>
     analysisPlugins.includes(Array.isArray(plugin) ? plugin[0] : plugin));
   for (const name of analysisPlugins) {

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and verify the pinned Parties completion-time and authority regressions."""
+"""Build and verify the pinned Parties completion-time, authority and query-deadline regressions."""
 
 from __future__ import annotations
 
@@ -25,6 +25,18 @@ SELECTIONS = {
         (QUERY_TYPE, "CurrentHuman_RequiresCompleteSourceAndCurrentExactActor", 1),
         ("Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests",
          "CurrentAuthorityChangeDuringReadMustNotReleaseIdentity", 8),
+        (QUERY_TYPE, "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence", 8),
+        (QUERY_TYPE, "WholeQueryDeadline_SynchronousProviderInvocationIsBounded", 4),
+        (QUERY_TYPE, "WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget", 2),
+        (QUERY_TYPE, "WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence", 2),
+        (QUERY_TYPE, "InvalidQueryTimeout_DeniesBeforeAnyProvider", 8),
+        (QUERY_TYPE, "WholeQueryDeadline_SetupTimeConsumesOperationBudget", 4),
+        (QUERY_TYPE, "ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves", 2),
+        (QUERY_TYPE, "WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence", 2),
+        (QUERY_TYPE, "CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken", 4),
+        (QUERY_TYPE, "ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict", 2),
+        (QUERY_TYPE, "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion", 12),
+        (QUERY_TYPE, "CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken", 4),
     ),
     "Hexalith.Parties.Client.Tests": (
         (CLIENT_TYPE, "DelayedReply_ValidatesCompletionTime", 9),
@@ -45,6 +57,84 @@ CASE_LABELS = {
     "CurrentAuthorityChangeDuringReadMustNotReleaseIdentity": tuple(
         f'(inCustody: {suspended}, change: "{change}")' for suspended in ("False", "True")
         for change in ("source", "actor-revision", "authority-revision", "unchanged")),
+    "WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence": (
+        '(historical: False, inCustody: False, lateFault: False)',
+        '(historical: False, inCustody: False, lateFault: True)',
+        '(historical: False, inCustody: True, lateFault: False)',
+        '(historical: False, inCustody: True, lateFault: True)',
+        '(historical: True, inCustody: False, lateFault: False)',
+        '(historical: True, inCustody: False, lateFault: True)',
+        '(historical: True, inCustody: True, lateFault: False)',
+        '(historical: True, inCustody: True, lateFault: True)',
+    ),
+    "WholeQueryDeadline_SynchronousProviderInvocationIsBounded": (
+        '(historical: False, inCustody: False)',
+        '(historical: False, inCustody: True)',
+        '(historical: True, inCustody: False)',
+        '(historical: True, inCustody: True)',
+    ),
+    "WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget": (
+        '(historical: False)',
+        '(historical: True)',
+    ),
+    "WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence": (
+        '(historical: False)',
+        '(historical: True)',
+    ),
+    "InvalidQueryTimeout_DeniesBeforeAnyProvider": (
+        '(historical: False, ticks: 0)',
+        '(historical: False, ticks: -1)',
+        '(historical: False, ticks: 300000001)',
+        '(historical: False, ticks: 9223372036854775807)',
+        '(historical: True, ticks: 0)',
+        '(historical: True, ticks: -1)',
+        '(historical: True, ticks: 300000001)',
+        '(historical: True, ticks: 9223372036854775807)',
+    ),
+    "WholeQueryDeadline_SetupTimeConsumesOperationBudget": (
+        '(historical: False, exhausted: False)',
+        '(historical: False, exhausted: True)',
+        '(historical: True, exhausted: False)',
+        '(historical: True, exhausted: True)',
+    ),
+    "ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves": (
+        '(historical: False)',
+        '(historical: True)',
+    ),
+    "WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence": (
+        '(historical: False)',
+        '(historical: True)',
+    ),
+    "CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken": (
+        '(historical: False, expire: False)',
+        '(historical: False, expire: True)',
+        '(historical: True, expire: False)',
+        '(historical: True, expire: True)',
+    ),
+    "ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict": (
+        '(historical: False)',
+        '(historical: True)',
+    ),
+    "BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion": (
+        '(historical: False, inCustody: False, trigger: "timer")',
+        '(historical: False, inCustody: False, trigger: "elapsed")',
+        '(historical: False, inCustody: False, trigger: "caller")',
+        '(historical: False, inCustody: True, trigger: "timer")',
+        '(historical: False, inCustody: True, trigger: "elapsed")',
+        '(historical: False, inCustody: True, trigger: "caller")',
+        '(historical: True, inCustody: False, trigger: "timer")',
+        '(historical: True, inCustody: False, trigger: "elapsed")',
+        '(historical: True, inCustody: False, trigger: "caller")',
+        '(historical: True, inCustody: True, trigger: "timer")',
+        '(historical: True, inCustody: True, trigger: "elapsed")',
+        '(historical: True, inCustody: True, trigger: "caller")',
+    ),
+    "CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken": (
+        '(historical: False, trigger: "deadline")',
+        '(historical: False, trigger: "fault")',
+        '(historical: True, trigger: "deadline")',
+        '(historical: True, trigger: "fault")',
+    ),
     "DelayedReply_ValidatesCompletionTime": tuple(f'(scenario: "{value}")' for value in (
         "current-valid", "current-interval-expiry", "current-custody-expiry", "current-source-rollback",
         "current-binding-rollback", "current-future-observation", "historical-closed-valid",
