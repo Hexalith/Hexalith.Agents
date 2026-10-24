@@ -1,0 +1,54 @@
+name: Recover release packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Original staged release version
+        required: true
+        type: string
+      source-sha:
+        description: Original source commit (must still be current green main)
+        required: true
+        type: string
+
+concurrency:
+  group: release-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    name: Protected original release recovery
+    if: github.ref == 'refs/heads/main' && vars.HEXALITH_RELEASE_PUBLISH_ENABLED == 'true'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+      - uses: actions/setup-dotnet@v5.3.0
+        with:
+          global-json-file: global.json
+      - name: Recover original archives without release planning
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          HEXALITH_RELEASE_PUBLISH_ENABLED: ${{ vars.HEXALITH_RELEASE_PUBLISH_ENABLED }}
+          VERSION: ${{ inputs.version }}
+          SOURCE_SHA: ${{ inputs.source-sha }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_SHA" = "$SOURCE_SHA"
+          ulimit -f 65536
+          python3 scripts/recover-release-packages.py "$VERSION" --source-sha "$SOURCE_SHA"

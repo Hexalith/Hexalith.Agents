@@ -80,6 +80,44 @@ public sealed class EventStoreProviderCatalogOperationsTests
             });
     }
 
+    [Theory]
+    [InlineData("01ARZ3NDEKTSV4RRFFQ69G5FAW", true, AgentOperationStatus.Succeeded)]
+    [InlineData("invalid", true, AgentOperationStatus.ValidationFailed)]
+    [InlineData("01arz3ndektsv4rrffq69g5faw", true, AgentOperationStatus.ValidationFailed)]
+    [InlineData("invalid", false, AgentOperationStatus.NotAuthorized)]
+    public async Task OutcomeCorrelationValidationPreservesAuthorizationPrecedence(string correlation, bool authorized, AgentOperationStatus expected)
+    {
+        if (!authorized)
+        {
+            _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "user", IsAgentsAdmin: false));
+        }
+        AgentOperationResult<AgentSetupWriteOutcome> result = await Operations().GetCommandWriteOutcomeAsync(
+            ProviderCatalogIdentity.PlatformTenantId, MessageId, new AgentOperationOptions(correlation));
+        result.Status.ShouldBe(expected);
+        result.CorrelationId.ShouldBe(correlation == CorrelationId ? CorrelationId : null);
+        if (expected == AgentOperationStatus.Succeeded)
+        {
+            await _gateway.Received(1).GetCommandStatusAsync(MessageId, Arg.Any<CancellationToken>());
+        }
+        else
+        {
+            await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+        }
+    }
+
+    [Theory]
+    [InlineData("invalid")]
+    [InlineData("01arz3ndektsv4rrffq69g5faw")]
+    public async Task LegacyOutcomeRejectionDiscardsMalformedCorrelation(string correlation)
+    {
+#pragma warning disable CS0618 // Verify the retained deprecated operation's rejection contract.
+        var result = await Operations().GetCommandOutcomeAsync("system", MessageId, new AgentOperationOptions(correlation));
+#pragma warning restore CS0618
+        result.Status.ShouldBe(AgentOperationStatus.Rejected);
+        result.CorrelationId.ShouldBeNull();
+        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+    }
+
     [Fact]
     public async Task CanonicalCallerIdentitiesSurviveAnExactProviderWriteRetry()
     {
@@ -230,18 +268,18 @@ public sealed class EventStoreProviderCatalogOperationsTests
     [Fact]
     public async Task Missing_command_status_without_a_receipt_is_unverifiable()
     {
-        AgentOperationResult<AgentSetupWriteStatus> result = await Operations()
-            .GetCommandOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId, "unknown-message");
+        AgentOperationResult<AgentSetupWriteOutcome> result = await Operations()
+            .GetCommandWriteOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId, "unknown-message");
 
         result.IsSuccess.ShouldBeTrue();
-        result.Value.ShouldBe(AgentSetupWriteStatus.UnableToVerify);
+        result.Value.ShouldBe(AgentSetupWriteOutcome.UnableToVerify);
     }
 
     [Theory]
-    [InlineData(CommandStatus.PublishFailed, AgentSetupWriteStatus.AwaitingProjection)]
-    [InlineData(CommandStatus.TimedOut, AgentSetupWriteStatus.Unavailable)]
+    [InlineData(CommandStatus.PublishFailed, AgentSetupWriteOutcome.AwaitingProjection)]
+    [InlineData(CommandStatus.TimedOut, AgentSetupWriteOutcome.Unavailable)]
     public async Task Stored_publish_failure_keeps_pending_truth_but_timeout_is_terminal(
-        CommandStatus status, AgentSetupWriteStatus expected)
+        CommandStatus status, AgentSetupWriteOutcome expected)
     {
         _gateway.GetCommandStatusAsync("msg-outcome", Arg.Any<CancellationToken>())
             .Returns(new CommandStatusQueryResponse("corr", status.ToString(), (int)status,
@@ -250,8 +288,8 @@ public sealed class EventStoreProviderCatalogOperationsTests
                 TenantId = ProviderCatalogIdentity.PlatformTenantId,
             });
 
-        AgentOperationResult<AgentSetupWriteStatus> result = await Operations()
-            .GetCommandOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId, "msg-outcome");
+        AgentOperationResult<AgentSetupWriteOutcome> result = await Operations()
+            .GetCommandWriteOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId, "msg-outcome");
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.ShouldBe(expected);
@@ -267,8 +305,8 @@ public sealed class EventStoreProviderCatalogOperationsTests
 
         write.IsSuccess.ShouldBeTrue();
         write.Value.ShouldNotBeNull().TruthState.ShouldBe(AgentSetupTruthState.Submitted);
-        (await Operations().GetCommandOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId,
-            write.Value.MessageId)).Value.ShouldBe(AgentSetupWriteStatus.UnableToVerify);
+        (await Operations().GetCommandWriteOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId,
+            write.Value.MessageId)).Value.ShouldBe(AgentSetupWriteOutcome.UnableToVerify);
     }
 
     [Fact]
@@ -459,12 +497,12 @@ public sealed class EventStoreProviderCatalogOperationsTests
     }
 
     [Theory]
-    [InlineData("infrastructure", AgentSetupWriteStatus.Unavailable)]
-    [InlineData("unknown-rejection", AgentSetupWriteStatus.UnableToVerify)]
-    [InlineData("retryable", AgentSetupWriteStatus.Submitted)]
-    [InlineData("mismatched-status", AgentSetupWriteStatus.UnableToVerify)]
+    [InlineData("infrastructure", AgentSetupWriteOutcome.Unavailable)]
+    [InlineData("unknown-rejection", AgentSetupWriteOutcome.UnableToVerify)]
+    [InlineData("retryable", AgentSetupWriteOutcome.Submitted)]
+    [InlineData("mismatched-status", AgentSetupWriteOutcome.UnableToVerify)]
     public async Task Only_canonical_domain_rejections_are_reported_as_rejected(
-        string scenario, AgentSetupWriteStatus expected)
+        string scenario, AgentSetupWriteOutcome expected)
     {
         _gateway.GetCommandStatusAsync("msg-outcome", Arg.Any<CancellationToken>())
             .Returns(new CommandStatusQueryResponse("corr",
@@ -476,12 +514,12 @@ public sealed class EventStoreProviderCatalogOperationsTests
                 Retryable = scenario == "retryable",
             });
 
-        AgentOperationResult<AgentSetupWriteStatus> result = await Operations()
-            .GetCommandOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId, "msg-outcome");
+        AgentOperationResult<AgentSetupWriteOutcome> result = await Operations()
+            .GetCommandWriteOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId, "msg-outcome");
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.ShouldBe(expected);
-        result.Value.ShouldNotBe(AgentSetupWriteStatus.Rejected);
+        result.Value.ShouldNotBe(AgentSetupWriteOutcome.Rejected);
     }
 
     [Fact]
@@ -502,16 +540,16 @@ public sealed class EventStoreProviderCatalogOperationsTests
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.ShouldNotBeNull().TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
-        AgentOperationResult<AgentSetupWriteStatus> otherTenant = await Operations()
-            .GetCommandOutcomeAsync("another-tenant", result.Value.MessageId);
+        AgentOperationResult<AgentSetupWriteOutcome> otherTenant = await Operations()
+            .GetCommandWriteOutcomeAsync("another-tenant", result.Value.MessageId);
 
         // Story 5.4 AC4: a foreign status is indistinguishable from an absent one and discloses nothing.
         otherTenant.IsSuccess.ShouldBeTrue();
-        otherTenant.Value.ShouldBe(AgentSetupWriteStatus.UnableToVerify);
+        otherTenant.Value.ShouldBe(AgentSetupWriteOutcome.UnableToVerify);
         _gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns((CommandStatusQueryResponse?)null);
-        AgentOperationResult<AgentSetupWriteStatus> absent = await Operations()
-            .GetCommandOutcomeAsync("another-tenant", "absent-message");
+        AgentOperationResult<AgentSetupWriteOutcome> absent = await Operations()
+            .GetCommandWriteOutcomeAsync("another-tenant", "absent-message");
         absent.IsSuccess.ShouldBe(otherTenant.IsSuccess);
         absent.Value.ShouldBe(otherTenant.Value);
     }
@@ -986,8 +1024,8 @@ public sealed class EventStoreProviderCatalogOperationsTests
         _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "tenant-admin", IsAgentsAdmin: true));
         _contextProvider.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => _contextProvider.GetContext());
 
-        AgentOperationResult<AgentSetupWriteStatus> result = await Operations()
-            .GetCommandOutcomeAsync(targetTenantId, "msg-outcome");
+        AgentOperationResult<AgentSetupWriteOutcome> result = await Operations()
+            .GetCommandWriteOutcomeAsync(targetTenantId, "msg-outcome");
 
         result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.NotAuthorized);
         await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
@@ -1036,9 +1074,9 @@ public sealed class EventStoreProviderCatalogOperationsTests
     }
 
     [Theory]
-    [InlineData(1, AgentSetupWriteStatus.AwaitingProjection)]
-    [InlineData(null, AgentSetupWriteStatus.UnableToVerify)]
-    public async Task Completed_command_outcome_depends_on_its_event_count(int? eventCount, AgentSetupWriteStatus expected)
+    [InlineData(1, AgentSetupWriteOutcome.AwaitingProjection)]
+    [InlineData(null, AgentSetupWriteOutcome.UnableToVerify)]
+    public async Task Completed_command_outcome_depends_on_its_event_count(int? eventCount, AgentSetupWriteOutcome expected)
     {
         _gateway.GetCommandStatusAsync("msg-outcome", Arg.Any<CancellationToken>())
             .Returns(new CommandStatusQueryResponse("corr", nameof(CommandStatus.Completed), (int)CommandStatus.Completed,
@@ -1048,8 +1086,8 @@ public sealed class EventStoreProviderCatalogOperationsTests
                 EventCount = eventCount,
             });
 
-        AgentOperationResult<AgentSetupWriteStatus> result = await Operations()
-            .GetCommandOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId, "msg-outcome");
+        AgentOperationResult<AgentSetupWriteOutcome> result = await Operations()
+            .GetCommandWriteOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId, "msg-outcome");
 
         result.Value.ShouldBe(expected);
     }

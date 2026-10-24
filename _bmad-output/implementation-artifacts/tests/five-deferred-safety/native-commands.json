@@ -1,0 +1,122 @@
+[
+  {
+    "startedAt": "2026-10-24T04:03:53.873185+00:00",
+    "argv": [
+      "dotnet",
+      "build",
+      "test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj",
+      "-c",
+      "Debug",
+      "-m:1",
+      "-p:NuGetAudit=false",
+      "-p:MinVerVersionOverride=1.0.0"
+    ],
+    "exitCode": 0,
+    "completedAtUtc": "2026-10-24T04:03:56.779797+00:00"
+  },
+  {
+    "startedAt": "2026-10-24T04:03:56.868894+00:00",
+    "argv": [
+      "dotnet",
+      "test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.dll",
+      "-class",
+      "Hexalith.Agents.Contracts.Tests.AgentOperationContractsTests",
+      "-result-xml",
+      "_bmad-output/implementation-artifacts/tests/five-deferred-safety/contracts-focused.xml"
+    ],
+    "exitCode": 0,
+    "completedAtUtc": "2026-10-24T04:03:58.735904+00:00"
+  },
+  {
+    "startedAt": "2026-10-24T04:03:58.753552+00:00",
+    "argv": [
+      "dotnet",
+      "test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.dll",
+      "-result-xml",
+      "_bmad-output/implementation-artifacts/tests/five-deferred-safety/contracts-full.xml"
+    ],
+    "exitCode": 0,
+    "completedAtUtc": "2026-10-24T04:04:01.016028+00:00"
+  },
+  {
+    "argv": [
+      "dotnet",
+      "build",
+      "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj",
+      "-c",
+      "Debug",
+      "-m:1",
+      "-p:NuGetAudit=false",
+      "-p:MinVerVersionOverride=1.0.0"
+    ],
+    "exitCode": 0,
+    "completedAtUtc": "2026-10-24T04:10:10.206418+00:00"
+  },
+  {
+    "argv": [
+      "dotnet",
+      "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "-class",
+      "Hexalith.Agents.Server.Tests.AgentsOperationEndpointsTests",
+      "-class",
+      "Hexalith.Agents.Server.Tests.AgentSetupProjectionTests",
+      "-class",
+      "Hexalith.Agents.Server.Tests.EventStoreProviderCatalogOperationsTests",
+      "-class",
+      "Hexalith.Agents.Server.Tests.ProviderCatalogMigrationTests",
+      "-result-xml",
+      "_bmad-output/implementation-artifacts/tests/five-deferred-safety/server-focused.xml"
+    ],
+    "exitCode": 0,
+    "completedAtUtc": "2026-10-24T04:10:28.126819+00:00"
+  },
+  {
+    "argv": [
+      "dotnet",
+      "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "-result-xml",
+      "_bmad-output/implementation-artifacts/tests/five-deferred-safety/server-full.xml"
+    ],
+    "exitCode": 0,
+    "completedAtUtc": "2026-10-24T04:11:08.124568+00:00"
+  },
+  {
+    "startedAt": "2026-10-24T04:04:43.293484+00:00",
+    "argv": [
+      "dotnet",
+      "build",
+      "test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj",
+      "-c",
+      "Debug",
+      "-m:1",
+      "-p:NuGetAudit=false",
+      "-p:MinVerVersionOverride=1.0.0"
+    ],
+    "exitCode": 0,
+    "completedAtUtc": "2026-10-24T04:04:47.815064+00:00"
+  },
+  {
+    "startedAt": "2026-10-24T04:04:47.862264+00:00",
+    "argv": [
+      "dotnet",
+      "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll",
+      "-class",
+      "Hexalith.Agents.UI.Tests.AgentsClientProviderCatalogGatewayTests",
+      "-result-xml",
+      "_bmad-output/implementation-artifacts/tests/five-deferred-safety/ui-focused.xml"
+    ],
+    "exitCode": 0,
+    "completedAtUtc": "2026-10-24T04:04:48.271064+00:00"
+  },
+  {
+    "startedAt": "2026-10-24T04:04:48.283680+00:00",
+    "argv": [
+      "dotnet",
+      "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll",
+      "-result-xml",
+      "_bmad-output/implementation-artifacts/tests/five-deferred-safety/ui-full.xml"
+    ],
+    "exitCode": 0,
+    "completedAtUtc": "2026-10-24T04:04:53.599139+00:00"
+  }
+]

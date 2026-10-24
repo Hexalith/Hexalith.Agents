@@ -47,7 +47,7 @@ name = pathlib.Path(sys.argv[0]).name
 args = sys.argv[1:]
 if name == "python3" and args[0].endswith("validate-nuget-packages.py"):
     os.execv({sys.executable!r}, [{sys.executable!r}, *args])
-stage = ("absence" if "absent" in args else "presence") if name == "python3" and "verify-nuget-publication.py" in args[0] else ("source" if name == "python3" else "push")
+stage = "staged" if name == "python3" and "recover-release-packages.py" in args[0] else ("absence" if "absent" in args else "presence") if name == "python3" and "verify-nuget-publication.py" in args[0] else ("source" if name == "python3" else "push")
 if name == "gh":
     stage = "main-ref" if "/git/ref/" in args[1] else "ci-runs"
 push_number = 1
@@ -92,12 +92,13 @@ elif stage == "ci-runs":
     def test_publishes_only_validated_manifest_archives_in_order(self) -> None:
         result, calls = self.run_publisher(directory_prefix="publisher with spaces ")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertEqual([call["stage"] for call in calls], ["absence", "source", *(["push"] * len(PACKAGE_IDS)), "presence"])
+        self.assertEqual([call["stage"] for call in calls], ["staged", "absence", "source", *(["push"] * len(PACKAGE_IDS)), "presence"])
         pushed = [call["args"][2] for call in calls if call["stage"] == "push"]
         self.assertEqual([Path(path).name for path in pushed], [f"{package_id}.{VERSION}.nupkg" for package_id in sorted(PACKAGE_IDS)])
         for call in calls:
             self.assertNotIn("--skip-duplicate", call["args"])
-        source_args = calls[1]["args"]
+        self.assertIn("--local-package-directory", calls[0]["args"])
+        source_args = calls[2]["args"]
         self.assertIn("refs/heads/main", source_args)
         self.assertIn("a" * 40, source_args)
 
@@ -109,7 +110,7 @@ elif stage == "ci-runs":
                 self.assertEqual(calls, [])
 
     def test_failed_absence_or_source_proof_prevents_every_push(self) -> None:
-        for fault, expected in (("absence", ["absence"]), ("source", ["absence", "source"])):
+        for fault, expected in (("staged", ["staged"]), ("absence", ["staged", "absence"]), ("source", ["staged", "absence", "source"])):
             with self.subTest(fault=fault):
                 result, calls = self.run_publisher(fault=fault)
                 self.assertEqual(result.returncode, 7)
@@ -118,10 +119,10 @@ elif stage == "ci-runs":
     def test_push_and_presence_failures_remain_failures(self) -> None:
         result, calls = self.run_publisher(fault="push")
         self.assertEqual(result.returncode, 7)
-        self.assertEqual([call["stage"] for call in calls], ["absence", "source", "push"])
+        self.assertEqual([call["stage"] for call in calls], ["staged", "absence", "source", "push"])
         result, calls = self.run_publisher(fault="push-3")
         self.assertEqual(result.returncode, 7)
-        self.assertEqual([call["stage"] for call in calls], ["absence", "source", "push", "push", "push"])
+        self.assertEqual([call["stage"] for call in calls], ["staged", "absence", "source", "push", "push", "push"])
         result, calls = self.run_publisher(fault="presence")
         self.assertEqual(result.returncode, 7)
         self.assertEqual(calls[-1]["stage"], "presence")
@@ -131,15 +132,15 @@ elif stage == "ci-runs":
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual([call["stage"] for call in calls], [
-            "absence", "source", "main-ref", "ci-runs", *(["push"] * len(PACKAGE_IDS)), "presence",
+            "staged", "absence", "source", "main-ref", "ci-runs", *(["push"] * len(PACKAGE_IDS)), "presence",
         ])
         self.assertIn("Verified exact successful main push CI", result.stdout)
-        self.assertEqual(calls[1]["args"], [
+        self.assertEqual(calls[2]["args"], [
             "scripts/verify-release-source.py", "--repository", "Hexalith/Hexalith.Agents",
             "--workflow", "ci.yml", "--dispatch-ref", "refs/heads/main", "--dispatch-sha", "a" * 40,
         ])
-        self.assertEqual(calls[2]["args"], ["api", "repos/Hexalith/Hexalith.Agents/git/ref/heads/main"])
-        self.assertEqual(calls[3]["args"], ["api", "repos/Hexalith/Hexalith.Agents/actions/workflows/ci.yml/runs"
+        self.assertEqual(calls[3]["args"], ["api", "repos/Hexalith/Hexalith.Agents/git/ref/heads/main"])
+        self.assertEqual(calls[4]["args"], ["api", "repos/Hexalith/Hexalith.Agents/actions/workflows/ci.yml/runs"
             f"?branch=main&event=push&status=completed&head_sha={'a' * 40}&per_page=100"])
 
     def test_real_source_proof_blocks_main_advanced_after_preflight_and_failed_ci(self) -> None:
@@ -150,11 +151,11 @@ elif stage == "ci-runs":
                 self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
                 self.assertIn(diagnostic, result.stderr)
                 self.assertNotIn("Traceback", result.stderr)
-                self.assertEqual([call["stage"] for call in calls], ["absence", "source", "main-ref", "ci-runs"])
+                self.assertEqual([call["stage"] for call in calls], ["staged", "absence", "source", "main-ref", "ci-runs"])
 
     def test_real_github_api_failure_prevents_every_push(self) -> None:
-        for fault, stages in (("main-ref", ["absence", "source", "main-ref"]),
-                              ("ci-runs", ["absence", "source", "main-ref", "ci-runs"])):
+        for fault, stages in (("main-ref", ["staged", "absence", "source", "main-ref"]),
+                              ("ci-runs", ["staged", "absence", "source", "main-ref", "ci-runs"])):
             with self.subTest(fault=fault):
                 result, calls = self.run_publisher(fault=fault, live_source=True)
 

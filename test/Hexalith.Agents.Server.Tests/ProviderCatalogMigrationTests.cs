@@ -545,7 +545,7 @@ public sealed class ProviderCatalogMigrationTests
         using var response = await app.GetTestClient().PostAsJsonAsync(
             "/api/agents/operations/providers/migration",
             new ProviderCatalogMigrationRequest(["tenant-a"]));
-        response.EnsureSuccessStatusCode();
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.OK);
         ProviderCatalogMigrationResult result = (await response.Content.ReadFromJsonAsync<ProviderCatalogMigrationResult>()).ShouldNotBeNull();
         result.Status.ShouldBe("ProjectionConfirmed");
         _sent.Count.ShouldBe(2);
@@ -567,7 +567,7 @@ public sealed class ProviderCatalogMigrationTests
         using var response = await app.GetTestClient().PostAsJsonAsync(
             "/api/agents/operations/providers/migration",
             new ProviderCatalogMigrationRequest(["tenant-a"]));
-        response.EnsureSuccessStatusCode();
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.Forbidden);
         ProviderCatalogMigrationResult result = (await response.Content.ReadFromJsonAsync<ProviderCatalogMigrationResult>()).ShouldNotBeNull();
         result.Status.ShouldBe("NotAuthorized");
         _sent.ShouldBeEmpty();

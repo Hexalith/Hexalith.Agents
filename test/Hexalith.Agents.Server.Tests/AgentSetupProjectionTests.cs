@@ -32,6 +32,83 @@ public sealed class AgentSetupProjectionTests
 
     private readonly FakeReadModelStore _store = new();
 
+    [Theory]
+    [InlineData("999")]
+    [InlineData("\"FutureMode\"")]
+    public async Task UnknownEnumScalarsRemainReplayable(string mode)
+    {
+        ProjectionEventDto historical = ResponseMode(2, AgentResponseMode.Confirmation) with
+        {
+            Payload = Encoding.UTF8.GetBytes("{\"agentId\":\"hexa\",\"mode\":" + mode + ",\"configurationVersion\":2}"),
+        };
+        (await ProjectAsync(Created(), historical, Disabled(3))).Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        Persisted().LastSequenceNumber.ShouldBe(3);
+    }
+
+    [Theory]
+    [InlineData("{}")]
+    [InlineData("[]")]
+    [InlineData("true")]
+    [InlineData("false")]
+    public async Task UnsupportedEnumShapesRejectWholePendingBatch(string mode)
+    {
+        await ProjectAsync(Created());
+        string before = JsonSerializer.Serialize(Persisted());
+        int batches = _store.BatchCount;
+        ProjectionEventDto invalid = ResponseMode(2, AgentResponseMode.Confirmation) with
+        {
+            Payload = Encoding.UTF8.GetBytes("{\"agentId\":\"hexa\",\"mode\":" + mode + ",\"configurationVersion\":2}"),
+        };
+        (await ProjectAsync(invalid, Disabled(3))).Status.ShouldBe(ProjectionDispatchStatus.Retryable);
+        _store.BatchCount.ShouldBe(batches);
+        JsonSerializer.Serialize(Persisted()).ShouldBe(before);
+        (await ProjectAsync(ResponseMode(2, AgentResponseMode.Confirmation), Disabled(3)))
+            .Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        Persisted().LastSequenceNumber.ShouldBe(3);
+    }
+
+    [Theory]
+    [InlineData("{\"agentId\":\"hexa\",\"policy\":null,\"approverPolicyVersion\":1,\"configurationVersion\":2}")]
+    [InlineData("{\"agentId\":\"hexa\",\"policy\":{\"sources\":null,\"disclosureCategory\":1},\"approverPolicyVersion\":1,\"configurationVersion\":2}")]
+    [InlineData("{\"agentId\":\"hexa\",\"policy\":{\"sources\":[null],\"disclosureCategory\":1},\"approverPolicyVersion\":1,\"configurationVersion\":2}")]
+    [InlineData("{\"agentId\":\"hexa\",\"policy\":{\"sources\":[]},\"approverPolicyVersion\":1,\"configurationVersion\":2}")]
+    [InlineData("{\"agentId\":\"hexa\",\"policy\":{\"sources\":[],\"disclosureCategory\":1},\"approverPolicyVersion\":0,\"configurationVersion\":2}")]
+    public async Task StructurallyIncompleteNestedEventsDoNotAdvancePersistence(string payload)
+    {
+        await ProjectAsync(Created());
+        string before = JsonSerializer.Serialize(Persisted());
+        int batches = _store.BatchCount;
+        ProjectionEventDto invalid = Event(nameof(AgentApproverPolicyConfigured), 2,
+            new AgentApproverPolicyConfigured(AgentId, new([], default), 1, 2))
+            with { Payload = Encoding.UTF8.GetBytes(payload) };
+
+        (await ProjectAsync(invalid)).Status.ShouldBe(ProjectionDispatchStatus.Retryable);
+        _store.BatchCount.ShouldBe(batches);
+        JsonSerializer.Serialize(Persisted()).ShouldBe(before);
+        (await ProjectAsync(Event(nameof(AgentApproverPolicyConfigured), 2,
+            new AgentApproverPolicyConfigured(AgentId, new([], (ApproverPolicyBasisDisclosure)999), 1, 2))))
+            .Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        Persisted().LastSequenceNumber.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task HistoricalIncompleteDraftAndFutureModeRemainReplayable()
+    {
+        (await ProjectAsync(Event(nameof(AgentCreated), 1,
+            new AgentCreated(AgentId, TenantId, "", null, "", 1, 0)),
+            ResponseMode(2, (AgentResponseMode)999),
+            Event(nameof(AgentApproverPolicyConfigured), 3,
+                new AgentApproverPolicyConfigured(AgentId, new([], (ApproverPolicyBasisDisclosure)999), 1, 3)),
+            Event(nameof(AgentContentSafetyPolicyConfigured), 4,
+                new AgentContentSafetyPolicyConfigured(AgentId,
+                    new(new([], [], [], (ContentSafetyFailureHandling)999, (ContentSafetyAuditTreatment)999), null, null), 1, 4)),
+            Event(nameof(AgentLaunchReadinessRecorded), 5,
+                new AgentLaunchReadinessRecorded(AgentId, new([], [], (CostControlPosture)999, null, ""), 1, 5)),
+            LegacyDisabled(6), Activated(7, 0)))
+            .Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        Persisted().LastSequenceNumber.ShouldBe(7);
+    }
+
     [Fact]
     public async Task Projecting_a_created_agent_persists_its_safe_setup_with_version_and_freshness()
     {
@@ -156,6 +233,10 @@ public sealed class AgentSetupProjectionTests
     [InlineData("", true)]
     [InlineData("null", true)]
     [InlineData("[]", true)]
+    [InlineData("{}", true)]
+    [InlineData("{\"agentId\":null}", false)]
+    [InlineData("{\"agentId\":\" \"}", true)]
+    [InlineData("{\"agentId\":\"hexa\",\"configurationVersion\":-1}", true)]
     public async Task CorruptPendingPayloadRejectsTheWholeBatchAndCorrectedRedeliveryCompletes(string payload, bool existing)
     {
         if (existing)
@@ -192,6 +273,7 @@ public sealed class AgentSetupProjectionTests
     [InlineData("")]
     [InlineData("null")]
     [InlineData("[]")]
+    [InlineData("{}")]
     public async Task CorruptRebuildIsRejectedWithoutChangingPersistedSetup(string payload)
     {
         await ProjectAsync(Created());
@@ -213,6 +295,7 @@ public sealed class AgentSetupProjectionTests
     [InlineData("")]
     [InlineData("null")]
     [InlineData("[]")]
+    [InlineData("{}")]
     public async Task CorruptCoveredDuplicateDoesNotBlockNewValidEvents(string payload)
     {
         await ProjectAsync(Created());
@@ -232,6 +315,7 @@ public sealed class AgentSetupProjectionTests
     [InlineData("")]
     [InlineData("null")]
     [InlineData("[]")]
+    [InlineData("{}")]
     public void DirectFoldStopsBeforeCorruptPayloadAndLaterEvents(string payload)
     {
         AgentSetupReadModel folded = AgentSetupProjectionFold.Fold(
@@ -239,11 +323,11 @@ public sealed class AgentSetupProjectionTests
                 Disabled(3) with { Payload = Encoding.UTF8.GetBytes(payload) }, Activated(4, 4)),
             current: null);
 
-        folded.LastSequenceNumber.ShouldBe(2);
-        folded.ProjectionVersion.ShouldBe("2");
-        folded.ProjectedAt.ShouldBe(Timestamp(2));
-        folded.ConfigurationVersion.ShouldBe(2);
-        folded.ResponseMode.ShouldBe(AgentResponseMode.Confirmation);
+        folded.LastSequenceNumber.ShouldBe(0);
+        folded.ProjectionVersion.ShouldBeNull();
+        folded.ProjectedAt.ShouldBeNull();
+        folded.ConfigurationVersion.ShouldBe(0);
+        folded.ResponseMode.ShouldBe(AgentResponseMode.Unknown);
     }
 
     [Fact]

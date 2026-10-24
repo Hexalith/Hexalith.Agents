@@ -50,6 +50,19 @@
     "Applied": 1,
     "AlreadyApplied": 2
   },
+  "Hexalith.Agents.Contracts.Agent.AgentSetupWriteOutcome": {
+    "Unknown": 0,
+    "Submitted": 1,
+    "NotAuthorized": 2,
+    "NotFound": 3,
+    "ValidationFailed": 4,
+    "Conflict": 5,
+    "Unavailable": 6,
+    "AlreadyApplied": 7,
+    "AwaitingProjection": 8,
+    "UnableToVerify": 9,
+    "Rejected": 10
+  },
   "Hexalith.Agents.Contracts.Agent.ApproverPolicyBasisDisclosure": {
     "Unknown": 0,
     "UserVisible": 1,

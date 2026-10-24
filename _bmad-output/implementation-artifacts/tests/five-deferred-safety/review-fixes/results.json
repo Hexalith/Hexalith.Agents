@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "localOnly": true,
+  "nativeReports": [
+    {
+      "path": "server-focused.xml.gz",
+      "uncompressedSha256": "53773148fdd10346a487276fab636b71d138227393da8726fc14230f7c4ae77a",
+      "counts": {
+        "total": 297,
+        "passed": 297,
+        "failed": 0,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      }
+    },
+    {
+      "path": "client-focused.xml.gz",
+      "uncompressedSha256": "cc4e2bd6c08682a773d13d598bbe67f32ddbca3f07a895332eee50ae732b3f54",
+      "counts": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      }
+    },
+    {
+      "path": "../consumer-assets-final-receipt.json.gz",
+      "uncompressedSha256": "2638850a9e292d0913172f7f55d9a1b401021be32d293d7e4f04556b52cc68c2",
+      "note": "Recollected from the same retained six 1.0.0 archives; selected package policy unchanged; controlled project file now explicit."
+    }
+  ],
+  "tooling": {
+    "recover_release_packages_test.py": 6,
+    "github_release_verification_test.py": 18,
+    "github_release_publisher_test.py": 3,
+    "dependency_assets_restore_test.py": 1
+  },
+  "commands": [
+    "dotnet build test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj -c Debug -m:1 -p:NuGetAudit=false -p:MinVerVersionOverride=1.0.0",
+    "dotnet test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll -class Hexalith.Agents.Server.Tests.AgentsOperationEndpointsTests -class Hexalith.Agents.Server.Tests.AgentSetupProjectionTests -class Hexalith.Agents.Server.Tests.EventStoreProviderCatalogOperationsTests -result-xml _bmad-output/implementation-artifacts/tests/five-deferred-safety/review-fixes/server-focused.xml",
+    "dotnet build test/Hexalith.Agents.Client.Tests/Hexalith.Agents.Client.Tests.csproj -c Debug -m:1 -p:NuGetAudit=false -p:MinVerVersionOverride=1.0.0",
+    "dotnet test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.Tests.dll -class Hexalith.Agents.Client.Tests.AgentsClientFacadeTests -result-xml _bmad-output/implementation-artifacts/tests/five-deferred-safety/review-fixes/client-focused.xml",
+    "python3 scripts/validate-consumer-package-references.py /tmp/agents-five-deferred-final/nupkgs --receipt _bmad-output/implementation-artifacts/tests/five-deferred-safety/review-fixes/consumer-imports-receipt.json",
+    "python3 -m unittest discover -s tests/tooling -p 'recover_release_packages_test.py'",
+    "python3 -m unittest discover -s tests/tooling -p 'github_release_verification_test.py'",
+    "python3 -m unittest discover -s tests/tooling -p 'github_release_publisher_test.py'",
+    "python3 -m unittest discover -s tests/tooling -p 'dependency_assets_restore_test.py'"
+  ],
+  "status": "passed",
+  "fullVerification": "Parent-owned; not run for this patch"
+}

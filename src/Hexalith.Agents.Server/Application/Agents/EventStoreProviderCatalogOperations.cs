@@ -55,19 +55,33 @@ public sealed class EventStoreProviderCatalogOperations(
     private readonly IEventStoreGatewayClient? _gateway = gateway;
 
     /// <inheritdoc />
+    [Obsolete("Use GetCommandWriteOutcomeAsync; the legacy operation is rejected.")]
     public ValueTask<AgentOperationResult<AgentSetupWriteStatus>> GetCommandOutcomeAsync(
         string targetTenantId,
         string messageId,
         AgentOperationOptions? options = null,
         CancellationToken cancellationToken = default)
-        => GetCommandOutcomeCoreAsync(targetTenantId, messageId, hasSubmissionReceipt: false,
-            cancellationToken);
+        => ValueTask.FromResult(AgentOperationResult<AgentSetupWriteStatus>.Failed(
+            AgentOperationErrorCode.Rejected, IsCanonicalUlid(options?.CorrelationId) ? options!.CorrelationId : null));
 
-    private async ValueTask<AgentOperationResult<AgentSetupWriteStatus>> GetCommandOutcomeCoreAsync(
+    /// <inheritdoc />
+    public async ValueTask<AgentOperationResult<AgentSetupWriteOutcome>> GetCommandWriteOutcomeAsync(
+        string targetTenantId,
+        string messageId,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default)
+        => (await GetCommandOutcomeCoreAsync(targetTenantId, messageId, hasSubmissionReceipt: false,
+            cancellationToken, options).ConfigureAwait(false)) with
+        {
+            CorrelationId = IsCanonicalUlid(options?.CorrelationId) ? options!.CorrelationId : null,
+        };
+
+    private async ValueTask<AgentOperationResult<AgentSetupWriteOutcome>> GetCommandOutcomeCoreAsync(
         string targetTenantId,
         string messageId,
         bool hasSubmissionReceipt,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        AgentOperationOptions? options = null)
     {
         AgentAdministrationContext context = await _contextProvider.GetContextAsync(targetTenantId == ProviderCatalogIdentity.PlatformTenantId, cancellationToken).ConfigureAwait(false);
         if (string.Equals(targetTenantId, "current", StringComparison.Ordinal))
@@ -82,13 +96,18 @@ public sealed class EventStoreProviderCatalogOperations(
             || (targetTenantId != ProviderCatalogIdentity.PlatformTenantId
                 && !context.IsPlatformOperator && targetTenantId != context.TenantId))
         {
-            return AgentOperationResult<AgentSetupWriteStatus>.Failed(AgentOperationErrorCode.NotAuthorized);
+            return AgentOperationResult<AgentSetupWriteOutcome>.Failed(AgentOperationErrorCode.NotAuthorized);
+        }
+
+        if (options?.CorrelationId is { } suppliedCorrelation && !IsCanonicalUlid(suppliedCorrelation))
+        {
+            return AgentOperationResult<AgentSetupWriteOutcome>.Failed(AgentOperationErrorCode.ValidationFailed);
         }
 
         if (_gateway is null)
         {
-            return AgentOperationResult<AgentSetupWriteStatus>.Succeeded(hasSubmissionReceipt
-                ? AgentSetupWriteStatus.Submitted : AgentSetupWriteStatus.UnableToVerify);
+            return AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(hasSubmissionReceipt
+                ? AgentSetupWriteOutcome.Submitted : AgentSetupWriteOutcome.UnableToVerify);
         }
 
         try
@@ -102,40 +121,40 @@ public sealed class EventStoreProviderCatalogOperations(
                 || !string.Equals(status.TenantId, targetTenantId, StringComparison.Ordinal)
                 || !string.Equals(status.MessageId, messageId, StringComparison.Ordinal))
             {
-                return AgentOperationResult<AgentSetupWriteStatus>.Succeeded(hasSubmissionReceipt
-                    ? AgentSetupWriteStatus.Submitted : AgentSetupWriteStatus.UnableToVerify);
+                return AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(hasSubmissionReceipt
+                    ? AgentSetupWriteOutcome.Submitted : AgentSetupWriteOutcome.UnableToVerify);
             }
 
-            AgentSetupWriteStatus outcome = status.IsRejected
-                ? AgentSetupWriteStatus.Rejected
+            AgentSetupWriteOutcome outcome = status.IsRejected
+                ? AgentSetupWriteOutcome.Rejected
                 : (status.StatusCode, status.Status) switch
                 {
                     ((int)CommandStatus.Completed, nameof(CommandStatus.Completed)) => status.EventCount switch
                     {
-                        0 => AgentSetupWriteStatus.AlreadyApplied,
-                        > 0 => AgentSetupWriteStatus.AwaitingProjection,
-                        _ => AgentSetupWriteStatus.UnableToVerify,
+                        0 => AgentSetupWriteOutcome.AlreadyApplied,
+                        > 0 => AgentSetupWriteOutcome.AwaitingProjection,
+                        _ => AgentSetupWriteOutcome.UnableToVerify,
                     },
                     ((int)CommandStatus.Rejected, nameof(CommandStatus.Rejected)) when status.Retryable is true
-                        => AgentSetupWriteStatus.Submitted,
+                        => AgentSetupWriteOutcome.Submitted,
                     ((int)CommandStatus.Rejected, nameof(CommandStatus.Rejected)) when !string.IsNullOrWhiteSpace(status.FailureReason)
-                        => AgentSetupWriteStatus.Unavailable,
+                        => AgentSetupWriteOutcome.Unavailable,
                     ((int)CommandStatus.PublishFailed, nameof(CommandStatus.PublishFailed))
-                        => AgentSetupWriteStatus.AwaitingProjection,
+                        => AgentSetupWriteOutcome.AwaitingProjection,
                     ((int)CommandStatus.TimedOut, nameof(CommandStatus.TimedOut))
-                        => AgentSetupWriteStatus.Unavailable,
+                        => AgentSetupWriteOutcome.Unavailable,
                     ((int)CommandStatus.Received, nameof(CommandStatus.Received))
                         or ((int)CommandStatus.Processing, nameof(CommandStatus.Processing))
                         or ((int)CommandStatus.EventsStored, nameof(CommandStatus.EventsStored))
                         or ((int)CommandStatus.EventsPublished, nameof(CommandStatus.EventsPublished))
-                        => AgentSetupWriteStatus.Submitted,
-                    _ => AgentSetupWriteStatus.UnableToVerify,
+                        => AgentSetupWriteOutcome.Submitted,
+                    _ => AgentSetupWriteOutcome.UnableToVerify,
                 };
-            return AgentOperationResult<AgentSetupWriteStatus>.Succeeded(outcome);
+            return AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(outcome);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
-            return AgentOperationResult<AgentSetupWriteStatus>.Succeeded(AgentSetupWriteStatus.UnableToVerify);
+            return AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(AgentSetupWriteOutcome.UnableToVerify);
         }
     }
 
@@ -747,10 +766,10 @@ public sealed class EventStoreProviderCatalogOperations(
         }
         else
         {
-            AgentOperationResult<AgentSetupWriteStatus> observed = await GetCommandOutcomeCoreAsync(
+            AgentOperationResult<AgentSetupWriteOutcome> observed = await GetCommandOutcomeCoreAsync(
                 targetTenantId, messageId, hasSubmissionReceipt: true, ct).ConfigureAwait(false);
             status = observed.IsSuccess && observed.Value is { } value
-                ? value == AgentSetupWriteStatus.UnableToVerify ? AgentSetupWriteStatus.Submitted : value
+                ? value == AgentSetupWriteOutcome.UnableToVerify ? AgentSetupWriteStatus.Submitted : (AgentSetupWriteStatus)((int)value - 1)
                 : AgentSetupWriteStatus.UnableToVerify;
         }
         return status switch

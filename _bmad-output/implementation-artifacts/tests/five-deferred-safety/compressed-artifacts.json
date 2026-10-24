@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "artifacts": [
+    {
+      "path": "consumer-assets-candidate-receipt.json.gz",
+      "uncompressedBytes": 231533,
+      "uncompressedSha256": "1bf76c8a4b940b3ec9acfe6c368dd04e3a3eaf82d9141038fecdcd37545f0fe0"
+    },
+    {
+      "path": "consumer-assets-final-receipt.json.gz",
+      "uncompressedBytes": 396317,
+      "uncompressedSha256": "2638850a9e292d0913172f7f55d9a1b401021be32d293d7e4f04556b52cc68c2"
+    }
+  ]
+}

@@ -7,12 +7,15 @@ using System.Text.Json;
 using Hexalith.Agents.Client;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
+using Hexalith.Agents.Contracts.AgentInteraction;
+using Hexalith.Agents.Contracts.AgentInteraction.Commands;
 using Hexalith.Agents.Contracts.Operations;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 using Hexalith.Agents.Server.Api;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +43,278 @@ public sealed class AgentsOperationEndpointsTests
         "raw provider payload",
         "other-tenant-id",
     ];
+
+    [Fact]
+    public void ReturnedBuilderAppliesAuthorizationAndCustomConventionsToBothRouteFamilies()
+    {
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.Services.AddSingleton<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>(Substitute.For<Hexalith.Agents.Server.Ports.IAgentDependencyAvailability>());
+        builder.Services.AddSingleton(AgentsClient.Unavailable());
+        WebApplication app = builder.Build();
+        app.MapAgentsOperationEndpoints().RequireAuthorization("operators").WithMetadata("shared-operation-convention");
+        RouteEndpoint[] routes = ((IEndpointRouteBuilder)app).DataSources.SelectMany(source => source.Endpoints)
+            .OfType<RouteEndpoint>().ToArray();
+        routes.ShouldContain(endpoint => endpoint.RoutePattern.RawText!.StartsWith("/api/v1/agents/operations", StringComparison.Ordinal));
+        routes.ShouldContain(endpoint => endpoint.RoutePattern.RawText!.StartsWith("/api/agents/operations", StringComparison.Ordinal));
+        foreach (RouteEndpoint endpoint in routes)
+        {
+            endpoint.Metadata.GetMetadata<IAuthorizeData>()!.Policy.ShouldBe("operators");
+            endpoint.Metadata.GetMetadata<string>().ShouldBe("shared-operation-convention");
+        }
+    }
+
+    [Theory]
+    [InlineData(AgentSetupTruthState.Submitted, 202)]
+    [InlineData(AgentSetupTruthState.AuthoritativePending, 202)]
+    [InlineData(AgentSetupTruthState.ProjectionConfirmed, 200)]
+    [InlineData(AgentSetupTruthState.Unknown, 500)]
+    public async Task ActualWriteRoutesMapAcceptanceTruthStages(AgentSetupTruthState truth, int expected)
+    {
+        IAgentsClient client = Substitute.For<IAgentsClient>();
+        IAgentAdministrationOperations administration = Substitute.For<IAgentAdministrationOperations>();
+        IProviderCatalogOperations catalog = Substitute.For<IProviderCatalogOperations>();
+        var agentAcceptance = new AgentCommandAcceptance("agent-1", MessageId, CorrelationId, truth,
+            truth == AgentSetupTruthState.ProjectionConfirmed ? AgentSetupWriteEffect.AlreadyApplied : AgentSetupWriteEffect.Applied, 1);
+        administration.CreateAsync(default!, default!, default, default).ReturnsForAnyArgs(
+            new ValueTask<AgentOperationResult<AgentCommandAcceptance>>(
+                AgentOperationResult<AgentCommandAcceptance>.Succeeded(agentAcceptance, correlationId: CorrelationId)));
+        catalog.EnableEntryAsync(default!, default, default).ReturnsForAnyArgs(
+            new ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>>(
+                AgentOperationResult<ProviderCatalogCommandAcceptance>.Succeeded(
+                    new("provider", "model", MessageId, CorrelationId, truth), correlationId: CorrelationId)));
+        client.AgentAdministration.Returns(administration);
+        client.ProviderCatalog.Returns(catalog);
+        await using WebApplication app = BuildHttpApp(client);
+        await app.StartAsync();
+        foreach ((string path, object command) in new (string, object)[]
+        {
+            ("/api/agents/operations/agents/agent-1", new CreateAgent("tenant", "hexa", null, "instructions")),
+            ("/api/agents/operations/providers/enable", new EnableProviderModelEntry("provider", "model", 1)),
+        })
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, path) { Content = JsonContent.Create(command, command.GetType()) };
+            request.Headers.Add("X-Correlation-ID", CorrelationId);
+            request.Headers.Add("Idempotency-Key", MessageId);
+            using HttpResponseMessage response = await app.GetTestClient().SendAsync(request);
+            ((int)response.StatusCode).ShouldBe(expected, path);
+            string body = await response.Content.ReadAsStringAsync();
+            body.ShouldContain("\"truthState\":\"" + truth + "\"");
+            body.ShouldContain(CorrelationId);
+        }
+    }
+
+    [Theory]
+    [InlineData(AgentProposalApprovalOutcome.Approved, 202)]
+    [InlineData(AgentProposalApprovalOutcome.IdempotentPostingPending, 202)]
+    [InlineData(AgentProposalApprovalOutcome.Posted, 200)]
+    [InlineData(AgentProposalApprovalOutcome.IdempotentPosted, 200)]
+    public async Task ApprovalRouteKeepsPostingPendingUntilConfirmed(AgentProposalApprovalOutcome outcome, int expected)
+    {
+        IAgentsClient client = Substitute.For<IAgentsClient>();
+        IProposalWorkflowOperations proposals = Substitute.For<IProposalWorkflowOperations>();
+        var result = new AgentProposalApprovalResult(outcome, "proposal", "conversation", "version", "party", 1,
+            ApproverPolicyValidationStatus.Valid, ApproverPolicyBasisDisclosure.OperatorOnly, "agent-party", "message", "retry", "posted-message");
+        proposals.ApproveAsync(default!, default, default).ReturnsForAnyArgs(new ValueTask<AgentOperationResult<AgentProposalApprovalResult>>(
+            AgentOperationResult<AgentProposalApprovalResult>.Succeeded(result, correlationId: CorrelationId)));
+        client.ProposalWorkflow.Returns(proposals);
+        await using WebApplication app = BuildHttpApp(client);
+        await app.StartAsync();
+        using HttpResponseMessage response = await app.GetTestClient().PostAsJsonAsync(
+            "/api/agents/operations/proposals/approve", new ApproveProposedAgentReply("interaction", result));
+        ((int)response.StatusCode).ShouldBe(expected);
+        (await response.Content.ReadFromJsonAsync<AgentOperationResult<AgentProposalApprovalResult>>())!.CorrelationId.ShouldBe(CorrelationId);
+    }
+
+    [Theory]
+    [InlineData(AgentInspectionStatus.Success, 200)]
+    [InlineData(AgentInspectionStatus.AgentNotFound, 404)]
+    [InlineData(AgentInspectionStatus.NotAuthorized, 403)]
+    [InlineData(AgentInspectionStatus.Unavailable, 503)]
+    public async Task SetupReadMapsNestedStatusAndPreservesBody(AgentInspectionStatus status, int expected)
+    {
+        IAgentAdministrationOperations administration = Substitute.For<IAgentAdministrationOperations>();
+        var agent = new AgentStatusView("agent-1", "tenant", "hexa", null, AgentLifecycleStatus.Draft, 1,
+            false, false, 0, false, false, null, null, AgentResponseMode.Unknown, false,
+            ApproverPolicyBasisDisclosure.Unknown, 0, false, 0, false, false, [], [], false);
+        AgentSetupView? view = status == AgentInspectionStatus.Success
+            ? new(agent, 1, "1", null, AgentSetupFreshness.Current, AgentSetupTruthState.ProjectionConfirmed) : null;
+        administration.GetStatusAsync(default!, default, default, default).ReturnsForAnyArgs(new ValueTask<AgentOperationResult<AgentSetupResult>>(
+            AgentOperationResult<AgentSetupResult>.Succeeded(new(status, view), correlationId: CorrelationId)));
+        await using WebApplication app = BuildHttpApp(AgentsClientWith(administration));
+        await app.StartAsync();
+        using HttpResponseMessage response = await app.GetTestClient().GetAsync("/api/agents/operations/agents/agent-1/status");
+        ((int)response.StatusCode).ShouldBe(expected);
+        var body = (await response.Content.ReadFromJsonAsync<AgentOperationResult<AgentSetupResult>>())!;
+        body.Value!.Status.ShouldBe(status);
+        body.CorrelationId.ShouldBe(CorrelationId);
+        (body.Value.Setup is not null).ShouldBe(status == AgentInspectionStatus.Success);
+    }
+
+    [Theory]
+    [InlineData("invalid")]
+    [InlineData("01arz3ndektsv4rrffq69g5faw")]
+    public async Task LegacyOutcomeRouteDoesNotEchoMalformedCorrelationOrSuccessValue(string correlation)
+    {
+        await using WebApplication app = BuildHttpApp(AgentsClient.Unavailable());
+        await app.StartAsync();
+        using var request = new HttpRequestMessage(HttpMethod.Get, "/api/agents/operations/providers/commands/system/message-1");
+        request.Headers.Add("X-Correlation-ID", correlation);
+        using HttpResponseMessage response = await app.GetTestClient().SendAsync(request);
+        ((int)response.StatusCode).ShouldBe(422);
+        string json = await response.Content.ReadAsStringAsync();
+        json.ShouldNotContain(correlation);
+        json.ShouldNotContain("Submitted");
+        json.ShouldNotContain("\"value\"");
+    }
+
+    [Theory]
+    [InlineData(AgentCallRequestStatus.Accepted, 202)]
+    [InlineData(AgentCallRequestStatus.NotAuthorized, 403)]
+    [InlineData(AgentCallRequestStatus.Rejected, 422)]
+    [InlineData(AgentCallRequestStatus.Unknown, 500)]
+    public async Task InteractionRequestMapsItsTypedOperationOutcome(AgentCallRequestStatus status, int expected)
+    {
+        IAgentsClient client = Substitute.For<IAgentsClient>();
+        IAgentInteractionOperations operations = Substitute.For<IAgentInteractionOperations>();
+        operations.RequestAsync(default!, default, default).ReturnsForAnyArgs(
+            new ValueTask<AgentOperationResult<AgentCallRequestResult>>(
+                AgentOperationResult<AgentCallRequestResult>.Succeeded(new(status,
+                    status == AgentCallRequestStatus.Accepted ? new("interaction-1", AgentInteractionStatus.Requested) : null),
+                    correlationId: CorrelationId)));
+        client.AgentInteractions.Returns(operations);
+        await using WebApplication app = BuildHttpApp(client);
+        await app.StartAsync();
+        using HttpResponseMessage response = await app.GetTestClient().PostAsJsonAsync(
+            "/api/agents/operations/interactions/", new RequestAgentInteraction("hexa", "conversation-1", "party-1", "prompt", "retry", null));
+        ((int)response.StatusCode).ShouldBe(expected);
+        (await response.Content.ReadFromJsonAsync<AgentOperationResult<AgentCallRequestResult>>())!
+            .CorrelationId.ShouldBe(CorrelationId);
+    }
+
+    [Theory]
+    [InlineData(AgentProposalRejectionOutcome.Rejected, 200)]
+    [InlineData(AgentProposalRejectionOutcome.AlreadyTerminal, 200)]
+    [InlineData(AgentProposalRejectionOutcome.NotAuthorized, 403)]
+    [InlineData(AgentProposalRejectionOutcome.PolicyFailure, 503)]
+    [InlineData(AgentProposalRejectionOutcome.ProposalNotPending, 409)]
+    [InlineData(AgentProposalRejectionOutcome.Unknown, 500)]
+    public async Task ProposalRejectionDistinguishesSuccessfulRejectionFromOperationFailure(AgentProposalRejectionOutcome outcome, int expected)
+    {
+        IAgentsClient client = Substitute.For<IAgentsClient>();
+        IProposalWorkflowOperations operations = Substitute.For<IProposalWorkflowOperations>();
+        var result = new AgentProposalRejectionResult(outcome, "proposal-1", "conversation-1", "party-1", 1,
+            ApproverPolicyValidationStatus.Valid, ApproverPolicyBasisDisclosure.OperatorOnly, null);
+        operations.RejectAsync(default!, default, default).ReturnsForAnyArgs(
+            new ValueTask<AgentOperationResult<AgentProposalRejectionResult>>(
+                AgentOperationResult<AgentProposalRejectionResult>.Succeeded(result, correlationId: CorrelationId)));
+        client.ProposalWorkflow.Returns(operations);
+        await using WebApplication app = BuildHttpApp(client);
+        await app.StartAsync();
+        using HttpResponseMessage response = await app.GetTestClient().PostAsJsonAsync(
+            "/api/agents/operations/proposals/reject", new RejectProposedAgentReply("interaction-1", result));
+        ((int)response.StatusCode).ShouldBe(expected);
+        (await response.Content.ReadFromJsonAsync<AgentOperationResult<AgentProposalRejectionResult>>())!
+            .CorrelationId.ShouldBe(CorrelationId);
+    }
+
+    [Theory]
+    [InlineData(ProposalOperationStatus.Rejected)]
+    [InlineData(ProposalOperationStatus.PostingPending)]
+    [InlineData(ProposalOperationStatus.PostingFailed)]
+    public async Task ReadingAProposalResourceStateDoesNotTurnItIntoAnOperationFailure(ProposalOperationStatus state)
+    {
+        IAgentsClient client = Substitute.For<IAgentsClient>();
+        IAgentStatusOperations status = Substitute.For<IAgentStatusOperations>();
+        status.GetProposalStatusAsync(default!, default, default).ReturnsForAnyArgs(
+            new ValueTask<AgentOperationResult<ProposalOperationStatus>>(
+                AgentOperationResult<ProposalOperationStatus>.Succeeded(state)));
+        client.Status.Returns(status);
+        await using WebApplication app = BuildHttpApp(client);
+        await app.StartAsync();
+        using HttpResponseMessage response = await app.GetTestClient().GetAsync(
+            "/api/agents/operations/status/interactions/interaction-1/proposal");
+        ((int)response.StatusCode).ShouldBe(200);
+        (await response.Content.ReadFromJsonAsync<AgentOperationResult<ProposalOperationStatus>>())!.Value.ShouldBe(state);
+    }
+
+    [Fact]
+    public async Task LegacyCommandOutcomeRouteReturnsTypedRejectionWithCorrelation()
+    {
+        await using WebApplication app = BuildHttpApp(AgentsClient.Unavailable());
+        await app.StartAsync();
+        using var request = new HttpRequestMessage(HttpMethod.Get,
+            "/api/agents/operations/providers/commands/system/message-1");
+        request.Headers.Add("X-Correlation-ID", CorrelationId);
+        using HttpResponseMessage response = await app.GetTestClient().SendAsync(request);
+        ((int)response.StatusCode).ShouldBe(422);
+        var body = await response.Content.ReadFromJsonAsync<AgentOperationResult<AgentSetupWriteStatus>>();
+        body!.Status.ShouldBe(AgentOperationStatus.Rejected);
+        body.CorrelationId.ShouldBe(CorrelationId);
+        (await response.Content.ReadAsStringAsync()).ShouldNotContain("\"value\"");
+    }
+
+    [Theory]
+    [InlineData(AgentOperationStatus.Succeeded, 200)]
+    [InlineData(AgentOperationStatus.Degraded, 200)]
+    [InlineData(AgentOperationStatus.Pending, 202)]
+    [InlineData(AgentOperationStatus.Checking, 202)]
+    [InlineData(AgentOperationStatus.NotAuthorized, 403)]
+    [InlineData(AgentOperationStatus.ValidationFailed, 400)]
+    [InlineData(AgentOperationStatus.NotFound, 404)]
+    [InlineData(AgentOperationStatus.Conflict, 409)]
+    [InlineData(AgentOperationStatus.Stale, 409)]
+    [InlineData(AgentOperationStatus.Rejected, 422)]
+    [InlineData(AgentOperationStatus.Blocked, 503)]
+    [InlineData(AgentOperationStatus.Unavailable, 503)]
+    [InlineData(AgentOperationStatus.UnableToVerify, 503)]
+    [InlineData(AgentOperationStatus.Unknown, 500)]
+    [InlineData((AgentOperationStatus)999, 500)]
+    public async Task OperationHttpStatusesPreserveTypedBodiesAndCorrelation(AgentOperationStatus status, int expected)
+    {
+        IProviderCatalogOperations catalog = Substitute.For<IProviderCatalogOperations>();
+        var body = new AgentOperationResult<ProviderCatalogInspectionResult>(status,
+            new ProviderCatalogInspectionResult(ProviderCatalogInspectionStatus.Success, [], null), CorrelationId: CorrelationId);
+        catalog.ListEntriesAsync(default, default, default, default).ReturnsForAnyArgs(
+            new ValueTask<AgentOperationResult<ProviderCatalogInspectionResult>>(body));
+        await using WebApplication app = BuildHttpApp(AgentsClientWith(catalog));
+        await app.StartAsync();
+
+        using HttpResponseMessage response = await app.GetTestClient().GetAsync(
+            "/api/agents/operations/providers/?includeDisabled=false");
+
+        ((int)response.StatusCode).ShouldBe(expected);
+        var actual = await response.Content.ReadFromJsonAsync<AgentOperationResult<ProviderCatalogInspectionResult>>();
+        actual!.CorrelationId.ShouldBe(CorrelationId);
+        actual.Value.ShouldNotBeNull();
+    }
+
+    [Theory]
+    [InlineData(AgentSetupWriteOutcome.Unknown, 500)]
+    [InlineData(AgentSetupWriteOutcome.Submitted, 202)]
+    [InlineData(AgentSetupWriteOutcome.AlreadyApplied, 200)]
+    [InlineData(AgentSetupWriteOutcome.AwaitingProjection, 202)]
+    [InlineData(AgentSetupWriteOutcome.NotAuthorized, 403)]
+    [InlineData(AgentSetupWriteOutcome.ValidationFailed, 400)]
+    [InlineData(AgentSetupWriteOutcome.NotFound, 404)]
+    [InlineData(AgentSetupWriteOutcome.Conflict, 409)]
+    [InlineData(AgentSetupWriteOutcome.Rejected, 422)]
+    [InlineData(AgentSetupWriteOutcome.Unavailable, 503)]
+    [InlineData(AgentSetupWriteOutcome.UnableToVerify, 503)]
+    [InlineData((AgentSetupWriteOutcome)999, 500)]
+    public async Task VersionedOutcomeMapsTheTypedValue(AgentSetupWriteOutcome outcome, int expected)
+    {
+        IProviderCatalogOperations catalog = Substitute.For<IProviderCatalogOperations>();
+        catalog.GetCommandWriteOutcomeAsync(default!, default!, default, default).ReturnsForAnyArgs(
+            new ValueTask<AgentOperationResult<AgentSetupWriteOutcome>>(
+                AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(outcome, correlationId: CorrelationId)));
+        await using WebApplication app = BuildHttpApp(AgentsClientWith(catalog));
+        await app.StartAsync();
+        using HttpResponseMessage response = await app.GetTestClient().GetAsync(
+            "/api/v1/agents/operations/providers/commands/system/message-1");
+        ((int)response.StatusCode).ShouldBe(expected);
+        (await response.Content.ReadFromJsonAsync<AgentOperationResult<AgentSetupWriteOutcome>>())!
+            .CorrelationId.ShouldBe(CorrelationId);
+    }
 
     [Fact]
     public void Operation_endpoints_register_stable_route_area()
@@ -846,7 +1121,7 @@ public sealed class AgentsOperationEndpointsTests
         }
 
         await endpoint.RequestDelegate!(context).ConfigureAwait(true);
-        context.Response.StatusCode.ShouldBe(StatusCodes.Status200OK);
+        // HTTP mappings are exercised through TestServer by OperationHttpStatusesPreserveTypedBodiesAndCorrelation.
 
         body.Position = 0;
         using StreamReader reader = new(body);

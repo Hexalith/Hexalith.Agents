@@ -134,13 +134,30 @@ declared in `eng/release-packages.json`. It validates archives and an isolated
 consumer, proves package versions absent, and rechecks the exact green main
 source before the first push. Publication sends only validated manifest/version
 archives; unrelated files are preserved. It then verifies NuGet presence and the
-GitHub Release's source and six downloaded archives. Each GitHub asset must match
+GitHub Release's source, six downloaded archives and retained provenance. Each GitHub asset must match
 its API SHA-256 digest, byte length and package identity. NuGet presence requires
 downloading every exact package and comparing all ordinary archive members with
 the release artifacts. Both gates validate package boundaries and enforce archive
 and expanded-content limits. Existing versions fail the release;
-`--skip-duplicate` is not used. A partial push requires maintainer investigation
-because automatic reconciliation is not implemented.
+`--skip-duplicate` is not used. Before publication, the root-owned
+`eng/github-release-publisher.mjs` semantic-release hook creates a draft release
+containing all six original archives and `release-provenance.json` (repository,
+version, exact source SHA/tag, archive byte lengths and SHA-256 hashes). It
+replaces the GitHub publisher plugin so only one release is created. The draft
+is finalized only after complete NuGet content verification; failures retain it.
+
+To recover a partial push, dispatch `.github/workflows/recover-release.yml` from
+`main` with the original version and source SHA. The protected `production`
+environment, publication freeze and `release-production` concurrency group also
+apply to recovery. Recovery requires the original source still to be current
+green main, its exact existing tag and original unpublished draft. It downloads
+those original archives, checks GitHub asset digests and provenance, validates
+every archive, then probes the full immutable NuGet set and compares every
+existing package before any missing push. A collision, unconfirmed probe,
+changed main or archive mismatch refuses every missing push. It never repacks or
+runs ordinary release planning. After missing pushes, it verifies the complete
+remote content set before finalizing the draft. If main has advanced, recovery
+requires a new approved procedure; this workflow provides no older-source exception.
 
 The NuGet comparison permits only changes to the root `.signature.p7s` member:
 [NuGet.org repository signing](https://devblogs.microsoft.com/dotnet/introducing-repository-signatures/)
@@ -152,11 +169,29 @@ It preflights release metadata before downloading, caps downloaded files at 64 M
 then runs full archive verification. Metadata-only success explicitly states that
 contents have not yet been verified.
 
-Dependency validation retains nuspec include/exclude metadata and rejects ordinary
-dependency build assets. The offline restore regression shows that removing the
-generated `exclude="Build,Analyzers"` imports an ordinary build target. This check
-does not establish suppression of transitive analyzer or `buildTransitive` assets;
-the fixture explicitly checks the analyzer limitation against the installed SDK.
+Dependency validation retains nuspec include/exclude metadata and checks ordinary
+dependency build selection. Analyzer and `buildTransitive` selection have separate
+semantics. `scripts/validate-consumer-package-references.py <package-directory>`
+restores and builds each packed Agents package individually and all six together
+in isolated directories with a copy of the root `global.json`. Its normalized
+receipt records selected analyzers and active imports with package ownership,
+version, path and SHA-256, separately from available archive assets, generated
+NuGet imports and SDK assets. Any unowned executable import or analyzer fails.
+
+`eng/consumer-executable-assets.json` is the reviewed initial executable asset
+policy. CI refuses additions, removals, version changes, hash changes and changed
+per-consumer selection. Retain `--receipt <path>` for dependency-change reviews.
+`--write-baseline <candidate-path>` only generates a candidate: inspect every
+selected package/path/version/hash and each consumer graph before explicitly
+replacing the policy. Build exclusions alone never establish analyzer purity.
+
+The legacy provider command-outcome operation is retained with typed rejection.
+Consumers use `IProviderCatalogOperations.GetCommandWriteOutcomeAsync` and
+`/api/v1/agents/operations/providers/commands/{targetTenantId}/{messageId}`.
+`AgentSetupWriteOutcome.Unknown=0` fails closed; legacy enum ordinals and setup
+result records remain stable. HTTP operation responses preserve typed bodies and
+correlation while mapping failures to their canonical non-200 statuses. Pending
+and checking outcomes use 202; unknown statuses use 500.
 
 For the focused EventStore gateway source-reference regression, use fresh artifacts
 to avoid stale package/source assets in shared `obj` directories:

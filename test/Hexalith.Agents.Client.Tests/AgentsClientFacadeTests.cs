@@ -3,6 +3,7 @@ namespace Hexalith.Agents.Client.Tests;
 using System.Reflection;
 
 using Hexalith.Agents.Client;
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Contracts.AgentInteraction.Commands;
 using Hexalith.Agents.Contracts.Operations;
@@ -27,6 +28,16 @@ public sealed class AgentsClientFacadeTests
         "Microsoft.Agents",
         "ModelContextProtocol",
     ];
+
+    [Fact]
+    public async Task PriorProviderImplementationUsesFailClosedSuccessorDefault()
+    {
+        IProviderCatalogOperations operations = new PriorProviderCatalogOperations();
+        AgentOperationResult<AgentSetupWriteOutcome> result = await operations.GetCommandWriteOutcomeAsync("tenant", "message");
+        result.Status.ShouldBe(AgentOperationStatus.Unavailable);
+        result.Value.ShouldBe(AgentSetupWriteOutcome.Unknown);
+        result.IsSuccess.ShouldBeFalse();
+    }
 
     [Fact]
     public async Task Unavailable_client_returns_structured_unavailable_results()

@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "localOnly": true,
+  "dependencyMode": "Debug source references",
+  "reports": [
+    {
+      "path": "contracts-focused.xml.gz",
+      "uncompressedSha256": "66a5e8957924e49e1038a75a5ddbd7fb3857823d5bfdf516ee65ccdc24f2e828",
+      "uncompressedBytes": 1215781,
+      "counts": {
+        "total": 1674,
+        "passed": 1674,
+        "failed": 0,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      }
+    },
+    {
+      "path": "contracts-full.xml.gz",
+      "uncompressedSha256": "782880f136b87f599d598b508146beae1d618508c31138ef1b98fc83abd8ed1d",
+      "uncompressedBytes": 1427014,
+      "counts": {
+        "total": 1997,
+        "passed": 1997,
+        "failed": 0,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      }
+    },
+    {
+      "path": "server-focused.xml.gz",
+      "uncompressedSha256": "b809eecdc9788ee8be1b93387a27e020c38dff339078ddc3d34c6c1ad43a59b9",
+      "uncompressedBytes": 202060,
+      "counts": {
+        "total": 301,
+        "passed": 301,
+        "failed": 0,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      }
+    },
+    {
+      "path": "server-full.xml.gz",
+      "uncompressedSha256": "05d40ceb82a9aa1ccf52a207b5c17aff8092dd3f3ff1edbe0616fa53803575d7",
+      "uncompressedBytes": 1067036,
+      "counts": {
+        "total": 1545,
+        "passed": 1545,
+        "failed": 0,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      }
+    },
+    {
+      "path": "ui-focused.xml.gz",
+      "uncompressedSha256": "3a46b5f51e03628fc709666c46238adb3a174eb58f2c2440fffc80d90984fe5e",
+      "uncompressedBytes": 10895,
+      "counts": {
+        "total": 15,
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      }
+    },
+    {
+      "path": "ui-full.xml.gz",
+      "uncompressedSha256": "284ee8a7b5fdc677a3a993ca36cf734f6258042fea6384d6a22101378b3e0011",
+      "uncompressedBytes": 762398,
+      "counts": {
+        "total": 1173,
+        "passed": 1173,
+        "failed": 0,
+        "skipped": 0,
+        "errors": 0,
+        "not-run": 0
+      }
+    }
+  ],
+  "commands": "native-commands.json",
+  "binaries": [
+    {
+      "path": "test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.dll",
+      "sha256": "53946b68fee3092d4fc41fa98a3a4fb8537abefefdc6703a23916aea07ebc48a"
+    },
+    {
+      "path": "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "sha256": "60aade3cb575cfb6c9fb851baf62106ce6a3f2c5b939dbc4e6f5a87b46241d0e"
+    },
+    {
+      "path": "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll",
+      "sha256": "cf7f6b5298ca69d876700dafd8ddc7b92fc3a4c5fa0ba3c04c0085d756939670"
+    }
+  ],
+  "notes": [
+    "Focused runs overlap their full suites; counts must not be added.",
+    "Debug builds used existing NuGetAudit=false and MinVerVersionOverride=1.0.0 environment pins."
+  ]
+}

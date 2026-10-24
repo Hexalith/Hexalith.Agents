@@ -188,7 +188,9 @@ origin: code review round 2, 2026-09-14
 location: src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteStatus.cs
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: The UI-internal enum predates this story with Submitted at zero; migration is required before it can safely be serialized.
-status: open
+status: done 2026-10-24
+resolution: `spec-five-deferred-contract-and-release-safety-items.md` — Preserves every legacy ordinal and declared member, retires the old wire operation with typed rejection and no default Submitted value, and adds AgentSetupWriteOutcome (Unknown=0), the approved versioned route and a fail-closed default interface implementation. Current source and package checks verify prospective values, prior implementations and UI mappings without renumbering historical contracts.
+evidence_record: [Final verification](tests/five-deferred-safety/README.md#final-verification)
 
 ### DW-12: Map Rejected to a terminal UI outcome when the live command-status reader is bound.
 
@@ -231,7 +233,9 @@ origin: code review round 4, 2026-09-15
 location: src/Hexalith.Agents.Server/Api/AgentsOperationEndpoints.cs
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: The pre-existing module-wide pattern returns HTTP 200 with typed failure bodies; changing that contract is outside this bounded story.
-status: open
+status: done 2026-10-24
+resolution: `spec-five-deferred-contract-and-release-safety-items.md` — Maps typed operation failures and pending acceptances to their canonical HTTP statuses while preserving bodies, correlation and dependency precedence. A shared returned route parent carries host authorization conventions to both route families; nested setup, actual writes, interaction/proposal outcomes and unknown values have real HTTP regressions. All 1,572 Server tests pass.
+evidence_record: [Final verification](tests/five-deferred-safety/README.md#final-verification)
 
 ### DW-17: Decide how confirmed authoritative setup should interact with a divergent local draft.
 
@@ -378,6 +382,9 @@ status: open
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Make multi-package NuGet publication recoverable after a partial push.
   evidence: The inherited release tooling requires the entire immutable version set to be absent before a non-transactional push; a partial service-side success leaves a package version set that the next run refuses to reconcile.
+  status: done 2026-10-24
+  resolution: `spec-five-deferred-contract-and-release-safety-items.md` — Stages original archives and provenance before NuGet publication and finalizes only after complete remote content proof. Protected recovery shares publication freeze/concurrency, requires the original exact tag and current green main source, checks all original hashes and every existing remote package before missing pushes, and refuses conflicts/unconfirmed evidence. Real final-verifier calls and controlled subprocess/HTTP fixtures pass; no actual release was executed.
+  evidence_record: [Final verification](tests/five-deferred-safety/README.md#final-verification)
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Restrict CodeQL concurrency cancellation so merged and scheduled revisions retain completed scans.
@@ -805,7 +812,17 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-projection-verification-items.md`
   summary: Define structural event-payload validation for successfully deserialized Agent projection events while preserving supported legacy defaults.
   evidence: Existing `AgentState.Apply(AgentResponseModeConfigured)` accepts default mode/configuration-version values from `{}`, while `Apply(AgentApproverPolicyConfigured)` dereferences a null Policy and lifecycle Apply rejects negative configuration versions. These paths predate the syntax/null/shape delivery correction; deserialization alone cannot enforce their semantic invariants. Agree the required-member/legacy compatibility policy and validate before folding; application failures already occur before any read-model batch is written.
+  status: done 2026-10-24
+  resolution: `spec-five-deferred-contract-and-release-safety-items.md` — Validates required members, supported enum scalar shapes, non-null object graphs and version bounds before pending batches advance state or checkpoints. Persisted-state, rebuild and redelivery regressions preserve lifecycle omitted/zero versions, incomplete drafts, optional nulls, empty lists, checkpoint-covered duplicates and future/retired scalar enum compatibility; current command eligibility is not reapplied to history.
+  evidence_record: [Final verification](tests/five-deferred-safety/README.md#final-verification)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-package-integrity-items.md`
   summary: Qualify the actual consumer analyzer and buildTransitive inventory separately from ordinary dependency Build exclusions.
   evidence: The DW-22 offline restore proof demonstrates that nuspec Build,Analyzers exclusions block ordinary build imports but do not suppress transitive analyzer items; buildTransitive has separate semantics. No unexpected analyzer in an actual Agents consumer was demonstrated. Unverified medium: an unexpected executable asset would require a consumer graph/asset inventory and owner-approved policy, rather than treating nuspec exclusion flags as proof of suppression. The demonstrated ordinary-build omission gap is fixed and covered.
+  status: done 2026-10-24
+  resolution: `spec-five-deferred-contract-and-release-safety-items.md` — Freshly packs the final six packages and validates seven SDK-pinned isolated consumers. The independently reviewed baseline binds 30 selected assets (12 analyzers, 18 imports), both union and individual selections, with exact package/version/path/hashes. Arbitrary-extension imports are included; unowned imports and unreviewed selection/hash changes fail. Available, SDK and generated inputs remain separately identified; dynamically loaded helper qualification is a separately recorded unverified follow-up.
+  evidence_record: [Final verification](tests/five-deferred-safety/README.md#final-verification)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-contract-and-release-safety-items.md`
+  summary: Qualify dynamically loaded helper and task dependencies of selected consumer executable assets if present.
+  evidence: Unverified medium from independent review: the new baseline fingerprints selected analyzer entry assemblies and active imports, rather than every dynamically loaded dependency. The 18 current selected package imports contain no UsingTask declaration and no omitted executable helper load was demonstrated. An actual analyzer dependency-load trace or an active UsingTask/helper-byte mutation fixture would establish whether extra executable bytes need a separately reviewed policy inventory.

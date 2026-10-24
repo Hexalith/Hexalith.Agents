@@ -1,6 +1,7 @@
 using System.Globalization;
 
 using Hexalith.Agents.Client;
+using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Contracts.AgentInteraction.Commands;
 using Hexalith.Agents.Contracts.Operations;
@@ -26,8 +27,17 @@ public static class AgentsOperationEndpoints
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        RouteGroupBuilder group = endpoints.MapGroup("/api/agents/operations");
-        group.AddEndpointFilter<AgentDependencyAvailabilityFilter>();
+        RouteGroupBuilder shared = endpoints.MapGroup(string.Empty);
+        shared.AddEndpointFilter<AgentDependencyAvailabilityFilter>();
+        shared.AddEndpointFilter<AgentOperationHttpStatusFilter>();
+        RouteGroupBuilder group = shared.MapGroup("/api/agents/operations");
+        RouteGroupBuilder versioned = shared.MapGroup("/api/v1/agents/operations");
+        versioned.MapGet("/providers/commands/{targetTenantId}/{messageId}", (
+            string targetTenantId, string messageId,
+            [FromHeader(Name = "X-Correlation-ID")] string? correlationId,
+            IAgentsClient client, CancellationToken cancellationToken) =>
+            client.ProviderCatalog.GetCommandWriteOutcomeAsync(targetTenantId, messageId,
+                new AgentOperationOptions(correlationId), cancellationToken));
 
         MapProviderCatalog(group);
         MapAgentAdministration(group);
@@ -36,16 +46,16 @@ public static class AgentsOperationEndpoints
         MapStatus(group);
         MapAudit(group);
 
-        return group;
+        return shared;
     }
 
     private static void MapProviderCatalog(RouteGroupBuilder group)
     {
         RouteGroupBuilder providers = group.MapGroup("/providers");
 
-        providers.MapGet("/commands/{targetTenantId}/{messageId}", (string targetTenantId, string messageId,
-            IAgentsClient client, CancellationToken cancellationToken) =>
-            client.ProviderCatalog.GetCommandOutcomeAsync(targetTenantId, messageId, cancellationToken: cancellationToken));
+        providers.MapGet("/commands/{targetTenantId}/{messageId}", (
+            [FromHeader(Name = "X-Correlation-ID")] string? correlationId) =>
+            AgentOperationResult.Failed(AgentOperationErrorCode.Rejected, CanonicalCorrelationId(correlationId)));
 
         providers.MapGet("/tenant", (bool includeDisabled, IAgentsClient client, CancellationToken cancellationToken) =>
             client.ProviderCatalog.ListTenantEntriesAsync(includeDisabled, cancellationToken: cancellationToken));
@@ -185,6 +195,10 @@ public static class AgentsOperationEndpoints
         agents.MapPost("/enable-production-like-generation", (EnableProductionLikeGeneration command, IAgentsClient client, CancellationToken cancellationToken) =>
             client.AgentAdministration.EnableProductionLikeGenerationAsync(command, cancellationToken: cancellationToken));
     }
+
+    private static string? CanonicalCorrelationId(string? value)
+        => value is not null && NUlid.Ulid.TryParse(value, out NUlid.Ulid parsed)
+            && string.Equals(parsed.ToString(), value, StringComparison.Ordinal) ? value : null;
 
     private static AgentOperationOptions GetCommandOptions(
         string? correlationId,

@@ -51,6 +51,18 @@ public sealed class AgentsClientProviderCatalogGatewayTests
         result.Acceptance.ShouldBeNull();
     }
 
+    [Theory]
+    [InlineData(AgentSetupWriteOutcome.Unknown)]
+    [InlineData((AgentSetupWriteOutcome)999)]
+    public async Task UnknownSuccessorOutcomeCannotBecomeSubmitted(AgentSetupWriteOutcome outcome)
+    {
+        _operations.GetCommandWriteOutcomeAsync("system", "message-1", Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentSetupWriteOutcome>>(
+                AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(outcome)));
+        (await Gateway().GetCommandOutcomeAsync("system", "message-1", CancellationToken.None))
+            .ShouldBe(AgentSetupWriteStatus.UnableToVerify);
+    }
+
     [Fact]
     public async Task An_accepted_write_carries_the_servers_acceptance_and_the_submitted_stage()
     {
@@ -76,9 +88,9 @@ public sealed class AgentsClientProviderCatalogGatewayTests
     [Fact]
     public async Task Command_outcome_passes_through_a_successful_client_result()
     {
-        _operations.GetCommandOutcomeAsync("system", "message-1", Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<AgentOperationResult<AgentSetupWriteStatus>>(
-                AgentOperationResult<AgentSetupWriteStatus>.Succeeded(AgentSetupWriteStatus.AwaitingProjection)));
+        _operations.GetCommandWriteOutcomeAsync("system", "message-1", Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentSetupWriteOutcome>>(
+                AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(AgentSetupWriteOutcome.AwaitingProjection)));
 
         (await Gateway().GetCommandOutcomeAsync("system", "message-1", CancellationToken.None))
             .ShouldBe(AgentSetupWriteStatus.AwaitingProjection);
@@ -90,9 +102,9 @@ public sealed class AgentsClientProviderCatalogGatewayTests
     public async Task Failed_command_outcome_read_preserves_pending_safety(
         AgentOperationErrorCode code, AgentSetupWriteStatus expected)
     {
-        _operations.GetCommandOutcomeAsync("system", "message-1", Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<AgentOperationResult<AgentSetupWriteStatus>>(
-                AgentOperationResult<AgentSetupWriteStatus>.Failed(code)));
+        _operations.GetCommandWriteOutcomeAsync("system", "message-1", Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentSetupWriteOutcome>>(
+                AgentOperationResult<AgentSetupWriteOutcome>.Failed(code)));
 
         (await Gateway().GetCommandOutcomeAsync("system", "message-1", CancellationToken.None))
             .ShouldBe(expected);

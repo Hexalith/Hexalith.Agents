@@ -5,12 +5,18 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib
+import os
 import json
 import re
 import sys
 from pathlib import Path
 
 from release_package_integrity import MAX_ARCHIVE_BYTES, package_contents
+
+
+PROVENANCE = importlib.import_module("recover-release-packages")
+MAX_PROVENANCE_BYTES = 64 * 1024
 
 
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
@@ -80,7 +86,7 @@ def verify_github_release(
     if any(not isinstance(name, str) or not name for name in asset_names):
         raise ReleaseVerificationError("GitHub Release contains an unnamed asset")
 
-    expected_assets = {f"{package_id}.{version}.nupkg" for package_id in package_ids}
+    expected_assets = {f"{package_id}.{version}.nupkg" for package_id in package_ids} | {"release-provenance.json"}
     actual_assets = set(asset_names)
     if len(actual_assets) != len(asset_names) or actual_assets != expected_assets:
         raise ReleaseVerificationError(
@@ -98,6 +104,7 @@ def main() -> int:
     parser.add_argument("expected_sha")
     parser.add_argument("resolved_tag_sha")
     parser.add_argument("--asset-directory", type=Path)
+    parser.add_argument("--repository", default=os.environ.get("GITHUB_REPOSITORY"))
     parser.add_argument("--metadata-only", action="store_true", help="preflight API metadata before downloading")
     args = parser.parse_args()
 
@@ -116,7 +123,7 @@ def main() -> int:
         return 0
     if args.asset_directory is None:
         raise ReleaseVerificationError("--asset-directory is required to verify archive contents")
-    verify_asset_archives(manifest, release, args.asset_directory.resolve(), args.version)
+    verify_asset_archives(manifest, release, args.asset_directory.resolve(), args.version, args.repository, args.expected_sha)
     print(f"Verified GitHub Release v{args.version} at {args.expected_sha}.")
     return 0
 
@@ -126,23 +133,29 @@ def verify_asset_metadata(release: dict) -> None:
     for asset in release["assets"]:
         size = asset.get("size")
         digest = asset.get("digest")
-        if type(size) is not int or not 0 < size <= MAX_ARCHIVE_BYTES:
+        if type(size) is not int or not 0 < size <= (MAX_PROVENANCE_BYTES if asset["name"] == "release-provenance.json" else MAX_ARCHIVE_BYTES):
             raise ReleaseVerificationError(f"{asset['name']}: asset size is missing or exceeds limits")
         if not isinstance(digest, str) or not re.fullmatch(r"sha256:[0-9a-f]{64}", digest):
             raise ReleaseVerificationError(f"{asset['name']}: missing or malformed asset SHA-256 digest")
 
 
-def verify_asset_archives(manifest: dict, release: dict, directory: Path, version: str) -> None:
+def verify_asset_archives(manifest: dict, release: dict, directory: Path, version: str,
+                          repository: str, source_sha: str) -> None:
     """Require each download's API digest, length, package identity and boundaries."""
+    if not isinstance(repository, str) or not PROVENANCE.SOURCE.REPOSITORY_PATTERN.fullmatch(repository):
+        raise ReleaseVerificationError("expected repository owner/name is required for provenance verification")
     expected = {f"{row['id']}.{version}.nupkg": row["id"] for row in manifest["packages"]}
     verify_asset_metadata(release)
     try:
         actual = {path.name for path in directory.iterdir()}
-        if actual != set(expected):
+        if actual != set(expected) | {"release-provenance.json"}:
             raise ValueError("downloaded asset inventory does not match release manifest")
         for asset in release["assets"]:
             path = directory / asset["name"]
-            package_contents(path, expected[path.name], version)
+            if path.is_symlink() or not path.is_file():
+                raise ValueError(f"{path.name}: asset must be a regular file")
+            if path.name in expected:
+                package_contents(path, expected[path.name], version)
             size = asset.get("size")
             digest = asset.get("digest")
             if type(size) is not int or size <= 0 or size != path.stat().st_size:
@@ -151,6 +164,11 @@ def verify_asset_archives(manifest: dict, release: dict, directory: Path, versio
                 raise ValueError(f"{path.name}: missing or malformed asset SHA-256 digest")
             if "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest() != digest:
                 raise ValueError(f"{path.name}: asset SHA-256 mismatch")
+        provenance_path = directory / "release-provenance.json"
+        if provenance_path.stat().st_size > MAX_PROVENANCE_BYTES:
+            raise ValueError("release provenance exceeds size bound")
+        PROVENANCE.verify_provenance(read_json(provenance_path, "release provenance"), directory,
+            tuple(expected.values()), version, repository, source_sha)
     except (OSError, ValueError) as error:
         raise ReleaseVerificationError(str(error)) from error
 

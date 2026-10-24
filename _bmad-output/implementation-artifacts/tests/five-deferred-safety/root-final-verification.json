@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUtc": "2026-10-24T04:47:41.144556+00:00",
+  "baselineCommit": "4d6bb6ca763fb04ede70676d8b2c4762f0ce48c0",
+  "localOnly": true,
+  "sourceGate": {
+    "completion": "root-source-completion.json",
+    "fullProjects": {
+      "Hexalith.Agents.Contracts.Tests": 1997,
+      "Hexalith.Agents.Client.Tests": 7,
+      "Hexalith.Agents.Tests": 1017,
+      "Hexalith.Agents.Server.Tests": 1572,
+      "Hexalith.Agents.UI.Tests": 1173
+    },
+    "uniqueFullProjectTests": 5766,
+    "failures": 0,
+    "skips": 0
+  },
+  "tooling": {
+    "completion": "root-tooling-completion.json",
+    "tests": 266,
+    "failures": 0,
+    "skips": 0
+  },
+  "packages": {
+    "completion": "root-packages-completion.json",
+    "consumers": 7,
+    "selectedAssets": 30,
+    "baselineIndependentlyReviewed": true
+  },
+  "compressedArtifacts": [
+    {
+      "path": "root-source.log.gz",
+      "uncompressedBytes": 277722,
+      "uncompressedSha256": "f40b4d2d90f52eff9ff6cb79103f7702eef3f27fc9e06c9a5c3e1c35ac8fdebe"
+    },
+    {
+      "path": "root-tooling.log.gz",
+      "uncompressedBytes": 47123,
+      "uncompressedSha256": "659570c174f694bfd84565b077eb3d30479802a2e06e791d552c9f4400c9356e"
+    },
+    {
+      "path": "root-pack.log.gz",
+      "uncompressedBytes": 4181,
+      "uncompressedSha256": "f163c8033022992a9668381cf4630988c92dffe6c251815590b02e747ef01660"
+    },
+    {
+      "path": "root-consumers.log.gz",
+      "uncompressedBytes": 2173,
+      "uncompressedSha256": "76a4046a8b4a657fca99e50d45c571680495857db658f774598328737b225094"
+    },
+    {
+      "path": "root-consumer-receipt.json.gz",
+      "uncompressedBytes": 396317,
+      "uncompressedSha256": "b72a939b6b882277c68b74a9da9b09463d5b9d184976f28e695ce12c9c13f2d5"
+    }
+  ],
+  "sourceHashes": [
+    {
+      "path": ".github/workflows/recover-release.yml",
+      "sha256": "e0d625c91bd6d2b1b984f1c67f1e58af91a0275d2c271e7fce9f05baaee86a99"
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "sha256": "e1805c1d0fb16a0ce806c97ffd7566ad43babe9d822362cf8eb01c75de654bb7"
+    },
+    {
+      "path": ".releaserc.json",
+      "sha256": "d8fbe2d4d5caca173648313e52faad35cf17888ad9de309db0bb1f630cee2dda"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "sha256": "5e7a7d6fa142fad91048805b11060fd2a31e0d5935dbe127549c250cd5af9395"
+    },
+    {
+      "path": "_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md",
+      "sha256": "56bee5788c955bca848df05f9bfe030122e8a13510869b3c6900e0ccb711e197"
+    },
+    {
+      "path": "eng/consumer-executable-assets.json",
+      "sha256": "5b9f3c2f659f7009b8d91e45da5429474abf0747cc608a8aa7419b5ae4ac306b"
+    },
+    {
+      "path": "eng/github-release-publisher.mjs",
+      "sha256": "cf770f99b8c883b5303616a112e49862cebedacbf189825dfa38c232d0f9c261"
+    },
+    {
+      "path": "eng/semantic-release-plan.mjs",
+      "sha256": "af5f123631403c40160955ed4c239de5b1aa19a878c504262e4520520051c8bf"
+    },
+    {
+      "path": "scripts/publish-release-packages.sh",
+      "sha256": "15ec307d748d6da9b5261b095146936dc1a44f364b491d97c35c74199cdc9a1d"
+    },
+    {
+      "path": "scripts/recover-release-packages.py",
+      "sha256": "0f78fb04f05fbc86f4d199ef1608689d9a0359b5bca7636911a9aa72914e73b7"
+    },
+    {
+      "path": "scripts/validate-consumer-package-references.py",
+      "sha256": "b0a21ef999341f3a6586cf29d5d7ae3bfec13840e48892de0947943dc313512c"
+    },
+    {
+      "path": "scripts/verify-github-release.py",
+      "sha256": "671c48be399567516c3e50dc2be99408e3fe5fd28da083d38588cf9198a34118"
+    },
+    {
+      "path": "src/Hexalith.Agents.Client/IProviderCatalogOperations.cs",
+      "sha256": "67811159a029399f01b7f9e248216262b2d83a30d05bbaaf3c478dd8894c6571"
+    },
+    {
+      "path": "src/Hexalith.Agents.Client/UnavailableOperations.cs",
+      "sha256": "74e3fa790f27480f28dafecddf875bd15b0fdfc7d3ccfec22e04e2b4f7b9310c"
+    },
+    {
+      "path": "src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteOutcome.cs",
+      "sha256": "0ff1e840ffae042f4bd72256776e89227b10b7df52d97bb47159c8babd6c6077"
+    },
+    {
+      "path": "src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteStatus.cs",
+      "sha256": "d5e888bf5d2231c40495dfb48bf585a92f24bedf45fbc44dcba421623a08953c"
+    },
+    {
+      "path": "src/Hexalith.Agents.Server/Api/AgentOperationHttpStatusFilter.cs",
+      "sha256": "fb5b4aa97b23af5d3d2ae094d13e94193d04f6a0688d18ad87a4a7413f1c0c01"
+    },
+    {
+      "path": "src/Hexalith.Agents.Server/Api/AgentsOperationEndpoints.cs",
+      "sha256": "7c299d13ad5e287100cdce8c5973c20aee1914c72ab2024326c96b26194dc41c"
+    },
+    {
+      "path": "src/Hexalith.Agents.Server/Application/Agents/EventStoreProviderCatalogOperations.cs",
+      "sha256": "f142869ab7a514cfac65c2935005b43b51167fbe0c9fe50fde294d2920a70b31"
+    },
+    {
+      "path": "src/Hexalith.Agents.Server/Projections/AgentEventPayloadStructure.cs",
+      "sha256": "05deb7d08f10fffae7df9e9e259412243c0e8a1541cbcca10364f6d8d556b1de"
+    },
+    {
+      "path": "src/Hexalith.Agents.Server/Projections/AgentSetupProjectionFold.cs",
+      "sha256": "8c3ba1a9203306f88edda8cf7218be2dfba7f5cf192d9f702a56cdaf0723c091"
+    },
+    {
+      "path": "src/Hexalith.Agents.UI/Services/Gateways/AgentsClientProviderCatalogGateway.cs",
+      "sha256": "4d123de876387f6a44396c88ca34ae91ad584b7d1b77217a23eba506432b8375"
+    },
+    {
+      "path": "test/Hexalith.Agents.Client.Tests/AgentsClientFacadeTests.cs",
+      "sha256": "916d27fb485b2f5f4abdb821ec07d113dee11862f0206b6104356f673bc97e2c"
+    },
+    {
+      "path": "test/Hexalith.Agents.Client.Tests/PriorProviderCatalogOperations.cs",
+      "sha256": "7dfb9a44896389419b3792633c4a0b688bef7191c4fb5c627bfb9886bd8e429e"
+    },
+    {
+      "path": "test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs",
+      "sha256": "0deb32bd84d5aed7b500ab96fb3c394a2b83ad4e8fe1964013abbebf6f5e1c0d"
+    },
+    {
+      "path": "test/Hexalith.Agents.Contracts.Tests/ContractEnumOrdinals.json",
+      "sha256": "73bb3804e8e0015f303400412d3fae80a1363bd64efdf52e46e415d8314ef352"
+    },
+    {
+      "path": "test/Hexalith.Agents.Server.Tests/AgentSetupProjectionTests.cs",
+      "sha256": "ff9848861414e252e3192f5b8b0f08981b4ba0715488a4266dbf7e400f54689a"
+    },
+    {
+      "path": "test/Hexalith.Agents.Server.Tests/AgentsOperationEndpointsTests.cs",
+      "sha256": "5ba7cd4f705b322188eeb67a72674325cecb7a2337a65810783498220200821d"
+    },
+    {
+      "path": "test/Hexalith.Agents.Server.Tests/EventStoreProviderCatalogOperationsTests.cs",
+      "sha256": "2fe13f600a266372c7b5cd57f972ceee21815944e99811c565d62f6c1d051e35"
+    },
+    {
+      "path": "test/Hexalith.Agents.Server.Tests/ProviderCatalogMigrationTests.cs",
+      "sha256": "0ca26b8b94346928f14aa7e0eedb81ad3da08b544b8523041a177a196c51f711"
+    },
+    {
+      "path": "test/Hexalith.Agents.UI.Tests/AgentsClientProviderCatalogGatewayTests.cs",
+      "sha256": "f816a067ea60ffaae65268dddb27b506e535ff82c44e05915dd8f92849697551"
+    },
+    {
+      "path": "tests/tooling/dependency_assets_restore_test.py",
+      "sha256": "8a1844ff6c99eb6e84860b768cb980d0eaacb8fdb4cad9727a2f275c47e49042"
+    },
+    {
+      "path": "tests/tooling/github_release_publisher_test.py",
+      "sha256": "63a408df17a99b2820351a710886cb3a4b0ecc608c479c1ba9730896eeb0662a"
+    },
+    {
+      "path": "tests/tooling/github_release_verification_test.py",
+      "sha256": "3a54fdffd458ca0c8d2a8a49a36d9f582c67b02cd597781fef74ca63919d4257"
+    },
+    {
+      "path": "tests/tooling/publish_release_packages_test.py",
+      "sha256": "d35856c109d1205cf8b0c4872d0a19b3b611ecb3d6a77bfdc4698692f902509c"
+    },
+    {
+      "path": "tests/tooling/recover_release_packages_test.py",
+      "sha256": "f5374533793cd7204449eab6b7c3d551e2e17e156aedb4e98b49dd62417676b7"
+    }
+  ],
+  "testBinaryHashes": [
+    {
+      "path": "test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.dll",
+      "sha256": "4ee9913e48a6cc19e478244a32a0a172cf583c6349639c142ede57029bc32eb9"
+    },
+    {
+      "path": "test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.Tests.dll",
+      "sha256": "395ab13a9c0adced38d349304334e7456b9a46eba378c36deac528c214b0c79b"
+    },
+    {
+      "path": "test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.dll",
+      "sha256": "a8a2da2242594dfc4e71ecded6e21596a6648743b1355e2afbe610173b70c2de"
+    },
+    {
+      "path": "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "sha256": "792c20cbb464bd24889cbab51ddcbce2685fe0124ab846f9a10a7f248bae34dd"
+    },
+    {
+      "path": "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll",
+      "sha256": "960a1e6ee38eb562a15769aba359c2176b3ea15443be3887d158e62a7ed67075"
+    }
+  ],
+  "unchangedSubmoduleGitlinks": {
+    "references/Hexalith.AI.Tools": "3f194e17174994d308ec84af9ee2b5aa68674d0d",
+    "references/Hexalith.Builds": "359fee24aeca4d9eabed4b425d4cfa2520b2adda",
+    "references/Hexalith.Commons": "5c23c818f639c5bb3175f964c5549440bd5b876d",
+    "references/Hexalith.Conversations": "ef3947078cb5ccf3d2b81ca684490e565e8cd04f",
+    "references/Hexalith.EventStore": "5ce5f1d84b88c808cc8a526b9decf149de977e55",
+    "references/Hexalith.FrontComposer": "7fcfb019bf94fa858410726fe9a1506f3a2e36a7",
+    "references/Hexalith.McpCli": "7f4a08cb4b7ff9402d1dcf0826ad45ab0256ba65",
+    "references/Hexalith.Memories": "921fee32fb1d03da1e1770a9747ecaeacc8abd7c",
+    "references/Hexalith.Parties": "4fc1124eb995a40553cb23b042d4a3c1add3dfb2",
+    "references/Hexalith.Platform": "c65d87a6f8f4a05fa3bea4e24ac778bf23f12cd6",
+    "references/Hexalith.PolymorphicSerializations": "221ac4592ba908ae7661ba1fa9e2d1fcc23baee0",
+    "references/Hexalith.Tenants": "0c10ef637171f9ac2639d4b5ac42f513ea9ef133"
+  },
+  "review": {
+    "layers": [
+      "blind-hunter",
+      "edge-case-hunter",
+      "verification-gap"
+    ],
+    "reviewerFindings": 15,
+    "additionalParentFinding": 1,
+    "unverifiedFollowups": 1,
+    "recheck": "All reported concrete defects corrected; independent focused source recheck found none remaining."
+  }
+}

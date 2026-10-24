@@ -1,7 +1,7 @@
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
-/// Outcome of an Agent setup write attempted from an administration surface (Story 5.2 AC1, AC3, AC4).
+/// Legacy UI outcome of an Agent setup write attempted from an administration surface (Story 5.2 AC1, AC3, AC4).
 /// </summary>
 public enum AgentSetupWriteStatus
 {

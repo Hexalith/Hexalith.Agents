@@ -1,5 +1,7 @@
 {
-  "branches": ["main"],
+  "branches": [
+    "main"
+  ],
   "tagFormat": "v${version}",
   "plugins": [
     "@semantic-release/commit-analyzer",
@@ -12,14 +14,6 @@
         "publishCmd": "bash scripts/publish-release-packages.sh ${nextRelease.version}"
       }
     ],
-    [
-      "@semantic-release/github",
-      {
-        "assets": ["nupkgs/*.nupkg"],
-        "labels": [],
-        "successCommentCondition": false,
-        "releasedLabels": false
-      }
-    ]
+    "./eng/github-release-publisher.mjs"
   ]
 }

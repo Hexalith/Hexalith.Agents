@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import shutil
 import json
 import ntpath
 import os
@@ -65,27 +67,81 @@ def normalize_disclosure_path(value: str) -> str:
         return os.path.normcase(os.path.normpath(decoded)).replace("\\", "/").casefold()
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("package_directory", type=Path)
-    args = parser.parse_args()
-    package_directory = args.package_directory.resolve()
+def active_import_paths(expanded: str) -> list[str]:
+    """Read MSBuild's active import filename comment lines, without extension filtering."""
+    return [line.strip() for line in expanded.splitlines()
+        if Path(line.strip()).is_absolute() and Path(line.strip()).is_file()]
 
-    subprocess.run(
-        [sys.executable, str(ROOT / "scripts" / "validate-nuget-packages.py"), str(package_directory)],
-        cwd=ROOT,
-        check=True,
-    )
-    identities = sorted(package_identity(path) for path in package_directory.glob("*.nupkg"))
-    versions = {version for _, version in identities}
-    if len(versions) != 1:
-        raise ValueError(f"package versions differ: {sorted(versions)}")
 
+def executable_asset_receipt(assets: dict, packages: Path, analyzers: list[str], imports: list[str], consumer_root: Path | None = None) -> dict:
+    """Separate selected compiler/import inputs from merely available package archive members."""
+    owned = []
+    available = []
+    for identity, library in sorted(assets["libraries"].items()):
+        if library.get("type") != "package":
+            continue
+        package_id, version = identity.rsplit("/", 1)
+        package_root = (packages / library["path"]).resolve()
+        owned.append((package_root, package_id, version))
+        for name in library.get("files", []):
+            if name.startswith(("analyzers/", "build/", "buildTransitive/", "buildMultiTargeting/")):
+                path = package_root / name
+                if path.is_file():
+                    available.append({"package": package_id, "version": version, "path": name,
+                        "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+    selected, sdk, sdk_imports, generated = [], [], [], []
+    dotnet_root = Path(shutil.which("dotnet") or "dotnet").resolve().parent
+    for kind, paths in (("analyzer", analyzers), ("import", imports)):
+        for value in sorted(set(paths)):
+            path = Path(value).resolve()
+            if not path.is_file():
+                raise ValueError(f"selected {kind} does not exist: {path}")
+            for package_root, package_id, version in owned:
+                if path.is_relative_to(package_root):
+                    selected.append({"kind": kind, "package": package_id, "version": version,
+                        "path": path.relative_to(package_root).as_posix(),
+                        "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+                    break
+            else:
+                if any(path.is_relative_to(dotnet_root / area) for area in ("sdk", "packs", "sdk-manifests")):
+                    entry = {"path": path.relative_to(dotnet_root).as_posix(),
+                        "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+                    (sdk if kind == "analyzer" else sdk_imports).append(entry)
+                elif (kind == "import" and consumer_root is not None
+                        and ((path.parent == (consumer_root / "obj").resolve()
+                              and path.name.endswith((".csproj.nuget.g.props", ".csproj.nuget.g.targets")))
+                             or path == (consumer_root / "Directory.Packages.props").resolve()
+                             or path == (consumer_root / "PackageConsumer.csproj").resolve()
+                             or path == (consumer_root / "Consumer.csproj").resolve())):
+                    generated.append({"path": path.relative_to(consumer_root).as_posix()})
+                else:
+                    raise ValueError(f"unowned executable consumer asset: {path}")
+    key = lambda entry: json.dumps(entry, sort_keys=True)
+    return {"selected": sorted(selected, key=key), "available": sorted(available, key=key),
+            "sdkAnalyzers": sorted(sdk, key=key), "sdkImports": sorted(sdk_imports, key=key),
+            "generatedImports": sorted(generated, key=key)}
+
+
+def enforce_asset_policy(receipts: list[dict], policy: dict) -> None:
+    """Fail closed on unreviewed selected package code, regardless of nuspec exclusion metadata."""
+    actual = sorted({json.dumps(entry, sort_keys=True) for receipt in receipts for entry in receipt["selected"]})
+    expected = sorted(json.dumps(entry, sort_keys=True) for entry in policy.get("selected", []))
+    per_consumer = {receipt["consumer"]: receipt["selected"] for receipt in receipts}
+    if policy.get("schemaVersion") != 1 or actual != expected or per_consumer != policy.get("consumers"):
+        raise ValueError("consumer executable asset baseline changed; review package/version/path/SHA-256 "
+            f"before updating eng/consumer-executable-assets.json; added={sorted(set(actual)-set(expected))}; "
+            f"removed={sorted(set(expected)-set(actual))}")
+
+
+def validate_consumer(package_directory: Path, identities: list[tuple[str, str]], all_identities: list[tuple[str, str]],
+                      label: str) -> dict:
+    """Restore and compile one independent consumer with the repository-pinned SDK."""
     with tempfile.TemporaryDirectory(prefix="agents-package-consumer-") as directory_name:
         directory = Path(directory_name)
+        shutil.copyfile(ROOT / "global.json", directory / "global.json")
         package_versions = "\n".join(
             f'    <PackageVersion Include="{package_id}" Version="{version}" />'
-            for package_id, version in identities
+            for package_id, version in all_identities
         )
         package_references = "\n".join(
             f'    <PackageReference Include="{package_id}" />' for package_id, _ in identities
@@ -104,35 +160,21 @@ def main() -> int:
             f"{package_references}\n  </ItemGroup>\n</Project>\n",
             encoding="utf-8",
         )
+        probes = {
+            "Hexalith.Agents": "Hexalith.Agents.AgentsAssemblyMarker",
+            "Hexalith.Agents.Client": "Hexalith.Agents.Client.AgentsClientAssemblyMarker",
+            "Hexalith.Agents.Contracts": "Hexalith.Agents.Contracts.Agent.AgentLifecycleStatus",
+            "Hexalith.Agents.EventStore": "Hexalith.Agents.EventStore.AgentsEventStoreServiceCollectionExtensions",
+            "Hexalith.Agents.Testing": "Hexalith.Agents.Testing.AgentsTestingAssemblyMarker",
+            "Hexalith.Agents.UI": "Hexalith.Agents.UI.AgentsUIAssemblyMarker",
+        }
+        types = ",".join(f"typeof({probes[package_id]})" for package_id, _ in identities)
         (directory / "ConsumerProbe.cs").write_text(
-            textwrap.dedent("""\
-            namespace Hexalith.Agents.PackageConsumer;
-
-            using Hexalith.Agents;
-            using Hexalith.Agents.Client;
-            using Hexalith.Agents.Contracts.Agent;
-            using Hexalith.Agents.EventStore;
-            using Hexalith.Agents.Testing;
-            using Hexalith.Agents.UI;
-
-            public static class ConsumerProbe
-            {
-                public static Type[] PublicPackageTypes { get; } =
-                [
-                    typeof(AgentsAssemblyMarker),
-                    typeof(AgentsClientAssemblyMarker),
-                    typeof(AgentLifecycleStatus),
-                    typeof(AgentsEventStoreServiceCollectionExtensions),
-                    typeof(AgentsTestingAssemblyMarker),
-                    typeof(AgentsUIAssemblyMarker),
-                ];
-            }
-            """),
-            encoding="utf-8",
-        )
+            "namespace Hexalith.Agents.PackageConsumer; public static class ConsumerProbe { "
+            f"public static System.Type[] PublicPackageTypes {{ get; }} = [{types}];" + " }", encoding="utf-8")
         config = directory / "NuGet.config"
         local_patterns = "\n".join(
-            f'                  <package pattern="{package_id}" />' for package_id, _ in identities
+            f'                  <package pattern="{package_id}" />' for package_id, _ in all_identities
         )
         config.write_text(
             textwrap.dedent(f"""\
@@ -188,7 +230,9 @@ def main() -> int:
             if value.get("type") == "package" and name.casefold().startswith("hexalith.agents/")
             or value.get("type") == "package" and name.casefold().startswith("hexalith.agents.")
         }
-        if actual_agent_libraries != expected_agent_libraries:
+        if not expected_agent_libraries <= actual_agent_libraries or not actual_agent_libraries <= {
+            f"{package_id}/{version}".casefold() for package_id, version in all_identities
+        }:
             raise ValueError(
                 "isolated consumer Agents package identity mismatch; "
                 f"missing={sorted(expected_agent_libraries - actual_agent_libraries)}; "
@@ -196,7 +240,9 @@ def main() -> int:
             )
 
         expected_source = normalize_disclosure_path(str(package_directory))
-        for package_id, version in identities:
+        for package_id, version in all_identities:
+            if f"{package_id}/{version}".casefold() not in actual_agent_libraries:
+                continue
             metadata_path = packages / package_id.casefold() / version / ".nupkg.metadata"
             if not metadata_path.is_file():
                 raise ValueError(f"missing NuGet source metadata for local package {package_id}/{version}")
@@ -222,7 +268,51 @@ def main() -> int:
         if disclosed:
             raise ValueError(f"isolated consumer assets disclose repository source paths: {disclosed}")
 
-    print(f"Validated isolated consumer for {len(identities)} package references at {next(iter(versions))}.")
+        environment = {**os.environ, "NUGET_PACKAGES": str(packages)}
+        evaluated = subprocess.run(["dotnet", "msbuild", str(project), "-nologo", "-target:Build", "-verbosity:quiet",
+            "-getItem:Analyzer", "-p:Configuration=Release", "/m:1", "/nr:false"], cwd=directory,
+            env=environment, check=True, capture_output=True, text=True)
+        analyzers = [item["Identity"] for item in json.loads(evaluated.stdout)["Items"]["Analyzer"]]
+        expanded = directory / "imports.xml"
+        subprocess.run(["dotnet", "msbuild", str(project), "-nologo", f"-preprocess:{expanded}",
+            "-p:Configuration=Release", "/m:1", "/nr:false"], cwd=directory, env=environment, check=True)
+        # MSBuild emits each active import's absolute filename on its own comment line.
+        imports = active_import_paths(expanded.read_text())
+        return {"consumer": label, **executable_asset_receipt(assets, packages, analyzers, imports, directory)}
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("package_directory", type=Path)
+    parser.add_argument("--receipt", type=Path, default=ROOT / "artifacts/consumer-executable-assets-receipt.json")
+    parser.add_argument("--write-baseline", type=Path, help="write a candidate for explicit maintainer review")
+    parser.add_argument("--policy", type=Path, default=ROOT / "eng/consumer-executable-assets.json")
+    args = parser.parse_args()
+    package_directory = args.package_directory.resolve()
+    subprocess.run([sys.executable, str(ROOT / "scripts/validate-nuget-packages.py"), str(package_directory)],
+                   cwd=ROOT, check=True)
+    identities = sorted(package_identity(path) for path in package_directory.glob("*.nupkg"))
+    versions = {version for _, version in identities}
+    if len(versions) != 1:
+        raise ValueError(f"package versions differ: {sorted(versions)}")
+    receipts = [validate_consumer(package_directory, [identity], identities, identity[0]) for identity in identities]
+    receipts.append(validate_consumer(package_directory, identities, identities, "combined"))
+    receipt = {"schemaVersion": 1, "sdk": json.loads((ROOT / "global.json").read_text())["sdk"],
+        "sdkVersion": subprocess.run(["dotnet", "--version"], cwd=ROOT, check=True,
+            capture_output=True, text=True).stdout.strip(),
+        "packages": [{"id": package_id, "version": version,
+            "sha256": hashlib.sha256((package_directory / f"{package_id}.{version}.nupkg").read_bytes()).hexdigest()}
+            for package_id, version in identities], "consumers": receipts}
+    args.receipt.parent.mkdir(parents=True, exist_ok=True)
+    args.receipt.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+    policy = {"schemaVersion": 1, "consumers": {result["consumer"]: result["selected"] for result in receipts}, "selected": [json.loads(entry) for entry in sorted({
+        json.dumps(entry, sort_keys=True) for result in receipts for entry in result["selected"]})]}
+    if args.write_baseline:
+        args.write_baseline.write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
+        print(f"Wrote candidate executable asset baseline for explicit review: {args.write_baseline}")
+    else:
+        enforce_asset_policy(receipts, json.loads(args.policy.read_text()))
+    print(f"Validated {len(receipts)} isolated consumers at {next(iter(versions))}.")
     return 0
 
 

@@ -36,6 +36,7 @@ MANIFEST = {
 EXPECTED_ASSETS = [
     {"name": "Hexalith.Agents.Contracts.1.2.3.nupkg"},
     {"name": "Hexalith.Agents.1.2.3.nupkg"},
+    {"name": "release-provenance.json"},
 ]
 
 
@@ -103,7 +104,7 @@ class GitHubReleaseVerificationTests(unittest.TestCase):
 
     def test_build_metadata_hyphen_does_not_make_a_stable_version_prerelease(self) -> None:
         version = "1.2.3+build-label"
-        assets = [{"name": f"{package['id']}.{version}.nupkg"} for package in MANIFEST["packages"]]
+        assets = [{"name": f"{package['id']}.{version}.nupkg"} for package in MANIFEST["packages"]] + [{"name": "release-provenance.json"}]
         payload = release(tag=f"v{version}", assets=assets)
         VERIFIER.verify_github_release(MANIFEST, payload, version, SHA, SHA)
 
@@ -113,7 +114,7 @@ class GitHubReleaseVerificationTests(unittest.TestCase):
 
     def test_prerelease_version_still_accepts_a_prerelease_release(self) -> None:
         version = "1.2.3-rc.1"
-        assets = [{"name": f"{package['id']}.{version}.nupkg"} for package in MANIFEST["packages"]]
+        assets = [{"name": f"{package['id']}.{version}.nupkg"} for package in MANIFEST["packages"]] + [{"name": "release-provenance.json"}]
         VERIFIER.verify_github_release(
             MANIFEST, release(tag=f"v{version}", prerelease=True, assets=assets), version, SHA, SHA
         )
@@ -140,6 +141,22 @@ class GitHubReleaseVerificationTests(unittest.TestCase):
                 for asset in payload.get("assets", []) if isinstance(payload, dict) else []:
                     if asset.get("name") == path.name:
                         asset.update(size=path.stat().st_size, digest="sha256:" + hashlib.sha256(path.read_bytes()).hexdigest())
+            provenance = assets / "release-provenance.json"
+            document = {"schemaVersion": 1, "repository": "Hexalith/Hexalith.Agents", "version": version,
+                "sourceSha": SHA, "tag": f"v{version}", "archives": [
+                    {"name": path.name, "size": path.stat().st_size,
+                     "sha256": hashlib.sha256(path.read_bytes()).hexdigest()} for path in sorted(assets.glob("*.nupkg"))]}
+            if asset_fault == "provenance source":
+                document["sourceSha"] = OTHER_SHA
+            elif asset_fault == "provenance archive":
+                document["archives"][0]["sha256"] = "0" * 64
+            elif asset_fault == "provenance oversized":
+                document["padding"] = "x" * (64 * 1024)
+            provenance.write_text(json.dumps(document))
+            for asset in payload.get("assets", []) if isinstance(payload, dict) else []:
+                if asset.get("name") == provenance.name:
+                    asset.update(size=provenance.stat().st_size,
+                        digest="sha256:" + hashlib.sha256(provenance.read_bytes()).hexdigest())
             path = assets / f"{MANIFEST['packages'][0]['id']}.{version}.nupkg"
             if asset_fault == "corrupt":
                 path.write_bytes(b"not a package")
@@ -175,6 +192,7 @@ class GitHubReleaseVerificationTests(unittest.TestCase):
                     (Path(directory) / filename).write_text(contents, encoding="utf-8")
             return subprocess.run(
                 [sys.executable, str(SCRIPT), str(manifest), str(release_path), version, SHA, resolved_tag_sha,
+                 "--repository", "Hexalith/Hexalith.Agents",
                  *( ["--metadata-only"] if metadata_only else ["--asset-directory", str(assets)] )],
                 capture_output=True,
                 text=True,
@@ -188,6 +206,13 @@ class GitHubReleaseVerificationTests(unittest.TestCase):
         self.assertIn(diagnostic, result.stderr)
         self.assertNotIn("Traceback", result.stderr)
         self.assertNotIn("Verified", result.stdout)
+
+    def test_provenance_identity_archive_claims_and_size_are_verified(self):
+        for fault, diagnostic in (("provenance source", "sourceSha mismatch"),
+                                  ("provenance archive", "archive integrity mismatch"),
+                                  ("provenance oversized", "asset size")):
+            with self.subTest(fault=fault):
+                self.assert_cli_failure(self.run_cli(release(), asset_fault=fault), diagnostic)
 
     def test_cli_accepts_exact_release(self) -> None:
         result = self.run_cli(release())
@@ -216,7 +241,7 @@ class GitHubReleaseVerificationTests(unittest.TestCase):
     def test_cli_accepts_stable_build_metadata_and_prerelease_versions(self) -> None:
         for version, prerelease in (("1.2.3+build-label", False), ("1.2.3-rc.1", True)):
             with self.subTest(version=version):
-                assets = [{"name": f"{package['id']}.{version}.nupkg"} for package in MANIFEST["packages"]]
+                assets = [{"name": f"{package['id']}.{version}.nupkg"} for package in MANIFEST["packages"]] + [{"name": "release-provenance.json"}]
                 payload = release(tag=f"v{version}", prerelease=prerelease, assets=assets)
                 result = self.run_cli(payload, version=version)
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -225,7 +250,7 @@ class GitHubReleaseVerificationTests(unittest.TestCase):
 
     def test_cli_rejects_prerelease_flag_on_stable_build_metadata(self) -> None:
         version = "1.2.3+build-label"
-        assets = [{"name": f"{package['id']}.{version}.nupkg"} for package in MANIFEST["packages"]]
+        assets = [{"name": f"{package['id']}.{version}.nupkg"} for package in MANIFEST["packages"]] + [{"name": "release-provenance.json"}]
         result = self.run_cli(release(tag=f"v{version}", prerelease=True, assets=assets), version=version)
         self.assert_cli_failure(result, "prerelease=false for a stable version")
 

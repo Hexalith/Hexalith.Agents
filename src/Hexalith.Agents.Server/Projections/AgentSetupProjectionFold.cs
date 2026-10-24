@@ -94,6 +94,10 @@ public static class AgentSetupProjectionFold
 
         long checkpoint = current?.LastSequenceNumber ?? 0;
         AgentState state = ToState(current, request.TenantId, request.AggregateId);
+        if (GetDeliveryFailureReason(request.Events, checkpoint) is not null)
+        {
+            return ToReadModel(state, checkpoint, current?.ProjectedAt);
+        }
         DateTimeOffset? projectedAt = current?.ProjectedAt;
         long lastSequence = checkpoint;
 
@@ -218,13 +222,21 @@ public static class AgentSetupProjectionFold
         {
             return payload is null or { Length: 0 }
                 ? null
-                : JsonSerializer.Deserialize(payload, eventType, _jsonOptions);
+                : DeserializeValidated(payload, eventType);
         }
         catch (JsonException)
         {
             // Delivery validation rejects the entire slice so no partial state or checkpoint is persisted.
             return null;
         }
+    }
+
+    private static object? DeserializeValidated(byte[] payload, Type eventType)
+    {
+        using JsonDocument document = JsonDocument.Parse(payload);
+        return AgentEventPayloadStructure.IsValid(document.RootElement, eventType)
+            ? JsonSerializer.Deserialize(payload, eventType, _jsonOptions)
+            : null;
     }
 
     private static void Apply(AgentState state, object payload)

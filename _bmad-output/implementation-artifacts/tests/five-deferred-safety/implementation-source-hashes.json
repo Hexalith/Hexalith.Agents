@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": ".github/workflows/recover-release.yml",
+      "sha256": "e0d625c91bd6d2b1b984f1c67f1e58af91a0275d2c271e7fce9f05baaee86a99"
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "sha256": "e1805c1d0fb16a0ce806c97ffd7566ad43babe9d822362cf8eb01c75de654bb7"
+    },
+    {
+      "path": ".releaserc.json",
+      "sha256": "d8fbe2d4d5caca173648313e52faad35cf17888ad9de309db0bb1f630cee2dda"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "sha256": "5e7a7d6fa142fad91048805b11060fd2a31e0d5935dbe127549c250cd5af9395"
+    },
+    {
+      "path": "eng/consumer-executable-assets.json",
+      "sha256": "5b9f3c2f659f7009b8d91e45da5429474abf0747cc608a8aa7419b5ae4ac306b"
+    },
+    {
+      "path": "eng/github-release-publisher.mjs",
+      "sha256": "cf770f99b8c883b5303616a112e49862cebedacbf189825dfa38c232d0f9c261"
+    },
+    {
+      "path": "eng/semantic-release-plan.mjs",
+      "sha256": "af5f123631403c40160955ed4c239de5b1aa19a878c504262e4520520051c8bf"
+    },
+    {
+      "path": "scripts/publish-release-packages.sh",
+      "sha256": "15ec307d748d6da9b5261b095146936dc1a44f364b491d97c35c74199cdc9a1d"
+    },
+    {
+      "path": "scripts/recover-release-packages.py",
+      "sha256": "80c7b02bcb6464958b5aabdb7b85d8d871e0bfd383bcca71bd56a3a9cf31628d"
+    },
+    {
+      "path": "scripts/validate-consumer-package-references.py",
+      "sha256": "4d3dd9524231df4ddb80387d353b86a969d60efd76e138f0695fcf6ade7302dc"
+    },
+    {
+      "path": "scripts/verify-github-release.py",
+      "sha256": "2b4b14dfb909f36b164b5ef08764de9207547c9c5dbb26fc0dfc39f681fd32fd"
+    },
+    {
+      "path": "src/Hexalith.Agents.Client/IProviderCatalogOperations.cs",
+      "sha256": "a30b6bd3e05ca63f9801e469910e9aba7c0df2b428516d165e0106613d52f27f"
+    },
+    {
+      "path": "src/Hexalith.Agents.Client/UnavailableOperations.cs",
+      "sha256": "4eb3296ad033a5752e6336a5db95c977f2dfad8a3c0611f406a42f3268512156"
+    },
+    {
+      "path": "src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteOutcome.cs",
+      "sha256": "0ff1e840ffae042f4bd72256776e89227b10b7df52d97bb47159c8babd6c6077"
+    },
+    {
+      "path": "src/Hexalith.Agents.Contracts/Agent/AgentSetupWriteStatus.cs",
+      "sha256": "d5e888bf5d2231c40495dfb48bf585a92f24bedf45fbc44dcba421623a08953c"
+    },
+    {
+      "path": "src/Hexalith.Agents.Server/Api/AgentOperationHttpStatusFilter.cs",
+      "sha256": "d501e0eab1825adea9a3f60976ace2b58088de1cf23407ef1b18274f158525ed"
+    },
+    {
+      "path": "src/Hexalith.Agents.Server/Api/AgentsOperationEndpoints.cs",
+      "sha256": "43b93b6053c6da20de0a90ccef19e5b2d66fba5ab4f35adb6213106049ee6958"
+    },
+    {
+      "path": "src/Hexalith.Agents.Server/Application/Agents/EventStoreProviderCatalogOperations.cs",
+      "sha256": "3edeb171afafa635f39b222f0ffe33dadbf5d73e165c1addebf6561598dfa1de"
+    },
+    {
+      "path": "src/Hexalith.Agents.Server/Projections/AgentEventPayloadStructure.cs",
+      "sha256": "5eae407cb814f2d979dfd245570366a9dc043a424fcb31439e13fd42629ce04a"
+    },
+    {
+      "path": "src/Hexalith.Agents.Server/Projections/AgentSetupProjectionFold.cs",
+      "sha256": "8c3ba1a9203306f88edda8cf7218be2dfba7f5cf192d9f702a56cdaf0723c091"
+    },
+    {
+      "path": "src/Hexalith.Agents.UI/Services/Gateways/AgentsClientProviderCatalogGateway.cs",
+      "sha256": "4d123de876387f6a44396c88ca34ae91ad584b7d1b77217a23eba506432b8375"
+    },
+    {
+      "path": "test/Hexalith.Agents.Contracts.Tests/AgentOperationContractsTests.cs",
+      "sha256": "0deb32bd84d5aed7b500ab96fb3c394a2b83ad4e8fe1964013abbebf6f5e1c0d"
+    },
+    {
+      "path": "test/Hexalith.Agents.Contracts.Tests/ContractEnumOrdinals.json",
+      "sha256": "73bb3804e8e0015f303400412d3fae80a1363bd64efdf52e46e415d8314ef352"
+    },
+    {
+      "path": "test/Hexalith.Agents.Server.Tests/AgentSetupProjectionTests.cs",
+      "sha256": "e1637b0471ba40454b828e4022bfacad10ed57af966126da09ada9a0f6358b25"
+    },
+    {
+      "path": "test/Hexalith.Agents.Server.Tests/AgentsOperationEndpointsTests.cs",
+      "sha256": "b7829a92df4a1ce6408949c2d13c021713a1417117caf5cc674d8b5f76abbf8c"
+    },
+    {
+      "path": "test/Hexalith.Agents.Server.Tests/EventStoreProviderCatalogOperationsTests.cs",
+      "sha256": "731a6db65bb8a7b28e6665808b4f7f44790d56de3c83b85df466269115442e62"
+    },
+    {
+      "path": "test/Hexalith.Agents.Server.Tests/ProviderCatalogMigrationTests.cs",
+      "sha256": "0ca26b8b94346928f14aa7e0eedb81ad3da08b544b8523041a177a196c51f711"
+    },
+    {
+      "path": "test/Hexalith.Agents.UI.Tests/AgentsClientProviderCatalogGatewayTests.cs",
+      "sha256": "f816a067ea60ffaae65268dddb27b506e535ff82c44e05915dd8f92849697551"
+    },
+    {
+      "path": "tests/tooling/dependency_assets_restore_test.py",
+      "sha256": "55bdb490ba8ba6fa1e081077d11ebc6857d277f11bbcb854bf2b1312c700d01e"
+    },
+    {
+      "path": "tests/tooling/github_release_publisher_test.py",
+      "sha256": "fc1796ecc6407ec7b38626c2e6063451e1d226c4cb181008fd2c80c3272f193f"
+    },
+    {
+      "path": "tests/tooling/github_release_verification_test.py",
+      "sha256": "5be0c19da57b11ce13a8f9f509da97bf7afd45194b219af12a4f2d681a1ed659"
+    },
+    {
+      "path": "tests/tooling/publish_release_packages_test.py",
+      "sha256": "d35856c109d1205cf8b0c4872d0a19b3b611ecb3d6a77bfdc4698692f902509c"
+    },
+    {
+      "path": "tests/tooling/recover_release_packages_test.py",
+      "sha256": "789cae06df83584be3ec748336dedb32291964c8669d977805e1b6a3771cfc2c"
+    }
+  ]
+}

@@ -30,6 +30,30 @@ public sealed class AgentOperationContractsTests
     ];
 
     [Fact]
+    public void SuccessorWriteOutcomeReservesUnknownAndPreservesLegacyOrdinals()
+    {
+        AgentSetupWriteOutcome.Unknown.ShouldBe(default);
+        foreach (AgentSetupWriteStatus legacy in Enum.GetValues<AgentSetupWriteStatus>())
+        {
+            Enum.Parse<AgentSetupWriteOutcome>(legacy.ToString()).ShouldBe((AgentSetupWriteOutcome)((int)legacy + 1));
+        }
+
+        ((int)AgentSetupWriteStatus.Submitted).ShouldBe(0);
+        ((int)AgentSetupWriteStatus.Rejected).ShouldBe(9);
+    }
+
+    [Theory]
+    [InlineData("0")]
+    [InlineData("999")]
+    [InlineData("\"FutureOutcome\"")]
+    public void SuccessorWriteOutcomeUnknownValuesFailClosed(string json)
+    {
+        JsonSerializer.Deserialize<AgentSetupWriteOutcome>(json).ShouldBe(AgentSetupWriteOutcome.Unknown);
+        JsonSerializer.Deserialize<AgentOperationResult<AgentSetupWriteOutcome>>("{\"Status\":\"Succeeded\"}")!
+            .Value.ShouldBe(AgentSetupWriteOutcome.Unknown);
+    }
+
+    [Fact]
     public void Operation_result_round_trips_status_enums_by_name()
     {
         AgentOperationResult<string> original = AgentOperationResult<string>.Succeeded("ok");

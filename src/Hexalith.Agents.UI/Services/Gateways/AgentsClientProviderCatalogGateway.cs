@@ -22,11 +22,16 @@ public sealed class AgentsClientProviderCatalogGateway(IAgentsClient client) : I
     public async Task<AgentSetupWriteStatus> GetCommandOutcomeAsync(
         string targetTenantId, string messageId, CancellationToken cancellationToken)
     {
-        AgentOperationResult<AgentSetupWriteStatus> result = await _client.ProviderCatalog
-            .GetCommandOutcomeAsync(targetTenantId, messageId, cancellationToken: cancellationToken)
+        AgentOperationResult<AgentSetupWriteOutcome> result = await _client.ProviderCatalog
+            .GetCommandWriteOutcomeAsync(targetTenantId, messageId, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
         return result.IsSuccess && result.Value is { } status
-            ? status : result.Status is AgentOperationStatus.NotAuthorized
+            ? status switch
+            {
+                AgentSetupWriteOutcome.Unknown => AgentSetupWriteStatus.UnableToVerify,
+                >= AgentSetupWriteOutcome.Submitted and <= AgentSetupWriteOutcome.Rejected => (AgentSetupWriteStatus)((int)status - 1),
+                _ => AgentSetupWriteStatus.UnableToVerify,
+            } : result.Status is AgentOperationStatus.NotAuthorized
                 ? AgentSetupWriteStatus.NotAuthorized : AgentSetupWriteStatus.UnableToVerify;
     }
 

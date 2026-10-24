@@ -8,7 +8,16 @@ namespace Hexalith.Agents.Client;
 /// <summary>Public provider-catalog administration operations.</summary>
 public interface IProviderCatalogOperations
 {
-    /// <summary>Reads the exact EventStore outcome of a previously submitted governance command.</summary>
+    /// <summary>Reads the exact command outcome using the fail-closed versioned contract.</summary>
+    ValueTask<AgentOperationResult<AgentSetupWriteOutcome>> GetCommandWriteOutcomeAsync(
+        string targetTenantId,
+        string messageId,
+        AgentOperationOptions? options = null,
+        CancellationToken cancellationToken = default)
+        => ValueTask.FromResult(AgentOperationResult<AgentSetupWriteOutcome>.Unavailable());
+
+    /// <summary>Legacy operation; rejected. Use GetCommandWriteOutcomeAsync.</summary>
+    [Obsolete("Use GetCommandWriteOutcomeAsync; the legacy operation is rejected.")]
     ValueTask<AgentOperationResult<AgentSetupWriteStatus>> GetCommandOutcomeAsync(
         string targetTenantId,
         string messageId,

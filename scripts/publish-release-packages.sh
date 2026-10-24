@@ -16,6 +16,7 @@ version="$1"
 package_paths="$(python3 scripts/validate-nuget-packages.py ./nupkgs --publication-version "$version")"
 mapfile -t packages <<< "$package_paths"
 
+python3 scripts/recover-release-packages.py "$version" --source-sha "$GITHUB_SHA" --staged-only --local-package-directory ./nupkgs
 python3 scripts/verify-nuget-publication.py eng/release-packages.json "$version" --expect absent
 python3 scripts/verify-release-source.py \
   --repository "$GITHUB_REPOSITORY" \

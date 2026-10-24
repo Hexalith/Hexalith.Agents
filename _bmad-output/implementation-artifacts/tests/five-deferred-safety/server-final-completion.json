@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "label": "server-final",
+  "sessionId": 17093,
+  "exitCode": 0,
+  "status": "passed",
+  "log": "server-full.log.gz",
+  "completedAtUtc": "2026-10-24T04:11:13.891Z"
+}

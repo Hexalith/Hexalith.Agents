@@ -27,7 +27,7 @@ try {
     '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',
   ];
-  const publicationPlugins = ['@semantic-release/exec', '@semantic-release/github'];
+  const publicationPlugins = ['@semantic-release/exec', '@semantic-release/github', './eng/github-release-publisher.mjs'];
   for (const plugin of configuration.plugins) {
     const [name, options] = Array.isArray(plugin) ? plugin : [plugin, {}];
     if (!analysisPlugins.includes(name) && !publicationPlugins.includes(name)) {

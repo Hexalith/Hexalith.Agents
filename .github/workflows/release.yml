@@ -171,7 +171,7 @@ jobs:
             eng/release-packages.json github-release.json "$VERSION" "$DISPATCH_SHA" "$release_sha" --metadata-only
           # Bash uses 1024-byte blocks: cap each downloaded file at 64 MiB.
           ulimit -f 65536
-          gh release download "$tag" --repo "$REPOSITORY" --pattern '*.nupkg' --dir release-assets
+          gh release download "$tag" --repo "$REPOSITORY" --dir release-assets
           python3 scripts/verify-github-release.py \
             eng/release-packages.json \
             github-release.json \

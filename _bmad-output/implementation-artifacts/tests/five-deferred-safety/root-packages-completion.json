@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packages": "/tmp/hexalith-agents-safety-final-packages-bc72d2iq",
+  "commands": [
+    {
+      "label": "root-pack",
+      "argv": [
+        "python3",
+        "scripts/pack-release-packages.py",
+        "/tmp/hexalith-agents-safety-final-packages-bc72d2iq",
+        "1.0.0"
+      ],
+      "startedAtUtc": "2026-10-24T04:29:40.079585+00:00",
+      "completedAtUtc": "2026-10-24T04:30:12.676968+00:00",
+      "exitCode": 0,
+      "status": "passed",
+      "log": "root-pack.log.gz"
+    },
+    {
+      "label": "root-consumers",
+      "argv": [
+        "python3",
+        "scripts/validate-consumer-package-references.py",
+        "/tmp/hexalith-agents-safety-final-packages-bc72d2iq",
+        "--receipt",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/five-deferred-safety/root-consumer-receipt.json"
+      ],
+      "startedAtUtc": "2026-10-24T04:30:12.677357+00:00",
+      "completedAtUtc": "2026-10-24T04:30:41.987418+00:00",
+      "exitCode": 0,
+      "status": "passed",
+      "log": "root-consumers.log.gz"
+    }
+  ]
+}

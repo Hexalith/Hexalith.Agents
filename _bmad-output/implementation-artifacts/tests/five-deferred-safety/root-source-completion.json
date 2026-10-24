@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "label": "root-source",
+  "argv": [
+    "pwsh",
+    "-NoLogo",
+    "-NoProfile",
+    "-File",
+    "eng/verify-story-5.2.ps1"
+  ],
+  "startedAtUtc": "2026-10-24T04:27:40.336179+00:00",
+  "completedAtUtc": "2026-10-24T04:29:12.409285+00:00",
+  "exitCode": 0,
+  "status": "passed",
+  "log": "root-source.log.gz"
+}

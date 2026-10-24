@@ -1,0 +1,683 @@
+{
+  "schemaVersion": 1,
+  "selected": [
+    {
+      "kind": "analyzer",
+      "package": "Dapr.Common",
+      "path": "analyzers/dotnet/cs/Dapr.Common.Generators.dll",
+      "sha256": "6b94e6a128d9057bf6e6176d88395566f6219901a981e74ad95102091ececdf3",
+      "version": "1.18.10"
+    },
+    {
+      "kind": "analyzer",
+      "package": "Fluxor.Blazor.Web",
+      "path": "analyzers/dotnet/cs/Fluxor.Blazor.Web.Analyzers.dll",
+      "sha256": "0facec57610941c4aad6039d67936b80b4aed94193d6ba3a4a1276a3356d235a",
+      "version": "6.11.0"
+    },
+    {
+      "kind": "analyzer",
+      "package": "MessagePackAnalyzer",
+      "path": "analyzers/roslyn4.3/cs/MessagePack.Analyzers.CodeFixes.dll",
+      "sha256": "5f775566f26ae1680020c092822fd912571c95450d371c805e8fe9ab43415071",
+      "version": "3.1.12"
+    },
+    {
+      "kind": "analyzer",
+      "package": "MessagePackAnalyzer",
+      "path": "analyzers/roslyn4.3/cs/MessagePack.SourceGenerator.dll",
+      "sha256": "e703844e5de11820560e2b198212d58cad437e0475380d5f67b60a0dcf07c299",
+      "version": "3.1.12"
+    },
+    {
+      "kind": "analyzer",
+      "package": "Microsoft.AspNetCore.OpenApi",
+      "path": "analyzers/dotnet/cs/Microsoft.AspNetCore.OpenApi.SourceGenerators.dll",
+      "sha256": "c7d4a31c8051292143b9050c1eace2c4507c38de0d31901ae13d8618a29fc71f",
+      "version": "10.0.13"
+    },
+    {
+      "kind": "analyzer",
+      "package": "Microsoft.Extensions.Logging.Abstractions",
+      "path": "analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Logging.Generators.dll",
+      "sha256": "f12014fa6cb498e6da10320089727934adfb95937fc644069469db27cf195c0f",
+      "version": "10.0.13"
+    },
+    {
+      "kind": "analyzer",
+      "package": "Microsoft.Extensions.Options",
+      "path": "analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Options.SourceGeneration.dll",
+      "sha256": "eb3dd6dae44582fc2519cf1ce8e7f4a530907ac38d1578d0d50d93a222a39089",
+      "version": "10.0.13"
+    },
+    {
+      "kind": "analyzer",
+      "package": "Microsoft.Extensions.Telemetry.Abstractions",
+      "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
+      "sha256": "9c90b953e381cb885f8653efae546c789fc79221088c86cbfefdd5ba767dc2b3",
+      "version": "10.11.0"
+    },
+    {
+      "kind": "analyzer",
+      "package": "Microsoft.Extensions.Telemetry.Abstractions",
+      "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
+      "sha256": "1f4c33a358639b504083cffd03caee45b642d83e05fb45de9d8defd9ac9312d7",
+      "version": "10.11.0"
+    },
+    {
+      "kind": "analyzer",
+      "package": "StackExchange.Redis",
+      "path": "analyzers/dotnet/cs/StackExchange.Redis.Build.dll",
+      "sha256": "3f4a95406adb7cb2ee5cbe6a27797da18bbef4309ac2ea960a833b63fcd249b0",
+      "version": "3.4.5"
+    },
+    {
+      "kind": "analyzer",
+      "package": "StackExchange.Redis",
+      "path": "analyzers/dotnet/cs/StackExchange.Redis.CodeFixes.dll",
+      "sha256": "bd80b6fe83dc385a9e1a1403f078cc36d3b3657dd0f6928d8f752500785cb28a",
+      "version": "3.4.5"
+    },
+    {
+      "kind": "analyzer",
+      "package": "System.Reactive",
+      "path": "analyzers/dotnet/System.Reactive.Analyzers.dll",
+      "sha256": "c042dd12f724c60c71c046430cc278463c082e42e85c7b3933127fa14ec682ad",
+      "version": "7.0.0"
+    },
+    {
+      "kind": "import",
+      "package": "Hexalith.FrontComposer.Shell",
+      "path": "build/Hexalith.FrontComposer.Shell.props",
+      "sha256": "01abcf003fb124a7d214a8898c2932c11b9aeaf0a8ecbd16bbca184f5d4b859b",
+      "version": "4.7.0"
+    },
+    {
+      "kind": "import",
+      "package": "Hexalith.FrontComposer.Shell",
+      "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "sha256": "31baf9b31dd541784b39d2ad9b6d4afd39c5873f451e09b3dd728737f36293e7",
+      "version": "4.7.0"
+    },
+    {
+      "kind": "import",
+      "package": "Hexalith.FrontComposer.Shell",
+      "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
+      "sha256": "51d19c1438535f92a5b3a71850ed57b082b81222bb4bfd47705a1d61f598f8db",
+      "version": "4.7.0"
+    },
+    {
+      "kind": "import",
+      "package": "Hexalith.FrontComposer.Shell",
+      "path": "buildMultiTargeting/Hexalith.FrontComposer.Shell.props",
+      "sha256": "df68680fc7100f443386fff25cbc1cc629ee87e990fc9b532d07fbe9e949191c",
+      "version": "4.7.0"
+    },
+    {
+      "kind": "import",
+      "package": "Hexalith.FrontComposer.Shell",
+      "path": "buildTransitive/Hexalith.FrontComposer.Shell.props",
+      "sha256": "75096dc345a9d400005e5bbb7020d9544e623bd5ed490c293e728289d7bb4d7c",
+      "version": "4.7.0"
+    },
+    {
+      "kind": "import",
+      "package": "Microsoft.AspNetCore.Components.Analyzers",
+      "path": "build/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
+      "sha256": "6c7c21c0237728a3be1db9c97651d48a442d82e669c991bc19c712bfc8a30e0f",
+      "version": "10.0.13"
+    },
+    {
+      "kind": "import",
+      "package": "Microsoft.AspNetCore.Components.Analyzers",
+      "path": "buildTransitive/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
+      "sha256": "4aa2bb7438904f47c969e14b8e7a406f5ff24865cd543aaade59b42d994dfa89",
+      "version": "10.0.13"
+    },
+    {
+      "kind": "import",
+      "package": "Microsoft.Extensions.Configuration.Binder",
+      "path": "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets",
+      "sha256": "1f9571c12725c07ddb6bad48f1cec803bf860203d2cffdc68b94ef2b1084a010",
+      "version": "10.0.13"
+    },
+    {
+      "kind": "import",
+      "package": "Microsoft.Extensions.Http.Resilience",
+      "path": "buildTransitive/net8.0/Microsoft.Extensions.Http.Resilience.targets",
+      "sha256": "ace26888263cfa33f11aba321dfedaadeef83b82521225c4f9c60c48925d768c",
+      "version": "10.11.0"
+    },
+    {
+      "kind": "import",
+      "package": "Microsoft.Extensions.Logging.Abstractions",
+      "path": "buildTransitive/net8.0/Microsoft.Extensions.Logging.Abstractions.targets",
+      "sha256": "956112ab4506f26794830ff56d0ba43098fb7dd5fe4753f505963e0e20960ea5",
+      "version": "10.0.13"
+    },
+    {
+      "kind": "import",
+      "package": "Microsoft.Extensions.Options",
+      "path": "buildTransitive/net8.0/Microsoft.Extensions.Options.targets",
+      "sha256": "d9ae5ef417cf1993c1f7ab2b0373711f7bb131013b321054c078c63135480ddd",
+      "version": "10.0.13"
+    },
+    {
+      "kind": "import",
+      "package": "Microsoft.Extensions.Telemetry.Abstractions",
+      "path": "buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.props",
+      "sha256": "cf216bb832dba54ffd5e0653d5727158228b9fcf08e0012166068e53e8887ad5",
+      "version": "10.11.0"
+    },
+    {
+      "kind": "import",
+      "package": "Microsoft.Extensions.Telemetry.Abstractions",
+      "path": "buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.targets",
+      "sha256": "9f20e6ab1056c314c79c8e99202afe601b555347fcea29a4644e4dece2c59f91",
+      "version": "10.11.0"
+    },
+    {
+      "kind": "import",
+      "package": "Microsoft.FluentUI.AspNetCore.Components",
+      "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "sha256": "149b96fbd8a58307250f90bf226ff633ab220321e35a08cc7769de542891f183",
+      "version": "5.0.1"
+    },
+    {
+      "kind": "import",
+      "package": "Microsoft.FluentUI.AspNetCore.Components",
+      "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
+      "sha256": "f07347d4ed081e05e16cd815b58a5b520670ad20c1be26089dc3298b20481824",
+      "version": "5.0.1"
+    },
+    {
+      "kind": "import",
+      "package": "Microsoft.FluentUI.AspNetCore.Components",
+      "path": "build/Microsoft.FluentUI.AspNetCore.Components.props",
+      "sha256": "a0c8334649677304f9eb88453fed84de58421ad0cfdabb314223a36d0a741a51",
+      "version": "5.0.1"
+    },
+    {
+      "kind": "import",
+      "package": "Microsoft.FluentUI.AspNetCore.Components",
+      "path": "buildMultiTargeting/Microsoft.FluentUI.AspNetCore.Components.props",
+      "sha256": "a8fbfc6b19ffc746531b919dd4a9c4acb42d803bef731469964538b884cdd3ac",
+      "version": "5.0.1"
+    },
+    {
+      "kind": "import",
+      "package": "Microsoft.FluentUI.AspNetCore.Components",
+      "path": "buildTransitive/Microsoft.FluentUI.AspNetCore.Components.props",
+      "sha256": "79f511414a009a879a887713b8d6ef2c4a04f23e05ab96768d5631621532207e",
+      "version": "5.0.1"
+    }
+  ],
+  "consumers": {
+    "Hexalith.Agents": [
+      {
+        "kind": "analyzer",
+        "package": "Dapr.Common",
+        "version": "1.18.10",
+        "path": "analyzers/dotnet/cs/Dapr.Common.Generators.dll",
+        "sha256": "6b94e6a128d9057bf6e6176d88395566f6219901a981e74ad95102091ececdf3"
+      },
+      {
+        "kind": "analyzer",
+        "package": "Microsoft.Extensions.Logging.Abstractions",
+        "version": "10.0.13",
+        "path": "analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Logging.Generators.dll",
+        "sha256": "f12014fa6cb498e6da10320089727934adfb95937fc644069469db27cf195c0f"
+      },
+      {
+        "kind": "analyzer",
+        "package": "Microsoft.Extensions.Options",
+        "version": "10.0.13",
+        "path": "analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Options.SourceGeneration.dll",
+        "sha256": "eb3dd6dae44582fc2519cf1ce8e7f4a530907ac38d1578d0d50d93a222a39089"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Configuration.Binder",
+        "version": "10.0.13",
+        "path": "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets",
+        "sha256": "1f9571c12725c07ddb6bad48f1cec803bf860203d2cffdc68b94ef2b1084a010"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Logging.Abstractions",
+        "version": "10.0.13",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Logging.Abstractions.targets",
+        "sha256": "956112ab4506f26794830ff56d0ba43098fb7dd5fe4753f505963e0e20960ea5"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Options",
+        "version": "10.0.13",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Options.targets",
+        "sha256": "d9ae5ef417cf1993c1f7ab2b0373711f7bb131013b321054c078c63135480ddd"
+      }
+    ],
+    "Hexalith.Agents.Client": [],
+    "Hexalith.Agents.Contracts": [],
+    "Hexalith.Agents.EventStore": [
+      {
+        "kind": "analyzer",
+        "package": "Dapr.Common",
+        "version": "1.18.10",
+        "path": "analyzers/dotnet/cs/Dapr.Common.Generators.dll",
+        "sha256": "6b94e6a128d9057bf6e6176d88395566f6219901a981e74ad95102091ececdf3"
+      },
+      {
+        "kind": "analyzer",
+        "package": "MessagePackAnalyzer",
+        "version": "3.1.12",
+        "path": "analyzers/roslyn4.3/cs/MessagePack.Analyzers.CodeFixes.dll",
+        "sha256": "5f775566f26ae1680020c092822fd912571c95450d371c805e8fe9ab43415071"
+      },
+      {
+        "kind": "analyzer",
+        "package": "MessagePackAnalyzer",
+        "version": "3.1.12",
+        "path": "analyzers/roslyn4.3/cs/MessagePack.SourceGenerator.dll",
+        "sha256": "e703844e5de11820560e2b198212d58cad437e0475380d5f67b60a0dcf07c299"
+      },
+      {
+        "kind": "analyzer",
+        "package": "Microsoft.AspNetCore.OpenApi",
+        "version": "10.0.13",
+        "path": "analyzers/dotnet/cs/Microsoft.AspNetCore.OpenApi.SourceGenerators.dll",
+        "sha256": "c7d4a31c8051292143b9050c1eace2c4507c38de0d31901ae13d8618a29fc71f"
+      },
+      {
+        "kind": "analyzer",
+        "package": "Microsoft.Extensions.Telemetry.Abstractions",
+        "version": "10.11.0",
+        "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
+        "sha256": "9c90b953e381cb885f8653efae546c789fc79221088c86cbfefdd5ba767dc2b3"
+      },
+      {
+        "kind": "analyzer",
+        "package": "Microsoft.Extensions.Telemetry.Abstractions",
+        "version": "10.11.0",
+        "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
+        "sha256": "1f4c33a358639b504083cffd03caee45b642d83e05fb45de9d8defd9ac9312d7"
+      },
+      {
+        "kind": "analyzer",
+        "package": "StackExchange.Redis",
+        "version": "3.4.5",
+        "path": "analyzers/dotnet/cs/StackExchange.Redis.Build.dll",
+        "sha256": "3f4a95406adb7cb2ee5cbe6a27797da18bbef4309ac2ea960a833b63fcd249b0"
+      },
+      {
+        "kind": "analyzer",
+        "package": "StackExchange.Redis",
+        "version": "3.4.5",
+        "path": "analyzers/dotnet/cs/StackExchange.Redis.CodeFixes.dll",
+        "sha256": "bd80b6fe83dc385a9e1a1403f078cc36d3b3657dd0f6928d8f752500785cb28a"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Configuration.Binder",
+        "version": "10.0.13",
+        "path": "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets",
+        "sha256": "1f9571c12725c07ddb6bad48f1cec803bf860203d2cffdc68b94ef2b1084a010"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Http.Resilience",
+        "version": "10.11.0",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Http.Resilience.targets",
+        "sha256": "ace26888263cfa33f11aba321dfedaadeef83b82521225c4f9c60c48925d768c"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Logging.Abstractions",
+        "version": "10.0.13",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Logging.Abstractions.targets",
+        "sha256": "956112ab4506f26794830ff56d0ba43098fb7dd5fe4753f505963e0e20960ea5"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Options",
+        "version": "10.0.13",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Options.targets",
+        "sha256": "d9ae5ef417cf1993c1f7ab2b0373711f7bb131013b321054c078c63135480ddd"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Telemetry.Abstractions",
+        "version": "10.11.0",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.props",
+        "sha256": "cf216bb832dba54ffd5e0653d5727158228b9fcf08e0012166068e53e8887ad5"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Telemetry.Abstractions",
+        "version": "10.11.0",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.targets",
+        "sha256": "9f20e6ab1056c314c79c8e99202afe601b555347fcea29a4644e4dece2c59f91"
+      }
+    ],
+    "Hexalith.Agents.Testing": [],
+    "Hexalith.Agents.UI": [
+      {
+        "kind": "analyzer",
+        "package": "Fluxor.Blazor.Web",
+        "version": "6.11.0",
+        "path": "analyzers/dotnet/cs/Fluxor.Blazor.Web.Analyzers.dll",
+        "sha256": "0facec57610941c4aad6039d67936b80b4aed94193d6ba3a4a1276a3356d235a"
+      },
+      {
+        "kind": "analyzer",
+        "package": "System.Reactive",
+        "version": "7.0.0",
+        "path": "analyzers/dotnet/System.Reactive.Analyzers.dll",
+        "sha256": "c042dd12f724c60c71c046430cc278463c082e42e85c7b3933127fa14ec682ad"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.FrontComposer.Shell",
+        "version": "4.7.0",
+        "path": "build/Hexalith.FrontComposer.Shell.props",
+        "sha256": "01abcf003fb124a7d214a8898c2932c11b9aeaf0a8ecbd16bbca184f5d4b859b"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.FrontComposer.Shell",
+        "version": "4.7.0",
+        "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+        "sha256": "31baf9b31dd541784b39d2ad9b6d4afd39c5873f451e09b3dd728737f36293e7"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.FrontComposer.Shell",
+        "version": "4.7.0",
+        "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
+        "sha256": "51d19c1438535f92a5b3a71850ed57b082b81222bb4bfd47705a1d61f598f8db"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.FrontComposer.Shell",
+        "version": "4.7.0",
+        "path": "buildMultiTargeting/Hexalith.FrontComposer.Shell.props",
+        "sha256": "df68680fc7100f443386fff25cbc1cc629ee87e990fc9b532d07fbe9e949191c"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.FrontComposer.Shell",
+        "version": "4.7.0",
+        "path": "buildTransitive/Hexalith.FrontComposer.Shell.props",
+        "sha256": "75096dc345a9d400005e5bbb7020d9544e623bd5ed490c293e728289d7bb4d7c"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.AspNetCore.Components.Analyzers",
+        "version": "10.0.13",
+        "path": "build/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
+        "sha256": "6c7c21c0237728a3be1db9c97651d48a442d82e669c991bc19c712bfc8a30e0f"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.AspNetCore.Components.Analyzers",
+        "version": "10.0.13",
+        "path": "buildTransitive/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
+        "sha256": "4aa2bb7438904f47c969e14b8e7a406f5ff24865cd543aaade59b42d994dfa89"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Configuration.Binder",
+        "version": "10.0.13",
+        "path": "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets",
+        "sha256": "1f9571c12725c07ddb6bad48f1cec803bf860203d2cffdc68b94ef2b1084a010"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Logging.Abstractions",
+        "version": "10.0.13",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Logging.Abstractions.targets",
+        "sha256": "956112ab4506f26794830ff56d0ba43098fb7dd5fe4753f505963e0e20960ea5"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Options",
+        "version": "10.0.13",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Options.targets",
+        "sha256": "d9ae5ef417cf1993c1f7ab2b0373711f7bb131013b321054c078c63135480ddd"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.FluentUI.AspNetCore.Components",
+        "version": "5.0.1",
+        "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+        "sha256": "149b96fbd8a58307250f90bf226ff633ab220321e35a08cc7769de542891f183"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.FluentUI.AspNetCore.Components",
+        "version": "5.0.1",
+        "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
+        "sha256": "f07347d4ed081e05e16cd815b58a5b520670ad20c1be26089dc3298b20481824"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.FluentUI.AspNetCore.Components",
+        "version": "5.0.1",
+        "path": "build/Microsoft.FluentUI.AspNetCore.Components.props",
+        "sha256": "a0c8334649677304f9eb88453fed84de58421ad0cfdabb314223a36d0a741a51"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.FluentUI.AspNetCore.Components",
+        "version": "5.0.1",
+        "path": "buildMultiTargeting/Microsoft.FluentUI.AspNetCore.Components.props",
+        "sha256": "a8fbfc6b19ffc746531b919dd4a9c4acb42d803bef731469964538b884cdd3ac"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.FluentUI.AspNetCore.Components",
+        "version": "5.0.1",
+        "path": "buildTransitive/Microsoft.FluentUI.AspNetCore.Components.props",
+        "sha256": "79f511414a009a879a887713b8d6ef2c4a04f23e05ab96768d5631621532207e"
+      }
+    ],
+    "combined": [
+      {
+        "kind": "analyzer",
+        "package": "Dapr.Common",
+        "version": "1.18.10",
+        "path": "analyzers/dotnet/cs/Dapr.Common.Generators.dll",
+        "sha256": "6b94e6a128d9057bf6e6176d88395566f6219901a981e74ad95102091ececdf3"
+      },
+      {
+        "kind": "analyzer",
+        "package": "Fluxor.Blazor.Web",
+        "version": "6.11.0",
+        "path": "analyzers/dotnet/cs/Fluxor.Blazor.Web.Analyzers.dll",
+        "sha256": "0facec57610941c4aad6039d67936b80b4aed94193d6ba3a4a1276a3356d235a"
+      },
+      {
+        "kind": "analyzer",
+        "package": "MessagePackAnalyzer",
+        "version": "3.1.12",
+        "path": "analyzers/roslyn4.3/cs/MessagePack.Analyzers.CodeFixes.dll",
+        "sha256": "5f775566f26ae1680020c092822fd912571c95450d371c805e8fe9ab43415071"
+      },
+      {
+        "kind": "analyzer",
+        "package": "MessagePackAnalyzer",
+        "version": "3.1.12",
+        "path": "analyzers/roslyn4.3/cs/MessagePack.SourceGenerator.dll",
+        "sha256": "e703844e5de11820560e2b198212d58cad437e0475380d5f67b60a0dcf07c299"
+      },
+      {
+        "kind": "analyzer",
+        "package": "Microsoft.AspNetCore.OpenApi",
+        "version": "10.0.13",
+        "path": "analyzers/dotnet/cs/Microsoft.AspNetCore.OpenApi.SourceGenerators.dll",
+        "sha256": "c7d4a31c8051292143b9050c1eace2c4507c38de0d31901ae13d8618a29fc71f"
+      },
+      {
+        "kind": "analyzer",
+        "package": "Microsoft.Extensions.Telemetry.Abstractions",
+        "version": "10.11.0",
+        "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
+        "sha256": "9c90b953e381cb885f8653efae546c789fc79221088c86cbfefdd5ba767dc2b3"
+      },
+      {
+        "kind": "analyzer",
+        "package": "Microsoft.Extensions.Telemetry.Abstractions",
+        "version": "10.11.0",
+        "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
+        "sha256": "1f4c33a358639b504083cffd03caee45b642d83e05fb45de9d8defd9ac9312d7"
+      },
+      {
+        "kind": "analyzer",
+        "package": "StackExchange.Redis",
+        "version": "3.4.5",
+        "path": "analyzers/dotnet/cs/StackExchange.Redis.Build.dll",
+        "sha256": "3f4a95406adb7cb2ee5cbe6a27797da18bbef4309ac2ea960a833b63fcd249b0"
+      },
+      {
+        "kind": "analyzer",
+        "package": "StackExchange.Redis",
+        "version": "3.4.5",
+        "path": "analyzers/dotnet/cs/StackExchange.Redis.CodeFixes.dll",
+        "sha256": "bd80b6fe83dc385a9e1a1403f078cc36d3b3657dd0f6928d8f752500785cb28a"
+      },
+      {
+        "kind": "analyzer",
+        "package": "System.Reactive",
+        "version": "7.0.0",
+        "path": "analyzers/dotnet/System.Reactive.Analyzers.dll",
+        "sha256": "c042dd12f724c60c71c046430cc278463c082e42e85c7b3933127fa14ec682ad"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.FrontComposer.Shell",
+        "version": "4.7.0",
+        "path": "build/Hexalith.FrontComposer.Shell.props",
+        "sha256": "01abcf003fb124a7d214a8898c2932c11b9aeaf0a8ecbd16bbca184f5d4b859b"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.FrontComposer.Shell",
+        "version": "4.7.0",
+        "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+        "sha256": "31baf9b31dd541784b39d2ad9b6d4afd39c5873f451e09b3dd728737f36293e7"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.FrontComposer.Shell",
+        "version": "4.7.0",
+        "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
+        "sha256": "51d19c1438535f92a5b3a71850ed57b082b81222bb4bfd47705a1d61f598f8db"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.FrontComposer.Shell",
+        "version": "4.7.0",
+        "path": "buildMultiTargeting/Hexalith.FrontComposer.Shell.props",
+        "sha256": "df68680fc7100f443386fff25cbc1cc629ee87e990fc9b532d07fbe9e949191c"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.FrontComposer.Shell",
+        "version": "4.7.0",
+        "path": "buildTransitive/Hexalith.FrontComposer.Shell.props",
+        "sha256": "75096dc345a9d400005e5bbb7020d9544e623bd5ed490c293e728289d7bb4d7c"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.AspNetCore.Components.Analyzers",
+        "version": "10.0.13",
+        "path": "build/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
+        "sha256": "6c7c21c0237728a3be1db9c97651d48a442d82e669c991bc19c712bfc8a30e0f"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.AspNetCore.Components.Analyzers",
+        "version": "10.0.13",
+        "path": "buildTransitive/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
+        "sha256": "4aa2bb7438904f47c969e14b8e7a406f5ff24865cd543aaade59b42d994dfa89"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Configuration.Binder",
+        "version": "10.0.13",
+        "path": "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets",
+        "sha256": "1f9571c12725c07ddb6bad48f1cec803bf860203d2cffdc68b94ef2b1084a010"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Http.Resilience",
+        "version": "10.11.0",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Http.Resilience.targets",
+        "sha256": "ace26888263cfa33f11aba321dfedaadeef83b82521225c4f9c60c48925d768c"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Logging.Abstractions",
+        "version": "10.0.13",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Logging.Abstractions.targets",
+        "sha256": "956112ab4506f26794830ff56d0ba43098fb7dd5fe4753f505963e0e20960ea5"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Options",
+        "version": "10.0.13",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Options.targets",
+        "sha256": "d9ae5ef417cf1993c1f7ab2b0373711f7bb131013b321054c078c63135480ddd"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Telemetry.Abstractions",
+        "version": "10.11.0",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.props",
+        "sha256": "cf216bb832dba54ffd5e0653d5727158228b9fcf08e0012166068e53e8887ad5"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.Extensions.Telemetry.Abstractions",
+        "version": "10.11.0",
+        "path": "buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.targets",
+        "sha256": "9f20e6ab1056c314c79c8e99202afe601b555347fcea29a4644e4dece2c59f91"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.FluentUI.AspNetCore.Components",
+        "version": "5.0.1",
+        "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+        "sha256": "149b96fbd8a58307250f90bf226ff633ab220321e35a08cc7769de542891f183"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.FluentUI.AspNetCore.Components",
+        "version": "5.0.1",
+        "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
+        "sha256": "f07347d4ed081e05e16cd815b58a5b520670ad20c1be26089dc3298b20481824"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.FluentUI.AspNetCore.Components",
+        "version": "5.0.1",
+        "path": "build/Microsoft.FluentUI.AspNetCore.Components.props",
+        "sha256": "a0c8334649677304f9eb88453fed84de58421ad0cfdabb314223a36d0a741a51"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.FluentUI.AspNetCore.Components",
+        "version": "5.0.1",
+        "path": "buildMultiTargeting/Microsoft.FluentUI.AspNetCore.Components.props",
+        "sha256": "a8fbfc6b19ffc746531b919dd4a9c4acb42d803bef731469964538b884cdd3ac"
+      },
+      {
+        "kind": "import",
+        "package": "Microsoft.FluentUI.AspNetCore.Components",
+        "version": "5.0.1",
+        "path": "buildTransitive/Microsoft.FluentUI.AspNetCore.Components.props",
+        "sha256": "79f511414a009a879a887713b8d6ef2c4a04f23e05ab96768d5631621532207e"
+      }
+    ]
+  }
+}
