@@ -14,7 +14,9 @@ origin: migrated from legacy ledger (""), 2026-09-08
 location: IDomainQueryHandler setup-query authorization
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-enforce-complete-launch-readiness-before-callability.md`
 reason: The write/read HTTP path uses HttpAgentAdministrationContextProvider while IDomainQueryHandler setup queries still authorize via ITenantAccessReader; live tenant/Party binding is Story 5.4.
-status: open
+status: done 2026-10-24
+resolution: `spec-five-deferred-owner-and-setup-verification-items.md` — Current composition installs ProjectedTenantAccessReader; the SDK dispatcher and both setup queries require verified subject/tenant binding, current actor/administrator authority and fresh tenant access before read-model disclosure. The maintained Story 5.2 gate now requires verified-caller and authority-ordering regressions; the full local source gate passes. These are admission-time checks; authority is not revalidated after store/enrichment awaits. Unavailable host authority defaults and live owner qualification remain binding.
+evidence_record: [Owner/setup verification](deferred-owner-setup-verification-2026-10-24.md#setup-query-authorization)
 
 ### DW-3: Optional post-write projection polling so AuthoritativePending can advance to ProjectionConfirmed without a manual reload.
 
@@ -122,6 +124,9 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations.md`
   summary: Correlate setup writes to their specific terminal command outcome and projection identity.
   evidence: Lifecycle N+1 polling prevents same-version false confirmation, but rejected/no-op submissions never reach that version, a timed-out submission permits another write from a stale baseline, and a concurrent different write can satisfy the threshold. Exact confirmation and safe re-submission need an accepted-command/outcome/projection correlation contract beyond this bounded remediation.
+  status: done 2026-10-24
+  resolution: `spec-five-deferred-owner-and-setup-verification-items.md` — Canonical exact receipts, domain-derived effect/target versions, retained retry identities and incrementing lifecycle versions already replace threshold-only guessing. Fresh receipt/no-op/mismatch and persisted disable projection regressions plus the full UI/setup source gate pass. Payload-less outcomes remain unverifiable under the default deferred status reader; production completion/replay/projection and route/reload attempt lifetime remain separately open.
+  evidence_record: [Owner/setup verification](deferred-owner-setup-verification-2026-10-24.md#exact-setup-write-correlation)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Implement immutable create-only `ProvisionHexa` and retire every legacy Agent Party link/replace mutation path after its replacement is available.
@@ -658,6 +663,9 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Successor continuity after predecessor expiry (B02) remains an earlier Story 5.4 prerequisite before owner qualification.
   evidence: RetainedHumanActorHistoryFold starts version at zero and rejects a Rebound with version zero. Removing an expired predecessor cannot reproduce a live successor. This previously recorded production blocker requires owner-authenticated continuity evidence; qualification alone is insufficient.
+  status: done 2026-10-24
+  resolution: `spec-five-deferred-owner-and-setup-verification-items.md` — The pinned Parties fold consumes actor-free exact-source expired-transition certificates before retained successor events. All 15 newly required query rows pass, including omitted/foreign/expired/malformed proof refusal, retained revocation/rebound and serialized version-three continuity without reconstructing expired actors. This closes the local source defect; installed-source/certificate/destruction qualification, rollout inventory and registry freshness remain separate requirements.
+  evidence_record: [Owner/setup verification](deferred-owner-setup-verification-2026-10-24.md#successor-continuity-after-predecessor-expiry)
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-apply-365-day-lifecycle.md`
   summary: Client completion expiry (B03) remains an earlier Story 5.4 prerequisite before owner qualification.
@@ -741,6 +749,9 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
   summary: Adopt the current EventStore SDK sidecar/workload security contract in the Parties host and authenticated process-endpoint fixture, then rerun all 13 endpoint cases without weakening the startup audit.
   evidence: Root final run against the reviewed assembly fails before requests on missing EventStoreSidecarChannel for /dapr/subscribe, /dapr/config and actor routes, plus anonymous /healthz; Parties `tests/owner-continuation-2026-10-07/review-final/endpoint-tests.xml` and endpoint-tests.log record the exact audit. This concurrent SDK/host compatibility blocker is independent of the passing 802-test Local matrix and serialized DomainServiceRequest fallback.
+  status: done 2026-10-24
+  resolution: `spec-five-deferred-owner-and-setup-verification-items.md` — The pinned host and authenticated fixture now apply real workload/channel authentication and pass the unchanged SDK audit. The maintained root command freshly passes all 13 process endpoint cases and all 35 security cases, including invalid credentials, sidecar delivery and inherited configuration isolation. Substituted backend health establishes no Dapr backend readiness or deployed qualification.
+  evidence_record: [Owner/setup verification](deferred-owner-setup-verification-2026-10-24.md#parties-endpoint-security-compatibility)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
   summary: B1 — Synchronous authority/fold responsiveness remains an owner qualification requirement.
@@ -757,6 +768,9 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
   summary: Standalone retained transport invocation remains part of full owner prerequisites (2026-10-08 review E2).
   evidence: Pre-existing RetainedIdentityHistoryReader invokes SendAsync/body providers synchronously before bounded waits and shares provider callbacks with wait cancellation. Parties query wraps this provider under its own deadline, but standalone callers remain unqualified. This is additional feasible full-scope source work, to address after current review corrections without inventing resource reclamation.
+  status: done 2026-10-24
+  resolution: `spec-five-deferred-owner-and-setup-verification-items.md` — The pinned EventStore retained-history reader now uses AuthoritativeStreamReadDeadline across provider invocation, waits, body reads and terminal validation. All 32 newly required transport rows pass, including synchronous/noncooperative invocation, blocking callbacks, cancellation and late/blocking/failing disposal. This closes the standalone bounded-wait defect; indefinitely blocked work admission/isolation/resource reclamation remains governed and unqualified under the existing B1/B4/B7 entries.
+  evidence_record: [Owner/setup verification](deferred-owner-setup-verification-2026-10-24.md#standalone-retained-transport-invocation)
 
 ## Deferred from: code review of spec-5-4-owner-prerequisites.md (2026-10-09, revisions 8+9 cumulative owner slice)
 

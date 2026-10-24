@@ -49,9 +49,9 @@ They verify expiry, retained transitions, receive limits, scope and caller-relat
 paths. They establish synthetic verifier behavior; dependency acceptance and
 production qualification still require their existing owner evidence.
 
-To build the pinned Parties identity projects and run their focused current-read,
-client completion-time, authority-change, query-deadline and exact-target receipt
-regressions:
+To build the pinned Parties and EventStore identity projects and run their focused
+current-read, client completion-time, authority-change, successor-continuity,
+endpoint-security, query/transport-deadline and exact-target receipt regressions:
 
 ```bash
 python3 scripts/verify-parties-identity.py --artifacts /tmp/agents-parties-identity
@@ -66,9 +66,20 @@ selections exercise current and historical queries, noncooperative source/custod
 providers, the shared operation budget, cancellation races and a successful read
 immediately before expiry. These checks establish bounded verdict waits; shared
 worker admission and resource reclamation still require owner qualification.
-Relative artifact
-paths resolve from the caller's directory; concurrent runs need separate artifact
-directories. This is local regression evidence; it does not change the dependency
+The successor selections require authenticated actor-free continuity certificates
+and deny missing, foreign, expired or malformed proofs. The endpoint selections
+run all process and security cases through the real workload/channel handlers and
+unchanged SDK audit; their substituted backend health does not prove backend
+readiness. Standalone retained-history transport selections additionally exercise
+synchronous and noncooperative providers, blocking cancellation callbacks, terminal
+budget checks and late owned-material disposal. EventStore source provenance is
+recorded alongside Agents and Parties, plus Builds, Commons, Tenants, McpCli and
+FrontComposer. The receipt fingerprints tracked diffs and untracked content,
+checks source stability before success, and records test assembly hashes. Keep
+these repositories stable during the command.
+Relative artifact paths resolve from the caller's directory. Choose a directory
+outside every consumed repository; source-tree outputs and ancestors are rejected
+before verification starts. Concurrent runs need separate artifact directories. This is local regression evidence; it does not change the dependency
 register or establish live readiness.
 
 The CI package lane restores and builds Release with

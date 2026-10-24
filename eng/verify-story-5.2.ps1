@@ -181,9 +181,11 @@ $focusedSuites = @(
         Assembly = 'test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll'
         Classes  = @(
             'Hexalith.Agents.Server.Tests.AgentSetupProjectionTests',
-            'Hexalith.Agents.Server.Tests.AgentSetupQueryHandlerTests'
+            'Hexalith.Agents.Server.Tests.AgentSetupQueryHandlerTests',
+            'Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests',
+            'Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests'
         )
-        Gate = 'AC2/AC3 projected setup truth and persisted read-model end state'
+        Gate = 'AC2/AC3 verified caller, current tenant authority, and persisted setup truth'
     },
     @{
         Assembly = 'test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll'
@@ -192,6 +194,15 @@ $focusedSuites = @(
             'Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests'
         )
         Gate = 'AC3/AC4 FrontComposer truth flow and retained activation attempt'
+    },
+    @{
+        Assembly = 'test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll'
+        Methods = @(
+            @{ Name = 'Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity'; MinimumExpectedTests = 12 },
+            @{ Name = 'Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.AdministrationAuthorityIsRecheckedAfterTheRoleAwait'; MinimumExpectedTests = 4 },
+            @{ Name = 'Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.ActorExpiringDuringTenantAuthorityAwaitCannotGrantAccess'; MinimumExpectedTests = 1 }
+        )
+        Gate = 'AC2 exact verified-caller matrix and authority-expiry methods'
     }
 )
 
@@ -265,6 +276,7 @@ function Invoke-TestGate {
         [Parameter(Mandatory = $true)] [string] $Name,
         [Parameter(Mandatory = $true)] [string] $Assembly,
         [string[]] $Classes = @(),
+        [object[]] $Methods = @(),
         [ValidateRange(1, [int]::MaxValue)] [int] $MinimumExpectedTests = 1
     )
 
@@ -276,6 +288,9 @@ function Invoke-TestGate {
 
     $selections = @(
         foreach ($class in $Classes) { @{ Option = '-class'; Value = $class } }
+        foreach ($method in $Methods) {
+            @{ Option = '-method'; Value = $method.Name; MinimumExpectedTests = $method.MinimumExpectedTests }
+        }
     )
     if ($selections.Count -eq 0) {
         $selections = @(@{ Option = ''; Value = 'all tests' })
@@ -283,6 +298,7 @@ function Invoke-TestGate {
 
     Write-Host "Gate: $Name"
     foreach ($selection in $selections) {
+        $selectionMinimum = if ($selection.MinimumExpectedTests) { $selection.MinimumExpectedTests } else { $MinimumExpectedTests }
         $arguments = @($path, '-failSkips')
         if ($selection.Option) {
             $arguments += @($selection.Option, $selection.Value)
@@ -341,8 +357,8 @@ function Invoke-TestGate {
         if ([int] $summary.Groups['Total'].Value -le 0) {
             throw "Gate '$Name' executed 0 tests; selection matched nothing: $($selection.Value)."
         }
-        if ([int] $summary.Groups['Total'].Value -lt $MinimumExpectedTests) {
-            throw "Gate '$Name' executed $($summary.Groups['Total'].Value) tests; expected at least $MinimumExpectedTests for '$($selection.Value)'."
+        if ([int] $summary.Groups['Total'].Value -lt $selectionMinimum) {
+            throw "Gate '$Name' executed $($summary.Groups['Total'].Value) tests; expected at least $selectionMinimum for '$($selection.Value)'."
         }
         if (-not $summary.Groups['Errors'].Success) {
             throw "Gate '$Name' produced an incomplete test summary row for '$($selection.Value)'."
@@ -384,7 +400,8 @@ try {
         Invoke-TestGate `
             -Name "story-5.2 focused — $($suite.Gate)" `
             -Assembly $suite.Assembly `
-            -Classes $suite.Classes
+            -Classes $suite.Classes `
+            -Methods $suite.Methods
     }
 
     foreach ($testProject in $testProjects) {

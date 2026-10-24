@@ -1,0 +1,2628 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-24T03:35:15.481922+00:00",
+  "spec": "spec-five-deferred-owner-and-setup-verification-items.md",
+  "rootBaseline": "f8ca548e1d55b26a4d9e0faaac04be96c511fc69",
+  "sdk": "10.0.402",
+  "localBehaviorVerified": true,
+  "liveReadinessEstablished": false,
+  "closedEntries": [
+    "DW-2",
+    "legacy exact setup-write correlation",
+    "B02 successor continuity",
+    "Parties SDK endpoint compatibility",
+    "E2 standalone retained transport invocation"
+  ],
+  "limits": [
+    "No deployed topology or production readiness qualification.",
+    "Backend health is substituted in endpoint fixtures.",
+    "Current actor-registry freshness, rollout inventory and installed-source privacy evidence remain open.",
+    "Indefinitely blocked provider admission/resource reclamation remains unqualified.",
+    "The default command-status reader remains deferred.",
+    "No owner source or gitlink changed."
+  ],
+  "ownerReceipt": {
+    "runId": "a70f1acf3440464387784330a531d757",
+    "startedAt": "2026-10-24T03:24:55.246831+00:00",
+    "sources": {
+      "agents": {
+        "commit": "f8ca548e1d55b26a4d9e0faaac04be96c511fc69",
+        "dirty": true,
+        "status": [
+          " M CONTRIBUTING.md",
+          " M _bmad-output/implementation-artifacts/deferred-work.md",
+          " M eng/verify-story-5.2.ps1",
+          " M scripts/verify-parties-identity.py",
+          " M tests/tooling/parties_identity_verification_test.py",
+          " M tests/tooling/story_52_verifier_test.py",
+          "?? _bmad-output/implementation-artifacts/deferred-owner-setup-verification-2026-10-24.json",
+          "?? _bmad-output/implementation-artifacts/deferred-owner-setup-verification-2026-10-24.md",
+          "?? _bmad-output/implementation-artifacts/spec-five-deferred-owner-and-setup-verification-items.md",
+          "?? scripts/validate-deferred-verification.py",
+          "?? tests/tooling/deferred_verification_evidence_test.py"
+        ],
+        "fingerprint": {
+          "trackedDiffSha256": "d2e7a46e969cb9ab8ef07ade7257ad52bc9962bb7297fbc7e748dbd16df5b1ab",
+          "untracked": [
+            {
+              "path": "_bmad-output/implementation-artifacts/deferred-owner-setup-verification-2026-10-24.json",
+              "kind": "file",
+              "sha256": "84f7a81eb77c7ae2ef3db530f63f11de47b3ac6d6ef82c10cc218ad4b79274fe"
+            },
+            {
+              "path": "_bmad-output/implementation-artifacts/deferred-owner-setup-verification-2026-10-24.md",
+              "kind": "file",
+              "sha256": "08596c0c733c26bae992c72a0331966120f2de350b34c05f3bddacb3fb1996d0"
+            },
+            {
+              "path": "_bmad-output/implementation-artifacts/spec-five-deferred-owner-and-setup-verification-items.md",
+              "kind": "file",
+              "sha256": "ad235caade8f5f6a10458ec970250c048733118512b96250390b32c8278ed462"
+            },
+            {
+              "path": "scripts/validate-deferred-verification.py",
+              "kind": "file",
+              "sha256": "005d20d7b0eefb612593ebacd23000a85833f386927947b76ceaec95626c6014"
+            },
+            {
+              "path": "tests/tooling/deferred_verification_evidence_test.py",
+              "kind": "file",
+              "sha256": "ea63e7cf0c80e5621ed03e1fa5e13b9bf4fe066ba271329ca6f51dd1b26dcbfa"
+            }
+          ]
+        }
+      },
+      "parties": {
+        "commit": "4fc1124eb995a40553cb23b042d4a3c1add3dfb2",
+        "dirty": false,
+        "status": [],
+        "fingerprint": {
+          "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "untracked": []
+        }
+      },
+      "eventstore": {
+        "commit": "5ce5f1d84b88c808cc8a526b9decf149de977e55",
+        "dirty": false,
+        "status": [],
+        "fingerprint": {
+          "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "untracked": []
+        }
+      },
+      "builds": {
+        "commit": "359fee24aeca4d9eabed4b425d4cfa2520b2adda",
+        "dirty": false,
+        "status": [],
+        "fingerprint": {
+          "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "untracked": []
+        }
+      },
+      "commons": {
+        "commit": "5c23c818f639c5bb3175f964c5549440bd5b876d",
+        "dirty": false,
+        "status": [],
+        "fingerprint": {
+          "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "untracked": []
+        }
+      },
+      "tenants": {
+        "commit": "0c10ef637171f9ac2639d4b5ac42f513ea9ef133",
+        "dirty": false,
+        "status": [],
+        "fingerprint": {
+          "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "untracked": []
+        }
+      },
+      "mcpcli": {
+        "commit": "7f4a08cb4b7ff9402d1dcf0826ad45ab0256ba65",
+        "dirty": false,
+        "status": [],
+        "fingerprint": {
+          "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "untracked": []
+        }
+      },
+      "frontcomposer": {
+        "commit": "7fcfb019bf94fa858410726fe9a1506f3a2e36a7",
+        "dirty": false,
+        "status": [],
+        "fingerprint": {
+          "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "untracked": []
+        }
+      }
+    },
+    "sourceArgumentInventory": {
+      "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarDelivery_MissingChannel_DeniesBeforeDispatch": {
+        "sourcePath": "references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartiesDomainServiceSecurityTests.cs",
+        "sourceSha256": "a2f4b200fc1d503ea53a0b874f8a5c3ec6fae10c7b40dcaac502e4d0c586dbdd",
+        "arguments": [
+          {
+            "route": "/actors/PartyProjectionActor/party-1/method/Untrusted"
+          },
+          {
+            "route": "/tenants/events"
+          }
+        ]
+      }
+    },
+    "assemblySha256": {
+      "Hexalith.Parties.Tests": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "Hexalith.Parties.Client.Tests": "973bd9d5008030a6bee48bc72f563c262e80bfd161ca6f694fb7e1fde85b7320",
+      "Hexalith.EventStore.Client.Tests": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1"
+    },
+    "localBehaviorVerified": true,
+    "liveReadinessEstablished": false,
+    "eventStoreVersion": "3.126.0",
+    "ownerCases": {
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentCompletionTimeChangesDuringCustody_DenyEvidence": 4,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentAuthorityChangesDuringAwait_DenyEvidence": 2,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentHuman_RequiresCompleteSourceAndCurrentExactActor": 1,
+      "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity": 8,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence": 8,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SynchronousProviderInvocationIsBounded": 4,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget": 2,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence": 2,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider": 8,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SetupTimeConsumesOperationBudget": 4,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves": 2,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence": 2,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken": 4,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict": 2,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion": 12,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken": 4,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ExpiredPredecessorOmitted_SuccessorReadRemainsUnavailable": 1,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ExpiredPredecessorCertifiedWithoutActor_ResolvesOnlyRetainedSuccessor": 7,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CertifiedExpiredEstablishmentRetainedRevocationAndReboundResolveThroughQuery": 5,
+      "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.MultipleExpiredTransitionsResolveOnlyRetainedVersionThreeThroughSerializedQuery": 2,
+      "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_InvokesRegisteredPartiesDomainProcessorAsync": 1,
+      "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_PreservesResultPayloadAcrossPartiesHostWireSerializationAsync": 1,
+      "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_WhenGdprFeaturesActive_DoesNotEmitMvpComplianceWarningHeaderAsync": 1,
+      "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_InvalidPayload_UsesProductionProcessorValidationRejectionAsync": 1,
+      "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_SerializedLifecycleHistory_EnforcesProductionReplayBoundaryAsync": 4,
+      "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.ProductionAsyncProcessor_AlreadyCanceledToken_ThrowsBeforeProducingEventsAsync": 1,
+      "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_CommonPartyDomainCaseVariants_ResolveProductionProcessorAsync": 3,
+      "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostReplayState_UsesProductionProcessorReplayCapabilityAsync": 1,
+      "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork": 15,
+      "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel": 16,
+      "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarDelivery_MissingChannel_DeniesBeforeDispatch": 2,
+      "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.ActualEndpointInventory_PassesUnchangedSdkAudit": 1,
+      "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.InheritedAuthenticationSettings_CannotAlterFixtureContracts": 1,
+      "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime": 9,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CompleteAuthenticatedSparseSourceRetainsItsOriginalHeadAndPositions": 1,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.ForeignOwnerResponseHasNoUsableHistory": 1,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.MissingExcludedPositionHasNoUsableHistory": 1,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.ServerFailureCannotReturnItsPartialPayload": 1,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CallerCancellationPropagates": 1,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CertificateExpiredDuringTransitCannotReleaseHistory": 1,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CancellationDuringCertificateValidationCannotReleaseHistory": 1,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.MaximumReadablePayloadFitsTheSharedBase64WireBound": 1,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.NoncooperativeTransportStopsBeforeCompletionAndDisposesLateMaterial": 8,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.SynchronousTransportInvocationIsBoundedAndLateOwnedMaterialDisposed": 8,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.BlockingProviderCancellationCannotRetainTransportDeadline": 4,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CumulativeTerminalValidationCannotReleaseAtReadBudgetBoundary": 1,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CompletedResponseBlockingDisposalCannotRetainRead": 2,
+      "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CompletedResponseCleanupFailureStillDisposesOwnedRequest": 1
+    },
+    "receiptSuite": "parties_readiness_verifier_test.ExactTargetReceiptTests",
+    "completedAt": "2026-10-24T03:27:33.773555+00:00"
+  },
+  "commands": [
+    {
+      "command": "pwsh -NoProfile -File eng/verify-story-5.2.ps1",
+      "exitCode": 0,
+      "log": "/tmp/agents-five-deferred-story52.log",
+      "sha256": "541bda0bbad2949e0f63dedf07f8782e94b88658e68a663f6a19d5c9b9b339e2",
+      "summaries": [
+        "0 Warning(s)",
+        "0 Error(s)",
+        "Hexalith.Agents.Contracts.Tests  Total: 1647, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 1.026s",
+        "Hexalith.Agents.Tests  Total: 9, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.117s",
+        "Hexalith.Agents.Tests  Total: 17, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.152s",
+        "Hexalith.Agents.Tests  Total: 47, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.195s",
+        "Hexalith.Agents.Server.Tests  Total: 8, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.169s",
+        "Hexalith.Agents.Server.Tests  Total: 29, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.220s",
+        "Hexalith.Agents.Server.Tests  Total: 10, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.209s",
+        "Hexalith.Agents.Server.Tests  Total: 16, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.209s",
+        "Hexalith.Agents.Server.Tests  Total: 1, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.130s",
+        "Hexalith.Agents.Server.Tests  Total: 141, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 1.018s",
+        "Hexalith.Agents.Server.Tests  Total: 9, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.189s",
+        "Hexalith.Agents.Server.Tests  Total: 59, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.327s",
+        "Hexalith.Agents.Server.Tests  Total: 32, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.227s",
+        "Hexalith.Agents.Server.Tests  Total: 67, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.317s",
+        "Hexalith.Agents.UI.Tests  Total: 67, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 2.823s",
+        "Hexalith.Agents.UI.Tests  Total: 26, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.182s",
+        "Hexalith.Agents.Contracts.Tests  Total: 1970, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 1.208s",
+        "Hexalith.Agents.Client.Tests  Total: 6, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.139s",
+        "Hexalith.Agents.Tests  Total: 1017, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.495s",
+        "Hexalith.Agents.Server.Tests  Total: 1491, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 25.935s",
+        "Hexalith.Agents.UI.Tests  Total: 1171, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 4.514s",
+        "Hexalith.Agents.Server.Tests  Total: 16, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.436s",
+        "Hexalith.Agents.Server.Tests  Total: 29, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.186s",
+        "Hexalith.Agents.Server.Tests  Total: 33, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 5.878s",
+        "Hexalith.Agents.UI.Tests  Total: 7, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.190s",
+        "Story 5.2 verification succeeded."
+      ]
+    },
+    {
+      "command": "pwsh -NoProfile -File eng/verify-story-5.2.ps1 -SkipBuild",
+      "exitCode": 0,
+      "log": "/tmp/agents-five-deferred-story52-reviewed.log",
+      "sha256": "a0e24d40f6f5628da7d93720eae49428108c9f727bf4ce596f9bde3edb54782b",
+      "summaries": [
+        "Hexalith.Agents.Contracts.Tests  Total: 1647, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 1.008s",
+        "Hexalith.Agents.Tests  Total: 9, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.116s",
+        "Hexalith.Agents.Tests  Total: 17, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.141s",
+        "Hexalith.Agents.Tests  Total: 47, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.185s",
+        "Hexalith.Agents.Server.Tests  Total: 8, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.165s",
+        "Hexalith.Agents.Server.Tests  Total: 29, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.210s",
+        "Hexalith.Agents.Server.Tests  Total: 10, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.197s",
+        "Hexalith.Agents.Server.Tests  Total: 16, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.196s",
+        "Hexalith.Agents.Server.Tests  Total: 1, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.114s",
+        "Hexalith.Agents.Server.Tests  Total: 141, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.965s",
+        "Hexalith.Agents.Server.Tests  Total: 9, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.184s",
+        "Hexalith.Agents.Server.Tests  Total: 59, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.332s",
+        "Hexalith.Agents.Server.Tests  Total: 32, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.212s",
+        "Hexalith.Agents.Server.Tests  Total: 67, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.304s",
+        "Hexalith.Agents.Server.Tests  Total: 12, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.289s",
+        "Hexalith.Agents.Server.Tests  Total: 32, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.189s",
+        "Hexalith.Agents.UI.Tests  Total: 67, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 2.470s",
+        "Hexalith.Agents.UI.Tests  Total: 26, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.172s",
+        "Hexalith.Agents.Server.Tests  Total: 12, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.269s",
+        "Hexalith.Agents.Server.Tests  Total: 4, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.161s",
+        "Hexalith.Agents.Server.Tests  Total: 1, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.135s",
+        "Hexalith.Agents.Contracts.Tests  Total: 1970, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 1.128s",
+        "Hexalith.Agents.Client.Tests  Total: 6, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.130s",
+        "Hexalith.Agents.Tests  Total: 1017, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.469s",
+        "Hexalith.Agents.Server.Tests  Total: 1491, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 20.997s",
+        "Hexalith.Agents.UI.Tests  Total: 1171, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 3.907s",
+        "Hexalith.Agents.Server.Tests  Total: 16, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.244s",
+        "Hexalith.Agents.Server.Tests  Total: 29, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.166s",
+        "Hexalith.Agents.Server.Tests  Total: 33, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 4.920s",
+        "Hexalith.Agents.UI.Tests  Total: 7, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 0.124s",
+        "Story 5.2 verification succeeded."
+      ]
+    },
+    {
+      "command": "python3 scripts/verify-parties-identity.py --artifacts /tmp/agents-five-deferred-owner",
+      "exitCode": 0,
+      "log": "/tmp/agents-five-deferred-owner-final.log",
+      "sha256": "f8075711bdff6143e697758991056e93334010a0674f05d119000020b6971c04",
+      "summaries": [
+        "Verified 173 owner cases and exact-target receipt regressions; evidence: /tmp/agents-five-deferred-owner/identity-verification.json"
+      ]
+    },
+    {
+      "command": "python3 -m unittest discover -s tests/tooling -p parties_identity_verification_test.py -v",
+      "exitCode": 0,
+      "log": "/tmp/identity-harness-final-r11-r12.log",
+      "sha256": "491e675b3d76c213fb3a5218a687c392a52e46d74c98993083d7c50c3881f2a1",
+      "summaries": [
+        "Ran 47 tests in 306.342s",
+        "OK"
+      ]
+    },
+    {
+      "command": "python3 -m unittest discover -s tests/tooling -p deferred_verification_evidence_test.py -v",
+      "exitCode": 0,
+      "log": "/tmp/agents-five-deferred-validator-final.log",
+      "sha256": "8e5a0a6bc72655991be5bd9d39c6ae8ee3d64a9c011a74c3d809e326cbb2938f",
+      "summaries": [
+        "Ran 23 tests in 1.460s",
+        "OK"
+      ]
+    },
+    {
+      "command": "python3 -m unittest discover -s tests/tooling -p '*_test.py'",
+      "exitCode": 0,
+      "log": "/tmp/agents-five-deferred-tooling-stable.log",
+      "sha256": "e12606433e28b2cbf510d71dd4873a4467f2cf384358d9d60d4441f388f04051",
+      "summaries": [
+        "Ran 247 tests in 994.849s",
+        "OK"
+      ]
+    }
+  ],
+  "supportingStages": [
+    {
+      "stage": "Hexalith.Parties.Tests.build",
+      "sha256": "093368e3384c62167637b07d7a09edeae87c4aa32c85680ba08c9e870bbe1b9b",
+      "summary": "0 warnings; 0 errors; Debug/source; -m:1"
+    },
+    {
+      "stage": "Hexalith.Parties.Client.Tests.build",
+      "sha256": "13573080cfeed98a9c267dc8d7742c04ea41d8f4b7657c06d528bab0eb154c0d",
+      "summary": "0 warnings; 0 errors; Debug/source; -m:1"
+    },
+    {
+      "stage": "Hexalith.EventStore.Client.Tests.build",
+      "sha256": "b838fa1bcba9c7b272bba157ee3c4d8e4b73a7a4e07a74249e99b4b07e7dcc44",
+      "summary": "0 warnings; 0 errors; Debug/source; -m:1"
+    },
+    {
+      "stage": "exact-target-receipts.log",
+      "sha256": "f2aa911de3d5126a889d083b75856e68f165e6af56afbc0890e5d668917f4bbb",
+      "result": "test_matching_receipt_passes (parties_readiness_verifier_test.ExactTargetReceiptTests.test_matching_receipt_passes) ... ok\ntest_matching_receipt_passes_through_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_matching_receipt_passes_through_wrapper) ... ok\ntest_mismatched_compatibilityCommand_prevents_http (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_compatibilityCommand_prevents_http) ... ok\ntest_mismatched_compatibilityCommand_prevents_http_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_compatibilityCommand_prevents_http_wrapper) ... ok\ntest_mismatched_evidenceLevel_prevents_http (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_evidenceLevel_prevents_http) ... ok\ntest_mismatched_evidenceLevel_prevents_http_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_evidenceLevel_prevents_http_wrapper) ... ok\ntest_mismatched_outcome_prevents_http (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_outcome_prevents_http) ... ok\ntest_mismatched_outcome_prevents_http_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_outcome_prevents_http_wrapper) ... ok\ntest_mismatched_prerequisitesAvailable_prevents_http (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_prerequisitesAvailable_prevents_http) ... ok\ntest_mismatched_prerequisitesAvailable_prevents_http_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_prerequisitesAvailable_prevents_http_wrapper) ... ok\ntest_mismatched_recordId_prevents_http (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_recordId_prevents_http) ... ok\ntest_mismatched_recordId_prevents_http_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_recordId_prevents_http_wrapper) ... ok\ntest_mismatched_targetVersionOrCommit_prevents_http (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_targetVersionOrCommit_prevents_http) ... ok\ntest_mismatched_targetVersionOrCommit_prevents_http_wrapper (parties_readiness_verifier_test.ExactTargetReceiptTests.test_mismatched_targetVersionOrCommit_prevents_http_wrapper) ... ok\n\n----------------------------------------------------------------------\nRan 14 tests in 83.883s\n\nOK\n"
+    }
+  ],
+  "sourceSha256": {
+    "CONTRIBUTING.md": "9ac8df47b263a743da1b0f6245399aac6d9366edd3ed371be7449bf997029a48",
+    "eng/verify-story-5.2.ps1": "833120c1dbb725621852e9bd35583543e85952ba1d532b538a07d8e2ab060d1b",
+    "scripts/verify-parties-identity.py": "b9324e97e886c3d2495196aa1faa54781fbd621c76923ff3975f7786e2f3912a",
+    "scripts/validate-deferred-verification.py": "005d20d7b0eefb612593ebacd23000a85833f386927947b76ceaec95626c6014",
+    "tests/tooling/deferred_verification_evidence_test.py": "ea63e7cf0c80e5621ed03e1fa5e13b9bf4fe066ba271329ca6f51dd1b26dcbfa",
+    "tests/tooling/parties_identity_verification_test.py": "079bc1caae9c9cb07ed188e9ffeb85dd8ad9896ec6efbc716354a84429517820",
+    "tests/tooling/story_52_verifier_test.py": "fb68f5581eae84d87b69094ed393106262483ba61533cd6d2f96fdb17bc93b46",
+    "tests/identity/identity-regressions.targets": "4952dc27491cf598764e5697526778414ba7055fab1aee3673ac593e2ab3bbee",
+    "tests/identity/CurrentIdentityAuthorityTests.cs": "e8d6f618fc6489046d472dfe0d871ee34c8e8b2289676571a9824ded22af03d9",
+    "src/Hexalith.Agents.Server/Composition/AgentSetupServiceCollectionExtensions.cs": "0057588c331ce608feb96f9fa74dd8ef9324e1f7910a147d5ced8434c0c753a2",
+    "src/Hexalith.Agents.Server/Application/Queries/AgentSetupQueryHandlerBase.cs": "fa37b8707027c096ec64ac864910973e59db50b3af95646a9a2290745ae14e5a",
+    "src/Hexalith.Agents.Server/Application/Agents/EventStoreAgentAdministrationOperations.cs": "d31289e95806d073be80dd231437624d735541859e181e2d37fca5c0b7bbaa7d",
+    "src/Hexalith.Agents.Server/Ports/ProjectedTenantAccessReader.cs": "f2e658020eaa31865d73e1dfaa8c86dc1953595c001f1df33b3f42bc19f5dacd",
+    "src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor": "3d824ed04794aa0eff7eed7a6ab133a4bc294eab5f9b9a128be82d0d46fb8aa7",
+    "test/Hexalith.Agents.Server.Tests/VerifiedSetupQueryCallerTests.cs": "d43c92687c7491640993e278af091e90eae3abde711f67fbd528defc6596cce3",
+    "test/Hexalith.Agents.Server.Tests/TenantAuthorityAdmissionOrderingTests.cs": "720e0db01f97b53f5f4d01da0a97051c022dfae75791c69baae42ee0a43f4702",
+    "test/Hexalith.Agents.Server.Tests/EventStoreAgentAdministrationOperationsTests.cs": "f09f2d6a1421cc141c498450f61cba30af5bf5715e4a44d835f3c5b440ebda4c",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Queries/RetainedHumanActorHistoryFold.cs": "9dbb51ce5afc84e8e14fea9e061602e5a0c6cedb9a2911f1246f16646e02423e",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs": "88aca1d2fe18260b7ed4393c30e348fcd75c7c03fa699b37af656e6abacdaa38",
+    "references/Hexalith.Parties/src/Hexalith.Parties/Program.cs": "3468af3de7efc5eeff80ccd8c26ab61279e43c4b3b9dd9897ea4a401d1926d4a",
+    "references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartyIdentityQueryHandlerTests.cs": "5fbc575fce0f6a28f09b176067460d5662e903dec16af5a47f40de876efbeb1a",
+    "references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartiesProcessEndpointTests.cs": "f9a578bc1d1560f9411a30e32ef5ee44ab823b6de1b3b41291375d7edda42e2f",
+    "references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartiesDomainServiceSecurityTests.cs": "a2f4b200fc1d503ea53a0b874f8a5c3ec6fae10c7b40dcaac502e4d0c586dbdd",
+    "references/Hexalith.Parties/tests/Hexalith.Parties.Tests/Gateway/PartiesProcessTestFactory.cs": "2cc67dbc309dd795d970a057bc33dafdbab69724afeea1383dae3a2350805d7d",
+    "references/Hexalith.EventStore/src/Hexalith.EventStore.Client/Streams/RetainedIdentityHistoryReader.cs": "e34eeb735be485dfb2096020afaed7bf0af2adfaede3f43f15c5f3043e339e3b",
+    "references/Hexalith.EventStore/src/Hexalith.EventStore.Client/Streams/AuthoritativeStreamReadDeadline.cs": "cfb6e340cce168ee1db129e02baf25e306ae4f32dd60a6dedf55bf3da537d095",
+    "references/Hexalith.EventStore/tests/Hexalith.EventStore.Client.Tests/Streams/RetainedIdentityHistoryReaderTests.cs": "bd2b914f6da629f0b93535e78cf17166451a9c149a4f2743d37514d5223abc89"
+  },
+  "ownerNativeResults": [
+    {
+      "report": "/tmp/agents-five-deferred-owner/ActualEndpointInventory_PassesUnchangedSdkAudit.xml",
+      "sha256": "396bf982aa3b4a5dc9320bfdb50e1e33d168730b9a309cd530ea52b236052f82",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.ActualEndpointInventory_PassesUnchangedSdkAudit",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/ActualEndpointInventory_PassesUnchangedSdkAudit.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.ActualEndpointInventory_PassesUnchangedSdkAudit",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "f9cce3324c869d2c4025cba5659999906b735ce0c269cd9dd460af7bb533fa85"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion.xml",
+      "sha256": "76d92007856b42dfcbeed5c79d6aec5200aa8450f14f7ae8cb431eb15a171c08",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion.xml"
+      ],
+      "summary": {
+        "total": 12,
+        "passed": 12,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: False, trigger: \\\"timer\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: False, trigger: \\\"timer\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: True, trigger: \\\"timer\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: True, trigger: \\\"timer\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: False, trigger: \\\"elapsed\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: False, trigger: \\\"elapsed\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: True, trigger: \\\"elapsed\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: True, trigger: \\\"elapsed\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: False, trigger: \\\"caller\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: False, trigger: \\\"caller\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: False, inCustody: True, trigger: \\\"caller\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.BlockingProviderCancellationCallback_DoesNotDelayQueryCompletion(historical: True, inCustody: True, trigger: \\\"caller\\\")",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "8eaeb17ecdbd6b8280773b66c537a34745b2187a7bba8b9992d5d0c7c1519916"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/BlockingProviderCancellationCannotRetainTransportDeadline.xml",
+      "sha256": "d1c9855a5bb8d048036693eaef187ba92704d1556769b56d33301309983aa29f",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.BlockingProviderCancellationCannotRetainTransportDeadline",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/BlockingProviderCancellationCannotRetainTransportDeadline.xml"
+      ],
+      "summary": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.BlockingProviderCancellationCannotRetainTransportDeadline(stage: 0)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.BlockingProviderCancellationCannotRetainTransportDeadline(stage: 1)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.BlockingProviderCancellationCannotRetainTransportDeadline(stage: 2)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.BlockingProviderCancellationCannotRetainTransportDeadline(stage: 3)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "ee4e01ce42732d153c2f8c4067fd8c4558091edb5d103c1129c8324a89ac57eb"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken.xml",
+      "sha256": "eb686283c39e80cb8232153c8cb33583b14c930c282c18fff7fb720102dc8b35",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken.xml"
+      ],
+      "summary": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken(historical: False, trigger: \\\"deadline\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken(historical: True, trigger: \\\"deadline\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken(historical: False, trigger: \\\"fault\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationAfterDeadlineOrFaultBeforeVerdict_PreservesOriginalToken(historical: True, trigger: \\\"fault\\\")",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "e73e47a343e3fdb45bc45aa2ae2b9bd3ccee8becf306966683191adb6a2a5278"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CallerCancellationPropagates.xml",
+      "sha256": "83682c6bb53fd11e633c3263569149290fc9b5d133c777c260fd0a0f3ade5ee4",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CallerCancellationPropagates",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CallerCancellationPropagates.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CallerCancellationPropagates",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "e9134a854dce69320cdbc19bd0cd5d9b96639160fc5c38a9dc381d541e3bf696"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken.xml",
+      "sha256": "f0be9f52eeb826a8e364e07da2a2a86f749db3e2d0409a1995c84a74e22dcbd2",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken.xml"
+      ],
+      "summary": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken(historical: False, expire: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken(historical: True, expire: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken(historical: False, expire: True)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CallerCancellationRacesDeadlineAndFault_PreservesOriginalToken(historical: True, expire: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "b52ef0658dcb6611dcb51550cc0cf792e9b0c9310fd6b3ef5000c8bc65f93d71"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CancellationDuringCertificateValidationCannotReleaseHistory.xml",
+      "sha256": "924d2202a496063554c9d0140e5ee51bf4a7009acfa715c4ec48a874876c68a3",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CancellationDuringCertificateValidationCannotReleaseHistory",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CancellationDuringCertificateValidationCannotReleaseHistory.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CancellationDuringCertificateValidationCannotReleaseHistory",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "1a776742d74920b8de80ce1db429777e9d64df7821ac710aab80a5554ac55ba4"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CertificateExpiredDuringTransitCannotReleaseHistory.xml",
+      "sha256": "c23729bf05a4287d08d1ede2de7bad3aad220f8d2032b73b76b1c7995ea42b69",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CertificateExpiredDuringTransitCannotReleaseHistory",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CertificateExpiredDuringTransitCannotReleaseHistory.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CertificateExpiredDuringTransitCannotReleaseHistory",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "7223dfe9560ab3b0b1296a3cedaa310c313cbac933d1ecad0158a027937b12ee"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CertifiedExpiredEstablishmentRetainedRevocationAndReboundResolveThroughQuery.xml",
+      "sha256": "0a8916502e17f5538bac636e55183d4bae2c4da2ddb8f69fb994d818a6223bbb",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CertifiedExpiredEstablishmentRetainedRevocationAndReboundResolveThroughQuery",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CertifiedExpiredEstablishmentRetainedRevocationAndReboundResolveThroughQuery.xml"
+      ],
+      "summary": {
+        "total": 5,
+        "passed": 5,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CertifiedExpiredEstablishmentRetainedRevocationAndReboundResolveThroughQuery(vector: \\\"valid\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CertifiedExpiredEstablishmentRetainedRevocationAndReboundResolveThroughQuery(vector: \\\"unproved\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CertifiedExpiredEstablishmentRetainedRevocationAndReboundResolveThroughQuery(vector: \\\"gap\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CertifiedExpiredEstablishmentRetainedRevocationAndReboundResolveThroughQuery(vector: \\\"wrong-rebound\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CertifiedExpiredEstablishmentRetainedRevocationAndReboundResolveThroughQuery(vector: \\\"expired-after-readable\\\")",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "f69e2fa7a739a92047ff89aefcb75e8a123437d11e34a2522efe5c6e47ebfe0a"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CompleteAuthenticatedSparseSourceRetainsItsOriginalHeadAndPositions.xml",
+      "sha256": "1e5c45d6b39e12223163a6240f3f165bd12e2cf34ac1e128ad5102f02bc9b579",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CompleteAuthenticatedSparseSourceRetainsItsOriginalHeadAndPositions",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CompleteAuthenticatedSparseSourceRetainsItsOriginalHeadAndPositions.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CompleteAuthenticatedSparseSourceRetainsItsOriginalHeadAndPositions",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "4e23885e9ee51a4c9e321e9307e17293b9e5fa49ff6e1cec47cef7f459ca915f"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CompletedResponseBlockingDisposalCannotRetainRead.xml",
+      "sha256": "b123b68e6d77e43b13fd942ab630944af1b31d01a152049c6b238888c994e3ae",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CompletedResponseBlockingDisposalCannotRetainRead",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CompletedResponseBlockingDisposalCannotRetainRead.xml"
+      ],
+      "summary": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CompletedResponseBlockingDisposalCannotRetainRead(completedAtDeadline: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CompletedResponseBlockingDisposalCannotRetainRead(completedAtDeadline: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "4fac7bbdda08e3cc684bb11c3ca744fe6cc7fe66c9eda989356824a254fb4fb3"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CompletedResponseCleanupFailureStillDisposesOwnedRequest.xml",
+      "sha256": "4a96cb37663e49f3f1a77c0699e287ca8df1242bf60973e3eb07a46b0e18430a",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CompletedResponseCleanupFailureStillDisposesOwnedRequest",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CompletedResponseCleanupFailureStillDisposesOwnedRequest.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CompletedResponseCleanupFailureStillDisposesOwnedRequest",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "ad87048d7db8c04aa8b7fe12aa27931e0e2cf9feecfc409c2e9508ef1ae629e6"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CumulativeTerminalValidationCannotReleaseAtReadBudgetBoundary.xml",
+      "sha256": "36065225262cb5ea55d0960dcdba6b0c54e03e4a7da1bbf3fa07beee1ee31261",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CumulativeTerminalValidationCannotReleaseAtReadBudgetBoundary",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CumulativeTerminalValidationCannotReleaseAtReadBudgetBoundary.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.CumulativeTerminalValidationCannotReleaseAtReadBudgetBoundary",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "6705926831b0000464b02034db0dfc836ae84bfe21838a46c506cb3b7bc0ecef"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CurrentAuthorityChangeDuringReadMustNotReleaseIdentity.xml",
+      "sha256": "f74918d69c6b9c467e11db0093ffb46cd0b4c5652e6326f6449dc87b14224c1e",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CurrentAuthorityChangeDuringReadMustNotReleaseIdentity.xml"
+      ],
+      "summary": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: False, change: \\\"source\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: True, change: \\\"source\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: False, change: \\\"actor-revision\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: True, change: \\\"actor-revision\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: False, change: \\\"authority-revision\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: True, change: \\\"authority-revision\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: False, change: \\\"unchanged\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Identity.Tests.CurrentIdentityAuthorityTests.CurrentAuthorityChangeDuringReadMustNotReleaseIdentity(inCustody: True, change: \\\"unchanged\\\")",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "0499255741ec3c1b595f40b5876c3666101b12dec1b7b00d9f43e472e57fc78d"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CurrentAuthorityChangesDuringAwait_DenyEvidence.xml",
+      "sha256": "7389e520b1d3373475208d6df3598694369c3c664098f81833917192671b8d81",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentAuthorityChangesDuringAwait_DenyEvidence",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CurrentAuthorityChangesDuringAwait_DenyEvidence.xml"
+      ],
+      "summary": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentAuthorityChangesDuringAwait_DenyEvidence(inCustody: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentAuthorityChangesDuringAwait_DenyEvidence(inCustody: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "088226792d4e59c3d8429291b487c6295679f427900f03fb1b93955cee4cf481"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CurrentCompletionTimeChangesDuringCustody_DenyEvidence.xml",
+      "sha256": "4114df6e43cfef68356a31a0af0eb43c2bedba3e0dc7215bb298354e9d991b7d",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentCompletionTimeChangesDuringCustody_DenyEvidence",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CurrentCompletionTimeChangesDuringCustody_DenyEvidence.xml"
+      ],
+      "summary": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentCompletionTimeChangesDuringCustody_DenyEvidence(change: \\\"interval-expiry\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentCompletionTimeChangesDuringCustody_DenyEvidence(change: \\\"custody-expiry\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentCompletionTimeChangesDuringCustody_DenyEvidence(change: \\\"source-rollback\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentCompletionTimeChangesDuringCustody_DenyEvidence(change: \\\"binding-rollback\\\")",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "f3861d7cae657ea9de8a6cf1523ab6e803977c7c1a23e3e86afaf80e1650eea5"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/CurrentHuman_RequiresCompleteSourceAndCurrentExactActor.xml",
+      "sha256": "7f15ce94e126fa7023eabba4d2f9c44167dd98eacadbb878b0210ca8f73cc6dc",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentHuman_RequiresCompleteSourceAndCurrentExactActor",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/CurrentHuman_RequiresCompleteSourceAndCurrentExactActor.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.CurrentHuman_RequiresCompleteSourceAndCurrentExactActor",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "efeb8e7975a10ebb68fcf5455940a37385afb3a37a2f6ac85951eff5e1c9366e"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/DelayedReply_ValidatesCompletionTime.xml",
+      "sha256": "5d9f0dab8f4505cb8029a443ca08d1f7af9b3bfcfb41ebc4e0b92353ac97c848",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Client.Tests/debug/Hexalith.Parties.Client.Tests.dll",
+      "assemblySha256": "973bd9d5008030a6bee48bc72f563c262e80bfd161ca6f694fb7e1fde85b7320",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Client.Tests/debug/Hexalith.Parties.Client.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/DelayedReply_ValidatesCompletionTime.xml"
+      ],
+      "summary": {
+        "total": 9,
+        "passed": 9,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"current-valid\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"current-interval-expiry\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"current-custody-expiry\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"current-source-rollback\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"current-binding-rollback\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"current-future-observation\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"historical-closed-valid\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"historical-custody-expiry\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Client.Tests.HttpPartiesIdentityClientTests.DelayedReply_ValidatesCompletionTime(scenario: \\\"historical-future-action\\\")",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "d1c6341138bfabaa6a9cf37b83c40e57aec7e184c0380af62d18667373776682"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/ExpiredPredecessorCertifiedWithoutActor_ResolvesOnlyRetainedSuccessor.xml",
+      "sha256": "720b6d134d7e5b2a6eec0b2314f737c92268176d742ec406a67fb4901812e08f",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ExpiredPredecessorCertifiedWithoutActor_ResolvesOnlyRetainedSuccessor",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/ExpiredPredecessorCertifiedWithoutActor_ResolvesOnlyRetainedSuccessor.xml"
+      ],
+      "summary": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ExpiredPredecessorCertifiedWithoutActor_ResolvesOnlyRetainedSuccessor(vector: \\\"valid\\\", expected: Resolved)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ExpiredPredecessorCertifiedWithoutActor_ResolvesOnlyRetainedSuccessor(vector: \\\"foreign\\\", expected: Unavailable)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ExpiredPredecessorCertifiedWithoutActor_ResolvesOnlyRetainedSuccessor(vector: \\\"wrong-policy\\\", expected: Unavailable)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ExpiredPredecessorCertifiedWithoutActor_ResolvesOnlyRetainedSuccessor(vector: \\\"expired\\\", expected: Unavailable)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ExpiredPredecessorCertifiedWithoutActor_ResolvesOnlyRetainedSuccessor(vector: \\\"unknown-contract\\\", expected: Unavailable)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ExpiredPredecessorCertifiedWithoutActor_ResolvesOnlyRetainedSuccessor(vector: \\\"wrong-transition\\\", expected: Unavailable)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ExpiredPredecessorCertifiedWithoutActor_ResolvesOnlyRetainedSuccessor(vector: \\\"overlap\\\", expected: Unavailable)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "c0c29e17708f3d598bc72b2345197556365f17911803216cc6623c439df82d00"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/ExpiredPredecessorOmitted_SuccessorReadRemainsUnavailable.xml",
+      "sha256": "a76855a218d9f53c6cd3722f2a196add52d26fe626c1e2a8bb4baecd0dae8e89",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ExpiredPredecessorOmitted_SuccessorReadRemainsUnavailable",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/ExpiredPredecessorOmitted_SuccessorReadRemainsUnavailable.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ExpiredPredecessorOmitted_SuccessorReadRemainsUnavailable",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "41dcb24b7416578fcef05ef8d1aeae032e365d74f8363d10b93a5b98977f22e9"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/ForeignOwnerResponseHasNoUsableHistory.xml",
+      "sha256": "b3c7c4885fa6bfdeb7bc7168a4ce06522d9f6069d00ab7e68b0a04f54d827108",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.ForeignOwnerResponseHasNoUsableHistory",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/ForeignOwnerResponseHasNoUsableHistory.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.ForeignOwnerResponseHasNoUsableHistory",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "6d7c724a129bfed266ecbd1c477c0006fdf65fa6d8cdd789f285f78a6162b5b8"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/InheritedAuthenticationSettings_CannotAlterFixtureContracts.xml",
+      "sha256": "43086ea64948c5f1f4e025d5af7aaebb1393a210b324c1646f941e8434df7cd4",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.InheritedAuthenticationSettings_CannotAlterFixtureContracts",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/InheritedAuthenticationSettings_CannotAlterFixtureContracts.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.InheritedAuthenticationSettings_CannotAlterFixtureContracts",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "89274fe525f91ab75a758afd6c146d89681f5385931e2a4492926763a8cd81be"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/InvalidQueryTimeout_DeniesBeforeAnyProvider.xml",
+      "sha256": "532d233cec738194ab278179ffb072dcdc93748ee4fcc7a5241ac1a8ac0077cd",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/InvalidQueryTimeout_DeniesBeforeAnyProvider.xml"
+      ],
+      "summary": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: False, ticks: 0)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: True, ticks: 0)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: False, ticks: -1)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: True, ticks: -1)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: False, ticks: 300000001)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: True, ticks: 300000001)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: False, ticks: 9223372036854775807)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.InvalidQueryTimeout_DeniesBeforeAnyProvider(historical: True, ticks: 9223372036854775807)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "e68fff21cae4b61035f91b374791d2035220f619168d781f39550880409067b4"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/MaximumReadablePayloadFitsTheSharedBase64WireBound.xml",
+      "sha256": "dc6600ef2ec495191f718cf14f1a44090685a09faa5deb714dd94851025d52b5",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.MaximumReadablePayloadFitsTheSharedBase64WireBound",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/MaximumReadablePayloadFitsTheSharedBase64WireBound.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.MaximumReadablePayloadFitsTheSharedBase64WireBound",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "74539da5c0596887018fb53c3da6bda5d90d8ef1490cdcfd39f39c7bb1ee951a"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/MissingExcludedPositionHasNoUsableHistory.xml",
+      "sha256": "382899e4619633037bd336aa8c3c7714a09a06ae5bd1b2e70dfd6e2d788514b1",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.MissingExcludedPositionHasNoUsableHistory",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/MissingExcludedPositionHasNoUsableHistory.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.MissingExcludedPositionHasNoUsableHistory",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "0697bc4c87554dc502f102550604717916ed6b1acac12d56b519e5016f7e45fb"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/MultipleExpiredTransitionsResolveOnlyRetainedVersionThreeThroughSerializedQuery.xml",
+      "sha256": "d9669947a7948d2eb9c9f63ca7938d6c13767c034479945793bb23be44451052",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.MultipleExpiredTransitionsResolveOnlyRetainedVersionThreeThroughSerializedQuery",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/MultipleExpiredTransitionsResolveOnlyRetainedVersionThreeThroughSerializedQuery.xml"
+      ],
+      "summary": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.MultipleExpiredTransitionsResolveOnlyRetainedVersionThreeThroughSerializedQuery(expiredTransition: \\\"rebound\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.MultipleExpiredTransitionsResolveOnlyRetainedVersionThreeThroughSerializedQuery(expiredTransition: \\\"revocation\\\")",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "fd4bc8fbef8f85a5a79a669f8e3451ba21ff50c580cc974ef726a704c9ced72c"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/NoncooperativeTransportStopsBeforeCompletionAndDisposesLateMaterial.xml",
+      "sha256": "a18096f968e8d01fa3cfa2db7f6650d559f29dafb6e818a573ed68379a0fa65a",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.NoncooperativeTransportStopsBeforeCompletionAndDisposesLateMaterial",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/NoncooperativeTransportStopsBeforeCompletionAndDisposesLateMaterial.xml"
+      ],
+      "summary": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.NoncooperativeTransportStopsBeforeCompletionAndDisposesLateMaterial(stage: 0, expireDeadline: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.NoncooperativeTransportStopsBeforeCompletionAndDisposesLateMaterial(stage: 1, expireDeadline: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.NoncooperativeTransportStopsBeforeCompletionAndDisposesLateMaterial(stage: 2, expireDeadline: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.NoncooperativeTransportStopsBeforeCompletionAndDisposesLateMaterial(stage: 3, expireDeadline: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.NoncooperativeTransportStopsBeforeCompletionAndDisposesLateMaterial(stage: 0, expireDeadline: True)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.NoncooperativeTransportStopsBeforeCompletionAndDisposesLateMaterial(stage: 1, expireDeadline: True)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.NoncooperativeTransportStopsBeforeCompletionAndDisposesLateMaterial(stage: 2, expireDeadline: True)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.NoncooperativeTransportStopsBeforeCompletionAndDisposesLateMaterial(stage: 3, expireDeadline: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "5dbcfbee3444d22a1da7224e53e7d0bb56f6541ee46d1eb78fa83397a1289cac"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/PostProcess_CommonPartyDomainCaseVariants_ResolveProductionProcessorAsync.xml",
+      "sha256": "d8b99fdee65506da553ebb0dbd28d51d8a19a20f42fb49a4b0f5cdb068197235",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_CommonPartyDomainCaseVariants_ResolveProductionProcessorAsync",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/PostProcess_CommonPartyDomainCaseVariants_ResolveProductionProcessorAsync.xml"
+      ],
+      "summary": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_CommonPartyDomainCaseVariants_ResolveProductionProcessorAsync(domain: \\\"Party\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_CommonPartyDomainCaseVariants_ResolveProductionProcessorAsync(domain: \\\"PARTY\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_CommonPartyDomainCaseVariants_ResolveProductionProcessorAsync(domain: \\\"pArTy\\\")",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "6bdc6b467774a34e1bf8326bb2513f639bde675b9b016aa2587438d8e6f22303"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/PostProcess_InvalidCredentials_DenyBeforeDomainWork.xml",
+      "sha256": "3d7a89991199ee27e1edfe40bf6d46e288dfa5aa3ebfe8df34155673fd1c7d6f",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/PostProcess_InvalidCredentials_DenyBeforeDomainWork.xml"
+      ],
+      "summary": {
+        "total": 15,
+        "passed": 15,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"missing\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"caller-header\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"channel-only\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"missing-channel\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"wrong-channel\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"duplicate-channel\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"forged-assertion\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"foreign-assertion\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"duplicate-assertion\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"conflicting-caller\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"human-bearer\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"human-bearer-only\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"disallowed-workload\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"wrong-audience\\\", expected: Unauthorized)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.PostProcess_InvalidCredentials_DenyBeforeDomainWork(scenario: \\\"wrong-operation\\\", expected: Forbidden)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "370971987126ce398edd4f9f040eb165a0e6f0103bd027c69f7b1382b902bb42"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/PostProcess_InvalidPayload_UsesProductionProcessorValidationRejectionAsync.xml",
+      "sha256": "d82c5d90ef6064eafd85f0b269e8e458fc2186cbe3ad4241f2a83c06ccb7711a",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_InvalidPayload_UsesProductionProcessorValidationRejectionAsync",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/PostProcess_InvalidPayload_UsesProductionProcessorValidationRejectionAsync.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_InvalidPayload_UsesProductionProcessorValidationRejectionAsync",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "587e44015283fb7650a72e1bfd324c84134134a05faf18cce98f3ed5b1ce62e1"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/PostProcess_InvokesRegisteredPartiesDomainProcessorAsync.xml",
+      "sha256": "13687848a50a73cd39897a482813cc2a1932d1278fd424ccd852537423606a6f",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_InvokesRegisteredPartiesDomainProcessorAsync",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/PostProcess_InvokesRegisteredPartiesDomainProcessorAsync.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_InvokesRegisteredPartiesDomainProcessorAsync",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "198b1a55ac4631611c344011211b8be13ae9e7622ee84b0a6dc36d2bf3ae783c"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/PostProcess_PreservesResultPayloadAcrossPartiesHostWireSerializationAsync.xml",
+      "sha256": "38408fa9d812d1d33c008815cef9e6000544ad8d4bb6bb21fa9407a400ca55c4",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_PreservesResultPayloadAcrossPartiesHostWireSerializationAsync",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/PostProcess_PreservesResultPayloadAcrossPartiesHostWireSerializationAsync.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_PreservesResultPayloadAcrossPartiesHostWireSerializationAsync",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "6d9004613d0697eaef7f2d11aac0b0ed5a7dafb0cb51ecb381dcf5acdd627bcf"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/PostProcess_SerializedLifecycleHistory_EnforcesProductionReplayBoundaryAsync.xml",
+      "sha256": "6516ab0ac316e71229d17ab64efc31e5ef4ac0b4ff7fecc4eb73ab8347468242",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_SerializedLifecycleHistory_EnforcesProductionReplayBoundaryAsync",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/PostProcess_SerializedLifecycleHistory_EnforcesProductionReplayBoundaryAsync.xml"
+      ],
+      "summary": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_SerializedLifecycleHistory_EnforcesProductionReplayBoundaryAsync(corruption: \\\"none\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_SerializedLifecycleHistory_EnforcesProductionReplayBoundaryAsync(corruption: \\\"metadata-version\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_SerializedLifecycleHistory_EnforcesProductionReplayBoundaryAsync(corruption: \\\"event-contract\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_SerializedLifecycleHistory_EnforcesProductionReplayBoundaryAsync(corruption: \\\"payload-version\\\")",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "3d437c1b6abb28e5bc171cd462f4c85c8dbfb9767fd6c80ff4ff459728efda7d"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/PostProcess_WhenGdprFeaturesActive_DoesNotEmitMvpComplianceWarningHeaderAsync.xml",
+      "sha256": "a2816756fc0ec3f4f8701e24234050252188b178b682c373e99fe2bc9d34ee86",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_WhenGdprFeaturesActive_DoesNotEmitMvpComplianceWarningHeaderAsync",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/PostProcess_WhenGdprFeaturesActive_DoesNotEmitMvpComplianceWarningHeaderAsync.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostProcess_WhenGdprFeaturesActive_DoesNotEmitMvpComplianceWarningHeaderAsync",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "d31e15b72a947ef6d5a114bc96d44221496894f241f08475706e53cd4ec2c276"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/PostReplayState_UsesProductionProcessorReplayCapabilityAsync.xml",
+      "sha256": "13fe09b538e2e795447a34495cdec97526339a88ba1bc4515d17777d27f0b616",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostReplayState_UsesProductionProcessorReplayCapabilityAsync",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/PostReplayState_UsesProductionProcessorReplayCapabilityAsync.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.PostReplayState_UsesProductionProcessorReplayCapabilityAsync",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "5865ca809163df78d05f8d866cb91188e3b033083463a5c820ca095e80fa1fc7"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/ProductionAsyncProcessor_AlreadyCanceledToken_ThrowsBeforeProducingEventsAsync.xml",
+      "sha256": "9e5c3a45ec40d0ba725c82fb90dbdd4213ea596e9c8106db6745b575a6b3c8e4",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.ProductionAsyncProcessor_AlreadyCanceledToken_ThrowsBeforeProducingEventsAsync",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/ProductionAsyncProcessor_AlreadyCanceledToken_ThrowsBeforeProducingEventsAsync.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesProcessEndpointTests.ProductionAsyncProcessor_AlreadyCanceledToken_ThrowsBeforeProducingEventsAsync",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "223dea759283202282a83b36347cd2f94c7b11e01e94e34da9ffe99361e0621a"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict.xml",
+      "sha256": "7ce022219956bf5e9bcca17299c83e403fb74d2f0361d8d016fe15409fa8c2a1",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict.xml"
+      ],
+      "summary": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict(historical: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ProviderCancellationCallbackFaultAfterDeadline_DoesNotAffectVerdict(historical: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "aaf76be4525fe756402f3085d2a9712ae6cf0120f954d65ef54e18a68d909991"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/ServerFailureCannotReturnItsPartialPayload.xml",
+      "sha256": "4b14fbc583f052e22bb405d88f469e2767bf2e262209e2dba28c2ba0ca5787d9",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.ServerFailureCannotReturnItsPartialPayload",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/ServerFailureCannotReturnItsPartialPayload.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.ServerFailureCannotReturnItsPartialPayload",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "fd7771853289d0a22961d221932fc34c8ce9588b721ce16e9ca3a335158492ba"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves.xml",
+      "sha256": "1e497e34e6530a044c817bf69541d3630484b20e247456609433560038c60947",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves.xml"
+      ],
+      "summary": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves(historical: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.ShortQueryDeadline_ImmediatelyBeforeExpiryStillResolves(historical: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "abde0395280354d379be1eed74c16cb134be21bd9463ed35b87e644eab5524be"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/SidecarDelivery_MissingChannel_DeniesBeforeDispatch.xml",
+      "sha256": "828bee597989d9c56c38ac3997ff4bc372cefa7c4a4be60d6670f8fed245d43a",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarDelivery_MissingChannel_DeniesBeforeDispatch",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/SidecarDelivery_MissingChannel_DeniesBeforeDispatch.xml"
+      ],
+      "summary": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarDelivery_MissingChannel_DeniesBeforeDispatch(route: \\\"/actors/PartyProjectionActor/party-1/method/Untrus\\\"\u00b7\u00b7\u00b7)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarDelivery_MissingChannel_DeniesBeforeDispatch(route: \\\"/tenants/events\\\")",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "f0a4408b047871dded52fdb4bb66e78429cf88a8c1fe21fcf5007741786f3a79"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/SidecarRoute_RequiresAuthenticatedChannel.xml",
+      "sha256": "5aefb76c3bfc95c925ea58abcd7915b241e6b031c1a3fe0707f95d0ac9fb0c9e",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/SidecarRoute_RequiresAuthenticatedChannel.xml"
+      ],
+      "summary": {
+        "total": 16,
+        "passed": 16,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/dapr/subscribe\\\", channel: \\\"valid\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/dapr/subscribe\\\", channel: \\\"missing\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/dapr/subscribe\\\", channel: \\\"wrong\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/dapr/subscribe\\\", channel: \\\"duplicate\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/dapr/config\\\", channel: \\\"valid\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/dapr/config\\\", channel: \\\"missing\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/dapr/config\\\", channel: \\\"wrong\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/dapr/config\\\", channel: \\\"duplicate\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/healthz\\\", channel: \\\"valid\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/healthz\\\", channel: \\\"missing\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/healthz\\\", channel: \\\"wrong\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/healthz\\\", channel: \\\"duplicate\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/healthz/\\\", channel: \\\"valid\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/healthz/\\\", channel: \\\"missing\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/healthz/\\\", channel: \\\"wrong\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartiesDomainServiceSecurityTests.SidecarRoute_RequiresAuthenticatedChannel(route: \\\"/healthz/\\\", channel: \\\"duplicate\\\")",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "f113d1c7135f9ceb626db90209d6d85b901060efeed0291bf316e8ab63a4a677"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/SynchronousTransportInvocationIsBoundedAndLateOwnedMaterialDisposed.xml",
+      "sha256": "3b7102a3791c918b24d83ee60f6c556d4a6ed4ada893941db91c417eb518e120",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+      "assemblySha256": "edb25b8a9817c4b64ea32ae6a05c7ba868e88a33458b73bf1119a4de2a58f2f1",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.EventStore.Client.Tests/debug/Hexalith.EventStore.Client.Tests.dll",
+        "-method",
+        "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.SynchronousTransportInvocationIsBoundedAndLateOwnedMaterialDisposed",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/SynchronousTransportInvocationIsBoundedAndLateOwnedMaterialDisposed.xml"
+      ],
+      "summary": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.SynchronousTransportInvocationIsBoundedAndLateOwnedMaterialDisposed(stage: 0, expire: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.SynchronousTransportInvocationIsBoundedAndLateOwnedMaterialDisposed(stage: 1, expire: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.SynchronousTransportInvocationIsBoundedAndLateOwnedMaterialDisposed(stage: 2, expire: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.SynchronousTransportInvocationIsBoundedAndLateOwnedMaterialDisposed(stage: 3, expire: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.SynchronousTransportInvocationIsBoundedAndLateOwnedMaterialDisposed(stage: 0, expire: True)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.SynchronousTransportInvocationIsBoundedAndLateOwnedMaterialDisposed(stage: 1, expire: True)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.SynchronousTransportInvocationIsBoundedAndLateOwnedMaterialDisposed(stage: 2, expire: True)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.EventStore.Client.Tests.Streams.RetainedIdentityHistoryReaderTests.SynchronousTransportInvocationIsBoundedAndLateOwnedMaterialDisposed(stage: 3, expire: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "2e016e2de18e12f7087985734d632a14b859a58dc7da22d6e251cbb5bf466417"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence.xml",
+      "sha256": "6bf5459a06a26e5d6b1cb71f5c764c5ef5eca111728cf5c24b6bb8765a7b8f51",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence.xml"
+      ],
+      "summary": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence(historical: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_ElapsedBeforeTimerCallbackDeniesEvidence(historical: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "b8b0cb6326cee960c91d0380e392346b9d233dfba078c208f948397853836c90"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence.xml",
+      "sha256": "e5f36671a698ab9bf103fbbec0edfdd2d1d5711a74c872b1127b927e53ccb8db",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence.xml"
+      ],
+      "summary": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence(historical: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_FinalAuthorityExpiryDeniesTerminalEvidence(historical: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "70dcd68b1d6841e39a9be4ac7aa4be93825a9c1a96f8ad9ffa16e2136552b42f"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence.xml",
+      "sha256": "2fbef1e2e24ed61b58e4f4e8a8424deb55f777584a5e9d84a420b5a841dba5be",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence.xml"
+      ],
+      "summary": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: False, inCustody: False, lateFault: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: True, inCustody: False, lateFault: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: False, inCustody: True, lateFault: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: True, inCustody: True, lateFault: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: False, inCustody: False, lateFault: True)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: True, inCustody: False, lateFault: True)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: False, inCustody: True, lateFault: True)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_NonCooperativeDependencyDeniesLateEvidence(historical: True, inCustody: True, lateFault: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "e78ff434ebc1a23c586fc91610f2072c4da2a78645d04b42c3787817ed15c746"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/WholeQueryDeadline_SetupTimeConsumesOperationBudget.xml",
+      "sha256": "8146f6c3899e4eb7a9f9dbc88f337a2e58c4269a241e4cecbaec595d80528e85",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SetupTimeConsumesOperationBudget",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/WholeQueryDeadline_SetupTimeConsumesOperationBudget.xml"
+      ],
+      "summary": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SetupTimeConsumesOperationBudget(historical: False, exhausted: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SetupTimeConsumesOperationBudget(historical: True, exhausted: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SetupTimeConsumesOperationBudget(historical: False, exhausted: True)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SetupTimeConsumesOperationBudget(historical: True, exhausted: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "7611ed8295b6209f6714c1aa6e829fcd1d0dd88e727b115564d07794e6af8deb"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget.xml",
+      "sha256": "becbadee861bbe8088d0168bccadc5ceda66613332e60767801e7c0be72b4cf0",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget.xml"
+      ],
+      "summary": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget(historical: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SourceAndCustodyShareCumulativeBudget(historical: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "547fc31ca33d390cd74c61f855030e2d487cfad90f72e96864eb6a077b6ed86f"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-owner/WholeQueryDeadline_SynchronousProviderInvocationIsBounded.xml",
+      "sha256": "72a7914cf9f93e15bcd014efff55d60a7ea4abf4e24627cf9d62901352bc065b",
+      "assembly": "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+      "assemblySha256": "e9a84c84279ea40efb6619649d2486bd34d4c20bdd3ef4cac68c87156d82e605",
+      "command": [
+        "dotnet",
+        "/tmp/agents-five-deferred-owner/build/bin/Hexalith.Parties.Tests/debug/Hexalith.Parties.Tests.dll",
+        "-method",
+        "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SynchronousProviderInvocationIsBounded",
+        "-result-xml",
+        "/tmp/agents-five-deferred-owner/WholeQueryDeadline_SynchronousProviderInvocationIsBounded.xml"
+      ],
+      "summary": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SynchronousProviderInvocationIsBounded(historical: False, inCustody: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SynchronousProviderInvocationIsBounded(historical: True, inCustody: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SynchronousProviderInvocationIsBounded(historical: False, inCustody: True)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Parties.Tests.Gateway.PartyIdentityQueryHandlerTests.WholeQueryDeadline_SynchronousProviderInvocationIsBounded(historical: True, inCustody: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "ceac23d16df45fc5b729261b339ddb552d88e4db1ee3a76970fe94feb669030b"
+    }
+  ],
+  "rootNativeResults": [
+    {
+      "report": "/tmp/agents-five-deferred-root-native/A_caller_supplied_idempotency_key_becomes_the_command_message_id.xml",
+      "sha256": "9f04c208d895e2e0ed00a02c07a7d87e812f6b0584bdc0c1898ef1351d819908",
+      "assembly": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "assemblySha256": "d91a7d10571be6454bcdc131e586863900e1518419f78c4f1036f9f98a686f4b",
+      "command": [
+        "dotnet",
+        "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+        "-method",
+        "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.A_caller_supplied_idempotency_key_becomes_the_command_message_id",
+        "-failSkips",
+        "-result-xml",
+        "/tmp/agents-five-deferred-root-native/A_caller_supplied_idempotency_key_becomes_the_command_message_id.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.A_caller_supplied_idempotency_key_becomes_the_command_message_id",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "67e1eaad403403e804a79f3a829d3042e91ac8ea51d33812e74741c170471b44"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-root-native/A_noop_receipt_returns_the_unchanged_authoritative_version_without_projection_guessing.xml",
+      "sha256": "710962c4449d2a38db39308c6e22d11b417c9e45d48df02d758177029f0a58e5",
+      "assembly": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "assemblySha256": "d91a7d10571be6454bcdc131e586863900e1518419f78c4f1036f9f98a686f4b",
+      "command": [
+        "dotnet",
+        "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+        "-method",
+        "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.A_noop_receipt_returns_the_unchanged_authoritative_version_without_projection_guessing",
+        "-failSkips",
+        "-result-xml",
+        "/tmp/agents-five-deferred-root-native/A_noop_receipt_returns_the_unchanged_authoritative_version_without_projection_guessing.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.A_noop_receipt_returns_the_unchanged_authoritative_version_without_projection_guessing",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "63182d5bfd3cdb81d7b894192ad0623446ef10be6d587dc1566b19d7840e52a9"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-root-native/A_receipt_identity_mismatch_never_queries_command_status.xml",
+      "sha256": "da5ffb55f04f51de7941dc41601236d6cdb894517129ce592ee9a497a9e6bd54",
+      "assembly": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "assemblySha256": "d91a7d10571be6454bcdc131e586863900e1518419f78c4f1036f9f98a686f4b",
+      "command": [
+        "dotnet",
+        "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+        "-method",
+        "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.A_receipt_identity_mismatch_never_queries_command_status",
+        "-failSkips",
+        "-result-xml",
+        "/tmp/agents-five-deferred-root-native/A_receipt_identity_mismatch_never_queries_command_status.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.A_receipt_identity_mismatch_never_queries_command_status",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "2ecef77aec05a74419a7b651e2b3140098e19ac82240f082f7c65ea9864e704a"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-root-native/ActorExpiringDuringTenantAuthorityAwaitCannotGrantAccess.xml",
+      "sha256": "9dd8136766af7873da8e6bfb86e0b3b0be69c65eba23e15639fd015066d7fdc7",
+      "assembly": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "assemblySha256": "d91a7d10571be6454bcdc131e586863900e1518419f78c4f1036f9f98a686f4b",
+      "command": [
+        "dotnet",
+        "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+        "-method",
+        "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.ActorExpiringDuringTenantAuthorityAwaitCannotGrantAccess",
+        "-failSkips",
+        "-result-xml",
+        "/tmp/agents-five-deferred-root-native/ActorExpiringDuringTenantAuthorityAwaitCannotGrantAccess.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.ActorExpiringDuringTenantAuthorityAwaitCannotGrantAccess",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "dab8c64edc1f676c9cf1450767965227fd2478b6fa1fd387302d0031ef2c95b4"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-root-native/AdministrationAuthorityIsRecheckedAfterTheRoleAwait.xml",
+      "sha256": "2832acc784a492e79168f22947856f6ee7d2c7fc0d501afa91c222f768ba4847",
+      "assembly": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "assemblySha256": "d91a7d10571be6454bcdc131e586863900e1518419f78c4f1036f9f98a686f4b",
+      "command": [
+        "dotnet",
+        "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+        "-method",
+        "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.AdministrationAuthorityIsRecheckedAfterTheRoleAwait",
+        "-failSkips",
+        "-result-xml",
+        "/tmp/agents-five-deferred-root-native/AdministrationAuthorityIsRecheckedAfterTheRoleAwait.xml"
+      ],
+      "summary": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.AdministrationAuthorityIsRecheckedAfterTheRoleAwait(platform: False, rollback: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.AdministrationAuthorityIsRecheckedAfterTheRoleAwait(platform: True, rollback: False)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.AdministrationAuthorityIsRecheckedAfterTheRoleAwait(platform: False, rollback: True)",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.AdministrationAuthorityIsRecheckedAfterTheRoleAwait(platform: True, rollback: True)",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "ed32a25e431b244625799979092a23cfb035796fcbaca96d5864544347ac779f"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-root-native/An_unverifiable_gateway_receipt_fails_closed.xml",
+      "sha256": "76632c49b6844f8e8a033f6605afb32a0a81806ee3c6ac4b2db213ea73d4292d",
+      "assembly": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "assemblySha256": "d91a7d10571be6454bcdc131e586863900e1518419f78c4f1036f9f98a686f4b",
+      "command": [
+        "dotnet",
+        "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+        "-method",
+        "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed",
+        "-failSkips",
+        "-result-xml",
+        "/tmp/agents-five-deferred-root-native/An_unverifiable_gateway_receipt_fails_closed.xml"
+      ],
+      "summary": {
+        "total": 13,
+        "passed": 13,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed(scenario: \\\"missing-payload\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed(scenario: \\\"malformed-payload\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed(scenario: \\\"mismatched-message\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed(scenario: \\\"mismatched-correlation\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed(scenario: \\\"unknown-effect\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed(scenario: \\\"undefined-effect\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed(scenario: \\\"wrong-case-effect\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed(scenario: \\\"string-version\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed(scenario: \\\"null-version\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed(scenario: \\\"bool-version\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed(scenario: \\\"object-version\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed(scenario: \\\"duplicate-effect\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.An_unverifiable_gateway_receipt_fails_closed(scenario: \\\"duplicate-version\\\")",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "77232b81c28c0d312902146893a9fe2d8bf545d3e8b214d3c5216929e4d2011a"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-root-native/DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity.xml",
+      "sha256": "c1673042493075b0a66fac2f5c21eb9ca21303d341dc57103c13016f2325669b",
+      "assembly": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "assemblySha256": "d91a7d10571be6454bcdc131e586863900e1518419f78c4f1036f9f98a686f4b",
+      "command": [
+        "dotnet",
+        "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+        "-method",
+        "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity",
+        "-failSkips",
+        "-result-xml",
+        "/tmp/agents-five-deferred-root-native/DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity.xml"
+      ],
+      "summary": {
+        "total": 12,
+        "passed": 12,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity(statusQuery: True, administrator: True, mutation: \\\"valid\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity(statusQuery: False, administrator: True, mutation: \\\"valid\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity(statusQuery: True, administrator: False, mutation: \\\"valid\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity(statusQuery: False, administrator: False, mutation: \\\"valid\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity(statusQuery: True, administrator: True, mutation: \\\"subject\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity(statusQuery: False, administrator: True, mutation: \\\"subject\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity(statusQuery: True, administrator: True, mutation: \\\"tenant\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity(statusQuery: False, administrator: True, mutation: \\\"tenant\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity(statusQuery: True, administrator: True, mutation: \\\"authority\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity(statusQuery: False, administrator: True, mutation: \\\"authority\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity(statusQuery: True, administrator: True, mutation: \\\"stripped\\\")",
+          "result": "Pass"
+        },
+        {
+          "name": "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity(statusQuery: False, administrator: True, mutation: \\\"stripped\\\")",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "fb224b4153a9b0d81acd66a390db255330f8e9047946bde01edb5776fb5ff49d"
+    },
+    {
+      "report": "/tmp/agents-five-deferred-root-native/LifecycleReceiptRequiresItsOwnNewConfigurationVersionBeforeConfirmation.xml",
+      "sha256": "3c9def4d90bf561cf009ce58238378127b3312e83f60fe37752fd29b4fa95519",
+      "assembly": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "assemblySha256": "d91a7d10571be6454bcdc131e586863900e1518419f78c4f1036f9f98a686f4b",
+      "command": [
+        "dotnet",
+        "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+        "-method",
+        "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.LifecycleReceiptRequiresItsOwnNewConfigurationVersionBeforeConfirmation",
+        "-failSkips",
+        "-result-xml",
+        "/tmp/agents-five-deferred-root-native/LifecycleReceiptRequiresItsOwnNewConfigurationVersionBeforeConfirmation.xml"
+      ],
+      "summary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cases": [
+        {
+          "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.LifecycleReceiptRequiresItsOwnNewConfigurationVersionBeforeConfirmation",
+          "result": "Pass"
+        }
+      ],
+      "canonicalSha256": "64448ced6902a653c3dfa3a3dd361df0d0598090f7aaa2e71b256011574bbdcb"
+    }
+  ],
+  "toolingCoverage": {
+    "broadSuiteTests": 247,
+    "finalIdentityHarnessTests": 47,
+    "finalEvidenceValidatorTests": 23,
+    "currentDiscoveredInventory": 256,
+    "note": "The final focused suites cover the two test modules changed after broad-suite discovery; suite counts overlap."
+  }
+}

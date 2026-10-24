@@ -59,7 +59,7 @@ scenario = os.environ["STORY_52_SCENARIO"]
 target = os.environ["STORY_52_TARGET"]
 matches = target in args
 if target.startswith("all::"):
-    matches = "-class" not in args and target[5:] in args
+    matches = "-class" not in args and "-method" not in args and target[5:] in args
 if not matches:
     scenario = "success"
 if scenario == "native-error":
@@ -81,7 +81,13 @@ if scenario == "progress":
 floors = {"Hexalith.Agents.Contracts.Tests": 529, "Hexalith.Agents.Client.Tests": 6,
           "Hexalith.Agents.Tests": 787, "Hexalith.Agents.Server.Tests": 573,
           "Hexalith.Agents.UI.Tests": 1073}
-minimum = floors[Path(args[0]).stem] if "-class" not in args else 1
+method_floors = {
+    "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity": 12,
+    "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.AdministrationAuthorityIsRecheckedAfterTheRoleAwait": 4,
+    "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.ActorExpiringDuringTenantAuthorityAwaitCannotGrantAccess": 1,
+}
+minimum = (method_floors[args[args.index("-method") + 1]] if "-method" in args
+           else floors[Path(args[0]).stem] if "-class" not in args else 1)
 counts = {"total": minimum, "errors": 0, "failed": 0, "skipped": 0, "not-run": 0}
 if scenario == "below-floor":
     counts["total"] = minimum - 1
@@ -195,6 +201,8 @@ class Story52VerifierTests(unittest.TestCase):
             "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests",
             "Hexalith.Agents.Server.Tests.AgentSetupProjectionTests",
             "Hexalith.Agents.Server.Tests.AgentSetupQueryHandlerTests",
+            "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests",
+            "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests",
             "Hexalith.Agents.UI.Tests.AgentConfigurationTests",
             "Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests",
             "Hexalith.Agents.Server.Tests.AgentSetupCompositionTests",
@@ -203,9 +211,15 @@ class Story52VerifierTests(unittest.TestCase):
             "Hexalith.Agents.UI.Tests.AgentsUiCompositionTests",
         ))
         test_calls = [call for call in calls if call[0].endswith(".dll")]
-        full_projects = [Path(call[0]).name for call in test_calls if "-class" not in call]
+        methods = [call[call.index("-method") + 1] for call in calls if "-method" in call]
+        self.assertCountEqual(methods, (
+            "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity",
+            "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.AdministrationAuthorityIsRecheckedAfterTheRoleAwait",
+            "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.ActorExpiringDuringTenantAuthorityAwaitCannotGrantAccess",
+        ))
+        full_projects = [Path(call[0]).name for call in test_calls if "-class" not in call and "-method" not in call]
         self.assertCountEqual(full_projects, [Path(project).name + ".dll" for project in PROJECTS])
-        self.assertEqual(len(calls), 26, "One package-floor check, 20 selections and five regression runs")
+        self.assertEqual(len(calls), 31, "One package-floor check, 25 selections and five regression runs")
         for call in test_calls:
             self.assertIn("-failSkips", call)
             self.assertNotIn("-filterVSTest", call)
@@ -216,7 +230,7 @@ class Story52VerifierTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         calls = self.calls()
         self.assertEqual([call[0] for call in calls[:3]], ["msbuild", "restore", "build"])
-        self.assertEqual(len(calls), 28)
+        self.assertEqual(len(calls), 33)
         for call in calls[1:3]:
             self.assertIn("-p:UseHexalithProjectReferences=true", call)
         for call in calls[:3]:
@@ -235,6 +249,37 @@ class Story52VerifierTests(unittest.TestCase):
         self.assertEqual(len(self.calls()), 1)
         self.assertEqual(self.calls()[0][0], "msbuild")
         self.assertIn("Gate: EventStore package floor", result.stdout)
+
+    def test_each_current_authority_selection_refuses_missing_or_skipped_results(self) -> None:
+        for test_type in ("VerifiedSetupQueryCallerTests", "TenantAuthorityAdmissionOrderingTests"):
+            target = "Hexalith.Agents.Server.Tests." + test_type
+            for scenario in ("zero", "skipped", "not-run"):
+                with self.subTest(test_type=test_type, scenario=scenario):
+                    self.log.unlink(missing_ok=True)
+                    result = self.run_verifier(scenario, target=target)
+                    self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                    self.assertIn(target, result.stdout + result.stderr)
+                    self.assertIn(target, self.calls()[-1])
+                    self.assertFalse(any("-class" not in call and call[0].endswith(".dll")
+                                         for call in self.calls()))
+
+    def test_exact_authority_methods_require_all_current_rows(self) -> None:
+        for target in (
+            "VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity",
+            "TenantAuthorityAdmissionOrderingTests.AdministrationAuthorityIsRecheckedAfterTheRoleAwait",
+            "TenantAuthorityAdmissionOrderingTests.ActorExpiringDuringTenantAuthorityAwaitCannotGrantAccess",
+        ):
+            target = "Hexalith.Agents.Server.Tests." + target
+            for scenario in ("zero", "below-floor", "skipped", "not-run"):
+                with self.subTest(target=target, scenario=scenario):
+                    self.log.unlink(missing_ok=True)
+                    result = self.run_verifier(scenario, target)
+                    self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                    self.assertIn(target, result.stdout + result.stderr)
+                    self.assertEqual(self.calls()[-1][1:3], ["-failSkips", "-method"])
+                    self.assertEqual(self.calls()[-1][3], target)
+                    self.assertFalse(any("-class" not in call and "-method" not in call
+                                         and call[0].endswith(".dll") for call in self.calls()))
 
     def test_later_empty_class_cannot_hide_behind_an_earlier_passing_class(self) -> None:
         result = self.run_verifier("zero")
