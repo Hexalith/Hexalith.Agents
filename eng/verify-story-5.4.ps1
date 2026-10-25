@@ -69,7 +69,7 @@ foreach ($name in $projects) {
     }
     $requiredClasses = switch ($name) {
         'Hexalith.Agents.Tests' { @('TrustedEnvelopeReplayTests', 'SecurityEventLogTests', 'AgentApproverPolicyTests') }
-        'Hexalith.Agents.Server.Tests' { @('Story54CurrentEvidenceTests', 'Story54BoundaryTests', 'ApproverEvidenceAdmissionTests', 'TenantAuthorityAdmissionOrderingTests', 'AuthorityCancellationAdmissionTests', 'AgentSetupQueryHandlerTests', 'SetupReadCancellationAdmissionTests', 'SetupWriteCancellationAdmissionTests', 'AuditQueryIsolationTests', 'AgentInteractionAuditQueryHandlerTests', 'AgentInteractionGateAdmissionTests') }
+        'Hexalith.Agents.Server.Tests' { @('Story54CurrentEvidenceTests', 'Story54BoundaryTests', 'ApproverEvidenceAdmissionTests', 'TenantAuthorityAdmissionOrderingTests', 'AuthorityCancellationAdmissionTests', 'AgentSetupQueryHandlerTests', 'AgentSetupApproverBasisTests', 'SetupReadCancellationAdmissionTests', 'SetupWriteCancellationAdmissionTests', 'AuditQueryIsolationTests', 'AgentInteractionAuditQueryHandlerTests', 'AgentInteractionGateAdmissionTests') }
         'Hexalith.Agents.UI.Tests' { @('AgentConfigurationTests', 'ApproverPolicyTests') }
         default { @() }
     }

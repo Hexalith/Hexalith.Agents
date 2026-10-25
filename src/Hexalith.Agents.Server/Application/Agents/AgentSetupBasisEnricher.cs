@@ -40,6 +40,7 @@ internal static class AgentSetupBasisEnricher
             ApproverPolicyValidationStatus status = item is null || item.Kind != sources[index].Kind
                 || item.Source != sources[index]
                 || sources[index].Kind is ApproverPolicySourceKind.Caller or ApproverPolicySourceKind.Unknown
+                || !Enum.IsDefined(sources[index].Kind)
                 ? ApproverPolicyValidationStatus.Unavailable : item.Outcome switch
                 {
                     ApproverSourceOutcome.Resolved => ApproverPolicyValidationStatus.Valid,
