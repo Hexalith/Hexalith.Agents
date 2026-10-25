@@ -58,7 +58,7 @@
     },
     "TargetIntegrationDate": {
       "parties": "Null; accepted 2026-10-08 remains historical/missed. Proposed 2026-11-13 feasibility and 2026-12-14 integration are superseded by stop direction, not active commitments.",
-      "conversations": "Packet repeats historical/missed 2026-10-08. New installed-delivery draft directs 2026-10-25 only if a complete packet is sealed that UTC date; no such sealed packet exists, so no changed date is submitted."
+      "conversations": "Packet repeats historical/missed 2026-10-08. New installed-delivery spec (now in-progress) directs 2026-10-25 only if a complete packet is sealed that UTC date; no such sealed packet exists, so no changed date is submitted."
     },
     "CompatibilityContractAndVerificationCommand": {
       "parties": "Accepted complete contract and historical exact command preserved. Candidate command is executable refusal only; current fresh-directory guard would refuse its already-existing output path. No production P-01-P-10 pass path or installed-hash binding.",
@@ -2024,7 +2024,8 @@
       "date": "2026-10-25",
       "condition": "Only when complete packet is sealed on that UTC date",
       "sealedCompletePacketFound": false,
-      "appliedToRegister": false
+      "appliedToRegister": false,
+      "sourceStatus": "in-progress"
     },
     "currentHeadVsPacketSourceInventory": [
       {
@@ -2476,7 +2477,25 @@
     "detachedDeliveryDirectories": [
       "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44",
       "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473"
-    ]
+    ],
+    "concurrentSourceReconciliation": {
+      "observedAtUtc": "2026-10-25T20:56:39.594476+00:00",
+      "path": "/home/administrator/projects/hexalith/conversations/_bmad-output/implementation-artifacts/spec-5-4-ext-conv-ai-1-installed-delivery.md",
+      "priorSha256": "3f44a8e3c47af9f2bebf661fb7afac3d16e7400b5bc5079543025af5adac561b",
+      "currentSha256": "4d56053d9b617de6a24c7d2ea98e7faabf072f03ce4c5ffbd72e868d9a63c680",
+      "onlyByteChange": "status: 'draft' -> status: 'in-progress'",
+      "proof": "Replacing only the current status string back to draft reproduces the exact prior SHA-256.",
+      "newPacketFound": false,
+      "installedManifestExists": false,
+      "meaning": "Workflow progress only; no changed complete commitment, installation, hash binding, date acceptance or Available evidence.",
+      "gitRecheck": {
+        "head": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3",
+        "localOriginMain": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3",
+        "specStatus": " M _bmad-output/implementation-artifacts/spec-5-4-ext-conv-ai-1-installed-delivery.md",
+        "remoteFreshness": "Root report owns fresh remote observations."
+      },
+      "specApprovalIsNotReplacementAcceptance": true
+    }
   },
   "inspectedFiles": [
     {
@@ -2734,8 +2753,17 @@
     {
       "path": "/home/administrator/projects/hexalith/conversations/_bmad-output/implementation-artifacts/spec-5-4-ext-conv-ai-1-installed-delivery.md",
       "exists": true,
-      "sha256": "3f44a8e3c47af9f2bebf661fb7afac3d16e7400b5bc5079543025af5adac561b",
-      "bytes": 7633
+      "sha256": "4d56053d9b617de6a24c7d2ea98e7faabf072f03ce4c5ffbd72e868d9a63c680",
+      "bytes": 7639,
+      "priorObservation": {
+        "observedAtUtc": "2026-10-25T20:50:22.334040+00:00",
+        "exists": true,
+        "sha256": "3f44a8e3c47af9f2bebf661fb7afac3d16e7400b5bc5079543025af5adac561b",
+        "bytes": 7633,
+        "status": "draft"
+      },
+      "reconciledAtUtc": "2026-10-25T20:56:39.594476+00:00",
+      "status": "in-progress"
     },
     {
       "path": "/home/administrator/projects/hexalith/conversations/docs/implementation/ext-conv-ai-1-deletion-conformance-receiver.md",
@@ -2916,6 +2944,15 @@
     "Committed replacement acceptance does not require its subsequent passing C1-C4 run; complete targets/commands/installed bindings are missing before acceptance."
   ],
   "finalStaticVerification": {
+    "observedAtUtc": "2026-10-25T20:56:39.594476+00:00",
+    "allInspectedFilesMatchReconciledObservations": true,
+    "inspectedFileCount": 70,
+    "allNineFieldsPresent": true,
+    "retainedNewPacketInventoryMatches": true,
+    "concurrentSourceChangesReconciled": 1,
+    "qualificationEvidence": false
+  },
+  "priorStaticVerification": {
     "allInspectedFilesUnchanged": true,
     "inspectedFileCount": 70,
     "allNineFieldsPresent": true,

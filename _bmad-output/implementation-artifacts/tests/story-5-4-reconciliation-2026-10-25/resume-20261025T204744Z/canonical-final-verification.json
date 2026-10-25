@@ -1,0 +1,45 @@
+{
+  "observedAtUtc": "2026-10-25T20:55:45.155027+00:00",
+  "records": [
+    {
+      "repository": "../platform",
+      "expectedCanonical": "51ea5deca1cbb70d1df0483766db8072b76cc348",
+      "remoteOutput": "51ea5deca1cbb70d1df0483766db8072b76cc348\trefs/heads/main",
+      "remoteExitCode": 0,
+      "matchesFinalObservation": true,
+      "currentHeadOnCanonical": true,
+      "ancestryExitCode": 0,
+      "ancestryStderr": ""
+    },
+    {
+      "repository": "../parties",
+      "expectedCanonical": "9ee857b11ebcd13d44644be7c04c4ea6da5fdc44",
+      "remoteOutput": "9ee857b11ebcd13d44644be7c04c4ea6da5fdc44\trefs/heads/main",
+      "remoteExitCode": 0,
+      "matchesFinalObservation": true,
+      "currentHeadOnCanonical": true,
+      "ancestryExitCode": 0,
+      "ancestryStderr": ""
+    },
+    {
+      "repository": "../conversations",
+      "expectedCanonical": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3",
+      "remoteOutput": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3\trefs/heads/main",
+      "remoteExitCode": 0,
+      "matchesFinalObservation": true,
+      "currentHeadOnCanonical": true,
+      "ancestryExitCode": 0,
+      "ancestryStderr": ""
+    },
+    {
+      "repository": "../eventstore",
+      "expectedCanonical": "45ec9c43102b638478e6fb9374b06b1abd21af0a",
+      "remoteOutput": "45ec9c43102b638478e6fb9374b06b1abd21af0a\trefs/heads/main",
+      "remoteExitCode": 0,
+      "matchesFinalObservation": true,
+      "currentHeadOnCanonical": true,
+      "ancestryExitCode": 0,
+      "ancestryStderr": ""
+    }
+  ]
+}

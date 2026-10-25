@@ -1,0 +1,227 @@
+{
+  "schema": "story-5-4-static-verification/v2",
+  "observedAtUtc": "2026-10-25T20:57:25.483279+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "name": "accepted register unchanged",
+      "passed": true,
+      "detail": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2"
+    },
+    {
+      "name": "EXT-PARTIES-1 complete section preserved",
+      "passed": true,
+      "detail": "Includes all contract extensions and runtime bindings."
+    },
+    {
+      "name": "EXT-PARTIES-1 nine commitment fields retained",
+      "passed": true,
+      "detail": [
+        "AcceptedStatus",
+        "CompatibilityContractAndVerificationCommand",
+        "ConsumingStories",
+        "Owner",
+        "Repository",
+        "RequiredArtifact",
+        "RequiredEvidenceLevel",
+        "TargetIntegrationDate",
+        "TargetVersionOrCommit"
+      ]
+    },
+    {
+      "name": "EXT-CONV-AI-1 complete section preserved",
+      "passed": true,
+      "detail": "Includes all contract extensions and runtime bindings."
+    },
+    {
+      "name": "EXT-CONV-AI-1 nine commitment fields retained",
+      "passed": true,
+      "detail": [
+        "AcceptedStatus",
+        "CompatibilityContractAndVerificationCommand",
+        "ConsumingStories",
+        "Owner",
+        "Repository",
+        "RequiredArtifact",
+        "RequiredEvidenceLevel",
+        "TargetIntegrationDate",
+        "TargetVersionOrCommit"
+      ]
+    },
+    {
+      "name": "EXT-SECRETS-1 complete section preserved",
+      "passed": true,
+      "detail": "Includes all contract extensions and runtime bindings."
+    },
+    {
+      "name": "EXT-SECRETS-1 nine commitment fields retained",
+      "passed": true,
+      "detail": [
+        "AcceptedStatus",
+        "CompatibilityContractAndVerificationCommand",
+        "ConsumingStories",
+        "Owner",
+        "Repository",
+        "RequiredArtifact",
+        "RequiredEvidenceLevel",
+        "RuntimeQualificationBinding",
+        "TargetIntegrationDate",
+        "TargetVersionOrCommit"
+      ]
+    },
+    {
+      "name": "EXT-HOST-1 complete section preserved",
+      "passed": true,
+      "detail": "Includes all contract extensions and runtime bindings."
+    },
+    {
+      "name": "EXT-HOST-1 nine commitment fields retained",
+      "passed": true,
+      "detail": [
+        "AcceptedStatus",
+        "CompatibilityContractAndVerificationCommand",
+        "ConsumingStories",
+        "Owner",
+        "Repository",
+        "RequiredArtifact",
+        "RequiredEvidenceLevel",
+        "TargetIntegrationDate",
+        "TargetVersionOrCommit"
+      ]
+    },
+    {
+      "name": "EXT-PROTECTION-1 complete section preserved",
+      "passed": true,
+      "detail": "Includes all contract extensions and runtime bindings."
+    },
+    {
+      "name": "EXT-PROTECTION-1 nine commitment fields retained",
+      "passed": true,
+      "detail": [
+        "AcceptedStatus",
+        "CompatibilityContractAndVerificationCommand",
+        "ConsumingStories",
+        "Owner",
+        "Repository",
+        "RequiredArtifact",
+        "RequiredEvidenceLevel",
+        "TargetIntegrationDate",
+        "TargetVersionOrCommit"
+      ]
+    },
+    {
+      "name": "historical evidence and gate files unchanged",
+      "passed": true,
+      "detail": {
+        "files": 11045,
+        "drift": []
+      }
+    },
+    {
+      "name": "original October 18 attempts unchanged",
+      "passed": true,
+      "detail": {
+        "files": 44,
+        "drift": []
+      }
+    },
+    {
+      "name": "frozen intent unchanged",
+      "passed": true,
+      "detail": "Verbatim comparison with the invocation baseline."
+    },
+    {
+      "name": "custody stop direction unchanged",
+      "passed": true,
+      "detail": "No contract amendment, backend implementation restart or replacement date."
+    },
+    {
+      "name": "draft and blocked status retained",
+      "passed": true,
+      "detail": "No approval requested for incomplete deliveries."
+    },
+    {
+      "name": "inspected input observations agree",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "inspected public inputs unchanged",
+      "passed": true,
+      "detail": {
+        "uniquePaths": 208,
+        "hashedFiles": 193,
+        "drift": []
+      }
+    },
+    {
+      "name": "consolidated evidence manifest matches",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "no incomplete commitments submitted",
+      "passed": true,
+      "detail": "No replacement acceptance or availability advancement."
+    },
+    {
+      "name": "accepted fields match consolidated record",
+      "passed": true,
+      "detail": "All five records."
+    },
+    {
+      "name": "zero qualification and consumer execution",
+      "passed": true,
+      "detail": {
+        "ownerCommandsRun": 0,
+        "ownerCohortAttemptsReserved": 0,
+        "ownerCohortPhasesRun": 0,
+        "consumingAgentsPathsRun": 0,
+        "targetInstallations": 0,
+        "registerMutations": 0,
+        "journalMutations": 0,
+        "physicalExperiments": 0,
+        "story54BuildResumed": false
+      }
+    },
+    {
+      "name": "git diff --check",
+      "passed": true,
+      "detail": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "new and updated document links resolve",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "new and updated documents have no trailing whitespace",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "execution": {
+    "ownerCommandsRun": 0,
+    "ownerCohortAttemptsReserved": 0,
+    "ownerCohortPhasesRun": 0,
+    "consumingAgentsPathsRun": 0,
+    "targetInstallations": 0,
+    "registerMutations": 0,
+    "journalMutations": 0,
+    "physicalExperiments": 0,
+    "story54BuildResumed": false
+  },
+  "reconciliationSha256": "858883db062ed11fac0480fa8ac08858ccf13dd4418211ee48893f98a020aa4e",
+  "reportSha256": "0241f302cd5783f86bcde1d53e0ba3254f88e2553081437e8a749aa7f987d627",
+  "specSha256": "e9bfa38e8cd871825e128269fcfbf6892c45a4f2c0a390efebaa7b1894dbff8f",
+  "limitations": [
+    "Static public-file and source audit only; no owner compatibility command or application tests ran.",
+    "No remote installation survey or secret/credential retrieval.",
+    "Canonical source observations are timestamped in source inventories and owner reports.",
+    "Baseline excludes build outputs, .git, node_modules and symlinks; mutable binaries are reported separately."
+  ]
+}

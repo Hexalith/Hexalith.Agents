@@ -10,6 +10,7 @@ last_reconciled: '2026-10-25'
 context:
   - '_bmad-output/planning-artifacts/external-dependency-register.md'
   - '_bmad-output/implementation-artifacts/story-5-4-dependency-reconciliation-2026-10-25.md'
+  - '_bmad-output/implementation-artifacts/story-5-4-dependency-reconciliation-2026-10-25-resumed.md'
 ---
 
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
@@ -44,16 +45,17 @@ The user applied the [custody feasibility recommendation](../../../platform/docs
 ## Code Map
 
 - `external-dependency-register.md` in planning artifacts — complete contracts and OQ-5.4-1; preserve accepted bytes.
-- `story-5-4-dependency-reconciliation-2026-10-25.md` and `tests/story-5-4-reconciliation-2026-10-25/` — all fields, commands, source/installed hashes, blockers and preservation evidence. Earlier reports remain historical.
-- Sibling Platform `eng/ext-{secrets,host}-1/` — packet/hash semantics; joint Live runner and installations remain missing despite October 25 component delivery.
-- Sibling Parties `eng/verify-ext-parties-1.ps1` — uncommitted coordination, null date, refusal-only Live. Conversations October 22 packet remains NotSubmitted with absent installed manifest/trust/receiver.
-- Sibling EventStore `docs/implementation/ext-protection-1-delivery-2026-10-25.json` — BlockedNotSubmitted, G1–G7 open, proposed 2026-11-02 date.
+- `story-5-4-dependency-reconciliation-2026-10-25-resumed.md` and `tests/story-5-4-reconciliation-2026-10-25/resume-20261025T204744Z/` — current canonical source, all fields/dates/commands, installed-hash gaps and preservation evidence. Earlier reports remain historical.
+- Sibling Platform `eng/ext-{secrets,host}-1/` — joint runner and original locators now exist; 234 cases still have zero complete drivers, 50 missing owner returns and 12 null installed hashes.
+- Sibling Parties `eng/verify-ext-parties-1.ps1` — committed coordination, null date, refusal-only Live and fresh-directory guard. New Conversations October 25 detached packet remains NotSubmitted; installed manifest/trust/receiver are absent.
+- Sibling EventStore `docs/implementation/ext-protection-1-delivery-2026-10-25-resumed.json` — full field transcription repaired and single-target snapshots hardened; G1–G7 remain open, 2026-11-02 only proposed.
 - `spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md` and `eng/verify-story-5.4.ps1` — approved consumer work; resume after exact-target availability.
 
 ## Tasks & Acceptance
 
 **Execution:**
 - [x] `story-5-4-dependency-reconciliation-2026-10-25.md` and reports — reconcile current packets; zero complete replacements.
+- [x] `story-5-4-dependency-reconciliation-2026-10-25-resumed.md` — recheck newer returned packets and changing canonical source; zero complete replacements.
 - [ ] `_bmad-output/planning-artifacts/external-dependency-register.md` — apply only complete explicitly accepted replacements; preserve historical acceptance.
 - [ ] Owner checkout/configuration paths in the reports — install accepted exact targets and independently enrolled inputs.
 - [ ] Accepted attempt paths in the reports — run the ordered sequence once; retain commands, persisted outcomes and journals; advance only on complete passes.
@@ -67,6 +69,8 @@ The user applied the [custody feasibility recommendation](../../../platform/docs
 ## Implementation Notes
 
 2026-10-25: Static reconciliation completed. No intent gap; missing owner deliveries block readiness. Footprint: this spec and new reports. Irreversible qualification stays conditional on acceptance and installation. No runtime, installation, owner command or attempt ran. Retain draft and blocked status.
+
+2026-10-25 evening resume: Reconciled new Platform, Parties, Conversations and protection deliveries with fresh remote-main checks and actual public-file hashes. Canonical runner/locator source supersedes earlier absence findings; complete installed targets/dates/commands and independent trust remain missing. Preserve frozen intent, custody stop, accepted records, earlier reports and attempts. No intent gap; footprint remains this spec plus new audit artifacts. Qualification remains irreversible and gated; no incomplete commitment or spec approval is requested. Story 5.4 stays blocked pending Available records.
 
 ## Spec Change Log
 
