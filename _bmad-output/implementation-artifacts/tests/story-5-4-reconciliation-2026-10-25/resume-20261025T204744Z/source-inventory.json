@@ -1,0 +1,364 @@
+{
+  "observedAtUtc": "2026-10-25T20:48:24.033553+00:00",
+  "fetchPerformed": false,
+  "checkoutUpdates": 0,
+  "repositories": {
+    ".": {
+      "path": "/home/administrator/projects/hexalith/agents",
+      "head": {
+        "exitCode": 0,
+        "stdout": "35b8a042dfc4dfd7cbee7c77b7572b356471d8e0",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "35b8a042dfc4dfd7cbee7c77b7572b356471d8e0",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "?? _bmad-output/implementation-artifacts/tests/story-5-4-reconciliation-2026-10-25/resume-20261025T204744Z/",
+        "stderr": ""
+      },
+      "remotes": {
+        "exitCode": 0,
+        "stdout": "origin\thttps://github.com/Hexalith/Hexalith.Agents.git (fetch)\norigin\thttps://github.com/Hexalith/Hexalith.Agents.git (push)",
+        "stderr": ""
+      },
+      "worktrees": {
+        "exitCode": 0,
+        "stdout": "worktree /home/administrator/projects/hexalith/agents\nHEAD 35b8a042dfc4dfd7cbee7c77b7572b356471d8e0\nbranch refs/heads/main\n\nworktree /tmp/ext-secrets-1-owner-20261014/agents\nHEAD 866ec2d8273939a652ad66f54a90da3eed90e96c\ndetached\nprunable gitdir file points to non-existent location",
+        "stderr": ""
+      },
+      "headOnLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "../platform": {
+      "path": "/home/administrator/projects/hexalith/platform",
+      "head": {
+        "exitCode": 0,
+        "stdout": "460e1ca9699f5eaaaba82ce9d9788c06476f3f89",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "8d61addebff5bb2f0af81b3e373d2d31a3a774a2",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "M eng/ext-secrets-1/README.md\n M src/Hexalith.Platform.Protection/Fr34IndependentOriginalCollector.cs\n M src/Hexalith.Platform.Protection/Fr34OccurrenceProducer.cs\n M src/Hexalith.Platform.Protection/Fr34OwnerOperationHandler.cs\n M src/Hexalith.Platform.Protection/JointPhaseCommand.cs\n M src/Hexalith.Platform.Protection/JointPhaseCommandExecutable.cs\n M src/Hexalith.Platform.Secrets.Runtime/IQualificationOriginalStore.cs\n M src/Hexalith.Platform.Secrets.Runtime/InstalledQualificationOriginalStore.cs\n M tests/Hexalith.Platform.Protection.Tests/JointPhaseCommandTests.cs\n M tests/Hexalith.Platform.Protection.Tests/QualificationGuardSourceTests.cs\n M tests/Hexalith.Platform.Secrets.Runtime.Tests/IndependentOriginalIndexTests.cs\n M tests/Hexalith.Platform.Secrets.Runtime.Tests/QualificationFreshCohortReceivingTests.cs\n?? src/Hexalith.Platform.Protection/IFr34UnsealMeasurement.cs\n?? tests/Hexalith.Platform.Protection.Tests/Fr34DynamicOccurrenceTests.cs\n?? tests/Hexalith.Platform.Secrets.Runtime.Tests/AgentsOwningProcessRegistrationTests.cs",
+        "stderr": "warning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files"
+      },
+      "remotes": {
+        "exitCode": 0,
+        "stdout": "origin\thttps://github.com/Hexalith/Hexalith.Platform.git (fetch)\norigin\thttps://github.com/Hexalith/Hexalith.Platform.git (push)",
+        "stderr": ""
+      },
+      "worktrees": {
+        "exitCode": 0,
+        "stdout": "worktree /home/administrator/projects/hexalith/platform\nHEAD 460e1ca9699f5eaaaba82ce9d9788c06476f3f89\nbranch refs/heads/main",
+        "stderr": ""
+      },
+      "remoteMain": {
+        "exitCode": 0,
+        "stdout": "8d61addebff5bb2f0af81b3e373d2d31a3a774a2\trefs/heads/main",
+        "stderr": ""
+      },
+      "remoteObjectPresent": {
+        "exitCode": 0,
+        "stdout": "commit",
+        "stderr": ""
+      },
+      "headOnRemoteMain": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": ""
+      },
+      "headOnLocalOriginMain": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "../parties": {
+      "path": "/home/administrator/projects/hexalith/parties",
+      "head": {
+        "exitCode": 0,
+        "stdout": "9ee857b11ebcd13d44644be7c04c4ea6da5fdc44",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "9ee857b11ebcd13d44644be7c04c4ea6da5fdc44",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "remotes": {
+        "exitCode": 0,
+        "stdout": "origin\thttps://github.com/Hexalith/Hexalith.Parties.git (fetch)\norigin\thttps://github.com/Hexalith/Hexalith.Parties.git (push)",
+        "stderr": ""
+      },
+      "worktrees": {
+        "exitCode": 0,
+        "stdout": "worktree /home/administrator/projects/hexalith/parties\nHEAD 9ee857b11ebcd13d44644be7c04c4ea6da5fdc44\nbranch refs/heads/main\n\nworktree /tmp/mcpcli-413-qualified-jip0st1u/parties\nHEAD d83fec24167aafd4edfc4d2f7310d6a87a218a1c\nbranch refs/heads/fix/mcpcli-413-projection-outcomes-20261025",
+        "stderr": ""
+      },
+      "remoteMain": {
+        "exitCode": 0,
+        "stdout": "9ee857b11ebcd13d44644be7c04c4ea6da5fdc44\trefs/heads/main",
+        "stderr": ""
+      },
+      "remoteObjectPresent": {
+        "exitCode": 0,
+        "stdout": "commit",
+        "stderr": ""
+      },
+      "headOnRemoteMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "headOnLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "../conversations": {
+      "path": "/home/administrator/projects/hexalith/conversations",
+      "head": {
+        "exitCode": 0,
+        "stdout": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "M .gitattributes\n M _bmad-output/implementation-artifacts/spec-16-1-persist-tenant-access-projection-state-and-prove-convergence.md\n M _bmad-output/implementation-artifacts/spec-5-4-ext-conv-ai-1-installed-delivery.md\n M _bmad/scripts/generate_story_record.py\n M _bmad/scripts/tests/test_verify_epic_16_adoption_v2.py\n?? _bmad-output/implementation-artifacts/epic-16-prerequisite-implementation-handoff-2026-10-25.md\n?? _bmad-output/implementation-artifacts/spec-epic-16-prerequisite-implementation.md\n?? _bmad-output/implementation-artifacts/story-16-1-entry-investigation-2026-10-25.md\n?? _bmad-output/planning-artifacts/epic-16-tooling-v1/\n?? _bmad/schemas/epic-16-tooling-v1.schema.json\n?? _bmad/scripts/epic16_domain.py\n?? _bmad/scripts/epic16_faults.py\n?? _bmad/scripts/epic16_measurements.py\n?? _bmad/scripts/epic16_native.py\n?? _bmad/scripts/epic16_native_helper/\n?? _bmad/scripts/epic16_relationships.py\n?? _bmad/scripts/epic16_tooling.py\n?? _bmad/scripts/epic16_trust.py\n?? _bmad/scripts/tests/fixtures/epic16-adoption-v2-generator.py.gz\n?? _bmad/scripts/tests/fixtures/epic16-adoption-v2-gitattributes.txt\n?? _bmad/scripts/tests/fixtures/epic16-contract-wire-goldens.json\n?? _bmad/scripts/tests/fixtures/epic16-contract-wire-provenance.json\n?? _bmad/scripts/tests/fixtures/epic16-domain-sources-LICENSE.txt\n?? _bmad/scripts/tests/fixtures/epic16-domain-sources.json\n?? _bmad/scripts/tests/fixtures/epic16-observations-v1.json\n?? _bmad/scripts/tests/fixtures/epic16-protocol-goldens.json\n?? _bmad/scripts/tests/test_epic16_tooling.py\n?? _bmad/scripts/verify_story_16_1.py\n?? _bmad/scripts/verify_story_16_2.py\n?? _bmad/scripts/verify_story_16_3.py\n?? module/validation/epic-16-prerequisite-implementation/",
+        "stderr": ""
+      },
+      "remotes": {
+        "exitCode": 0,
+        "stdout": "origin\thttps://github.com/Hexalith/Hexalith.Conversations.git (fetch)\norigin\thttps://github.com/Hexalith/Hexalith.Conversations.git (push)",
+        "stderr": ""
+      },
+      "worktrees": {
+        "exitCode": 0,
+        "stdout": "worktree /home/administrator/projects/hexalith/conversations\nHEAD 8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3\nbranch refs/heads/main",
+        "stderr": ""
+      },
+      "remoteMain": {
+        "exitCode": 0,
+        "stdout": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3\trefs/heads/main",
+        "stderr": ""
+      },
+      "remoteObjectPresent": {
+        "exitCode": 0,
+        "stdout": "commit",
+        "stderr": ""
+      },
+      "headOnRemoteMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "headOnLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "../eventstore": {
+      "path": "/home/administrator/projects/hexalith/eventstore",
+      "head": {
+        "exitCode": 0,
+        "stdout": "9580c08444a774d03381b3479d464d885c10f2e9",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "1b404e7fbcdbb5604418f04025d16756436cec24",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "remotes": {
+        "exitCode": 0,
+        "stdout": "origin\thttps://github.com/Hexalith/Hexalith.EventStore.git (fetch)\norigin\thttps://github.com/Hexalith/Hexalith.EventStore.git (push)",
+        "stderr": ""
+      },
+      "worktrees": {
+        "exitCode": 0,
+        "stdout": "worktree /home/administrator/projects/hexalith/eventstore\nHEAD 9580c08444a774d03381b3479d464d885c10f2e9\nbranch refs/heads/main",
+        "stderr": ""
+      },
+      "remoteMain": {
+        "exitCode": 0,
+        "stdout": "1b404e7fbcdbb5604418f04025d16756436cec24\trefs/heads/main",
+        "stderr": ""
+      },
+      "remoteObjectPresent": {
+        "exitCode": 0,
+        "stdout": "commit",
+        "stderr": ""
+      },
+      "headOnRemoteMain": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": ""
+      },
+      "headOnLocalOriginMain": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "references/Hexalith.Platform": {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform",
+      "head": {
+        "exitCode": 0,
+        "stdout": "90f33a59164d0dcfc21fb688f28651afa4d3df4b",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "7c56ad6352a74edec62450668e106ec8d6011e40",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "remotes": {
+        "exitCode": 0,
+        "stdout": "origin\thttps://github.com/Hexalith/Hexalith.Platform.git (fetch)\norigin\thttps://github.com/Hexalith/Hexalith.Platform.git (push)",
+        "stderr": ""
+      },
+      "worktrees": {
+        "exitCode": 0,
+        "stdout": "worktree /home/administrator/projects/hexalith/agents/.git/modules/Hexalith.Platform\nHEAD 90f33a59164d0dcfc21fb688f28651afa4d3df4b\nbranch refs/heads/main",
+        "stderr": ""
+      },
+      "headOnLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "references/Hexalith.Parties": {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties",
+      "head": {
+        "exitCode": 0,
+        "stdout": "9c116910f9d712b82ae27ceb1946605d76c8a451",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "9c116910f9d712b82ae27ceb1946605d76c8a451",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "remotes": {
+        "exitCode": 0,
+        "stdout": "origin\thttps://github.com/Hexalith/Hexalith.Parties.git (fetch)\norigin\thttps://github.com/Hexalith/Hexalith.Parties.git (push)",
+        "stderr": ""
+      },
+      "worktrees": {
+        "exitCode": 0,
+        "stdout": "worktree /home/administrator/projects/hexalith/agents/.git/modules/Hexalith.Parties\nHEAD 9c116910f9d712b82ae27ceb1946605d76c8a451\nbranch refs/heads/main",
+        "stderr": ""
+      },
+      "headOnLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "references/Hexalith.Conversations": {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations",
+      "head": {
+        "exitCode": 0,
+        "stdout": "8444207001d6ad3cd197c2ffba519317effa8b37",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "8444207001d6ad3cd197c2ffba519317effa8b37",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "remotes": {
+        "exitCode": 0,
+        "stdout": "origin\thttps://github.com/Hexalith/Hexalith.Conversations.git (fetch)\norigin\thttps://github.com/Hexalith/Hexalith.Conversations.git (push)",
+        "stderr": ""
+      },
+      "worktrees": {
+        "exitCode": 0,
+        "stdout": "worktree /home/administrator/projects/hexalith/agents/.git/modules/Hexalith.Conversations\nHEAD 8444207001d6ad3cd197c2ffba519317effa8b37\nbranch refs/heads/main",
+        "stderr": ""
+      },
+      "headOnLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "references/Hexalith.EventStore": {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+      "head": {
+        "exitCode": 0,
+        "stdout": "4e91e552be41bfba984d67d68335e6b1709917b5",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "c5d1c280d8c1c1a207cd159d817f614e93c93130",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "remotes": {
+        "exitCode": 0,
+        "stdout": "origin\thttps://github.com/Hexalith/Hexalith.EventStore.git (fetch)\norigin\thttps://github.com/Hexalith/Hexalith.EventStore.git (push)",
+        "stderr": ""
+      },
+      "worktrees": {
+        "exitCode": 0,
+        "stdout": "worktree /home/administrator/projects/hexalith/agents/.git/modules/Hexalith.EventStore\nHEAD 4e91e552be41bfba984d67d68335e6b1709917b5\nbranch refs/heads/main",
+        "stderr": ""
+      },
+      "headOnLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    }
+  }
+}

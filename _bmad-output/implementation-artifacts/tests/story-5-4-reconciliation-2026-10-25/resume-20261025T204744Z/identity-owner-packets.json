@@ -1,0 +1,2925 @@
+{
+  "schemaVersion": 2,
+  "observedAtUtc": "2026-10-25T20:50:22.334040+00:00",
+  "kind": "StaticIdentityPacketReconciliation",
+  "completeChangedCommitments": 0,
+  "acceptedRegister": {
+    "path": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/external-dependency-register.md",
+    "sha256": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2"
+  },
+  "acceptedRecords": {
+    "EXT-PARTIES-1": {
+      "fields": {
+        "Owner": "Project owner (user declaration 2026-10-07), acting as Parties Maintainer",
+        "Repository": "`Hexalith.Parties`",
+        "RequiredArtifact": "Selected V1 branch: **Branch B**. **Branch A:** a public AI Party type and an authorization contract permitting only the Agents Service Principal to create `hexa`'s deterministic provisioned Party under that type. **Branch B:** Parties Maintainer and Product formally accept the existing Organization-typed provisioned Party as the V1 launch contract, verified everywhere by its immutable deterministic id and never by type. Both branches require create-only AD-2 provisioning, idempotent exact retries, typed conflict for divergent identity/type requests, mandatory tenant scope, no tenant-role creation or replacement, and no Party PII in public results. The record must name the selected branch; absence of that decision is `Uncommitted`. Independently of the selected identity branch, Parties exposes a tenant-scoped authoritative resolution by `PartyId` returning stable Party classification (`Human`, `Organization`, or `AI`), active/liveness state, evidence position and observed instant, plus typed missing, ambiguous, stale, denied, and unavailable outcomes. For every human Party, the same seam also returns one stable non-PII `AuthenticatedHumanActorId`, `HumanActorBindingVersion`, validity interval, and queryable binding history sufficient to reproduce the identity in force at an action; it returns typed missing, ambiguous, stale, and overlapping-history outcomes. AD-8 uses both classification and binding at predefined-approver configuration and every runtime approver resolution; non-human Parties can never be Approvers, and a human command carrying a Party must bind to the same authenticated actor id.",
+        "TargetVersionOrCommit": "`56cb4401c4179d431385ad3d931fefa402e4fc5a`",
+        "TargetIntegrationDate": "`2026-10-08`",
+        "CompatibilityContractAndVerificationCommand": "Contract: for the selected branch, create and resolve exactly one deterministic tenant-scoped provisioned Party for `hexa` under the Agents Service Principal; verify immutable identity by id on every path and additionally verify AI type only for Branch A; reject tenant-role creation, cross-tenant access, divergent replay, and replacement; return typed safe outcomes without Party PII; resolve approver candidates to fresh authoritative human-type and active/liveness evidence; resolve each human Party to its stable `AuthenticatedHumanActorId` and binding version; reproduce the binding in force for a historical instant; and reject missing, stale, ambiguous, overlapping, or actor-mismatched bindings with typed fail-closed outcomes. Command: `test \"$(git -C ../parties rev-parse HEAD)\" = \"56cb4401c4179d431385ad3d931fefa402e4fc5a\" && test -z \"$(git -C ../parties status --porcelain)\" && pwsh -NoProfile -File ../parties/eng/verify-ext-parties-1.ps1 -Mode Live -EventStoreRoot ../eventstore -PlatformRoot ../platform -EvidenceDirectory /tmp/ext-parties-1-live`.",
+        "RequiredEvidenceLevel": "Levels 4 and 5",
+        "AcceptedStatus": "`Committed`",
+        "ConsumingStories": "`RQ-1`; Stories 5.2, 5.4, 5.5, 6.1, 6.6, 7.1–7.5, 8.1–8.4, and 8.8 directly or conditionally consume identity or human Party/liveness/binding evidence. Story 6.1 directly verifies the caller and provisioned Agent Party and executes FR-8 membership step 10; Story 5.5's consumption remains conditional on the Product-selected recorder scope; Story 8.4 consumes the Release-Operator review branch. Branch-B-compatible identity-by-id portions may be developed where applicable, but no consumer may cite that work or any human actor-binding seam as launch evidence while this record is `Uncommitted`"
+      },
+      "completeSection": "### EXT-PARTIES-1 — Agent Party Identity Contract\n\n| Commitment field | Value |\n| --- | --- |\n| `Owner` | Project owner (user declaration 2026-10-07), acting as Parties Maintainer |\n| `Repository` | `Hexalith.Parties` |\n| `RequiredArtifact` | Selected V1 branch: **Branch B**. **Branch A:** a public AI Party type and an authorization contract permitting only the Agents Service Principal to create `hexa`'s deterministic provisioned Party under that type. **Branch B:** Parties Maintainer and Product formally accept the existing Organization-typed provisioned Party as the V1 launch contract, verified everywhere by its immutable deterministic id and never by type. Both branches require create-only AD-2 provisioning, idempotent exact retries, typed conflict for divergent identity/type requests, mandatory tenant scope, no tenant-role creation or replacement, and no Party PII in public results. The record must name the selected branch; absence of that decision is `Uncommitted`. Independently of the selected identity branch, Parties exposes a tenant-scoped authoritative resolution by `PartyId` returning stable Party classification (`Human`, `Organization`, or `AI`), active/liveness state, evidence position and observed instant, plus typed missing, ambiguous, stale, denied, and unavailable outcomes. For every human Party, the same seam also returns one stable non-PII `AuthenticatedHumanActorId`, `HumanActorBindingVersion`, validity interval, and queryable binding history sufficient to reproduce the identity in force at an action; it returns typed missing, ambiguous, stale, and overlapping-history outcomes. AD-8 uses both classification and binding at predefined-approver configuration and every runtime approver resolution; non-human Parties can never be Approvers, and a human command carrying a Party must bind to the same authenticated actor id. |\n| `TargetVersionOrCommit` | `56cb4401c4179d431385ad3d931fefa402e4fc5a` |\n| `TargetIntegrationDate` | `2026-10-08` |\n| `CompatibilityContractAndVerificationCommand` | Contract: for the selected branch, create and resolve exactly one deterministic tenant-scoped provisioned Party for `hexa` under the Agents Service Principal; verify immutable identity by id on every path and additionally verify AI type only for Branch A; reject tenant-role creation, cross-tenant access, divergent replay, and replacement; return typed safe outcomes without Party PII; resolve approver candidates to fresh authoritative human-type and active/liveness evidence; resolve each human Party to its stable `AuthenticatedHumanActorId` and binding version; reproduce the binding in force for a historical instant; and reject missing, stale, ambiguous, overlapping, or actor-mismatched bindings with typed fail-closed outcomes. Command: `test \"$(git -C ../parties rev-parse HEAD)\" = \"56cb4401c4179d431385ad3d931fefa402e4fc5a\" && test -z \"$(git -C ../parties status --porcelain)\" && pwsh -NoProfile -File ../parties/eng/verify-ext-parties-1.ps1 -Mode Live -EventStoreRoot ../eventstore -PlatformRoot ../platform -EvidenceDirectory /tmp/ext-parties-1-live`. |\n| `RequiredEvidenceLevel` | Levels 4 and 5 |\n| `AcceptedStatus` | `Committed` |\n| `ConsumingStories` | `RQ-1`; Stories 5.2, 5.4, 5.5, 6.1, 6.6, 7.1–7.5, 8.1–8.4, and 8.8 directly or conditionally consume identity or human Party/liveness/binding evidence. Story 6.1 directly verifies the caller and provisioned Agent Party and executes FR-8 membership step 10; Story 5.5's consumption remains conditional on the Product-selected recorder scope; Story 8.4 consumes the Release-Operator review branch. Branch-B-compatible identity-by-id portions may be developed where applicable, but no consumer may cite that work or any human actor-binding seam as launch evidence while this record is `Uncommitted` |\n\n*Added 2026-09-12 to land the dependency requested by PRD A-27. Its branch, immutable target, date, and verification command remain incomplete, so `RQ-1` stays blocked; adding the record does not retire A-27 or turn transitional development behavior into launch evidence.*\n\n*Implementation direction 2026-09-27: the user selected **Branch B** after reviewing the Parties-first implementation proposal. Owner work should preserve the existing Organization-typed `hexa` Party and prove identity everywhere by its immutable tenant-scoped ID. This direction does not establish formal Product or Parties Maintainer acceptance of the complete Branch B launch contract. The immutable target, integration date and executable command remain `TBD`; `AcceptedStatus` remains `Uncommitted`, and no consumer may execute the seam or cite this direction as launch evidence.*\n\n*Owner declaration 2026-10-07: the project owner authorized this complete delivery scope. [Owner commitment packet](../implementation-artifacts/story-5-4-owner-commitments-2026-10-07.md) records accountability and repository selection; Branch B remains the selected Party contract. Immutable target, integration date and complete executable compatibility command remain unresolved; this is not a complete Committed or Available record.*\n\n",
+      "sectionSha256": "33404972f940086e5e35a8149fbf220b7c75a192afa6c1d1a576f4fc5a61ee39"
+    },
+    "EXT-CONV-AI-1": {
+      "fields": {
+        "Owner": "Project owner (user declaration 2026-10-07), acting as Conversations Maintainer",
+        "Repository": "`Hexalith.Conversations`",
+        "RequiredArtifact": "Six core V1 seams. (1) Membership: public `IConversationClient.AddParticipantAsync` and `POST /api/v1/conversations/{conversationId}/participants`, limited for Agents to stable AI Party identity, `ParticipantType.AiAgent`, and `ParticipantRole.Member`; exact retries are idempotent no-ops, conflicting type/role is a typed conflict, and cross-tenant or general participant management is denied; plus a participant-state read for the AI participant and a participant removal limited to the AI participant for the PRD FR-2 removal block. Before accepting membership, Conversations verifies the immutable provisioned Party by id and additionally verifies AI type only when `EXT-PARTIES-1` commits Branch A; Branch B accepts its approved Organization type by id; the record owner supplies the final member and typed failure names (A-21). (2) Posting: append a Conversation Message as the `AiAgent` participant with an Agents-supplied deterministic `MessageId` and idempotency key, persisted verbatim or rejected (a differing returned id is a typed incompatibility that blocks posting), and message metadata carrying the Agent Call trace reference and provenance flags (AI-generated; human-edited and by which Party), so restart or replay cannot duplicate a post; plus an existence read by `MessageId` returning the message, typed absence, typed `ConversationDeleted`, typed `PrincipalRemovedFromConversation`, or unavailable, so Agents can check before retry or abandonment after a lost acknowledgement and record `LateConfirmed` rather than contradict an already-posted message. (3) Facilitator resolution: `ParticipantRole.Facilitator` on the participant read model. (4) The Eligible Conversation denominator is supplied either as an active-Conversation count per tenant/window or as a Conversations-side tenant event feed from which Agents computes the same count, never from Agent Calls (A-4). (5) Tenant-scoped reads under the Agents Service Principal of complete Conversation content, the Participant roster with roles, and Conversation existence/accessibility; they return typed `ConversationDeleted` and `PrincipalRemovedFromConversation` distinctly from transient denial or error, and content contains the messages a Participant would currently see, including current edit/delete state (A-15). (6) A Conversations-owned durable outbox or ordered tenant/source feed entry created atomically with the approved Conversation-deletion decision. It carries one immutable `ConversationDeletionSignalId` bound one-to-one to that logical approval, `TenantId`, `ConversationId`, stable source stream/revision, approval reference, source-contract version, and an independent delivery-attempt id. Reconnect/backfill is ordered from a durable checkpoint; the source retains and retries the same logical entry through Agents outage, typed refusal, target-version rollover, and lost acknowledgement until authenticated `DeletionSignalAccepted(SignalId, SourceRevision, ProtectedDeletionRevision)` advances the checkpoint. Retransmission never mints a new signal id/source revision; changed fields at the same id are a quarantined compatibility conflict that is not skipped or acknowledged, blocks seam readiness, and exposes only safe poison metadata. Source-revision and Agents acknowledgement lookup resolve both sides of lost delivery. The authenticated source identity and exact target are verified before Agents dispatch; the signal triggers PRD FR-30 deletion of derived Agent content and never grants a human Agents role, local cancellation authority, or scope beyond that source Conversation. Final member and typed failure names are owned by this record (PRD §8.1 assumptions A-1 through A-4, A-15, A-16, A-21).",
+        "TargetVersionOrCommit": "`87e8b4a6ec3224b20a560b0e83de857805925572`",
+        "TargetIntegrationDate": "`2026-10-08`",
+        "CompatibilityContractAndVerificationCommand": "Contract: typed idempotent membership with participant-state read, AI-participant removal, and Hexalith.Parties identity-by-id verification plus AI-type verification only under committed Branch A; idempotent posting with trace/provenance metadata and a typed `MessageId` existence read covering message, absence, deletion, principal removal, and unavailable; Facilitator role exposure; active-Conversation count or equivalent Conversations-side tenant event feed; tenant-scoped current content/roster/existence/accessibility reads that distinguish deletion/removal from transient denial/error; and atomic durable approved-deletion outbox/feed delivery with stable logical signal/source revision, ordered checkpoint/backfill, retry until authenticated Agents acknowledgement, target-version rollover, conflict quarantine/no-skip, acknowledgement/source lookup, local-cancellation denial, and focused cross-tenant denial. During owner qualification the receiver role is filled per accepted cohort `OQ-5.4-1` item 1. Command: `test \"$(git -C ../conversations rev-parse HEAD)\" = \"87e8b4a6ec3224b20a560b0e83de857805925572\" && test -z \"$(git -C ../conversations status --porcelain)\" && pwsh -NoProfile -File ../conversations/eng/verify-ext-conv-ai-1.ps1 -Mode Live -LiveManifest /home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/live-manifest.json -ArtifactsPath /tmp/ext-conv-ai-1-live`",
+        "RequiredEvidenceLevel": "Levels 4 and 5",
+        "AcceptedStatus": "`Committed`",
+        "ConsumingStories": "5.4, 6.1, 6.2, 6.3, 6.6, 6.8, 7.1–7.5, 7.7, 8.3, 8.5, 8.8; `RQ-1`"
+      },
+      "completeSection": "### EXT-CONV-AI-1 — Conversations AI Membership And Posting\n\n| Commitment field | Value |\n| --- | --- |\n| `Owner` | Project owner (user declaration 2026-10-07), acting as Conversations Maintainer |\n| `Repository` | `Hexalith.Conversations` |\n| `RequiredArtifact` | Six core V1 seams. (1) Membership: public `IConversationClient.AddParticipantAsync` and `POST /api/v1/conversations/{conversationId}/participants`, limited for Agents to stable AI Party identity, `ParticipantType.AiAgent`, and `ParticipantRole.Member`; exact retries are idempotent no-ops, conflicting type/role is a typed conflict, and cross-tenant or general participant management is denied; plus a participant-state read for the AI participant and a participant removal limited to the AI participant for the PRD FR-2 removal block. Before accepting membership, Conversations verifies the immutable provisioned Party by id and additionally verifies AI type only when `EXT-PARTIES-1` commits Branch A; Branch B accepts its approved Organization type by id; the record owner supplies the final member and typed failure names (A-21). (2) Posting: append a Conversation Message as the `AiAgent` participant with an Agents-supplied deterministic `MessageId` and idempotency key, persisted verbatim or rejected (a differing returned id is a typed incompatibility that blocks posting), and message metadata carrying the Agent Call trace reference and provenance flags (AI-generated; human-edited and by which Party), so restart or replay cannot duplicate a post; plus an existence read by `MessageId` returning the message, typed absence, typed `ConversationDeleted`, typed `PrincipalRemovedFromConversation`, or unavailable, so Agents can check before retry or abandonment after a lost acknowledgement and record `LateConfirmed` rather than contradict an already-posted message. (3) Facilitator resolution: `ParticipantRole.Facilitator` on the participant read model. (4) The Eligible Conversation denominator is supplied either as an active-Conversation count per tenant/window or as a Conversations-side tenant event feed from which Agents computes the same count, never from Agent Calls (A-4). (5) Tenant-scoped reads under the Agents Service Principal of complete Conversation content, the Participant roster with roles, and Conversation existence/accessibility; they return typed `ConversationDeleted` and `PrincipalRemovedFromConversation` distinctly from transient denial or error, and content contains the messages a Participant would currently see, including current edit/delete state (A-15). (6) A Conversations-owned durable outbox or ordered tenant/source feed entry created atomically with the approved Conversation-deletion decision. It carries one immutable `ConversationDeletionSignalId` bound one-to-one to that logical approval, `TenantId`, `ConversationId`, stable source stream/revision, approval reference, source-contract version, and an independent delivery-attempt id. Reconnect/backfill is ordered from a durable checkpoint; the source retains and retries the same logical entry through Agents outage, typed refusal, target-version rollover, and lost acknowledgement until authenticated `DeletionSignalAccepted(SignalId, SourceRevision, ProtectedDeletionRevision)` advances the checkpoint. Retransmission never mints a new signal id/source revision; changed fields at the same id are a quarantined compatibility conflict that is not skipped or acknowledged, blocks seam readiness, and exposes only safe poison metadata. Source-revision and Agents acknowledgement lookup resolve both sides of lost delivery. The authenticated source identity and exact target are verified before Agents dispatch; the signal triggers PRD FR-30 deletion of derived Agent content and never grants a human Agents role, local cancellation authority, or scope beyond that source Conversation. Final member and typed failure names are owned by this record (PRD §8.1 assumptions A-1 through A-4, A-15, A-16, A-21). |\n| `TargetVersionOrCommit` | `87e8b4a6ec3224b20a560b0e83de857805925572` |\n| `TargetIntegrationDate` | `2026-10-08` |\n| `CompatibilityContractAndVerificationCommand` | Contract: typed idempotent membership with participant-state read, AI-participant removal, and Hexalith.Parties identity-by-id verification plus AI-type verification only under committed Branch A; idempotent posting with trace/provenance metadata and a typed `MessageId` existence read covering message, absence, deletion, principal removal, and unavailable; Facilitator role exposure; active-Conversation count or equivalent Conversations-side tenant event feed; tenant-scoped current content/roster/existence/accessibility reads that distinguish deletion/removal from transient denial/error; and atomic durable approved-deletion outbox/feed delivery with stable logical signal/source revision, ordered checkpoint/backfill, retry until authenticated Agents acknowledgement, target-version rollover, conflict quarantine/no-skip, acknowledgement/source lookup, local-cancellation denial, and focused cross-tenant denial. During owner qualification the receiver role is filled per accepted cohort `OQ-5.4-1` item 1. Command: `test \"$(git -C ../conversations rev-parse HEAD)\" = \"87e8b4a6ec3224b20a560b0e83de857805925572\" && test -z \"$(git -C ../conversations status --porcelain)\" && pwsh -NoProfile -File ../conversations/eng/verify-ext-conv-ai-1.ps1 -Mode Live -LiveManifest /home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/live-manifest.json -ArtifactsPath /tmp/ext-conv-ai-1-live` |\n| `RequiredEvidenceLevel` | Levels 4 and 5 |\n| `AcceptedStatus` | `Committed` |\n| `ConsumingStories` | 5.4, 6.1, 6.2, 6.3, 6.6, 6.8, 7.1–7.5, 7.7, 8.3, 8.5, 8.8; `RQ-1` |\n\n*Scope extended 2026-09-09 by the PRD validation reconciliation and follow-through proposal: the posting existence read, Facilitator resolution, active-count/event-feed denominator, and tenant-scoped content/roster/existence/accessibility consumers are explicit. Story 8.3 was added as the delivery owner for seam 6 Conversation-deletion propagation on 2026-09-12. The record was already `Uncommitted`; the extension changes no status and blocks every newly listed consumer from `ready-for-dev` until accepted.*\n\n*Deletion-delivery clarification 2026-09-12: seam 6 now requires source-atomic durable publication, stable logical identity, ordered backfill, retry through typed refusal/outage, authenticated Agents acknowledgement, and poison-entry blocking. These are reliability mechanics for the already-required A-16 trigger, not a new Product deletion or cancellation choice. The record remains `Uncommitted` until its owner accepts all fields.*\n\n*Core-scope correction 2026-09-12: the optional PRD-requested message-retraction signal moved to `EXT-CONV-RETRACTION-1`, so its unresolved status cannot block commitment of these six core seams. This record remains `Uncommitted` on its own incomplete fields.*\n\n*Party-type compatibility correction 2026-09-12: every membership check always verifies the immutable provisioned Party by id. AI-type verification applies only when `EXT-PARTIES-1` selects Branch A and is `Available`; under Branch B the Product/Parties-approved Organization-typed identity remains valid by id and must not be rejected or replaced on type alone. An `Uncommitted` record supports no launch execution under either branch.*\n\n*Owner declaration 2026-10-07: the project owner authorized this complete delivery scope. [Owner commitment packet](../implementation-artifacts/story-5-4-owner-commitments-2026-10-07.md) records accountability and repository selection. Immutable target, integration date and complete executable compatibility command remain unresolved; this is not a complete Committed or Available record.*\n\n",
+      "sectionSha256": "ea560dcab81a852dc8a44eb2f545a0505cdf8aaadcdfe0dc6091c794805811c8"
+    }
+  },
+  "fieldReconciliation": {
+    "Owner": {
+      "parties": "Accepted accountable project owner unchanged; no new installed operator/authority enrollment.",
+      "conversations": "Accepted accountable project owner unchanged; no new installed operator/authority enrollment."
+    },
+    "Repository": {
+      "parties": "Hexalith.Parties matches; sibling canonical source and Agents reference are separate checkouts.",
+      "conversations": "Hexalith.Conversations matches; sibling canonical source and Agents reference are separate checkouts."
+    },
+    "RequiredArtifact": {
+      "parties": "Full Branch B identity, authoritative liveness, human actor binding and 365-day original-unit history scope retained; local P-01-P-10 cannot satisfy production custody.",
+      "conversations": "All six seams and C1-C4 retained, including durable approved deletion and independent contract-conformance receiver; no subset acceptance."
+    },
+    "TargetVersionOrCommit": {
+      "parties": "Packet still preserves accepted 56cb4401c4179d431385ad3d931fefa402e4fc5a; old coordination pin is not current canonical delivery. Packet is now committed but no complete replacement target is offered.",
+      "conversations": "October 25 packet candidate ed53473ea4c67aa10ffc46c9b951d9864fe263d4 is canonical ancestry; replacement target and completeReviewedImmutableTarget remain null. Current sibling is newer."
+    },
+    "TargetIntegrationDate": {
+      "parties": "Null; accepted 2026-10-08 remains historical/missed. Proposed 2026-11-13 feasibility and 2026-12-14 integration are superseded by stop direction, not active commitments.",
+      "conversations": "Packet repeats historical/missed 2026-10-08. New installed-delivery draft directs 2026-10-25 only if a complete packet is sealed that UTC date; no such sealed packet exists, so no changed date is submitted."
+    },
+    "CompatibilityContractAndVerificationCommand": {
+      "parties": "Accepted complete contract and historical exact command preserved. Candidate command is executable refusal only; current fresh-directory guard would refuse its already-existing output path. No production P-01-P-10 pass path or installed-hash binding.",
+      "conversations": "Replacement exact command null, manifest/artifacts operands null. Current verifier guards committed exact target and twelve input hashes/manifest via RuntimeQualificationBinding; no complete accepted binding or installed bytes exists."
+    },
+    "RequiredEvidenceLevel": {
+      "parties": "Levels 4 and 5 retained. Exact-target installed Level 4 required for Available; local test custody is insufficient.",
+      "conversations": "Levels 4 and 5 retained. Receiver is ContractConformance Level 4 only; Story 8.3/RQ-1 Level 5 deferred. Source/build closure is not installed Level 4."
+    },
+    "AcceptedStatus": {
+      "parties": "Accepted register remains Committed unavailable; proposed packet is explicitly unaccepted/unavailable.",
+      "conversations": "Accepted register remains Committed unavailable; packet NotSubmitted explicitly incomplete/unaccepted/unavailable."
+    },
+    "ConsumingStories": {
+      "parties": "Complete accepted list and conditional consumption retained verbatim in acceptedRecords; no consumer gate relaxed.",
+      "conversations": "Complete accepted list retained verbatim in acceptedRecords, including RQ-1; no consumer gate relaxed."
+    }
+  },
+  "repositories": {
+    "/home/administrator/projects/hexalith/parties": {
+      "head": {
+        "exitCode": 0,
+        "stdout": "9ee857b11ebcd13d44644be7c04c4ea6da5fdc44",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "9ee857b11ebcd13d44644be7c04c4ea6da5fdc44",
+        "stderr": ""
+      },
+      "onLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "/home/administrator/projects/hexalith/conversations": {
+      "head": {
+        "exitCode": 0,
+        "stdout": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3",
+        "stderr": ""
+      },
+      "onLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "M _bmad-output/implementation-artifacts/spec-16-1-persist-tenant-access-projection-state-and-prove-convergence.md\n M _bmad-output/implementation-artifacts/spec-5-4-ext-conv-ai-1-installed-delivery.md\n?? _bmad-output/implementation-artifacts/epic-16-prerequisite-implementation-handoff-2026-10-25.md\n?? _bmad-output/implementation-artifacts/spec-epic-16-prerequisite-implementation.md\n?? _bmad-output/implementation-artifacts/story-16-1-entry-investigation-2026-10-25.md\n?? module/validation/epic-16-prerequisite-implementation/",
+        "stderr": ""
+      }
+    },
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties": {
+      "head": {
+        "exitCode": 0,
+        "stdout": "9c116910f9d712b82ae27ceb1946605d76c8a451",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "9c116910f9d712b82ae27ceb1946605d76c8a451",
+        "stderr": ""
+      },
+      "onLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations": {
+      "head": {
+        "exitCode": 0,
+        "stdout": "8444207001d6ad3cd197c2ffba519317effa8b37",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "8444207001d6ad3cd197c2ffba519317effa8b37",
+        "stderr": ""
+      },
+      "onLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    }
+  },
+  "parties": {
+    "packetPath": "/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/tests/ext-parties-1-owner-delivery-2026-10-25/replacement-acceptance-packet.json",
+    "packetSha256": "5e1a89ff07f7663d603c27737b9242320c305b6595f4096cc4c96f29d851e3ea",
+    "packet": {
+      "schemaVersion": 1,
+      "recordId": "EXT-PARTIES-1",
+      "preparedAtUtc": "2026-10-25T10:50:00Z",
+      "disposition": "proposed-coordination",
+      "accepted": false,
+      "available": false,
+      "liveQualified": false,
+      "localPersistedEvidenceIsAvailable": false,
+      "registerTargetNotReplaced": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+      "registerFields": {
+        "Owner": "Project owner (user declaration 2026-10-07), acting as Parties Maintainer",
+        "Repository": "Hexalith.Parties",
+        "RequiredArtifact": "Selected V1 branch: Branch B. Branch A: a public AI Party type and an authorization contract permitting only the Agents Service Principal to create hexa's deterministic provisioned Party under that type. Branch B: Parties Maintainer and Product formally accept the existing Organization-typed provisioned Party as the V1 launch contract, verified everywhere by its immutable deterministic id and never by type. Both branches require create-only AD-2 provisioning, idempotent exact retries, typed conflict for divergent identity/type requests, mandatory tenant scope, no tenant-role creation or replacement, and no Party PII in public results. The record must name the selected branch; absence of that decision is Uncommitted. Independently of the selected identity branch, Parties exposes a tenant-scoped authoritative resolution by PartyId returning stable Party classification (Human, Organization, or AI), active/liveness state, evidence position and observed instant, plus typed missing, ambiguous, stale, denied, and unavailable outcomes. For every human Party, the same seam also returns one stable non-PII AuthenticatedHumanActorId, HumanActorBindingVersion, validity interval, and queryable binding history sufficient to reproduce the identity in force at an action; it returns typed missing, ambiguous, stale, and overlapping-history outcomes. AD-8 uses both classification and binding at predefined-approver configuration and every runtime approver resolution; non-human Parties can never be Approvers, and a human command carrying a Party must bind to the same authenticated actor id.",
+        "TargetVersionOrCommit": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+        "TargetIntegrationDate": null,
+        "CompatibilityContractAndVerificationCommand": "Contract: for the selected branch, create and resolve exactly one deterministic tenant-scoped provisioned Party for hexa under the Agents Service Principal; verify immutable identity by id on every path and additionally verify AI type only for Branch A; reject tenant-role creation, cross-tenant access, divergent replay, and replacement; return typed safe outcomes without Party PII; resolve approver candidates to fresh authoritative human-type and active/liveness evidence; resolve each human Party to its stable AuthenticatedHumanActorId and binding version; reproduce the binding in force for a historical instant; and reject missing, stale, ambiguous, overlapping, or actor-mismatched bindings with typed fail-closed outcomes. Register command, not replaced and not accepted by this packet: test \"$(git -C ../parties rev-parse HEAD)\" = \"56cb4401c4179d431385ad3d931fefa402e4fc5a\" && test -z \"$(git -C ../parties status --porcelain)\" && pwsh -NoProfile -File ../parties/eng/verify-ext-parties-1.ps1 -Mode Live -EventStoreRoot ../eventstore -PlatformRoot ../platform -EvidenceDirectory /tmp/ext-parties-1-live.",
+        "RequiredEvidenceLevel": "Levels 4 and 5",
+        "AcceptedStatus": "proposed",
+        "ConsumingStories": "RQ-1; Stories 5.2, 5.4, 5.5, 6.1, 6.6, 7.1-7.5, 8.1-8.4, and 8.8 directly or conditionally consume identity or human Party/liveness/binding evidence. Story 6.1 directly verifies the caller and provisioned Agent Party and executes FR-8 membership step 10; Story 5.5's consumption remains conditional on the Product-selected recorder scope; Story 8.4 consumes the Release-Operator review branch. Branch-B-compatible identity-by-id portions may be developed where applicable, but no consumer may cite that work or any human actor-binding seam as launch evidence while this record is Uncommitted"
+      },
+      "fieldNotes": {
+        "AcceptedStatus": "proposed, not accepted. The Agents register still records Committed. This packet does not copy that status and does not edit the register.",
+        "TargetIntegrationDate": "unresolved owner field. The register value 2026-10-08 is historical, was not met, and is not accepted here.",
+        "TargetVersionOrCommit": "Remains 56cb4401c4179d431385ad3d931fefa402e4fc5a. Proposed coordination commits below do not replace it."
+      },
+      "executableLiveCommand": {
+        "command": "pwsh -NoProfile -File eng/verify-ext-parties-1.ps1 -Mode Live -EvidenceDirectory /tmp/ext-parties-1-owner-delivery-20261025-live",
+        "label": "fail-closed gate, proposed, not acceptance, not qualification",
+        "observedExitCode": 1
+      },
+      "proposedCoordination": {
+        "label": "proposed coordination, not acceptance",
+        "acceptance": false,
+        "replacesRegisterTarget": false,
+        "parties": {
+          "root": "/home/administrator/projects/hexalith/parties",
+          "commit": "9c116910f9d712b82ae27ceb1946605d76c8a451"
+        },
+        "eventStore": {
+          "root": "/home/administrator/projects/hexalith/eventstore",
+          "commit": "d41a3c55a684491d02f61c5ea98e0f74332b5d4d",
+          "resolvedHexalithEventStoreVersion": "3.127.0"
+        },
+        "platform": {
+          "root": "/home/administrator/projects/hexalith/platform",
+          "commit": "90f33a59164d0dcfc21fb688f28651afa4d3df4b",
+          "checkoutAtAbortedLocalScriptStart": "f045ac70d107bad32a1c1d2463f8e0f6fe7353cd",
+          "note": "The aborted Local script never compiled Platform. HEAD moved from f045ac70d107bad32a1c1d2463f8e0f6fe7353cd to 90f33a59164d0dcfc21fb688f28651afa4d3df4b at 2026-10-25T11:40:19+0100, before that script exited and before the persisted owner class was executed. The pin is the checkout present for the persisted-class evidence."
+        },
+        "uncommittedWorkIsNotACommitId": true
+      },
+      "remainingInstallationInputs": [
+        {
+          "id": "Q1",
+          "decision": "Custody backend",
+          "status": "unresolved",
+          "acceptedAt": null,
+          "requiredOutcome": "Select a qualified existing backend/key hierarchy and show per-original-unit irreversible destruction of every generation, including historical immutable key backups. Reject soft delete, TTL, tombstones and merely denied reads."
+        },
+        {
+          "id": "Q2",
+          "decision": "Surviving authority",
+          "status": "unresolved",
+          "acceptedAt": null,
+          "requiredOutcome": "Name the independent authority outside the EventStore/OpenBao/ciphertext restore cut; writers, fence/reissue procedure, authenticated time source, skew and currentness bounds."
+        },
+        {
+          "id": "Q3",
+          "decision": "Inventory and operators",
+          "status": "unresolved",
+          "acceptedAt": null,
+          "requiredOutcome": "Close C01-C16 with real locations/generations or authenticated absence; durable work and original receipts, owner-approved targets and independent probes; define receipt minimization and retention."
+        },
+        {
+          "id": "Q4",
+          "decision": "Hard expiry during failures",
+          "status": "unresolved",
+          "acceptedAt": null,
+          "requiredOutcome": "Name cleanup, escalation and renewal operators; approve bounded retries, outage and receipt-completion limits and prove cryptographic expiry during outage. The five-second library wait is not an expiry SLA."
+        },
+        {
+          "id": "Q5",
+          "decision": "Original binding and revocation mapping",
+          "status": "unresolved",
+          "acceptedAt": null,
+          "requiredOutcome": "Approve collision/idempotency identity and exact original-binding lookup for establish/rebind/revoke. Revocation effectiveAt cannot create a later deadline for predecessor actor evidence; SDK AdmitAsync lacks binding/logical ID."
+        },
+        {
+          "id": "Q6",
+          "decision": "Host composition and source admission",
+          "status": "unresolved",
+          "acceptedAt": null,
+          "requiredOutcome": "Approve package/bootstrap path in both actual owning hosts, Party snapshot codec and payload adapter, retained-source reader and independent source admission; no no-op/local-dev fallback."
+        },
+        {
+          "id": "Q7",
+          "decision": "Erasure and retained metadata",
+          "status": "unresolved",
+          "acceptedAt": null,
+          "requiredOutcome": "Preserve immediate profile ineligibility and independently bounded actor history; decide all key/backup erasure boundaries and minimal content-free anchor/receipt/continuation retention. Reconcile ordinary backup-key retention with hard actor-purpose expiry."
+        },
+        {
+          "id": "D01",
+          "decision": "Deployment and registry",
+          "status": "unresolved",
+          "acceptedAt": null,
+          "requiredOutcome": "Supply both exact environment bindings and release/enrollment records; registry issuer, authoritative deployment and two explicitly approved tenants. No existing target established."
+        },
+        {
+          "id": "D02",
+          "decision": "Credentials and renewal",
+          "status": "unresolved",
+          "acceptedAt": null,
+          "requiredOutcome": "Supply credential references, only-writer policies, renewal owners and procedures for every role. Generic shared bootstrap and recovery credentials are ineligible substitutes."
+        },
+        {
+          "id": "D03",
+          "decision": "Restore target",
+          "status": "unresolved",
+          "acceptedAt": null,
+          "requiredOutcome": "Supply exact isolated target, immutable cut, authority reconciliation/epoch hooks, independent observer, outage approval, cleanup scope and verified disposal bound. No target selected."
+        },
+        {
+          "id": "D04",
+          "decision": "Failure injection",
+          "status": "unresolved",
+          "acceptedAt": null,
+          "requiredOutcome": "Supply exact workload UIDs and faults for admission/copy/destruction/receipt commit and lost acknowledgement; operator/observer credentials, duration, abort, cleanup and rollback. 6.1 rollout faults alone do not cover custody failure probes."
+        },
+        {
+          "id": "F1",
+          "decision": "Actor-free successor continuity",
+          "status": "unresolved",
+          "acceptedAt": null,
+          "requiredOutcome": "Approve proof producer/schema/version/scope/positions/epochs/currentness and erasure classification that proves complete unique successor versions/intervals without retaining expired predecessor actor/provenance/logical evidence. Current strict fold stays closed until accepted."
+        }
+      ],
+      "f2ReplacementAcceptance": {
+        "id": "F2",
+        "decision": "Replacement implementation and qualification acceptance",
+        "status": "unresolved",
+        "acceptedAt": null,
+        "requiredOutcome": "After decisions, implementation and installed probes exist, accept immutable source/package/image targets, integration date, exact complete Live command and all P-01-P-10 evidence. Keep status Committed until that owner-accepted command passes from clean exact checkouts.",
+        "closedByThisPacket": false
+      },
+      "liveEnvironmentVariables": [
+        "EXT_PARTIES_GATEWAY_URL",
+        "EXT_PARTIES_TENANT_A",
+        "EXT_PARTIES_TENANT_B",
+        "EXT_PARTIES_PROVISIONER_CREDENTIAL",
+        "EXT_PARTIES_IDENTITY_WRITER_CREDENTIAL",
+        "EXT_PARTIES_READER_CREDENTIAL",
+        "EXT_PARTIES_POLICY_ID",
+        "EXT_PARTIES_RETENTION",
+        "EXT_PARTIES_EXPIRY_TRIGGER",
+        "EXT_PARTIES_CUSTODY_TARGET",
+        "EXT_PARTIES_RESTORE_TARGET",
+        "EXT_PARTIES_FAILURE_INJECTION_TARGET"
+      ],
+      "evidence": {
+        "persistedOwnerClass": {
+          "command": "dotnet /tmp/ext-parties-1-owner-delivery-20261025/artifacts/bin/Hexalith.Parties.IntegrationTests/debug/Hexalith.Parties.IntegrationTests.dll -class *PartyIdentityPersistedVerifierTests -result-xml /tmp/ext-parties-1-owner-delivery-20261025/Hexalith.Parties.IntegrationTests-tests.xml",
+          "buildFlags": "Debug, UseHexalithProjectReferences=true, UseNuGetDeps=false, HexalithEventStoreRoot=/home/administrator/projects/hexalith/eventstore, HexalithEventStoreVersion=3.127.0, NuGetAudit=false",
+          "exitCode": 0,
+          "summary": "Total: 11, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 1.112s",
+          "xmlResults": "11 Pass",
+          "productionProviderRegistered": false,
+          "isAvailable": false
+        },
+        "fullLocalScript": {
+          "command": "pwsh -NoProfile -File eng/verify-ext-parties-1.ps1 -Mode Local -EventStoreRoot /home/administrator/projects/hexalith/eventstore -PlatformRoot /home/administrator/projects/hexalith/platform -EvidenceDirectory /tmp/ext-parties-1-owner-delivery-20261025",
+          "exitCode": 1,
+          "stoppedAt": "Hexalith.EventStore.Server.Tests",
+          "summary": "Total: 450, Errors: 0, Failed: 4, Skipped: 0, Not Run: 0, Time: 5.811s",
+          "failingTests": "StreamsControllerTests.NativeHeadGatewayCrossesRealWorkloadMiddlewareWithJwtBindingsOrExactSignedProof (head 0/5, jwtBindings true/false): observation should not be null",
+          "bypassed": false,
+          "persistedClassReached": false
+        },
+        "liveWithoutVariables": {
+          "evidence": "/tmp/ext-parties-1-owner-delivery-20261025-live/live-gate.txt",
+          "exitCode": 1,
+          "result": "Missing live inputs: EXT_PARTIES_GATEWAY_URL, EXT_PARTIES_TENANT_A, EXT_PARTIES_TENANT_B, EXT_PARTIES_PROVISIONER_CREDENTIAL, EXT_PARTIES_IDENTITY_WRITER_CREDENTIAL, EXT_PARTIES_READER_CREDENTIAL, EXT_PARTIES_POLICY_ID, EXT_PARTIES_RETENTION, EXT_PARTIES_EXPIRY_TRIGGER, EXT_PARTIES_CUSTODY_TARGET, EXT_PARTIES_RESTORE_TARGET, EXT_PARTIES_FAILURE_INJECTION_TARGET",
+          "qualification": false
+        },
+        "liveWithAllTwelveVariables": {
+          "evidence": "/tmp/ext-parties-1-owner-delivery-20261025-live-present/live-gate.txt",
+          "exitCode": 1,
+          "result": "Live qualification remains blocked: production custody/policy and complete authenticated P-01-P-10 persisted-state/restart/restore/failure-injection lanes are not installed. The purpose-scoped history contract and LiveReadiness read probes do not establish complete qualification.",
+          "qualification": false
+        }
+      }
+    },
+    "packetMatchesCurrentHead": true,
+    "missingPacketFields": [
+      "registerFields.TargetIntegrationDate",
+      "remainingInstallationInputs[0].acceptedAt",
+      "remainingInstallationInputs[1].acceptedAt",
+      "remainingInstallationInputs[2].acceptedAt",
+      "remainingInstallationInputs[3].acceptedAt",
+      "remainingInstallationInputs[4].acceptedAt",
+      "remainingInstallationInputs[5].acceptedAt",
+      "remainingInstallationInputs[6].acceptedAt",
+      "remainingInstallationInputs[7].acceptedAt",
+      "remainingInstallationInputs[8].acceptedAt",
+      "remainingInstallationInputs[9].acceptedAt",
+      "remainingInstallationInputs[10].acceptedAt",
+      "remainingInstallationInputs[11].acceptedAt",
+      "f2ReplacementAcceptance.acceptedAt"
+    ],
+    "prerequisiteDecisions": [
+      {
+        "id": "D01",
+        "decision": "Deployment and registry",
+        "requestedDecisionRole": "Platform deployment owner with EventStore, Tenants and Parties owners",
+        "assignedPrincipalRef": null,
+        "owningWork": "4.8, 4.9, 4.14–4.22, 6.7, 6.11, 6.23",
+        "requiredOutcome": "Supply both exact environment bindings and release/enrollment records; registry issuer, authoritative deployment and two explicitly approved tenants. No existing target established.",
+        "decisionRecordRef": null,
+        "acceptedAt": null,
+        "status": "unresolved"
+      },
+      {
+        "id": "D02",
+        "decision": "Credentials and renewal",
+        "requestedDecisionRole": "Platform identity/secret operations with each capability owner",
+        "assignedPrincipalRef": null,
+        "owningWork": "4.9, 4.15, 4.19, 4.20, 6.8, 6.11",
+        "requiredOutcome": "Supply credential references, only-writer policies, renewal owners and procedures for every role. Generic shared bootstrap and recovery credentials are ineligible substitutes.",
+        "decisionRecordRef": null,
+        "acceptedAt": null,
+        "status": "unresolved"
+      },
+      {
+        "id": "Q1",
+        "decision": "Custody backend",
+        "requestedDecisionRole": "Platform custody/key owners",
+        "assignedPrincipalRef": null,
+        "owningWork": "PLAT-ACTOR-HISTORY-1 T2; 4.15; 8.6",
+        "requiredOutcome": "Select a qualified existing backend/key hierarchy and show per-original-unit irreversible destruction of every generation, including historical immutable key backups. Reject soft delete, TTL, tombstones and merely denied reads.",
+        "decisionRecordRef": null,
+        "acceptedAt": null,
+        "status": "unresolved"
+      },
+      {
+        "id": "Q2",
+        "decision": "Surviving authority",
+        "requestedDecisionRole": "Platform lifecycle and recovery owners",
+        "assignedPrincipalRef": null,
+        "owningWork": "PLAT-ACTOR-HISTORY-1 T2; 8.4; 8.9",
+        "requiredOutcome": "Name the independent authority outside the EventStore/OpenBao/ciphertext restore cut; writers, fence/reissue procedure, authenticated time source, skew and currentness bounds.",
+        "decisionRecordRef": null,
+        "acceptedAt": null,
+        "status": "unresolved"
+      },
+      {
+        "id": "Q3",
+        "decision": "Inventory and operators",
+        "requestedDecisionRole": "Platform recovery owner and each copy owner",
+        "assignedPrincipalRef": null,
+        "owningWork": "PLAT-ACTOR-HISTORY-1 T2/T5; 4.10; 8.4–8.10",
+        "requiredOutcome": "Close C01–C16 with real locations/generations or authenticated absence; durable work and original receipts, owner-approved targets and independent probes; define receipt minimization and retention.",
+        "decisionRecordRef": null,
+        "acceptedAt": null,
+        "status": "unresolved"
+      },
+      {
+        "id": "Q4",
+        "decision": "Hard expiry during failures",
+        "requestedDecisionRole": "Platform expiry/monitoring operators and key owner",
+        "assignedPrincipalRef": null,
+        "owningWork": "PLAT-ACTOR-HISTORY-1 T2/T5; 8.8",
+        "requiredOutcome": "Name cleanup, escalation and renewal operators; approve bounded retries, outage and receipt-completion limits and prove cryptographic expiry during outage. The five-second library wait is not an expiry SLA.",
+        "decisionRecordRef": null,
+        "acceptedAt": null,
+        "status": "unresolved"
+      },
+      {
+        "id": "Q5",
+        "decision": "Original binding and revocation mapping",
+        "requestedDecisionRole": "Parties domain owner, EventStore SDK owner and Platform custody owner",
+        "assignedPrincipalRef": null,
+        "owningWork": "PLAT-ACTOR-HISTORY-1 T3",
+        "requiredOutcome": "Approve collision/idempotency identity and exact original-binding lookup for establish/rebind/revoke. Revocation effectiveAt cannot create a later deadline for predecessor actor evidence; SDK AdmitAsync lacks binding/logical ID.",
+        "decisionRecordRef": null,
+        "acceptedAt": null,
+        "status": "unresolved"
+      },
+      {
+        "id": "Q6",
+        "decision": "Host composition and source admission",
+        "requestedDecisionRole": "Platform host owner with Parties and EventStore integration owners",
+        "assignedPrincipalRef": null,
+        "owningWork": "PLAT-ACTOR-HISTORY-1 T3/T4; 4.5; 4.8; 4.22",
+        "requiredOutcome": "Approve package/bootstrap path in both actual owning hosts, Party snapshot codec and payload adapter, retained-source reader and independent source admission; no no-op/local-dev fallback.",
+        "decisionRecordRef": null,
+        "acceptedAt": null,
+        "status": "unresolved"
+      },
+      {
+        "id": "Q7",
+        "decision": "Erasure and retained metadata",
+        "requestedDecisionRole": "Parties privacy/domain owner with Platform/8.6 recovery owners",
+        "assignedPrincipalRef": null,
+        "owningWork": "PLAT-ACTOR-HISTORY-1 T5; 8.6",
+        "requiredOutcome": "Preserve immediate profile ineligibility and independently bounded actor history; decide all key/backup erasure boundaries and minimal content-free anchor/receipt/continuation retention. Reconcile ordinary backup-key retention with hard actor-purpose expiry.",
+        "decisionRecordRef": null,
+        "acceptedAt": null,
+        "status": "unresolved"
+      },
+      {
+        "id": "F1",
+        "decision": "Actor-free successor continuity",
+        "requestedDecisionRole": "Parties and EventStore source-contract owners, with Platform authority and privacy owners",
+        "assignedPrincipalRef": null,
+        "owningWork": "Explicit F1 in S04",
+        "requiredOutcome": "Approve proof producer/schema/version/scope/positions/epochs/currentness and erasure classification that proves complete unique successor versions/intervals without retaining expired predecessor actor/provenance/logical evidence. Current strict fold stays closed until accepted.",
+        "decisionRecordRef": null,
+        "acceptedAt": null,
+        "status": "unresolved"
+      },
+      {
+        "id": "D03",
+        "decision": "Restore target",
+        "requestedDecisionRole": "Administrator/recovery owner, actual deputy and surviving-authority fence owners",
+        "assignedPrincipalRef": null,
+        "owningWork": "4.10; 4.23; 8.1; 8.9; 8.10; 8.14; 8.17",
+        "requiredOutcome": "Supply exact isolated target, immutable cut, authority reconciliation/epoch hooks, independent observer, outage approval, cleanup scope and verified disposal bound. No target selected.",
+        "decisionRecordRef": null,
+        "acceptedAt": null,
+        "status": "unresolved"
+      },
+      {
+        "id": "D04",
+        "decision": "Failure injection",
+        "requestedDecisionRole": "Administrator/rehearsal owner with Parties/EventStore/custody operators",
+        "assignedPrincipalRef": null,
+        "owningWork": "6.1; 6.24; F2",
+        "requiredOutcome": "Supply exact workload UIDs and faults for admission/copy/destruction/receipt commit and lost acknowledgement; operator/observer credentials, duration, abort, cleanup and rollback. 6.1 rollout faults alone do not cover custody failure probes.",
+        "decisionRecordRef": null,
+        "acceptedAt": null,
+        "status": "unresolved"
+      },
+      {
+        "id": "F2",
+        "decision": "Replacement implementation and qualification acceptance",
+        "requestedDecisionRole": "Project owner acting as Parties Maintainer; Platform and EventStore delivery owners; Product for Branch B launch contract",
+        "assignedPrincipalRef": null,
+        "owningWork": "Explicit F2 in S04; EXT-PARTIES-1",
+        "requiredOutcome": "After decisions, implementation and installed probes exist, accept immutable source/package/image targets, integration date, exact complete Live command and all P-01–P-10 evidence. Keep status Committed until that owner-accepted command passes from clean exact checkouts.",
+        "decisionRecordRef": null,
+        "acceptedAt": null,
+        "status": "unresolved"
+      }
+    ],
+    "missingPrerequisiteFields": [
+      "environments[0].binding.approvalRecordRef",
+      "environments[0].binding.kubeconfigRef",
+      "environments[0].binding.context",
+      "environments[0].binding.clusterUid",
+      "environments[0].binding.environmentInstance",
+      "environments[0].binding.applicationNamespace",
+      "environments[0].binding.applicationNamespaceUid",
+      "environments[0].binding.dataNamespace",
+      "environments[0].binding.dataNamespaceUid",
+      "environments[0].binding.releaseRecordRef",
+      "environments[0].binding.profileDigest",
+      "environments[0].binding.effectiveConfigurationDigest",
+      "environments[0].binding.helmRelease",
+      "environments[0].binding.workloadRefs",
+      "environments[0].binding.workloadUids",
+      "environments[0].binding.imageDigests",
+      "environments[0].binding.gatewayRef",
+      "environments[0].binding.gatewayUid",
+      "environments[0].binding.gatewayUrl",
+      "environments[0].binding.httpRouteRef",
+      "environments[0].binding.serviceRef",
+      "environments[0].binding.certificateRef",
+      "environments[0].binding.issuerRef",
+      "environments[0].binding.tenantRegistryDeploymentRef",
+      "environments[0].binding.tenantRegistryIssuerRef",
+      "environments[0].binding.tenantRegistryAuthorityRef",
+      "environments[0].binding.tenantARef",
+      "environments[0].binding.tenantBRef",
+      "environments[1].binding.approvalRecordRef",
+      "environments[1].binding.kubeconfigRef",
+      "environments[1].binding.context",
+      "environments[1].binding.clusterUid",
+      "environments[1].binding.environmentInstance",
+      "environments[1].binding.applicationNamespace",
+      "environments[1].binding.applicationNamespaceUid",
+      "environments[1].binding.dataNamespace",
+      "environments[1].binding.dataNamespaceUid",
+      "environments[1].binding.releaseRecordRef",
+      "environments[1].binding.profileDigest",
+      "environments[1].binding.effectiveConfigurationDigest",
+      "environments[1].binding.helmRelease",
+      "environments[1].binding.workloadRefs",
+      "environments[1].binding.workloadUids",
+      "environments[1].binding.imageDigests",
+      "environments[1].binding.gatewayRef",
+      "environments[1].binding.gatewayUid",
+      "environments[1].binding.gatewayUrl",
+      "environments[1].binding.httpRouteRef",
+      "environments[1].binding.serviceRef",
+      "environments[1].binding.certificateRef",
+      "environments[1].binding.issuerRef",
+      "environments[1].binding.tenantRegistryDeploymentRef",
+      "environments[1].binding.tenantRegistryIssuerRef",
+      "environments[1].binding.tenantRegistryAuthorityRef",
+      "environments[1].binding.tenantARef",
+      "environments[1].binding.tenantBRef",
+      "credentials[0].environmentBindings[0].secretStoreRef",
+      "credentials[0].environmentBindings[0].mountOrNamespaceRef",
+      "credentials[0].environmentBindings[0].policyRef",
+      "credentials[0].environmentBindings[0].roleRef",
+      "credentials[0].environmentBindings[0].credentialRef",
+      "credentials[0].environmentBindings[0].issuerRef",
+      "credentials[0].environmentBindings[0].subjectOrWorkloadRef",
+      "credentials[0].environmentBindings[0].audienceRef",
+      "credentials[0].environmentBindings[0].expiryMetadataRef",
+      "credentials[0].environmentBindings[0].renewalOwnerPrincipalRef",
+      "credentials[0].environmentBindings[0].renewalProcedureRef",
+      "credentials[0].environmentBindings[0].revocationProcedureRef",
+      "credentials[0].environmentBindings[0].approvalRecordRef",
+      "credentials[0].environmentBindings[1].secretStoreRef",
+      "credentials[0].environmentBindings[1].mountOrNamespaceRef",
+      "credentials[0].environmentBindings[1].policyRef",
+      "credentials[0].environmentBindings[1].roleRef",
+      "credentials[0].environmentBindings[1].credentialRef",
+      "credentials[0].environmentBindings[1].issuerRef",
+      "credentials[0].environmentBindings[1].subjectOrWorkloadRef",
+      "credentials[0].environmentBindings[1].audienceRef",
+      "credentials[0].environmentBindings[1].expiryMetadataRef",
+      "credentials[0].environmentBindings[1].renewalOwnerPrincipalRef",
+      "credentials[0].environmentBindings[1].renewalProcedureRef",
+      "credentials[0].environmentBindings[1].revocationProcedureRef",
+      "credentials[0].environmentBindings[1].approvalRecordRef",
+      "credentials[1].environmentBindings[0].secretStoreRef",
+      "credentials[1].environmentBindings[0].mountOrNamespaceRef",
+      "credentials[1].environmentBindings[0].policyRef",
+      "credentials[1].environmentBindings[0].roleRef",
+      "credentials[1].environmentBindings[0].credentialRef",
+      "credentials[1].environmentBindings[0].issuerRef",
+      "credentials[1].environmentBindings[0].subjectOrWorkloadRef",
+      "credentials[1].environmentBindings[0].audienceRef",
+      "credentials[1].environmentBindings[0].expiryMetadataRef",
+      "credentials[1].environmentBindings[0].renewalOwnerPrincipalRef",
+      "credentials[1].environmentBindings[0].renewalProcedureRef",
+      "credentials[1].environmentBindings[0].revocationProcedureRef",
+      "credentials[1].environmentBindings[0].approvalRecordRef",
+      "credentials[1].environmentBindings[1].secretStoreRef",
+      "credentials[1].environmentBindings[1].mountOrNamespaceRef",
+      "credentials[1].environmentBindings[1].policyRef",
+      "credentials[1].environmentBindings[1].roleRef",
+      "credentials[1].environmentBindings[1].credentialRef",
+      "credentials[1].environmentBindings[1].issuerRef",
+      "credentials[1].environmentBindings[1].subjectOrWorkloadRef",
+      "credentials[1].environmentBindings[1].audienceRef",
+      "credentials[1].environmentBindings[1].expiryMetadataRef",
+      "credentials[1].environmentBindings[1].renewalOwnerPrincipalRef",
+      "credentials[1].environmentBindings[1].renewalProcedureRef",
+      "credentials[1].environmentBindings[1].revocationProcedureRef",
+      "credentials[1].environmentBindings[1].approvalRecordRef",
+      "credentials[2].environmentBindings[0].secretStoreRef",
+      "credentials[2].environmentBindings[0].mountOrNamespaceRef",
+      "credentials[2].environmentBindings[0].policyRef",
+      "credentials[2].environmentBindings[0].roleRef",
+      "credentials[2].environmentBindings[0].credentialRef",
+      "credentials[2].environmentBindings[0].issuerRef",
+      "credentials[2].environmentBindings[0].subjectOrWorkloadRef",
+      "credentials[2].environmentBindings[0].audienceRef",
+      "credentials[2].environmentBindings[0].expiryMetadataRef",
+      "credentials[2].environmentBindings[0].renewalOwnerPrincipalRef",
+      "credentials[2].environmentBindings[0].renewalProcedureRef",
+      "credentials[2].environmentBindings[0].revocationProcedureRef",
+      "credentials[2].environmentBindings[0].approvalRecordRef",
+      "credentials[2].environmentBindings[1].secretStoreRef",
+      "credentials[2].environmentBindings[1].mountOrNamespaceRef",
+      "credentials[2].environmentBindings[1].policyRef",
+      "credentials[2].environmentBindings[1].roleRef",
+      "credentials[2].environmentBindings[1].credentialRef",
+      "credentials[2].environmentBindings[1].issuerRef",
+      "credentials[2].environmentBindings[1].subjectOrWorkloadRef",
+      "credentials[2].environmentBindings[1].audienceRef",
+      "credentials[2].environmentBindings[1].expiryMetadataRef",
+      "credentials[2].environmentBindings[1].renewalOwnerPrincipalRef",
+      "credentials[2].environmentBindings[1].renewalProcedureRef",
+      "credentials[2].environmentBindings[1].revocationProcedureRef",
+      "credentials[2].environmentBindings[1].approvalRecordRef",
+      "credentials[3].liveInputName",
+      "credentials[3].environmentBindings[0].secretStoreRef",
+      "credentials[3].environmentBindings[0].mountOrNamespaceRef",
+      "credentials[3].environmentBindings[0].policyRef",
+      "credentials[3].environmentBindings[0].roleRef",
+      "credentials[3].environmentBindings[0].credentialRef",
+      "credentials[3].environmentBindings[0].issuerRef",
+      "credentials[3].environmentBindings[0].subjectOrWorkloadRef",
+      "credentials[3].environmentBindings[0].audienceRef",
+      "credentials[3].environmentBindings[0].expiryMetadataRef",
+      "credentials[3].environmentBindings[0].renewalOwnerPrincipalRef",
+      "credentials[3].environmentBindings[0].renewalProcedureRef",
+      "credentials[3].environmentBindings[0].revocationProcedureRef",
+      "credentials[3].environmentBindings[0].approvalRecordRef",
+      "credentials[3].environmentBindings[1].secretStoreRef",
+      "credentials[3].environmentBindings[1].mountOrNamespaceRef",
+      "credentials[3].environmentBindings[1].policyRef",
+      "credentials[3].environmentBindings[1].roleRef",
+      "credentials[3].environmentBindings[1].credentialRef",
+      "credentials[3].environmentBindings[1].issuerRef",
+      "credentials[3].environmentBindings[1].subjectOrWorkloadRef",
+      "credentials[3].environmentBindings[1].audienceRef",
+      "credentials[3].environmentBindings[1].expiryMetadataRef",
+      "credentials[3].environmentBindings[1].renewalOwnerPrincipalRef",
+      "credentials[3].environmentBindings[1].renewalProcedureRef",
+      "credentials[3].environmentBindings[1].revocationProcedureRef",
+      "credentials[3].environmentBindings[1].approvalRecordRef",
+      "credentials[4].liveInputName",
+      "credentials[4].environmentBindings[0].secretStoreRef",
+      "credentials[4].environmentBindings[0].mountOrNamespaceRef",
+      "credentials[4].environmentBindings[0].policyRef",
+      "credentials[4].environmentBindings[0].roleRef",
+      "credentials[4].environmentBindings[0].credentialRef",
+      "credentials[4].environmentBindings[0].issuerRef",
+      "credentials[4].environmentBindings[0].subjectOrWorkloadRef",
+      "credentials[4].environmentBindings[0].audienceRef",
+      "credentials[4].environmentBindings[0].expiryMetadataRef",
+      "credentials[4].environmentBindings[0].renewalOwnerPrincipalRef",
+      "credentials[4].environmentBindings[0].renewalProcedureRef",
+      "credentials[4].environmentBindings[0].revocationProcedureRef",
+      "credentials[4].environmentBindings[0].approvalRecordRef",
+      "credentials[4].environmentBindings[1].secretStoreRef",
+      "credentials[4].environmentBindings[1].mountOrNamespaceRef",
+      "credentials[4].environmentBindings[1].policyRef",
+      "credentials[4].environmentBindings[1].roleRef",
+      "credentials[4].environmentBindings[1].credentialRef",
+      "credentials[4].environmentBindings[1].issuerRef",
+      "credentials[4].environmentBindings[1].subjectOrWorkloadRef",
+      "credentials[4].environmentBindings[1].audienceRef",
+      "credentials[4].environmentBindings[1].expiryMetadataRef",
+      "credentials[4].environmentBindings[1].renewalOwnerPrincipalRef",
+      "credentials[4].environmentBindings[1].renewalProcedureRef",
+      "credentials[4].environmentBindings[1].revocationProcedureRef",
+      "credentials[4].environmentBindings[1].approvalRecordRef",
+      "credentials[5].liveInputName",
+      "credentials[5].environmentBindings[0].secretStoreRef",
+      "credentials[5].environmentBindings[0].mountOrNamespaceRef",
+      "credentials[5].environmentBindings[0].policyRef",
+      "credentials[5].environmentBindings[0].roleRef",
+      "credentials[5].environmentBindings[0].credentialRef",
+      "credentials[5].environmentBindings[0].issuerRef",
+      "credentials[5].environmentBindings[0].subjectOrWorkloadRef",
+      "credentials[5].environmentBindings[0].audienceRef",
+      "credentials[5].environmentBindings[0].expiryMetadataRef",
+      "credentials[5].environmentBindings[0].renewalOwnerPrincipalRef",
+      "credentials[5].environmentBindings[0].renewalProcedureRef",
+      "credentials[5].environmentBindings[0].revocationProcedureRef",
+      "credentials[5].environmentBindings[0].approvalRecordRef",
+      "credentials[5].environmentBindings[1].secretStoreRef",
+      "credentials[5].environmentBindings[1].mountOrNamespaceRef",
+      "credentials[5].environmentBindings[1].policyRef",
+      "credentials[5].environmentBindings[1].roleRef",
+      "credentials[5].environmentBindings[1].credentialRef",
+      "credentials[5].environmentBindings[1].issuerRef",
+      "credentials[5].environmentBindings[1].subjectOrWorkloadRef",
+      "credentials[5].environmentBindings[1].audienceRef",
+      "credentials[5].environmentBindings[1].expiryMetadataRef",
+      "credentials[5].environmentBindings[1].renewalOwnerPrincipalRef",
+      "credentials[5].environmentBindings[1].renewalProcedureRef",
+      "credentials[5].environmentBindings[1].revocationProcedureRef",
+      "credentials[5].environmentBindings[1].approvalRecordRef",
+      "credentials[6].liveInputName",
+      "credentials[6].environmentBindings[0].secretStoreRef",
+      "credentials[6].environmentBindings[0].mountOrNamespaceRef",
+      "credentials[6].environmentBindings[0].policyRef",
+      "credentials[6].environmentBindings[0].roleRef",
+      "credentials[6].environmentBindings[0].credentialRef",
+      "credentials[6].environmentBindings[0].issuerRef",
+      "credentials[6].environmentBindings[0].subjectOrWorkloadRef",
+      "credentials[6].environmentBindings[0].audienceRef",
+      "credentials[6].environmentBindings[0].expiryMetadataRef",
+      "credentials[6].environmentBindings[0].renewalOwnerPrincipalRef",
+      "credentials[6].environmentBindings[0].renewalProcedureRef",
+      "credentials[6].environmentBindings[0].revocationProcedureRef",
+      "credentials[6].environmentBindings[0].approvalRecordRef",
+      "credentials[6].environmentBindings[1].secretStoreRef",
+      "credentials[6].environmentBindings[1].mountOrNamespaceRef",
+      "credentials[6].environmentBindings[1].policyRef",
+      "credentials[6].environmentBindings[1].roleRef",
+      "credentials[6].environmentBindings[1].credentialRef",
+      "credentials[6].environmentBindings[1].issuerRef",
+      "credentials[6].environmentBindings[1].subjectOrWorkloadRef",
+      "credentials[6].environmentBindings[1].audienceRef",
+      "credentials[6].environmentBindings[1].expiryMetadataRef",
+      "credentials[6].environmentBindings[1].renewalOwnerPrincipalRef",
+      "credentials[6].environmentBindings[1].renewalProcedureRef",
+      "credentials[6].environmentBindings[1].revocationProcedureRef",
+      "credentials[6].environmentBindings[1].approvalRecordRef",
+      "credentials[7].liveInputName",
+      "credentials[7].environmentBindings[0].secretStoreRef",
+      "credentials[7].environmentBindings[0].mountOrNamespaceRef",
+      "credentials[7].environmentBindings[0].policyRef",
+      "credentials[7].environmentBindings[0].roleRef",
+      "credentials[7].environmentBindings[0].credentialRef",
+      "credentials[7].environmentBindings[0].issuerRef",
+      "credentials[7].environmentBindings[0].subjectOrWorkloadRef",
+      "credentials[7].environmentBindings[0].audienceRef",
+      "credentials[7].environmentBindings[0].expiryMetadataRef",
+      "credentials[7].environmentBindings[0].renewalOwnerPrincipalRef",
+      "credentials[7].environmentBindings[0].renewalProcedureRef",
+      "credentials[7].environmentBindings[0].revocationProcedureRef",
+      "credentials[7].environmentBindings[0].approvalRecordRef",
+      "credentials[7].environmentBindings[1].secretStoreRef",
+      "credentials[7].environmentBindings[1].mountOrNamespaceRef",
+      "credentials[7].environmentBindings[1].policyRef",
+      "credentials[7].environmentBindings[1].roleRef",
+      "credentials[7].environmentBindings[1].credentialRef",
+      "credentials[7].environmentBindings[1].issuerRef",
+      "credentials[7].environmentBindings[1].subjectOrWorkloadRef",
+      "credentials[7].environmentBindings[1].audienceRef",
+      "credentials[7].environmentBindings[1].expiryMetadataRef",
+      "credentials[7].environmentBindings[1].renewalOwnerPrincipalRef",
+      "credentials[7].environmentBindings[1].renewalProcedureRef",
+      "credentials[7].environmentBindings[1].revocationProcedureRef",
+      "credentials[7].environmentBindings[1].approvalRecordRef",
+      "credentials[8].liveInputName",
+      "credentials[8].environmentBindings[0].secretStoreRef",
+      "credentials[8].environmentBindings[0].mountOrNamespaceRef",
+      "credentials[8].environmentBindings[0].policyRef",
+      "credentials[8].environmentBindings[0].roleRef",
+      "credentials[8].environmentBindings[0].credentialRef",
+      "credentials[8].environmentBindings[0].issuerRef",
+      "credentials[8].environmentBindings[0].subjectOrWorkloadRef",
+      "credentials[8].environmentBindings[0].audienceRef",
+      "credentials[8].environmentBindings[0].expiryMetadataRef",
+      "credentials[8].environmentBindings[0].renewalOwnerPrincipalRef",
+      "credentials[8].environmentBindings[0].renewalProcedureRef",
+      "credentials[8].environmentBindings[0].revocationProcedureRef",
+      "credentials[8].environmentBindings[0].approvalRecordRef",
+      "credentials[8].environmentBindings[1].secretStoreRef",
+      "credentials[8].environmentBindings[1].mountOrNamespaceRef",
+      "credentials[8].environmentBindings[1].policyRef",
+      "credentials[8].environmentBindings[1].roleRef",
+      "credentials[8].environmentBindings[1].credentialRef",
+      "credentials[8].environmentBindings[1].issuerRef",
+      "credentials[8].environmentBindings[1].subjectOrWorkloadRef",
+      "credentials[8].environmentBindings[1].audienceRef",
+      "credentials[8].environmentBindings[1].expiryMetadataRef",
+      "credentials[8].environmentBindings[1].renewalOwnerPrincipalRef",
+      "credentials[8].environmentBindings[1].renewalProcedureRef",
+      "credentials[8].environmentBindings[1].revocationProcedureRef",
+      "credentials[8].environmentBindings[1].approvalRecordRef",
+      "credentials[9].liveInputName",
+      "credentials[9].environmentBindings[0].secretStoreRef",
+      "credentials[9].environmentBindings[0].mountOrNamespaceRef",
+      "credentials[9].environmentBindings[0].policyRef",
+      "credentials[9].environmentBindings[0].roleRef",
+      "credentials[9].environmentBindings[0].credentialRef",
+      "credentials[9].environmentBindings[0].issuerRef",
+      "credentials[9].environmentBindings[0].subjectOrWorkloadRef",
+      "credentials[9].environmentBindings[0].audienceRef",
+      "credentials[9].environmentBindings[0].expiryMetadataRef",
+      "credentials[9].environmentBindings[0].renewalOwnerPrincipalRef",
+      "credentials[9].environmentBindings[0].renewalProcedureRef",
+      "credentials[9].environmentBindings[0].revocationProcedureRef",
+      "credentials[9].environmentBindings[0].approvalRecordRef",
+      "credentials[9].environmentBindings[1].secretStoreRef",
+      "credentials[9].environmentBindings[1].mountOrNamespaceRef",
+      "credentials[9].environmentBindings[1].policyRef",
+      "credentials[9].environmentBindings[1].roleRef",
+      "credentials[9].environmentBindings[1].credentialRef",
+      "credentials[9].environmentBindings[1].issuerRef",
+      "credentials[9].environmentBindings[1].subjectOrWorkloadRef",
+      "credentials[9].environmentBindings[1].audienceRef",
+      "credentials[9].environmentBindings[1].expiryMetadataRef",
+      "credentials[9].environmentBindings[1].renewalOwnerPrincipalRef",
+      "credentials[9].environmentBindings[1].renewalProcedureRef",
+      "credentials[9].environmentBindings[1].revocationProcedureRef",
+      "credentials[9].environmentBindings[1].approvalRecordRef",
+      "credentials[10].liveInputName",
+      "credentials[10].environmentBindings[0].secretStoreRef",
+      "credentials[10].environmentBindings[0].mountOrNamespaceRef",
+      "credentials[10].environmentBindings[0].policyRef",
+      "credentials[10].environmentBindings[0].roleRef",
+      "credentials[10].environmentBindings[0].credentialRef",
+      "credentials[10].environmentBindings[0].issuerRef",
+      "credentials[10].environmentBindings[0].subjectOrWorkloadRef",
+      "credentials[10].environmentBindings[0].audienceRef",
+      "credentials[10].environmentBindings[0].expiryMetadataRef",
+      "credentials[10].environmentBindings[0].renewalOwnerPrincipalRef",
+      "credentials[10].environmentBindings[0].renewalProcedureRef",
+      "credentials[10].environmentBindings[0].revocationProcedureRef",
+      "credentials[10].environmentBindings[0].approvalRecordRef",
+      "credentials[10].environmentBindings[1].secretStoreRef",
+      "credentials[10].environmentBindings[1].mountOrNamespaceRef",
+      "credentials[10].environmentBindings[1].policyRef",
+      "credentials[10].environmentBindings[1].roleRef",
+      "credentials[10].environmentBindings[1].credentialRef",
+      "credentials[10].environmentBindings[1].issuerRef",
+      "credentials[10].environmentBindings[1].subjectOrWorkloadRef",
+      "credentials[10].environmentBindings[1].audienceRef",
+      "credentials[10].environmentBindings[1].expiryMetadataRef",
+      "credentials[10].environmentBindings[1].renewalOwnerPrincipalRef",
+      "credentials[10].environmentBindings[1].renewalProcedureRef",
+      "credentials[10].environmentBindings[1].revocationProcedureRef",
+      "credentials[10].environmentBindings[1].approvalRecordRef",
+      "custody.backendRef",
+      "custody.mountRef",
+      "custody.unitKeyHierarchyRef",
+      "custody.allGenerationDestructionRef",
+      "custody.providerPackageRef",
+      "custody.providerImageRef",
+      "custody.hostRegistrationRef",
+      "custody.independentLifecycleAuthorityRef",
+      "custody.authorityFailureDomainRef",
+      "custody.fenceAndReissueOwnerRef",
+      "custody.fenceAndReissueProcedureRef",
+      "custody.authenticatedTimeSourceRef",
+      "custody.maximumClockSkew",
+      "custody.maximumAuthorityAge",
+      "custody.backendIoBounds",
+      "custody.cleanupOperatorRef",
+      "custody.cleanupRetryBound",
+      "custody.maximumOutageBound",
+      "custody.maximumReceiptCompletionBound",
+      "custody.expiryGuaranteeDuringOutageRef",
+      "copyInventory.generation",
+      "copyInventory.digest",
+      "copyInventory.inventoryAuthorityRef",
+      "copyInventory.classes[0].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[0].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[0].physicalInventoryRef",
+      "copyInventory.classes[0].unitAndGenerationMappingRef",
+      "copyInventory.classes[0].locationOrObjectVersionRefs",
+      "copyInventory.classes[0].allDecryptingPathsRef",
+      "copyInventory.classes[0].originalDeadlineMappingRef",
+      "copyInventory.classes[0].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[0].irreversibleMechanismRef",
+      "copyInventory.classes[0].receiptRef",
+      "copyInventory.classes[0].absenceAttestationRef",
+      "copyInventory.classes[1].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[1].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[1].physicalInventoryRef",
+      "copyInventory.classes[1].unitAndGenerationMappingRef",
+      "copyInventory.classes[1].locationOrObjectVersionRefs",
+      "copyInventory.classes[1].allDecryptingPathsRef",
+      "copyInventory.classes[1].originalDeadlineMappingRef",
+      "copyInventory.classes[1].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[1].irreversibleMechanismRef",
+      "copyInventory.classes[1].receiptRef",
+      "copyInventory.classes[1].absenceAttestationRef",
+      "copyInventory.classes[2].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[2].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[2].physicalInventoryRef",
+      "copyInventory.classes[2].unitAndGenerationMappingRef",
+      "copyInventory.classes[2].locationOrObjectVersionRefs",
+      "copyInventory.classes[2].allDecryptingPathsRef",
+      "copyInventory.classes[2].originalDeadlineMappingRef",
+      "copyInventory.classes[2].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[2].irreversibleMechanismRef",
+      "copyInventory.classes[2].receiptRef",
+      "copyInventory.classes[2].absenceAttestationRef",
+      "copyInventory.classes[3].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[3].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[3].physicalInventoryRef",
+      "copyInventory.classes[3].unitAndGenerationMappingRef",
+      "copyInventory.classes[3].locationOrObjectVersionRefs",
+      "copyInventory.classes[3].allDecryptingPathsRef",
+      "copyInventory.classes[3].originalDeadlineMappingRef",
+      "copyInventory.classes[3].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[3].irreversibleMechanismRef",
+      "copyInventory.classes[3].receiptRef",
+      "copyInventory.classes[3].absenceAttestationRef",
+      "copyInventory.classes[4].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[4].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[4].physicalInventoryRef",
+      "copyInventory.classes[4].unitAndGenerationMappingRef",
+      "copyInventory.classes[4].locationOrObjectVersionRefs",
+      "copyInventory.classes[4].allDecryptingPathsRef",
+      "copyInventory.classes[4].originalDeadlineMappingRef",
+      "copyInventory.classes[4].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[4].irreversibleMechanismRef",
+      "copyInventory.classes[4].receiptRef",
+      "copyInventory.classes[4].absenceAttestationRef",
+      "copyInventory.classes[5].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[5].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[5].proposedRecoveryClass",
+      "copyInventory.classes[5].physicalInventoryRef",
+      "copyInventory.classes[5].unitAndGenerationMappingRef",
+      "copyInventory.classes[5].locationOrObjectVersionRefs",
+      "copyInventory.classes[5].allDecryptingPathsRef",
+      "copyInventory.classes[5].originalDeadlineMappingRef",
+      "copyInventory.classes[5].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[5].irreversibleMechanismRef",
+      "copyInventory.classes[5].receiptRef",
+      "copyInventory.classes[5].absenceAttestationRef",
+      "copyInventory.classes[6].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[6].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[6].proposedRecoveryClass",
+      "copyInventory.classes[6].physicalInventoryRef",
+      "copyInventory.classes[6].unitAndGenerationMappingRef",
+      "copyInventory.classes[6].locationOrObjectVersionRefs",
+      "copyInventory.classes[6].allDecryptingPathsRef",
+      "copyInventory.classes[6].originalDeadlineMappingRef",
+      "copyInventory.classes[6].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[6].irreversibleMechanismRef",
+      "copyInventory.classes[6].receiptRef",
+      "copyInventory.classes[6].absenceAttestationRef",
+      "copyInventory.classes[7].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[7].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[7].proposedRecoveryClass",
+      "copyInventory.classes[7].physicalInventoryRef",
+      "copyInventory.classes[7].unitAndGenerationMappingRef",
+      "copyInventory.classes[7].locationOrObjectVersionRefs",
+      "copyInventory.classes[7].allDecryptingPathsRef",
+      "copyInventory.classes[7].originalDeadlineMappingRef",
+      "copyInventory.classes[7].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[7].irreversibleMechanismRef",
+      "copyInventory.classes[7].receiptRef",
+      "copyInventory.classes[7].absenceAttestationRef",
+      "copyInventory.classes[8].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[8].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[8].proposedRecoveryClass",
+      "copyInventory.classes[8].physicalInventoryRef",
+      "copyInventory.classes[8].unitAndGenerationMappingRef",
+      "copyInventory.classes[8].locationOrObjectVersionRefs",
+      "copyInventory.classes[8].allDecryptingPathsRef",
+      "copyInventory.classes[8].originalDeadlineMappingRef",
+      "copyInventory.classes[8].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[8].irreversibleMechanismRef",
+      "copyInventory.classes[8].receiptRef",
+      "copyInventory.classes[8].absenceAttestationRef",
+      "copyInventory.classes[9].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[9].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[9].physicalInventoryRef",
+      "copyInventory.classes[9].unitAndGenerationMappingRef",
+      "copyInventory.classes[9].locationOrObjectVersionRefs",
+      "copyInventory.classes[9].allDecryptingPathsRef",
+      "copyInventory.classes[9].originalDeadlineMappingRef",
+      "copyInventory.classes[9].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[9].irreversibleMechanismRef",
+      "copyInventory.classes[9].receiptRef",
+      "copyInventory.classes[9].absenceAttestationRef",
+      "copyInventory.classes[10].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[10].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[10].proposedRecoveryClass",
+      "copyInventory.classes[10].physicalInventoryRef",
+      "copyInventory.classes[10].unitAndGenerationMappingRef",
+      "copyInventory.classes[10].locationOrObjectVersionRefs",
+      "copyInventory.classes[10].allDecryptingPathsRef",
+      "copyInventory.classes[10].originalDeadlineMappingRef",
+      "copyInventory.classes[10].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[10].irreversibleMechanismRef",
+      "copyInventory.classes[10].receiptRef",
+      "copyInventory.classes[10].absenceAttestationRef",
+      "copyInventory.classes[11].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[11].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[11].proposedRecoveryClass",
+      "copyInventory.classes[11].physicalInventoryRef",
+      "copyInventory.classes[11].unitAndGenerationMappingRef",
+      "copyInventory.classes[11].locationOrObjectVersionRefs",
+      "copyInventory.classes[11].allDecryptingPathsRef",
+      "copyInventory.classes[11].originalDeadlineMappingRef",
+      "copyInventory.classes[11].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[11].irreversibleMechanismRef",
+      "copyInventory.classes[11].receiptRef",
+      "copyInventory.classes[11].absenceAttestationRef",
+      "copyInventory.classes[12].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[12].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[12].proposedRecoveryClass",
+      "copyInventory.classes[12].physicalInventoryRef",
+      "copyInventory.classes[12].unitAndGenerationMappingRef",
+      "copyInventory.classes[12].locationOrObjectVersionRefs",
+      "copyInventory.classes[12].allDecryptingPathsRef",
+      "copyInventory.classes[12].originalDeadlineMappingRef",
+      "copyInventory.classes[12].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[12].irreversibleMechanismRef",
+      "copyInventory.classes[12].receiptRef",
+      "copyInventory.classes[12].absenceAttestationRef",
+      "copyInventory.classes[13].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[13].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[13].proposedRecoveryClass",
+      "copyInventory.classes[13].physicalInventoryRef",
+      "copyInventory.classes[13].unitAndGenerationMappingRef",
+      "copyInventory.classes[13].locationOrObjectVersionRefs",
+      "copyInventory.classes[13].allDecryptingPathsRef",
+      "copyInventory.classes[13].originalDeadlineMappingRef",
+      "copyInventory.classes[13].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[13].irreversibleMechanismRef",
+      "copyInventory.classes[13].receiptRef",
+      "copyInventory.classes[13].absenceAttestationRef",
+      "copyInventory.classes[14].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[14].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[14].physicalInventoryRef",
+      "copyInventory.classes[14].unitAndGenerationMappingRef",
+      "copyInventory.classes[14].locationOrObjectVersionRefs",
+      "copyInventory.classes[14].allDecryptingPathsRef",
+      "copyInventory.classes[14].originalDeadlineMappingRef",
+      "copyInventory.classes[14].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[14].irreversibleMechanismRef",
+      "copyInventory.classes[14].receiptRef",
+      "copyInventory.classes[14].absenceAttestationRef",
+      "copyInventory.classes[15].actualCopyOwnerPrincipalRef",
+      "copyInventory.classes[15].actualDestructionOwnerPrincipalRef",
+      "copyInventory.classes[15].proposedRecoveryClass",
+      "copyInventory.classes[15].physicalInventoryRef",
+      "copyInventory.classes[15].unitAndGenerationMappingRef",
+      "copyInventory.classes[15].locationOrObjectVersionRefs",
+      "copyInventory.classes[15].allDecryptingPathsRef",
+      "copyInventory.classes[15].originalDeadlineMappingRef",
+      "copyInventory.classes[15].fencingAndRegistrationProtocolRef",
+      "copyInventory.classes[15].irreversibleMechanismRef",
+      "copyInventory.classes[15].receiptRef",
+      "copyInventory.classes[15].absenceAttestationRef",
+      "copyInventory.receiptRetentionPolicyRef",
+      "copyInventory.terminalReceiptStoreRef",
+      "copyInventory.independentObserverRef",
+      "restore.approvalRecordRef",
+      "restore.targetRef",
+      "restore.kubeconfigRef",
+      "restore.context",
+      "restore.clusterUid",
+      "restore.namespace",
+      "restore.namespaceUid",
+      "restore.workloadUids",
+      "restore.imageDigests",
+      "restore.cutRef",
+      "restore.immutableBackupObjectVersions",
+      "restore.keyGenerationCoverageRef",
+      "restore.survivingAuthorityRef",
+      "restore.oldIncarnationFenceRef",
+      "restore.recoveryHookContractRef",
+      "restore.hookImplementationRefs",
+      "restore.attemptRef",
+      "restore.epochRef",
+      "restore.operatorPrincipalRef",
+      "restore.observerCredentialRef",
+      "restore.quarantineNetworkPolicyRefs",
+      "restore.cleanupProcedureRef",
+      "restore.verifiedDisposalBound",
+      "failureInjection.approvalRecordRef",
+      "failureInjection.targetRef",
+      "failureInjection.workloadUids",
+      "failureInjection.allowedFaults",
+      "failureInjection.maximumDuration",
+      "failureInjection.operatorPrincipalRef",
+      "failureInjection.observerPrincipalRef",
+      "failureInjection.credentialRefs",
+      "failureInjection.attemptRef",
+      "failureInjection.epochRef",
+      "failureInjection.abortProcedureRef",
+      "failureInjection.rollbackProcedureRef",
+      "failureInjection.cleanupProcedureRef",
+      "decisionRequests[0].assignedPrincipalRef",
+      "decisionRequests[0].decisionRecordRef",
+      "decisionRequests[0].acceptedAt",
+      "decisionRequests[1].assignedPrincipalRef",
+      "decisionRequests[1].decisionRecordRef",
+      "decisionRequests[1].acceptedAt",
+      "decisionRequests[2].assignedPrincipalRef",
+      "decisionRequests[2].decisionRecordRef",
+      "decisionRequests[2].acceptedAt",
+      "decisionRequests[3].assignedPrincipalRef",
+      "decisionRequests[3].decisionRecordRef",
+      "decisionRequests[3].acceptedAt",
+      "decisionRequests[4].assignedPrincipalRef",
+      "decisionRequests[4].decisionRecordRef",
+      "decisionRequests[4].acceptedAt",
+      "decisionRequests[5].assignedPrincipalRef",
+      "decisionRequests[5].decisionRecordRef",
+      "decisionRequests[5].acceptedAt",
+      "decisionRequests[6].assignedPrincipalRef",
+      "decisionRequests[6].decisionRecordRef",
+      "decisionRequests[6].acceptedAt",
+      "decisionRequests[7].assignedPrincipalRef",
+      "decisionRequests[7].decisionRecordRef",
+      "decisionRequests[7].acceptedAt",
+      "decisionRequests[8].assignedPrincipalRef",
+      "decisionRequests[8].decisionRecordRef",
+      "decisionRequests[8].acceptedAt",
+      "decisionRequests[9].assignedPrincipalRef",
+      "decisionRequests[9].decisionRecordRef",
+      "decisionRequests[9].acceptedAt",
+      "decisionRequests[10].assignedPrincipalRef",
+      "decisionRequests[10].decisionRecordRef",
+      "decisionRequests[10].acceptedAt",
+      "decisionRequests[11].assignedPrincipalRef",
+      "decisionRequests[11].decisionRecordRef",
+      "decisionRequests[11].acceptedAt",
+      "decisionRequests[12].assignedPrincipalRef",
+      "decisionRequests[12].decisionRecordRef",
+      "decisionRequests[12].acceptedAt",
+      "acceptance.replacement.partiesCommit",
+      "acceptance.replacement.eventStoreCommit",
+      "acceptance.replacement.platformCommit",
+      "acceptance.replacement.packageAndImageDigests",
+      "acceptance.replacement.rootSubmoduleManifestRef",
+      "acceptance.replacement.runtimeReferenceManifestRef",
+      "acceptance.replacement.integrationDate",
+      "acceptance.replacement.fullLiveCommand",
+      "acceptance.replacement.commandWorkingDirectory",
+      "acceptance.replacement.ownerAcceptanceRecordRef",
+      "acceptance.replacement.passingExactTargetEvidenceRef",
+      "resourceScope.requiredTupleShape.approvalRecordRef",
+      "resourceScope.requiredTupleShape.operatorPrincipalRef",
+      "resourceScope.requiredTupleShape.credentialRef",
+      "resourceScope.requiredTupleShape.clusterUid",
+      "resourceScope.requiredTupleShape.environmentInstance",
+      "resourceScope.requiredTupleShape.apiVersion",
+      "resourceScope.requiredTupleShape.kind",
+      "resourceScope.requiredTupleShape.namespace",
+      "resourceScope.requiredTupleShape.name",
+      "resourceScope.requiredTupleShape.preexistingUid",
+      "resourceScope.requiredTupleShape.intendedReleaseDigest",
+      "resourceScope.requiredTupleShape.expectedImageDigest",
+      "resourceScope.requiredTupleShape.action",
+      "resourceScope.requiredTupleShape.rollbackOrCleanupRef"
+    ],
+    "commandBindings": {
+      "schemaVersion": 1,
+      "recordId": "EXT-PARTIES-1",
+      "status": "unresolved-owner-command-bindings",
+      "executable": false,
+      "bindings": [
+        {
+          "id": "B01",
+          "operation": "Release allowlist/profile/configuration validator",
+          "requestedOperatorRole": "Platform release owner",
+          "owningWork": "4.5/4.6/4.9/4.11/4.12",
+          "requiredValidation": "Exact rendered GVK/namespace/name allowlist, no embedded Secret values, image digests, writer/namespace/hostname isolation.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B02",
+          "operation": "Environment-layer install executor",
+          "requestedOperatorRole": "Platform environment-layer operator",
+          "owningWork": "4.14–4.21/6.7",
+          "requiredValidation": "Closed approved cluster/environment-layer resource list; lock/epoch/fence and exact application/data separation.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B03",
+          "operation": "Application release executor",
+          "requestedOperatorRole": "Platform release operator",
+          "owningWork": "4.22/6.16/6.18/6.23",
+          "requiredValidation": "Retained package/image digests and source/version bindings, epoch, rollout deadline, failure and cleanup behavior; no data rewind.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B04",
+          "operation": "Tenant registry enrollment and two-tenant verification",
+          "requestedOperatorRole": "Tenants operator with Platform identity owner",
+          "owningWork": "4.8/4.19/6.11",
+          "requiredValidation": "Actual authoritative registry/issuer and approved exact tenant references, current enrollment and cross-tenant denial; retain content-free proof.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B05",
+          "operation": "Credential resolve/renew/revoke and missing-generation readiness probes",
+          "requestedOperatorRole": "Actual credential renewal owners",
+          "owningWork": "4.9/4.15",
+          "requiredValidation": "Credential references only; exact only-writer permissions, audience/subject, issuer, expiry/rotation and old-credential denial.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B06",
+          "operation": "Runtime isolation and trust enforcement probes",
+          "requestedOperatorRole": "Platform runtime/network owner",
+          "owningWork": "4.14/4.16/4.18/4.25/6.7",
+          "requiredValidation": "Actual positive and negative network/storage/namespace/Dapr/route controls; no mere label assertion.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B07",
+          "operation": "Backend purpose/key capability and all-generation destruction probes",
+          "requestedOperatorRole": "Selected actor-purpose key custodian",
+          "owningWork": "Q1/Q4/8.6/T2/T6",
+          "requiredValidation": "Prove irreversible per-original-unit expiry of all raw/wrapped/backup generations even during outages, with retained unexpired controls.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B08",
+          "operation": "Current lifecycle/time/epoch and fence-reissue probes",
+          "requestedOperatorRole": "Selected independent authority owner",
+          "owningWork": "Q2/Q4/8.9/T2/T5/T6",
+          "requiredValidation": "Authenticated independent placement, time/skew/currentness and terminal nonrollback state; old-writer denial and new-epoch success.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B09",
+          "operation": "Independent persisted source/snapshot/copy/work/receipt observer",
+          "requestedOperatorRole": "Authorized independent persistence/copy observer",
+          "owningWork": "Q3/T6/F2",
+          "requiredValidation": "Before/after metadata and digests for actual persisted representations and every copy/key generation; no protected plaintext or key output.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B10",
+          "operation": "Original-unit cleanup and original outcome lookup",
+          "requestedOperatorRole": "Assigned destruction operator",
+          "owningWork": "Q3/Q4/T5/T6",
+          "requiredValidation": "Exact original tuple and stable operation/receipt, pending work after uncertain outcomes; closed inventory generation and in-flight copy fencing.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B11",
+          "operation": "Pre-expiry backup capture and immutable version verification",
+          "requestedOperatorRole": "Approved backup operator",
+          "owningWork": "8.4/8.5/8.6/8.7",
+          "requiredValidation": "Genuine data/key/lifecycle cut with complete chain/lineage and independent immutable readback; separate key class.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B12",
+          "operation": "Isolated restore, reconciliation and cleanup executor",
+          "requestedOperatorRole": "Approved Administrator or qualified deputy plus authority fence owners",
+          "owningWork": "4.10/4.23/8.1/8.9/8.10/8.14/8.17",
+          "requiredValidation": "Exact fenced quarantine target/cut/epoch/hook chain and successful retained controls; no current-authority rollback; verified copy disposal.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B13",
+          "operation": "Fault and lost-ack injection/rollback executor",
+          "requestedOperatorRole": "Approved rehearsal operator",
+          "owningWork": "6.1/6.24/F2",
+          "requiredValidation": "Exact workloads, allowed before/after admission/copy/destruction/receipt fault points, restart/lost ack, limits, abort and rollback; no standing production fault credential.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B14",
+          "operation": "Actor-free successor certificate producer/verifier",
+          "requestedOperatorRole": "Parties/EventStore F1 owners",
+          "owningWork": "Q5/Q7/F1",
+          "requiredValidation": "Accepted schema/scope/complete partition and current authority; no expired actor or provenance retained; version/interval uniqueness and positive successor control.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        },
+        {
+          "id": "B15",
+          "operation": "Full exact-checkout compatibility command",
+          "requestedOperatorRole": "Project owner acting as Parties Maintainer with delivery owners",
+          "owningWork": "EXT-PARTIES-1/F2",
+          "requiredValidation": "Owner-accepted immutable repositories/submodules, installed targets and command/date; P-01–P-10 plus all installed custody/recovery/fault rows with no skip.",
+          "approvalRecordRef": null,
+          "operatorPrincipalRef": null,
+          "observerPrincipalRef": null,
+          "credentialRefs": null,
+          "targetAndResourceAllowlistRef": null,
+          "exactArgv": null,
+          "workingDirectory": null,
+          "timeoutAndCancellationRef": null,
+          "expectedReceiptSchemaRef": null,
+          "abortAndCleanupRef": null,
+          "resultRef": null
+        }
+      ],
+      "metadataCommandsAlreadyExecuted": "native-metadata.json",
+      "conditionalValidationSyntaxOnly": "installation-plan.md",
+      "liveCommandRule": "Only after all required references, implementation and owner acceptance exist; do not execute the preserved legacy command or the template now."
+    },
+    "missingCommandFields": [
+      "bindings[0].approvalRecordRef",
+      "bindings[0].operatorPrincipalRef",
+      "bindings[0].observerPrincipalRef",
+      "bindings[0].credentialRefs",
+      "bindings[0].targetAndResourceAllowlistRef",
+      "bindings[0].exactArgv",
+      "bindings[0].workingDirectory",
+      "bindings[0].timeoutAndCancellationRef",
+      "bindings[0].expectedReceiptSchemaRef",
+      "bindings[0].abortAndCleanupRef",
+      "bindings[0].resultRef",
+      "bindings[1].approvalRecordRef",
+      "bindings[1].operatorPrincipalRef",
+      "bindings[1].observerPrincipalRef",
+      "bindings[1].credentialRefs",
+      "bindings[1].targetAndResourceAllowlistRef",
+      "bindings[1].exactArgv",
+      "bindings[1].workingDirectory",
+      "bindings[1].timeoutAndCancellationRef",
+      "bindings[1].expectedReceiptSchemaRef",
+      "bindings[1].abortAndCleanupRef",
+      "bindings[1].resultRef",
+      "bindings[2].approvalRecordRef",
+      "bindings[2].operatorPrincipalRef",
+      "bindings[2].observerPrincipalRef",
+      "bindings[2].credentialRefs",
+      "bindings[2].targetAndResourceAllowlistRef",
+      "bindings[2].exactArgv",
+      "bindings[2].workingDirectory",
+      "bindings[2].timeoutAndCancellationRef",
+      "bindings[2].expectedReceiptSchemaRef",
+      "bindings[2].abortAndCleanupRef",
+      "bindings[2].resultRef",
+      "bindings[3].approvalRecordRef",
+      "bindings[3].operatorPrincipalRef",
+      "bindings[3].observerPrincipalRef",
+      "bindings[3].credentialRefs",
+      "bindings[3].targetAndResourceAllowlistRef",
+      "bindings[3].exactArgv",
+      "bindings[3].workingDirectory",
+      "bindings[3].timeoutAndCancellationRef",
+      "bindings[3].expectedReceiptSchemaRef",
+      "bindings[3].abortAndCleanupRef",
+      "bindings[3].resultRef",
+      "bindings[4].approvalRecordRef",
+      "bindings[4].operatorPrincipalRef",
+      "bindings[4].observerPrincipalRef",
+      "bindings[4].credentialRefs",
+      "bindings[4].targetAndResourceAllowlistRef",
+      "bindings[4].exactArgv",
+      "bindings[4].workingDirectory",
+      "bindings[4].timeoutAndCancellationRef",
+      "bindings[4].expectedReceiptSchemaRef",
+      "bindings[4].abortAndCleanupRef",
+      "bindings[4].resultRef",
+      "bindings[5].approvalRecordRef",
+      "bindings[5].operatorPrincipalRef",
+      "bindings[5].observerPrincipalRef",
+      "bindings[5].credentialRefs",
+      "bindings[5].targetAndResourceAllowlistRef",
+      "bindings[5].exactArgv",
+      "bindings[5].workingDirectory",
+      "bindings[5].timeoutAndCancellationRef",
+      "bindings[5].expectedReceiptSchemaRef",
+      "bindings[5].abortAndCleanupRef",
+      "bindings[5].resultRef",
+      "bindings[6].approvalRecordRef",
+      "bindings[6].operatorPrincipalRef",
+      "bindings[6].observerPrincipalRef",
+      "bindings[6].credentialRefs",
+      "bindings[6].targetAndResourceAllowlistRef",
+      "bindings[6].exactArgv",
+      "bindings[6].workingDirectory",
+      "bindings[6].timeoutAndCancellationRef",
+      "bindings[6].expectedReceiptSchemaRef",
+      "bindings[6].abortAndCleanupRef",
+      "bindings[6].resultRef",
+      "bindings[7].approvalRecordRef",
+      "bindings[7].operatorPrincipalRef",
+      "bindings[7].observerPrincipalRef",
+      "bindings[7].credentialRefs",
+      "bindings[7].targetAndResourceAllowlistRef",
+      "bindings[7].exactArgv",
+      "bindings[7].workingDirectory",
+      "bindings[7].timeoutAndCancellationRef",
+      "bindings[7].expectedReceiptSchemaRef",
+      "bindings[7].abortAndCleanupRef",
+      "bindings[7].resultRef",
+      "bindings[8].approvalRecordRef",
+      "bindings[8].operatorPrincipalRef",
+      "bindings[8].observerPrincipalRef",
+      "bindings[8].credentialRefs",
+      "bindings[8].targetAndResourceAllowlistRef",
+      "bindings[8].exactArgv",
+      "bindings[8].workingDirectory",
+      "bindings[8].timeoutAndCancellationRef",
+      "bindings[8].expectedReceiptSchemaRef",
+      "bindings[8].abortAndCleanupRef",
+      "bindings[8].resultRef",
+      "bindings[9].approvalRecordRef",
+      "bindings[9].operatorPrincipalRef",
+      "bindings[9].observerPrincipalRef",
+      "bindings[9].credentialRefs",
+      "bindings[9].targetAndResourceAllowlistRef",
+      "bindings[9].exactArgv",
+      "bindings[9].workingDirectory",
+      "bindings[9].timeoutAndCancellationRef",
+      "bindings[9].expectedReceiptSchemaRef",
+      "bindings[9].abortAndCleanupRef",
+      "bindings[9].resultRef",
+      "bindings[10].approvalRecordRef",
+      "bindings[10].operatorPrincipalRef",
+      "bindings[10].observerPrincipalRef",
+      "bindings[10].credentialRefs",
+      "bindings[10].targetAndResourceAllowlistRef",
+      "bindings[10].exactArgv",
+      "bindings[10].workingDirectory",
+      "bindings[10].timeoutAndCancellationRef",
+      "bindings[10].expectedReceiptSchemaRef",
+      "bindings[10].abortAndCleanupRef",
+      "bindings[10].resultRef",
+      "bindings[11].approvalRecordRef",
+      "bindings[11].operatorPrincipalRef",
+      "bindings[11].observerPrincipalRef",
+      "bindings[11].credentialRefs",
+      "bindings[11].targetAndResourceAllowlistRef",
+      "bindings[11].exactArgv",
+      "bindings[11].workingDirectory",
+      "bindings[11].timeoutAndCancellationRef",
+      "bindings[11].expectedReceiptSchemaRef",
+      "bindings[11].abortAndCleanupRef",
+      "bindings[11].resultRef",
+      "bindings[12].approvalRecordRef",
+      "bindings[12].operatorPrincipalRef",
+      "bindings[12].observerPrincipalRef",
+      "bindings[12].credentialRefs",
+      "bindings[12].targetAndResourceAllowlistRef",
+      "bindings[12].exactArgv",
+      "bindings[12].workingDirectory",
+      "bindings[12].timeoutAndCancellationRef",
+      "bindings[12].expectedReceiptSchemaRef",
+      "bindings[12].abortAndCleanupRef",
+      "bindings[12].resultRef",
+      "bindings[13].approvalRecordRef",
+      "bindings[13].operatorPrincipalRef",
+      "bindings[13].observerPrincipalRef",
+      "bindings[13].credentialRefs",
+      "bindings[13].targetAndResourceAllowlistRef",
+      "bindings[13].exactArgv",
+      "bindings[13].workingDirectory",
+      "bindings[13].timeoutAndCancellationRef",
+      "bindings[13].expectedReceiptSchemaRef",
+      "bindings[13].abortAndCleanupRef",
+      "bindings[13].resultRef",
+      "bindings[14].approvalRecordRef",
+      "bindings[14].operatorPrincipalRef",
+      "bindings[14].observerPrincipalRef",
+      "bindings[14].credentialRefs",
+      "bindings[14].targetAndResourceAllowlistRef",
+      "bindings[14].exactArgv",
+      "bindings[14].workingDirectory",
+      "bindings[14].timeoutAndCancellationRef",
+      "bindings[14].expectedReceiptSchemaRef",
+      "bindings[14].abortAndCleanupRef",
+      "bindings[14].resultRef"
+    ],
+    "historicalProposalLedgerInstalledHashes": {
+      "backendProfile": null,
+      "applicationConfiguration": null,
+      "qualificationPlan": null,
+      "publicTrust": null,
+      "completeInstalledTarget": null
+    },
+    "installedHashState": {
+      "profile": null,
+      "configuration": null,
+      "plan": null,
+      "publicTrust": null
+    },
+    "liveInputPresenceOnly": {
+      "EXT_PARTIES_GATEWAY_URL": false,
+      "EXT_PARTIES_TENANT_A": false,
+      "EXT_PARTIES_TENANT_B": false,
+      "EXT_PARTIES_PROVISIONER_CREDENTIAL": false,
+      "EXT_PARTIES_IDENTITY_WRITER_CREDENTIAL": false,
+      "EXT_PARTIES_READER_CREDENTIAL": false,
+      "EXT_PARTIES_POLICY_ID": false,
+      "EXT_PARTIES_RETENTION": false,
+      "EXT_PARTIES_EXPIRY_TRIGGER": false,
+      "EXT_PARTIES_CUSTODY_TARGET": false,
+      "EXT_PARTIES_RESTORE_TARGET": false,
+      "EXT_PARTIES_FAILURE_INJECTION_TARGET": false
+    },
+    "acceptedCommand": "test \"$(git -C ../parties rev-parse HEAD)\" = \"56cb4401c4179d431385ad3d931fefa402e4fc5a\" && test -z \"$(git -C ../parties status --porcelain)\" && pwsh -NoProfile -File ../parties/eng/verify-ext-parties-1.ps1 -Mode Live -EventStoreRoot ../eventstore -PlatformRoot ../platform -EvidenceDirectory /tmp/ext-parties-1-live",
+    "candidateRefusalCommand": "pwsh -NoProfile -File eng/verify-ext-parties-1.ps1 -Mode Live -EvidenceDirectory /tmp/ext-parties-1-owner-delivery-20261025-live",
+    "candidateCommandEvidenceDirectoryAlreadyExists": true,
+    "livePassPath": false,
+    "currentGuard": "eng/verify-ext-parties-1.ps1:27-31 refuses an existing evidence directory and atomically creates .ext-parties-1-attempt; Live:33-44 then refuses regardless of complete environment variables. No invocation performed.",
+    "stopDirection": {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-custody-direction-2026-10-25.md",
+      "effective": true,
+      "productionBackendImplementationAllowed": false,
+      "qualifiedBackendEstablished": false,
+      "contractAmended": false,
+      "replacementIntegrationDate": null,
+      "supersededDates": [
+        "2026-11-13",
+        "2026-12-14"
+      ]
+    },
+    "preservedLocalEvidence": [
+      {
+        "path": "/tmp/ext-parties-1-owner-delivery-20261025/Hexalith.Parties.IntegrationTests-tests.xml",
+        "assemblies": [
+          {
+            "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+            "id": "117fdc98-67ad-452d-a2b5-7f150a3aa5d3",
+            "name": "/tmp/ext-parties-1-owner-delivery-20261025/artifacts/bin/Hexalith.Parties.IntegrationTests/debug/Hexalith.Parties.IntegrationTests.dll",
+            "run-date": "2026-10-25",
+            "run-time": "10:42:09",
+            "start-rtf": "2026-10-25T10:42:09.6253297+00:00",
+            "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+            "target-framework": ".NETCoreApp,Version=v10.0",
+            "errors": "0",
+            "failed": "0",
+            "finish-rtf": "2026-10-25T10:42:10.7368317+00:00",
+            "not-run": "0",
+            "passed": "11",
+            "skipped": "0",
+            "time": "1.112",
+            "time-rtf": "00:00:01.1120000",
+            "total": "11"
+          }
+        ],
+        "testCount": 11
+      },
+      {
+        "path": "/tmp/ext-parties-1-owner-delivery-20261025/Hexalith.EventStore.Server.Tests-tests.xml",
+        "assemblies": [
+          {
+            "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, non-parallel]",
+            "id": "73e70267-74cd-4d4d-9f90-e538ea8caa87",
+            "name": "/tmp/ext-parties-1-owner-delivery-20261025/artifacts/bin/Hexalith.EventStore.Server.Tests/debug/Hexalith.EventStore.Server.Tests.dll",
+            "run-date": "2026-10-25",
+            "run-time": "10:40:33",
+            "start-rtf": "2026-10-25T10:40:33.4524847+00:00",
+            "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+            "target-framework": ".NETCoreApp,Version=v10.0",
+            "errors": "0",
+            "failed": "4",
+            "finish-rtf": "2026-10-25T10:40:39.2619529+00:00",
+            "not-run": "0",
+            "passed": "446",
+            "skipped": "0",
+            "time": "5.811",
+            "time-rtf": "00:00:05.8110000",
+            "total": "450"
+          }
+        ],
+        "testCount": 450
+      }
+    ]
+  },
+  "conversations": {
+    "packetPath": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/replacement-acceptance-packet.blocked.json",
+    "packetSha256": "20530c84523119b21e609d7e4dbdb95abe08aff867b58097dfa51105cac76932",
+    "packet": {
+      "schemaVersion": 1,
+      "kind": "BlockedReplacementAcceptancePacket",
+      "record": "EXT-CONV-AI-1",
+      "cohort": "OQ-5.4-1",
+      "observedAt": "2026-10-25T11:31:13.614898+00:00",
+      "result": "BLOCKED",
+      "complete": false,
+      "accepted": false,
+      "available": false,
+      "acceptedRegister": {
+        "repository": "Hexalith.Agents",
+        "commit": "28d0c413107275c9ab1590fb2f64376445c89280",
+        "path": "_bmad-output/planning-artifacts/external-dependency-register.md",
+        "sha256": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2",
+        "snapshot": "accepted-register.git-blob.md"
+      },
+      "replacement": {
+        "owner": "Project owner (user declaration 2026-10-07), acting as Conversations Maintainer",
+        "repository": "Hexalith.Conversations",
+        "requiredArtifact": "Six core V1 seams. (1) Membership: public `IConversationClient.AddParticipantAsync` and `POST /api/v1/conversations/{conversationId}/participants`, limited for Agents to stable AI Party identity, `ParticipantType.AiAgent`, and `ParticipantRole.Member`; exact retries are idempotent no-ops, conflicting type/role is a typed conflict, and cross-tenant or general participant management is denied; plus a participant-state read for the AI participant and a participant removal limited to the AI participant for the PRD FR-2 removal block. Before accepting membership, Conversations verifies the immutable provisioned Party by id and additionally verifies AI type only when `EXT-PARTIES-1` commits Branch A; Branch B accepts its approved Organization type by id; the record owner supplies the final member and typed failure names (A-21). (2) Posting: append a Conversation Message as the `AiAgent` participant with an Agents-supplied deterministic `MessageId` and idempotency key, persisted verbatim or rejected (a differing returned id is a typed incompatibility that blocks posting), and message metadata carrying the Agent Call trace reference and provenance flags (AI-generated; human-edited and by which Party), so restart or replay cannot duplicate a post; plus an existence read by `MessageId` returning the message, typed absence, typed `ConversationDeleted`, typed `PrincipalRemovedFromConversation`, or unavailable, so Agents can check before retry or abandonment after a lost acknowledgement and record `LateConfirmed` rather than contradict an already-posted message. (3) Facilitator resolution: `ParticipantRole.Facilitator` on the participant read model. (4) The Eligible Conversation denominator is supplied either as an active-Conversation count per tenant/window or as a Conversations-side tenant event feed from which Agents computes the same count, never from Agent Calls (A-4). (5) Tenant-scoped reads under the Agents Service Principal of complete Conversation content, the Participant roster with roles, and Conversation existence/accessibility; they return typed `ConversationDeleted` and `PrincipalRemovedFromConversation` distinctly from transient denial or error, and content contains the messages a Participant would currently see, including current edit/delete state (A-15). (6) A Conversations-owned durable outbox or ordered tenant/source feed entry created atomically with the approved Conversation-deletion decision. It carries one immutable `ConversationDeletionSignalId` bound one-to-one to that logical approval, `TenantId`, `ConversationId`, stable source stream/revision, approval reference, source-contract version, and an independent delivery-attempt id. Reconnect/backfill is ordered from a durable checkpoint; the source retains and retries the same logical entry through Agents outage, typed refusal, target-version rollover, and lost acknowledgement until authenticated `DeletionSignalAccepted(SignalId, SourceRevision, ProtectedDeletionRevision)` advances the checkpoint. Retransmission never mints a new signal id/source revision; changed fields at the same id are a quarantined compatibility conflict that is not skipped or acknowledged, blocks seam readiness, and exposes only safe poison metadata. Source-revision and Agents acknowledgement lookup resolve both sides of lost delivery. The authenticated source identity and exact target are verified before Agents dispatch; the signal triggers PRD FR-30 deletion of derived Agent content and never grants a human Agents role, local cancellation authority, or scope beyond that source Conversation. Final member and typed failure names are owned by this record (PRD §8.1 assumptions A-1 through A-4, A-15, A-16, A-21).",
+        "targetVersionOrCommit": null,
+        "targetIntegrationDate": "2026-10-08",
+        "verificationCommand": null,
+        "requiredEvidenceLevel": "Levels 4 and 5",
+        "consumingStories": "5.4, 6.1, 6.2, 6.3, 6.6, 6.8, 7.1–7.5, 7.7, 8.3, 8.5, 8.8; `RQ-1`",
+        "status": "NotSubmitted",
+        "reason": "The source candidate is recorded separately. A complete exact-command/hash acceptance packet remains blocked on independently verified installed bindings, prerequisite owner targets and hashes. Replacement Committed acceptance precedes execution of its exact owner command; persisted C1-C4 evidence is required to establish Available, not to propose or accept Committed.",
+        "proposedCommandShape": {
+          "executable": "pwsh",
+          "arguments": [
+            "-NoProfile",
+            "-File",
+            "../conversations/eng/verify-ext-conv-ai-1.ps1",
+            "-Mode",
+            "Live",
+            "-LiveManifest",
+            null,
+            "-ArtifactsPath",
+            null
+          ],
+          "exactPinnedShellCommand": null
+        },
+        "runtimeQualificationBinding": {
+          "schemaVersion": 1,
+          "cohortId": "OQ-5.4-1",
+          "manifestSha256": null,
+          "files": {
+            "configuration": {
+              "path": null,
+              "sha256": null
+            },
+            "plan": {
+              "path": null,
+              "sha256": null
+            },
+            "hostProfile": {
+              "path": null,
+              "sha256": null
+            },
+            "hostVerifierEvidence": {
+              "path": null,
+              "sha256": null
+            },
+            "sourceAnchor": {
+              "path": null,
+              "sha256": null
+            },
+            "partyAnchor": {
+              "path": null,
+              "sha256": null
+            },
+            "approvalAnchor": {
+              "path": null,
+              "sha256": null
+            },
+            "workerAnchor": {
+              "path": null,
+              "sha256": null
+            },
+            "receiverAnchor": {
+              "path": null,
+              "sha256": null
+            },
+            "lookupAnchor": {
+              "path": null,
+              "sha256": null
+            },
+            "observerAnchor": {
+              "path": null,
+              "sha256": null
+            },
+            "controlAnchor": {
+              "path": null,
+              "sha256": null
+            }
+          }
+        }
+      },
+      "source": {
+        "baselineCommit": "71fab44b7dd664699cedbbfc17ed0d7822e8bdb9",
+        "observedCommit": "ed53473ea4c67aa10ffc46c9b951d9864fe263d4",
+        "candidateSourceCommit": "ed53473ea4c67aa10ffc46c9b951d9864fe263d4",
+        "candidateIsCanonical": true,
+        "completeReviewedImmutableTarget": null,
+        "sourceInventory": "source-observations.json",
+        "historicalReviewUnchangedFiles": 29,
+        "historicalReviewTotalFiles": 31,
+        "allInventoryFilesMatchCandidateCommit": true,
+        "workingTreeStatusBeforeDocumentationUpdate": " M references/Hexalith.Builds\n",
+        "committedByThisRun": false
+      },
+      "verification": {
+        "summary": "verification.json",
+        "componentTestsPassed": true,
+        "cohortExecuted": false,
+        "attemptReserved": false,
+        "liveCommandExecuted": false,
+        "refusalCommandExecuted": false,
+        "C1": "NOT_RUN",
+        "C2": "NOT_RUN",
+        "C3": "NOT_RUN",
+        "C4": "NOT_RUN",
+        "historicalEvidencePreservedAt": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44",
+        "qualificationAuthorization": "User requires acceptance before any Live qualification."
+      },
+      "installedBindings": {
+        "liveManifest": null,
+        "servicePartyEnrollment": null,
+        "workerMachineBinding": null,
+        "approvalIssuer": null,
+        "commandSourceAuthority": null,
+        "sourcePublicationAuthority": null,
+        "hostDeliveryTransport": null,
+        "conformanceReceiver": null,
+        "independentLookup": null,
+        "retainedOwnerAttemptJournal": null
+      },
+      "separation": {
+        "receiverKind": "ContractConformance",
+        "evidenceLevel": 4,
+        "agentsPackageIncluded": false,
+        "agentsStory83Receiver": "GATED",
+        "rq1Level5": "GATED"
+      },
+      "blockerCodes": [
+        "APPROVAL_ISSUER_MISSING",
+        "COMMAND_SOURCE_ATTESTATION_UNAVAILABLE",
+        "HOST_DELIVERY_TRANSPORT_MISSING",
+        "HOST_LIVE_PASS_PATH_NOT_QUALIFIED",
+        "LIVE_MANIFEST_MISSING",
+        "OWNER_TARGET_NOT_ACCEPTED",
+        "PARTY_ENROLLMENT_MISSING",
+        "PROTECTION_NOT_COMMITTED",
+        "PUBLICATION_AUTHORITY_UNAVAILABLE",
+        "RECEIVER_NOT_INSTALLED",
+        "WORKER_BINDING_MISSING"
+      ],
+      "completionOrder": [
+        "Obtain the full Committed EXT-PROTECTION-1 owner target and executable command, the pinned EXT-HOST-1 Live pass path/profile, and all OQ prerequisite owner inputs.",
+        "Deliver and independently verify current source/compare-append and publication authorities, the dedicated immutable tenant/Party enrollment, worker machine binding, and approval issuer.",
+        "Compose the actual authenticated host delivery adapter and separately install/enroll the conformance receiver and independent lookup with current SDK credentials and retained target/journal storage.",
+        "Freeze the complete clean canonical source candidate, exact installed targets, manifest, configuration, plan/body inventory, profile, public anchors and retained journal location. Prepare and obtain replacement Committed acceptance for the exact command and hashes before any Live invocation.",
+        "Only after acceptance and all OQ prerequisites pass, execute exactly one approved C1-C4 owner qualification and retain all attempts. Passing persisted evidence is required before an Available claim."
+      ],
+      "evidenceInventory": "evidence-inventory.json",
+      "acceptanceReadiness": {
+        "status": "BLOCKED",
+        "candidateSourceCommit": "ed53473ea4c67aa10ffc46c9b951d9864fe263d4",
+        "installedManifestSha256": null,
+        "installedConfigurationSha256": null,
+        "planSha256": null,
+        "profileSha256": null,
+        "protectionTarget": null,
+        "hostLivePassPathQualified": false,
+        "runtimeQualificationBindingAccepted": false,
+        "requiresPassingC1C4BeforeCommittedAcceptance": false
+      }
+    },
+    "missingPacketFields": [
+      "replacement.targetVersionOrCommit",
+      "replacement.verificationCommand",
+      "replacement.proposedCommandShape.arguments[6]",
+      "replacement.proposedCommandShape.arguments[8]",
+      "replacement.proposedCommandShape.exactPinnedShellCommand",
+      "replacement.runtimeQualificationBinding.manifestSha256",
+      "replacement.runtimeQualificationBinding.files.configuration.path",
+      "replacement.runtimeQualificationBinding.files.configuration.sha256",
+      "replacement.runtimeQualificationBinding.files.plan.path",
+      "replacement.runtimeQualificationBinding.files.plan.sha256",
+      "replacement.runtimeQualificationBinding.files.hostProfile.path",
+      "replacement.runtimeQualificationBinding.files.hostProfile.sha256",
+      "replacement.runtimeQualificationBinding.files.hostVerifierEvidence.path",
+      "replacement.runtimeQualificationBinding.files.hostVerifierEvidence.sha256",
+      "replacement.runtimeQualificationBinding.files.sourceAnchor.path",
+      "replacement.runtimeQualificationBinding.files.sourceAnchor.sha256",
+      "replacement.runtimeQualificationBinding.files.partyAnchor.path",
+      "replacement.runtimeQualificationBinding.files.partyAnchor.sha256",
+      "replacement.runtimeQualificationBinding.files.approvalAnchor.path",
+      "replacement.runtimeQualificationBinding.files.approvalAnchor.sha256",
+      "replacement.runtimeQualificationBinding.files.workerAnchor.path",
+      "replacement.runtimeQualificationBinding.files.workerAnchor.sha256",
+      "replacement.runtimeQualificationBinding.files.receiverAnchor.path",
+      "replacement.runtimeQualificationBinding.files.receiverAnchor.sha256",
+      "replacement.runtimeQualificationBinding.files.lookupAnchor.path",
+      "replacement.runtimeQualificationBinding.files.lookupAnchor.sha256",
+      "replacement.runtimeQualificationBinding.files.observerAnchor.path",
+      "replacement.runtimeQualificationBinding.files.observerAnchor.sha256",
+      "replacement.runtimeQualificationBinding.files.controlAnchor.path",
+      "replacement.runtimeQualificationBinding.files.controlAnchor.sha256",
+      "source.completeReviewedImmutableTarget",
+      "installedBindings.liveManifest",
+      "installedBindings.servicePartyEnrollment",
+      "installedBindings.workerMachineBinding",
+      "installedBindings.approvalIssuer",
+      "installedBindings.commandSourceAuthority",
+      "installedBindings.sourcePublicationAuthority",
+      "installedBindings.hostDeliveryTransport",
+      "installedBindings.conformanceReceiver",
+      "installedBindings.independentLookup",
+      "installedBindings.retainedOwnerAttemptJournal",
+      "acceptanceReadiness.installedManifestSha256",
+      "acceptanceReadiness.installedConfigurationSha256",
+      "acceptanceReadiness.planSha256",
+      "acceptanceReadiness.profileSha256",
+      "acceptanceReadiness.protectionTarget"
+    ],
+    "installedManifest": {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/live-manifest.json",
+      "exists": false,
+      "sha256": null
+    },
+    "manifestEnvironmentReferencePresent": false,
+    "installedHashState": {
+      "manifest": null,
+      "configuration": null,
+      "plan": null,
+      "hostProfile": null,
+      "publicTrust": null
+    },
+    "missingInstalledBindings": [
+      "liveManifest",
+      "servicePartyEnrollment",
+      "workerMachineBinding",
+      "approvalIssuer",
+      "commandSourceAuthority",
+      "sourcePublicationAuthority",
+      "hostDeliveryTransport",
+      "conformanceReceiver",
+      "independentLookup",
+      "retainedOwnerAttemptJournal"
+    ],
+    "missingFrozenInputs": [
+      "configuration",
+      "plan",
+      "hostProfile",
+      "hostVerifierEvidence",
+      "sourceAnchor",
+      "partyAnchor",
+      "approvalAnchor",
+      "workerAnchor",
+      "receiverAnchor",
+      "lookupAnchor",
+      "observerAnchor",
+      "controlAnchor"
+    ],
+    "acceptedCommand": "test \"$(git -C ../conversations rev-parse HEAD)\" = \"87e8b4a6ec3224b20a560b0e83de857805925572\" && test -z \"$(git -C ../conversations status --porcelain)\" && pwsh -NoProfile -File ../conversations/eng/verify-ext-conv-ai-1.ps1 -Mode Live -LiveManifest /home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/live-manifest.json -ArtifactsPath /tmp/ext-conv-ai-1-live",
+    "proposedCommandShape": {
+      "executable": "pwsh",
+      "arguments": [
+        "-NoProfile",
+        "-File",
+        "../conversations/eng/verify-ext-conv-ai-1.ps1",
+        "-Mode",
+        "Live",
+        "-LiveManifest",
+        null,
+        "-ArtifactsPath",
+        null
+      ],
+      "exactPinnedShellCommand": null
+    },
+    "replacementExactCommand": null,
+    "conditionalNewSpecDate": {
+      "path": "/home/administrator/projects/hexalith/conversations/_bmad-output/implementation-artifacts/spec-5-4-ext-conv-ai-1-installed-delivery.md",
+      "date": "2026-10-25",
+      "condition": "Only when complete packet is sealed on that UTC date",
+      "sealedCompletePacketFound": false,
+      "appliedToRegister": false
+    },
+    "currentHeadVsPacketSourceInventory": [
+      {
+        "path": ".github/workflows/ci.yml",
+        "packetSha256": "83d426cfd36de8eff90a44931612bc385087cc660bc63e56eb10dc96689cafe6",
+        "currentHeadSha256": "83d426cfd36de8eff90a44931612bc385087cc660bc63e56eb10dc96689cafe6",
+        "matches": true
+      },
+      {
+        "path": "Hexalith.Conversations.slnx",
+        "packetSha256": "42cbe1bdcd286bd7bddec1f1e9f200966694e58705fd5a0b8e5572c7e39aacf5",
+        "currentHeadSha256": "42cbe1bdcd286bd7bddec1f1e9f200966694e58705fd5a0b8e5572c7e39aacf5",
+        "matches": true
+      },
+      {
+        "path": "_bmad-output/implementation-artifacts/deferred-work.md",
+        "packetSha256": "94d6e900b87441909bf7a70553fcfdb5d39c263f95395f17e3c4f31c941b6a2e",
+        "currentHeadSha256": "19f50128bdfa4d040f83a8e777204e25146e085461eb32ddd5c32a6120b4c354",
+        "matches": false
+      },
+      {
+        "path": "_bmad-output/implementation-artifacts/spec-5-4-ext-conv-ai-1-owner-qualification.md",
+        "packetSha256": "549aba1d58ff4e58d39ece11ca65b4aac6a25d09c93170635cf055f4796e4b4e",
+        "currentHeadSha256": "d47b086dda8917acfcf64b84bf02792eddec2c3f981baa6bad38acefd2a2520a",
+        "matches": false
+      },
+      {
+        "path": "docs/implementation/ext-conv-ai-1-deletion-conformance-receiver.md",
+        "packetSha256": "b19f449f7aeb59da5916e83076a77938fe5ea2dabdf02b170d6a87b9cb3fa98e",
+        "currentHeadSha256": "b19f449f7aeb59da5916e83076a77938fe5ea2dabdf02b170d6a87b9cb3fa98e",
+        "matches": true
+      },
+      {
+        "path": "docs/implementation/ext-conv-ai-1-runtime-qualification.md",
+        "packetSha256": "0087665ac0d04817ebd5005287f41cb760c390505f788fcf5a9ef96aa12f3130",
+        "currentHeadSha256": "375a7fbeb966480ff14085fb9d6d6a663382fc2f393a4278d9a774b313132435",
+        "matches": false
+      },
+      {
+        "path": "eng/ext-conv-ai-1-qualification.ps1",
+        "packetSha256": "7f33345fb23f0ecd4cfec0fab24a83d755bb8e130b27f4da51873b4e827b9b82",
+        "currentHeadSha256": "7f33345fb23f0ecd4cfec0fab24a83d755bb8e130b27f4da51873b4e827b9b82",
+        "matches": true
+      },
+      {
+        "path": "eng/verify-ext-conv-ai-1-live.ps1",
+        "packetSha256": "e2b8f7662606fb6ffb1093122044a91652ad0c28beddab5743ba4094a312f89e",
+        "currentHeadSha256": "e2b8f7662606fb6ffb1093122044a91652ad0c28beddab5743ba4094a312f89e",
+        "matches": true
+      },
+      {
+        "path": "eng/verify-ext-conv-ai-1.ps1",
+        "packetSha256": "1b1f5419faa96b18cbc4cd0361c294b0558cdb8f5b9a2c63b9cab54d3cc7fd20",
+        "currentHeadSha256": "1b1f5419faa96b18cbc4cd0361c294b0558cdb8f5b9a2c63b9cab54d3cc7fd20",
+        "matches": true
+      },
+      {
+        "path": "tests/Hexalith.Conversations.DeletionConformance.Tests/ConformanceFixture.cs",
+        "packetSha256": "3d287eede97cd81897a0f233145562065b471e342fcf4d287162ff3165f53c12",
+        "currentHeadSha256": "3d287eede97cd81897a0f233145562065b471e342fcf4d287162ff3165f53c12",
+        "matches": true
+      },
+      {
+        "path": "tests/Hexalith.Conversations.DeletionConformance.Tests/DeletionConformanceStartupTests.cs",
+        "packetSha256": "fdff4dd499c8786a5f7415ce1f3f84d1b24901faa61674c4f181a43c820fd819",
+        "currentHeadSha256": "fdff4dd499c8786a5f7415ce1f3f84d1b24901faa61674c4f181a43c820fd819",
+        "matches": true
+      },
+      {
+        "path": "tests/Hexalith.Conversations.DeletionConformance.Tests/DeletionConformanceTests.cs",
+        "packetSha256": "2af63e27f1a0468c9c1d5d86e428c5459d5d5d51db0ea8aa5015e66c1731d03f",
+        "currentHeadSha256": "2af63e27f1a0468c9c1d5d86e428c5459d5d5d51db0ea8aa5015e66c1731d03f",
+        "matches": true
+      },
+      {
+        "path": "tests/Hexalith.Conversations.DeletionConformance.Tests/Hexalith.Conversations.DeletionConformance.Tests.csproj",
+        "packetSha256": "5a748c82a944f2d0182966794f254059975a7bedc89094bd5813523430d80840",
+        "currentHeadSha256": "5a748c82a944f2d0182966794f254059975a7bedc89094bd5813523430d80840",
+        "matches": true
+      },
+      {
+        "path": "tests/tooling/test_ext_conv_ai_1_live_runner.py",
+        "packetSha256": "f7f7cf8049717cf6494242e3a8bffef1fe408e6b53ac3c238609bdacb917373f",
+        "currentHeadSha256": "f7f7cf8049717cf6494242e3a8bffef1fe408e6b53ac3c238609bdacb917373f",
+        "matches": true
+      },
+      {
+        "path": "tests/tooling/test_ext_conv_ai_1_qualification.py",
+        "packetSha256": "b647794a33815bbda67896d67a9183a7b16beb614768eeceeaa46eed38171a98",
+        "currentHeadSha256": "b647794a33815bbda67896d67a9183a7b16beb614768eeceeaa46eed38171a98",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/AcceptConformanceDeletion.cs",
+        "packetSha256": "67647704742367a000078cdf36634683d80ab06e66c1285c19c88138b52a4c3d",
+        "currentHeadSha256": "67647704742367a000078cdf36634683d80ab06e66c1285c19c88138b52a4c3d",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/ConformanceDeletionAccepted.cs",
+        "packetSha256": "a47faf7e148578f3e3586f9ab52785bd24347fe178c00d1f9978be5680ef28e6",
+        "currentHeadSha256": "a47faf7e148578f3e3586f9ab52785bd24347fe178c00d1f9978be5680ef28e6",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/ConformanceDeletionRejected.cs",
+        "packetSha256": "fef1af1e461c0b7354d2ef0b325099ae638f3edf83959bf5bded0cd13674e48c",
+        "currentHeadSha256": "fef1af1e461c0b7354d2ef0b325099ae638f3edf83959bf5bded0cd13674e48c",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/DeletionConformanceAdmission.cs",
+        "packetSha256": "ab20b29ed7e4354dff7289c18cdbd6b77364f082711c2f8618e99eec8d8e00d9",
+        "currentHeadSha256": "ab20b29ed7e4354dff7289c18cdbd6b77364f082711c2f8618e99eec8d8e00d9",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/DeletionConformanceAggregate.cs",
+        "packetSha256": "61b7b4793812b6875455d860786abc6884ead52c1d037ba5f4d4e74b14df896e",
+        "currentHeadSha256": "61b7b4793812b6875455d860786abc6884ead52c1d037ba5f4d4e74b14df896e",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/DeletionConformanceAuthorization.cs",
+        "packetSha256": "a2733d1e20b4206d4276444abf0effe3991c94323ca4d8ab03b6c15318555104",
+        "currentHeadSha256": "a2733d1e20b4206d4276444abf0effe3991c94323ca4d8ab03b6c15318555104",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/DeletionConformanceContract.cs",
+        "packetSha256": "4eaade762799ab47bd6d77cd8fc616f82bc08a90194d55c1ba759a84f4a56790",
+        "currentHeadSha256": "4eaade762799ab47bd6d77cd8fc616f82bc08a90194d55c1ba759a84f4a56790",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/DeletionConformanceIdentityQuery.cs",
+        "packetSha256": "7ae3c070a325e1ecb60f5d89d31213496e22e494133c559ca0e5b7244b806a1c",
+        "currentHeadSha256": "7ae3c070a325e1ecb60f5d89d31213496e22e494133c559ca0e5b7244b806a1c",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/DeletionConformanceLookup.cs",
+        "packetSha256": "d5d0d54aabe33694b59f07f516bf44e96a213d877d116a59e6f9bcf58b89438a",
+        "currentHeadSha256": "d5d0d54aabe33694b59f07f516bf44e96a213d877d116a59e6f9bcf58b89438a",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/DeletionConformanceOptions.cs",
+        "packetSha256": "7afe2e33ea8bc1588d781bccb0021cd0202edeb36ac15bfe485185d703b55cff",
+        "currentHeadSha256": "7afe2e33ea8bc1588d781bccb0021cd0202edeb36ac15bfe485185d703b55cff",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/DeletionConformanceReceiptQuery.cs",
+        "packetSha256": "5082c9c6b3a5c27e8ca2e02f3b9421e1f868bf35bf17952eaf3ad035ce2b6e69",
+        "currentHeadSha256": "5082c9c6b3a5c27e8ca2e02f3b9421e1f868bf35bf17952eaf3ad035ce2b6e69",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/DeletionConformanceResult.cs",
+        "packetSha256": "513254fc2cacc013316cb64d3ba4adb819487b3360746c714a3747efc5491225",
+        "currentHeadSha256": "513254fc2cacc013316cb64d3ba4adb819487b3360746c714a3747efc5491225",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/DeletionConformanceState.cs",
+        "packetSha256": "67a7bdabc5bf9d8e813c62fe164b8f2af4a984a8448f222e2eefd1c18dd115f3",
+        "currentHeadSha256": "67a7bdabc5bf9d8e813c62fe164b8f2af4a984a8448f222e2eefd1c18dd115f3",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/DeletionConformanceStreams.cs",
+        "packetSha256": "b59183aa149450c2b26224eaae8bfaa08e45a2cfb45025e7dab607205917ee5d",
+        "currentHeadSha256": "b59183aa149450c2b26224eaae8bfaa08e45a2cfb45025e7dab607205917ee5d",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/Hexalith.Conversations.DeletionConformance.csproj",
+        "packetSha256": "222b3070a0bc88b22886bc4be1d4557a30f9c88115695f31cb7f0e1499554060",
+        "currentHeadSha256": "222b3070a0bc88b22886bc4be1d4557a30f9c88115695f31cb7f0e1499554060",
+        "matches": true
+      },
+      {
+        "path": "tools/Hexalith.Conversations.DeletionConformance/Program.cs",
+        "packetSha256": "e03ad76050aede8b8012db89587b23429cbeb0a4567f7e42bf24ab73568d16cb",
+        "currentHeadSha256": "e03ad76050aede8b8012db89587b23429cbeb0a4567f7e42bf24ab73568d16cb",
+        "matches": true
+      }
+    ],
+    "packetCandidateOnLocalOriginMain": {
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "detachedPacketIntegrity": [
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/README.md",
+        "expectedSha256": "d104d1334faf9cec967436263853aa4444d11c9b8a7e7260c328f586373c0593",
+        "actualSha256": "d104d1334faf9cec967436263853aa4444d11c9b8a7e7260c328f586373c0593",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/accepted-register-binding.json",
+        "expectedSha256": "81f6198be719f4768e6f09293cbf17ab93e299cdd235f10e80c83502ecc7fecd",
+        "actualSha256": "81f6198be719f4768e6f09293cbf17ab93e299cdd235f10e80c83502ecc7fecd",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/accepted-register.git-blob.md",
+        "expectedSha256": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2",
+        "actualSha256": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/documentation-update.diff",
+        "expectedSha256": "3adb0008238a0417fc57eee5b8d272581e141c2cf77991152b5c2cddd93fa03b",
+        "actualSha256": "3adb0008238a0417fc57eee5b8d272581e141c2cf77991152b5c2cddd93fa03b",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/documentation-update.json",
+        "expectedSha256": "d1150dc0657069d622cbfe04f751601d8a63913dd4000a65698400e57f2d68ff",
+        "actualSha256": "d1150dc0657069d622cbfe04f751601d8a63913dd4000a65698400e57f2d68ff",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/installed-input-observations.json",
+        "expectedSha256": "11833faf370217288bf4b312903ebf047e05829c820fa906d737e81e32699da1",
+        "actualSha256": "11833faf370217288bf4b312903ebf047e05829c820fa906d737e81e32699da1",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Client.Tests-build.log",
+        "expectedSha256": "46600cfd38a27b3bebbabfa686529ade30dbb12ba48f2b91bcb5e0b9c1b890ba",
+        "actualSha256": "46600cfd38a27b3bebbabfa686529ade30dbb12ba48f2b91bcb5e0b9c1b890ba",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Client.Tests.log",
+        "expectedSha256": "2a6e67d045ada26eb3a30f3597de1253abcc1c24b277dc72de2ecece57d5ef37",
+        "actualSha256": "2a6e67d045ada26eb3a30f3597de1253abcc1c24b277dc72de2ecece57d5ef37",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Client.Tests.xml",
+        "expectedSha256": "1e5a4cc9f919668f50fb70ebf113ff43dac4f9a31836ffed425fec1facabfb76",
+        "actualSha256": "1e5a4cc9f919668f50fb70ebf113ff43dac4f9a31836ffed425fec1facabfb76",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Contracts.Tests-build.log",
+        "expectedSha256": "a90709b38be782073874a830b103a25497603ce9ab7737e64b2b675875ca7e37",
+        "actualSha256": "a90709b38be782073874a830b103a25497603ce9ab7737e64b2b675875ca7e37",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Contracts.Tests.log",
+        "expectedSha256": "7f0f0a8b72986146be390be2203db5688aeb2fb04db64acae89030831d20e2f2",
+        "actualSha256": "7f0f0a8b72986146be390be2203db5688aeb2fb04db64acae89030831d20e2f2",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Contracts.Tests.xml",
+        "expectedSha256": "d6b8896cd419b97e43dd55d6f30b67fc01e7a4f2824ee1e55847a9cbcad119ff",
+        "actualSha256": "d6b8896cd419b97e43dd55d6f30b67fc01e7a4f2824ee1e55847a9cbcad119ff",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.DeletionConformance.Tests-build.log",
+        "expectedSha256": "c09b2ea583c7a5b2ec224c8e060f76df39cb506dc60ed8a631547b04f515891d",
+        "actualSha256": "c09b2ea583c7a5b2ec224c8e060f76df39cb506dc60ed8a631547b04f515891d",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.DeletionConformance.Tests.log",
+        "expectedSha256": "672601219024bb4d3db2c74b6c6ab487e741b5e030037ef7fde9f59d7c967858",
+        "actualSha256": "672601219024bb4d3db2c74b6c6ab487e741b5e030037ef7fde9f59d7c967858",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.DeletionConformance.Tests.xml",
+        "expectedSha256": "79f4f981e32e4eedb015efd19b77e43283c2dece941da1ecb91a38de7fb09727",
+        "actualSha256": "79f4f981e32e4eedb015efd19b77e43283c2dece941da1ecb91a38de7fb09727",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Server.Tests-build.log",
+        "expectedSha256": "bc165346d8e18f07f998f3b73b273e616165ca29c6ea6ac5fec95f8bf50ced32",
+        "actualSha256": "bc165346d8e18f07f998f3b73b273e616165ca29c6ea6ac5fec95f8bf50ced32",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Server.Tests.log",
+        "expectedSha256": "ef78ef8660e82e66bd74b2f3de03c9dd28b8efd35fef4484f5f513c0c56cc85d",
+        "actualSha256": "ef78ef8660e82e66bd74b2f3de03c9dd28b8efd35fef4484f5f513c0c56cc85d",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Server.Tests.xml",
+        "expectedSha256": "6325a928a1bb3e6283cb9d097d574e205fb0e77823d363d159444e67db1c4bb9",
+        "actualSha256": "6325a928a1bb3e6283cb9d097d574e205fb0e77823d363d159444e67db1c4bb9",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Tests-build.log",
+        "expectedSha256": "39531af2ef5ee0e14fa03d4f0fafba9c493f5158be55636330a87b600550db74",
+        "actualSha256": "39531af2ef5ee0e14fa03d4f0fafba9c493f5158be55636330a87b600550db74",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Tests.log",
+        "expectedSha256": "68fa05863611c9ab611c46981718980b86298eef01b3c593a3b9d09279a7007a",
+        "actualSha256": "68fa05863611c9ab611c46981718980b86298eef01b3c593a3b9d09279a7007a",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Tests.xml",
+        "expectedSha256": "ca291c706a11d7e0887d236385689b1d4f4925613241d4491678ffee084a2d1f",
+        "actualSha256": "ca291c706a11d7e0887d236385689b1d4f4925613241d4491678ffee084a2d1f",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/eventstore-version.log",
+        "expectedSha256": "22bd2201e7361e26de85ab784f26e3c0baa21d5701d03548abd40d10258c4105",
+        "actualSha256": "22bd2201e7361e26de85ab784f26e3c0baa21d5701d03548abd40d10258c4105",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/eventstore-version.stderr.log",
+        "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/local-evidence.json",
+        "expectedSha256": "0410e2412d7715d1721586e971416e743767e426fd643e7832ad671fe8540431",
+        "actualSha256": "0410e2412d7715d1721586e971416e743767e426fd643e7832ad671fe8540431",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/local-six-seam.log",
+        "expectedSha256": "a5c4146fd1c1175e44da78bee3e440c984edbbaaeed1636baa0c35a43afb1c96",
+        "actualSha256": "a5c4146fd1c1175e44da78bee3e440c984edbbaaeed1636baa0c35a43afb1c96",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/local-six-seam.xml",
+        "expectedSha256": "c450eba7fdf2ab392f01b5e339b497e847d1fdc7ef95c241c63e743f7d61dc97",
+        "actualSha256": "c450eba7fdf2ab392f01b5e339b497e847d1fdc7ef95c241c63e743f7d61dc97",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local-command-result.json",
+        "expectedSha256": "bc9d691c3282f7bb7533b2aeae3674e0eb51c9d383d34bae2f70e297018c37c2",
+        "actualSha256": "bc9d691c3282f7bb7533b2aeae3674e0eb51c9d383d34bae2f70e297018c37c2",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/receiver-dependency-closure.json",
+        "expectedSha256": "4b554454eaefe484a5ebdd13e22a3373b4117e52156697d79a8b17531e72bf62",
+        "actualSha256": "4b554454eaefe484a5ebdd13e22a3373b4117e52156697d79a8b17531e72bf62",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/replacement-acceptance-packet.blocked.json",
+        "expectedSha256": "20530c84523119b21e609d7e4dbdb95abe08aff867b58097dfa51105cac76932",
+        "actualSha256": "20530c84523119b21e609d7e4dbdb95abe08aff867b58097dfa51105cac76932",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/source-observations.json",
+        "expectedSha256": "8c1b33feb5145276380e4c5c2f7be976dea6ef76e74fbed3cc074f25f7d9895f",
+        "actualSha256": "8c1b33feb5145276380e4c5c2f7be976dea6ef76e74fbed3cc074f25f7d9895f",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/tooling-result.json",
+        "expectedSha256": "63b79d8e6e80e205a9168e88d90b3efc4156df431e28eb8621462cab52507feb",
+        "actualSha256": "63b79d8e6e80e205a9168e88d90b3efc4156df431e28eb8621462cab52507feb",
+        "matches": true
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/verification.json",
+        "expectedSha256": "de88ccedae5c5acd8f34bda87cf930fc9bbeb69a4a925870a6d31f51df9c001f",
+        "actualSha256": "de88ccedae5c5acd8f34bda87cf930fc9bbeb69a4a925870a6d31f51df9c001f",
+        "matches": true
+      }
+    ],
+    "retainedNativeXmlVerification": [
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Client.Tests.xml",
+        "tests": 39,
+        "passed": 39,
+        "otherResults": []
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Contracts.Tests.xml",
+        "tests": 638,
+        "passed": 638,
+        "otherResults": []
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.DeletionConformance.Tests.xml",
+        "tests": 31,
+        "passed": 31,
+        "otherResults": []
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Server.Tests.xml",
+        "tests": 1350,
+        "passed": 1350,
+        "otherResults": []
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Tests.xml",
+        "tests": 189,
+        "passed": 189,
+        "otherResults": []
+      },
+      {
+        "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/local-six-seam.xml",
+        "tests": 37,
+        "passed": 37,
+        "otherResults": []
+      }
+    ],
+    "receiverLocalClosure": {
+      "path": "/tmp/ext-conv-ai-1-local-20261025/run-20261025T1126476290465Z/obj/Hexalith.Conversations.DeletionConformance/project.assets.json",
+      "exists": true,
+      "expectedSha256": "01601c212646a8c3cc5d9446208a26b0c0ee4b6d2e4a1c588ce803d3229c1058",
+      "actualSha256": "01601c212646a8c3cc5d9446208a26b0c0ee4b6d2e4a1c588ce803d3229c1058",
+      "installed": false,
+      "libraryCount": 52,
+      "agentsLibraries": []
+    },
+    "receiverInstalledAndIndependentlyAuthenticated": false,
+    "receiverMissingProof": "No installed receiver/lookup enrollment, signed authority/trust binding, or installed restore graph; current source contains no Agents reference, and retained local restore closure has zero Agents libraries only.",
+    "runnerPrerequisites": [
+      "Committed protection exact target",
+      "Shared accepted Platform host/secrets target",
+      "Committed accepted Conversations exact clean target",
+      "Accepted RuntimeQualificationBinding with raw manifest and twelve file hashes",
+      "Live host passPath true at accepted target/profile",
+      "Distinct enrolled receiver/lookup/worker identities",
+      "Canonical absolute retained journal path",
+      "Exact POST body-set hashes"
+    ],
+    "latestDetachedDeliveryDirectory": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473",
+    "detachedDeliveryDirectories": [
+      "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44",
+      "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473"
+    ]
+  },
+  "inspectedFiles": [
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/README.md",
+      "exists": true,
+      "sha256": "7f1696e577b0cf370ace4de3f8ea2a571ef6a451102b0d4419761d6c3454a348",
+      "bytes": 3104
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/evidence-inventory.json",
+      "exists": true,
+      "sha256": "044d6bc5d7c2af2486140236d37422d871b8de90691e226bd59b93454011372b",
+      "bytes": 26358
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/final-accepted-command-refusal.json",
+      "exists": true,
+      "sha256": "fd9794d9321e4cdfd2c908fa5451a07352d10c80015210c6f8d19e52fbd12ef7",
+      "bytes": 740
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/final-readiness.json",
+      "exists": true,
+      "sha256": "22ca22085b6bb687940c2bd954f9945b6d53fffaf6fdd4e9facec124591d9ec1",
+      "bytes": 935
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/final-verification.json",
+      "exists": true,
+      "sha256": "41e017befe97ea52c9777cefb0300845eb6ca210665773247c083d44977b7386",
+      "bytes": 2480
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/replacement-acceptance-packet.blocked.json",
+      "exists": true,
+      "sha256": "579b59180e13df164757204113bae20f3c15a07d0867432631b5a1cb2ad023df",
+      "bytes": 20693
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/reviewed-receiver-publish.json",
+      "exists": true,
+      "sha256": "2703df04dc36501aa30c2ce3215d83a9e2ee9766ad96f11f78572c5782e591af",
+      "bytes": 11140
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261022-71fab44/reviewed-source-inventory.json",
+      "exists": true,
+      "sha256": "e8a06faad669ff58b01b883d60d87baddec5c2e5f094d3fc11e48789870e12d1",
+      "bytes": 6588
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/README.md",
+      "exists": true,
+      "sha256": "d104d1334faf9cec967436263853aa4444d11c9b8a7e7260c328f586373c0593",
+      "bytes": 2678
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/accepted-register-binding.json",
+      "exists": true,
+      "sha256": "81f6198be719f4768e6f09293cbf17ab93e299cdd235f10e80c83502ecc7fecd",
+      "bytes": 298
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/accepted-register.git-blob.md",
+      "exists": true,
+      "sha256": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2",
+      "bytes": 74710
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/documentation-update.diff",
+      "exists": true,
+      "sha256": "3adb0008238a0417fc57eee5b8d272581e141c2cf77991152b5c2cddd93fa03b",
+      "bytes": 9823
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/documentation-update.json",
+      "exists": true,
+      "sha256": "d1150dc0657069d622cbfe04f751601d8a63913dd4000a65698400e57f2d68ff",
+      "bytes": 992
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/evidence-inventory.json",
+      "exists": true,
+      "sha256": "45f136a673af4689c4e00c51ab8aa68fb3a4b6d2659c111f4e1ef154f4c1bf8b",
+      "bytes": 5506
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/installed-input-observations.json",
+      "exists": true,
+      "sha256": "11833faf370217288bf4b312903ebf047e05829c820fa906d737e81e32699da1",
+      "bytes": 1390
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Client.Tests-build.log",
+      "exists": true,
+      "sha256": "46600cfd38a27b3bebbabfa686529ade30dbb12ba48f2b91bcb5e0b9c1b890ba",
+      "bytes": 1813
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Client.Tests.log",
+      "exists": true,
+      "sha256": "2a6e67d045ada26eb3a30f3597de1253abcc1c24b277dc72de2ecece57d5ef37",
+      "bytes": 490
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Client.Tests.xml",
+      "exists": true,
+      "sha256": "1e5a4cc9f919668f50fb70ebf113ff43dac4f9a31836ffed425fec1facabfb76",
+      "bytes": 27634
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Contracts.Tests-build.log",
+      "exists": true,
+      "sha256": "a90709b38be782073874a830b103a25497603ce9ab7737e64b2b675875ca7e37",
+      "bytes": 4431
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Contracts.Tests.log",
+      "exists": true,
+      "sha256": "7f0f0a8b72986146be390be2203db5688aeb2fb04db64acae89030831d20e2f2",
+      "bytes": 507
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Contracts.Tests.xml",
+      "exists": true,
+      "sha256": "d6b8896cd419b97e43dd55d6f30b67fc01e7a4f2824ee1e55847a9cbcad119ff",
+      "bytes": 448635
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.DeletionConformance.Tests-build.log",
+      "exists": true,
+      "sha256": "c09b2ea583c7a5b2ec224c8e060f76df39cb506dc60ed8a631547b04f515891d",
+      "bytes": 2331
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.DeletionConformance.Tests.log",
+      "exists": true,
+      "sha256": "672601219024bb4d3db2c74b6c6ab487e741b5e030037ef7fde9f59d7c967858",
+      "bytes": 555
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.DeletionConformance.Tests.xml",
+      "exists": true,
+      "sha256": "79f4f981e32e4eedb015efd19b77e43283c2dece941da1ecb91a38de7fb09727",
+      "bytes": 21812
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Server.Tests-build.log",
+      "exists": true,
+      "sha256": "bc165346d8e18f07f998f3b73b273e616165ca29c6ea6ac5fec95f8bf50ced32",
+      "bytes": 9173
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Server.Tests.log",
+      "exists": true,
+      "sha256": "ef78ef8660e82e66bd74b2f3de03c9dd28b8efd35fef4484f5f513c0c56cc85d",
+      "bytes": 352141
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Server.Tests.xml",
+      "exists": true,
+      "sha256": "6325a928a1bb3e6283cb9d097d574e205fb0e77823d363d159444e67db1c4bb9",
+      "bytes": 999494
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Tests-build.log",
+      "exists": true,
+      "sha256": "39531af2ef5ee0e14fa03d4f0fafba9c493f5158be55636330a87b600550db74",
+      "bytes": 2549
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Tests.log",
+      "exists": true,
+      "sha256": "68fa05863611c9ab611c46981718980b86298eef01b3c593a3b9d09279a7007a",
+      "bytes": 457
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/Hexalith.Conversations.Tests.xml",
+      "exists": true,
+      "sha256": "ca291c706a11d7e0887d236385689b1d4f4925613241d4491678ffee084a2d1f",
+      "bytes": 134327
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/eventstore-version.log",
+      "exists": true,
+      "sha256": "22bd2201e7361e26de85ab784f26e3c0baa21d5701d03548abd40d10258c4105",
+      "bytes": 8
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/eventstore-version.stderr.log",
+      "exists": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/local-evidence.json",
+      "exists": true,
+      "sha256": "0410e2412d7715d1721586e971416e743767e426fd643e7832ad671fe8540431",
+      "bytes": 3321
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/local-six-seam.log",
+      "exists": true,
+      "sha256": "a5c4146fd1c1175e44da78bee3e440c984edbbaaeed1636baa0c35a43afb1c96",
+      "bytes": 970
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local/local-six-seam.xml",
+      "exists": true,
+      "sha256": "c450eba7fdf2ab392f01b5e339b497e847d1fdc7ef95c241c63e743f7d61dc97",
+      "bytes": 26054
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/local-command-result.json",
+      "exists": true,
+      "sha256": "bc9d691c3282f7bb7533b2aeae3674e0eb51c9d383d34bae2f70e297018c37c2",
+      "bytes": 322
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/receiver-dependency-closure.json",
+      "exists": true,
+      "sha256": "4b554454eaefe484a5ebdd13e22a3373b4117e52156697d79a8b17531e72bf62",
+      "bytes": 2683
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/replacement-acceptance-packet.blocked.json",
+      "exists": true,
+      "sha256": "20530c84523119b21e609d7e4dbdb95abe08aff867b58097dfa51105cac76932",
+      "bytes": 10402
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/source-observations.json",
+      "exists": true,
+      "sha256": "8c1b33feb5145276380e4c5c2f7be976dea6ef76e74fbed3cc074f25f7d9895f",
+      "bytes": 9097
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/tooling-result.json",
+      "exists": true,
+      "sha256": "63b79d8e6e80e205a9168e88d90b3efc4156df431e28eb8621462cab52507feb",
+      "bytes": 615
+    },
+    {
+      "path": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/delivery-20261025-ed53473/verification.json",
+      "exists": true,
+      "sha256": "de88ccedae5c5acd8f34bda87cf930fc9bbeb69a4a925870a6d31f51df9c001f",
+      "bytes": 2113
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/external-dependency-register.md",
+      "exists": true,
+      "sha256": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2",
+      "bytes": 74710
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/_bmad-output/implementation-artifacts/spec-5-4-ext-conv-ai-1-installed-delivery.md",
+      "exists": true,
+      "sha256": "3f44a8e3c47af9f2bebf661fb7afac3d16e7400b5bc5079543025af5adac561b",
+      "bytes": 7633
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/docs/implementation/ext-conv-ai-1-deletion-conformance-receiver.md",
+      "exists": true,
+      "sha256": "b19f449f7aeb59da5916e83076a77938fe5ea2dabdf02b170d6a87b9cb3fa98e",
+      "bytes": 9295
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/docs/implementation/ext-conv-ai-1-runtime-qualification.md",
+      "exists": true,
+      "sha256": "375a7fbeb966480ff14085fb9d6d6a663382fc2f393a4278d9a774b313132435",
+      "bytes": 14490
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/eng/ext-conv-ai-1-qualification.ps1",
+      "exists": true,
+      "sha256": "7f33345fb23f0ecd4cfec0fab24a83d755bb8e130b27f4da51873b4e827b9b82",
+      "bytes": 10524
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/eng/verify-ext-conv-ai-1-live.ps1",
+      "exists": true,
+      "sha256": "e2b8f7662606fb6ffb1093122044a91652ad0c28beddab5743ba4094a312f89e",
+      "bytes": 29575
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/eng/verify-ext-conv-ai-1.ps1",
+      "exists": true,
+      "sha256": "1b1f5419faa96b18cbc4cd0361c294b0558cdb8f5b9a2c63b9cab54d3cc7fd20",
+      "bytes": 8136
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Agents/ConversationAgentServiceCollectionExtensions.cs",
+      "exists": true,
+      "sha256": "b7826d6b2e11bfd8a64949f38516485c63e33d08973ed1014e0c65cea6ccda2d",
+      "bytes": 6915
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/src/Hexalith.Conversations.Server/Program.cs",
+      "exists": true,
+      "sha256": "c5155b67f8478d4d74ec731161157d7e6d980ec1cfcd226e21409a1c4fef9ed9",
+      "bytes": 2627
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tools/Hexalith.Conversations.DeletionConformance/Hexalith.Conversations.DeletionConformance.csproj",
+      "exists": true,
+      "sha256": "222b3070a0bc88b22886bc4be1d4557a30f9c88115695f31cb7f0e1499554060",
+      "bytes": 846
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/conversations/tools/Hexalith.Conversations.DeletionConformance/Program.cs",
+      "exists": true,
+      "sha256": "e03ad76050aede8b8012db89587b23429cbeb0a4567f7e42bf24ab73568d16cb",
+      "bytes": 2227
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/spec-ext-parties-1-owner-delivery.md",
+      "exists": true,
+      "sha256": "4122fd32ef5e9b09439af8788cd8b52efcfda81c7dcfd8cd4e1a4a26b727cf6f",
+      "bytes": 7143
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/_bmad-output/implementation-artifacts/tests/ext-parties-1-owner-delivery-2026-10-25/replacement-acceptance-packet.json",
+      "exists": true,
+      "sha256": "5e1a89ff07f7663d603c27737b9242320c305b6595f4096cc4c96f29d851e3ea",
+      "bytes": 14180
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/docs/implementation/ext-parties-1-custody-prerequisites-2026-10-25.md",
+      "exists": true,
+      "sha256": "abcc9b9fc21b2e34fedf7184aff76d8d2a42c107345abe2738edeb88973106b0",
+      "bytes": 2884
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-1.ps1",
+      "exists": true,
+      "sha256": "4dd903a4ee4f2667aee6908da9706493ce0783348675cbfa8fdc01de428ada00",
+      "bytes": 12195
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/src/Hexalith.Parties/Extensions/PartiesServiceCollectionExtensions.cs",
+      "exists": true,
+      "sha256": "dca2ac9e7b36345061f851308f1ad6affe24f6bdedc6f641e4577e159f7ec940",
+      "bytes": 26753
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/parties/tests/Hexalith.Parties.IntegrationTests/Identity/PartyIdentityPersistedVerifierTests.cs",
+      "exists": true,
+      "sha256": "2435510cedf17c27b2c9c6ced3d78efd816f19ad94c133a1bc41ccae6d301900",
+      "bytes": 55856
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-custody-direction-2026-10-25.md",
+      "exists": true,
+      "sha256": "e733c85418706644372312f37640e9df2310fe05f5d7e7a53154892c7a60db3a",
+      "bytes": 5563
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-custody-proposal-2026-10-25/decision-and-binding-ledger.json",
+      "exists": true,
+      "sha256": "a8496d20f44b0c0511de4e17a988db4f3ec9dc7330b5e8e37380b5c2277e42ad",
+      "bytes": 64286
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/README.md",
+      "exists": true,
+      "sha256": "d9130b9171fec5f6ea71f49a6e65b9a8f9507bd01e498d910d9a82d297edd5e1",
+      "bytes": 14192
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/command-bindings.json",
+      "exists": true,
+      "sha256": "657723d4692a99e57ec6cd3c2df9ad5a032c4db4e354716858125550e1312c69",
+      "bytes": 11860
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/decision-packet.json",
+      "exists": true,
+      "sha256": "dfe23b4aa297a8aadc0edecf44f21e62811e98e935715eaf510f445bfe6eab2c",
+      "bytes": 69161
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/installation-plan.md",
+      "exists": true,
+      "sha256": "d4b71da0b8c0db0c2d6b1528ba410cd36ea070b125b54d2e40c828ad474697f5",
+      "bytes": 16873
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/ext-parties-1-platform-prerequisites-2026-10-18/qualification-plan.md",
+      "exists": true,
+      "sha256": "2ec91e0c2d45f510e27312f985ca71f9967630c50e67b873af34ae286d1dc221",
+      "bytes": 13074
+    },
+    {
+      "path": "/tmp/ext-conv-ai-1-local-20261025/run-20261025T1126476290465Z/obj/Hexalith.Conversations.DeletionConformance/project.assets.json",
+      "exists": true,
+      "sha256": "01601c212646a8c3cc5d9446208a26b0c0ee4b6d2e4a1c588ce803d3229c1058",
+      "bytes": 131231
+    },
+    {
+      "path": "/tmp/ext-parties-1-owner-delivery-20261025/Hexalith.EventStore.Server.Tests-tests.xml",
+      "exists": true,
+      "sha256": "1e14eabe65f1dc5c80941ea678d5e9b992f8a03ac934bc7cbc66c75777fcf868",
+      "bytes": 314040
+    },
+    {
+      "path": "/tmp/ext-parties-1-owner-delivery-20261025/Hexalith.Parties.IntegrationTests-tests.xml",
+      "exists": true,
+      "sha256": "8eee31ddf970c409ac193b4ef7ed08e6d5a627b6c058ab3de0cdb399678357a9",
+      "bytes": 8392
+    },
+    {
+      "path": "/tmp/ext-parties-1-owner-delivery-20261025-live/live-gate.txt",
+      "exists": true,
+      "sha256": "b60753bd1e52b607eb2f91bdc4cb3bbd67b760c8a87814215fb91ceb2cd9bdfd",
+      "bytes": 364
+    },
+    {
+      "path": "/tmp/ext-parties-1-owner-delivery-20261025-live-present/live-gate.txt",
+      "exists": true,
+      "sha256": "98954a20c6675bf848cb35e575a5db2cc536e55c7c72d6b85cd39f6aecbaea33",
+      "bytes": 281
+    }
+  ],
+  "execution": {
+    "ownerCommandsRun": 0,
+    "qualificationExecuted": false,
+    "attemptReserved": false,
+    "installations": 0,
+    "registerMutations": 0,
+    "consumingPaths": 0
+  },
+  "limits": [
+    "Local exact-byte/source/evidence audit; root records remote branch freshness separately.",
+    "No remote installation survey, runtime HTTP call, credential retrieval, build/test or owner command executed.",
+    "Process variable presence is not installation or authority; values were not read into reports.",
+    "No synthetic trust or null-map digest treated as installed trust.",
+    "Committed replacement acceptance does not require its subsequent passing C1-C4 run; complete targets/commands/installed bindings are missing before acceptance."
+  ],
+  "finalStaticVerification": {
+    "allInspectedFilesUnchanged": true,
+    "inspectedFileCount": 70,
+    "allNineFieldsPresent": true,
+    "retainedNewPacketInventoryMatches": true,
+    "qualificationEvidence": false
+  }
+}

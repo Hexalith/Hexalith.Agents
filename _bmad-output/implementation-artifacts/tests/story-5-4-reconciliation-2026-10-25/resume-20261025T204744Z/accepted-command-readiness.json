@@ -1,0 +1,81 @@
+{
+  "observedAtUtc": "2026-10-25T20:50:31.898744+00:00",
+  "interpreters": {
+    "bash": "/usr/bin/bash",
+    "pwsh": "/home/administrator/.dotnet/tools/pwsh",
+    "python3": "/usr/bin/python3"
+  },
+  "records": {
+    "EXT-PARTIES-1": {
+      "acceptedCommand": "test \"$(git -C ../parties rev-parse HEAD)\" = \"56cb4401c4179d431385ad3d931fefa402e4fc5a\" && test -z \"$(git -C ../parties status --porcelain)\" && pwsh -NoProfile -File ../parties/eng/verify-ext-parties-1.ps1 -Mode Live -EventStoreRoot ../eventstore -PlatformRoot ../platform -EvidenceDirectory /tmp/ext-parties-1-live",
+      "acceptedTarget": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+      "currentSiblingHead": "9ee857b11ebcd13d44644be7c04c4ea6da5fdc44",
+      "headMatchesAcceptedTarget": false,
+      "siblingCleanAtObservation": true,
+      "acceptedDate": "`2026-10-08`",
+      "acceptedDateIsHistoricalMissed": true,
+      "entrypoint": "/home/administrator/projects/hexalith/parties/eng/verify-ext-parties-1.ps1",
+      "entrypointExists": true,
+      "entrypointSha256": "4dd903a4ee4f2667aee6908da9706493ce0783348675cbfa8fdc01de428ada00",
+      "execution": false,
+      "disposition": "Exact target guard cannot pass at observed current sibling HEAD; not executed"
+    },
+    "EXT-CONV-AI-1": {
+      "acceptedCommand": "test \"$(git -C ../conversations rev-parse HEAD)\" = \"87e8b4a6ec3224b20a560b0e83de857805925572\" && test -z \"$(git -C ../conversations status --porcelain)\" && pwsh -NoProfile -File ../conversations/eng/verify-ext-conv-ai-1.ps1 -Mode Live -LiveManifest /home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/live-manifest.json -ArtifactsPath /tmp/ext-conv-ai-1-live",
+      "acceptedTarget": "87e8b4a6ec3224b20a560b0e83de857805925572",
+      "currentSiblingHead": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3",
+      "headMatchesAcceptedTarget": false,
+      "siblingCleanAtObservation": false,
+      "acceptedDate": "`2026-10-08`",
+      "acceptedDateIsHistoricalMissed": true,
+      "entrypoint": "/home/administrator/projects/hexalith/conversations/eng/verify-ext-conv-ai-1.ps1",
+      "entrypointExists": true,
+      "entrypointSha256": "1b1f5419faa96b18cbc4cd0361c294b0558cdb8f5b9a2c63b9cab54d3cc7fd20",
+      "execution": false,
+      "disposition": "Exact target guard cannot pass at observed current sibling HEAD; not executed"
+    },
+    "EXT-SECRETS-1": {
+      "acceptedCommand": "test \"$(git -C ../platform rev-parse HEAD)\" = \"abbec4093715c1db854433119b32d4e16df20d08\" && test -z \"$(git -C ../platform status --porcelain)\" && env EXT_SECRETS_1_RUNTIME_CONFIGURATION=/home/administrator/hexalith-secrets-evidence/ext-secrets-1/acceptance-abbec40-20261018/detached-packet/runtime-reference.json EXT_SECRETS_1_ACCEPTANCE_PACKET=/home/administrator/hexalith-secrets-evidence/ext-secrets-1/acceptance-abbec40-20261018/detached-packet/replacement-acceptance-packet.json pwsh -NoProfile -File ../platform/eng/verify-ext-secrets-1.ps1 -Mode Live -EventStoreSourceRoot ../eventstore -ArtifactsDirectory /tmp/ext-secrets-1-live-20261018-abbec40-artifacts -EvidenceDirectory /tmp/ext-secrets-1-live-20261018-abbec40-evidence",
+      "acceptedTarget": "abbec4093715c1db854433119b32d4e16df20d08",
+      "currentSiblingHead": "460e1ca9699f5eaaaba82ce9d9788c06476f3f89",
+      "headMatchesAcceptedTarget": false,
+      "siblingCleanAtObservation": false,
+      "acceptedDate": "`2026-10-08`",
+      "acceptedDateIsHistoricalMissed": true,
+      "entrypoint": "/home/administrator/projects/hexalith/platform/eng/verify-ext-secrets-1.ps1",
+      "entrypointExists": true,
+      "entrypointSha256": "31c4ad13e6d6f4c18cbab95b88b119f7e6969ea6b0915bf423ba9a96129bf424",
+      "execution": false,
+      "disposition": "Exact target guard cannot pass at observed current sibling HEAD; not executed"
+    },
+    "EXT-HOST-1": {
+      "acceptedCommand": "test \"$(git -C ../platform rev-parse HEAD)\" = \"abbec4093715c1db854433119b32d4e16df20d08\" && test -z \"$(git -C ../platform status --porcelain)\" && bash ../platform/eng/verify-agents-host.sh --mode Full --artifacts-path /tmp/ext-host-1-full",
+      "acceptedTarget": "abbec4093715c1db854433119b32d4e16df20d08",
+      "currentSiblingHead": "460e1ca9699f5eaaaba82ce9d9788c06476f3f89",
+      "headMatchesAcceptedTarget": false,
+      "siblingCleanAtObservation": false,
+      "acceptedDate": "`2026-10-08`",
+      "acceptedDateIsHistoricalMissed": true,
+      "entrypoint": "/home/administrator/projects/hexalith/platform/eng/verify-agents-host.sh",
+      "entrypointExists": true,
+      "entrypointSha256": "64355c776175336239ad20e35eadf9090828addc7b4c6cb246623e75146cc15b",
+      "execution": false,
+      "disposition": "Exact target guard cannot pass at observed current sibling HEAD; not executed"
+    },
+    "EXT-PROTECTION-1": {
+      "acceptedCommand": "TBD",
+      "acceptedTarget": "TBD",
+      "currentSiblingHead": "9580c08444a774d03381b3479d464d885c10f2e9",
+      "headMatchesAcceptedTarget": false,
+      "siblingCleanAtObservation": true,
+      "acceptedDate": "`TBD`",
+      "acceptedDateIsHistoricalMissed": false,
+      "entrypoint": "/home/administrator/projects/hexalith/eventstore/tools/verify-ext-protection-1.py",
+      "entrypointExists": true,
+      "entrypointSha256": "6810d3ede10d42c2e5fdd63b031d1de6bc2f3eb0e6f0ab2d5d24f762f052624d",
+      "execution": false,
+      "disposition": "TBD command: not executable"
+    }
+  },
+  "scope": "Static guard, interpreter and file checks only. Script presence does not establish a complete qualification pass path or installed service."
+}

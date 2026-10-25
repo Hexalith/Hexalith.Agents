@@ -1,0 +1,218 @@
+{
+  "observedAtUtc": "2026-10-25T20:52:13.394781+00:00",
+  "fetchPerformed": false,
+  "checkoutUpdates": 0,
+  "repositories": {
+    ".": {
+      "path": "/home/administrator/projects/hexalith/agents",
+      "head": {
+        "exitCode": 0,
+        "stdout": "35b8a042dfc4dfd7cbee7c77b7572b356471d8e0",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "35b8a042dfc4dfd7cbee7c77b7572b356471d8e0",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "?? _bmad-output/implementation-artifacts/tests/story-5-4-reconciliation-2026-10-25/resume-20261025T204744Z/",
+        "stderr": ""
+      },
+      "headChangedDuringAudit": false
+    },
+    "../platform": {
+      "path": "/home/administrator/projects/hexalith/platform",
+      "head": {
+        "exitCode": 0,
+        "stdout": "51ea5deca1cbb70d1df0483766db8072b76cc348",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "51ea5deca1cbb70d1df0483766db8072b76cc348",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "M _bmad-output/implementation-artifacts/spec-5-4-shared-target-completion.md\n M eng/ext-secrets-1/README.md\n M eng/ext-secrets-1/coordinated_packets.py\n M eng/ext-secrets-1/joint_authority_service.py\n M eng/ext-secrets-1/test_coordinated_packets.py\n M src/Hexalith.Platform.Protection/CustodyInteractionOccurrenceKeyProvider.cs\n M src/Hexalith.Platform.Protection/Fr34IndependentOriginalCollector.cs\n M src/Hexalith.Platform.Protection/Fr34OccurrenceProducer.cs\n M src/Hexalith.Platform.Protection/Fr34OwnerOperationHandler.cs\n M src/Hexalith.Platform.Protection/JointPhaseCommand.cs\n M src/Hexalith.Platform.Protection/JointPhaseCommandExecutable.cs\n M src/Hexalith.Platform.Secrets.Runtime/IQualificationOriginalStore.cs\n M src/Hexalith.Platform.Secrets.Runtime/InstalledQualificationOriginalStore.cs\n M tests/Hexalith.Platform.Protection.Tests/JointPhaseCommandTests.cs\n M tests/Hexalith.Platform.Protection.Tests/QualificationGuardSourceTests.cs\n M tests/Hexalith.Platform.Secrets.Runtime.Tests/IndependentOriginalIndexTests.cs\n M tests/Hexalith.Platform.Secrets.Runtime.Tests/QualificationFreshCohortReceivingTests.cs\n M tests/Hexalith.Platform.Secrets.Runtime.Tests/QualificationHostTests.cs\n?? eng/ext-secrets-1/test_phase_metadata_recovery.py\n?? src/Hexalith.Platform.Protection/CustodyMaterialUseIdentity.cs\n?? src/Hexalith.Platform.Protection/IFr34UnsealMeasurement.cs\n?? tests/Hexalith.Platform.Protection.Tests/Fr34DynamicOccurrenceTests.cs\n?? tests/Hexalith.Platform.Secrets.Runtime.Tests/AgentsOwningProcessRegistrationTests.cs",
+        "stderr": "warning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files"
+      },
+      "remoteMain": {
+        "exitCode": 0,
+        "stdout": "51ea5deca1cbb70d1df0483766db8072b76cc348\trefs/heads/main",
+        "stderr": ""
+      },
+      "headOnRemoteMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "headChangedDuringAudit": true
+    },
+    "../parties": {
+      "path": "/home/administrator/projects/hexalith/parties",
+      "head": {
+        "exitCode": 0,
+        "stdout": "9ee857b11ebcd13d44644be7c04c4ea6da5fdc44",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "9ee857b11ebcd13d44644be7c04c4ea6da5fdc44",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "remoteMain": {
+        "exitCode": 0,
+        "stdout": "9ee857b11ebcd13d44644be7c04c4ea6da5fdc44\trefs/heads/main",
+        "stderr": ""
+      },
+      "headOnRemoteMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "headChangedDuringAudit": false
+    },
+    "../conversations": {
+      "path": "/home/administrator/projects/hexalith/conversations",
+      "head": {
+        "exitCode": 0,
+        "stdout": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "M .gitattributes\n M _bmad-output/implementation-artifacts/spec-16-1-persist-tenant-access-projection-state-and-prove-convergence.md\n M _bmad-output/implementation-artifacts/spec-5-4-ext-conv-ai-1-installed-delivery.md\n M _bmad/scripts/generate_story_record.py\n M _bmad/scripts/tests/test_verify_epic_16_adoption_v2.py\n?? _bmad-output/implementation-artifacts/epic-16-prerequisite-implementation-handoff-2026-10-25.md\n?? _bmad-output/implementation-artifacts/spec-epic-16-prerequisite-implementation.md\n?? _bmad-output/implementation-artifacts/story-16-1-entry-investigation-2026-10-25.md\n?? _bmad-output/planning-artifacts/epic-16-tooling-v1/\n?? _bmad/schemas/epic-16-tooling-v1.schema.json\n?? _bmad/scripts/epic16_domain.py\n?? _bmad/scripts/epic16_faults.py\n?? _bmad/scripts/epic16_measurements.py\n?? _bmad/scripts/epic16_native.py\n?? _bmad/scripts/epic16_native_helper/\n?? _bmad/scripts/epic16_relationships.py\n?? _bmad/scripts/epic16_tooling.py\n?? _bmad/scripts/epic16_trust.py\n?? _bmad/scripts/tests/fixtures/epic16-adoption-v2-generator.py.gz\n?? _bmad/scripts/tests/fixtures/epic16-adoption-v2-gitattributes.txt\n?? _bmad/scripts/tests/fixtures/epic16-contract-wire-goldens.json\n?? _bmad/scripts/tests/fixtures/epic16-contract-wire-provenance.json\n?? _bmad/scripts/tests/fixtures/epic16-domain-sources-LICENSE.txt\n?? _bmad/scripts/tests/fixtures/epic16-domain-sources.json\n?? _bmad/scripts/tests/fixtures/epic16-observations-v1.json\n?? _bmad/scripts/tests/fixtures/epic16-protocol-goldens.json\n?? _bmad/scripts/tests/test_epic16_tooling.py\n?? _bmad/scripts/verify_story_16_1.py\n?? _bmad/scripts/verify_story_16_2.py\n?? _bmad/scripts/verify_story_16_3.py\n?? module/validation/epic-16-prerequisite-implementation/",
+        "stderr": ""
+      },
+      "remoteMain": {
+        "exitCode": 0,
+        "stdout": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3\trefs/heads/main",
+        "stderr": ""
+      },
+      "headOnRemoteMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "headChangedDuringAudit": false
+    },
+    "../eventstore": {
+      "path": "/home/administrator/projects/hexalith/eventstore",
+      "head": {
+        "exitCode": 0,
+        "stdout": "84ef97a8a7398d2cd39284252e1e2e2d0ec19e6c",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "84ef97a8a7398d2cd39284252e1e2e2d0ec19e6c",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "remoteMain": {
+        "exitCode": 0,
+        "stdout": "45ec9c43102b638478e6fb9374b06b1abd21af0a\trefs/heads/main",
+        "stderr": ""
+      },
+      "headOnRemoteMain": {
+        "exitCode": 128,
+        "stdout": "",
+        "stderr": "fatal: Not a valid commit name 45ec9c43102b638478e6fb9374b06b1abd21af0a"
+      },
+      "headChangedDuringAudit": true
+    },
+    "references/Hexalith.Platform": {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform",
+      "head": {
+        "exitCode": 0,
+        "stdout": "90f33a59164d0dcfc21fb688f28651afa4d3df4b",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "7c56ad6352a74edec62450668e106ec8d6011e40",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "headChangedDuringAudit": false
+    },
+    "references/Hexalith.Parties": {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties",
+      "head": {
+        "exitCode": 0,
+        "stdout": "9c116910f9d712b82ae27ceb1946605d76c8a451",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "9c116910f9d712b82ae27ceb1946605d76c8a451",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "headChangedDuringAudit": false
+    },
+    "references/Hexalith.Conversations": {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations",
+      "head": {
+        "exitCode": 0,
+        "stdout": "8444207001d6ad3cd197c2ffba519317effa8b37",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "8444207001d6ad3cd197c2ffba519317effa8b37",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "headChangedDuringAudit": false
+    },
+    "references/Hexalith.EventStore": {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+      "head": {
+        "exitCode": 0,
+        "stdout": "4e91e552be41bfba984d67d68335e6b1709917b5",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "c5d1c280d8c1c1a207cd159d817f614e93c93130",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "headChangedDuringAudit": false
+    }
+  }
+}

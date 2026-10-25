@@ -1,0 +1,95 @@
+{
+  "observedAtUtc": "2026-10-25T20:49:37.243406+00:00",
+  "repositories": {
+    "../platform": {
+      "head": "460e1ca9699f5eaaaba82ce9d9788c06476f3f89",
+      "remoteMain": "8d61addebff5bb2f0af81b3e373d2d31a3a774a2",
+      "observations": [
+        {
+          "argv": [
+            "git",
+            "rev-list",
+            "--left-right",
+            "--count",
+            "HEAD...8d61addebff5bb2f0af81b3e373d2d31a3a774a2"
+          ],
+          "exitCode": 0,
+          "stdout": "2\t6\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "log",
+            "--format=%H %s",
+            "--left-right",
+            "HEAD...8d61addebff5bb2f0af81b3e373d2d31a3a774a2"
+          ],
+          "exitCode": 0,
+          "stdout": "460e1ca9699f5eaaaba82ce9d9788c06476f3f89 build: sync local changes via /pushall\n8d61addebff5bb2f0af81b3e373d2d31a3a774a2 build: merge origin/build/works-corrected-catalog into main via /pushall\n5be0a2d24f5d3366eeee0e65a45ba68d72a078c1 fix: story 2.5\n2c261d2517692ac45721099fcccf822f3821509e build(works): bind corrected EventStore catalog fixtures\n4430ab191436ffb77aa67dea6565ce154a07bc17 build: merge origin/fix/works-published-sdk-consumer into main via /pushall\nd5a616c99a8c4df53c37fe81593c3c1192732976 build(works): select published EventStore 3.128.0\n0386b388ccb31b74f7633983368649bcd0cfa5f4 fix(custody): validate export qualification inputs\n75514f5a0ad4551d09863dee010b8795ff8bfa8d fix(works): bind embedded composition qualification resource\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--name-status",
+            "HEAD",
+            "8d61addebff5bb2f0af81b3e373d2d31a3a774a2",
+            "--",
+            "eng",
+            "docs/implementation"
+          ],
+          "exitCode": 0,
+          "stdout": "D\tdocs/implementation/story-5-4-shared-target-completion-2026-10-25/independent-review-pass-2.json\nD\tdocs/implementation/story-5-4-shared-target-completion-2026-10-25/independent-review-pass-3.json\nD\tdocs/implementation/story-5-4-shared-target-completion-2026-10-25/preservation-verification.json\nM\tdocs/implementation/story-5-4-shared-target-completion-2026-10-25/remaining-installation-ledger.json\nD\tdocs/implementation/story-5-4-shared-target-completion-2026-10-25/source-boundary-audit.json\nD\tdocs/implementation/story-5-4-shared-target-completion-2026-10-25/source-verification-history.json\nM\teng/ext-host-1/test_verify_full.py\nM\teng/ext-host-1/verify_full.py\nM\teng/ext-secrets-1/case-driver-inventory.json\nD\teng/ext-secrets-1/closed_phase_invariants.py\nM\teng/ext-secrets-1/joint-authority-schema.sql\nM\teng/ext-secrets-1/joint_authority_service.py\nM\teng/ext-secrets-1/joint_live_phase_runner.py\nD\teng/ext-secrets-1/native-phase-invariant-inventory.json\nM\teng/ext-secrets-1/qualify.py\nM\teng/ext-secrets-1/reconcile_inputs.py\nD\teng/ext-secrets-1/test_closed_phase_invariants.py\nD\teng/ext-secrets-1/test_joint_admission_ordering.py\nM\teng/ext-secrets-1/test_joint_live_phase_runner.py\nM\teng/ext-secrets-1/test_persisted_phase_observer.py\nM\teng/ext-secrets-1/test_reconcile_inputs.py\nM\teng/test_verify_works_host.py\nM\teng/test_works_host_snapshot.py\nM\teng/verify_works_host.py\nM\teng/works_host_snapshot.py\n",
+          "stderr": ""
+        }
+      ]
+    },
+    "../eventstore": {
+      "head": "9580c08444a774d03381b3479d464d885c10f2e9",
+      "remoteMain": "1b404e7fbcdbb5604418f04025d16756436cec24",
+      "observations": [
+        {
+          "argv": [
+            "git",
+            "rev-list",
+            "--left-right",
+            "--count",
+            "HEAD...1b404e7fbcdbb5604418f04025d16756436cec24"
+          ],
+          "exitCode": 0,
+          "stdout": "2\t2\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "log",
+            "--format=%H %s",
+            "--left-right",
+            "HEAD...1b404e7fbcdbb5604418f04025d16756436cec24"
+          ],
+          "exitCode": 0,
+          "stdout": "1b404e7fbcdbb5604418f04025d16756436cec24 build: advance dependency pointers to origin/main\n9580c08444a774d03381b3479d464d885c10f2e9 build: sync local changes via /pushall\n3ef316a14d74dac429adf13f105e1858082a4020 docs(signalr): accept scoped Redis backplane exception for story 2.13\nee56b15ac0b0a787e9c5fb9dc46cad96a59b46ab build: advance dependency pointers to origin/main\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "diff",
+            "--name-status",
+            "HEAD",
+            "1b404e7fbcdbb5604418f04025d16756436cec24",
+            "--",
+            "eng",
+            "docs/implementation"
+          ],
+          "exitCode": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    }
+  }
+}
