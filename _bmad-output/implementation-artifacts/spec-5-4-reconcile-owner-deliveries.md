@@ -37,6 +37,10 @@ context:
 
 </frozen-after-approval>
 
+## EXT-PARTIES-1 execution direction — 2026-10-25
+
+The user applied the [custody feasibility recommendation](../../../platform/docs/implementation/ext-parties-1-custody-direction-2026-10-25.md): the custom Luna/FM path and further production actor-history backend implementation are stopped under the unchanged contract. No complete non-AWS backend is verified. OpenBao remains conditional on an explicit guarantee amendment; it supplies no accepted replacement or Available evidence. Preserve the complete EXT-PARTIES-1 record, October 25 reconciliation and original attempts. Its accepted October 8 date stays historical/missed; no replacement date is accepted and the proposed December 14 target is not an active commitment. No consuming Story 5.4 execution or qualification follows from this direction. Other owner work is unaffected.
+
 ## Code Map
 
 - `external-dependency-register.md` in planning artifacts — complete contracts and OQ-5.4-1; preserve accepted bytes.
